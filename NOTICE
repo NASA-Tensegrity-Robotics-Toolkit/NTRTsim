@@ -1,0 +1,17 @@
+NASA Tensegrity Robotics Toolkit v1
+
+Copyright © 2012, United States Government, as represented by the
+Administrator of the National Aeronautics and Space Administration.
+All rights reserved.
+
+The NTRTsim portion of the NTRT is made possible by a number of other 
+third-party open source libraries. We do not directly redistribute any
+of these libraries, and your use of them is dependent upon your own
+download and installation of those libraries, and acceptance of their
+individual license agreements.  In order to make installation easy, we
+have provided configuration scripts which will fetch and install the
+required libraries for you.  The key third party libraries NTRTsim
+depends upon are:
+- Boost C++ Libraries: http://www.boost.org/
+- The Bullet Physics Library: http://bulletphysics.org
+- FreeGLUT: http://freeglut.sourceforge.net/

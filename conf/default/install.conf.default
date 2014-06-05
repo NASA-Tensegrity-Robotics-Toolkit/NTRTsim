@@ -1,0 +1,142 @@
+#!/bin/sh
+# Purpose: Define configuration directives for setup.sh. 
+# Date:    2013-04-29
+# Usage:   Copy/rename this file to 'install.conf' and run setup.sh
+
+
+#############################################
+#  Script Initialization -- do not edit.
+if [[ -z "$base_dir" ]]; then
+    echo "install.conf: base_dir must be set before sourcing this file."
+    exit 1
+fi
+env_name='env'
+env_dir="$base_dir/$env_name"
+downloads_dir="$env_dir/downloads"
+bin_dir="$env_dir/bin"
+build_dir="$env_dir/build"
+#############################################
+
+
+#############################################
+#  Configuration -- edit below as needed.
+#############################################
+
+# Uncomment this to use installations that are available to the whole system. 
+# NOTE: By default, setup installs bullet under env rather than $INSTALL_PREFIX
+#INSTALL_PREFIX="/usr/local"  
+
+# Uncomment this to install locally (under env/include and env/lib)
+# IMPORTANT: If you've previously installed to /usr/local, you'll need to 
+# delete your 'env' directory before running setup again.
+INSTALL_PREFIX="$env_dir"  
+
+
+#
+# Bullet Physics
+# 
+
+# @see scripts/setup_bullet.sh for more info.
+
+# Bullet installation prefix
+# Global install: /usr/local, env install: "$env_dir"
+# By default, setup will download and install bullet under your env directory.
+# If you have an existing bullet install, you should change 
+# BULLET_INSTALL_PREFIX to what was used for installation (likely /usr/local).
+BULLET_INSTALL_PREFIX="$env_dir"
+
+# Location where bullet is to be built, or where it was built if you're using 
+# an existing package.
+BULLET_BUILD_DIR="$env_dir/build/bullet-2.82-r2704"
+
+# This is the location where you unzipped the package (or, where it will be
+# unzipped if required). This will be the same as the build dir unless you did
+# an out-of-source build (not common for bullet).
+BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
+
+# BULLET_URL can be either a web address or a local file address, 
+# e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
+BULLET_URL="http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz"
+
+#
+# Boost
+#
+
+# @see scripts/setup_boost.sh for more info
+
+# Boost installation prefix
+# Global install: /usr/local (default), env install: "$ENV_DIR"
+# If you've already installed the package under this prefix, this is the
+# only thing you'll need to set.
+BOOST_INSTALL_PREFIX="$INSTALL_PREFIX"
+
+# Location where bullet is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless boost is
+# not already installed. 
+BOOST_BUILD_DIR="$env_dir/build/boost_1_53_0"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
+
+# BOOST_URL can be either a web address or a local file address,
+# e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
+BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
+
+
+
+#
+# GNU Scientific Library
+# 
+
+# @see scripts/setup_gsl.sh for more info
+
+GSL_INSTALL_PREFIX="$INSTALL_PREFIX"
+GSL_BUILD_DIR="$env_dir/build/gsl-1.15"
+GSL_PACKAGE="$base_dir/pkg/source/gsl/gsl-1.15.tar.gz"
+
+
+#
+# Eigen
+#
+
+# @see scripts/setup_eigen.sh for more info
+
+# Location where eigen is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless eigen is
+# not already installed. 
+EIGEN_INCLUDE_DIR="$env_dir/include/eigen"
+
+# This is the location where the package is located
+EIGEN_PACKAGE_DIR="$base_dir/pkg/source/eigen/*.gz"
+
+
+#
+# Codyn
+#
+
+# @see scripts/setup_codyn.sh for more info
+# Note that there is a secific installation depending on the type
+# of operating system used. The installation script for Mac OSX
+# requires the sudo password in order to complete the installation
+
+# Codyn installation prefix
+# Global install: /usr/local (default), env install: "$ENV_DIR"
+# If you've already installed the package under this prefix, this is the
+# only thing you'll need to set.
+CODYN_INSTALL_PREFIX="$INSTALL_PREFIX"
+
+# Location where codyn is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless codyn is
+# not already installed. 
+CODYN_BUILD_DIR="$env_dir/build/codyn-3.0.0"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+CODYN_PACKAGE_DIR="$CODYN_BUILD_DIR"
+
+# CODYN_URL can be either a web address or a local file address,
+# note that this address will be used only for an installation on Linux systems,
+# Mac OSX platforms use a .pkg file located in $base_dir/pkg/codyn
+CODYN_URL="download.codyn.net/releases/codyn-3.3.tar.xz" # Official Codyn website
+

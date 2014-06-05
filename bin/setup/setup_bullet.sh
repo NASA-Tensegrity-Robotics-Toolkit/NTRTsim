@@ -1,0 +1,334 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Bullet Physics setup
+# Date:    2013-05-01
+
+###############################
+# Configuration
+local_setup_path="`dirname \"$0\"`"                # relative
+base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
+install_conf_file="$base_dir/conf/install.conf"
+if [ ! -f "$install_conf_file" ]; then
+    echo "Missing install.conf ($install_conf_file). Please fix this and try again."
+    exit 1
+fi
+source "$install_conf_file"
+###############################
+
+# Adding 5-20-2014 for patching bullet
+SCRIPT_PATH="`dirname \"$0\"`"                  # relative
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
+setup_dir="$SCRIPT_PATH"
+
+
+# Variables
+bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
+
+# Constants
+TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
+FALSE=1 # FALSE is non-zero
+
+function ensure_install_prefix_writable() {
+    touch "$BULLET_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
+        || { echo "Install prefix '$BULLET_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
+    rm "$BULLET_INSTALL_PREFIX/tensegrity.deleteme"
+}
+
+# Check if the package is already installed in the location specified in install.conf 
+function check_bullet_installed() {
+    count_libs=$(count_files "$BULLET_INSTALL_PREFIX/lib/libBulletDynamics*")
+    if [ "$count_libs" == "0" ]; then
+        return $FALSE
+    fi
+    return $TRUE
+}
+
+# Check to see if bullet has been built already
+function check_bullet_built() {
+    # Check for a library that's created when bullet is built   
+    fname=$(find "$BULLET_BUILD_DIR" -iname libBulletCollision.* 2>/dev/null)
+    if [ -f "$fname" ]; then
+        return $TRUE
+    fi
+    return $FALSE
+}
+
+# Check to see if bullet has been unpacked
+function check_bullet_unpacked() {
+    # The CMakeLists.txt will only exist if it's been unpacked.
+    if [ -f "$BULLET_PACKAGE_DIR/CMakeLists.txt" ]; then
+        return $TRUE
+    fi
+    return $FALSE
+}
+
+# Determine if the package exists under env/downloads
+function check_bullet_downloaded() {
+    if [ -f "$downloads_dir/$bullet_pkg" ]; then
+        return $TRUE
+    fi
+    return $FALSE
+}
+
+function ensure_bullet_openglsupport() {
+    result=$(count_files "$BULLET_BUILD_DIR/Demos/OpenGL/libOpenGLSupport.*")
+    if [ "$result" == "0" ]; then
+        echo "ERROR: It seems that bullet has been installed under prefix $BULLET_INSTALL_PREFIX, \
+but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR/Demos/OpenGL)."
+        echo "  Option 1: Make sure that BULLET_BUILD_DIR in install.conf points to the location where you built bullet."
+        echo "  Option 2: Change BULLET_INSTALL_PREFIX in install.conf to something besides $BULLET_INSTALL_PREFIX (see install.conf for more details)."
+        echo "  Option 3: Remove the bullet files from the existing install location to have setup build bullet for you. To do this:"
+        echo "            - remove the $BULLET_INSTALL_PREFIX/include/bullet directory"
+        echo "            - remove the bullet libraries ($BULLET_INSTALL_PREFIX/lib/libBullet*, $BULLET_INSTALL_PREFIX/lib/libLinearMath.*, and $BULLET_INSTALL_PREFIX/lib/libMiniCL.*)"
+        exit 1
+    fi
+}
+
+# Download the package to env/downloads
+function download_bullet() {
+
+    bullet_pkg_path="$downloads_dir/$bullet_pkg"
+
+    if [ -f "$bullet_pkg_path" ]; then
+        echo "- Bullet Physics package already exists ('$bullet_pkg_path') -- skipping download."
+        return
+    fi
+
+    echo "Downloading $bullet_pkg to $bullet_pkg_path"
+    curl -k -L "$BULLET_URL" > "$bullet_pkg_path" || { echo "- ERROR: Bullet Physics download failed."; exit 1; }
+}
+
+# Unpack to the build directory specified in install.conf
+function unpack_bullet() {
+    # Create directory and unpack
+    if [ -d "$BULLET_BUILD_DIR" ]; then
+        echo "- Bullet Physics is already unpacked to '$BULLET_BUILD_DIR' -- skipping."
+        return
+    fi
+
+    echo "Unpacking bullet to $BULLET_BUILD_DIR (this may take a minute...)"
+    if [ ! -d "$BULLET_BUILD_DIR" ]; then
+        # TODO: Do we need to remove the dir if it already exists?
+        mkdir -p "$BULLET_BUILD_DIR"
+    fi
+
+    # Unzip
+    pushd "$BULLET_BUILD_DIR" > /dev/null
+    tar xf "$downloads_dir/$bullet_pkg" --strip 1 || { echo "- ERROR: Failed to unpack Bullet Physics."; exit 1; }
+    popd > /dev/null
+}
+
+# Patch Bullet to include OpenGL Directories
+function patch_bullet() {
+	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
+
+	# Copy the files we're going to change
+	mkdir "OpenGL_FreeGlut"
+	cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
+	cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
+	cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
+	cp "OpenGL/GLDebugDrawer.h" "OpenGL_FreeGlut/tgGLDebugDrawer.h"
+	cp "OpenGL/GLDebugDrawer.cpp" "OpenGL_FreeGlut/tgGLDebugDrawer.cpp"
+	cp "OpenGL/GlutDemoApplication.h" "OpenGL_FreeGlut/tgGlutDemoApplication.h"
+	cp "OpenGL/GlutDemoApplication.cpp" "OpenGL_FreeGlut/tgGlutDemoApplication.cpp"
+	cp "OpenGL/GlutStuff.h" "OpenGL_FreeGlut/tgGlutStuff.h"
+	cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
+
+	# Patch them
+	patch -p5 < "$setup_dir/patches/CMakePatch.diff"
+	patch -p5 < "$setup_dir/patches/OpenGLPatch.diff"
+
+	popd > /dev/null
+}
+
+# Build the package under the build directory specified in in install.conf
+function build_bullet() {
+    
+    echo "- Building Bullet Physics under $BULLET_BUILD_DIR"
+    pushd "$BULLET_BUILD_DIR" > /dev/null
+    
+    # Drew Sabelhaus Edit 4-28-14
+    # Call cmake from a different place depending on if you've custom installed it,
+    # or want to use the version that comes with your distribution of linux.
+    if [ $USE_DISTRO_CMAKE == 1 ]; then
+    CMAKECOMMAND="cmake"
+    else
+    CMAKECOMMAND="$env_dir/bin/cmake"
+    fi
+
+    # Additional Change 4-28-14: trying to pass in the -fPIC option to solve GLUT issues on linux
+    # This appears to work. Need second opinion from Ryan: does this actually add definitions 
+    # correctly?
+    # Mac 
+
+    # Perform the build
+    "$env_dir/bin/cmake" . -G "Unix Makefiles" \
+    $CMAKECOMMAND . -G "Unix Makefiles" \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_EXTRAS=ON \
+        -DCMAKE_INSTALL_PREFIX="$BULLET_INSTALL_PREFIX" \
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_INSTALL_NAME_DIR="$BULLET_INSTALL_PREFIX" || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+
+    # Additional bullet options: 
+        # -DFRAMEWORK=ON
+        # -DBUILD_DEMOS=ON
+                
+    make || { echo "- ERROR: Bullet build failed"; exit 1; }
+    
+    popd > /dev/null
+}
+
+# Install the package under the package install prefix from install.conf
+function install_bullet() {
+    
+    echo "- Installing Bullet Physics under $BULLET_INSTALL_PREFIX"
+    
+    pushd "$BULLET_BUILD_DIR" > /dev/null
+
+    make install || { echo "Install failed -- maybe you need to use sudo when running setup?"; exit 1; }
+    
+    popd > /dev/null
+}
+
+# Create symlinks under env for building our applications and IDE integration
+function env_link_bullet() {
+
+    # Build
+    pushd "$env_dir/build" > /dev/null
+    rm bullet 2>/dev/null   # Note: this will fail if 'bullet' is a directory, which is what we want.
+
+    # If we're building under env, use a relative path for the link; otherwise use an absolute one.
+    if str_contains "$BULLET_BUILD_DIR" "$env_dir"; then
+        current_pwd=`pwd`
+        rel_path=$(get_relative_path "$current_pwd" "$BULLET_BUILD_DIR" )
+        ln -s "$rel_path" bullet
+    else
+        ln -s "$BULLET_BUILD_DIR" bullet  # this links directly to the most recent build...
+    fi
+    
+    popd > /dev/null
+        
+    # Header Files
+    pushd "$env_dir/include" > /dev/null
+    if [ ! -d "bullet" ]; then  # We may have built here, so only create a symlink if not
+        rm bullet 2>/dev/null
+        ln -s "$BULLET_INSTALL_PREFIX/include/bullet" bullet
+    fi
+    popd > /dev/null
+
+}
+
+# Get the relative path between two absolute paths
+# Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
+function get_relative_path() {
+    source=$1
+    target=$2
+
+    common_part=$source
+    back=
+    while [ "${target#$common_part}" = "${target}" ]; do
+      common_part=$(dirname $common_part)
+      back="../${back}"
+    done
+
+    echo ${back}${target#$common_part/}
+}
+
+# Count the number of files matching the given pattern
+# Usage: e.g. n_files=$(count_files "/path/with/file/matching/pattern/*.*")
+# Note: the 'echo `command`' is there to remove leading spaces that wc adds
+function count_files {
+    pattern=$1
+    if [ "$pattern" == "" ]; then
+        pattern="*"
+    fi
+    # Count the number of files
+    echo `ls -a $pattern 2>/dev/null | wc -l`
+}
+
+# Deteremine if a string contains a substring
+# Usage: tf=$(str_contains "my string" "substring")
+function str_contains() {
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+        return 0    # $substring is in $string
+    else
+        return 1    # $substring is not in $string
+    fi
+}
+
+function main() {
+        
+    ensure_install_prefix_writable
+    
+    if check_bullet_installed; then
+        echo "- Bullet Physics is installed under prefix $BULLET_INSTALL_PREFIX -- skipping."
+        ensure_bullet_openglsupport
+        env_link_bullet
+        return
+    fi
+    
+    if check_bullet_built; then
+        echo "- Bullet Physics is already built under $BULLET_BUILD_DIR -- skipping."
+        ensure_bullet_openglsupport
+        install_bullet
+        env_link_bullet
+        return
+    fi
+    
+    # @todo: add check bullet patched
+    
+    if check_bullet_unpacked; then
+        echo "- Bullet Physics is already unpacked to $BULLET_BUILD_DIR -- skipping."
+        patch_bullet
+        build_bullet
+        install_bullet
+        env_link_bullet
+        return
+    fi
+    
+    if check_bullet_downloaded; then
+        echo "- Bullet Physics package already exists under env/downloads -- skipping download."
+        unpack_bullet
+        patch_bullet
+        build_bullet
+        install_bullet
+        env_link_bullet
+        return
+    fi
+    
+    # If we haven't returned by now, we have to do everything
+    download_bullet
+    unpack_bullet
+    patch_bullet
+    build_bullet
+    install_bullet
+    env_link_bullet
+
+}
+
+
+main
