@@ -1,0 +1,184 @@
+** Overview **
+
+This repository contains everything that is needed to set up and build the 
+Tensegrity simulators. The 'env' and 'build' directories that are created
+during setup are considered to be local directories and are ignored in the 
+repository. If you run into problems, you can always delete these and run
+setup again. 
+
+To get started, run the setup script (setup.sh). It will walk you through
+the process of getting everything configured and installed. If you already have
+some things installed in the standard locations, setup will find those so that
+you don't have to reinstall. You can run setup as many times as you like
+without hurting anything.
+
+
+** Linux / Mac Installation **
+
+  - Some Linux prerequisites, outside of the setup script file. Make
+	sure the following are installed (you can use sudo apt-get install):
+	
+	- g++ (the compiler for cmake)
+	- libglib2.0-dev
+	- cmake
+	- curl
+	- freeglut3
+	- freeglut3-dev (glut for bullet graphics)
+		
+    Also if available, it's easier to install cmake and boost
+    from your distro. On ubuntu, sudo apt-get install cmake libboost-all-dev
+    If you do this, be sure to change the appropriate lines in install.conf
+
+  - If you want to specify setup options, copy setup/install.default.conf to
+    setup/install.conf and edit as desired. This can save you time if you
+    already have Boost installed. See install.default.conf for more
+    info. You can also just run setup.sh -- it will create setup/install.conf 
+    for you and allow you to set certain options like the location of your 
+    bullet build if you already have one. 
+
+  - Run setup.sh. (sh setup.sh or bash setup.sh)
+
+    The setup.sh script may be run multiple times without hurting anything. 
+
+  - To build the the src tree, run bin/build.sh 
+
+    The resulting executables will be located under the 'build' folder.
+
+    To run an app, go to build/examples/SomeApp and run the executable.
+    (for example: build/examples/3_prism/AppPrismModel)
+
+    To build a specific app (after making changes to the source, for instance),
+    go to build/dev/myApp and run 'make' 
+
+  - Create a project in your favorite IDE using the equivalent of 
+    'Create a project using existing source' to point your project to the src 
+    directory. See below for more instructions.
+
+
+** Development Environments **
+
+    During setup, an 'env' directory will be created. This directory is intended to
+    be local to your system and is ignored in the repository. It contains builds of
+    the software installed by setup as well as symlinks needed by CMakeLists.txt
+    for the build process.
+
+    After you create a new project using the existing source (the 'src' directory), 
+    add the include and library paths that have been created during setup. Note
+    that all relative paths listed below (e.g. env/lib) are relative to this 
+    directory. 
+
+      - Add the following to your c++ include paths:
+
+        env/include/bullet
+        env/include/boost
+
+      - You'll also want to add the standard include paths if they're not 
+        already present, e.g.:
+
+        /usr/include
+        /usr/local/include
+        /usr/include/c++/4.2.1 (location of cstdlib header on your system)
+
+      - Add the following to your c++ library paths:
+
+        env/lib
+
+      - If you are working on Mac OSX you will need to include the default framework location
+
+        /Library/Frameworks
+
+      - Also add the standard library paths (may be slightly different for you):
+
+        /usr/lib
+        /usr/local/lib
+
+
+** Manual Installation **
+
+  - Install cmake (see http://www.cmake.org for details)
+
+  - Install boost in the standard manner (see http://www.boost.org)
+        
+  - Create an 'env' directory in the same directory as this INSTALL file. 
+
+    mkdir env
+  
+  - Create the necessary subdirectories under env:
+
+    cd env
+    mkdir bin build downloads include lib
+    cd ..
+
+    
+  - Create a symlink to cmake under env/bin:
+    
+    cd env/bin
+    ln -s `which cmake` # (or just provide the path, e.g. ln -s /usr/bin/cmake)
+    cd ../..  # back to top level
+
+  - Download and build Bullet Physics:
+    
+    cd env/downloads
+    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.81-rev2613.tgz
+    cd ../build
+    tar xzvf ../downloads/bullet-2.82-r2704.tgz
+
+    cd bullet-2.82-r2704/
+    path_to_env=`pwd`/../../../env
+    "$path_to_env/bin/cmake" . -G "Unix Makefiles" \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_EXTRAS=ON \
+        -DCMAKE_INSTALL_PREFIX="$path_to_env" \
+        -DCMAKE_INSTALL_NAME_DIR="$path_to_env"
+    make
+    make install
+    cd ..   # back to env/build
+    
+  - Create a 'bullet' symlink to your bullet build under env/build. This will 
+    be expected by CMakeLists.txt
+  
+    ln -s bullet-2.82-r2704 bullet
+    cd ../..   # back to top level
+    
+  - Create the necessary symlinks under env/include. The following values 
+    reflect global installations of boost and gsl; adjust these values if you
+    installed these packages elsewhere (e.g. using --prefix=/path/to/env).
+    
+    cd env/include
+    ln -s /usr/local/include/boost boost
+    cd ../..  # back to top level
+    
+    You should also have a 'bullet' directory under env/include. If not, make 
+    sure to create a symlink that points to the bullet header files.
+    
+    - NOTE: When complete, your 'env' directory must have either directories or
+      symlinks for the following elements:
+
+      env/
+        bin/
+          cmake  # (executable)
+        include/
+          bullet/  # Bullet header files
+          boost/   # Boost header files
+        lib/     # Libraries will be installed here when you build the source.
+
+  - That should do it. You can now run bin/build.sh to build your code.
+    
+** Troubleshooting **
+(Started by Drew Sabelhaus 4-28-14)
+
+  - If the download fails, there may be a corrupt file in env/downloads.
+    Be sure to remove it before running setup/setup.sh again.
+    Similarly, there might be a failed install directory under env/build to remove.
+
+  - If you'd like to use cmake that comes with your distro, check out the option
+    in install.conf. As of now (4-28-14) I've only implemented its use in the 
+    setup_bullet.sh, but if some of the other installs need cmake and you'd like to
+    use it with them, please copy over my edits to those other install files.
+
+  - If you get an error when running bin/build.sh about CMake not "including"
+    a GLIB directory, be sure you've installed libglib2.0-dev
+
+  - Mind the -fPIC error! (a CMake flag, should be enabled by default at this point)
+
+
