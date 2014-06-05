@@ -1,13 +1,16 @@
-The NASA Tensegrity Robotics Toolkit (NTRT) is a collection of C++ and MATLAB software modules
-for the modeling, simulation, and control of Tensegrity Robots. The NTRT Simulator is a
-tensegrity-specific simulator built to run ontop of the Bullet Physics Engine, version 2.82.
+The NASA Tensegrity Robotics Toolkit (NTRT) is a collection of C++ and
+MATLAB software modules for the modeling, simulation, and control of
+Tensegrity Robots. The NTRT Simulator is a tensegrity-specific simulator
+built to run ontop of the Bullet Physics Engine, version 2.82.
 
-See INSTALL for instructions on how to install the library and build from source.
+See INSTALL for instructions on how to install the library and build
+from source.
 
-The most accessable examples of tensegrity structures are in the examples directory.
-Additional examples can be found in folders "models controllers and apps" or in
-dev/tests and dev/btietz.
+The most accessable examples of tensegrity structures are in the
+examples directory. Additional examples can be found in folders
+"models controllers and apps" or in dev/tests and dev/btietz.
 
-More information can be found at: http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
-DOxygen documentation can be compiled in the source directory (run "doxygen Doxyfile" when in src)
-or found at: 
+More information can be found at:
+http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
+DOxygen documentation can be compiled in the source directory
+(run "doxygen Doxyfile" when in src) or found at: 
