@@ -53,7 +53,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/CMake
 -		Win32DemoApplication.cpp
 -		Win32DemoApplication.h
 +                
-+ADD_LIBRARY(tgOpenGLSupport SHARED
++ADD_LIBRARY(tgOpenGLSupport
 +                tgDemoApplication.cpp
 +                tgDemoApplication.h
 +                
