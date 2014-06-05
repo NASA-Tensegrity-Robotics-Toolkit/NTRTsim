@@ -19,12 +19,25 @@
 #ifndef FLEMONS_SPINE_MODEL_LEARNING_CL_H
 #define FLEMONS_SPINE_MODEL_LEARNING_CL_H
 
+/**
+ * @file FlemonsSpineModelLearningCL.h
+ * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "dev/btietz/BaseSpineModelLearning.h"
 
 class tgWorld;
 class tgStructureInfo;
 class tgLinearString;
 
+/**
+ * This class implements the octahedral complex tensegrity spine
+ * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
+ */
 class FlemonsSpineModelLearningCL : public BaseSpineModelLearning
 {
 public: 

@@ -34,6 +34,15 @@
 #include <iostream>
 #include <stdexcept>
 
+/**
+ * @file TetraSpineLearningModel.cpp
+ * @brief Tetraspine, configured for learning in the NTRT simulator
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 TetraSpineLearningModel::TetraSpineLearningModel(size_t segments) : 
     BaseSpineModelLearning(segments)
 {

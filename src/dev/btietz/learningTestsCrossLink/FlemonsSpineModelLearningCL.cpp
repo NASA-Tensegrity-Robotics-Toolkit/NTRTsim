@@ -16,6 +16,15 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file FlemonsSpineModelLearningCL.cpp
+ * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "FlemonsSpineModelLearningCL.h"
 
 // This library

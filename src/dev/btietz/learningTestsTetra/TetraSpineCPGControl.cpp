@@ -16,6 +16,15 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file TetraSpineCPGControl.cpp
+ * @brief Controller for TetraSpineLearningModel
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "TetraSpineCPGControl.h"
 
 #include <string>

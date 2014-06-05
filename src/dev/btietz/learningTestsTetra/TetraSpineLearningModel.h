@@ -19,6 +19,15 @@
 #ifndef TETRA_SPINE_LEARNING_MODEL_H
 #define TETRA_SPINE_LEARNING_MODEL_H
 
+/**
+ * @file TetraSpineLearningModel.h
+ * @brief Tetraspine, configured for learning in the NTRT simulator
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 // This library
 #include "dev/btietz/BaseSpineModelLearning.h"
 
@@ -26,6 +35,10 @@
 // Forward Declarations
 class tgWorld;
 
+/**
+ * Basically the same structure as NestedStructureTestModel
+ * just with different parameters and learning capabilities.
+ */
 class TetraSpineLearningModel: public BaseSpineModelLearning
 {
 public: 

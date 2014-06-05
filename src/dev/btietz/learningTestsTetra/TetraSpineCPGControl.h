@@ -19,8 +19,21 @@
 #ifndef TETRA_SPINE_CPG_CONTROL_H
 #define TETRA_SPINE_CPG_CONTROL_H
 
+/**
+ * @file TetraSpineCPGControl.h
+ * @brief Controller for TetraSpineLearningModel
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "dev/btietz/BaseSpineCPGControl.h"
 
+/**
+ * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
+ * different muscle groups can have different ImpedanceControl parameters
+ */
 class TetraSpineCPGControl : public BaseSpineCPGControl
 {
 public:
