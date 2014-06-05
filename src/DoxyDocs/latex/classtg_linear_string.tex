@@ -1,0 +1,726 @@
+\hypertarget{classtg_linear_string}{\section{tg\-Linear\-String Class Reference}
+\label{classtg_linear_string}\index{tg\-Linear\-String@{tg\-Linear\-String}}
+}
+
+
+Inheritance diagram for tg\-Linear\-String\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classtg_linear_string__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-Linear\-String\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classtg_linear_string__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_linear_string_acb8874a75256a2d8ebd73b4c26e6396e}{tg\-Linear\-String} (\hyperlink{class_muscle2_p}{Muscle2\-P} $\ast$muscle, const \hyperlink{classtg_tags}{tg\-Tags} \&tags, \hyperlink{structtg_base_string_1_1_config}{tg\-Base\-String\-::\-Config} \&config)
+\item 
+\hyperlink{classtg_linear_string_af48bbfa51cd851cdaa88673292b354fd}{tg\-Linear\-String} (\hyperlink{class_muscle2_p}{Muscle2\-P} $\ast$muscle, std\-::string space\-\_\-separated\-\_\-tags, \hyperlink{structtg_base_string_1_1_config}{tg\-Base\-String\-::\-Config} \&config)
+\item 
+virtual \hyperlink{classtg_linear_string_a302829a71bb6ae05346d90ff2573c986}{$\sim$tg\-Linear\-String} ()
+\item 
+virtual void \hyperlink{classtg_linear_string_a022d8147ddc53a5449d22a74128231a7}{setup} (\hyperlink{classtg_world}{tg\-World} \&world)
+\item 
+virtual void \hyperlink{classtg_linear_string_a1c4be827e518aa1fc944dd14895b3892}{teardown} ()
+\item 
+virtual void \hyperlink{classtg_linear_string_ae6ffae9c4a4a9501b1933a2beceee67f}{step} (double dt)
+\item 
+virtual void \hyperlink{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5}{on\-Visit} (const \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&r) const 
+\item 
+virtual void \hyperlink{classtg_linear_string_a616a328ef9d507069ab8e150c67b045a}{tension\-Min\-Length\-Controller} (const double target\-Tension, float dt)
+\item 
+void \hyperlink{classtg_linear_string_ad2ff47888e3687494392d6ceeb6245c4}{set\-Rest\-Length} (double new\-Length, float dt)
+\item 
+const \hyperlink{class_muscle2_p}{Muscle2\-P} $\ast$ \hyperlink{classtg_linear_string_a01de993b2269f8858068ce92c47becf9}{get\-Muscle} () const 
+\item 
+virtual const double \hyperlink{classtg_linear_string_a0a3df476e0c37c1ef78d41127b86631b}{get\-Start\-Length} () const 
+\item 
+\hypertarget{classtg_linear_string_afd458d6032da95ea372828815aadc85e}{virtual const double {\bfseries get\-Current\-Length} () const }\label{classtg_linear_string_afd458d6032da95ea372828815aadc85e}
+
+\item 
+\hypertarget{classtg_linear_string_aa15675c6077e36e7bc2af241d35a5558}{virtual const double {\bfseries get\-Tension} () const }\label{classtg_linear_string_aa15675c6077e36e7bc2af241d35a5558}
+
+\item 
+\hypertarget{classtg_linear_string_ada03e9507dbd7f3e8573e2dceaf0a05e}{virtual const double {\bfseries get\-Rest\-Length} () const }\label{classtg_linear_string_ada03e9507dbd7f3e8573e2dceaf0a05e}
+
+\item 
+\hypertarget{classtg_linear_string_afab568f679f8f95292a4cdfb2825ae05}{virtual const double {\bfseries get\-Velocity} () const }\label{classtg_linear_string_afab568f679f8f95292a4cdfb2825ae05}
+
+\item 
+\hypertarget{classtg_linear_string_a4daf160d7d0a54c3c8ffb893046af2e0}{virtual const \\*
+\hyperlink{structtg_base_string_1_1_base_string_history}{tg\-Base\-String\-::\-Base\-String\-History} \& {\bfseries get\-History} () const }\label{classtg_linear_string_a4daf160d7d0a54c3c8ffb893046af2e0}
+
+\item 
+void \hyperlink{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{attach} (\hyperlink{classtg_observer}{tg\-Observer}$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $>$ $\ast$p\-Observer)
+\item 
+void \hyperlink{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{notify\-Step} (double dt)
+\item 
+void \hyperlink{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{notify\-Setup} ()
+\item 
+void \hyperlink{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{notify\-Teardown} ()
+\item 
+void \hyperlink{classtg_model_a292c17848b96caee32b2286e44c13f2f}{add\-Child} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Child)
+\item 
+virtual std\-::string \hyperlink{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{to\-String} (std\-::string prefix=\char`\"{}\char`\"{}) const 
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{find} (const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{find} (const std\-::string \&tag\-Search)
+\item 
+std\-::vector$<$ \hyperlink{classtg_model}{tg\-Model} $\ast$ $>$ \hyperlink{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{get\-Descendants} () const 
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{classtg_linear_string_a4d0aaf4ae1652fbc4f14602e6b7e092d}{move\-Motors} (double dt)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_linear_string_a6b9e3702b95ee50afbc34b78db478101}{\hyperlink{class_muscle2_p}{Muscle2\-P} $\ast$ {\bfseries m\-\_\-muscle}}\label{classtg_linear_string_a6b9e3702b95ee50afbc34b78db478101}
+
+\item 
+\hyperlink{structtg_base_string_1_1_config}{Config} \hyperlink{classtg_base_string_ac13cae3d6eb82d20b182be6aaa5e4fe0}{m\-\_\-config}
+\item 
+\hyperlink{structtg_base_string_1_1_base_string_history}{Base\-String\-History} $\ast$const \hyperlink{classtg_base_string_ab50177e75064ed5863e497cad34df60a}{m\-\_\-p\-History}
+\item 
+double \hyperlink{classtg_base_string_a7e5cf579c266faed950ee215bf1bc596}{m\-\_\-rest\-Length}
+\item 
+\hypertarget{classtg_base_string_a6666588cac8003ed2ba3d87eeee6075d}{double {\bfseries m\-\_\-preferred\-Length}}\label{classtg_base_string_a6666588cac8003ed2ba3d87eeee6075d}
+
+\item 
+double \hyperlink{classtg_base_string_a14e96c33278197f084ee733b93123b0e}{m\-\_\-start\-Length}
+\item 
+double \hyperlink{classtg_base_string_af54d1188ce7eb296b3b1df2224286424}{m\-\_\-prev\-Velocity}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 41 of file tg\-Linear\-String.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_linear_string_acb8874a75256a2d8ebd73b4c26e6396e}{\index{tg\-Linear\-String@{tg\-Linear\-String}!tg\-Linear\-String@{tg\-Linear\-String}}
+\index{tg\-Linear\-String@{tg\-Linear\-String}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{tg\-Linear\-String}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Linear\-String\-::tg\-Linear\-String (
+\begin{DoxyParamCaption}
+\item[{{\bf Muscle2\-P} $\ast$}]{muscle, }
+\item[{const {\bf tg\-Tags} \&}]{tags, }
+\item[{{\bf tg\-Base\-String\-::\-Config} \&}]{config}
+\end{DoxyParamCaption}
+)}}\label{classtg_linear_string_acb8874a75256a2d8ebd73b4c26e6396e}
+Constructor using tags. Typically called in \hyperlink{tg_linear_string_info_8cpp}{tg\-Linear\-String\-Info.\-cpp} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em muscle} & The muscle2\-P object that this controls and logs. Set up in \hyperlink{tg_linear_string_info_8cpp}{tg\-Linear\-String\-Info.\-cpp} \\
+\hline
+\mbox{\tt in}  & {\em tags} & as passed through \hyperlink{classtg_structure}{tg\-Structure} and \hyperlink{classtg_structure_info}{tg\-Structure\-Info} \\
+\hline
+\mbox{\tt in}  & {\em config} & Holds member variables like elasticity, damping and motor parameters. See \hyperlink{classtg_base_string}{tg\-Base\-String} \\
+\hline
+\mbox{\tt in}  & {\em hist} & whether or not to log additional history\\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000013}{Todo}]move hist to config \end{DoxyRefDesc}
+
+
+Definition at line 65 of file tg\-Linear\-String.\-cpp.
+
+\hypertarget{classtg_linear_string_af48bbfa51cd851cdaa88673292b354fd}{\index{tg\-Linear\-String@{tg\-Linear\-String}!tg\-Linear\-String@{tg\-Linear\-String}}
+\index{tg\-Linear\-String@{tg\-Linear\-String}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{tg\-Linear\-String}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Linear\-String\-::tg\-Linear\-String (
+\begin{DoxyParamCaption}
+\item[{{\bf Muscle2\-P} $\ast$}]{muscle, }
+\item[{std\-::string}]{space\-\_\-separated\-\_\-tags, }
+\item[{{\bf tg\-Base\-String\-::\-Config} \&}]{config}
+\end{DoxyParamCaption}
+)}}\label{classtg_linear_string_af48bbfa51cd851cdaa88673292b354fd}
+Same as other constructor, just a different type of tags 
+
+Definition at line 79 of file tg\-Linear\-String.\-cpp.
+
+\hypertarget{classtg_linear_string_a302829a71bb6ae05346d90ff2573c986}{\index{tg\-Linear\-String@{tg\-Linear\-String}!$\sim$tg\-Linear\-String@{$\sim$tg\-Linear\-String}}
+\index{$\sim$tg\-Linear\-String@{$\sim$tg\-Linear\-String}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{$\sim$tg\-Linear\-String}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Linear\-String\-::$\sim$tg\-Linear\-String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a302829a71bb6ae05346d90ff2573c986}
+Destructor deletes the \hyperlink{class_muscle2_p}{Muscle2\-P} 
+
+Definition at line 96 of file tg\-Linear\-String.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_model_a292c17848b96caee32b2286e44c13f2f}{\index{tg\-Linear\-String@{tg\-Linear\-String}!add\-Child@{add\-Child}}
+\index{add\-Child@{add\-Child}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{add\-Child}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::add\-Child (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Model} $\ast$}]{p\-Child}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a292c17848b96caee32b2286e44c13f2f}
+Add a sub-\/model to this model. The model takes ownership of the child sub-\/model and is responsible for deallocating it. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Child} & a pointer to a sub-\/model \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & is p\-Child is N\-U\-L\-L, this object, or already a descendant \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000016}{Todo}]Make sure that every child appears no more than once in the tree. \end{DoxyRefDesc}
+
+
+Definition at line 126 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{\index{tg\-Linear\-String@{tg\-Linear\-String}!attach@{attach}}
+\index{attach@{attach}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{attach}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf tg\-Linear\-String}  $>$\-::attach (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Observer}$<$ {\bf tg\-Linear\-String}  $>$ $\ast$}]{p\-Observer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}
+Attach an observer to the subject of the observer. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Observer} & a pointer to an observer for the subject; do nothing if the pointer is N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+\hypertarget{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{\index{tg\-Linear\-String@{tg\-Linear\-String}!find@{find}}
+\index{find@{find}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Tag\-Search} \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & tag\-Search that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 129 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_ab75836fdfbd9200f165c3b28a19630c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{\index{tg\-Linear\-String@{tg\-Linear\-String}!find@{find}}
+\index{find@{find}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & std\-::string\& that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 142 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{\index{tg\-Linear\-String@{tg\-Linear\-String}!get\-Descendants@{get\-Descendants}}
+\index{get\-Descendants@{get\-Descendants}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{get\-Descendants}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ {\bf tg\-Model} $\ast$ $>$ tg\-Model\-::get\-Descendants (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}
+Return a std\-::vector of const pointers to all sub-\/models. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000017}{Todo}]examine whether this should be public, and perhaps create a read only version \end{DoxyRefDesc}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of const pointers all sub-\/models.
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000014}{Todo}]Unnecessary copying can be avoided by pasing the result collection in the recursive step. \end{DoxyRefDesc}
+
+
+Definition at line 174 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a01de993b2269f8858068ce92c47becf9}{\index{tg\-Linear\-String@{tg\-Linear\-String}!get\-Muscle@{get\-Muscle}}
+\index{get\-Muscle@{get\-Muscle}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{get\-Muscle}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Muscle2\-P}$\ast$ tg\-Linear\-String\-::get\-Muscle (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_linear_string_a01de993b2269f8858068ce92c47becf9}
+Returns a pointer the string's \hyperlink{class_muscle2_p}{Muscle2\-P}. Used for rendering in \hyperlink{classtg_bullet_renderer}{tg\-Bullet\-Renderer} 
+
+Definition at line 121 of file tg\-Linear\-String.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a01de993b2269f8858068ce92c47becf9_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a0a3df476e0c37c1ef78d41127b86631b}{\index{tg\-Linear\-String@{tg\-Linear\-String}!get\-Start\-Length@{get\-Start\-Length}}
+\index{get\-Start\-Length@{get\-Start\-Length}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{get\-Start\-Length}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Linear\-String\-::get\-Start\-Length (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a0a3df476e0c37c1ef78d41127b86631b}
+Return the appropreate values. 
+
+Implements \hyperlink{classtg_base_string}{tg\-Base\-String}.
+
+
+
+Definition at line 150 of file tg\-Linear\-String.\-cpp.
+
+\hypertarget{classtg_linear_string_a4d0aaf4ae1652fbc4f14602e6b7e092d}{\index{tg\-Linear\-String@{tg\-Linear\-String}!move\-Motors@{move\-Motors}}
+\index{move\-Motors@{move\-Motors}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{move\-Motors}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::move\-Motors (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}}\label{classtg_linear_string_a4d0aaf4ae1652fbc4f14602e6b7e092d}
+Called from public functions, it makes the rest\-Length get closer to preferredlength, according to config constraints. 
+
+Implements \hyperlink{classtg_base_string_aa0f4ffc6a2be342451f20e3b21efcea8}{tg\-Base\-String}.
+
+
+
+Definition at line 196 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a4d0aaf4ae1652fbc4f14602e6b7e092d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{\index{tg\-Linear\-String@{tg\-Linear\-String}!notify\-Setup@{notify\-Setup}}
+\index{notify\-Setup@{notify\-Setup}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{notify\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf tg\-Linear\-String}  $>$\-::notify\-Setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a80799e5d0c8512d3d05a55764790392b}
+Call \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{tg\-Observer$<$\-T$>$\-::on\-Setup()} on all observers in the order in which they were attached. 
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_subject_a80799e5d0c8512d3d05a55764790392b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{\index{tg\-Linear\-String@{tg\-Linear\-String}!notify\-Step@{notify\-Step}}
+\index{notify\-Step@{notify\-Step}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{notify\-Step}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf tg\-Linear\-String}  $>$\-::notify\-Step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}
+Call \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$\-T$>$\-::on\-Step()} on all observers in the order in which they were attached. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; do nothing if not positive \\
+\hline
+\end{DoxyParams}
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{\index{tg\-Linear\-String@{tg\-Linear\-String}!notify\-Teardown@{notify\-Teardown}}
+\index{notify\-Teardown@{notify\-Teardown}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{notify\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf tg\-Linear\-String}  $>$\-::notify\-Teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}
+Call \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{tg\-Observer$<$\-T$>$\-::on\-Teardown()} on all observers in the order in which they were attached. 
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5}{\index{tg\-Linear\-String@{tg\-Linear\-String}!on\-Visit@{on\-Visit}}
+\index{on\-Visit@{on\-Visit}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{on\-Visit}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::on\-Visit (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Model\-Visitor} \&}]{r}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5}
+Double dispatch function for a \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor}. This object will pass itself back to the visitor. Used for rendering and data logging as of May 2014. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em r,the} & visiting \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{tg\-Model}.
+
+
+
+Definition at line 131 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_ad2ff47888e3687494392d6ceeb6245c4}{\index{tg\-Linear\-String@{tg\-Linear\-String}!set\-Rest\-Length@{set\-Rest\-Length}}
+\index{set\-Rest\-Length@{set\-Rest\-Length}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{set\-Rest\-Length}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::set\-Rest\-Length (
+\begin{DoxyParamCaption}
+\item[{double}]{new\-Length, }
+\item[{float}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_ad2ff47888e3687494392d6ceeb6245c4}
+Directly set m\-\_\-preferred\-Length (see base class \hyperlink{classtg_base_string}{tg\-Base\-String}) Calls move\-Motors(dt) to adjust the rest length of \hyperlink{class_muscle2_p}{Muscle2\-P} 
+
+Reimplemented from \hyperlink{classtg_base_string}{tg\-Base\-String}.
+
+
+
+Definition at line 175 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_ad2ff47888e3687494392d6ceeb6245c4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a022d8147ddc53a5449d22a74128231a7}{\index{tg\-Linear\-String@{tg\-Linear\-String}!setup@{setup}}
+\index{setup@{setup}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::setup (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a022d8147ddc53a5449d22a74128231a7}
+Notifies observers of setup, calls setup on children 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em world,the} & \hyperlink{classtg_world}{tg\-World} the models are being built into \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_base_string_a066210b878fc5307fc5a9271957a9c84}{tg\-Base\-String}.
+
+
+
+Definition at line 103 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a022d8147ddc53a5449d22a74128231a7_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_ae6ffae9c4a4a9501b1933a2beceee67f}{\index{tg\-Linear\-String@{tg\-Linear\-String}!step@{step}}
+\index{step@{step}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_ae6ffae9c4a4a9501b1933a2beceee67f}
+Step dt forward with the simulation. Notifies observers of step, applies forces to rigid bodies via \hyperlink{class_muscle2_p}{Muscle2\-P}, logs history if desired, steps children. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt,must} & be $>$= 0.\-0 \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_base_string_aadd5b654c0a426f83645c0d63525aefb}{tg\-Base\-String}.
+
+
+
+Definition at line 115 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classtg_linear_string_ae6ffae9c4a4a9501b1933a2beceee67f_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a1c4be827e518aa1fc944dd14895b3892}{\index{tg\-Linear\-String@{tg\-Linear\-String}!teardown@{teardown}}
+\index{teardown@{teardown}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{teardown}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a1c4be827e518aa1fc944dd14895b3892}
+Notifies observers of teardown, teardown any children 
+
+Reimplemented from \hyperlink{classtg_base_string_ae4470639491da403b0a29ef0f11ac7b2}{tg\-Base\-String}.
+
+
+
+Definition at line 109 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a1c4be827e518aa1fc944dd14895b3892_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_linear_string_a616a328ef9d507069ab8e150c67b045a}{\index{tg\-Linear\-String@{tg\-Linear\-String}!tension\-Min\-Length\-Controller@{tension\-Min\-Length\-Controller}}
+\index{tension\-Min\-Length\-Controller@{tension\-Min\-Length\-Controller}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{tension\-Min\-Length\-Controller}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Linear\-String\-::tension\-Min\-Length\-Controller (
+\begin{DoxyParamCaption}
+\item[{const double}]{target\-Tension, }
+\item[{float}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_linear_string_a616a328ef9d507069ab8e150c67b045a}
+Functions for interfacing with muscle2\-P, and higher level controllers Set the desired tension of the string. Will change m\-\_\-preferred\-Length (see base class \hyperlink{classtg_base_string}{tg\-Base\-String}) to reach target\-Tension, subject to the constraints in the kinematic motor model. Calls move\-Motors(dt) upon completion of calculations 
+
+Implements \hyperlink{classtg_base_string}{tg\-Base\-String}.
+
+
+
+Definition at line 278 of file tg\-Linear\-String.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a616a328ef9d507069ab8e150c67b045a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_linear_string_a616a328ef9d507069ab8e150c67b045a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{\index{tg\-Linear\-String@{tg\-Linear\-String}!to\-String@{to\-String}}
+\index{to\-String@{to\-String}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{to\-String}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tg\-Model\-::to\-String (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{prefix = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}
+Returns the tag names of this model and its children 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em prefix} & a string to append to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the original string with this model and its children's tags appended 
+\end{DoxyReturn}
+
+
+Definition at line 156 of file tg\-Model.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classtg_base_string_ac13cae3d6eb82d20b182be6aaa5e4fe0}{\index{tg\-Linear\-String@{tg\-Linear\-String}!m\-\_\-config@{m\-\_\-config}}
+\index{m\-\_\-config@{m\-\_\-config}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{m\-\_\-config}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Config} tg\-Base\-String\-::m\-\_\-config\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}}\label{classtg_base_string_ac13cae3d6eb82d20b182be6aaa5e4fe0}
+A copy of the configuration P\-O\-D supplied at constuction. This is not const. 
+
+Definition at line 223 of file tg\-Base\-String.\-h.
+
+\hypertarget{classtg_base_string_ab50177e75064ed5863e497cad34df60a}{\index{tg\-Linear\-String@{tg\-Linear\-String}!m\-\_\-p\-History@{m\-\_\-p\-History}}
+\index{m\-\_\-p\-History@{m\-\_\-p\-History}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{m\-\_\-p\-History}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Base\-String\-History}$\ast$ const tg\-Base\-String\-::m\-\_\-p\-History\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}}\label{classtg_base_string_ab50177e75064ed5863e497cad34df60a}
+All history sequences. 
+
+Definition at line 226 of file tg\-Base\-String.\-h.
+
+\hypertarget{classtg_base_string_af54d1188ce7eb296b3b1df2224286424}{\index{tg\-Linear\-String@{tg\-Linear\-String}!m\-\_\-prev\-Velocity@{m\-\_\-prev\-Velocity}}
+\index{m\-\_\-prev\-Velocity@{m\-\_\-prev\-Velocity}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{m\-\_\-prev\-Velocity}]{\setlength{\rightskip}{0pt plus 5cm}double tg\-Base\-String\-::m\-\_\-prev\-Velocity\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}}\label{classtg_base_string_af54d1188ce7eb296b3b1df2224286424}
+Tracking the most recent velocity to avoid using deques. 
+
+Definition at line 245 of file tg\-Base\-String.\-h.
+
+\hypertarget{classtg_base_string_a7e5cf579c266faed950ee215bf1bc596}{\index{tg\-Linear\-String@{tg\-Linear\-String}!m\-\_\-rest\-Length@{m\-\_\-rest\-Length}}
+\index{m\-\_\-rest\-Length@{m\-\_\-rest\-Length}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{m\-\_\-rest\-Length}]{\setlength{\rightskip}{0pt plus 5cm}double tg\-Base\-String\-::m\-\_\-rest\-Length\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}}\label{classtg_base_string_a7e5cf579c266faed950ee215bf1bc596}
+Motor Model Parameters 
+
+Definition at line 233 of file tg\-Base\-String.\-h.
+
+\hypertarget{classtg_base_string_a14e96c33278197f084ee733b93123b0e}{\index{tg\-Linear\-String@{tg\-Linear\-String}!m\-\_\-start\-Length@{m\-\_\-start\-Length}}
+\index{m\-\_\-start\-Length@{m\-\_\-start\-Length}!tgLinearString@{tg\-Linear\-String}}
+\subsubsection[{m\-\_\-start\-Length}]{\setlength{\rightskip}{0pt plus 5cm}double tg\-Base\-String\-::m\-\_\-start\-Length\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}}\label{classtg_base_string_a14e96c33278197f084ee733b93123b0e}
+Tracking the start length to avoid using deques. 
+
+Definition at line 240 of file tg\-Base\-String.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_linear_string_8h}{tg\-Linear\-String.\-h}\item 
+core/\hyperlink{tg_linear_string_8cpp}{tg\-Linear\-String.\-cpp}\end{DoxyCompactItemize}

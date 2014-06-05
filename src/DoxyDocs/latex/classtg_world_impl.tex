@@ -1,0 +1,98 @@
+\hypertarget{classtg_world_impl}{\section{tg\-World\-Impl Class Reference}
+\label{classtg_world_impl}\index{tg\-World\-Impl@{tg\-World\-Impl}}
+}
+
+
+{\ttfamily \#include $<$tg\-World\-Impl.\-h$>$}
+
+
+
+Inheritance diagram for tg\-World\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_world_impl__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_world_impl_aa87edc3655ae90fc14e46c724646daf3}{tg\-World\-Impl} (const \hyperlink{structtg_world_1_1_config}{tg\-World\-::\-Config} \&config, const \hyperlink{classtg_ground}{tg\-Ground} $\ast$const ground)
+\item 
+virtual \hyperlink{classtg_world_impl_ab7ea78aa20cfc49ea5c9a606755f63e9}{$\sim$tg\-World\-Impl} ()
+\item 
+virtual void \hyperlink{classtg_world_impl_a105ab0706232a897663d181afd960866}{step} (double dt)=0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Abstract base class to encapsulate the implementation of the \hyperlink{classtg_world}{tg\-World}. The \hyperlink{classtg_world}{tg\-World} owns an instance of this. 
+
+Definition at line 39 of file tg\-World\-Impl.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_world_impl_aa87edc3655ae90fc14e46c724646daf3}{\index{tg\-World\-Impl@{tg\-World\-Impl}!tg\-World\-Impl@{tg\-World\-Impl}}
+\index{tg\-World\-Impl@{tg\-World\-Impl}!tgWorldImpl@{tg\-World\-Impl}}
+\subsubsection[{tg\-World\-Impl}]{\setlength{\rightskip}{0pt plus 5cm}tg\-World\-Impl\-::tg\-World\-Impl (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-World\-::\-Config} \&}]{config, }
+\item[{const {\bf tg\-Ground} $\ast$const}]{ground}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_world_impl_aa87edc3655ae90fc14e46c724646daf3}
+The only constructor. The base class initializes nothing. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em config} & configuration P\-O\-D \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 47 of file tg\-World\-Impl.\-h.
+
+\hypertarget{classtg_world_impl_ab7ea78aa20cfc49ea5c9a606755f63e9}{\index{tg\-World\-Impl@{tg\-World\-Impl}!$\sim$tg\-World\-Impl@{$\sim$tg\-World\-Impl}}
+\index{$\sim$tg\-World\-Impl@{$\sim$tg\-World\-Impl}!tgWorldImpl@{tg\-World\-Impl}}
+\subsubsection[{$\sim$tg\-World\-Impl}]{\setlength{\rightskip}{0pt plus 5cm}virtual tg\-World\-Impl\-::$\sim$tg\-World\-Impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_world_impl_ab7ea78aa20cfc49ea5c9a606755f63e9}
+Clean up the implementation. The base class holds nothing. 
+
+Definition at line 50 of file tg\-World\-Impl.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_world_impl_a105ab0706232a897663d181afd960866}{\index{tg\-World\-Impl@{tg\-World\-Impl}!step@{step}}
+\index{step@{step}!tgWorldImpl@{tg\-World\-Impl}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tg\-World\-Impl\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_world_impl_a105ab0706232a897663d181afd960866}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classtg_world_bullet_physics_impl_a7b1ae320bea710dced04f03222644f1e}{tg\-World\-Bullet\-Physics\-Impl}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_world_impl_a105ab0706232a897663d181afd960866_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_world_impl_8h}{tg\-World\-Impl.\-h}\end{DoxyCompactItemize}

@@ -1,0 +1,66 @@
+\hypertarget{tg_node_8h}{\section{tgcreator/tg\-Node.h File Reference}
+\label{tg_node_8h}\index{tgcreator/tg\-Node.\-h@{tgcreator/tg\-Node.\-h}}
+}
+
+
+Definition of class \hyperlink{classtg_node}{tg\-Node}.  
+
+
+{\ttfamily \#include \char`\"{}tg\-Util.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}core/tg\-Taggable.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Linear\-Math/bt\-Vector3.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Linear\-Math/bt\-Quaternion.\-h\char`\"{}}\\*
+This graph shows which files directly or indirectly include this file\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{tg_node_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtg_node}{tg\-Node}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::ostream \& \hyperlink{tg_node_8h_a061685aa319efb6f9275eba40a6edbcd}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_node}{tg\-Node} \&node)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definition of class \hyperlink{classtg_node}{tg\-Node}. \begin{DoxyDate}{Date}
+March 21, 2014 \$\-Id\$ 
+\end{DoxyDate}
+
+
+Definition in file \hyperlink{tg_node_8h_source}{tg\-Node.\-h}.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tg_node_8h_a061685aa319efb6f9275eba40a6edbcd}{\index{tg\-Node.\-h@{tg\-Node.\-h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tgNode.h@{tg\-Node.\-h}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::ostream\& operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{std\-::ostream \&}]{os, }
+\item[{const {\bf tg\-Node} \&}]{node}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{tg_node_8h_a061685aa319efb6f9275eba40a6edbcd}
+Overload \hyperlink{tg_model_8cpp_a2a689ee3da32701c6ee9352145507f66}{operator$<$$<$()} to handle a \hyperlink{classtg_node}{tg\-Node} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em os} & an ostream \\
+\hline
+\mbox{\tt in}  & {\em pair} & a \hyperlink{classtg_node}{tg\-Node} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+os 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000080}{Todo}]Inlining this does no good; stream operations are slow. \end{DoxyRefDesc}
+
+
+Definition at line 112 of file tg\-Node.\-h.
+

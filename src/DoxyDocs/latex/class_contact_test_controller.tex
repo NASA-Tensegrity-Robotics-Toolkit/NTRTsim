@@ -1,0 +1,129 @@
+\hypertarget{class_contact_test_controller}{\section{Contact\-Test\-Controller Class Reference}
+\label{class_contact_test_controller}\index{Contact\-Test\-Controller@{Contact\-Test\-Controller}}
+}
+
+
+Inheritance diagram for Contact\-Test\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{class_contact_test_controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Contact\-Test\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{class_contact_test_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{class_contact_test_controller_ac66f0ea2e87ccd2512ad0fb5bfd61208}{on\-Step} (\hyperlink{class_contact_test_model}{Contact\-Test\-Model} \&subject, double dt)
+\item 
+virtual void \hyperlink{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{on\-Attach} (\hyperlink{class_contact_test_model}{Contact\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{on\-Setup} (\hyperlink{class_contact_test_model}{Contact\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{on\-Teardown} (\hyperlink{class_contact_test_model}{Contact\-Test\-Model} \&subject)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 29 of file Contact\-Test\-Controller.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{\index{Contact\-Test\-Controller@{Contact\-Test\-Controller}!on\-Attach@{on\-Attach}}
+\index{on\-Attach@{on\-Attach}!ContactTestController@{Contact\-Test\-Controller}}
+\subsubsection[{on\-Attach}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Contact\-Test\-Model}  $>$\-::on\-Attach (
+\begin{DoxyParamCaption}
+\item[{{\bf Contact\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}
+Notify the observers when an attach action has occurred. Will only occur once, typically before setup 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 54 of file tg\-Observer.\-h.
+
+\hypertarget{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{\index{Contact\-Test\-Controller@{Contact\-Test\-Controller}!on\-Setup@{on\-Setup}}
+\index{on\-Setup@{on\-Setup}!ContactTestController@{Contact\-Test\-Controller}}
+\subsubsection[{on\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Contact\-Test\-Model}  $>$\-::on\-Setup (
+\begin{DoxyParamCaption}
+\item[{{\bf Contact\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}
+Notify the observers when a setup action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 60 of file tg\-Observer.\-h.
+
+\hypertarget{class_contact_test_controller_ac66f0ea2e87ccd2512ad0fb5bfd61208}{\index{Contact\-Test\-Controller@{Contact\-Test\-Controller}!on\-Step@{on\-Step}}
+\index{on\-Step@{on\-Step}!ContactTestController@{Contact\-Test\-Controller}}
+\subsubsection[{on\-Step}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Contact\-Test\-Controller\-::on\-Step (
+\begin{DoxyParamCaption}
+\item[{{\bf Contact\-Test\-Model} \&}]{subject, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{class_contact_test_controller_ac66f0ea2e87ccd2512ad0fb5bfd61208}
+Notify the observers when a step action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\mbox{\tt in}  & {\em the} & number of seconds since the previous call; must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$ Contact\-Test\-Model $>$}.
+
+
+
+Definition at line 37 of file Contact\-Test\-Controller.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_contact_test_controller_ac66f0ea2e87ccd2512ad0fb5bfd61208_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{\index{Contact\-Test\-Controller@{Contact\-Test\-Controller}!on\-Teardown@{on\-Teardown}}
+\index{on\-Teardown@{on\-Teardown}!ContactTestController@{Contact\-Test\-Controller}}
+\subsubsection[{on\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Contact\-Test\-Model}  $>$\-::on\-Teardown (
+\begin{DoxyParamCaption}
+\item[{{\bf Contact\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}
+Notify the observers when a teardown action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 66 of file tg\-Observer.\-h.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+dev/btietz/\-R\-B\-Tests/Contact\-Test\-Controller.\-h\end{DoxyCompactItemize}

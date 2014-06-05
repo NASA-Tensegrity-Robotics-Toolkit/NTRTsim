@@ -1,0 +1,101 @@
+\hypertarget{classtg_c_p_g_info}{\section{tg\-C\-P\-G\-Info Class Reference}
+\label{classtg_c_p_g_info}\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_c_p_g_info_a4469e37ac5f58284c5907582dc30346c}{const int {\bfseries get\-Node\-Number} () const }\label{classtg_c_p_g_info_a4469e37ac5f58284c5907582dc30346c}
+
+\item 
+const \hyperlink{class_c_p_g_equations}{C\-P\-G\-Equations} $\ast$ \hyperlink{classtg_c_p_g_info_ac11605f641e691ac369ce4bff3958409}{get\-C\-P\-G\-Sys} () const 
+\item 
+void \hyperlink{classtg_c_p_g_info_a5bc9ebf51c48c38e3c079047bdfaa41f}{add\-Control\-Info} (\hyperlink{classtg_base_c_p_g_node}{tg\-Base\-C\-P\-G\-Node} $\ast$string)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_c_p_g_info_aadfe544fa67d2255e08a73ac8c34a529}{tg\-C\-P\-G\-Info} (\hyperlink{class_c_p_g_equations}{C\-P\-G\-Equations} $\ast$C\-P\-G\-Sys, array\-\_\-2\-D node\-Params)
+\item 
+void \hyperlink{classtg_c_p_g_info_ae6196de220c88e8631b863e0d63d1d7f}{set\-Connectivity} (\hyperlink{classtg_connector_info}{tg\-Connector\-Info} $\ast$this\-String, std\-::vector$<$ \hyperlink{classtg_connector_info}{tg\-Connector\-Info} $\ast$ $>$ all\-Strings, array\-\_\-4\-D edge\-Params)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 31 of file tg\-C\-P\-G\-Info.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_c_p_g_info_aadfe544fa67d2255e08a73ac8c34a529}{\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}!tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}}
+\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}!tgCPGInfo@{tg\-C\-P\-G\-Info}}
+\subsubsection[{tg\-C\-P\-G\-Info}]{\setlength{\rightskip}{0pt plus 5cm}tg\-C\-P\-G\-Info\-::tg\-C\-P\-G\-Info (
+\begin{DoxyParamCaption}
+\item[{{\bf C\-P\-G\-Equations} $\ast$}]{C\-P\-G\-Sys, }
+\item[{array\-\_\-2\-D}]{node\-Params}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classtg_c_p_g_info_aadfe544fa67d2255e08a73ac8c34a529}
+Node parameters are required right 
+
+Definition at line 29 of file tg\-C\-P\-G\-Info.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_c_p_g_info_a5bc9ebf51c48c38e3c079047bdfaa41f}{\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}!add\-Control\-Info@{add\-Control\-Info}}
+\index{add\-Control\-Info@{add\-Control\-Info}!tgCPGInfo@{tg\-C\-P\-G\-Info}}
+\subsubsection[{add\-Control\-Info}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-C\-P\-G\-Info\-::add\-Control\-Info (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Base\-C\-P\-G\-Node} $\ast$}]{string}
+\end{DoxyParamCaption}
+)}}\label{classtg_c_p_g_info_a5bc9ebf51c48c38e3c079047bdfaa41f}
+Give the C\-P\-G information to the \hyperlink{classtg_model}{tg\-Model} \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000047}{Todo}]see if this can be ready for construction of the \hyperlink{classtg_model}{tg\-Model} the first time. Would require editing \hyperlink{classtg_structure_info}{tg\-Structure\-Info} \end{DoxyRefDesc}
+
+
+Definition at line 110 of file tg\-C\-P\-G\-Info.\-cpp.
+
+\hypertarget{classtg_c_p_g_info_ac11605f641e691ac369ce4bff3958409}{\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}!get\-C\-P\-G\-Sys@{get\-C\-P\-G\-Sys}}
+\index{get\-C\-P\-G\-Sys@{get\-C\-P\-G\-Sys}!tgCPGInfo@{tg\-C\-P\-G\-Info}}
+\subsubsection[{get\-C\-P\-G\-Sys}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\-P\-G\-Equations}$\ast$ tg\-C\-P\-G\-Info\-::get\-C\-P\-G\-Sys (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_c_p_g_info_ac11605f641e691ac369ce4bff3958409}
+Pointer to the C\-P\-G system. Owned by the higher level structure 
+
+Definition at line 44 of file tg\-C\-P\-G\-Info.\-h.
+
+\hypertarget{classtg_c_p_g_info_ae6196de220c88e8631b863e0d63d1d7f}{\index{tg\-C\-P\-G\-Info@{tg\-C\-P\-G\-Info}!set\-Connectivity@{set\-Connectivity}}
+\index{set\-Connectivity@{set\-Connectivity}!tgCPGInfo@{tg\-C\-P\-G\-Info}}
+\subsubsection[{set\-Connectivity}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-C\-P\-G\-Info\-::set\-Connectivity (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Connector\-Info} $\ast$}]{this\-String, }
+\item[{std\-::vector$<$ {\bf tg\-Connector\-Info} $\ast$ $>$}]{all\-Strings, }
+\item[{array\-\_\-4\-D}]{edge\-Params}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classtg_c_p_g_info_ae6196de220c88e8631b863e0d63d1d7f}
+Iterate through all other tg\-Linear\-String\-C\-P\-G\-Infos, and determine C\-P\-G network by rigid body connectivity Can call these any time, but they'll only have the intended effect after all of the strings have been constructed. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000046}{Todo}]can we check to make sure the strings are on the same C\-P\-G system like we used to \end{DoxyRefDesc}
+
+
+Definition at line 50 of file tg\-C\-P\-G\-Info.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_c_p_g_info_ae6196de220c88e8631b863e0d63d1d7f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/btietz/tg\-C\-P\-G\-Info.\-h\item 
+dev/btietz/tg\-C\-P\-G\-Info.\-cpp\end{DoxyCompactItemize}

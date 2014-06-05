@@ -1,0 +1,148 @@
+# This is rather long and doesn't require changes, so it's separated
+# into its own file to keep CMakeLists.txt clean. Its purpose is to 
+# bring in any bullet dependencies that are needed to build the 
+# simulator apps.
+
+# NOTE: ENV_DIR is set in ./CMakeLists.txt
+
+SET(LIB_DIR ${ENV_DIR}/lib)
+SET(INC_DIR ${ENV_DIR}/include)
+
+SET(BULLET_PHYSICS_SOURCE_DIR ${ENV_DIR}/build/bullet)
+
+SET(OPENGL_LIB ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL)
+
+SET(OPENGL_FG_LIB ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL_FreeGlut)
+
+include_directories (
+    ${BULLET_PHYSICS_SOURCE_DIR}/src
+    ${ENV_INC_DIR}
+    ${ENV_INC_DIR}/bullet
+    ${ENV_INC_DIR}/boost
+    ${ENV_INC_DIR}/tensegrity
+    ${PROJECT_SOURCE_DIR}
+    ${OPENGL_FG_LIB}
+    "/usr/include/glib-2.0"
+)
+
+link_directories(${LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
+
+OPTION(USE_GLUT "Use Glut"  ON)
+
+FIND_PACKAGE(OpenGL)
+IF (OPENGL_FOUND)
+        MESSAGE("OPENGL FOUND")
+        MESSAGE(${OPENGL_LIBRARIES})
+ELSE (OPENGL_FOUND)
+        MESSAGE("OPENGL NOT FOUND")
+        SET(OPENGL_gl_LIBRARY opengl32)
+        SET(OPENGL_glu_LIBRARY glu32)
+ENDIF (OPENGL_FOUND)
+
+
+IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    FIND_PATH(GLIB_INCLUDE_DIR glib.h PATH_SUFFIXES glib-2.0)
+
+    FIND_PATH(GLIB_LIB_INCLUDE_DIR glibconfig.h 
+          PATH_SUFFIXES "../lib/glib-2.0/include"
+          HINTS "/usr/lib/x86_64-linux-gnu/glib-2.0/include" "/usr/lib/i386-linux-gnu/glib-2.0/include")
+
+    FIND_LIBRARY(GLIB
+             NAMES glib libglib libglib-2.0.so
+             HINTS "/usr/lib/x86_64-linux-gnu" "/usr/lib/i386-linux-gnu")
+
+    INCLUDE_DIRECTORIES(${GLIB_INCLUDE_DIR}
+                ${GLIB_LIB_INCLUDE_DIR})
+ENDIF()
+
+FIND_PACKAGE(GLU)
+
+IF (USE_GLUT)
+FIND_PACKAGE(GLUT)
+IF (GLUT_FOUND)
+    MESSAGE("GLUT FOUND")
+    MESSAGE(${GLUT_glut_LIBRARY})
+ELSE (GLUT_FOUND)
+    IF (MINGW)
+        MESSAGE ("GLUT NOT FOUND not found, trying to use MINGW glut32")
+        SET(GLUT_glut_LIBRARY glut32)
+        #TODO add better GLUT detection for MinGW
+        SET(GLUT_FOUND TRUE)
+    ENDIF (MINGW)
+    IF (MSVC)
+        SET(GLUT_FOUND TRUE)
+        IF (CMAKE_CL_64)
+            message("Win64 using Glut/glut64.lib")
+            SET(GLUT_glut_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glut64.lib)
+        ELSE(CMAKE_CL_64)
+            message("Win32 using Glut/glut32.lib")
+            SET(GLUT_glut_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glut32.lib)
+        ENDIF (CMAKE_CL_64)
+        INCLUDE_DIRECTORIES(${BULLET_PHYSICS_SOURCE_DIR}/Glut)
+    ELSE()
+        MESSAGE("GLUT NOT FOUND")   
+    ENDIF (MSVC)
+ENDIF (GLUT_FOUND)
+
+IF(NOT WIN32)   
+    # This is added for linux. This should always work if everything is installed and working fine.
+    #INCLUDE_DIRECTORIES(/usr/include /usr/local/include) 
+ENDIF()
+ENDIF(USE_GLUT)
+
+
+IF (USE_GLUT)
+
+    INCLUDE_DIRECTORIES(
+    ${BULLET_PHYSICS_SOURCE_DIR}/src ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL 
+    )
+
+    LINK_LIBRARIES(
+    tgOpenGLSupport OpenGLSupport BulletSoftBody BulletDynamics  BulletCollision LinearMath    ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
+    )
+    
+    # The definitions of executables are defined in the CMakeLists.txt files in subdirectories. 
+    # 
+    #IF (WIN32)
+    #   ADD_EXECUTABLE(AppSoftBodyDemo
+    #       main.cpp
+    #       SoftDemo.cpp
+    #       ${BULLET_PHYSICS_SOURCE_DIR}/build/bullet.rc
+    #   )
+    #ELSE()
+    #   ADD_EXECUTABLE(AppSoftBodyDemo
+    #       main.cpp
+    #       SoftDemo.cpp
+    #   )
+    #ENDIF()
+    
+    
+    IF (WIN32)
+        IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+            IF (CMAKE_CL_64)
+                ADD_CUSTOM_COMMAND(
+                    TARGET ${PROJECT_NAME}
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll ${CMAKE_CURRENT_BINARY_DIR}
+                )
+            ELSE(CMAKE_CL_64)
+                ADD_CUSTOM_COMMAND(
+                    TARGET ${PROJECT_NAME}
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL ${CMAKE_CURRENT_BINARY_DIR}
+                )
+            ENDIF(CMAKE_CL_64)
+        ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+    ENDIF(WIN32)
+
+
+ELSE(USE_GLUT)
+
+ENDIF (USE_GLUT)
+
+IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+            SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES  DEBUG_POSTFIX "_Debug")
+            SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
+            SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
+ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+

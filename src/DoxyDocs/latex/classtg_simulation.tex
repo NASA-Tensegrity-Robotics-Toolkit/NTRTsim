@@ -1,0 +1,227 @@
+\hypertarget{classtg_simulation}{\section{tg\-Simulation Class Reference}
+\label{classtg_simulation}\index{tg\-Simulation@{tg\-Simulation}}
+}
+
+
+{\ttfamily \#include $<$tg\-Simulation.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_simulation_aebf9c10f57d7c67350a90b7b46affbcf}{tg\-Simulation} (\hyperlink{classtg_sim_view}{tg\-Sim\-View} \&view)
+\item 
+void \hyperlink{classtg_simulation_a1e1b937fa359a501ab7ddd415b229c33}{step} (double dt) const 
+\item 
+void \hyperlink{classtg_simulation_ad2b39f98f266911bf37c09319dce6c24}{run} () const 
+\item 
+void \hyperlink{classtg_simulation_aee97eee2bd59defdb36ef34715b8abb9}{run} (int steps) const 
+\item 
+void \hyperlink{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c}{add\-Model} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Model)
+\item 
+\hypertarget{classtg_simulation_a543a38ceef0cf33d57087a23864d9f15}{void {\bfseries on\-Visit} (const \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&r) const }\label{classtg_simulation_a543a38ceef0cf33d57087a23864d9f15}
+
+\item 
+\hypertarget{classtg_simulation_a456e2f62d48204859e6b7da4ea52279f}{void {\bfseries reset} ()}\label{classtg_simulation_a456e2f62d48204859e6b7da4ea52279f}
+
+\item 
+\hyperlink{classtg_world}{tg\-World} \& \hyperlink{classtg_simulation_aaaba2fee70633115cdea3727c7cd7842}{get\-World} () const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds objects necessary for simulation, a world, a view and a list of models. 
+
+Definition at line 42 of file tg\-Simulation.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_simulation_aebf9c10f57d7c67350a90b7b46affbcf}{\index{tg\-Simulation@{tg\-Simulation}!tg\-Simulation@{tg\-Simulation}}
+\index{tg\-Simulation@{tg\-Simulation}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{tg\-Simulation}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Simulation\-::tg\-Simulation (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Sim\-View} \&}]{view}
+\end{DoxyParamCaption}
+)}}\label{classtg_simulation_aebf9c10f57d7c67350a90b7b46affbcf}
+The only constructor. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em view} & the way the world and its models are rendered. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file tg\-Simulation.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_simulation_aebf9c10f57d7c67350a90b7b46affbcf_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c}{\index{tg\-Simulation@{tg\-Simulation}!add\-Model@{add\-Model}}
+\index{add\-Model@{add\-Model}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{add\-Model}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Simulation\-::add\-Model (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Model} $\ast$}]{p\-Model}
+\end{DoxyParamCaption}
+)}}\label{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c}
+Add a Tensegrity to the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em p\-Model} & a pointer to a \hyperlink{classtg_model}{tg\-Model} representing a Tensegrity; an exception is thrown if it is N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invarlid\-\_\-argument} & if p\-Model is N\-U\-L\-L \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000019}{Todo}]Model pointer can't be N\-U\-L\-L. \end{DoxyRefDesc}
+
+
+Definition at line 56 of file tg\-Simulation.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_simulation_aaaba2fee70633115cdea3727c7cd7842}{\index{tg\-Simulation@{tg\-Simulation}!get\-World@{get\-World}}
+\index{get\-World@{get\-World}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{get\-World}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tg\-World} \& tg\-Simulation\-::get\-World (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classtg_simulation_aaaba2fee70633115cdea3727c7cd7842}
+\begin{DoxyNote}{Note}
+This is not inlined because it depends on the definition of \hyperlink{classtg_sim_view}{tg\-Sim\-View}. 
+\end{DoxyNote}
+
+
+Definition at line 100 of file tg\-Simulation.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{classtg_simulation_aaaba2fee70633115cdea3727c7cd7842_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_simulation_aaaba2fee70633115cdea3727c7cd7842_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_simulation_ad2b39f98f266911bf37c09319dce6c24}{\index{tg\-Simulation@{tg\-Simulation}!run@{run}}
+\index{run@{run}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Simulation\-::run (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classtg_simulation_ad2b39f98f266911bf37c09319dce6c24}
+Run until stopped by user. Calls tg\-Sim\-View.\-run() 
+
+Definition at line 142 of file tg\-Simulation.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{classtg_simulation_ad2b39f98f266911bf37c09319dce6c24_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_simulation_aee97eee2bd59defdb36ef34715b8abb9}{\index{tg\-Simulation@{tg\-Simulation}!run@{run}}
+\index{run@{run}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Simulation\-::run (
+\begin{DoxyParamCaption}
+\item[{int}]{steps}
+\end{DoxyParamCaption}
+) const}}\label{classtg_simulation_aee97eee2bd59defdb36ef34715b8abb9}
+Run for a specific number of steps. Calls tg\-Sim\-View.\-run(int steps) 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em steps} & the number of steps to update the graphics \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000018}{Todo}]Make steps of type size\-\_\-t. \end{DoxyRefDesc}
+
+
+Definition at line 147 of file tg\-Simulation.\-cpp.
+
+\hypertarget{classtg_simulation_a1e1b937fa359a501ab7ddd415b229c33}{\index{tg\-Simulation@{tg\-Simulation}!step@{step}}
+\index{step@{step}!tgSimulation@{tg\-Simulation}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Simulation\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+) const}}\label{classtg_simulation_a1e1b937fa359a501ab7ddd415b229c33}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; throw an exception if not positive \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if dt is not positive \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line 105 of file tg\-Simulation.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classtg_simulation_a1e1b937fa359a501ab7ddd415b229c33_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_simulation_8h}{tg\-Simulation.\-h}\item 
+core/\hyperlink{tg_simulation_8cpp}{tg\-Simulation.\-cpp}\end{DoxyCompactItemize}

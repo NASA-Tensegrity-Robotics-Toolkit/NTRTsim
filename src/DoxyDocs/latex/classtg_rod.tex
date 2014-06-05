@@ -1,0 +1,466 @@
+\hypertarget{classtg_rod}{\section{tg\-Rod Class Reference}
+\label{classtg_rod}\index{tg\-Rod@{tg\-Rod}}
+}
+
+
+{\ttfamily \#include $<$tg\-Rod.\-h$>$}
+
+
+
+Inheritance diagram for tg\-Rod\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=130pt]{classtg_rod__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-Rod\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=144pt]{classtg_rod__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtg_rod_1_1_config}{Config}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_rod_a8b718cc38627d2ef66e135fae5a17c9e}{{\bfseries tg\-Rod} (bt\-Rigid\-Body $\ast$p\-Rigid\-Body, const \hyperlink{classtg_tags}{tg\-Tags} \&tags, const double \hyperlink{classtg_rod_af3c94065d43dcf54e5f325d61721e263}{length})}\label{classtg_rod_a8b718cc38627d2ef66e135fae5a17c9e}
+
+\item 
+virtual \hyperlink{classtg_rod_a233b6ac07df4074c985190d6491f8294}{$\sim$tg\-Rod} ()
+\item 
+virtual void \hyperlink{classtg_rod_a7a12ab9a8190c95c28c2dd6749bb1c8c}{teardown} ()
+\item 
+virtual void \hyperlink{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449}{on\-Visit} (const \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&v) const 
+\item 
+double \hyperlink{classtg_rod_ab1090c64d68829612fb74afbc55d0b63}{mass} () const 
+\item 
+double \hyperlink{classtg_rod_af3c94065d43dcf54e5f325d61721e263}{length} () const 
+\item 
+bt\-Vector3 \hyperlink{classtg_rod_aeb8f14739d3449ee0b344a18030dd474}{center\-Of\-Mass} () const 
+\item 
+virtual void \hyperlink{classtg_model_a85c68e064972f67c61c47ead392cf6f8}{setup} (\hyperlink{classtg_world}{tg\-World} \&world)
+\item 
+virtual void \hyperlink{classtg_model_acc6f9ae005f9f51447d7efe5f1815737}{step} (double dt)
+\item 
+void \hyperlink{classtg_model_a292c17848b96caee32b2286e44c13f2f}{add\-Child} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Child)
+\item 
+virtual std\-::string \hyperlink{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{to\-String} (std\-::string prefix=\char`\"{}\char`\"{}) const 
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{find} (const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{find} (const std\-::string \&tag\-Search)
+\item 
+std\-::vector$<$ \hyperlink{classtg_model}{tg\-Model} $\ast$ $>$ \hyperlink{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{get\-Descendants} () const 
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A rod is a rigid body. Length is defined by nodes, radius and density are defined by config. 
+
+Definition at line 42 of file tg\-Rod.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_rod_a233b6ac07df4074c985190d6491f8294}{\index{tg\-Rod@{tg\-Rod}!$\sim$tg\-Rod@{$\sim$tg\-Rod}}
+\index{$\sim$tg\-Rod@{$\sim$tg\-Rod}!tgRod@{tg\-Rod}}
+\subsubsection[{$\sim$tg\-Rod}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Rod\-::$\sim$tg\-Rod (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_rod_a233b6ac07df4074c985190d6491f8294}
+A class with a virtual memeber function requires a virtual destructor. 
+
+Definition at line 79 of file tg\-Rod.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_model_a292c17848b96caee32b2286e44c13f2f}{\index{tg\-Rod@{tg\-Rod}!add\-Child@{add\-Child}}
+\index{add\-Child@{add\-Child}!tgRod@{tg\-Rod}}
+\subsubsection[{add\-Child}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::add\-Child (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Model} $\ast$}]{p\-Child}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a292c17848b96caee32b2286e44c13f2f}
+Add a sub-\/model to this model. The model takes ownership of the child sub-\/model and is responsible for deallocating it. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Child} & a pointer to a sub-\/model \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & is p\-Child is N\-U\-L\-L, this object, or already a descendant \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000016}{Todo}]Make sure that every child appears no more than once in the tree. \end{DoxyRefDesc}
+
+
+Definition at line 126 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rod_aeb8f14739d3449ee0b344a18030dd474}{\index{tg\-Rod@{tg\-Rod}!center\-Of\-Mass@{center\-Of\-Mass}}
+\index{center\-Of\-Mass@{center\-Of\-Mass}!tgRod@{tg\-Rod}}
+\subsubsection[{center\-Of\-Mass}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Vector3 tg\-Rod\-::center\-Of\-Mass (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classtg_rod_aeb8f14739d3449ee0b344a18030dd474}
+Return the center of mass of the rod, a vector in 3-\/space. \begin{DoxyReturn}{Returns}
+the center of mass of the rod, a vector in 3-\/space 
+\end{DoxyReturn}
+
+
+Definition at line 97 of file tg\-Rod.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classtg_rod_aeb8f14739d3449ee0b344a18030dd474_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{\index{tg\-Rod@{tg\-Rod}!find@{find}}
+\index{find@{find}!tgRod@{tg\-Rod}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Tag\-Search} \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & tag\-Search that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 129 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_ab75836fdfbd9200f165c3b28a19630c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{\index{tg\-Rod@{tg\-Rod}!find@{find}}
+\index{find@{find}!tgRod@{tg\-Rod}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & std\-::string\& that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 142 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{\index{tg\-Rod@{tg\-Rod}!get\-Descendants@{get\-Descendants}}
+\index{get\-Descendants@{get\-Descendants}!tgRod@{tg\-Rod}}
+\subsubsection[{get\-Descendants}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ {\bf tg\-Model} $\ast$ $>$ tg\-Model\-::get\-Descendants (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}
+Return a std\-::vector of const pointers to all sub-\/models. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000017}{Todo}]examine whether this should be public, and perhaps create a read only version \end{DoxyRefDesc}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of const pointers all sub-\/models.
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000014}{Todo}]Unnecessary copying can be avoided by pasing the result collection in the recursive step. \end{DoxyRefDesc}
+
+
+Definition at line 174 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rod_af3c94065d43dcf54e5f325d61721e263}{\index{tg\-Rod@{tg\-Rod}!length@{length}}
+\index{length@{length}!tgRod@{tg\-Rod}}
+\subsubsection[{length}]{\setlength{\rightskip}{0pt plus 5cm}double tg\-Rod\-::length (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_rod_af3c94065d43dcf54e5f325d61721e263}
+Return the rod's length in application-\/dependent units. \begin{DoxyReturn}{Returns}
+the rod's length in application-\/dependent units 
+\end{DoxyReturn}
+
+
+Definition at line 104 of file tg\-Rod.\-h.
+
+\hypertarget{classtg_rod_ab1090c64d68829612fb74afbc55d0b63}{\index{tg\-Rod@{tg\-Rod}!mass@{mass}}
+\index{mass@{mass}!tgRod@{tg\-Rod}}
+\subsubsection[{mass}]{\setlength{\rightskip}{0pt plus 5cm}double tg\-Rod\-::mass (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_rod_ab1090c64d68829612fb74afbc55d0b63}
+Return the rod's mass in application-\/dependent units. \begin{DoxyReturn}{Returns}
+the rod's mass in application-\/dependent units 
+\end{DoxyReturn}
+
+
+Definition at line 98 of file tg\-Rod.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=298pt]{classtg_rod_ab1090c64d68829612fb74afbc55d0b63_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449}{\index{tg\-Rod@{tg\-Rod}!on\-Visit@{on\-Visit}}
+\index{on\-Visit@{on\-Visit}!tgRod@{tg\-Rod}}
+\subsubsection[{on\-Visit}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Rod\-::on\-Visit (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Model\-Visitor} \&}]{r}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449}
+Call \hyperlink{classtg_model_visitor_a69d056cf31bb4eeef03c243a86f59cc1}{tg\-Model\-Visitor\-::render()} on self and all descendants. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em r} & a reference to a \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{tg\-Model}.
+
+
+
+Definition at line 81 of file tg\-Rod.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_a85c68e064972f67c61c47ead392cf6f8}{\index{tg\-Rod@{tg\-Rod}!setup@{setup}}
+\index{setup@{setup}!tgRod@{tg\-Rod}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::setup (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_a85c68e064972f67c61c47ead392cf6f8}
+Setup takes a \hyperlink{classtg_world}{tg\-World} and passes it to any children for their own setup functions. All subclasses should call this at the appropriate time (usually end of setup) within their own setup function. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em world} & -\/ the \hyperlink{classtg_world}{tg\-World} the models will exist in. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classtg_base_string_a066210b878fc5307fc5a9271957a9c84}{tg\-Base\-String}, \hyperlink{class_prism_model_a29ef3abc8f1d0767744000661c1c02f1}{Prism\-Model}, \hyperlink{class_nested_structure_test_model_a97902a2ec224bec01898ff6750358418}{Nested\-Structure\-Test\-Model}, \hyperlink{classtg_r_b_string_a57298f001da09ec54a717033713a788b}{tg\-R\-B\-String}, \hyperlink{classtg_linear_string_a022d8147ddc53a5449d22a74128231a7}{tg\-Linear\-String}, \hyperlink{class_single_rib_model_a124840540b52ec55d3e0a562f5bf8038}{Single\-Rib\-Model}, \hyperlink{class_single_rib_model_a124840540b52ec55d3e0a562f5bf8038}{Single\-Rib\-Model}, \hyperlink{class_t6_model_a4ad8e9a8dd86e2ee2a293cea2b03feb8}{T6\-Model}, \hyperlink{class_hilbert2_d_model_aaf9926d279ec53308991aa86df6fb06b}{Hilbert2\-D\-Model}, \hyperlink{class_r_b_string_test_a2eed2174fc286c7ac261a2e6bdc8fb7e}{R\-B\-String\-Test}, \hyperlink{class_contact_test_model_a9bebeeb19f836cb456aa187a76015675}{Contact\-Test\-Model}, \hyperlink{class_structure_test_model_a74f877900f9416a6182ce51f2783463e}{Structure\-Test\-Model}, \hyperlink{class_connector_test_model_a98cee5085d31f5238dd6c5607eef02bf}{Connector\-Test\-Model}, \hyperlink{class_build_test_model_ac41e963bca43e2bc670e18f0801671f7}{Build\-Test\-Model}, \hyperlink{class_spiral_spine_a375666b36e080f35dab35ebea12117a9}{Spiral\-Spine}, \hyperlink{class_base_spine_model_learning_a6d97d4097674fb9c7ea7f667e11442bb}{Base\-Spine\-Model\-Learning}, \hyperlink{class_j_early_model_a77fca3da35b411aaac33269b22f4cddc}{J\-Early\-Model}, \hyperlink{class_nested_spiral_spine_a87ca6b8b6482b448be5826e7fef49287}{Nested\-Spiral\-Spine}, \hyperlink{class_flemons_spine_model_a83df0a46dee3987cb6db35a2c5ef7cad}{Flemons\-Spine\-Model}, \hyperlink{class_flemons_spine_model_learning_ad7d329634cf8d812bcee974a3430fcee}{Flemons\-Spine\-Model\-Learning}, \hyperlink{class_flemons_spine_model_learning_a1c5e086a665023dbc637cfd617ddc094}{Flemons\-Spine\-Model\-Learning}, \hyperlink{class_tetra_spine_learning_model_a78f283f3a2479c9af5b43cef52f2428f}{Tetra\-Spine\-Learning\-Model}, and \hyperlink{class_rib_model_a4cbc6a0649ca5deb7ab0c98b8ae1ab1e}{Rib\-Model}.
+
+
+
+Definition at line 62 of file tg\-Model.\-cpp.
+
+\hypertarget{classtg_model_acc6f9ae005f9f51447d7efe5f1815737}{\index{tg\-Rod@{tg\-Rod}!step@{step}}
+\index{step@{step}!tgRod@{tg\-Rod}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_acc6f9ae005f9f51447d7efe5f1815737}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; std\-::invalid\-\_\-argument is thrown if dt is not positive \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if dt is not positive \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+This is not necessarily const for every child. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{class_nested_structure_test_model_af670e0e83b05c97575e7ba96436652d4}{Nested\-Structure\-Test\-Model}, \hyperlink{classtg_base_string_aadd5b654c0a426f83645c0d63525aefb}{tg\-Base\-String}, \hyperlink{class_connector_test_model_a30e5b347373f77dc84584569d8ac7b4e}{Connector\-Test\-Model}, \hyperlink{class_build_test_model_aabd9261840e8466e8648585ccca67397}{Build\-Test\-Model}, \hyperlink{class_contact_test_model_a4ca4c597ea5333b0230fb3f05eebca97}{Contact\-Test\-Model}, \hyperlink{class_structure_test_model_a5496e69ff5d9c7bf1ecf84686900ea37}{Structure\-Test\-Model}, \hyperlink{class_prism_model_af56267cc470ba060c634f869ab04d2d5}{Prism\-Model}, \hyperlink{classtg_linear_string_ae6ffae9c4a4a9501b1933a2beceee67f}{tg\-Linear\-String}, \hyperlink{class_nested_structure_test_model_a525541e96fd433c3cfc5fc3a574b655e}{Nested\-Structure\-Test\-Model}, \hyperlink{classtg_r_b_string_a656dac3acb8e7d4f4204a5bb2ea6ce06}{tg\-R\-B\-String}, \hyperlink{class_t6_model_ad6689b7750728d58a2a9b1b00902082b}{T6\-Model}, \hyperlink{class_r_b_string_test_af105e21e1166be1546b1cd37c74b8d3b}{R\-B\-String\-Test}, \hyperlink{class_spiral_spine_aec58e69f08f72da5806c104a77e69db1}{Spiral\-Spine}, \hyperlink{class_j_early_model_a9a8eddf8d5f8f08d1717d64ee2db1b4e}{J\-Early\-Model}, \hyperlink{class_nested_spiral_spine_adcf53d51b436c471765513c9ab203be7}{Nested\-Spiral\-Spine}, \hyperlink{class_base_spine_model_learning_abe197971d9b438aaaf36d2e8bddfc739}{Base\-Spine\-Model\-Learning}, \hyperlink{class_flemons_spine_model_learning_ab0c5bc7a89e7358015877ed147b66da9}{Flemons\-Spine\-Model\-Learning}, \hyperlink{class_flemons_spine_model_ace12ed6daa45bdf130c70774df3afde9}{Flemons\-Spine\-Model}, \hyperlink{class_flemons_spine_model_learning_a29969832ceaa6143afcce7dfe1d6d8e8}{Flemons\-Spine\-Model\-Learning}, \hyperlink{class_tetra_spine_learning_model_a5b3b6e1543c56deafe50d7cf3478ebfe}{Tetra\-Spine\-Learning\-Model}, and \hyperlink{class_rib_model_a71a67cc85f18bf8bf72c82b3e7d8c538}{Rib\-Model}.
+
+
+
+Definition at line 86 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=156pt]{classtg_model_acc6f9ae005f9f51447d7efe5f1815737_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rod_a7a12ab9a8190c95c28c2dd6749bb1c8c}{\index{tg\-Rod@{tg\-Rod}!teardown@{teardown}}
+\index{teardown@{teardown}!tgRod@{tg\-Rod}}
+\subsubsection[{teardown}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Rod\-::teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_rod_a7a12ab9a8190c95c28c2dd6749bb1c8c}
+Deletes the children (undoes setup) 
+
+Reimplemented from \hyperlink{classtg_model_adb5eec1dcf70a8c039850aea144dcc7e}{tg\-Model}.
+
+
+
+Definition at line 87 of file tg\-Rod.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classtg_rod_a7a12ab9a8190c95c28c2dd6749bb1c8c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{\index{tg\-Rod@{tg\-Rod}!to\-String@{to\-String}}
+\index{to\-String@{to\-String}!tgRod@{tg\-Rod}}
+\subsubsection[{to\-String}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tg\-Model\-::to\-String (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{prefix = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}
+Returns the tag names of this model and its children 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em prefix} & a string to append to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the original string with this model and its children's tags appended 
+\end{DoxyReturn}
+
+
+Definition at line 156 of file tg\-Model.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_rod_8h}{tg\-Rod.\-h}\item 
+core/\hyperlink{tg_rod_8cpp}{tg\-Rod.\-cpp}\end{DoxyCompactItemize}

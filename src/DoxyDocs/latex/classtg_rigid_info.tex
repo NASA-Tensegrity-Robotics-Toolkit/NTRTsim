@@ -1,0 +1,662 @@
+\hypertarget{classtg_rigid_info}{\section{tg\-Rigid\-Info Class Reference}
+\label{classtg_rigid_info}\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}}
+}
+
+
+{\ttfamily \#include $<$tg\-Rigid\-Info.\-h$>$}
+
+
+
+Inherits \hyperlink{classtg_taggable}{tg\-Taggable}.
+
+
+
+Inherited by \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info}, and \hyperlink{classtg_rod_info}{tg\-Rod\-Info}.
+
+
+
+Collaboration diagram for tg\-Rigid\-Info\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classtg_rigid_info__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_rigid_info_afd0e27834c2f88732f1d7dbbe077f745}{{\bfseries tg\-Rigid\-Info} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_rigid_info_afd0e27834c2f88732f1d7dbbe077f745}
+
+\item 
+\hypertarget{classtg_rigid_info_ae9228bfcf969ea281009e7091669b4a3}{{\bfseries tg\-Rigid\-Info} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_rigid_info_ae9228bfcf969ea281009e7091669b4a3}
+
+\item 
+virtual \hyperlink{classtg_rigid_info_ac8a9f4cc598d4a4914ae20a574cd7248}{$\sim$tg\-Rigid\-Info} ()
+\item 
+\hypertarget{classtg_rigid_info_a5d2a96b8148b75b8bb71640c74e355cb}{virtual \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ {\bfseries create\-Rigid\-Info} (const \hyperlink{classtg_node}{tg\-Node} \&node)}\label{classtg_rigid_info_a5d2a96b8148b75b8bb71640c74e355cb}
+
+\item 
+\hypertarget{classtg_rigid_info_ab49822de5b103feac5e08465618873de}{virtual \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ {\bfseries create\-Rigid\-Info} (const \hyperlink{classtg_pair}{tg\-Pair} \&pair)}\label{classtg_rigid_info_ab49822de5b103feac5e08465618873de}
+
+\item 
+\hypertarget{classtg_rigid_info_a06b02534af62fa7c935accf8321a4c8f}{virtual \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ {\bfseries create\-Rigid\-Info} (const \hyperlink{classtg_node}{tg\-Node} \&node, const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)}\label{classtg_rigid_info_a06b02534af62fa7c935accf8321a4c8f}
+
+\item 
+\hypertarget{classtg_rigid_info_aec3117ed1b4e6561930fa2709805073e}{virtual \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ {\bfseries create\-Rigid\-Info} (const \hyperlink{classtg_pair}{tg\-Pair} \&pair, const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)}\label{classtg_rigid_info_aec3117ed1b4e6561930fa2709805073e}
+
+\item 
+\hypertarget{classtg_rigid_info_a54605e906e00a814e1494375602e02ee}{virtual std\-::vector\\*
+$<$ \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ $>$ {\bfseries create\-Rigid\-Infos} (const \hyperlink{classtg_nodes}{tg\-Nodes} \&nodes, const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)}\label{classtg_rigid_info_a54605e906e00a814e1494375602e02ee}
+
+\item 
+\hypertarget{classtg_rigid_info_a3707c0ddac713beb6287525765f9bd02}{virtual std\-::vector\\*
+$<$ \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ $>$ {\bfseries create\-Rigid\-Infos} (const \hyperlink{classtg_pairs}{tg\-Pairs} \&pairs, const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)}\label{classtg_rigid_info_a3707c0ddac713beb6287525765f9bd02}
+
+\item 
+\hypertarget{classtg_rigid_info_ae6a36e5b07c69730e95fc1fef2c1cc7f}{virtual void {\bfseries init\-Rigid\-Body} (\hyperlink{classtg_world}{tg\-World} \&world)}\label{classtg_rigid_info_ae6a36e5b07c69730e95fc1fef2c1cc7f}
+
+\item 
+\hypertarget{classtg_rigid_info_a8a898688148766bf840013a99d4306cb}{virtual \hyperlink{classtg_model}{tg\-Model} $\ast$ {\bfseries create\-Model} (\hyperlink{classtg_world}{tg\-World} \&world)=0}\label{classtg_rigid_info_a8a898688148766bf840013a99d4306cb}
+
+\item 
+virtual bt\-Collision\-Shape $\ast$ \hyperlink{classtg_rigid_info_a42313c1b58d341c1d5707c105209186d}{get\-Collision\-Shape} (\hyperlink{classtg_world}{tg\-World} \&world) const =0
+\item 
+void \hyperlink{classtg_rigid_info_a8b6d9ed5609dad929593f6f7f82d3f92}{set\-Collision\-Shape} (bt\-Collision\-Shape $\ast$p\-\_\-bt\-Collision\-Shape)
+\item 
+virtual \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ \hyperlink{classtg_rigid_info_a1a0d5dcdb3794c8772abd8d93a646e54}{get\-Rigid\-Info\-Group} ()
+\item 
+\hypertarget{classtg_rigid_info_aded8e887331027bee5ef4b64b44f455b}{virtual const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ {\bfseries get\-Rigid\-Info\-Group} () const }\label{classtg_rigid_info_aded8e887331027bee5ef4b64b44f455b}
+
+\item 
+virtual void \hyperlink{classtg_rigid_info_ad8a4b26de8d647ff945076dfc03e709f}{set\-Rigid\-Info\-Group} (\hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$rigid\-Info\-Group)
+\item 
+virtual bt\-Rigid\-Body $\ast$ \hyperlink{classtg_rigid_info_aa729160748dca4c89bc4dcb84e357c4f}{get\-Rigid\-Body} ()
+\item 
+virtual const bt\-Rigid\-Body $\ast$ \hyperlink{classtg_rigid_info_af5f63cc39e1d34cd9190f9c1e2bb752b}{get\-Rigid\-Body} () const 
+\item 
+virtual void \hyperlink{classtg_rigid_info_a6a27b3d380b20c36a1c41392b7f6e2be}{set\-Rigid\-Body} (bt\-Rigid\-Body $\ast$rigid\-Body)
+\item 
+virtual bt\-Transform \hyperlink{classtg_rigid_info_a18546401332c62360d28225594129f60}{get\-Transform} () const =0
+\item 
+virtual double \hyperlink{classtg_rigid_info_ae0e3f72c6dc4fd1e852ca9d27935bbe2}{get\-Mass} () const =0
+\item 
+virtual bt\-Vector3 \hyperlink{classtg_rigid_info_afadf95cbc744d14eb8bdb00a5498fbbb}{get\-Center\-Of\-Mass} () const =0
+\item 
+virtual bt\-Vector3 \hyperlink{classtg_rigid_info_a347721597db231b7eefc5b01a59346cc}{get\-Connection\-Point} (const bt\-Vector3 \&reference\-Point, const bt\-Vector3 \&destination\-Point) const =0
+\item 
+virtual bt\-Vector3 \hyperlink{classtg_rigid_info_ad52c51a8d052daf9b8a8c00d80f4b9f8}{get\-Connection\-Point} (const bt\-Vector3 \&reference\-Point, const bt\-Vector3 \&destination\-Point, const double rotation) const 
+\item 
+bool \hyperlink{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51}{is\-Compound} () const 
+\item 
+virtual \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} $\ast$ \hyperlink{classtg_rigid_info_af52e7743e7fb7ed3530cd101e464c242}{get\-Compound} ()=0
+\item 
+virtual const \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} $\ast$ \hyperlink{classtg_rigid_info_a87335e33b2c650447dcf644bd85e6ace}{get\-Compound} () const =0
+\item 
+virtual std\-::set$<$ \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ $>$ \hyperlink{classtg_rigid_info_ad1d699be1d892fac10575f7dd1d1d6de}{get\-Leaf\-Rigids} ()=0
+\item 
+virtual bool \hyperlink{classtg_rigid_info_abbc82d1601b04c86a77c1719b56f92b4}{contains\-Node} (const bt\-Vector3 \&node\-Vector) const =0
+\item 
+virtual std\-::set$<$ bt\-Vector3 $>$ \hyperlink{classtg_rigid_info_a35b84de1b721ab94536f4313b64b84da}{get\-Contained\-Nodes} () const =0
+\item 
+virtual bool \hyperlink{classtg_rigid_info_a9c3c7d1827ffd68214f76a1b19278a9b}{shares\-Nodes\-With} (const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&other) const =0
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bt\-Collision\-Shape $\ast$ \hyperlink{classtg_rigid_info_a8a1c3ca00fe917c90d035e2ac101d4b1}{m\-\_\-collision\-Shape}
+\item 
+\hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$ \hyperlink{classtg_rigid_info_a410205a69125205c4d63883e1fcfb0ae}{m\-\_\-rigid\-Info\-Group}
+\item 
+bt\-Rigid\-Body $\ast$ \hyperlink{classtg_rigid_info_ab6e331d7cb329704f24a069ff3c309f3}{m\-\_\-rigid\-Body}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A collector for keeping track of all of the necessary components of a rigid model during the build process. Information is filled in in the following order\-:
+\begin{DoxyEnumerate}
+\item Structural information (different for each subclass) that is necessary for subsequent steps (e.\-g. radius, density, and end points for a rod)
+\item m\-\_\-collision\-Shape -- the information from \#1 is used to create an appropriate bt\-Collision\-Shape. Note that a bt\-Collision\-Shape does not have mass or placement info, it's just a shape.
+\item m\-\_\-rigid\-Group -- this is usually filled in by a \hyperlink{classtg_structure_info}{tg\-Structure\-Info} object during the group\-Rigids() operation that is required for auto-\/compounding. If the group is not set, a pointer to self is returned. If you know your rigid does not share any nodes with other rigids, you can skip setting this and things will still work.
+\item m\-\_\-rigid\-Body -- This is the actual representation of the rigid for Bullet Physics to use. We keep a pointer to it here so that \hyperlink{classtg_connector_info}{tg\-Connector\-Info} objects that point to this can be translated into tg\-Models.
+\end{DoxyEnumerate}
+
+Note\-: A \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a tree. If it is not compound, the tree has one node. 
+
+Definition at line 75 of file tg\-Rigid\-Info.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_rigid_info_ac8a9f4cc598d4a4914ae20a574cd7248}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!$\sim$tg\-Rigid\-Info@{$\sim$tg\-Rigid\-Info}}
+\index{$\sim$tg\-Rigid\-Info@{$\sim$tg\-Rigid\-Info}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{$\sim$tg\-Rigid\-Info}]{\setlength{\rightskip}{0pt plus 5cm}virtual tg\-Rigid\-Info\-::$\sim$tg\-Rigid\-Info (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_ac8a9f4cc598d4a4914ae20a574cd7248}
+The destructor has nothing to do. 
+
+Definition at line 100 of file tg\-Rigid\-Info.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_rigid_info_abbc82d1601b04c86a77c1719b56f92b4}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!contains\-Node@{contains\-Node}}
+\index{contains\-Node@{contains\-Node}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{contains\-Node}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool tg\-Rigid\-Info\-::contains\-Node (
+\begin{DoxyParamCaption}
+\item[{const bt\-Vector3 \&}]{node\-Vector}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_abbc82d1601b04c86a77c1719b56f92b4}
+Is the given vector a node anywhere in this rigid body? 
+\begin{DoxyRetVals}{Return values}
+{\em true} & if node\-Vector is a node anywhere in this rigid body \\
+\hline
+{\em false} & if node\-Vector is not a node anywhere in this rigid body \\
+\hline
+\end{DoxyRetVals}
+
+
+Implemented in \hyperlink{classtg_rod_info_abcd658cb529d023d27f5a1943a69fd0e}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a3c82d68ac0347f3a584c2628fdb825cc}{tg\-Compound\-Rigid\-Info}.
+
+\hypertarget{classtg_rigid_info_afadf95cbc744d14eb8bdb00a5498fbbb}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Center\-Of\-Mass@{get\-Center\-Of\-Mass}}
+\index{get\-Center\-Of\-Mass@{get\-Center\-Of\-Mass}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Center\-Of\-Mass}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Vector3 tg\-Rigid\-Info\-::get\-Center\-Of\-Mass (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_afadf95cbc744d14eb8bdb00a5498fbbb}
+Return the rigid body's center of mass. \begin{DoxyReturn}{Returns}
+the rigid body's center of mass. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classtg_rod_info_a5857eea8b1f79344b82860f7b693c27a}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a16b340c7766ee6fd9397bc78170fca27}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_afadf95cbc744d14eb8bdb00a5498fbbb_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_a42313c1b58d341c1d5707c105209186d}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Collision\-Shape@{get\-Collision\-Shape}}
+\index{get\-Collision\-Shape@{get\-Collision\-Shape}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Collision\-Shape}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Collision\-Shape$\ast$ tg\-Rigid\-Info\-::get\-Collision\-Shape (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a42313c1b58d341c1d5707c105209186d}
+Return a pointer to the corresponding bt\-Collision\-Shape. \begin{DoxyReturn}{Returns}
+a pointer to the corresponding bt\-Collision\-Shape 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classtg_rod_info_a96e1c559014d7ec068265b49582484a9}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a184e85ae5d52f42405e6acb80135aa9c}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_a42313c1b58d341c1d5707c105209186d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_af52e7743e7fb7ed3530cd101e464c242}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Compound@{get\-Compound}}
+\index{get\-Compound@{get\-Compound}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Compound}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf tg\-Compound\-Rigid\-Info}$\ast$ tg\-Rigid\-Info\-::get\-Compound (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_af52e7743e7fb7ed3530cd101e464c242}
+If this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info}, return a pointer to it; otherwise return N\-U\-L\-L. 
+\begin{DoxyRetVals}{Return values}
+{\em N\-U\-L\-L} & if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is not a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} \\
+\hline
+{\em the} & this pointer if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000096}{Todo}]Is this necessary? \end{DoxyRefDesc}
+
+
+Implemented in \hyperlink{classtg_rod_info_aafb7e1f895fcbb0ccda9c372d6e0e36b}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_aa3efabdcaaa73b20e8f54f0a9078e7c8}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_af52e7743e7fb7ed3530cd101e464c242_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_a87335e33b2c650447dcf644bd85e6ace}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Compound@{get\-Compound}}
+\index{get\-Compound@{get\-Compound}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Compound}]{\setlength{\rightskip}{0pt plus 5cm}virtual const {\bf tg\-Compound\-Rigid\-Info}$\ast$ tg\-Rigid\-Info\-::get\-Compound (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a87335e33b2c650447dcf644bd85e6ace}
+If this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info}, return a pointer to it; otherwise return N\-U\-L\-L. 
+\begin{DoxyRetVals}{Return values}
+{\em N\-U\-L\-L} & if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is not a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} \\
+\hline
+{\em the} & this pointer if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a \hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000097}{Todo}]Is this necessary? \end{DoxyRefDesc}
+
+
+Implemented in \hyperlink{classtg_rod_info_af30ba2b40867f337110976354fa795fd}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a7fd1daa19aaaf18b8bc4a6515ad3fe49}{tg\-Compound\-Rigid\-Info}.
+
+\hypertarget{classtg_rigid_info_a347721597db231b7eefc5b01a59346cc}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Connection\-Point@{get\-Connection\-Point}}
+\index{get\-Connection\-Point@{get\-Connection\-Point}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Connection\-Point}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Vector3 tg\-Rigid\-Info\-::get\-Connection\-Point (
+\begin{DoxyParamCaption}
+\item[{const bt\-Vector3 \&}]{reference\-Point, }
+\item[{const bt\-Vector3 \&}]{destination\-Point}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a347721597db231b7eefc5b01a59346cc}
+Add this (for determining, for instance, an edge connection point for a cylinder, a surface point on a ball, etc.) Usually the reference\-Point is something like the node at the end of a cylinder or the center point of a sphere, and the destination\-Point is a point on the other object that we'll be connecting to. In the case of a cylinder, this function might return the edge point closest to the destination\-Point.
+
+Or for an irregular surface (or any shape for that matter), you could keep a list of surface points and have this function select the closest one to the destination.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000094}{Todo}]\-: For the generic \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} implementation, allow people to provide a delegate object to find the connection point. 
+
+\-: Should this return a reference instead of a value? Possibility of change indicates a reference, but do we want to allow this to be changeable? \end{DoxyRefDesc}
+
+
+Implemented in \hyperlink{classtg_rod_info_aca23f26087d16107f258c24317b505df}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a68d3a9c0aba249e83afc987157d92205}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_a347721597db231b7eefc5b01a59346cc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_ad52c51a8d052daf9b8a8c00d80f4b9f8}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Connection\-Point@{get\-Connection\-Point}}
+\index{get\-Connection\-Point@{get\-Connection\-Point}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Connection\-Point}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Vector3 tg\-Rigid\-Info\-::get\-Connection\-Point (
+\begin{DoxyParamCaption}
+\item[{const bt\-Vector3 \&}]{reference\-Point, }
+\item[{const bt\-Vector3 \&}]{destination\-Point, }
+\item[{const double}]{rotation}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_ad52c51a8d052daf9b8a8c00d80f4b9f8}
+Virtual version of get\-Connection\-Point quietly ignores rotation information for non-\/rod objects 
+
+Reimplemented in \hyperlink{classtg_rod_info_a89e3ba148877bec946dec12a85c24eec}{tg\-Rod\-Info}.
+
+
+
+Definition at line 243 of file tg\-Rigid\-Info.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_ad52c51a8d052daf9b8a8c00d80f4b9f8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_a35b84de1b721ab94536f4313b64b84da}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Contained\-Nodes@{get\-Contained\-Nodes}}
+\index{get\-Contained\-Nodes@{get\-Contained\-Nodes}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Contained\-Nodes}]{\setlength{\rightskip}{0pt plus 5cm}virtual std\-::set$<$bt\-Vector3$>$ tg\-Rigid\-Info\-::get\-Contained\-Nodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a35b84de1b721ab94536f4313b64b84da}
+Return the set of nodes contained anywhere in the rigid body. For instance, a \hyperlink{classtg_rod}{tg\-Rod} would return a set containing its 'from' and 'to' points. 
+
+Implemented in \hyperlink{classtg_rod_info_a5f180833f6936b33001e5ed082bf7876}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_ae2cd4e778a173251232f257467a84a17}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_a35b84de1b721ab94536f4313b64b84da_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_ad1d699be1d892fac10575f7dd1d1d6de}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Leaf\-Rigids@{get\-Leaf\-Rigids}}
+\index{get\-Leaf\-Rigids@{get\-Leaf\-Rigids}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Leaf\-Rigids}]{\setlength{\rightskip}{0pt plus 5cm}virtual std\-::set$<${\bf tg\-Rigid\-Info}$\ast$$>$ tg\-Rigid\-Info\-::get\-Leaf\-Rigids (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_ad1d699be1d892fac10575f7dd1d1d6de}
+Return a set of all non-\/compound \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} objects in the \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} tree. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000098}{Todo}]This function can't be const unless the return value is std\-::set$<$const tg\-Rigid\-Info$\ast$$>$. \end{DoxyRefDesc}
+
+
+Implemented in \hyperlink{classtg_rod_info_ad35a38bd39a06c1c1e592451a7178885}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a253b7389913caff94baa2a34150d1171}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_ad1d699be1d892fac10575f7dd1d1d6de_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_ae0e3f72c6dc4fd1e852ca9d27935bbe2}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Mass@{get\-Mass}}
+\index{get\-Mass@{get\-Mass}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Mass}]{\setlength{\rightskip}{0pt plus 5cm}virtual double tg\-Rigid\-Info\-::get\-Mass (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_ae0e3f72c6dc4fd1e852ca9d27935bbe2}
+Return the rigid body's mass. \begin{DoxyReturn}{Returns}
+the rigid bddy's mass 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classtg_rod_info_a6483466479b4d6a54634103e7d555884}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a2989775971a4723c170c6d8c982f28f8}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_ae0e3f72c6dc4fd1e852ca9d27935bbe2_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_aa729160748dca4c89bc4dcb84e357c4f}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Rigid\-Body@{get\-Rigid\-Body}}
+\index{get\-Rigid\-Body@{get\-Rigid\-Body}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Rigid\-Body}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Rigid\-Body$\ast$ tg\-Rigid\-Info\-::get\-Rigid\-Body (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_aa729160748dca4c89bc4dcb84e357c4f}
+Return a pointer to the corresponding bt\-Rigid\-Body. \begin{DoxyReturn}{Returns}
+a pointer to the corresponding bt\-Rigid\-Body 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classtg_compound_rigid_info_a910b05d8a902d57d143522b7769114ca}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Definition at line 174 of file tg\-Rigid\-Info.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{classtg_rigid_info_aa729160748dca4c89bc4dcb84e357c4f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_af5f63cc39e1d34cd9190f9c1e2bb752b}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Rigid\-Body@{get\-Rigid\-Body}}
+\index{get\-Rigid\-Body@{get\-Rigid\-Body}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Rigid\-Body}]{\setlength{\rightskip}{0pt plus 5cm}virtual const bt\-Rigid\-Body$\ast$ tg\-Rigid\-Info\-::get\-Rigid\-Body (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_af5f63cc39e1d34cd9190f9c1e2bb752b}
+Return a const pointer to the corresponding bt\-Rigid\-Body. \begin{DoxyReturn}{Returns}
+a pointer to the corresponding bt\-Rigid\-Body 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classtg_compound_rigid_info_a81581bcc603c96ee81fb4d18de7e07d8}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Definition at line 183 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_a1a0d5dcdb3794c8772abd8d93a646e54}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Rigid\-Info\-Group@{get\-Rigid\-Info\-Group}}
+\index{get\-Rigid\-Info\-Group@{get\-Rigid\-Info\-Group}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Rigid\-Info\-Group}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf tg\-Rigid\-Info}$\ast$ tg\-Rigid\-Info\-::get\-Rigid\-Info\-Group (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_a1a0d5dcdb3794c8772abd8d93a646e54}
+Get the \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} that represents the compound rigid that this rigid belongs to. If it doesn't share nodes with any other rigids (determined during auto-\/compounding), it will point to itself. 
+
+Definition at line 151 of file tg\-Rigid\-Info.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_a1a0d5dcdb3794c8772abd8d93a646e54_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_a18546401332c62360d28225594129f60}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!get\-Transform@{get\-Transform}}
+\index{get\-Transform@{get\-Transform}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{get\-Transform}]{\setlength{\rightskip}{0pt plus 5cm}virtual bt\-Transform tg\-Rigid\-Info\-::get\-Transform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a18546401332c62360d28225594129f60}
+Return a bt\-Transform. \begin{DoxyReturn}{Returns}
+a bt\-Transform 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classtg_rod_info_a24abe5478302164d03c2bcbd524db85d}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a3e0f704bd270a36d9abbf4b70662daf2}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_a18546401332c62360d28225594129f60_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!is\-Compound@{is\-Compound}}
+\index{is\-Compound@{is\-Compound}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{is\-Compound}]{\setlength{\rightskip}{0pt plus 5cm}bool tg\-Rigid\-Info\-::is\-Compound (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51}
+Is this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} a compound? 
+\begin{DoxyRetVals}{Return values}
+{\em true} & if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is a compound \\
+\hline
+{\em false} & if this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} is not a compound \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000095}{Todo}]Is this necessary? \end{DoxyRefDesc}
+
+
+Definition at line 256 of file tg\-Rigid\-Info.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_rigid_info_a8b6d9ed5609dad929593f6f7f82d3f92}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!set\-Collision\-Shape@{set\-Collision\-Shape}}
+\index{set\-Collision\-Shape@{set\-Collision\-Shape}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{set\-Collision\-Shape}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Rigid\-Info\-::set\-Collision\-Shape (
+\begin{DoxyParamCaption}
+\item[{bt\-Collision\-Shape $\ast$}]{p\-\_\-bt\-Collision\-Shape}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_rigid_info_a8b6d9ed5609dad929593f6f7f82d3f92}
+Set the corresponding bt\-Collision\-Shape. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em a} & pointer to a bt\-Collision\-Shape \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000092}{Todo}]Does this leak any previous value of m\-\_\-collision\-Shape? \end{DoxyRefDesc}
+
+
+Definition at line 139 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_a6a27b3d380b20c36a1c41392b7f6e2be}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!set\-Rigid\-Body@{set\-Rigid\-Body}}
+\index{set\-Rigid\-Body@{set\-Rigid\-Body}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{set\-Rigid\-Body}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tg\-Rigid\-Info\-::set\-Rigid\-Body (
+\begin{DoxyParamCaption}
+\item[{bt\-Rigid\-Body $\ast$}]{rigid\-Body}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_a6a27b3d380b20c36a1c41392b7f6e2be}
+Set the corresponding bt\-Rigid\-Body. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em a} & pointer to a bt\-Rigid\-Body \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000093}{Todo}]Does this leak any previous value of m\-\_\-rigid\-Body? \end{DoxyRefDesc}
+
+
+Reimplemented in \hyperlink{classtg_compound_rigid_info_a9eab038d880498b14bf0229eca28b933}{tg\-Compound\-Rigid\-Info}.
+
+
+
+Definition at line 191 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_ad8a4b26de8d647ff945076dfc03e709f}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!set\-Rigid\-Info\-Group@{set\-Rigid\-Info\-Group}}
+\index{set\-Rigid\-Info\-Group@{set\-Rigid\-Info\-Group}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{set\-Rigid\-Info\-Group}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tg\-Rigid\-Info\-::set\-Rigid\-Info\-Group (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Rigid\-Info} $\ast$}]{rigid\-Info\-Group}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_rigid_info_ad8a4b26de8d647ff945076dfc03e709f}
+Set the \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} that represents the compound rigid that this may belong to. This will be set during auto-\/compounding. 
+
+Definition at line 165 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_a9c3c7d1827ffd68214f76a1b19278a9b}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!shares\-Nodes\-With@{shares\-Nodes\-With}}
+\index{shares\-Nodes\-With@{shares\-Nodes\-With}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{shares\-Nodes\-With}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool tg\-Rigid\-Info\-::shares\-Nodes\-With (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Rigid\-Info} \&}]{other}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_rigid_info_a9c3c7d1827ffd68214f76a1b19278a9b}
+Does this \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} have any nodes in common with the given \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} object? 
+\begin{DoxyParams}{Parameters}
+{\em in\mbox{]}} & other a reference to a \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} object \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em true} & if any node in this rigid body is also in other \\
+\hline
+{\em false} & if no node in this rigid body is also in other \\
+\hline
+\end{DoxyRetVals}
+
+
+Implemented in \hyperlink{classtg_rod_info_aaeb0b149e81d3ff85f191b913889e54f}{tg\-Rod\-Info}, and \hyperlink{classtg_compound_rigid_info_a372bf800b5f126b5347acb109b3bba53}{tg\-Compound\-Rigid\-Info}.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classtg_rigid_info_a8a1c3ca00fe917c90d035e2ac101d4b1}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!m\-\_\-collision\-Shape@{m\-\_\-collision\-Shape}}
+\index{m\-\_\-collision\-Shape@{m\-\_\-collision\-Shape}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{m\-\_\-collision\-Shape}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Collision\-Shape$\ast$ tg\-Rigid\-Info\-::m\-\_\-collision\-Shape\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [protected]}}}\label{classtg_rigid_info_a8a1c3ca00fe917c90d035e2ac101d4b1}
+A pointer to the corresponding bt\-Collision\-Shape. 
+
+Definition at line 316 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_ab6e331d7cb329704f24a069ff3c309f3}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!m\-\_\-rigid\-Body@{m\-\_\-rigid\-Body}}
+\index{m\-\_\-rigid\-Body@{m\-\_\-rigid\-Body}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{m\-\_\-rigid\-Body}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Rigid\-Body$\ast$ tg\-Rigid\-Info\-::m\-\_\-rigid\-Body\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [protected]}}}\label{classtg_rigid_info_ab6e331d7cb329704f24a069ff3c309f3}
+A pointer to the corresponding bt\-Rigid\-Body. 
+
+Definition at line 330 of file tg\-Rigid\-Info.\-h.
+
+\hypertarget{classtg_rigid_info_a410205a69125205c4d63883e1fcfb0ae}{\index{tg\-Rigid\-Info@{tg\-Rigid\-Info}!m\-\_\-rigid\-Info\-Group@{m\-\_\-rigid\-Info\-Group}}
+\index{m\-\_\-rigid\-Info\-Group@{m\-\_\-rigid\-Info\-Group}!tgRigidInfo@{tg\-Rigid\-Info}}
+\subsubsection[{m\-\_\-rigid\-Info\-Group}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tg\-Rigid\-Info}$\ast$ tg\-Rigid\-Info\-::m\-\_\-rigid\-Info\-Group\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [protected]}}}\label{classtg_rigid_info_a410205a69125205c4d63883e1fcfb0ae}
+A pointer to a group of rigids to which this rigid belongs. This is set during the rigid grouping step by a Structure\-Info. If this is not set, get\-Rigid\-Group() will return a pointer to this (effectively, \char`\"{}\-I'm in my own group\char`\"{}) 
+
+Definition at line 325 of file tg\-Rigid\-Info.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+tgcreator/\hyperlink{tg_rigid_info_8h}{tg\-Rigid\-Info.\-h}\item 
+tgcreator/\hyperlink{tg_rigid_info_8cpp}{tg\-Rigid\-Info.\-cpp}\end{DoxyCompactItemize}

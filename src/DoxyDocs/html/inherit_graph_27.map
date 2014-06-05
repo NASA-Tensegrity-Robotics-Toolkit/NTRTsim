@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classtg_ground.html" title="tgGround" alt="" coords="5,5,80,35"/>
+<area shape="rect" id="node3" href="$classtg_bullet_ground.html" title="tgBulletGround" alt="" coords="129,5,236,35"/>
+<area shape="rect" id="node5" href="$classtg_box_ground.html" title="tgBoxGround" alt="" coords="285,5,384,35"/>
+</map>

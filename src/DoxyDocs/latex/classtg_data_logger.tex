@@ -1,0 +1,140 @@
+\hypertarget{classtg_data_logger}{\section{tg\-Data\-Logger Class Reference}
+\label{classtg_data_logger}\index{tg\-Data\-Logger@{tg\-Data\-Logger}}
+}
+
+
+{\ttfamily \#include $<$tg\-Data\-Logger.\-h$>$}
+
+
+
+Inheritance diagram for tg\-Data\-Logger\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classtg_data_logger__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-Data\-Logger\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classtg_data_logger__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_data_logger_a39ca32d94ea527d036abb1ce7e040c9c}{{\bfseries tg\-Data\-Logger} (std\-::string file\-Name)}\label{classtg_data_logger_a39ca32d94ea527d036abb1ce7e040c9c}
+
+\item 
+virtual \hyperlink{classtg_data_logger_a21ad9fe3bc23f2a399b0a550bee4903c}{$\sim$tg\-Data\-Logger} ()
+\item 
+virtual void \hyperlink{classtg_data_logger_a652669e28cc1dcabe210432ca0b30634}{render} (const \hyperlink{classtg_rod}{tg\-Rod} \&rod) const 
+\item 
+virtual void \hyperlink{classtg_data_logger_a5435257fbe4d09ee862e83bda229f8da}{render} (const \hyperlink{classtg_linear_string}{tg\-Linear\-String} \&linear\-String) const 
+\item 
+virtual void \hyperlink{classtg_data_logger_a3411a932558d43846b6b991d52b1afdf}{render} (const \hyperlink{classtg_model}{tg\-Model} \&model) const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Interface for Data Logger. 
+
+Definition at line 49 of file tg\-Data\-Logger.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_data_logger_a21ad9fe3bc23f2a399b0a550bee4903c}{\index{tg\-Data\-Logger@{tg\-Data\-Logger}!$\sim$tg\-Data\-Logger@{$\sim$tg\-Data\-Logger}}
+\index{$\sim$tg\-Data\-Logger@{$\sim$tg\-Data\-Logger}!tgDataLogger@{tg\-Data\-Logger}}
+\subsubsection[{$\sim$tg\-Data\-Logger}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Data\-Logger\-::$\sim$tg\-Data\-Logger (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_data_logger_a21ad9fe3bc23f2a399b0a550bee4903c}
+Virtual base classes must have a virtual destructor. 
+
+Definition at line 40 of file tg\-Data\-Logger.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_data_logger_a652669e28cc1dcabe210432ca0b30634}{\index{tg\-Data\-Logger@{tg\-Data\-Logger}!render@{render}}
+\index{render@{render}!tgDataLogger@{tg\-Data\-Logger}}
+\subsubsection[{render}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Data\-Logger\-::render (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Rod} \&}]{rod}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_data_logger_a652669e28cc1dcabe210432ca0b30634}
+Render a \hyperlink{classtg_rod}{tg\-Rod}. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rod} & a const reference to a \hyperlink{classtg_rod}{tg\-Rod} to render \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_model_visitor_a69d056cf31bb4eeef03c243a86f59cc1}{tg\-Model\-Visitor}.
+
+
+
+Definition at line 44 of file tg\-Data\-Logger.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classtg_data_logger_a652669e28cc1dcabe210432ca0b30634_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_data_logger_a5435257fbe4d09ee862e83bda229f8da}{\index{tg\-Data\-Logger@{tg\-Data\-Logger}!render@{render}}
+\index{render@{render}!tgDataLogger@{tg\-Data\-Logger}}
+\subsubsection[{render}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Data\-Logger\-::render (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Linear\-String} \&}]{linear\-String}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_data_logger_a5435257fbe4d09ee862e83bda229f8da}
+Render a \hyperlink{classtg_linear_string}{tg\-Linear\-String} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em linear\-String} & a const reference to a \hyperlink{classtg_linear_string}{tg\-Linear\-String} to log data \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_model_visitor_a2f48f15116ed7e28162ca154efcde403}{tg\-Model\-Visitor}.
+
+
+
+Definition at line 59 of file tg\-Data\-Logger.\-cpp.
+
+\hypertarget{classtg_data_logger_a3411a932558d43846b6b991d52b1afdf}{\index{tg\-Data\-Logger@{tg\-Data\-Logger}!render@{render}}
+\index{render@{render}!tgDataLogger@{tg\-Data\-Logger}}
+\subsubsection[{render}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Data\-Logger\-::render (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Model} \&}]{m}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_data_logger_a3411a932558d43846b6b991d52b1afdf}
+Render a \hyperlink{classtg_model}{tg\-Model}. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em model} & a const reference to a \hyperlink{classtg_model}{tg\-Model} to render. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classtg_model_visitor_ac8567b6bbe2c62ddc44c11136502261b}{tg\-Model\-Visitor}.
+
+
+
+Definition at line 71 of file tg\-Data\-Logger.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+sensors/\hyperlink{tg_data_logger_8h}{tg\-Data\-Logger.\-h}\item 
+sensors/\hyperlink{tg_data_logger_8cpp}{tg\-Data\-Logger.\-cpp}\end{DoxyCompactItemize}

@@ -1,0 +1,71 @@
+\hypertarget{_c_p_g_node_8h}{\section{util/\-C\-P\-G\-Node.h File Reference}
+\label{_c_p_g_node_8h}\index{util/\-C\-P\-G\-Node.\-h@{util/\-C\-P\-G\-Node.\-h}}
+}
+
+
+Definition of class \hyperlink{class_c_p_g_node}{C\-P\-G\-Node}.  
+
+
+{\ttfamily \#include $<$algorithm$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$assert.\-h$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include \char`\"{}C\-P\-G\-Edge.\-h\char`\"{}}\\*
+This graph shows which files directly or indirectly include this file\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{_c_p_g_node_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_c_p_g_node}{C\-P\-G\-Node}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::ostream \& \hyperlink{_c_p_g_node_8h_a4630a34253957d5b37b5e211cb2a6397}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} \&obj)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definition of class \hyperlink{class_c_p_g_node}{C\-P\-G\-Node}. \begin{DoxyDate}{Date}
+March 2014 
+\end{DoxyDate}
+\begin{DoxyAuthor}{Author}
+Brian Tietz \$\-Id\$ 
+\end{DoxyAuthor}
+
+
+Definition in file \hyperlink{_c_p_g_node_8h_source}{C\-P\-G\-Node.\-h}.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{_c_p_g_node_8h_a4630a34253957d5b37b5e211cb2a6397}{\index{C\-P\-G\-Node.\-h@{C\-P\-G\-Node.\-h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!CPGNode.h@{C\-P\-G\-Node.\-h}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::ostream\& operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{std\-::ostream \&}]{os, }
+\item[{const {\bf C\-P\-G\-Node} \&}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{_c_p_g_node_8h_a4630a34253957d5b37b5e211cb2a6397}
+Overload \hyperlink{tg_model_8cpp_a2a689ee3da32701c6ee9352145507f66}{operator$<$$<$()} to handle \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em os} & an ostream \\
+\hline
+\mbox{\tt in}  & {\em a} & reference to a \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+os 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000119}{Todo}]Inlining this does no good; stream operations are slow. \end{DoxyRefDesc}
+
+
+Definition at line 135 of file C\-P\-G\-Node.\-h.
+

@@ -1,0 +1,377 @@
+
+\begin{DoxyRefList}
+\item[\label{todo__todo000031}%
+\hypertarget{todo__todo000031}{}%
+Member \hyperlink{class_base_spine_c_p_g_control_aa209e0699b3dfc5889c6084409be4d20}{Base\-Spine\-C\-P\-G\-Control\-:\-:on\-Teardown} (\hyperlink{class_base_spine_model_learning}{Base\-Spine\-Model\-Learning} \&subject)]-\/ consolidate with other controller classes. 
+
+-\/ return length scale as a parameter 
+
+-\/ return length scale as a parameter  
+\item[\label{todo__todo000030}%
+\hypertarget{todo__todo000030}{}%
+Member \hyperlink{class_base_spine_c_p_g_control_a4f54eecdac3f19693752a77a8668f119}{Base\-Spine\-C\-P\-G\-Control\-:\-:setup\-C\-P\-Gs} (\hyperlink{class_base_spine_model_learning}{Base\-Spine\-Model\-Learning} \&subject, array\-\_\-2\-D node\-Actions, array\-\_\-4\-D edge\-Actions)]\-: redo with for\-\_\-each  
+\item[\label{todo__todo000042}%
+\hypertarget{todo__todo000042}{}%
+Member \hyperlink{class_contact_test_model_a9bebeeb19f836cb456aa187a76015675}{Contact\-Test\-Model\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000117}%
+\hypertarget{todo__todo000117}{}%
+Member \hyperlink{class_c_p_g_equations_a99b42aef759c8915005352aba8ff6fbe}{C\-P\-G\-Equations\-:\-:define\-Connections} (int node\-Index, std\-::vector$<$ int $>$ connections, std\-::vector$<$ double $>$ new\-Weights, std\-::vector$<$ double $>$ new\-Phase\-Offsets)]\-: define conections which generates the connectivity\-List for connect\-Node from vectors.  
+\item[\label{todo__todo000120}%
+\hypertarget{todo__todo000120}{}%
+Member \hyperlink{class_c_p_g_node_adf85adc940fc65c55661d2c54680761b}{C\-P\-G\-Node\-:\-:C\-P\-G\-Node} (int node\-Num, const std\-::vector$<$ double $>$ \&params)]consider adding vector of initial conditions for stability  
+\item[\label{todo__todo000121}%
+\hypertarget{todo__todo000121}{}%
+Member \hyperlink{class_c_p_g_node_ad48c60bc4b025c3bb3aac740183ccac6}{C\-P\-G\-Node\-:\-:update\-D\-Ts} (double desc\-Com)]better name? 
+
+ask about refactoring to use for\-\_\-each  
+\item[\label{todo__todo000034}%
+\hypertarget{todo__todo000034}{}%
+Member \hyperlink{class_flemons_spine_model_learning_ad7d329634cf8d812bcee974a3430fcee}{Flemons\-Spine\-Model\-Learning\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]\-: reference the things that do this for us 
+
+\-: there seems to be an issue with \hyperlink{class_muscle2_p}{Muscle2\-P} connections if the front of a tetra is inside the next one. 
+
+\-: the snake is a temporary variable -- will its destructor be called? If not, where do we delete its children?  
+\item[\label{todo__todo000003}%
+\hypertarget{todo__todo000003}{}%
+Member \hyperlink{class_impedance_control_a1c4d6e99303cc3e6934658db166de7ff}{Impedance\-Control\-:\-:\-\_\-length\-Stiffness} ]Rename m\-\_\-length\-Stiffness.  
+\item[\label{todo__todo000002}%
+\hypertarget{todo__todo000002}{}%
+Member \hyperlink{class_impedance_control_a2c5a6ed274fdd9f44708c5c74c520bd7}{Impedance\-Control\-:\-:\-\_\-offset\-Tension} ]rename m\-\_\-offset\-Tension.  
+\item[\label{todo__todo000004}%
+\hypertarget{todo__todo000004}{}%
+Member \hyperlink{class_impedance_control_af5bf17d7b651e84912e666b3bc3a25e4}{Impedance\-Control\-:\-:\-\_\-vel\-Stiffness} ]Rename m\-\_\-velocity\-Stiffness.  
+\item[\label{todo__todo000001}%
+\hypertarget{todo__todo000001}{}%
+Member \hyperlink{class_impedance_control_a2fd876daa099a35a108e24d68a253382}{Impedance\-Control\-:\-:control} (\hyperlink{classtg_base_string}{tg\-Base\-String} $\ast$const m\-String, double delta\-Time\-Seconds, double new\-Position, double offset\-Vel=0)]Make m\-Muscle a reference. 
+
+should we add an offset position so it can just control??  
+\item[\label{todo__todo000051}%
+\hypertarget{todo__todo000051}{}%
+Member \hyperlink{class_j_early_model_a77fca3da35b411aaac33269b22f4cddc}{J\-Early\-Model\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000052}%
+\hypertarget{todo__todo000052}{}%
+Member \hyperlink{class_j_early_model_a0883e6fcb262de284dcca1bc91b76154}{J\-Early\-Model\-:\-:teardown} ()]Get rid of this.  
+\item[\label{todo__todo000005}%
+\hypertarget{todo__todo000005}{}%
+File \hyperlink{_muscle2_p_8cpp}{Muscle2\-P.cpp} ]Split so only one class is defined per file. \$\-Id\$  
+\item[\label{todo__todo000006}%
+\hypertarget{todo__todo000006}{}%
+File \hyperlink{_muscle2_p_8h}{Muscle2\-P.h} ]Split so only one class is defined per header file. \$\-Id\$  
+\item[\label{todo__todo000053}%
+\hypertarget{todo__todo000053}{}%
+Member \hyperlink{class_nested_spiral_spine_a87ca6b8b6482b448be5826e7fef49287}{Nested\-Spiral\-Spine\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000054}%
+\hypertarget{todo__todo000054}{}%
+Member \hyperlink{class_nested_spiral_spine_aea6ab5feee049adfb73835c848366392}{Nested\-Spiral\-Spine\-:\-:teardown} ()]Get rid of this.  
+\item[\label{todo__todo000106}%
+\hypertarget{todo__todo000106}{}%
+Member \hyperlink{tg_structure_info_8h_a9ab7cd01b53c61486c9a319ec7e62107}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_structure_info}{tg\-Structure\-Info} \&obj)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000015}%
+\hypertarget{todo__todo000015}{}%
+Member \hyperlink{tg_model_8h_a2a689ee3da32701c6ee9352145507f66}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_model}{tg\-Model} \&obj)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000082}%
+\hypertarget{todo__todo000082}{}%
+Member \hyperlink{tg_nodes_8h_a997ccdea7c3189facd4acdba444532bc}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_nodes}{tg\-Nodes} \&n)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000024}%
+\hypertarget{todo__todo000024}{}%
+Member \hyperlink{tg_tags_8h_a3135a1c3f766cd0447e091921e8e35f2}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_tags}{tg\-Tags} \&tags)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000078}%
+\hypertarget{todo__todo000078}{}%
+Member \hyperlink{tg_connector_info_8h_a0b0b1dbea568b35e9ba79033879ce756}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_connector_info}{tg\-Connector\-Info} \&n)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000080}%
+\hypertarget{todo__todo000080}{}%
+Member \hyperlink{tg_node_8h_a061685aa319efb6f9275eba40a6edbcd}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_node}{tg\-Node} \&node)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000088}%
+\hypertarget{todo__todo000088}{}%
+Member \hyperlink{tg_pair_8h_ae8e6492e87247281b154f70ff334eee9}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_pair}{tg\-Pair} \&pair)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000090}%
+\hypertarget{todo__todo000090}{}%
+Member \hyperlink{tg_pairs_8h_aa0303a85ae4164c1f2c0d3fcd4003406}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_pairs}{tg\-Pairs} \&p)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000091}%
+\hypertarget{todo__todo000091}{}%
+Member \hyperlink{tg_rigid_info_8h_a571cc463bc11aac00c2f6acc6f8b39ba}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&obj)]Inlining this does no good; stream operations are slow. 
+
+Do we need to re-\/add the collision shape for debugging?  
+\item[\label{todo__todo000116}%
+\hypertarget{todo__todo000116}{}%
+Member \hyperlink{_c_p_g_equations_8h_a5a61194729762e1b288a7e8b12d660df}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{class_c_p_g_equations}{C\-P\-G\-Equations} \&obj)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000107}%
+\hypertarget{todo__todo000107}{}%
+Member \hyperlink{tg_util_8h_ac7882eaeeb8e0c93fe08b90adcbf06ec}{operator$<$$<$} (std\-::ostream \&os, const bt\-Quaternion \&q)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000108}%
+\hypertarget{todo__todo000108}{}%
+Member \hyperlink{tg_util_8h_a7e64726736e7fafd9cd9ee046afe6b54}{operator$<$$<$} (std\-::ostream \&os, const bt\-Vector3 \&v)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000109}%
+\hypertarget{todo__todo000109}{}%
+Member \hyperlink{tg_util_8h_a800df9062cc44a651daf5d26df9dce12}{operator$<$$<$} (std\-::ostream \&os, const bt\-Transform \&xf)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000111}%
+\hypertarget{todo__todo000111}{}%
+Member \hyperlink{tg_util_8h_a4ab2e7269cf18d0d21c48f2714909ebf}{operator$<$$<$} (std\-::ostream \&os, const bt\-Collision\-Shape \&cs)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000112}%
+\hypertarget{todo__todo000112}{}%
+Member \hyperlink{tg_util_8h_a9448c6c8a7cd774cf2cd7b199277a6f1}{operator$<$$<$} (std\-::ostream \&os, const bt\-Compound\-Shape \&cs)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000115}%
+\hypertarget{todo__todo000115}{}%
+Member \hyperlink{_c_p_g_edge_8h_ae6e09f6882e751a88ce2b79e69670415}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{class_c_p_g_edge}{C\-P\-G\-Edge} \&obj)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000119}%
+\hypertarget{todo__todo000119}{}%
+Member \hyperlink{_c_p_g_node_8h_a4630a34253957d5b37b5e211cb2a6397}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} \&obj)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000110}%
+\hypertarget{todo__todo000110}{}%
+Member \hyperlink{tg_util_8h_ace7292f17ed230942b2acdc9fae321d6}{operator$<$$<$} (std\-::ostream \&os, const bt\-Rigid\-Body \&rb)]Inlining this does no good; stream operations are slow.  
+\item[\label{todo__todo000055}%
+\hypertarget{todo__todo000055}{}%
+Member \hyperlink{class_spiral_spine_a375666b36e080f35dab35ebea12117a9}{Spiral\-Spine\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000056}%
+\hypertarget{todo__todo000056}{}%
+Member \hyperlink{class_spiral_spine_a72bb17d2fabd672ae79dcd80c598303a}{Spiral\-Spine\-:\-:teardown} ()]Get rid of this.  
+\item[\label{todo__todo000058}%
+\hypertarget{todo__todo000058}{}%
+Member \hyperlink{class_structure_test_model_a74f877900f9416a6182ce51f2783463e}{Structure\-Test\-Model\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000039}%
+\hypertarget{todo__todo000039}{}%
+Member \hyperlink{class_tetra_spine_c_p_g_control_a1011f7ba6c6df843b8a7d3bd64f75ac5}{Tetra\-Spine\-C\-P\-G\-Control\-:\-:setup\-C\-P\-Gs} (\hyperlink{class_base_spine_model_learning}{Base\-Spine\-Model\-Learning} \&subject, array\-\_\-2\-D node\-Actions, array\-\_\-4\-D edge\-Actions)]\-: redo with for\-\_\-each  
+\item[\label{todo__todo000007}%
+\hypertarget{todo__todo000007}{}%
+Member \hyperlink{structtg_base_string_1_1_config_ac40c60ffadf6ea368013580a4cc907bc}{tg\-Base\-String\-:\-:Config\-:\-:Config} (double s=1000.\-0, double d=10.\-0, bool h=false, double rot=0, double mf=1000.\-0, double t\-Vel=100.\-0, double mx\-Acc=10000.\-0, double mn\-A\-L=0.\-1, double mn\-R\-L=0.\-1)]is this the right place for this, or the constructor of this class?  
+\item[\label{todo__todo000009}%
+\hypertarget{todo__todo000009}{}%
+Member \hyperlink{structtg_base_string_1_1_config_a0db6cb3d545d501cd40f2d24545e91e8}{tg\-Base\-String\-:\-:Config\-:\-:max\-Tens} ]give the motor interia, and specify more things by torque  
+\item[\label{todo__todo000008}%
+\hypertarget{todo__todo000008}{}%
+Member \hyperlink{structtg_base_string_1_1_config_adcbba0b56f674d0c38b1fc98e99e3d64}{tg\-Base\-String\-:\-:Config\-:\-:rotation} ]Is this meaningful for non-\/rod shapes?  
+\item[\label{todo__todo000010}%
+\hypertarget{todo__todo000010}{}%
+Member \hyperlink{classtg_bullet_renderer_a36638ecb277823712903573c06b77b4d}{tg\-Bullet\-Renderer\-:\-:tg\-Bullet\-Renderer} (\hyperlink{classtg_world}{tg\-World} \&world)]Make the world const.  
+\item[\label{todo__todo000012}%
+\hypertarget{todo__todo000012}{}%
+Member \hyperlink{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946}{tg\-Bullet\-Util\-:\-:world\-To\-Dynamics\-World} (\hyperlink{classtg_world}{tg\-World} \&world)]Use typeinfo to verify that this is correct.  
+\item[\label{todo__todo000069}%
+\hypertarget{todo__todo000069}{}%
+Member \hyperlink{classtg_compound_rigid_info_a4f908cf4b37888890667c941d7d2fddd}{tg\-Compound\-Rigid\-Info\-:\-:add\-Rigid} (\hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&rigid)]Get rid of this. Require all m\-\_\-rigids to be supplied in the constructor.  
+\item[\label{todo__todo000065}%
+\hypertarget{todo__todo000065}{}%
+Member \hyperlink{classtg_compound_rigid_info_a3c82d68ac0347f3a584c2628fdb825cc}{tg\-Compound\-Rigid\-Info\-:\-:contains\-Node} (const bt\-Vector3 \&node\-Vector) const ]Use std\-::find\-\_\-if()  
+\item[\label{todo__todo000070}%
+\hypertarget{todo__todo000070}{}%
+Member \hyperlink{classtg_compound_rigid_info_a16b340c7766ee6fd9397bc78170fca27}{tg\-Compound\-Rigid\-Info\-:\-:get\-Center\-Of\-Mass} () const ]Make this const here and in all base classes and derived classes. 
+
+Make rigid const when \hyperlink{classtg_compound_rigid_info_a16b340c7766ee6fd9397bc78170fca27}{tg\-Compound\-Rigid\-Info\-::get\-Center\-Of\-Mass()} is const. 
+
+If all m\-\_\-rigids are supplied in the constructor, this can be calculated in the constructor and cashed as a const member variable.  
+\item[\label{todo__todo000073}%
+\hypertarget{todo__todo000073}{}%
+Member \hyperlink{classtg_compound_rigid_info_aa3efabdcaaa73b20e8f54f0a9078e7c8}{tg\-Compound\-Rigid\-Info\-:\-:get\-Compound} ()]What is the purpose? The caller must already have the object, a reference or a pointer to be able to call this.  
+\item[\label{todo__todo000074}%
+\hypertarget{todo__todo000074}{}%
+Member \hyperlink{classtg_compound_rigid_info_a7fd1daa19aaaf18b8bc4a6515ad3fe49}{tg\-Compound\-Rigid\-Info\-:\-:get\-Compound} () const ]What is the purpose? The caller must already have the object, a reference or a pointer to be able to call this. 
+
+Add this to the base classes and derived classes.  
+\item[\label{todo__todo000067}%
+\hypertarget{todo__todo000067}{}%
+Member \hyperlink{classtg_compound_rigid_info_ae2cd4e778a173251232f257467a84a17}{tg\-Compound\-Rigid\-Info\-:\-:get\-Contained\-Nodes} () const ]Use std\-::accumulate()  
+\item[\label{todo__todo000075}%
+\hypertarget{todo__todo000075}{}%
+Member \hyperlink{classtg_compound_rigid_info_a253b7389913caff94baa2a34150d1171}{tg\-Compound\-Rigid\-Info\-:\-:get\-Leaf\-Rigids} ()]This function can't be const unless the return value is std\-::set$<$const tg\-Rigid\-Info$\ast$$>$.  
+\item[\label{todo__todo000071}%
+\hypertarget{todo__todo000071}{}%
+Member \hyperlink{classtg_compound_rigid_info_a2989775971a4723c170c6d8c982f28f8}{tg\-Compound\-Rigid\-Info\-:\-:get\-Mass} () const ]Do this in the constructor and cache the result as a member variable. 
+
+Use std\-::accumulate()  
+\item[\label{todo__todo000077}%
+\hypertarget{todo__todo000077}{}%
+Member \hyperlink{classtg_compound_rigid_info_a4131882aec347aa599442b578ac6d4e9}{tg\-Compound\-Rigid\-Info\-:\-:m\-\_\-rigids} ]Change this to std\-::set to prevent duplication. 
+
+Make this const and initialize it in the constructor.  
+\item[\label{todo__todo000072}%
+\hypertarget{todo__todo000072}{}%
+Member \hyperlink{classtg_compound_rigid_info_a9eab038d880498b14bf0229eca28b933}{tg\-Compound\-Rigid\-Info\-:\-:set\-Rigid\-Body} (bt\-Rigid\-Body $\ast$const rigid\-Body)]\hyperlink{classtg_compound_rigid_info}{tg\-Compound\-Rigid\-Info} is infected by Bullet Physics 
+
+Use std\-::for\-\_\-each()  
+\item[\label{todo__todo000076}%
+\hypertarget{todo__todo000076}{}%
+Member \hyperlink{classtg_compound_rigid_info_a372bf800b5f126b5347acb109b3bba53}{tg\-Compound\-Rigid\-Info\-:\-:shares\-Nodes\-With} (const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&other) const ]Make this const in all base classes and all derived classes. 
+
+Make other const in all base classes and all derived classes. 
+
+Use std\-::find\-\_\-if()  
+\item[\label{todo__todo000068}%
+\hypertarget{todo__todo000068}{}%
+Member \hyperlink{classtg_compound_rigid_info_aa14e89fb681677147ae38737455cb960}{tg\-Compound\-Rigid\-Info\-:\-:tg\-Compound\-Rigid\-Info} ()]Require both m\-\_\-rigid\-Body and m\-\_\-rigids to be supplied in the constructor. Initialize m\-\_\-compound\-Shape, store mass and center of mass in member variables.  
+\item[\label{todo__todo000047}%
+\hypertarget{todo__todo000047}{}%
+Member \hyperlink{classtg_c_p_g_info_a5bc9ebf51c48c38e3c079047bdfaa41f}{tg\-C\-P\-G\-Info\-:\-:add\-Control\-Info} (\hyperlink{classtg_base_c_p_g_node}{tg\-Base\-C\-P\-G\-Node} $\ast$string)]see if this can be ready for construction of the \hyperlink{classtg_model}{tg\-Model} the first time. Would require editing \hyperlink{classtg_structure_info}{tg\-Structure\-Info}  
+\item[\label{todo__todo000046}%
+\hypertarget{todo__todo000046}{}%
+Member \hyperlink{classtg_c_p_g_info_ae6196de220c88e8631b863e0d63d1d7f}{tg\-C\-P\-G\-Info\-:\-:set\-Connectivity} (\hyperlink{classtg_connector_info}{tg\-Connector\-Info} $\ast$this\-String, std\-::vector$<$ tg\-Connector\-Info $\ast$ $>$ all\-Strings, array\-\_\-4\-D edge\-Params)]can we check to make sure the strings are on the same C\-P\-G system like we used to  
+\item[\label{todo__todo000048}%
+\hypertarget{todo__todo000048}{}%
+Member \hyperlink{classtg_c_p_g_string_control_a86ba4af920798c9f6cda4bbc5b1880e0}{tg\-C\-P\-G\-String\-Control\-:\-:on\-Step} (\hyperlink{classtg_linear_string}{tg\-Linear\-String} \&subject, double dt)]this fails if its attached to multiple controllers! is there a way to track {\itshape global} time at this level  
+\item[\label{todo__todo000060}%
+\hypertarget{todo__todo000060}{}%
+Member \hyperlink{classtg_data_observer_ab875570fe88ead645d443caf00ebb2d0}{tg\-Data\-Observer\-:\-:on\-Setup} (\hyperlink{classtg_model}{tg\-Model} \&model)]move functions to constructor when possible 
+
+move functions to constructor when possible  
+\item[\label{todo__todo000013}%
+\hypertarget{todo__todo000013}{}%
+Member \hyperlink{classtg_linear_string_acb8874a75256a2d8ebd73b4c26e6396e}{tg\-Linear\-String\-:\-:tg\-Linear\-String} (\hyperlink{class_muscle2_p}{Muscle2\-P} $\ast$muscle, const \hyperlink{classtg_tags}{tg\-Tags} \&tags, \hyperlink{structtg_base_string_1_1_config}{tg\-Base\-String\-::\-Config} \&config)]move hist to config  
+\item[\label{todo__todo000079}%
+\hypertarget{todo__todo000079}{}%
+Member \hyperlink{classtg_linear_string_info_a22f715aabc4a2413e34bea9ef9f7465b}{tg\-Linear\-String\-Info\-:\-:tg\-Linear\-String\-Info} (const tg\-Linear\-String\-::\-Config \&config, const \hyperlink{classtg_pair}{tg\-Pair} \&pair)]\-: make sure that \hyperlink{classtg_pairs}{tg\-Pairs} returns references to the vectors...  
+\item[\label{todo__todo000016}%
+\hypertarget{todo__todo000016}{}%
+Member \hyperlink{classtg_model_a292c17848b96caee32b2286e44c13f2f}{tg\-Model\-:\-:add\-Child} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Child)]Make sure that every child appears no more than once in the tree.  
+\item[\label{todo__todo000017}%
+\hypertarget{todo__todo000017}{}%
+Member \hyperlink{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{tg\-Model\-:\-:get\-Descendants} () const ]examine whether this should be public, and perhaps create a read only version 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step. 
+
+Unnecessary copying can be avoided by pasing the result collection in the recursive step.  
+\item[\label{todo__todo000081}%
+\hypertarget{todo__todo000081}{}%
+Class \hyperlink{classtg_nodes}{tg\-Nodes} ]\-: move operator\mbox{[}\mbox{]} out of \hyperlink{classtg_taggables}{tg\-Taggables} into here  
+\item[\label{todo__todo000083}%
+\hypertarget{todo__todo000083}{}%
+Member \hyperlink{classtg_nodes_aa63a138ca633becefe3bc6f64bc93520}{tg\-Nodes\-:\-:add\-Node} (const bt\-Vector3 \&node)]If node is already a value in the map, return its key.  
+\item[\label{todo__todo000084}%
+\hypertarget{todo__todo000084}{}%
+Member \hyperlink{classtg_nodes_a9f28fa971610f4ee16264de703a74386}{tg\-Nodes\-:\-:add\-Node} (double x, double y, double z)]If node is already a value in the map, return its index.  
+\item[\label{todo__todo000085}%
+\hypertarget{todo__todo000085}{}%
+Member \hyperlink{classtg_nodes_a9375dc4de8bcf20b49efae0a26e4f3af}{tg\-Nodes\-:\-:move} (const bt\-Vector3 \&offset)]use std\-::for\-\_\-each()  
+\item[\label{todo__todo000087}%
+\hypertarget{todo__todo000087}{}%
+Class \hyperlink{classtg_pair}{tg\-Pair} ]Replace with \char`\"{}typedef tg\-Pair std\-::pair$<$bt\-Vector3$\ast$, bt\-Vector3$\ast$$>$;\char`\"{}  
+\item[\label{todo__todo000089}%
+\hypertarget{todo__todo000089}{}%
+Member \hyperlink{classtg_pair_abc00b76d5026561c5cf8025cfe77520f}{tg\-Pair\-:\-:tg\-Pair} (bt\-Vector3 from, bt\-Vector3 to)]Is it O\-K for from == to, either the same object or the same value? 
+
+Is it O\-K for from == to, either the same object or the same value?  
+\item[\label{todo__todo000049}%
+\hypertarget{todo__todo000049}{}%
+Member \hyperlink{structtg_r_b_string_1_1_config_a599e7c66d595cbb500ad71722660d092}{tg\-R\-B\-String\-:\-:Config\-:\-:Config} ()]remove this  
+\item[\label{todo__todo000050}%
+\hypertarget{todo__todo000050}{}%
+Member \hyperlink{classtg_r_b_string_a57298f001da09ec54a717033713a788b}{tg\-R\-B\-String\-:\-:setup} (\hyperlink{classtg_world}{tg\-World} \&world)]Get rid of this.  
+\item[\label{todo__todo000096}%
+\hypertarget{todo__todo000096}{}%
+Member \hyperlink{classtg_rigid_info_af52e7743e7fb7ed3530cd101e464c242}{tg\-Rigid\-Info\-:\-:get\-Compound} ()=0]Is this necessary?  
+\item[\label{todo__todo000097}%
+\hypertarget{todo__todo000097}{}%
+Member \hyperlink{classtg_rigid_info_a87335e33b2c650447dcf644bd85e6ace}{tg\-Rigid\-Info\-:\-:get\-Compound} () const =0]Is this necessary?  
+\item[\label{todo__todo000094}%
+\hypertarget{todo__todo000094}{}%
+Member \hyperlink{classtg_rigid_info_a347721597db231b7eefc5b01a59346cc}{tg\-Rigid\-Info\-:\-:get\-Connection\-Point} (const bt\-Vector3 \&reference\-Point, const bt\-Vector3 \&destination\-Point) const =0]\-: For the generic \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} implementation, allow people to provide a delegate object to find the connection point. 
+
+\-: Should this return a reference instead of a value? Possibility of change indicates a reference, but do we want to allow this to be changeable?  
+\item[\label{todo__todo000098}%
+\hypertarget{todo__todo000098}{}%
+Member \hyperlink{classtg_rigid_info_ad1d699be1d892fac10575f7dd1d1d6de}{tg\-Rigid\-Info\-:\-:get\-Leaf\-Rigids} ()=0]This function can't be const unless the return value is std\-::set$<$const tg\-Rigid\-Info$\ast$$>$.  
+\item[\label{todo__todo000095}%
+\hypertarget{todo__todo000095}{}%
+Member \hyperlink{classtg_rigid_info_aa20950230ff2c3346af0629e1ecd0f51}{tg\-Rigid\-Info\-:\-:is\-Compound} () const ]Is this necessary?  
+\item[\label{todo__todo000092}%
+\hypertarget{todo__todo000092}{}%
+Member \hyperlink{classtg_rigid_info_a8b6d9ed5609dad929593f6f7f82d3f92}{tg\-Rigid\-Info\-:\-:set\-Collision\-Shape} (bt\-Collision\-Shape $\ast$p\-\_\-bt\-Collision\-Shape)]Does this leak any previous value of m\-\_\-collision\-Shape?  
+\item[\label{todo__todo000093}%
+\hypertarget{todo__todo000093}{}%
+Member \hyperlink{classtg_rigid_info_a6a27b3d380b20c36a1c41392b7f6e2be}{tg\-Rigid\-Info\-:\-:set\-Rigid\-Body} (bt\-Rigid\-Body $\ast$rigid\-Body)]Does this leak any previous value of m\-\_\-rigid\-Body?  
+\item[\label{todo__todo000102}%
+\hypertarget{todo__todo000102}{}%
+Member \hyperlink{classtg_rod_info_ad35a38bd39a06c1c1e592451a7178885}{tg\-Rod\-Info\-:\-:get\-Leaf\-Rigids} ()]This function can't be const unless the return value is std\-::set$<$const tg\-Rigid\-Info$\ast$$>$.  
+\item[\label{todo__todo000101}%
+\hypertarget{todo__todo000101}{}%
+Member \hyperlink{classtg_rod_info_a9de55488229d7533834d9b67c8a9562c}{tg\-Rod\-Info\-:\-:init\-Rigid\-Body} (\hyperlink{classtg_world}{tg\-World} \&world)]come up with a general solution in tg\-Rigid\-Info\-::init\-Rigid\-Body Currently very difficult to pass around the config file in \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info}, since  
+\item[\label{todo__todo000103}%
+\hypertarget{todo__todo000103}{}%
+Member \hyperlink{classtg_rod_info_aaeb0b149e81d3ff85f191b913889e54f}{tg\-Rod\-Info\-:\-:shares\-Nodes\-With} (const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&other) const ]\-: Move this to \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} Does this rod have any nodes in common with the given \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} object?  
+\item[\label{todo__todo000099}%
+\hypertarget{todo__todo000099}{}%
+Member \hyperlink{classtg_rod_info_aa16ec8cde5912ea0f91e25c9fd2e3228}{tg\-Rod\-Info\-:\-:tg\-Rod\-Info} (const \hyperlink{structtg_rod_1_1_config}{tg\-Rod\-::\-Config} \&config, const \hyperlink{classtg_pair}{tg\-Pair} \&pair)]\-: make sure that \hyperlink{classtg_pairs}{tg\-Pairs} returns references to the vectors...  
+\item[\label{todo__todo000100}%
+\hypertarget{todo__todo000100}{}%
+Member \hyperlink{classtg_rod_info_a1988041b7d13e40f46c365bd27f68e73}{tg\-Rod\-Info\-:\-:tg\-Rod\-Info} (const \hyperlink{structtg_rod_1_1_config}{tg\-Rod\-::\-Config} \&config, \hyperlink{classtg_tags}{tg\-Tags} tags, const \hyperlink{classtg_pair}{tg\-Pair} \&pair)]\-: make sure that \hyperlink{classtg_pairs}{tg\-Pairs} returns references to the vectors...  
+\item[\label{todo__todo000019}%
+\hypertarget{todo__todo000019}{}%
+Member \hyperlink{classtg_simulation_a23caf4331a3006bdc9df595756c0cc5c}{tg\-Simulation\-:\-:add\-Model} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Model)]Model pointer can't be N\-U\-L\-L.  
+\item[\label{todo__todo000018}%
+\hypertarget{todo__todo000018}{}%
+Member \hyperlink{classtg_simulation_aee97eee2bd59defdb36ef34715b8abb9}{tg\-Simulation\-:\-:run} (int steps) const ]Make steps of type size\-\_\-t.  
+\item[\label{todo__todo000021}%
+\hypertarget{todo__todo000021}{}%
+Member \hyperlink{classtg_sim_view_ae0154bfc6695adbc59116c1455e968e9}{tg\-Sim\-View\-:\-:is\-Initialzed} () const ]Get rid of this.  
+\item[\label{todo__todo000023}%
+\hypertarget{todo__todo000023}{}%
+Member \hyperlink{classtg_sim_view_graphics_a564f833afe40bf7763bcf682098b043e}{tg\-Sim\-View\-Graphics\-:\-:setup} ()]Can this pointer become invalid if a reset occurs?  
+\item[\label{todo__todo000022}%
+\hypertarget{todo__todo000022}{}%
+Member \hyperlink{classtg_sim_view_graphics_aafb23490336341d08679b10a7a239a2b}{tg\-Sim\-View\-Graphics\-:\-:tg\-Sim\-View\-Graphics} (\hyperlink{classtg_world}{tg\-World} \&world, double step\-Size=1.\-0/120.0, double render\-Rate=1.\-0/60.0)]figure out a good time to delete this  
+\item[\label{todo__todo000104}%
+\hypertarget{todo__todo000104}{}%
+Member \hyperlink{classtg_structure_a6e5d932f321fbe791c36430ec6a9f469}{tg\-Structure\-:\-:add\-Child} (\hyperlink{classtg_structure}{tg\-Structure} $\ast$child)]\-: check to make sure we don't already have one of these structures (what does that mean?)  
+\item[\label{todo__todo000105}%
+\hypertarget{todo__todo000105}{}%
+Member \hyperlink{classtg_structure_aaab3aeae354efdb63ab40acdb7bf3553}{tg\-Structure\-:\-:add\-Rotation} (const bt\-Vector3 \&fixed\-Point, const bt\-Vector3 \&axis, double angle)]add rotate functionality  
+\item[\label{todo__todo000114}%
+\hypertarget{todo__todo000114}{}%
+Member \hyperlink{classtg_util_a84689e1db28a5d63f157e628e137415c}{tg\-Util\-:\-:deg2rad} (double degrees)]Normalize the return value so that it is in \mbox{[}0.\-0, 2 $\ast$ pi).  
+\item[\label{todo__todo000113}%
+\hypertarget{todo__todo000113}{}%
+Member \hyperlink{classtg_util_ad4c52698d54e566e5b8f5d87677bd92a}{tg\-Util\-:\-:rad2deg} (double radians)]Normalize the return value so that it is in \mbox{[}0.\-0, 360.\-0).  
+\item[\label{todo__todo000028}%
+\hypertarget{todo__todo000028}{}%
+Member \hyperlink{classtg_world_aaf344a85c8ae0b3b90b201b37c8a2a57}{tg\-World\-:\-:tg\-World} (const Config \&config)]I couldn't find a way to give config a default value. 
+
+Use the factory method design pattern to create the m\-\_\-p\-Impl object.  
+\item[\label{todo__todo000029}%
+\hypertarget{todo__todo000029}{}%
+Member \hyperlink{classtg_world_a015dcc7c703a957e5ec15b64364f5991}{tg\-World\-:\-:tg\-World} (const Config \&config, \hyperlink{classtg_ground}{tg\-Ground} $\ast$ground)]can we make the ground const? 
+
+Use the factory method design pattern to create the m\-\_\-p\-Impl object.  
+\item[\label{todo__todo000025}%
+\hypertarget{todo__todo000025}{}%
+Member \hyperlink{classtg_world_af71f7c0c5516173079cb3c7e8b28e015}{tg\-World\-:\-:tg\-World} ()]Use the factory method design pattern to create the m\-\_\-p\-Impl object. 
+\end{DoxyRefList}

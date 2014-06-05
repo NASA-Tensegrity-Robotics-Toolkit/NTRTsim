@@ -1,0 +1,118 @@
+\hypertarget{class_nested_structure_controller}{\section{Nested\-Structure\-Controller Class Reference}
+\label{class_nested_structure_controller}\index{Nested\-Structure\-Controller@{Nested\-Structure\-Controller}}
+}
+
+
+Inheritance diagram for Nested\-Structure\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{class_nested_structure_controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Nested\-Structure\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{class_nested_structure_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_nested_structure_controller_a44adc42c16fbeadbfa169dd71b796daa}{virtual void {\bfseries on\-Step} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} $\ast$subject, double dt)}\label{class_nested_structure_controller_a44adc42c16fbeadbfa169dd71b796daa}
+
+\item 
+virtual void \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{on\-Step} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject, double dt)=0
+\item 
+virtual void \hyperlink{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{on\-Attach} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{on\-Setup} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{on\-Teardown} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 28 of file Nested\-Structure\-Controller.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{\index{Nested\-Structure\-Controller@{Nested\-Structure\-Controller}!on\-Attach@{on\-Attach}}
+\index{on\-Attach@{on\-Attach}!NestedStructureController@{Nested\-Structure\-Controller}}
+\subsubsection[{on\-Attach}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Attach (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}
+Notify the observers when an attach action has occurred. Will only occur once, typically before setup 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 54 of file tg\-Observer.\-h.
+
+\hypertarget{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{\index{Nested\-Structure\-Controller@{Nested\-Structure\-Controller}!on\-Setup@{on\-Setup}}
+\index{on\-Setup@{on\-Setup}!NestedStructureController@{Nested\-Structure\-Controller}}
+\subsubsection[{on\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Setup (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}
+Notify the observers when a setup action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 60 of file tg\-Observer.\-h.
+
+\hypertarget{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{\index{Nested\-Structure\-Controller@{Nested\-Structure\-Controller}!on\-Step@{on\-Step}}
+\index{on\-Step@{on\-Step}!NestedStructureController@{Nested\-Structure\-Controller}}
+\subsubsection[{on\-Step}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Step (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}
+Notify the observers when a step action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\mbox{\tt in}  & {\em the} & number of seconds since the previous call; must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190}{Nested\-Structure\-Sine\-Waves}.
+
+\hypertarget{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{\index{Nested\-Structure\-Controller@{Nested\-Structure\-Controller}!on\-Teardown@{on\-Teardown}}
+\index{on\-Teardown@{on\-Teardown}!NestedStructureController@{Nested\-Structure\-Controller}}
+\subsubsection[{on\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Teardown (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}
+Notify the observers when a teardown action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 66 of file tg\-Observer.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/tests/Nested\-Structure\-Controller.\-h\item 
+dev/tests/Nested\-Structure\-Controller.\-cpp\end{DoxyCompactItemize}

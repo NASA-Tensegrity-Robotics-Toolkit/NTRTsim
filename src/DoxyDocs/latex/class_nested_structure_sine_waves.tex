@@ -1,0 +1,252 @@
+\hypertarget{class_nested_structure_sine_waves}{\section{Nested\-Structure\-Sine\-Waves Class Reference}
+\label{class_nested_structure_sine_waves}\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}}
+}
+
+
+{\ttfamily \#include $<$Nested\-Structure\-Sine\-Waves.\-h$>$}
+
+
+
+Inheritance diagram for Nested\-Structure\-Sine\-Waves\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{class_nested_structure_sine_waves__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Nested\-Structure\-Sine\-Waves\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{class_nested_structure_sine_waves__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_nested_structure_sine_waves_a8794018a803f463467da113ca24fae03}{Nested\-Structure\-Sine\-Waves} ()
+\item 
+\hyperlink{class_nested_structure_sine_waves_a395aae92244c7dc041de171285f7c2da}{$\sim$\-Nested\-Structure\-Sine\-Waves} ()
+\item 
+void \hyperlink{class_nested_structure_sine_waves_ac68f98b32f41efc28bb9ac5e4a03b726}{apply\-Impedance\-Control\-Inside} (const std\-::vector$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ string\-List, double dt)
+\item 
+void \hyperlink{class_nested_structure_sine_waves_aa7ed76a8a4797cee41a024a9b8f5b245}{apply\-Impedance\-Control\-Outside} (const std\-::vector$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ string\-List, double dt, std\-::size\-\_\-t phase)
+\item 
+virtual void \hyperlink{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190}{on\-Step} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject, double dt)
+\item 
+virtual void \hyperlink{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{on\-Attach} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{on\-Setup} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{on\-Teardown} (\hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} \&subject)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Control the \hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} with a series of sine waves and local impedance controllers 
+
+Definition at line 44 of file Nested\-Structure\-Sine\-Waves.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_nested_structure_sine_waves_a8794018a803f463467da113ca24fae03}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}}
+\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{Nested\-Structure\-Sine\-Waves}]{\setlength{\rightskip}{0pt plus 5cm}Nested\-Structure\-Sine\-Waves\-::\-Nested\-Structure\-Sine\-Waves (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_nested_structure_sine_waves_a8794018a803f463467da113ca24fae03}
+Construct the controller. Typically occurs in the main function. The controller will need to be attached to a subject (model) Parameters are currently set in the initalizer lists. 
+
+Definition at line 37 of file Nested\-Structure\-Sine\-Waves.\-cpp.
+
+\hypertarget{class_nested_structure_sine_waves_a395aae92244c7dc041de171285f7c2da}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!$\sim$\-Nested\-Structure\-Sine\-Waves@{$\sim$\-Nested\-Structure\-Sine\-Waves}}
+\index{$\sim$\-Nested\-Structure\-Sine\-Waves@{$\sim$\-Nested\-Structure\-Sine\-Waves}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{$\sim$\-Nested\-Structure\-Sine\-Waves}]{\setlength{\rightskip}{0pt plus 5cm}Nested\-Structure\-Sine\-Waves\-::$\sim$\-Nested\-Structure\-Sine\-Waves (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_nested_structure_sine_waves_a395aae92244c7dc041de171285f7c2da}
+Destructor. Frees the \hyperlink{class_impedance_control}{Impedance\-Control} pointers 
+
+Definition at line 57 of file Nested\-Structure\-Sine\-Waves.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_nested_structure_sine_waves_ac68f98b32f41efc28bb9ac5e4a03b726}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!apply\-Impedance\-Control\-Inside@{apply\-Impedance\-Control\-Inside}}
+\index{apply\-Impedance\-Control\-Inside@{apply\-Impedance\-Control\-Inside}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{apply\-Impedance\-Control\-Inside}]{\setlength{\rightskip}{0pt plus 5cm}void Nested\-Structure\-Sine\-Waves\-::apply\-Impedance\-Control\-Inside (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ {\bf tg\-Linear\-String} $\ast$ $>$}]{string\-List, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)}}\label{class_nested_structure_sine_waves_ac68f98b32f41efc28bb9ac5e4a03b726}
+Applies the impedance controllers using a velocity setpoint of 0. Called during this classes on\-Step function. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string\-List} & a std\-::vector of strings taken from the subject's Muscle\-Map \\
+\hline
+\mbox{\tt in}  & {\em dt} & -\/ a timestep. Must be positive. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 63 of file Nested\-Structure\-Sine\-Waves.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_nested_structure_sine_waves_ac68f98b32f41efc28bb9ac5e4a03b726_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_nested_structure_sine_waves_ac68f98b32f41efc28bb9ac5e4a03b726_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_nested_structure_sine_waves_aa7ed76a8a4797cee41a024a9b8f5b245}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!apply\-Impedance\-Control\-Outside@{apply\-Impedance\-Control\-Outside}}
+\index{apply\-Impedance\-Control\-Outside@{apply\-Impedance\-Control\-Outside}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{apply\-Impedance\-Control\-Outside}]{\setlength{\rightskip}{0pt plus 5cm}void Nested\-Structure\-Sine\-Waves\-::apply\-Impedance\-Control\-Outside (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ {\bf tg\-Linear\-String} $\ast$ $>$}]{string\-List, }
+\item[{double}]{dt, }
+\item[{std\-::size\-\_\-t}]{phase}
+\end{DoxyParamCaption}
+)}}\label{class_nested_structure_sine_waves_aa7ed76a8a4797cee41a024a9b8f5b245}
+Applies the impedance controllers using a velocity setpoint determined. by the phase parameter and Called during this classes on\-Step function. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string\-List} & a std\-::vector of strings taken from the subject's Muscle\-Map \\
+\hline
+\mbox{\tt in}  & {\em dt} & -\/ a timestep. Must be positive. \\
+\hline
+\mbox{\tt in}  & {\em phase} & -\/ reads the index out of the phase\-Offsets vector \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 79 of file Nested\-Structure\-Sine\-Waves.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_nested_structure_sine_waves_aa7ed76a8a4797cee41a024a9b8f5b245_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_nested_structure_sine_waves_aa7ed76a8a4797cee41a024a9b8f5b245_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!on\-Attach@{on\-Attach}}
+\index{on\-Attach@{on\-Attach}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{on\-Attach}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Attach (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}
+Notify the observers when an attach action has occurred. Will only occur once, typically before setup 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 54 of file tg\-Observer.\-h.
+
+\hypertarget{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!on\-Setup@{on\-Setup}}
+\index{on\-Setup@{on\-Setup}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{on\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Setup (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}
+Notify the observers when a setup action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 60 of file tg\-Observer.\-h.
+
+\hypertarget{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!on\-Step@{on\-Step}}
+\index{on\-Step@{on\-Step}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{on\-Step}]{\setlength{\rightskip}{0pt plus 5cm}void Nested\-Structure\-Sine\-Waves\-::on\-Step (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model} \&}]{subject, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190}
+Apply the sine\-Wave controller. Called my notify\-Step(dt) of its subject. Calls the apply\-Impedance\-Control functions of this class 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em subject} & -\/ the \hyperlink{class_nested_structure_test_model}{Nested\-Structure\-Test\-Model} that is being Subject must have a Muscle\-Map populated \\
+\hline
+\mbox{\tt in}  & {\em dt,current} & timestep must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$ Nested\-Structure\-Test\-Model $>$}.
+
+
+
+Definition at line 101 of file Nested\-Structure\-Sine\-Waves.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{\index{Nested\-Structure\-Sine\-Waves@{Nested\-Structure\-Sine\-Waves}!on\-Teardown@{on\-Teardown}}
+\index{on\-Teardown@{on\-Teardown}!NestedStructureSineWaves@{Nested\-Structure\-Sine\-Waves}}
+\subsubsection[{on\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf Nested\-Structure\-Test\-Model}  $>$\-::on\-Teardown (
+\begin{DoxyParamCaption}
+\item[{{\bf Nested\-Structure\-Test\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}
+Notify the observers when a teardown action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 66 of file tg\-Observer.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/tests/\hyperlink{_nested_structure_sine_waves_8h}{Nested\-Structure\-Sine\-Waves.\-h}\item 
+dev/tests/\hyperlink{_nested_structure_sine_waves_8cpp}{Nested\-Structure\-Sine\-Waves.\-cpp}\end{DoxyCompactItemize}

@@ -1,0 +1,174 @@
+\hypertarget{classtg_observer}{\section{tg\-Observer$<$ Subject $>$ Class Template Reference}
+\label{classtg_observer}\index{tg\-Observer$<$ Subject $>$@{tg\-Observer$<$ Subject $>$}}
+}
+
+
+{\ttfamily \#include $<$tg\-Observer.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classtg_observer_a41ba53a117e6fd5ffe3b0ce11f5705fd}{$\sim$tg\-Observer} ()
+\item 
+virtual void \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{on\-Step} (Subject \&subject, double dt)=0
+\item 
+virtual void \hyperlink{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{on\-Attach} (Subject \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{on\-Setup} (Subject \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{on\-Teardown} (Subject \&subject)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Subject$>$class tg\-Observer$<$ Subject $>$}
+
+A mixin class which makes its derived class the Subject in the Obsever design pattern. These are typically controllers. 
+
+Definition at line 34 of file tg\-Observer.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_observer_a41ba53a117e6fd5ffe3b0ce11f5705fd}{\index{tg\-Observer@{tg\-Observer}!$\sim$tg\-Observer@{$\sim$tg\-Observer}}
+\index{$\sim$tg\-Observer@{$\sim$tg\-Observer}!tgObserver@{tg\-Observer}}
+\subsubsection[{$\sim$tg\-Observer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Subject$>$ virtual {\bf tg\-Observer}$<$ Subject $>$\-::$\sim${\bf tg\-Observer} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_observer_a41ba53a117e6fd5ffe3b0ce11f5705fd}
+A class with virtual member functions must have a virtual destructor. 
+
+Definition at line 39 of file tg\-Observer.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{\index{tg\-Observer@{tg\-Observer}!on\-Attach@{on\-Attach}}
+\index{on\-Attach@{on\-Attach}!tgObserver@{tg\-Observer}}
+\subsubsection[{on\-Attach}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Subject$>$ virtual void {\bf tg\-Observer}$<$ Subject $>$\-::on\-Attach (
+\begin{DoxyParamCaption}
+\item[{Subject \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}
+Notify the observers when an attach action has occurred. Will only occur once, typically before setup 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classtg_c_p_g_string_control_abc4e5f2a73920cd4aed294f080bdee25}{tg\-C\-P\-G\-String\-Control}.
+
+
+
+Definition at line 54 of file tg\-Observer.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{\index{tg\-Observer@{tg\-Observer}!on\-Setup@{on\-Setup}}
+\index{on\-Setup@{on\-Setup}!tgObserver@{tg\-Observer}}
+\subsubsection[{on\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Subject$>$ virtual void {\bf tg\-Observer}$<$ Subject $>$\-::on\-Setup (
+\begin{DoxyParamCaption}
+\item[{Subject \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}
+Notify the observers when a setup action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{class_base_spine_c_p_g_control_a25508234dbe960a6fea460d2abd6f353}{Base\-Spine\-C\-P\-G\-Control}.
+
+
+
+Definition at line 60 of file tg\-Observer.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{\index{tg\-Observer@{tg\-Observer}!on\-Step@{on\-Step}}
+\index{on\-Step@{on\-Step}!tgObserver@{tg\-Observer}}
+\subsubsection[{on\-Step}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Subject$>$ virtual void {\bf tg\-Observer}$<$ Subject $>$\-::on\-Step (
+\begin{DoxyParamCaption}
+\item[{Subject \&}]{subject, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}
+Notify the observers when a step action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\mbox{\tt in}  & {\em the} & number of seconds since the previous call; must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{class_base_spine_c_p_g_control_afa0b0e1f995545476511eac4fd322da2}{Base\-Spine\-C\-P\-G\-Control}, \hyperlink{class_nested_structure_sine_waves_a5066c42717c87e9f7eca0b75d29ab190}{Nested\-Structure\-Sine\-Waves}, \hyperlink{class_t6_tension_controller_a63fdbb09fd74b79c16f5cf441041c1e3}{T6\-Tension\-Controller}, \hyperlink{class_pretension_controller_a23be779af005b2ad9d5f4533ddf2b6ec}{Pretension\-Controller}, \hyperlink{classtg_c_p_g_string_control_a86ba4af920798c9f6cda4bbc5b1880e0}{tg\-C\-P\-G\-String\-Control}, \hyperlink{class_contact_test_controller_ac66f0ea2e87ccd2512ad0fb5bfd61208}{Contact\-Test\-Controller}, \hyperlink{class_spiral_spine_tension_controller_adba84042917c4c0a51cf94e2fef6634a}{Spiral\-Spine\-Tension\-Controller}, \hyperlink{class_nested_spiral_spine_tension_controller_a43fd037dbf2f7391cea57ec6386d77b1}{Nested\-Spiral\-Spine\-Tension\-Controller}, \hyperlink{class_prism_tension_controller_a1d9939a36e656e478dcca22f2c664675}{Prism\-Tension\-Controller}, and \hyperlink{class_build_test_controller_a8eba0a685d2e8b499591841effd085b8}{Build\-Test\-Controller}.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{\index{tg\-Observer@{tg\-Observer}!on\-Teardown@{on\-Teardown}}
+\index{on\-Teardown@{on\-Teardown}!tgObserver@{tg\-Observer}}
+\subsubsection[{on\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Subject$>$ virtual void {\bf tg\-Observer}$<$ Subject $>$\-::on\-Teardown (
+\begin{DoxyParamCaption}
+\item[{Subject \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}
+Notify the observers when a teardown action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{class_base_spine_c_p_g_control_aa209e0699b3dfc5889c6084409be4d20}{Base\-Spine\-C\-P\-G\-Control}.
+
+
+
+Definition at line 66 of file tg\-Observer.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_observer_8h}{tg\-Observer.\-h}\end{DoxyCompactItemize}

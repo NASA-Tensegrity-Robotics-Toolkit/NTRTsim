@@ -1,0 +1,457 @@
+\hypertarget{class_spiral_spine}{\section{Spiral\-Spine Class Reference}
+\label{class_spiral_spine}\index{Spiral\-Spine@{Spiral\-Spine}}
+}
+
+
+Inheritance diagram for Spiral\-Spine\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{class_spiral_spine__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Spiral\-Spine\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{class_spiral_spine__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_spiral_spine_aae6f6a5e783397af63f7a1dcd8b2beed}{typedef std\-::map$<$ std\-::string, \\*
+std\-::vector$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ $>$ {\bfseries Muscle\-Map}}\label{class_spiral_spine_aae6f6a5e783397af63f7a1dcd8b2beed}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{class_spiral_spine_a375666b36e080f35dab35ebea12117a9}{setup} (\hyperlink{classtg_world}{tg\-World} \&world)
+\item 
+void \hyperlink{class_spiral_spine_a72bb17d2fabd672ae79dcd80c598303a}{teardown} ()
+\item 
+virtual void \hyperlink{class_spiral_spine_aec58e69f08f72da5806c104a77e69db1}{step} (double dt)
+\item 
+\hypertarget{class_spiral_spine_a1e5dd7c8cd18828959a4d0768d8effa4}{virtual void {\bfseries on\-Visit} (\hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&r)}\label{class_spiral_spine_a1e5dd7c8cd18828959a4d0768d8effa4}
+
+\item 
+\hypertarget{class_spiral_spine_ad4af0c3c9ac313c137b75e6e58fa08a3}{const std\-::vector\\*
+$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ \& {\bfseries get\-All\-Muscles} () const }\label{class_spiral_spine_ad4af0c3c9ac313c137b75e6e58fa08a3}
+
+\item 
+\hypertarget{class_spiral_spine_ab04964d0e347dbcbf1ca41b1d6eceabc}{void {\bfseries change\-Muscle} (double length)}\label{class_spiral_spine_ab04964d0e347dbcbf1ca41b1d6eceabc}
+
+\item 
+\hypertarget{class_spiral_spine_a63144197479186e2ce074490b4833409}{const std\-::vector\\*
+$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ \& {\bfseries get\-Muscles} (const std\-::string \&key) const }\label{class_spiral_spine_a63144197479186e2ce074490b4833409}
+
+\item 
+void \hyperlink{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{attach} (\hyperlink{classtg_observer}{tg\-Observer}$<$ \hyperlink{class_spiral_spine}{Spiral\-Spine} $>$ $\ast$p\-Observer)
+\item 
+void \hyperlink{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{notify\-Step} (double dt)
+\item 
+void \hyperlink{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{notify\-Setup} ()
+\item 
+void \hyperlink{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{notify\-Teardown} ()
+\item 
+virtual void \hyperlink{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{on\-Visit} (const \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&r) const 
+\item 
+void \hyperlink{classtg_model_a292c17848b96caee32b2286e44c13f2f}{add\-Child} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Child)
+\item 
+virtual std\-::string \hyperlink{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{to\-String} (std\-::string prefix=\char`\"{}\char`\"{}) const 
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{find} (const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{find} (const std\-::string \&tag\-Search)
+\item 
+std\-::vector$<$ \hyperlink{classtg_model}{tg\-Model} $\ast$ $>$ \hyperlink{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{get\-Descendants} () const 
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 35 of file Spiral\-Spine.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_model_a292c17848b96caee32b2286e44c13f2f}{\index{Spiral\-Spine@{Spiral\-Spine}!add\-Child@{add\-Child}}
+\index{add\-Child@{add\-Child}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{add\-Child}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::add\-Child (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Model} $\ast$}]{p\-Child}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a292c17848b96caee32b2286e44c13f2f}
+Add a sub-\/model to this model. The model takes ownership of the child sub-\/model and is responsible for deallocating it. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Child} & a pointer to a sub-\/model \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & is p\-Child is N\-U\-L\-L, this object, or already a descendant \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000016}{Todo}]Make sure that every child appears no more than once in the tree. \end{DoxyRefDesc}
+
+
+Definition at line 126 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{\index{Spiral\-Spine@{Spiral\-Spine}!attach@{attach}}
+\index{attach@{attach}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{attach}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Spiral\-Spine}  $>$\-::attach (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Observer}$<$ {\bf Spiral\-Spine}  $>$ $\ast$}]{p\-Observer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}
+Attach an observer to the subject of the observer. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Observer} & a pointer to an observer for the subject; do nothing if the pointer is N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+\hypertarget{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{\index{Spiral\-Spine@{Spiral\-Spine}!find@{find}}
+\index{find@{find}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Tag\-Search} \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & tag\-Search that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 129 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_ab75836fdfbd9200f165c3b28a19630c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{\index{Spiral\-Spine@{Spiral\-Spine}!find@{find}}
+\index{find@{find}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & std\-::string\& that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 142 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{\index{Spiral\-Spine@{Spiral\-Spine}!get\-Descendants@{get\-Descendants}}
+\index{get\-Descendants@{get\-Descendants}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{get\-Descendants}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ {\bf tg\-Model} $\ast$ $>$ tg\-Model\-::get\-Descendants (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}
+Return a std\-::vector of const pointers to all sub-\/models. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000017}{Todo}]examine whether this should be public, and perhaps create a read only version \end{DoxyRefDesc}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of const pointers all sub-\/models.
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000014}{Todo}]Unnecessary copying can be avoided by pasing the result collection in the recursive step. \end{DoxyRefDesc}
+
+
+Definition at line 174 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{\index{Spiral\-Spine@{Spiral\-Spine}!notify\-Setup@{notify\-Setup}}
+\index{notify\-Setup@{notify\-Setup}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{notify\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Spiral\-Spine}  $>$\-::notify\-Setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a80799e5d0c8512d3d05a55764790392b}
+Call \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{tg\-Observer$<$\-T$>$\-::on\-Setup()} on all observers in the order in which they were attached. \hypertarget{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{\index{Spiral\-Spine@{Spiral\-Spine}!notify\-Step@{notify\-Step}}
+\index{notify\-Step@{notify\-Step}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{notify\-Step}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Spiral\-Spine}  $>$\-::notify\-Step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}
+Call \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$\-T$>$\-::on\-Step()} on all observers in the order in which they were attached. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; do nothing if not positive \\
+\hline
+\end{DoxyParams}
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{\index{Spiral\-Spine@{Spiral\-Spine}!notify\-Teardown@{notify\-Teardown}}
+\index{notify\-Teardown@{notify\-Teardown}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{notify\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Spiral\-Spine}  $>$\-::notify\-Teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}
+Call \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{tg\-Observer$<$\-T$>$\-::on\-Teardown()} on all observers in the order in which they were attached. \hypertarget{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{\index{Spiral\-Spine@{Spiral\-Spine}!on\-Visit@{on\-Visit}}
+\index{on\-Visit@{on\-Visit}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{on\-Visit}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::on\-Visit (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Model\-Visitor} \&}]{r}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}
+Call \hyperlink{classtg_model_visitor_a69d056cf31bb4eeef03c243a86f59cc1}{tg\-Model\-Visitor\-::render()} on self and all descendants. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em r} & a reference to a \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{class_connector_test_model_a8d4e146eb48dd23676a5522e9417abdb}{Connector\-Test\-Model}, \hyperlink{class_build_test_model_a8f12c5e787faba7606bbd46531819a4b}{Build\-Test\-Model}, \hyperlink{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5}{tg\-Linear\-String}, and \hyperlink{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449}{tg\-Rod}.
+
+
+
+Definition at line 109 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_spiral_spine_a375666b36e080f35dab35ebea12117a9}{\index{Spiral\-Spine@{Spiral\-Spine}!setup@{setup}}
+\index{setup@{setup}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}void Spiral\-Spine\-::setup (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_spiral_spine_a375666b36e080f35dab35ebea12117a9}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000055}{Todo}]Get rid of this. \end{DoxyRefDesc}
+
+
+Reimplemented from \hyperlink{classtg_model_a85c68e064972f67c61c47ead392cf6f8}{tg\-Model}.
+
+
+
+Definition at line 229 of file Spiral\-Spine.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{class_spiral_spine_a375666b36e080f35dab35ebea12117a9_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_spiral_spine_aec58e69f08f72da5806c104a77e69db1}{\index{Spiral\-Spine@{Spiral\-Spine}!step@{step}}
+\index{step@{step}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void Spiral\-Spine\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_spiral_spine_aec58e69f08f72da5806c104a77e69db1}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; std\-::invalid\-\_\-argument is thrown if dt is not positive \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if dt is not positive \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+This is not necessarily const for every child. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classtg_model_acc6f9ae005f9f51447d7efe5f1815737}{tg\-Model}.
+
+
+
+Definition at line 266 of file Spiral\-Spine.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{class_spiral_spine_aec58e69f08f72da5806c104a77e69db1_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_spiral_spine_a72bb17d2fabd672ae79dcd80c598303a}{\index{Spiral\-Spine@{Spiral\-Spine}!teardown@{teardown}}
+\index{teardown@{teardown}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{teardown}]{\setlength{\rightskip}{0pt plus 5cm}void Spiral\-Spine\-::teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_spiral_spine_a72bb17d2fabd672ae79dcd80c598303a}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000056}{Todo}]Get rid of this. \end{DoxyRefDesc}
+
+
+Reimplemented from \hyperlink{classtg_model_adb5eec1dcf70a8c039850aea144dcc7e}{tg\-Model}.
+
+
+
+Definition at line 301 of file Spiral\-Spine.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{class_spiral_spine_a72bb17d2fabd672ae79dcd80c598303a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{\index{Spiral\-Spine@{Spiral\-Spine}!to\-String@{to\-String}}
+\index{to\-String@{to\-String}!SpiralSpine@{Spiral\-Spine}}
+\subsubsection[{to\-String}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tg\-Model\-::to\-String (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{prefix = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}
+Returns the tag names of this model and its children 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em prefix} & a string to append to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the original string with this model and its children's tags appended 
+\end{DoxyReturn}
+
+
+Definition at line 156 of file tg\-Model.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/jearly/Spiral\-Spine.\-h\item 
+dev/jearly/Spiral\-Spine.\-cpp\end{DoxyCompactItemize}

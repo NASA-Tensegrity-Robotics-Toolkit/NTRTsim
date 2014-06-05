@@ -1,0 +1,28 @@
+var classtg_pair =
+[
+    [ "tgPair", "classtg_pair.html#a2c64b3da767119872c33417fb3fc0e7d", null ],
+    [ "tgPair", "classtg_pair.html#abc00b76d5026561c5cf8025cfe77520f", null ],
+    [ "tgPair", "classtg_pair.html#a31e737e6c443478996ff23fcfe98d739", null ],
+    [ "addRotation", "classtg_pair.html#ab78b53c5899b1584e1333f350f9d6d10", null ],
+    [ "addRotation", "classtg_pair.html#ac362bfbe98f8887115df7802b905adba", null ],
+    [ "addRotation", "classtg_pair.html#a21e7ae1d2e7e3d23d771545b0ad2a9a8", null ],
+    [ "addTags", "classtg_pair.html#af0b8f1729653b0b90d2fecbd51163612", null ],
+    [ "addTags", "classtg_pair.html#af28e3fe1a7e4eb28772dc006d575dd1f", null ],
+    [ "getFrom", "classtg_pair.html#af977dd8f19b84ae27b0d4d61f73a795a", null ],
+    [ "getFrom", "classtg_pair.html#a0a3cb71fb347992918be8179fc88026c", null ],
+    [ "getTags", "classtg_pair.html#acf1d7fa9df8f374f25015c4080902681", null ],
+    [ "getTags", "classtg_pair.html#ae70d7d3b45301665bc363b0ed8b9b292", null ],
+    [ "getTagStr", "classtg_pair.html#a346d66b066d2d9eb1eadba01da43749f", null ],
+    [ "getTo", "classtg_pair.html#a307e3a7d285b79337d5a5106b741537e", null ],
+    [ "getTo", "classtg_pair.html#ace352e2229cbb8689ff1ed6203a44132", null ],
+    [ "hasAllTags", "classtg_pair.html#a33b77b1075171b63f673965687b2e844", null ],
+    [ "hasAnyTags", "classtg_pair.html#af14af28fa98021c4f20a5e8f2ddd5606", null ],
+    [ "hasNoTags", "classtg_pair.html#adff345e116e16420c701a748ff8f995f", null ],
+    [ "hasTag", "classtg_pair.html#ae31f65869c8887bfeb34a344902c4d5b", null ],
+    [ "move", "classtg_pair.html#ae3e2802fec592abbd5e5d379361ba804", null ],
+    [ "operator==", "classtg_pair.html#a8640379510883e0f365626d66c758d7b", null ],
+    [ "setFrom", "classtg_pair.html#a5e15e2aada37ec92a0de956e14029200", null ],
+    [ "setTags", "classtg_pair.html#a5492888e4e4da4cca6261070b5726adf", null ],
+    [ "setTo", "classtg_pair.html#afa57f88dc9997c1dd10bcc78815774ee", null ],
+    [ "m_pair", "classtg_pair.html#ab8d66d088c3bbcce641190dd80a61f5f", null ]
+];

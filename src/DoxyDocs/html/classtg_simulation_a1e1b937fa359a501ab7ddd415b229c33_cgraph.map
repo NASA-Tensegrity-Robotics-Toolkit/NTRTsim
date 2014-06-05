@@ -1,0 +1,4 @@
+<map id="tgSimulation::step" name="tgSimulation::step">
+<area shape="rect" id="node3" href="$classtg_sim_view.html#a349682d852193ee75f416ab07c2d4a62" title="tgSimView::world" alt="" coords="183,5,305,35"/>
+<area shape="rect" id="node5" href="$classtg_world.html#ac659156f5f0680451085b7cdb3ac1311" title="tgWorld::step" alt="" coords="195,59,293,88"/>
+</map>

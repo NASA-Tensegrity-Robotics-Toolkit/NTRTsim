@@ -1,0 +1,254 @@
+\hypertarget{classtg_pair}{\section{tg\-Pair Class Reference}
+\label{classtg_pair}\index{tg\-Pair@{tg\-Pair}}
+}
+
+
+{\ttfamily \#include $<$tg\-Pair.\-h$>$}
+
+
+
+Inheritance diagram for tg\-Pair\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=144pt]{classtg_pair__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-Pair\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=144pt]{classtg_pair__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_pair_abc00b76d5026561c5cf8025cfe77520f}{tg\-Pair} (bt\-Vector3 from, bt\-Vector3 to)
+\item 
+\hypertarget{classtg_pair_a31e737e6c443478996ff23fcfe98d739}{{\bfseries tg\-Pair} (bt\-Vector3 from, bt\-Vector3 to, std\-::string tags)}\label{classtg_pair_a31e737e6c443478996ff23fcfe98d739}
+
+\item 
+bt\-Vector3 \& \hyperlink{classtg_pair_af977dd8f19b84ae27b0d4d61f73a795a}{get\-From} ()
+\item 
+\hypertarget{classtg_pair_a0a3cb71fb347992918be8179fc88026c}{const bt\-Vector3 \& {\bfseries get\-From} () const }\label{classtg_pair_a0a3cb71fb347992918be8179fc88026c}
+
+\item 
+void \hyperlink{classtg_pair_a5e15e2aada37ec92a0de956e14029200}{set\-From} (bt\-Vector3 from)
+\item 
+bt\-Vector3 \& \hyperlink{classtg_pair_a307e3a7d285b79337d5a5106b741537e}{get\-To} ()
+\item 
+\hypertarget{classtg_pair_ace352e2229cbb8689ff1ed6203a44132}{const bt\-Vector3 \& {\bfseries get\-To} () const }\label{classtg_pair_ace352e2229cbb8689ff1ed6203a44132}
+
+\item 
+void \hyperlink{classtg_pair_afa57f88dc9997c1dd10bcc78815774ee}{set\-To} (bt\-Vector3 to)
+\item 
+\hypertarget{classtg_pair_ab78b53c5899b1584e1333f350f9d6d10}{void {\bfseries add\-Rotation} (const bt\-Vector3 \&fixed\-Point, const bt\-Vector3 \&axis, double angle)}\label{classtg_pair_ab78b53c5899b1584e1333f350f9d6d10}
+
+\item 
+\hypertarget{classtg_pair_ac362bfbe98f8887115df7802b905adba}{void {\bfseries add\-Rotation} (const bt\-Vector3 \&fixed\-Point, const bt\-Vector3 \&from\-Orientation, const bt\-Vector3 \&to\-Orientation)}\label{classtg_pair_ac362bfbe98f8887115df7802b905adba}
+
+\item 
+\hypertarget{classtg_pair_a21e7ae1d2e7e3d23d771545b0ad2a9a8}{void {\bfseries add\-Rotation} (const bt\-Vector3 \&fixed\-Point, const bt\-Quaternion \&rotation)}\label{classtg_pair_a21e7ae1d2e7e3d23d771545b0ad2a9a8}
+
+\item 
+\hypertarget{classtg_pair_a8640379510883e0f365626d66c758d7b}{bool {\bfseries operator==} (const \hyperlink{classtg_pair}{tg\-Pair} \&other) const }\label{classtg_pair_a8640379510883e0f365626d66c758d7b}
+
+\item 
+\hypertarget{classtg_pair_ae3e2802fec592abbd5e5d379361ba804}{void {\bfseries move} (const bt\-Vector3 \&offset)}\label{classtg_pair_ae3e2802fec592abbd5e5d379361ba804}
+
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\-::pair$<$ bt\-Vector3, bt\-Vector3 $>$ \hyperlink{classtg_pair_ab8d66d088c3bbcce641190dd80a61f5f}{m\-\_\-pair}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Change the A\-P\-I to std\-::pair$<$bt\-Vector3$\ast$, bt\-Vector3$\ast$$>$. This renames \char`\"{}first\char`\"{} to \char`\"{}from\char`\"{} and \char`\"{}second\char`\"{} to \char`\"{}to\char`\"{}. The client uses non-\/const references. \begin{DoxyNote}{Note}
+\-: this maintains references to bt\-Vector3\& since we can have a std\-::pair of references in c++03 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See Also}
+\href{http://stackoverflow.com/questions/3769781/stdpair-of-references}{\tt http\-://stackoverflow.\-com/questions/3769781/stdpair-\/of-\/references} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000087}{Todo}]Replace with \char`\"{}typedef tg\-Pair std\-::pair$<$bt\-Vector3$\ast$, bt\-Vector3$\ast$$>$;\char`\"{} \end{DoxyRefDesc}
+
+
+Definition at line 47 of file tg\-Pair.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_pair_abc00b76d5026561c5cf8025cfe77520f}{\index{tg\-Pair@{tg\-Pair}!tg\-Pair@{tg\-Pair}}
+\index{tg\-Pair@{tg\-Pair}!tgPair@{tg\-Pair}}
+\subsubsection[{tg\-Pair}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Pair\-::tg\-Pair (
+\begin{DoxyParamCaption}
+\item[{bt\-Vector3}]{from, }
+\item[{bt\-Vector3}]{to}
+\end{DoxyParamCaption}
+)}}\label{classtg_pair_abc00b76d5026561c5cf8025cfe77520f}
+Create a pair from two bt\-Vector3 objects. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em from} & a bt\-Vector3 \\
+\hline
+\mbox{\tt in}  & {\em to} & a bt\-Vector3 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000089}{Todo}]Is it O\-K for from == to, either the same object or the same value? \end{DoxyRefDesc}
+
+
+Create a pair from two bt\-Vector3 objects. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em from} & a bt\-Vector3 \\
+\hline
+\mbox{\tt in}  & {\em to} & a bt\-Vector3 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000086}{Todo}]Is it O\-K for from == to, either the same object or the same value? \end{DoxyRefDesc}
+
+
+Definition at line 39 of file tg\-Pair.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_pair_af977dd8f19b84ae27b0d4d61f73a795a}{\index{tg\-Pair@{tg\-Pair}!get\-From@{get\-From}}
+\index{get\-From@{get\-From}!tgPair@{tg\-Pair}}
+\subsubsection[{get\-From}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Vector3 \& tg\-Pair\-::get\-From (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_pair_af977dd8f19b84ae27b0d4d61f73a795a}
+Return the from (first) member of the pair. \begin{DoxyReturn}{Returns}
+the from (first) member of the pair 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+This will fail if the default constructor is used and \hyperlink{classtg_pair_a5e15e2aada37ec92a0de956e14029200}{set\-From()} is not called first. 
+\end{DoxyWarning}
+
+
+Definition at line 51 of file tg\-Pair.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{classtg_pair_af977dd8f19b84ae27b0d4d61f73a795a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_pair_a307e3a7d285b79337d5a5106b741537e}{\index{tg\-Pair@{tg\-Pair}!get\-To@{get\-To}}
+\index{get\-To@{get\-To}!tgPair@{tg\-Pair}}
+\subsubsection[{get\-To}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Vector3 \& tg\-Pair\-::get\-To (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_pair_a307e3a7d285b79337d5a5106b741537e}
+Return the to (second) member of the pair. \begin{DoxyReturn}{Returns}
+the to (second) member of the pair 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+This will fail if the default constructor is used and \hyperlink{classtg_pair_afa57f88dc9997c1dd10bcc78815774ee}{set\-To()} is not called first. 
+\end{DoxyWarning}
+
+
+Definition at line 75 of file tg\-Pair.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{classtg_pair_a307e3a7d285b79337d5a5106b741537e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_pair_a5e15e2aada37ec92a0de956e14029200}{\index{tg\-Pair@{tg\-Pair}!set\-From@{set\-From}}
+\index{set\-From@{set\-From}!tgPair@{tg\-Pair}}
+\subsubsection[{set\-From}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Pair\-::set\-From (
+\begin{DoxyParamCaption}
+\item[{bt\-Vector3}]{from}
+\end{DoxyParamCaption}
+)}}\label{classtg_pair_a5e15e2aada37ec92a0de956e14029200}
+Set the from (first) member of the pair. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em from} & the to (first) member of the pair \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 67 of file tg\-Pair.\-cpp.
+
+\hypertarget{classtg_pair_afa57f88dc9997c1dd10bcc78815774ee}{\index{tg\-Pair@{tg\-Pair}!set\-To@{set\-To}}
+\index{set\-To@{set\-To}!tgPair@{tg\-Pair}}
+\subsubsection[{set\-To}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Pair\-::set\-To (
+\begin{DoxyParamCaption}
+\item[{bt\-Vector3}]{to}
+\end{DoxyParamCaption}
+)}}\label{classtg_pair_afa57f88dc9997c1dd10bcc78815774ee}
+Set the to (second) member of the pair. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em to} & the to (second) member of the pair \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 91 of file tg\-Pair.\-cpp.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classtg_pair_ab8d66d088c3bbcce641190dd80a61f5f}{\index{tg\-Pair@{tg\-Pair}!m\-\_\-pair@{m\-\_\-pair}}
+\index{m\-\_\-pair@{m\-\_\-pair}!tgPair@{tg\-Pair}}
+\subsubsection[{m\-\_\-pair}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$bt\-Vector3, bt\-Vector3$>$ tg\-Pair\-::m\-\_\-pair\hspace{0.3cm}{\ttfamily [protected]}}}\label{classtg_pair_ab8d66d088c3bbcce641190dd80a61f5f}
+The underlying representation of the pair of bt\-Vector3 objects. 
+
+Definition at line 119 of file tg\-Pair.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+tgcreator/\hyperlink{tg_pair_8h}{tg\-Pair.\-h}\item 
+tgcreator/\hyperlink{tg_pair_8cpp}{tg\-Pair.\-cpp}\end{DoxyCompactItemize}

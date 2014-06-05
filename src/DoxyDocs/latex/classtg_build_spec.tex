@@ -1,0 +1,42 @@
+\hypertarget{classtg_build_spec}{\section{tg\-Build\-Spec Class Reference}
+\label{classtg_build_spec}\index{tg\-Build\-Spec@{tg\-Build\-Spec}}
+}
+
+
+{\ttfamily \#include $<$tg\-Build\-Spec.\-h$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtg_build_spec_1_1_connector_agent}{Connector\-Agent}
+\item 
+struct \hyperlink{structtg_build_spec_1_1_rigid_agent}{Rigid\-Agent}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_build_spec_afd54d8bab0a9bc84d4900be145a7203e}{void {\bfseries add\-Builder} (std\-::string tag\-\_\-search, \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} $\ast$info\-Factory)}\label{classtg_build_spec_afd54d8bab0a9bc84d4900be145a7203e}
+
+\item 
+\hypertarget{classtg_build_spec_ac638cfc86ea908f5fd476ad22205426e}{void {\bfseries add\-Builder} (std\-::string tag\-\_\-search, \hyperlink{classtg_connector_info}{tg\-Connector\-Info} $\ast$info\-Factory)}\label{classtg_build_spec_ac638cfc86ea908f5fd476ad22205426e}
+
+\item 
+\hypertarget{classtg_build_spec_a8ef9c22ea03708a690d69c3ce91f91a2}{std\-::vector$<$ \hyperlink{structtg_build_spec_1_1_rigid_agent}{Rigid\-Agent} $\ast$ $>$ {\bfseries get\-Rigid\-Agents} ()}\label{classtg_build_spec_a8ef9c22ea03708a690d69c3ce91f91a2}
+
+\item 
+\hypertarget{classtg_build_spec_a4bdccb72f531b3a736e4c1f38ef6a7bf}{std\-::vector$<$ \hyperlink{structtg_build_spec_1_1_connector_agent}{Connector\-Agent} $\ast$ $>$ {\bfseries get\-Connector\-Agents} ()}\label{classtg_build_spec_a4bdccb72f531b3a736e4c1f38ef6a7bf}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contains a search and a builder, to be applied to something like a structure (passed in to the contained builder). The contained builder can create a \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} or a \hyperlink{classtg_connector_info}{tg\-Connector\-Info}, which will be placed where needed by the caller. 
+
+Definition at line 55 of file tg\-Build\-Spec.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+tgcreator/\hyperlink{tg_build_spec_8h}{tg\-Build\-Spec.\-h}\item 
+tgcreator/\hyperlink{tg_build_spec_8cpp}{tg\-Build\-Spec.\-cpp}\end{DoxyCompactItemize}

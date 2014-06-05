@@ -1,0 +1,114 @@
+\hypertarget{classtg_box_ground}{\section{tg\-Box\-Ground Class Reference}
+\label{classtg_box_ground}\index{tg\-Box\-Ground@{tg\-Box\-Ground}}
+}
+
+
+{\ttfamily \#include $<$tg\-Box\-Ground.\-h$>$}
+
+
+
+Inheritance diagram for tg\-Box\-Ground\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classtg_box_ground__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-Box\-Ground\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classtg_box_ground__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtg_box_ground_1_1_config}{Config}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_box_ground_ac3e36f505ee861043516debb6915b3a4}{tg\-Box\-Ground} ()
+\item 
+\hyperlink{classtg_box_ground_ac3b8b4f7f0cf5d5a71821138fdc06d13}{tg\-Box\-Ground} (const \hyperlink{structtg_box_ground_1_1_config}{tg\-Box\-Ground\-::\-Config} \&config)
+\item 
+virtual \hyperlink{classtg_box_ground_aeb3e2be3696eafd91e1e9925c9bd8713}{$\sim$tg\-Box\-Ground} ()
+\item 
+virtual bt\-Rigid\-Body $\ast$ \hyperlink{classtg_box_ground_a5a11eeebd51d871e1a115093d362508d}{get\-Ground\-Rigid\-Body} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_bullet_ground_aa0e6f48193455ae90579e493b0ff27c7}{bt\-Collision\-Shape $\ast$ {\bfseries p\-Ground\-Shape}}\label{classtg_bullet_ground_aa0e6f48193455ae90579e493b0ff27c7}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Simplest ground implementation -\/ a flat box. Can be put at an angle to allow for an incline 
+
+Definition at line 47 of file tg\-Box\-Ground.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_box_ground_ac3e36f505ee861043516debb6915b3a4}{\index{tg\-Box\-Ground@{tg\-Box\-Ground}!tg\-Box\-Ground@{tg\-Box\-Ground}}
+\index{tg\-Box\-Ground@{tg\-Box\-Ground}!tgBoxGround@{tg\-Box\-Ground}}
+\subsubsection[{tg\-Box\-Ground}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Box\-Ground\-::tg\-Box\-Ground (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_box_ground_ac3e36f505ee861043516debb6915b3a4}
+Default construction that uses the default values of config Sets up a collision object that is stored in the bullet\-Ground object 
+
+Definition at line 54 of file tg\-Box\-Ground.\-cpp.
+
+\hypertarget{classtg_box_ground_ac3b8b4f7f0cf5d5a71821138fdc06d13}{\index{tg\-Box\-Ground@{tg\-Box\-Ground}!tg\-Box\-Ground@{tg\-Box\-Ground}}
+\index{tg\-Box\-Ground@{tg\-Box\-Ground}!tgBoxGround@{tg\-Box\-Ground}}
+\subsubsection[{tg\-Box\-Ground}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Box\-Ground\-::tg\-Box\-Ground (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Box\-Ground\-::\-Config} \&}]{config}
+\end{DoxyParamCaption}
+)}}\label{classtg_box_ground_ac3b8b4f7f0cf5d5a71821138fdc06d13}
+Allows a user to specify their own config 
+
+Definition at line 63 of file tg\-Box\-Ground.\-cpp.
+
+\hypertarget{classtg_box_ground_aeb3e2be3696eafd91e1e9925c9bd8713}{\index{tg\-Box\-Ground@{tg\-Box\-Ground}!$\sim$tg\-Box\-Ground@{$\sim$tg\-Box\-Ground}}
+\index{$\sim$tg\-Box\-Ground@{$\sim$tg\-Box\-Ground}!tgBoxGround@{tg\-Box\-Ground}}
+\subsubsection[{$\sim$tg\-Box\-Ground}]{\setlength{\rightskip}{0pt plus 5cm}virtual tg\-Box\-Ground\-::$\sim$tg\-Box\-Ground (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_box_ground_aeb3e2be3696eafd91e1e9925c9bd8713}
+Clean up the implementation. The base class holds nothing. 
+
+Definition at line 98 of file tg\-Box\-Ground.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_box_ground_a5a11eeebd51d871e1a115093d362508d}{\index{tg\-Box\-Ground@{tg\-Box\-Ground}!get\-Ground\-Rigid\-Body@{get\-Ground\-Rigid\-Body}}
+\index{get\-Ground\-Rigid\-Body@{get\-Ground\-Rigid\-Body}!tgBoxGround@{tg\-Box\-Ground}}
+\subsubsection[{get\-Ground\-Rigid\-Body}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Rigid\-Body $\ast$ tg\-Box\-Ground\-::get\-Ground\-Rigid\-Body (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_box_ground_a5a11eeebd51d871e1a115093d362508d}
+Setup and return a return a rigid body based on the collision object 
+
+Implements \hyperlink{classtg_bullet_ground_a9a6ce685977283feae2becf4f705e4cd}{tg\-Bullet\-Ground}.
+
+
+
+Definition at line 72 of file tg\-Box\-Ground.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/terrain/\hyperlink{tg_box_ground_8h}{tg\-Box\-Ground.\-h}\item 
+core/terrain/\hyperlink{tg_box_ground_8cpp}{tg\-Box\-Ground.\-cpp}\end{DoxyCompactItemize}

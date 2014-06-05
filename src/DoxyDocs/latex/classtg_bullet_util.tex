@@ -1,0 +1,74 @@
+\hypertarget{classtg_bullet_util}{\section{tg\-Bullet\-Util Class Reference}
+\label{classtg_bullet_util}\index{tg\-Bullet\-Util@{tg\-Bullet\-Util}}
+}
+
+
+{\ttfamily \#include $<$tg\-Bullet\-Util.\-h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classtg_bullet_util_a9a557c0fbf39ab0b29a2d5b97edc2be9}{static bt\-Rigid\-Body $\ast$ {\bfseries create\-Rigid\-Body} (bt\-Dynamics\-World $\ast$dynamics\-World, float mass, const bt\-Transform \&start\-Transform, bt\-Collision\-Shape $\ast$shape)}\label{classtg_bullet_util_a9a557c0fbf39ab0b29a2d5b97edc2be9}
+
+\item 
+static bt\-Soft\-Rigid\-Dynamics\-World \& \hyperlink{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946}{world\-To\-Dynamics\-World} (\hyperlink{classtg_world}{tg\-World} \&world)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Utility class for dealing with Bullet Physics 
+
+Definition at line 40 of file tg\-Bullet\-Util.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946}{\index{tg\-Bullet\-Util@{tg\-Bullet\-Util}!world\-To\-Dynamics\-World@{world\-To\-Dynamics\-World}}
+\index{world\-To\-Dynamics\-World@{world\-To\-Dynamics\-World}!tgBulletUtil@{tg\-Bullet\-Util}}
+\subsubsection[{world\-To\-Dynamics\-World}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Soft\-Rigid\-Dynamics\-World \& tg\-Bullet\-Util\-::world\-To\-Dynamics\-World (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946}
+Assuming that world has a \hyperlink{classtg_world_bullet_physics_impl}{tg\-World\-Bullet\-Physics\-Impl}, return its dynamics world. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em world} & a \hyperlink{classtg_world}{tg\-World} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the world's implementation's bt\-Soft\-Rigid\-Dynamics\-View 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000012}{Todo}]Use typeinfo to verify that this is correct. \end{DoxyRefDesc}
+
+
+Definition at line 79 of file tg\-Bullet\-Util.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_bullet_util_a91ab094c3c3cc9ab7402a3618cc75946_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_bullet_util_8h}{tg\-Bullet\-Util.\-h}\item 
+core/\hyperlink{tg_bullet_util_8cpp}{tg\-Bullet\-Util.\-cpp}\end{DoxyCompactItemize}

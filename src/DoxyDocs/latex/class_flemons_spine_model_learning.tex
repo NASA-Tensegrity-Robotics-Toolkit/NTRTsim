@@ -1,0 +1,528 @@
+\hypertarget{class_flemons_spine_model_learning}{\section{Flemons\-Spine\-Model\-Learning Class Reference}
+\label{class_flemons_spine_model_learning}\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}}
+}
+
+
+Inheritance diagram for Flemons\-Spine\-Model\-Learning\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{class_flemons_spine_model_learning__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Flemons\-Spine\-Model\-Learning\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{class_flemons_spine_model_learning__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_base_spine_model_learning_a0f779ad979f0353d68af012f50f822b7}{typedef std\-::map$<$ std\-::string, \\*
+std\-::vector$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ $>$ {\bfseries Muscle\-Map}}\label{class_base_spine_model_learning_a0f779ad979f0353d68af012f50f822b7}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_flemons_spine_model_learning_a027b493482022b7605c72e6f915c0a2a}{{\bfseries Flemons\-Spine\-Model\-Learning} (int segments)}\label{class_flemons_spine_model_learning_a027b493482022b7605c72e6f915c0a2a}
+
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_ad7d329634cf8d812bcee974a3430fcee}{setup} (\hyperlink{classtg_world}{tg\-World} \&world)
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_a489aeb8529c20f9a2473812ea0e78f41}{teardown} ()
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_ab0c5bc7a89e7358015877ed147b66da9}{step} (double dt)
+\item 
+\hypertarget{class_flemons_spine_model_learning_a027b493482022b7605c72e6f915c0a2a}{{\bfseries Flemons\-Spine\-Model\-Learning} (int segments)}\label{class_flemons_spine_model_learning_a027b493482022b7605c72e6f915c0a2a}
+
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_a1c5e086a665023dbc637cfd617ddc094}{setup} (\hyperlink{classtg_world}{tg\-World} \&world)
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_ab2f98f3230f4980bed706d9337a2fae5}{teardown} ()
+\item 
+virtual void \hyperlink{class_flemons_spine_model_learning_a29969832ceaa6143afcce7dfe1d6d8e8}{step} (double dt)
+\item 
+\hypertarget{class_base_spine_model_learning_afd3d71b99a2105a60c78d52d67068c00}{virtual std\-::vector$<$ double $>$ {\bfseries get\-Segment\-C\-O\-M} (const int n) const }\label{class_base_spine_model_learning_afd3d71b99a2105a60c78d52d67068c00}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a0c595346fb7a23e89d9f6ec572a19c49}{virtual const std\-::vector\\*
+$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ \& {\bfseries get\-Muscles} (const std\-::string \&key) const }\label{class_base_spine_model_learning_a0c595346fb7a23e89d9f6ec572a19c49}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a508eae423b9fd9e194b620563b15b9db}{virtual const std\-::vector\\*
+$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ \& {\bfseries get\-All\-Muscles} ()}\label{class_base_spine_model_learning_a508eae423b9fd9e194b620563b15b9db}
+
+\item 
+\hypertarget{class_base_spine_model_learning_af38ddf518f0b9d524d869591216070fd}{virtual const int {\bfseries get\-Segments} ()}\label{class_base_spine_model_learning_af38ddf518f0b9d524d869591216070fd}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a21c0b6e4c84e4f61b92d803dd677525f}{virtual std\-::size\-\_\-t {\bfseries get\-Numberof\-Muslces} () const }\label{class_base_spine_model_learning_a21c0b6e4c84e4f61b92d803dd677525f}
+
+\item 
+void \hyperlink{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{attach} (\hyperlink{classtg_observer}{tg\-Observer}$<$ \hyperlink{class_base_spine_model_learning}{Base\-Spine\-Model\-Learning} $>$ $\ast$p\-Observer)
+\item 
+void \hyperlink{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{notify\-Step} (double dt)
+\item 
+void \hyperlink{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{notify\-Setup} ()
+\item 
+void \hyperlink{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{notify\-Teardown} ()
+\item 
+virtual void \hyperlink{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{on\-Visit} (const \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \&r) const 
+\item 
+void \hyperlink{classtg_model_a292c17848b96caee32b2286e44c13f2f}{add\-Child} (\hyperlink{classtg_model}{tg\-Model} $\ast$p\-Child)
+\item 
+virtual std\-::string \hyperlink{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{to\-String} (std\-::string prefix=\char`\"{}\char`\"{}) const 
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{find} (const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search)
+\item 
+{\footnotesize template$<$typename T $>$ }\\std\-::vector$<$ T $\ast$ $>$ \hyperlink{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{find} (const std\-::string \&tag\-Search)
+\item 
+std\-::vector$<$ \hyperlink{classtg_model}{tg\-Model} $\ast$ $>$ \hyperlink{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{get\-Descendants} () const 
+\item 
+\hypertarget{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}{void {\bfseries add\-Tags} (const std\-::string \&space\-\_\-separated\-\_\-tags)}\label{classtg_taggable_af0b8f1729653b0b90d2fecbd51163612}
+
+\item 
+\hypertarget{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}{void {\bfseries add\-Tags} (const \hyperlink{classtg_tags}{tg\-Tags} \&tags)}\label{classtg_taggable_af28e3fe1a7e4eb28772dc006d575dd1f}
+
+\item 
+\hypertarget{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}{bool {\bfseries has\-Tag} (const std\-::string tag) const }\label{classtg_taggable_ae31f65869c8887bfeb34a344902c4d5b}
+
+\item 
+\hypertarget{classtg_taggable_a33b77b1075171b63f673965687b2e844}{bool {\bfseries has\-All\-Tags} (std\-::string tags)}\label{classtg_taggable_a33b77b1075171b63f673965687b2e844}
+
+\item 
+\hypertarget{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}{bool {\bfseries has\-Any\-Tags} (const std\-::string tags)}\label{classtg_taggable_af14af28fa98021c4f20a5e8f2ddd5606}
+
+\item 
+\hypertarget{classtg_taggable_adff345e116e16420c701a748ff8f995f}{bool {\bfseries has\-No\-Tags} ()}\label{classtg_taggable_adff345e116e16420c701a748ff8f995f}
+
+\item 
+\hypertarget{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}{\hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} ()}\label{classtg_taggable_acf1d7fa9df8f374f25015c4080902681}
+
+\item 
+\hypertarget{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}{const \hyperlink{classtg_tags}{tg\-Tags} \& {\bfseries get\-Tags} () const }\label{classtg_taggable_ae70d7d3b45301665bc363b0ed8b9b292}
+
+\item 
+\hypertarget{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}{void {\bfseries set\-Tags} (\hyperlink{classtg_tags}{tg\-Tags} tags)}\label{classtg_taggable_a5492888e4e4da4cca6261070b5726adf}
+
+\item 
+\hypertarget{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}{std\-::string {\bfseries get\-Tag\-Str} (std\-::string delim=\char`\"{} \char`\"{}) const }\label{classtg_taggable_a346d66b066d2d9eb1eadba01da43749f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_base_spine_model_learning_a9cd74c4c79da8749fb5c8bffecede666}{std\-::vector$<$ \hyperlink{classtg_linear_string}{tg\-Linear\-String} $\ast$ $>$ {\bfseries m\-\_\-all\-Muscles}}\label{class_base_spine_model_learning_a9cd74c4c79da8749fb5c8bffecede666}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a1c1e64b40b4c67189fbc67ad411f316a}{std\-::vector$<$ \hyperlink{classtg_model}{tg\-Model} $\ast$ $>$ {\bfseries m\-\_\-all\-Segments}}\label{class_base_spine_model_learning_a1c1e64b40b4c67189fbc67ad411f316a}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a75cad2ae3b68f93d283550b417af5523}{Muscle\-Map {\bfseries m\-\_\-muscle\-Map}}\label{class_base_spine_model_learning_a75cad2ae3b68f93d283550b417af5523}
+
+\item 
+\hypertarget{class_base_spine_model_learning_a5d68dbbcbda4091b040279200a185d50}{const std\-::size\-\_\-t {\bfseries m\-\_\-segments}}\label{class_base_spine_model_learning_a5d68dbbcbda4091b040279200a185d50}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 32 of file Flemons\-Spine\-Model\-Learning.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_model_a292c17848b96caee32b2286e44c13f2f}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!add\-Child@{add\-Child}}
+\index{add\-Child@{add\-Child}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{add\-Child}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::add\-Child (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Model} $\ast$}]{p\-Child}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a292c17848b96caee32b2286e44c13f2f}
+Add a sub-\/model to this model. The model takes ownership of the child sub-\/model and is responsible for deallocating it. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Child} & a pointer to a sub-\/model \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & is p\-Child is N\-U\-L\-L, this object, or already a descendant \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000016}{Todo}]Make sure that every child appears no more than once in the tree. \end{DoxyRefDesc}
+
+
+Definition at line 126 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classtg_model_a292c17848b96caee32b2286e44c13f2f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!attach@{attach}}
+\index{attach@{attach}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{attach}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Base\-Spine\-Model\-Learning}  $>$\-::attach (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Observer}$<$ {\bf Base\-Spine\-Model\-Learning}  $>$ $\ast$}]{p\-Observer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}
+Attach an observer to the subject of the observer. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Observer} & a pointer to an observer for the subject; do nothing if the pointer is N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+\hypertarget{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!find@{find}}
+\index{find@{find}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Tag\-Search} \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_ab75836fdfbd9200f165c3b28a19630c0}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & tag\-Search that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 129 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_ab75836fdfbd9200f165c3b28a19630c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!find@{find}}
+\index{find@{find}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ std\-::vector$<$T$\ast$$>$ tg\-Model\-::find (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{tag\-Search}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}}\label{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c}
+Get a vector of descendants sorted by type and a tagsearch. Useful for pulling out muscle groups, or similar. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tag\-Search,a} & std\-::string\& that contains the desired tags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of pointers to members that match the tag search and typename T 
+\end{DoxyReturn}
+
+
+Definition at line 142 of file tg\-Model.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_model_aa40b5fb32f8941e04d537f4e6c6db35c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!get\-Descendants@{get\-Descendants}}
+\index{get\-Descendants@{get\-Descendants}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{get\-Descendants}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ {\bf tg\-Model} $\ast$ $>$ tg\-Model\-::get\-Descendants (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4}
+Return a std\-::vector of const pointers to all sub-\/models. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000017}{Todo}]examine whether this should be public, and perhaps create a read only version \end{DoxyRefDesc}
+\begin{DoxyReturn}{Returns}
+a std\-::vector of const pointers all sub-\/models.
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000014}{Todo}]Unnecessary copying can be avoided by pasing the result collection in the recursive step. \end{DoxyRefDesc}
+
+
+Definition at line 174 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_model_a2efa4321fa5c77b4ce23b01f6fd3a1c4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!notify\-Setup@{notify\-Setup}}
+\index{notify\-Setup@{notify\-Setup}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{notify\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Base\-Spine\-Model\-Learning}  $>$\-::notify\-Setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_a80799e5d0c8512d3d05a55764790392b}
+Call \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{tg\-Observer$<$\-T$>$\-::on\-Setup()} on all observers in the order in which they were attached. \hypertarget{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!notify\-Step@{notify\-Step}}
+\index{notify\-Step@{notify\-Step}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{notify\-Step}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Base\-Spine\-Model\-Learning}  $>$\-::notify\-Step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}
+Call \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$\-T$>$\-::on\-Step()} on all observers in the order in which they were attached. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; do nothing if not positive \\
+\hline
+\end{DoxyParams}
+\hypertarget{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!notify\-Teardown@{notify\-Teardown}}
+\index{notify\-Teardown@{notify\-Teardown}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{notify\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf tg\-Subject}$<$ {\bf Base\-Spine\-Model\-Learning}  $>$\-::notify\-Teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}
+Call \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{tg\-Observer$<$\-T$>$\-::on\-Teardown()} on all observers in the order in which they were attached. \hypertarget{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!on\-Visit@{on\-Visit}}
+\index{on\-Visit@{on\-Visit}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{on\-Visit}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-Model\-::on\-Visit (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-Model\-Visitor} \&}]{r}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0}
+Call \hyperlink{classtg_model_visitor_a69d056cf31bb4eeef03c243a86f59cc1}{tg\-Model\-Visitor\-::render()} on self and all descendants. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em r} & a reference to a \hyperlink{classtg_model_visitor}{tg\-Model\-Visitor} \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{class_connector_test_model_a8d4e146eb48dd23676a5522e9417abdb}{Connector\-Test\-Model}, \hyperlink{class_build_test_model_a8f12c5e787faba7606bbd46531819a4b}{Build\-Test\-Model}, \hyperlink{classtg_linear_string_a9f659486ba4276dc9d60982158fb7aa5}{tg\-Linear\-String}, and \hyperlink{classtg_rod_ae3651ef650b66a5d016bc5ffb27ec449}{tg\-Rod}.
+
+
+
+Definition at line 109 of file tg\-Model.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{classtg_model_aee6457e0fc54d5570b87bfc779f9b1c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_flemons_spine_model_learning_a1c5e086a665023dbc637cfd617ddc094}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!setup@{setup}}
+\index{setup@{setup}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Flemons\-Spine\-Model\-Learning\-::setup (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_a1c5e086a665023dbc637cfd617ddc094}
+Setup takes a \hyperlink{classtg_world}{tg\-World} and passes it to any children for their own setup functions. All subclasses should call this at the appropriate time (usually end of setup) within their own setup function. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em world} & -\/ the \hyperlink{classtg_world}{tg\-World} the models will exist in. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_a6d97d4097674fb9c7ea7f667e11442bb}{Base\-Spine\-Model\-Learning}.
+
+\hypertarget{class_flemons_spine_model_learning_ad7d329634cf8d812bcee974a3430fcee}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!setup@{setup}}
+\index{setup@{setup}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}void Flemons\-Spine\-Model\-Learning\-::setup (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-World} \&}]{world}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_ad7d329634cf8d812bcee974a3430fcee}
+Setup takes a \hyperlink{classtg_world}{tg\-World} and passes it to any children for their own setup functions. All subclasses should call this at the appropriate time (usually end of setup) within their own setup function. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em world} & -\/ the \hyperlink{classtg_world}{tg\-World} the models will exist in. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000034}{Todo}]\-: reference the things that do this for us \end{DoxyRefDesc}
+
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000035}{Todo}]\-: there seems to be an issue with \hyperlink{class_muscle2_p}{Muscle2\-P} connections if the front of a tetra is inside the next one. \end{DoxyRefDesc}
+
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000036}{Todo}]\-: the snake is a temporary variable -- will its destructor be called? If not, where do we delete its children? \end{DoxyRefDesc}
+
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_a6d97d4097674fb9c7ea7f667e11442bb}{Base\-Spine\-Model\-Learning}.
+
+
+
+Definition at line 46 of file Flemons\-Spine\-Model\-Learning.\-cpp.
+
+\hypertarget{class_flemons_spine_model_learning_a29969832ceaa6143afcce7dfe1d6d8e8}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!step@{step}}
+\index{step@{step}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Flemons\-Spine\-Model\-Learning\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_a29969832ceaa6143afcce7dfe1d6d8e8}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; std\-::invalid\-\_\-argument is thrown if dt is not positive \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if dt is not positive \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+This is not necessarily const for every child. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_abe197971d9b438aaaf36d2e8bddfc739}{Base\-Spine\-Model\-Learning}.
+
+\hypertarget{class_flemons_spine_model_learning_ab0c5bc7a89e7358015877ed147b66da9}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!step@{step}}
+\index{step@{step}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void Flemons\-Spine\-Model\-Learning\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_ab0c5bc7a89e7358015877ed147b66da9}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; std\-::invalid\-\_\-argument is thrown if dt is not positive \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if dt is not positive \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+This is not necessarily const for every child. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_abe197971d9b438aaaf36d2e8bddfc739}{Base\-Spine\-Model\-Learning}.
+
+
+
+Definition at line 167 of file Flemons\-Spine\-Model\-Learning.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_flemons_spine_model_learning_ab0c5bc7a89e7358015877ed147b66da9_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{class_flemons_spine_model_learning_ab2f98f3230f4980bed706d9337a2fae5}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!teardown@{teardown}}
+\index{teardown@{teardown}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{teardown}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Flemons\-Spine\-Model\-Learning\-::teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_ab2f98f3230f4980bed706d9337a2fae5}
+Deletes the children (undoes setup) 
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_aa04ab240035720769a95c403c1f61f73}{Base\-Spine\-Model\-Learning}.
+
+\hypertarget{class_flemons_spine_model_learning_a489aeb8529c20f9a2473812ea0e78f41}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!teardown@{teardown}}
+\index{teardown@{teardown}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{teardown}]{\setlength{\rightskip}{0pt plus 5cm}void Flemons\-Spine\-Model\-Learning\-::teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_flemons_spine_model_learning_a489aeb8529c20f9a2473812ea0e78f41}
+Deletes the children (undoes setup) 
+
+Reimplemented from \hyperlink{class_base_spine_model_learning_aa04ab240035720769a95c403c1f61f73}{Base\-Spine\-Model\-Learning}.
+
+
+
+Definition at line 160 of file Flemons\-Spine\-Model\-Learning.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_flemons_spine_model_learning_a489aeb8529c20f9a2473812ea0e78f41_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}{\index{Flemons\-Spine\-Model\-Learning@{Flemons\-Spine\-Model\-Learning}!to\-String@{to\-String}}
+\index{to\-String@{to\-String}!FlemonsSpineModelLearning@{Flemons\-Spine\-Model\-Learning}}
+\subsubsection[{to\-String}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tg\-Model\-::to\-String (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{prefix = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725}
+Returns the tag names of this model and its children 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em prefix} & a string to append to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the original string with this model and its children's tags appended 
+\end{DoxyReturn}
+
+
+Definition at line 156 of file tg\-Model.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classtg_model_af37b0c1a6d4060bfe0bb9b5038a17725_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/btietz/learning\-Tests/Flemons\-Spine\-Model\-Learning.\-h\item 
+dev/btietz/learning\-Tests\-Cross\-Link/Flemons\-Spine\-Model\-Learning.\-h\item 
+dev/btietz/learning\-Tests/Flemons\-Spine\-Model\-Learning.\-cpp\item 
+dev/btietz/learning\-Tests\-Cross\-Link/Flemons\-Spine\-Model\-Learning.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,83 @@
+\hypertarget{tg_rigid_info_8h}{\section{tgcreator/tg\-Rigid\-Info.h File Reference}
+\label{tg_rigid_info_8h}\index{tgcreator/tg\-Rigid\-Info.\-h@{tgcreator/tg\-Rigid\-Info.\-h}}
+}
+
+
+Definition of abstract class \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info}.  
+
+
+{\ttfamily \#include \char`\"{}bt\-Bullet\-Dynamics\-Common.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Bullet\-Soft\-Body/bt\-Soft\-Rigid\-Dynamics\-World.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$set$>$}\\*
+{\ttfamily \#include \char`\"{}core/tg\-Taggable.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}core/tg\-Bullet\-Util.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}core/tg\-World.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}core/tg\-Model.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tg\-Util.\-h\char`\"{}}\\*
+This graph shows which files directly or indirectly include this file\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{tg_rigid_info_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::ostream \& \hyperlink{tg_rigid_info_8h_a571cc463bc11aac00c2f6acc6f8b39ba}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \&obj)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definition of abstract class \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info}. \begin{DoxyDate}{Date}
+January 21, 2014 \$\-Id\$ 
+\end{DoxyDate}
+
+
+Definition in file \hyperlink{tg_rigid_info_8h_source}{tg\-Rigid\-Info.\-h}.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tg_rigid_info_8h_a571cc463bc11aac00c2f6acc6f8b39ba}{\index{tg\-Rigid\-Info.\-h@{tg\-Rigid\-Info.\-h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tgRigidInfo.h@{tg\-Rigid\-Info.\-h}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::ostream\& operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{std\-::ostream \&}]{os, }
+\item[{const {\bf tg\-Rigid\-Info} \&}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{tg_rigid_info_8h_a571cc463bc11aac00c2f6acc6f8b39ba}
+Overload \hyperlink{tg_model_8cpp_a2a689ee3da32701c6ee9352145507f66}{operator$<$$<$()} to handle \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em os} & an ostream \\
+\hline
+\mbox{\tt in}  & {\em a} & reference to a \hyperlink{classtg_rigid_info}{tg\-Rigid\-Info} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+os 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000091}{Todo}]Inlining this does no good; stream operations are slow. 
+
+Do we need to re-\/add the collision shape for debugging? \end{DoxyRefDesc}
+
+
+Definition at line 344 of file tg\-Rigid\-Info.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{tg_rigid_info_8h_a571cc463bc11aac00c2f6acc6f8b39ba_cgraph}
+\end{center}
+\end{figure}
+
+

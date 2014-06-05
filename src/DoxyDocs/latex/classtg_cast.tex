@@ -1,0 +1,67 @@
+\hypertarget{classtg_cast}{\section{tg\-Cast Class Reference}
+\label{classtg_cast}\index{tg\-Cast@{tg\-Cast}}
+}
+
+
+{\ttfamily \#include $<$tg\-Cast.\-h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ }\\static std\-::vector$<$ T\-\_\-\-T\-O $\ast$ $>$ \hyperlink{classtg_cast_a8af34972fd56916c145154544fb9c81d}{filter} (const std\-::vector$<$ T\-\_\-\-F\-R\-O\-M $\ast$ $>$ \&v)
+\item 
+{\footnotesize template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ }\\static T\-\_\-\-T\-O $\ast$ \hyperlink{classtg_cast_a25141576cb5aa5de8323b096b1da4fe4}{cast} (T\-\_\-\-F\-R\-O\-M $\ast$obj)
+\item 
+{\footnotesize template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ }\\static T\-\_\-\-T\-O $\ast$ \hyperlink{classtg_cast_a7eb068181f54113dcdce17c2cd3ab308}{cast} (T\-\_\-\-F\-R\-O\-M \&obj)
+\item 
+\hypertarget{classtg_cast_ae76307bab5c1a812915b62352de3a9f2}{{\footnotesize template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ }\\static std\-::vector$<$ T\-\_\-\-T\-O $\ast$ $>$ {\bfseries find} (const \hyperlink{classtg_tag_search}{tg\-Tag\-Search} \&tag\-Search, const std\-::vector$<$ T\-\_\-\-F\-R\-O\-M $\ast$ $>$ haystack)}\label{classtg_cast_ae76307bab5c1a812915b62352de3a9f2}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Utility class for typecasting 
+
+Definition at line 38 of file tg\-Cast.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_cast_a25141576cb5aa5de8323b096b1da4fe4}{\index{tg\-Cast@{tg\-Cast}!cast@{cast}}
+\index{cast@{cast}!tgCast@{tg\-Cast}}
+\subsubsection[{cast}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ static T\-\_\-\-T\-O$\ast$ tg\-Cast\-::cast (
+\begin{DoxyParamCaption}
+\item[{T\-\_\-\-F\-R\-O\-M $\ast$}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classtg_cast_a25141576cb5aa5de8323b096b1da4fe4}
+Attempt a dynamic cast to the provided type. If it fails, return 0 
+
+Definition at line 66 of file tg\-Cast.\-h.
+
+\hypertarget{classtg_cast_a7eb068181f54113dcdce17c2cd3ab308}{\index{tg\-Cast@{tg\-Cast}!cast@{cast}}
+\index{cast@{cast}!tgCast@{tg\-Cast}}
+\subsubsection[{cast}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ static T\-\_\-\-T\-O$\ast$ tg\-Cast\-::cast (
+\begin{DoxyParamCaption}
+\item[{T\-\_\-\-F\-R\-O\-M \&}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classtg_cast_a7eb068181f54113dcdce17c2cd3ab308}
+Attempt a dynamic cast to the provided type. If it fails, return 0 
+
+Definition at line 80 of file tg\-Cast.\-h.
+
+\hypertarget{classtg_cast_a8af34972fd56916c145154544fb9c81d}{\index{tg\-Cast@{tg\-Cast}!filter@{filter}}
+\index{filter@{filter}!tgCast@{tg\-Cast}}
+\subsubsection[{filter}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T\-\_\-\-F\-R\-O\-M , typename T\-\_\-\-T\-O $>$ static std\-::vector$<$T\-\_\-\-T\-O$\ast$$>$ tg\-Cast\-::filter (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ T\-\_\-\-F\-R\-O\-M $\ast$ $>$ \&}]{v}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classtg_cast_a8af34972fd56916c145154544fb9c81d}
+Filter by type, e.\-g. std\-::vector$<$\-Some\-Base\-Type$>$ my\-Vector; tg\-Cast\-::filter$<$\-Some\-Base\-Type, Some\-Sub\-Type$>$(my\-Vector); will return a vector containing only the elements in my\-Vector that are castable to Some\-Sub\-Type 
+
+Definition at line 50 of file tg\-Cast.\-h.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_cast_8h}{tg\-Cast.\-h}\end{DoxyCompactItemize}

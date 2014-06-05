@@ -1,0 +1,173 @@
+\hypertarget{classtg_subject}{\section{tg\-Subject$<$ T $>$ Class Template Reference}
+\label{classtg_subject}\index{tg\-Subject$<$ T $>$@{tg\-Subject$<$ T $>$}}
+}
+
+
+{\ttfamily \#include $<$tg\-Subject.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_subject_aca26d6636b9d6d91cec8d213d7dec262}{tg\-Subject} ()
+\item 
+virtual \hyperlink{classtg_subject_adba463ea10aea113b88f5eca807a51ae}{$\sim$tg\-Subject} ()
+\item 
+void \hyperlink{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{attach} (\hyperlink{classtg_observer}{tg\-Observer}$<$ T $>$ $\ast$p\-Observer)
+\item 
+void \hyperlink{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{notify\-Step} (double dt)
+\item 
+void \hyperlink{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{notify\-Setup} ()
+\item 
+void \hyperlink{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{notify\-Teardown} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$class tg\-Subject$<$ T $>$}
+
+A mixin base class for the subject in the observer design pattern. Observers are attached to the subject, and their on\-Step() member functions are called when notification is required. Used primarily for control of tensegrity structures, a structure that needs to be controlled will be a child of this class. This can either be the main model or submodels such as a \hyperlink{classtg_linear_string}{tg\-Linear\-String} 
+
+Definition at line 43 of file tg\-Subject.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_subject_aca26d6636b9d6d91cec8d213d7dec262}{\index{tg\-Subject@{tg\-Subject}!tg\-Subject@{tg\-Subject}}
+\index{tg\-Subject@{tg\-Subject}!tgSubject@{tg\-Subject}}
+\subsubsection[{tg\-Subject}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T$>$ {\bf tg\-Subject}$<$ T $>$\-::{\bf tg\-Subject} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_subject_aca26d6636b9d6d91cec8d213d7dec262}
+The consructor has nothing to do. 
+
+Definition at line 48 of file tg\-Subject.\-h.
+
+\hypertarget{classtg_subject_adba463ea10aea113b88f5eca807a51ae}{\index{tg\-Subject@{tg\-Subject}!$\sim$tg\-Subject@{$\sim$tg\-Subject}}
+\index{$\sim$tg\-Subject@{$\sim$tg\-Subject}!tgSubject@{tg\-Subject}}
+\subsubsection[{$\sim$tg\-Subject}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T$>$ virtual {\bf tg\-Subject}$<$ T $>$\-::$\sim${\bf tg\-Subject} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtg_subject_adba463ea10aea113b88f5eca807a51ae}
+The virtual destructor has nothing to do. 
+
+Definition at line 51 of file tg\-Subject.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}{\index{tg\-Subject@{tg\-Subject}!attach@{attach}}
+\index{attach@{attach}!tgSubject@{tg\-Subject}}
+\subsubsection[{attach}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Subject$>$ void {\bf tg\-Subject}$<$ Subject $>$\-::attach (
+\begin{DoxyParamCaption}
+\item[{{\bf tg\-Observer}$<$ Subject $>$ $\ast$}]{p\-Observer}
+\end{DoxyParamCaption}
+)}}\label{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548}
+Attach an observer to the subject of the observer. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em p\-Observer} & a pointer to an observer for the subject; do nothing if the pointer is N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 90 of file tg\-Subject.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classtg_subject_a56ecfd33a048c3a7f1a884318d9af548_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_a80799e5d0c8512d3d05a55764790392b}{\index{tg\-Subject@{tg\-Subject}!notify\-Setup@{notify\-Setup}}
+\index{notify\-Setup@{notify\-Setup}!tgSubject@{tg\-Subject}}
+\subsubsection[{notify\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Subject $>$ void {\bf tg\-Subject}$<$ Subject $>$\-::notify\-Setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_subject_a80799e5d0c8512d3d05a55764790392b}
+Call \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{tg\-Observer$<$\-T$>$\-::on\-Setup()} on all observers in the order in which they were attached. 
+
+Definition at line 111 of file tg\-Subject.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classtg_subject_a80799e5d0c8512d3d05a55764790392b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}{\index{tg\-Subject@{tg\-Subject}!notify\-Step@{notify\-Step}}
+\index{notify\-Step@{notify\-Step}!tgSubject@{tg\-Subject}}
+\subsubsection[{notify\-Step}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Subject $>$ void {\bf tg\-Subject}$<$ Subject $>$\-::notify\-Step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)}}\label{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42}
+Call \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$\-T$>$\-::on\-Step()} on all observers in the order in which they were attached. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; do nothing if not positive \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 97 of file tg\-Subject.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{classtg_subject_ad9640aa7fcc1e0b4ce8a913a4ce1ea42_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}{\index{tg\-Subject@{tg\-Subject}!notify\-Teardown@{notify\-Teardown}}
+\index{notify\-Teardown@{notify\-Teardown}!tgSubject@{tg\-Subject}}
+\subsubsection[{notify\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Subject $>$ void {\bf tg\-Subject}$<$ Subject $>$\-::notify\-Teardown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63}
+Call \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{tg\-Observer$<$\-T$>$\-::on\-Teardown()} on all observers in the order in which they were attached. 
+
+Definition at line 122 of file tg\-Subject.\-h.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_subject_adf7a60dbb0faf0de5528f862e7953e63_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_subject_8h}{tg\-Subject.\-h}\end{DoxyCompactItemize}

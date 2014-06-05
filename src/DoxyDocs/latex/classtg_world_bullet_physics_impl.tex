@@ -1,0 +1,168 @@
+\hypertarget{classtg_world_bullet_physics_impl}{\section{tg\-World\-Bullet\-Physics\-Impl Class Reference}
+\label{classtg_world_bullet_physics_impl}\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}}
+}
+
+
+{\ttfamily \#include $<$tg\-World\-Bullet\-Physics\-Impl.\-h$>$}
+
+
+
+Inheritance diagram for tg\-World\-Bullet\-Physics\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_world_bullet_physics_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for tg\-World\-Bullet\-Physics\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtg_world_bullet_physics_impl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtg_world_bullet_physics_impl_a5d580bbb1e01cda639cc913f7afb4e32}{tg\-World\-Bullet\-Physics\-Impl} (const \hyperlink{structtg_world_1_1_config}{tg\-World\-::\-Config} \&config, \hyperlink{classtg_bullet_ground}{tg\-Bullet\-Ground} $\ast$ground)
+\item 
+\hyperlink{classtg_world_bullet_physics_impl_a911e342b4d323524f045760c9b24780f}{$\sim$tg\-World\-Bullet\-Physics\-Impl} ()
+\item 
+virtual void \hyperlink{classtg_world_bullet_physics_impl_a7b1ae320bea710dced04f03222644f1e}{step} (double dt)
+\item 
+bt\-Soft\-Rigid\-Dynamics\-World \& \hyperlink{classtg_world_bullet_physics_impl_ae82f851ae223956a60e425d7e88cf1bc}{dynamics\-World} () const 
+\item 
+void \hyperlink{classtg_world_bullet_physics_impl_a8d9da0d41c6ff4e38788a39ea8183c42}{add\-Collision\-Shape} (bt\-Collision\-Shape $\ast$p\-Shape)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Concrete class derived from \hyperlink{classtg_world_impl}{tg\-World\-Impl} for Bullet Physics implementations. 
+
+Definition at line 46 of file tg\-World\-Bullet\-Physics\-Impl.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtg_world_bullet_physics_impl_a5d580bbb1e01cda639cc913f7afb4e32}{\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}}
+\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!tgWorldBulletPhysicsImpl@{tg\-World\-Bullet\-Physics\-Impl}}
+\subsubsection[{tg\-World\-Bullet\-Physics\-Impl}]{\setlength{\rightskip}{0pt plus 5cm}tg\-World\-Bullet\-Physics\-Impl\-::tg\-World\-Bullet\-Physics\-Impl (
+\begin{DoxyParamCaption}
+\item[{const {\bf tg\-World\-::\-Config} \&}]{config, }
+\item[{{\bf tg\-Bullet\-Ground} $\ast$}]{ground}
+\end{DoxyParamCaption}
+)}}\label{classtg_world_bullet_physics_impl_a5d580bbb1e01cda639cc913f7afb4e32}
+The only constructor. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em gravity} & the gravitational acceleration in m/sec$^\wedge$2 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 63 of file tg\-World\-Bullet\-Physics\-Impl.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_world_bullet_physics_impl_a5d580bbb1e01cda639cc913f7afb4e32_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_world_bullet_physics_impl_a911e342b4d323524f045760c9b24780f}{\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!$\sim$tg\-World\-Bullet\-Physics\-Impl@{$\sim$tg\-World\-Bullet\-Physics\-Impl}}
+\index{$\sim$tg\-World\-Bullet\-Physics\-Impl@{$\sim$tg\-World\-Bullet\-Physics\-Impl}!tgWorldBulletPhysicsImpl@{tg\-World\-Bullet\-Physics\-Impl}}
+\subsubsection[{$\sim$tg\-World\-Bullet\-Physics\-Impl}]{\setlength{\rightskip}{0pt plus 5cm}tg\-World\-Bullet\-Physics\-Impl\-::$\sim$tg\-World\-Bullet\-Physics\-Impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtg_world_bullet_physics_impl_a911e342b4d323524f045760c9b24780f}
+Clean up Bullet Physics state. 
+
+Definition at line 85 of file tg\-World\-Bullet\-Physics\-Impl.\-cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_world_bullet_physics_impl_a8d9da0d41c6ff4e38788a39ea8183c42}{\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!add\-Collision\-Shape@{add\-Collision\-Shape}}
+\index{add\-Collision\-Shape@{add\-Collision\-Shape}!tgWorldBulletPhysicsImpl@{tg\-World\-Bullet\-Physics\-Impl}}
+\subsubsection[{add\-Collision\-Shape}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-World\-Bullet\-Physics\-Impl\-::add\-Collision\-Shape (
+\begin{DoxyParamCaption}
+\item[{bt\-Collision\-Shape $\ast$}]{p\-Shape}
+\end{DoxyParamCaption}
+)}}\label{classtg_world_bullet_physics_impl_a8d9da0d41c6ff4e38788a39ea8183c42}
+Add a bt\-Collision\-Shape the a collection for deletion upon destruction. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em p\-Shape} & a pointer to a bt\-Collision\-Shape; do nothing if N\-U\-L\-L \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 182 of file tg\-World\-Bullet\-Physics\-Impl.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_world_bullet_physics_impl_a8d9da0d41c6ff4e38788a39ea8183c42_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_world_bullet_physics_impl_ae82f851ae223956a60e425d7e88cf1bc}{\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!dynamics\-World@{dynamics\-World}}
+\index{dynamics\-World@{dynamics\-World}!tgWorldBulletPhysicsImpl@{tg\-World\-Bullet\-Physics\-Impl}}
+\subsubsection[{dynamics\-World}]{\setlength{\rightskip}{0pt plus 5cm}bt\-Soft\-Rigid\-Dynamics\-World\& tg\-World\-Bullet\-Physics\-Impl\-::dynamics\-World (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtg_world_bullet_physics_impl_ae82f851ae223956a60e425d7e88cf1bc}
+Return a reference to the dynamics world. \begin{DoxyReturn}{Returns}
+a reference to the dynamics world 
+\end{DoxyReturn}
+
+
+Definition at line 71 of file tg\-World\-Bullet\-Physics\-Impl.\-h.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtg_world_bullet_physics_impl_ae82f851ae223956a60e425d7e88cf1bc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_world_bullet_physics_impl_a7b1ae320bea710dced04f03222644f1e}{\index{tg\-World\-Bullet\-Physics\-Impl@{tg\-World\-Bullet\-Physics\-Impl}!step@{step}}
+\index{step@{step}!tgWorldBulletPhysicsImpl@{tg\-World\-Bullet\-Physics\-Impl}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void tg\-World\-Bullet\-Physics\-Impl\-::step (
+\begin{DoxyParamCaption}
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtg_world_bullet_physics_impl_a7b1ae320bea710dced04f03222644f1e}
+Advance the simulation. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dt} & the number of seconds since the previous call; must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtg_world_impl_a105ab0706232a897663d181afd960866}{tg\-World\-Impl}.
+
+
+
+Definition at line 168 of file tg\-World\-Bullet\-Physics\-Impl.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_world_bullet_physics_impl_8h}{tg\-World\-Bullet\-Physics\-Impl.\-h}\item 
+core/\hyperlink{tg_world_bullet_physics_impl_8cpp}{tg\-World\-Bullet\-Physics\-Impl.\-cpp}\end{DoxyCompactItemize}

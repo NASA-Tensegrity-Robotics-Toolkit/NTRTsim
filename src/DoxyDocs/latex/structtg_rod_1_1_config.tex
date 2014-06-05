@@ -1,0 +1,101 @@
+\hypertarget{structtg_rod_1_1_config}{\section{tg\-Rod\-:\-:Config Struct Reference}
+\label{structtg_rod_1_1_config}\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}}
+}
+
+
+{\ttfamily \#include $<$tg\-Rod.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structtg_rod_1_1_config_ae4f5148db61532a98c75d34dd97a186f}{Config} (double r=0.\-5, double d=1.\-0, double f=0.\-5, double rf=0.\-0, double res=0.\-0)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const double \hyperlink{structtg_rod_1_1_config_a20c2370d27608ee1d7e8521095f6b0df}{radius}
+\item 
+const double \hyperlink{structtg_rod_1_1_config_ad4949cc9e0d084a5d0907ee6b89616c7}{density}
+\item 
+const double \hyperlink{structtg_rod_1_1_config_a7c85c2b9b8f2d30fea1a8c5e498b2fd6}{friction}
+\item 
+const double \hyperlink{structtg_rod_1_1_config_a99421c0930dce83ed7721fe899611e7c}{roll\-Friction}
+\item 
+const double \hyperlink{structtg_rod_1_1_config_aa16247d472088ec2476f409da5f92f87}{restitution}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds two public member variables, density and radius, describing a rod configuration. A constructor allows them to be set together and to default. 
+
+Definition at line 51 of file tg\-Rod.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{structtg_rod_1_1_config_ae4f5148db61532a98c75d34dd97a186f}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!Config@{Config}}
+\index{Config@{Config}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{Config}]{\setlength{\rightskip}{0pt plus 5cm}tg\-Rod\-::\-Config\-::\-Config (
+\begin{DoxyParamCaption}
+\item[{double}]{r = {\ttfamily 0.5}, }
+\item[{double}]{d = {\ttfamily 1.0}, }
+\item[{double}]{f = {\ttfamily 0.5}, }
+\item[{double}]{rf = {\ttfamily 0.0}, }
+\item[{double}]{res = {\ttfamily 0.0}}
+\end{DoxyParamCaption}
+)}}\label{structtg_rod_1_1_config_ae4f5148db61532a98c75d34dd97a186f}
+Initialize with radius and density, which may default. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em radius} & the rod's radius; must be non-\/negative \\
+\hline
+\mbox{\tt in}  & {\em density} & the rod's density; must be non-\/negative \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file tg\-Rod.\-cpp.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structtg_rod_1_1_config_ad4949cc9e0d084a5d0907ee6b89616c7}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!density@{density}}
+\index{density@{density}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{density}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Rod\-::\-Config\-::density}}\label{structtg_rod_1_1_config_ad4949cc9e0d084a5d0907ee6b89616c7}
+The rod's density; must be nonnegative. 
+
+Definition at line 68 of file tg\-Rod.\-h.
+
+\hypertarget{structtg_rod_1_1_config_a7c85c2b9b8f2d30fea1a8c5e498b2fd6}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!friction@{friction}}
+\index{friction@{friction}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{friction}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Rod\-::\-Config\-::friction}}\label{structtg_rod_1_1_config_a7c85c2b9b8f2d30fea1a8c5e498b2fd6}
+The rod's friction; must be between 0 and 1 (inclusive). 
+
+Definition at line 72 of file tg\-Rod.\-h.
+
+\hypertarget{structtg_rod_1_1_config_a20c2370d27608ee1d7e8521095f6b0df}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!radius@{radius}}
+\index{radius@{radius}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{radius}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Rod\-::\-Config\-::radius}}\label{structtg_rod_1_1_config_a20c2370d27608ee1d7e8521095f6b0df}
+The rod's radius; must be nonnegative. 
+
+Definition at line 65 of file tg\-Rod.\-h.
+
+\hypertarget{structtg_rod_1_1_config_aa16247d472088ec2476f409da5f92f87}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!restitution@{restitution}}
+\index{restitution@{restitution}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{restitution}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Rod\-::\-Config\-::restitution}}\label{structtg_rod_1_1_config_aa16247d472088ec2476f409da5f92f87}
+The rod's coefficient of restitution; must be between 0 and 1 (inclusive). 
+
+Definition at line 80 of file tg\-Rod.\-h.
+
+\hypertarget{structtg_rod_1_1_config_a99421c0930dce83ed7721fe899611e7c}{\index{tg\-Rod\-::\-Config@{tg\-Rod\-::\-Config}!roll\-Friction@{roll\-Friction}}
+\index{roll\-Friction@{roll\-Friction}!tgRod::Config@{tg\-Rod\-::\-Config}}
+\subsubsection[{roll\-Friction}]{\setlength{\rightskip}{0pt plus 5cm}const double tg\-Rod\-::\-Config\-::roll\-Friction}}\label{structtg_rod_1_1_config_a99421c0930dce83ed7721fe899611e7c}
+The rod's rolling friction; must be between 0 and 1 (inclusive). 
+
+Definition at line 76 of file tg\-Rod.\-h.
+
+
+
+The documentation for this struct was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+core/\hyperlink{tg_rod_8h}{tg\-Rod.\-h}\item 
+core/\hyperlink{tg_rod_8cpp}{tg\-Rod.\-cpp}\end{DoxyCompactItemize}

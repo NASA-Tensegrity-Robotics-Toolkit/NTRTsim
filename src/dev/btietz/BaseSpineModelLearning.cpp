@@ -1,0 +1,148 @@
+/*
+ * Copyright © 2012, United States Government, as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ * 
+ * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+*/
+
+// This module
+#include "BaseSpineModelLearning.h"
+// This library
+#include "tgcreator/tgBuildSpec.h"
+#include "core/tgCast.h"
+#include "tgcreator/tgConnectorInfo.h"
+#include "core/tgLinearString.h"
+#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgRigidAutoCompound.h"
+#include "tgcreator/tgRodInfo.h"
+#include "core/tgString.h"
+#include "tgcreator/tgStructure.h"
+#include "tgcreator/tgStructureInfo.h"
+#include "tgcreator/tgUtil.h"
+// The Bullet Physics library
+#include "btBulletDynamicsCommon.h"
+// The C++ Standard Library
+#include <algorithm> // std::fill
+#include <iostream>
+
+BaseSpineModelLearning::BaseSpineModelLearning(int segments) : 
+    m_segments(segments),   
+    tgModel() 
+{
+}
+
+BaseSpineModelLearning::~BaseSpineModelLearning()
+{
+}
+
+void BaseSpineModelLearning::setup(tgWorld& world)
+{
+	
+    notifySetup();
+    
+    // Actually setup the children
+    tgModel::setup(world);
+}
+
+void BaseSpineModelLearning::teardown()
+{
+    notifyTeardown();
+    
+    tgModel::teardown();
+      
+    // These pointers will be freed by tgModel::teardown
+    m_allMuscles.clear();
+    m_allSegments.clear();
+    m_muscleMap.clear();
+}
+
+void BaseSpineModelLearning::step(double dt)
+{
+    /* CPG update occurs in the controller so that we can decouple it
+    * from the physics update
+    */
+    notifyStep(dt);
+    
+    tgModel::step(dt);  // Step any children
+}
+
+const std::vector<tgLinearString*>&
+BaseSpineModelLearning::getMuscles (const std::string& key) const
+{
+    const MuscleMap::const_iterator it = m_muscleMap.find(key);
+    if (it == m_muscleMap.end())
+    {
+        throw std::invalid_argument("Key '" + key + "' not found in muscle map");
+    }
+    else
+    {
+        return it->second;
+    }
+}
+
+const std::vector<tgLinearString*>& BaseSpineModelLearning::getAllMuscles()
+{
+    return m_allMuscles;
+}
+
+const int BaseSpineModelLearning::getSegments()
+{
+    return m_segments;
+}
+    
+std::vector<double> BaseSpineModelLearning::getSegmentCOM(const int n) const
+{
+    if (m_allSegments.size() != m_segments)
+    {
+        throw std::runtime_error("Not initialized");
+    }
+    else if (n < 0) 
+    {
+        throw std::range_error("Negative segment number"); 
+    }
+    else if (n >= m_segments)
+    {
+        throw std::range_error(tgString("Segment number > ", m_segments));
+    }
+    
+    std::vector<tgRod*> p_rods =
+        tgCast::filter<tgModel, tgRod> (m_allSegments[n]->getDescendants());
+    
+    // Ensure our segments are being populated correctly
+    assert(!p_rods.empty());
+
+    btVector3 segmentCenterOfMass(0, 0, 0);
+    double segmentMass = 0.0;
+    for (std::size_t i = 0; i < p_rods.size(); i++)
+    {
+        const tgRod* const pRod = p_rods[i];
+        assert(pRod != NULL);
+        const double rodMass = pRod->mass();
+        std::cout << "mass " << rodMass;
+        const btVector3 rodCenterOfMass = pRod->centerOfMass();
+        segmentCenterOfMass += rodCenterOfMass * rodMass;
+        segmentMass += rodMass;
+    }
+    
+    // Check to make sure the rods actually had mass
+    assert(segmentMass > 0.0);
+    
+    segmentCenterOfMass /= segmentMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = segmentCenterOfMass[i]; }
+    
+    return result;
+}

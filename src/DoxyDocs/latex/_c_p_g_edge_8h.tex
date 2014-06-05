@@ -1,0 +1,69 @@
+\hypertarget{_c_p_g_edge_8h}{\section{util/\-C\-P\-G\-Edge.h File Reference}
+\label{_c_p_g_edge_8h}\index{util/\-C\-P\-G\-Edge.\-h@{util/\-C\-P\-G\-Edge.\-h}}
+}
+
+
+Definition of class \hyperlink{class_c_p_g_edge}{C\-P\-G\-Edge}.  
+
+
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include \char`\"{}C\-P\-G\-Node.\-h\char`\"{}}\\*
+This graph shows which files directly or indirectly include this file\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{_c_p_g_edge_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_c_p_g_edge}{C\-P\-G\-Edge}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::ostream \& \hyperlink{_c_p_g_edge_8h_ae6e09f6882e751a88ce2b79e69670415}{operator$<$$<$} (std\-::ostream \&os, const \hyperlink{class_c_p_g_edge}{C\-P\-G\-Edge} \&obj)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definition of class \hyperlink{class_c_p_g_edge}{C\-P\-G\-Edge}. \begin{DoxyDate}{Date}
+March 2014 
+\end{DoxyDate}
+\begin{DoxyAuthor}{Author}
+Brian Tietz \$\-Id\$ 
+\end{DoxyAuthor}
+
+
+Definition in file \hyperlink{_c_p_g_edge_8h_source}{C\-P\-G\-Edge.\-h}.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{_c_p_g_edge_8h_ae6e09f6882e751a88ce2b79e69670415}{\index{C\-P\-G\-Edge.\-h@{C\-P\-G\-Edge.\-h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!CPGEdge.h@{C\-P\-G\-Edge.\-h}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::ostream\& operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{std\-::ostream \&}]{os, }
+\item[{const {\bf C\-P\-G\-Edge} \&}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{_c_p_g_edge_8h_ae6e09f6882e751a88ce2b79e69670415}
+Overload \hyperlink{tg_model_8cpp_a2a689ee3da32701c6ee9352145507f66}{operator$<$$<$()} to handle \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em os} & an ostream \\
+\hline
+\mbox{\tt in}  & {\em a} & reference to a \hyperlink{class_c_p_g_node}{C\-P\-G\-Node} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+os 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000115}{Todo}]Inlining this does no good; stream operations are slow. \end{DoxyRefDesc}
+
+
+Definition at line 80 of file C\-P\-G\-Edge.\-h.
+

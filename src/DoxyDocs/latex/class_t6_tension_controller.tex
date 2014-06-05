@@ -1,0 +1,168 @@
+\hypertarget{class_t6_tension_controller}{\section{T6\-Tension\-Controller Class Reference}
+\label{class_t6_tension_controller}\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}}
+}
+
+
+{\ttfamily \#include $<$T6\-Tension\-Controller.\-h$>$}
+
+
+
+Inheritance diagram for T6\-Tension\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{class_t6_tension_controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for T6\-Tension\-Controller\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{class_t6_tension_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_t6_tension_controller_ad389b5f78726db80e793cc16c76357d1}{T6\-Tension\-Controller} (const double tension=.\-01)
+\item 
+virtual \hyperlink{class_t6_tension_controller_afa5ca68d156bf3a360432438a6035f50}{$\sim$\-T6\-Tension\-Controller} ()
+\item 
+virtual void \hyperlink{class_t6_tension_controller_a63fdbb09fd74b79c16f5cf441041c1e3}{on\-Step} (\hyperlink{class_t6_model}{T6\-Model} \&subject, double dt)
+\item 
+virtual void \hyperlink{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{on\-Attach} (\hyperlink{class_t6_model}{T6\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{on\-Setup} (\hyperlink{class_t6_model}{T6\-Model} \&subject)
+\item 
+virtual void \hyperlink{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{on\-Teardown} (\hyperlink{class_t6_model}{T6\-Model} \&subject)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A controller to apply uniform tension to a \hyperlink{class_t6_model}{T6\-Model}. Iterates through all \hyperlink{classtg_linear_string}{tg\-Linear\-String} members and calls tension\-Min\-Length\-Controller 
+
+Definition at line 39 of file T6\-Tension\-Controller.\-h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_t6_tension_controller_ad389b5f78726db80e793cc16c76357d1}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!T6\-Tension\-Controller@{T6\-Tension\-Controller}}
+\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{T6\-Tension\-Controller}]{\setlength{\rightskip}{0pt plus 5cm}T6\-Tension\-Controller\-::\-T6\-Tension\-Controller (
+\begin{DoxyParamCaption}
+\item[{const double}]{tension = {\ttfamily .01}}
+\end{DoxyParamCaption}
+)}}\label{class_t6_tension_controller_ad389b5f78726db80e793cc16c76357d1}
+Construct a \hyperlink{class_t6_tension_controller}{T6\-Tension\-Controller}. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tension,a} & double specifying the desired tension throughougt structure. Must be non-\/negitive \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 30 of file T6\-Tension\-Controller.\-cpp.
+
+\hypertarget{class_t6_tension_controller_afa5ca68d156bf3a360432438a6035f50}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!$\sim$\-T6\-Tension\-Controller@{$\sim$\-T6\-Tension\-Controller}}
+\index{$\sim$\-T6\-Tension\-Controller@{$\sim$\-T6\-Tension\-Controller}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{$\sim$\-T6\-Tension\-Controller}]{\setlength{\rightskip}{0pt plus 5cm}virtual T6\-Tension\-Controller\-::$\sim$\-T6\-Tension\-Controller (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{class_t6_tension_controller_afa5ca68d156bf3a360432438a6035f50}
+Nothing to delete, destructor must be virtual 
+
+Definition at line 53 of file T6\-Tension\-Controller.\-h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!on\-Attach@{on\-Attach}}
+\index{on\-Attach@{on\-Attach}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{on\-Attach}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf T6\-Model}  $>$\-::on\-Attach (
+\begin{DoxyParamCaption}
+\item[{{\bf T6\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a0ecd07483eb41f9a0ab19b8ed24052f1}
+Notify the observers when an attach action has occurred. Will only occur once, typically before setup 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 54 of file tg\-Observer.\-h.
+
+\hypertarget{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!on\-Setup@{on\-Setup}}
+\index{on\-Setup@{on\-Setup}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{on\-Setup}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf T6\-Model}  $>$\-::on\-Setup (
+\begin{DoxyParamCaption}
+\item[{{\bf T6\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_ae7b2de87bd4a6e786bc16f1b801c36a6}
+Notify the observers when a setup action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 60 of file tg\-Observer.\-h.
+
+\hypertarget{class_t6_tension_controller_a63fdbb09fd74b79c16f5cf441041c1e3}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!on\-Step@{on\-Step}}
+\index{on\-Step@{on\-Step}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{on\-Step}]{\setlength{\rightskip}{0pt plus 5cm}void T6\-Tension\-Controller\-::on\-Step (
+\begin{DoxyParamCaption}
+\item[{{\bf T6\-Model} \&}]{subject, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_t6_tension_controller_a63fdbb09fd74b79c16f5cf441041c1e3}
+Apply the tension controller. Called my notify\-Step(dt) of its subject. The tg\-Linear\-Strings will update using their tension\-Min\-Length\-Controller each step 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em subject} & -\/ the \hyperlink{class_t6_model}{T6\-Model} that is being controlled. Must have a list of all\-Muscles populated \\
+\hline
+\mbox{\tt in}  & {\em dt,current} & timestep must be positive \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtg_observer_a6db5ef1e2792102b8e36dbad5e1a3d7a}{tg\-Observer$<$ T6\-Model $>$}.
+
+
+
+Definition at line 39 of file T6\-Tension\-Controller.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_t6_tension_controller_a63fdbb09fd74b79c16f5cf441041c1e3_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}{\index{T6\-Tension\-Controller@{T6\-Tension\-Controller}!on\-Teardown@{on\-Teardown}}
+\index{on\-Teardown@{on\-Teardown}!T6TensionController@{T6\-Tension\-Controller}}
+\subsubsection[{on\-Teardown}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf tg\-Observer}$<$ {\bf T6\-Model}  $>$\-::on\-Teardown (
+\begin{DoxyParamCaption}
+\item[{{\bf T6\-Model}  \&}]{subject}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}}\label{classtg_observer_a1663edb3732e5ffb7bbe6bfb4ade88b8}
+Notify the observers when a teardown action has occurred. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em subject} & the subject being observed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 66 of file tg\-Observer.\-h.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+dev/tests/\hyperlink{_t6_tension_controller_8h}{T6\-Tension\-Controller.\-h}\item 
+dev/tests/T6\-Tension\-Controller.\-cpp\end{DoxyCompactItemize}
