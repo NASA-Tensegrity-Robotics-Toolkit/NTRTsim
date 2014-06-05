@@ -16,7 +16,7 @@
  * governing permissions and limitations under the License.
 */
 
-#include "FlemonsSpineModelLearning.h"
+#include "FlemonsSpineModelLearningCL.h"
 
 // This library
 #include "core/tgCast.h"
@@ -29,20 +29,22 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
 
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btVector3.h"
 #include <iostream>
 #include <algorithm> // std::fill
+#include <map>
+#include <set>
 
-FlemonsSpineModelLearning::FlemonsSpineModelLearning(int segments) :   
+FlemonsSpineModelLearningCL::FlemonsSpineModelLearningCL(int segments) :   
     BaseSpineModelLearning(segments) 
 {
 }
 
-FlemonsSpineModelLearning::~FlemonsSpineModelLearning()
+FlemonsSpineModelLearningCL::~FlemonsSpineModelLearningCL()
 {
 }
 
-void FlemonsSpineModelLearning::setup(tgWorld& world)
+void FlemonsSpineModelLearningCL::setup(tgWorld& world)
 {
     // This is basically a manual setup of a model. There are things that do this for us (@todo: reference the things that do this for us)
 
@@ -206,14 +208,14 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     BaseSpineModelLearning::setup(world);
 }
 
-void FlemonsSpineModelLearning::teardown()
+void FlemonsSpineModelLearningCL::teardown()
 {
     
     BaseSpineModelLearning::teardown();
       
 }
 
-void FlemonsSpineModelLearning::step(double dt)
+void FlemonsSpineModelLearningCL::step(double dt)
 {
 	
 	// Probably should go in a controller eventually

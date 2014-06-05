@@ -16,25 +16,25 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file BaseSpineModelLearning.cpp
+ * @brief A template base class for a tensegrity spine
+ * @author Brian Tietz
+ * @version 1.0.0
+ * $Id$
+ */
+
 // This module
 #include "BaseSpineModelLearning.h"
 // This library
-#include "tgcreator/tgBuildSpec.h"
 #include "core/tgCast.h"
-#include "tgcreator/tgConnectorInfo.h"
 #include "core/tgLinearString.h"
-#include "tgcreator/tgLinearStringInfo.h"
-#include "tgcreator/tgRigidAutoCompound.h"
-#include "tgcreator/tgRodInfo.h"
+#include "core/tgRod.h"
 #include "core/tgString.h"
-#include "tgcreator/tgStructure.h"
-#include "tgcreator/tgStructureInfo.h"
-#include "tgcreator/tgUtil.h"
-// The Bullet Physics library
-#include "btBulletDynamicsCommon.h"
 // The C++ Standard Library
 #include <algorithm> // std::fill
 #include <iostream>
+#include <stdexcept>
 
 BaseSpineModelLearning::BaseSpineModelLearning(int segments) : 
     m_segments(segments),   

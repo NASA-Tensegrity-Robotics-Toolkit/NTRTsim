@@ -16,6 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file BaseSpineCPGControl.cpp
+ * @brief A controller for the template class BaseSpineModelLearning
+ * @author Brian Tietz
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "BaseSpineCPGControl.h"
 
 #include <string>

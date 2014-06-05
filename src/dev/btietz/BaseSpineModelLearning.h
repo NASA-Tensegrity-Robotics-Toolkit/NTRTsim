@@ -19,10 +19,17 @@
 #ifndef BASE_SPINE_MODEL_LEARNING_H
 #define BASE_SPINE_MODEL_LEARNING_H
 
+/**
+ * @file BaseSpineModelLearning.h
+ * @brief A template base class for a tensegrity spine
+ * @author Brian Tietz
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "core/tgModel.h" 
 #include "core/tgSubject.h"
-#include "LinearMath/btVector3.h"
-#include "boost/multi_array.hpp"
+
 #include <map>
 #include <set>
 #include <string>
@@ -32,6 +39,10 @@ class tgWorld;
 class tgStructureInfo;
 class tgLinearString;
 
+/**
+ * Provides all of the interfaces for a learning spine model, which
+ * implements all of the functions except using  setup
+ */
 class BaseSpineModelLearning: public tgSubject<BaseSpineModelLearning>,
                                  public tgModel
 {

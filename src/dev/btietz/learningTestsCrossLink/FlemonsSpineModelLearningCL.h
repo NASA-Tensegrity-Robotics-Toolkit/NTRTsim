@@ -16,25 +16,22 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef FLEMONS_SPINE_MODEL_LEARNING_H
-#define FLEMONS_SPINE_MODEL_LEARNING_H
+#ifndef FLEMONS_SPINE_MODEL_LEARNING_CL_H
+#define FLEMONS_SPINE_MODEL_LEARNING_CL_H
 
 #include "dev/btietz/BaseSpineModelLearning.h"
-#include "LinearMath/btVector3.h"
-#include <map>
-#include <set>
 
 class tgWorld;
 class tgStructureInfo;
 class tgLinearString;
 
-class FlemonsSpineModelLearning : public BaseSpineModelLearning
+class FlemonsSpineModelLearningCL : public BaseSpineModelLearning
 {
 public: 
 
-    FlemonsSpineModelLearning(int segments);
+    FlemonsSpineModelLearningCL(int segments);
 
-    virtual ~FlemonsSpineModelLearning();
+    virtual ~FlemonsSpineModelLearningCL();
     
     virtual void setup(tgWorld& world);
     

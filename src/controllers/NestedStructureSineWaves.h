@@ -23,6 +23,7 @@
  * @file NestedStructureSineWaves.h
  * @brief Contains the definition of class NestedStructureSineWaves
  * @author Brian Tietz
+ * @version 1.0.0
  * $Id$
  */
 

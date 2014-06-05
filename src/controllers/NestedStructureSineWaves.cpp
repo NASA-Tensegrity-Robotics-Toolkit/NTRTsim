@@ -20,6 +20,7 @@
  * @file NestedStructureSineWaves.cpp
  * @brief Contains the implementation of class NestedStructureSineWaves
  * @author Brian Tietz
+ * @version 1.0.0
  * $Id$
  */
 

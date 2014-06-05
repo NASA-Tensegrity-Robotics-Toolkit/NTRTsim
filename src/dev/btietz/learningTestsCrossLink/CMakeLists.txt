@@ -17,7 +17,7 @@ file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/logs)
 
 add_executable(AppFlemonsSpineLearningCL
-    FlemonsSpineModelLearning.cpp
-    AppFlemonsSpineLearning.cpp
+    FlemonsSpineModelLearningCL.cpp
+    AppFlemonsSpineLearningCL.cpp
     
 ) 

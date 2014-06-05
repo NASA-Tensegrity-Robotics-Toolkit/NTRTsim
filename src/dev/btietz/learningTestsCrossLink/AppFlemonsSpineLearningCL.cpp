@@ -17,16 +17,15 @@
 */
 
 /**
- * @file AppFlemonsSpineLearning.cpp
+ * @file AppFlemonsSpineLearningCL.cpp
  * @brief Contains the definition function main() for the Flemons Spine Learning
  * application.
  * @author Brian Tietz
- * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "FlemonsSpineModelLearning.h"
+#include "FlemonsSpineModelLearningCL.h"
 // This library
 #include "dev/btietz/BaseSpineCPGControl.h"
 #include "core/tgModel.h"
@@ -66,8 +65,8 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 12;
-    FlemonsSpineModelLearning* myModel =
-      new FlemonsSpineModelLearning(segments);
+    FlemonsSpineModelLearningCL* myModel =
+      new FlemonsSpineModelLearningCL(segments);
     
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");

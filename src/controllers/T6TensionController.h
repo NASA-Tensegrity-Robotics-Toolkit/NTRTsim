@@ -23,6 +23,7 @@
  * @file T6TensionController.h
  * @brief Contains the definition of class T6TensionController.
  * @author Brian Tietz
+ * @version 1.0.0
  * $Id$
  */
 

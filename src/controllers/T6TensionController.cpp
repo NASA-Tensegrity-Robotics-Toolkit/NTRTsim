@@ -16,6 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file T6TensionController.cpp
+ * @brief Implementation of six strut tensegrity.
+ * @author Brian Tietz
+ * @version 1.0.0
+ * $Id$
+ */
+
 // This module
 #include "T6TensionController.h"
 // This application

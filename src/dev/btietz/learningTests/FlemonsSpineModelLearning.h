@@ -19,16 +19,25 @@
 #ifndef FLEMONS_SPINE_MODEL_LEARNING_H
 #define FLEMONS_SPINE_MODEL_LEARNING_H
 
+/**
+ * @file FlemonsSpineModelLearning.h
+ * @brief Implementing the tetrahedral complex spine inspired by Tom Flemons
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "dev/btietz/BaseSpineModelLearning.h" 
-#include "LinearMath/btVector3.h"
-#include "boost/multi_array.hpp"
-#include <map>
-#include <set>
 
 class tgWorld;
 class tgStructureInfo;
 class tgLinearString;
 
+/**
+ * This class implements the tetrahedral complex tensegrity spine
+ * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
+ */
 class FlemonsSpineModelLearning : public BaseSpineModelLearning
 {
 public: 

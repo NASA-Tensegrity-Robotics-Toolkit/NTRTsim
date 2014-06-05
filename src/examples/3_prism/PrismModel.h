@@ -23,6 +23,7 @@
  * @file PrismModel.h
  * @brief Defines a 3 strut 9 string tensegrity model
  * @author Brian Tietz
+ * @version 1.0.0
  * $Id$
  */
 

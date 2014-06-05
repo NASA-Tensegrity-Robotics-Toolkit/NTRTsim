@@ -16,6 +16,15 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file FlemonsSpineModelLearning.cpp
+ * @brief Implementing the tetrahedral complex spine inspired by Tom Flemons
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 // This module
 #include "FlemonsSpineModelLearning.h"
 // This library
@@ -29,10 +38,12 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
 // The Bullet Physics library
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <algorithm> // std::fill
 #include <iostream>
+#include <map>
+#include <set>
 
 FlemonsSpineModelLearning::FlemonsSpineModelLearning(int segments) : 
     BaseSpineModelLearning(segments) 
