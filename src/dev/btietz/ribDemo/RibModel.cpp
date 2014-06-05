@@ -16,6 +16,15 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file RibModel.cpp
+ * @brief Implements a spine model with a rib cage
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "RibModel.h"
 
 #include "core/tgCast.h"
@@ -29,7 +38,7 @@
 #include "tgcreator/tgUtil.h"
 
 // Bullet Physics
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 

@@ -19,10 +19,23 @@
 #ifndef RIB_MODEL_H
 #define RIB_MODEL_H
 
+/**
+ * @file RibModel.h
+ * @brief Implements a spine model with a rib cage
+ * @author Brian Tietz
+ * @date May 2014
+ * @version 1.0.0
+ * $Id$
+ */
+
 #include "dev/btietz/BaseSpineModelLearning.h"
 
 class tgWorld;
 
+/**
+ * The spine model is similar in shape to FlemonsSpineModelLearning, the
+ * ribs are rigidly attached ellipses.
+ */
 class RibModel: public BaseSpineModelLearning
 {
 public: 

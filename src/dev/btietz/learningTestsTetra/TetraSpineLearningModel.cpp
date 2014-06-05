@@ -29,7 +29,7 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
 // The Bullet Physics library
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
