@@ -14,16 +14,28 @@
 	and run AppPrismModel. You should see a three strut tensegrity
 	prism. You can use your mouse to grab and move the structure in
 	space. Depending on the forces it may collapse, you can either move
-	it again or reset with the spacebar. A full list of keyboard commands
+	it again or reset by pressing spacebar. A full list of keyboard commands
 	is available at \ref keys.
 	
 	If you want to dive into the source code, look at the folder
 	src/examples/3_prism. A tensegrity application needs two classes and
-	a main in order to run
+	a main in order to run. The first class is the model of the actual
+	tensegrity, which in this case is PrismModel. The second class is 
+	a controller. PrismModel is using the general purpose controller
+	PretensionController which is located in src/controllers.
+	Finally, the main in AppPrismModel configures the world and simulation
+	using the classes tgWorld, tgSimViewGraphics, and tgSimulation. See
+	the comments in main for more details and an example.
+	
+	\section build Creating a new tensegrity - tgcreator
 	the most relevant function
 	is PrismModel's setup function. This uses the tools in tgcreator
+	
 	\subsection superball Six Strut Icosahedron
 	
+	\subsection tetraspine Nested Tetrahedrons
+	
+	\subsection spines learningSpines
 */
 
 /** \page keys Keyboard Commands
