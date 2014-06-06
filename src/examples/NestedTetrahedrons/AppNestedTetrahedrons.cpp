@@ -17,23 +17,22 @@
 */
 
 /**
- * @file AppT6ModelTest.cpp
- * @brief Contains the definition function main() for the T6 Model Test
+ * @file AppNestedStructureTest.cpp
+ * @brief Contains the definition function main() for the Nested Structure Test
  * application.
+ * @author Brian Tietz
+ * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "models/T6Model.h"
-#include "controllers/T6TensionController.h"
+#include "NestedStructureTestModel.h"
+#include "NestedStructureSineWaves.h"
 // This library
-#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
-// Bullet Physics
-#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -45,42 +44,32 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppT6ModelTest" << std::endl;
+    std::cout << "AppNestedStructureTest" << std::endl;
 
-    // First create the ground and world
-    
-    // Determine the angle of the ground in radians. All 0 is flat
-    const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
-    const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
+    // First create the world
     const tgWorld::Config config = 
     {
-        981 // gravity, cm/sec^2 Use this to adjust length scale of world
+        981 // gravity, cm/sec^2
     };
-    tgWorld world(config, ground);
+    tgWorld world(config); 
 
     // Second create the view
-    const double timestep_physics = 0.0001; // Seconds
-    const double timestep_graphics = 1.f/60.f; // Seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    const double stepSize = 1.0/120.0; //Seconds
+    tgSimViewGraphics view(world, stepSize);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    T6Model* const myModel = new T6Model();
-    // Set the tension of the controller units of kg * length / s^2
-    // So 10000 units at this scale is 100 N
-    T6TensionController* const pTC = new T6TensionController(10000);
-    myModel->attach(pTC);
+    const int segments = 12;
+    NestedStructureTestModel* myModel = new NestedStructureTestModel(segments);
+    NestedStructureSineWaves* const pMuscleControl =
+      new NestedStructureSineWaves();
+    myModel->attach(pMuscleControl);
     simulation.addModel(myModel);
-    
-    // Run until the user stops
+	
+	// Run until the user stops
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

@@ -27,7 +27,7 @@
 // This module
 #include "T6TensionController.h"
 // This application
-#include "models/T6Model.h"
+#include "T6Model.h"
 // This library
 #include "core/tgLinearString.h"
 // The C++ Standard Library

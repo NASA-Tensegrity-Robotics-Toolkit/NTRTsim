@@ -28,7 +28,7 @@
 #include "NestedStructureSineWaves.h"
 
 // Its subject
-#include "models/NestedStructureTestModel.h"
+#include "NestedStructureTestModel.h"
 
 // NTRTSim
 #include "core/tgLinearString.h"

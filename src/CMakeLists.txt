@@ -9,9 +9,7 @@ subdirs(
     util
     sensors
     tgcreator
-    models
     controllers
-    apps
     dev
     examples
 )
