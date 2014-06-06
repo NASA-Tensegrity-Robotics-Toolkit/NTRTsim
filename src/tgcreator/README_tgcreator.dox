@@ -1,0 +1,19 @@
+
+/**
+ * \dir tgcreator
+ * @brief Classes used to build a tensegrity out of rigid objects and strings.
+ * 
+ * For detailed description see \ref tgcreator
+ * \page tgcreator tgcreator
+ * \section tgcreator Library
+ * tgcreator a specification of tgNodes and tgPairs to build a tensegrity structure.
+ * Nodes are first placed into a tgStructure, and then those nodes are paired and tagged.
+ * A tgPair can either become a tgRigidInfo or a tgConnectorInfo based on
+ * its tgTag structure. This is determined by the config (from tgRodInfo or tgLinearStringInfo)
+ * that is passed into a tgBuildSpec.
+ * The tgBuildSpec is given to a tgStructureInfo, which then builds the structure
+ * into the relevant tgModel. It takes care of compouding tgRod (s) that share the same
+ * nodes using tgRigidAutoCompound.
+ * 
+ * For an example, see PrismModel
+ */
