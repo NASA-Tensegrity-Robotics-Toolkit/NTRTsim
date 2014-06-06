@@ -108,7 +108,7 @@ void tgLinearString::setup(tgWorld& world)
 
 void tgLinearString::teardown()
 {
-    notifyTeardown();
+    // Do not notify teardown. The controller has already been deleted.
     tgModel::teardown();
 }
     
