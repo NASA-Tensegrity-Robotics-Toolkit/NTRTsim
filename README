@@ -7,8 +7,9 @@ See INSTALL for instructions on how to install the library and build
 from source.
 
 The most accessable examples of tensegrity structures are in the
-examples directory. Additional examples can be found in folders
-"models controllers and apps" or in dev/tests and dev/btietz.
+examples directory. README.dox files can be found in each folder with
+additional information about that library. Additional examples can be 
+found in folders "models controllers and apps" or in dev/tests and dev/btietz.
 
 More information can be found at:
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
