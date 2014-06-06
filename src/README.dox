@@ -17,7 +17,10 @@
 	it again or reset with the spacebar. A full list of keyboard commands
 	is available at \ref keys.
 	
-	If you want to dive into the source code, the most relevant function
+	If you want to dive into the source code, look at the folder
+	src/examples/3_prism. A tensegrity application needs two classes and
+	a main in order to run
+	the most relevant function
 	is PrismModel's setup function. This uses the tools in tgcreator
 	\subsection superball Six Strut Icosahedron
 	

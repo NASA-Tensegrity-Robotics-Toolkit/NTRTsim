@@ -4,12 +4,15 @@ Tensegrity Robots. The NTRT Simulator is a tensegrity-specific simulator
 built to run ontop of the Bullet Physics Engine, version 2.82.
 
 See INSTALL for instructions on how to install the library and build
-from source.
+from source. A getting started guide is available in src/README.dox,
+which contains the main page of the DOxygen documentation.
 
 The most accessable examples of tensegrity structures are in the
-examples directory. README.dox files can be found in each folder with
-additional information about that library. Additional examples can be 
-found in folders "models controllers and apps" or in dev/tests and dev/btietz.
+examples directory, we recommend starting with src/examples/3_prism
+Additional README.dox files can be found in each folder with
+additional information about that applicaiton or library. Additional 
+examples can be found in folders "models controllers and apps" or in 
+dev/tests and dev/btietz.
 
 More information can be found at:
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/

@@ -26,7 +26,6 @@
 
 // This application
 #include "PrismModel.h"
-#include "PrismTensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"

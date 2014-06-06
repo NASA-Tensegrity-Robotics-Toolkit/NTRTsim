@@ -10,7 +10,6 @@ link_libraries(controllers
 
 add_executable(AppPrismModel
     PrismModel.cpp
-    PrismTensionController.cpp
     AppPrismModel.cpp
 ) 
 
