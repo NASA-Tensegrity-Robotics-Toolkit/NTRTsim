@@ -17,19 +17,17 @@
 */
 
 /**
- * @file AppFlemonsSpineLearning.cpp
+ * @file AppFlemonsSpineLearningCL.cpp
  * @brief Contains the definition function main() for the Flemons Spine Learning
  * application.
  * @author Brian Tietz
- * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "RibModel.h"
-
+#include "FlemonsSpineModelLearningCL.h"
 // This library
-#include "dev/btietz/BaseSpineCPGControl.h"
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
@@ -67,25 +65,40 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 12;
-    RibModel* myModel =
-      new RibModel(segments);
+    FlemonsSpineModelLearningCL* myModel =
+      new FlemonsSpineModelLearningCL(segments);
     
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
+    
     const int segmentSpan = 3;
-    const int numMuscles = 7;
+    const int numMuscles = 4;
     const int numParams = 2;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams);
+    const int segNumber = 0;
+    
+    const double controlTime = 0.1;
+    const double lowPhase = -1 * M_PI;
+    const double highPhase = M_PI;
+    const double lowAmplitude = 0.0;
+    const double highAmplitude = 30.0;
+    
+    const double tension = 0.0;
+    const double kPosition = 400.0;
+    const double kVelocity = 40.0; 
+
+    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
+												lowAmplitude, highAmplitude, lowPhase, highPhase,
+												tension, kPosition, kVelocity);
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix);
     myModel->attach(myControl);
     
     simulation.addModel(myModel);
-
+    
     int i = 0;
-    while (i < 2000)
+    while (i < 20000)
     {
-        simulation.run(15000);
+        simulation.run(30000);
         simulation.reset();
         i++;
     }

@@ -34,7 +34,7 @@
 // to a cpp over there
 #include "core/tgLinearString.h"
 #include "core/ImpedanceControl.h"
-#include "dev/btietz/tgCPGStringControl.h"
+#include "tgCPGStringControl.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"

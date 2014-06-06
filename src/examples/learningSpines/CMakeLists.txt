@@ -1,4 +1,4 @@
-Project(btietz)
+Project(learningSpines)
 
 link_libraries(sensors
                 tgcreator
@@ -11,11 +11,13 @@ link_libraries(sensors
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED
-   
-            tgRBString.cpp
-            tgRBStringInfo.cpp
+			BaseSpineModelLearning.cpp
+			BaseSpineCPGControl.cpp
+            tgCPGStringControl.cpp    
             )
 
-subdirs(
-    RBTests
+subdirs(    OctahedralComplex
+    ribDemo
+    TetrahedralComplex
+    TetraSpine
     )

@@ -16,45 +16,37 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef FLEMONS_SPINE_MODEL_LEARNING_CL_H
-#define FLEMONS_SPINE_MODEL_LEARNING_CL_H
+#ifndef TETRA_SPINE_CPG_CONTROL_H
+#define TETRA_SPINE_CPG_CONTROL_H
 
 /**
- * @file FlemonsSpineModelLearningCL.h
- * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
+ * @file TetraSpineCPGControl.h
+ * @brief Controller for TetraSpineLearningModel
  * @author Brian Tietz
  * @date May 2014
  * @version 1.0.0
  * $Id$
  */
 
-#include "dev/btietz/BaseSpineModelLearning.h"
-
-class tgWorld;
-class tgStructureInfo;
-class tgLinearString;
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 
 /**
- * This class implements the octahedral complex tensegrity spine
- * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
+ * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
+ * different muscle groups can have different ImpedanceControl parameters
  */
-class FlemonsSpineModelLearningCL : public BaseSpineModelLearning
+class TetraSpineCPGControl : public BaseSpineCPGControl
 {
-public: 
+public:
 
-    FlemonsSpineModelLearningCL(int segments);
+    TetraSpineCPGControl(BaseSpineCPGControl::Config config,	
+							std::string args,
+                            std::string ec = "edgeConfig.ini",
+                            std::string nc = "nodeConfig.ini");
+    
+    ~TetraSpineCPGControl() {}
 
-    virtual ~FlemonsSpineModelLearningCL();
-    
-    virtual void setup(tgWorld& world);
-    
-    virtual void teardown();
-        
-    virtual void step(double dt);
-    
-   
-private:
-    std::vector<tgLinearString*> reflexMuscles;
+	virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
+	
 };
 
-#endif // FLEMONS_SPINE_MODEL_H
+#endif // FLEMONS_SPINE_CPG_CONTROL_H

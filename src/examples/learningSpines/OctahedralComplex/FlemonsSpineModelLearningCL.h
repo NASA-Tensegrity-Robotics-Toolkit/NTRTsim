@@ -16,40 +16,45 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef RIB_MODEL_H
-#define RIB_MODEL_H
+#ifndef FLEMONS_SPINE_MODEL_LEARNING_CL_H
+#define FLEMONS_SPINE_MODEL_LEARNING_CL_H
 
 /**
- * @file RibModel.h
- * @brief Implements a spine model with a rib cage
+ * @file FlemonsSpineModelLearningCL.h
+ * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
  * @author Brian Tietz
  * @date May 2014
  * @version 1.0.0
  * $Id$
  */
 
-#include "dev/btietz/BaseSpineModelLearning.h"
+#include "examples/learningSpines/BaseSpineModelLearning.h"
 
 class tgWorld;
+class tgStructureInfo;
+class tgLinearString;
 
 /**
- * The spine model is similar in shape to FlemonsSpineModelLearning, the
- * ribs are rigidly attached ellipses.
+ * This class implements the octahedral complex tensegrity spine
+ * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
  */
-class RibModel: public BaseSpineModelLearning
+class FlemonsSpineModelLearningCL : public BaseSpineModelLearning
 {
 public: 
+
+    FlemonsSpineModelLearningCL(int segments);
+
+    virtual ~FlemonsSpineModelLearningCL();
     
-    RibModel(int segments);
-
-    virtual ~RibModel();
-
     virtual void setup(tgWorld& world);
     
-    virtual void teardown();    
-    
+    virtual void teardown();
+        
     virtual void step(double dt);
-
+    
+   
+private:
+    std::vector<tgLinearString*> reflexMuscles;
 };
 
-#endif // RIB_MODEL_H
+#endif // FLEMONS_SPINE_MODEL_H

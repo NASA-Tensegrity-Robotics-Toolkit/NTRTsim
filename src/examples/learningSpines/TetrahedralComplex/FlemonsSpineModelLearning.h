@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "dev/btietz/BaseSpineModelLearning.h" 
+#include "examples/learningSpines/BaseSpineModelLearning.h" 
 
 class tgWorld;
 class tgStructureInfo;

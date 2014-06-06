@@ -39,7 +39,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "dev/btietz/tgCPGStringControl.h"
+#include "examples/learningSpines/tgCPGStringControl.h"
 
 /**
  * Defining the adapters here assumes the controller is around and

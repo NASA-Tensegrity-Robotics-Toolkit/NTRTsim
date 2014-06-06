@@ -16,37 +16,44 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TETRA_SPINE_CPG_CONTROL_H
-#define TETRA_SPINE_CPG_CONTROL_H
+#ifndef TETRA_SPINE_LEARNING_MODEL_H
+#define TETRA_SPINE_LEARNING_MODEL_H
 
 /**
- * @file TetraSpineCPGControl.h
- * @brief Controller for TetraSpineLearningModel
+ * @file TetraSpineLearningModel.h
+ * @brief Tetraspine, configured for learning in the NTRT simulator
  * @author Brian Tietz
  * @date May 2014
  * @version 1.0.0
  * $Id$
  */
 
-#include "dev/btietz/BaseSpineCPGControl.h"
+// This library
+#include "examples/learningSpines/BaseSpineModelLearning.h"
+
+
+// Forward Declarations
+class tgWorld;
 
 /**
- * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
- * different muscle groups can have different ImpedanceControl parameters
+ * Basically the same structure as NestedStructureTestModel
+ * just with different parameters and learning capabilities.
  */
-class TetraSpineCPGControl : public BaseSpineCPGControl
+class TetraSpineLearningModel: public BaseSpineModelLearning
 {
-public:
+public: 
 
-    TetraSpineCPGControl(BaseSpineCPGControl::Config config,	
-							std::string args,
-                            std::string ec = "edgeConfig.ini",
-                            std::string nc = "nodeConfig.ini");
     
-    ~TetraSpineCPGControl() {}
+    TetraSpineLearningModel(size_t segments);
 
-	virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
-	
+    virtual ~TetraSpineLearningModel();
+    
+    virtual void setup(tgWorld& world);
+    
+    virtual void teardown();
+    
+    virtual void step(const double dt);
+
 };
 
-#endif // FLEMONS_SPINE_CPG_CONTROL_H
+#endif

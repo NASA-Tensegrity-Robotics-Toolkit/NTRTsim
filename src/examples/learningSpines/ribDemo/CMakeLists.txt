@@ -1,6 +1,6 @@
 link_directories(${LIB_DIR})
 
-link_libraries(btietz
+link_libraries(learningSpines
                 sensors
                 tgcreator
                 core

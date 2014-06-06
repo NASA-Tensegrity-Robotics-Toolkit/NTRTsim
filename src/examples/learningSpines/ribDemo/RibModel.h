@@ -16,44 +16,40 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TETRA_SPINE_LEARNING_MODEL_H
-#define TETRA_SPINE_LEARNING_MODEL_H
+#ifndef RIB_MODEL_H
+#define RIB_MODEL_H
 
 /**
- * @file TetraSpineLearningModel.h
- * @brief Tetraspine, configured for learning in the NTRT simulator
+ * @file RibModel.h
+ * @brief Implements a spine model with a rib cage
  * @author Brian Tietz
  * @date May 2014
  * @version 1.0.0
  * $Id$
  */
 
-// This library
-#include "dev/btietz/BaseSpineModelLearning.h"
+#include "examples/learningSpines/BaseSpineModelLearning.h"
 
-
-// Forward Declarations
 class tgWorld;
 
 /**
- * Basically the same structure as NestedStructureTestModel
- * just with different parameters and learning capabilities.
+ * The spine model is similar in shape to FlemonsSpineModelLearning, the
+ * ribs are rigidly attached ellipses.
  */
-class TetraSpineLearningModel: public BaseSpineModelLearning
+class RibModel: public BaseSpineModelLearning
 {
 public: 
-
     
-    TetraSpineLearningModel(size_t segments);
+    RibModel(int segments);
 
-    virtual ~TetraSpineLearningModel();
-    
+    virtual ~RibModel();
+
     virtual void setup(tgWorld& world);
     
-    virtual void teardown();
+    virtual void teardown();    
     
-    virtual void step(const double dt);
+    virtual void step(double dt);
 
 };
 
-#endif
+#endif // RIB_MODEL_H

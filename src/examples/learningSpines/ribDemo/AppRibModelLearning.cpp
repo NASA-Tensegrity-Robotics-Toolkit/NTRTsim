@@ -26,9 +26,10 @@
  */
 
 // This application
-#include "FlemonsSpineModelLearning.h"
-#include "dev/btietz/BaseSpineCPGControl.h"
+#include "RibModel.h"
+
 // This library
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
@@ -66,33 +67,25 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 12;
-    FlemonsSpineModelLearning* myModel =
-      new FlemonsSpineModelLearning(segments);
-
+    RibModel* myModel =
+      new RibModel(segments);
+    
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
-    
     const int segmentSpan = 3;
-    const int numMuscles = 8;
+    const int numMuscles = 7;
     const int numParams = 2;
-    const int segNumber = 6;
-    const double controlTime = .01;
-    const double lowPhase = -1 * M_PI;
-    const double highPhase = M_PI;
-    const double lowAmplitude = -30.0;
-    const double highAmplitude = 30.0;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, controlTime, segNumber,
-												lowAmplitude, highAmplitude, lowPhase, highPhase);
+    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams);
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix);
     myModel->attach(myControl);
     
     simulation.addModel(myModel);
-    
+
     int i = 0;
-    while (i < 3000)
+    while (i < 2000)
     {
-        simulation.run(30000);
+        simulation.run(15000);
         simulation.reset();
         i++;
     }

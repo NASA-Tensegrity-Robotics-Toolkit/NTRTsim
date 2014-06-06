@@ -1,7 +1,7 @@
 link_directories(${LIB_DIR})
 
-link_libraries(btietz
-                sensors
+link_libraries(learningSpines
+				sensors
                 tgcreator
                 core
                 util
@@ -16,8 +16,8 @@ file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 #ensure logs exists
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/logs)
 
-add_executable(AppFlemonsSpineLearningCL
-    FlemonsSpineModelLearningCL.cpp
-    AppFlemonsSpineLearningCL.cpp
+add_executable(AppFlemonsSpineLearning
+    FlemonsSpineModelLearning.cpp
+    AppFlemonsSpineLearning.cpp
     
 ) 
