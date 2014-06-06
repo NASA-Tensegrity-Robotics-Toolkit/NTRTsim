@@ -45,6 +45,12 @@
 	\subsection tetraspine Nested Tetrahedrons
 	
 	\subsection spines learningSpines
+	As of this writing (6-6-14), we have not uploaded parameters for
+	gaits learned by these structures. You can either run
+	these models by turning learning on in nodeConfig.ini and edgeConfig.ini
+	or wait for parameters to be uploaded (or email Brian brt6 (at) case.edu).
+	You may also need to turn
+	graphics on by changing tgSimView to tgSimViewGraphics in these files.
 */
 
 /** \page keys Keyboard Commands
