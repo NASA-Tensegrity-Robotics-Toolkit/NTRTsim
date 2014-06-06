@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 #include <assert.h>
+#include <stdexcept>
 
 using namespace std;
 
@@ -116,17 +117,26 @@ void AnnealEvoMember::loadFromFile(const char * outputFilename)
     // Disable definition of unused variable to suppress compiler warning
     double valueDbl;
 #endif
-    while(!ss.eof())
-    {
-        cout<<"success opening file"<<endl;
-        // @todo fix the infinite loop that occurs here!
-        if(getline ( ss, value, ',' )>0)
-        {
-            cout<<"value read as string: "<<value<<endl;
-            statelessParameters[i++]=atof(value.c_str());
-            cout<<statelessParameters[i-1]<<",";
-        }
-    }
+	if(ss.is_open())
+	{
+		while(!ss.eof())
+		{
+			cout<<"success opening file"<<endl;
+			// @todo fix the infinite loop that occurs here!
+			if(getline ( ss, value, ',' )>0)
+			{
+				cout<<"value read as string: "<<value<<endl;
+				statelessParameters[i++]=atof(value.c_str());
+				cout<<statelessParameters[i-1]<<",";
+			}
+		}
+	}
+	else
+	{
+		cout << "File of name " << outputFilename << " does not exist" << std::endl;
+		cout << "Try turning learning on in config.ini to generate parameters" << std::endl;
+		throw std::invalid_argument("Parameter file does not exist");
+	}
     //cout<<"reading complete"<<endl;
     //cout<<endl;
     ss.close();
