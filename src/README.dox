@@ -1,12 +1,55 @@
 /** \mainpage NTRT Simulator Documentation
 	\tableofcontents
 	\section welc Welcome!
-
+	The NASA Tensegrity Robotics Toolkit (NTRT) is a collection of C++ and
+	MATLAB software modules for the modeling, simulation, and control of
+	Tensegrity Robots. The NTRT Simulator is a tensegrity-specific simulator
+	built to run ontop of the Bullet Physics Engine, version 2.82.
+	\section start Getting Started
+	If you haven't already, follow the instructions in INSTALL (in the
+	root directory, above source) to get the simulator setup and
+	built.
+	\subsection prism Three Strut Prism
+	Once the simulator is built, navigate to build/examples/3_prism
+	and run AppPrismModel. You should see a three strut tensegrity
+	prism. You can use your mouse to grab and move the structure in
+	space. Depending on the forces it may collapse, you can either move
+	it again or reset with the spacebar. A full list of keyboard commands
+	is available at \ref keys.
+	
+	If you want to dive into the source code, the most relevant function
+	is PrismModel's setup function. This uses the tools in tgcreator
+	\subsection superball Six Strut Icosahedron
+	
 */
 
-/** \page page1 NTRT Simulator
-	\tableofcontents
-	\section sec1 Getting Started
+/** \page keys Keyboard Commands
+	\section sec1 Keyboard Commands for NTRT
+	The NTRT GUI supports user interaction through the keyboard.
+	Commands are listed below:
 	
-
+	- q - quit
+	- spacebar - restart simulation
+	- w - wireframe mode
+	- r/right arrow - rotate the camera counterclockwise (right)
+	- u - change ground texture
+	- i/home - Pause (debug mode, muscles will dissapear
+	- o - set camera to origin
+	- end - Stop/Pause (not supported, will crash)
+	- a - show collision boxes
+	- f/up arrow - rotate camera forward/up
+	- g - shading on/off
+	- h - turn of debugging info (good for videos)
+	- l/left arrow - rotate camera clockwise (left)
+	- ; - Follow center of mass of structure
+	- x/page up - zoom in
+	- z/page down - zoom out
+	- b/down arrow - rotate camera down
+	- . - shoot bullets
+	
+	These are built into our patched Bullet code. Source code location 
+	on your build config, but the default is
+	depends env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut\*
+	
+	\*FreeGlut support pending in version 1.0.1
 */
