@@ -28,8 +28,17 @@
 	the comments in main for more details and an example.
 	
 	\section build Creating a new tensegrity - tgcreator
-	the most relevant function
-	is PrismModel's setup function. This uses the tools in tgcreator
+	If you look at the source code for PrismModel, you can see the how
+	we define and construct the tensegrities in PrismModel's setup
+	function. This uses the tools in \ref tgcreator to specify the
+	exterior points of the prism as six nodes. The nodes are then
+	paired into the three rods that cross through the interior of the
+	prism, and the nine muscles that line the outside. Specifications
+	are then given for the rods and muscles. Finally the PretensionController
+	is applied to each string.
+	
+	The following examples demonstrate more features of \ref tgcreator
+	and our core library.
 	
 	\subsection superball Six Strut Icosahedron
 	
