@@ -36,7 +36,7 @@
  this is used exclusivly for machine learning. The parameters in the
  included config files are explained below:
  \section sup_params Parameters
-	For binary parameters - 0 is "off" 1 is "on
+	For binary parameters - 0 is "off" 1 is "on"
  \subsection learn_param_1 Startup Parameters
 	- learning: if learning is off, it loads from the file logs/bestParameters-<argv>.prm
 	The default is logs/bestParameters-default.prm
@@ -60,7 +60,8 @@
 	- deviation=0.75
 	- compareAverageScores=0
 	- clearScoresBetweenGenerations=0
-	\Section un_params Unsupported Parameters
+	
+	\section un_params Unsupported Parameters
 	The following parameters are from an older version of the code,
 	but are explained here in case you are trying to use V 0.1
 	(not recommended generally)
