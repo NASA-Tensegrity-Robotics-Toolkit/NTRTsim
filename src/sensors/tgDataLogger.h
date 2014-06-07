@@ -25,15 +25,7 @@
  * @author Brian Tietz
  * $Id$
  */
-
-/**
- * \dir sensors
- * @brief Contains sensors that can be used by controllers.
- * 
- * Defines components of controllers that sense the world. In version
- * 1.0.0 this only includes classes for logging data to text files
- * during a run
- */ 
+ 
 #include "core/tgModelVisitor.h"
 
 #include <string>

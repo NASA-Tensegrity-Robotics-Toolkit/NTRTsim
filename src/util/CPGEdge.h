@@ -27,14 +27,6 @@
  * $Id$
  */
 
-/**
- * \dir util
- * @brief General functions usable by models or controllers
- * 
- * Contains general utility classes for tensegrity models or controllers
- * As of version 1.0.0 this includes classes for central pattern generators
- * or CPGs
- */
 #include <math.h> 
 #include <sstream>
 #include <vector>
