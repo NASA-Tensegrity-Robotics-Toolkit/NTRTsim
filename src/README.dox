@@ -72,6 +72,8 @@
 	or wait for parameters to be uploaded (or email Brian brt6 (at) case.edu).
 	You may also need to turn
 	graphics on by changing tgSimView to tgSimViewGraphics in these files.
+	
+	\version 1.0.0 (beta)
 */
 
 /** \page keys Keyboard Commands
@@ -103,4 +105,6 @@
 	depends env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut\*
 	
 	\*FreeGlut support pending in version 1.0.1
+	
+	\version 1.0.0 (beta)
 */
