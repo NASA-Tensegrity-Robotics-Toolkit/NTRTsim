@@ -11,7 +11,9 @@
  read a simulation configuration from a .ini text file
  
   \section adapters Adapters
-  A class that passes parameters between AnnealEvolution and a controller
+  A class that passes parameters between AnnealEvolution and a controller.
+  Parameters are scaled 0.0 to 1.0, so will need to be scaled to their
+  relevant ranges in the controllers.
   Depends upon both AnnealEvolution and Configuration
   
   \section annealevo Anneal Evolution
@@ -44,38 +46,42 @@
 	from bestParameters. Good for resuming a run or changing learning
 	modes.
  \subsection learn_param_2 Controller parameters
-	- numberOfActions: T
-	- numberOfControllers=77
-	- numberOfMusclesPerController=1
-	#evolution
-	#coevolution on selects a random element from the pool. Off ensures
-	#all elements are tested. Off is better with max score, on is better
-	#with average
-	- coevolution=0
-	- populationSize=2
-	- numberOfElementsToMutate=1
-	- numberOfTestsBetweenGenerations=1
-	- leniencyCoef=1.0
-	- MonteCarlo=1
-	- deviation=0.75
-	- compareAverageScores=0
-	- clearScoresBetweenGenerations=0
+	- numberOfActions: The number of parameters in a "unit" of the system.
+	For example, the CPGEdges have two: weight and phase
+	- numberOfControllers: Number of units in the system.
+ \subsection learn_param_3 
+	- coevolution: Coevolution on selects a random element from the pool. Off ensures
+	all elements are tested. Off is better with max score, on is better
+	with average
+	- populationSize: Number of controllers in the population. Allows for
+	genetic algorithms to use.
+	- numberOfElementsToMutate: Number of elements to mutate between each
+	generation
+	- numberOfTestsBetweenGenerations: Number of tests between run between
+	mutiations
+	- leniencyCoef: How much past scores are factored in. 1.0 considers the current score
+	- MonteCarlo: If on, parameters will be chosen in a flat random between 0.0 and 1.0
+	- deviation: How large of a standard deviation to mutate by if MonteCarlo is off
+	- compareAverageScores: Comparing the average scores over a number of previous 
+	generations. Setting to 0 will compare maximum scores
+	- clearScoresBetweenGenerations: Whether or not to clear scores between generations.
+	If looking for a maximum, do not clear.
 	
 	\section un_params Unsupported Parameters
 	The following parameters are from an older version of the code,
-	but are explained here in case you are trying to use V 0.1
-	(not recommended generally)
-	- graphics=1
-	- brokenLink=0
-	- noise=0.0
-	- addObstacles=0
-	- addBumps=0
-	- addRandomTerrain=0
-	- addSlope=0
-	- recordPositions=0
-	- numberOfStates: 
-	- cycleDuration=1
-	
+	but are explained here since they are still in the .ini files
+	or in case you are trying to use V 0.1 (not recommended generally)
+	- graphics: Work around is to change 
+	- brokenLink: Break one string
+	- noise: Including noise into muscle control 
+	- addObstacles: Terrain adjustment - can be adjusted with tgGround classes
+	- addBumps: Terrain adjustment - can be adjusted with tgGround classes
+	- addRandomTerrain: Terrain adjustment - can be adjusted with tgGround classes
+	- addSlope: Terrain adjustment - can be adjusted with tgGround classes
+	- recordPositions: See version 0.1
+	- numberOfStates: Number of states for a neural network input
+	- numberOfMusclesPerController: See version 0.1
+	- cycleDuration: See version 0.1
  
  \version 1.0.0 (beta)
 */
