@@ -13,8 +13,6 @@ link_libraries(learningSpines
 
 file(COPY nodeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-#ensure logs exists
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/logs)
 
 add_executable(AppTetraSpineLearning
     TetraSpineLearningModel.cpp
@@ -22,3 +20,6 @@ add_executable(AppTetraSpineLearning
     AppTetraSpineLearning.cpp
     
 ) 
+
+add_custom_command(TARGET AppTetraSpineLearning POST_BUILD
+					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/logs)

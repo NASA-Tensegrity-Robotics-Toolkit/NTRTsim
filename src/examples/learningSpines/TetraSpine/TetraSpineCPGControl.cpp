@@ -84,7 +84,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
         //String will own this pointer
-#if (0) // origninal params
+#if (1) // origninal params
         if (allMuscles[i]->hasTag("outer"))
         {
             tension = 0.0;

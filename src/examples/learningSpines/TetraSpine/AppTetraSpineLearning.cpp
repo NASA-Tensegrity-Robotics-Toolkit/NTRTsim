@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     tgWorld world(config); 
 
     // Second create the view
-    const double stepSize = 1.0/10000.0; // Seconds
+    const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
     tgSimViewGraphics view(world, stepSize, renderRate);
 
