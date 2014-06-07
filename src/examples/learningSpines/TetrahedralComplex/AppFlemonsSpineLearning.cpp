@@ -75,13 +75,13 @@ int main(int argc, char** argv)
     const int segmentSpan = 3;
     const int numMuscles = 8;
     const int numParams = 2;
-    const int segNumber = 6;
-    const double controlTime = .01;
+    const int segNumber = 6; // For learning results
+    const double controlTime = .001;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
     const double lowAmplitude = -30.0;
     const double highAmplitude = 30.0;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, controlTime, segNumber,
+    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
 												lowAmplitude, highAmplitude, lowPhase, highPhase);
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix);
