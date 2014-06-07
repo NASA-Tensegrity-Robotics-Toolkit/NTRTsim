@@ -66,12 +66,15 @@
 	class to determine the tension for the strings.
 	
 	\subsection spines learningSpines
-	As of this writing (6-6-14), we have not uploaded parameters for
-	gaits learned by these structures. You can either run
-	these models by turning learning on in nodeConfig.ini and edgeConfig.ini
-	or wait for parameters to be uploaded (or email Brian brt6 (at) case.edu).
-	You may also need to turn
-	graphics on by changing tgSimView to tgSimViewGraphics in these files.
+	All four of the models in this directory used our machine learning
+	framework to determine parameters, which have been uploaded as examples
+	of the kinds of motion these structures are capable of. The default
+	parameters can be run just by running the executable. The learning
+	applicaitons also take a parameter set as argv, so if you wanted to
+	try to learn a new set of parameters you could run
+	"AppFlemonsSpineLearning 1" to write to bestParameters-1_*.nnw.
+	More information on configuring learning can be found at \ref learning
+	and \ref config_full.
 	
 	\version 1.0.0 (beta)
 */
