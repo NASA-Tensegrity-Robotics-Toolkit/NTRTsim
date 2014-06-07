@@ -1,0 +1,7 @@
+/**
+ \page dev Dev Folder
+ The dev directory holds a number of models we used to test while developing
+ the library, and some areas of active research, like strings with
+ contact dynamics. Documentation may be quite sparse, but all applications
+ should at least run under version 1.0.0
+*/

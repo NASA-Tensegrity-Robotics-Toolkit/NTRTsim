@@ -27,18 +27,6 @@
  * $Id$
  */
 
-/**
- * \dir examples
- * @brief Provides example models for new users.
- */
- 
-/**
- * \dir examples\3_prism
- * @brief A three strut tensegrity prism. The simplest 3D tensegrity
- * 
- * Contains a tensegrity model and the applicaiton for running that
- * model. 
- */
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
