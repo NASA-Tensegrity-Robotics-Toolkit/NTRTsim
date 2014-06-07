@@ -26,13 +26,6 @@
  * $Id$
  */
 
-/**
- * \dir controllers 
- * @brief controllers for tensegrities in the examples and models directories.
- * 
- * The controllers library contains files that can be used to
- * control a variety of tensegrities. It depends on the core library
- */
 // This library
 #include "core/tgObserver.h"
 

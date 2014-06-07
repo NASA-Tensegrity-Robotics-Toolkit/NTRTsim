@@ -2,6 +2,9 @@
  * \dir core
  * @brief The core simulation and base level models.
  * 
+ * For a detailed description see page core 
+ *
+ * \page core Core
  * The core directory contains all of the necessary components for
  * modeling and simulation. This includes:
  * - the world tgWorld, 

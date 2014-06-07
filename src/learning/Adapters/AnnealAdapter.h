@@ -28,23 +28,6 @@
  * $Id$
  */
 
-/**
- * \dir learning
- * @brief Tools for machine learning on tensegrity structures.
- * 
- * Contains an evolution scheme that can be configured for MonteCarlo,
- * gaussian sampling or simulated annealing. Also contains adapters to
- * read parameters in and out of evolution objects, and a class to
- * read a simulation configuration from a .ini text file
- */
- 
- /**
-  * \dir learning/Adapters
-  * @brief A class that passes parameters between AnnealEvolution and a controller
-  * 
-  * Depends upon both AnnealEvolution and Configuration
-  */
-
 #include <vector>
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/AnnealEvolution/AnnealEvoMember.h"

@@ -1,0 +1,41 @@
+/**
+ \dir learning
+ @brief Tools for machine learning on tensegrity structures.
+  
+ \page learning Learning
+ \tableofcontents
+ \section mainlearn Learning Library
+ Contains an evolution scheme that can be configured for MonteCarlo,
+ gaussian sampling or simulated annealing. Also contains adapters to
+ read parameters in and out of evolution objects, and a class to
+ read a simulation configuration from a .ini text file
+ 
+  \section adapters Adapters
+  A class that passes parameters between AnnealEvolution and a controller
+  Depends upon both AnnealEvolution and Configuration
+  
+  \section annealevo Anneal Evolution
+  Learning is overseen by AnnealEvolution. AnnealEvoMember and
+  AnnealEvoPopulation contain sets of parameters and are modified
+  according to the style of evolution
+  
+  \section configuration Configuration
+  Configuration parameters depend on the specific learning applicaiton,
+  but always map keys to integer or double values.
+*/
+
+/**
+  \dir learning/Adapters
+  @brief A class that passes parameters between AnnealEvolution and a controller
+ 
+*/
+
+/**
+ * \dir learning/AnnealEvolution
+ * @brief A library to perform a variety of evolution algorithms.
+ */
+
+/**
+ * \dir learning/Configuration
+ * @brief A class to read a learning configuration from a .ini file.
+ */

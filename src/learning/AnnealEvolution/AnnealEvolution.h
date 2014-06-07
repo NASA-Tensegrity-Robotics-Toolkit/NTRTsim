@@ -28,14 +28,6 @@
  * $Id$
  */
 
-/**
- * \dir learning/AnnealEvolution
- * @brief A library to perform a variety of evolution algorithms.
- * 
- * Learning is overseen by AnnealEvolution. AnnealEvoMember and
- * AnnealEvoPopulation contain sets of parameters and are modified
- * according to the style of evolution
- */
 #include "AnnealEvoPopulation.h"
 #include "AnnealEvoMember.h"
 #include <fstream>

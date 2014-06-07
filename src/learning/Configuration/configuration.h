@@ -27,14 +27,6 @@
  * $Id$
  */
 
-/**
- * \dir learning/Configuration
- * @brief A class to read a learning configuration from a .ini file.
- * 
- * Configuration parameters depend on the specific learning applicaiton,
- * but always map keys to integer or double values.
- */
-
 #include <map>
 #include <string>
 
