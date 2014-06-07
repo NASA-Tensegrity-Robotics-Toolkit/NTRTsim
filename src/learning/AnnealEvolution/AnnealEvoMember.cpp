@@ -36,7 +36,6 @@ using namespace std;
 AnnealEvoMember::AnnealEvoMember(configuration config)
 {
     //readConfigFromXML(configFile);
-    this->numInputs=config.getintvalue("numberOfStates");
     this->numOutputs=config.getintvalue("numberOfActions");
     this->devBase=config.getDoubleValue("deviation");
     this->monteCarlo=config.getintvalue("MonteCarlo");

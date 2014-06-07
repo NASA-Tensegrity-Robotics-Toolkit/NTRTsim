@@ -17,13 +17,66 @@
   \section annealevo Anneal Evolution
   Learning is overseen by AnnealEvolution. AnnealEvoMember and
   AnnealEvoPopulation contain sets of parameters and are modified
-  according to the style of evolution
+  according to the style of evolution. A detailed explanation of how
+  to configure the .ini files is available on \ref config_full
   
-  \section configuration Configuration
+  \section config_breif Configuration
   Configuration parameters depend on the specific learning applicaiton,
-  but always map keys to integer or double values.
+  but always map keys to integer or double values. See \ref config_full
+  for details on the parameters for \ref annealevo
   
   \version 1.0.0 (beta)
+*/
+
+/**
+ \page config_full Configuration Parameters
+ The configuration library allows for users to specify string keys that
+ relate to double or integer values specified in a Config.ini file, such
+ that relevant parameters can be read from a text file. In version 1.0.0
+ this is used exclusivly for machine learning. The parameters in the
+ included config files are explained below:
+ \section sup_params Parameters
+	For binary parameters - 0 is "off" 1 is "on
+ \subsection learn_param_1 Startup Parameters
+	- learning: if learning is off, it loads from the file logs/bestParameters-<argv>.prm
+	The default is logs/bestParameters-default.prm
+	- startSeed: Whether or not to 'seed' the population with the data
+	from bestParameters. Good for resuming a run or changing learning
+	modes.
+ \subsection learn_param_2 Controller parameters
+	- numberOfActions: T
+	- numberOfControllers=77
+	- numberOfMusclesPerController=1
+	#evolution
+	#coevolution on selects a random element from the pool. Off ensures
+	#all elements are tested. Off is better with max score, on is better
+	#with average
+	- coevolution=0
+	- populationSize=2
+	- numberOfElementsToMutate=1
+	- numberOfTestsBetweenGenerations=1
+	- leniencyCoef=1.0
+	- MonteCarlo=1
+	- deviation=0.75
+	- compareAverageScores=0
+	- clearScoresBetweenGenerations=0
+	\Section un_params Unsupported Parameters
+	The following parameters are from an older version of the code,
+	but are explained here in case you are trying to use V 0.1
+	(not recommended generally)
+	- graphics=1
+	- brokenLink=0
+	- noise=0.0
+	- addObstacles=0
+	- addBumps=0
+	- addRandomTerrain=0
+	- addSlope=0
+	- recordPositions=0
+	- numberOfStates: 
+	- cycleDuration=1
+	
+ 
+ \version 1.0.0 (beta)
 */
 
 /**

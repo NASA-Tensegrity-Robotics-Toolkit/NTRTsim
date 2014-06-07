@@ -55,7 +55,6 @@ public:
     double averageScore;
 
 private:
-    int numInputs;
     int numOutputs;
     double devBase;
     bool monteCarlo;
