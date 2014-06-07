@@ -22,6 +22,8 @@
   \section configuration Configuration
   Configuration parameters depend on the specific learning applicaiton,
   but always map keys to integer or double values.
+  
+  \version 1.0.0 (beta)
 */
 
 /**
@@ -31,11 +33,11 @@
 */
 
 /**
- * \dir learning/AnnealEvolution
- * @brief A library to perform a variety of evolution algorithms.
+ \dir learning/AnnealEvolution
+ @brief A library to perform a variety of evolution algorithms.
  */
 
 /**
- * \dir learning/Configuration
- * @brief A class to read a learning configuration from a .ini file.
+ \dir learning/Configuration
+ @brief A class to read a learning configuration from a .ini file.
  */

@@ -4,4 +4,6 @@
  the library, and some areas of active research, like strings with
  contact dynamics. Documentation may be quite sparse, but all applications
  should at least run under version 1.0.0
+ 
+ \version 1.0.0 (beta)
 */

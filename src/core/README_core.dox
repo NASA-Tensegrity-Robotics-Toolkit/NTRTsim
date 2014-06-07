@@ -1,18 +1,20 @@
 /**
- * \dir core
- * @brief The core simulation and base level models.
- * 
- * For a detailed description see page core 
- *
- * \page core Core
- * The core directory contains all of the necessary components for
- * modeling and simulation. This includes:
- * - the world tgWorld, 
- * - simulation control in tgSimulation,
- * - views of the simulation: tgSimView and tgSimViewGraphics
- * - rendering functions tgBulletRenderer, based on tgModelVisitor
- * - the base class for models tgModel,
- * - components of models such as tgRod and tgLinearString
- * - the ability to tag models and components with tgTags and tgTaggable
- * - basic components of controllers tgSubject and tgObserver
+ \dir core
+ @brief The core simulation and base level models.
+ 
+ For a detailed description see page core 
+ 
+ \page core Core
+ The core directory contains all of the necessary components for
+ modeling and simulation. This includes:
+ - the world tgWorld, 
+ - simulation control in tgSimulation,
+ - views of the simulation: tgSimView and tgSimViewGraphics
+ - rendering functions tgBulletRenderer, based on tgModelVisitor
+ - the base class for models tgModel,
+ - components of models such as tgRod and tgLinearString
+ - the ability to tag models and components with tgTags and tgTaggable
+ - basic components of controllers tgSubject and tgObserver
+ 
+ \version 1.0.0 (beta)
  */
