@@ -17,8 +17,8 @@
 */
 
 /**
- * @file AppT6ModelTest.cpp
- * @brief Contains the definition function main() for the T6 Model Test
+ * @file AppSuperBall.cpp
+ * @brief Contains the definition function main() for the Super Ball applicaiton
  * application.
  * $Id$
  */

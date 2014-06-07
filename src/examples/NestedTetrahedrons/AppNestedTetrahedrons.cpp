@@ -17,8 +17,8 @@
 */
 
 /**
- * @file AppNestedStructureTest.cpp
- * @brief Contains the definition function main() for the Nested Structure Test
+ * @file AppNestedTetrahedrons.cpp
+ * @brief Contains the definition function main() for the Nested Tetrahedrons
  * application.
  * @author Brian Tietz
  * @copyright Copyright (C) 2014 NASA Ames Research Center

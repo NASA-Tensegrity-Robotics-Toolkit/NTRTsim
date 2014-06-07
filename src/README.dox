@@ -41,8 +41,29 @@
 	and our core library.
 	
 	\subsection superball Six Strut Icosahedron
+	T6Model, also known as the Icosahedron or SuperBall, demonstrates
+	a number of other features of the simulator. First, the ground is
+	set at an angle using the tgBoxGround class and parameters set in
+	AppSuperBall. Second, the controller deals directly with the top
+	level model, and is attached in the app. This demonstrates how to
+	use tgCast to sort sub-models and pass them to controllers.
 	
 	\subsection tetraspine Nested Tetrahedrons
+	The NestedStructureTestModel adds another layer of complexity to
+	our tensegrity models. First, we are no longer building class one
+	tensegrities - rigid bars have been joined together into a compound
+	object. This is due to the autoCompound functions, see the tgcreator
+	library for more information. 
+	Second, this object has been repeated in a nested chain
+	through a for loop in the addSegments function.
+	This allows for the creation of arbitrarily large
+	spine-like structures, and demonstrates the use of sub-structures.
+	Multiple for loops could create appendages in multiple directions.
+	Finally, the model makes better use of the tagging system,
+	by using tags to sort muscles into groups (see mapMuscles)
+	
+	The controller, NestedStructureSineWaves also utilizes the ImpedanceControl
+	class to determine the tension for the strings.
 	
 	\subsection spines learningSpines
 	As of this writing (6-6-14), we have not uploaded parameters for
