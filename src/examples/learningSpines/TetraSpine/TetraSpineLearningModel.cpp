@@ -169,7 +169,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
     
-#if (0) // Original parameters
+#if (1) // Original parameters
     const double density = 4.2 / 300.0;
     const double radius  = 0.5;
     const double friction = 1.0;

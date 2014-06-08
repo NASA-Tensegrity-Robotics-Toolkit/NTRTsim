@@ -66,12 +66,20 @@
 	class to determine the tension for the strings.
 	
 	\subsection spines learningSpines
-	As of this writing (6-6-14), we have not uploaded parameters for
-	gaits learned by these structures. You can either run
-	these models by turning learning on in nodeConfig.ini and edgeConfig.ini
-	or wait for parameters to be uploaded (or email Brian brt6 (at) case.edu).
-	You may also need to turn
-	graphics on by changing tgSimView to tgSimViewGraphics in these files.
+	All four of the models in this directory used our machine learning
+	framework to determine parameters, which have been uploaded as examples
+	of the kinds of motion these structures are capable of. The default
+	parameters can be run just by running the executable. The learning
+	applicaitons also take a parameter set as argv, so if you wanted to
+	try to learn a new set of parameters you could run
+	"AppFlemonsSpineLearning 1" to write to bestParameters-1_*.nnw.
+	More information on configuring learning can be found at \ref learning
+	and \ref config_full.
+	
+	These models were published in the paper
+	Brian T. Mirletz, In-Won Park, Thomas E. Flemons, Adrian K. Agogino, Roger D. Quinn, and Vytas SunSpiral,
+	“Design and Control of Modular Spine-Like Tensegrity Structures”,
+	To Appear in Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
 	
 	\version 1.0.0 (beta)
 */
@@ -107,4 +115,25 @@
 	\*FreeGlut support pending in version 1.0.1
 	
 	\version 1.0.0 (beta)
+*/
+
+/**
+ \page copyright Copyright
+ Copyright © 2012, United States Government, as represented by the
+ Administrator of the National Aeronautics and Space Administration.
+ All rights reserved.
+ 
+ The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+ under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0.
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ either express or implied. See the License for the specific language
+ governing permissions and limitations under the License.
+
+ \version 1.0.0 (beta)
 */
