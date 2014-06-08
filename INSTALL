@@ -22,7 +22,7 @@ anything.
   ** Prerequisites/Dependencies **
 
   - Some Linux prerequisites, outside of the setup script file. Make
-	sure the following are installed (you can use sudo apt-get install):
+    sure the following are installed (you can use sudo apt-get install):
 	
 	- g++ (the compiler for cmake)
 	- libglib2.0-dev
@@ -39,7 +39,8 @@ anything.
   - Installing libboost-all-dev under Ubuntu does NOT place these files
     where our install script can see them. At the moment, it's easier to 
     just have our installer download and compile its own version of
-    libboost-1.53.0-dev, as counterintuitive as that seems.
+    libboost-1.53.0-dev, as counterintuitive as that seems. See a known
+    issue below about this compilation under Ubuntu 14.04.
 
   ** Running the setup script **
 
@@ -179,7 +180,11 @@ anything.
 
   - That should do it. You can now run bin/build.sh to build your code.
     
-** Troubleshooting **
+** Troubleshooting and Known Issues **
+
+  - Our usage of Git does not respect file permissions well enough
+    on occassion. You may have to "chmod ug+x" our setup.sh and bin/build.sh
+    scripts. 
 
   - If any of the downloads fail, there may be a corrupt file in env/downloads.
     Be sure to remove it before running setup/setup.sh again.
@@ -191,11 +196,21 @@ anything.
     downloads and then fail. If you get errors, just delete the package's 
     directory under ./env/downloads and ./env/build
 
-  - If a compile fails, when you try and re-run ./setup.sh, remove not only
-    the downloaded file and extracted files under ./env/build, but also the 
-    (failed) compiled files under ./env/include and ./env/lib, for example,
-    a failed compile of Boost requires deleting ./env/include/boost and
-    everthing named "libboost" under ./env/lib
+  - Under Ubuntu 14.04, the compile of Boost will exit with errors even though
+    it actually completes successfully. You'll get an exit message like:
+         >> ...failed updating 6 targets...
+         >> ...skipped 18 targets...
+         >> ...updated 11024 targets...
+         >> Install failed
+         >> Boost initialization failed -- exiting now.
+    This is fine. Just run setup.sh again to confirm everything is OK, then
+    move on to running bin/build.sh
+
+  - If you want to recompile a library, when you try and re-run ./setup.sh,
+    remove not only the downloaded file and extracted files under 
+    ./env/build, but also the (failed) compiled files under ./env/include 
+    and ./env/lib, for example, a failed compile of Boost requires deleting 
+    ./env/include/boost and everthing named "libboost" under ./env/lib
 
   - If you get an error when running bin/build.sh about CMake not "including"
     a GLIB directory, be sure you've installed libglib2.0-dev (Ubuntu 14.04).
@@ -204,5 +219,11 @@ anything.
     position-independent-code flag, -fPIC, passed in. Though this flag should
     be enabled by default now, if you do get an error related to -fPIC, just 
     edit the CMakeLists files to include -fPIC.
+
+  - The bin/build.sh script may fail if there are directories for the log
+    files under build/examples/learningSpines, since these need to be links
+    to the actual src/examples/learningSpines/.../logs directories. Just
+    delete the empty folders in build/examples/... if you encounter this error
+    when running build.sh
 
 
