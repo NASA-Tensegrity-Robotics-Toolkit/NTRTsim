@@ -76,6 +76,11 @@
 	More information on configuring learning can be found at \ref learning
 	and \ref config_full.
 	
+	These models were published in the paper
+	Brian T. Mirletz, In-Won Park, Thomas E. Flemons, Adrian K. Agogino, Roger D. Quinn, and Vytas SunSpiral,
+	“Design and Control of Modular Spine-Like Tensegrity Structures”,
+	To Appear in Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
+	
 	\version 1.0.0 (beta)
 */
 
