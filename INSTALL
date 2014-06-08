@@ -6,39 +6,54 @@ during setup are considered to be local directories and are ignored in the
 repository. If you run into problems, you can always delete these and run
 setup again. 
 
-To get started, run the setup script (setup.sh). It will walk you through
-the process of getting everything configured and installed. If you already have
-some things installed in the standard locations, setup will find those so that
-you don't have to reinstall. You can run setup as many times as you like
-without hurting anything.
+To get started, read the below instructions, then run the setup script 
+(setup.sh). It will walk you through the process of getting everything 
+configured and installed. If you already have some things installed in 
+the standard locations, setup will find those so that
+you don't have to reinstall. However, this functionality may be limited
+based on your linux distribution, so if you're not using Ubuntu 13.10 or 
+14.04, be sure to read below and confirm you have the necessary packages
+in your $PATH. You can run setup as many times as you like without hurting 
+anything.
 
 
 ** Linux / Mac Installation **
+
+  ** Prerequisites/Dependencies **
 
   - Some Linux prerequisites, outside of the setup script file. Make
 	sure the following are installed (you can use sudo apt-get install):
 	
 	- g++ (the compiler for cmake)
 	- libglib2.0-dev
-	- cmake
 	- curl
 	- freeglut3
 	- freeglut3-dev (glut for bullet graphics)
 		
-    Also if available, it's easier to install cmake and boost
-    from your distro. On ubuntu, sudo apt-get install cmake libboost-all-dev
-    If you do this, be sure to change the appropriate lines in install.conf
+  - Also if available, it's sometimes easier to install cmake (and/or boost)
+    from your distro. On ubuntu, sudo apt-get install cmake.
+    If you do this, the script is designed to detect system-wide cmake
+    installations on both Linux and Mac; however, it only correctly
+    detects boost installations on Mac.
 
-  - If you want to specify setup options, copy setup/install.default.conf to
-    setup/install.conf and edit as desired. This can save you time if you
-    already have Boost installed. See install.default.conf for more
-    info. You can also just run setup.sh -- it will create setup/install.conf 
+  - Installing libboost-all-dev under Ubuntu does NOT place these files
+    where our install script can see them. At the moment, it's easier to 
+    just have our installer download and compile its own version of
+    libboost-1.53.0-dev, as counterintuitive as that seems.
+
+  ** Running the setup script **
+
+  - If you want to specify setup options, copy 
+    conf/default/install.conf.default to conf/install.conf and edit as 
+    desired. This can save you time if you already have Boost installed (Mac).
+    See install.conf.default for more information.
+    You can also just run setup.sh -- it will create setup/install.conf 
     for you and allow you to set certain options like the location of your 
     bullet build if you already have one. 
 
   - Run setup.sh. (sh setup.sh or bash setup.sh)
 
-    The setup.sh script may be run multiple times without hurting anything. 
+  - The setup.sh script may be run multiple times without hurting anything. 
 
   - To build the the src tree, run bin/build.sh 
 
@@ -165,20 +180,29 @@ without hurting anything.
   - That should do it. You can now run bin/build.sh to build your code.
     
 ** Troubleshooting **
-(Started by Drew Sabelhaus 4-28-14)
 
-  - If the download fails, there may be a corrupt file in env/downloads.
+  - If any of the downloads fail, there may be a corrupt file in env/downloads.
     Be sure to remove it before running setup/setup.sh again.
-    Similarly, there might be a failed install directory under env/build to remove.
+    Similarly, there might be a failed install directory under env/build, if
+    a compilation fails. TO-DO: create a "make clean"-like function for setup.
 
-  - If you'd like to use cmake that comes with your distro, check out the option
-    in install.conf. As of now (4-28-14) I've only implemented its use in the 
-    setup_bullet.sh, but if some of the other installs need cmake and you'd like to
-    use it with them, please copy over my edits to those other install files.
+  - Similarly, this script does not currently check for package integrity
+    before extracting tarballs, and will happily attempt to extract incomplete
+    downloads and then fail. If you get errors, just delete the package's 
+    directory under ./env/downloads and ./env/build
+
+  - If a compile fails, when you try and re-run ./setup.sh, remove not only
+    the downloaded file and extracted files under ./env/build, but also the 
+    (failed) compiled files under ./env/include and ./env/lib, for example,
+    a failed compile of Boost requires deleting ./env/include/boost and
+    everthing named "libboost" under ./env/lib
 
   - If you get an error when running bin/build.sh about CMake not "including"
-    a GLIB directory, be sure you've installed libglib2.0-dev
+    a GLIB directory, be sure you've installed libglib2.0-dev (Ubuntu 14.04).
 
-  - Mind the -fPIC error! (a CMake flag, should be enabled by default at this point)
+  - A known bug is that some of this code will not compile without the
+    position-independent-code flag, -fPIC, passed in. Though this flag should
+    be enabled by default now, if you do get an error related to -fPIC, just 
+    edit the CMakeLists files to include -fPIC.
 
 

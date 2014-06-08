@@ -1,7 +1,7 @@
 #!/bin/sh
 # Purpose: Define configuration directives for setup.sh. 
 # Date:    2013-04-29
-# Usage:   Copy/rename this file to 'install.conf' and run setup.sh
+# Usage:   Copy/rename this file to '../install.conf' and run setup.sh
 
 
 #############################################

@@ -4,7 +4,7 @@ Project(examples)
 subdirs(
     3_prism
     NestedTetrahedrons
-    SuperBall
+    SUPERball
     learningSpines
 )
 

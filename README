@@ -16,5 +16,9 @@ dev/tests and dev/btietz.
 
 More information can be found at:
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
+
 DOxygen documentation can be compiled in the source directory
-(run "doxygen Doxyfile" when in src) or found at: 
+(run "doxygen Doxyfile" when in src).
+Under Ubuntu 14.04, installing doxygen and graphviz (required) can be
+done by running "sudo apt-get install doxygen graphviz".
+HTML-based documentation can then be found under src/DoxyDocs/index.html
