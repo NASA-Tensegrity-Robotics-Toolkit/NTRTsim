@@ -39,6 +39,18 @@
 
 namespace
 {
+    // see tgBaseString.h for a descripton of some of these rod parameters
+    // (specifically, those related to the motor moving the strings.)
+    // NOTE that any parameter that depends on units of length will scale
+    // with the current gravity scaling. E.g., with gravity as 98.1,
+    // the length units below are in decimeters.
+
+    // Note: This current model of the SUPERball rod is 1.5m long by 3 cm radius,
+    // which is 0.00424 m^3.
+    // For SUPERball v1.5, mass = 3.5kg per strut, which comes out to 
+    // 0.825 kg / (decimeter^3).
+
+    // similarly, frictional parameters are for the tgRod objects.
     const struct Config
     {
         double density;
@@ -46,15 +58,37 @@ namespace
         double stiffness;
         double damping;
         double rod_length;
-        double rod_space;     
+        double rod_space;    
+        double friction;
+        double rollFriction;
+        double restitution;
+        double rotation;  
+        double maxTens;
+        double targetVelocity;
+        double maxAcc;
     } c =
    {
-       1.006,    // density (kg / length^3)
-       0.31,     // radius (length)
-       300000.0, // stiffness (kg / sec^2)
-       3000.0,   // damping (kg / sec)
-       15.0,     // rod_length (length)
-       7.5,      // rod_space (length)
+     0.825,    // density (kg / length^3)
+     0.31,     // radius (length)
+     1500.0,   // stiffness (kg / sec^2)
+     200.0,    // damping (kg / sec)
+     15.0,     // rod_length (length)
+     7.5,      // rod_space (length)
+     1.0,      // friction (unitless)
+     0.01,     // rollFriction (unitless)
+     0.0,      // restitution (?)
+     0,        // rotation
+     100000,   // maxTens
+     10000,    // targetVelocity
+     20000     // maxAcc
+
+     // Use the below values for earlier versions of simulation.
+     // 1.006,    
+     // 0.31,     
+     // 300000.0, 
+     // 3000.0,   
+     // 15.0,     
+     // 7.5,      
   };
 } // namespace
 
@@ -134,15 +168,27 @@ void T6Model::addMuscles(tgStructure& s)
 void T6Model::setup(tgWorld& world)
 {
 
-    const tgRod::Config rodConfig(c.radius, c.density);
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping);
+    const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
+				c.rollFriction, c.restitution);
+
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+					    c.maxTens, c.targetVelocity, 
+					    c.maxAcc);
             
+    // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
     addMuscles(s);
     s.move(btVector3(0, 10, 0));
-        
+
+    // Add a rotation. This is needed if the ground slopes too much,
+    // otherwise  glitches put a rod below the ground.
+    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    double rotationAngle = M_PI/2;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -157,6 +203,9 @@ void T6Model::setup(tgWorld& world)
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+
+    // call the onSetup methods of all observed things e.g. controllers
+    notifySetup();
 
     // Actually setup the children
     tgModel::setup(world);

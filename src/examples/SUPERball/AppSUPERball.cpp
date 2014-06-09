@@ -17,7 +17,7 @@
 */
 
 /**
- * @file AppSuperBall.cpp
+ * @file AppSUPERball.cpp
  * @brief Contains the definition function main() for the Super Ball applicaiton
  * application.
  * $Id$
@@ -26,6 +26,7 @@
 // This application
 #include "T6Model.h"
 #include "T6TensionController.h"
+#include "T6RestLengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -45,7 +46,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppT6ModelTest" << std::endl;
+    std::cout << "AppSUPERball" << std::endl;
 
     // First create the ground and world
     
@@ -59,7 +60,11 @@ int main(int argc, char** argv)
     
     const tgWorld::Config config = 
     {
-        981 // gravity, cm/sec^2 Use this to adjust length scale of world
+        // Note, by changing the setting below from 981 to 98.1, we've
+        // scaled the world length scale to decimeters not cm.
+
+        // Gravity, in cm/sec^2. Use this to adjust length scale of world.
+        98.1
     };
     tgWorld world(config, ground);
 
@@ -74,9 +79,22 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     T6Model* const myModel = new T6Model();
+
+    // Fifth, select the controller to use. Uncomment desired controller.
+
+    // For the T6RestLengthController, pass in the amount of cable to contract
+    // in. This is the "rest length difference": the static offset of cable
+    // length between geometric length in equilibrium and the actual rest length
+    // of an individual cable. 
+    // Note for the above scale of gravity, this is in decimeters.
+    T6RestLengthController* const pTC = new T6RestLengthController(4);
+
+    // For the T6TensionController,
     // Set the tension of the controller units of kg * length / s^2
-    // So 10000 units at this scale is 100 N
-    T6TensionController* const pTC = new T6TensionController(10000);
+    // So 10000 units at this scale is 1000 N
+
+    // T6TensionController* const pTC = new T6TensionController(10000);
+
     myModel->attach(pTC);
     simulation.addModel(myModel);
     
