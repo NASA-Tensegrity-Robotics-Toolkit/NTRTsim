@@ -11,8 +11,8 @@ The most accessable examples of tensegrity structures are in the
 examples directory, we recommend starting with src/examples/3_prism
 Additional README.dox files can be found in each folder with
 additional information about that applicaiton or library. Additional 
-examples can be found in folders "models controllers and apps" or in 
-dev/tests and dev/btietz.
+examples can be found in example folders NestedTetrahedrons, SUPERball,
+learningSpines or development folders: dev/tests and dev/btietz.
 
 More information can be found at:
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
