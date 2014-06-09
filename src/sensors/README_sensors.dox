@@ -2,7 +2,11 @@
   \page sensors Sensors
   Defines components of controllers that sense the world. In version
   1.0.0 this only includes classes for logging data to text files
-  during a run
+  during a run.
+  
+  An example is available in
+  examples/learningSpines/BaseSpineCPGControl.cpp, but two conditional
+  compile flags need to be set to true in the source code.
   
   \version 1.0.0 (beta)
 */
