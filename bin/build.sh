@@ -157,8 +157,6 @@ fi
 
 make || exit 1
 
-make install 
-
 popd > /dev/null  # exit make dir
 
 popd > /dev/null  # exit base dir

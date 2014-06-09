@@ -13,7 +13,6 @@ link_libraries(learningSpines
 
 file(COPY nodeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-#ensure logs exists
 
 add_executable(AppFlemonsSpineLearningCL
     FlemonsSpineModelLearningCL.cpp

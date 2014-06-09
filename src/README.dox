@@ -84,6 +84,24 @@
 	\version 1.0.0 (beta)
 */
 
+/**
+ \page contributors Contributors
+ The NASA Tensegrity Robotics Toolkit has taken contributions from a 
+ number of students and others supported by various fellowships, institutes
+ and internships. The following is a list of the main contributors to this software:
+ - Vytas SunSpiral		-	SGT Inc./NASA Ames Research Center			-	vytas.sunspiral (at) nasa.gov
+ - Brian Mirletz		-	Case Western Reserve University				-	brt6 (at) case.edu
+ - Lee Brownston		-	SGT Inc./NASA Ames Research Center			-	Lee.S.Brownston (at) nasa.gov
+ - Atil Iscen			-	Oregon State University						-	atiliscen (at) gmail.com
+ - Adrian Agogino		-	UC Santa Cruz/NASA Ames Research Center		-	adrian.k.agogino (at) nasa.gov
+ - Andrew Sabelhaus		-	UC Berkeley									-	apsabelhaus (at) berkeley.edu
+ - Ken Caluwaerts 		-	Ghent University/FWO						-	ken (at) caluwaerts.eu
+ - Jonathan Bruce		-	USRA/UC Santa Cruz							-	jbruce (at) soe.ucsc.edu
+ - Jérémie Despraz		-	Ecole Polytechnique Fédérale de Lausanne	-	jer.despraz (at) gmail.com
+ - Jeffrey Friesen		-	UC San Diego								-	jfriesen (at) ucsd.edu
+ - Alexie Pogue			-	UC San Diego								-	alexie.pogue (at) gmail.com
+*/
+
 /** \page keys Keyboard Commands
 	\section sec1 Keyboard Commands for NTRT
 	The NTRT GUI supports user interaction through the keyboard.
