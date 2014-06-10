@@ -22,13 +22,21 @@ anything.
   ** Prerequisites/Dependencies **
 
   - Some Linux prerequisites, outside of the setup script file. Make
-    sure the following are installed (you can use sudo apt-get install):
-	
+    sure the following are installed: 
+    
+    Ubuntu (you can use sudo apt-get install):
 	- g++ (the compiler for cmake)
 	- libglib2.0-dev
 	- curl
 	- freeglut3
 	- freeglut3-dev (glut for bullet graphics)
+
+    Fedora/CentOS (you can use sudo yum install):
+	- gcc-c++ (the compiler for cmake)
+	- glib2-devel and glib2-devel.i686
+	- curl
+	- freeglut
+	- freeglut-devel 
 		
   - Also if available, it's sometimes easier to install cmake (and/or boost)
     from your distro. On ubuntu, sudo apt-get install cmake.
