@@ -25,5 +25,36 @@
  * @author Brian Mirletz
  * $Id$
  */
+
+// Bullet Linear Algebra
+#include "btVector3.h"
+#include "btQuaternion.h"
+
+// The C++ Standard Library
+#include <vector>
+
+class CordeModel
+{
+
+private:
+	struct CordePositionElement
+	{
+		btVector3 pos;
+		btVector3 vel;
+		btVector3 force;
+	}
+	struct CordeQuaternionElement
+	{
+		btQuaternion q;
+		btQuaternion qdot;
+		btQuaternion tprime;
+		btVector3 torques;
+		btVector3 omega;
+	}
+
+
+
+}
+ 
  
 #endif // CORDE_MODEL
