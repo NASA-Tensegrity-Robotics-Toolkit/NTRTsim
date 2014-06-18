@@ -16,56 +16,34 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef CORDE_MODEL
-#define CORDE_MODEL
-
 /**
- * @file CordeModel.h
+ * @file CordeModel.cpp
  * @brief Defines structure for the Corde softbody String Model
  * @author Brian Mirletz
  * $Id$
  */
 
 // Bullet Linear Algebra
-#include "LinearMath/btScalar.h"
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btQuaternion.h"
+#include "CordeModel.h"
 
-// The C++ Standard Library
-#include <vector>
-
-class CordeModel
+CordeModel::CordeModel(btVector3 pos1, btVector3 pos2)
 {
-public:
-	CordeModel(btVector3 pos1, btVector3 pos2);
 	
-	~CordeModel();
-	
-	void step (btScalar dt);
-	
-private:
-	void computeInternalForces();
-	
-
-	struct CordePositionElement
-	{
-		btVector3 pos;
-		btVector3 vel;
-		btVector3 force;
-		btScalar mass;
-	}
-	struct CordeQuaternionElement
-	{
-		btQuaternion q;
-		btQuaternion qdot;
-		btQuaternion tprime;
-		btVector3 torques;
-		btVector3 omega;
-	}
-
-	std::vector<CordePositionElement> m_massPoints;
-	std::vector<CordeQuaternionElement> m_Centerlines;
 }
- 
- 
-#endif // CORDE_MODEL
+
+CordeModel::~CordeModel()
+{
+	
+}
+
+void CordeModel::step (btScalar dt)
+{
+	
+}
+
+
+void CordeModel::computeInternalForces()
+{
+	
+}
+
