@@ -16,56 +16,38 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef CORDE_MODEL
-#define CORDE_MODEL
-
 /**
- * @file CordeModel.h
- * @brief Defines structure for the Corde softbody String Model
+ * @file AppCordeTest.cpp
+ * @brief Contains the definition function main() for testing the Corde
+ * string model
  * @author Brian Mirletz
  * $Id$
  */
 
-// Bullet Linear Algebra
-#include "LinearMath/btScalar.h"
+// This application
+#include "CordeModel.h"
+// This library
+#include "core/tgModel.h"
+#include "core/tgSimViewGraphics.h"
+#include "core/tgSimulation.h"
+#include "core/tgWorld.h"
+// The Bullet Physics Library
 #include "LinearMath/btVector3.h"
-#include "LinearMath/btQuaternion.h"
-
 // The C++ Standard Library
-#include <vector>
+#include <iostream>
 
-class CordeModel
+/**
+ * The entry point.
+ * @param[in] argc the number of command-line arguments
+ * @param[in] argv argv[0] is the executable name
+ * @return 0
+ */
+int main(int argc, char** argv)
 {
-public:
-	CordeModel(btVector3 pos1, btVector3 pos2);
+	btVector3 startPos(0.0, 0.0, 0.0);
+	btVector3 endPos  (0.0, 0.0, 10.0);
 	
-	~CordeModel();
+	CordeModel testString(startPos, endPos);
 	
-	void step (btScalar dt);
-	
-private:
-	void computeInternalForces();
-	
-
-	struct CordePositionElement
-	{
-		btVector3 pos;
-		btVector3 vel;
-		btVector3 force;
-		btScalar mass;
-	};
-	struct CordeQuaternionElement
-	{
-		btQuaternion q;
-		btQuaternion qdot;
-		btQuaternion tprime;
-		btVector3 torques;
-		btVector3 omega;
-	};
-
-	std::vector<CordePositionElement> m_massPoints;
-	std::vector<CordeQuaternionElement> m_Centerlines;
-};
- 
- 
-#endif // CORDE_MODEL
+    return 0;
+}

@@ -44,6 +44,7 @@ void CordeModel::step (btScalar dt)
 
 void CordeModel::computeInternalForces()
 {
-	
+	// Setup common factors
+    btScalar posNorm_2;
 }
 
