@@ -38,13 +38,66 @@ CordeModel::~CordeModel()
 
 void CordeModel::step (btScalar dt)
 {
-	
+    stepPrerequisites();
+	computeInternalForces();
 }
 
+void CordeModel::computeConstants()
+{
+    
+}
+
+void CordeModel::stepPrerequisites()
+{
+    std::size_t n = m_massPoints.size();
+	for (std::size_t i = 0; i < n - 1; i++)
+    {
+        CordePositionElement* r_0 = m_massPoints[i];
+        r_0->force.setZero();
+    }
+    
+    n = m_Centerlines.size();
+	for (std::size_t i = 0; i < n - 1; i++)
+    {
+        CordeQuaternionElement* q_0 = m_Centerlines[i];
+        q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
+        q_0->torques.setZero();
+    }
+}
 
 void CordeModel::computeInternalForces()
 {
-	// Setup common factors
-    btScalar posNorm_2;
+    std::size_t n = m_massPoints.size();
+	for (std::size_t i = 0; i < n - 1; i++)
+    {
+        const CordePositionElement* r_0 = m_massPoints[i];
+        const CordePositionElement* r_1 = m_massPoints[i + 1];
+        
+        const CordeQuaternionElement* quat_0 = m_Centerlines[i];
+        const CordeQuaternionElement* quat_1 = m_Centerlines[i + 1];
+        
+        // Get position elements in standard variable names
+        const btScalar x1 = r_0->pos[0];
+        const btScalar y1 = r_0->pos[1];
+        const btScalar z1 = r_0->pos[2];
+        
+        const btScalar x2 = r_1->pos[0];
+        const btScalar y2 = r_1->pos[1];
+        const btScalar z2 = r_1->pos[2];
+        
+        // Same for quaternion elements
+        const btScalar q1_1 = quat_0->q[0];
+        const btScalar q1_2 = quat_0->q[1];
+        const btScalar q1_3 = quat_0->q[2];
+        const btScalar q1_4 = quat_0->q[3];
+        
+        const btScalar q2_1 = quat_1->q[0];
+        const btScalar q2_2 = quat_1->q[1];
+        const btScalar q2_3 = quat_1->q[2];
+        const btScalar q2_4 = quat_1->q[3];
+        
+        // Setup common factors
+        btScalar posNorm_2;
+    }
 }
 

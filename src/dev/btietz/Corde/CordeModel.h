@@ -44,6 +44,10 @@ public:
 	void step (btScalar dt);
 	
 private:
+	void computeConstants();
+
+	void stepPrerequisites();
+
 	void computeInternalForces();
 	
 
@@ -58,13 +62,16 @@ private:
 	{
 		btQuaternion q;
 		btQuaternion qdot;
+		/**
+		 * Just a 4x1 vector, but easier to store this way.
+		 */
 		btQuaternion tprime;
 		btVector3 torques;
 		btVector3 omega;
 	};
 
-	std::vector<CordePositionElement> m_massPoints;
-	std::vector<CordeQuaternionElement> m_Centerlines;
+	std::vector<CordePositionElement*> m_massPoints;
+	std::vector<CordeQuaternionElement*> m_Centerlines;
 };
  
  
