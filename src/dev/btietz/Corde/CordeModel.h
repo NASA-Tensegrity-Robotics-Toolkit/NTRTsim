@@ -37,6 +37,20 @@
 class CordeModel
 {
 public:
+	struct Config
+	{
+		Config();
+		
+		const double radius;
+		const double density;
+		const double YoungMod;
+		const double ShearMod;
+		const double StretchMod;
+		const double ConsSpringConst;
+		const double gammaT;
+		const double gammaR;
+	};
+	
 	CordeModel(btVector3 pos1, btVector3 pos2);
 	
 	~CordeModel();
@@ -56,7 +70,7 @@ private:
 		btVector3 pos;
 		btVector3 vel;
 		btVector3 force;
-		btScalar mass;
+		double mass;
 	};
 	struct CordeQuaternionElement
 	{
@@ -69,9 +83,25 @@ private:
 		btVector3 torques;
 		btVector3 omega;
 	};
-
+	
 	std::vector<CordePositionElement*> m_massPoints;
 	std::vector<CordeQuaternionElement*> m_Centerlines;
+	/**
+	 * Should have length equal to m_massPoints.size()-1
+	 */
+	std::vector<double> linkLengths;
+	/**
+	 * Should have length equal to m_Centerlines.size()-1
+	 */
+	std::vector<double> quaternionShapes;
+	
+	/**
+	 * Computed based on the values in config. Should have length 4
+	 * 0: linear stiffness used by mass models
+	 * 1 - 3: bending and torsion stiffnesses
+	 * @todo can this be const?
+	 */
+	std::vector<double> computedStiffness;
 };
  
  
