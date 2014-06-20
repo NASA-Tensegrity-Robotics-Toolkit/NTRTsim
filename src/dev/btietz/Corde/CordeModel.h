@@ -64,7 +64,9 @@ private:
 
 	void computeInternalForces();
 	
-
+	/**
+	 * Holds all of the data for one of the mass elements of the string
+	 */
 	struct CordePositionElement
 	{
 		btVector3 pos;
@@ -72,6 +74,10 @@ private:
 		btVector3 force;
 		double mass;
 	};
+	
+	/**
+	 * Holds all of the data for the centerline quaternions of the string
+	 */
 	struct CordeQuaternionElement
 	{
 		btQuaternion q;
