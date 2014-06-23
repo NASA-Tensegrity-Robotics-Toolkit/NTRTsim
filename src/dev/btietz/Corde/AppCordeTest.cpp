@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	btQuaternion endRot = startRot;
 	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 10;
+	const std::size_t resolution = 100;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5;
@@ -68,5 +68,9 @@ int main(int argc, char** argv)
 	
 	CordeModel testString(startPos, endPos, startRot, endRot, config);
 	
+	for (int i = 0; i < 1000; i++)
+	{
+		testString.step(0.001);
+	}
     return 0;
 }

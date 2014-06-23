@@ -143,6 +143,13 @@ void CordeModel::step (btScalar dt)
     
     stepPrerequisites();
 	computeInternalForces();
+    unconstrainedMotion(dt);
+    
+    for (std::size_t i = 0; i < m_massPoints.size(); i++)
+    {
+        std::cout << "Position " << i << " " << m_massPoints[i]->pos 
+                  << "Force " << i << " " << m_massPoints[i]->force << std::endl;
+    }
     
     assert(invariant());
 }
@@ -175,14 +182,15 @@ void CordeModel::stepPrerequisites()
 
 void CordeModel::computeInternalForces()
 {
-    std::size_t n = m_massPoints.size();
-	for (std::size_t i = 0; i < n - 1; i++)
+    std::size_t n = m_massPoints.size() - 1;
+    
+    // Update position elements
+	for (std::size_t i = 0; i < n; i++)
     {
         CordePositionElement* r_0 = m_massPoints[i];
         CordePositionElement* r_1 = m_massPoints[i + 1];
         
         CordeQuaternionElement* quat_0 = m_centerlines[i];
-        CordeQuaternionElement* quat_1 = m_centerlines[i + 1];
         
         // Get position elements in standard variable names
         const btScalar x1 = r_0->pos[0];
@@ -199,11 +207,6 @@ void CordeModel::computeInternalForces()
         const btScalar q1_3 = quat_0->q[2];
         const btScalar q1_4 = quat_0->q[3];
         
-        const btScalar q2_1 = quat_1->q[0];
-        const btScalar q2_2 = quat_1->q[1];
-        const btScalar q2_3 = quat_1->q[2];
-        const btScalar q2_4 = quat_1->q[3];
-        
         // Setup common factors
         const btVector3 posDiff = r_0->pos - r_1->pos;
         const btVector3 velDiff = r_0->vel - r_1->vel;
@@ -213,17 +216,19 @@ void CordeModel::computeInternalForces()
                                   (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
            ( -1.0 * q1_1 * q1_1 - q1_2 * q1_2 + q1_3 * q1_3 + q1_4 * q1_4));
         
-        // Sum X Forces:
+        // Sum Forces, have to split it out into components due to
+        // derivatives of energy quantaties
         
-        // Spring Constraint
+        // Spring Constraint X
         const btScalar spring_cons_x = computedStiffness[0] * 
             (linkLengths[i] - posNorm) * (x1 - x2) / (linkLengths[i] * posNorm);
         
-        // Quaternion Constraint
+        // Quaternion Constraint X
         const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
         
+        // Dissipation in X
         const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
                             
@@ -231,6 +236,43 @@ void CordeModel::computeInternalForces()
         r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x + diss_energy_x;
              
         r_1->force[0] += spring_cons_x + quat_cons_x - diss_energy_x;
+        
+        // Do the torques associated with the constraints here, but the other quaternion updates in the second loop
+    }
+    
+    n = m_centerlines.size() - 1;
+    
+    // Update quaternion elements
+	for (std::size_t i = 0; i < n; i++)
+    {
+        CordeQuaternionElement* quat_0 = m_centerlines[i];
+        CordeQuaternionElement* quat_1 = m_centerlines[i + 1];
+        
+        const btScalar q1_1 = quat_0->q[0];
+        const btScalar q1_2 = quat_0->q[1];
+        const btScalar q1_3 = quat_0->q[2];
+        const btScalar q1_4 = quat_0->q[3];
+        
+        const btScalar q2_1 = quat_1->q[0];
+        const btScalar q2_2 = quat_1->q[1];
+        const btScalar q2_3 = quat_1->q[2];
+        const btScalar q2_4 = quat_1->q[3];
+    }
+}
+
+void CordeModel::unconstrainedMotion(double dt)
+{
+    for (std::size_t i = 0; i < m_massPoints.size(); i++)
+    {
+        CordePositionElement* p_0 = m_massPoints[i];
+        // Velocity update - semi-implicit Euler
+        p_0->vel = p_0->vel + dt / p_0->mass * p_0->force;
+        // Position update, uses v(t + dt)
+        p_0->pos = p_0->pos + dt * p_0->vel;
+    }
+    for (std::size_t i = 0; i < m_centerlines.size(); i++)
+    {
+        // Need to figure out how to include 4x4 matricies
     }
 }
 

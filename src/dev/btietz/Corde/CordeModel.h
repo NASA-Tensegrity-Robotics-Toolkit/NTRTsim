@@ -79,6 +79,8 @@ private:
 
 	void computeInternalForces();
 	
+	void unconstrainedMotion(double dt);
+	
 	/**
 	 * Holds all of the data for one of the mass elements of the string
 	 */
