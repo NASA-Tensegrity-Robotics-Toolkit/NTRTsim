@@ -39,7 +39,10 @@ class CordeModel
 public:
 	struct Config
 	{
-		Config();
+		Config(const double r, const double d,
+                            const double ym, const double shm,
+                            const double stm, const double csc,
+                            const double gt, const double gr);
 		
 		const double radius;
 		const double density;
@@ -51,7 +54,7 @@ public:
 		const double gammaR;
 	};
 	
-	CordeModel(btVector3 pos1, btVector3 pos2);
+	CordeModel(btVector3 pos1, btVector3 pos2, CordeModel::Config& Config);
 	
 	~CordeModel();
 	
@@ -89,6 +92,8 @@ private:
 		btVector3 torques;
 		btVector3 omega;
 	};
+	
+	CordeModel::Config m_config;
 	
 	std::vector<CordePositionElement*> m_massPoints;
 	std::vector<CordeQuaternionElement*> m_Centerlines;

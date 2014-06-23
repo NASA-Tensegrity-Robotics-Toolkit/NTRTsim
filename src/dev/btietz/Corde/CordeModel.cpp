@@ -26,7 +26,24 @@
 // Bullet Linear Algebra
 #include "CordeModel.h"
 
-CordeModel::CordeModel(btVector3 pos1, btVector3 pos2)
+CordeModel::Config::Config(const double r, const double d,
+                            const double ym, const double shm,
+                            const double stm, const double csc,
+                            const double gt, const double gr) :
+    radius(r),
+    density(d),
+    YoungMod(ym),
+    ShearMod(shm),
+    StretchMod(stm),
+    ConsSpringConst(csc),
+    gammaT(gt),
+    gammaR(gr)
+{
+    
+}
+
+CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, CordeModel::Config& Config) : 
+m_config(Config)
 {
 	
 }
@@ -70,11 +87,11 @@ void CordeModel::computeInternalForces()
     std::size_t n = m_massPoints.size();
 	for (std::size_t i = 0; i < n - 1; i++)
     {
-        const CordePositionElement* r_0 = m_massPoints[i];
-        const CordePositionElement* r_1 = m_massPoints[i + 1];
+        CordePositionElement* r_0 = m_massPoints[i];
+        CordePositionElement* r_1 = m_massPoints[i + 1];
         
-        const CordeQuaternionElement* quat_0 = m_Centerlines[i];
-        const CordeQuaternionElement* quat_1 = m_Centerlines[i + 1];
+        CordeQuaternionElement* quat_0 = m_Centerlines[i];
+        CordeQuaternionElement* quat_1 = m_Centerlines[i + 1];
         
         // Get position elements in standard variable names
         const btScalar x1 = r_0->pos[0];
@@ -97,7 +114,27 @@ void CordeModel::computeInternalForces()
         const btScalar q2_4 = quat_1->q[3];
         
         // Setup common factors
-        btScalar posNorm_2;
+        btVector3 posDiff = r_0->pos - r_1->pos;
+        btScalar posNorm   = posDiff.length();
+        btScalar posNorm_2 = posDiff.length2();
+        btVector3 director( (2.0 * (q1_1 * q1_3 + q1_2 * q1_4)),
+                            (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
+           ( -1.0 * q1_1 * q1_1 - q1_2 * q1_2 + q1_3 * q1_3 + q1_4 * q1_4));
+        
+        // Sum X Forces:
+        
+        // Spring Constraint
+        btScalar spring_cons_x = computedStiffness[0] * (linkLengths[i] - posNorm)
+            * (x1 - x2) / (linkLengths[i] * posNorm);
+        
+        // Quaternion Constraint
+        btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
+        ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
+        + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
+        
+        r_0->force[0] += -1.0 * spring_cons_x;
+             
+        r_1->force[0] += spring_cons_x;
     }
 }
 

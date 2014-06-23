@@ -47,7 +47,19 @@ int main(int argc, char** argv)
 	btVector3 startPos(0.0, 0.0, 0.0);
 	btVector3 endPos  (0.0, 0.0, 10.0);
 	
-	CordeModel testString(startPos, endPos);
+	// Values for Rope from Spillman's paper
+	const double radius = 0.01;
+	const double density = 1300;
+	const double youngMod = 0.5;
+	const double shearMod = 0.5;
+	const double stretchMod = 20.0;
+	const double springConst = 100.0;
+	const double gammaT = 10.0;
+	const double gammaR = 1.0;
+	CordeModel::Config config(radius, density, youngMod, shearMod,
+								stretchMod, springConst, gammaT, gammaR);
+	
+	CordeModel testString(startPos, endPos, config);
 	
     return 0;
 }
