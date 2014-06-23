@@ -57,6 +57,8 @@ public:
 	};
 	
 	/**
+	 * A constructor which assumes uniformally distributed mass
+	 * points and rotation
 	 * pos1 and pos2 specify the start and end points of the rod.
 	 * quat1 and quat2 need to be computed based on the torsion in the rod.
 	 * Note that if there is neither bending nor torsion one can say quat1 = quat2
@@ -117,7 +119,7 @@ private:
 	CordeModel::Config m_config;
 	
 	std::vector<CordePositionElement*> m_massPoints;
-	std::vector<CordeQuaternionElement*> m_Centerlines;
+	std::vector<CordeQuaternionElement*> m_centerlines;
 	/**
 	 * Should have length equal to m_massPoints.size()-1
 	 */

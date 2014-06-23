@@ -26,6 +26,9 @@
 // This module
 #include "CordeModel.h"
 
+// This library
+#include "tgcreator/tgUtil.h"
+
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -83,18 +86,61 @@ m_config(Config)
 {
 	computeConstants();
     
+    btVector3 rodLength(pos2 - pos1);
+    btVector3 unitLength( rodLength / ((double) m_config.resolution - 1) );
+    btVector3 massPos(pos1);
     
+    double unitMass =  m_config.density * M_PI * pow( m_config.radius, 2) * unitLength.length();
+    
+    CordePositionElement* currentPoint = new CordePositionElement(massPos, unitMass);
+    
+    m_massPoints.push_back(currentPoint);
+    
+    std::cout << massPos << std::endl;
+    // Setup mass elements
+    for (std::size_t i = 1; i < m_config.resolution; i++)
+    {
+                
+        massPos += unitLength;
+        currentPoint = new CordePositionElement(massPos, unitMass);
+        m_massPoints.push_back(currentPoint);
+        linkLengths.push_back(unitLength.length());
+        std::cout << massPos << " " << unitMass << std::endl;
+    }
+    
+    CordeQuaternionElement* currentAngle = new CordeQuaternionElement(quat1);
+    m_centerlines.push_back(currentAngle);
+    
+    std::size_t n = m_config.resolution - 1;
+    for (std::size_t i = 1; i < n; i++)
+    {
+        currentAngle = new CordeQuaternionElement(quat1.slerp(quat2, (double) i / (double) n) );
+        m_centerlines.push_back(currentAngle);
+        quaternionShapes.push_back(unitLength.length());
+    }
     
     assert(invariant());
 }
 
 CordeModel::~CordeModel()
 {
-	
+	for (std::size_t i = 0; i < m_massPoints.size(); i++)
+    {
+        delete m_massPoints[i];
+    }
+    for (std::size_t i = 0; i < m_centerlines.size(); i++)
+    {
+        delete m_centerlines[i];
+    }
 }
 
 void CordeModel::step (btScalar dt)
 {
+    if (dt <= 0.0)
+    {
+        throw std::invalid_argument("Timestep is not positive.");
+    }
+    
     stepPrerequisites();
 	computeInternalForces();
     
@@ -118,10 +164,10 @@ void CordeModel::stepPrerequisites()
         r_0->force.setZero();
     }
     
-    n = m_Centerlines.size();
+    n = m_centerlines.size();
 	for (std::size_t i = 0; i < n - 1; i++)
     {
-        CordeQuaternionElement* q_0 = m_Centerlines[i];
+        CordeQuaternionElement* q_0 = m_centerlines[i];
         q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
         q_0->torques.setZero();
     }
@@ -135,8 +181,8 @@ void CordeModel::computeInternalForces()
         CordePositionElement* r_0 = m_massPoints[i];
         CordePositionElement* r_1 = m_massPoints[i + 1];
         
-        CordeQuaternionElement* quat_0 = m_Centerlines[i];
-        CordeQuaternionElement* quat_1 = m_Centerlines[i + 1];
+        CordeQuaternionElement* quat_0 = m_centerlines[i];
+        CordeQuaternionElement* quat_1 = m_centerlines[i + 1];
         
         // Get position elements in standard variable names
         const btScalar x1 = r_0->pos[0];
@@ -210,8 +256,11 @@ CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
     
 }
 
-/// @todo add constraints on length of vectors, etc
+/// Checks lengths of vectors. @todo add additional invariants
 bool CordeModel::invariant()
 {
-    return true;
+    return (m_massPoints.size() == m_centerlines.size() + 1)
+        && (m_centerlines.size() == linkLengths.size())
+        && (linkLengths.size() == quaternionShapes.size() + 1)
+        && (computedStiffness.size() == 4);
 }
