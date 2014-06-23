@@ -31,8 +31,10 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "tgcreator/tgUtil.h"
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -47,7 +49,12 @@ int main(int argc, char** argv)
 	btVector3 startPos(0.0, 0.0, 0.0);
 	btVector3 endPos  (10.0, 0.0, 0.0);
 	
+	// Setup for neither bending nor rotation
+	btQuaternion startRot( (endPos - startPos).normalize(), 0);
+	btQuaternion endRot = startRot;
+	
 	// Values for Rope from Spillman's paper
+	const std::size_t resolution = 10;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5;
@@ -56,10 +63,10 @@ int main(int argc, char** argv)
 	const double springConst = 100.0;
 	const double gammaT = 10.0;
 	const double gammaR = 1.0;
-	CordeModel::Config config(radius, density, youngMod, shearMod,
+	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
-	CordeModel testString(startPos, endPos, config);
+	CordeModel testString(startPos, endPos, startRot, endRot, config);
 	
     return 0;
 }

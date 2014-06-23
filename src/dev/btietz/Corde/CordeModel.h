@@ -39,11 +39,13 @@ class CordeModel
 public:
 	struct Config
 	{
-		Config(const double r, const double d,
-                            const double ym, const double shm,
-                            const double stm, const double csc,
-                            const double gt, const double gr);
+		Config(const std::size_t res,
+				const double r, const double d,
+				const double ym, const double shm,
+				const double stm, const double csc,
+				const double gt, const double gr);
 		
+		const std::size_t resolution;
 		const double radius;
 		const double density;
 		const double YoungMod;
@@ -54,7 +56,15 @@ public:
 		const double gammaR;
 	};
 	
-	CordeModel(btVector3 pos1, btVector3 pos2, CordeModel::Config& Config);
+	/**
+	 * pos1 and pos2 specify the start and end points of the rod.
+	 * quat1 and quat2 need to be computed based on the torsion in the rod.
+	 * Note that if there is neither bending nor torsion one can say quat1 = quat2
+	 * = btQuaternion((pos2 - pos1).normalize, 0) (axis-angle constructor)
+	 * @todo develop a constructor that can handle more complex shapes
+	 * i.e. wrapped around a motor. This one maxes out at 1 - eps rotations
+	 */
+	CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config);
 	
 	~CordeModel();
 	
@@ -72,6 +82,12 @@ private:
 	 */
 	struct CordePositionElement
 	{
+		/**
+		 * Sets pos to p1, mass to m, everything else to zero
+		 * Assumes rod is at rest on start
+		 */
+		CordePositionElement(btVector3 p1, double m);
+		
 		btVector3 pos;
 		btVector3 vel;
 		btVector3 force;
@@ -82,7 +98,12 @@ private:
 	 * Holds all of the data for the centerline quaternions of the string
 	 */
 	struct CordeQuaternionElement
-	{
+	{	
+		/**
+		 * Sets q to q1.normalized(), everything else to zero
+		 */
+		CordeQuaternionElement(btQuaternion q1);
+		
 		btQuaternion q;
 		btQuaternion qdot;
 		/**
@@ -113,6 +134,8 @@ private:
 	 * @todo can this be const?
 	 */
 	std::vector<double> computedStiffness;
+	
+	bool invariant();
 };
  
  

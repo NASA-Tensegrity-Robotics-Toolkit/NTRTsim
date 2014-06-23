@@ -29,10 +29,12 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-CordeModel::Config::Config(const double r, const double d,
+CordeModel::Config::Config(const std::size_t res,
+                            const double r, const double d,
                             const double ym, const double shm,
                             const double stm, const double csc,
                             const double gt, const double gr) :
+    resolution(res),
     radius(r),
     density(d),
     YoungMod(ym),
@@ -76,10 +78,14 @@ CordeModel::Config::Config(const double r, const double d,
     }
 }
 
-CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, CordeModel::Config& Config) : 
+CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config) : 
 m_config(Config)
 {
-	
+	computeConstants();
+    
+    
+    
+    assert(invariant());
 }
 
 CordeModel::~CordeModel()
@@ -91,11 +97,16 @@ void CordeModel::step (btScalar dt)
 {
     stepPrerequisites();
 	computeInternalForces();
+    
+    assert(invariant());
 }
 
 void CordeModel::computeConstants()
 {
-    
+    computedStiffness.push_back( m_config.StretchMod * M_PI * pow(m_config.radius, 2));
+    computedStiffness.push_back( m_config.YoungMod * M_PI * pow(m_config.radius, 2) / 4.0);
+    computedStiffness.push_back( m_config.YoungMod * M_PI * pow(m_config.radius, 2) / 4.0);
+    computedStiffness.push_back( m_config.ShearMod * M_PI * pow(m_config.radius, 2) / 2.0);
 }
 
 void CordeModel::stepPrerequisites()
@@ -171,9 +182,36 @@ void CordeModel::computeInternalForces()
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
                             
         
-        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x;
+        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x + diss_energy_x;
              
-        r_1->force[0] += spring_cons_x + quat_cons_x;
+        r_1->force[0] += spring_cons_x + quat_cons_x - diss_energy_x;
     }
 }
 
+CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
+	pos(p1),
+	vel(0.0, 0.0, 0.0),
+	force(0.0, 0.0, 0.0),
+	mass(m)
+{
+    if (m < 0.0)
+    {
+        throw std::invalid_argument("Mass is negative.");
+    }
+}
+
+CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
+    q(q1.normalize()),
+	qdot(0.0, 0.0, 0.0, 0.0),
+    tprime(0.0, 0.0, 0.0, 0.0),
+	torques(0.0, 0.0, 0.0),
+	omega(0.0, 0.0, 0.0)
+{
+    
+}
+
+/// @todo add constraints on length of vectors, etc
+bool CordeModel::invariant()
+{
+    return true;
+}
