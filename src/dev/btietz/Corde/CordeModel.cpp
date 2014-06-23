@@ -23,8 +23,11 @@
  * $Id$
  */
 
-// Bullet Linear Algebra
+// This module
 #include "CordeModel.h"
+
+// The C++ Standard Library
+#include <stdexcept>
 
 CordeModel::Config::Config(const double r, const double d,
                             const double ym, const double shm,
@@ -39,7 +42,38 @@ CordeModel::Config::Config(const double r, const double d,
     gammaT(gt),
     gammaR(gr)
 {
-    
+    if (r < 0.0)
+    {
+        throw std::invalid_argument("Corde string radius is negative.");
+    }
+    else if (d < 0.0)
+    {
+        throw std::invalid_argument("Corde String density is negative.");
+    }
+    else if (ym < 0.0)
+    {
+        throw std::invalid_argument("String Young's Modulus is negative.");
+    }
+    else if (shm < 0.0)
+    {
+        throw std::invalid_argument("Shear Modulus is negative.");
+    }
+    else if (stm < 0.0)
+    {
+        throw std::invalid_argument("Stretch Modulus is negative.");
+    }
+    else if (csc < 0.0)
+    {
+        throw std::invalid_argument("Spring Constant is negative.");
+    }
+    else if (gt < 0.0)
+    {
+        throw std::invalid_argument("Damping Constant (position) is negative.");
+    }
+    else if (gr < 0.0)
+    {
+        throw std::invalid_argument("Damping Constant (rotation) is negative.");
+    }
 }
 
 CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, CordeModel::Config& Config) : 
@@ -114,27 +148,32 @@ void CordeModel::computeInternalForces()
         const btScalar q2_4 = quat_1->q[3];
         
         // Setup common factors
-        btVector3 posDiff = r_0->pos - r_1->pos;
-        btScalar posNorm   = posDiff.length();
-        btScalar posNorm_2 = posDiff.length2();
-        btVector3 director( (2.0 * (q1_1 * q1_3 + q1_2 * q1_4)),
-                            (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
+        const btVector3 posDiff = r_0->pos - r_1->pos;
+        const btVector3 velDiff = r_0->vel - r_1->vel;
+        const btScalar posNorm   = posDiff.length();
+        const btScalar posNorm_2 = posDiff.length2();
+        const btVector3 director( (2.0 * (q1_1 * q1_3 + q1_2 * q1_4)),
+                                  (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
            ( -1.0 * q1_1 * q1_1 - q1_2 * q1_2 + q1_3 * q1_3 + q1_4 * q1_4));
         
         // Sum X Forces:
         
         // Spring Constraint
-        btScalar spring_cons_x = computedStiffness[0] * (linkLengths[i] - posNorm)
-            * (x1 - x2) / (linkLengths[i] * posNorm);
+        const btScalar spring_cons_x = computedStiffness[0] * 
+            (linkLengths[i] - posNorm) * (x1 - x2) / (linkLengths[i] * posNorm);
         
         // Quaternion Constraint
-        btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
+        const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
         
-        r_0->force[0] += -1.0 * spring_cons_x;
+        const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
+                        posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
+                            
+        
+        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x;
              
-        r_1->force[0] += spring_cons_x;
+        r_1->force[0] += spring_cons_x + quat_cons_x;
     }
 }
 

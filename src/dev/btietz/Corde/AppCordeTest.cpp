@@ -45,7 +45,7 @@
 int main(int argc, char** argv)
 {
 	btVector3 startPos(0.0, 0.0, 0.0);
-	btVector3 endPos  (0.0, 0.0, 10.0);
+	btVector3 endPos  (10.0, 0.0, 0.0);
 	
 	// Values for Rope from Spillman's paper
 	const double radius = 0.01;
