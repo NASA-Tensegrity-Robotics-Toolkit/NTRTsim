@@ -213,7 +213,7 @@ void CordeModel::computeInternalForces()
         const btScalar posNorm   = posDiff.length();
         const btScalar posNorm_2 = posDiff.length2();
         const btVector3 director( (2.0 * (q1_1 * q1_3 + q1_2 * q1_4)),
-                                  (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
+                        (2.0 * (q1_2 * q1_3 - q1_1 * q1_4)),
            ( -1.0 * q1_1 * q1_1 - q1_2 * q1_2 + q1_3 * q1_3 + q1_4 * q1_4));
         
         // Sum Forces, have to split it out into components due to
@@ -233,9 +233,9 @@ void CordeModel::computeInternalForces()
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
                             
         
-        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x + diss_energy_x;
+        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x - diss_energy_x;
              
-        r_1->force[0] += spring_cons_x + quat_cons_x - diss_energy_x;
+        r_1->force[0] += spring_cons_x + quat_cons_x + diss_energy_x;
         
         // Do the torques associated with the constraints here, but the other quaternion updates in the second loop
     }

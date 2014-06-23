@@ -68,9 +68,17 @@ int main(int argc, char** argv)
 	
 	CordeModel testString(startPos, endPos, startRot, endRot, config);
 	
+	double t = 0.0;
+	double dt = 0.001;
 	for (int i = 0; i < 1000; i++)
 	{
-		testString.step(0.001);
+		testString.step(dt);
+		t += dt;
 	}
+	#ifdef BT_USE_DOUBLE_PRECISION
+		std::cout << "Double precision" << std::endl;
+	#else
+		std::cout << "Single Precision" << std::endl;
+	#endif
     return 0;
 }
