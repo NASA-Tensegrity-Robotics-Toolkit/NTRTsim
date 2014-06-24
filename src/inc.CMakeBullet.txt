@@ -28,7 +28,11 @@ include_directories (
 link_directories(${LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
 
 OPTION(USE_GLUT "Use Glut"  ON)
+
+# If you turn this on, turn it on in setup_bullet.sh as well and
+# re-build your env directory (line 191 as of 6-24-14)
 OPTION(USE_DOUBLE_PRECISION "Use double precision"	ON)
+
 
 FIND_PACKAGE(OpenGL)
 IF (OPENGL_FOUND)

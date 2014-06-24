@@ -237,15 +237,17 @@ void CordeModel::computeInternalForces()
         // Dissipation in X
         const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
-                                                    
+        
+        // Viscous everywhere!!
+        const btScalar visc_damp = m_config.gammaT * (velDiff[0]);                                            
 #if (0)
         r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x - diss_energy_x;
         
         r_1->force[0] += spring_cons_x + quat_cons_x + diss_energy_x;
 #else
-        r_0->force[0] += spring_cons_x;
+        r_0->force[0] += spring_cons_x - visc_damp;
         
-        r_1->force[0] += -1.0 * spring_cons_x;
+        r_1->force[0] += -1.0 * spring_cons_x + visc_damp;
 #endif
         
         
