@@ -16,7 +16,7 @@
  * governing permissions and limitations under the License.
 */
 
-#define BT_USE_DOUBLE_PRECISION
+//#define BT_USE_DOUBLE_PRECISION
 
 #ifndef CORDE_MODEL
 #define CORDE_MODEL

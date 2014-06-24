@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimViewGraphics view(world, stepSize, renderRate);
+    tgSimView view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -93,6 +93,11 @@ int main(int argc, char** argv)
     while (i < 3000)
     {
         simulation.run(30000);
+    	#ifdef BT_USE_DOUBLE_PRECISION
+		std::cout << "Double precision" << std::endl;
+	#else
+		std::cout << "Single Precision" << std::endl;
+	#endif
         simulation.reset();
         i++;
     }
