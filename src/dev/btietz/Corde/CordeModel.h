@@ -142,6 +142,8 @@ private:
 	std::vector<double> computedStiffness;
 	
 	bool invariant();
+	
+	double simTime;
 };
  
  

@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	btQuaternion endRot = startRot;
 	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 100;
+	const std::size_t resolution = 1000;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5;
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 	
 	double t = 0.0;
 	double dt = 0.0001;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		testString.step(dt);
 		t += dt;

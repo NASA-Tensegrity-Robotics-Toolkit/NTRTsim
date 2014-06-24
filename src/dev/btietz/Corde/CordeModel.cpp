@@ -82,7 +82,8 @@ CordeModel::Config::Config(const std::size_t res,
 }
 
 CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config) : 
-m_config(Config)
+m_config(Config),
+    simTime(0.0)
 {
 	computeConstants();
     
@@ -104,7 +105,8 @@ m_config(Config)
         massPos += unitLength;
         currentPoint = new CordePositionElement(massPos, unitMass);
         m_massPoints.push_back(currentPoint);
-        linkLengths.push_back(unitLength.length());
+        // Introduce stretch
+        linkLengths.push_back(unitLength.length() * 1.0);
         std::cout << massPos << " " << unitMass << std::endl;
     }
     
@@ -144,11 +146,15 @@ void CordeModel::step (btScalar dt)
     stepPrerequisites();
 	computeInternalForces();
     unconstrainedMotion(dt);
-    
-    for (std::size_t i = 0; i < m_massPoints.size(); i++)
+    simTime += dt;
+    if (simTime >= .01)
     {
-        std::cout << "Position " << i << " " << m_massPoints[i]->pos 
-                  << "Force " << i << " " << m_massPoints[i]->force << std::endl;
+        for (std::size_t i = 0; i < m_massPoints.size(); i++)
+        {
+            std::cout << "Position " << i << " " << m_massPoints[i]->pos 
+                      << "Force " << i << " " << m_massPoints[i]->force << std::endl;
+        }
+        simTime = 0.0;
     }
     
     assert(invariant());
@@ -231,11 +237,17 @@ void CordeModel::computeInternalForces()
         // Dissipation in X
         const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
-                            
-        
+                                                    
+#if (0)
         r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x - diss_energy_x;
-             
+        
         r_1->force[0] += spring_cons_x + quat_cons_x + diss_energy_x;
+#else
+        r_0->force[0] += spring_cons_x;
+        
+        r_1->force[0] += -1.0 * spring_cons_x;
+#endif
+        
         
         // Do the torques associated with the constraints here, but the other quaternion updates in the second loop
     }
