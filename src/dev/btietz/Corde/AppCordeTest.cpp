@@ -60,9 +60,9 @@ int main(int argc, char** argv)
 	const double youngMod = 0.5;
 	const double shearMod = 0.5;
 	const double stretchMod = 20.0;
-	const double springConst = 100.0;
-	const double gammaT = 10.0;
-	const double gammaR = 1.0;
+	const double springConst = 100.0 * pow(10, 3);
+	const double gammaT = 10.0 * pow(10, -6);
+	const double gammaR = 1.0 * pow(10, -6);
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
