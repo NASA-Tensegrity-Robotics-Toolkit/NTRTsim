@@ -224,27 +224,61 @@ void CordeModel::computeInternalForces()
         
         // Sum Forces, have to split it out into components due to
         // derivatives of energy quantaties
+
+        // Spring common
+        const btScalar spring_common = computedStiffness[0] * 
+            (linkLengths[i] - posNorm) / (linkLengths[i] * posNorm);
         
-        // Spring Constraint X
-        const btScalar spring_cons_x = computedStiffness[0] * 
-            (linkLengths[i] - posNorm) * (x1 - x2) / (linkLengths[i] * posNorm);
+        const btScalar diss_common = m_config.gammaT *
+                        posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
+        
         
         /* Quaternion Constraint X */
         const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
         
-        /* Dissipation in X */
-        const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
-                        posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
-
-        r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x - diss_energy_x;
+        /* Apply x forces*/
+        r_0->force[0] += -1.0 * (x1 - x2) * (spring_common + diss_common) - quat_cons_x;
         
-        r_1->force[0] += spring_cons_x + quat_cons_x + diss_energy_x;
-
+        r_1->force[0] += (x1 - x2) * (spring_common + diss_common) + quat_cons_x;
         
+        /* Quaternion Constraint Y */
+        const btScalar quat_cons_y = m_config.ConsSpringConst * linkLengths[i] *
+        ( -1.0 * director[2] * (y1 - y2) * (z1 - z2) + director[1] * ( pow( posDiff[0], 2) + pow( posDiff[2], 2) )
+        - director[0] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
         
-        // Do the torques associated with the constraints here, but the other quaternion updates in the second loop
+        /* Apply Y forces */
+        r_0->force[1] += -1.0 * (y1 - y2) * (spring_common + diss_common) - quat_cons_y;
+        
+        r_1->force[1] += (y1 - y2) * (spring_common + diss_common) + quat_cons_y;
+        
+        /* Quaternion Constraint Z */
+        const btScalar quat_cons_z = m_config.ConsSpringConst * linkLengths[i] *
+        ( -1.0 * director[0] * (y1 - y2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
+        - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
+        
+        /* Apply Z Forces */
+        r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common) - quat_cons_z;
+        
+        r_1->force[2] += (z1 - z2) * (spring_common + diss_common) + quat_cons_z;
+        
+        /* Torques resulting from quaternion alignment constraints */
+        quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q1_1 * quat_0->q.length2() + (q1_3 * posDiff[0] -
+            q1_4 * posDiff[1] - q1_1 * posDiff[2]) / posNorm);
+        
+        quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q1_2 * quat_0->q.length2() + (q1_3 * posDiff[0] +
+            q1_3 * posDiff[1] - q1_2 * posDiff[2]) / posNorm);
+            
+        quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q1_3 * quat_0->q.length2() + (q1_1 * posDiff[0] +
+            q1_2 * posDiff[1] + q1_3 * posDiff[2]) / posNorm);
+            
+        quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q1_4 * quat_0->q.length2() + (q1_2 * posDiff[0] -
+            q1_1 * posDiff[1] + q1_4 * posDiff[2]) / posNorm);
     }
     
     n = m_centerlines.size() - 1;

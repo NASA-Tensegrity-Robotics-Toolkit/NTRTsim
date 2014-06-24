@@ -54,6 +54,10 @@ public:
 		const double ShearMod;
 		const double StretchMod;
 		const double ConsSpringConst;
+		/**
+		 * For really short segments (< .001 length) consider decreasing
+		 * these further or changing length to cubic (currently ^5)
+		 */
 		const double gammaT;
 		const double gammaR;
 	};
