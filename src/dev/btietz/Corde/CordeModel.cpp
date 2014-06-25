@@ -149,10 +149,18 @@ void CordeModel::step (btScalar dt)
     simTime += dt;
     if (simTime >= .00001)
     {
-        for (std::size_t i = 0; i < m_massPoints.size(); i++)
+        size_t n = m_massPoints.size();
+        for (std::size_t i = 0; i < n; i++)
         {
-            std::cout << "Position " << i << " " << m_massPoints[i]->pos 
+            std::cout << "Position " << i << " " << m_massPoints[i]->pos << std::endl
                       << "Force " << i << " " << m_massPoints[i]->force << std::endl;
+            if (i < n - 1)
+            {
+            std::cout << "Quaternion " << i << " " << m_centerlines[i]->q << std::endl
+                      << "Qdot " << i << " " << m_centerlines[i]->qdot << std::endl
+                      << "Force " << i << " " << m_centerlines[i]->tprime << std::endl
+                      << "Torque " << i << " " << m_centerlines[i]->torques << std::endl;
+            }       
         }
         simTime = 0.0;
     }
@@ -255,36 +263,66 @@ void CordeModel::computeInternalForces()
         const btScalar diss_common = m_config.gammaT *
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
         
-        
         /* Quaternion Constraint X */
         const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
-        
-        /* Apply x forces*/
-        r_0->force[0] += -1.0 * (x1 - x2) * (spring_common + diss_common) - quat_cons_x;
-        
-        r_1->force[0] += (x1 - x2) * (spring_common + diss_common) + quat_cons_x;
         
         /* Quaternion Constraint Y */
         const btScalar quat_cons_y = m_config.ConsSpringConst * linkLengths[i] *
         ( -1.0 * director[2] * (y1 - y2) * (z1 - z2) + director[1] * ( pow( posDiff[0], 2) + pow( posDiff[2], 2) )
         - director[0] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
         
-        /* Apply Y forces */
-        r_0->force[1] += -1.0 * (y1 - y2) * (spring_common + diss_common) - quat_cons_y;
-        
-        r_1->force[1] += (y1 - y2) * (spring_common + diss_common) + quat_cons_y;
-        
         /* Quaternion Constraint Z */
         const btScalar quat_cons_z = m_config.ConsSpringConst * linkLengths[i] *
         ( -1.0 * director[0] * (y1 - y2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
         - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
         
-        /* Apply Z Forces */
-        r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common) - quat_cons_z;
+        r_0->force[0] += -1.0 * (x1 - x2) * (spring_common + diss_common);
         
-        r_1->force[2] += (z1 - z2) * (spring_common + diss_common) + quat_cons_z;
+        r_1->force[0] += (x1 - x2) * (spring_common + diss_common);
+        
+        /* Apply Y forces */
+        r_0->force[1] += -1.0 * (y1 - y2) * (spring_common + diss_common);
+        
+        r_1->force[1] += (y1 - y2) * (spring_common + diss_common);
+        
+        /* Apply Z Forces */
+        r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common);
+        
+        r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
+        
+        /* Apply constraint equation with boundry conditions */
+        if (i == 0)
+        {
+           r_1->force[0] += quat_cons_x;
+            
+            
+           r_1->force[1] += quat_cons_y;
+            
+            
+           r_1->force[2] += quat_cons_z; 
+        }
+        else if (i == n - 1)
+        {
+            r_0->force[0] -= quat_cons_x;
+
+            r_0->force[1] -= quat_cons_y;
+            
+            r_0->force[2] -= quat_cons_z;       
+        }
+        else
+        {
+            r_0->force[0] -= quat_cons_x;
+            r_1->force[0] += quat_cons_x;
+            
+            r_0->force[1] -= quat_cons_y;
+            r_1->force[1] += quat_cons_y;
+            
+            r_0->force[2] -= quat_cons_z;
+            r_1->force[2] += quat_cons_z;            
+        }
+
         
         /* Torques resulting from quaternion alignment constraints */
         quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
@@ -292,7 +330,7 @@ void CordeModel::computeInternalForces()
             q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
         
         quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q12 * quat_0->q.length2() + (q13 * posDiff[0] +
+            * ( q12 * quat_0->q.length2() + (q14 * posDiff[0] +
             q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
             
         quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
@@ -499,17 +537,17 @@ CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
 
 void CordeModel::CordeQuaternionElement::transposeTorques()
 {
-    torques[0] += 1.0/2.0 * (q[2] * tprime[0] - q[0] * tprime[2] - q[1] * tprime[3] + q[3] * tprime[1]);
-    torques[1] += 1.0/2.0 * (q[0] * tprime[1] - q[1] * tprime[0] - q[2] * tprime[3] + q[3] * tprime[2]);
-    torques[2] += 1.0/2.0 * (q[0] * tprime[0] - q[1] * tprime[1] - q[2] * tprime[2] + q[3] * tprime[3]);
+    torques[0] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
+    torques[1] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
+    torques[2] += 1.0/2.0 * (q[0] * tprime[0] + q[1] * tprime[1] + q[2] * tprime[2] + q[3] * tprime[3]);
 }
 
 void CordeModel::CordeQuaternionElement::updateQDot()
 {
-    qdot[0] = 1.0/2.0 * (q[0] * omega[2] - q[1] * omega[1] + q[3] * omega[0]);
-    qdot[1] = 1.0/2.0 * (q[0] * omega[1] + q[1] * omega[2] + q[3] * omega[0]);
-    qdot[2] = 1.0/2.0 * (q[2] * omega[2] - q[0] * omega[0] + q[3] * omega[1]);
-    qdot[3] = 1.0/2.0 * (q[3] * omega[2] - q[2] * omega[1] - q[2] * omega[0]);
+    qdot[0] = 1.0/2.0 * (q[0] * omega[2] + q[1] * omega[1] - q[2] * omega[0]);
+    qdot[1] = 1.0/2.0 * (q[1] * omega[2] - q[0] * omega[1] + q[3] * omega[0]);
+    qdot[2] = 1.0/2.0 * (q[0] * omega[0] + q[2] * omega[2] + q[3] * omega[1]);
+    qdot[3] = 1.0/2.0 * (q[3] * omega[2] - q[2] * omega[1] - q[1] * omega[0]);
 }
 
 /// Checks lengths of vectors. @todo add additional invariants

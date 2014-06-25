@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 	
 	double t = 0.0;
 	double dt = 0.0001;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		testString.step(dt);
 		t += dt;
