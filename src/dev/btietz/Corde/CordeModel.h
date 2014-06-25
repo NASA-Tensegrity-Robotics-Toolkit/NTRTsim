@@ -114,6 +114,12 @@ private:
 		 */
 		CordeQuaternionElement(btQuaternion q1);
 		
+		void transposeTorques();
+		/**
+		 * Must be called after transpose torques and omega is updated
+		 */
+		void updateQDot();
+		
 		btQuaternion q;
 		btQuaternion qdot;
 		/**
@@ -144,6 +150,13 @@ private:
 	 * @todo can this be const?
 	 */
 	std::vector<double> computedStiffness;
+	
+	/**
+	 * Computed based on the values in config. Should have length 3
+	 * Assuming products of inertia are negligible as in the paper
+	 */
+	btVector3 computedInertia;
+	btVector3 inverseInertia;
 	
 	bool invariant();
 	

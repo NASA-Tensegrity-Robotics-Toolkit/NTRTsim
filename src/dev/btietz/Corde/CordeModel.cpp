@@ -47,13 +47,13 @@ CordeModel::Config::Config(const std::size_t res,
     gammaT(gt),
     gammaR(gr)
 {
-    if (r < 0.0)
+    if (r <= 0.0)
     {
-        throw std::invalid_argument("Corde string radius is negative.");
+        throw std::invalid_argument("Corde string radius is not positive.");
     }
-    else if (d < 0.0)
+    else if (d <= 0.0)
     {
-        throw std::invalid_argument("Corde String density is negative.");
+        throw std::invalid_argument("Corde String density is not positive.");
     }
     else if (ym < 0.0)
     {
@@ -147,7 +147,7 @@ void CordeModel::step (btScalar dt)
 	computeInternalForces();
     unconstrainedMotion(dt);
     simTime += dt;
-    if (simTime >= .01)
+    if (simTime >= .00001)
     {
         for (std::size_t i = 0; i < m_massPoints.size(); i++)
         {
@@ -162,12 +162,35 @@ void CordeModel::step (btScalar dt)
 
 void CordeModel::computeConstants()
 {
-    computedStiffness.push_back( m_config.StretchMod * M_PI * pow(m_config.radius, 2));
-    computedStiffness.push_back( m_config.YoungMod * M_PI * pow(m_config.radius, 2) / 4.0);
-    computedStiffness.push_back( m_config.YoungMod * M_PI * pow(m_config.radius, 2) / 4.0);
-    computedStiffness.push_back( m_config.ShearMod * M_PI * pow(m_config.radius, 2) / 2.0);
+    assert(computedStiffness.empty());
+    
+    const double pir2 =  M_PI * pow(m_config.radius, 2);
+    
+    computedStiffness.push_back( m_config.StretchMod * pir2);
+    computedStiffness.push_back( m_config.YoungMod * pir2 / 4.0);
+    computedStiffness.push_back( m_config.YoungMod * pir2 / 4.0);
+    computedStiffness.push_back( m_config.ShearMod * pir2 / 2.0);
+    
+    /* Could probably do this in constructor directly, but easier
+     * here since pir2 is already computed
+     */
+    computedInertia.setValue(m_config.density * pir2 / 4.0, 
+                     m_config.density * pir2 / 4.0,
+                     m_config.density * pir2 / 2.0);
+    
+    // Can assume if one element is zero, all elements are zero and we've screwed up
+    // Should pass automatically based on exceptions in config constructor
+    assert(!computedInertia.fuzzyZero());
+    
+    inverseInertia.setValue(1.0/computedInertia[0],
+                            1.0/computedInertia[1],
+                            1.0/computedInertia[2]);
+                      
 }
 
+/**
+ * @todo consider making a reset function for the elements
+ */
 void CordeModel::stepPrerequisites()
 {
     std::size_t n = m_massPoints.size();
@@ -315,6 +338,12 @@ void CordeModel::computeInternalForces()
         const btScalar k2 = computedStiffness[2];
         const btScalar k3 = computedStiffness[3];
         
+        /* I apologize for the mess below - the derivatives involved
+         * here do not leave a lot of common factors. If you see
+         * any nice vector operations I missed, implement them and/or
+         * let me know! _Brian
+         */
+        
         /* Bending and torsional stiffness */        
         const btScalar stiffness_common = 4.0 / quaternionShapes[i] *
         pow(quaternionShapes[i] - 1.0, 2);
@@ -433,7 +462,16 @@ void CordeModel::unconstrainedMotion(double dt)
     }
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
     {
-        // Need to figure out how to include 4x4 matricies
+        /* Transpose quaternion torques into Euclidean torques */
+        CordeQuaternionElement* quat_0 = m_centerlines[i];
+        quat_0->transposeTorques();
+        
+        const btVector3 omega = quat_0->omega;
+        // Since I is diagonal, we can use elementwise multiplication of vectors
+        quat_0->omega = inverseInertia * (quat_0->torques - 
+            omega.cross(computedInertia * omega)) * dt + omega;
+        quat_0->updateQDot();
+        quat_0->q = (quat_0->qdot*dt + quat_0->q).normalize();
     }
 }
 
@@ -457,6 +495,21 @@ CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
 	omega(0.0, 0.0, 0.0)
 {
     
+}
+
+void CordeModel::CordeQuaternionElement::transposeTorques()
+{
+    torques[0] += 1.0/2.0 * (q[2] * tprime[0] - q[0] * tprime[2] - q[1] * tprime[3] + q[3] * tprime[1]);
+    torques[1] += 1.0/2.0 * (q[0] * tprime[1] - q[1] * tprime[0] - q[2] * tprime[3] + q[3] * tprime[2]);
+    torques[2] += 1.0/2.0 * (q[0] * tprime[0] - q[1] * tprime[1] - q[2] * tprime[2] + q[3] * tprime[3]);
+}
+
+void CordeModel::CordeQuaternionElement::updateQDot()
+{
+    qdot[0] = 1.0/2.0 * (q[0] * omega[2] - q[1] * omega[1] + q[3] * omega[0]);
+    qdot[1] = 1.0/2.0 * (q[0] * omega[1] + q[1] * omega[2] + q[3] * omega[0]);
+    qdot[2] = 1.0/2.0 * (q[2] * omega[2] - q[0] * omega[0] + q[3] * omega[1]);
+    qdot[3] = 1.0/2.0 * (q[3] * omega[2] - q[2] * omega[1] - q[2] * omega[0]);
 }
 
 /// Checks lengths of vectors. @todo add additional invariants
