@@ -47,7 +47,7 @@
 int main(int argc, char** argv)
 {
 	btVector3 startPos(0.0, 0.0, 0.0);
-	btVector3 endPos  (10.0, 0.0, 0.0);
+	btVector3 endPos  (0.0, 0.0, 10.0);
 	
 	// Setup for neither bending nor rotation
 	btQuaternion startRot( (endPos - startPos).normalize(), 0);
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 	
 	double t = 0.0;
 	double dt = 0.0001;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		testString.step(dt);
 		t += dt;

@@ -118,6 +118,7 @@ m_config(Config),
     {
         currentAngle = new CordeQuaternionElement(quat1.slerp(quat2, (double) i / (double) n) );
         m_centerlines.push_back(currentAngle);
+        std::cout << currentAngle->q << std::endl;
         quaternionShapes.push_back(unitLength.length());
     }
     
@@ -147,7 +148,7 @@ void CordeModel::step (btScalar dt)
 	computeInternalForces();
     unconstrainedMotion(dt);
     simTime += dt;
-    if (simTime >= .00001)
+    if (simTime >= .01)
     {
         size_t n = m_massPoints.size();
         for (std::size_t i = 0; i < n; i++)
@@ -291,7 +292,7 @@ void CordeModel::computeInternalForces()
         r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common);
         
         r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
-        
+
         /* Apply constraint equation with boundry conditions */
         if (i == 0)
         {
@@ -340,7 +341,7 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q14 * quat_0->q.length2() + (q12 * posDiff[0] -
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
-        
+
     }
     
     n = m_centerlines.size() - 1;
@@ -393,7 +394,7 @@ void CordeModel::computeInternalForces()
          
         const btScalar q12_stiffness = stiffness_common * 
         (k1 * q23 * (q12 * q23 + q11 * q24 - q13 * q22 - q14 * q21) +
-         k2 * q24 * (q12 * q24 - q11 * q23 + q13 * q21 - q14 * q24) +
+         k2 * q24 * (q12 * q24 - q11 * q23 + q13 * q21 - q14 * q22) +
          k3 * q21 * (q12 * q21 - q11 * q22 - q13 * q24 + q14 * q23));
          
         const btScalar q13_stiffness = stiffness_common * 
@@ -475,7 +476,7 @@ void CordeModel::computeInternalForces()
         quat_1->tprime[0] += q21_stiffness + q21_damping;
         
         quat_0->tprime[1] += q12_stiffness + q12_damping;
-        
+    
         quat_1->tprime[1] += q22_stiffness + q22_damping;
         
         quat_0->tprime[2] += q13_stiffness + q13_damping;
@@ -485,6 +486,7 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] += q14_stiffness + q14_damping;
         
         quat_1->tprime[3] += q24_stiffness + q24_damping;
+
     }
 }
 
@@ -494,9 +496,9 @@ void CordeModel::unconstrainedMotion(double dt)
     {
         CordePositionElement* p_0 = m_massPoints[i];
         // Velocity update - semi-implicit Euler
-        p_0->vel = p_0->vel + dt / p_0->mass * p_0->force;
+        p_0->vel += dt / p_0->mass * p_0->force;
         // Position update, uses v(t + dt)
-        p_0->pos = p_0->pos + dt * p_0->vel;
+        p_0->pos += dt * p_0->vel;
     }
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
     {
@@ -506,8 +508,8 @@ void CordeModel::unconstrainedMotion(double dt)
         
         const btVector3 omega = quat_0->omega;
         // Since I is diagonal, we can use elementwise multiplication of vectors
-        quat_0->omega = inverseInertia * (quat_0->torques - 
-            omega.cross(computedInertia * omega)) * dt + omega;
+        quat_0->omega += inverseInertia * (quat_0->torques - 
+            omega.cross(computedInertia * omega)) * dt;
         quat_0->updateQDot();
         quat_0->q = (quat_0->qdot*dt + quat_0->q).normalize();
     }
