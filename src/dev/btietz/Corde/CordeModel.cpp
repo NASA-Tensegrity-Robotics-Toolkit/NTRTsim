@@ -401,10 +401,23 @@ void CordeModel::computeInternalForces()
         (q21 * (q21 * qdot24 - q11 * qdot14 + q12 * qdot13 - q13 * qdot12 + q14 * qdot11 - q24 * qdot21) +
          q22 * (q21 * qdot24 - q11 * qdot13 - q12 * qdot14 + q13 * qdot11 + q14 * qdot12 - q24 * qdot22) +
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
+        
         /* Apply torques */
         quat_0->tprime[0] += q11_stiffness + q11_damping;
         
         quat_1->tprime[0] += q21_stiffness + q21_damping;
+        
+        quat_0->tprime[1] += q12_stiffness + q12_damping;
+        
+        quat_1->tprime[1] += q22_stiffness + q22_damping;
+        
+        quat_0->tprime[2] += q13_stiffness + q13_damping;
+        
+        quat_1->tprime[2] += q23_stiffness + q23_damping;
+        
+        quat_0->tprime[3] += q14_stiffness + q14_damping;
+        
+        quat_1->tprime[3] += q24_stiffness + q24_damping;
     }
 }
 
