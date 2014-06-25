@@ -339,8 +339,26 @@ void CordeModel::computeInternalForces()
          k2 * q22 * (q14 * q22 + q11 * q23 - q12 * q24 - q13 * q21) +
          k3 * q23 * (q14 * q23 - q11 * q22 + q12 * q21 - q13 * q24));   
         
-        const btScalar q21_stiffness = 0;
+        const btScalar q21_stiffness = stiffness_common *
+        (k1 * q14 * (q14 * q21 - q11 * q24 - q12 * q23 + q13 * q22) +
+         k2 * q13 * (q13 * q21 - q11 * q23 + q12 * q24 - q14 * q22) +
+         k3 * q12 * (q12 * q21 - q11 * q22 + q14 * q23 - q13 * q24));
         
+        const btScalar q22_stiffness = stiffness_common *
+        (k1 * q13 * (q13 * q22 - q11 * q24 - q12 * q23 + q14 * q21) + 
+         k2 * q14 * (q14 * q22 + q11 * q23 - q12 * q24 - q13 * q21) +
+         k3 * q11 * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23));
+         
+        const btScalar q23_stiffness = stiffness_common *
+        (k1 * q12 * (q12 * q23 + q11 * q24 - q13 * q22 - q14 * q21) +
+         k2 * q11 * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22) +
+         k3 * q14 * (q14 * q23 - q11 * q22 + q12 * q21 - q13 * q24));
+         
+        const btScalar q24_stiffness = stiffness_common *
+        (k1 * q11 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21) +
+         k2 * q12 * (q12 * q24 - q11 * q23 + q13 * q21 - q14 * q22) +
+         k3 * q13 * (q13 * q24 + q11 * q22 - q12 * q21 - q14 * q23));
+         
         /* Torsional Damping */
         const btScalar damping_common = 4.0 * m_config.gammaR / quaternionShapes[i];
         
@@ -369,7 +387,20 @@ void CordeModel::computeInternalForces()
          q23 * (q23 * qdot21 + q11 * qdot13 + q12 * qdot14 - q13 * qdot11 - q14 * qdot12 - q21 * qdot23) +
          q24 * (q24 * qdot21 + q11 * qdot14 - q12 * qdot13 + q13 * qdot12 - q14 * qdot11 - q21 * qdot24));
          
-        
+        const btScalar q22_damping = damping_common *
+        (q21 * (q21 * qdot22 - q11 * qdot12 + q12 * qdot11 + q13 * qdot14 - q14 * qdot13 - q22 * qdot21) +
+         q23 * (q23 * qdot22 - q11 * qdot14 + q12 * qdot13 - q13 * qdot12 + q14 * qdot11 - q22 * qdot23) +
+         q24 * (q24 * qdot22 + q11 * qdot13 + q12 * qdot14 - q13 * qdot11 - q14 * qdot12 - q22 * qdot24));
+         
+        const btScalar q23_damping = damping_common *
+        (q21 * (q21 * qdot23 - q11 * qdot13 + q13 * qdot11 - q12 * qdot14 + q14 * qdot12 - q23 * qdot21) +
+         q22 * (q22 * qdot23 + q11 * qdot14 - q12 * qdot13 + q13 * qdot12 - q14 * qdot11 - q22 * qdot22) +
+         q24 * (q24 * qdot23 - q11 * qdot12 + q12 * qdot11 + q13 * qdot14 - q14 * qdot13 - q23 * qdot24));
+         
+        const btScalar q24_damping = damping_common *
+        (q21 * (q21 * qdot24 - q11 * qdot14 + q12 * qdot13 - q13 * qdot12 + q14 * qdot11 - q24 * qdot21) +
+         q22 * (q21 * qdot24 - q11 * qdot13 - q12 * qdot14 + q13 * qdot11 + q14 * qdot12 - q24 * qdot22) +
+         q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
         /* Apply torques */
         quat_0->tprime[0] += q11_stiffness + q11_damping;
         
