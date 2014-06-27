@@ -324,7 +324,7 @@ void CordeModel::computeInternalForces()
             r_1->force[2] += quat_cons_z;            
         }
 
-        
+#if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
         quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q11 * quat_0->q.length2() + (q13 * posDiff[0] -
@@ -341,7 +341,24 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q14 * quat_0->q.length2() + (q12 * posDiff[0] -
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
-
+#else // quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
+        // The simulation is much more stable if we just assume its one.
+        quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q11 + (q13 * posDiff[0] -
+            q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
+        
+        quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q12 + (q14 * posDiff[0] +
+            q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
+            
+        quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q13 + (q11 * posDiff[0] +
+            q12 * posDiff[1] + q13 * posDiff[2]) / posNorm);
+            
+        quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+            * ( q14 + (q12 * posDiff[0] -
+            q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
+#endif
     }
     
     n = m_centerlines.size() - 1;
@@ -469,8 +486,8 @@ void CordeModel::computeInternalForces()
         (q21 * (q21 * qdot24 - q11 * qdot14 + q12 * qdot13 - q13 * qdot12 + q14 * qdot11 - q24 * qdot21) +
          q22 * (q21 * qdot24 - q11 * qdot13 - q12 * qdot14 + q13 * qdot11 + q14 * qdot12 - q24 * qdot22) +
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
-        
-        /* Apply torques */
+      
+        /* Apply torques */ /// @todo double check the sign convention. Looks good numerically.q
         quat_0->tprime[0] += q11_stiffness + q11_damping;
         
         quat_1->tprime[0] += q21_stiffness + q21_damping;

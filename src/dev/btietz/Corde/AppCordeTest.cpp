@@ -46,13 +46,22 @@
  */
 int main(int argc, char** argv)
 {
+
+#if (1) // X Pos
+	btVector3 startPos(0.0, 0.0, 0.0);
+	btVector3 endPos  (10.0, 0.0, 0.0);
+	
+	// Setup for neither bending nor rotation
+	btQuaternion startRot( 0, sqrt(2)/2.0, 0, sqrt(2)/2.0);
+	btQuaternion endRot = startRot;
+#else
 	btVector3 startPos(0.0, 0.0, 0.0);
 	btVector3 endPos  (0.0, 0.0, 10.0);
 	
 	// Setup for neither bending nor rotation
-	btQuaternion startRot( (endPos - startPos).normalize(), 0);
+	btQuaternion startRot( 0, 0, 0, 1);
 	btQuaternion endRot = startRot;
-	
+#endif	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 10;
 	const double radius = 0.01;
