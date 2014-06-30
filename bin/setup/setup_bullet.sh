@@ -188,7 +188,7 @@ function build_bullet() {
     -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
     -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
     -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-    -DUSE_DOUBLE_PRECISION=ON \
+    -DUSE_DOUBLE_PRECISION=OFF \ #If you turn this on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
         -DCMAKE_INSTALL_NAME_DIR="$BULLET_INSTALL_PREFIX" || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 
     # Additional bullet options: 

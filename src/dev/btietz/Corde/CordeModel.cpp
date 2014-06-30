@@ -222,21 +222,26 @@ void CordeModel::computeInternalForces()
         // Spring Constraint X
         const btScalar spring_cons_x = computedStiffness[0] * 
             (linkLengths[i] - posNorm) * (x1 - x2) / (linkLengths[i] * posNorm);
-        
+         #if (0)    
+        // Dissipation in X
+        const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
+                        posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);    
+       
         // Quaternion Constraint X
         const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
         
-        // Dissipation in X
-        const btScalar diss_energy_x = m_config.gammaT * (x1 - x2) * 
-                        posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
-                            
-        
         r_0->force[0] += -1.0 * spring_cons_x - quat_cons_x - diss_energy_x;
              
         r_1->force[0] += spring_cons_x + quat_cons_x + diss_energy_x;
+        #else
+       
+        r_0->force[0] += -1.0 * spring_cons_x;
+             
+        r_1->force[0] += spring_cons_x ;
         
+        #endif
         // Do the torques associated with the constraints here, but the other quaternion updates in the second loop
     }
     
