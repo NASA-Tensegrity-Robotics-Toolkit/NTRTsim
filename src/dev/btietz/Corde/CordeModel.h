@@ -16,6 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
+//#define BT_USE_DOUBLE_PRECISION
+
 #ifndef CORDE_MODEL
 #define CORDE_MODEL
 
@@ -39,19 +41,38 @@ class CordeModel
 public:
 	struct Config
 	{
-		Config();
+		Config(const std::size_t res,
+				const double r, const double d,
+				const double ym, const double shm,
+				const double stm, const double csc,
+				const double gt, const double gr);
 		
+		const std::size_t resolution;
 		const double radius;
 		const double density;
 		const double YoungMod;
 		const double ShearMod;
 		const double StretchMod;
 		const double ConsSpringConst;
+		/**
+		 * For really short segments (< .001 length) consider decreasing
+		 * these further or changing length to cubic (currently ^5)
+		 */
 		const double gammaT;
 		const double gammaR;
 	};
 	
-	CordeModel(btVector3 pos1, btVector3 pos2);
+	/**
+	 * A constructor which assumes uniformally distributed mass
+	 * points and rotation
+	 * pos1 and pos2 specify the start and end points of the rod.
+	 * quat1 and quat2 need to be computed based on the torsion in the rod.
+	 * Note that if there is neither bending nor torsion one can say quat1 = quat2
+	 * = btQuaternion((pos2 - pos1).normalize, 0) (axis-angle constructor)
+	 * @todo develop a constructor that can handle more complex shapes
+	 * i.e. wrapped around a motor. This one maxes out at 1 - eps rotations
+	 */
+	CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config);
 	
 	~CordeModel();
 	
@@ -64,16 +85,41 @@ private:
 
 	void computeInternalForces();
 	
-
+	void unconstrainedMotion(double dt);
+	
+	/**
+	 * Holds all of the data for one of the mass elements of the string
+	 */
 	struct CordePositionElement
 	{
+		/**
+		 * Sets pos to p1, mass to m, everything else to zero
+		 * Assumes rod is at rest on start
+		 */
+		CordePositionElement(btVector3 p1, double m);
+		
 		btVector3 pos;
 		btVector3 vel;
 		btVector3 force;
 		double mass;
 	};
+	
+	/**
+	 * Holds all of the data for the centerline quaternions of the string
+	 */
 	struct CordeQuaternionElement
-	{
+	{	
+		/**
+		 * Sets q to q1.normalized(), everything else to zero
+		 */
+		CordeQuaternionElement(btQuaternion q1);
+		
+		void transposeTorques();
+		/**
+		 * Must be called after transpose torques and omega is updated
+		 */
+		void updateQDot();
+		
 		btQuaternion q;
 		btQuaternion qdot;
 		/**
@@ -84,8 +130,10 @@ private:
 		btVector3 omega;
 	};
 	
+	CordeModel::Config m_config;
+	
 	std::vector<CordePositionElement*> m_massPoints;
-	std::vector<CordeQuaternionElement*> m_Centerlines;
+	std::vector<CordeQuaternionElement*> m_centerlines;
 	/**
 	 * Should have length equal to m_massPoints.size()-1
 	 */
@@ -102,6 +150,17 @@ private:
 	 * @todo can this be const?
 	 */
 	std::vector<double> computedStiffness;
+	
+	/**
+	 * Computed based on the values in config. Should have length 3
+	 * Assuming products of inertia are negligible as in the paper
+	 */
+	btVector3 computedInertia;
+	btVector3 inverseInertia;
+	
+	bool invariant();
+	
+	double simTime;
 };
  
  
