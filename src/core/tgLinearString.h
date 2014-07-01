@@ -113,6 +113,12 @@ public:
      * Calls moveMotors(dt) to adjust the rest length of Muscle2P
      */
     void setRestLength(double newLength, float dt);
+
+    /**
+     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly adjusts the rest length of Muscle2P, not using moveMotors.
+     */
+    void setRestLengthSingleStep(double newLength);
     
     /**
      * Returns a pointer the string's Muscle2P. Used for rendering in

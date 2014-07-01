@@ -61,9 +61,9 @@ void T6RestLengthController::onSetup(T6Model& subject)
 	// However, the dt is only used in tgLinearString for upper-bounding
 	// velocity and acceleration of our imaginary "motors," so we can
 	// choose whatever we want here.
-	double dt = 0.01;
+	//double dt = 0.01;
 	double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
-	pMuscle->setRestLength(desiredRestLength, dt);
+	pMuscle->setRestLengthSingleStep(desiredRestLength);
     }
 }
 
@@ -89,7 +89,7 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 
 	    // set rest length of the i-th muscle
 	    double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
-	    pMuscle->setRestLength(desiredRestLength, dt);
+	    //pMuscle->setRestLengthSingleCall(desiredRestLength, dt);
 	}
     }
 }
