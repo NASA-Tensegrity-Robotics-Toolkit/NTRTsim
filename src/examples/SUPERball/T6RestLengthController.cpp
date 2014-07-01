@@ -56,19 +56,13 @@ void T6RestLengthController::onSetup(T6Model& subject)
         tgLinearString * const pMuscle = muscles[i];
 	assert(pMuscle != NULL);
 
-	// set rest length of the i-th muscle
-	// NOTE that we don't technically have a dt here: this is pre-simualtion.
-	// However, the dt is only used in tgLinearString for upper-bounding
-	// velocity and acceleration of our imaginary "motors," so we can
-	// choose whatever we want here.
-	//double dt = 0.01;
 	double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
+	// Note that the single step version of setRestLength is used here,
+	// since we only want to call it once (not iteratively like the original.)
 	pMuscle->setRestLengthSingleStep(desiredRestLength);
     }
 }
 
-// This method is included for now: this SHOULD really work without the update
-// each timestep... but just including it in onSetup doesn't seem to work.
 void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
     if (dt <= 0.0)
@@ -77,19 +71,6 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
     }
     else
     {
-        // Do an update of all cable rest lengths
-        // First, get all muscles (cables)
-        const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-
-	// then, iterate over all muscles
-	for (size_t i = 0; i < muscles.size(); ++i)
-	{
-	    tgLinearString * const pMuscle = muscles[i];
-	    assert(pMuscle != NULL);
-
-	    // set rest length of the i-th muscle
-	    double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
-	    //pMuscle->setRestLengthSingleCall(desiredRestLength, dt);
-	}
+      // Nothing!!
     }
 }

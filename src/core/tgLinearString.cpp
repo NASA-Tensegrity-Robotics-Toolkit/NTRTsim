@@ -300,8 +300,6 @@ void tgLinearString::setRestLengthSingleStep(double newLength)
 	m_muscle->setRestLength(newLength);
 	m_restLength = newLength;
 	m_preferredLength = newLength;
-              
-	//moveMotors(dt);
     }
 
     // Postcondition
