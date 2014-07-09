@@ -117,6 +117,16 @@ const double Muscle2P::getRestLength() const
     return m_restLength;
 }
 
+const double Muscle2P::getPreferredLength() const
+{
+    return m_preferredLength;
+}
+
+void Muscle2P::setPreferredLength( const double newPrefLength)
+{
+	m_preferredLength = newPrefLength;
+}
+
 const btScalar Muscle2P::getActualLength() const
 {
     const btVector3 dist =
@@ -129,6 +139,27 @@ const double Muscle2P::getTension() const
     double tension = (getActualLength() - m_restLength) * m_coefK;
     tension = (tension < 0.0) ? 0.0 : tension;
     return tension;
+}
+
+//Moves the rest length towards the previous length according to the motor speed and time "dt"
+void Muscle2P::moveMotor(const double dt)
+{
+    // Reverse the sign if restLength >= preferredLength
+    double moveAmount = dt * maxMotorSpeed * ((restLength < preferredLength) ? 1 : -1);
+
+    //introduce noise (used for robustness tests)
+    double noisePercent=0.00;
+    moveAmount+=  moveAmount * noisePercent * ((2.0 * rand() / RAND_MAX) - 1.0) ;
+
+	// If motor is too fast, just move to the desired length
+	if (abs(restLength - m_preferredLength) < abs(moveAmount))
+	{
+		this->m_restLength = m_preferredLength;
+	}
+	else
+	{
+		this->m_restLength += moveAmount;
+	}
 }
 
 Muscle2P::~Muscle2P()

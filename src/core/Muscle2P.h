@@ -56,6 +56,10 @@ public:
     
     const double getRestLength() const;
     
+    const double getPreferredLength() const;
+
+    void setPreferredLength( const double newPrefLength);
+
     void setRestLength( const double newRestLength); 
 
     const btScalar getActualLength() const;
@@ -80,7 +84,15 @@ public:
     const std::string& getName() const {
         return name;
     }
-    
+
+	double getMotorSpeed() const {
+		return m_motorSpeed;
+	}
+
+	void setMotorSpeed(const double motorSpeed) {
+		m_motorSpeed = motorSpeed;
+	}
+
     muscleAnchor * anchor1;
 
     muscleAnchor * anchor2;
@@ -93,6 +105,8 @@ public:
  private:
     // Necessary for computations
     double m_restLength;
+
+    double m_preferredLength;
  
     double m_prevLength;
     
@@ -107,6 +121,9 @@ public:
     const btScalar m_coefK;
  
     bool invariant(void) const;
+
+    //Necessary for prefLengthControllers, it defines the speed to change the rest length
+    double m_motorSpeed;
 };
 
 class muscleAnchor
