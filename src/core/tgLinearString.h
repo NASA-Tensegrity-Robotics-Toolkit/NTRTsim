@@ -144,13 +144,14 @@ public:
     
     virtual const tgBaseString::BaseStringHistory& getHistory() const;
     
-protected: 
     
     /** Called from public functions, it makes the restLength get closer
      * to preferredlength, according to config constraints.
      */
     virtual void moveMotors(double dt);
-    
+
+protected:
+
     Muscle2P* m_muscle;
 
 private:
