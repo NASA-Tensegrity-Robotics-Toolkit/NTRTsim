@@ -145,14 +145,14 @@ const double Muscle2P::getTension() const
 void Muscle2P::moveMotor(const double dt)
 {
     // Reverse the sign if restLength >= preferredLength
-    double moveAmount = dt * maxMotorSpeed * ((restLength < preferredLength) ? 1 : -1);
+    double moveAmount = dt * m_motorSpeed * ((m_restLength < m_preferredLength) ? 1 : -1);
 
     //introduce noise (used for robustness tests)
     double noisePercent=0.00;
     moveAmount+=  moveAmount * noisePercent * ((2.0 * rand() / RAND_MAX) - 1.0) ;
 
 	// If motor is too fast, just move to the desired length
-	if (abs(restLength - m_preferredLength) < abs(moveAmount))
+	if (abs(m_restLength - m_preferredLength) < abs(moveAmount))
 	{
 		this->m_restLength = m_preferredLength;
 	}
