@@ -93,8 +93,6 @@ public:
 		m_motorSpeed = motorSpeed;
 	}
 
-	void moveMotor(const double dt);
-
     muscleAnchor * anchor1;
 
     muscleAnchor * anchor2;
@@ -110,8 +108,6 @@ public:
 
     double m_preferredLength;
  
-    double m_motorSpeed;
-
     double m_prevLength;
     
     // So we can get it without passing a dt
@@ -127,6 +123,7 @@ public:
     bool invariant(void) const;
 
     //Necessary for prefLengthControllers, it defines the speed to change the rest length
+    double m_motorSpeed;
 };
 
 class muscleAnchor
