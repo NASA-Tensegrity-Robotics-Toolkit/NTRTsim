@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef T6_PREFLENGTH_CONTROLLER_H
-#define T6_PREFLENGTH_CONTROLLER_H
+#ifndef SUPERBALL_LEARNINGCONTROLLER_H
+#define SUPERBALL_LEARNINGCONTROLLER_H
 
 /**
- * @file T6PrefLengthController.h
- * @brief Contains the definition of class T6PrefLengthController.
+ * @file SuperBallLearningController.h.h
+ * @brief Contains the definition of class SuperBallLearningController.
  * @author Atil Iscen
  * @version 1.0.0
  * $Id$
@@ -29,9 +29,14 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "learning/Adapters/AnnealAdapter.h"
+#include <vector>
 
 // Forward declarations
-class T6Model;
+class SuperBallModel;
+
+//namespace std for vectors
+using namespace std;
 
 /**
  * Preferred Length Controller for T6. This controllers sets a preferred rest length for the muscles.
@@ -39,7 +44,7 @@ class T6Model;
  * The assumption here is that motors are constant speed independent of the tension of the muscles.
  * motorspeed and movemotors are defined at the tgLinearString class.
  */
-class T6PrefLengthController : public tgObserver<T6Model>
+class SuperBallPrefLengthController : public tgObserver<SuperBallModel>
 {
 public:
 	
@@ -49,20 +54,29 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-	T6PrefLengthController(const double prefLength=5);
+	SuperBallPrefLengthController(const double prefLength=5);
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~T6PrefLengthController() { }
+  virtual ~SuperBallPrefLengthController() { }
 
-  virtual void onSetup(T6Model& subject);
+  virtual void onSetup(SuperBallModel& subject);
     
-  virtual void onStep(T6Model& subject, double dt);
-    
+  virtual void onStep(SuperBallModel& subject, double dt);
+
+protected:
+
+  virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+
+  virtual void applyActions (SuperBallModel& subject, vector< vector <double> > act);
+
 private:
   double m_initialLengths;
+  double m_totalTime;
+
+  AnnealAdapter evolutionAdapter;
 	
 };
 
-#endif // T6_PREFLENGTH_CONTROLLER_H
+#endif // SUPERBALL_LEARNINGCONTROLLER_H

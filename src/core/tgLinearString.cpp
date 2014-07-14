@@ -193,6 +193,18 @@ void tgLinearString::setRestLength(double newLength, float dt)
     
 }
 
+void tgLinearString::setPrefLength(double newLength)
+{
+    if (newLength < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = newLength;
+    }
+}
+
 void tgLinearString::moveMotors(double dt)
 {
     // @todo add functions from muscle2P Bounded

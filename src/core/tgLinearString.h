@@ -116,6 +116,12 @@ public:
 
     /**
      * Directly set m_preferredLength (see base class tgBaseString)
+     * Does not call moveMotors.
+     */
+    void setPrefLength(double newLength);
+
+    /**
+     * Directly set m_preferredLength (see base class tgBaseString)
      * Directly adjusts the rest length of Muscle2P, not using moveMotors.
      */
     void setRestLengthSingleStep(double newLength);
