@@ -79,5 +79,18 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 
 void tgBulletRenderer::render(const tgModel& model) const
 {
+
+	/**
+	 * Render the markers of the model using spheres.
+	 */
+
+	// Fetch the btDynamicsWorld
+	btSoftRigidDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+	btIDebugDraw* const idraw = dynamicsWorld.getDebugDrawer();
+	for(int j=0;j<model.getMarkers().size() ;j++)
+	{
+		abstractMarker mark = model.getMarkers()[j];
+		idraw->drawSphere(mark.getWorldPosition(),0.6,mark.getColor());
+	}
 }
 

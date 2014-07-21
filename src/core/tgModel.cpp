@@ -78,6 +78,9 @@ void tgModel::teardown()
     delete m_children[i];
   }
   m_children.clear();
+  //Clear the markers
+  this->m_markers.clear();
+
   // Postcondition
   assert(invariant());
   assert(m_children.empty());
