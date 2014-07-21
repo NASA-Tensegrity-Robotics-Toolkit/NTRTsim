@@ -87,7 +87,6 @@ int main(int argc, char** argv)
     // of an individual cable. 
     // Note for the above scale of gravity, this is in decimeters.
 
-    	//T6RestLengthController* const pTC = new T6RestLengthController(4);
 
     SuperBallPrefLengthController* const pTC = new SuperBallPrefLengthController(9);
 

@@ -94,7 +94,8 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 	actions = transformActions(actions);
 
 	//apply these actions to the appropriate muscles according to the sensor values
-	applyActions(subject,actions);
+//	applyActions(subject,actions);
+
 }
 
 //Scale actions according to Min and Max length of muscles.

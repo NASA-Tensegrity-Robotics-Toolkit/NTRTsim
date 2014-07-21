@@ -28,6 +28,7 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+#include "core/tgRod.h"
 // The C++ Standard Library
 #include <vector>
 
@@ -102,7 +103,7 @@ private:
      * for your own models
      * @param[in] tetra: A tgStructure that we're building into
      */
-    static void addNodes(tgStructure& s);
+     void addNodes(tgStructure& s);
 	
 	/**
      * A function called during setup that creates rods from the
@@ -118,6 +119,21 @@ private:
      */
     void addMuscles(tgStructure& s);
 
+    /*
+     * Adds the 12 markers to the end of the rods so that we can visualize
+     * them and track their position
+     */
+    void addMarkers(tgStructure& s);
+
+    /*
+	 * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
+	 * First rotates the structure around 3 axises given 3 angles.
+	 * Moves the structure to the target point.
+	 * Sets all the bars speed to the given speed vector.
+	 * (muscles and markers are moved automatically since they are attached).
+	 */
+     void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
+
 private:
 	
 	/**
@@ -128,6 +144,7 @@ private:
 	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
 	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
+	std::vector<btVector3> nodePositions;
 };
 
 #endif  // SUPERBALL_MODEL_H
