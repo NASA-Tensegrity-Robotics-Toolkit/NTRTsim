@@ -6,5 +6,6 @@ subdirs(
     tests
     atil
     steve
+    kmorse
 )
 
