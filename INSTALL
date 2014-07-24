@@ -145,7 +145,7 @@ anything.
   - Download and build Bullet Physics:
     
     cd env/downloads
-    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.81-rev2613.tgz
+    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz
     cd ../build
     tar xzvf ../downloads/bullet-2.82-r2704.tgz
 
