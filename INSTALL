@@ -145,7 +145,7 @@ anything.
   - Download and build Bullet Physics:
     
     cd env/downloads
-    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.81-rev2613.tgz
+    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz
     cd ../build
     tar xzvf ../downloads/bullet-2.82-r2704.tgz
 
@@ -245,25 +245,8 @@ anything.
 
 	1) Install gcc, g++ using macports or homebrew (I used with gcc 4.5.4 through macports).
 	2) Download the github directory
-	3) Add these two lines to the file "bin/setup/setup_bullet.sh” to line 188
-	    -DCMAKE_C_COMPILER="gcc" \
-	    -DCMAKE_CXX_COMPILER="g++” \
-	4)Run setup.sh, but don’t wait until it ends, otherwise it will compile it with clang compiler. 
-	4.1) setup.sh will install bullet
-	4.2) setup.sh will start downloading the boost
-	4.3) setup.sh will unpack boost
-	4.4) setup.sh will start compiling boost, at this stage, hit control-c to stop the script.
-	
-	5)Edit this file "env/build/boost_1_53_0/tools/build/v2/user-config.jam “ 
-	Uncomment the line 42 that says “using gcc"
-	(by removing the ‘#’ character)
-
-	6)run setup.sh and wait it to complete.
-	
-	7)edit the file bin/build.sh
-	to add these two lines at line 136
-	      -DCMAKE_C_COMPILER="gcc" \
-	      -DCMAKE_CXX_COMPILER="g++” \
-
-	8)run bin/build.sh
+	3) Edit bin/setup/setup_boost.sh and uncomment this line by deleting '#':
+		#sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+	4)run setup.sh
+	5)run bin/build.sh
 

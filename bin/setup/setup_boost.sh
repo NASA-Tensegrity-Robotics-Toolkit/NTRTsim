@@ -127,6 +127,9 @@ function build_boost() {
         echo "- Boost is already built in '$BOOST_BUILD_DIR' -- skipping."
         return
     fi
+    
+    #For MAC and gcc
+    #sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
 
     # Perform the build
     #./bootstrap.sh --prefix="$BOOST_INSTALL_PREFIX" --with-libraries=system || { echo "Boost bootstrap failed."; exit 1; } # Lite

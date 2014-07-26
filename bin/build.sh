@@ -133,6 +133,7 @@ fi
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
     -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+    -DCMAKE_CXX_COMPILER="/opt/local/bin/g++" \
     -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
     -DCMAKE_C_FLAGS="-fPIC" \
     -DCMAKE_CXX_FLAGS="-fPIC" \
