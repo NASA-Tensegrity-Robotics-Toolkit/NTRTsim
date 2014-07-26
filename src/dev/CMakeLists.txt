@@ -5,5 +5,7 @@ subdirs(
     btietz
     tests
     atil
+    steve
+    kmorse
 )
 
