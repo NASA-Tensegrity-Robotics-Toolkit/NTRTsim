@@ -1,6 +1,8 @@
 #include "tgCordeModel.h"
 
-#include "dev/btietz/Corde/CordeModel.h"
+#include "core/tgModelVisitor.h"
+
+#include "dev/Corde/CordeModel.h"
 
 
 tgCordeModel::tgCordeModel()
@@ -53,7 +55,7 @@ void tgCordeModel::teardown()
     
 void tgCordeModel::step(double dt)
 {
-    testString.step(dt);
+    testString->step(dt);
 }
 /**
 * Call tgModelVisitor::render() on self and all descendants.
@@ -61,5 +63,5 @@ void tgCordeModel::step(double dt)
 */
 void tgCordeModel::onVisit(const tgModelVisitor& r) const
 {
-
+    r.render(*this);
 }

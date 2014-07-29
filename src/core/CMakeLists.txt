@@ -23,7 +23,7 @@ add_library( ${PROJECT_NAME} SHARED
 
 link_directories(${LIB_DIR})
 
-target_link_libraries(${PROJECT_NAME} terrain tgOpenGLSupport)
+target_link_libraries(${PROJECT_NAME} Corde terrain tgOpenGLSupport)
 
 subdirs(
     terrain

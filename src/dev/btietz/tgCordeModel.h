@@ -24,7 +24,12 @@ public:
     virtual void onVisit(const tgModelVisitor& r) const;
     
     /** @todo consider adding a toString method **/
-
+    
+    const CordeModel* const getModel() const
+    {
+        return testString;
+    }
+    
 private:
     CordeModel* testString;
 };

@@ -137,6 +137,18 @@ CordeModel::~CordeModel()
     }
 }
 
+btVector3& CordeModel::getPosition(std::size_t i) const
+{
+    if (i < m_massPoints.size())
+    {
+        throw std::invalid_argument("Index is greater than size of m_massPoints");
+    }
+    else
+    {
+        return m_massPoints[i]->pos;
+    }
+}
+
 void CordeModel::step (btScalar dt)
 {
     if (dt <= 0.0)

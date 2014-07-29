@@ -25,7 +25,7 @@
  */
 
 // This application
-#include "CordeModel.h"
+#include "dev/btietz/tgCordeModel.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"

@@ -4,13 +4,12 @@ link_libraries(btietz
 				tgcreator
                 util
                 sensors
-                core    
+                core
+                Corde    
                 terrain 
                 tgOpenGLSupport)
 
 
 add_executable(AppCordeTest
-    CordeModel.cpp
-    tgCordeModel.cpp
     AppCordeTest.cpp
 ) 

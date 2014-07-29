@@ -76,6 +76,13 @@ public:
 	
 	~CordeModel();
 	
+	btVector3& getPosition(std::size_t i) const;
+	
+	std::size_t getNumElements() const
+	{
+		return m_massPoints.size();
+	}
+
 	void step (btScalar dt);
 	
 private:
