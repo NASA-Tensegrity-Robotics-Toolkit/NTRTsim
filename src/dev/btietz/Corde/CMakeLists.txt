@@ -11,5 +11,6 @@ link_libraries(btietz
 
 add_executable(AppCordeTest
     CordeModel.cpp
+    tgCordeModel.cpp
     AppCordeTest.cpp
 ) 

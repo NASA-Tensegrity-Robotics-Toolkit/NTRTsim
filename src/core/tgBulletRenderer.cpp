@@ -65,6 +65,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
         pMuscle->anchor1->getWorldPosition();
       const btVector3 lineTo = 
         pMuscle->anchor2->getWorldPosition();
+       // Should this be normalized??
       const double stretch = 
         linString.getCurrentLength() - pMuscle->getRestLength();
       const btVector3 color =
