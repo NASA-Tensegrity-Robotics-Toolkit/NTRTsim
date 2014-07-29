@@ -27,6 +27,7 @@
 // This application
 #include "dev/btietz/tgCordeModel.h"
 // This library
+#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -46,19 +47,43 @@
  */
 int main(int argc, char** argv)
 {
-	
-	double t = 0.0;
-	double dt = 0.0001;
-	for (int i = 0; i < 10000; i++)
-	{
-		
-		t += dt;
-	}
 	#ifdef BT_USE_DOUBLE_PRECISION
 		std::cout << "Double precision" << std::endl;
 	#else
 		std::cout << "Single Precision" << std::endl;
 	#endif
+    std::cout << "AppCordeModelTest" << std::endl;
+
+    // First create the ground and world. Specify ground rotation in radians
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // the world will delete this
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    
+    const tgWorld::Config config = 
+    {
+        981 // gravity, cm/sec^2
+    };
+    tgWorld world(config, ground);
+
+    // Second create the view
+    const double timestep_physics = 1.0/10000.0; // seconds
+    const double timestep_graphics = 1.f/60.f; // seconds
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+
+    // Third create the simulation
+    tgSimulation simulation(view);
+
+	    // Fourth create the models with their controllers and add the models to the
+    // simulation
+    tgCordeModel* const myModel = new tgCordeModel();
+    
+    // Add the model to the world
+    simulation.addModel(myModel);
+    
+    simulation.run();
 	
     return 0;
 }

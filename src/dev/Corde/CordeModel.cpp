@@ -139,7 +139,7 @@ CordeModel::~CordeModel()
 
 btVector3& CordeModel::getPosition(std::size_t i) const
 {
-    if (i < m_massPoints.size())
+    if (i >= m_massPoints.size())
     {
         throw std::invalid_argument("Index is greater than size of m_massPoints");
     }
@@ -160,6 +160,7 @@ void CordeModel::step (btScalar dt)
 	computeInternalForces();
     unconstrainedMotion(dt);
     simTime += dt;
+#if (0)
     if (simTime >= .01)
     {
         size_t n = m_massPoints.size();
@@ -177,7 +178,7 @@ void CordeModel::step (btScalar dt)
         }
         simTime = 0.0;
     }
-    
+#endif    
     assert(invariant());
 }
 
