@@ -169,7 +169,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
     
-#if (1) // Original parameters
+#if (0) // Original parameters
     const double density = 4.2 / 300.0;
     const double radius  = 0.5;
     const double friction = 1.0;
@@ -187,7 +187,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(650000, 65, false, 0, 7000, 5.6, 100000);
+    tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #endif
     // Create your structureInfo

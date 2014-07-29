@@ -84,7 +84,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
         //String will own this pointer
-#if (1) // origninal params
+#if (0) // origninal params
         if (allMuscles[i]->hasTag("outer"))
         {
             tension = 0.0;
@@ -102,23 +102,24 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
 #else // Params for In Won
         if (allMuscles[i]->hasTag("outer"))
         {
-            tension = 0.0;
-            kPosition = 2000.0;
-            kVelocity = 300.0;
-            controlLength = 17.5;
+            tension = 100.0;
+            kPosition = 100.0;
+            kVelocity = 200.0;
+            controlLength = 19.5;
         }
         else
         {
-            tension = 0.0;
-            kPosition = 2000.0;
-            kVelocity = 300.0;
-            controlLength = 15.0 ;
+            tension = 100.0;
+            kPosition = 500.0;
+            kVelocity = 200.0;
+            controlLength = 16.5 ;
         }
 #endif
         ImpedanceControl* p_ipc = new ImpedanceControl( tension,
                                                         kPosition,
                                                         kVelocity);
         pStringInfo->setupControl(*p_ipc, controlLength);
+
     }
     
 }

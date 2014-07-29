@@ -17,6 +17,8 @@ add_library( ${PROJECT_NAME} SHARED
     
     tgBulletUtil.cpp
     tgRod.cpp
+    
+    abstractMarker.cpp
 )
 
 link_directories(${LIB_DIR})

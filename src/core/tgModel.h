@@ -29,6 +29,7 @@
 #include "tgCast.h"
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
+#include "abstractMarker.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
@@ -152,6 +153,14 @@ public:
      */
     std::vector<tgModel*> getDescendants() const;
 
+	const std::vector<abstractMarker>& getMarkers() const {
+		return m_markers;
+	}
+
+	void addMarker(abstractMarker a){
+		m_markers.push_back(a);
+	}
+
 private:
 
     /** Integrity predicate. */
@@ -165,6 +174,10 @@ private:
      * iterating without using an algorithm.
      */
     std::vector<tgModel*> m_children;
+
+    std::vector<abstractMarker> m_markers;
+
+
 };
 
 /**

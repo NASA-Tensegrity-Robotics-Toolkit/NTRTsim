@@ -17,7 +17,7 @@
 # governing permissions and limitations under the License.
 
 # Purpose: Build the source tree including libraries and applications.
-# Date:    2013-04-26
+# Date:    2014-07-27
 # Notes:   This is intended to be run any time you need to build the 
 #          source tree.
 
@@ -26,6 +26,42 @@ SCRIPT_PATH="`dirname \"$0\"`"                  # relative
 BASE_DIR="`( cd \"$SCRIPT_PATH/..\" && pwd )`"  # absolutized and normalized
 SRC_DIR="`( cd \"$BASE_DIR/src\" && pwd )`"
 BUILD_DIR="$BASE_DIR/build"
+
+# Functions for calling CMake, depending on operating system
+function cmake_OSX(){
+
+"$BASE_DIR/env/bin/cmake" ../src \
+    -G "$build_type" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+    -DCMAKE_CXX_COMPILER=/opt/local/bin/g++
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+
+}
+
+function cmake_linux(){
+
+"$BASE_DIR/env/bin/cmake" ../src \
+    -G "$build_type" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+
+}
 
 # Make sure the build directory exists
 if [ ! -d "$BUILD_DIR" ]; then
@@ -114,6 +150,8 @@ if [ ! -d env ]; then
     exit 1
 fi
 
+### COMPILING STEP
+
 # CMake everything (@todo: can we just have it cmake certain things?)
 pushd "$BUILD_DIR" > /dev/null
 
@@ -128,6 +166,31 @@ else
   cmake_cxx_flags=""
 fi
 
+# Since OS X Mavericks places the g++ compiler in a different place than
+# Linux, and since we want CMake to automatically find g++ on linux distros,
+# run one of two possible functions for actually compiling.
+
+# Functions for calling CMake, depending on operating system
+function cmake_OSX(){
+
+"$BASE_DIR/env/bin/cmake" ../src \
+    -G "$build_type" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+    -DCMAKE_CXX_COMPILER="g++" \
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+
+}
+
+function cmake_linux(){
+
 "$BASE_DIR/env/bin/cmake" ../src \
     -G "$build_type" \
     -DCMAKE_BUILD_TYPE=Debug \
@@ -140,6 +203,16 @@ fi
     -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
     -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
 || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+
+}
+
+if [ $(uname) == 'Darwin' ]
+    then
+    cmake_OSX
+else
+    cmake_linux
+fi
+
 
 popd > /dev/null # exit build dir (done with cmake)
 
