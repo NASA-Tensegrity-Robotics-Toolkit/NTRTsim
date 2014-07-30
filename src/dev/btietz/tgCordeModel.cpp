@@ -66,7 +66,7 @@ void tgCordeModel::teardown()
     
 void tgCordeModel::step(double dt)
 {
-	//testString->applyForce(btVector3(-9.81, 0.0, 0.0), 0);
+	testString->applyForce(btVector3(-9.81, 0.0, 0.0), 0);
     testString->step(dt);
 }
 /**

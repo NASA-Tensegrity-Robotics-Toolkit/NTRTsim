@@ -321,7 +321,7 @@ void CordeModel::computeInternalForces()
         const btScalar quat_cons_z = m_config.ConsSpringConst * linkLengths[i] *
         ( -1.0 * director[0] * (y1 - y2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
         - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
-        
+#if (0)        
         /* Apply X forces */
         r_0->force[0] += -1.0 * (x1 - x2) * (spring_common + diss_common);
         
@@ -336,6 +336,22 @@ void CordeModel::computeInternalForces()
         r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common);
         
         r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
+#else
+        /* Apply X forces */
+        r_0->force[0] += -1.0 * (x1 - x2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[0] +=  (x1 - x2) * (-1.0 * spring_common + diss_common);
+        
+        /* Apply Y forces */
+        r_0->force[1] += -1.0 * (y1 - y2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[1] += (y1 - y2) * (-1.0 * spring_common + diss_common);
+        
+        /* Apply Z Forces */
+        r_0->force[2] += -1.0 * (z1 - z2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[2] += (z1 - z2) * (-1.0 * spring_common + diss_common);
+#endif
 
         /* Apply constraint equation with boundry conditions */
 #if (0) //Original deriviation
