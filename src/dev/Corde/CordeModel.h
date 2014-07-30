@@ -76,17 +76,23 @@ public:
 	
 	~CordeModel();
 	
-	btVector3& getPosition(std::size_t i) const;
+	btVector3& getPosition(const std::size_t i) const;
 	
 	std::size_t getNumElements() const
 	{
 		return m_massPoints.size();
 	}
-
+    
+    void applyForce(const btVector3&, const std::size_t segN);
+    
+    void applyUniformForce(const btVector3& force);
+    
+    /// TODO: apply torques
+    
 	void step (btScalar dt);
 	
 private:
-	void computeConstants();
+	void computeConstants(double length);
 
 	void stepPrerequisites();
 
