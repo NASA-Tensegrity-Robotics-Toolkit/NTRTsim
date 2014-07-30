@@ -253,7 +253,7 @@ void CordeModel::stepPrerequisites()
     }
     
     n = m_centerlines.size();
-	for (std::size_t i = 0; i < n - 1; i++)
+	for (std::size_t i = 0; i < n; i++)
     {
         CordeQuaternionElement* q_0 = m_centerlines[i];
         q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
@@ -384,7 +384,7 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
-#else // Sign convention appears to be more stable. Double check in other parts of the code
+#else // Lateral movement test not affected by this one (sort of obvious)
     if (i == 0)
         {
            r_1->force[0] -= quat_cons_x;
@@ -580,7 +580,7 @@ void CordeModel::computeInternalForces()
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
         /* Apply torques */ /// @todo double check the sign convention. Looks good numerically.
-#if (1) // First sign
+#if (0) // First sign
         quat_0->tprime[0] += q11_stiffness + q11_damping;
         
         quat_1->tprime[0] += q21_stiffness + q21_damping;
@@ -643,8 +643,19 @@ void CordeModel::unconstrainedMotion(double dt)
         quat_0->omega += inverseInertia * (quat_0->torques - 
             omega.cross(computedInertia * omega)) * dt;
         quat_0->updateQDot();
+        if (quat_0->q.dot(quat_0->qdot*dt + quat_0->q) < 0)
+        {
+            // This'll probably never happen. But if it does and the physics are otherwise mostly reasonable, see
+            // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
+            // for solution
+            throw std::runtime_error("Tripped quaternion condition.");
+        }
         quat_0->q = (quat_0->qdot*dt + quat_0->q);
         quat_0->q /= quat_0->q.length();
+        if (quat_0->q.length() <= 0.99999 || quat_0->q.length() >= 1.00001)
+        {
+            throw std::runtime_error("Tripped quaternion length condition.");
+        }
     #endif
     }
 }
