@@ -122,6 +122,10 @@ m_config(Config),
         quaternionShapes.push_back(unitLength.length());
     }
     
+    /// Start first step
+	stepPrerequisites();
+	computeInternalForces();
+    
     assert(invariant());
 }
 
@@ -155,9 +159,7 @@ void CordeModel::step (btScalar dt)
     {
         throw std::invalid_argument("Timestep is not positive.");
     }
-    
-    stepPrerequisites();
-	computeInternalForces();
+   
     unconstrainedMotion(dt);
     simTime += dt;
 #if (0)
@@ -178,7 +180,12 @@ void CordeModel::step (btScalar dt)
         }
         simTime = 0.0;
     }
-#endif    
+#endif
+	
+	/// Start next step so other classes can apply external forces.
+	stepPrerequisites();
+	computeInternalForces();
+	
     assert(invariant());
 }
 
