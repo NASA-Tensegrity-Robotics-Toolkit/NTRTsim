@@ -44,7 +44,7 @@ void tgCordeModel::setup(tgWorld& world)
 	btQuaternion endRot = startRot;
 
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 100;
+	const std::size_t resolution = 10;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);
