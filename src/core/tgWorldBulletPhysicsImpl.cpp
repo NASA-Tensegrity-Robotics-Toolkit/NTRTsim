@@ -32,6 +32,7 @@
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
+#include "BulletCollision/BroadphaseCollision/btAxisSweep3.h" // New broadphase
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
@@ -51,19 +52,30 @@
 class IntermediateBuildProducts
 {
 public:
-  IntermediateBuildProducts() : dispatcher(&collisionConfiguration)
+  IntermediateBuildProducts(double worldSize) : 
+  corner1 (-worldSize,-worldSize, -worldSize),
+  corner2 (worldSize, worldSize, worldSize),
+  dispatcher(&collisionConfiguration),
+  broadphase(corner1, corner2)
   {
   }
+  const btVector3 corner1;
+  const btVector3 corner2;
   btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
   btCollisionDispatcher dispatcher;
+#if (0) // Default broadphase
   btDbvtBroadphase broadphase;
+#else
+  // More accurate broadphase:
+  btAxisSweep3 broadphase;
+#endif
   btSequentialImpulseConstraintSolver solver;
 };
 
 tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
                                                     tgBulletGround* ground) :
     tgWorldImpl(config, ground),
-    m_pIntermediateBuildProducts(new IntermediateBuildProducts),
+    m_pIntermediateBuildProducts(new IntermediateBuildProducts(config.worldSize)),
     m_pDynamicsWorld(createDynamicsWorld())
 {
   // Gravitational acceleration is down on the Y axis
@@ -78,6 +90,9 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
   m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
   #endif
 
+#if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
+	m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
+#endif	
   // Postcondition
   assert(invariant());
 }
