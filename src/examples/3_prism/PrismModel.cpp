@@ -60,7 +60,7 @@ namespace
         double pretension;     
     } c =
    {
-       0.05,     // density (mass / length^3)
+       0.2,     // density (mass / length^3)
        0.31,     // radius (length)
        1000.0,   // stiffness (mass / sec^2)
        10.0,     // damping (mass / sec)
