@@ -4,5 +4,8 @@ Project(Dev)
 subdirs(
     btietz
     tests
+    atil
+    steve
+    kmorse
 )
 

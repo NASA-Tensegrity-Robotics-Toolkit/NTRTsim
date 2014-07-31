@@ -2,3 +2,4 @@ env
 build
 conf/install.conf
 src/DoxyDocs
+src/examples/learningSpines/TetraSpine/logs
