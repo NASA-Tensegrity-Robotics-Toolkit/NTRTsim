@@ -62,15 +62,9 @@ int main(int argc, char** argv)
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
-    const tgWorld::Config config = 
-    {
-        // Note, by changing the setting below from 981 to 98.1, we've
-        // scaled the world length scale to decimeters not cm.
 
-        // Gravity, in cm/sec^2. Use this to adjust length scale of world.
-        98.1
-    };
+    // Gravity is 98.1, so our length unit is decimeters
+    const tgWorld::Config config(98.1);
     tgWorld world(config, ground);
 
     // Second create the view
@@ -106,6 +100,7 @@ int main(int argc, char** argv)
 
     // Create a vector of all the loggers we want to attach...
     std::vector<tgDataLogger_tgDLR*> loggers;
+
     //tgDataLogger_tgDLR* rodLogger = new tgDataLoggerRodBasic();
     tgDataLogger_tgDLR* rodLogger = new tgDataLoggerRodFullState();
     tgDataLogger_tgDLR* linearStringLogger = new tgDataLoggerLinearStringBasic();
