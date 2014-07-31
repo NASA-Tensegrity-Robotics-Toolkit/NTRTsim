@@ -32,21 +32,22 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace
+tgWorld::Config::Config(double g, double ws) :
+gravity(g),
+worldSize(ws)
 {
-  // The default configuration to use if not supplied
-  const tgWorld::Config defaultConfig =
+  if (ws <= 0.0)
   {
-    9.81 // gravity, g in m/sec^2
-  };
-} // namespace
+    throw std::invalid_argument("worldSize is not postive");
+  }
+}
 
 /**
  * @todo Use the factory method design pattern to
  * create the m_pImpl object.
  */
 tgWorld::tgWorld() :
-  m_config(defaultConfig),
+  m_config(),
   m_pGround(new tgBoxGround()),
   m_pImpl(new tgWorldBulletPhysicsImpl(m_config, (tgBulletGround*)m_pGround))
 {

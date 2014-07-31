@@ -50,10 +50,7 @@ int main(int argc, char** argv)
     std::cout << "AppNestedStructureTest" << std::endl;
 
     // First create the world
-    const tgWorld::Config config = 
-    {
-        981 // gravity, cm/sec^2
-    };
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view

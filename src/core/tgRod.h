@@ -57,9 +57,9 @@ public:
          */
             Config(double r = 0.5,
                     double d = 1.0,
-                    double f = 0.5,
+                    double f = 1.0,
                     double rf = 0.0,
-                    double res = 0.0);
+                    double res = 0.2);
 
 
 
