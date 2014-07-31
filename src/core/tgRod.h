@@ -114,9 +114,16 @@ public:
     /**
      * Getter for rigid body
      */
-	 btRigidBody* getPRigidBody() {
-		return m_pRigidBody;
-	}
+    btRigidBody* getPRigidBody() 
+    {
+        return m_pRigidBody;
+    }
+
+    /**
+     * Return the rod's orientation in Euler angles.
+     * @return 3-vector of these euler angles
+     */
+    btVector3 orientation() const;
 
 private:
 
