@@ -54,6 +54,10 @@ public:
 		const double ShearMod;
 		const double StretchMod;
 		const double ConsSpringConst;
+		/**
+		 * For really short segments (< .001 length) consider decreasing
+		 * these further or changing length to cubic (currently ^5)
+		 */
 		const double gammaT;
 		const double gammaR;
 	};
@@ -110,6 +114,12 @@ private:
 		 */
 		CordeQuaternionElement(btQuaternion q1);
 		
+		void transposeTorques();
+		/**
+		 * Must be called after transpose torques and omega is updated
+		 */
+		void updateQDot();
+		
 		btQuaternion q;
 		btQuaternion qdot;
 		/**
@@ -141,7 +151,16 @@ private:
 	 */
 	std::vector<double> computedStiffness;
 	
+	/**
+	 * Computed based on the values in config. Should have length 3
+	 * Assuming products of inertia are negligible as in the paper
+	 */
+	btVector3 computedInertia;
+	btVector3 inverseInertia;
+	
 	bool invariant();
+	
+	double simTime;
 };
  
  

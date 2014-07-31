@@ -46,23 +46,36 @@
  */
 int main(int argc, char** argv)
 {
+
+#if (1) // X Pos
 	btVector3 startPos(0.0, 0.0, 0.0);
 	btVector3 endPos  (10.0, 0.0, 0.0);
 	
 	// Setup for neither bending nor rotation
-	btQuaternion startRot( (endPos - startPos).normalize(), 0);
+	btQuaternion startRot( 0, sqrt(2)/2.0, 0, sqrt(2)/2.0);
 	btQuaternion endRot = startRot;
+#else
+	btVector3 startPos(0.0, 0.0, 0.0);
+	btVector3 endPos  (0.0, 0.0, 10.0);
 	
+	// Setup for neither bending nor rotation
+	btQuaternion startRot( 0, 0, 0, 1);
+	btQuaternion endRot = startRot;
+#endif	
 	// Values for Rope from Spillman's paper
+<<<<<<< HEAD
 	const std::size_t resolution = 1000;
+=======
+	const std::size_t resolution = 10;
+>>>>>>> 331da5e190f436aba3fae094b0f11d85c26199bf
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5;
 	const double shearMod = 0.5;
 	const double stretchMod = 20.0;
-	const double springConst = 100.0;
-	const double gammaT = 10.0;
-	const double gammaR = 1.0;
+	const double springConst = 100.0 * pow(10, 3);
+	const double gammaT = 10.0 * pow(10, -6);
+	const double gammaR = 1.0 * pow(10, -6);
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
@@ -70,7 +83,7 @@ int main(int argc, char** argv)
 	
 	double t = 0.0;
 	double dt = 0.0001;
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		testString.step(dt);
 		t += dt;
@@ -80,5 +93,6 @@ int main(int argc, char** argv)
 	#else
 		std::cout << "Single Precision" << std::endl;
 	#endif
+	
     return 0;
 }
