@@ -56,7 +56,9 @@ public:
   corner1 (-worldSize,-worldSize, -worldSize),
   corner2 (worldSize, worldSize, worldSize),
   dispatcher(&collisionConfiguration),
-  broadphase(corner1, corner2)
+#if (1) // More acc broadphase - remeber the comma
+  broadphase(corner1, corner2, 16384)
+#endif
   {
   }
   const btVector3 corner1;
