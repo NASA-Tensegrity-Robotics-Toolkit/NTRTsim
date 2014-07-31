@@ -31,6 +31,8 @@
 #include "tgLinearString.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
+#include "dev/btietz/tgCordeModel.h"
+#include "dev/Corde/CordeModel.h"
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -65,6 +67,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
         pMuscle->anchor1->getWorldPosition();
       const btVector3 lineTo = 
         pMuscle->anchor2->getWorldPosition();
+       // Should this be normalized??
       const double stretch = 
         linString.getCurrentLength() - pMuscle->getRestLength();
       const btVector3 color =
@@ -75,6 +78,45 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
               0.0);
       pDrawer->drawLine(lineFrom, lineTo, color);
     }
+}
+
+void tgBulletRenderer::render(const tgCordeModel& cordeString) const
+{
+	// Fetch the btDynamicsWorld
+	btSoftRigidDynamicsWorld& dynamicsWorld =
+	   tgBulletUtil::worldToDynamicsWorld(m_world);
+
+    btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
+	
+	const CordeModel* const pCorde = cordeString.getModel();
+	if (pDrawer && pCorde)
+    {
+		std::size_t n = pCorde->getNumElements() - 1;
+		
+		for (int i = 0; i < n; i++)
+		{
+		  const btVector3 lineFrom =
+			pCorde->getPosition(i);
+		  const btVector3 lineTo = 
+			pCorde->getPosition(i + 1);
+#if (0)
+		   // Should this be normalized??
+		  const double stretch = 
+			linString.getCurrentLength() - pMuscle->getRestLength();
+
+		// Old color behavior, restore when we can more easily compute stretch
+		  const btVector3 color =
+			(stretch < 0.0) ?
+			btVector3(0.0, 0.0, 1.0) :
+			btVector3(0.5 + stretch / 3.0, 
+				  0.5 - stretch / 2.0, 
+				  0.0);
+#else
+		const btVector3 color = btVector3(0.0, 0.0, 1.0);
+#endif
+		  pDrawer->drawLine(lineFrom, lineTo, color);
+		}
+	}
 }
 
 void tgBulletRenderer::render(const tgModel& model) const

@@ -28,6 +28,7 @@
 
 // Forward declarations
 class tgLinearString;
+class tgCordeModel;
 class tgModel;
 class tgRod;
 
@@ -52,6 +53,12 @@ public:
    * @param[in] linearString a const reference to a tgLinearString to render
    */
   virtual void render(const tgLinearString& linearString) const {};
+ 
+   /**
+   * Render a cordeModel string.
+   * @param[in] rod a const reference to a tgRod to render
+   */
+  virtual void render(const tgCordeModel& cordeString) const {};
  
   /**
    * Render a tgModel.

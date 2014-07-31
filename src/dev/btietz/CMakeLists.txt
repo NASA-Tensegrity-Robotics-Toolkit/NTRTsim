@@ -3,15 +3,12 @@ Project(btietz)
 link_libraries(sensors
                 tgcreator
                 core
+                Corde
                 util
-                terrain
-                Adapters
-                Configuration
-                AnnealEvolution
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED
-   
+			tgCordeModel.cpp
             tgRBString.cpp
             tgRBStringInfo.cpp
             )

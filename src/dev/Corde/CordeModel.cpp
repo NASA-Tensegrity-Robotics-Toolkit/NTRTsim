@@ -84,12 +84,12 @@ CordeModel::Config::Config(const std::size_t res,
 CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config) : 
 m_config(Config),
     simTime(0.0)
-{
-	computeConstants();
-    
+{    
     btVector3 rodLength(pos2 - pos1);
     btVector3 unitLength( rodLength / ((double) m_config.resolution - 1) );
     btVector3 massPos(pos1);
+    
+    computeConstants(unitLength.length());
     
     double unitMass =  m_config.density * M_PI * pow( m_config.radius, 2) * unitLength.length();
     
@@ -122,6 +122,10 @@ m_config(Config),
         quaternionShapes.push_back(unitLength.length());
     }
     
+    /// Start first step
+	stepPrerequisites();
+	computeInternalForces();
+    
     assert(invariant());
 }
 
@@ -137,18 +141,52 @@ CordeModel::~CordeModel()
     }
 }
 
+btVector3& CordeModel::getPosition(const std::size_t i) const
+{
+    if (i >= m_massPoints.size())
+    {
+        throw std::invalid_argument("Index is greater than size of m_massPoints");
+    }
+    else
+    {
+        return m_massPoints[i]->pos;
+    }
+}
+
+void CordeModel::applyForce(const btVector3& force, const std::size_t segN)
+{
+    if (segN >= m_massPoints.size())
+    {
+        throw std::invalid_argument("Index is greater than size of m_massPoints");
+    }
+    else
+    {
+        m_massPoints[segN]->force += force;
+    }
+}
+
+void CordeModel::applyUniformForce(const btVector3& force)
+{
+    const std::size_t n = m_massPoints.size();
+    
+    for(std::size_t i = 0; i < n; i++)
+    {
+        m_massPoints[i]->force += force;
+    }
+}
+
 void CordeModel::step (btScalar dt)
 {
     if (dt <= 0.0)
     {
         throw std::invalid_argument("Timestep is not positive.");
     }
-    
-    stepPrerequisites();
-	computeInternalForces();
+   
     unconstrainedMotion(dt);
     simTime += dt;
-    if (simTime >= .01)
+	
+    #if (1)
+    if (simTime >= 1.0/1000.0)
     {
         size_t n = m_massPoints.size();
         for (std::size_t i = 0; i < n; i++)
@@ -165,11 +203,16 @@ void CordeModel::step (btScalar dt)
         }
         simTime = 0.0;
     }
+    #endif
+    
+	/// Start next step so other classes can apply external forces.
+	stepPrerequisites();
+	computeInternalForces();
     
     assert(invariant());
 }
 
-void CordeModel::computeConstants()
+void CordeModel::computeConstants(double length)
 {
     assert(computedStiffness.empty());
     
@@ -183,9 +226,9 @@ void CordeModel::computeConstants()
     /* Could probably do this in constructor directly, but easier
      * here since pir2 is already computed
      */
-    computedInertia.setValue(m_config.density * pir2 / 4.0, 
-                     m_config.density * pir2 / 4.0,
-                     m_config.density * pir2 / 2.0);
+    computedInertia.setValue(m_config.density * length * pir2 / 4.0, 
+                     m_config.density * length * pir2 / 4.0,
+                     m_config.density * length * pir2 / 2.0);
     
     // Can assume if one element is zero, all elements are zero and we've screwed up
     // Should pass automatically based on exceptions in config constructor
@@ -203,14 +246,14 @@ void CordeModel::computeConstants()
 void CordeModel::stepPrerequisites()
 {
     std::size_t n = m_massPoints.size();
-	for (std::size_t i = 0; i < n - 1; i++)
+	for (std::size_t i = 0; i < n; i++)
     {
         CordePositionElement* r_0 = m_massPoints[i];
         r_0->force.setZero();
     }
     
     n = m_centerlines.size();
-	for (std::size_t i = 0; i < n - 1; i++)
+	for (std::size_t i = 0; i < n; i++)
     {
         CordeQuaternionElement* q_0 = m_centerlines[i];
         q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
@@ -303,10 +346,11 @@ void CordeModel::computeInternalForces()
         const btScalar quat_cons_z = m_config.ConsSpringConst * linkLengths[i] *
         ( -1.0 * director[0] * (y1 - y2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
         - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
-        
+#if (0)        
+        /* Apply X forces */
         r_0->force[0] += -1.0 * (x1 - x2) * (spring_common + diss_common);
         
-        r_1->force[0] += (x1 - x2) * (spring_common + diss_common);
+        r_1->force[0] +=  (x1 - x2) * (spring_common + diss_common);
         
         /* Apply Y forces */
         r_0->force[1] += -1.0 * (y1 - y2) * (spring_common + diss_common);
@@ -317,8 +361,25 @@ void CordeModel::computeInternalForces()
         r_0->force[2] += -1.0 * (z1 - z2) * (spring_common + diss_common);
         
         r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
+#else
+        /* Apply X forces */
+        r_0->force[0] += -1.0 * (x1 - x2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[0] +=  (x1 - x2) * (-1.0 * spring_common + diss_common);
+        
+        /* Apply Y forces */
+        r_0->force[1] += -1.0 * (y1 - y2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[1] += (y1 - y2) * (-1.0 * spring_common + diss_common);
+        
+        /* Apply Z Forces */
+        r_0->force[2] += -1.0 * (z1 - z2) * (-1.0 * spring_common + diss_common);
+        
+        r_1->force[2] += (z1 - z2) * (-1.0 * spring_common + diss_common);
+#endif
 
         /* Apply constraint equation with boundry conditions */
+#if (0) //Original deriviation
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -348,6 +409,37 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
+#else // Lateral movement test not affected by this one (sort of obvious)
+    if (i == 0)
+        {
+           r_1->force[0] -= quat_cons_x;
+            
+            
+           r_1->force[1] -= quat_cons_y;
+            
+            
+           r_1->force[2] -= quat_cons_z; 
+        }
+        else if (i == n - 1)
+        {
+            r_0->force[0] += quat_cons_x;
+
+            r_0->force[1] += quat_cons_y;
+            
+            r_0->force[2] += quat_cons_z;       
+        }
+        else
+        {
+            r_0->force[0] += quat_cons_x;
+            r_1->force[0] -= quat_cons_x;
+            
+            r_0->force[1] += quat_cons_y;
+            r_1->force[1] -= quat_cons_y;
+            
+            r_0->force[2] += quat_cons_z;
+            r_1->force[2] -= quat_cons_z;            
+        }
+#endif
 
 #if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
@@ -513,7 +605,8 @@ void CordeModel::computeInternalForces()
          q22 * (q21 * qdot24 - q11 * qdot13 - q12 * qdot14 + q13 * qdot11 + q14 * qdot12 - q24 * qdot22) +
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
-        /* Apply torques */ /// @todo double check the sign convention. Looks good numerically.q
+        /* Apply torques */ /// @todo double check the sign convention. Looks good numerically.
+#if (0) // First sign
         quat_0->tprime[0] += q11_stiffness + q11_damping;
         
         quat_1->tprime[0] += q21_stiffness + q21_damping;
@@ -529,7 +622,31 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] += q14_stiffness + q14_damping;
         
         quat_1->tprime[3] += q24_stiffness + q24_damping;
+#else
+        quat_0->tprime[0] += q11_stiffness - q11_damping;
+        
+        quat_1->tprime[0] += q21_stiffness - q21_damping;
+        
+        quat_0->tprime[1] += q12_stiffness - q12_damping;
+    
+        quat_1->tprime[1] += q22_stiffness - q22_damping;
+        
+        quat_0->tprime[2] += q13_stiffness - q13_damping;
+        
+        quat_1->tprime[2] += q23_stiffness - q23_damping;
+        
+        quat_0->tprime[3] += q14_stiffness - q14_damping;
+        
+        quat_1->tprime[3] += q24_stiffness - q24_damping;
+#endif        
 
+    }
+    
+    for (std::size_t i = 0; i < m_centerlines.size(); i++)
+    {
+        /* Transpose quaternion torques into Euclidean torques */
+        CordeQuaternionElement* quat_0 = m_centerlines[i];
+        quat_0->transposeTorques();
     }
 }
 
@@ -544,17 +661,28 @@ void CordeModel::unconstrainedMotion(double dt)
         p_0->pos += dt * p_0->vel;
     }
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
-    {
-        /* Transpose quaternion torques into Euclidean torques */
+    {   
         CordeQuaternionElement* quat_0 = m_centerlines[i];
-        quat_0->transposeTorques();
-        
+    #if (1)         
         const btVector3 omega = quat_0->omega;
         // Since I is diagonal, we can use elementwise multiplication of vectors
         quat_0->omega += inverseInertia * (quat_0->torques - 
             omega.cross(computedInertia * omega)) * dt;
         quat_0->updateQDot();
-        quat_0->q = (quat_0->qdot*dt + quat_0->q).normalize();
+        if (quat_0->q.dot(quat_0->qdot*dt + quat_0->q) < 0)
+        {
+            // This'll probably never happen. But if it does and the physics are otherwise mostly reasonable, see
+            // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
+            // for solution
+            throw std::runtime_error("Tripped quaternion condition.");
+        }
+        quat_0->q = (quat_0->qdot*dt + quat_0->q);
+        quat_0->q /= quat_0->q.length();
+        if (quat_0->q.length() <= 0.99999 || quat_0->q.length() >= 1.00001)
+        {
+            throw std::runtime_error("Tripped quaternion length condition.");
+        }
+    #endif
     }
 }
 
