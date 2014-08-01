@@ -44,7 +44,7 @@ void tgCordeModel::setup(tgWorld& world)
 	btQuaternion endRot = startRot;
 
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 20;
+	const std::size_t resolution = 40;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);
@@ -52,7 +52,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double stretchMod = 20.0 * pow(10, 6);
 	const double springConst = 1.0 * pow(10, 0);
 	const double gammaT = 100.0 * pow(10, -3); // Position Damping
-	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
+	const double gammaR = 1.0 * pow(10, -3); // Rotation Damping
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
