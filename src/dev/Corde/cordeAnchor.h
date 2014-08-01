@@ -16,42 +16,35 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_CORDE_MODEL
-#define TG_CORDE_MODEL
+#ifndef CORDE_ANCHOR
+#define CORDE_ANCHOR
 
-#include "core/tgModel.h"
+// The Bullet Physics library
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
 
-// Forward Declaration
-class CordeModel;
+class btRigidBody;
 
-class tgCordeModel : public tgModel
+class cordeAnchor
 {
 public:
-    tgCordeModel();
+    cordeAnchor(btRigidBody *body, btVector3 pos);
     
-    ~tgCordeModel();
+    ~cordeAnchor();
     
-    virtual void setup(tgWorld& world);
+    btVector3 getWorldPosition();
+
+    // Relative to the body
+    btVector3 getRelativePosition();
+
+    const btRigidBody * attachedBody;
+
+    // Relative to the body when it is first constructed
+    const btVector3 attachedRelativeOriginalPosition;
     
-    virtual void teardown();
-    
-    virtual void step(double dt);
-    
-    /**
-    * Call tgModelVisitor::render() on self and all descendants.
-    * @param[in,out] r a reference to a tgModelVisitor
-    */
-    virtual void onVisit(const tgModelVisitor& r) const;
-    
-    /** @todo consider adding a toString method **/
-    
-    const CordeModel* const getModel() const
-    {
-        return testString;
-    }
-    
-private:
-    CordeModel* testString;
+ private:
+	cordeAnchor();
+
 };
 
-#endif //TG_CORDE_MODEL
+#endif //CORDE_ANCHOR

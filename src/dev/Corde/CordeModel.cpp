@@ -637,8 +637,7 @@ void CordeModel::unconstrainedMotion(double dt)
     }
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
     {   
-        CordeQuaternionElement* quat_0 = m_centerlines[i];
-    #if (1)         
+        CordeQuaternionElement* quat_0 = m_centerlines[i];        
         const btVector3 omega = quat_0->omega;
         // Since I is diagonal, we can use elementwise multiplication of vectors
         quat_0->omega += inverseInertia * (quat_0->torques - 
@@ -657,7 +656,6 @@ void CordeModel::unconstrainedMotion(double dt)
         {
             throw std::runtime_error("Tripped quaternion length condition.");
         }
-    #endif
     }
 }
 
@@ -690,6 +688,7 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
     torques[2] += 1.0/2.0 * (q[0] * tprime[0] + q[1] * tprime[1] + q[2] * tprime[2] + q[3] * tprime[3]);
 }
 
+// omega holds history.
 void CordeModel::CordeQuaternionElement::updateQDot()
 {
     qdot[0] = 1.0/2.0 * (q[0] * omega[2] + q[1] * omega[1] - q[2] * omega[0]);
