@@ -679,18 +679,19 @@ CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
 
 void CordeModel::CordeQuaternionElement::transposeTorques()
 {
-    torques[0] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
-    torques[1] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
-    torques[2] += 1.0/2.0 * (q[0] * tprime[0] + q[1] * tprime[1] + q[2] * tprime[2] + q[3] * tprime[3]);
+	torques[0] += 1.0/2.0 * (q[2] * tprime[1] - q[1] * tprime[2] - q[0] * tprime[3] + q[3] * tprime[0]);
+    torques[1] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
+    torques[2] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
+    
 }
 
 // omega holds history.
 void CordeModel::CordeQuaternionElement::updateQDot()
 {
-    qdot[0] = 1.0/2.0 * (q[0] * omega[2] + q[1] * omega[1] - q[2] * omega[0]);
-    qdot[1] = 1.0/2.0 * (q[1] * omega[2] - q[0] * omega[1] + q[3] * omega[0]);
-    qdot[2] = 1.0/2.0 * (q[0] * omega[0] + q[2] * omega[2] + q[3] * omega[1]);
-    qdot[3] = 1.0/2.0 * (q[3] * omega[2] - q[2] * omega[1] - q[1] * omega[0]);
+    qdot[0] = 1.0/2.0 * (q[1] * omega[2] - q[2] * omega[1] + q[3] * omega[0]);
+    qdot[1] = 1.0/2.0 * (q[2] * omega[0] - q[0] * omega[2] + q[3] * omega[1]);
+    qdot[2] = 1.0/2.0 * (q[0] * omega[1] - q[1] * omega[0] + q[3] * omega[2]);
+    qdot[3] = 1.0/2.0 * (-1.0*q[0] * omega[0] - q[1] * omega[1] - q[2] * omega[2]);
 }
 
 /// Checks lengths of vectors. @todo add additional invariants

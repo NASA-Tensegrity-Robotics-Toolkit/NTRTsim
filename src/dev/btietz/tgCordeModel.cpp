@@ -40,11 +40,11 @@ void tgCordeModel::setup(tgWorld& world)
 	btVector3 endPos  (10.0, 10.0, 0.0);
 	
 	// Setup for neither bending nor rotation
-	btQuaternion startRot( 0.5, 0.5, 0.5, 0.5);
+	btQuaternion startRot( 0.0, 0.0, 0.0, -1.0);
 	btQuaternion endRot = startRot;
 
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 40;
+	const std::size_t resolution = 20;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);
