@@ -36,12 +36,18 @@ public:
 
     // Relative to the body
     btVector3 getRelativePosition();
-
+	
+	/**
+	 * Pointer is const.
+	 * @todo Should we make this private? How many other classes
+	 * need to know about it?
+	 */
     const btRigidBody * attachedBody;
 
     // Relative to the body when it is first constructed
     const btVector3 attachedRelativeOriginalPosition;
     
+
  private:
 	cordeAnchor();
 
