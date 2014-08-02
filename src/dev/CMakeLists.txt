@@ -5,5 +5,9 @@ subdirs(
     axydes
     btietz
     tests
+    atil
+    steve
+    kmorse
+    apsabelhaus
 )
 

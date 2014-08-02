@@ -1,0 +1,38 @@
+% File paralist.ins
+% Copyright 1998-2002 Bernd Schandl
+% email schandl@gmx.net
+% www   http://schandl.gmxhome.de/paralist
+%
+% Installation file for the paralist package.
+%
+% See the README file for instructions.
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License distributed from CTAN
+% archives in the directory macros/latex/base/lppl.txt; either
+% version 1 of the license, or (at your option) any later version.
+%
+\input docstrip
+\keepsilent
+
+% define preamble
+\preamble
+
+Copyright 1998-2002 Bernd Schandl
+email schandl@gmx.net
+www   http://schandl.gmxhome.de/paralist
+
+This file can be redistributed and/or modified under the terms
+of the LaTeX Project Public License distributed from CTAN
+archives in the directory macros/latex/base/lppl.txt; either
+version 1 of the license, or (at your option) any later version.
+
+\endpreamble
+
+
+\generate{%
+  \file{paralist.sty}{\from{paralist.dtx}{package}}%
+  \usepostamble\empty
+  \file{paralist.drv}{\from{paralist.dtx}{driver}}}
+
+\endbatchfile

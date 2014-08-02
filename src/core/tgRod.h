@@ -57,10 +57,12 @@ public:
          */
             Config(double r = 0.5,
                     double d = 1.0,
-                    double f = 0.5,
+                    double f = 1.0,
                     double rf = 0.0,
-                    double res = 0.0);
-        
+                    double res = 0.2);
+
+
+
             /** The rod's radius; must be nonnegative. */
             const double radius;
 
@@ -108,6 +110,20 @@ public:
      * @return the center of mass of the rod, a vector in 3-space
      */
     btVector3 centerOfMass() const;
+
+    /**
+     * Getter for rigid body
+     */
+    btRigidBody* getPRigidBody() 
+    {
+        return m_pRigidBody;
+    }
+
+    /**
+     * Return the rod's orientation in Euler angles.
+     * @return 3-vector of these euler angles
+     */
+    btVector3 orientation() const;
 
 private:
 
