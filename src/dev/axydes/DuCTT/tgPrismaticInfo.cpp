@@ -152,7 +152,7 @@ void tgPrismaticInfo::buildModel(tgWorld& world, tgModel* prismatic)
     allRigids.push_back(getFromRigidInfo());
 
     // We have to delete these
-//    std::vector <tgConnectorInfo* > linkerInfo;
+    std::vector <tgConnectorInfo* > linkerInfo;
 
     // Can this part be done in a loop easily?
 //    linkerInfo.push_back(new tgLinearStringInfo(m_stringConfig, *linkerPairs[0]));
