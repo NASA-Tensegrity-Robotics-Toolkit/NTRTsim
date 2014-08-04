@@ -87,6 +87,8 @@ public:
     
     void applyUniformForce(const btVector3& force);
     
+    void applyUniformAcc(const btVector3& acc);
+    
     /// TODO: apply torques
     
 	void step (btScalar dt);

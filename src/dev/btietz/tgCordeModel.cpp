@@ -46,7 +46,7 @@ void tgCordeModel::setup(tgWorld& world)
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 40;
 	const double radius = 0.01;
-	const double density = 1300;
+	const double density = 13;
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
@@ -68,7 +68,7 @@ void tgCordeModel::step(double dt)
 {
 	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 0);
 	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 9);
-	testString->applyUniformForce(btVector3(0.0, -9.0, 0.0));
+	testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
     testString->step(dt);
 }
 /**

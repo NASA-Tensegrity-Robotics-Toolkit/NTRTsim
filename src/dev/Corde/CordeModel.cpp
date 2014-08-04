@@ -175,6 +175,16 @@ void CordeModel::applyUniformForce(const btVector3& force)
     }
 }
 
+void CordeModel::applyUniformAcc(const btVector3& acc)
+{
+    const std::size_t n = m_massPoints.size();
+    
+    for(std::size_t i = 0; i < n; i++)
+    {
+        m_massPoints[i]->force += m_massPoints[i]->mass * acc;
+    }
+}
+
 void CordeModel::step (btScalar dt)
 {
     if (dt <= 0.0)
