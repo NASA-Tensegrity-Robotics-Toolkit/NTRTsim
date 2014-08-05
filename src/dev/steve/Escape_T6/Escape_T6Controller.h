@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 #ifndef ESCAPE_T6CONTROLLER
 #define ESCAPE_T6CONTROLLER
@@ -43,37 +43,36 @@ using namespace std;
  */
 class Escape_T6Controller : public tgObserver<Escape_T6Model>
 {
-public:
-	
-  /**
-   * Construct a T6PrefLengthController with the initial preferred length.
-   *
-   */
-  
-  // Note that currently this is calibrated for decimeters.
-	Escape_T6Controller(const double prefLength=5);
-    
-  /**
-   * Nothing to delete, destructor must be virtual
-   */
-  virtual ~Escape_T6Controller() { }
+    public:
 
-  virtual void onSetup(Escape_T6Model& subject);
-    
-  virtual void onStep(Escape_T6Model& subject, double dt);
+        /**
+         * Construct a T6PrefLengthController with the initial preferred length.
+         */
 
-protected:
+        // Note that currently this is calibrated for decimeters.
+        Escape_T6Controller(const double prefLength=5);
 
-  virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+        /**
+         * Nothing to delete, destructor must be virtual
+         */
+        virtual ~Escape_T6Controller() { }
 
-  virtual void applyActions (Escape_T6Model& subject, vector< vector <double> > act);
+        virtual void onSetup(Escape_T6Model& subject);
 
-private:
-  double m_initialLengths;
-  double m_totalTime;
+        virtual void onStep(Escape_T6Model& subject, double dt);
 
-  AnnealAdapter evolutionAdapter;
-	
+    protected:
+
+        virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+
+        virtual void applyActions (Escape_T6Model& subject, vector< vector <double> > act);
+
+    private:
+        double m_initialLengths;
+        double m_totalTime;
+
+        AnnealAdapter evolutionAdapter;
+
 };
 
 #endif // ESCAPE_T6CONTROLLER

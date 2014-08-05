@@ -14,11 +14,11 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 /**
  * @file AppEscape_T6.cpp
- * @brief Contains the definition function main() for the Super Ball applicaiton
+ * @brief Contains the definition function main() for the Escape T6
  * application.
  * $Id$
  */
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     std::cout << "AppEscape_T6" << std::endl;
 
     // First create the ground and world
-    
+
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
     const double pitch = M_PI/15.0;
@@ -56,10 +56,12 @@ int main(int argc, char** argv)
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
+
+    //TODO: Add terrain to simulation
+
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
-        // Note, by changing the setting below from 981 to 98.1, we've
-        // scaled the world length scale to decimeters not cm.
+    // Note, by changing the setting below from 981 to 98.1, we've
+    // scaled the world length scale to decimeters not cm.
     tgWorld world(config, ground);
 
     // Second create the view
@@ -94,7 +96,7 @@ int main(int argc, char** argv)
 
     myModel->attach(pTC);
     simulation.addModel(myModel);
-    
+
     // Run until the user stops
     simulation.run();
 

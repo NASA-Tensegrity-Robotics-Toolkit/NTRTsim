@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 /**
  * @file Escape_T6Model.cpp
@@ -67,29 +67,29 @@ namespace
         double targetVelocity;
         double maxAcc;
     } c =
-   {
-     0.825,    // density (kg / length^3)
-     0.31,     // radius (length)
-     3000.0,   // stiffness (kg / sec^2)
-     200.0,    // damping (kg / sec)
-     15.0,     // rod_length (length)
-     7.5,      // rod_space (length)
-     1.0,      // friction (unitless)
-     0.01,     // rollFriction (unitless)
-     0.2,      // restitution (?)
-     0,        // rotation
-     100000,   // maxTens
-     10000,    // targetVelocity
-     20000     // maxAcc
+    {
+        0.825,    // density (kg / length^3)
+        0.31,     // radius (length)
+        3000.0,   // stiffness (kg / sec^2)
+        200.0,    // damping (kg / sec)
+        15.0,     // rod_length (length)
+        7.5,      // rod_space (length)
+        1.0,      // friction (unitless)
+        0.01,     // rollFriction (unitless)
+        0.2,      // restitution (?)
+        0,        // rotation
+        100000,   // maxTens
+        10000,    // targetVelocity
+        20000     // maxAcc
 
-     // Use the below values for earlier versions of simulation.
-     // 1.006,    
-     // 0.31,     
-     // 300000.0, 
-     // 3000.0,   
-     // 15.0,     
-     // 7.5,      
-  };
+            // Use the below values for earlier versions of simulation.
+            // 1.006,    
+            // 0.31,     
+            // 300000.0, 
+            // 3000.0,   
+            // 15.0,     
+            // 7.5,      
+    };
 } // namespace
 
 /*
@@ -149,7 +149,7 @@ void Escape_T6Model::addNodes(tgStructure& s)
 
     for(int i=0;i<12;i++)
     {
-		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
+        s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
     }
 }
 
@@ -169,94 +169,94 @@ void Escape_T6Model::addMarkers(tgStructure &s)
 {
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
-	for(int i=0;i<12;i++)
-	{
-		const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
-		btTransform inverseTransform = bt->getWorldTransform().inverse();
-		btVector3 pos = inverseTransform * (nodePositions[i]);
-		abstractMarker tmp=abstractMarker(bt,pos,btVector3(0.08*i,1.0 - 0.08*i,.0),i);
-		this->addMarker(tmp);
-	}
+    for(int i=0;i<12;i++)
+    {
+        const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
+        btTransform inverseTransform = bt->getWorldTransform().inverse();
+        btVector3 pos = inverseTransform * (nodePositions[i]);
+        abstractMarker tmp=abstractMarker(bt,pos,btVector3(0.08*i,1.0 - 0.08*i,.0),i);
+        this->addMarker(tmp);
+    }
 }
 
 void Escape_T6Model::addMuscles(tgStructure& s)
 {
 
-	int muscleConnections[13][13];
-	musclesPerNodes.resize(13);
-	for(int i=0;i<13;i++)
-	{
-		musclesPerNodes[i].resize(13);
-		for(int j=0;j<13;j++)
-			musclesPerNodes[i][j]=NULL;
-	}
-	for(int i=0;i<13;i++)
-		for(int j=0;j<13;j++)
-			muscleConnections[i][j]=-1;
+    int muscleConnections[13][13];
+    musclesPerNodes.resize(13);
+    for(int i=0;i<13;i++)
+    {
+        musclesPerNodes[i].resize(13);
+        for(int j=0;j<13;j++)
+            musclesPerNodes[i][j]=NULL;
+    }
+    for(int i=0;i<13;i++)
+        for(int j=0;j<13;j++)
+            muscleConnections[i][j]=-1;
 
-	muscleConnections[0][3]=0;
-	muscleConnections[3][2]=0;
-	muscleConnections[2][0]=0;
-	muscleConnections[4][5]=0;
-	muscleConnections[5][7]=0;
-	muscleConnections[7][4]=0;
-	muscleConnections[1][8]=0;
-	muscleConnections[8][10]=0;
-	muscleConnections[10][1]=0;
-	muscleConnections[9][11]=0;
-	muscleConnections[11][6]=0;
-	muscleConnections[6][9]=0;
-	muscleConnections[1][2]=1;
-	muscleConnections[2][4]=1;
-	muscleConnections[4][1]=1;
-	muscleConnections[3][5]=1;
-	muscleConnections[5][6]=1;
-	muscleConnections[6][3]=1;
-	muscleConnections[0][8]=1;
-	muscleConnections[8][9]=1;
-	muscleConnections[9][0]=1;
-	muscleConnections[11][7]=1;
-	muscleConnections[7][10]=1;
-	muscleConnections[10][11]=1;
+    muscleConnections[0][3]=0;
+    muscleConnections[3][2]=0;
+    muscleConnections[2][0]=0;
+    muscleConnections[4][5]=0;
+    muscleConnections[5][7]=0;
+    muscleConnections[7][4]=0;
+    muscleConnections[1][8]=0;
+    muscleConnections[8][10]=0;
+    muscleConnections[10][1]=0;
+    muscleConnections[9][11]=0;
+    muscleConnections[11][6]=0;
+    muscleConnections[6][9]=0;
+    muscleConnections[1][2]=1;
+    muscleConnections[2][4]=1;
+    muscleConnections[4][1]=1;
+    muscleConnections[3][5]=1;
+    muscleConnections[5][6]=1;
+    muscleConnections[6][3]=1;
+    muscleConnections[0][8]=1;
+    muscleConnections[8][9]=1;
+    muscleConnections[9][0]=1;
+    muscleConnections[11][7]=1;
+    muscleConnections[7][10]=1;
+    muscleConnections[10][11]=1;
 
-	for(int i=0;i<13;i++)
-	{
-		for(int j=0;j<13;j++)
-		{
-			if(muscleConnections[i][j]>=0)
-			{
-				std::stringstream tag;
-				tag<<"muscle-"<<i<<"-"<<j;
-				s.addPair(i, j, "muscle");
-				//musclesPerNodes[i][j]=s.addPair(i, j,  tag);
-				//musclesPerNodes[j][i]=musclesPerNodes[i][j];
-			}
-		}
-	}
+    for(int i=0;i<13;i++)
+    {
+        for(int j=0;j<13;j++)
+        {
+            if(muscleConnections[i][j]>=0)
+            {
+                std::stringstream tag;
+                tag<<"muscle-"<<i<<"-"<<j;
+                s.addPair(i, j, "muscle");
+                //musclesPerNodes[i][j]=s.addPair(i, j,  tag);
+                //musclesPerNodes[j][i]=musclesPerNodes[i][j];
+            }
+        }
+    }
 }
 
 void Escape_T6Model::setup(tgWorld& world)
 {
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
-				c.rollFriction, c.restitution);
+            c.rollFriction, c.restitution);
 
     tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
-            
+            c.maxTens, c.targetVelocity, 
+            c.maxAcc);
+
     // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
     addMuscles(s);
 
-//    // Add a rotation. This is needed if the ground slopes too much,
-//    // otherwise  glitches put a rod below the ground.
-//    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-//    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-//    double rotationAngle = M_PI/2;
-//    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    //    // Add a rotation. This is needed if the ground slopes too much,
+    //    // otherwise  glitches put a rod below the ground.
+    //    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    //    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    //    double rotationAngle = M_PI/2;
+    //    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     //s.move(btVector3(0,30,0));
 
@@ -264,7 +264,7 @@ void Escape_T6Model::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    
+
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
@@ -286,7 +286,8 @@ void Escape_T6Model::setup(tgWorld& world)
 
     btVector3 location(0,10.0,0);
     btVector3 rotation(0.0,0.6,0.8);
-  	btVector3 speed(0,20,100);
+    btVector3 speed(0,0,0);
+    //btVector3 speed(0,20,100);
     this->moveModel(location,rotation,speed);
 }
 
@@ -314,7 +315,7 @@ const std::vector<tgLinearString*>& Escape_T6Model::getAllMuscles() const
 {
     return allMuscles;
 }
-    
+
 void Escape_T6Model::teardown()
 {
     tgModel::teardown();
@@ -324,15 +325,15 @@ void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector
 {
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
-	btQuaternion initialRotationQuat;
-	initialRotationQuat.setEuler(rotationVector[0],rotationVector[1],rotationVector[2]);
-	btTransform initialTransform;
-	initialTransform.setIdentity();
-	initialTransform.setRotation(initialRotationQuat);
-	initialTransform.setOrigin(positionVector);
-	for(int i=0;i<rods.size();i++)
-	{
-			rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
-			rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
-	}
+    btQuaternion initialRotationQuat;
+    initialRotationQuat.setEuler(rotationVector[0],rotationVector[1],rotationVector[2]);
+    btTransform initialTransform;
+    initialTransform.setIdentity();
+    initialTransform.setRotation(initialRotationQuat);
+    initialTransform.setOrigin(positionVector);
+    for(int i=0;i<rods.size();i++)
+    {
+        rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
+        rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
+    }
 }
