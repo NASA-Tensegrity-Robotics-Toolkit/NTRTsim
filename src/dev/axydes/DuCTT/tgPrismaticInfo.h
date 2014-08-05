@@ -40,6 +40,7 @@
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgPair.h"
+#include "tgcreator/tgRigidInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -58,7 +59,7 @@ public:
 
     tgPrismaticInfo(const tgPrismatic::Config& config, const tgPair& pair);
     
-    virtual ~tgPrismaticInfo() {}
+    ~tgPrismaticInfo();
     
     /**
      * Create a tgConnectorInfo* from a tgPair
@@ -72,6 +73,7 @@ public:
     const int getSegments() const;
     
     double getMass();
+
 
 protected:
 

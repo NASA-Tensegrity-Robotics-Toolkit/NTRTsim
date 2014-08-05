@@ -43,6 +43,10 @@ tgPrismaticInfo::tgPrismaticInfo(const tgPrismatic::Config& config, const tgPair
     tgConnectorInfo(pair)
 {}
 
+tgPrismaticInfo::~tgPrismaticInfo()
+{
+}
+
 tgConnectorInfo* tgPrismaticInfo::createConnectorInfo(const tgPair& pair)
 {
     return new tgPrismaticInfo(m_config, pair);
@@ -50,7 +54,6 @@ tgConnectorInfo* tgPrismaticInfo::createConnectorInfo(const tgPair& pair)
 
 void tgPrismaticInfo::initConnector(tgWorld& world)
 {
-    // Anything to do here?
 }
 
 tgModel* tgPrismaticInfo::createModel(tgWorld& world)
@@ -61,8 +64,8 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
     btVector3 buildVec = (endNode - startNode);
     double m_startLength = buildVec.length();
 
-    tgNode midNode = tgNode(startNode + (buildVec / 2.0),"mid");
-
+    m_stringConfig.stiffness = 1000;
+    m_stringConfig.damping = 10;
     m_config.m_minTotalLength = m_startLength;
 
     tgPrismatic* prism = new tgPrismatic(getTags(), m_config);
@@ -73,7 +76,7 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
 const int tgPrismaticInfo::getSegments() const
 {
     //@todo: make configurable
-    return 2;
+    return m_config.m_segments;
 }
 
 double tgPrismaticInfo::getMass()
@@ -102,181 +105,40 @@ void tgPrismaticInfo::buildModel(tgWorld& world, tgModel* prismatic)
 
     tgStructure rod;
     rod.addNode(0,0,0); //Bottom
-    rod.addNode(midNode1);
-    rod.addPair(0,1,"a rod");
-
-    tgStructure* rod1 = new tgStructure(rod);
-    rod1->addTags("rod v1");
-    rod1->move(startNode + offset);
-    prism.addChild(rod1);
-
-    tgStructure* rod2 = new tgStructure(rod);
-    rod2->addTags("rod v2");
-    rod2->move(startNode + midNode2);
-    prism.addChild(rod2);
-
-    std::vector<tgStructure*> children = prism.getChildren();
-    tgNodes n1 = children[0]->getNodes();
-    tgNodes n2 = children[1]->getNodes();
-    prism.addPair(n1[1], n2[0], "muscle seg");
-
-    tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(m_config.m_rod1Config));
-    spec.addBuilder("muscle", new tgLinearStringInfo(m_stringConfig));
-
-    // Create your structureInfo
-    tgStructureInfo structureInfo(prism, spec);
-
-    std::cout << "tgPrismaticInfo::buildModel() 7" << std::endl;
-    // Use the structureInfo to build our model
-    structureInfo.buildInto(*prismatic, world);
-
-    /* Now that the sub-structure has been created, attach it
-    * to the super-structure via hard links?
-    * Very manual from here, since this is the only place we have all
-    * of the necessary pointers
-    */
-    // We have to delete these
-    std::vector<tgPair*> linkerPairs;
-
-    // "From" side:
-    linkerPairs.push_back(new tgPair(startNode, n1[0], tgString("anchor seg",1)));
-    // "To" side:
-    linkerPairs.push_back(new tgPair(n2[1], endNode, tgString("anchor seg",2)));
-
-    // Perhaps overkill...
-    // These pointers will be deleted by tgStructure
-    std::vector <tgRigidInfo*> allRigids(structureInfo.getAllRigids());
-    std::cout << "tgPrismaticInfo num rigids: " << allRigids.size() << std::endl;
-    allRigids.push_back(getToRigidInfo());
-    allRigids.push_back(getFromRigidInfo());
-
-    // We have to delete these
-    std::vector <tgConnectorInfo* > linkerInfo;
-
-    // Can this part be done in a loop easily?
-//    linkerInfo.push_back(new tgLinearStringInfo(m_stringConfig, *linkerPairs[0]));
-//    linkerInfo.push_back(new tgLinearStringInfo(m_stringConfig, *linkerPairs[1]));
-
-    for (std::size_t i = 0; i < linkerInfo.size(); i++)
-    {
-        linkerInfo[i]->chooseRigids(allRigids);
-        linkerInfo[i]->initConnector(world);
-
-        tgModel* m = linkerInfo[i]->createModel(world);
-        m->setTags(linkerInfo[i]->getTags());
-        if(m != 0) {
-            prismatic->addChild(m);
-        }
-    }
-
-    // Clean up - see if there's a way to do this with references instead?
-    for (std::size_t i = 0; i < linkerInfo.size(); i++)
-    {
-        delete linkerInfo[i];
-    }
-    linkerInfo.clear();
-
-    for (std::size_t i = 0; i < linkerPairs.size(); i++)
-    {
-        delete linkerPairs[i];
-    }
-    linkerPairs.clear();
-
-    /**
-    double m_startLength = buildVec.length();
-    btVector3 offset = buildVec.normalize();
-    tgStructure rod;
-    rod.addNode(0,0,0); //Bottom
     rod.addNode(midNode);
     rod.addPair(0,1,"a rod");
 
-    //1st rod
     tgStructure* rod1 = new tgStructure(rod);
-
-    //Move the first one into position
     rod1->addTags("rod v1");
     rod1->move(startNode);
     prism.addChild(rod1);
 
-    //second rod
     tgStructure* rod2 = new tgStructure(rod);
     rod2->addTags("rod v2");
     rod2->move(startNode + midNode);
     prism.addChild(rod2);
 
+    std::cout << "Displaying all nodes:" << std::endl;
+    std::cout << "From: " << startNode << ", To: " << endNode << std::endl;
+    std::cout << "Rod1: " << rod1->getNodes()[0] << ", " << rod1->getNodes()[1] << std::endl;
+    std::cout << "Rod2: " << rod2->getNodes()[0] << ", " << rod2->getNodes()[1] << std::endl;
+
     std::vector<tgStructure*> children = prism.getChildren();
     tgNodes n1 = children[0]->getNodes();
     tgNodes n2 = children[1]->getNodes();
-    prism.addPair(n1[1], n2[0], "muscle seg");
+//    prism.addPair(n1[1], n2[0], "anchor seg");
+//    prism.addPair(n1[1], n2[0], "muscle seg");
 
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(m_config.m_rod1Config));
-//    spec.addBuilder("rod v1", new tgRodInfo(m_config.m_rod1Config));
-//    spec.addBuilder("rod v2", new tgRodInfo(m_config.m_rod2Config));
+    spec.addBuilder("rod", new tgRodInfo(m_config.m_rodConfig));
     spec.addBuilder("muscle", new tgLinearStringInfo(m_stringConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(prism, spec);
 
-    std::cout << "tgPrismaticInfo::buildModel() 7" << std::endl;
     // Use the structureInfo to build our model
     structureInfo.buildInto(*prismatic, world);
 
-    /* Now that the sub-structure has been created, attach it
-    * to the super-structure
-    * Very manual from here, since this is the only place we have all
-    * of the necessary pointers
-    *
-    // We have to delete these
-    std::vector<tgPair*> linkerPairs;
-
-    // "From" side:
-    linkerPairs.push_back(new tgPair(startNode, n1[0], tgString("anchor seg",1)));
-    // "To" side:
-    linkerPairs.push_back(new tgPair(n2[1], endNode, tgString("anchor seg",2)));
-
-    // Perhaps overkill...
-    // These pointers will be deleted by tgStructure
-    std::vector <tgRigidInfo*> allRigids(structureInfo.getAllRigids());
-    std::cout << "tgPrismaticInfo num rigids: " << allRigids.size() << std::endl;
-    allRigids.push_back(getToRigidInfo());
-    allRigids.push_back(getFromRigidInfo());
-
-    // We have to delete these
-    std::vector <tgConnectorInfo* > linkerInfo;
-
-    // Can this part be done in a loop easily?
-    linkerInfo.push_back(new tgLinearStringInfo(m_stringConfig, *linkerPairs[0]));
-    linkerInfo.push_back(new tgLinearStringInfo(m_stringConfig, *linkerPairs[1]));
-
-    for (std::size_t i = 0; i < linkerInfo.size(); i++)
-    {
-        linkerInfo[i]->chooseRigids(allRigids);
-        linkerInfo[i]->initConnector(world);
-
-        tgModel* m = linkerInfo[i]->createModel(world);
-        m->setTags(linkerInfo[i]->getTags());
-        if(m != 0) {
-            prismatic->addChild(m);
-        }
-    }
-
-    // Clean up - see if there's a way to do this with references instead?
-    for (std::size_t i = 0; i < linkerInfo.size(); i++)
-    {
-        delete linkerInfo[i];
-    }
-    linkerInfo.clear();
-
-    for (std::size_t i = 0; i < linkerPairs.size(); i++)
-    {
-        delete linkerPairs[i];
-    }
-    linkerPairs.clear();
-    /**/
-
-    std::cout << "tgPrismaticInfo::buildModel() 8" << std::endl;
     //not needed?
 //    prismatic->setup(world);
 

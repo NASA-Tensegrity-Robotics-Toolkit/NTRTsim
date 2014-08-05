@@ -51,14 +51,14 @@ public:
         // To make the complier happy. Probably should never be called
         Config();
         
-        Config( std::size_t segments,
-                const tgRod::Config& rod1Conf,
-                const tgRod::Config& rod2Conf,
-                double minTotalLength = 0.1); // todo: find better default
+        Config(
+                const tgRod::Config& rodConf,
+                double minTotalLength = 0.1, // todo: find better default
+                std::size_t segments = 2
+                );
         
         std::size_t m_segments;
-        tgRod::Config m_rod1Config;
-        tgRod::Config m_rod2Config;
+        tgRod::Config m_rodConfig;
         double m_minTotalLength;
     };
     

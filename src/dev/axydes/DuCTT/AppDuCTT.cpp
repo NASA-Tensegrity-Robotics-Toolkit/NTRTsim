@@ -47,7 +47,8 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(
-        0//981 // gravity, cm/sec^2
+//        0
+        981 // gravity, cm/sec^2
     );
     tgWorld world(config); 
 

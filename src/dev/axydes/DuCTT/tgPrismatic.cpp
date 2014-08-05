@@ -35,13 +35,13 @@ tgPrismatic::Config::Config()
     throw std::invalid_argument("Failed to provide arguments to tgPrismatic::Config");
 }
 
-tgPrismatic::Config::Config( std::size_t segments,
-                const tgRod::Config& rod1Conf,
-                const tgRod::Config& rod2Conf,
-                double minTotalLength) :
+tgPrismatic::Config::Config(
+                const tgRod::Config& rodConf,
+                double minTotalLength,
+                std::size_t segments
+        ) :
 m_segments(segments),
-m_rod1Config(rod1Conf),
-m_rod2Config(rod2Conf),
+m_rodConfig(rodConf),
 m_minTotalLength(minTotalLength)
 {
 }

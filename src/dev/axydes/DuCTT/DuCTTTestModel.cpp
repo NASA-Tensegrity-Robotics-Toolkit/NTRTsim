@@ -131,19 +131,20 @@ void DuCTTTestModel::setup(tgWorld& world)
     addPairs(tetra);
 
     // Move the first one so we can create the second
-    tetra.move(btVector3(0.0, 2.0, 10.0));
+    tetra.move(btVector3(0.0, 10.0, 10.0));
 
     // Create our snake segments
     tgStructure snake;
-    addSegments(snake, tetra, edge, m_segments);
-    addMuscles(snake);
+    addSegments(snake, tetra, edge, 1);
+//    addSegments(snake, tetra, edge, m_segments);
+//    addMuscles(snake);
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2 / 300.0; // kg / length^3 - see app for length
     const double radius  = 0.5;
     const tgRod::Config rodConfig(radius, density);
-    const tgPrismatic::Config prismConfig(2,rodConfig,rodConfig,3);
+    const tgPrismatic::Config prismConfig(rodConfig,3);
 
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
