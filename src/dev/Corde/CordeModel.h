@@ -89,7 +89,11 @@ public:
     
     void applyUniformAcc(const btVector3& acc);
     
-    /// TODO: apply torques
+    void applyVecTorque(const btVector3& tq, const std::size_t segN);
+    
+    void applyQuatTorque(const btQuaternion& qtq, const std::size_t segN);
+    
+    /// TODO: apply uniform torques?
     
 	void step (btScalar dt);
 	

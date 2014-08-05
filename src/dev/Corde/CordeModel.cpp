@@ -185,6 +185,30 @@ void CordeModel::applyUniformAcc(const btVector3& acc)
     }
 }
 
+void CordeModel::applyVecTorque(const btVector3& tq, const std::size_t segN)
+{
+	if (segN >= m_centerlines.size())
+    {
+        throw std::invalid_argument("Index is greater than size of m_centerlines");
+    }
+    else
+    {
+        m_centerlines[segN]->torques += tq;
+    }
+}
+
+void CordeModel::applyQuatTorque(const btQuaternion& qtq, const std::size_t segN)
+{
+	if (segN >= m_centerlines.size())
+    {
+        throw std::invalid_argument("Index is greater than size of m_centerlines");
+    }
+    else
+    {
+        m_centerlines[segN]->tprime += qtq;
+    }
+}
+
 void CordeModel::step (btScalar dt)
 {
     if (dt <= 0.0)
@@ -352,7 +376,6 @@ void CordeModel::computeInternalForces()
 
         /* Apply constraint equation with boundry conditions */
         /* 8/5/14 - need confirmed once equations corrected */
-#if (0)
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -363,7 +386,7 @@ void CordeModel::computeInternalForces()
             
            r_1->force[2] += quat_cons_z; 
         }
-        else if (i == n - 1)
+        else if (i == n)
         {
             r_0->force[0] -= quat_cons_x;
 
@@ -382,37 +405,7 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
-#else        
-        if (i == 0)
-        {
-           r_1->force[0] -= quat_cons_x;
-            
-            
-           r_1->force[1] -= quat_cons_y;
-            
-            
-           r_1->force[2] -= quat_cons_z; 
-        }
-        else if (i == n - 1)
-        {
-            r_0->force[0] += quat_cons_x;
 
-            r_0->force[1] += quat_cons_y;
-            
-            r_0->force[2] += quat_cons_z;       
-        }
-        else
-        {
-            r_0->force[0] += quat_cons_x;
-            r_1->force[0] -= quat_cons_x;
-            
-            r_0->force[1] += quat_cons_y;
-            r_1->force[1] -= quat_cons_y;
-            
-            r_0->force[2] += quat_cons_z;
-            r_1->force[2] -= quat_cons_z;            
-        }
-#endif
 
 #if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
@@ -433,19 +426,19 @@ void CordeModel::computeInternalForces()
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
 #else // quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
         // The simulation is much more stable if we just assume its one.
-        quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+        quat_0->tprime[0] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q11 + (q13 * posDiff[0] -
             q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
         
-        quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+        quat_0->tprime[1] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q12 + (q14 * posDiff[0] +
             q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
             
-        quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+        quat_0->tprime[2] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q13 + (q11 * posDiff[0] +
             q12 * posDiff[1] + q13 * posDiff[2]) / posNorm);
             
-        quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
+        quat_0->tprime[3] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q14 + (q12 * posDiff[0] -
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
 #endif
@@ -578,22 +571,22 @@ void CordeModel::computeInternalForces()
          q22 * (q21 * qdot24 - q11 * qdot13 - q12 * qdot14 + q13 * qdot11 + q14 * qdot12 - q24 * qdot22) +
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
-        /* Apply torques */ // 8/5/14: stiff + damp produces damping behavior. @todo - check with theory!
-        quat_0->tprime[0] += q11_stiffness + q11_damping;
+        /* Apply torques */ /// @todo - check with theory!
+        quat_0->tprime[0] -= q11_stiffness - q11_damping;
+       
+        quat_1->tprime[0] -= q21_stiffness - q21_damping;
         
-        quat_1->tprime[0] += q21_stiffness + q21_damping;
-        
-        quat_0->tprime[1] += q12_stiffness + q12_damping;
+        quat_0->tprime[1] -= q12_stiffness - q12_damping;
     
-        quat_1->tprime[1] += q22_stiffness + q22_damping;
+        quat_1->tprime[1] -= q22_stiffness - q22_damping;
         
-        quat_0->tprime[2] += q13_stiffness + q13_damping;
+        quat_0->tprime[2] -= q13_stiffness - q13_damping;
         
-        quat_1->tprime[2] += q23_stiffness + q23_damping;
+        quat_1->tprime[2] -= q23_stiffness - q23_damping;
         
-        quat_0->tprime[3] += q14_stiffness + q14_damping;
+        quat_0->tprime[3] -= q14_stiffness - q14_damping;
         
-        quat_1->tprime[3] += q24_stiffness + q24_damping;
+        quat_1->tprime[3] -= q24_stiffness - q24_damping;
       
 
     }
@@ -642,15 +635,16 @@ void CordeModel::unconstrainedMotion(double dt)
 
 void CordeModel::constrainMotion (double dt)
 {
-/*	
+	
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
 
-	//m_centerlines[0]->q = btQuaternion( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	//m_centerlines[0]->omega = btVector3(0.0, 0.0, 0.0);
+	m_centerlines[18]->q = btQuaternion( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
+	m_centerlines[18]->qdot = btQuaternion( 0.0, 0.0, 0.0, 0.0);
+	m_centerlines[18]->omega = btVector3(0.0, 0.0, 0.0);
 
 	m_massPoints[19]->pos = btVector3(10.0, 10.0, 0.0);
-	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);*/
+	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);
 }
 
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :

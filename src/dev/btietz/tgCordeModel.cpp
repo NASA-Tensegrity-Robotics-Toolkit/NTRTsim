@@ -40,10 +40,11 @@ void tgCordeModel::setup(tgWorld& world)
 	btVector3 endPos  (10.0, 10.0, 0.0);
 	
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
-	//btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	btQuaternion startRot( 0.5, 0.5, 0.5, 0.5);
+	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
+	//btQuaternion startRot( 0.5, 0.5, 0.5, 0.5);
 	btQuaternion endRot = startRot;
-
+	
+#if (1)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 20;
 	const double radius = 0.01;
@@ -51,9 +52,20 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 10.0 * pow(10, 0);
-	const double gammaT = 100.0 * pow(10, -6); // Position Damping
-	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
+	const double springConst = 1.0 * pow(10, 1);
+	const double gammaT = 100.0 * pow(10, -4); // Position Damping
+	const double gammaR = 1.0 * pow(10, -4); // Rotation Damping
+#else
+	// Values for thread
+		const std::size_t resolution = 20;
+	const double radius = 0.001;
+	const double density = 1300;
+	const double youngMod = 1.0 * pow(10, 1);
+	const double shearMod = 1.0 * pow(10, 1);
+	const double stretchMod = 0.02 * pow(10, 6);
+	const double springConst = 0.1 * pow(10, 0);
+	const double gammaT = 1.0 * pow(10, -6); // Position Damping
+#endif
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
@@ -67,9 +79,11 @@ void tgCordeModel::teardown()
     
 void tgCordeModel::step(double dt)
 {
-	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 0);
-	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 9);
-	testString->applyUniformAcc(btVector3(-9.81, 0.0, 0.0));
+	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 0);
+	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 19);
+	//testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
+	testString->applyVecTorque(btVector3(0.0, -100.0, 0.0), 0);
+	//testString->applyVecTorque(btVector3(0.0, 10.0, 0.0), 18);
     testString->step(dt);
 }
 /**
