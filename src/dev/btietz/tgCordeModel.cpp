@@ -69,7 +69,7 @@ void tgCordeModel::step(double dt)
 {
 	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 0);
 	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 9);
-	testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
+	testString->applyUniformAcc(btVector3(-9.81, 0.0, 0.0));
     testString->step(dt);
 }
 /**

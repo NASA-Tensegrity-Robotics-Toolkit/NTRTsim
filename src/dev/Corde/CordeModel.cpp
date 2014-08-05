@@ -306,8 +306,8 @@ void CordeModel::computeInternalForces()
         const btVector3 velDiff = r_0->vel - r_1->vel;
         const btScalar posNorm   = posDiff.length();
         const btScalar posNorm_2 = posDiff.length2();
-        const btVector3 director( (2.0 * (q11 * q13 - q12 * q14)),
-                        (2.0 * (q12 * q13 + q11 * q14)),
+        const btVector3 director( (2.0 * (q11 * q13 + q12 * q14)),
+                        (2.0 * (q12 * q13 - q11 * q14)),
            ( -1.0 * q11 * q11 - q12 * q12 + q13 * q13 + q14 * q14));
         
         // Sum Forces, have to split it out into components due to
@@ -351,8 +351,8 @@ void CordeModel::computeInternalForces()
         r_1->force[2] += (z1 - z2) * (-1.0 * spring_common + diss_common);
 
         /* Apply constraint equation with boundry conditions */
-        /* 8/5/14 - questioning need for boundry conditions*/
-#if (1) //Original deriviation
+        /* 8/5/14 - need confirmed once equations corrected */
+#if (0)
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -382,8 +382,8 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
-#else // Lateral movement test not affected by this one (sort of obvious)
-	/*if (i == 0)
+#else        
+        if (i == 0)
         {
            r_1->force[0] -= quat_cons_x;
             
@@ -403,7 +403,6 @@ void CordeModel::computeInternalForces()
         }
         else
         {
-		*/
             r_0->force[0] += quat_cons_x;
             r_1->force[0] -= quat_cons_x;
             
@@ -412,10 +411,10 @@ void CordeModel::computeInternalForces()
             
             r_0->force[2] += quat_cons_z;
             r_1->force[2] -= quat_cons_z;            
-        //}
+        }
 #endif
 
-#if (1) // Original derivation
+#if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
         quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q11 * quat_0->q.length2() + (q13 * posDiff[0] -
@@ -435,20 +434,20 @@ void CordeModel::computeInternalForces()
 #else // quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
         // The simulation is much more stable if we just assume its one.
         quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q11 - (q13 * posDiff[0] -
+            * ( q11 + (q13 * posDiff[0] -
             q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
         
         quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q12 + (q13 * posDiff[0] -
-            q14 * posDiff[1] - q12 * posDiff[2]) / posNorm);
+            * ( q12 + (q14 * posDiff[0] +
+            q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
             
         quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q13 + (q11 * posDiff[0] +
             q12 * posDiff[1] + q13 * posDiff[2]) / posNorm);
             
         quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q14 + (q11 * posDiff[0] -
-            q12 * posDiff[1] + q14 * posDiff[2]) / posNorm);
+            * ( q14 + (q12 * posDiff[0] -
+            q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
 #endif
 
     }
@@ -643,15 +642,15 @@ void CordeModel::unconstrainedMotion(double dt)
 
 void CordeModel::constrainMotion (double dt)
 {
-	
+/*	
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
-	/*
-	m_centerlines[0]->q = btQuaternion( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	m_centerlines[0]->omega = btVector3(0.0, 0.0, 0.0);
-	*/
+
+	//m_centerlines[0]->q = btQuaternion( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
+	//m_centerlines[0]->omega = btVector3(0.0, 0.0, 0.0);
+
 	m_massPoints[19]->pos = btVector3(10.0, 10.0, 0.0);
-	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);
+	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);*/
 }
 
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
