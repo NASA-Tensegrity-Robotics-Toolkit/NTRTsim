@@ -635,7 +635,7 @@ void CordeModel::unconstrainedMotion(double dt)
 
 void CordeModel::constrainMotion (double dt)
 {
-	
+#if (0)	
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
 
@@ -645,6 +645,7 @@ void CordeModel::constrainMotion (double dt)
 
 	m_massPoints[19]->pos = btVector3(10.0, 10.0, 0.0);
 	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);
+#endif
 }
 
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :

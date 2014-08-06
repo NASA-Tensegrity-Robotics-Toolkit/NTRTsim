@@ -40,21 +40,22 @@ void tgCordeModel::setup(tgWorld& world)
 	btVector3 endPos  (10.0, 10.0, 0.0);
 	
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
+	//btQuaternion startRot( 0.0, sqrt(2)/2.0, sqrt(2)/2.0, 0.0); // Y axis
+	//btQuaternion startRot( 0.0, 0.0, 0.0, 1.0); // Z axis
 	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	//btQuaternion startRot( 0.5, 0.5, 0.5, 0.5);
 	btQuaternion endRot = startRot;
 	
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 20;
+	const std::size_t resolution = 100;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 1.0 * pow(10, 1);
-	const double gammaT = 100.0 * pow(10, -4); // Position Damping
-	const double gammaR = 1.0 * pow(10, -4); // Rotation Damping
+	const double springConst = 10.0 * pow(10, 1);
+	const double gammaT = 100.0 * pow(10, -6); // Position Damping
+	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
 	// Values for thread
 		const std::size_t resolution = 20;
@@ -82,7 +83,7 @@ void tgCordeModel::step(double dt)
 	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 0);
 	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 19);
 	//testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
-	testString->applyVecTorque(btVector3(0.0, -100.0, 0.0), 0);
+	//testString->applyVecTorque(btVector3(0.0, -100.0, 0.0), 0);
 	//testString->applyVecTorque(btVector3(0.0, 10.0, 0.0), 18);
     testString->step(dt);
 }
