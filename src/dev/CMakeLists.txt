@@ -8,5 +8,6 @@ subdirs(
     atil
     steve
     kmorse
+    apsabelhaus
 )
 

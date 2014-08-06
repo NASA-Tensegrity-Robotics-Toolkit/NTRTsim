@@ -1,0 +1,108 @@
+Drew Sabelhaus
+7-31-14
+A brief explanation of the tgDataLoggerRedesign
+
+Everything with _tgDLR is a change that would otherwise be pushed to the core, but
+for which I made a new class for testing purposes. Imagine these without the _tgDLR
+extension.
+
+Some of the new classes I made...
+
+- tgDataLogger_tgDLR: abstract base class for data loggers.
+- tgDataLoggerRodBasic, ...RodFullState, and ...LinearStringBasic: implementations
+		      of loggers with varying verbosities for different tgModel
+		      subclasses.
+
+Differences with prior version:
+
+1) tgDataObserver class is now a proper observer: it gets attach()ed to a model
+   in the App file. This is better than the previous way we did things, which was
+   to have the controller call the logger - which doesn't make sense, we'd want to 
+   log data from a model independently of whatever controller we use.
+
+2) There is only one tgDataObserver class, but it works generically for ALL types
+   of tgModels and tgDataLoggers. You pass in a vector of data loggers in the App
+   file, and the tgDataObserver matches a model's descendents against each logger
+   (through checking casting, with a method in the data logger.) This way, we only
+   need to change one clas - the logger - when introducing new types of loggable
+   objects.
+
+3) With multiple types of tgDataLoggers, none of them have model-specific info,
+   (unlike before, where we had hard-coded what to expect from different models.) 
+   Specifically, the structure now is...
+
+   - tgDataObserver is attached in App, having been given its loggers.
+     It creates the full name of the log file (appending timestamp) and passes
+     that onto its loggers. It then generates the header for the logfile by
+     having each logger append an appropriate section.
+
+   - on notifyStep(), the tgDataObserver asks the model for all its tgModel 
+     descendents, then passes them into the appropriate data logger.
+
+   - tgDataLoggerRodBasic (or other types of loggers) are called by the Observer
+     on notifyStep() to output data. Here, after matching up the specific class
+     of the object, the data logger queries some subset of information from it, 
+     then writes it to our log file.
+
+This framework has a couple very neat and interesting properties. For example...
+
+i) We can easily interchange different levels of verbosity when logging. For
+   example, see tgDataLoggerRodBasic and tgDataLoggerRodFullState: These two 
+   loggers are similar except for their writeHeader and render methods! One
+   saves just the center of mass of the rods, the other saves euler angles too.
+
+ii) This is completely independent of the model. The number of rigid bodies,
+    strings, etc. is automatically calculated and logged appropriately.
+
+iii) Like before, we automatically ignore tgModel descendents that do not have
+     a matching observer.     
+
+iv) We can turn on or off data logging very easily: in the App file, where it
+    makes most sense, just comment or uncomment the lines that create the Observer
+    and make sure not to attach() it to the model.
+
+v) We can log data for controllers if we want! See improvement below: this should
+   be easy to do.
+
+**** FUTURE TO-DO
+
+- Once everyone accepts this change, go through and change all the "*_tgDLR" files
+  to their original name and move the changes into core.
+
+- Implement a tgDataLogger for the LinearStringCPG class
+
+- Implement "Loggables" interface. This way, we can log data from controllers too:
+  in tgDataObserver, instead of calling model.getDescendents (or is it 
+  model.getChildren?), do something like model.getLoggables, 
+  which would then potentially pass references to both
+  its children and its controller if the controller is Loggable.
+
+- Implement an example of a tgDataLogger for a controller
+
+- Implement exception throwing and catching for checking if the correct logger
+  is being call for a specific object
+
+- Other sanity checks: for example, if there is a logger with no corresponding
+  objects, what should we do?
+
+- What do we want to do about multiple loggers that would log the same data type?
+  Right now, we could pass in (for example) both a RodLoggerBasic and a
+  RodLoggerFullState and have duplicate data.
+
+- Fix polymorphism issues...
+
+  -> There should be only one attach() command and one data structure of 
+     m_observers, but right now we have two: one from tgSubject that's templated
+     to the direct inheritor of tgSubject (in our case, the concrete model 
+     class: T6Model_tgDLR), and another within tgModel for observers that
+     generically observe tgModel(s) instead of their descendents. Yes, I know
+     this is bad, but my polymorphism kung-fu is rusty :(
+     Once the polymorphism issue is fixed, make tgModel inherit tgSubject,
+     and remove all the code from tgModel that I've commented about, 
+     and just use the inherited methods from tgSubject.
+
+  -> Do we really need to do all the casting around between the observer and 
+     loggers? There should be some way to make this cleaner...
+
+- Check for memory leaks. Are the loggers and observers both getting delete()-ed
+  (or alternatively, clear()-ed, for the std::vector objects)?

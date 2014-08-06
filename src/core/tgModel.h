@@ -38,6 +38,10 @@
 class tgModelVisitor;
 class tgWorld;
 
+// Forward declaration for use with the data logger redesign
+class tgModelVisitor_tgDLR;
+// end forward declarations for the tgDLR
+
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
  * The Composite design pattern is used for the sub-models.
@@ -153,13 +157,57 @@ public:
      */
     std::vector<tgModel*> getDescendants() const;
 
-	const std::vector<abstractMarker>& getMarkers() const {
-		return m_markers;
-	}
+    const std::vector<abstractMarker>& getMarkers() const {
+        return m_markers;
+    }
 
-	void addMarker(abstractMarker a){
-		m_markers.push_back(a);
-	}
+    void addMarker(abstractMarker a){
+        m_markers.push_back(a);
+    }
+
+    // Below this line are all the tgDataObserver hacks.
+
+    /**
+     * Attach an tgModel observer to the subject of the observer.
+     * @param[in,out] pObserver a pointer to an observer for the subject;
+     * do nothing if the pointer is NULL
+     */
+    void attachtgModel(tgObserver<tgModel>* pObserver);
+
+    /**
+     * Call tgObserver<tgModel>::onStep() on all observers in the 
+     * order in which they were attached, on those specific to tgModel.
+     * @param[in] dt the number of seconds since the previous call; do nothing
+     * if not positive
+     */
+    void notifySteptgModel(double dt);
+
+    /**
+     * Call tgObserver<tgModel>::onSetup() on all observers in the order 
+     * in which they were attached, on those specific to tgModel
+     */
+    void notifySetuptgModel();
+
+    /**
+     * Call tgObserver<tgModel>::onTeardown() on all observers in the order 
+     * in which they were attached, on those specific to tgModel.
+     */
+    void notifyTeardowntgModel();
+
+    // remove the above once we make everything actually polymorphic
+
+    // below this line are functions that will not be needed once the data logger
+    // redesign code is merged into the main core - for now, if it was changed,
+    // others' loggers would break!
+
+    /**
+     * Call tgModelVisitor::render() on self and all descendants.
+     * @param[in,out] r a reference to a tgModelVisitor
+     */
+    virtual void onVisit(const tgModelVisitor_tgDLR& r) const;
+
+    // end data logger redesign methods
+	
 
 private:
 
@@ -177,6 +225,13 @@ private:
 
     std::vector<abstractMarker> m_markers;
 
+    /**
+     * A sequence of observers called in the order in which they were attached.
+     * The subject does not own the observers and must not deallocate them.
+     * Note that though this looks the same as in tgSubject, it'll be different
+     * because of namespaces.
+     */
+     std::vector<tgObserver<tgModel> * > m_observers;
 
 };
 

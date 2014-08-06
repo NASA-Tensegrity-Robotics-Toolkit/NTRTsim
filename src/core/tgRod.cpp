@@ -86,31 +86,49 @@ void tgRod::onVisit(const tgModelVisitor& v) const
 
 void tgRod::teardown()
 {
-        // World should delete the body
-        m_pRigidBody = NULL;
-    tgModel::teardown();
+  // World should delete the body
+  m_pRigidBody = NULL;
+  tgModel::teardown();
 
-    // Postcondition
-    // This does not preserve the invariant
+  // Postcondition
+  // This does not preserve the invariant
 }
 
 btVector3 tgRod::centerOfMass() const
 {
-        // Precondition
-        assert(m_pRigidBody->getMotionState() != NULL);
+  // Precondition
+  assert(m_pRigidBody->getMotionState() != NULL);
 
-        btTransform transform;
-        m_pRigidBody->getMotionState()->getWorldTransform(transform);
-    const btVector3& result = transform.getOrigin();
+  btTransform transform;
+  m_pRigidBody->getMotionState()->getWorldTransform(transform);
+  const btVector3& result = transform.getOrigin();
    
-    // Return a copy
-    return result;
+  // Return a copy
+  return result;
+}
+
+btVector3 tgRod::orientation() const
+{
+  //Precondition
+  assert(invariant());
+
+  // get the orientation of this rod w.r.t. the world's refernce coorinate system
+  // oddly enough, there isn't a getEuler method for btQuaternion, which is
+  // returned by getOrientation from RigidBody, so convert it
+  // into a rotation matrix first.
+  btMatrix3x3 rot = btMatrix3x3(m_pRigidBody->getOrientation());
+  btScalar yaw = 0.0;
+  btScalar pitch = 0.0;
+  btScalar roll = 0.0;
+  rot.getEulerYPR(yaw, pitch, roll);
+  btVector3 *result = new btVector3(yaw, pitch, roll);
+  return *result;
 }
 
 bool tgRod::invariant() const
 {
-        return
-            (m_pRigidBody != NULL) &&
-            (m_mass >= 0.0) &&
-            (m_length >= 0.0);
+  return
+    (m_pRigidBody != NULL) &&
+    (m_mass >= 0.0) &&
+    (m_length >= 0.0);
 }
