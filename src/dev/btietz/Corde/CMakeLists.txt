@@ -12,4 +12,8 @@ link_libraries(btietz
 
 add_executable(AppCordeTest
     AppCordeTest.cpp
-) 
+)
+
+add_executable(AppVectorTest
+	AppVectorTest.cpp
+)
