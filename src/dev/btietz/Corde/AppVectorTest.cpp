@@ -26,6 +26,7 @@
 #include "tgcreator/tgUtil.h"
 
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 
 #include <iostream>
 #include <stdlib.h> 
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
 	btVector3 perp1, perp2, perp3, perp4, perp5, perp6;
 	btScalar a, b, c;
 	
-	if (unit.dot(unit2) > .999)
+	if (unit.dot(unit2) > 1.f - FLT_EPSILON)
 	{
 		a = unit[0];
 		b = unit[1];
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
 	// Find one perpendicular to both
 	perp4 = perp3.cross(unit2).normalize();
 	
-	if (unit.dot(unit2) > .999)
+	if (unit.dot(unit2) > 1.f - FLT_EPSILON)
 	{
 		a = unit[0];
 		b = unit[1];
@@ -103,6 +104,45 @@ int main(int argc, char** argv)
 		perp5 = unit2.cross(unit3).normalize();
 	}
 	
+	
+	btScalar x, y, z, w;
+	// Compute quaternions - testing method in paper
+	btScalar q4sqr = 0.25 * (1 + perp2[0] + perp1[1] + unit[2]);
+	if (q4sqr > FLT_EPSILON)
+	{
+		w = sqrt(q4sqr);
+		x = (unit[1] - perp1[2]) / (4.0 * w);
+		y = (perp2[2] - unit[0]) / (4.0 * w);
+		z = (perp1[0] - perp2[1]) / (4.0 * w);
+	}
+	else
+	{
+		w = 0;
+		btScalar q1sqr = - 0.5 * (perp2[1] + unit[2]);
+		if (q1sqr > FLT_EPSILON)
+		{
+			x = sqrt(q1sqr);
+			y = perp2[1] / (2.0 * x);
+			z = perp2[2] / (2.0 * x);
+		}
+		else
+		{
+			x = 0;
+			btScalar q2sqr = 0.5 * (1 - unit[2]);
+			if (q2sqr > FLT_EPSILON)
+			{
+				y = sqrt(q2sqr);
+				z = perp1[2] / (2.0 * y);
+			}
+			else
+			{
+				y = 0;
+				z = 1;
+			}
+		}
+	}
+	btQuaternion qtOut(x, y, z, w);
+	
 	perp6 = perp5.cross(unit3).normalize();
 	
 	cout << "Unit Vectors" << endl;
@@ -121,4 +161,6 @@ int main(int argc, char** argv)
 	cout << "Test lack of torsion" << endl;
 	cout << perp1.dot(perp3) << " " << perp2.dot(perp4) << " " << perp1.dot(perp4) << " " << perp2.dot(perp3) << endl;
 	cout << perp3.dot(perp5) << " " << perp4.dot(perp6) << " " << perp3.dot(perp6) << " " << perp4.dot(perp5) << endl;
+	
+	cout << qtOut << endl;
 }
