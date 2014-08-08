@@ -80,7 +80,7 @@ CordeModel::Config::Config(const std::size_t res,
         throw std::invalid_argument("Damping Constant (rotation) is negative.");
     }
 }
-
+#if (0)
 CordeModel::CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config) : 
 m_config(Config),
     simTime(0.0)
@@ -89,9 +89,9 @@ m_config(Config),
     btVector3 unitLength( rodLength / ((double) m_config.resolution - 1) );
     btVector3 massPos(pos1);
     
-    computeConstants(unitLength.length());
+    computeConstants(rodLength.length());
     
-    double unitMass =  m_config.density * M_PI * pow( m_config.radius, 2) * unitLength.length();
+    double unitMass =  m_config.density * M_PI * pow( m_config.radius, 2) * unitLength.length(); // This might not be the best assumption
     
     CordePositionElement* currentPoint = new CordePositionElement(massPos, unitMass);
     
@@ -127,6 +127,50 @@ m_config(Config),
 	computeInternalForces();
     
     assert(invariant());
+}
+#endif // Comment out constructor
+
+CordeModel::CordeModel(std::vector<btVector3>& centerLine, CordeModel::Config& Config) : 
+m_config(Config),
+    simTime(0.0)
+{
+	///@todo consider writing interpolation function in case res is higher.
+	if (m_config.resolution != centerLine.size())
+	{
+		throw std::invalid_argument("Resolution does not match specified points");
+	}	
+	
+	CordePositionElement* currentPoint = NULL;
+	
+	std::size_t n = centerLine.size();
+	for (std::size_t i = 0; i < n; i++)
+	{
+		double unitLength;
+		double totalLength = 0;
+		/// @todo - this assumes control points are in centers of mass, and not at ends. Confirm this matches assumptions about anchors and contact.
+		if (i != n - 1)
+		{	
+			unitLength = (centerLine[i+1] - centerLine[i]).length();
+			linkLengths.push_back(unitLength);
+			totalLength += unitLength;
+		}
+		else
+		{
+			unitLength = (centerLine[i] - centerLine[i-1]).length();
+			totalLength += unitLength;
+		}
+		double unitMass = m_config.density * M_PI * pow( m_config.radius, 2) * unitLength;
+		currentPoint = new CordePositionElement(centerLine[i], unitMass);
+        m_massPoints.push_back(currentPoint);
+	}
+	
+	computeConstants();
+	
+	/// Start first step
+	stepPrerequisites();
+	computeInternalForces();
+	
+	assert(invariant());
 }
 
 CordeModel::~CordeModel()
@@ -249,7 +293,7 @@ void CordeModel::step (btScalar dt)
     assert(invariant());
 }
 
-void CordeModel::computeConstants(double length)
+void CordeModel::computeConstants()
 {
     assert(computedStiffness.empty());
     
@@ -259,22 +303,22 @@ void CordeModel::computeConstants(double length)
     computedStiffness.push_back( m_config.YoungMod * pir2 / 4.0);
     computedStiffness.push_back( m_config.YoungMod * pir2 / 4.0);
     computedStiffness.push_back( m_config.ShearMod * pir2 / 2.0);
-    
-    /* Could probably do this in constructor directly, but easier
-     * here since pir2 is already computed
-     */
-    computedInertia.setValue(m_config.density * length * pir2 / 4.0, 
-                     m_config.density * length * pir2 / 4.0,
-                     m_config.density * length * pir2 / 2.0);
-    
-    // Can assume if one element is zero, all elements are zero and we've screwed up
-    // Should pass automatically based on exceptions in config constructor
-    assert(!computedInertia.fuzzyZero());
-    
-    inverseInertia.setValue(1.0/computedInertia[0],
-                            1.0/computedInertia[1],
-                            1.0/computedInertia[2]);
                       
+}
+
+void CordeModel::computeCenterlines()
+{
+	// Ensure all mass points have been created
+	assert(m_massPoints.size() == m_config.resolution && m_massPoints.size() == (linkLengths.size() + 1));
+	
+	std::size_t n = 1; //stuff
+	for (std::size_t i = 0; i < n; i++)
+	{
+
+		
+	
+	}
+	
 }
 
 /**
@@ -614,8 +658,8 @@ void CordeModel::unconstrainedMotion(double dt)
         CordeQuaternionElement* quat_0 = m_centerlines[i];        
         const btVector3 omega = quat_0->omega;
         // Since I is diagonal, we can use elementwise multiplication of vectors
-        quat_0->omega += inverseInertia * (quat_0->torques - 
-            omega.cross(computedInertia * omega)) * dt;
+        quat_0->omega += quat_0->inverseInertia * (quat_0->torques - 
+            omega.cross(quat_0->computedInertia * omega)) * dt;
         quat_0->updateQDot();
         if (quat_0->q.dot(quat_0->qdot*dt + quat_0->q) < 0)
         {
@@ -648,6 +692,101 @@ void CordeModel::constrainMotion (double dt)
 #endif
 }
 
+std::vector<btVector3> getDirectorAxes (const btVector3 point1, const btVector3 point2, const btVector3 point3)
+{
+	std::vector<btVector3> retVector;
+	
+	btVector3 unit = (point2 - point1).normalize();
+	// Considering the next point forward/backward for stability - what about the last point!?
+	btVector3 unit2 = (point3 - point2).normalize();
+	
+	retVector.push_back(unit);
+	
+	btVector3 perp1, perp2;
+	btScalar a, b, c;
+
+	if (unit.dot(unit2) > 1.f - FLT_EPSILON)
+	{
+		a = unit[0];
+		b = unit[1];
+		c = unit[2];
+		// Find an arbitrary perpendicular vector
+		if (a != 0 && b != c)
+		{
+			perp1 = btVector3(b - c, -a, a).normalize();
+		}
+		else
+		{
+			perp1 = btVector3(-b, a - c, b).normalize();
+		}
+	}
+	else
+	{ 
+		perp1 = unit.cross(unit2).normalize();
+	}
+	
+	// Find one perpendicular to both
+	perp2 = perp1.cross(unit).normalize();
+	
+	retVector.push_back(perp1);
+	retVector.push_back(perp2);
+	
+	// Assumed input of next function
+	assert(retVector.size() == 3);
+	
+	return retVector;		
+}
+
+btQuaternion quaternionFromAxes (const std::vector<btVector3> inVec)
+{
+	assert (inVec.size() == 3);
+	
+	// Consider not copying this again...
+	const btVector3 unit = inVec[0];
+	const btVector3 perp1 = inVec[1];
+	const btVector3 perp2 = inVec[2];
+	
+	btScalar x, y, z, w;
+	// Compute quaternions - testing method in paper
+	btScalar q4sqr = 0.25 * (1 + perp2[0] + perp1[1] + unit[2]);
+	if (q4sqr > FLT_EPSILON)
+	{
+		w = sqrt(q4sqr);
+		x = (unit[1] - perp1[2]) / (4.0 * w);
+		y = (perp2[2] - unit[0]) / (4.0 * w);
+		z = (perp1[0] - perp2[1]) / (4.0 * w);
+	}
+	else
+	{
+		w = 0;
+		btScalar q1sqr = - 0.5 * (perp2[1] + unit[2]);
+		if (q1sqr > FLT_EPSILON)
+		{
+			x = sqrt(q1sqr);
+			y = perp2[1] / (2.0 * x);
+			z = perp2[2] / (2.0 * x);
+		}
+		else
+		{
+			x = 0;
+			btScalar q2sqr = 0.5 * (1 - unit[2]);
+			if (q2sqr > FLT_EPSILON)
+			{
+				y = sqrt(q2sqr);
+				z = perp1[2] / (2.0 * y);
+			}
+			else
+			{
+				y = 0;
+				z = 1;
+			}
+		}
+	}
+	
+	btQuaternion qtOut(x, y, z, w);
+	return qtOut;
+}
+
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
 	pos(p1),
 	vel(0.0, 0.0, 0.0),
@@ -660,14 +799,20 @@ CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
     }
 }
 
-CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1) :
+CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1, btVector3 inertia) :
     q(q1.normalize()),
 	qdot(0.0, 0.0, 0.0, 0.0),
     tprime(0.0, 0.0, 0.0, 0.0),
 	torques(0.0, 0.0, 0.0),
-	omega(0.0, 0.0, 0.0)
+	omega(0.0, 0.0, 0.0),
+	computedInertia(inertia),
+	inverseInertia(1.0/computedInertia[0],
+                    1.0/computedInertia[1],
+                    1.0/computedInertia[2])
 {
-    
+    // Can assume if one element is zero, all elements are zero and we've screwed up
+    // Should pass automatically based on exceptions in config constructor
+    assert(!computedInertia.fuzzyZero());
 }
 
 void CordeModel::CordeQuaternionElement::transposeTorques()

@@ -84,11 +84,11 @@ int main(int argc, char** argv)
 	// Find one perpendicular to both
 	perp4 = perp3.cross(unit2).normalize();
 	
-	if (unit.dot(unit2) > 1.f - FLT_EPSILON)
+	if (unit2.dot(unit3) > 1.f - FLT_EPSILON)
 	{
-		a = unit[0];
-		b = unit[1];
-		c = unit[2];
+		a = unit3[0];
+		b = unit3[1];
+		c = unit3[2];
 		// Find an arbitrary perpendicular vector
 		if (a != 0 && b != c)
 		{

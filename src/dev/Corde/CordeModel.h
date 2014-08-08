@@ -72,7 +72,14 @@ public:
 	 * @todo develop a constructor that can handle more complex shapes
 	 * i.e. wrapped around a motor. This one maxes out at 1 - eps rotations
 	 */
+#if (0)
 	CordeModel(btVector3 pos1, btVector3 pos2, btQuaternion quat1, btQuaternion quat2, CordeModel::Config& Config);
+#endif
+	/**
+	 * A more advanced constructor which needs the entire centerline specified.
+	 * Will automatically calculate quaternions assuming no torsion.
+	 */
+	CordeModel(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
 	
 	~CordeModel();
 	
@@ -98,8 +105,13 @@ public:
 	void step (btScalar dt);
 	
 private:
-	void computeConstants(double length);
-
+	void computeConstants();
+	
+	/**
+	 * Only run after mass points have been set up.
+	 */
+	void computeCenterlines();
+	
 	void stepPrerequisites();
 
 	void computeInternalForces();
@@ -107,6 +119,11 @@ private:
 	void unconstrainedMotion(double dt);
 	
 	void constrainMotion(double dt);
+	
+	std::vector<btVector3> getDirectorAxes (const btVector3 point1,
+											const btVector3 point2);
+	
+	btQuaternion quaternionFromAxes (const std::vector <btVector3> inVec);
 	
 	/**
 	 * Holds all of the data for one of the mass elements of the string
@@ -133,7 +150,7 @@ private:
 		/**
 		 * Sets q to q1.normalized(), everything else to zero
 		 */
-		CordeQuaternionElement(btQuaternion q1);
+		CordeQuaternionElement(btQuaternion q1, btVector3 inertia);
 		
 		void transposeTorques();
 		/**
@@ -149,6 +166,13 @@ private:
 		btQuaternion tprime;
 		btVector3 torques;
 		btVector3 omega;
+		
+		/**
+		 * Computed based on the values in config. Should have length 3
+		 * Assuming products of inertia are negligible as in the paper
+		 */
+		btVector3 computedInertia;
+		btVector3 inverseInertia;
 	};
 	
 	CordeModel::Config m_config;
@@ -171,13 +195,6 @@ private:
 	 * @todo can this be const?
 	 */
 	std::vector<double> computedStiffness;
-	
-	/**
-	 * Computed based on the values in config. Should have length 3
-	 * Assuming products of inertia are negligible as in the paper
-	 */
-	btVector3 computedInertia;
-	btVector3 inverseInertia;
 	
 	bool invariant();
 	
