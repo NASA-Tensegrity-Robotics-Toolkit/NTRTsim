@@ -78,6 +78,8 @@ public:
 	/**
 	 * A more advanced constructor which needs the entire centerline specified.
 	 * Will automatically calculate quaternions assuming no torsion.
+	 * Requires at least 3 points in the centerLine (if you only have two, why not use Muscle2P?)
+	 * @todo support interpolation to generate additional points
 	 */
 	CordeModel(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
 	
@@ -120,8 +122,9 @@ private:
 	
 	void constrainMotion(double dt);
 	
-	std::vector<btVector3> getDirectorAxes (const btVector3 point1,
-											const btVector3 point2);
+	std::vector<btVector3> getDirectorAxes (const btVector3& point1,
+											const btVector3& point2,
+											const btVector3& point3);
 	
 	btQuaternion quaternionFromAxes (const std::vector <btVector3> inVec);
 	

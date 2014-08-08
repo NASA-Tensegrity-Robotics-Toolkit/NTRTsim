@@ -39,15 +39,16 @@ void tgCordeModel::setup(tgWorld& world)
 	btVector3 startPos(0.0, 10.0, 0.0);
 	btVector3 endPos  (10.0, 10.0, 0.0);
 	
+#if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
-	//btQuaternion startRot( 0.0, sqrt(2)/2.0, sqrt(2)/2.0, 0.0); // Y axis
-	//btQuaternion startRot( 0.0, 0.0, 0.0, 1.0); // Z axis
+	btQuaternion startRot( 0.0, sqrt(2)/2.0, sqrt(2)/2.0, 0.0); // Y axis
+	btQuaternion startRot( 0.0, 0.0, 0.0, 1.0); // Z axis
 	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	btQuaternion endRot = startRot;
+#endif
 	
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 100;
+	const std::size_t resolution = 10;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);
@@ -70,7 +71,9 @@ void tgCordeModel::setup(tgWorld& world)
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 	
-	testString = new CordeModel(startPos, endPos, startRot, endRot, config);
+    std::vector<btVector3> startPositions = generatePoints(startPos, endPos, resolution);
+    
+	testString = new CordeModel(startPositions, config);
 }
 
 void tgCordeModel::teardown()
@@ -94,4 +97,28 @@ void tgCordeModel::step(double dt)
 void tgCordeModel::onVisit(const tgModelVisitor& r) const
 {
     r.render(*this);
+}
+
+std::vector<btVector3> tgCordeModel::generatePoints(btVector3& point1, 
+													btVector3& point2,
+													std::size_t resolution)
+{
+	std::vector<btVector3> points;
+	
+	points.push_back(point1);
+	
+    btVector3 rodLength(point2 - point1);
+    btVector3 unitLength( rodLength / ((double) resolution - 1) );
+    
+    btVector3 massPos(point1);
+    
+    for (std::size_t i = 1; i < resolution; i++)
+    {
+		massPos += unitLength;
+        points.push_back(massPos);
+	}
+    
+    assert(points.size() == resolution);
+
+    return points;
 }

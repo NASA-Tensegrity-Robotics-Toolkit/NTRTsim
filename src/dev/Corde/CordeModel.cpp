@@ -146,18 +146,15 @@ m_config(Config),
 	for (std::size_t i = 0; i < n; i++)
 	{
 		double unitLength;
-		double totalLength = 0;
 		/// @todo - this assumes control points are in centers of mass, and not at ends. Confirm this matches assumptions about anchors and contact.
 		if (i != n - 1)
 		{	
 			unitLength = (centerLine[i+1] - centerLine[i]).length();
 			linkLengths.push_back(unitLength);
-			totalLength += unitLength;
 		}
 		else
 		{
 			unitLength = (centerLine[i] - centerLine[i-1]).length();
-			totalLength += unitLength;
 		}
 		double unitMass = m_config.density * M_PI * pow( m_config.radius, 2) * unitLength;
 		currentPoint = new CordePositionElement(centerLine[i], unitMass);
@@ -165,6 +162,7 @@ m_config(Config),
 	}
 	
 	computeConstants();
+	computeCenterlines();
 	
 	/// Start first step
 	stepPrerequisites();
@@ -264,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (1)
+    #if (0)
     if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
@@ -311,12 +309,42 @@ void CordeModel::computeCenterlines()
 	// Ensure all mass points have been created
 	assert(m_massPoints.size() == m_config.resolution && m_massPoints.size() == (linkLengths.size() + 1));
 	
-	std::size_t n = 1; //stuff
+	std::size_t n = m_massPoints.size() - 1; //stuff
 	for (std::size_t i = 0; i < n; i++)
 	{
-
+		std::vector<btVector3> directorAxes;
+				
+		double length = (linkLengths[i] + linkLengths[i+1]) / 2.0;
 		
-	
+		if (i != n - 1)
+		{
+			directorAxes = getDirectorAxes(m_massPoints[i]->pos,
+											m_massPoints[i+1]->pos,
+											m_massPoints[i+2]->pos);
+								
+			quaternionShapes.push_back( length );
+		}
+		else
+		{
+			// Funky, hope it works
+			directorAxes = getDirectorAxes(m_massPoints[i]->pos,
+											m_massPoints[i+1]->pos,
+											m_massPoints[i-1]->pos);	
+		}
+		
+		btQuaternion currentAngle = quaternionFromAxes(directorAxes);
+		
+		double mass = m_config.density * length * M_PI * pow(m_config.radius, 2);
+		
+		btVector3 inertia(mass * (3.0 * pow(length, 2) + pow(m_config.radius, 2)) / 12.0,
+							mass * (3.0 * pow(length, 2) + pow(m_config.radius, 2)) / 12.0,
+							mass * pow(m_config.radius, 2) / 2.0);
+		
+		CordeQuaternionElement* nextElement = new CordeQuaternionElement(currentAngle, inertia);
+		
+		std::cout << nextElement->q << std::endl;
+		
+		m_centerlines.push_back(nextElement);
 	}
 	
 }
@@ -692,7 +720,7 @@ void CordeModel::constrainMotion (double dt)
 #endif
 }
 
-std::vector<btVector3> getDirectorAxes (const btVector3 point1, const btVector3 point2, const btVector3 point3)
+std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, const btVector3& point2, const btVector3& point3)
 {
 	std::vector<btVector3> retVector;
 	
@@ -705,7 +733,7 @@ std::vector<btVector3> getDirectorAxes (const btVector3 point1, const btVector3 
 	btVector3 perp1, perp2;
 	btScalar a, b, c;
 
-	if (unit.dot(unit2) > 1.f - FLT_EPSILON)
+	if (std::abs(unit.dot(unit2)) > 1.f - FLT_EPSILON)
 	{
 		a = unit[0];
 		b = unit[1];
@@ -726,7 +754,7 @@ std::vector<btVector3> getDirectorAxes (const btVector3 point1, const btVector3 
 	}
 	
 	// Find one perpendicular to both
-	perp2 = perp1.cross(unit).normalize();
+	perp2 = unit.cross(perp1).normalize();
 	
 	retVector.push_back(perp1);
 	retVector.push_back(perp2);
@@ -737,14 +765,14 @@ std::vector<btVector3> getDirectorAxes (const btVector3 point1, const btVector3 
 	return retVector;		
 }
 
-btQuaternion quaternionFromAxes (const std::vector<btVector3> inVec)
+btQuaternion CordeModel::quaternionFromAxes (const std::vector<btVector3> inVec)
 {
 	assert (inVec.size() == 3);
 	
 	// Consider not copying this again...
 	const btVector3 unit = inVec[0];
-	const btVector3 perp1 = inVec[1];
-	const btVector3 perp2 = inVec[2];
+	const btVector3 perp1 = inVec[2];
+	const btVector3 perp2 = inVec[1];
 	
 	btScalar x, y, z, w;
 	// Compute quaternions - testing method in paper
@@ -759,7 +787,7 @@ btQuaternion quaternionFromAxes (const std::vector<btVector3> inVec)
 	else
 	{
 		w = 0;
-		btScalar q1sqr = - 0.5 * (perp2[1] + unit[2]);
+		btScalar q1sqr = - 0.5 * (perp1[1] + unit[2]);
 		if (q1sqr > FLT_EPSILON)
 		{
 			x = sqrt(q1sqr);

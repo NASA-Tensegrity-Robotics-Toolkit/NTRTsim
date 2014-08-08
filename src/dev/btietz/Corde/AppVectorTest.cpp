@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 	}
 	
 	// Find one perpendicular to both
-	perp2 = perp1.cross(unit).normalize();
+	perp2 = unit.cross(perp1).normalize();
 	
 	a = unit2[0];
 	b = unit2[1];
@@ -107,13 +107,13 @@ int main(int argc, char** argv)
 	
 	btScalar x, y, z, w;
 	// Compute quaternions - testing method in paper
-	btScalar q4sqr = 0.25 * (1 + perp2[0] + perp1[1] + unit[2]);
+	btScalar q4sqr = 0.25 * (1 + perp1[0] + perp2[1] + unit[2]);
 	if (q4sqr > FLT_EPSILON)
 	{
 		w = sqrt(q4sqr);
-		x = (unit[1] - perp1[2]) / (4.0 * w);
-		y = (perp2[2] - unit[0]) / (4.0 * w);
-		z = (perp1[0] - perp2[1]) / (4.0 * w);
+		x = (unit[1] - perp2[2]) / (4.0 * w);
+		y = (perp1[2] - unit[0]) / (4.0 * w);
+		z = (perp2[0] - perp1[1]) / (4.0 * w);
 	}
 	else
 	{
@@ -122,8 +122,8 @@ int main(int argc, char** argv)
 		if (q1sqr > FLT_EPSILON)
 		{
 			x = sqrt(q1sqr);
-			y = perp2[1] / (2.0 * x);
-			z = perp2[2] / (2.0 * x);
+			y = perp1[1] / (2.0 * x);
+			z = perp1[2] / (2.0 * x);
 		}
 		else
 		{
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 			if (q2sqr > FLT_EPSILON)
 			{
 				y = sqrt(q2sqr);
-				z = perp1[2] / (2.0 * y);
+				z = perp2[2] / (2.0 * y);
 			}
 			else
 			{
