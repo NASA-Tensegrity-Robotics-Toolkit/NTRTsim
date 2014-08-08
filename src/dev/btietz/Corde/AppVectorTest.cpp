@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 	}
 	
 	// Find one perpendicular to both
-	perp2 = perp1.cross(unit).normalize();
+	perp2 = unit.cross(perp1).normalize();
 	
 	a = unit2[0];
 	b = unit2[1];

@@ -262,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (1)
+    #if (0)
     if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
@@ -315,7 +315,7 @@ void CordeModel::computeCenterlines()
 		std::vector<btVector3> directorAxes;
 				
 		double length = (linkLengths[i] + linkLengths[i+1]) / 2.0;
-		
+#if (0)		
 		if (i != n - 1)
 		{
 			directorAxes = getDirectorAxes(m_massPoints[i]->pos,
@@ -333,7 +333,17 @@ void CordeModel::computeCenterlines()
 		}
 		
 		btQuaternion currentAngle = quaternionFromAxes(directorAxes);
+#else
 		
+		if (i != n - 1)
+		{				
+			quaternionShapes.push_back( length );
+		}
+		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
+		btVector3 zAxis(0.0, 0.0, 1.0);
+		
+		btQuaternion currentAngle( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
+#endif		
 		double mass = m_config.density * length * M_PI * pow(m_config.radius, 2);
 		
 		btVector3 inertia(mass * (3.0 * pow(length, 2) + pow(m_config.radius, 2)) / 12.0,
@@ -754,7 +764,7 @@ std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, con
 	}
 	
 	// Find one perpendicular to both
-	perp2 = perp1.cross(unit).normalize();
+	perp2 = unit.cross(perp1).normalize();
 	
 	retVector.push_back(perp1);
 	retVector.push_back(perp2);
@@ -849,6 +859,13 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
     torques[1] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
     torques[2] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
     
+   // Eliminate vibrations due to imprecision
+    for (std::size_t i = 0; i < 3; i++)
+    {
+		double a = DBL_EPSILON;
+		torques[i] = torques[i] < FLT_EPSILON ? 0.0 : torques[i];
+	}
+  
 }
 
 // omega holds history.
