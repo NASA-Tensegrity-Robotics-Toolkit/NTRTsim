@@ -262,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (0)
+    #if (1)
     if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
@@ -741,11 +741,11 @@ std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, con
 		// Find an arbitrary perpendicular vector
 		if (a != 0 && b != c)
 		{
-			perp1 = btVector3(b - c, -a, a).normalize();
+			perp1 = btVector3(b - c, a, -a).normalize();
 		}
 		else
 		{
-			perp1 = btVector3(-b, a - c, b).normalize();
+			perp1 = btVector3(-b, c - a, b).normalize();
 		}
 	}
 	else
@@ -754,7 +754,7 @@ std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, con
 	}
 	
 	// Find one perpendicular to both
-	perp2 = unit.cross(perp1).normalize();
+	perp2 = perp1.cross(unit).normalize();
 	
 	retVector.push_back(perp1);
 	retVector.push_back(perp2);
@@ -771,8 +771,8 @@ btQuaternion CordeModel::quaternionFromAxes (const std::vector<btVector3> inVec)
 	
 	// Consider not copying this again...
 	const btVector3 unit = inVec[0];
-	const btVector3 perp1 = inVec[2];
-	const btVector3 perp2 = inVec[1];
+	const btVector3 perp1 = inVec[1];
+	const btVector3 perp2 = inVec[2];
 	
 	btScalar x, y, z, w;
 	// Compute quaternions - testing method in paper
