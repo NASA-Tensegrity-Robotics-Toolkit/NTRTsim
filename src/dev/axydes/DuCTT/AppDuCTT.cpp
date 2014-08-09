@@ -44,13 +44,12 @@
 int main(int argc, char** argv)
 {
     std::cout << "AppDuCTTTest" << std::endl;
-
     // First create the world
     const tgWorld::Config config(
 //        0
         981 // gravity, cm/sec^2
     );
-    tgWorld world(config); 
+    tgWorld world(config);
 
     // Second create the view
     const double stepSize = 1.0/120.0; //Seconds

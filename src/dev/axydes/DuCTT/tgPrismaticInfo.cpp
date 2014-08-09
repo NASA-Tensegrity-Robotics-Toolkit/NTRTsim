@@ -66,9 +66,16 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
 
     m_stringConfig.stiffness = 1000;
     m_stringConfig.damping = 10;
-    m_config.m_minTotalLength = m_startLength;
+//    m_config.m_minLength = m_startLength;
 
-    tgPrismatic* prism = new tgPrismatic(getTags(), m_config);
+    btRigidBody* fromBody = getFromRigidBody();
+    btRigidBody* toBody = getToRigidBody();
+
+    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);//m_config.rotation);
+    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);//m_config.rotation);
+
+
+    tgPrismatic* prism = new tgPrismatic(fromBody, from, toBody, to, getTags(), m_config);
     buildModel(world, prism);
     return prism;
 } 
@@ -91,6 +98,9 @@ void tgPrismaticInfo::buildModel(tgWorld& world, tgModel* prismatic)
     tgNode startNode = this->getFrom();
     tgNode endNode = this->getTo();
 
+    prismatic->setup(world);
+
+    /**
     // Calculate the size of the rods
     double rodSize = m_config.m_minTotalLength / 2.0;
 
@@ -141,6 +151,7 @@ void tgPrismaticInfo::buildModel(tgWorld& world, tgModel* prismatic)
 
     //not needed?
 //    prismatic->setup(world);
+    /**/
 
 #if(0)
     // Debug printing

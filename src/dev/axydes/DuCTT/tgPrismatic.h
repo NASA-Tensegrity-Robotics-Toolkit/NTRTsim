@@ -27,10 +27,15 @@
  * $Id$
  */
 
+#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+
+#include "core/tgBulletUtil.h"
 #include "core/tgCast.h"
 #include "core/tgModel.h" 
 #include "core/tgRod.h"
 #include "core/tgSubject.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
 
 // The C++ Standard Library
 #include <cmath>
@@ -41,7 +46,7 @@
 
 class tgWorld;
 
-class tgPrismatic: public tgModel
+class tgPrismatic: public tgSubject<tgPrismatic>, public tgModel
 {
 public: 
     
@@ -52,33 +57,43 @@ public:
         Config();
         
         Config(
-                const tgRod::Config& rodConf,
-                double minTotalLength = 0.1, // todo: find better default
+                double maxLength = 5, //todo: find better default
+                double minLength = 0.1, // todo: find better default
+                double maxMotorForce = 20,
                 std::size_t segments = 2
                 );
         
+        double m_maxLength;
+        double m_minLength;
+        double m_maxMotorForce;
         std::size_t m_segments;
-        tgRod::Config m_rodConfig;
-        double m_minTotalLength;
     };
     
-    tgPrismatic(const tgTags& tags,
+    tgPrismatic(
+            btRigidBody* body1,
+            btVector3 pos1,
+            btRigidBody* body2,
+            btVector3 pos2,
+            const tgTags& tags,
            tgPrismatic::Config& config);
     
-    tgPrismatic(std::string space_separated_tags,
+    tgPrismatic(
+            btRigidBody* body1,
+            btVector3 pos1,
+            btRigidBody* body2,
+            btVector3 pos2,
+            std::string space_separated_tags,
            tgPrismatic::Config& config);
 
-    virtual ~tgPrismatic() {}
+    virtual ~tgPrismatic();// {}
+
+    virtual void init();
     
-    /** @todo Get rid of this. */
     virtual void setup(tgWorld& world);
-    
-    // @todo: Is there a way that we can get rid of the need to override this function in subclasses of tgModel? 
-    // comment_BRT: only if we can somehow make tgModel a template class,
-    // we need to know what class we're notifying
-    virtual void step(double dt);
-    
+
     virtual void teardown();
+
+    virtual void step(double dt);
     
     virtual void moveMotors(double dt);
 
@@ -91,6 +106,13 @@ private:
     std::vector<tgRod*> allSegments;
 
     Config m_config;
+    btRigidBody* m_body1;
+    btRigidBody* m_body2;
+    btVector3 m_pos1;
+    btVector3 m_pos2;
+
+    btSliderConstraint* m_slider;
+    btSoftRigidDynamicsWorld* dynWorld;
 };
 
 #endif // TG_RB_STRING_TEST_H

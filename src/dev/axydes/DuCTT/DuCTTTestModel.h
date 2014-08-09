@@ -121,6 +121,8 @@ private:
 
     void addNodes(tgStructure& tetra, double edge, double height);
     void addPairs(tgStructure& tetra);
+    void addTopPairs(tgStructure& tetra);
+    void addBottomPairs(tgStructure& tetra);
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount);
     // Add muscles that connect the segments;

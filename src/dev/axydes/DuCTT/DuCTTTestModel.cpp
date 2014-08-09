@@ -36,10 +36,20 @@ void DuCTTTestModel::addNodes(tgStructure& tetra, double edge, double height)
     tetra.addNode(-edge / 2.0, 0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
     // left
     tetra.addNode( edge / 2.0, 0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+
     // front
     tetra.addNode(0, edge/2.0, 0);
     // back
     tetra.addNode(0, -edge/2.0, 0);
+
+    // top middle 1
+    tetra.addNode(-0.01, 0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+    // top middle 2
+    tetra.addNode(0.01, 0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+    // bottom middle 1
+    tetra.addNode(0, -0.01, 0);
+    // bottom middle 2
+    tetra.addNode(0, 0.01, 0);
 }
 
 //add param for top or bottom prismatic actuator
@@ -49,10 +59,29 @@ void DuCTTTestModel::addPairs(tgStructure& tetra)
     tetra.addPair(3, 1, "back left rod");
     tetra.addPair(2, 0, "front right rod");
     tetra.addPair(2, 1, "front left rod");
+
 //    tetra.addPair(0, 1, "top rod");
 //    tetra.addPair(2, 3, "bottom rod");
-    tetra.addPair(0, 1, "top prismatic");
-    tetra.addPair(2, 3, "bottom prismatic");
+//    tetra.addPair(0, 1, "top prismatic");
+//    tetra.addPair(2, 3, "bottom prismatic");
+    addBottomPairs(tetra);
+//    addTopPairs(tetra);
+}
+
+void DuCTTTestModel::addTopPairs(tgStructure& tetra)
+{
+    tetra.addPair(0, 4, "top1 rod");
+    tetra.addPair(5, 1, "top2 rod");
+//    tetra.addPair(4, 5, "top muscle");
+    tetra.addPair(4, 5, "top prismatic");
+}
+
+void DuCTTTestModel::addBottomPairs(tgStructure& tetra)
+{
+    tetra.addPair(2, 6, "bottom1 rod");
+    tetra.addPair(7, 3, "bottom2 rod");
+//    tetra.addPair(6, 7, "bottom muscle");
+    tetra.addPair(6, 7, "bottom prismatic");
 }
 
 void DuCTTTestModel::addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
@@ -73,9 +102,15 @@ void DuCTTTestModel::addSegments(tgStructure& snake, const tgStructure& tetra, d
 // Add muscles that connect the segments
 void DuCTTTestModel::addMuscles(tgStructure& snake)
 {
-    const std::vector<tgStructure*> children = snake.getChildren();
+    std::vector<tgStructure*> children = snake.getChildren();
     for (size_t i = 1; i < children.size(); ++i)
     {
+        addBottomPairs(*children[i]);
+        addTopPairs(*children[i-1]);
+
+//        addBottomPairs(*children[i-1]);
+//        addTopPairs(*children[i]);
+
         tgNodes n0 = children[i-1]->getNodes();
         tgNodes n1 = children[i  ]->getNodes();
 
@@ -131,7 +166,7 @@ void DuCTTTestModel::setup(tgWorld& world)
     addPairs(tetra);
 
     // Move the first one so we can create the second
-    tetra.move(btVector3(0.0, 10.0, 10.0));
+    tetra.move(btVector3(0.0, edge, 10.0));
 
     // Create our snake segments
     tgStructure snake;
@@ -143,8 +178,8 @@ void DuCTTTestModel::setup(tgWorld& world)
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2 / 300.0; // kg / length^3 - see app for length
     const double radius  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
-    const tgPrismatic::Config prismConfig(rodConfig,3);
+    const tgRod::Config rodConfig(radius, density, 0.5, 0, 0.2);
+    const tgPrismatic::Config prismConfig(3);
 
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
