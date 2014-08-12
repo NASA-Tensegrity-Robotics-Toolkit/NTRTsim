@@ -262,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (0)
+    #if (1)
     if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
@@ -339,8 +339,16 @@ void CordeModel::computeCenterlines()
 		{				
 			quaternionShapes.push_back( length );
 		}
-		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
 		btVector3 zAxis(0.0, 0.0, 1.0);
+		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
+		/*
+		if (acos(zAxis.dot(axisVec)) > M_PI / 2.0)
+		{
+			axisVec = (m_massPoints[i]->pos - m_massPoints[i+1]->pos).normalize();
+		}
+		*/
+		std::cout << zAxis.cross(axisVec).normalize() << std::endl;
+		std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		
 		btQuaternion currentAngle( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
 #endif		
@@ -457,7 +465,7 @@ void CordeModel::computeInternalForces()
         r_1->force[2] += (z1 - z2) * (-1.0 * spring_common + diss_common);
 
         /* Apply constraint equation with boundry conditions */
-        /* 8/5/14 - need confirmed once equations corrected */
+        /* 8/5/14 - need was confirmed once equations corrected */
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -863,7 +871,7 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
     for (std::size_t i = 0; i < 3; i++)
     {
 		double a = DBL_EPSILON;
-		torques[i] = torques[i] < FLT_EPSILON ? 0.0 : torques[i];
+		torques[i] = std::abs(torques[i]) < FLT_EPSILON ? 0.0 : torques[i];
 	}
   
 }
