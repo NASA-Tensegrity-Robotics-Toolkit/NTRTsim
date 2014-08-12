@@ -84,11 +84,6 @@ tgPrismatic::tgPrismatic(
 
 tgPrismatic::~tgPrismatic()
 {
-    if (m_slider)
-    {
-        dynWorld->removeConstraint(m_slider);
-        delete m_slider;
-    }
 }
 
 void tgPrismatic::init()
@@ -111,9 +106,12 @@ void tgPrismatic::init()
 void tgPrismatic::setup(tgWorld& world)
 {
     assert(m_slider != NULL);
-//    btSoftRigidDynamicsWorld dynWorld = tgBulletUtil::worldToDynamicsWorld(world);
-    dynWorld = &tgBulletUtil::worldToDynamicsWorld(world);
-    dynWorld->addConstraint(m_slider);
+
+    //add constraint to world
+    tgWorldBulletPhysicsImpl& bulletWorld =
+      (tgWorldBulletPhysicsImpl&)world.implementation();
+    bulletWorld.addConstraint(m_slider);
+
     // All the heavy lifting is done by info
     notifySetup();
     tgModel::setup(world);
@@ -133,6 +131,7 @@ void tgPrismatic::step(double dt)
     else
     { 
         notifyStep(dt);
+        moveMotors(dt);
         tgModel::step(dt);  // Step any children
     }
 }
