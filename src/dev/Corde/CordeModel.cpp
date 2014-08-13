@@ -355,14 +355,14 @@ void CordeModel::computeCenterlines()
 		
 		CordeQuaternionElement* nextElement = new CordeQuaternionElement(currentAngle, inertia);
 		
+		std::cout << nextElement->q << std::endl;
+		
+		m_centerlines.push_back(nextElement);
+		
 		if (i != 0)
 		{				
 			computeQuaternionShapes(i, length);
 		}
-		
-		std::cout << nextElement->q << std::endl;
-		
-		m_centerlines.push_back(nextElement);
 	}
 	
 }
@@ -574,54 +574,59 @@ void CordeModel::computeInternalForces()
         const btScalar mu1 = quaternionShapes[i][1];
         const btScalar mu2 = quaternionShapes[i][2];
         const btScalar mu3 = quaternionShapes[i][3];
+
+        const btScalar c_mu1 = -2.0 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21);
+        const btScalar c_mu2 = 2.0 * (q11 * q23 - q12 * q24 - q13 * q21 + q14 * q22);
+        const btScalar c_mu3 = -2.0 * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23);
+          
+        /* Bending and torsional stiffness */
+        const btScalar stiffness_common = 2.0 / lj;
+        
+        const btScalar q11_stiffness = stiffness_common * 
+        (k1 * q24 * (-1.0 * c_mu1 + lj * mu1) +
+         k2 * q23 * (c_mu2 - lj * mu2) +
+         k3 * q22 * (-1.0 * c_mu3 + lj * mu3));
+         
+        const btScalar q12_stiffness = stiffness_common * 
+        (k1 * q23 * (-1.0 * c_mu1 + lj * mu1) +
+         k2 * q24 * (-1.0 * c_mu2 + lj * mu2) +
+         k3 * q21 * (c_mu3 - lj * mu3));
+         
+        const btScalar q13_stiffness = stiffness_common * 
+        (k1 * q22 * (c_mu1 - lj * mu1) +
+         k2 * q21 * (-1.0 * c_mu2 + lj * mu2) +
+         k3 * q24 * (-1.0 * c_mu3 + lj * mu3));
+         
+        const btScalar q14_stiffness = stiffness_common * 
+        (k1 * q21 * (c_mu1 - lj * mu1) +
+         k2 * q22 * (c_mu2 - lj * mu2) +
+         k3 * q23 * (c_mu3 - lj * mu3)); 
+        
+        const btScalar q21_stiffness = stiffness_common *
+        (k1 * q14 * (c_mu1  - lj * mu1) +
+         k2 * q13 * (-1.0 * c_mu2 + lj * mu2)+
+         k3 * q12 * (c_mu3 - lj * mu3));
+        
+        const btScalar q22_stiffness = stiffness_common *
+        (k1 * q13 * (c_mu1 - lj * mu1) + 
+         k2 * q14 * (c_mu2 - lj * mu2) +
+         k3 * q11 * (-1.0 * c_mu3 + lj * mu3));
+         
+        const btScalar q23_stiffness = stiffness_common *
+        (k1 * q12 * (-1.0 * c_mu1 + lj * mu1) +
+         k2 * q11 * (c_mu2 - lj * mu2) +
+         k3 * q14 * (c_mu3 - lj * mu3));
+         
+        const btScalar q24_stiffness = stiffness_common *
+        (k1 * q11 * (-1.0 * c_mu1 + lj * mu1) +
+         k2 * q12 * (-1.0 * c_mu2 + lj * mu2) +
+         k3 * q13 * (-1.0 * c_mu3 + lj * mu3));
+         
         /* I apologize for the mess below - the derivatives involved
          * here do not leave a lot of common factors. If you see
          * any nice vector operations I missed, implement them and/or
          * let me know! _Brian
          */
-        
-        /* Bending and torsional stiffness */
-        const btScalar stiffness_common = 2.0 / lj;
-        
-        const btScalar q11_stiffness = stiffness_common * 
-        (k1 * q24 * (2.0 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21) + lj * mu1) +
-         k2 * q23 * (q11 * q23 - q12 * q24 - q13 * q21 + q14 * q22) +
-         k3 * q22 * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23));
-         
-        const btScalar q12_stiffness = stiffness_common * 
-        (k1 * q23 * (q12 * q23 + q11 * q24 - q13 * q22 - q14 * q21) +
-         k2 * q24 * (q12 * q24 - q11 * q23 + q13 * q21 - q14 * q22) +
-         k3 * q21 * (q12 * q21 - q11 * q22 - q13 * q24 + q14 * q23));
-         
-        const btScalar q13_stiffness = stiffness_common * 
-        (k1 * q22 * (q13 * q22 - q11 * q24 - q12 * q23 + q14 * q21) +
-         k2 * q21 * (q13 * q21 - q11 * q23 + q12 * q24 - q14 * q22) +
-         k3 * q24 * (q13 * q24 + q11 * q22 - q12 * q21 - q14 * q23));
-         
-        const btScalar q14_stiffness = stiffness_common * 
-        (k1 * q21 * (q14 * q21 - q11 * q24 - q12 * q23 + q13 * q22) +
-         k2 * q22 * (q14 * q22 + q11 * q23 - q12 * q24 - q13 * q21) +
-         k3 * q23 * (q14 * q23 - q11 * q22 + q12 * q21 - q13 * q24));   
-        
-        const btScalar q21_stiffness = stiffness_common *
-        (k1 * q14 * (q14 * q21 - q11 * q24 - q12 * q23 + q13 * q22) +
-         k2 * q13 * (q13 * q21 - q11 * q23 + q12 * q24 - q14 * q22) +
-         k3 * q12 * (q12 * q21 - q11 * q22 + q14 * q23 - q13 * q24));
-        
-        const btScalar q22_stiffness = stiffness_common *
-        (k1 * q13 * (q13 * q22 - q11 * q24 - q12 * q23 + q14 * q21) + 
-         k2 * q14 * (q14 * q22 + q11 * q23 - q12 * q24 - q13 * q21) +
-         k3 * q11 * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23));
-         
-        const btScalar q23_stiffness = stiffness_common *
-        (k1 * q12 * (q12 * q23 + q11 * q24 - q13 * q22 - q14 * q21) +
-         k2 * q11 * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22) +
-         k3 * q14 * (q14 * q23 - q11 * q22 + q12 * q21 - q13 * q24));
-         
-        const btScalar q24_stiffness = stiffness_common *
-        (k1 * q11 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21) +
-         k2 * q12 * (q12 * q24 - q11 * q23 + q13 * q21 - q14 * q22) +
-         k3 * q13 * (q13 * q24 + q11 * q22 - q12 * q21 - q14 * q23));
          
         /* Torsional Damping */
         const btScalar damping_common = 4.0 * m_config.gammaR / lj;
@@ -667,7 +672,6 @@ void CordeModel::computeInternalForces()
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
         /* Apply torques */ /// @todo - check with theory!
-#if (0)
         quat_0->tprime[0] -= q11_stiffness - q11_damping;
        
         quat_1->tprime[0] -= q21_stiffness - q21_damping;
@@ -683,23 +687,7 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] -= q14_stiffness - q14_damping;
         
         quat_1->tprime[3] -= q24_stiffness - q24_damping;
-#else      
-        quat_0->tprime[0] += q11_damping;
-       
-        quat_1->tprime[0] += q21_damping;
-        
-        quat_0->tprime[1] += q12_damping;
-    
-        quat_1->tprime[1] += q22_damping;
-        
-        quat_0->tprime[2] += q13_damping;
-        
-        quat_1->tprime[2] += q23_damping;
-        
-        quat_0->tprime[3] += q14_damping;
-        
-        quat_1->tprime[3] += q24_damping;
-#endif
+
     }
     
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
@@ -762,7 +750,7 @@ void CordeModel::constrainMotion (double dt)
 void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
 {
 	// If this isn't true, this has been called at a bad spot
-	assert(i == m_centerlines.size() && i != 0);
+	assert(i == m_centerlines.size() - 1 && i != 0);
 	assert(lj > 0.0);
 	
 	CordeQuaternionElement* quat_0 = m_centerlines[i - 1];
@@ -781,7 +769,7 @@ void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
 	
 	btScalar c = - 2.0 / lj;
 	btScalar mu1 = c * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21);
-	btScalar mu2 = c * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22);
+	btScalar mu2 = -1.0 * c * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22);
 	btScalar mu3 = c * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23);
 	
 	btQuaternion shapeQ(lj, mu1, mu2, mu3);
@@ -918,14 +906,14 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
 	torques[0] += 1.0/2.0 * (q[2] * tprime[1] - q[1] * tprime[2] - q[0] * tprime[3] + q[3] * tprime[0]);
     torques[1] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
     torques[2] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
-    
+#if (1)    
    // Eliminate vibrations due to imprecision
     for (std::size_t i = 0; i < 3; i++)
     {
 		double a = DBL_EPSILON;
 		torques[i] = std::abs(torques[i]) < FLT_EPSILON ? 0.0 : torques[i];
 	}
-  
+#endif  
 }
 
 // omega holds history.

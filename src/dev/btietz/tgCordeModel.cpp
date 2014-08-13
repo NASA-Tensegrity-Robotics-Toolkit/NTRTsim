@@ -36,8 +36,8 @@ tgCordeModel::~tgCordeModel()
 void tgCordeModel::setup(tgWorld& world)
 {
 
-	btVector3 startPos(0.0, 10.0, 0.0);
-	btVector3 endPos  (10.0, 10.0, 0.);
+	btVector3 startPos(0.0, 0.0, 0.0);
+	btVector3 endPos  (0.0, 10.0, 10.0);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
