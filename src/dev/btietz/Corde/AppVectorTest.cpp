@@ -49,10 +49,12 @@ int main(int argc, char** argv)
 	btVector3 unit2 = (point3 - point2).normalize();
 	btVector3 unit3 = (point4 - point3).normalize();
 	
+	btVector3 zVec(0.0, 0.0, 1.0);
+	
 	btVector3 perp1, perp2, perp3, perp4, perp5, perp6;
 	btScalar a, b, c;
 	
-	if (std::abs(unit.dot(unit2)) > 1.f - FLT_EPSILON)
+	if (std::abs(unit.dot(zVec)) > 1.f - FLT_EPSILON)
 	{
 		a = unit[0];
 		b = unit[1];
@@ -69,7 +71,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{ 
-		perp1 = unit.cross(unit2).normalize();
+		perp1 = unit.cross(zVec).normalize();
 	}
 	
 	// Find one perpendicular to both
@@ -84,7 +86,7 @@ int main(int argc, char** argv)
 	// Find one perpendicular to both
 	perp4 = perp3.cross(unit2).normalize();
 	
-	if (unit2.dot(unit3) > 1.f - FLT_EPSILON)
+	if (unit3.dot(zVec) > 1.f - FLT_EPSILON)
 	{
 		a = unit3[0];
 		b = unit3[1];
@@ -101,7 +103,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{ 
-		perp5 = unit2.cross(unit3).normalize();
+		perp5 = unit3.cross(zVec).normalize();
 	}
 	
 	

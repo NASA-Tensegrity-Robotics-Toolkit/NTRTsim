@@ -122,6 +122,8 @@ private:
 	
 	void constrainMotion(double dt);
 	
+	void computeQuaternionShapes(std::size_t i, double lj);
+	
 	std::vector<btVector3> getDirectorAxes (const btVector3& point1,
 											const btVector3& point2,
 											const btVector3& point3);
@@ -188,8 +190,12 @@ private:
 	std::vector<double> linkLengths;
 	/**
 	 * Should have length equal to m_Centerlines.size()-1
+	 * 0 -> lj
+	 * 1 -> mu1
+	 * 2 -> mu2
+	 * 3 -> mu3
 	 */
-	std::vector<double> quaternionShapes;
+	std::vector<btQuaternion> quaternionShapes;
 	
 	/**
 	 * Computed based on the values in config. Should have length 4

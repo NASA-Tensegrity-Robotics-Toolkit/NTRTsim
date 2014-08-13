@@ -262,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (1)
+    #if (0)
     if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
@@ -322,7 +322,6 @@ void CordeModel::computeCenterlines()
 											m_massPoints[i+1]->pos,
 											m_massPoints[i+2]->pos);
 								
-			quaternionShapes.push_back( length );
 		}
 		else
 		{
@@ -335,10 +334,6 @@ void CordeModel::computeCenterlines()
 		btQuaternion currentAngle = quaternionFromAxes(directorAxes);
 #else
 		
-		if (i != n - 1)
-		{				
-			quaternionShapes.push_back( length );
-		}
 		btVector3 zAxis(0.0, 0.0, 1.0);
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
 		/*
@@ -359,6 +354,11 @@ void CordeModel::computeCenterlines()
 							mass * pow(m_config.radius, 2) / 2.0);
 		
 		CordeQuaternionElement* nextElement = new CordeQuaternionElement(currentAngle, inertia);
+		
+		if (i != 0)
+		{				
+			computeQuaternionShapes(i, length);
+		}
 		
 		std::cout << nextElement->q << std::endl;
 		
@@ -564,22 +564,27 @@ void CordeModel::computeInternalForces()
         const btScalar qdot23 = quat_1->qdot[2];
         const btScalar qdot24 = quat_1->qdot[3];
         
+        const btScalar u1 = quat_0->qdot[0];
+        
         const btScalar k1 = computedStiffness[1];
         const btScalar k2 = computedStiffness[2];
         const btScalar k3 = computedStiffness[3];
         
+        const btScalar lj = quaternionShapes[i][0];
+        const btScalar mu1 = quaternionShapes[i][1];
+        const btScalar mu2 = quaternionShapes[i][2];
+        const btScalar mu3 = quaternionShapes[i][3];
         /* I apologize for the mess below - the derivatives involved
          * here do not leave a lot of common factors. If you see
          * any nice vector operations I missed, implement them and/or
          * let me know! _Brian
          */
         
-        /* Bending and torsional stiffness */        
-        const btScalar stiffness_common = 4.0 / quaternionShapes[i] *
-        pow(quaternionShapes[i] - 1.0, 2);
+        /* Bending and torsional stiffness */
+        const btScalar stiffness_common = 2.0 / lj;
         
         const btScalar q11_stiffness = stiffness_common * 
-        (k1 * q24 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21) +
+        (k1 * q24 * (2.0 * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21) + lj * mu1) +
          k2 * q23 * (q11 * q23 - q12 * q24 - q13 * q21 + q14 * q22) +
          k3 * q22 * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23));
          
@@ -619,7 +624,7 @@ void CordeModel::computeInternalForces()
          k3 * q13 * (q13 * q24 + q11 * q22 - q12 * q21 - q14 * q23));
          
         /* Torsional Damping */
-        const btScalar damping_common = 4.0 * m_config.gammaR / quaternionShapes[i];
+        const btScalar damping_common = 4.0 * m_config.gammaR / lj;
         
         const btScalar q11_damping = damping_common *
         (q12 * (q12 * qdot11 - q11 * qdot12 + q21 * qdot22 - q22 * qdot21 - q23 * qdot24 + q24 * qdot23) +
@@ -662,6 +667,7 @@ void CordeModel::computeInternalForces()
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
         /* Apply torques */ /// @todo - check with theory!
+#if (0)
         quat_0->tprime[0] -= q11_stiffness - q11_damping;
        
         quat_1->tprime[0] -= q21_stiffness - q21_damping;
@@ -677,8 +683,23 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] -= q14_stiffness - q14_damping;
         
         quat_1->tprime[3] -= q24_stiffness - q24_damping;
-      
-
+#else      
+        quat_0->tprime[0] += q11_damping;
+       
+        quat_1->tprime[0] += q21_damping;
+        
+        quat_0->tprime[1] += q12_damping;
+    
+        quat_1->tprime[1] += q22_damping;
+        
+        quat_0->tprime[2] += q13_damping;
+        
+        quat_1->tprime[2] += q23_damping;
+        
+        quat_0->tprime[3] += q14_damping;
+        
+        quat_1->tprime[3] += q24_damping;
+#endif
     }
     
     for (std::size_t i = 0; i < m_centerlines.size(); i++)
@@ -738,13 +759,44 @@ void CordeModel::constrainMotion (double dt)
 #endif
 }
 
+void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
+{
+	// If this isn't true, this has been called at a bad spot
+	assert(i == m_centerlines.size() && i != 0);
+	assert(lj > 0.0);
+	
+	CordeQuaternionElement* quat_0 = m_centerlines[i - 1];
+	CordeQuaternionElement* quat_1 = m_centerlines[i];
+	
+	/* Setup Variables */
+	const btScalar q11 = quat_0->q[0];
+	const btScalar q12 = quat_0->q[1];
+	const btScalar q13 = quat_0->q[2];
+	const btScalar q14 = quat_0->q[3];
+	
+	const btScalar q21 = quat_1->q[0];
+	const btScalar q22 = quat_1->q[1];
+	const btScalar q23 = quat_1->q[2];
+	const btScalar q24 = quat_1->q[3];
+	
+	btScalar c = - 2.0 / lj;
+	btScalar mu1 = c * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21);
+	btScalar mu2 = c * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22);
+	btScalar mu3 = c * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23);
+	
+	btQuaternion shapeQ(lj, mu1, mu2, mu3);
+	quaternionShapes.push_back(shapeQ);
+	
+	assert(quaternionShapes.size() == m_centerlines.size() - 1);
+}
+
 std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, const btVector3& point2, const btVector3& point3)
 {
 	std::vector<btVector3> retVector;
 	
 	btVector3 unit = (point2 - point1).normalize();
 	// Considering the next point forward/backward for stability - what about the last point!?
-	btVector3 unit2 = (point3 - point2).normalize();
+	btVector3 unit2(0.0, 0.0, 1.0);
 	
 	retVector.push_back(unit);
 	
