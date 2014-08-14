@@ -17,3 +17,7 @@ add_executable(AppCordeTest
 add_executable(AppVectorTest
 	AppVectorTest.cpp
 )
+
+add_executable(AppVectorTestaa
+	AppVectorTestaa.cpp
+)

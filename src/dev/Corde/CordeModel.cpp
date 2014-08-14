@@ -476,7 +476,7 @@ void CordeModel::computeInternalForces()
             
            r_1->force[2] += quat_cons_z; 
         }
-        else if (i == n)
+        else if (i == n - 1)
         {
             r_0->force[0] -= quat_cons_x;
 
@@ -829,8 +829,11 @@ btQuaternion CordeModel::quaternionFromAxes (const std::vector<btVector3> inVec)
 	
 	// Consider not copying this again...
 	const btVector3 unit = inVec[0];
-	const btVector3 perp1 = inVec[1];
-	const btVector3 perp2 = inVec[2];
+	const btVector3 perp1 = inVec[2];
+	const btVector3 perp2 = inVec[1];
+	
+	std::cout << "Unit Vectors" << std::endl;
+	std::cout << unit << " " << perp1 << " " << perp2 << std::endl;
 	
 	btScalar x, y, z, w;
 	// Compute quaternions - testing method in paper

@@ -39,9 +39,13 @@ int main(int argc, char** argv)
 	
 	btVector3 point1(atof(argv[1]), atof(argv[2]), atof(argv[3]));
 	btVector3 point2(atof(argv[4]), atof(argv[5]), atof(argv[6]));
+#if (0)
 	btVector3 point3(atof(argv[7]), atof(argv[8]), atof(argv[9]));
 	btVector3 point4(atof(argv[10]), atof(argv[11]), atof(argv[12]));
-	
+#else
+	btVector3 point3(0.0, 0.0, 0.0);
+	btVector3 point4(0.0, 0.0, 0.0);	
+#endif	
 	cout << point1 << " " << point2 << " " << point3 << endl;
 	
 	btVector3 unit = (point2 - point1).normalize();
@@ -106,6 +110,8 @@ int main(int argc, char** argv)
 		perp5 = unit3.cross(zVec).normalize();
 	}
 	
+	perp1 = perp2;
+	perp2 = perp3;
 	
 	btScalar x, y, z, w;
 	// Compute quaternions - testing method in paper
