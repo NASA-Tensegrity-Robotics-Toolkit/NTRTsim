@@ -124,12 +124,6 @@ private:
 	
 	void computeQuaternionShapes(std::size_t i, double lj);
 	
-	std::vector<btVector3> getDirectorAxes (const btVector3& point1,
-											const btVector3& point2,
-											const btVector3& point3);
-	
-	btQuaternion quaternionFromAxes (const std::vector <btVector3> inVec);
-	
 	/**
 	 * Holds all of the data for one of the mass elements of the string
 	 */

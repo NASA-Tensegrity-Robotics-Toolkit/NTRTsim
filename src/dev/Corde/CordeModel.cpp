@@ -309,44 +309,21 @@ void CordeModel::computeCenterlines()
 	// Ensure all mass points have been created
 	assert(m_massPoints.size() == m_config.resolution && m_massPoints.size() == (linkLengths.size() + 1));
 	
-	std::size_t n = m_massPoints.size() - 1; //stuff
+	std::size_t n = m_massPoints.size() - 1;
 	for (std::size_t i = 0; i < n; i++)
 	{
 		std::vector<btVector3> directorAxes;
 				
 		double length = (linkLengths[i] + linkLengths[i+1]) / 2.0;
-#if (0)		
-		if (i != n - 1)
-		{
-			directorAxes = getDirectorAxes(m_massPoints[i]->pos,
-											m_massPoints[i+1]->pos,
-											m_massPoints[i+2]->pos);
-								
-		}
-		else
-		{
-			// Funky, hope it works
-			directorAxes = getDirectorAxes(m_massPoints[i]->pos,
-											m_massPoints[i+1]->pos,
-											m_massPoints[i-1]->pos);	
-		}
-		
-		btQuaternion currentAngle = quaternionFromAxes(directorAxes);
-#else
 		
 		btVector3 zAxis(0.0, 0.0, 1.0);
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
-		/*
-		if (acos(zAxis.dot(axisVec)) > M_PI / 2.0)
-		{
-			axisVec = (m_massPoints[i]->pos - m_massPoints[i+1]->pos).normalize();
-		}
-		*/
+
 		std::cout << zAxis.cross(axisVec).normalize() << std::endl;
 		std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		
 		btQuaternion currentAngle( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
-#endif		
+		
 		double mass = m_config.density * length * M_PI * pow(m_config.radius, 2);
 		
 		btVector3 inertia(mass * (3.0 * pow(length, 2) + pow(m_config.radius, 2)) / 12.0,
@@ -495,7 +472,6 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
-
 
 #if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
@@ -778,104 +754,6 @@ void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
 	assert(quaternionShapes.size() == m_centerlines.size() - 1);
 }
 
-std::vector<btVector3> CordeModel::getDirectorAxes (const btVector3& point1, const btVector3& point2, const btVector3& point3)
-{
-	std::vector<btVector3> retVector;
-	
-	btVector3 unit = (point2 - point1).normalize();
-	// Considering the next point forward/backward for stability - what about the last point!?
-	btVector3 unit2(0.0, 0.0, 1.0);
-	
-	retVector.push_back(unit);
-	
-	btVector3 perp1, perp2;
-	btScalar a, b, c;
-
-	if (std::abs(unit.dot(unit2)) > 1.f - FLT_EPSILON)
-	{
-		a = unit[0];
-		b = unit[1];
-		c = unit[2];
-		// Find an arbitrary perpendicular vector
-		if (a != 0 && b != c)
-		{
-			perp1 = btVector3(b - c, a, -a).normalize();
-		}
-		else
-		{
-			perp1 = btVector3(-b, c - a, b).normalize();
-		}
-	}
-	else
-	{ 
-		perp1 = unit.cross(unit2).normalize();
-	}
-	
-	// Find one perpendicular to both
-	perp2 = unit.cross(perp1).normalize();
-	
-	retVector.push_back(perp1);
-	retVector.push_back(perp2);
-	
-	// Assumed input of next function
-	assert(retVector.size() == 3);
-	
-	return retVector;		
-}
-
-btQuaternion CordeModel::quaternionFromAxes (const std::vector<btVector3> inVec)
-{
-	assert (inVec.size() == 3);
-	
-	// Consider not copying this again...
-	const btVector3 unit = inVec[0];
-	const btVector3 perp1 = inVec[2];
-	const btVector3 perp2 = inVec[1];
-	
-	std::cout << "Unit Vectors" << std::endl;
-	std::cout << unit << " " << perp1 << " " << perp2 << std::endl;
-	
-	btScalar x, y, z, w;
-	// Compute quaternions - testing method in paper
-	btScalar q4sqr = 0.25 * (1 + perp2[0] + perp1[1] + unit[2]);
-	if (q4sqr > FLT_EPSILON)
-	{
-		w = sqrt(q4sqr);
-		x = (unit[1] - perp1[2]) / (4.0 * w);
-		y = (perp2[2] - unit[0]) / (4.0 * w);
-		z = (perp1[0] - perp2[1]) / (4.0 * w);
-	}
-	else
-	{
-		w = 0;
-		btScalar q1sqr = - 0.5 * (perp1[1] + unit[2]);
-		if (q1sqr > FLT_EPSILON)
-		{
-			x = sqrt(q1sqr);
-			y = perp2[1] / (2.0 * x);
-			z = perp2[2] / (2.0 * x);
-		}
-		else
-		{
-			x = 0;
-			btScalar q2sqr = 0.5 * (1 - unit[2]);
-			if (q2sqr > FLT_EPSILON)
-			{
-				y = sqrt(q2sqr);
-				z = perp1[2] / (2.0 * y);
-			}
-			else
-			{
-				y = 0;
-				z = 1;
-			}
-		}
-	}
-	
-	btQuaternion qtOut(x, y, z, w);
-	return qtOut;
-}
-
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
 	pos(p1),
 	vel(0.0, 0.0, 0.0),
@@ -909,7 +787,7 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
 	torques[0] += 1.0/2.0 * (q[2] * tprime[1] - q[1] * tprime[2] - q[0] * tprime[3] + q[3] * tprime[0]);
     torques[1] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
     torques[2] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
-#if (1)    
+#if (1) 
    // Eliminate vibrations due to imprecision
     for (std::size_t i = 0; i < 3; i++)
     {
