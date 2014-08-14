@@ -322,7 +322,15 @@ void CordeModel::computeCenterlines()
 		std::cout << zAxis.cross(axisVec).normalize() << std::endl;
 		std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		
-		btQuaternion currentAngle( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
+		btQuaternion currentAngle;
+		if (zAxis.dot(axisVec) != 1.0)
+		{
+			currentAngle.setRotation( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
+		}
+		else
+		{
+			currentAngle.setRotation( zAxis, 0.0);
+		}
 		
 		double mass = m_config.density * length * M_PI * pow(m_config.radius, 2);
 		
