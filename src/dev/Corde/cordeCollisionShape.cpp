@@ -17,17 +17,19 @@
 */
 
 /**
- * @file CordeCollisionObject.cpp
- * @brief Interface Between Corde Model and Bullet
+ * @file cordeCollisionShape.cpp
+ * @brief Collision shape for the Corde Collision object
+ * Largely based on bullet's btSoftBodyCollisionShape in btSoftBodyInternals.h
  * @author Brian Mirletz
  * $Id$
  */
 
-// This Module
-#include "CordeCollisionObject.h"
+#include "cordeCollisionShape.h"
 
-CordeCollisionObject::CordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config) :
-CordeModel(centerLine, Config)
-	{}
+cordeCollisionShape::cordeCollisionShape(cordeCollisionObject* objectShape)
+{
+	m_shapeType = SOFTBODY_SHAPE_PROXYTYPE;
+	p_objectShape = objectShape;
+}
 	
-CordeCollisionObject::~CordeCollisionObject() {}
+
