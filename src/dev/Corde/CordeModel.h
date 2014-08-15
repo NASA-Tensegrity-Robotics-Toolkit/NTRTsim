@@ -16,8 +16,6 @@
  * governing permissions and limitations under the License.
 */
 
-//#define BT_USE_DOUBLE_PRECISION
-
 #ifndef CORDE_MODEL
 #define CORDE_MODEL
 
@@ -83,30 +81,30 @@ public:
 	 */
 	CordeModel(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
 	
-	~CordeModel();
+	virtual ~CordeModel();
 	
-	btVector3& getPosition(const std::size_t i) const;
+	virtual btVector3& getPosition(const std::size_t i) const;
 	
-	std::size_t getNumElements() const
+	virtual std::size_t getNumElements() const
 	{
 		return m_massPoints.size();
 	}
     
-    void applyForce(const btVector3&, const std::size_t segN);
+    virtual void applyForce(const btVector3&, const std::size_t segN);
     
-    void applyUniformForce(const btVector3& force);
+    virtual void applyUniformForce(const btVector3& force);
     
-    void applyUniformAcc(const btVector3& acc);
+    virtual void applyUniformAcc(const btVector3& acc);
     
-    void applyVecTorque(const btVector3& tq, const std::size_t segN);
+    virtual void applyVecTorque(const btVector3& tq, const std::size_t segN);
     
-    void applyQuatTorque(const btQuaternion& qtq, const std::size_t segN);
+    virtual void applyQuatTorque(const btQuaternion& qtq, const std::size_t segN);
     
     /// TODO: apply uniform torques?
     
-	void step (btScalar dt);
+	virtual void step (btScalar dt);
 	
-private:
+protected:
 	void computeConstants();
 	
 	/**

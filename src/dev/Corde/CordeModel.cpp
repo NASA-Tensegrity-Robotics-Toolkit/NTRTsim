@@ -262,8 +262,8 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (0)
-    if (simTime >= 1.0/10.0)
+    #if (1)
+    if (simTime >= 1.0/1.0)
     {
         size_t n = m_massPoints.size();
         for (std::size_t i = 0; i < n; i++)
@@ -687,6 +687,16 @@ void CordeModel::unconstrainedMotion(double dt)
     for (std::size_t i = 0; i < m_massPoints.size(); i++)
     {
         CordePositionElement* p_0 = m_massPoints[i];
+        
+#if (1) 
+	   // Eliminate vibrations due to imprecision
+		for (std::size_t i = 0; i < 3; i++)
+		{
+			double a = DBL_EPSILON;
+			p_0->force[i] = std::abs(p_0->force[i]) < FLT_EPSILON ? 0.0 : p_0->force[i];
+		}
+#endif 
+        
         // Velocity update - semi-implicit Euler
         p_0->vel += dt / p_0->mass * p_0->force;
         // Position update, uses v(t + dt)
