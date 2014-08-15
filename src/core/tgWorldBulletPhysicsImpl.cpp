@@ -222,9 +222,10 @@ btRigidBody* tgWorldBulletPhysicsImpl::createGroundRigidBody()
 
     /* The Problem Area */
     //TODO: Change to be polymorphic
-    //const btVector3 groundDimensions(btScalar(500.0), btScalar(0.5), btScalar(500.0));
-    //btBoxShape* const pGroundShape = new btBoxShape(groundDimensions);
-
+#if (0)
+    const btVector3 groundDimensions(btScalar(500.0), btScalar(0.5), btScalar(500.0));
+    btBoxShape* const pGroundShape = new btBoxShape(groundDimensions);
+#else
     // Determine the angle of the ground in radians. All 0 is flat         
     
     const double yaw = 0.0;
@@ -232,7 +233,8 @@ btRigidBody* tgWorldBulletPhysicsImpl::createGroundRigidBody()
     const double roll = 0.0;
     const tgHillyGround::Config groundConfig(btVector3(yaw, pitch, roll));
     tgHillyGround *hillyGround = new tgHillyGround(groundConfig);
-    btCollisionShape *const pGroundShape = hillyGround->hillyCollisionShape();
+    btCollisionShape *const pGroundShape = hillyGround->getCollisionShape();
+#endif    
     /**/
 
     addCollisionShape(pGroundShape);

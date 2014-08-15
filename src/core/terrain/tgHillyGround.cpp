@@ -56,7 +56,11 @@ tgHillyGround::Config::Config(btVector3 eulerAngles,
 }
 
 tgHillyGround::tgHillyGround() :
-    m_config(Config())
+    m_config(Config()),
+    m_margin(1.0),
+    m_triangleSize(1.0),
+    m_waveHeight(5.0),
+    m_offset(0.5)
 {
     // @todo make constructor aux to avoid repeated code
     std::cout << "Default constructor in tgHillyGround.cpp" << std::endl;
@@ -70,7 +74,11 @@ tgHillyGround::tgHillyGround() :
 }
 
 tgHillyGround::tgHillyGround(const tgHillyGround::Config& config) :
-    m_config(config)
+    m_config(config),
+    m_margin(1.0),
+    m_triangleSize(1.0),
+    m_waveHeight(5.0),
+    m_offset(0.5)
 {
     std::cout << "Config constructor in tgHillyGround.cpp" << std::endl;
     m_nx = 50;
@@ -147,6 +155,12 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
 
     assert(pShape);
     return pShape; 
+}
+
+btCollisionShape* const tgHillyGround::getCollisionShape() const
+{
+	assert(pGroundShape);
+	return pGroundShape;
 }
 
 btTriangleIndexVertexArray *tgHillyGround::createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]) {

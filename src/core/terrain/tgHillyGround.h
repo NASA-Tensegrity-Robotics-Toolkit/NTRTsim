@@ -107,7 +107,9 @@ class tgHillyGround : public tgBulletGround
          * Returns the collision shape that forms a hilly ground
          */
         btCollisionShape* hillyCollisionShape();
-
+        
+        btCollisionShape* const getCollisionShape() const;
+        
     private:  
         /** Store the configuration data for use later */
         Config m_config;
