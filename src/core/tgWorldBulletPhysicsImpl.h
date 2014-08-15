@@ -38,6 +38,7 @@ class btSoftRigidDynamicsWorld;
 class btRigidBody;
 class IntermediateBuildProducts;
 class tgBulletGround;
+class tgHillyGround;
 
 /**
  * Concrete class derived from tgWorldImpl for Bullet Physics
@@ -46,13 +47,20 @@ class tgBulletGround;
 class tgWorldBulletPhysicsImpl : public tgWorldImpl
 {
  public:
-
+ 
   /** 
    * The only constructor.
    * @param[in] gravity the gravitational acceleration in m/sec^2
    */
   tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
-                            tgBulletGround* ground);
+                           tgBulletGround* ground);
+ 
+  /** 
+   * TODO: Remove maybe after testing The only constructor.
+   * @param[in] gravity the gravitational acceleration in m/sec^2
+   */
+  tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
+                           tgHillyGround* ground);
 
   /** Clean up Bullet Physics state. */
   ~tgWorldBulletPhysicsImpl();
