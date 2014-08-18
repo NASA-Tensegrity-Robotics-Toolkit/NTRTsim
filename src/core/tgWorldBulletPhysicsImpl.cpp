@@ -89,39 +89,7 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     m_pDynamicsWorld->setGravity(gravityVector);
     std::cout << "calling non-Hilly constructor" << std::endl;
 
-    // Create and add the ground rigid body
-    #if (1)
-        btRigidBody * const pGroundRigidBody = createGroundRigidBody();
-        m_pDynamicsWorld->addRigidBody(pGroundRigidBody);
-    #else
-        m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
-    #endif
-
-    #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
-        m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
-    #endif	
-    // Postcondition
-    assert(invariant());
-}
-
-tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
-        tgHillyGround* ground) :
-    tgWorldImpl(config, ground),
-    m_pIntermediateBuildProducts(new IntermediateBuildProducts(config.worldSize)),
-    m_pDynamicsWorld(createDynamicsWorld())
-{
-    // Gravitational acceleration is down on the Y axis
-    const btVector3 gravityVector(0, -config.gravity, 0);
-    m_pDynamicsWorld->setGravity(gravityVector);
-    std::cout << "calling Hilly constructor" << std::endl;
-
-    // Create and add the ground rigid body
-    #if (1)
-        btRigidBody * const pGroundRigidBody = createGroundRigidBody();
-        m_pDynamicsWorld->addRigidBody(pGroundRigidBody);
-    #else
-        m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
-    #endif
+	m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
 
     #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
@@ -202,52 +170,6 @@ btSoftRigidDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
 
     return result;
 }
-
-/**
- * Create and return a new instance of a btRigidBody for the ground shape.
- * This will be added to the btSoftRigidDynamicsWorld.
- */
-btRigidBody* tgWorldBulletPhysicsImpl::createGroundRigidBody()
-{
-    const btScalar mass = 0.0;
-
-    btTransform groundTransform;
-    groundTransform.setIdentity();
-    groundTransform.setOrigin(btVector3(0, -0.5, 0));
-
-    // Using motionstate is recommended
-    // It provides interpolation capabilities, and only synchronizes 'active' objects
-    btDefaultMotionState* const pMotionState =
-        new btDefaultMotionState(groundTransform);
-
-    /* The Problem Area */
-    //TODO: Change to be polymorphic
-#if (0)
-    const btVector3 groundDimensions(btScalar(500.0), btScalar(0.5), btScalar(500.0));
-    btBoxShape* const pGroundShape = new btBoxShape(groundDimensions);
-#else
-    // Determine the angle of the ground in radians. All 0 is flat         
-    
-    const double yaw = 0.0;
-    const double pitch = 0.0;
-    const double roll = 0.0;
-    const tgHillyGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    tgHillyGround *hillyGround = new tgHillyGround(groundConfig);
-    btCollisionShape *const pGroundShape = hillyGround->getCollisionShape();
-#endif    
-    /**/
-
-    addCollisionShape(pGroundShape);
-
-    const btVector3 localInertia(0, 0, 0);
-
-    btRigidBody::btRigidBodyConstructionInfo const rbInfo(mass, pMotionState, pGroundShape, localInertia);
-
-    btRigidBody* const pGroundRigidBody = new btRigidBody(rbInfo);
-
-    return pGroundRigidBody;
-}
-
 
 void tgWorldBulletPhysicsImpl::step(double dt)
 {

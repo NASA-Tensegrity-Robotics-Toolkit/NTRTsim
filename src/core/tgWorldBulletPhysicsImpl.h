@@ -116,12 +116,6 @@ private:
      */
         btSoftRigidDynamicsWorld* createDynamicsWorld() const;
     
-    /**
-     * Create the ground - needs to be in the namespace so we can
-     * free the pointers it creates
-     */
-    btRigidBody* createGroundRigidBody();
-    
     /** Integrity predicate. */
     bool invariant() const;
 
