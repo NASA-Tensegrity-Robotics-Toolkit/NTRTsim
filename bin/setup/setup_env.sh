@@ -19,6 +19,8 @@
 # Purpose: Env setup
 # Date:    2013-05-04
 
+# Source our common setup code
+source "setup_common.sh"
 
 ###############################
 # Configuration
@@ -26,11 +28,12 @@ local_setup_path="`dirname \"$0\"`"                      # relative
 base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
 install_conf_file="$base_dir/conf/install.conf"
 if [ ! -f "$install_conf_file" ]; then
-    echo "Missing install.conf ($install_conf_file). Please fix this and try again."
+    echo "Missing ../install.conf ($install_conf_file). Please fix this and try again."
     exit 1
 fi
 source "$install_conf_file"
 ###############################
+
 
 function get_actual_user() {
     who am i | awk '{print $1}'
