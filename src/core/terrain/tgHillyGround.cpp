@@ -157,12 +157,6 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
     return pShape; 
 }
 
-btCollisionShape* const tgHillyGround::getCollisionShape() const
-{
-	assert(pGroundShape);
-	return pGroundShape;
-}
-
 btTriangleIndexVertexArray *tgHillyGround::createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]) {
     const int vertexStride = sizeof(btVector3);
     const int indexStride = 3 * sizeof(int);

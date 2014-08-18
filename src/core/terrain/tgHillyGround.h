@@ -108,8 +108,6 @@ class tgHillyGround : public tgBulletGround
          */
         btCollisionShape* hillyCollisionShape();
         
-        btCollisionShape* const getCollisionShape() const;
-        
     private:  
         /** Store the configuration data for use later */
         Config m_config;
