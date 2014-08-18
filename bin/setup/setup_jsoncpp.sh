@@ -210,6 +210,11 @@ function str_contains() {
 function main() {
         
     ensure_install_prefix_writable
+
+    if check_jsoncpp_installed; then
+	    echo "- jsoncpp is already installed under $JSONCPP_BUILD_DIR -- skipping."
+	    return
+    fi
    
     if check_jsoncpp_built; then
         echo "- jsoncpp is already built under $JSONCPP_BUILD_DIR -- skipping."
