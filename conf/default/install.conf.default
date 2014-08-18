@@ -83,4 +83,27 @@ BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
 # e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
 BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
 
+#
+# jsoncpp
+#
 
+# @see scripts/setup_jsoncpp.sh for more info
+
+# jsoncpp installation prefix
+# Global install: /usr/local (default), env install: "$ENV_DIR"
+# If you've already installed the package under this prefix, this is the
+# only thing you'll need to set.
+JSONCPP_INSTALL_PREFIX="$env_dir"
+
+# Location where jsoncpp is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless jsoncpp is
+# not already installed. 
+JSONCPP_BUILD_DIR="$env_dir/build/jsoncpp"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+JSONCPP_PACKAGE_DIR="$JSONCPP_BUILD_DIR"
+
+# JSONCPP_URL can be either a web address or a local file address,
+# e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
+JSONCPP_URL="https://github.com/open-source-parsers/jsoncpp/archive/3515db184a836ce73b99c064bcc83884570657c2.zip"
