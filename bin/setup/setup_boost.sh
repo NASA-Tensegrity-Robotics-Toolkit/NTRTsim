@@ -20,7 +20,9 @@
 # Date:    2013-05-01
 
 # Source our common setup code
-source "setup_common.sh"
+local_setup_path="`dirname \"$0\"`"                # relative
+base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
+source "$base_dir/bin/setup/setup_common.sh"
 
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url

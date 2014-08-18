@@ -21,8 +21,6 @@
 
 ###############################
 # Configuration
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
 install_conf_file="$base_dir/conf/install.conf"
 if [ ! -f "$install_conf_file" ]; then
 	echo "Missing install.conf ($install_conf_file). Please fix this and try again."
