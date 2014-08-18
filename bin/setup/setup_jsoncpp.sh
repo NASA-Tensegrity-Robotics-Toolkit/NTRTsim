@@ -107,8 +107,7 @@ function unpack_jsoncpp() {
 
     # Unzip
     pushd "$JSONCPP_BUILD_DIR" > /dev/null
-    unzip "$downloads_dir/$jsoncpp_pkg" || { echo "- ERROR: Failed to unpack jsoncpp."; exit 1; }
-    mv jsoncpp-*/* .
+    tar xf "$downloads_dir/$jsoncpp_pkg" --strip 1 || { echo "- ERROR: Failed to unpack jsoncpp"; exit 1; }
     popd > /dev/null
 }
 
