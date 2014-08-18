@@ -16,23 +16,19 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: CMake setup
-# Date:    2013-05-04
+# Purpose: Common setup code
+# Date:    2014-08-18
 
-# Source our common setup code
-source "setup_common.sh"
-
-if type cmake >/dev/null 2>&1; then
-    cmake_info=$(cmake --version)
-    echo "- CMake is installed ($cmake_info). Creating link under env/bin."; 
-    
-    # Make a symlink under env to the existing cmake install
-    pushd "$bin_dir" > /dev/null
-    rm cmake 2>/dev/null  # delete any existing symlink
-    ln -s `which cmake` cmake
-    popd > /dev/null
-else
-    echo "ERROR: CMake must be installed and available on the path before continuing."
-    echo "Please see http://www.cmake.org for more info."
-    exit 1
+###############################
+# Configuration
+local_setup_path="`dirname \"$0\"`"                # relative
+base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
+install_conf_file="$base_dir/conf/install.conf"
+if [ ! -f "$install_conf_file" ]; then
+	echo "Missing install.conf ($install_conf_file). Please fix this and try again."
+	exit 1
 fi
+source "$install_conf_file"
+###############################
+
+

@@ -19,17 +19,8 @@
 # Purpose: Bullet Physics setup
 # Date:    2013-05-01
 
-###############################
-# Configuration
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-install_conf_file="$base_dir/conf/install.conf"
-if [ ! -f "$install_conf_file" ]; then
-    echo "Missing install.conf ($install_conf_file). Please fix this and try again."
-    exit 1
-fi
-source "$install_conf_file"
-###############################
+# Source our common setup code
+source "setup_common.sh"
 
 # Adding 5-20-2014 for patching bullet
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
