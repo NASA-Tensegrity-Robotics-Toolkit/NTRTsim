@@ -76,7 +76,7 @@ tgHillyGround::tgHillyGround() :
 tgHillyGround::tgHillyGround(const tgHillyGround::Config& config) :
     m_config(config),
     m_margin(1.0),
-    m_triangleSize(1.0),
+    m_triangleSize(5.0),
     m_waveHeight(5.0),
     m_offset(0.5)
 {
