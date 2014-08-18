@@ -55,13 +55,6 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
    */
   tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
                            tgBulletGround* ground);
- 
-  /** 
-   * TODO: Remove maybe after testing The only constructor.
-   * @param[in] gravity the gravitational acceleration in m/sec^2
-   */
-  tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
-                           tgHillyGround* ground);
 
   /** Clean up Bullet Physics state. */
   ~tgWorldBulletPhysicsImpl();
