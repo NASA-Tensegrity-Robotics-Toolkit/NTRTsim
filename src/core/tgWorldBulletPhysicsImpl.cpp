@@ -121,8 +121,9 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
     assert(m_pDynamicsWorld->getNumCollisionObjects() == 0);
 
     // Delete all the collision shapes. This can be done at any time.
-
-    for (size_t i = 0; i < nco; ++i) { delete m_collisionShapes[i]; }
+    const size_t ncs = m_collisionShapes.size();
+    
+    for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
 
     delete m_pDynamicsWorld;
 
