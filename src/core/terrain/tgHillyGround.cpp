@@ -64,7 +64,12 @@ tgHillyGround::Config::Config(btVector3 eulerAngles,
     assert((m_friction >= 0.0) && (m_friction <= 1.0));
     assert((m_restitution >= 0.0) && (m_restitution <= 1.0));
     assert((m_size[0] >= 0.0) && (m_size[1] >= 0.0) && (m_size[2] >= 0.0));
-    //TODO: Add asserts for hill config params
+    assert(m_nx > 0);
+    assert(m_ny > 0);
+    assert((m_margin >= 0.0) && (m_margin >= 1.0));
+    assert(m_triangleSize >= 0.0);
+    assert(m_waveHeight >= 0.0);
+    assert(m_offset >= 0.0);
 }
 
 tgHillyGround::tgHillyGround() :
