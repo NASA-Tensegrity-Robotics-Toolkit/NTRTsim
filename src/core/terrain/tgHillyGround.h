@@ -84,7 +84,7 @@ class tgHillyGround : public tgBulletGround
                 /** Number of nodes in the y-direction */
                 size_t m_ny;
 
-                /** TODO */
+                /** See Bullet documentation on Collision Margin */
                 double m_margin;
 
                 /** Scale factor for the X and Z axes, varies according to m_nx and m_ny */
