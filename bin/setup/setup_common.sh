@@ -19,15 +19,20 @@
 # Purpose: Common setup code
 # Date:    2014-08-18
 
-###############################
-# Configuration
-install_conf_file="$base_dir/conf/install.conf"
-if [ ! -f "$install_conf_file" ]; then
-	echo "Missing install.conf ($install_conf_file). Please fix this and try again."
-	exit 1
-fi
-source "$install_conf_file"
-###############################
+function source_conf() {
+	conf_file_name="$base_dir/conf/$1"
+	if [ ! -f "$conf_file_name" ]; then
+		echo "Missing $conf_file_name. Please fix this and try again."
+		exit 1
+	fi
+	source	"$conf_file_name"
+}
+
+source_conf "general.conf"
+
+# Constants
+TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
+FALSE=1 # Ditto, FALSE is non-zero
 
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")

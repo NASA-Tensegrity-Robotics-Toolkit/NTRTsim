@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Define general configuration directives for setup
+# Date:    2014-08-18
+# Usage:   Copy/rename this file to '../general.conf' and run setup.sh
+
+#############################################
+#  Script Initialization -- do not edit.
+if [[ -z "$base_dir" ]]; then
+    echo "general.conf : base_dir must be set before sourcing this file."
+    exit 1
+fi
+env_name='env'
+env_dir="$base_dir/$env_name"
+downloads_dir="$env_dir/downloads"
+bin_dir="$env_dir/bin"
+build_dir="$env_dir/build"
+#############################################
+
+#############################################
+#  Configuration -- edit below as needed.
+#############################################
+
+# Uncomment this to use installations that are available to the whole system. 
+# NOTE: By default, setup installs bullet under env rather than $INSTALL_PREFIX
+#INSTALL_PREFIX="/usr/local"  
+
+# Uncomment this to install locally (under env/include and env/lib)
+# IMPORTANT: If you've previously installed to /usr/local, you'll need to 
+# delete your 'env' directory before running setup again.
+INSTALL_PREFIX="$env_dir"  
+
+# Set the path (or executable name if it's in your path) for the utility
+# to use for SHA1 summing. To disable download integrity verification
+# simply set the variable to an empty string.
+SHA1SUM_UTILITY="sha1sum"
