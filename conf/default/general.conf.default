@@ -16,14 +16,14 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: Define configuration directives for setup
+# Purpose: Define general configuration directives for setup
 # Date:    2014-08-18
-# Usage:   Copy/rename this file to '../install.conf' and run setup.sh
+# Usage:   Copy/rename this file to '../general.conf' and run setup.sh
 
 #############################################
 #  Script Initialization -- do not edit.
 if [[ -z "$base_dir" ]]; then
-    echo "install.conf: base_dir must be set before sourcing this file."
+    echo "general.conf : base_dir must be set before sourcing this file."
     exit 1
 fi
 env_name='env'
