@@ -35,6 +35,7 @@
 // Forward declarations
 class btCollisionShape;
 class btSoftRigidDynamicsWorld;
+class btTypedConstraint;
 class btRigidBody;
 class IntermediateBuildProducts;
 class tgBulletGround;
@@ -73,7 +74,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
   {
     return *m_pDynamicsWorld;
   }
-  
+
         /**
      * Add a btCollisionShape the a collection for deletion upon
      * destruction.
@@ -81,8 +82,26 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
      */
         void addCollisionShape(btCollisionShape* pShape);
 
- private:
-    
+        /**
+     * Add a btTypedConstraint to a collection for deletion upon
+     * destruction. Also add to the physics.
+     * @param[in] pConstraint a pointer to a btTypedConstraint; do nothing if NULL
+     */
+        void addConstraint(btTypedConstraint* pConstaint);
+private:
+
+    /**
+     * Delete all the collision objects. The dynamics world must exist.
+     * Delete in reverse order of creation.
+     */
+    void removeCollisionShapes();
+
+    /**
+     * Delete all the constraint objects. The dynamics world must exist.
+     * Delete in reverse order of creation.
+     */
+    void removeConstraints();
+
         /**
      * Create a new dynamics world. Needs to be in the namespace so we
      * can free the pointers it creates.
@@ -100,14 +119,21 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
     
     /** The Bullet Physics representation of the tgWorld. */
     btSoftRigidDynamicsWorld* m_pDynamicsWorld;
-    
-    /* 
+
+    /*
      * A vector of collision shapes for easy reference. Does not affect
      * physics or rendering unles the shape is placed into the dynamics
      * world. Bullet encourages reuse of collision shapes when possible
      * for efficiency.
      */
     btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
+
+    /* 
+     * A vector of constraints for easy reference. Does not affect
+     * physics or rendering unles the constraint is placed into the dynamics
+     * world.
+     */
+    btAlignedObjectArray<btTypedConstraint*> m_constraints;
 };
 
 #endif  // TG_WORLDBULLETPHYSICSIMPL_H
