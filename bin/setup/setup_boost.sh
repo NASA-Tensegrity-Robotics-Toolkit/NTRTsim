@@ -25,7 +25,7 @@ base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and norma
 source "$base_dir/bin/setup/setup_common.sh"
 
 #Source this package's configuration
-source_conf("boost.conf")
+source_conf "boost.conf"
 
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url

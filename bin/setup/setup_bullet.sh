@@ -25,7 +25,7 @@ base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and norma
 source "$base_dir/bin/setup/setup_common.sh"
 
 #Source this package's configuration
-source_conf("bullet.conf")
+source_conf "bullet.conf"
 
 # Adding 5-20-2014 for patching bullet
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative

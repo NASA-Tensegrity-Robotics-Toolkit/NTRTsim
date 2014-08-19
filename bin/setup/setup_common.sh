@@ -19,19 +19,16 @@
 # Purpose: Common setup code
 # Date:    2014-08-18
 
-###############################
-# Configuration
-source_conf("general.conf")
-###############################
-
-function source_conf(conf_file_name) {
-	conf_file_name="$base_dir/conf/$conf_file_name"
+function source_conf() {
+	conf_file_name="$base_dir/conf/$1"
 	if [ ! -f "$conf_file_name" ]; then
 		echo "Missing $conf_file_name. Please fix this and try again."
 		exit 1
 	fi
 	source	"$conf_file_name"
 }
+
+source_conf "general.conf"
 
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")
