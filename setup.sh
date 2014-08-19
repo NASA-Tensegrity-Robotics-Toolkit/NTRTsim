@@ -27,7 +27,9 @@ SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
 setup_dir="$SCRIPT_PATH/bin/setup"
 conf_dir="$SCRIPT_PATH/conf"
 base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "jsoncpp.conf")
 
+#Load our common set up functions
 
 function banner() {
     echo ""
@@ -37,25 +39,42 @@ function banner() {
 function init_config() {
     
     if [ -f "$conf_dir/install.conf" ]; then
-        source "$conf_dir/install.conf"
-        return
+	echo "Your conf directory contains install.conf, which has been deprecated. Please delete install.conf and run set up again. See issue 21 for more details."
+	exit 1
     fi
 
     echo "- Starting configuration"
 
-    message="Configuration file setup/install.conf not found -- would you like setup to create it now?"
-    options=("Y" "n")
-    default="Y"
-    result=$(read_options "$message" $options $default)
-    if [ "$result" == "Y" ]; then
-        cp "$conf_dir/default/install.conf.default" "$conf_dir/install.conf"
-        echo "conf/install.conf has been created. Please edit it as needed and re-run setup.sh."
-    else
-        echo "Please create a conf/install.conf before running setup. See conf/default/install.conf.default for an example."
-    fi
+    to_create=()
+	
+	for file_name in "${CONF_FILES[@]}"
+	do
+		if [ ! -f "$conf_dir/$file_name" ]; then
+			to_create+=($file_name)
+		fi
+	done
 
-    exit 0
+	if [ "${#to_create}" -eq 0 ]; then
+		source "$conf_dir/general.conf"
+		return
+	fi
 
+	message="One or more package files do not exist. Would you like setup to create them now?"
+	options=("Y" "n")
+	default="Y"
+	result=$(read_options "$message" $options $default)
+	if [ "$result" == "Y" ]; then
+		for file_name in "${to_create[@]}"
+		do
+			echo "Creating conf/$file_name"
+			cp "$conf_dir/default/${file_name}.default" "$conf_dir/$file_name"
+		done
+		echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
+	else
+		echo "Please create all necessary conf files before running set up. See conf/default/* for a list of the needed files, as well as a base configuration."
+	fi
+
+	exit 0
 }
 
 function init_scripts() {
@@ -88,6 +107,12 @@ function init_boost() {
     echo ""
     echo "Initializing the Boost library..."
     "$setup_dir/setup_boost.sh" || { echo "Boost initialization failed -- exiting now."; exit 1; }
+}
+
+function init_jsoncpp() {
+echo ""
+echo "Initializing jsoncpp..."
+"$setup_dir/setup_jsoncpp.sh" || { echo "jsoncpp initialization failed -- exiting now."; exit 1; }
 }
 
 
@@ -182,9 +207,9 @@ init_config
 init_scripts
 init_env
 init_cmake 
+init_jsoncpp
 init_bullet
 init_boost
-
 
 echo ""
 echo "Setup Complete!"

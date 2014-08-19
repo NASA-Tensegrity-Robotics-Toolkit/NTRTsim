@@ -19,17 +19,13 @@
 # Purpose: Bullet Physics setup
 # Date:    2013-05-01
 
-###############################
-# Configuration
+# Source our common setup code
 local_setup_path="`dirname \"$0\"`"                # relative
 base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-install_conf_file="$base_dir/conf/install.conf"
-if [ ! -f "$install_conf_file" ]; then
-    echo "Missing install.conf ($install_conf_file). Please fix this and try again."
-    exit 1
-fi
-source "$install_conf_file"
-###############################
+source "$base_dir/bin/setup/setup_common.sh"
+
+#Source this package's configuration
+source_conf "bullet.conf"
 
 # Adding 5-20-2014 for patching bullet
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
@@ -39,10 +35,6 @@ setup_dir="$SCRIPT_PATH"
 
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
-
-# Constants
-TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
-FALSE=1 # FALSE is non-zero
 
 function ensure_install_prefix_writable() {
     touch "$BULLET_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
@@ -240,47 +232,6 @@ function env_link_bullet() {
     fi
     popd > /dev/null
 
-}
-
-# Get the relative path between two absolute paths
-# Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
-function get_relative_path() {
-    source=$1
-    target=$2
-
-    common_part=$source
-    back=
-    while [ "${target#$common_part}" = "${target}" ]; do
-      common_part=$(dirname $common_part)
-      back="../${back}"
-    done
-
-    echo ${back}${target#$common_part/}
-}
-
-# Count the number of files matching the given pattern
-# Usage: e.g. n_files=$(count_files "/path/with/file/matching/pattern/*.*")
-# Note: the 'echo `command`' is there to remove leading spaces that wc adds
-function count_files {
-    pattern=$1
-    if [ "$pattern" == "" ]; then
-        pattern="*"
-    fi
-    # Count the number of files
-    echo `ls -a $pattern 2>/dev/null | wc -l`
-}
-
-# Deteremine if a string contains a substring
-# Usage: tf=$(str_contains "my string" "substring")
-function str_contains() {
-    string="$1"
-    substring="$2"
-    if test "${string#*$substring}" != "$string"
-    then
-        return 0    # $substring is in $string
-    else
-        return 1    # $substring is not in $string
-    fi
 }
 
 function main() {
