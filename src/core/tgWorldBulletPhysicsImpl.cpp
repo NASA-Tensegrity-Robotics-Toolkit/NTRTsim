@@ -104,8 +104,8 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 {
   // Delete all the collision objects. The dynamics world must exist.
   // Delete in reverse order of creation.
-  removeCollisionShapes();
   removeConstraints();
+  removeCollisionShapes();
 
   delete m_pDynamicsWorld;
 
@@ -151,15 +151,9 @@ void tgWorldBulletPhysicsImpl::removeConstraints()
 
       // Remove the constraint from the dynamics world
       m_pDynamicsWorld->removeConstraint(pTypedConstraint);
-      // Delete the collision object
-      delete pTypedConstraint;
     }
     // All constraints have been removed and deleted
     assert(m_pDynamicsWorld->getNumConstraints() == 0);
-
-    // Delete all the collision shapes. This can be done at any time.
-    const size_t ncs = m_constraints.size();
-    for (size_t i = 0; i < ncs; ++i) { delete m_constraints[i]; }
 }
 
 /**
