@@ -26,6 +26,15 @@
 
 #include "tgPrismaticInfo.h"
 
+#include "btBulletDynamicsCommon.h"
+#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
+
+#include <iostream>
+
+#include "tgcreator/tgNode.h"
+#include "tgcreator/tgStructureInfo.h"
 
 tgPrismaticInfo::tgPrismaticInfo(const tgPrismatic::Config& config) :
     m_config(config),
@@ -56,6 +65,27 @@ void tgPrismaticInfo::initConnector(tgWorld& world)
 {
 }
 
+btSliderConstraint* tgPrismaticInfo::createSlider()
+{
+    btRigidBody* fromBody = getFromRigidBody();
+    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);//m_config.rotation);
+    btTransform transATop;
+    transATop.setIdentity();
+    transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
+    transATop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
+
+    btRigidBody* toBody = getToRigidBody();
+    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);//m_config.rotation);
+    btTransform transBTop;
+    transBTop.setIdentity();
+    transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);
+    transBTop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
+
+    btSliderConstraint* slider = new btSliderConstraint(*fromBody, *toBody, transATop, transBTop, true);
+
+    return slider;
+}
+
 tgModel* tgPrismaticInfo::createModel(tgWorld& world)
 {  
     tgNode startNode = this->getFrom();
@@ -64,101 +94,17 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
     btVector3 buildVec = (endNode - startNode);
     double m_startLength = buildVec.length();
 
-    m_stringConfig.stiffness = 1000;
-    m_stringConfig.damping = 10;
 //    m_config.m_minLength = m_startLength;
 
-    btRigidBody* fromBody = getFromRigidBody();
-    btRigidBody* toBody = getToRigidBody();
+    btSliderConstraint* slider = createSlider();
 
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);//m_config.rotation);
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);//m_config.rotation);
-
-
-    tgPrismatic* prism = new tgPrismatic(fromBody, from, toBody, to, getTags(), m_config);
-    buildModel(world, prism);
+    tgPrismatic* prism = new tgPrismatic(slider, getTags(), m_config);
+    prism->setup(world);
     return prism;
 } 
-
-const int tgPrismaticInfo::getSegments() const
-{
-    //@todo: make configurable
-    return m_config.m_segments;
-}
 
 double tgPrismaticInfo::getMass()
 {
     // @todo: add up the rigid bodies
     return 0;
-}
-
-void tgPrismaticInfo::buildModel(tgWorld& world, tgModel* prismatic)
-{
-    // get global from _ to - still need these is both places I think.
-    tgNode startNode = this->getFrom();
-    tgNode endNode = this->getTo();
-
-    prismatic->setup(world);
-
-    /**
-    // Calculate the size of the rods
-    double rodSize = m_config.m_minTotalLength / 2.0;
-
-    btVector3 buildVec = (endNode - startNode);
-    btVector3 offset = btVector3(0.1,0.1,0.1);
-    tgNode midNode = tgNode((buildVec / 2.0),"mid");
-    tgNode midNode1 = tgNode(midNode - offset,"mid1");
-    tgNode midNode2 = tgNode(midNode + offset,"mid2");
-
-    //super structure to the prismatic actuator's two rods
-    tgStructure prism;
-
-    tgStructure rod;
-    rod.addNode(0,0,0); //Bottom
-    rod.addNode(midNode);
-    rod.addPair(0,1,"a rod");
-
-    tgStructure* rod1 = new tgStructure(rod);
-    rod1->addTags("rod v1");
-    rod1->move(startNode);
-    prism.addChild(rod1);
-
-    tgStructure* rod2 = new tgStructure(rod);
-    rod2->addTags("rod v2");
-    rod2->move(startNode + midNode);
-    prism.addChild(rod2);
-
-    std::cout << "Displaying all nodes:" << std::endl;
-    std::cout << "From: " << startNode << ", To: " << endNode << std::endl;
-    std::cout << "Rod1: " << rod1->getNodes()[0] << ", " << rod1->getNodes()[1] << std::endl;
-    std::cout << "Rod2: " << rod2->getNodes()[0] << ", " << rod2->getNodes()[1] << std::endl;
-
-    std::vector<tgStructure*> children = prism.getChildren();
-    tgNodes n1 = children[0]->getNodes();
-    tgNodes n2 = children[1]->getNodes();
-//    prism.addPair(n1[1], n2[0], "anchor seg");
-//    prism.addPair(n1[1], n2[0], "muscle seg");
-
-    tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(m_config.m_rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(m_stringConfig));
-
-    // Create your structureInfo
-    tgStructureInfo structureInfo(prism, spec);
-
-    // Use the structureInfo to build our model
-    structureInfo.buildInto(*prismatic, world);
-
-    //not needed?
-//    prismatic->setup(world);
-    /**/
-
-#if(0)
-    // Debug printing
-    std::cout << "StructureInfo:" << std::endl;
-    std::cout << structureInfo << std::endl;
-
-    std::cout << "Model: " << std::endl;
-    std::cout << *prismatic << std::endl;
-#endif
 }

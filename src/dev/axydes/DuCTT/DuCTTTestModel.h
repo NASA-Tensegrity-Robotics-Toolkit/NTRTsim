@@ -32,6 +32,7 @@
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
 #include "core/tgCast.h"
+#include "core/tgString.h"
 #include "core/tgLinearString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"

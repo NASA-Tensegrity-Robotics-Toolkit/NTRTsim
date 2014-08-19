@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_RB_STRING_H
-#define TG_RB_STRING_H
+#ifndef TG_PRISMATIC_H
+#define TG_PRISMATIC_H
 
 /**
  * @file tgPrismatic.h
@@ -27,24 +27,11 @@
  * $Id$
  */
 
-#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
-
-#include "core/tgBulletUtil.h"
-#include "core/tgCast.h"
-#include "core/tgModel.h" 
-#include "core/tgRod.h"
+#include "core/tgModel.h"
 #include "core/tgSubject.h"
-#include "core/tgWorldBulletPhysicsImpl.h"
-
-// The C++ Standard Library
-#include <cmath>
-#include <stdexcept>
-
-#include <set>
-#include <map>
 
 class tgWorld;
+class btSliderConstraint;
 
 class tgPrismatic: public tgSubject<tgPrismatic>, public tgModel
 {
@@ -60,32 +47,26 @@ public:
                 double maxLength = 5, //todo: find better default
                 double minLength = 0.1, // todo: find better default
                 double maxMotorForce = 20,
-                std::size_t segments = 2
+                double maxVelocity = 0.5 //m/s
                 );
         
         double m_maxLength;
         double m_minLength;
         double m_maxMotorForce;
-        std::size_t m_segments;
+        double m_maxVelocity;
     };
     
     tgPrismatic(
-            btRigidBody* body1,
-            btVector3 pos1,
-            btRigidBody* body2,
-            btVector3 pos2,
-            const tgTags& tags,
-           tgPrismatic::Config& config);
+        btSliderConstraint* constraint,
+        const tgTags& tags,
+        tgPrismatic::Config& config);
     
     tgPrismatic(
-            btRigidBody* body1,
-            btVector3 pos1,
-            btRigidBody* body2,
-            btVector3 pos2,
-            std::string space_separated_tags,
-           tgPrismatic::Config& config);
+        btSliderConstraint* constraint,
+        std::string space_separated_tags,
+        tgPrismatic::Config& config);
 
-    virtual ~tgPrismatic();// {}
+    virtual ~tgPrismatic();
 
     virtual void init();
     
@@ -97,22 +78,9 @@ public:
     
     virtual void moveMotors(double dt);
 
-    const int getSegments() const
-    {
-        return m_config.m_segments;
-    }
-
 private:
-    std::vector<tgRod*> allSegments;
-
     Config m_config;
-    btRigidBody* m_body1;
-    btRigidBody* m_body2;
-    btVector3 m_pos1;
-    btVector3 m_pos2;
-
     btSliderConstraint* m_slider;
-    btSoftRigidDynamicsWorld* dynWorld;
 };
 
-#endif // TG_RB_STRING_TEST_H
+#endif // TG_PRISMATIC_H

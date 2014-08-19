@@ -26,6 +26,14 @@
 
 #include "tgPrismatic.h"
 
+#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+#include "core/tgBulletUtil.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
+
+// The C++ Standard Library
+#include <cmath>
+#include <stdexcept>
+
 /**
  * Dummy constructor to make the compiler happy.
  * @todo remove this
@@ -39,44 +47,32 @@ tgPrismatic::Config::Config(
                 double maxLength,
                 double minLength,
                 double maxMotorForce,
-                std::size_t segments
+                double maxVelocity
         ) :
 m_maxLength(maxLength),
 m_minLength(minLength),
 m_maxMotorForce(maxMotorForce),
-m_segments(segments)
+m_maxVelocity(maxVelocity)
 {
 }
 
 tgPrismatic::tgPrismatic(
-        btRigidBody* body1,
-        btVector3 pos1,
-        btRigidBody* body2,
-        btVector3 pos2,
+        btSliderConstraint* constraint,
         const tgTags& tags,
         tgPrismatic::Config& config) :
     tgModel(tags),
-    m_body1(body1),
-    m_pos1(body1->getWorldTransform().inverse() * pos1),
-    m_body2(body2),
-    m_pos2(body2->getWorldTransform().inverse() * pos2),
+    m_slider(constraint),
     m_config(config)
 {
     init();
 }
 
 tgPrismatic::tgPrismatic(
-        btRigidBody* body1,
-        btVector3 pos1,
-        btRigidBody* body2,
-        btVector3 pos2,
+        btSliderConstraint* constraint,
         std::string space_separated_tags,
         tgPrismatic::Config& config) :
     tgModel(space_separated_tags),
-    m_body1(body1),
-    m_pos1(body1->getWorldTransform().inverse() * pos1),
-    m_body2(body2),
-    m_pos2(body2->getWorldTransform().inverse() * pos2),
+    m_slider(constraint),
     m_config(config)
 {
     init();
@@ -84,23 +80,15 @@ tgPrismatic::tgPrismatic(
 
 tgPrismatic::~tgPrismatic()
 {
+    teardown();
 }
 
 void tgPrismatic::init()
 {
-    btTransform transATop;
-    btTransform transBTop;
-    transATop.setIdentity();
-    transBTop.setIdentity();
-    transATop.setOrigin(m_pos1);
-    transBTop.setOrigin(m_pos2);
-    transATop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
-    transBTop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
-    m_slider = new btSliderConstraint(*m_body1, *m_body2, transATop, transBTop, true);
     m_slider->setLowerLinLimit(m_config.m_minLength);
     m_slider->setUpperLinLimit(m_config.m_maxLength);
-//    m_slider->setPoweredLinMotor(true);
-//    m_slider->setMaxLinMotorForce(m_config.m_maxMotorForce);
+    m_slider->setPoweredLinMotor(true);
+    m_slider->setMaxLinMotorForce(m_config.m_maxMotorForce);
 }
 
 void tgPrismatic::setup(tgWorld& world)
@@ -119,6 +107,7 @@ void tgPrismatic::setup(tgWorld& world)
 
 void tgPrismatic::teardown()
 {
+    notifyTeardown();
     tgModel::teardown();
 }
 
@@ -138,4 +127,5 @@ void tgPrismatic::step(double dt)
 
 void tgPrismatic::moveMotors(double dt)
 {
+    m_slider->setTargetLinMotorVelocity(m_config.m_maxVelocity/dt);
 }

@@ -27,27 +27,10 @@
  * $Id$
  */
 
-#include "btBulletDynamicsCommon.h"
-#include <iostream>
-
 #include "tgPrismatic.h"
-
-#include "core/tgBaseString.h"
-#include "core/tgString.h"
-
-#include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgConnectorInfo.h"
-#include "tgcreator/tgLinearStringInfo.h"
-#include "tgcreator/tgNode.h"
-#include "tgcreator/tgPair.h"
-#include "tgcreator/tgRigidInfo.h"
-#include "tgcreator/tgRodInfo.h"
-#include "tgcreator/tgStructure.h"
-#include "tgcreator/tgStructureInfo.h"
-#include "tgcreator/tgUtil.h"
 
-class tgWorld;
-class tgNode;
+class btSliderConstraint;
 
 class tgPrismaticInfo: public tgConnectorInfo
 {
@@ -70,17 +53,12 @@ public:
     
     virtual tgModel* createModel(tgWorld& world);
     
-    const int getSegments() const;
-    
     double getMass();
 
+    btSliderConstraint* createSlider();
 
 protected:
-
-    void buildModel(tgWorld& world, tgModel* prismatic);
-
     tgPrismatic::Config m_config;
-    tgLinearString::Config m_stringConfig;
 };
 
 #endif
