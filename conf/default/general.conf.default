@@ -45,3 +45,8 @@ build_dir="$env_dir/build"
 # IMPORTANT: If you've previously installed to /usr/local, you'll need to 
 # delete your 'env' directory before running setup again.
 INSTALL_PREFIX="$env_dir"  
+
+# Set the path (or executable name if it's in your path) for the utility
+# to use for SHA1 summing. To disable download integrity verification
+# simply set the variable to an empty string.
+SHA1SUM_UTILITY="sha1sum"
