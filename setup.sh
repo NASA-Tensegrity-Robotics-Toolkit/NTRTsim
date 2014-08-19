@@ -90,6 +90,12 @@ function init_boost() {
     "$setup_dir/setup_boost.sh" || { echo "Boost initialization failed -- exiting now."; exit 1; }
 }
 
+function init_jsoncpp() {
+echo ""
+echo "Initializing jsoncpp..."
+"$setup_dir/setup_jsoncpp.sh" || { echo "jsoncpp initialization failed -- exiting now."; exit 1; }
+}
+
 
 # Set a variable in the install.conf configuration file
 function set_config_var() {
@@ -184,7 +190,7 @@ init_env
 init_cmake 
 init_bullet
 init_boost
-
+init_jsoncpp
 
 echo ""
 echo "Setup Complete!"
