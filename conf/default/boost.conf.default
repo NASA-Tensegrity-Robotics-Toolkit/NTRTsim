@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Define configuration directives for setup_boost.sh. 
+# Date:    2014-08-18
+# Usage:   Copy/rename this file to '../boost.conf' and run setup.sh
+
+# @see scripts/setup_boost.sh for more info
+
+# Boost installation prefix
+# Global install: /usr/local (default), env install: "$ENV_DIR"
+# If you've already installed the package under this prefix, this is the
+# only thing you'll need to set.
+BOOST_INSTALL_PREFIX="$INSTALL_PREFIX"
+
+# Location where bullet is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless boost is
+# not already installed. 
+BOOST_BUILD_DIR="$env_dir/build/boost_1_53_0"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
+
+# BOOST_URL can be either a web address or a local file address,
+# e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
+BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
+
