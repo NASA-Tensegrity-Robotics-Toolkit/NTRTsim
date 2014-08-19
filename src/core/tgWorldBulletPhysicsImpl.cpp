@@ -29,7 +29,6 @@
 // This application
 #include "tgWorld.h"
 #include "terrain/tgBulletGround.h"
-#include "terrain/tgHillyGround.h"
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
@@ -46,7 +45,6 @@
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
-#include <iostream> //TODO: Remove after debugging
 
 /**
  * Helper class to bundle objects that have the same life cycle, so they can be
@@ -86,7 +84,6 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     // Gravitational acceleration is down on the Y axis
     const btVector3 gravityVector(0, -config.gravity, 0);
     m_pDynamicsWorld->setGravity(gravityVector);
-    std::cout << "calling non-Hilly constructor" << std::endl;
 
 	m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
 
@@ -166,7 +163,6 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 {
     if (pShape)
     {
-        std::cout << "Pushed shape: " << pShape->getName() << std::endl;
         m_collisionShapes.push_back(pShape);
     }
 
