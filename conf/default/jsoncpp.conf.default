@@ -40,3 +40,7 @@ JSONCPP_PACKAGE_DIR="$JSONCPP_BUILD_DIR"
 # JSONCPP_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
 JSONCPP_URL="https://github.com/open-source-parsers/jsoncpp/archive/3515db184a836ce73b99c064bcc83884570657c2.tar.gz"
+
+# Set the expected SHA1 hash for this package's download.
+# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
+JSONCPP_SHA1="a2824f2c5a46b85ce78ca438b2aabdd7a382697c"

@@ -42,3 +42,6 @@ BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
 # e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
 BULLET_URL="http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz"
 
+# Set the expected SHA1 hash for this package's download.
+# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
+BULLET_SHA1="a0867257b9b18e9829bbeb4c6c5872a5b29d1d33"

@@ -41,3 +41,6 @@ BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
 # e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
 BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
 
+# Set the expected SHA1 hash for this package's download.
+# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
+BOOST_SHA1="0e4ef26cc7780c6bbc63987ef2f29be920e2395b"
