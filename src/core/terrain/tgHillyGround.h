@@ -55,31 +55,46 @@ class tgHillyGround : public tgBulletGround
                        btScalar friction = 0.5,
                        btScalar restitution = 0.0,
                        btVector3 size = btVector3(500.0, 1.5, 500.0),
-                       btVector3 origin = btVector3(0.0, 0.0, 0.0) );
-                /**
-                 * Euler angles are specified as yaw pitch and roll
-                 */
+                       btVector3 origin = btVector3(0.0, 0.0, 0.0),
+                       size_t nx = 50,
+                       size_t ny = 50,
+                       double margin = 0.5,
+                       double triangleSize = 5.0,
+                       double waveHeight = 5.0,
+                       double offset = 0.5);
+
+                /** Euler angles are specified as yaw pitch and roll */
                 btVector3 m_eulerAngles;
 
-                /**
-                 * Friction value of the ground, must be between 0 to 1 
-                 */
+                /** Friction value of the ground, must be between 0 to 1 */
                 btScalar  m_friction;
 
-                /**
-                 * Restitution coefficient of the ground, must be between 0 to 1 
-                 */
+                /** Restitution coefficient of the ground, must be between 0 to 1 */
                 btScalar  m_restitution;
 
-                /**
-                 * Size of the ground, must be between non-negitive
-                 */
+                /** Size of the ground, must be between non-negitive */
                 btVector3 m_size;
 
-                /**
-                 * Origin position of the ground
-                 */
+                /** Origin position of the ground */
                 btVector3 m_origin;
+
+                /** Number of nodes in the x-direction */
+                size_t m_nx;
+
+                /** Number of nodes in the y-direction */
+                size_t m_ny;
+
+                /** TODO */
+                double m_margin;
+
+                /** Scale factor for the X and Z axes, varies according to m_nx and m_ny */
+                double m_triangleSize;
+
+                /** Scale factor for the Y axis */
+                double m_waveHeight;
+
+                /** Translation factor for the Y axis */
+                double m_offset;
         };
 
         /**
@@ -107,30 +122,20 @@ class tgHillyGround : public tgBulletGround
          * Returns the collision shape that forms a hilly ground
          */
         btCollisionShape* hillyCollisionShape();
-        
+
     private:  
         /** Store the configuration data for use later */
         Config m_config;
 
-        /** Number of nodes in the x-direction */
-        size_t m_nx;
-
-        /** Number of nodes in the y-direction */
-        size_t m_ny;
-
-        double m_margin;
-
-        /** Scale factor for the X and Z axes */
-        double m_triangleSize;
-
-        /** Scale factor for the Y axis */
-        double m_waveHeight;
-
-        /** Translation factor for the Y axis */
-        double m_offset;
-
+        /** Pre-condition: Quantity of triangles and vertices must each be greater than zero 
+         *  Post-condition: Returns a mesh, as configured by the input parameters, 
+         *                  to be used as a template for a btBvhTriangleMeshShape
+         */
         btTriangleIndexVertexArray* createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]);
 
+        /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
+         *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
+         */
         btCollisionShape *createShape(btTriangleIndexVertexArray * pMesh);
 
         /**
