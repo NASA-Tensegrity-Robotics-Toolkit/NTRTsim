@@ -26,15 +26,17 @@
 // This application
 #include "Escape_T6Model.h"
 #include "Escape_T6Controller.h"
+
 // This library
 #include "core/terrain/tgHillyGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+
 // Bullet Physics
 #include "LinearMath/btVector3.h"
-#include "BulletCollision/CollisionShapes/btConvexHullShape.h"
+
 // The C++ Standard Library
 #include <iostream>
 
