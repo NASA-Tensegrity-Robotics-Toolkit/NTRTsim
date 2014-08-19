@@ -207,9 +207,9 @@ init_config
 init_scripts
 init_env
 init_cmake 
+init_jsoncpp
 init_bullet
 init_boost
-init_jsoncpp
 
 echo ""
 echo "Setup Complete!"
