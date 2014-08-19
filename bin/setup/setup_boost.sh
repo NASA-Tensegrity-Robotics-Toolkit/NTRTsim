@@ -30,10 +30,6 @@ source_conf "boost.conf"
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-# Constants
-TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
-FALSE=1 # Ditto, FALSE is non-zero
-
 function ensure_install_prefix_writable() {
     touch "$BOOST_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
         || { echo "Install prefix '$BOOST_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
