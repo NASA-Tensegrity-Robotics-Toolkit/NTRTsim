@@ -33,50 +33,37 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef BT_SOFT_BODY_SOLVERS_H
-#define BT_SOFT_BODY_SOLVERS_H
+#ifndef CORDE_SOLVERS_H
+#define CORDE_SOLVERS_H
 
 #include "BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h"
 
-
-class btSoftBodyTriangleData;
-class btSoftBodyLinkData;
-class btSoftBodyVertexData;
 class btVertexBufferDescriptor;
 class btCollisionObject;
-class btSoftBody;
+class cordeCollisionObject;
 
 
-class btSoftBodySolver
+class cordeSolver
 {
 public:
 	enum SolverTypes
 	{
-		DEFAULT_SOLVER,
-		CPU_SOLVER,
-		CL_SOLVER,
-		CL_SIMD_SOLVER,
-		DX_SOLVER,
-		DX_SIMD_SOLVER
+		DEFAULT_SOLVER
 	};
 
 
 protected:
-	int m_numberOfPositionIterations;
-	int m_numberOfVelocityIterations;
 	// Simulation timescale
 	float m_timeScale;
 	
 public:
-	btSoftBodySolver() :
-		m_numberOfPositionIterations( 10 ),
+	cordeSolver() :
 		m_timeScale( 1 )
 	{
-		m_numberOfVelocityIterations = 0;
-		m_numberOfPositionIterations = 5;
+
 	}
 
-	virtual ~btSoftBodySolver()
+	virtual ~cordeSolver()
 	{
 	}
 	
@@ -90,7 +77,7 @@ public:
 	virtual bool checkInitialized() = 0;
 
 	/** Optimize soft bodies in this solver. */
-	virtual void optimize( btAlignedObjectArray< btSoftBody * > &softBodies , bool forceUpdate=false) = 0;
+	virtual void optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies , bool forceUpdate=false) = 0;
 
 	/** Copy necessary data back to the original soft body source objects. */
 	virtual void copyBackToSoftBodies(bool bMove = true) = 0;
@@ -105,34 +92,10 @@ public:
 	virtual void updateSoftBodies() = 0;
 
 	/** Process a collision between one of the world's soft bodies and another collision object */
-	virtual void processCollision( btSoftBody *, const struct btCollisionObjectWrapper* ) = 0;
+	virtual void processCollision( cordeCollisionObject *, const struct btCollisionObjectWrapper* ) = 0;
 
 	/** Process a collision between two soft bodies */
-	virtual void processCollision( btSoftBody*, btSoftBody* ) = 0;
-
-	/** Set the number of velocity constraint solver iterations this solver uses. */
-	virtual void setNumberOfPositionIterations( int iterations )
-	{
-		m_numberOfPositionIterations = iterations;
-	}
-
-	/** Get the number of velocity constraint solver iterations this solver uses. */
-	virtual int getNumberOfPositionIterations()
-	{
-		return m_numberOfPositionIterations;
-	}
-
-	/** Set the number of velocity constraint solver iterations this solver uses. */
-	virtual void setNumberOfVelocityIterations( int iterations )
-	{
-		m_numberOfVelocityIterations = iterations;
-	}
-
-	/** Get the number of velocity constraint solver iterations this solver uses. */
-	virtual int getNumberOfVelocityIterations()
-	{
-		return m_numberOfVelocityIterations;
-	}
+	virtual void processCollision( cordeCollisionObject*, cordeCollisionObject* ) = 0;
 
 	/** Return the timescale that the simulation is using */
 	float getTimeScale()
@@ -140,12 +103,6 @@ public:
 		return m_timeScale;
 	}
 
-#if 0
-	/**
-	 * Add a collision object to be used by the indicated softbody.
-	 */
-	virtual void addCollisionObjectForSoftBody( int clothIdentifier, btCollisionObject *collisionObject ) = 0;
-#endif
 };
 
 /** 
@@ -167,8 +124,8 @@ public:
 
 
 	/** Output current computed vertex data to the vertex buffers for all cloths in the solver. */
-	virtual void copySoftBodyToVertexBuffer( const btSoftBody * const softBody, btVertexBufferDescriptor *vertexBuffer ) = 0;
+	virtual void copySoftBodyToVertexBuffer( const cordeCollisionObject * const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer ) = 0;
 };
 
 
-#endif // #ifndef BT_SOFT_BODY_SOLVERS_H
+#endif // #ifndef CORDE_SOLVERS_H

@@ -39,14 +39,14 @@ subject to the following restrictions:
 
 //softbody & helpers
 #include "LinearMath/btSerializer.h"
-
+#include "defaultCordeSolver.h"
 
 cordeDynamicsWorld::cordeDynamicsWorld(
 	btDispatcher* dispatcher,
 	btBroadphaseInterface* pairCache,
 	btConstraintSolver* constraintSolver,
 	btCollisionConfiguration* collisionConfiguration,
-	btSoftBodySolver *softBodySolver ) : 
+	cordeSolver *softBodySolver ) : 
 		btDiscreteDynamicsWorld(dispatcher,pairCache,constraintSolver,collisionConfiguration),
 		m_softBodySolver( softBodySolver ),
 		m_ownsSolver(false)
@@ -54,7 +54,7 @@ cordeDynamicsWorld::cordeDynamicsWorld(
 	if( !m_softBodySolver )
 	{
 		void* ptr = btAlignedAlloc(sizeof(btDefaultSoftBodySolver),16);
-		m_softBodySolver = new(ptr) btDefaultSoftBodySolver();
+		m_softBodySolver = new(ptr) defaultCordeSolver();
 		m_ownsSolver = true;
 	}
 

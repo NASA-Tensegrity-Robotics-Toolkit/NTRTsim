@@ -60,7 +60,7 @@ void cordeDefaultSolver::copyBackToSoftBodies(bool bMove)
 
 }
 
-void cordeDefaultSolver::optimize( btAlignedObjectArray< btSoftBody * > &softBodies , bool forceUpdate)
+void cordeDefaultSolver::optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies , bool forceUpdate)
 {
 	m_softBodySet.copyFromArray( softBodies );
 }
@@ -69,7 +69,7 @@ void cordeDefaultSolver::updateSoftBodies( )
 {
 	for ( int i=0; i < m_softBodySet.size(); i++)
 	{
-		btSoftBody*	psb=(btSoftBody*)m_softBodySet[i];
+		cordeCollisionObject*	psb=(cordeCollisionObject*)m_softBodySet[i];
 		if (psb->isActive())
 		{
 			psb->integrateMotion();	
@@ -87,7 +87,7 @@ void cordeDefaultSolver::solveConstraints( float solverdt )
 	// Solve constraints for non-solver softbodies
 	for(int i=0; i < m_softBodySet.size(); ++i)
 	{
-		btSoftBody*	psb = static_cast<btSoftBody*>(m_softBodySet[i]);
+		cordeCollisionObject*	psb = static_cast<cordeCollisionObject*>(m_softBodySet[i]);
 		if (psb->isActive())
 		{
 			psb->solveConstraints();
@@ -96,7 +96,7 @@ void cordeDefaultSolver::solveConstraints( float solverdt )
 } // cordeDefaultSolver::solveConstraints
 
 
-void cordeDefaultSolver::copySoftBodyToVertexBuffer( const btSoftBody *const softBody, btVertexBufferDescriptor *vertexBuffer )
+void cordeDefaultSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer )
 {
 	// Currently only support CPU output buffers
 	// TODO: check for DX11 buffers. Take all offsets into the same DX11 buffer
@@ -144,13 +144,13 @@ void cordeDefaultSolver::copySoftBodyToVertexBuffer( const btSoftBody *const sof
 	}
 } // cordeDefaultSolver::copySoftBodyToVertexBuffer
 
-void cordeDefaultSolver::processCollision( btSoftBody* softBody, btSoftBody* otherSoftBody)
+void cordeDefaultSolver::processCollision( cordeCollisionObject* softBody, cordeCollisionObject* otherSoftBody)
 {
 	softBody->defaultCollisionHandler( otherSoftBody);
 }
 
 // For the default solver just leave the soft body to do its collision processing
-void cordeDefaultSolver::processCollision( btSoftBody *softBody, const btCollisionObjectWrapper* collisionObjectWrap )
+void cordeDefaultSolver::processCollision( cordeCollisionObject* softBody, const btCollisionObjectWrapper* collisionObjectWrap )
 {
 	softBody->defaultCollisionHandler( collisionObjectWrap );
 } // cordeDefaultSolver::processCollision
@@ -160,7 +160,7 @@ void cordeDefaultSolver::predictMotion( float timeStep )
 {
 	for ( int i=0; i < m_softBodySet.size(); ++i)
 	{
-		btSoftBody*	psb = m_softBodySet[i];
+		cordeCollisionObject*	psb = m_softBodySet[i];
 
 		if (psb->isActive())
 		{

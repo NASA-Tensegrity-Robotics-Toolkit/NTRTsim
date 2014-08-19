@@ -37,17 +37,19 @@ subject to the following restrictions:
 #define DEFAULT_CORDE_SOLVER_H
 
 
-#include "BulletSoftBody/btSoftBodySolvers.h"
+#include "cordeSolver.h"
+
+/// @todo evaluate necessity of vertex buffer, etc.
 #include "btSoftBodySolverVertexBuffer.h"
 struct btCollisionObjectWrapper;
 
-class cordeDefaultSolver : public btSoftBodySolver
+class cordeDefaultSolver : public cordeSolver
 {
 protected:		
 	/** Variable to define whether we need to update solver constants on the next iteration */
 	bool m_updateSolverConstants;
 
-	btAlignedObjectArray< btSoftBody * > m_softBodySet;
+	btAlignedObjectArray< cordeCollisionObject * > m_softBodySet;
 
 
 public:
@@ -64,7 +66,7 @@ public:
 
 	virtual void updateSoftBodies( );
 
-	virtual void optimize( btAlignedObjectArray< btSoftBody * > &softBodies,bool forceUpdate=false );
+	virtual void optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies,bool forceUpdate=false );
 
 	virtual void copyBackToSoftBodies(bool bMove = true);
 
@@ -72,11 +74,11 @@ public:
 
 	virtual void predictMotion( float solverdt );
 
-	virtual void copySoftBodyToVertexBuffer( const btSoftBody *const softBody, btVertexBufferDescriptor *vertexBuffer );
+	virtual void copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer );
 
-	virtual void processCollision( btSoftBody *, const btCollisionObjectWrapper* );
+	virtual void processCollision( cordeCollisionObject *, const btCollisionObjectWrapper* );
 
-	virtual void processCollision( btSoftBody*, btSoftBody* );
+	virtual void processCollision( cordeCollisionObject*, cordeCollisionObject* );
 
 };
 

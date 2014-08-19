@@ -50,7 +50,7 @@ subject to the following restrictions:
 
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h"
-#include "BulletSoftBody/btSoftBody.h"
+#include "cordeCollisionObject.h"
 
 #define BT_SOFTBODY_TRIANGLE_EXTRUSION btScalar(0.06)//make this configurable
 
@@ -73,7 +73,7 @@ cordeTriangleCallback::cordeTriangleCallback(btDispatcher*  dispatcher,const btC
 m_dispatcher(dispatcher),
 m_dispatchInfoPtr(0)
 {
-	m_softBody = (isSwapped? (btSoftBody*)body1Wrap->getCollisionObject():(btSoftBody*)body0Wrap->getCollisionObject());
+	m_softBody = (isSwapped? (cordeCollisionObject*)body1Wrap->getCollisionObject():(cordeCollisionObject*)body0Wrap->getCollisionObject());
 	m_triBody = isSwapped? body0Wrap->getCollisionObject():body1Wrap->getCollisionObject();
 
 	//

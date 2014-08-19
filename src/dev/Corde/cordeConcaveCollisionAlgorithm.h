@@ -44,7 +44,7 @@ subject to the following restrictions:
 class btDispatcher;
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionCreateFunc.h"
-class btSoftBody;
+class cordeCollisionObject;
 class btCollisionShape;
 
 #include "LinearMath/btHashMap.h"
@@ -84,7 +84,7 @@ struct btTriIndex
 ///For each triangle in the concave mesh that overlaps with the AABB of a soft body (m_softBody), processTriangle is called.
 class cordeTriangleCallback : public btTriangleCallback
 {
-	btSoftBody* m_softBody;
+	cordeCollisionObject* m_softBody;
 	const btCollisionObject* m_triBody;
 
 	btVector3	m_aabbMin;

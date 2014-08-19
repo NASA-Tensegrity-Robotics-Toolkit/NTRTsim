@@ -42,7 +42,7 @@ class cordeCollisionObject;
 
 typedef	btAlignedObjectArray<cordeCollisionObject*> btCordeObjectArray;
 
-class btSoftBodySolver;
+class cordeSolver;
 
 class cordeDynamicsWorld : public btDiscreteDynamicsWorld
 {
@@ -50,7 +50,7 @@ class cordeDynamicsWorld : public btDiscreteDynamicsWorld
 	btCordeObjectArray	m_cordeObjects;
 	btSoftBodyWorldInfo m_sbi;
 	///Solver classes that encapsulate multiple soft bodies for solving
-	btSoftBodySolver *m_softBodySolver;
+	cordeSolver *m_softBodySolver;
 	bool			m_ownsSolver;
 
 protected:
@@ -65,7 +65,7 @@ protected:
 
 public:
 
-	cordeDynamicsWorld(btDispatcher* dispatcher,btBroadphaseInterface* pairCache,btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration, btSoftBodySolver *softBodySolver = 0 );
+	cordeDynamicsWorld(btDispatcher* dispatcher,btBroadphaseInterface* pairCache,btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration, cordeSolver *softBodySolver = 0 );
 
 	virtual ~cordeDynamicsWorld();
 
