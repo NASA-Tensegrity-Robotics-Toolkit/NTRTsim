@@ -15,7 +15,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
 
-This class is a modified version of btSoftBodyCollisionShape
+This class is a modified version of btSoftBodyRigidBodyCollisionConfiguration
 * from Bullet 2.82. A copy of the z-lib license from the Bullet Physics
 * Library is provided below:
 
@@ -33,49 +33,36 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CORDE_COLLISION_SHAPE
-#define CORDE_COLLISION_SHAPE
+#ifndef CORDE_RIGIDBODY_COLLISION_CONFIGURATION
+#define CORDE_RIGIDBODY_COLLISION_CONFIGURATION
 
-/**
- * @file cordeCollisionShape.h
- * @brief Collision shape for the Corde Collision object
- * Largely based on bullet's btSoftBodyCollisionShape in btSoftBodyInternals.h
- * @author Brian Mirletz
- * $Id$
- */
+#include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 
-// Bullet Physics
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "LinearMath/btVector3.h"
+class btVoronoiSimplexSolver;
+class btGjkEpaPenetrationDepthSolver;
 
-// Can this be forward declared??
-#include "cordeCollisionObject.h"
 
-class cordeCollisionObject;
-
-class cordeCollisionShape : public btCollisionShape
+///cordeRigidBodyCollisionConfiguration add softbody interaction on top of btDefaultCollisionConfiguration
+class	cordeRigidBodyCollisionConfiguration : public btDefaultCollisionConfiguration
 {
+
+	//default CreationFunctions, filling the m_doubleDispatch table
+	btCollisionAlgorithmCreateFunc*	m_softSoftCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_softRigidConvexCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_swappedSoftRigidConvexCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_softRigidConcaveCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_swappedSoftRigidConcaveCreateFunc;
+
 public:
 
-	cordeCollisionShape(cordeCollisionObject* objectShape);
-	
-	virtual ~cordeCollisionShape() { }
-	
-	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
-	{
-		///@todo define this once we know how to calculate bounds from cordeCollisionObject
-	}
-	
-	virtual void	setLocalScaling(const btVector3& scaling) { }/// @todo 
-	virtual const btVector3& getLocalScaling() { }/// @todo 
-	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const { }/// @todo 
-	virtual const char*	getName() const { return "cordeCollisionShape"; }/// @todo 
-	virtual void	setMargin(btScalar margin) { } /// @todo 
-	virtual btScalar	getMargin() const { return 0.0; } /// @todo 
-	
-private:
-	
-	cordeCollisionObject* p_objectShape;
+	cordeRigidBodyCollisionConfiguration(const btDefaultCollisionConstructionInfo& constructionInfo = btDefaultCollisionConstructionInfo());
+
+	virtual ~cordeRigidBodyCollisionConfiguration();
+
+	///creation of soft-soft and soft-rigid, and otherwise fallback to base class implementation
+	virtual btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc(int proxyType0,int proxyType1);
+
 };
 
-#endif // CORDE_COLLISION_SHAPE
+#endif //CORDE_RIGIDBODY_COLLISION_CONFIGURATION
+

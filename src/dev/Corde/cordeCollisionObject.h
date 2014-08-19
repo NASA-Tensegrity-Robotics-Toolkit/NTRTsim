@@ -40,13 +40,38 @@
 // The C++ Standard Library
 #include <vector>
 
-class CordeCollisionObject : public CordeModel, public btCollisionObject
+class cordeCollisionObject : public CordeModel, public btCollisionObject
 {
 public:
 
-	CordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
+	cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
 	
-	virtual ~CordeCollisionObject();
+	virtual ~cordeCollisionObject();
+
+/**
+ * @todo implement these members and functions:"
+ * if (softBody->m_collisionDisabledObjects.findLinearSearch(rigidCollisionObjectWrap->getCollisionObject())==softBody->m_collisionDisabledObjects.size())
+	{
+		softBody->getSoftBodySolver()->processCollision(softBody, rigidCollisionObjectWrap);
+	}
+	* 
+	* soft0->getSoftBodySolver()->processCollision(soft0, soft1);
+	*
+	if (psb->isActive())
+		{
+			psb->integrateMotion();	
+		}
+	*
+	psb->solveConstraints();
+	* 
+	softBody->defaultCollisionHandler( otherSoftBody);
+	* 
+	softBody->defaultCollisionHandler( collisionObjectWrap );
+	* 
+	psb->predictMotion(timeStep);
+	* 
+	btSoftBody::upcast(collisionObject) 
+*/
 
 };
  

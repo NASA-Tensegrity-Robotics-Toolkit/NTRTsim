@@ -15,7 +15,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
 
-This class is a modified version of btSoftBodyCollisionShape
+This class is a modified version of btSoftSoftCollisionAlgorithm
 * from Bullet 2.82. A copy of the z-lib license from the Bullet Physics
 * Library is provided below:
 
@@ -33,49 +33,34 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CORDE_COLLISION_SHAPE
-#define CORDE_COLLISION_SHAPE
-
-/**
- * @file cordeCollisionShape.h
- * @brief Collision shape for the Corde Collision object
- * Largely based on bullet's btSoftBodyCollisionShape in btSoftBodyInternals.h
- * @author Brian Mirletz
- * $Id$
- */
-
-// Bullet Physics
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "LinearMath/btVector3.h"
-
-// Can this be forward declared??
+#include "cordeSelfCollisionAlgorithm.h"
+#include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "BulletSoftBody/btSoftBodySolvers.h"
 #include "cordeCollisionObject.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
-class cordeCollisionObject;
+#define USE_PERSISTENT_CONTACTS 1
 
-class cordeCollisionShape : public btCollisionShape
+cordeSelfCollisionAlgorithm::cordeSelfCollisionAlgorithm(btPersistentManifold* /*mf*/,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* /*obj0*/,const btCollisionObjectWrapper* /*obj1*/)
+: btCollisionAlgorithm(ci)
 {
-public:
+}
 
-	cordeCollisionShape(cordeCollisionObject* objectShape);
-	
-	virtual ~cordeCollisionShape() { }
-	
-	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
-	{
-		///@todo define this once we know how to calculate bounds from cordeCollisionObject
-	}
-	
-	virtual void	setLocalScaling(const btVector3& scaling) { }/// @todo 
-	virtual const btVector3& getLocalScaling() { }/// @todo 
-	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const { }/// @todo 
-	virtual const char*	getName() const { return "cordeCollisionShape"; }/// @todo 
-	virtual void	setMargin(btScalar margin) { } /// @todo 
-	virtual btScalar	getMargin() const { return 0.0; } /// @todo 
-	
-private:
-	
-	cordeCollisionObject* p_objectShape;
-};
+cordeSelfCollisionAlgorithm::~cordeSelfCollisionAlgorithm()
+{
+}
 
-#endif // CORDE_COLLISION_SHAPE
+void cordeSelfCollisionAlgorithm::processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)
+{
+	cordeCollisionObject* soft0 =	(cordeCollisionObject*)body0Wrap->getCollisionObject();
+	cordeCollisionObject* soft1 =	(cordeCollisionObject*)body1Wrap->getCollisionObject();
+	soft0->getSoftBodySolver()->processCollision(soft0, soft1);
+}
+
+btScalar cordeSelfCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* /*body0*/,btCollisionObject* /*body1*/,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)
+{
+	//not yet
+	return 1.f;
+}

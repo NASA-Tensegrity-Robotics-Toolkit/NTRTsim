@@ -15,7 +15,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
 
-This class is a modified version of btSoftBodyCollisionShape
+This class is a modified version of btDefaultSoftBodySolver
 * from Bullet 2.82. A copy of the z-lib license from the Bullet Physics
 * Library is provided below:
 
@@ -33,49 +33,51 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CORDE_COLLISION_SHAPE
-#define CORDE_COLLISION_SHAPE
+#ifndef DEFAULT_CORDE_SOLVER_H
+#define DEFAULT_CORDE_SOLVER_H
 
-/**
- * @file cordeCollisionShape.h
- * @brief Collision shape for the Corde Collision object
- * Largely based on bullet's btSoftBodyCollisionShape in btSoftBodyInternals.h
- * @author Brian Mirletz
- * $Id$
- */
 
-// Bullet Physics
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "LinearMath/btVector3.h"
+#include "BulletSoftBody/btSoftBodySolvers.h"
+#include "btSoftBodySolverVertexBuffer.h"
+struct btCollisionObjectWrapper;
 
-// Can this be forward declared??
-#include "cordeCollisionObject.h"
-
-class cordeCollisionObject;
-
-class cordeCollisionShape : public btCollisionShape
+class cordeDefaultSolver : public btSoftBodySolver
 {
-public:
+protected:		
+	/** Variable to define whether we need to update solver constants on the next iteration */
+	bool m_updateSolverConstants;
 
-	cordeCollisionShape(cordeCollisionObject* objectShape);
+	btAlignedObjectArray< btSoftBody * > m_softBodySet;
+
+
+public:
+	cordeDefaultSolver();
 	
-	virtual ~cordeCollisionShape() { }
+	virtual ~cordeDefaultSolver();
 	
-	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
+	virtual SolverTypes getSolverType() const
 	{
-		///@todo define this once we know how to calculate bounds from cordeCollisionObject
+		return DEFAULT_SOLVER;
 	}
-	
-	virtual void	setLocalScaling(const btVector3& scaling) { }/// @todo 
-	virtual const btVector3& getLocalScaling() { }/// @todo 
-	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const { }/// @todo 
-	virtual const char*	getName() const { return "cordeCollisionShape"; }/// @todo 
-	virtual void	setMargin(btScalar margin) { } /// @todo 
-	virtual btScalar	getMargin() const { return 0.0; } /// @todo 
-	
-private:
-	
-	cordeCollisionObject* p_objectShape;
+
+	virtual bool checkInitialized();
+
+	virtual void updateSoftBodies( );
+
+	virtual void optimize( btAlignedObjectArray< btSoftBody * > &softBodies,bool forceUpdate=false );
+
+	virtual void copyBackToSoftBodies(bool bMove = true);
+
+	virtual void solveConstraints( float solverdt );
+
+	virtual void predictMotion( float solverdt );
+
+	virtual void copySoftBodyToVertexBuffer( const btSoftBody *const softBody, btVertexBufferDescriptor *vertexBuffer );
+
+	virtual void processCollision( btSoftBody *, const btCollisionObjectWrapper* );
+
+	virtual void processCollision( btSoftBody*, btSoftBody* );
+
 };
 
-#endif // CORDE_COLLISION_SHAPE
+#endif // #ifndef DEFAULT_CORDE_SOLVER_H

@@ -17,7 +17,7 @@
 */
 
 /**
- * @file CordeCollisionObject.cpp
+ * @file cordeCollisionObject.cpp
  * @brief Interface Between Corde Model and Bullet
  * @author Brian Mirletz
  * $Id$
@@ -26,10 +26,10 @@
 // This Module
 #include "cordeCollisionObject.h"
 
-CordeCollisionObject::CordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config) :
+cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config) :
 CordeModel(centerLine, Config)
 {
 ///@todo examine how to reconfigure collision shape defaults (m_friction, etc)	
 }
 	
-CordeCollisionObject::~CordeCollisionObject() {}
+cordeCollisionObject::~cordeCollisionObject() {}
