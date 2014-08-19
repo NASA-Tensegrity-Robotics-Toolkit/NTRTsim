@@ -25,7 +25,7 @@ base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and norma
 source "$base_dir/bin/setup/setup_common.sh"
 
 #Source this package's configuration
-source_conf("jsoncpp.conf")
+source_conf "jsoncpp.conf"
 
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
 SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
