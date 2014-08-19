@@ -21,13 +21,17 @@
 
 ###############################
 # Configuration
-install_conf_file="$base_dir/conf/install.conf"
-if [ ! -f "$install_conf_file" ]; then
-	echo "Missing install.conf ($install_conf_file). Please fix this and try again."
-	exit 1
-fi
-source "$install_conf_file"
+source_conf("general.conf")
 ###############################
+
+function source_conf(conf_file_name) {
+	conf_file_name="$base_dir/conf/$conf_file_name"
+	if [ ! -f "$conf_file_name" ]; then
+		echo "Missing $conf_file_name. Please fix this and try again."
+		exit 1
+	fi
+	source	"$conf_file_name"
+}
 
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")
