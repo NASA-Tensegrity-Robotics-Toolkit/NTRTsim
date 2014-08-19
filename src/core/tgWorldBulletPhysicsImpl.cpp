@@ -136,6 +136,7 @@ void tgWorldBulletPhysicsImpl::removeCollisionShapes()
 
     // Delete all the collision shapes. This can be done at any time.
     const size_t ncs = m_collisionShapes.size();
+
     for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
 }
 
