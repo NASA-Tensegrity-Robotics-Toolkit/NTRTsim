@@ -122,7 +122,7 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 
     // Delete all the collision shapes. This can be done at any time.
 
-    for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
+    for (size_t i = 0; i < nco; ++i) { delete m_collisionShapes[i]; }
 
     delete m_pDynamicsWorld;
 
