@@ -76,17 +76,13 @@ tgHillyGround::tgHillyGround() :
     m_config(Config())
 {
     // @todo make constructor aux to avoid repeated code
-    const btVector3 groundDimensions(m_config.m_size);
-    //pGroundShape = new btBoxShape(groundDimensions);
-    pGroundShape = hillyCollisionShape(); // TODO: Incorporate input groundDimensions
+    pGroundShape = hillyCollisionShape();
 }
 
 tgHillyGround::tgHillyGround(const tgHillyGround::Config& config) :
     m_config(config)
 {
-    const btVector3 groundDimensions(m_config.m_size);
-    //pGroundShape = new btBoxShape(groundDimensions);
-    pGroundShape = hillyCollisionShape(); // TODO: Incorporate input groundDimensions
+    pGroundShape = hillyCollisionShape();
 }
 
 btRigidBody* tgHillyGround::getGroundRigidBody() const
