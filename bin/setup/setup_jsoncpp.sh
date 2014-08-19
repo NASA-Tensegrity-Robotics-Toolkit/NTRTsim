@@ -34,10 +34,6 @@ setup_dir="$SCRIPT_PATH"
 # Variables
 jsoncpp_pkg=`echo $JSONCPP_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-# Constants
-TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
-FALSE=1 # FALSE is non-zero
-
 function ensure_install_prefix_writable() {
     touch "$JSONCPP_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
         || { echo "Install prefix '$JSONCPP_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }

@@ -30,6 +30,10 @@ function source_conf() {
 
 source_conf "general.conf"
 
+# Constants
+TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
+FALSE=1 # Ditto, FALSE is non-zero
+
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")
 function str_contains() {
