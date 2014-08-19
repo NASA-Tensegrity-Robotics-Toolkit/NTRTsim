@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Define configuration directives for setup_bullet.sh. 
+# Date:    2014-08-18
+# Usage:   Copy/rename this file to '../bullet.conf' and run setup.sh
+
+# @see scripts/setup_bullet.sh for more info.
+
+# Bullet installation prefix
+# Global install: /usr/local, env install: "$env_dir"
+# By default, setup will download and install bullet under your env directory.
+# If you have an existing bullet install, you should change 
+# BULLET_INSTALL_PREFIX to what was used for installation (likely /usr/local).
+BULLET_INSTALL_PREFIX="$env_dir"
+
+# Location where bullet is to be built, or where it was built if you're using 
+# an existing package.
+BULLET_BUILD_DIR="$env_dir/build/bullet-2.82-r2704"
+
+# This is the location where you unzipped the package (or, where it will be
+# unzipped if required). This will be the same as the build dir unless you did
+# an out-of-source build (not common for bullet).
+BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
+
+# BULLET_URL can be either a web address or a local file address, 
+# e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
+BULLET_URL="http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz"
+
+# Set the expected SHA1 hash for this package's download.
+# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
+BULLET_SHA1="a0867257b9b18e9829bbeb4c6c5872a5b29d1d33"
