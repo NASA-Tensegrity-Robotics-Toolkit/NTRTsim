@@ -22,7 +22,8 @@
 /**
  * @file tgConnectorInfo.h
  * @brief Definition of class tgConnectorInfo
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

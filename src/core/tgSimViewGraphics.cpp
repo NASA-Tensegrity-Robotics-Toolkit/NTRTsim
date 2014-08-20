@@ -19,6 +19,7 @@
 /**
  * @file tgSimViewGraphics.cpp
  * @brief Contains the definitions of members of class tgSimViewGraphics
+ * @author Brian Mirletz, Ryan Adams
  * $Id$
  */
 

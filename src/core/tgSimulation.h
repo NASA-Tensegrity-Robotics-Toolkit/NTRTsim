@@ -22,6 +22,7 @@
 /**
  * @file tgSimulation.h
  * @brief Contains the definition of class tgSimulation
+ * @author Ryan Adams, Brian Mirletz
  * $Id$
  */
 

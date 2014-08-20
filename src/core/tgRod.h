@@ -22,6 +22,7 @@
 /**
  * @file tgRod.h
  * @brief Contains the definition of class tgRod
+ * @author Ryan Adams
  * $Id$
  */
 

@@ -19,6 +19,7 @@
 /**
  * @file tgLinearStringInfo.cpp
  * @brief Implementation of class tgLinearStringInfo
+ * @author Ryan Adams
  * @date March 2014
  * $Id$
  */

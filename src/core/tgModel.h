@@ -22,6 +22,7 @@
 /**
  * @file tgModel.h
  * @brief Contains the definition of class tgModel.
+ * @author Ryan Adams
  * $Id$
  */
 
