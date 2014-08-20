@@ -30,7 +30,6 @@
 class btCollisionShape;
 class btDynamicsWorld;
 class btRigidBody;
-class btSoftRigidDynamicsWorld;
 class btTransform;
 class tgWorld;
 
@@ -52,8 +51,9 @@ public:
      * its dynamics world.
      * @param[in,out] world a tgWorld
      * @return the world's implementation's btSoftRigidDynamicsView
+     * @todo consider implications of casting to include Corde objects
      */
-    static btSoftRigidDynamicsWorld& worldToDynamicsWorld(tgWorld& world);
+    static btDynamicsWorld& worldToDynamicsWorld(tgWorld& world);
 };
 
 

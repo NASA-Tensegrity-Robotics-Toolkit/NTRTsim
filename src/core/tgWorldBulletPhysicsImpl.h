@@ -34,7 +34,7 @@
 
 // Forward declarations
 class btCollisionShape;
-class btSoftRigidDynamicsWorld;
+class btDynamicsWorld;
 class btRigidBody;
 class IntermediateBuildProducts;
 class tgBulletGround;
@@ -68,7 +68,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
    * Return a reference to the dynamics world.
    * @return a reference to the dynamics world
    */
-  btSoftRigidDynamicsWorld& dynamicsWorld() const
+  btDynamicsWorld& dynamicsWorld() const
   {
     return *m_pDynamicsWorld;
   }
@@ -87,7 +87,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
      * can free the pointers it creates.
      * @return the newly-created btSoftRigidDynamicsWorld
      */
-        btSoftRigidDynamicsWorld* createDynamicsWorld() const;
+        btDynamicsWorld* createDynamicsWorld() const;
     
     /**
      * Create the ground - needs to be in the namespace so we can
@@ -103,8 +103,9 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
     /** Used to build the btSoftRigidDynamicsWorld. */
     IntermediateBuildProducts * const m_pIntermediateBuildProducts;
     
-    /** The Bullet Physics representation of the tgWorld. */
-    btSoftRigidDynamicsWorld* m_pDynamicsWorld;
+    /** The Bullet Physics representation of the tgWorld. 
+     */
+   btDynamicsWorld* m_pDynamicsWorld;
     
     /* 
      * A vector of collision shapes for easy reference. Does not affect

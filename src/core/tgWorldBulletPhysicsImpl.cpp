@@ -29,6 +29,8 @@
 // This application
 #include "tgWorld.h"
 #include "terrain/tgBulletGround.h"
+#include "dev/Corde/cordeDynamicsWorld.h"
+#include "dev/Corde/cordeRigidBodyCollisionConfiguration.h"
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
@@ -37,9 +39,8 @@
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
-#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "LinearMath/btDefaultMotionState.h"
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btTransform.h"
@@ -63,7 +64,7 @@ public:
   }
   const btVector3 corner1;
   const btVector3 corner2;
-  btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
+  cordeRigidBodyCollisionConfiguration collisionConfiguration;
   btCollisionDispatcher dispatcher;
 #if (0) // Default broadphase
   btDbvtBroadphase broadphase;
@@ -139,10 +140,10 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
  * Create and return a new instance of a btSoftRigidDynamicsWorld.
  * @return a pointer to a new instance of a btSoftRigidDynamicsWorld
  */
-btSoftRigidDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
+btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
 {    
-  btSoftRigidDynamicsWorld * const result =
-    new btSoftRigidDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
+  cordeDynamicsWorld * const result =
+    new cordeDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
                  &m_pIntermediateBuildProducts->broadphase,
                  &m_pIntermediateBuildProducts->solver, 
                  &m_pIntermediateBuildProducts->collisionConfiguration);
