@@ -35,6 +35,9 @@ subject to the following restrictions:
 
 
 #include "cordeDynamicsWorld.h"
+#include "cordeCollisionObject.h"
+#include "cordeSolvers.h"
+#include "defaultCordeSolver.h"
 #include "LinearMath/btQuickprof.h"
 
 //softbody & helpers
@@ -78,7 +81,7 @@ cordeDynamicsWorld::~cordeDynamicsWorld()
 {
 	if (m_ownsSolver)
 	{
-		m_softBodySolver->~btSoftBodySolver();
+		m_softBodySolver->~cordeSolver();
 		btAlignedFree(m_softBodySolver);
 	}
 }
@@ -109,9 +112,9 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 	solveSoftBodiesConstraints( timeStep );
 
 	//self collisions
-	for ( int i=0;i<m_softBodies.size();i++)
+	for ( int i=0;i<m_cordeObjects.size();i++)
 	{
-		btSoftBody*	psb=(btSoftBody*)m_softBodies[i];
+		cordeCollisionObject*	psb=(cordeCollisionObject*)m_cordeObjects[i];
 		psb->defaultCollisionHandler(psb);
 	}
 
@@ -127,9 +130,10 @@ void	cordeDynamicsWorld::solveSoftBodiesConstraints( btScalar timeStep )
 {
 	BT_PROFILE("solveSoftConstraints");
 
-	if(m_softBodies.size())
+	if(m_cordeObjects.size())
 	{
-		btSoftBody::solveClusters(m_softBodies);
+		// Internal step prior to solving constraints?
+		//btSoftBody::solveClusters(m_cordeObjects);
 	}
 
 	// Solve constraints solver-wise
@@ -137,13 +141,13 @@ void	cordeDynamicsWorld::solveSoftBodiesConstraints( btScalar timeStep )
 
 }
 
-void	cordeDynamicsWorld::addSoftBody(btSoftBody* body,short int collisionFilterGroup,short int collisionFilterMask)
+void	cordeDynamicsWorld::addSoftBody(cordeCollisionObject* body,short int collisionFilterGroup,short int collisionFilterMask)
 {
-	m_softBodies.push_back(body);
+	m_cordeObjects.push_back(body);
 
 	// Set the soft body solver that will deal with this body
 	// to be the world's solver
-	body->setSoftBodySolver( m_softBodySolver );
+	body->setSolver( m_softBodySolver );
 
 	btCollisionWorld::addCollisionObject(body,
 		collisionFilterGroup,
@@ -151,16 +155,16 @@ void	cordeDynamicsWorld::addSoftBody(btSoftBody* body,short int collisionFilterG
 
 }
 
-void	cordeDynamicsWorld::removeSoftBody(btSoftBody* body)
+void	cordeDynamicsWorld::removeSoftBody(cordeCollisionObject* body)
 {
-	m_softBodies.remove(body);
+	m_cordeObjects.remove(body);
 
 	btCollisionWorld::removeCollisionObject(body);
 }
 
 void	cordeDynamicsWorld::removeCollisionObject(btCollisionObject* collisionObject)
 {
-	btSoftBody* body = btSoftBody::upcast(collisionObject);
+	cordeCollisionObject* body = cordeCollisionObject::upcast(collisionObject);
 	if (body)
 		removeSoftBody(body);
 	else
@@ -280,7 +284,7 @@ void	cordeDynamicsWorld::rayTestSingle(const btTransform& rayFromTrans,const btT
 					  RayResultCallback& resultCallback)
 {
 	if (collisionShape->isSoftBody()) {
-		btSoftBody* softBody = btSoftBody::upcast(collisionObject);
+		cordeCollisionObject* softBody = btSoftBody::upcast(collisionObject);
 		if (softBody) {
 			btSoftBody::sRayCast softResult;
 			if (softBody->rayTest(rayFromTrans.getOrigin(), rayToTrans.getOrigin(), softResult)) 

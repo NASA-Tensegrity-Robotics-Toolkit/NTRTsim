@@ -43,6 +43,7 @@ class cordeCollisionObject;
 typedef	btAlignedObjectArray<cordeCollisionObject*> btCordeObjectArray;
 
 class cordeSolver;
+class btSoftBodyWorldInfo;
 
 class cordeDynamicsWorld : public btDiscreteDynamicsWorld
 {
@@ -77,9 +78,6 @@ public:
 
 	///removeCollisionObject will first check if it is a rigid body, if so call removeRigidBody otherwise call btDiscreteDynamicsWorld::removeCollisionObject
 	virtual void	removeCollisionObject(btCollisionObject* collisionObject);
-
-	int		getDrawFlags() const { return(m_drawFlags); }
-	void	setDrawFlags(int f)	{ m_drawFlags=f; }
 
 	btSoftBodyWorldInfo&	getWorldInfo()
 	{
@@ -120,9 +118,9 @@ public:
 					  const btCollisionShape* collisionShape,
 					  const btTransform& colObjWorldTransform,
 					  RayResultCallback& resultCallback);
-
-	virtual	void	serialize(btSerializer* serializer);
 #endif // Temp disable raytest and serialize
+	virtual	void	serialize(btSerializer* serializer) { } ///@todo
+
 };
 
 #endif //CORDE_RIGID_DYNAMICS_WORLD_H
