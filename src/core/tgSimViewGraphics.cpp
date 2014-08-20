@@ -58,7 +58,7 @@ void tgSimViewGraphics::setup()
 
         // Cache a pointer to the btSoftRigidDynamicsWorld
         tgWorld& world = m_pSimulation->getWorld();
-        btSoftRigidDynamicsWorld& dynamicsWorld =
+        btDynamicsWorld& dynamicsWorld =
                 tgBulletUtil::worldToDynamicsWorld(world);
         // Store a pointer to the btSoftRigidDynamicsWorld
         // This class is not taking ownership of it

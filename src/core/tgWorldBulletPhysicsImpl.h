@@ -34,10 +34,12 @@
 
 // Forward declarations
 class btCollisionShape;
-class btSoftRigidDynamicsWorld;
 class btTypedConstraint;
+class btDynamicsWorld;
 class btRigidBody;
 class IntermediateBuildProducts;
+class btBroadphaseInterface;
+class btDispatcher;
 class tgBulletGround;
 class tgHillyGround;
 
@@ -70,17 +72,23 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
    * Return a reference to the dynamics world.
    * @return a reference to the dynamics world
    */
-  btSoftRigidDynamicsWorld& dynamicsWorld() const
+  btDynamicsWorld& dynamicsWorld() const
   {
     return *m_pDynamicsWorld;
   }
+  
+	/**
+	 * Add a btCollisionShape the a collection for deletion upon
+	 * destruction.
+	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
+	 */
+	void addCollisionShape(btCollisionShape* pShape);
 
-        /**
-     * Add a btCollisionShape the a collection for deletion upon
-     * destruction.
-     * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
-     */
-        void addCollisionShape(btCollisionShape* pShape);
+	/**
+	 * Soft-bodies need access to the broadphase and dispatcher
+	 */
+	btBroadphaseInterface& getBroadphase() const;
+	btDispatcher& getDispatcher() const;
 
         /**
      * Add a btTypedConstraint to a collection for deletion upon
@@ -107,7 +115,7 @@ private:
      * can free the pointers it creates.
      * @return the newly-created btSoftRigidDynamicsWorld
      */
-        btSoftRigidDynamicsWorld* createDynamicsWorld() const;
+        btDynamicsWorld* createDynamicsWorld() const;
     
     /** Integrity predicate. */
     bool invariant() const;
@@ -117,10 +125,13 @@ private:
     /** Used to build the btSoftRigidDynamicsWorld. */
     IntermediateBuildProducts * const m_pIntermediateBuildProducts;
     
-    /** The Bullet Physics representation of the tgWorld. */
-    btSoftRigidDynamicsWorld* m_pDynamicsWorld;
 
-    /*
+
+    /** The Bullet Physics representation of the tgWorld. 
+     */
+   btDynamicsWorld* m_pDynamicsWorld;
+    
+    /* 
      * A vector of collision shapes for easy reference. Does not affect
      * physics or rendering unles the shape is placed into the dynamics
      * world. Bullet encourages reuse of collision shapes when possible
