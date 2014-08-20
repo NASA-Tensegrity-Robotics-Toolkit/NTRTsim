@@ -38,6 +38,7 @@
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
@@ -60,12 +61,12 @@ class IntermediateBuildProducts
 #if (1) // More acc broadphase - remeber the comma
             broadphase(corner1, corner2, 16384)
 #endif
-            {
-            }
-        const btVector3 corner1;
-        const btVector3 corner2;
-        btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
-        btCollisionDispatcher dispatcher;
+  {
+  }
+  const btVector3 corner1;
+  const btVector3 corner2;
+  btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
+  btCollisionDispatcher dispatcher;
 #if (0) // Default broadphase
         btDbvtBroadphase broadphase;
 #else
@@ -135,15 +136,15 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
  * Create and return a new instance of a btSoftRigidDynamicsWorld.
  * @return a pointer to a new instance of a btSoftRigidDynamicsWorld
  */
-btSoftRigidDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
+btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
 {    
-    btSoftRigidDynamicsWorld * const result =
-        new btSoftRigidDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
-                &m_pIntermediateBuildProducts->broadphase,
-                &m_pIntermediateBuildProducts->solver, 
-                &m_pIntermediateBuildProducts->collisionConfiguration);
+  btSoftRigidDynamicsWorld* const result =
+    new btSoftRigidDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
+                 &m_pIntermediateBuildProducts->broadphase,
+                 &m_pIntermediateBuildProducts->solver, 
+                 &m_pIntermediateBuildProducts->collisionConfiguration);
 
-    return result;
+  return result;
 }
 
 void tgWorldBulletPhysicsImpl::step(double dt)
@@ -169,6 +170,20 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 
       // Postcondition
       assert(invariant());
+}
+
+btBroadphaseInterface& tgWorldBulletPhysicsImpl::getBroadphase() const
+{
+	assert(m_pIntermediateBuildProducts);
+	
+	return m_pIntermediateBuildProducts->broadphase;
+}
+
+btDispatcher& tgWorldBulletPhysicsImpl::getDispatcher() const
+{
+	assert(m_pIntermediateBuildProducts);
+	
+	return m_pIntermediateBuildProducts->dispatcher;
 }
 
 bool tgWorldBulletPhysicsImpl::invariant() const

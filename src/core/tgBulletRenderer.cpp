@@ -51,7 +51,7 @@ void tgBulletRenderer::render(const tgRod& rod) const
 void tgBulletRenderer::render(const tgLinearString& linString) const
 {
         // Fetch the btDynamicsWorld
-        btSoftRigidDynamicsWorld& dynamicsWorld =
+        btDynamicsWorld& dynamicsWorld =
       tgBulletUtil::worldToDynamicsWorld(m_world);
 
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
@@ -65,6 +65,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
         pMuscle->anchor1->getWorldPosition();
       const btVector3 lineTo = 
         pMuscle->anchor2->getWorldPosition();
+       // Should this be normalized??
       const double stretch = 
         linString.getCurrentLength() - pMuscle->getRestLength();
       const btVector3 color =
@@ -85,7 +86,7 @@ void tgBulletRenderer::render(const tgModel& model) const
 	 */
 
 	// Fetch the btDynamicsWorld
-	btSoftRigidDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+	btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
 	btIDebugDraw* const idraw = dynamicsWorld.getDebugDrawer();
 	for(int j=0;j<model.getMarkers().size() ;j++)
 	{
