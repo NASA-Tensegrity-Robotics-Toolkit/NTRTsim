@@ -49,7 +49,6 @@ subject to the following restrictions:
 #include "LinearMath/btVector3.h"
 
 // Can this be forward declared??
-#include "cordeCollisionObject.h"
 
 class cordeCollisionObject;
 
@@ -66,16 +65,24 @@ public:
 		///@todo define this once we know how to calculate bounds from cordeCollisionObject
 	}
 	
-	virtual void	setLocalScaling(const btVector3& scaling) { }/// @todo 
-	virtual const btVector3& getLocalScaling() { }/// @todo 
+	virtual void	setLocalScaling(const btVector3& scaling);
+	
+	virtual const btVector3& getLocalScaling() const;
+	
 	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const { }/// @todo 
 	virtual const char*	getName() const { return "cordeCollisionShape"; }/// @todo 
-	virtual void	setMargin(btScalar margin) { } /// @todo 
-	virtual btScalar	getMargin() const { return 0.0; } /// @todo 
+	
+	virtual void	setMargin(btScalar margin) {m_collisionMargin = margin; } /// @todo check input
+	
+	virtual btScalar	getMargin() const { return m_collisionMargin;}
 	
 private:
 	
 	cordeCollisionObject* p_objectShape;
+	
+	btScalar m_collisionMargin;
+	
+	btVector3 localScaling;
 };
 
 #endif // CORDE_COLLISION_SHAPE

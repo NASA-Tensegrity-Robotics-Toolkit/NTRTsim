@@ -31,27 +31,44 @@
 
 // Bullet Physics
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "BulletCollision/BroadphaseCollision/btDbvt.h"
 
 // Bullet Linear Algebra
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btAlignedObjectArray.h"
 
 // The C++ Standard Library
 #include <vector>
 
 class cordeSolver;
+class cordeCollisionShape;
 class btCollisionObjectWrapper;
+class btBroadphaseInterface;
+class btDispatcher;
+class tgWorldBulletPhysicsImpl;
 
 class cordeCollisionObject : public CordeModel, public btCollisionObject
 {
 public:
+	/* SolverState	*/ 
+	struct	SolverState
+	{
+		btScalar				sdt;			// dt*timescale
+		btScalar				isdt;			// 1/sdt
+		btScalar				velmrg;			// velocity margin
+		btScalar				radmrg;			// radial margin
+		btScalar				updmrg;			// Update margin
+	};	
+	
+public:
 
-	cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
+	cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorldBulletPhysicsImpl& world, CordeModel::Config& Config);
 	
 	virtual ~cordeCollisionObject();
 	
-	void predictMotion(btScalar dt) { } // Will likely eventually call cordeModels final (post collision) update step
+	void predictMotion(btScalar dt); // Will likely eventually call cordeModels final (post collision) update step
 	
 	void integrateMotion() { } // Will likely eventually call cordeModels final (post collision) update step
 	
@@ -109,10 +126,28 @@ public:
 private:
 	
 	/**
+	 * Update the collision bounds of the AABB
+	 */
+	void updateAABBBounds();
+	
+	/**
 	 * The solver that handles this softbody. 
 	 */
 	cordeSolver* m_softBodySolver;
-
+	
+	/**
+	 * The broadphase from the tgWorld (bullet impl)
+	 */
+	btBroadphaseInterface& m_broadphase;
+	btDispatcher& m_dispatcher;
+	
+	/**
+	 * Collision Data
+	 */
+	SolverState					m_sst;			// Solver state
+	std::vector<btDbvtNode*> 	m_leaves;		// Leaves, should have length same as m_massPoints
+	btDbvt						m_ndbvt;		// Nodes tree
+	btVector3					m_bounds[2];	// Spatial bounds
 };
  
  

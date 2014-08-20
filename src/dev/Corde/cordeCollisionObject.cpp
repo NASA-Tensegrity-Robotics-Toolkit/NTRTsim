@@ -25,13 +25,98 @@
 
 // This Module
 #include "cordeCollisionObject.h"
+#include "cordeCollisionShape.h"
 
-cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config) :
-CordeModel(centerLine, Config)
+// Core library
+#include "core/tgWorld.h"
+#include "core/tgBulletUtil.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
+
+// The Bullet Physics Library
+#include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
+#include "BulletCollision/BroadphaseCollision/btDispatcher.h"
+
+
+cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorldBulletPhysicsImpl& world, CordeModel::Config& Config) :
+CordeModel(centerLine, Config),
+m_broadphase(world.getBroadphase()),
+m_dispatcher(world.getDispatcher())
 {
 	// Enum from btCollisionObject
 	m_internalType		=	CO_USER_TYPE;
+	
+	// Apparently a hack...
+	m_collisionShape = new cordeCollisionShape(this);
+	m_collisionShape->setMargin(0.25f);
+	
+	const btScalar		margin=getCollisionShape()->getMargin();
+	
+	// Get cordeModel data into collision object
+	for (std::size_t i; i < m_massPoints.size(); i++)
+	{
+		CordePositionElement&	n = *m_massPoints[i];
+		m_leaves.push_back( m_ndbvt.insert(btDbvtVolume::FromCR(n.pos, margin),&n) );
+	}
+	
+	updateAABBBounds();
 ///@todo examine how to reconfigure collision shape defaults (m_friction, etc)	
 }
 	
 cordeCollisionObject::~cordeCollisionObject() {}
+
+void cordeCollisionObject::predictMotion(btScalar dt)
+{
+	assert(m_massPoints.size() == m_leaves.size());
+	
+	/* Prepare				*/ 
+	m_sst.sdt		=	dt;
+	m_sst.isdt		=	1/m_sst.sdt;
+	m_sst.velmrg	=	m_sst.sdt*3; ///@todo investigate
+	m_sst.radmrg	=	getCollisionShape()->getMargin();
+	m_sst.updmrg	=	m_sst.radmrg*(btScalar)0.25;
+	
+	// Place Corde initial loop here
+	
+	updateAABBBounds();	
+	
+	ATTRIBUTE_ALIGNED16(btDbvtVolume)	vol;
+	for(std::size_t i=0, ni= m_massPoints.size(); i<ni; ++i)
+	{
+		CordePositionElement&	n = *m_massPoints[i];
+		vol = btDbvtVolume::FromCR(n.pos, m_sst.radmrg);
+		m_ndbvt.update(	m_leaves[i],
+			vol,
+			n.vel * m_sst.velmrg,
+			m_sst.updmrg);
+	}
+	
+	/* Optimize dbvt's		*/ 
+	m_ndbvt.optimizeIncremental(1);
+}
+
+void cordeCollisionObject::updateAABBBounds()
+{
+	if(m_ndbvt.m_root)
+	{
+		const btVector3&	mins=m_ndbvt.m_root->volume.Mins();
+		const btVector3&	maxs=m_ndbvt.m_root->volume.Maxs();
+		const btScalar		csm=getCollisionShape()->getMargin();
+		const btVector3		mrg=btVector3(	csm,
+			csm,
+			csm)*1; // ??? to investigate...
+		m_bounds[0] = mins - mrg;
+		m_bounds[1] = maxs + mrg;
+		if(0 != getBroadphaseHandle())
+		{					
+			m_broadphase.setAabb(	getBroadphaseHandle(),
+				m_bounds[0],
+				m_bounds[1],
+				&m_dispatcher);
+		}
+	}
+	else
+	{
+		m_bounds[0]=
+			m_bounds[1]=btVector3(0,0,0);
+	}
+}

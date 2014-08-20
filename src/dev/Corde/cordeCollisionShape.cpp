@@ -43,10 +43,20 @@ subject to the following restrictions:
 
 #include "cordeCollisionShape.h"
 
+#include "cordeCollisionObject.h"
+
 cordeCollisionShape::cordeCollisionShape(cordeCollisionObject* objectShape)
 {
 	m_shapeType = SOFTBODY_SHAPE_PROXYTYPE;
 	p_objectShape = objectShape;
 }
 	
+void	cordeCollisionShape::setLocalScaling(const btVector3& scaling) 
+{ 
+	localScaling = scaling;
+}
 
+const btVector3& cordeCollisionShape::getLocalScaling() const
+{
+	return localScaling;
+} 

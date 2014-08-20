@@ -37,6 +37,8 @@ class btCollisionShape;
 class btDynamicsWorld;
 class btRigidBody;
 class IntermediateBuildProducts;
+class btBroadphaseInterface;
+class btDispatcher;
 class tgBulletGround;
 
 /**
@@ -73,12 +75,18 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
     return *m_pDynamicsWorld;
   }
   
-        /**
-     * Add a btCollisionShape the a collection for deletion upon
-     * destruction.
-     * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
-     */
-        void addCollisionShape(btCollisionShape* pShape);
+	/**
+	 * Add a btCollisionShape the a collection for deletion upon
+	 * destruction.
+	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
+	 */
+	void addCollisionShape(btCollisionShape* pShape);
+
+	/**
+	 * Soft-bodies need access to the broadphase and dispatcher
+	 */
+	btBroadphaseInterface& getBroadphase() const;
+	btDispatcher& getDispatcher() const;
 
  private:
     

@@ -2,8 +2,8 @@ Project(Corde)
 
 add_library(${PROJECT_NAME} SHARED
 			   cordeAnchor.cpp
-			   cordeCollisionObject.cpp
 			   cordeCollisionShape.cpp
+			   cordeCollisionObject.cpp
 			   #cordeConcaveCollisionAlgorithm.cpp
 			   cordeDynamicsWorld.cpp
 			   CordeModel.cpp
