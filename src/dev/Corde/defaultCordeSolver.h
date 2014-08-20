@@ -43,7 +43,7 @@ subject to the following restrictions:
 //#include "btSoftBodySolverVertexBuffer.h"
 struct btCollisionObjectWrapper;
 
-class cordeDefaultSolver : public cordeSolver
+class defaultCordeSolver : public cordeSolver
 {
 protected:		
 	/** Variable to define whether we need to update solver constants on the next iteration */
@@ -53,9 +53,9 @@ protected:
 
 
 public:
-	cordeDefaultSolver();
+	defaultCordeSolver();
 	
-	virtual ~cordeDefaultSolver();
+	virtual ~defaultCordeSolver();
 	
 	virtual SolverTypes getSolverType() const
 	{

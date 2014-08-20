@@ -42,7 +42,6 @@ subject to the following restrictions:
 
 //softbody & helpers
 #include "LinearMath/btSerializer.h"
-#include "defaultCordeSolver.h"
 
 cordeDynamicsWorld::cordeDynamicsWorld(
 	btDispatcher* dispatcher,
@@ -56,24 +55,10 @@ cordeDynamicsWorld::cordeDynamicsWorld(
 {
 	if( !m_softBodySolver )
 	{
-		void* ptr = btAlignedAlloc(sizeof(btDefaultSoftBodySolver),16);
+		void* ptr = btAlignedAlloc(sizeof(defaultCordeSolver),16);
 		m_softBodySolver = new(ptr) defaultCordeSolver();
 		m_ownsSolver = true;
 	}
-
-	m_sbi.m_broadphase = pairCache;
-	m_sbi.m_dispatcher = dispatcher;
-	m_sbi.m_sparsesdf.Initialize();
-	m_sbi.m_sparsesdf.Reset();
-
-	m_sbi.air_density		=	(btScalar)1.2;
-	m_sbi.water_density	=	0;
-	m_sbi.water_offset		=	0;
-	m_sbi.water_normal		=	btVector3(0,0,0);
-	m_sbi.m_gravity.setValue(0,-10,0);
-
-	m_sbi.m_sparsesdf.Initialize();
-
 
 }
 
@@ -354,7 +339,7 @@ void	cordeDynamicsWorld::serialize(btSerializer* serializer)
 
 	serializeDynamicsWorldInfo( serializer);
 #if (0)
-	serializeSoftBodies(serializer);
+	serializeSoftBodies(serializer); ///@todo
 #endif
 	serializeRigidBodies(serializer);
 

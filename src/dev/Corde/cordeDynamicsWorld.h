@@ -43,13 +43,11 @@ class cordeCollisionObject;
 typedef	btAlignedObjectArray<cordeCollisionObject*> btCordeObjectArray;
 
 class cordeSolver;
-class btSoftBodyWorldInfo;
 
 class cordeDynamicsWorld : public btDiscreteDynamicsWorld
 {
 
 	btCordeObjectArray	m_cordeObjects;
-	btSoftBodyWorldInfo m_sbi;
 	///Solver classes that encapsulate multiple soft bodies for solving
 	cordeSolver *m_softBodySolver;
 	bool			m_ownsSolver;
@@ -79,15 +77,6 @@ public:
 	///removeCollisionObject will first check if it is a rigid body, if so call removeRigidBody otherwise call btDiscreteDynamicsWorld::removeCollisionObject
 	virtual void	removeCollisionObject(btCollisionObject* collisionObject);
 
-	btSoftBodyWorldInfo&	getWorldInfo()
-	{
-		return m_sbi;
-	}
-	const btSoftBodyWorldInfo&	getWorldInfo() const
-	{
-		return m_sbi;
-	}
-	
 	/**
 	 * Changing this to something unique would require adding to the 
 	 * enum in btDynamicsWorld.h
@@ -119,7 +108,7 @@ public:
 					  const btTransform& colObjWorldTransform,
 					  RayResultCallback& resultCallback);
 #endif // Temp disable raytest and serialize
-	virtual	void	serialize(btSerializer* serializer) { } ///@todo
+	virtual	void	serialize(btSerializer* serializer);
 
 };
 

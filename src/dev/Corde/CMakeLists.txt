@@ -5,7 +5,7 @@ add_library(${PROJECT_NAME} SHARED
 			   cordeCollisionObject.cpp
 			   cordeCollisionShape.cpp
 			   #cordeConcaveCollisionAlgorithm.cpp
-			   #cordeDynamicsWorld.cpp
+			   cordeDynamicsWorld.cpp
 			   CordeModel.cpp
 			   cordeRigidBodyCollisionConfiguration.cpp
 			   cordeRigidCollisionAlgorithm.cpp

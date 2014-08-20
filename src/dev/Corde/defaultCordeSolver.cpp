@@ -44,7 +44,7 @@ subject to the following restrictions:
 
 
 
-cordeDefaultSolver::cordeDefaultSolver()
+defaultCordeSolver::defaultCordeSolver()
 {
 	// Initial we will clearly need to update solver constants
 	// For now this is global for the cloths linked with this solver - we should probably make this body specific 
@@ -52,22 +52,22 @@ cordeDefaultSolver::cordeDefaultSolver()
 	m_updateSolverConstants = true;
 }
 
-cordeDefaultSolver::~cordeDefaultSolver()
+defaultCordeSolver::~defaultCordeSolver()
 {
 }
 
 // In this case the data is already in the soft bodies so there is no need for us to do anything
-void cordeDefaultSolver::copyBackToSoftBodies(bool bMove)
+void defaultCordeSolver::copyBackToSoftBodies(bool bMove)
 {
 
 }
 
-void cordeDefaultSolver::optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies , bool forceUpdate)
+void defaultCordeSolver::optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies , bool forceUpdate)
 {
 	m_softBodySet.copyFromArray( softBodies );
 }
 
-void cordeDefaultSolver::updateSoftBodies( )
+void defaultCordeSolver::updateSoftBodies( )
 {
 	for ( int i=0; i < m_softBodySet.size(); i++)
 	{
@@ -79,12 +79,12 @@ void cordeDefaultSolver::updateSoftBodies( )
 	}
 } // updateSoftBodies
 
-bool cordeDefaultSolver::checkInitialized()
+bool defaultCordeSolver::checkInitialized()
 {
 	return true;
 }
 
-void cordeDefaultSolver::solveConstraints( float solverdt )
+void defaultCordeSolver::solveConstraints( float solverdt )
 {
 	// Solve constraints for non-solver softbodies
 	for(int i=0; i < m_softBodySet.size(); ++i)
@@ -95,10 +95,10 @@ void cordeDefaultSolver::solveConstraints( float solverdt )
 			psb->solveConstraints();
 		}
 	}	
-} // cordeDefaultSolver::solveConstraints
+} // defaultCordeSolver::solveConstraints
 
 #if (0) /// @todo restore once we have the proper buffers
-void cordeDefaultSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer )
+void defaultCordeSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer )
 {
 	// Currently only support CPU output buffers
 	// TODO: check for DX11 buffers. Take all offsets into the same DX11 buffer
@@ -144,22 +144,22 @@ void cordeDefaultSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject 
 			}
 		}
 	}
-} // cordeDefaultSolver::copySoftBodyToVertexBuffer
+} // defaultCordeSolver::copySoftBodyToVertexBuffer
 #endif
 
-void cordeDefaultSolver::processCollision( cordeCollisionObject* softBody, cordeCollisionObject* otherSoftBody)
+void defaultCordeSolver::processCollision( cordeCollisionObject* softBody, cordeCollisionObject* otherSoftBody)
 {
 	softBody->defaultCollisionHandler( otherSoftBody);
 }
 
 // For the default solver just leave the soft body to do its collision processing
-void cordeDefaultSolver::processCollision( cordeCollisionObject* softBody, const btCollisionObjectWrapper* collisionObjectWrap )
+void defaultCordeSolver::processCollision( cordeCollisionObject* softBody, const btCollisionObjectWrapper* collisionObjectWrap )
 {
 	softBody->defaultCollisionHandler( collisionObjectWrap );
-} // cordeDefaultSolver::processCollision
+} // defaultCordeSolver::processCollision
 
 
-void cordeDefaultSolver::predictMotion( float timeStep )
+void defaultCordeSolver::predictMotion( float timeStep )
 {
 	for ( int i=0; i < m_softBodySet.size(); ++i)
 	{
