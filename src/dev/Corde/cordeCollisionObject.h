@@ -74,9 +74,11 @@ public:
 	
 	void predictMotion(btScalar dt); // Will likely eventually call cordeModels final (post collision) update step
 	
-	void integrateMotion() { } // Will likely eventually call cordeModels final (post collision) update step
+	// Final part of step loop
+	void integrateMotion(btScalar dt);
 	
-	void solveConstraints() { } // Might need to pass in dt eventually. Internal dynamics of collision object (internal "constraints")
+	// Constrained motion - anchors etc
+	void solveConstraints() { }
 	
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	

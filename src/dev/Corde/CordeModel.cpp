@@ -262,7 +262,7 @@ void CordeModel::step (btScalar dt)
     constrainMotion(dt);
     simTime += dt;
 	
-    #if (1)
+    #if (1) ///@todo create a print out function
     if (simTime >= 1.0/1.0)
     {
         size_t n = m_massPoints.size();

@@ -59,10 +59,12 @@ m_dispatcher(world.getDispatcher())
 	}
 	
 	updateAABBBounds();
+	stepPrerequisites();
 ///@todo examine how to reconfigure collision shape defaults (m_friction, etc)	
 }
 	
-cordeCollisionObject::~cordeCollisionObject() {}
+cordeCollisionObject::~cordeCollisionObject() 
+{}
 
 void cordeCollisionObject::predictMotion(btScalar dt)
 {
@@ -75,7 +77,8 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	m_sst.radmrg	=	getCollisionShape()->getMargin();
 	m_sst.updmrg	=	m_sst.radmrg*(btScalar)0.25;
 	
-	// Place Corde initial loop here
+	computeInternalForces();
+    unconstrainedMotion(dt);
 	
 	updateAABBBounds();	
 	
@@ -92,6 +95,13 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	
 	/* Optimize dbvt's		*/ 
 	m_ndbvt.optimizeIncremental(1);
+}
+
+void cordeCollisionObject::integrateMotion (btScalar dt)
+{
+	constrainMotion(dt);
+    simTime += dt;
+	stepPrerequisites();
 }
 
 void cordeCollisionObject::updateAABBBounds()

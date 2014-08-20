@@ -94,7 +94,7 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 	// Includes predictUnconstraintMotion
 	btDiscreteDynamicsWorld::internalSingleStepSimulation( timeStep );
 
-	///solve soft bodies constraints
+	///solve soft bodies constraints (anchors and such)
 	solveSoftBodiesConstraints( timeStep );
 
 	//self collisions
@@ -103,9 +103,9 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 		cordeCollisionObject*	psb=(cordeCollisionObject*)m_cordeObjects[i];
 		psb->defaultCollisionHandler(psb);
 	}
-
+	
 	///update soft bodies
-	m_softBodySolver->updateSoftBodies( );
+	m_softBodySolver->updateSoftBodies(timeStep );
 	
 	// End solver-wise simulation step
 	// ///////////////////////////////
@@ -115,12 +115,6 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 void	cordeDynamicsWorld::solveSoftBodiesConstraints( btScalar timeStep )
 {
 	BT_PROFILE("solveSoftConstraints");
-
-	if(m_cordeObjects.size())
-	{
-		// Internal step prior to solving constraints?
-		//btSoftBody::solveClusters(m_cordeObjects);
-	}
 
 	// Solve constraints solver-wise
 	m_softBodySolver->solveConstraints( timeStep * m_softBodySolver->getTimeScale() );

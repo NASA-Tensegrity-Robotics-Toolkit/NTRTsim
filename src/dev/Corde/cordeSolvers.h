@@ -88,8 +88,8 @@ public:
 	/** Solve constraints for a set of soft bodies */
 	virtual void solveConstraints( float solverdt ) = 0;
 
-	/** Perform necessary per-step updates of soft bodies such as recomputing normals and bounding boxes */
-	virtual void updateSoftBodies() = 0;
+	/** Execute constrained motion and update details */
+	virtual void updateSoftBodies(float solverdt) = 0;
 
 	/** Process a collision between one of the world's soft bodies and another collision object */
 	virtual void processCollision( cordeCollisionObject *, const struct btCollisionObjectWrapper* ) = 0;

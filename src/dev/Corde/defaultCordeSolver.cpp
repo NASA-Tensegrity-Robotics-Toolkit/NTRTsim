@@ -67,14 +67,14 @@ void defaultCordeSolver::optimize( btAlignedObjectArray< cordeCollisionObject * 
 	m_softBodySet.copyFromArray( softBodies );
 }
 
-void defaultCordeSolver::updateSoftBodies( )
+void defaultCordeSolver::updateSoftBodies(float dt )
 {
 	for ( int i=0; i < m_softBodySet.size(); i++)
 	{
 		cordeCollisionObject*	psb=(cordeCollisionObject*)m_softBodySet[i];
 		if (psb->isActive())
 		{
-			psb->integrateMotion();	
+			psb->integrateMotion(dt);	
 		}
 	}
 } // updateSoftBodies

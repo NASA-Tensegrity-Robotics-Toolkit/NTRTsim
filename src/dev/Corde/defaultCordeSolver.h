@@ -64,7 +64,7 @@ public:
 
 	virtual bool checkInitialized();
 
-	virtual void updateSoftBodies( );
+	virtual void updateSoftBodies(float dt );
 
 	virtual void optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies,bool forceUpdate=false );
 
