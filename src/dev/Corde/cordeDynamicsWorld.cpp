@@ -90,7 +90,8 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 	{
 		btAssert( "Solver initialization failed\n" );
 	}
-
+	
+	// Includes predictUnconstraintMotion
 	btDiscreteDynamicsWorld::internalSingleStepSimulation( timeStep );
 
 	///solve soft bodies constraints

@@ -60,24 +60,33 @@ public:
 	
 	virtual ~cordeCollisionShape() { }
 	
-	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
-	{
-		///@todo define this once we know how to calculate bounds from cordeCollisionObject
-	}
+	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 	
-	virtual void	setLocalScaling(const btVector3& scaling);
+	virtual void	setLocalScaling(const btVector3& scaling); ///@todo - 
 	
 	virtual const btVector3& getLocalScaling() const;
 	
 	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const { }/// @todo 
-	virtual const char*	getName() const { return "cordeCollisionShape"; }/// @todo 
 	
-	virtual void	setMargin(btScalar margin) {m_collisionMargin = margin; } /// @todo check input
+	virtual const char*	getName() const 
+	{ 
+		return "cordeCollisionShape"; 
+	} 
 	
-	virtual btScalar	getMargin() const { return m_collisionMargin;}
+	virtual void	setMargin(btScalar margin) 
+	{
+		/// @todo check input, must be >= 0
+		m_collisionMargin = margin;
+	} 
+	
+	virtual btScalar	getMargin() const 
+	{
+		return m_collisionMargin;
+	}
 	
 private:
 	
+	/** Backpointer, we don't own this */
 	cordeCollisionObject* p_objectShape;
 	
 	btScalar m_collisionMargin;

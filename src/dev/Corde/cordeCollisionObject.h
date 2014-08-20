@@ -51,6 +51,10 @@ class tgWorldBulletPhysicsImpl;
 
 class cordeCollisionObject : public CordeModel, public btCollisionObject
 {
+	/**
+	 * cordeCollisionShape needs access to bounds, etc, but that's the only class that needs them
+	 */
+	friend class cordeCollisionShape;
 public:
 	/* SolverState	*/ 
 	struct	SolverState

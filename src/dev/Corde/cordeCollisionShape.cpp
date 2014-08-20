@@ -45,12 +45,35 @@ subject to the following restrictions:
 
 #include "cordeCollisionObject.h"
 
-cordeCollisionShape::cordeCollisionShape(cordeCollisionObject* objectShape)
+cordeCollisionShape::cordeCollisionShape(cordeCollisionObject* objectShape) :
+localScaling(1, 1, 1),
+m_collisionMargin( 0.04), // Default by Bullet's user manual
+p_objectShape(objectShape)
 {
 	m_shapeType = SOFTBODY_SHAPE_PROXYTYPE;
-	p_objectShape = objectShape;
 }
-	
+
+void cordeCollisionShape::getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
+{
+	/* t is usually identity, except when colliding against btCompoundShape. See Issue 512 */
+	const btVector3	mins = p_objectShape->m_bounds[0];
+	const btVector3	maxs = p_objectShape->m_bounds[1];
+	const btVector3	crns[]={t*btVector3(mins.x(),mins.y(),mins.z()),
+		t*btVector3(maxs.x(),mins.y(),mins.z()),
+		t*btVector3(maxs.x(),maxs.y(),mins.z()),
+		t*btVector3(mins.x(),maxs.y(),mins.z()),
+		t*btVector3(mins.x(),mins.y(),maxs.z()),
+		t*btVector3(maxs.x(),mins.y(),maxs.z()),
+		t*btVector3(maxs.x(),maxs.y(),maxs.z()),
+		t*btVector3(mins.x(),maxs.y(),maxs.z())};
+	aabbMin=aabbMax=crns[0];
+	for(int i=1;i<8;++i)
+	{
+		aabbMin.setMin(crns[i]);
+		aabbMax.setMax(crns[i]);
+	}
+}
+
 void	cordeCollisionShape::setLocalScaling(const btVector3& scaling) 
 { 
 	localScaling = scaling;
