@@ -40,11 +40,23 @@
 // The C++ Standard Library
 #include <vector>
 
+class btCollisionObjectWrapper;
+
 class cordeCollisionObject : public CordeModel, public btCollisionObject
 {
 public:
 
 	cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
+	
+	void predictMotion(btScalar dt) { } // Will likely eventually call cordeModels final (post collision) update step
+	
+	void integrateMotion() { } // Will likely eventually call cordeModels final (post collision) update step
+	
+	void solveConstraints() { } // Might need to pass in dt eventually. Internal dynamics of collision object (internal "constraints")
+	
+	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
+	
+	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) { }
 	
 	virtual ~cordeCollisionObject();
 
@@ -56,13 +68,7 @@ public:
 	}
 	* 
 	* soft0->getSoftBodySolver()->processCollision(soft0, soft1);
-	*
-	if (psb->isActive())
-		{
-			psb->integrateMotion();	
-		}
-	*
-	psb->solveConstraints();
+	
 	* 
 	softBody->defaultCollisionHandler( otherSoftBody);
 	* 

@@ -37,10 +37,10 @@ subject to the following restrictions:
 #define DEFAULT_CORDE_SOLVER_H
 
 
-#include "cordeSolver.h"
+#include "cordeSolvers.h"
 
 /// @todo evaluate necessity of vertex buffer, etc.
-#include "btSoftBodySolverVertexBuffer.h"
+//#include "btSoftBodySolverVertexBuffer.h"
 struct btCollisionObjectWrapper;
 
 class cordeDefaultSolver : public cordeSolver
@@ -74,7 +74,7 @@ public:
 
 	virtual void predictMotion( float solverdt );
 
-	virtual void copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer );
+	//virtual void copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer );
 
 	virtual void processCollision( cordeCollisionObject *, const btCollisionObjectWrapper* );
 

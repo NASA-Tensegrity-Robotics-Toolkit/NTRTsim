@@ -33,13 +33,15 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "defaultCordeSolver.h"
+#include "cordeCollisionObject.h"
+
 #include "BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
 
-#include "btDefaultSoftBodySolver.h"
 #include "BulletCollision/CollisionShapes/btCapsuleShape.h"
-#include "BulletSoftBody/btSoftBody.h"
+
 
 
 cordeDefaultSolver::cordeDefaultSolver()
@@ -95,7 +97,7 @@ void cordeDefaultSolver::solveConstraints( float solverdt )
 	}	
 } // cordeDefaultSolver::solveConstraints
 
-
+#if (0) /// @todo restore once we have the proper buffers
 void cordeDefaultSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject *const cordeCollisionObject, btVertexBufferDescriptor *vertexBuffer )
 {
 	// Currently only support CPU output buffers
@@ -143,6 +145,7 @@ void cordeDefaultSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject 
 		}
 	}
 } // cordeDefaultSolver::copySoftBodyToVertexBuffer
+#endif
 
 void cordeDefaultSolver::processCollision( cordeCollisionObject* softBody, cordeCollisionObject* otherSoftBody)
 {

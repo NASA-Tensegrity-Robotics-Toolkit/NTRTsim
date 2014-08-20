@@ -5,5 +5,6 @@ add_library(${PROJECT_NAME} SHARED
 			   cordeCollisionObject.cpp
 			   cordeCollisionShape.cpp
 			   CordeModel.cpp
+			   defaultCordeSolver.cpp
             )
 
