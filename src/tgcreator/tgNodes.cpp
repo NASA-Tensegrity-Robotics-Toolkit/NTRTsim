@@ -19,7 +19,8 @@
 /**
  * @file tgNodes.cpp
  * @brief Implementation of class tgNodes
- * @date March 21, 2014
+ * @author Ryan Adams
+ * @date March 2014
  * $Id$
  */
 

@@ -12,6 +12,7 @@ subdirs(
     controllers
     dev
     examples
+    json
 )
 
 add_definitions(

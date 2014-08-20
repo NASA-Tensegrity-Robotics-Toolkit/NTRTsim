@@ -29,9 +29,16 @@
 //Bullet Physics
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
 
+// The C++ Standard Library
+#include <cassert>
+
 tgBulletGround::~tgBulletGround() 
 { 
     delete pGroundShape;
 }
 
-
+btCollisionShape* const tgBulletGround::getCollisionShape() const
+{
+	assert(pGroundShape);
+	return pGroundShape;
+}

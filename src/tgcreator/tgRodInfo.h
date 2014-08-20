@@ -22,7 +22,8 @@
 /**
  * @file tgRodInfo.h
  * @brief Definition of class tgRodInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

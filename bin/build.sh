@@ -17,7 +17,8 @@
 # governing permissions and limitations under the License.
 
 # Purpose: Build the source tree including libraries and applications.
-# Date:    2014-07-27
+# Author:  Ryan Adams
+# Date:    July 2014
 # Notes:   This is intended to be run any time you need to build the 
 #          source tree.
 

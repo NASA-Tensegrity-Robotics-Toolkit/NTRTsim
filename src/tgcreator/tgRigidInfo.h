@@ -22,7 +22,8 @@
 /**
  * @file tgRigidInfo.h
  * @brief Definition of abstract class tgRigidInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

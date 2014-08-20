@@ -39,13 +39,13 @@ class tgGround;
 class tgWorldImpl
 {
 public:
-
+  
   /** 
    * The only constructor. The base class initializes nothing.
    * @param[in] config configuration POD
    */
   tgWorldImpl(const tgWorld::Config& config, const tgGround* const ground) { }
-
+   
   /** Clean up the implementation. The base class holds nothing. */
   virtual ~tgWorldImpl() { }
 
