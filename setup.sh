@@ -27,7 +27,7 @@ SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
 setup_dir="$SCRIPT_PATH/bin/setup"
 conf_dir="$SCRIPT_PATH/conf"
 base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "jsoncpp.conf")
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
 
 #Load our common set up functions
 
@@ -108,13 +108,6 @@ function init_boost() {
     echo "Initializing the Boost library..."
     "$setup_dir/setup_boost.sh" || { echo "Boost initialization failed -- exiting now."; exit 1; }
 }
-
-function init_jsoncpp() {
-echo ""
-echo "Initializing jsoncpp..."
-"$setup_dir/setup_jsoncpp.sh" || { echo "jsoncpp initialization failed -- exiting now."; exit 1; }
-}
-
 
 # Set a variable in the install.conf configuration file
 function set_config_var() {
@@ -207,7 +200,6 @@ init_config
 init_scripts
 init_env
 init_cmake 
-init_jsoncpp
 init_bullet
 init_boost
 
