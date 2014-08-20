@@ -22,6 +22,7 @@
 /**
  * @file tgString.h
  * @brief Convenience function for combining strings with ints, mostly for naming structures
+ * @author Ryan Adams
  * @date March 2014
  */
 

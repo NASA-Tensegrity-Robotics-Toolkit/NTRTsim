@@ -19,6 +19,7 @@
 /**
  * @file tgRigidInfo.cpp
  * @brief Contains the definitions of members of class tgRigidInfo
+ * @author Ryan Adams
  * $Id$
  */
 

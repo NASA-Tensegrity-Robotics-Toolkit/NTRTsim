@@ -22,7 +22,8 @@
 /**
  * @file tgCompoundRigidInfo.h
  * @brief Definition of class tgCompoundRigidInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

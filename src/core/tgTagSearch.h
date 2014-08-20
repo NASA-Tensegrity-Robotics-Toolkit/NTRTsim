@@ -19,6 +19,7 @@
 /**
  * @file tgTagSearch.h
  * @brief Contains the definition of class tgTagSearch
+ * @author Ryan Adams
  * $Id$
  */
 

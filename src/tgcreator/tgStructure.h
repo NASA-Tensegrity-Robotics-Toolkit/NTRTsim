@@ -22,7 +22,8 @@
 /**
  * @file tgStructure.h
  * @brief Definition of class tgStructure
- * @date March 21, 2014
+ * @author Ryan Adams
+ * @date March 2014
  * $Id$
  */
 

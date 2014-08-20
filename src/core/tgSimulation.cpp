@@ -19,6 +19,7 @@
 /**
  * @file tgSimulation.cpp
  * @brief Contains the definitions of members of class tgSimulation
+ * @author Ryan Adams, Brian Mirletz
  * $Id$
  */
 

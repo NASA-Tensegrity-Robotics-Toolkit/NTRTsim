@@ -24,6 +24,7 @@
  * @brief Contains the definition of class tgUtil and overloaded
  * operator<<() free functions.
  * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @author Ryan Adams
  * $Id$
  */
 
