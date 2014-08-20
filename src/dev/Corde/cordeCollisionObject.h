@@ -40,6 +40,7 @@
 // The C++ Standard Library
 #include <vector>
 
+class cordeSolver;
 class btCollisionObjectWrapper;
 
 class cordeCollisionObject : public CordeModel, public btCollisionObject
@@ -47,6 +48,8 @@ class cordeCollisionObject : public CordeModel, public btCollisionObject
 public:
 
 	cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config);
+	
+	virtual ~cordeCollisionObject();
 	
 	void predictMotion(btScalar dt) { } // Will likely eventually call cordeModels final (post collision) update step
 	
@@ -58,26 +61,57 @@ public:
 	
 	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) { }
 	
-	virtual ~cordeCollisionObject();
-
-/**
- * @todo implement these members and functions:"
- * if (softBody->m_collisionDisabledObjects.findLinearSearch(rigidCollisionObjectWrap->getCollisionObject())==softBody->m_collisionDisabledObjects.size())
-	{
-		softBody->getSoftBodySolver()->processCollision(softBody, rigidCollisionObjectWrap);
-	}
-	* 
-	* soft0->getSoftBodySolver()->processCollision(soft0, soft1);
 	
-	* 
-	softBody->defaultCollisionHandler( otherSoftBody);
-	* 
-	softBody->defaultCollisionHandler( collisionObjectWrap );
-	* 
-	psb->predictMotion(timeStep);
-	* 
-	btSoftBody::upcast(collisionObject) 
-*/
+
+	//
+	// Set the solver that handles this soft body
+	// Should not be allowed to get out of sync with reality
+	// Currently called internally on addition to the world
+	void setSolver( cordeSolver *softBodySolver )
+	{
+		m_softBodySolver = softBodySolver;
+	}
+
+	//
+	// Return the solver that handles this soft body
+	// 
+	cordeSolver* getSoftBodySolver()
+	{
+		return m_softBodySolver;
+	}
+
+	//
+	// Return the solver that handles this soft body
+	// 
+	cordeSolver* getSoftBodySolver() const
+	{
+		return m_softBodySolver;
+	}
+	
+	/// @todo look into tgCast for this behavior
+	//
+	// Cast
+	//
+
+	static const cordeCollisionObject*	upcast(const btCollisionObject* colObj)
+	{
+		if (colObj->getInternalType()==CO_USER_TYPE)
+			return (const cordeCollisionObject*)colObj;
+		return 0;
+	}
+	static cordeCollisionObject*			upcast(btCollisionObject* colObj)
+	{
+		if (colObj->getInternalType()==CO_USER_TYPE)
+			return (cordeCollisionObject*)colObj;
+		return 0;
+	}
+	
+private:
+	
+	/**
+	 * The solver that handles this softbody. 
+	 */
+	cordeSolver* m_softBodySolver;
 
 };
  

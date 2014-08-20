@@ -34,12 +34,12 @@ subject to the following restrictions:
 */
 #include "cordeRigidBodyCollisionConfiguration.h"
 #include "cordeRigidCollisionAlgorithm.h"
-#include "cordeConcaveCollisionAlgorithm.h"
+//#include "cordeConcaveCollisionAlgorithm.h" (not yet)
 #include "cordeSelfCollisionAlgorithm.h"
 
 #include "LinearMath/btPoolAllocator.h"
 
-#define ENABLE_SOFTBODY_CONCAVE_COLLISIONS 0
+//#define ENABLE_SOFTBODY_CONCAVE_COLLISIONS
 
 cordeRigidBodyCollisionConfiguration::cordeRigidBodyCollisionConfiguration(const btDefaultCollisionConstructionInfo& constructionInfo)
 :btDefaultCollisionConfiguration(constructionInfo)
@@ -75,11 +75,13 @@ cordeRigidBodyCollisionConfiguration::cordeRigidBodyCollisionConfiguration(const
 
 		int maxSize0 = sizeof(cordeSelfCollisionAlgorithm);
 		int maxSize1 = sizeof(cordeRigidCollisionAlgorithm);
+#ifdef ENABLE_SOFTBODY_CONCAVE_COLLISIONS		
 		int maxSize2 = sizeof(cordeConcaveCollisionAlgorithm);
-
+#endif
 		int	collisionAlgorithmMaxElementSize = btMax(maxSize0,maxSize1);
+#ifdef ENABLE_SOFTBODY_CONCAVE_COLLISIONS		
 		collisionAlgorithmMaxElementSize = btMax(collisionAlgorithmMaxElementSize,maxSize2);
-		
+#endif		
 		if (collisionAlgorithmMaxElementSize > curElemSize)
 		{
 			m_collisionAlgorithmPool->~btPoolAllocator();

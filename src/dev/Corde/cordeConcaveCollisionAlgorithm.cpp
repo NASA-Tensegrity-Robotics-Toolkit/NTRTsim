@@ -34,7 +34,7 @@ subject to the following restrictions:
 */
 
 
-#include "btSoftBodyConcaveCollisionAlgorithm.h"
+#include "cordeConcaveCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletCollision/CollisionShapes/btMultiSphereShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"

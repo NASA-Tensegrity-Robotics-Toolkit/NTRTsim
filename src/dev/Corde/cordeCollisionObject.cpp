@@ -29,6 +29,8 @@
 cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, CordeModel::Config& Config) :
 CordeModel(centerLine, Config)
 {
+	// Enum from btCollisionObject
+	m_internalType		=	CO_USER_TYPE;
 ///@todo examine how to reconfigure collision shape defaults (m_friction, etc)	
 }
 	

@@ -36,7 +36,7 @@ subject to the following restrictions:
 // This library
 #include "cordeRigidCollisionAlgorithm.h"
 #include "cordeCollisionObject.h"
-//#include "BulletSoftBody/btSoftBodySolvers.h" - Update solver, abstract or here?
+#include "cordeSolvers.h"
 
 // The Bullet Physics Library
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"

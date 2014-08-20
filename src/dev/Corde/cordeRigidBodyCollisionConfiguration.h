@@ -47,11 +47,11 @@ class	cordeRigidBodyCollisionConfiguration : public btDefaultCollisionConfigurat
 {
 
 	//default CreationFunctions, filling the m_doubleDispatch table
-	btCollisionAlgorithmCreateFunc*	m_softSoftCreateFunc;
-	btCollisionAlgorithmCreateFunc*	m_softRigidConvexCreateFunc;
-	btCollisionAlgorithmCreateFunc*	m_swappedSoftRigidConvexCreateFunc;
-	btCollisionAlgorithmCreateFunc*	m_softRigidConcaveCreateFunc;
-	btCollisionAlgorithmCreateFunc*	m_swappedSoftRigidConcaveCreateFunc;
+	btCollisionAlgorithmCreateFunc* m_cordeSelfCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_cordeRigidConvexCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_swappedCordeRigidConvexCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_cordeRigidConcaveCreateFunc;
+	btCollisionAlgorithmCreateFunc*	m_swappedCordeRigidConcaveCreateFunc;
 
 public:
 
