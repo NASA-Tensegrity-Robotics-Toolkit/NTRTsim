@@ -22,6 +22,7 @@
 /**
  * @file tgSimViewGraphics.h
  * @brief Contains the definition of class tgSimViewGraphics
+ * @author Brian Mirletz, Ryan Adams
  * $Id$
  */
 

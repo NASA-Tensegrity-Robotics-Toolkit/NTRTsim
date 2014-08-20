@@ -17,7 +17,7 @@
 # governing permissions and limitations under the License.
 
 # Purpose: Install script for everything related to the tensegrity repository
-# Date:    2013-05-01
+# Author:  Ryan Adams, Perry Bhandal
 
 env_name='env'
 

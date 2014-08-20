@@ -19,6 +19,7 @@
 /**
  * @file tgRigidAutoCompound.cpp
  * @brief Definition of class tgRigidAutoCompound
+ * @author Ryan Adams
  * @date March 2014
  * $Id$
  */

@@ -19,6 +19,7 @@
 /**
  * @file tgPair.cpp
  * @brief Definition of class tgPair
+ * @author Ryan Adams
  * @date March 2014
  * $Id$
  */

@@ -19,6 +19,7 @@
 /**
  * @file tgBuildSpec.cpp
  * @brief Implementation of class tgBuildSpec
+ * @author Ryan Adams
  * @date March 2014
  * $Id$
  */

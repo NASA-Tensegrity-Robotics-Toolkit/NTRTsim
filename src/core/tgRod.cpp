@@ -19,6 +19,7 @@
 /**
  * @file tgRod.cpp
  * @brief Contains the definitions of members of class tgRod
+ * @author Ryan Adams
  * $Id$
  */
 

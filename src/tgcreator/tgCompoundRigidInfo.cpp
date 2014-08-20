@@ -19,7 +19,8 @@
 /**
  * @file tgCompoundRigidInfo.cpp
  * @brief Implementaton of class tgCompoundRigidInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 #include "tgCompoundRigidInfo.h"
