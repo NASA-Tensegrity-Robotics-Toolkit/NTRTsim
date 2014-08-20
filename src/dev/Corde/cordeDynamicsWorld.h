@@ -109,7 +109,7 @@ public:
 		return m_cordeObjects;
 	}
 
-
+#if (0)
 	virtual void rayTest(const btVector3& rayFromWorld, const btVector3& rayToWorld, RayResultCallback& resultCallback) const; 
 
 	/// rayTestSingle performs a raycast call and calls the resultCallback. It is used internally by rayTest.
@@ -122,7 +122,7 @@ public:
 					  RayResultCallback& resultCallback);
 
 	virtual	void	serialize(btSerializer* serializer);
-
+#endif // Temp disable raytest and serialize
 };
 
 #endif //CORDE_RIGID_DYNAMICS_WORLD_H

@@ -175,7 +175,7 @@ void	cordeDynamicsWorld::debugDrawWorld()
 }
 
 
-
+#if (0) // Temporarily disable raytesting
 
 struct btSoftSingleRayCallback : public btBroadphaseRayCallback
 {
@@ -321,8 +321,9 @@ void	cordeDynamicsWorld::rayTestSingle(const btTransform& rayFromTrans,const btT
 		btCollisionWorld::rayTestSingle(rayFromTrans,rayToTrans,collisionObject,collisionShape,colObjWorldTransform,resultCallback);
 	}
 }
+#endif // Disable raytest temp
 
-
+#if (0)
 void	cordeDynamicsWorld::serializeSoftBodies(btSerializer* serializer)
 {
 	int i;
@@ -340,6 +341,7 @@ void	cordeDynamicsWorld::serializeSoftBodies(btSerializer* serializer)
 	}
 
 }
+#endif // Disable serialize
 
 void	cordeDynamicsWorld::serialize(btSerializer* serializer)
 {
@@ -347,9 +349,9 @@ void	cordeDynamicsWorld::serialize(btSerializer* serializer)
 	serializer->startSerialization();
 
 	serializeDynamicsWorldInfo( serializer);
-
+#if (0)
 	serializeSoftBodies(serializer);
-
+#endif
 	serializeRigidBodies(serializer);
 
 	serializeCollisionObjects(serializer);
