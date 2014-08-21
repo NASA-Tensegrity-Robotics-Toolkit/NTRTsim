@@ -41,13 +41,18 @@
 #include <iostream>
 
 /**
- * The entry point.
- * @param[in] argc the number of command-line arguments
- * @param[in] argv argv[0] is the executable name
- * @return 0
+ * Runs a series of nEpisodes episodes. 
+ * Each episode tests a given control pattern for nSteps.
+ * The fitness function (reward metric) for this experiment is 
+ *     the maximum distance from the tensegrity's starting point 
+ *     at any point during the episode
+ * NB: Running episodes and using graphics are mutually exclusive features
  */
 int main(int argc, char** argv)
 {
+    int nEpisodes = 10; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode
+
     std::cout << "AppEscape_T6" << std::endl;
 
     // First create the ground and world
@@ -67,8 +72,10 @@ int main(int argc, char** argv)
 
     // Second create the view
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+
+    //tgSimViewGraphics view(world, timestep_physics, timestep_graphics); // For display
+    tgSimView view(world, timestep_physics, timestep_graphics); // For trial episodes
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -84,8 +91,12 @@ int main(int argc, char** argv)
     myModel->attach(pTC);
     simulation.addModel(myModel);
 
-    // Run until the user stops
-    simulation.run();
+    // Run a series of episodes for nSteps each
+    for (int i=0; i<nEpisodes; i++)
+    {   
+        simulation.run(nSteps);
+        simulation.reset();
+    }
 
     //Teardown is handled by delete, so that should be automatic
     return 0;
