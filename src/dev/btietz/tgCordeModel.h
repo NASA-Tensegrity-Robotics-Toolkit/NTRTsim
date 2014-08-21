@@ -22,7 +22,7 @@
 #include "core/tgModel.h"
 
 // Forward Declaration
-class CordeModel;
+class cordeCollisionObject;
 
 class tgCordeModel : public tgModel
 {
@@ -45,13 +45,13 @@ public:
     
     /** @todo consider adding a toString method **/
     
-    const CordeModel* const getModel() const
+    const cordeCollisionObject* const getModel() const
     {
         return testString;
     }
     
 private:
-    CordeModel* testString;
+    cordeCollisionObject* testString;
     
     std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
 };

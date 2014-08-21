@@ -33,6 +33,7 @@
 #include "tgWorldBulletPhysicsImpl.h"
 #include "dev/btietz/tgCordeModel.h"
 #include "dev/Corde/CordeModel.h"
+#include "dev/Corde/cordeCollisionObject.h"
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -88,7 +89,7 @@ void tgBulletRenderer::render(const tgCordeModel& cordeString) const
 
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
 	
-	const CordeModel* const pCorde = cordeString.getModel();
+	const cordeCollisionObject* const pCorde = cordeString.getModel();
 	if (pDrawer && pCorde)
     {
 		std::size_t n = pCorde->getNumElements() - 1;

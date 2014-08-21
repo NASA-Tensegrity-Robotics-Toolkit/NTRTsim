@@ -27,6 +27,7 @@
 // This application
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
+#include "dev/Corde/cordeDynamicsWorld.h"
 // The Bullet Physics library
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
@@ -86,5 +87,15 @@ btDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(tgWorld& world)
   tgWorldBulletPhysicsImpl& bulletPhysicsImpl =
     static_cast<tgWorldBulletPhysicsImpl&>(impl);
   btDynamicsWorld& result = bulletPhysicsImpl.dynamicsWorld();
+  return result;
+}
+
+cordeDynamicsWorld& tgBulletUtil::worldToCordeDynamicsWorld(tgWorld& world)
+{
+
+  btDynamicsWorld& dynWorld = worldToDynamicsWorld(world);
+  
+  cordeDynamicsWorld& result = 
+	static_cast<cordeDynamicsWorld&>(dynWorld);
   return result;
 }

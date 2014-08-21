@@ -19,9 +19,12 @@
 #include "tgCordeModel.h"
 
 #include "core/tgModelVisitor.h"
+#include "core/tgBulletUtil.h"
+#include "core/tgWorld.h"
 
 #include "dev/Corde/CordeModel.h"
-
+#include "dev/Corde/cordeCollisionObject.h"
+#include "dev/Corde/cordeDynamicsWorld.h"
 
 tgCordeModel::tgCordeModel()
 {
@@ -73,7 +76,12 @@ void tgCordeModel::setup(tgWorld& world)
 	
     std::vector<btVector3> startPositions = generatePoints(startPos, endPos, resolution);
     
-	testString = new CordeModel(startPositions, config);
+    cordeDynamicsWorld& dynamicsWorld =
+                tgBulletUtil::worldToCordeDynamicsWorld(world);
+    
+	testString = new cordeCollisionObject(startPositions, (tgWorldBulletPhysicsImpl&)world, config);
+	
+	dynamicsWorld.addSoftBody(testString);
 }
 
 void tgCordeModel::teardown()
@@ -88,7 +96,7 @@ void tgCordeModel::step(double dt)
 	testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
 	//testString->applyVecTorque(btVector3(0.0, -100.0, 0.0), 0);
 	//testString->applyVecTorque(btVector3(0.0, 10.0, 0.0), 18);
-    testString->step(dt);
+    //testString->step(dt);
 }
 /**
 * Call tgModelVisitor::render() on self and all descendants.

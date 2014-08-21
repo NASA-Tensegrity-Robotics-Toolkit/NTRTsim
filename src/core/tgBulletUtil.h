@@ -29,6 +29,7 @@
 // Forward declarations
 class btCollisionShape;
 class btDynamicsWorld;
+class cordeDynamicsWorld;
 class btRigidBody;
 class btTransform;
 class tgWorld;
@@ -54,6 +55,8 @@ public:
      * @todo consider implications of casting to include Corde objects
      */
     static btDynamicsWorld& worldToDynamicsWorld(tgWorld& world);
+    
+    static cordeDynamicsWorld& worldToCordeDynamicsWorld(tgWorld& world);
 };
 
 
