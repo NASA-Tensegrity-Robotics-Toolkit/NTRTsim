@@ -83,13 +83,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
 	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
 	 */
 	void addCollisionShape(btCollisionShape* pShape);
-#if (0)
-	/**
-	 * Soft-bodies need access to the broadphase and dispatcher
-	 */
-	btBroadphaseInterface* getBroadphase() const;
-	btDispatcher* getDispatcher() const;
-#endif
+
     /**
      * Add a btTypedConstraint to a collection for deletion upon
      * destruction. Also add to the physics.
@@ -108,7 +102,7 @@ private:
      * Delete all the constraint objects. The dynamics world must exist.
      * Delete in reverse order of creation.
      */
-
+	void removeConstraints();
 
         /**
      * Create a new dynamics world. Needs to be in the namespace so we

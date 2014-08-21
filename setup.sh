@@ -67,7 +67,7 @@ function init_config() {
 		for file_name in "${to_create[@]}"
 		do
 			echo "Creating conf/$file_name"
-			cp "$conf_dir/default/${file_name}.default" "$conf_dir/$file_name"
+			cp "$conf_dir/default/${file_name}.default" "$conf_dir/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
 		done
 		echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
 	else
