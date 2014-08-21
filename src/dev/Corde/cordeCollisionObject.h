@@ -47,7 +47,7 @@ class cordeCollisionShape;
 class btCollisionObjectWrapper;
 class btBroadphaseInterface;
 class btDispatcher;
-class tgWorldBulletPhysicsImpl;
+class tgWorld;
 
 class cordeCollisionObject : public CordeModel, public btCollisionObject
 {
@@ -68,7 +68,7 @@ public:
 	
 public:
 
-	cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorldBulletPhysicsImpl& world, CordeModel::Config& Config);
+	cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config);
 	
 	virtual ~cordeCollisionObject();
 	
@@ -144,8 +144,8 @@ private:
 	/**
 	 * The broadphase from the tgWorld (bullet impl)
 	 */
-	btBroadphaseInterface& m_broadphase;
-	btDispatcher& m_dispatcher;
+	btBroadphaseInterface* m_broadphase;
+	btDispatcher* m_dispatcher;
 	
 	/**
 	 * Collision Data

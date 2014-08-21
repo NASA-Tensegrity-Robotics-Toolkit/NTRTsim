@@ -79,7 +79,7 @@ void tgCordeModel::setup(tgWorld& world)
     cordeDynamicsWorld& dynamicsWorld =
                 tgBulletUtil::worldToCordeDynamicsWorld(world);
     
-	testString = new cordeCollisionObject(startPositions, (tgWorldBulletPhysicsImpl&)world, config);
+	testString = new cordeCollisionObject(startPositions, world, config);
 	
 	dynamicsWorld.addSoftBody(testString);
 }

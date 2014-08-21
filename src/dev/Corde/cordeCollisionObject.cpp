@@ -30,17 +30,16 @@
 // Core library
 #include "core/tgWorld.h"
 #include "core/tgBulletUtil.h"
-#include "core/tgWorldBulletPhysicsImpl.h"
 
 // The Bullet Physics Library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
-
-cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorldBulletPhysicsImpl& world, CordeModel::Config& Config) :
+cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config) :
 CordeModel(centerLine, Config),
-m_broadphase(world.getBroadphase()),
-m_dispatcher(world.getDispatcher())
+m_broadphase(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
+m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 {
 	// Enum from btCollisionObject
 	m_internalType		=	CO_USER_TYPE;
@@ -52,7 +51,7 @@ m_dispatcher(world.getDispatcher())
 	const btScalar		margin=getCollisionShape()->getMargin();
 	
 	// Get cordeModel data into collision object
-	for (std::size_t i; i < m_massPoints.size(); i++)
+	for (std::size_t i = 0; i < m_massPoints.size(); i++)
 	{
 		CordePositionElement&	n = *m_massPoints[i];
 		m_leaves.push_back( m_ndbvt.insert(btDbvtVolume::FromCR(n.pos, margin),&n) );
@@ -118,10 +117,10 @@ void cordeCollisionObject::updateAABBBounds()
 		m_bounds[1] = maxs + mrg;
 		if(0 != getBroadphaseHandle())
 		{					
-			m_broadphase.setAabb(	getBroadphaseHandle(),
+			m_broadphase->setAabb(	getBroadphaseHandle(),
 				m_bounds[0],
 				m_bounds[1],
-				&m_dispatcher);
+				m_dispatcher);
 		}
 	}
 	else

@@ -171,21 +171,21 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
       // Postcondition
       assert(invariant());
 }
-
-btBroadphaseInterface& tgWorldBulletPhysicsImpl::getBroadphase() const
+#if (0)
+btBroadphaseInterface* tgWorldBulletPhysicsImpl::getBroadphase() const
 {
 	assert(m_pIntermediateBuildProducts);
 	
-	return m_pIntermediateBuildProducts->broadphase;
+	return &(m_pIntermediateBuildProducts->broadphase);
 }
 
-btDispatcher& tgWorldBulletPhysicsImpl::getDispatcher() const
+btDispatcher* tgWorldBulletPhysicsImpl::getDispatcher() const
 {
 	assert(m_pIntermediateBuildProducts);
 	
-	return m_pIntermediateBuildProducts->dispatcher;
+	return &(m_pIntermediateBuildProducts->dispatcher);
 }
-
+#endif
 bool tgWorldBulletPhysicsImpl::invariant() const
 {
     return (m_pDynamicsWorld != 0);
