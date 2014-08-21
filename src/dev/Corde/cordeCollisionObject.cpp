@@ -14,6 +14,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
+ * 
+This class is a modified version of btSoftBody
+* from Bullet 2.82. A copy of the z-lib license from the Bullet Physics
+* Library is provided below:
+
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
 */
 
 /**
@@ -26,6 +43,7 @@
 // This Module
 #include "cordeCollisionObject.h"
 #include "cordeCollisionShape.h"
+#include "cordeColliders.h"
 
 // Core library
 #include "core/tgWorld.h"
@@ -111,7 +129,30 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 
 void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) 
 { 
-	std::cout << "Handling collision!" << std::endl; 
+	std::cout << "Handling rigid collision!" << std::endl;
+	
+	cordeColliders::CollideSDF_RS	docollide;		
+	btRigidBody*		prb1=(btRigidBody*) btRigidBody::upcast(pcoWrap->getCollisionObject());
+	btTransform	wtr=pcoWrap->getWorldTransform();
+
+	const btTransform	ctr=pcoWrap->getWorldTransform();
+	const btScalar		timemargin=(wtr.getOrigin()-ctr.getOrigin()).length();
+	const btScalar		basemargin=getCollisionShape()->getMargin();
+	btVector3			mins;
+	btVector3			maxs;
+	ATTRIBUTE_ALIGNED16(btDbvtVolume)		volume;
+	pcoWrap->getCollisionShape()->getAabb(	pcoWrap->getWorldTransform(),
+		mins,
+		maxs);
+	volume=btDbvtVolume::FromMM(mins,maxs);
+	volume.Expand(btVector3(basemargin,basemargin,basemargin));		
+	docollide.psb		=	this;
+	docollide.m_colObj1Wrap = pcoWrap;
+	docollide.m_rigidBody = prb1;
+
+	docollide.dynmargin	=	basemargin+timemargin;
+	docollide.stamargin	=	basemargin;
+	m_ndbvt.collideTV(m_ndbvt.m_root,volume,docollide);
 }
 
 void cordeCollisionObject::updateAABBBounds()

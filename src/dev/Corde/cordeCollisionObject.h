@@ -14,6 +14,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
+ * 
+This class is a modified version of btSoftBody
+* from Bullet 2.82. A copy of the z-lib license from the Bullet Physics
+* Library is provided below:
+
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
 */
 
 #ifndef CORDE_COLLISION_OBJECT
@@ -55,6 +72,11 @@ class cordeCollisionObject : public CordeModel, public btCollisionObject
 	 * cordeCollisionShape needs access to bounds, etc, but that's the only class that needs them
 	 */
 	friend class cordeCollisionShape;
+	
+	/**
+	 * cordeColliders needs access to solver state
+	 */
+	friend struct cordeColliders;
 public:
 	/* SolverState	*/ 
 	struct	SolverState
@@ -64,7 +86,35 @@ public:
 		btScalar				velmrg;			// velocity margin
 		btScalar				radmrg;			// radial margin
 		btScalar				updmrg;			// Update margin
-	};	
+	};
+	/* sCti is Softbody contact info	*/ 
+	struct	sCti
+	{
+		const btCollisionObject*	m_colObj;		/* Rigid body			*/ 
+		btVector3		m_normal;	/* Outward normal		*/ 
+		btScalar		m_offset;	/* Offset from origin	*/ 
+	};		
+	/* RContact		*/ 
+	struct	RContact
+	{
+		sCti		m_cti;			// Contact infos
+		CordePositionElement*	m_node;			// Owner node
+		btMatrix3x3				m_c0;			// Impulse matrix
+		btVector3				m_c1;			// Relative anchor
+		btScalar				m_c2;			// ima*dt
+		btScalar				m_c3;			// Friction
+		btScalar				m_c4;			// Hardness
+	};
+	/* SContact		*/ 
+	struct	SContact
+	{
+		CordePositionElement*	m_node;			// Node
+		btVector3				m_weights;		// Weigths
+		btVector3				m_normal;		// Normal
+		btScalar				m_margin;		// Margin
+		btScalar				m_friction;		// Friction
+		btScalar				m_cfm[2];		// Constraint force mixing
+	};
 	
 public:
 	// Used in append anchors, unused otherwise
@@ -84,6 +134,7 @@ public:
 	
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	
+	// Just adds contact points etc, still need to process collisions elsewhere
 	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap );
 	
 	
@@ -130,7 +181,13 @@ public:
 			return (cordeCollisionObject*)colObj;
 		return 0;
 	}
-	
+
+public:
+	typedef btAlignedObjectArray<RContact>		tRContactArray;
+	typedef btAlignedObjectArray<SContact>		tSContactArray;
+
+	tRContactArray			m_rcontacts;	// Rigid contacts
+	tSContactArray			m_scontacts;	// Soft contacts
 private:
 	
 	/**

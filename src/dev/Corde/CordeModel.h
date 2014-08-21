@@ -61,6 +61,56 @@ public:
 	};
 	
 	/**
+	 * Holds all of the data for one of the mass elements of the string
+	 */
+	struct CordePositionElement
+	{
+		/**
+		 * Sets pos to p1, mass to m, everything else to zero
+		 * Assumes rod is at rest on start
+		 */
+		CordePositionElement(btVector3 p1, double m);
+		
+		btVector3 pos;
+		btVector3 vel;
+		btVector3 force;
+		double mass;
+	};
+	
+	/**
+	 * Holds all of the data for the centerline quaternions of the string
+	 */
+	struct CordeQuaternionElement
+	{	
+		/**
+		 * Sets q to q1.normalized(), everything else to zero
+		 */
+		CordeQuaternionElement(btQuaternion q1, btVector3 inertia);
+		
+		void transposeTorques();
+		/**
+		 * Must be called after transpose torques and omega is updated
+		 */
+		void updateQDot();
+		
+		btQuaternion q;
+		btQuaternion qdot;
+		/**
+		 * Just a 4x1 vector, but easier to store this way.
+		 */
+		btQuaternion tprime;
+		btVector3 torques;
+		btVector3 omega;
+		
+		/**
+		 * Computed based on the values in config. Should have length 3
+		 * Assuming products of inertia are negligible as in the paper
+		 */
+		btVector3 computedInertia;
+		btVector3 inverseInertia;
+	};
+	
+	/**
 	 * A constructor which assumes uniformally distributed mass
 	 * points and rotation
 	 * pos1 and pos2 specify the start and end points of the rod.
@@ -121,56 +171,6 @@ protected:
 	void constrainMotion(double dt);
 	
 	void computeQuaternionShapes(std::size_t i, double lj);
-	
-	/**
-	 * Holds all of the data for one of the mass elements of the string
-	 */
-	struct CordePositionElement
-	{
-		/**
-		 * Sets pos to p1, mass to m, everything else to zero
-		 * Assumes rod is at rest on start
-		 */
-		CordePositionElement(btVector3 p1, double m);
-		
-		btVector3 pos;
-		btVector3 vel;
-		btVector3 force;
-		double mass;
-	};
-	
-	/**
-	 * Holds all of the data for the centerline quaternions of the string
-	 */
-	struct CordeQuaternionElement
-	{	
-		/**
-		 * Sets q to q1.normalized(), everything else to zero
-		 */
-		CordeQuaternionElement(btQuaternion q1, btVector3 inertia);
-		
-		void transposeTorques();
-		/**
-		 * Must be called after transpose torques and omega is updated
-		 */
-		void updateQDot();
-		
-		btQuaternion q;
-		btQuaternion qdot;
-		/**
-		 * Just a 4x1 vector, but easier to store this way.
-		 */
-		btQuaternion tprime;
-		btVector3 torques;
-		btVector3 omega;
-		
-		/**
-		 * Computed based on the values in config. Should have length 3
-		 * Assuming products of inertia are negligible as in the paper
-		 */
-		btVector3 computedInertia;
-		btVector3 inverseInertia;
-	};
 	
 	CordeModel::Config m_config;
 	

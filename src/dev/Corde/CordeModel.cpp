@@ -778,6 +778,7 @@ CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
 	force(0.0, 0.0, 0.0),
 	mass(m)
 {
+	/// @todo get consistency on what this allowed to be with cordeColliders.cpp
     if (m < 0.0)
     {
         throw std::invalid_argument("Mass is negative.");
