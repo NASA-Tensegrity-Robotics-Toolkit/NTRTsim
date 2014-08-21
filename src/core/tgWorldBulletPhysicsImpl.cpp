@@ -209,20 +209,6 @@ void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
       assert(invariant());
 }
 
-btBroadphaseInterface& tgWorldBulletPhysicsImpl::getBroadphase() const
-{
-	assert(m_pIntermediateBuildProducts);
-	
-	return m_pIntermediateBuildProducts->broadphase;
-}
-
-btDispatcher& tgWorldBulletPhysicsImpl::getDispatcher() const
-{
-	assert(m_pIntermediateBuildProducts);
-	
-	return m_pIntermediateBuildProducts->dispatcher;
-}
-
 bool tgWorldBulletPhysicsImpl::invariant() const
 {
     return (m_pDynamicsWorld != 0);
