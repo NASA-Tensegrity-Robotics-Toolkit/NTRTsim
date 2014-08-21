@@ -86,7 +86,7 @@ void tgCordeModel::setup(tgWorld& world)
 
 void tgCordeModel::teardown()
 {
-    delete testString;
+    // World handles deleting collision object
 }
     
 void tgCordeModel::step(double dt)
