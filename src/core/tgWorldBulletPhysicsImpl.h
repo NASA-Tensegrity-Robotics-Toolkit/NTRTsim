@@ -84,12 +84,6 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
 	 */
 	void addCollisionShape(btCollisionShape* pShape);
 
-	/**
-	 * Soft-bodies need access to the broadphase and dispatcher
-	 */
-	btBroadphaseInterface& getBroadphase() const;
-	btDispatcher& getDispatcher() const;
-
         /**
      * Add a btTypedConstraint to a collection for deletion upon
      * destruction. Also add to the physics.
