@@ -36,6 +36,9 @@
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
+//The C++ Standard Library
+#include <iostream>
+
 cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config) :
 CordeModel(centerLine, Config),
 m_broadphase(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
@@ -43,6 +46,7 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 {
 	// Enum from btCollisionObject
 	m_internalType		=	CO_USER_TYPE;
+	m_collisionFlags =  CF_KINEMATIC_OBJECT;
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
@@ -63,7 +67,9 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 }
 	
 cordeCollisionObject::~cordeCollisionObject() 
-{}
+{
+	delete m_collisionShape;	
+}
 
 void cordeCollisionObject::predictMotion(btScalar dt)
 {
@@ -101,6 +107,11 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 	constrainMotion(dt);
     simTime += dt;
 	stepPrerequisites();
+}
+
+void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) 
+{ 
+	std::cout << "Handling collision!" << std::endl; 
 }
 
 void cordeCollisionObject::updateAABBBounds()

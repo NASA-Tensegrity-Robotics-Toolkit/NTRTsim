@@ -67,6 +67,8 @@ public:
 	};	
 	
 public:
+	// Used in append anchors, unused otherwise
+	btAlignedObjectArray<const class btCollisionObject*> m_collisionDisabledObjects;
 
 	cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config);
 	
@@ -82,7 +84,7 @@ public:
 	
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	
-	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) { }
+	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap );
 	
 	
 

@@ -74,14 +74,10 @@ void cordeRigidCollisionAlgorithm::processCollision (const btCollisionObjectWrap
 	cordeCollisionObject* cordeObject =  m_isSwapped? (cordeCollisionObject*)body1Wrap->getCollisionObject() : (cordeCollisionObject*)body0Wrap->getCollisionObject();
 	const btCollisionObjectWrapper* rigidCollisionObjectWrap = m_isSwapped? body0Wrap : body1Wrap;
 	
-	/// @todo add these functions
-	/*
-	if (softBody->m_collisionDisabledObjects.findLinearSearch(rigidCollisionObjectWrap->getCollisionObject())==softBody->m_collisionDisabledObjects.size())
+	if (cordeObject->m_collisionDisabledObjects.findLinearSearch(rigidCollisionObjectWrap->getCollisionObject())==cordeObject->m_collisionDisabledObjects.size())
 	{
-		softBody->getSoftBodySolver()->processCollision(softBody, rigidCollisionObjectWrap);
+		cordeObject->getSoftBodySolver()->processCollision(cordeObject, rigidCollisionObjectWrap);
 	}
-	*/
-
 
 }
 

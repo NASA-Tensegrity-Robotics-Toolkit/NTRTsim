@@ -57,6 +57,7 @@ class IntermediateBuildProducts
         IntermediateBuildProducts(double worldSize) : 
             corner1 (-worldSize,-worldSize, -worldSize),
             corner2 (worldSize, worldSize, worldSize),
+            collisionConfiguration(),
             dispatcher(&collisionConfiguration),
 #if (1) // More acc broadphase - remeber the comma
             broadphase(corner1, corner2, 16384)
