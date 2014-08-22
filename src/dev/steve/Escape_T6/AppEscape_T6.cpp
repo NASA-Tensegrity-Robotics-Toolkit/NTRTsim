@@ -62,8 +62,8 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    tgSimView       *view = createView(world);         // For running multiple episodes
+    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    //tgSimView       *view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
@@ -90,7 +90,19 @@ tgHillyGround *createGround() {
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgHillyGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
+    const double friction = 0.5; // Default: 0.5
+    const double restitution = 0.0;  // Default: 0.0
+    const btVector3 size = btVector3(500.0, 1.5, 500.0); // Default: (500.0, 1.5, 500.0)
+    const btVector3 origin = btVector3(0.0, 0.0, 0.0); // Default: (0.0, 0.0, 0.0)
+    const size_t nx = 50; // Default: 50
+    const size_t ny = 50; // Default: 50
+    const double margin = 0.5; // Default: 0.5
+    const double triangleSize = 5.0; // Default: 5.0
+    const double waveHeight = 2.0; // Default: 5.0
+    const double offset = 0.5; // Default: 0.5
+    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution, size, origin, 
+                                             nx, ny, margin, triangleSize, waveHeight, offset);
     // the world will delete this
     return new tgHillyGround(groundConfig);
 }
