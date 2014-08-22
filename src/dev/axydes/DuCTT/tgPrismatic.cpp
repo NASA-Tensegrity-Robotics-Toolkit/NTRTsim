@@ -47,12 +47,14 @@ tgPrismatic::Config::Config(
                 double maxLength,
                 double minLength,
                 double maxMotorForce,
-                double maxVelocity
+                double maxVelocity,
+                double eps
         ) :
 m_maxLength(maxLength),
 m_minLength(minLength),
 m_maxMotorForce(maxMotorForce),
-m_maxVelocity(maxVelocity)
+m_maxVelocity(maxVelocity),
+m_eps(eps)
 {
 }
 
@@ -87,8 +89,9 @@ void tgPrismatic::init()
 {
     m_slider->setLowerLinLimit(m_config.m_minLength);
     m_slider->setUpperLinLimit(m_config.m_maxLength);
-    m_slider->setPoweredLinMotor(true);
+    m_slider->setPoweredLinMotor(false);
     m_slider->setMaxLinMotorForce(m_config.m_maxMotorForce);
+    m_preferredLength = m_config.m_minLength + ((m_config.m_maxLength - m_config.m_minLength)/2.0);
 }
 
 void tgPrismatic::setup(tgWorld& world)
@@ -125,7 +128,49 @@ void tgPrismatic::step(double dt)
     }
 }
 
+bool tgPrismatic::setPreferredLength(double length)
+{
+    bool success = true;
+    if (length > m_config.m_maxLength)
+    {
+        m_preferredLength = m_config.m_maxLength;
+        success = false;
+    }
+    else if (length < m_config.m_minLength)
+    {
+        m_preferredLength = m_config.m_minLength;
+        success = false;
+    }
+    else
+    {
+        m_preferredLength = length;
+    }
+
+    return success;
+}
+
 void tgPrismatic::moveMotors(double dt)
 {
-    m_slider->setTargetLinMotorVelocity(m_config.m_maxVelocity/dt);
+    btScalar linDepth = m_slider->getLinearPos();
+
+    if (fabs(linDepth - m_preferredLength) <= m_config.m_eps)
+    {
+        m_slider->setPoweredLinMotor(false);
+        m_slider->setTargetLinMotorVelocity(0);
+    }
+    else if (linDepth < m_preferredLength)
+    {
+        m_slider->setPoweredLinMotor(true);
+        m_slider->setTargetLinMotorVelocity(m_config.m_maxVelocity/dt);
+    }
+    else if (linDepth > m_preferredLength)
+    {
+        m_slider->setPoweredLinMotor(true);
+        m_slider->setTargetLinMotorVelocity(-m_config.m_maxVelocity/dt);
+    }
+    else
+    {
+        m_slider->setPoweredLinMotor(false);
+        m_slider->setTargetLinMotorVelocity(0);
+    }
 }

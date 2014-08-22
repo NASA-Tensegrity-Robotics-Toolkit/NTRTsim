@@ -47,13 +47,15 @@ public:
                 double maxLength = 5, //todo: find better default
                 double minLength = 0.1, // todo: find better default
                 double maxMotorForce = 20,
-                double maxVelocity = 0.5 //m/s
+                double maxVelocity = 0.5, //m/s
+                double eps = 0.01
                 );
         
         double m_maxLength;
         double m_minLength;
         double m_maxMotorForce;
         double m_maxVelocity;
+        double m_eps;
     };
     
     tgPrismatic(
@@ -75,12 +77,15 @@ public:
     virtual void teardown();
 
     virtual void step(double dt);
+
+    virtual bool setPreferredLength(double length);
     
     virtual void moveMotors(double dt);
 
 private:
     Config m_config;
     btSliderConstraint* m_slider;
+    double m_preferredLength;
 };
 
 #endif // TG_PRISMATIC_H
