@@ -19,19 +19,33 @@
 # Purpose: Bullet Physics setup
 # Date:    2013-05-01
 
-# Source our common setup code
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-source "$base_dir/bin/setup/setup_common.sh"
-
-#Source this package's configuration
-source_conf "bullet.conf"
-
-# Adding 5-20-2014 for patching bullet
+##############################################################################
+#                       Services Configuration                               #
+##############################################################################
+# Add the relative path from your current directory to the bash services folder
+# so we can import all helper scripts. If this script is operating from the
+# root directory
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
 SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-setup_dir="$SCRIPT_PATH"
 
+pushd "${SCRIPT_PATH}/../../services/bash/" > /dev/null
+
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash services folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+
+# Get out of the bash services folder.
+popd > /dev/null
+##############################################################################
+
+#Source this package's configuration
+source_conf "general.conf"
+source_conf "bullet.conf"
 
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
@@ -152,8 +166,8 @@ function patch_bullet()
 	cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
 
 	# Patch them
-	patch -p5 < "$setup_dir/patches/CMakePatch.diff"
-	patch -p5 < "$setup_dir/patches/OpenGLPatch.diff"
+	patch -p5 < "$SETUP_DIR/patches/CMakePatch.diff"
+	patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
 
 	popd > /dev/null
 }
