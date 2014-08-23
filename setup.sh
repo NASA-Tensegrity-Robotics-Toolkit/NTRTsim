@@ -38,20 +38,12 @@ source "helper_paths.sh"
 
 # Get out of the bash services folder.
 popd > /dev/null
+
+getScriptPath
 ##############################################################################
 
-### Begin universal configuration 
-SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-setup_dir="$SCRIPT_PATH/bin/setup"
-conf_dir="$SCRIPT_PATH/conf"
-base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
-### End universal configuration
-
-### Begin script configuration 
 env_name='env'
 CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
-### End script configuration
 
 function banner() 
 {
@@ -62,7 +54,7 @@ function banner()
 function init_config()
 {
 
-    if [ -f "$conf_dir/install.conf" ]; then
+    if [ -f "$CONF_DIR/install.conf" ]; then
         echo "Your conf directory contains install.conf, which has been deprecated. Please delete install.conf and run set up again. See issue 21 for more details."
         exit 1
     fi
@@ -74,13 +66,13 @@ function init_config()
 
     for file_name in "${CONF_FILES[@]}"
     do
-        if [ ! -f "$conf_dir/$file_name" ]; then
+        if [ ! -f "$CONF_DIR/$file_name" ]; then
             to_create+=($file_name)
         fi
     done
 
     if [ "${#to_create}" -eq 0 ]; then
-        source "$conf_dir/general.conf"
+        source "$CONF_DIR/general.conf"
         return
     fi
 
@@ -92,7 +84,7 @@ function init_config()
         for file_name in "${to_create[@]}"
         do
             echo "Creating conf/$file_name"
-            cp "$conf_dir/default/${file_name}.default" "$conf_dir/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
+            cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
         done
         echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
     else
@@ -105,7 +97,7 @@ function init_config()
 function init_scripts()
 {
     # Make sure permissions are correct, etc.
-    pushd "$setup_dir" > /dev/null
+    pushd "$SETUP_DIR" > /dev/null
     chmod a+x *
     popd > /dev/null
 }
@@ -116,7 +108,7 @@ function run_setupscript()
     full_name=$2
     echo ""
     echo "Initializing ${2}..."
-    "$setup_dir/setup_${script_name}.sh" || { echo "$full_name initialization failed -- exiting now."; exit 1; }
+    "$SETUP_DIR/setup_${script_name}.sh" || { echo "$full_name initialization failed -- exiting now."; exit 1; }
 }
 
 # Set a variable in the install.conf configuration file
@@ -125,8 +117,8 @@ function set_config_var()
     var=$1
     value=$2
     echo "var: $var; value: $value"
-    sed "s,$var=.*,$var=\"$value\",g" "$setup_dir/install.conf" > "$setup_dir/install.conf.tmp"
-    mv "$setup_dir/install.conf.tmp" "$setup_dir/install.conf"
+    sed "s,$var=.*,$var=\"$value\",g" "$SETUP_DIR/install.conf" > "$SETUP_DIR/install.conf.tmp"
+    mv "$SETUP_DIR/install.conf.tmp" "$SETUP_DIR/install.conf"
 
 }
 
