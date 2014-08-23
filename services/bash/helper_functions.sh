@@ -93,8 +93,10 @@ function check_package_installed()
     return $TRUE
 }
 
-# Returns TRUE (1) if the directory exists,
-# FALSE (0) otherwise.
+# Returns TRUE if the directory exists,
+# FALSE otherwise. Assumes the script that calls
+# the function has included helper_definitions.sh
+# (that's where TRUE and FALSE are defined).
 function check_directory_exists()
 {
     if [ -d "$BOOST_BUILD_DIR/stage" ]; then
