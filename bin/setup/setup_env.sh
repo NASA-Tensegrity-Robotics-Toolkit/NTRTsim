@@ -24,11 +24,13 @@ local_setup_path="`dirname \"$0\"`"                # relative
 base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
 source "$base_dir/bin/setup/setup_common.sh"
 
-function get_actual_user() {
+function get_actual_user()
+{
     who am i | awk '{print $1}'
 }
 
-function get_primary_group() {
+function get_primary_group()
+{
     id -g -n $1
 }
 
@@ -50,8 +52,8 @@ echo "- Changing ownership of env to current user ($actual_user:$primary_group)"
 # Test for sudo (try a non-recursive change for speed)
 chown $actual_user:$primary_group "$env_dir" 2>/dev/null
 if [ ! $? -eq 0 ]; then
-  echo "  - ERROR: sudo required -- please re-run the command with sudo."
-  exit 1;
+    echo "  - ERROR: sudo required -- please re-run the command with sudo."
+    exit 1;
 fi
 # Actually change the permissions
 chown -R -P $actual_user:$primary_group "$env_dir"

@@ -29,38 +29,37 @@ SRC_DIR="`( cd \"$BASE_DIR/src\" && pwd )`"
 BUILD_DIR="$BASE_DIR/build"
 
 # Functions for calling CMake, depending on operating system
-function cmake_OSX(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_CXX_COMPILER=/opt/local/bin/g++
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
+function cmake_OSX()
+{
+    "$BASE_DIR/env/bin/cmake" ../src \
+        -G "$build_type" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+        -DCMAKE_CXX_COMPILER=/opt/local/bin/g++ \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 }
 
-function cmake_linux(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+function cmake_linux()
+{
+    "$BASE_DIR/env/bin/cmake" ../src \
+        -G "$build_type" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 
 }
 
@@ -73,7 +72,8 @@ if [ ! -d "$BUILD_DIR" ]; then
     exit 2
 fi
 
-function usage {
+function usage
+{
     echo "usage: $0 [-h] [-c] [-l] [-s] [-w] [build_path]"
     echo ""
     echo "positional arguments:"
@@ -96,32 +96,32 @@ MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
 
 while getopts ":hclsw" opt; do
-  case $opt in
-    h)
-      usage;
-      exit 0;
-      ;;
-    c)
-      MAKE_CLEAN_FLAG=true
-      ;;
-    l)
-      MAKE_CLEAN_LIB_FLAG=true
-      ;;
-    s)
-      MAKE_LIB_FLAG=false
-      ;;
-    w)
-      CMAKE_COMPILER_WARNINGS_FLAG=true
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
+    case $opt in
+        h)
+            usage;
+            exit 0;
+            ;;
+        c)
+            MAKE_CLEAN_FLAG=true
+            ;;
+        l)
+            MAKE_CLEAN_LIB_FLAG=true
+            ;;
+        s)
+            MAKE_LIB_FLAG=false
+            ;;
+        w)
+            CMAKE_COMPILER_WARNINGS_FLAG=true
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
 done
 
 TO_BUILD=${@:$OPTIND:1}
@@ -162,9 +162,9 @@ build_type="Unix Makefiles"
 #build_type="Eclipse CDT4 - Unix Makefiles"
 
 if $CMAKE_COMPILER_WARNINGS_FLAG; then
-  cmake_cxx_flags="-Wall -Wno-long-long"
+    cmake_cxx_flags="-Wall -Wno-long-long"
 else
-  cmake_cxx_flags=""
+    cmake_cxx_flags=""
 fi
 
 # Since OS X Mavericks places the g++ compiler in a different place than
@@ -172,43 +172,43 @@ fi
 # run one of two possible functions for actually compiling.
 
 # Functions for calling CMake, depending on operating system
-function cmake_OSX(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_CXX_COMPILER="g++" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+function cmake_OSX()
+{
+    "$BASE_DIR/env/bin/cmake" ../src \
+        -G "$build_type" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+        -DCMAKE_CXX_COMPILER="g++" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 
 }
 
-function cmake_linux(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+function cmake_linux()
+{
+    "$BASE_DIR/env/bin/cmake" ../src \
+        -G "$build_type" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 
 }
 
 if [ $(uname) == 'Darwin' ]
-    then
+then
     cmake_OSX
 else
     cmake_linux

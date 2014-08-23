@@ -36,14 +36,16 @@ setup_dir="$SCRIPT_PATH"
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-function ensure_install_prefix_writable() {
+function ensure_install_prefix_writable()
+{
     touch "$BULLET_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
         || { echo "Install prefix '$BULLET_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
     rm "$BULLET_INSTALL_PREFIX/tensegrity.deleteme"
 }
 
 # Check if the package is already installed in the location specified in install.conf 
-function check_bullet_installed() {
+function check_bullet_installed()
+{
     count_libs=$(count_files "$BULLET_INSTALL_PREFIX/lib/libBulletDynamics*")
     if [ "$count_libs" == "0" ]; then
         return $FALSE
@@ -52,7 +54,8 @@ function check_bullet_installed() {
 }
 
 # Check to see if bullet has been built already
-function check_bullet_built() {
+function check_bullet_built()
+{
     # Check for a library that's created when bullet is built   
     fname=$(find "$BULLET_BUILD_DIR" -iname libBulletCollision.* 2>/dev/null)
     if [ -f "$fname" ]; then
@@ -62,7 +65,8 @@ function check_bullet_built() {
 }
 
 # Check to see if bullet has been unpacked
-function check_bullet_unpacked() {
+function check_bullet_unpacked()
+{
     # The CMakeLists.txt will only exist if it's been unpacked.
     if [ -f "$BULLET_PACKAGE_DIR/CMakeLists.txt" ]; then
         return $TRUE
@@ -71,14 +75,16 @@ function check_bullet_unpacked() {
 }
 
 # Determine if the package exists under env/downloads
-function check_bullet_downloaded() {
+function check_bullet_downloaded()
+{
     if [ -f "$downloads_dir/$bullet_pkg" ]; then
         return $TRUE
     fi
     return $FALSE
 }
 
-function ensure_bullet_openglsupport() {
+function ensure_bullet_openglsupport()
+{
     result=$(count_files "$BULLET_BUILD_DIR/Demos/OpenGL/libOpenGLSupport.*")
     if [ "$result" == "0" ]; then
         echo "ERROR: It seems that bullet has been installed under prefix $BULLET_INSTALL_PREFIX, \
@@ -93,7 +99,8 @@ but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR
 }
 
 # Download the package to env/downloads
-function download_bullet() {
+function download_bullet()
+{
 
     bullet_pkg_path="$downloads_dir/$bullet_pkg"
 
@@ -107,7 +114,8 @@ function download_bullet() {
 }
 
 # Unpack to the build directory specified in install.conf
-function unpack_bullet() {
+function unpack_bullet()
+{
     # Create directory and unpack
     if [ -d "$BULLET_BUILD_DIR" ]; then
         echo "- Bullet Physics is already unpacked to '$BULLET_BUILD_DIR' -- skipping."
@@ -127,7 +135,8 @@ function unpack_bullet() {
 }
 
 # Patch Bullet to include OpenGL Directories
-function patch_bullet() {
+function patch_bullet()
+{
 	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
 	# Copy the files we're going to change
@@ -150,7 +159,8 @@ function patch_bullet() {
 }
 
 # Build the package under the build directory specified in in install.conf
-function build_bullet() {
+function build_bullet()
+{
     
     echo "- Building Bullet Physics under $BULLET_BUILD_DIR"
     pushd "$BULLET_BUILD_DIR" > /dev/null
@@ -194,7 +204,8 @@ function build_bullet() {
 }
 
 # Install the package under the package install prefix from install.conf
-function install_bullet() {
+function install_bullet()
+{
     
     echo "- Installing Bullet Physics under $BULLET_INSTALL_PREFIX"
     
@@ -206,7 +217,8 @@ function install_bullet() {
 }
 
 # Create symlinks under env for building our applications and IDE integration
-function env_link_bullet() {
+function env_link_bullet()
+{
 
     # Build
     pushd "$env_dir/build" > /dev/null
@@ -233,7 +245,8 @@ function env_link_bullet() {
 
 }
 
-function main() {
+function main()
+{
         
     ensure_install_prefix_writable
     
