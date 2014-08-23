@@ -31,15 +31,12 @@ if [ ! -f "helper_functions.sh" ]; then
     echo "Could not find helper_functions.sh. Are we in the bash services folder?"
     exit 1;
 fi
-
 # Import our common files
 source "helper_functions.sh"
 source "helper_paths.sh"
 
 # Get out of the bash services folder.
 popd > /dev/null
-
-getScriptPath
 ##############################################################################
 
 env_name='env'

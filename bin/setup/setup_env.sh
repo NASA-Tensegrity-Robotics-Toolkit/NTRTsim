@@ -19,10 +19,29 @@
 # Purpose: Env setup
 # Date:    2013-05-04
 
-# Source our common setup code
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-source "$base_dir/bin/setup/setup_common.sh"
+##############################################################################
+#                       Services Configuration                               #
+##############################################################################
+# Add the relative path from your current directory to the bash services folder
+# so we can import all helper scripts. If this script is operating from the
+# root directory
+SCRIPT_PATH="`dirname \"$0\"`"                  # relative
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
+
+pushd "${SCRIPT_PATH}/../../services/bash/" > /dev/null
+
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash services folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+
+# Get out of the bash services folder.
+popd > /dev/null
+##############################################################################
 
 function get_actual_user()
 {
@@ -34,12 +53,12 @@ function get_primary_group()
     id -g -n $1
 }
 
-if [ -d "$env_dir" ]; then
+if [ -d "$ENV_DIR" ]; then
     echo "- env directory exists. Ensuring subdirectories."
 else
-    mkdir "$env_dir"
+    mkdir "$ENV_DIR"
 fi    
-pushd "$env_dir" > /dev/null
+pushd "$ENV_DIR" > /dev/null
 mkdir bin build downloads include lib 2>/dev/null
 popd > /dev/null
 
@@ -50,10 +69,10 @@ actual_user=$(get_actual_user)
 primary_group=$(get_primary_group $actual_user)
 echo "- Changing ownership of env to current user ($actual_user:$primary_group)"
 # Test for sudo (try a non-recursive change for speed)
-chown $actual_user:$primary_group "$env_dir" 2>/dev/null
+chown $actual_user:$primary_group "$ENV_DIR" 2>/dev/null
 if [ ! $? -eq 0 ]; then
     echo "  - ERROR: sudo required -- please re-run the command with sudo."
     exit 1;
 fi
 # Actually change the permissions
-chown -R -P $actual_user:$primary_group "$env_dir"
+chown -R -P $actual_user:$primary_group "$ENV_DIR"

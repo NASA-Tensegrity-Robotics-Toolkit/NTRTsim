@@ -15,22 +15,13 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
-
 helper_pwd=`pwd`
-SETUP_DIR="${helper_pwd}/../../setup/"
-CONF_DIR="${helper_pwd}/../../conf/"
-BASE_DIR="${helper_pwd}/../../"
+SETUP_DIR="${helper_pwd}/../../bin/setup"
+CONF_DIR="${helper_pwd}/../../conf"
+BASE_DIR="${helper_pwd}/../.."
+ENV_DIR="${helper_pwd}/../../env"
 
 # TODO: Remove this. It's a kludge until we can clean up the conf files and
 # remove their dependence on base_dir rather than BASE_DIR.
 base_dir=$BASE_DIR
 
-# We put this as a function rather than simply declaring it because when
-# the user imports this file, they'll have done pushd to get into bash
-# services. They should call this after they've run popd following
-# their imports. 
-function getScriptPath()
-{
-    SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-    SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-}
