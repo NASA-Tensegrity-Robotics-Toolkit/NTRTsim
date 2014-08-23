@@ -19,7 +19,6 @@
 # Purpose: Install script for everything related to the tensegrity repository
 # Author:  Ryan Adams, Perry Bhandal
 
-env_name='env'
 
 # Locations
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
@@ -27,6 +26,8 @@ SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
 setup_dir="$SCRIPT_PATH/bin/setup"
 conf_dir="$SCRIPT_PATH/conf"
 base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
+
+env_name='env'
 CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
 
 #Load our common set up functions
@@ -87,33 +88,13 @@ function init_scripts()
     popd > /dev/null
 }
 
-function init_env()
+function run_setupscript()
 {
-    # Note: $env_dir is set in install.conf
+    script_name=$1
+    full_name=$2
     echo ""
-    echo "Initializing env ($env_dir)..."   
-    "$setup_dir/setup_env.sh" || { echo "Env setup failed -- exiting now."; exit 1; }  
-}
-
-function init_cmake()
-{
-    echo ""
-    echo "Initializing CMake..."
-    "$setup_dir/setup_cmake.sh" || { echo "CMake initialization failed -- exiting now."; exit 1; }  
-}
-
-function init_bullet()
-{
-    echo ""
-    echo "Initializing Bullet Physics..."
-    "$setup_dir/setup_bullet.sh" || { echo "Bullet Physics initialization failed -- exiting now."; exit 1; }
-}
-
-function init_boost()
-{
-    echo ""
-    echo "Initializing the Boost library..."
-    "$setup_dir/setup_boost.sh" || { echo "Boost initialization failed -- exiting now."; exit 1; }
+    echo "Initializing ${2}..."
+    "$setup_dir/setup_${script_name}.sh" || { echo "$full_name initialization failed -- exiting now."; exit 1; }
 }
 
 # Set a variable in the install.conf configuration file
@@ -212,10 +193,11 @@ function test_relative_path()
 banner
 init_config
 init_scripts
-init_env
-init_cmake 
-init_bullet
-init_boost
+
+run_setupscript "env" "Env directory"
+run_setupscript "cmake" "CMake"
+run_setupscript "bullet" "Bullet Physics Library"
+run_setupscript "boost" "Boost"
 
 echo ""
 echo "Setup Complete!"
