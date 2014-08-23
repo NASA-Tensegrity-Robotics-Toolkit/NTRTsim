@@ -115,4 +115,39 @@ function check_file_exists()
     return $FALSE
 }
 
-# Downloads the provided file.
+# Allow user to select from a set of options and return the selected option
+# usage: result=$(read_options "Is the default option capitalized? (yes, no, abort)" ("Y" "n" "a") "Y")
+function read_options()
+{
+    message=$1
+    options=$2
+    default=$3
+
+    # Assemble the options
+    str_opts=$(printf "/%s" "${options[@]}")
+    str_opts="[${str_opts:1}]"
+    read -p "$message $str_opts " input
+    if [[ "$input" == "" ]]; then
+        input="$default"
+    fi
+    input=`echo $input|tr [a-z] [A-Z]`
+
+    # TODO: Check options, make sure that a proper one was selected (maybe)
+
+    echo "$input"
+}
+
+# Read a line of text, returning the default if user hits enter.
+# usage: result=$(read_text "Is this the prompt" "yes, I believe it is.")
+function read_text()
+{
+    message=$1
+    default=$2
+
+    read -p "$message: " input
+    if [[ "$input" == "" ]]; then
+        input="$default"
+    fi
+    echo "$input"
+}
+

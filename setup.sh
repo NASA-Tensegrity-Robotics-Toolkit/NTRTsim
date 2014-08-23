@@ -131,59 +131,6 @@ function set_config_var()
 
 }
 
-# Get the relative path between two absolute paths
-# Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
-function get_relative_path()
-{
-    source=$1
-    target=$2
-
-    common_part=$source
-    back=
-    while [ "${target#$common_part}" = "${target}" ]; do
-        common_part=$(dirname $common_part)
-        back="../${back}"
-    done
-
-    echo ${back}${target#$common_part/}
-}
-
-# Allow user to select from a set of options and return the selected option
-# usage: result=$(read_options "Is the default option capitalized? (yes, no, abort)" ("Y" "n" "a") "Y")
-function read_options()
-{
-    message=$1
-    options=$2
-    default=$3
-
-    # Assemble the options
-    str_opts=$(printf "/%s" "${options[@]}")
-    str_opts="[${str_opts:1}]"
-    read -p "$message $str_opts " input
-    if [[ "$input" == "" ]]; then
-        input="$default"
-    fi
-    input=`echo $input|tr [a-z] [A-Z]`
-
-    # TODO: Check options, make sure that a proper one was selected (maybe)
-
-    echo "$input"
-}
-
-# Read a line of text, returning the default if user hits enter.
-# usage: result=$(read_text "Is this the prompt" "yes, I believe it is.")
-function read_text()
-{
-    message=$1
-    default=$2
-
-    read -p "$message: " input
-    if [[ "$input" == "" ]]; then
-        input="$default"
-    fi
-    echo "$input"
-}
-
 # TEST FUNCTIONS
 
 function test_read_options()
