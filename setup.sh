@@ -39,7 +39,6 @@ source "helper_paths.sh"
 popd > /dev/null
 ##############################################################################
 
-env_name='env'
 CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
 
 function banner() 

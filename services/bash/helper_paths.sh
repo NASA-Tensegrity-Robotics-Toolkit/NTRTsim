@@ -20,8 +20,7 @@ SETUP_DIR="${helper_pwd}/../../bin/setup"
 CONF_DIR="${helper_pwd}/../../conf"
 BASE_DIR="${helper_pwd}/../.."
 ENV_DIR="${helper_pwd}/../../env"
-
-# TODO: Remove this. It's a kludge until we can clean up the conf files and
-# remove their dependence on base_dir rather than BASE_DIR.
-base_dir=$BASE_DIR
-
+DOWNLOADS_DIR="${helper_pwd}/../../env/downloads"
+BIN_DIR="${helper_pwd}/../../env/bin"
+BUILD_DIR="${helper_pwd}/../../env/build"
+ENV_NAME='env'

@@ -21,19 +21,6 @@
 # Usage:   Copy/rename this file to '../general.conf' and run setup.sh
 
 #############################################
-#  Script Initialization -- do not edit.
-if [[ -z "$base_dir" ]]; then
-    echo "general.conf : base_dir must be set before sourcing this file."
-    exit 1
-fi
-env_name='env'
-ENV_DIR="$base_dir/$env_name"
-downloads_dir="$ENV_DIR/downloads"
-bin_dir="$ENV_DIR/bin"
-build_dir="$ENV_DIR/build"
-#############################################
-
-#############################################
 #  Configuration -- edit below as needed.
 #############################################
 
