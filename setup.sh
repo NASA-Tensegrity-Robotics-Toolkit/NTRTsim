@@ -19,6 +19,26 @@
 # Purpose: Install script for everything related to the tensegrity repository
 # Author:  Ryan Adams, Perry Bhandal
 
+##############################################################################
+#                       Services Configuration                               #
+##############################################################################
+# Add the relative path from your current directory to the bash services folder
+# so we can import all helper scripts. If this script is operating from the
+# root directory
+pushd "services/bash/" > /dev/null
+
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash services folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+
+# Get out of the bash services folder.
+popd > /dev/null
+##############################################################################
 
 ### Begin universal configuration 
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
