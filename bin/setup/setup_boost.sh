@@ -201,28 +201,6 @@ function env_link_boost()
 
 }
 
-# Allow user to select from a set of options and return the selected option
-# usage: myResult=$(read_options "Is the default option capitalized? (yes, no, abort)" ("Y" "n" "a") "Y")
-function read_options()
-{
-    message=$1
-    options=$2
-    default=$3
-    
-    # Assemble the options
-    str_opts=$(printf "/%s" "${options[@]}")
-    str_opts="[${str_opts:1}]"
-    read -p "$message $str_opts " input
-    if [[ "$input" == "" ]]; then
-        input="$default"
-    fi
-    input=`echo $input|tr [a-z] [A-Z]`
-
-    # TODO: Check options, make sure that a proper one was selected (maybe)
-
-    echo "$input"
-}
-
 function main()
 {
     
