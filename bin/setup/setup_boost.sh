@@ -38,6 +38,7 @@ fi
 # Import our common files
 source "helper_functions.sh"
 source "helper_paths.sh"
+source "helper_definitions.sh"
 
 # Get out of the bash services folder.
 popd > /dev/null
