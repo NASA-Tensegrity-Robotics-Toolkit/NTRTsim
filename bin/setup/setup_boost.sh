@@ -174,12 +174,12 @@ function env_link_boost()
 {
 
     # Build
-    pushd "$env_dir/build" > /dev/null
+    pushd "$ENV_DIR/build" > /dev/null
     rm boost 2>/dev/null  # This will fail if 'boost' is a directory, which is what we want.
     if [ -d "$BOOST_BUILD_DIR" ]; then  # If we built boost (as opposed to installing it another way)...
         
         # If we're building under env, use a relative link; otherwise use an absolute one.
-        if str_contains "$BOOST_BUILD_DIR" "$env_dir"; then
+        if str_contains "$BOOST_BUILD_DIR" "$ENV_DIR"; then
             current_pwd=`pwd`
             rel_path=$(get_relative_path "$current_pwd" "$BOOST_BUILD_DIR" )
             ln -s "$rel_path" boost
@@ -191,7 +191,7 @@ function env_link_boost()
     popd > /dev/null
     
     # Header Files
-    pushd "$env_dir/include" > /dev/null
+    pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "boost" ]; then  # We may have built boost here, so only create a symlink if not
         rm boost 2>/dev/null
         ln -s "$BOOST_INSTALL_PREFIX/include/boost" boost
