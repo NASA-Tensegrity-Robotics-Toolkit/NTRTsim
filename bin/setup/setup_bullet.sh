@@ -20,16 +20,22 @@
 # Date:    2013-05-01
 
 ##############################################################################
-#                       Services Configuration                               #
+#                         START DO NOT MODIFY                                #
 ##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"                  # relative
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
 # Add the relative path from your current directory to the bash services folder
 # so we can import all helper scripts. If this script is operating from the
 # root directory
-SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-
 pushd "${SCRIPT_PATH}/../../services/bash/" > /dev/null
 
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
 if [ ! -f "helper_functions.sh" ]; then
     echo "Could not find helper_functions.sh. Are we in the bash services folder?"
     exit 1;
@@ -42,6 +48,8 @@ source "helper_definitions.sh"
 
 # Get out of the bash services folder.
 popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
 ##############################################################################
 
 #Source this package's configuration
