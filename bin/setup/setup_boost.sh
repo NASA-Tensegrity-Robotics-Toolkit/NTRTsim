@@ -91,7 +91,7 @@ function check_boost_unpacked()
 # Determine if the package exists under env/downloads
 function check_boost_downloaded()
 {
-    if [ -f "$downloads_dir/$boost_pkg" ]; then
+    if [ -f "$DOWNLOADS_DIR/$boost_pkg" ]; then
         return $TRUE
     fi
     return $FALSE
@@ -102,7 +102,7 @@ function check_boost_downloaded()
 function download_boost()
 {
 
-    boost_pkg_path="$downloads_dir/$boost_pkg"
+    boost_pkg_path="$DOWNLOADS_DIR/$boost_pkg"
 
     if [ -f "$boost_pkg_path" ]; then
         echo "- Boost package already exists ('$boost_pkg_path') -- skipping download."
@@ -130,7 +130,7 @@ function unpack_boost()
 
     # Unzip
     pushd "$BOOST_BUILD_DIR" > /dev/null
-    tar xf "$downloads_dir/$boost_pkg" --strip 1 
+    tar xf "$DOWNLOADS_DIR/$boost_pkg" --strip 1 
     popd > /dev/null
 
 }

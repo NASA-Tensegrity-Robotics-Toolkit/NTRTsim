@@ -91,7 +91,7 @@ function check_bullet_unpacked()
 # Determine if the package exists under env/downloads
 function check_bullet_downloaded()
 {
-    if [ -f "$downloads_dir/$bullet_pkg" ]; then
+    if [ -f "$DOWNLOADS_DIR/$bullet_pkg" ]; then
         return $TRUE
     fi
     return $FALSE
@@ -116,7 +116,7 @@ but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR
 function download_bullet()
 {
 
-    bullet_pkg_path="$downloads_dir/$bullet_pkg"
+    bullet_pkg_path="$DOWNLOADS_DIR/$bullet_pkg"
 
     if [ -f "$bullet_pkg_path" ]; then
         echo "- Bullet Physics package already exists ('$bullet_pkg_path') -- skipping download."
@@ -144,7 +144,7 @@ function unpack_bullet()
 
     # Unzip
     pushd "$BULLET_BUILD_DIR" > /dev/null
-    tar xf "$downloads_dir/$bullet_pkg" --strip 1 || { echo "- ERROR: Failed to unpack Bullet Physics."; exit 1; }
+    tar xf "$DOWNLOADS_DIR/$bullet_pkg" --strip 1 || { echo "- ERROR: Failed to unpack Bullet Physics."; exit 1; }
     popd > /dev/null
 }
 
