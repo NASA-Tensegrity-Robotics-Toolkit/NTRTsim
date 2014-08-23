@@ -21,7 +21,6 @@
 
 function source_conf()
 {
-    echo "Conf dir is ${CONF_DIR}"
     conf_file_name="$CONF_DIR/$1"
     if [ ! -f "$conf_file_name" ]; then
         echo "Missing $conf_file_name. Please fix this and try again."
