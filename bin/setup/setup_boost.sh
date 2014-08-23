@@ -51,47 +51,6 @@ source_conf "boost.conf"
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-# Check if the package is already installed in the location specified in install.conf 
-# TODO: Check to make sure that the header files are also installed properly.
-function check_boost_installed()
-{
-    count_boost_libs=$(count_files "$BOOST_INSTALL_PREFIX/lib/libboost*")
-    if [ "$count_boost_libs" == "0" ]; then
-        return $FALSE
-    fi
-    return $TRUE
-}
-
-# Check to see if boost has been built already
-function check_boost_built()
-{
-    # Check for the 'stage' directory that's created when boost is built    
-    if [ -d "$BOOST_BUILD_DIR/stage" ]; then
-        return $TRUE
-    fi
-    return $FALSE
-}
-
-# Check to see if boost has been unpacked
-function check_boost_unpacked()
-{
-    # Check for the 'boost' subdirectory that's present when boost is unpacked
-    if [ -d "$BOOST_PACKAGE_DIR/boost" ]; then
-        return $TRUE
-    fi
-    return $FALSE
-}
-
-# Determine if the package exists under env/downloads
-function check_boost_downloaded()
-{
-    if [ -f "$DOWNLOADS_DIR/$boost_pkg" ]; then
-        return $TRUE
-    fi
-    return $FALSE
-}
-
-
 # Download the package to env/downloads
 function download_boost()
 {
@@ -132,15 +91,15 @@ function unpack_boost()
 # Build the package under the build directory specified in in install.conf
 function build_boost()
 {
-    
+
     echo "- Building Boost under $BOOST_BUILD_DIR"
     pushd "$BOOST_BUILD_DIR" > /dev/null
-    
+
     if [ -d "stage" ]; then
         echo "- Boost is already built in '$BOOST_BUILD_DIR' -- skipping."
         return
     fi
-    
+
     #For MAC and gcc
     #sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
 
@@ -154,13 +113,13 @@ function build_boost()
 # Install the package under the package install prefix from install.conf
 function install_boost()
 {
-    
+
     echo "- Installing Boost under $BOOST_INSTALL_PREFIX"
 
     pushd "$BOOST_BUILD_DIR" > /dev/null
     ./b2 install || { echo "Install failed"; exit 1; }
     popd > /dev/null
-            
+
 }
 
 # Create symlinks under env for building our applications and IDE integration
@@ -171,7 +130,7 @@ function env_link_boost()
     pushd "$ENV_DIR/build" > /dev/null
     rm boost 2>/dev/null  # This will fail if 'boost' is a directory, which is what we want.
     if [ -d "$BOOST_BUILD_DIR" ]; then  # If we built boost (as opposed to installing it another way)...
-        
+
         # If we're building under env, use a relative link; otherwise use an absolute one.
         if str_contains "$BOOST_BUILD_DIR" "$ENV_DIR"; then
             current_pwd=`pwd`
@@ -183,7 +142,7 @@ function env_link_boost()
 
     fi
     popd > /dev/null
-    
+
     # Header Files
     pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "boost" ]; then  # We may have built boost here, so only create a symlink if not
@@ -196,31 +155,35 @@ function env_link_boost()
 
 function main()
 {
-    
+
     ensure_install_prefix_writable $BOOST_INSTALL_PREFIX
     
-    if check_boost_installed; then
+    # TODO: Check to make sure that the header files are also installed properly.
+    if check_package_installed "$BOOST_INSTALL_PREFIX/lib/libboost*"; then
         echo "- Boost is installed under prefix $BOOST_INSTALL_PREFIX -- skipping."
         env_link_boost
         return
     fi
     
-    if check_boost_built; then
+    # Check if boost is built.
+    if check_directory_exists "$BOOST_BUILD_DIR/stage"; then
         echo "- Boost is already built under $BOOST_BUILD_DIR -- skipping."
         install_boost
         env_link_boost
         return
     fi
-    
-    if check_boost_unpacked; then
+
+    # Check if boost is unpacked
+    if check_directory_exists "$BOOST_PACKAGE_DIR/boost"; then
         echo "- Boost is already unpacked to $BOOST_BUILD_DIR -- skipping."
         build_boost
         install_boost
         env_link_boost
         return
     fi
-    
-    if check_boost_downloaded; then
+
+    # Check if boost is downloaded.
+    if check_file_exists "$DOWNLOADS_DIR/$boost_pkg"; then
         echo "- Boost package already exists under env/downloads -- skipping download."
         unpack_boost
         build_boost
@@ -228,7 +191,7 @@ function main()
         env_link_boost
         return
     fi
-    
+
     # If we haven't returned by now, we have to do everything
     download_boost
     unpack_boost

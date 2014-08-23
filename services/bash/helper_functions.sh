@@ -81,4 +81,36 @@ function count_files()
     echo `ls -a $pattern 2>/dev/null | wc -l`
 }
 
+# Count the number of occurrences of a specific selection string.
+# For example, calling this function with "$BOOST_INSTALL_PREFIX/lib/libboost*"
+# as a parameter would tell you whether any files match that selection string.
+function check_package_installed()
+{
+    count_libs=$(count_files $1)
+    if [ "$count_libs" == "0" ]; then
+        return $FALSE
+    fi
+    return $TRUE
+}
 
+# Returns TRUE (1) if the directory exists,
+# FALSE (0) otherwise.
+function check_directory_exists()
+{
+    if [ -d "$BOOST_BUILD_DIR/stage" ]; then
+        return $TRUE
+    fi
+    return $FALSE
+}
+
+# Returns TRUE (1) if the file exists,
+# FALSE (0) otherwise.
+function check_file_exists()
+{
+    if [ -d "$BOOST_BUILD_DIR/stage" ]; then
+        return $TRUE
+    fi
+    return $FALSE
+}
+
+# Downloads the provided file.
