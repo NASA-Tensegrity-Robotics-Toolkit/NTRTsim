@@ -20,17 +20,18 @@
 # Author:  Ryan Adams, Perry Bhandal
 
 
-# Locations
+### Begin universal configuration 
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
 SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
 setup_dir="$SCRIPT_PATH/bin/setup"
 conf_dir="$SCRIPT_PATH/conf"
 base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
+### End universal configuration
 
+### Begin script configuration 
 env_name='env'
 CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
-
-#Load our common set up functions
+### End script configuration
 
 function banner() 
 {
@@ -48,6 +49,7 @@ function init_config()
 
     echo "- Starting configuration"
 
+    ## Determine if any conf files are missing
     to_create=()
 
     for file_name in "${CONF_FILES[@]}"
