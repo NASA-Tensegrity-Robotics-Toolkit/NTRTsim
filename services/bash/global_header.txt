@@ -1,0 +1,5 @@
+This file contains the global header that all setup scripts must contain. If you make a change here, you must propagate it to every .sh script outside of this directory. It's used so that all shell scripts can find the common bash services in this folder for sourcing.
+
+## Begin service path (do not modify)
+
+## End service path
