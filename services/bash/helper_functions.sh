@@ -19,6 +19,14 @@
 # Purpose: Common setup code
 # Date:    2014-08-18
 
+function ensure_install_prefix_writable()
+{
+    touch "$1/tensegrity.deleteme" 2>/dev/null \
+        || { echo "Install prefix '$1' is not writable -- please use sudo or execute as root."; exit 1; }
+    rm "$1/tensegrity.deleteme"
+}
+
+
 function source_conf()
 {
     conf_file_name="$CONF_DIR/$1"

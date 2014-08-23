@@ -51,13 +51,6 @@ source_conf "bullet.conf"
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-function ensure_install_prefix_writable()
-{
-    touch "$BULLET_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
-        || { echo "Install prefix '$BULLET_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
-    rm "$BULLET_INSTALL_PREFIX/tensegrity.deleteme"
-}
-
 # Check if the package is already installed in the location specified in install.conf 
 function check_bullet_installed()
 {
@@ -263,7 +256,7 @@ function env_link_bullet()
 function main()
 {
         
-    ensure_install_prefix_writable
+    ensure_install_prefix_writable $BULLET_INSTALL_PREFIX
     
     if check_bullet_installed; then
         echo "- Bullet Physics is installed under prefix $BULLET_INSTALL_PREFIX -- skipping."

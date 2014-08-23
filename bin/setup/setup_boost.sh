@@ -51,13 +51,6 @@ source_conf "boost.conf"
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-function ensure_install_prefix_writable()
-{
-    touch "$BOOST_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
-        || { echo "Install prefix '$BOOST_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
-    rm "$BOOST_INSTALL_PREFIX/tensegrity.deleteme"
-}
-
 # Check if the package is already installed in the location specified in install.conf 
 # TODO: Check to make sure that the header files are also installed properly.
 function check_boost_installed()
@@ -204,7 +197,7 @@ function env_link_boost()
 function main()
 {
     
-    ensure_install_prefix_writable
+    ensure_install_prefix_writable $BOOST_INSTALL_PREFIX
     
     if check_boost_installed; then
         echo "- Boost is installed under prefix $BOOST_INSTALL_PREFIX -- skipping."
