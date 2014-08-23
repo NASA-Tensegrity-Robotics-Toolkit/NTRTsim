@@ -23,15 +23,15 @@
 # @see scripts/setup_bullet.sh for more info.
 
 # Bullet installation prefix
-# Global install: /usr/local, env install: "$env_dir"
+# Global install: /usr/local, env install: "$ENV_DIR"
 # By default, setup will download and install bullet under your env directory.
 # If you have an existing bullet install, you should change 
 # BULLET_INSTALL_PREFIX to what was used for installation (likely /usr/local).
-BULLET_INSTALL_PREFIX="$env_dir"
+BULLET_INSTALL_PREFIX="$ENV_DIR"
 
 # Location where bullet is to be built, or where it was built if you're using 
 # an existing package.
-BULLET_BUILD_DIR="$env_dir/build/bullet-2.82-r2704"
+BULLET_BUILD_DIR="$ENV_DIR/build/bullet-2.82-r2704"
 
 # This is the location where you unzipped the package (or, where it will be
 # unzipped if required). This will be the same as the build dir unless you did

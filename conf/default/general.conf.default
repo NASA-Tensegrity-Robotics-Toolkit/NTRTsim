@@ -27,10 +27,10 @@ if [[ -z "$base_dir" ]]; then
     exit 1
 fi
 env_name='env'
-env_dir="$base_dir/$env_name"
-downloads_dir="$env_dir/downloads"
-bin_dir="$env_dir/bin"
-build_dir="$env_dir/build"
+ENV_DIR="$base_dir/$env_name"
+downloads_dir="$ENV_DIR/downloads"
+bin_dir="$ENV_DIR/bin"
+build_dir="$ENV_DIR/build"
 #############################################
 
 #############################################
@@ -44,7 +44,7 @@ build_dir="$env_dir/build"
 # Uncomment this to install locally (under env/include and env/lib)
 # IMPORTANT: If you've previously installed to /usr/local, you'll need to 
 # delete your 'env' directory before running setup again.
-INSTALL_PREFIX="$env_dir"  
+INSTALL_PREFIX="$ENV_DIR"  
 
 # Set the path (or executable name if it's in your path) for the utility
 # to use for SHA1 summing. To disable download integrity verification

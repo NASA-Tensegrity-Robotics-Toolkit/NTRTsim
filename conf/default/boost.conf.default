@@ -31,7 +31,7 @@ BOOST_INSTALL_PREFIX="$INSTALL_PREFIX"
 # Location where bullet is to be built if necessary, or where it was built if 
 # you're using an existing package. This doesn't need to be set unless boost is
 # not already installed. 
-BOOST_BUILD_DIR="$env_dir/build/boost_1_53_0"
+BOOST_BUILD_DIR="$ENV_DIR/build/boost_1_53_0"
 
 # This is the location where you unzipped the package (or, where it will
 # be unzipped if necessary). 

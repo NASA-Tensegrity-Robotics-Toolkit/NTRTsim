@@ -185,7 +185,7 @@ function build_bullet()
     if [ $USE_DISTRO_CMAKE == 1 ]; then
     CMAKECOMMAND="cmake"
     else
-    CMAKECOMMAND="$env_dir/bin/cmake"
+    CMAKECOMMAND="$ENV_DIR/bin/cmake"
     fi
 
     # Additional Change 4-28-14: trying to pass in the -fPIC option to solve GLUT issues on linux
@@ -195,7 +195,7 @@ function build_bullet()
 
 	# Perform the build
 	# If you turn double precision on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
-    "$env_dir/bin/cmake" . -G "Unix Makefiles" \
+    "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
     $CMAKECOMMAND . -G "Unix Makefiles" \
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_EXTRAS=ON \
@@ -235,11 +235,11 @@ function env_link_bullet()
 {
 
     # Build
-    pushd "$env_dir/build" > /dev/null
+    pushd "$ENV_DIR/build" > /dev/null
     rm bullet 2>/dev/null   # Note: this will fail if 'bullet' is a directory, which is what we want.
 
     # If we're building under env, use a relative path for the link; otherwise use an absolute one.
-    if str_contains "$BULLET_BUILD_DIR" "$env_dir"; then
+    if str_contains "$BULLET_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$BULLET_BUILD_DIR" )
         ln -s "$rel_path" bullet
@@ -250,7 +250,7 @@ function env_link_bullet()
     popd > /dev/null
         
     # Header Files
-    pushd "$env_dir/include" > /dev/null
+    pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "bullet" ]; then  # We may have built here, so only create a symlink if not
         rm bullet 2>/dev/null
         ln -s "$BULLET_INSTALL_PREFIX/include/bullet" bullet
