@@ -16,9 +16,6 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: Common setup code
-# Date:    2014-08-18
-
 function ensure_install_prefix_writable()
 {
     touch "$1/tensegrity.deleteme" 2>/dev/null \

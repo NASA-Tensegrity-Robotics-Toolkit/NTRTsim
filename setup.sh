@@ -131,35 +131,7 @@ function set_config_var()
 
 }
 
-# TEST FUNCTIONS
-
-function test_read_options()
-{
-    message="Do you want to test read_options?"
-    options=("Y" "n" "a")
-    default="Y"
-    output=$(read_options "$message" $options $default)
-    echo "read_options() returned '$output'"
-}
-
-function test_read_text()
-{
-    message="Do you want to test read_text?"
-    default="I'd rather test the default."
-    output=$(read_text "$message" "$default")
-    echo "read_text() returned '$output'"
-}
-
-function test_relative_path()
-{
-    a="/this/is/an/absolute/path"
-    b="/this/is/the/target/path"
-    rel=$(get_relative_path "$a" "$b")
-    echo "relative path is $rel (should be '../../../the/target/path')"
-}
-
 # EXECUTION
-
 banner
 init_config
 init_scripts

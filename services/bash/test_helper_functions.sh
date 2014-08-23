@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+source "helper_functions.sh"
+
+function test_read_options()
+{
+    message="Do you want to test read_options?"
+    options=("Y" "n" "a")
+    default="Y"
+    output=$(read_options "$message" $options $default)
+    echo "read_options() returned '$output'"
+}
+
+function test_read_text()
+{
+    message="Do you want to test read_text?"
+    default="I'd rather test the default."
+    output=$(read_text "$message" "$default")
+    echo "read_text() returned '$output'"
+}
+
+function test_relative_path()
+{
+    a="/this/is/an/absolute/path"
+    b="/this/is/the/target/path"
+    rel=$(get_relative_path "$a" "$b")
+    echo "relative path is $rel (should be '../../../the/target/path')"
+}
+
