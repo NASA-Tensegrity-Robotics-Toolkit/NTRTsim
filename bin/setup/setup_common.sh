@@ -19,13 +19,14 @@
 # Purpose: Common setup code
 # Date:    2014-08-18
 
-function source_conf() {
-	conf_file_name="$base_dir/conf/$1"
-	if [ ! -f "$conf_file_name" ]; then
-		echo "Missing $conf_file_name. Please fix this and try again."
-		exit 1
-	fi
-	source	"$conf_file_name"
+function source_conf()
+{
+    conf_file_name="$base_dir/conf/$1"
+    if [ ! -f "$conf_file_name" ]; then
+        echo "Missing $conf_file_name. Please fix this and try again."
+        exit 1
+    fi
+    source	"$conf_file_name"
 }
 
 source_conf "general.conf"
@@ -36,42 +37,45 @@ FALSE=1 # Ditto, FALSE is non-zero
 
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")
-function str_contains() {
-string="$1"
-substring="$2"
-if test "${string#*$substring}" != "$string"
-then
-	return 0    # $substring is in $string
-else
-	return 1    # $substring is not in $string
-fi
+function str_contains()
+{
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+        return 0    # $substring is in $string
+    else
+        return 1    # $substring is not in $string
+    fi
 }
 
 
 # Get the relative path between two absolute paths
 # Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
-function get_relative_path() {
-source=$1
-target=$2
+function get_relative_path()
+{
+    source=$1
+    target=$2
 
-common_part=$source
-back=
-while [ "${target#$common_part}" = "${target}" ]; do
-	common_part=$(dirname $common_part)
-	back="../${back}"
-done
+    common_part=$source
+    back=
+    while [ "${target#$common_part}" = "${target}" ]; do
+        common_part=$(dirname $common_part)
+        back="../${back}"
+    done
 
-echo ${back}${target#$common_part/}
+    echo ${back}${target#$common_part/}
 }
 
 # Count the number of files matching the given pattern
 # Usage: e.g. n_files=$(count_files "/path/with/file/matching/pattern/*.*")
 # Note: the 'echo `command`' is there to remove leading spaces that wc adds
-function count_files {
-pattern=$1
-if [ "$pattern" == "" ]; then
-	pattern="*"
-fi
-# Count the number of files
-echo `ls -a $pattern 2>/dev/null | wc -l`
+function count_files()
+{
+    pattern=$1
+    if [ "$pattern" == "" ]; then
+        pattern="*"
+    fi
+    # Count the number of files
+    echo `ls -a $pattern 2>/dev/null | wc -l`
 }

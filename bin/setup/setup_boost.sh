@@ -30,7 +30,8 @@ source_conf "boost.conf"
 # Variables
 boost_pkg=`echo $BOOST_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-function ensure_install_prefix_writable() {
+function ensure_install_prefix_writable()
+{
     touch "$BOOST_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
         || { echo "Install prefix '$BOOST_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
     rm "$BOOST_INSTALL_PREFIX/tensegrity.deleteme"
@@ -38,7 +39,8 @@ function ensure_install_prefix_writable() {
 
 # Check if the package is already installed in the location specified in install.conf 
 # TODO: Check to make sure that the header files are also installed properly.
-function check_boost_installed() {
+function check_boost_installed()
+{
     count_boost_libs=$(count_files "$BOOST_INSTALL_PREFIX/lib/libboost*")
     if [ "$count_boost_libs" == "0" ]; then
         return $FALSE
@@ -47,7 +49,8 @@ function check_boost_installed() {
 }
 
 # Check to see if boost has been built already
-function check_boost_built() {
+function check_boost_built()
+{
     # Check for the 'stage' directory that's created when boost is built    
     if [ -d "$BOOST_BUILD_DIR/stage" ]; then
         return $TRUE
@@ -56,7 +59,8 @@ function check_boost_built() {
 }
 
 # Check to see if boost has been unpacked
-function check_boost_unpacked() {
+function check_boost_unpacked()
+{
     # Check for the 'boost' subdirectory that's present when boost is unpacked
     if [ -d "$BOOST_PACKAGE_DIR/boost" ]; then
         return $TRUE
@@ -65,7 +69,8 @@ function check_boost_unpacked() {
 }
 
 # Determine if the package exists under env/downloads
-function check_boost_downloaded() {
+function check_boost_downloaded()
+{
     if [ -f "$downloads_dir/$boost_pkg" ]; then
         return $TRUE
     fi
@@ -74,7 +79,8 @@ function check_boost_downloaded() {
 
 
 # Download the package to env/downloads
-function download_boost() {
+function download_boost()
+{
 
     boost_pkg_path="$downloads_dir/$boost_pkg"
 
@@ -88,7 +94,8 @@ function download_boost() {
 }
 
 # Unpack to the build directory specified in install.conf
-function unpack_boost() {
+function unpack_boost()
+{
     # Create directory and unpack
     if [ -d "$BOOST_BUILD_DIR" ]; then
         echo "- Boost is already unpacked to '$BOOST_BUILD_DIR' -- skipping."
@@ -109,7 +116,8 @@ function unpack_boost() {
 }
 
 # Build the package under the build directory specified in in install.conf
-function build_boost() {
+function build_boost()
+{
     
     echo "- Building Boost under $BOOST_BUILD_DIR"
     pushd "$BOOST_BUILD_DIR" > /dev/null
@@ -130,7 +138,8 @@ function build_boost() {
 }
 
 # Install the package under the package install prefix from install.conf
-function install_boost() {
+function install_boost()
+{
     
     echo "- Installing Boost under $BOOST_INSTALL_PREFIX"
 
@@ -141,7 +150,8 @@ function install_boost() {
 }
 
 # Create symlinks under env for building our applications and IDE integration
-function env_link_boost() {
+function env_link_boost()
+{
 
     # Build
     pushd "$env_dir/build" > /dev/null
@@ -172,7 +182,8 @@ function env_link_boost() {
 
 # Allow user to select from a set of options and return the selected option
 # usage: myResult=$(read_options "Is the default option capitalized? (yes, no, abort)" ("Y" "n" "a") "Y")
-function read_options() {
+function read_options()
+{
     message=$1
     options=$2
     default=$3
@@ -191,7 +202,8 @@ function read_options() {
     echo "$input"
 }
 
-function main() {
+function main()
+{
     
     ensure_install_prefix_writable
     
