@@ -29,10 +29,6 @@ function source_conf()
     source	"$conf_file_name"
 }
 
-# Constants
-TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
-FALSE=1 # Ditto, FALSE is non-zero
-
 # Deteremine if a string contains a substring
 # Usage: tf=$(str_contains "my string" "substring")
 function str_contains()
@@ -46,7 +42,6 @@ function str_contains()
         return 1    # $substring is not in $string
     fi
 }
-
 
 # Get the relative path between two absolute paths
 # Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
@@ -77,3 +72,5 @@ function count_files()
     # Count the number of files
     echo `ls -a $pattern 2>/dev/null | wc -l`
 }
+
+
