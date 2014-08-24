@@ -133,7 +133,7 @@ function download_bullet()
 function unpack_bullet()
 {
     # Create directory and unpack
-    if [ -d "$BULLET_BUILD_DIR" ]; then
+    if check_directory_exists "$BULLET_BUILD_DIR"; then
         echo "- Bullet Physics is already unpacked to '$BULLET_BUILD_DIR' -- skipping."
         return
     fi

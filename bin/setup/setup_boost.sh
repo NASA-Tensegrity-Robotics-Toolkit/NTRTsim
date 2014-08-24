@@ -78,7 +78,7 @@ function download_boost()
 function unpack_boost()
 {
     # Create directory and unpack
-    if [ -d "$BOOST_BUILD_DIR" ]; then
+    if check_directory_exists "$BOOST_BUILD_DIR"; then
         echo "- Boost is already unpacked to '$BOOST_BUILD_DIR' -- skipping."
         return
     fi
@@ -103,7 +103,7 @@ function build_boost()
     echo "- Building Boost under $BOOST_BUILD_DIR"
     pushd "$BOOST_BUILD_DIR" > /dev/null
 
-    if [ -d "stage" ]; then
+    if check_directory_exists "stage"; then
         echo "- Boost is already built in '$BOOST_BUILD_DIR' -- skipping."
         return
     fi
@@ -137,7 +137,7 @@ function env_link_boost()
     # Build
     pushd "$ENV_DIR/build" > /dev/null
     rm boost 2>/dev/null  # This will fail if 'boost' is a directory, which is what we want.
-    if [ -d "$BOOST_BUILD_DIR" ]; then  # If we built boost (as opposed to installing it another way)...
+    if check_directory_exists "$BOOST_BUILD_DIR"; then  # If we built boost (as opposed to installing it another way)...
 
         # If we're building under env, use a relative link; otherwise use an absolute one.
         if str_contains "$BOOST_BUILD_DIR" "$ENV_DIR"; then
@@ -165,14 +165,14 @@ function main()
 {
 
     ensure_install_prefix_writable $BOOST_INSTALL_PREFIX
-    
+
     # TODO: Check to make sure that the header files are also installed properly.
     if check_package_installed "$BOOST_INSTALL_PREFIX/lib/libboost*"; then
         echo "- Boost is installed under prefix $BOOST_INSTALL_PREFIX -- skipping."
         env_link_boost
         return
     fi
-    
+
     # Check if boost is built.
     if check_directory_exists "$BOOST_BUILD_DIR/stage"; then
         echo "- Boost is already built under $BOOST_BUILD_DIR -- skipping."
