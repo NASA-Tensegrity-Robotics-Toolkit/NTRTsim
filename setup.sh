@@ -29,7 +29,7 @@ SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
 ##############################################################################
 
 # Add the relative path from this script to the helpers folder.
-pushd "${SCRIPT_PATH}/setup/helpers/" > /dev/null
+pushd "${SCRIPT_PATH}/bin/setup/helpers/" > /dev/null
 
 ##############################################################################
 #                         START DO NOT MODIFY                                #
