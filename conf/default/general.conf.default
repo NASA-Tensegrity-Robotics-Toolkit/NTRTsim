@@ -32,8 +32,3 @@
 # IMPORTANT: If you've previously installed to /usr/local, you'll need to 
 # delete your 'env' directory before running setup again.
 INSTALL_PREFIX="$ENV_DIR"  
-
-# MD5_SUM_BINARY refers to the name of the binary md5sum application. On most distros
-# this will be md5sum. If you wish to disable md5 verification checking, simply comment
-# this line out.
-MD5_SUM_BINARY="md5sum"

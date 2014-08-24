@@ -70,8 +70,6 @@ function download_boost()
 
     echo "Downloading $boost_pkg to $boost_pkg_path"
     curl -k -L "$BOOST_URL" > "$boost_pkg_path"
-
-    verify_md5 $boost_pkg_path $BOOST_MD5
 }
 
 # Unpack to the build directory specified in install.conf

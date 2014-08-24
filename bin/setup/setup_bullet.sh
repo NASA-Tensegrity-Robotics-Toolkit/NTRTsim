@@ -125,8 +125,6 @@ function download_bullet()
 
     echo "Downloading $bullet_pkg to $bullet_pkg_path"
     curl -k -L "$BULLET_URL" > "$bullet_pkg_path" || { echo "- ERROR: Bullet Physics download failed."; exit 1; }
-
-    verify_md5 $bullet_pkg_path $BULLET_MD5
 }
 
 # Unpack to the build directory specified in install.conf
