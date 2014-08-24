@@ -101,32 +101,6 @@ function init_config()
     exit 0
 }
 
-function check_md5_install()
-{
-    # We source this now as we know the conf is created.
-    source_conf "general.conf"
-
-    if [[ ! -z $MD5_SUM_BINARY ]]; then
-        if ! has_command $MD5_SUM_BINARY; then
-            echo "======= MISSING MD5 VERIFICATION BINARY ======="
-            echo "Your general.conf specifies that your md5 verification binary"
-            echo "is named $MD5_SUM_BINARY, but that binary does not appear to be"
-            echo "available in your path."
-            echo ""
-            echo "Please do one of the following, then re-start setup.sh:"
-            echo ""
-            echo "1) Disable MD5 verification by commenting out MD5_SUM_BINARY in general.conf"
-            echo "2) Install a MD5 verification tool (e.g. md5sum) and specify its name in general.conf"
-            echo ""
-            echo "Setup will not exit."
-            exit 1
-        else
-            echo "Using $MD5_SUM_BINARY as our md5 verification tool."
-        fi
-    else
-        echo "=== WARNING: MD5 hash verification of downloads has been disabled. ==="
-    fi
-}
 
 function init_scripts()
 {
@@ -160,8 +134,6 @@ function set_config_var()
 banner
 
 init_config
-
-check_md5_install
 init_scripts
 
 run_setupscript "env" "Env directory"
