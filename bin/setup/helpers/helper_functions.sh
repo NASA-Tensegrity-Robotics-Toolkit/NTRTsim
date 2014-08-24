@@ -161,7 +161,13 @@ function read_text()
 }
 
 # Returns TRUE (1) if the user has the command
-# provided in the path. Returns FALSE (0) otherwise.  function has_command() { command -v $1 > /dev/null 2>&1 || { return $FALSE; } } # This function requires two parameters.
+# provided in the path. Returns FALSE (0) otherwise.
+function has_command()
+{ 
+    command -v $1 > /dev/null 2>&1 || { return $FALSE; } 
+} 
+
+# This function requires two parameters.
 # 
 # $1 should include the path (either absolute or relative) to
 # the file that needs its md5 checked.
