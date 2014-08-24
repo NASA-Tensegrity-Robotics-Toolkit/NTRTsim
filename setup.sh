@@ -31,7 +31,7 @@ SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
 # Add the relative path from your current directory to the bash services folder
 # so we can import all helper scripts. If this script is operating from the
 # root directory
-pushd "${SCRIPT_PATH}/services/bash/" > /dev/null
+pushd "${SCRIPT_PATH}/bin/setup/helpers/" > /dev/null
 
 ##############################################################################
 #                         START DO NOT MODIFY                                #
