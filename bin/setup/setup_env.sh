@@ -62,7 +62,7 @@ function get_primary_group()
     id -g -n $1
 }
 
-if [ -d "$ENV_DIR" ]; then
+if check_directory_exists "$ENV_DIR"; then
     echo "- env directory exists. Ensuring subdirectories."
 else
     mkdir "$ENV_DIR"
