@@ -55,7 +55,7 @@ if type cmake >/dev/null 2>&1; then
     echo "- CMake is installed ($cmake_info). Creating link under env/bin."; 
     
     # Make a symlink under env to the existing cmake install
-    pushd "$BIN_DIR" > /dev/null
+    pushd "$ENV_BIN_DIR" > /dev/null
     rm cmake 2>/dev/null  # delete any existing symlink
     ln -s `which cmake` cmake
     popd > /dev/null
