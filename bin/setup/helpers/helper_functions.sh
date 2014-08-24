@@ -114,8 +114,8 @@ function create_directory_if_noexist()
     fi
 }
 
-# Returns TRUE (1) if the file exists,
-# FALSE (0) otherwise.
+# Returns TRUE (0) if the file exists,
+# FALSE (1) otherwise.
 function check_file_exists()
 {
     if [ -d $1 ]; then
@@ -160,8 +160,8 @@ function read_text()
     echo "$input"
 }
 
-# Returns TRUE (1) if the user has the command
-# provided in the path. Returns FALSE (0) otherwise.
+# Returns TRUE (0) if the user has the command
+# provided in the path. Returns FALSE (1) otherwise.
 function has_command()
 { 
     command -v $1 > /dev/null 2>&1 || { return $FALSE; } 
