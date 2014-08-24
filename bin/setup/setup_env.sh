@@ -62,13 +62,13 @@ function get_primary_group()
     id -g -n $1
 }
 
-if check_directory_exists "$ENV_DIR"; then
-    echo "- env directory exists. Ensuring subdirectories."
-else
-    mkdir "$ENV_DIR"
-fi    
+create_directory_if_noexist "$ENV_DIR"
 pushd "$ENV_DIR" > /dev/null
-mkdir bin build downloads include lib 2>/dev/null
+create_directory_if_noexist "bin"
+create_directory_if_noexist "build"
+create_directory_if_noexist "downloads"
+create_directory_if_noexist "include"
+create_directory_if_noexist "lib"
 popd > /dev/null
 
 

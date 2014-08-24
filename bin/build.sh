@@ -110,9 +110,7 @@ function cmake_linux()
 }
 
 # Make sure the build directory exists
-if [ ! -d "$BUILD_DIR" ]; then
-    mkdir "$BUILD_DIR"
-fi
+create_directory_if_noexist $BUILD_DIR
 if [ ! -d "$BUILD_DIR" ]; then
     echo "Unable to create build directory '$BUILD_DIR' -- exiting."
     exit 2
