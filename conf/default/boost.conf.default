@@ -40,8 +40,3 @@ BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
 # BOOST_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
 BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
-
-# Set the expected MD5 hash (as well as the expected file name) of
-# this package's download.
-# Note: Hashes are only checked if an md5sum utility is specified in general.conf
-BOOST_MD5="57a9e2047c0f511c4dfcf00eb5eb2fbb"
