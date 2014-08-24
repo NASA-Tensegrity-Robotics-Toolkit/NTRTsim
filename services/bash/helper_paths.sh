@@ -23,4 +23,5 @@ ENV_DIR="${helper_pwd}/../../env"
 DOWNLOADS_DIR="${helper_pwd}/../../env/downloads"
 BIN_DIR="${helper_pwd}/../../env/bin"
 BUILD_DIR="${helper_pwd}/../../env/build"
+SRC_DIR="${helper_pwd}/../../src"
 ENV_NAME='env'
