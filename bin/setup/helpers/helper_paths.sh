@@ -16,12 +16,15 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 helper_pwd=`pwd`
-SETUP_DIR="${helper_pwd}/../../../bin/setup"
-CONF_DIR="${helper_pwd}/../../../conf"
-BASE_DIR="${helper_pwd}/../../.."
-ENV_DIR="${helper_pwd}/../../../env"
-DOWNLOADS_DIR="${helper_pwd}/../../../env/downloads"
-BIN_DIR="${helper_pwd}/../../../env/bin"
-BUILD_DIR="${helper_pwd}/../../../env/build"
-SRC_DIR="${helper_pwd}/../../../src"
+BASE_DIR="${helper_pwd}/../../../"
+
+SETUP_DIR="${BASE_DIR}/setup"
+CONF_DIR="${BASE_DIR}/conf"
+ENV_DIR="${BASE_DIR}/env"
+SRC_DIR="${BASE_DIR}/src"
+
+DOWNLOADS_DIR="${ENV_DIR}/downloads"
+BIN_DIR="${ENV_DIR}/bin"
+BUILD_DIR="${ENV_DIR}/build"
+
 ENV_NAME='env'
