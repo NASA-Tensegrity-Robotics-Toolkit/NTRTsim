@@ -96,7 +96,7 @@ function check_package_installed()
 # (that's where TRUE and FALSE are defined).
 function check_directory_exists()
 {
-    if [ -d "$BOOST_BUILD_DIR/stage" ]; then
+    if [ -d $1 ]; then
         return $TRUE
     fi
     return $FALSE
@@ -106,7 +106,7 @@ function check_directory_exists()
 # FALSE (0) otherwise.
 function check_file_exists()
 {
-    if [ -d "$BOOST_BUILD_DIR/stage" ]; then
+    if [ -d $1 ]; then
         return $TRUE
     fi
     return $FALSE
