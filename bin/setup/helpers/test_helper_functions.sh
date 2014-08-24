@@ -68,5 +68,5 @@ function test_verify_md5()
     # We have to set md5sum as the tool manually because we don't import
     # general.conf
     MD5_SUM_BINARY="md5sum"
-    verify_md5 "test.txt" "68b329da9893e34099c7d8ad5cb9c940  test.txt"
+    verify_md5 "test.txt" "68b329da9893e34099c7d8ad5cb9c940"
 }

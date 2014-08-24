@@ -184,7 +184,7 @@ function has_command()
 # and the function returns.
 function verify_md5()
 {
-    if [[ ! -z $MD5_SUM_BINARY ]]; then
+    if [ ! -n $MD5_SUM_BINARY ]; then
         echo "=== SKIPPING MD5 VERIFICATION ==="
         echo "Skipping verification of $1 as MD5 verification is disabled."
         echo "=================================="
@@ -203,15 +203,24 @@ function verify_md5()
         exit 1
     fi
 
-    md5output=`$MD5_SUM_BINARY $1`
+    md5_raw_output=`$MD5_SUM_BINARY $1`
+    md5output=
+    # Extract the hash only.
+    for word in $md5_raw_output
+    do
+        md5output=$word
+        break
+    done
 
     if [ "$md5output" == "$2" ]; then
+        echo "=== MD5 HASH VERIFIED ==="
         echo "Completed MD5 verification on $1"
         echo ""
         echo "Expected: $2"
         echo "Received: $md5output"
         echo ""
         echo "File successfully verified."
+        echo "========================="
         return 
     fi
 
