@@ -42,6 +42,7 @@ BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
 # e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
 BULLET_URL="http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz"
 
-# Set the expected SHA1 hash for this package's download.
-# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
-BULLET_SHA1="a0867257b9b18e9829bbeb4c6c5872a5b29d1d33"
+# Set the expected MD5 hash (as well as the expected file name) of
+# this package's download.
+# Note: Hashes are only checked if an md5sum utility is specified in general.conf
+BULLET_MD5="70b3c8d202dee91a0854b4cbc88173e8  bullet-2.82-r2704.tgz"
