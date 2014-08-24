@@ -109,9 +109,12 @@ function check_directory_exists()
 # message is echoed and we exit with an exit code of 1.
 function create_directory_if_noexist()
 {
-    if check_directory_exists $1 == $FALSE; then
+    if ! check_directory_exists $1; then
         mkdir -p $1 || { echo "Failed while attempting to create directory: ${1}. This is a fatal error. Are you sure you have write access to that directory?"; exit 1; }
+    else
+        echo "here2"
     fi
+    exit 1
 }
 
 # Returns TRUE (1) if the file exists,
