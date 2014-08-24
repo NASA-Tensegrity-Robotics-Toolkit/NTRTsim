@@ -22,11 +22,38 @@
 # Notes:   This is intended to be run any time you need to build the 
 #          source tree.
 
-# Get the script path so we can run this from anywhere
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
 SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-BASE_DIR="`( cd \"$SCRIPT_PATH/..\" && pwd )`"  # absolutized and normalized
-SRC_DIR="`( cd \"$BASE_DIR/src\" && pwd )`"
-BUILD_DIR="$BASE_DIR/build"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+# Add the relative path from your current directory to the bash services folder
+# so we can import all helper scripts. If this script is operating from the
+# root directory
+pushd "${SCRIPT_PATH}/services/bash/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash services folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash services folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
 function usage
 {
