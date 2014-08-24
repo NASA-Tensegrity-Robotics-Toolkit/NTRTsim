@@ -33,10 +33,7 @@
 # delete your 'env' directory before running setup again.
 INSTALL_PREFIX="$ENV_DIR"  
 
-# MD5_VERIFY_ENABLE specifies whether we verify the integrity of downloaded files
-# using the md5sum utility. Hashes for package file are stored in their respective
-# conf files.
-# 
-# IMPORTANT NOTE: Valid values are $TRUE and $FALSE (be sure to include $ before it
-# as we're referring to a constant set in helpers_definitions.sh)
-MD5_VERIFY_ENABLE=$TRUE
+# MD5_SUM_BINARY refers to the name of the binary md5sum application. On most distros
+# this will be md5sum. If you wish to disable md5 verification checking, simply comment
+# this line out.
+MD5_SUM_BINARY="md5sum"
