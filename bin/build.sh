@@ -75,7 +75,7 @@ function usage
 # Functions for calling CMake, depending on operating system
 function cmake_OSX()
 {
-    "$BASE_DIR/env/bin/cmake" ../src \
+    "$ENV_BIN_DIR/cmake" $SRC_DIR \
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
@@ -92,7 +92,7 @@ function cmake_OSX()
 
 function cmake_linux()
 {
-    "$BASE_DIR/env/bin/cmake" ../src \
+    "$ENV_BIN_DIR/cmake" $SRC_DIR \
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
