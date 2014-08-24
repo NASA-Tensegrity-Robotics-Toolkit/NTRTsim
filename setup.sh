@@ -162,7 +162,6 @@ banner
 init_config
 
 check_md5_install
-exit 1
 init_scripts
 
 run_setupscript "env" "Env directory"
