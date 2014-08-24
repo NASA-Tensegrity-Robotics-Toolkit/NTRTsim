@@ -105,10 +105,12 @@ function check_directory_exists()
 # If the provided directory does not exist, it creates
 # it using mkdir with the -p flag (in order to create
 # all intermediate directories as well.
+# If creation of the directory fails, an informative
+# message is echoed and we exit with an exit code of 1.
 function create_directory_if_noexist()
 {
     if check_directory_exists $1 == $FALSE; then
-        mkdir -p $1
+        mkdir -p $1 || { echo "Failed while attempting to create directory: ${1}. This is a fatal error. Are you sure you have write access to that directory?"; exit 1; }
     fi
 }
 
