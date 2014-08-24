@@ -48,3 +48,8 @@ function test_create_directory_if_noexist()
     create_directory_if_noexist "/home/perry/meow/mix/dog/yow"
     create_directory_if_noexist "this/is/a/relative/dir"
 }
+
+function test_error_exit_if_create_directory_fail()
+{
+    create_directory_if_noexist "/cantwritehere/"
+}
