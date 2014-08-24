@@ -178,6 +178,13 @@ function read_text()
 # and the function returns.
 function verify_md5()
 {
+    if [[ ! -z $MD5_SUM_BINARY ]]; then
+        echo "=== SKIPPING MD5 VERIFICATION ==="
+        echo "Skipping verification of $1 as MD5 verification is disabled."
+        echo "=================================="
+        return
+    fi
+
     if [ ! -f $1 ]; then
         echo "==== MD5 VERIFICATION FAILURE ==="
         echo "Could not find file $1 to generate MD5."
