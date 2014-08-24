@@ -102,6 +102,16 @@ function check_directory_exists()
     return $FALSE
 }
 
+# If the provided directory does not exist, it creates
+# it using mkdir with the -p flag (in order to create
+# all intermediate directories as well.
+function create_directory_if_noexist()
+{
+    if check_directory_exists $1 == $FALSE; then
+        mkdir -p $1
+    fi
+}
+
 # Returns TRUE (1) if the file exists,
 # FALSE (0) otherwise.
 function check_file_exists()

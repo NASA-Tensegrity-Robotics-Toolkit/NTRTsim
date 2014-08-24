@@ -43,3 +43,8 @@ function test_relative_path()
     echo "relative path is $rel (should be '../../../the/target/path')"
 }
 
+function test_create_directory_if_noexist()
+{
+    create_directory_if_noexist "/home/perry/meow/mix/dog/yow"
+    create_directory_if_noexist "this/is/a/relative/dir"
+}
