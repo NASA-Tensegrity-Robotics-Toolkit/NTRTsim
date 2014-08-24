@@ -139,10 +139,8 @@ function unpack_bullet()
     fi
 
     echo "Unpacking bullet to $BULLET_BUILD_DIR (this may take a minute...)"
-    if [ ! -d "$BULLET_BUILD_DIR" ]; then
-        # TODO: Do we need to remove the dir if it already exists?
-        mkdir -p "$BULLET_BUILD_DIR"
-    fi
+    # TODO: Do we need to remove the dir if it already exists?
+    create_directory_if_noexist $BULLET_BUILD_DIR
 
     # Unzip
     pushd "$BULLET_BUILD_DIR" > /dev/null
@@ -156,7 +154,7 @@ function patch_bullet()
 	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
 	# Copy the files we're going to change
-	mkdir "OpenGL_FreeGlut"
+        create_directory_if_noexist "OpenGL_FreeGlut"
 	cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
 	cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
 	cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"

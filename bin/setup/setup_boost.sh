@@ -84,10 +84,8 @@ function unpack_boost()
     fi
 
     echo "Unpacking boost to $BOOST_BUILD_DIR (this may take a minute...)"
-    if [ ! -d "$BOOST_BUILD_DIR" ]; then
-        # TODO: Do we need to remove the dir if it already exists?
-        mkdir -p "$BOOST_BUILD_DIR"
-    fi
+    # TODO: Do we need to remove the dir if it already exists?
+    create_directory_if_noexist "$BOOST_BUILD_DIR"
 
     # Unzip
     pushd "$BOOST_BUILD_DIR" > /dev/null
