@@ -53,3 +53,12 @@ function test_error_exit_if_create_directory_fail()
 {
     create_directory_if_noexist "/cantwritehere/"
 }
+
+function test_has_command()
+{
+    if has_command $1; then
+        echo "User has $1 installed."
+    else
+        echo "User does NOT have $1 installed."
+    fi
+}

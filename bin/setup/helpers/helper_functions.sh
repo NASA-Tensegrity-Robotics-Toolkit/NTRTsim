@@ -160,3 +160,9 @@ function read_text()
     echo "$input"
 }
 
+# Returns TRUE (1) if the user has the command
+# provided in the path. Returns FALSE (0) otherwise.
+function has_command()
+{
+    command -v $1 > /dev/null 2>&1 || { return $FALSE; }
+}
