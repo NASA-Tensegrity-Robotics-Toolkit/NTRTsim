@@ -62,3 +62,10 @@ function test_has_command()
         echo "User does NOT have $1 installed."
     fi
 }
+
+function test_get_valid_link()
+{
+    download_file "http://www.perryb.ca/" "/home/perry/sandbox/works.html"
+    download_file "http://www.perryb.ca/test.txt" "/home/perry/sandbox/404.txt"
+    download_file "http://google.com:81/test.txt" "/home/perry/sandbox/timeout.txt"
+}
