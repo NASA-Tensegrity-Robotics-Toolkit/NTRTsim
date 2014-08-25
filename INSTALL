@@ -30,6 +30,7 @@ anything.
 	- curl
 	- freeglut3
 	- freeglut3-dev (glut for bullet graphics)
+	- cmake
 
     Fedora/CentOS (you can use sudo yum install):
 	- gcc-c++ (the compiler for cmake)
@@ -37,6 +38,7 @@ anything.
 	- curl
 	- freeglut
 	- freeglut-devel
+
     MAC OSX (please read the detailed instructions below for OSX 10.9 at the end of this file)
 	-gcc/g++ 4.5 (via Macports or Homebrew)
 		
