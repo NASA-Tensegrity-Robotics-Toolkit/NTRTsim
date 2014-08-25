@@ -202,3 +202,22 @@ function download_file()
             exit 1 
         }
 }
+
+# This runs make with either the total number of cores
+# specified by the user in build.conf, or using the maximum
+# number of cores in the user's system.
+# 
+# NOTE: We do *not* exit in the event of a non-zero exit
+# code from make. If you wish to exit on a non-zero exit code,
+# you should handle that in your call to multi_core_make
+function multi_core_make()
+{
+    source_conf "build.conf"
+    if [ -n "$MAX_BUILD_CORES" ]; then
+        max_cores=$MAX_BUILD_CORES
+    else
+        max_cores=`grep -c ^processor /proc/cpuinfo`
+    fi
+
+    make$max_cores
+}
