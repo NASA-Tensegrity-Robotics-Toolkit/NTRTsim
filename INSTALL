@@ -31,6 +31,7 @@ anything.
 	- freeglut3
 	- freeglut3-dev (glut for bullet graphics)
 	- cmake
+	- build-essential
 
     Fedora/CentOS (you can use sudo yum install):
 	- gcc-c++ (the compiler for cmake)
