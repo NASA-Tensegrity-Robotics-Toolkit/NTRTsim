@@ -31,7 +31,7 @@ BOOST_INSTALL_PREFIX="$INSTALL_PREFIX"
 # Location where bullet is to be built if necessary, or where it was built if 
 # you're using an existing package. This doesn't need to be set unless boost is
 # not already installed. 
-BOOST_BUILD_DIR="$env_dir/build/boost_1_53_0"
+BOOST_BUILD_DIR="$ENV_DIR/build/boost_1_53_0"
 
 # This is the location where you unzipped the package (or, where it will
 # be unzipped if necessary). 
@@ -40,7 +40,3 @@ BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
 # BOOST_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
 BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz"
-
-# Set the expected SHA1 hash for this package's download.
-# Note: Hashes are only checked if a SHA1 sum utility is specified in general.conf
-BOOST_SHA1="0e4ef26cc7780c6bbc63987ef2f29be920e2395b"

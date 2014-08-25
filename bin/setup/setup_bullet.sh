@@ -19,29 +19,43 @@
 # Purpose: Bullet Physics setup
 # Date:    2013-05-01
 
-# Source our common setup code
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-source "$base_dir/bin/setup/setup_common.sh"
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/helpers/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
 #Source this package's configuration
+source_conf "general.conf"
 source_conf "bullet.conf"
-
-# Adding 5-20-2014 for patching bullet
-SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-setup_dir="$SCRIPT_PATH"
-
 
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
-
-function ensure_install_prefix_writable()
-{
-    touch "$BULLET_INSTALL_PREFIX/tensegrity.deleteme" 2>/dev/null \
-        || { echo "Install prefix '$BULLET_INSTALL_PREFIX' is not writable -- please use sudo or execute as root."; exit 1; }
-    rm "$BULLET_INSTALL_PREFIX/tensegrity.deleteme"
-}
 
 # Check if the package is already installed in the location specified in install.conf 
 function check_bullet_installed()
@@ -77,7 +91,7 @@ function check_bullet_unpacked()
 # Determine if the package exists under env/downloads
 function check_bullet_downloaded()
 {
-    if [ -f "$downloads_dir/$bullet_pkg" ]; then
+    if [ -f "$DOWNLOADS_DIR/$bullet_pkg" ]; then
         return $TRUE
     fi
     return $FALSE
@@ -102,7 +116,7 @@ but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR
 function download_bullet()
 {
 
-    bullet_pkg_path="$downloads_dir/$bullet_pkg"
+    bullet_pkg_path="$DOWNLOADS_DIR/$bullet_pkg"
 
     if [ -f "$bullet_pkg_path" ]; then
         echo "- Bullet Physics package already exists ('$bullet_pkg_path') -- skipping download."
@@ -110,27 +124,25 @@ function download_bullet()
     fi
 
     echo "Downloading $bullet_pkg to $bullet_pkg_path"
-    curl -k -L "$BULLET_URL" > "$bullet_pkg_path" || { echo "- ERROR: Bullet Physics download failed."; exit 1; }
+    download_file "$BULLET_URL" "$bullet_pkg_path"
 }
 
 # Unpack to the build directory specified in install.conf
 function unpack_bullet()
 {
     # Create directory and unpack
-    if [ -d "$BULLET_BUILD_DIR" ]; then
+    if check_directory_exists "$BULLET_BUILD_DIR"; then
         echo "- Bullet Physics is already unpacked to '$BULLET_BUILD_DIR' -- skipping."
         return
     fi
 
     echo "Unpacking bullet to $BULLET_BUILD_DIR (this may take a minute...)"
-    if [ ! -d "$BULLET_BUILD_DIR" ]; then
-        # TODO: Do we need to remove the dir if it already exists?
-        mkdir -p "$BULLET_BUILD_DIR"
-    fi
+    # TODO: Do we need to remove the dir if it already exists?
+    create_directory_if_noexist $BULLET_BUILD_DIR
 
     # Unzip
     pushd "$BULLET_BUILD_DIR" > /dev/null
-    tar xf "$downloads_dir/$bullet_pkg" --strip 1 || { echo "- ERROR: Failed to unpack Bullet Physics."; exit 1; }
+    tar xf "$DOWNLOADS_DIR/$bullet_pkg" --strip 1 || { echo "- ERROR: Failed to unpack Bullet Physics."; exit 1; }
     popd > /dev/null
 }
 
@@ -140,7 +152,7 @@ function patch_bullet()
 	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
 	# Copy the files we're going to change
-	mkdir "OpenGL_FreeGlut"
+        create_directory_if_noexist "OpenGL_FreeGlut"
 	cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
 	cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
 	cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
@@ -152,8 +164,8 @@ function patch_bullet()
 	cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
 
 	# Patch them
-	patch -p5 < "$setup_dir/patches/CMakePatch.diff"
-	patch -p5 < "$setup_dir/patches/OpenGLPatch.diff"
+	patch -p5 < "$SETUP_DIR/patches/CMakePatch.diff"
+	patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
 
 	popd > /dev/null
 }
@@ -171,7 +183,7 @@ function build_bullet()
     if [ $USE_DISTRO_CMAKE == 1 ]; then
     CMAKECOMMAND="cmake"
     else
-    CMAKECOMMAND="$env_dir/bin/cmake"
+    CMAKECOMMAND="$ENV_DIR/bin/cmake"
     fi
 
     # Additional Change 4-28-14: trying to pass in the -fPIC option to solve GLUT issues on linux
@@ -181,7 +193,7 @@ function build_bullet()
 
 	# Perform the build
 	# If you turn double precision on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
-    "$env_dir/bin/cmake" . -G "Unix Makefiles" \
+    "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
     $CMAKECOMMAND . -G "Unix Makefiles" \
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_EXTRAS=ON \
@@ -221,11 +233,11 @@ function env_link_bullet()
 {
 
     # Build
-    pushd "$env_dir/build" > /dev/null
+    pushd "$ENV_DIR/build" > /dev/null
     rm bullet 2>/dev/null   # Note: this will fail if 'bullet' is a directory, which is what we want.
 
     # If we're building under env, use a relative path for the link; otherwise use an absolute one.
-    if str_contains "$BULLET_BUILD_DIR" "$env_dir"; then
+    if str_contains "$BULLET_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$BULLET_BUILD_DIR" )
         ln -s "$rel_path" bullet
@@ -236,7 +248,7 @@ function env_link_bullet()
     popd > /dev/null
         
     # Header Files
-    pushd "$env_dir/include" > /dev/null
+    pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "bullet" ]; then  # We may have built here, so only create a symlink if not
         rm bullet 2>/dev/null
         ln -s "$BULLET_INSTALL_PREFIX/include/bullet" bullet
@@ -248,7 +260,7 @@ function env_link_bullet()
 function main()
 {
         
-    ensure_install_prefix_writable
+    ensure_install_prefix_writable $BULLET_INSTALL_PREFIX
     
     if check_bullet_installed; then
         echo "- Bullet Physics is installed under prefix $BULLET_INSTALL_PREFIX -- skipping."

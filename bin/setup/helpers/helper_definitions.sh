@@ -16,19 +16,7 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: Define general configuration directives for setup
-# Date:    2014-08-18
-# Usage:   Copy/rename this file to '../general.conf' and run setup.sh
+# Constants
+TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
+FALSE=1 # Ditto, FALSE is non-zero
 
-#############################################
-#  Configuration -- edit below as needed.
-#############################################
-
-# Uncomment this to use installations that are available to the whole system. 
-# NOTE: By default, setup installs bullet under env rather than $INSTALL_PREFIX
-#INSTALL_PREFIX="/usr/local"  
-
-# Uncomment this to install locally (under env/include and env/lib)
-# IMPORTANT: If you've previously installed to /usr/local, you'll need to 
-# delete your 'env' directory before running setup again.
-INSTALL_PREFIX="$ENV_DIR"  

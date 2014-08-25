@@ -19,17 +19,38 @@
 # Purpose: Install script for everything related to the tensegrity repository
 # Author:  Ryan Adams, Perry Bhandal
 
-env_name='env'
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
-# Locations
-SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"  # absolutized and normalized
-setup_dir="$SCRIPT_PATH/bin/setup"
-conf_dir="$SCRIPT_PATH/conf"
-base_dir="`( cd \"$setup_dir/\" && pwd )`"   # Required for init scripts
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/bin/setup/helpers/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
 CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
-
-#Load our common set up functions
 
 function banner() 
 {
@@ -40,24 +61,25 @@ function banner()
 function init_config()
 {
 
-    if [ -f "$conf_dir/install.conf" ]; then
+    if [ -f "$CONF_DIR/install.conf" ]; then
         echo "Your conf directory contains install.conf, which has been deprecated. Please delete install.conf and run set up again. See issue 21 for more details."
         exit 1
     fi
 
     echo "- Starting configuration"
 
+    ## Determine if any conf files are missing
     to_create=()
 
     for file_name in "${CONF_FILES[@]}"
     do
-        if [ ! -f "$conf_dir/$file_name" ]; then
+        if [ ! -f "$CONF_DIR/$file_name" ]; then
             to_create+=($file_name)
         fi
     done
 
     if [ "${#to_create}" -eq 0 ]; then
-        source "$conf_dir/general.conf"
+        source "$CONF_DIR/general.conf"
         return
     fi
 
@@ -69,7 +91,7 @@ function init_config()
         for file_name in "${to_create[@]}"
         do
             echo "Creating conf/$file_name"
-            cp "$conf_dir/default/${file_name}.default" "$conf_dir/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
+            cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
         done
         echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
     else
@@ -79,41 +101,22 @@ function init_config()
     exit 0
 }
 
+
 function init_scripts()
 {
     # Make sure permissions are correct, etc.
-    pushd "$setup_dir" > /dev/null
+    pushd "$SETUP_DIR" > /dev/null
     chmod a+x *
     popd > /dev/null
 }
 
-function init_env()
+function run_setupscript()
 {
-    # Note: $env_dir is set in install.conf
+    script_name=$1
+    full_name=$2
     echo ""
-    echo "Initializing env ($env_dir)..."   
-    "$setup_dir/setup_env.sh" || { echo "Env setup failed -- exiting now."; exit 1; }  
-}
-
-function init_cmake()
-{
-    echo ""
-    echo "Initializing CMake..."
-    "$setup_dir/setup_cmake.sh" || { echo "CMake initialization failed -- exiting now."; exit 1; }  
-}
-
-function init_bullet()
-{
-    echo ""
-    echo "Initializing Bullet Physics..."
-    "$setup_dir/setup_bullet.sh" || { echo "Bullet Physics initialization failed -- exiting now."; exit 1; }
-}
-
-function init_boost()
-{
-    echo ""
-    echo "Initializing the Boost library..."
-    "$setup_dir/setup_boost.sh" || { echo "Boost initialization failed -- exiting now."; exit 1; }
+    echo "Initializing ${2}..."
+    "$SETUP_DIR/setup_${script_name}.sh" || { echo "$full_name initialization failed -- exiting now."; exit 1; }
 }
 
 # Set a variable in the install.conf configuration file
@@ -122,100 +125,21 @@ function set_config_var()
     var=$1
     value=$2
     echo "var: $var; value: $value"
-    sed "s,$var=.*,$var=\"$value\",g" "$setup_dir/install.conf" > "$setup_dir/install.conf.tmp"
-    mv "$setup_dir/install.conf.tmp" "$setup_dir/install.conf"
+    sed "s,$var=.*,$var=\"$value\",g" "$SETUP_DIR/install.conf" > "$SETUP_DIR/install.conf.tmp"
+    mv "$SETUP_DIR/install.conf.tmp" "$SETUP_DIR/install.conf"
 
-}
-
-# Get the relative path between two absolute paths
-# Usage: rel=$(get_relative_path /absolute/path/one /absolute/path/two)
-function get_relative_path()
-{
-    source=$1
-    target=$2
-
-    common_part=$source
-    back=
-    while [ "${target#$common_part}" = "${target}" ]; do
-        common_part=$(dirname $common_part)
-        back="../${back}"
-    done
-
-    echo ${back}${target#$common_part/}
-}
-
-# Allow user to select from a set of options and return the selected option
-# usage: result=$(read_options "Is the default option capitalized? (yes, no, abort)" ("Y" "n" "a") "Y")
-function read_options()
-{
-    message=$1
-    options=$2
-    default=$3
-
-    # Assemble the options
-    str_opts=$(printf "/%s" "${options[@]}")
-    str_opts="[${str_opts:1}]"
-    read -p "$message $str_opts " input
-    if [[ "$input" == "" ]]; then
-        input="$default"
-    fi
-    input=`echo $input|tr [a-z] [A-Z]`
-
-    # TODO: Check options, make sure that a proper one was selected (maybe)
-
-    echo "$input"
-}
-
-# Read a line of text, returning the default if user hits enter.
-# usage: result=$(read_text "Is this the prompt" "yes, I believe it is.")
-function read_text()
-{
-    message=$1
-    default=$2
-
-    read -p "$message: " input
-    if [[ "$input" == "" ]]; then
-        input="$default"
-    fi
-    echo "$input"
-}
-
-# TEST FUNCTIONS
-
-function test_read_options()
-{
-    message="Do you want to test read_options?"
-    options=("Y" "n" "a")
-    default="Y"
-    output=$(read_options "$message" $options $default)
-    echo "read_options() returned '$output'"
-}
-
-function test_read_text()
-{
-    message="Do you want to test read_text?"
-    default="I'd rather test the default."
-    output=$(read_text "$message" "$default")
-    echo "read_text() returned '$output'"
-}
-
-function test_relative_path()
-{
-    a="/this/is/an/absolute/path"
-    b="/this/is/the/target/path"
-    rel=$(get_relative_path "$a" "$b")
-    echo "relative path is $rel (should be '../../../the/target/path')"
 }
 
 # EXECUTION
-
 banner
+
 init_config
 init_scripts
-init_env
-init_cmake 
-init_bullet
-init_boost
+
+run_setupscript "env" "Env directory"
+run_setupscript "cmake" "CMake"
+run_setupscript "bullet" "Bullet Physics Library"
+run_setupscript "boost" "Boost"
 
 echo ""
 echo "Setup Complete!"
