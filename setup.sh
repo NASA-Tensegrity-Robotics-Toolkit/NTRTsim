@@ -50,7 +50,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf") 
 
 function banner() 
 {
