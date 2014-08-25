@@ -219,5 +219,5 @@ function multi_core_make()
         max_cores=`grep -c ^processor /proc/cpuinfo`
     fi
 
-    make$max_cores
+    make -j$max_cores
 }
