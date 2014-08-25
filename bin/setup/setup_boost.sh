@@ -69,7 +69,7 @@ function download_boost()
     fi
 
     echo "Downloading $boost_pkg to $boost_pkg_path"
-    curl -k -L "$BOOST_URL" > "$boost_pkg_path"
+    download_file "$BOOST_URL" "$boost_pkg_path"
 }
 
 # Unpack to the build directory specified in install.conf
