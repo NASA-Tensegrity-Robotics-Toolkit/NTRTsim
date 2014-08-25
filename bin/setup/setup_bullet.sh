@@ -151,7 +151,8 @@ function patch_bullet()
 {
 	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
-	# Copy the files we're going to change create_directory_if_noexist "OpenGL_FreeGlut"
+	# Copy the files we're going to change
+        create_directory_if_noexist "OpenGL_FreeGlut"
 	cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
 	cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
 	cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
