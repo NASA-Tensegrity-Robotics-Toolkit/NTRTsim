@@ -181,7 +181,7 @@ function build_bullet()
         # -DFRAMEWORK=ON
         # -DBUILD_DEMOS=ON
                 
-    make || { echo "- ERROR: Bullet build failed"; exit 1; }
+    multi_core_make || { echo "- ERROR: Bullet build failed"; exit 1; }
     
     popd > /dev/null
 }
