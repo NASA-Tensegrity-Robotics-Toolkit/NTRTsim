@@ -166,3 +166,39 @@ function has_command()
 { 
     command -v $1 > /dev/null 2>&1 || { return $FALSE; } 
 } 
+
+# Downloads the file located at the first argument to
+# the local path specified by the second argument.
+# 
+# This call exits with a return code of 1 if curl returns
+# a non-zero error code.
+# 
+# It's important to note that curl is being called with the -f
+# flag in this case. So curl will return a non-zero exit code
+# in any case where an HTTP return > 400 is returned. As a result
+# this should gracefully handle cases like error 404, as opposed to
+# simply saving the 404 page.
+function download_file()
+{
+    download_url=$1
+    save_to=$2
+
+    # We'll manually set our connection time out. No need to put this
+    # in a conf file. No conceivable reason anyone will want granular
+    # control over this.
+    connect_timeout=30
+
+    curl -k -f --connect-timeout $connect_timeout -L "$download_url" > "$save_to" || 
+        { 
+            rm "$save_to"
+            echo "======== DOWNLOAD FAILURE ========="
+            echo "Encountered a failure while downloading:"
+            echo ""
+            echo "Target URL: $download_url"
+            echo "Local URL: $save_to"
+            echo ""
+            echo "Exiting now."
+            echo "======== DOWNLOAD FAILURE ========="
+            exit 1 
+        }
+}
