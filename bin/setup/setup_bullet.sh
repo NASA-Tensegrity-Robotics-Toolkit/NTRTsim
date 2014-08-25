@@ -57,41 +57,12 @@ source_conf "bullet.conf"
 # Variables
 bullet_pkg=`echo $BULLET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-# Check if the package is already installed in the location specified in install.conf 
-function check_bullet_installed()
-{
-    count_libs=$(count_files "$BULLET_INSTALL_PREFIX/lib/libBulletDynamics*")
-    if [ "$count_libs" == "0" ]; then
-        return $FALSE
-    fi
-    return $TRUE
-}
-
 # Check to see if bullet has been built already
 function check_bullet_built()
 {
     # Check for a library that's created when bullet is built   
     fname=$(find "$BULLET_BUILD_DIR" -iname libBulletCollision.* 2>/dev/null)
     if [ -f "$fname" ]; then
-        return $TRUE
-    fi
-    return $FALSE
-}
-
-# Check to see if bullet has been unpacked
-function check_bullet_unpacked()
-{
-    # The CMakeLists.txt will only exist if it's been unpacked.
-    if [ -f "$BULLET_PACKAGE_DIR/CMakeLists.txt" ]; then
-        return $TRUE
-    fi
-    return $FALSE
-}
-
-# Determine if the package exists under env/downloads
-function check_bullet_downloaded()
-{
-    if [ -f "$DOWNLOADS_DIR/$bullet_pkg" ]; then
         return $TRUE
     fi
     return $FALSE
@@ -262,7 +233,7 @@ function main()
         
     ensure_install_prefix_writable $BULLET_INSTALL_PREFIX
     
-    if check_bullet_installed; then
+    if check_package_installed "$BULLET_INSTALL_PREFIX/lib/libBulletDynamics*"; then
         echo "- Bullet Physics is installed under prefix $BULLET_INSTALL_PREFIX -- skipping."
         ensure_bullet_openglsupport
         env_link_bullet
@@ -279,7 +250,7 @@ function main()
     
     # @todo: add check bullet patched
     
-    if check_bullet_unpacked; then
+    if check_file_exists "$BULLET_PACKAGE_DIR/CMakeLists.txt"; then
         echo "- Bullet Physics is already unpacked to $BULLET_BUILD_DIR -- skipping."
         patch_bullet
         build_bullet
@@ -288,7 +259,7 @@ function main()
         return
     fi
     
-    if check_bullet_downloaded; then
+    if check_file_exists "$DOWNLOADS_DIR/$bullet_pkg"; then
         echo "- Bullet Physics package already exists under env/downloads -- skipping download."
         unpack_bullet
         patch_bullet
