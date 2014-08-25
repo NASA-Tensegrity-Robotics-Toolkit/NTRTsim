@@ -214,7 +214,7 @@ if $MAKE_CLEAN_FLAG; then
     make clean
 fi
 
-make || exit 1
+multi_core_make || exit 1
 
 popd > /dev/null  # exit make dir
 
