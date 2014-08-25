@@ -69,6 +69,8 @@ create_directory_if_noexist "include"
 create_directory_if_noexist "lib"
 popd > /dev/null
 
+# Create a symlink to G++ so we can handle platform differences
+ln -s `which g++` "$ENV_BIN_DIR/g++"
 
 # Permissions (change the env dir to be owned by the real current user)
 # @todo: do we need to use this? We may not need sudo now...
