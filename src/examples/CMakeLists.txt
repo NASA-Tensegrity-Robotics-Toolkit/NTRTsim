@@ -6,5 +6,6 @@ subdirs(
     NestedTetrahedrons
     SUPERball
     learningSpines
+    testjson
 )
 
