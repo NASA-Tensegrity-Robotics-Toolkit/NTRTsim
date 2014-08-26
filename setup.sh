@@ -136,6 +136,8 @@ banner
 init_config
 init_scripts
 
+set_multicore_make
+
 run_setupscript "env" "Env directory"
 run_setupscript "cmake" "CMake"
 run_setupscript "bullet" "Bullet Physics Library"
