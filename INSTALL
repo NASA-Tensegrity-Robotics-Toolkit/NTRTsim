@@ -121,6 +121,20 @@ anything.
         /usr/lib
         /usr/local/lib
 
+** Build Options **
+
+  - After the first install, note the following options are available with build.sh (run build.sh -h for an up to date list)
+  
+    positional arguments:
+    build_path            Path to build (relative to src, e.g. 'BasicApp' or
+                           'lib/Example'). Defaults to all if not specified, includes dependancies.
+   
+    optional arguments:
+    -h       Show this help message and exit
+    -c       Run 'make clean' before make/make install on non-library sources
+    -l       Run 'make clean' before make/make install on libraries
+    -s       Don't automatically build the libraries
+    -w       Show compiler warnings when building
 
 ** Manual Installation **
 
