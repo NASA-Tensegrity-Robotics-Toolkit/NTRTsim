@@ -91,7 +91,7 @@ void tgPrismatic::init()
     m_slider->setUpperLinLimit(m_config.m_maxLength);
     m_slider->setPoweredLinMotor(true);
     m_slider->setMaxLinMotorForce(m_config.m_maxMotorForce);
-    m_preferredLength = m_config.m_minLength + ((m_config.m_maxLength - m_config.m_minLength)/2.0);
+    m_preferredLength = m_config.m_minLength;
 }
 
 void tgPrismatic::setup(tgWorld& world)
@@ -133,13 +133,11 @@ bool tgPrismatic::setPreferredLength(double length)
     bool success = true;
     if (length > m_config.m_maxLength)
     {
-        std::cerr << "tgPrismatic::setPreferredLength() desired length " << length << " higher than maximum length: " << m_config.m_minLength << ", using maximum" << std::endl;
         m_preferredLength = m_config.m_maxLength;
         success = false;
     }
     else if (length < m_config.m_minLength)
     {
-        std::cerr << "tgPrismatic::setPreferredLength() desired length " << length << " lower than minimum length: " << m_config.m_minLength << ", using minimum" << std::endl;
         m_preferredLength = m_config.m_minLength;
         success = false;
     }
@@ -155,32 +153,26 @@ void tgPrismatic::moveMotors(double dt)
 {
     btScalar linDepth = m_slider->getLinearPos();
 
-//    std::cout << "tgPrismatic::moveMotors() Slider length: " << linDepth << ", preferred length: " << m_preferredLength << ", eps: " << m_config.m_eps << std::endl;
-
     if (fabs(linDepth - m_preferredLength) <= m_config.m_eps)
     {
-//        std::cout << "tgPrismatic::moveMotors() Stopping motor" << std::endl;
         m_slider->setLowerLinLimit(linDepth);
         m_slider->setUpperLinLimit(linDepth);
         m_slider->setTargetLinMotorVelocity(0);
     }
     else if (linDepth < m_preferredLength)
     {
-//        std::cout << "tgPrismatic::moveMotors() Positive movement" << std::endl;
         m_slider->setLowerLinLimit(m_config.m_minLength);
         m_slider->setUpperLinLimit(m_config.m_maxLength);
         m_slider->setTargetLinMotorVelocity(m_config.m_maxVelocity/dt);
     }
     else if (linDepth > m_preferredLength)
     {
-//        std::cout << "tgPrismatic::moveMotors() negative movement" << std::endl;
         m_slider->setLowerLinLimit(m_config.m_minLength);
         m_slider->setUpperLinLimit(m_config.m_maxLength);
         m_slider->setTargetLinMotorVelocity(-m_config.m_maxVelocity/dt);
     }
     else
     {
-//        std::cout << "tgPrismatic::moveMotors() Stopping motor" << std::endl;
         m_slider->setLowerLinLimit(linDepth);
         m_slider->setUpperLinLimit(linDepth);
         m_slider->setTargetLinMotorVelocity(0);

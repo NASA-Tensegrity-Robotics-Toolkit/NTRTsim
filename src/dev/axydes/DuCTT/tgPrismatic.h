@@ -47,8 +47,8 @@ public:
                 double maxLength = 5, //todo: find better default
                 double minLength = 0.1, // todo: find better default
                 double maxMotorForce = 20,
-                double maxVelocity = 0.5, //m/s
-                double eps = 0.2
+                double maxVelocity = 0.01, //m/s
+                double eps = 0.01
                 );
         
         double m_maxLength;
