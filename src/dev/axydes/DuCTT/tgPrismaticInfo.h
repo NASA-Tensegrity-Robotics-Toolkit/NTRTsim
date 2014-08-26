@@ -36,10 +36,27 @@ class tgPrismaticInfo: public tgConnectorInfo
 {
 public: 
        
+    /**
+     * Construct a tgPrismaticInfo with just a config. The pair must be filled in
+     * later, or factory methods can be used to create instances with
+     * pairs.
+     */
     tgPrismaticInfo(const tgPrismatic::Config& config);
     
+    /**
+     * Construct a tgPrismaticInfo with just a config and tags. The pair must
+     * be filled in later, or factory methods can be used to create instances
+     * with pairs.
+     */
     tgPrismaticInfo(const tgPrismatic::Config& config, tgTags tags);
 
+    /**
+     * Construct a tgPrismaticInfo from its Config
+     * @param[in] from one endpoint
+     * @param[in] to the other endpoint
+     * @param[in] config
+     * @todo: make sure that tgPairs returns references to the vectors...
+     */
     tgPrismaticInfo(const tgPrismatic::Config& config, const tgPair& pair);
     
     ~tgPrismaticInfo();

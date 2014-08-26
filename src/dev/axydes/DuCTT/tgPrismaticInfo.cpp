@@ -94,8 +94,6 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
     btVector3 buildVec = (endNode - startNode);
     double m_startLength = buildVec.length();
 
-//    m_config.m_minLength = m_startLength;
-
     btSliderConstraint* slider = createSlider();
 
     tgPrismatic* prism = new tgPrismatic(slider, getTags(), m_config);

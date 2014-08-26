@@ -149,6 +149,16 @@ bool tgPrismatic::setPreferredLength(double length)
     return success;
 }
 
+void tgPrismatic::setMaxVelocity(double vel)
+{
+    m_config.m_maxVelocity = vel;
+}
+
+void tgPrismatic::setMaxForce(double force)
+{
+    m_config.m_maxMotorForce = force;
+}
+
 void tgPrismatic::moveMotors(double dt)
 {
     btScalar linDepth = m_slider->getLinearPos();
