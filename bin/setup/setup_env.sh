@@ -63,7 +63,7 @@ function get_primary_group()
 create_directory_if_noexist "$ENV_DIR"
 pushd "$ENV_DIR" > /dev/null
 create_directory_if_noexist "$ENV_BIN_DIR"
-create_directory_if_noexist "$BUILD_DIR"
+create_directory_if_noexist "$ENV_BUILD_DIR"
 create_directory_if_noexist "$DOWNLOADS_DIR"
 create_directory_if_noexist "$INCLUDE_DIR"
 create_directory_if_noexist "$LIB_DIR"
