@@ -36,6 +36,7 @@
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
@@ -103,36 +104,56 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 {
   // Delete all the collision objects. The dynamics world must exist.
   // Delete in reverse order of creation.
-  const size_t nco = m_pDynamicsWorld->getNumCollisionObjects();
-  btCollisionObjectArray& oa = m_pDynamicsWorld->getCollisionObjectArray();
-  for (int i = nco - 1; i >= 0; --i)
-  {
-    btCollisionObject * const pCollisionObject = oa[i];
-
-    // If the collision object is a rigid body, delete its motion state
-    const btRigidBody* const pRigidBody =
-      btRigidBody::upcast(pCollisionObject);
-    if (pRigidBody)
-    {
-      delete pRigidBody->getMotionState();
-    }
-
-    // Remove the collision object from the dynamics world
-    m_pDynamicsWorld->removeCollisionObject(pCollisionObject);
-    // Delete the collision object
-    delete pCollisionObject;
-  }
-  // All collision objects have been removed and deleted
-  assert(m_pDynamicsWorld->getNumCollisionObjects() == 0);
-  
-  // Delete all the collision shapes. This can be done at any time.
-  const size_t ncs = m_collisionShapes.size();
-  for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
+  removeConstraints();
+  removeCollisionShapes();
 
   delete m_pDynamicsWorld;
 
   // Delete the intermediate build products, which are now orphaned
   delete m_pIntermediateBuildProducts;
+}
+
+void tgWorldBulletPhysicsImpl::removeCollisionShapes()
+{
+    const size_t nco = m_pDynamicsWorld->getNumCollisionObjects();
+    btCollisionObjectArray& oa = m_pDynamicsWorld->getCollisionObjectArray();
+    for (int i = nco - 1; i >= 0; --i)
+    {
+      btCollisionObject * const pCollisionObject = oa[i];
+
+      // If the collision object is a rigid body, delete its motion state
+      const btRigidBody* const pRigidBody =
+        btRigidBody::upcast(pCollisionObject);
+      if (pRigidBody)
+      {
+        delete pRigidBody->getMotionState();
+      }
+
+      // Remove the collision object from the dynamics world
+      m_pDynamicsWorld->removeCollisionObject(pCollisionObject);
+      // Delete the collision object
+      delete pCollisionObject;
+    }
+    // All collision objects have been removed and deleted
+    assert(m_pDynamicsWorld->getNumCollisionObjects() == 0);
+
+    // Delete all the collision shapes. This can be done at any time.
+    const size_t ncs = m_collisionShapes.size();
+    for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
+}
+
+void tgWorldBulletPhysicsImpl::removeConstraints()
+{
+    const size_t nc = m_pDynamicsWorld->getNumConstraints();
+    for (int i = nc - 1; i >= 0; --i)
+    {
+      btTypedConstraint * const pTypedConstraint = m_pDynamicsWorld->getConstraint(i);
+
+      // Remove the constraint from the dynamics world
+      m_pDynamicsWorld->removeConstraint(pTypedConstraint);
+    }
+    // All constraints have been removed and deleted
+    assert(m_pDynamicsWorld->getNumConstraints() == 0);
 }
 
 /**
@@ -201,6 +222,20 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
       if (pShape)
       {
         m_collisionShapes.push_back(pShape);
+      }
+
+      // Postcondition
+      assert(invariant());
+}
+
+void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
+{
+      assert(invariant());
+
+      if (pConstraint)
+      {
+        m_constraints.push_back(pConstraint);
+        m_pDynamicsWorld->addConstraint(pConstraint);
       }
 
       // Postcondition
