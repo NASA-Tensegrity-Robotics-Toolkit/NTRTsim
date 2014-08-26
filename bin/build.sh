@@ -17,63 +17,44 @@
 # governing permissions and limitations under the License.
 
 # Purpose: Build the source tree including libraries and applications.
-# Author:  Ryan Adams
+# Author:  Ryan Adams, Perry Bhandal
 # Date:    July 2014
 # Notes:   This is intended to be run any time you need to build the 
 #          source tree.
 
-# Get the script path so we can run this from anywhere
-SCRIPT_PATH="`dirname \"$0\"`"                  # relative
-BASE_DIR="`( cd \"$SCRIPT_PATH/..\" && pwd )`"  # absolutized and normalized
-SRC_DIR="`( cd \"$BASE_DIR/src\" && pwd )`"
-BUILD_DIR="$BASE_DIR/build"
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
-# Functions for calling CMake, depending on operating system
-function cmake_OSX(){
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/setup/helpers/" > /dev/null
 
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_CXX_COMPILER=/opt/local/bin/g++
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
-}
-
-function cmake_linux(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
-}
-
-# Make sure the build directory exists
-if [ ! -d "$BUILD_DIR" ]; then
-    mkdir "$BUILD_DIR"
-fi
-if [ ! -d "$BUILD_DIR" ]; then
-    echo "Unable to create build directory '$BUILD_DIR' -- exiting."
-    exit 2
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
 fi
 
-function usage {
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+function usage
+{
     echo "usage: $0 [-h] [-c] [-l] [-s] [-w] [build_path]"
     echo ""
     echo "positional arguments:"
@@ -88,40 +69,63 @@ function usage {
     echo "  -w       Show compiler warnings when building"
 }
 
-# Handle Arguments
+function cmake_cross_platform()
+{
+    "$ENV_BIN_DIR/cmake" $SRC_DIR \
+        -G "$build_type" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
+        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
+        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
+        -DCMAKE_CXX_COMPILER="$ENV_BIN_DIR/g++" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+}
 
+# Make sure the build directory exists
+create_directory_if_noexist $BUILD_DIR
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "Unable to create build directory '$BUILD_DIR' -- exiting."
+    exit 2
+fi
+
+# Handle Arguments
 MAKE_CLEAN_FLAG=false
 MAKE_CLEAN_LIB_FLAG=false
 MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
 
 while getopts ":hclsw" opt; do
-  case $opt in
-    h)
-      usage;
-      exit 0;
-      ;;
-    c)
-      MAKE_CLEAN_FLAG=true
-      ;;
-    l)
-      MAKE_CLEAN_LIB_FLAG=true
-      ;;
-    s)
-      MAKE_LIB_FLAG=false
-      ;;
-    w)
-      CMAKE_COMPILER_WARNINGS_FLAG=true
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
+    case $opt in
+        h)
+            usage;
+            exit 0;
+            ;;
+        c)
+            MAKE_CLEAN_FLAG=true
+            ;;
+        l)
+            MAKE_CLEAN_LIB_FLAG=true
+            ;;
+        s)
+            MAKE_LIB_FLAG=false
+            ;;
+        w)
+            CMAKE_COMPILER_WARNINGS_FLAG=true
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
 done
 
 TO_BUILD=${@:$OPTIND:1}
@@ -144,7 +148,6 @@ fi
 # Go to the base directory
 pushd "$BASE_DIR" > /dev/null
 
-
 # Make sure setup has been run
 if [ ! -d env ]; then
     echo "Setup must be run before building -- see README.txt for more info."
@@ -162,58 +165,12 @@ build_type="Unix Makefiles"
 #build_type="Eclipse CDT4 - Unix Makefiles"
 
 if $CMAKE_COMPILER_WARNINGS_FLAG; then
-  cmake_cxx_flags="-Wall -Wno-long-long"
+    cmake_cxx_flags="-Wall -Wno-long-long"
 else
-  cmake_cxx_flags=""
+    cmake_cxx_flags=""
 fi
 
-# Since OS X Mavericks places the g++ compiler in a different place than
-# Linux, and since we want CMake to automatically find g++ on linux distros,
-# run one of two possible functions for actually compiling.
-
-# Functions for calling CMake, depending on operating system
-function cmake_OSX(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_CXX_COMPILER="g++" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
-}
-
-function cmake_linux(){
-
-"$BASE_DIR/env/bin/cmake" ../src \
-    -G "$build_type" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-    -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-    -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-|| { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
-}
-
-if [ $(uname) == 'Darwin' ]
-    then
-    cmake_OSX
-else
-    cmake_linux
-fi
-
+cmake_cross_platform
 
 popd > /dev/null # exit build dir (done with cmake)
 
@@ -234,3 +191,4 @@ make || exit 1
 popd > /dev/null  # exit make dir
 
 popd > /dev/null  # exit base dir
+

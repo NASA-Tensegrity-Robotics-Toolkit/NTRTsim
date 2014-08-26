@@ -19,26 +19,54 @@
 # Purpose: Env setup
 # Date:    2013-05-04
 
-# Source our common setup code
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-source "$base_dir/bin/setup/setup_common.sh"
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
-function get_actual_user() {
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/helpers/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+function get_actual_user()
+{
     who am i | awk '{print $1}'
 }
 
-function get_primary_group() {
+function get_primary_group()
+{
     id -g -n $1
 }
 
-if [ -d "$env_dir" ]; then
-    echo "- env directory exists. Ensuring subdirectories."
-else
-    mkdir "$env_dir"
-fi    
-pushd "$env_dir" > /dev/null
-mkdir bin build downloads include lib 2>/dev/null
+create_directory_if_noexist "$ENV_DIR"
+pushd "$ENV_DIR" > /dev/null
+create_directory_if_noexist "$ENV_BIN_DIR"
+create_directory_if_noexist "$ENV_BUILD_DIR"
+create_directory_if_noexist "$DOWNLOADS_DIR"
+create_directory_if_noexist "$INCLUDE_DIR"
+create_directory_if_noexist "$LIB_DIR"
 popd > /dev/null
 
 
@@ -48,10 +76,13 @@ actual_user=$(get_actual_user)
 primary_group=$(get_primary_group $actual_user)
 echo "- Changing ownership of env to current user ($actual_user:$primary_group)"
 # Test for sudo (try a non-recursive change for speed)
-chown $actual_user:$primary_group "$env_dir" 2>/dev/null
+chown $actual_user:$primary_group "$ENV_DIR" 2>/dev/null
 if [ ! $? -eq 0 ]; then
-  echo "  - ERROR: sudo required -- please re-run the command with sudo."
-  exit 1;
+    echo "  - ERROR: sudo required -- please re-run the command with sudo."
+    exit 1;
 fi
+
+ln -s `which g++` "${ENV_BIN_DIR}/g++"
+
 # Actually change the permissions
-chown -R -P $actual_user:$primary_group "$env_dir"
+chown -R -P $actual_user:$primary_group "$ENV_DIR"

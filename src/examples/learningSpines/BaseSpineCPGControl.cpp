@@ -234,6 +234,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 #if (0) // Conditional compile for data logging        
         m_dataObserver.onStep(subject, m_updateTime);
 #endif
+		notifyStep(m_updateTime);
         m_updateTime = 0;
     }
 }
@@ -291,6 +292,12 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
 		delete m_allControllers[i];
 	}
 	m_allControllers.clear();
+}
+
+const double BaseSpineCPGControl::getCPGValue(std::size_t i) const
+{
+	// Error handling on input done in CPG_Equations
+	return (*m_pCPGSys)[i];
 }
 
 array_4D BaseSpineCPGControl::scaleEdgeActions  

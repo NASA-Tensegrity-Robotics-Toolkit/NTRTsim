@@ -40,54 +40,104 @@
 // The C++ Standard Library
 #include <iostream>
 
+tgHillyGround *createGround();
+tgWorld *createWorld();
+tgSimViewGraphics *createGraphicsView(tgWorld *world);
+tgSimView *createView(tgWorld *world);
+void simulate(tgSimulation *simulation);
+
 /**
- * The entry point.
- * @param[in] argc the number of command-line arguments
- * @param[in] argv argv[0] is the executable name
- * @return 0
+ * Runs a series of episodes. 
+ * Each episode tests a given control pattern for a given number of steps.
+ * The fitness function (reward metric) for this experiment is 
+ *     the maximum distance from the tensegrity's starting point 
+ *     at any point during the episode
+ * NB: Running episodes and using graphics are mutually exclusive features
  */
 int main(int argc, char** argv)
 {
     std::cout << "AppEscape_T6" << std::endl;
 
-    // First create the ground and world
+    // First create the world
+    tgWorld *world = createWorld();
 
+    // Second create the view
+    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    //tgSimView       *view = createView(world);         // For running multiple episodes
+
+    // Third create the simulation
+    tgSimulation *simulation = new tgSimulation(*view);
+
+    // Fourth create the models with their controllers and add the models to the simulation
+    Escape_T6Model* const model = new Escape_T6Model();
+
+    // Fifth create controller and attach it to the model
+    double initialLength = 9; // decimeters
+    Escape_T6Controller* const controller = new Escape_T6Controller(initialLength);
+    model->attach(controller);
+
+    //Sixth add model (with controller) to simulation
+    simulation->addModel(model);
+
+    simulate(simulation);
+
+    //Teardown is handled by delete, so that should be automatic
+    return 0;
+}
+
+tgHillyGround *createGround() {
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgHillyGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
+    const double friction = 0.5; // Default: 0.5
+    const double restitution = 0.0;  // Default: 0.0
+    const btVector3 size = btVector3(500.0, 1.5, 500.0); // Default: (500.0, 1.5, 500.0)
+    const btVector3 origin = btVector3(0.0, 0.0, 0.0); // Default: (0.0, 0.0, 0.0)
+    const size_t nx = 50; // Default: 50
+    const size_t ny = 50; // Default: 50
+    const double margin = 0.5; // Default: 0.5
+    const double triangleSize = 5.0; // Default: 5.0
+    const double waveHeight = 2.0; // Default: 5.0
+    const double offset = 0.5; // Default: 0.5
+    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution, size, origin, 
+                                             nx, ny, margin, triangleSize, waveHeight, offset);
     // the world will delete this
-    tgHillyGround* ground = new tgHillyGround(groundConfig);
+    return new tgHillyGround(groundConfig);
+}
 
+tgWorld *createWorld() {
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
-    // Note, by changing the setting below from 981 to 98.1, we've
+    // NB: by changing the setting below from 981 to 98.1, we've
     // scaled the world length scale to decimeters not cm.
-    tgWorld world(config, ground);
 
-    // Second create the view
+    tgHillyGround* ground = createGround();
+    return new tgWorld(config, ground);
+}
+
+/** Use for displaying tensegrities in simulation */
+tgSimViewGraphics *createGraphicsView(tgWorld *world) {
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics); 
+}
 
-    // Third create the simulation
-    tgSimulation simulation(view);
+/** Use for trial episodes of many tensegrities in an experiment */
+tgSimView *createView(tgWorld *world) {
+    const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    return new tgSimView(*world, timestep_physics, timestep_graphics); 
+}
 
-    // Fourth create the models with their controllers and add the models to the simulation
-    Escape_T6Model* const myModel = new Escape_T6Model();
-
-    // Fifth, select the controller to use. Uncomment desired controller.
-    // Note for the above scale of gravity, this is in decimeters.
-
-    Escape_T6Controller* const pTC = new Escape_T6Controller(9);
-
-    myModel->attach(pTC);
-    simulation.addModel(myModel);
-
-    // Run until the user stops
-    simulation.run();
-
-    //Teardown is handled by delete, so that should be automatic
-    return 0;
+/** Run a series of episodes for nSteps each */
+void simulate(tgSimulation *simulation) {
+    int nEpisodes = 10; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode
+    for (int i=0; i<nEpisodes; i++)
+    {   
+        simulation->run(nSteps);
+        simulation->reset();
+    }
 }
 

@@ -16,19 +16,28 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: Define general configuration directives for setup
-# Date:    2014-08-18
-# Usage:   Copy/rename this file to '../general.conf' and run setup.sh
+# Constants
+TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
+FALSE=1 # Ditto, FALSE is non-zero
 
-#############################################
-#  Configuration -- edit below as needed.
-#############################################
+script_name=$(basename $0)
 
-# Uncomment this to use installations that are available to the whole system. 
-# NOTE: By default, setup installs bullet under env rather than $INSTALL_PREFIX
-#INSTALL_PREFIX="/usr/local"  
+# This runs make with either the total number of cores
+# specified by the user in build.conf, or using the maximum
+# number of cores in the user's system.
+function set_multicore_make()
+{
+    source_conf "build.conf"
+    if [ -n "$MAX_BUILD_CORES" ]; then
+        max_cores=$MAX_BUILD_CORES
+    else
+        max_cores=`grep -c ^processor /proc/cpuinfo`
+    fi
 
-# Uncomment this to install locally (under env/include and env/lib)
-# IMPORTANT: If you've previously installed to /usr/local, you'll need to 
-# delete your 'env' directory before running setup again.
-INSTALL_PREFIX="$ENV_DIR"  
+    shopt -s expand_aliases
+    alias make="make -j$max_cores"
+}
+
+if [[ "$script_name" != "setup.sh" ]]; then
+    set_multicore_make
+fi

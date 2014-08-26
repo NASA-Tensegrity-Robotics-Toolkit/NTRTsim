@@ -19,17 +19,43 @@
 # Purpose: CMake setup
 # Date:    2013-05-04
 
-# Source our common setup code
-local_setup_path="`dirname \"$0\"`"                # relative
-base_dir="`( cd \"$local_setup_path/../../\" && pwd )`"  # absolutized and normalized
-source "$base_dir/bin/setup/setup_common.sh"
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/helpers/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
 
 if type cmake >/dev/null 2>&1; then
     cmake_info=$(cmake --version)
     echo "- CMake is installed ($cmake_info). Creating link under env/bin."; 
     
     # Make a symlink under env to the existing cmake install
-    pushd "$bin_dir" > /dev/null
+    pushd "$ENV_BIN_DIR" > /dev/null
     rm cmake 2>/dev/null  # delete any existing symlink
     ln -s `which cmake` cmake
     popd > /dev/null

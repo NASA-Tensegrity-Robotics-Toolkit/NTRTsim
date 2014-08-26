@@ -36,7 +36,6 @@
 
 // The C++ Standard Library
 #include <cassert>
-#include <iostream> //For debugging
 
 tgHillyGround::Config::Config(btVector3 eulerAngles,
         btScalar friction,
@@ -119,13 +118,10 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
     // The number of vertices in the mesh
     // Hill Paramenters: Subject to Change
     const size_t vertexCount = m_config.m_nx * m_config.m_ny;
-    std::cout << "vertexCount: " << vertexCount << std::endl;
 
-    std::cout << "In hillyCollisionShape()" << std::endl;
     if (vertexCount > 0) {
         // The number of triangles in the mesh
         const size_t triangleCount = 2 * (m_config.m_nx - 1) * (m_config.m_ny - 1);
-        std::cout << "triangleCount: " << triangleCount << std::endl;
 
         // A flattened array of all vertices in the mesh
         btVector3 * const vertices = new btVector3[vertexCount];

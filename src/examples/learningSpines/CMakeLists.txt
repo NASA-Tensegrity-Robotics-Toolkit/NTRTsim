@@ -14,6 +14,7 @@ add_library(${PROJECT_NAME} SHARED
 			BaseSpineModelLearning.cpp
 			BaseSpineCPGControl.cpp
             tgCPGStringControl.cpp    
+            tgCPGLogger.cpp
             )
 
 subdirs(    OctahedralComplex
