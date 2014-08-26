@@ -62,11 +62,11 @@ function get_primary_group()
 
 create_directory_if_noexist "$ENV_DIR"
 pushd "$ENV_DIR" > /dev/null
-create_directory_if_noexist "bin"
-create_directory_if_noexist "build"
-create_directory_if_noexist "downloads"
-create_directory_if_noexist "include"
-create_directory_if_noexist "lib"
+create_directory_if_noexist "$ENV_BIN_DIR"
+create_directory_if_noexist "$BUILD_DIR"
+create_directory_if_noexist "$DOWNLOADS_DIR"
+create_directory_if_noexist "$INCLUDE_DIR"
+create_directory_if_noexist "$LIB_DIR"
 popd > /dev/null
 
 
@@ -81,5 +81,8 @@ if [ ! $? -eq 0 ]; then
     echo "  - ERROR: sudo required -- please re-run the command with sudo."
     exit 1;
 fi
+
+ln -s `which g++` "${ENV_BIN_DIR}/g++"
+
 # Actually change the permissions
 chown -R -P $actual_user:$primary_group "$ENV_DIR"

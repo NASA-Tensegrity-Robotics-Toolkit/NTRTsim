@@ -28,5 +28,7 @@ SETUP_DIR="${BIN_DIR}/setup"
 DOWNLOADS_DIR="${ENV_DIR}/downloads"
 BUILD_DIR="${ENV_DIR}/build"
 ENV_BIN_DIR="${ENV_DIR}/bin"
+LIB_DIR="${ENV_DIR}/lib"
+INCLUDE_DIR="${ENV_DIR}/include"
 
 ENV_NAME='env'
