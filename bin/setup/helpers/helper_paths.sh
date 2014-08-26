@@ -22,11 +22,12 @@ BIN_DIR="${BASE_DIR}/bin"
 CONF_DIR="${BASE_DIR}/conf"
 ENV_DIR="${BASE_DIR}/env"
 SRC_DIR="${BASE_DIR}/src"
+BUILD_DIR="${BASE_DIR}/build"
 
 SETUP_DIR="${BIN_DIR}/setup"
 
 DOWNLOADS_DIR="${ENV_DIR}/downloads"
-BUILD_DIR="${ENV_DIR}/build"
+ENV_BUILD_DIR="${ENV_DIR}/build"
 ENV_BIN_DIR="${ENV_DIR}/bin"
 LIB_DIR="${ENV_DIR}/lib"
 INCLUDE_DIR="${ENV_DIR}/include"
