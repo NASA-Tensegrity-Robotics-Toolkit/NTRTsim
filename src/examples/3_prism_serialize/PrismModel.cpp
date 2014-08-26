@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 /**
  * @file PrismModel.cpp
@@ -37,9 +37,12 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
-#include <string>;
-
+#include <string>
+#include "helpers/FileHelpers.h"
 #include <json/json.h>
+
+using namespace std;
+
 /**
  * Anonomous namespace so we don't have to declare the config in
  * the header.
@@ -61,21 +64,21 @@ namespace
         double prism_height;
         double pretension;     
     } c =
-   {
-       0.2,     // density (mass / length^3)
-       0.31,     // radius (length)
-       1000.0,   // stiffness (mass / sec^2)
-       10.0,     // damping (mass / sec)
-       10.0,     // triangle_length (length)
-       10.0,     // triangle_height (length)
-       20.0,     // prism_height (length)
-       0.05      // Pretension (percentage)
-  };
+    {
+        0.2,     // density (mass / length^3)
+        0.31,     // radius (length)
+        1000.0,   // stiffness (mass / sec^2)
+        10.0,     // damping (mass / sec)
+        10.0,     // triangle_length (length)
+        10.0,     // triangle_height (length)
+        20.0,     // prism_height (length)
+        0.05      // Pretension (percentage)
+    };
 } // namespace
 
 PrismModel::PrismModel() :
-m_pStringController(new PretensionController(c.pretension)),
-tgModel() 
+    m_pStringController(new PretensionController(c.pretension)),
+    tgModel() 
 {
 }
 
@@ -85,9 +88,9 @@ PrismModel::~PrismModel()
 }
 
 void PrismModel::addNodes(tgStructure& tetra,
-                            double edge,
-                            double width,
-                            double height)
+        double edge,
+        double width,
+        double height)
 {
     // bottom right
     tetra.addNode(-edge / 2.0, 0, 0); // 1
@@ -116,7 +119,7 @@ void PrismModel::addMuscles(tgStructure& s)
     s.addPair(0, 1,  "muscle");
     s.addPair(1, 2,  "muscle");
     s.addPair(2, 0,  "muscle");
-    
+
     // Top
     s.addPair(3, 4, "muscle");
     s.addPair(4, 5,  "muscle");
@@ -133,45 +136,47 @@ void PrismModel::setup(tgWorld& world)
     // Define the configurations of the rods and strings
     const tgRod::Config rodConfig(c.radius, c.density);
     const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-    
+
     // Create a structure that will hold the details of this model
     tgStructure s;
 
     //BEGIN DESERIALIZING
-    
-Json::Value root; // will contains the root value after parsing.
-Json::Reader reader;
-S
-bool parsingSuccessful = reader.parse( FileHelpers::getFileString("config.json"), root );
-if ( !parsingSuccessful )
-{
-// report to the user the failure and their locations in the document.
-std::cout << "Failed to parse configuration\n"
-<< reader.getFormattedErrorMessages();
-return 1;
-}
-// Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
-// such member.
-double triangle_height = root.get("triangle_height").asDouble();
-   //END SERIALIZING
-    
+
+    Json::Value root; // will contains the root value after parsing.
+    Json::Reader reader;
+
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("config.json"), root );
+    if ( !parsingSuccessful )
+    {
+        // report to the user the failure and their locations in the document.
+        std::cout << "Failed to parse configuration\n"
+            << reader.getFormattedErrorMessages();
+        return;
+    }
+    // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
+    // such member.
+    double triangle_height = root.get("triangle_height", "UTF-8").asDouble();
+    double triangle_length = root.get("triangle_length", "UTF-8").asDouble();
+    double prism_height = root.get("prism_height", "UTF-8").asDouble();
+    //END SERIALIZING
+
     // Add nodes to the structure
-    addNodes(s, c.triangle_length, triangle_height, c.prism_height);
-    
+    addNodes(s, triangle_length, triangle_height, prism_height);
+
     // Add rods to the structure
     addRods(s);
-    
+
     // Add muscles to the structure
     addMuscles(s);
-    
+
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
-    
+
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    
+
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
@@ -181,17 +186,17 @@ double triangle_height = root.get("triangle_height").asDouble();
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-    
+
     // Then attach the pretension controller to each of these muscles to keep
     // the tensegrity's shape
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
         allMuscles[i]->attach(m_pStringController);
     }
-    
+
     // Notify controllers that setup has finished.
     notifySetup();
-    
+
     // Actually setup the children
     tgModel::setup(world);
 }
@@ -221,7 +226,7 @@ const std::vector<tgLinearString*>& PrismModel::getAllMuscles() const
 {
     return allMuscles;
 }
-    
+
 void PrismModel::teardown()
 {
     notifyTeardown();
