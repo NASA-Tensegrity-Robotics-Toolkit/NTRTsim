@@ -122,7 +122,9 @@ while getopts ":hclswp:" opt; do
             CMAKE_COMPILER_WARNINGS_FLAG=true
             ;;
         p)
+            if $OPTARG != "."; then
             BUILD_ROOT="$SRC_DIR/$OPTARG"
+            fi
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
