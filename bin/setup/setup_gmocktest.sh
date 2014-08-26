@@ -144,6 +144,8 @@ function install_gmocktest()
     ln -s $GMOCKTEST_BUILD_DIR/libgmock.a $LIB_DIR/
     ln -s $GMOCKTEST_BUILD_DIR/libgmock_main.a $LIB_DIR/
 
+    ln -s $GMOCKTEST_BUILD_DIR/gtest/libgtest.a $LIB_DIR/
+    ln -s $GMOCKTEST_BUILD_DIR/gtest/libgtest_main.a $LIB_DIR/
 
    popd > /dev/null
 }
@@ -164,6 +166,10 @@ function env_link_gmocktest()
     else
         ln -s "$GMOCKTEST_BUILD_DIR" gmocktest  # this links directly to the most recent build...
     fi
+
+    # Symlink our header files in
+    ln -s $GMOCKTEST_BUILD_DIR/gtest/include/gtest $INCLUDE_DIR/gtest
+    ln -s $GMOCKTEST_BUILD_DIR/include/gmock $INCLUDE_DIR/gmock
 
     popd > /dev/null
 
