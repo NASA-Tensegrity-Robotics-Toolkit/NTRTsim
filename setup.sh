@@ -50,7 +50,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf") 
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf") 
 
 function banner() 
 {
@@ -140,6 +140,7 @@ set_multicore_make
 
 run_setupscript "env" "Env directory"
 run_setupscript "cmake" "CMake"
+run_setupscript "jsoncpp" "JsonCPP"
 run_setupscript "bullet" "Bullet Physics Library"
 run_setupscript "boost" "Boost"
 
