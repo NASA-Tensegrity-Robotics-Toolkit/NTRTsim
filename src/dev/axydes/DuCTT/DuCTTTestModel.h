@@ -98,14 +98,14 @@ public:
      * @param[in] dt, the timestep. Must be positive.
      */
     virtual void step(const double dt);
-	
-	/**
-	 * Get a group of muscles according to the provided key. Groups are
-	 * populated during setup.
-	 * @param[in] key - a std:string* used as a key to a std::map from
-	 * a string to a vector of muscles
-	 * @return a std::vector of pointers to the muscles found by the key
-	 */
+
+    /**
+     * Get a group of muscles according to the provided key. Groups are
+     * populated during setup.
+     * @param[in] key - a std:string* used as a key to a std::map from
+     * a string to a vector of muscles
+     * @return a std::vector of pointers to the muscles found by the key
+     */
     const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
     
     /**
@@ -118,6 +118,7 @@ public:
         return m_segments;
     }
     
+    std::vector<tgPrismatic*> allPrisms;
 private:
 
     void addNodes(tgStructure& tetra, double edge, double height);

@@ -60,11 +60,7 @@ void DuCTTTestModel::addPairs(tgStructure& tetra)
     tetra.addPair(2, 0, "front right rod");
     tetra.addPair(2, 1, "front left rod");
 
-//    tetra.addPair(0, 1, "top rod");
-//    tetra.addPair(2, 3, "bottom rod");
-//    tetra.addPair(0, 1, "top prismatic");
-//    tetra.addPair(2, 3, "bottom prismatic");
-    addBottomPairs(tetra);
+//    addBottomPairs(tetra);
 //    addTopPairs(tetra);
 }
 
@@ -72,7 +68,6 @@ void DuCTTTestModel::addTopPairs(tgStructure& tetra)
 {
     tetra.addPair(0, 4, "top1 rod");
     tetra.addPair(5, 1, "top2 rod");
-//    tetra.addPair(4, 5, "top muscle");
     tetra.addPair(4, 5, "top prismatic");
 }
 
@@ -80,7 +75,6 @@ void DuCTTTestModel::addBottomPairs(tgStructure& tetra)
 {
     tetra.addPair(2, 6, "bottom1 rod");
     tetra.addPair(7, 3, "bottom2 rod");
-//    tetra.addPair(6, 7, "bottom muscle");
     tetra.addPair(6, 7, "bottom prismatic");
 }
 
@@ -108,8 +102,8 @@ void DuCTTTestModel::addMuscles(tgStructure& snake)
         addBottomPairs(*children[i]);
         addTopPairs(*children[i-1]);
 
-//        addBottomPairs(*children[i-1]);
-//        addTopPairs(*children[i]);
+        addBottomPairs(*children[i-1]);
+        addTopPairs(*children[i]);
 
         tgNodes n0 = children[i-1]->getNodes();
         tgNodes n1 = children[i  ]->getNodes();
@@ -170,9 +164,8 @@ void DuCTTTestModel::setup(tgWorld& world)
 
     // Create our snake segments
     tgStructure snake;
-    addSegments(snake, tetra, edge, 1);
-//    addSegments(snake, tetra, edge, m_segments);
-//    addMuscles(snake);
+    addSegments(snake, tetra, edge, m_segments);
+    addMuscles(snake);
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
@@ -180,12 +173,11 @@ void DuCTTTestModel::setup(tgWorld& world)
     const double radius  = 0.5;
     const tgRod::Config rodConfig(radius, density, 0.5, 0, 0.2);
     const tgPrismatic::Config prismConfig(3);
+    tgLinearString::Config muscleConfig(1000, 10);
 
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
-    
-    tgLinearString::Config muscleConfig(1000, 10);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     
     // Create your structureInfo
@@ -197,6 +189,7 @@ void DuCTTTestModel::setup(tgWorld& world)
     // that we want to control.    
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
     mapMuscles(muscleMap, *this);
+    allPrisms = tgCast::filter<tgModel, tgPrismatic> (getDescendants());
 
     trace(structureInfo, *this);
 
