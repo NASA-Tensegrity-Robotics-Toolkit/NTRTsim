@@ -69,11 +69,7 @@ function usage
     echo "  -w       Show compiler warnings when building"
 }
 
-# Since OS X Mavericks places the g++ compiler in a different place than
-# Linux, and since we want CMake to automatically find g++ on linux distros,
-# run one of two possible functions for actually compiling.
-# Functions for calling CMake, depending on operating system
-function cmake_OSX()
+function cmake_cross_platform()
 {
     "$ENV_BIN_DIR/cmake" $SRC_DIR \
         -G "$build_type" \
@@ -81,30 +77,13 @@ function cmake_OSX()
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
         -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
         -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-        -DCMAKE_CXX_COMPILER="g++" \
+        -DCMAKE_CXX_COMPILER="$ENV_BIN_DIR/g++" \
         -DCMAKE_C_FLAGS="-fPIC" \
         -DCMAKE_CXX_FLAGS="-fPIC" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
         || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-}
-
-function cmake_linux()
-{
-    "$ENV_BIN_DIR/cmake" $SRC_DIR \
-        -G "$build_type" \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-        -DCMAKE_C_FLAGS="-fPIC" \
-        -DCMAKE_CXX_FLAGS="-fPIC" \
-        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
 }
 
 # Make sure the build directory exists
@@ -191,14 +170,7 @@ else
     cmake_cxx_flags=""
 fi
 
-
-if [ $(uname) == 'Darwin' ]
-then
-    cmake_OSX
-else
-    cmake_linux
-fi
-
+cmake_cross_platform
 
 popd > /dev/null # exit build dir (done with cmake)
 
