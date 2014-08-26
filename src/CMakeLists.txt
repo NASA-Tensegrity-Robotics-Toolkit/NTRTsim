@@ -5,6 +5,7 @@ PROJECT(NASA_Tensegrity_Robotics_Toolkit)
 # Add your subdirectories here
 subdirs(
     core
+    helpers
     learning
     util
     sensors
