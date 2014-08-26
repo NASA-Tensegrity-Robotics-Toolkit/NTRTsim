@@ -67,11 +67,14 @@ function usage
     echo "  -l       Run 'make clean' before make/make install on libraries"
     echo "  -s       Don't automatically build the libraries"
     echo "  -w       Show compiler warnings when building"
+    echo "  -p       Builds projects at the provided directory and lower. The parameter"
+    echo "           should be relative to the src directory. For example, -p \"examples\""
+    echo "           would build everything in src/examples/ and below."
 }
 
 function cmake_cross_platform()
 {
-    "$ENV_BIN_DIR/cmake" $SRC_DIR \
+    "$ENV_BIN_DIR/cmake" $BUILD_ROOT \
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
@@ -98,8 +101,9 @@ MAKE_CLEAN_FLAG=false
 MAKE_CLEAN_LIB_FLAG=false
 MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
+BUILD_ROOT="$SRC_DIR"
 
-while getopts ":hclsw" opt; do
+while getopts ":hclswp:" opt; do
     case $opt in
         h)
             usage;
@@ -116,6 +120,9 @@ while getopts ":hclsw" opt; do
             ;;
         w)
             CMAKE_COMPILER_WARNINGS_FLAG=true
+            ;;
+        p)
+            BUILD_ROOT="$SRC_DIR/$OPTARG"
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
