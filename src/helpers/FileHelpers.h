@@ -26,7 +26,7 @@ class FileHelpers
 {
 public: 
     
-    static void getFileString(string fileName);
+    static std::string getFileString(std::string fileName);
     
-}
+};
 #endif  // File_Helpers_H 

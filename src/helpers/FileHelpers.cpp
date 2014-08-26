@@ -1,13 +1,14 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <stringstream>
+#include <sstream>
+#include "FileHelpers.h"
 
 using namespace std;
 
-void FileHelpers::getFileString(string fileName) {
-    ifStream fileInput(fileName);
+std::string FileHelpers::getFileString(std::string fileName) {
+    std::ifstream fileInput(fileName.c_str());
     stringstream buffer;
-    buffer << fileInput.rdbuf()
+    buffer << fileInput.rdbuf();
     return buffer.str();
 }
