@@ -97,7 +97,7 @@ function unpack_neuralnet()
     create_directory_if_noexist $NEURALNET_BUILD_DIR
 
     # Unzip
-    pushd "$NEURALNET_BUILD_DIR" > /dev/null
+    pushd "$NEURALNET_PACKAGE_DIR" > /dev/null
     unzip "$DOWNLOADS_DIR/$neuralnet_pkg" || { echo "- ERROR: Failed to unpack NeuralNet"; exit 1; }
     #mv */* . - todo, investigate cleaner build with this
     popd > /dev/null

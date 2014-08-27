@@ -30,7 +30,7 @@ NEURALNET_INSTALL_PREFIX="$ENV_DIR"
 
 # This is the location where you unzipped the package (or, where it will
 # be unzipped if necessary). 
-NEURALNET_PACKAGE_DIR="$ENV_DIR/neuralNet"
+NEURALNET_PACKAGE_DIR="$ENV_DIR/build/neuralNet"
 
 # Location where Anguelov's neural net library is to be built if necessary, or where it was built if 
 # you're using an existing package. This doesn't need to be set unless Anguelov's neural net library is

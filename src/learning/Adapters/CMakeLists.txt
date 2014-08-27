@@ -10,11 +10,12 @@ project(Adapters)
 
 add_library( ${PROJECT_NAME} SHARED
     AnnealAdapter.cpp
+    NeuroAdapter.cpp
 )
 
 target_link_libraries(${PROJECT_NAME})
 
-target_link_libraries(Adapters AnnealEvolution)
+target_link_libraries(Adapters AnnealEvolution NeuroEvolution)
 
 # TODO: Should we add in a pkgconfig file (like env/lib/pkgconfig/bullet.pc)?
 
