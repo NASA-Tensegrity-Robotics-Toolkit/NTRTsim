@@ -17,17 +17,17 @@
 */
 
 /**
- * @file tgPrismaticInfo.cpp
- * @brief Contains the definition of members of the class tgPrismatic. A prismatic actuator builder.
+ * @file tgHingeInfo.cpp
+ * @brief Contains the definition of members of the class tgHinge. A prismatic actuator builder.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "tgPrismaticInfo.h"
+#include "tgHingeInfo.h"
 
 #include "btBulletDynamicsCommon.h"
-#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
 
@@ -36,36 +36,36 @@
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgStructureInfo.h"
 
-tgPrismaticInfo::tgPrismaticInfo(const tgPrismatic::Config& config) :
+tgHingeInfo::tgHingeInfo(const tgHinge::Config& config) :
     m_config(config),
     tgConnectorInfo() 
 {
 }
 
-tgPrismaticInfo::tgPrismaticInfo(const tgPrismatic::Config& config, tgTags tags) :
+tgHingeInfo::tgHingeInfo(const tgHinge::Config& config, tgTags tags) :
     m_config(config),
     tgConnectorInfo(tags)
 {}
 
-tgPrismaticInfo::tgPrismaticInfo(const tgPrismatic::Config& config, const tgPair& pair) :
+tgHingeInfo::tgHingeInfo(const tgHinge::Config& config, const tgPair& pair) :
     m_config(config),
     tgConnectorInfo(pair)
 {}
 
-tgPrismaticInfo::~tgPrismaticInfo()
+tgHingeInfo::~tgHingeInfo()
 {
 }
 
-tgConnectorInfo* tgPrismaticInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgHingeInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgPrismaticInfo(m_config, pair);
+    return new tgHingeInfo(m_config, pair);
 }
 
-void tgPrismaticInfo::initConnector(tgWorld& world)
+void tgHingeInfo::initConnector(tgWorld& world)
 {
 }
 
-btSliderConstraint* tgPrismaticInfo::createSlider()
+btHingeConstraint* tgHingeInfo::createHinge()
 {
     btRigidBody* fromBody = getFromRigidBody();
     btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
@@ -81,12 +81,12 @@ btSliderConstraint* tgPrismaticInfo::createSlider()
     transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);
     transBTop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
 
-    btSliderConstraint* slider = new btSliderConstraint(*fromBody, *toBody, transATop, transBTop, true);
+    btHingeConstraint* slider = new btHingeConstraint(*fromBody, transATop);
 
     return slider;
 }
 
-tgModel* tgPrismaticInfo::createModel(tgWorld& world)
+tgModel* tgHingeInfo::createModel(tgWorld& world)
 {  
     tgNode startNode = this->getFrom();
     tgNode endNode = this->getTo();
@@ -94,14 +94,14 @@ tgModel* tgPrismaticInfo::createModel(tgWorld& world)
     btVector3 buildVec = (endNode - startNode);
     double m_startLength = buildVec.length();
 
-    btSliderConstraint* slider = createSlider();
+    btHingeConstraint* slider = createHinge();
 
-    tgPrismatic* prism = new tgPrismatic(slider, getTags(), m_config);
-    prism->setup(world);
-    return prism;
+    tgHinge* hinge = new tgHinge(slider, getTags(), m_config);
+    hinge->setup(world);
+    return hinge;
 } 
 
-double tgPrismaticInfo::getMass()
+double tgHingeInfo::getMass()
 {
     // @todo: add up the rigid bodies
     return 0;
