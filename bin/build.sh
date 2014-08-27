@@ -72,7 +72,7 @@ function usage
 
 function cmake_cross_platform()
 {
-    "$ENV_BIN_DIR/cmake" $build_src 
+    "$ENV_BIN_DIR/cmake" $build_src \
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
