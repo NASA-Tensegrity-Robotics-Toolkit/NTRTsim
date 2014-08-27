@@ -83,77 +83,226 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
     #endif
     
-    
-    // create and add duct using 8 boxes
-    
-    // vertical walls
-    const btVector3 boxDimensions1(btScalar(0.1), btScalar(40), btScalar(0.5));
-    const btVector3 Origin1(0, 40, -17);
-    
-    const btVector3 boxDimensions2(btScalar(17), btScalar(40), btScalar(0.5));
-    const btVector3 Origin2(0, 40, 17);
-    
-    const btVector3 boxDimensions3(btScalar(0.5), btScalar(40), btScalar(17));
-    const btVector3 Origin3(-17, 40, 0);
-    
-    const btVector3 boxDimensions4(btScalar(0.5), btScalar(23), btScalar(17));
-    const btVector3 Origin4(17, 23, 0);
-    
-    //horizontal walls
-    const btVector3 boxDimensions5(btScalar(30), btScalar(0.1), btScalar(0.5));
-    const btVector3 Origin5(47, 63, -17);
-    
-    const btVector3 boxDimensions6(btScalar(30), btScalar(17), btScalar(0.5));
-    const btVector3 Origin6(47, 63, 17);
-    
-    const btVector3 boxDimensions7(btScalar(47), btScalar(0.5), btScalar(17));
-    const btVector3 Origin7(30, 80, 0);
-    
-    const btVector3 boxDimensions8(btScalar(30), btScalar(0.5), btScalar(17));
-    const btVector3 Origin8(47, 46, 0);
+//    ///////////////////////////////////////////////////////////////////////////////////
+//    ////////////////////////// L SHAPED DUCT //////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////
+//                                                                                     //
+//    // vertical walls                                                                //
+//    const btVector3 boxDimensions1(btScalar(17), btScalar(40), btScalar(0.5));       //
+//    const btVector3 Origin1(0, 40, -17);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions2(btScalar(17), btScalar(40), btScalar(0.5));       //
+//    const btVector3 Origin2(0, 40, 17);                                              //
+//                                                                                     //
+//    const btVector3 boxDimensions3(btScalar(0.5), btScalar(40), btScalar(17));       //
+//    const btVector3 Origin3(-17, 40, 0);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions4(btScalar(0.5), btScalar(23), btScalar(17));       //
+//    const btVector3 Origin4(17, 23, 0);                                              //
+//                                                                                     //
+//    //horizontal walls                                                               //
+//    const btVector3 boxDimensions5(btScalar(30), btScalar(17), btScalar(0.5));       //
+//    const btVector3 Origin5(47, 63, -17);                                            //
+//                                                                                     //
+//    const btVector3 boxDimensions6(btScalar(30), btScalar(17), btScalar(0.5));       //
+//    const btVector3 Origin6(47, 63, 17);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions7(btScalar(47), btScalar(0.5), btScalar(17));       //
+//    const btVector3 Origin7(30, 80, 0);                                              //
+//                                                                                     //
+//    const btVector3 boxDimensions8(btScalar(30), btScalar(0.5), btScalar(17));       //
+//    const btVector3 Origin8(47, 46, 0);                                              //
+//                                                                                     //
+//    //create boxes                                                                   //
+//    btRigidBody * const pBoxRigidBody1 = createBoxRigidBody(boxDimensions1, Origin1);//
+//    btRigidBody * const pBoxRigidBody2 = createBoxRigidBody(boxDimensions2, Origin2);//
+//    btRigidBody * const pBoxRigidBody3 = createBoxRigidBody(boxDimensions3, Origin3);//
+//    btRigidBody * const pBoxRigidBody4 = createBoxRigidBody(boxDimensions4, Origin4);//
+//    btRigidBody * const pBoxRigidBody5 = createBoxRigidBody(boxDimensions5, Origin5);//
+//    btRigidBody * const pBoxRigidBody6 = createBoxRigidBody(boxDimensions6, Origin6);//
+//    btRigidBody * const pBoxRigidBody7 = createBoxRigidBody(boxDimensions7, Origin7);//
+//    btRigidBody * const pBoxRigidBody8 = createBoxRigidBody(boxDimensions8, Origin8);//
+//                                                                                     //
+//    // add boxes to world                                                            //
+//    // why does duct disappear when simulation is reset???                           //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody1);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody2);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody3);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody4);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody5);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody6);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody7);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody8);                                  //
+//                                                                                     //
+//    ///////////////////////////////////////////////////////////////////////////////////
 
+    
+//    ///////////////////////////////////////////////////////////////////////////////////
+//    ////////////////////////// STRAIGHT DUCT //////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////
+//                                                                                     //
+//    // vertical walls                                                                //
+//    const btVector3 boxDimensions1(btScalar(17), btScalar(50), btScalar(0.5));       //
+//    const btVector3 Origin1(0, 50, -17);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions2(btScalar(17), btScalar(50), btScalar(0.5));       //
+//    const btVector3 Origin2(0, 50, 17);                                              //
+//                                                                                     //
+//    const btVector3 boxDimensions3(btScalar(0.5), btScalar(50), btScalar(17));       //
+//    const btVector3 Origin3(-17, 50, 0);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions4(btScalar(0.5), btScalar(50), btScalar(17));       //
+//    const btVector3 Origin4(17, 50, 0);                                              //
+//                                                                                     //
+//    //create boxes                                                                   //
+//    btRigidBody * const pBoxRigidBody1 = createBoxRigidBody(boxDimensions1, Origin1);//
+//    btRigidBody * const pBoxRigidBody2 = createBoxRigidBody(boxDimensions2, Origin2);//
+//    btRigidBody * const pBoxRigidBody3 = createBoxRigidBody(boxDimensions3, Origin3);//
+//    btRigidBody * const pBoxRigidBody4 = createBoxRigidBody(boxDimensions4, Origin4);//
+//                                                                                     //
+//    // add boxes to world                                                            //
+//    // why does duct disappear when simulation is reset???                           //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody1);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody2);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody3);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody4);                                  //
+//                                                                                     //
+//    ///////////////////////////////////////////////////////////////////////////////////
+ 
+
+//    ///////////////////////////////////////////////////////////////////////////////////
+//    ////////////////////////// T SHAPED DUCT //////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////
+//                                                                                     //
+//    // vertical walls                                                                //
+//    const btVector3 boxDimensions1(btScalar(17), btScalar(40), btScalar(0.5));       //
+//    const btVector3 Origin1(0, 40, -17);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions2(btScalar(17), btScalar(40), btScalar(0.5));       //
+//    const btVector3 Origin2(0, 40, 17);                                              //
+//                                                                                     //
+//    const btVector3 boxDimensions3(btScalar(0.5), btScalar(23), btScalar(17));       //
+//    const btVector3 Origin3(-17, 23, 0);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions4(btScalar(0.5), btScalar(23), btScalar(17));       //
+//    const btVector3 Origin4(17, 23, 0);                                              //
+//                                                                                     //
+//    //horizontal walls                                                               //
+//    const btVector3 boxDimensions5(btScalar(78), btScalar(17), btScalar(0.5));       //
+//    const btVector3 Origin5(0, 63, -17);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions6(btScalar(78), btScalar(17), btScalar(0.5));       //
+//    const btVector3 Origin6(0, 63, 17);                                              //
+//                                                                                     //
+//    const btVector3 boxDimensions7(btScalar(78), btScalar(0.5), btScalar(17));       //
+//    const btVector3 Origin7(0, 80, 0);                                               //
+//                                                                                     //
+//    const btVector3 boxDimensions8(btScalar(31), btScalar(0.5), btScalar(17));       //
+//    const btVector3 Origin8(-48, 46, 0);                                             //
+//                                                                                     //
+//    const btVector3 boxDimensions9(btScalar(31), btScalar(0.5), btScalar(17));       //
+//    const btVector3 Origin9(48, 46, 0);                                              //
+//                                                                                     //
+//    //create boxes                                                                   //
+//    btRigidBody * const pBoxRigidBody1 = createBoxRigidBody(boxDimensions1, Origin1);//
+//    btRigidBody * const pBoxRigidBody2 = createBoxRigidBody(boxDimensions2, Origin2);//
+//    btRigidBody * const pBoxRigidBody3 = createBoxRigidBody(boxDimensions3, Origin3);//
+//    btRigidBody * const pBoxRigidBody4 = createBoxRigidBody(boxDimensions4, Origin4);//
+//    btRigidBody * const pBoxRigidBody5 = createBoxRigidBody(boxDimensions5, Origin5);//
+//    btRigidBody * const pBoxRigidBody6 = createBoxRigidBody(boxDimensions6, Origin6);//
+//    btRigidBody * const pBoxRigidBody7 = createBoxRigidBody(boxDimensions7, Origin7);//
+//    btRigidBody * const pBoxRigidBody8 = createBoxRigidBody(boxDimensions8, Origin8);//
+//    btRigidBody * const pBoxRigidBody9 = createBoxRigidBody(boxDimensions9, Origin9);//
+//                                                                                     //
+//    // add boxes to world                                                            //
+//    // why does duct disappear when simulation is reset???                           //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody1);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody2);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody3);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody4);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody5);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody6);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody7);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody8);                                  //
+//    m_pDynamicsWorld->addRigidBody(pBoxRigidBody9);                                  //
+//                                                                                     //
+//    ///////////////////////////////////////////////////////////////////////////////////
+    
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////// X SHAPED DUCT /////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+                                                                                        //
+    // vertical walls                                                                   //
+    const btVector3 boxDimensions1(btScalar(17), btScalar(65), btScalar(0.5));          //
+    const btVector3 Origin1(0, 65, -17);                                                //
+                                                                                        //
+    const btVector3 boxDimensions2(btScalar(17), btScalar(65), btScalar(0.5));          //
+    const btVector3 Origin2(0, 65, 17);                                                 //
+                                                                                        //
+    const btVector3 boxDimensions3(btScalar(0.5), btScalar(23), btScalar(17));          //
+    const btVector3 Origin3(-17, 23, 0);                                                //
+                                                                                        //
+    const btVector3 boxDimensions4(btScalar(0.5), btScalar(23), btScalar(17));          //
+    const btVector3 Origin4(17, 23, 0);                                                 //
+                                                                                        //
+    const btVector3 boxDimensions5(btScalar(0.5), btScalar(25), btScalar(17));          //
+    const btVector3 Origin5(-17, 105, 0);                                               //
+                                                                                        //
+    const btVector3 boxDimensions6(btScalar(0.5), btScalar(25), btScalar(17));          //
+    const btVector3 Origin6(17, 105, 0);                                                //
+                                                                                        //
+                                                                                        //
+    //horizontal walls                                                                  //
+    const btVector3 boxDimensions7(btScalar(78), btScalar(17), btScalar(0.5));          //
+    const btVector3 Origin7(0, 63, -17);                                                //
+                                                                                        //
+    const btVector3 boxDimensions8(btScalar(78), btScalar(17), btScalar(0.5));          //
+    const btVector3 Origin8(0, 63, 17);                                                 //
+                                                                                        //
+    const btVector3 boxDimensions9(btScalar(31), btScalar(0.5), btScalar(17));          //
+    const btVector3 Origin9(-48, 80, 0);                                                //
+                                                                                        //
+    const btVector3 boxDimensions10(btScalar(31), btScalar(0.5), btScalar(17));         //
+    const btVector3 Origin10(48, 80, 0);                                                //
+                                                                                        //
+    const btVector3 boxDimensions11(btScalar(31), btScalar(0.5), btScalar(17));         //
+    const btVector3 Origin11(-48, 46, 0);                                               //
+                                                                                        //
+    const btVector3 boxDimensions12(btScalar(31), btScalar(0.5), btScalar(17));         //
+    const btVector3 Origin12(48, 46, 0);                                                //
+                                                                                        //
+    //create boxes                                                                      //
+    btRigidBody * const pBoxRigidBody1 = createBoxRigidBody(boxDimensions1, Origin1);   //
+    btRigidBody * const pBoxRigidBody2 = createBoxRigidBody(boxDimensions2, Origin2);   //
+    btRigidBody * const pBoxRigidBody3 = createBoxRigidBody(boxDimensions3, Origin3);   //
+    btRigidBody * const pBoxRigidBody4 = createBoxRigidBody(boxDimensions4, Origin4);   //
+    btRigidBody * const pBoxRigidBody5 = createBoxRigidBody(boxDimensions5, Origin5);   //
+    btRigidBody * const pBoxRigidBody6 = createBoxRigidBody(boxDimensions6, Origin6);   //
+    btRigidBody * const pBoxRigidBody7 = createBoxRigidBody(boxDimensions7, Origin7);   //
+    btRigidBody * const pBoxRigidBody8 = createBoxRigidBody(boxDimensions8, Origin8);   //
+    btRigidBody * const pBoxRigidBody9 = createBoxRigidBody(boxDimensions9, Origin9);   //
+    btRigidBody * const pBoxRigidBody10 = createBoxRigidBody(boxDimensions10, Origin10);//
+    btRigidBody * const pBoxRigidBody11 = createBoxRigidBody(boxDimensions11, Origin11);//
+    btRigidBody * const pBoxRigidBody12 = createBoxRigidBody(boxDimensions12, Origin12);//
+                                                                                        //
+    // add boxes to world                                                               //
+    // why does duct disappear when simulation is reset???                              //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody1);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody2);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody3);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody4);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody5);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody6);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody7);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody8);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody9);                                     //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody10);                                    //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody11);                                    //
+    m_pDynamicsWorld->addRigidBody(pBoxRigidBody12);                                    //
+                                                                                        //
+    //////////////////////////////////////////////////////////////////////////////////////
 
     
-    //create boxes
-    //btRigidBody * const pBoxRigidBody1 = createBoxRigidBody(boxDimensions1, Origin1);
-    btRigidBody * const pBoxRigidBody2 = createBoxRigidBody(boxDimensions2, Origin2);
-    btRigidBody * const pBoxRigidBody3 = createBoxRigidBody(boxDimensions3, Origin3);
-    btRigidBody * const pBoxRigidBody4 = createBoxRigidBody(boxDimensions4, Origin4);
-    btRigidBody * const pBoxRigidBody5 = createBoxRigidBody(boxDimensions5, Origin5);
-    btRigidBody * const pBoxRigidBody6 = createBoxRigidBody(boxDimensions6, Origin6);
-    btRigidBody * const pBoxRigidBody7 = createBoxRigidBody(boxDimensions7, Origin7);
-    btRigidBody * const pBoxRigidBody8 = createBoxRigidBody(boxDimensions8, Origin8);
-    
-    // add boxes to world
-    // why does duct disappear when simulation is reset???
-    //m_pDynamicsWorld->addRigidBody(pBoxRigidBody1);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody2);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody3);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody4);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody5);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody6);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody7);
-    m_pDynamicsWorld->addRigidBody(pBoxRigidBody8);
-    
-    
-    
-    // test
-    
-    btRigidBody * const InvisibleBox = createInvisibleBox(boxDimensions1, Origin1);
-    m_pDynamicsWorld->addRigidBody(InvisibleBox);
-    
-    // invisible sphere test
-//    btBoxShape* const pBoxTemp = new btBoxShape(boxDimensions1);
-//    btGhostObject* ghostObject = new btGhostObject();
-//    ghostObject->setCollisionShape(pBoxTemp);
-//    ghostObject->setWorldTransform(btTransform(btQuaternion(0,0,0,1),btVector3(0,15,0)));
-//    m_pDynamicsWorld->addCollisionObject(ghostObject);
-    
-    
-//    // add sphere for fun
-//    btRigidBody * const pSphereRigidBody = createSphereRigidBody();
-//    m_pDynamicsWorld->addRigidBody(pSphereRigidBody);
-
 
   // Postcondition
   assert(invariant());
@@ -271,64 +420,6 @@ btRigidBody* tgWorldBulletPhysicsImpl::createBoxRigidBody(btVector3 boxDimension
     
     return pBoxRigidBody;
 }
-
-btRigidBody* tgWorldBulletPhysicsImpl::createInvisibleBox(const btVector3 boxDimensions, const btVector3 Origin) {
-	
-	// Set the initial position of the object
-	btTransform Transform;
-	Transform.setIdentity();
-	Transform.setOrigin(Origin);
-    
-	btDefaultMotionState *MotionState = new btDefaultMotionState(Transform);
-    
-	// Create the shape
-	//btVector3 HalfExtents(TScale.X * 0.5f, TScale.Y * 0.5f, TScale.Z * 0.5f);
-	btCollisionShape *Shape = new btBoxShape(boxDimensions);
-    
-	// Add mass
-	btVector3 LocalInertia;
-	Shape->calculateLocalInertia(0.0f, LocalInertia);
-    
-	// Create the rigid body object
-	btRigidBody *RigidBody = new btRigidBody(0.0f, MotionState, Shape, LocalInertia);
-    
-	// Store a pointer to the irrlicht node so we can update it later
-	RigidBody->setUserPointer(NULL);
-    
-    //m_collisionShapes.push_back(RigidBody);
-    
-    return RigidBody;
-}
-
-
-// add random sphere for fun
-//btRigidBody* tgWorldBulletPhysicsImpl::createSphereRigidBody()
-//{
-//    const btScalar mass = 0.0;
-//    
-//    btTransform sphereTransform;
-//    sphereTransform.setIdentity();
-//    sphereTransform.setOrigin(btVector3(0,10,0));
-//    
-//    // Using motionstate is recommended
-//    // It provides interpolation capabilities, and only synchronizes 'active' objects
-//    btDefaultMotionState* const pMotionState =
-//    new btDefaultMotionState(sphereTransform);
-//    
-//    btSphereShape* const pSphereShape = new btSphereShape(5);
-//    
-//    addCollisionShape(pSphereShape);
-//    
-//    const btVector3 localInertia(0, 0, 0);
-//    
-//    btRigidBody::btRigidBodyConstructionInfo const rbInfo(mass, pMotionState, pSphereShape, localInertia);
-//    
-//    btRigidBody* const pSphereRigidBody = new btRigidBody(rbInfo);
-//    
-//    return pSphereRigidBody;
-//}
-
-
 
 
 

@@ -96,8 +96,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
      */
     btRigidBody* createGroundRigidBody();
     btRigidBody* createBoxRigidBody(btVector3 boxDimensions, btVector3 Origin);
-    btRigidBody* createInvisibleBox(btVector3 boxDimensions, btVector3 Origin);
-//    btRigidBody* createSphereRigidBody();
+
     
     
     /** Integrity predicate. */
