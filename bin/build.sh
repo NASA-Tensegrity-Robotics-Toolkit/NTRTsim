@@ -67,11 +67,12 @@ function usage
     echo "  -l       Run 'make clean' before make/make install on libraries"
     echo "  -s       Don't automatically build the libraries"
     echo "  -w       Show compiler warnings when building"
+    echo "  -t       Build test/ rather than src/" 
 }
 
 function cmake_cross_platform()
 {
-    "$ENV_BIN_DIR/cmake" $SRC_DIR \
+    "$ENV_BIN_DIR/cmake" $build_src 
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
@@ -86,12 +87,8 @@ function cmake_cross_platform()
         || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 }
 
-# Make sure the build directory exists
-create_directory_if_noexist $BUILD_DIR
-if [ ! -d "$BUILD_DIR" ]; then
-    echo "Unable to create build directory '$BUILD_DIR' -- exiting."
-    exit 2
-fi
+build_target=$BUILD_DIR
+build_src=$SRC_DIR
 
 # Handle Arguments
 MAKE_CLEAN_FLAG=false
@@ -99,7 +96,7 @@ MAKE_CLEAN_LIB_FLAG=false
 MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
 
-while getopts ":hclsw" opt; do
+while getopts ":hclswt" opt; do
     case $opt in
         h)
             usage;
@@ -117,6 +114,10 @@ while getopts ":hclsw" opt; do
         w)
             CMAKE_COMPILER_WARNINGS_FLAG=true
             ;;
+        t)
+            build_target=$BUILD_TEST_DIR 
+            build_src=$TEST_DIR
+            ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
             exit 1
@@ -128,12 +129,21 @@ while getopts ":hclsw" opt; do
     esac
 done
 
+
+# Make sure the build directory exists
+create_directory_if_noexist $build_target
+if [ ! -d "$build_target" ]; then
+    echo "Unable to create build directory '$build_target' -- exiting."
+    exit 2
+fi
+
+
 TO_BUILD=${@:$OPTIND:1}
 
 if [ "$TO_BUILD" != "" ]; then
     echo "Building src/$TO_BUILD => build/$TO_BUILD";
 else
-    echo "Building src/ => build/";
+    echo "Building src/ => $build_target";
     if $MAKE_CLEAN_FLAG; then
         MAKE_LIB_FLAG=true  # have to make the libs if we're doing a full clean
         MAKE_CLEAN_LIB_FLAG=true
@@ -157,7 +167,7 @@ fi
 ### COMPILING STEP
 
 # CMake everything (@todo: can we just have it cmake certain things?)
-pushd "$BUILD_DIR" > /dev/null
+pushd "$build_target" > /dev/null
 
 # Uncomment this to create standard unix makefiles
 build_type="Unix Makefiles"
@@ -176,9 +186,9 @@ popd > /dev/null # exit build dir (done with cmake)
 
 # Make / install
 if [ "$TO_BUILD" != "" ]; then
-    pushd "$BUILD_DIR/$TO_BUILD" > /dev/null
+    pushd "$build_target/$TO_BUILD" > /dev/null
 else
-    pushd "$BUILD_DIR" > /dev/null
+    pushd "$build_target" > /dev/null
 fi    
 
 # Make clean if requested
