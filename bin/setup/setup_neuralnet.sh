@@ -57,7 +57,7 @@ source_conf "neuralnet.conf"
 # Variables
 neuralnet_pkg=`echo $NEURALNET_URL|awk -F/ '{print $NF}'`  # get the package name from the url
 
-# Check to see if jsoncpp has been built already
+# Check to see if neuralnet has been built already
 function check_neuralnet_built()
 {
     # Check for a library that's created when neuralnet is built   
@@ -99,7 +99,7 @@ function unpack_neuralnet()
     # Unzip
     pushd "$NEURALNET_BUILD_DIR" > /dev/null
     unzip "$DOWNLOADS_DIR/$neuralnet_pkg" || { echo "- ERROR: Failed to unpack NeuralNet"; exit 1; }
-    mv json*/* .
+    #mv */* . - todo, investigate cleaner build with this
     popd > /dev/null
 }
 

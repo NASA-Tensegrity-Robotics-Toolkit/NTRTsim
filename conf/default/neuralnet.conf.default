@@ -20,7 +20,7 @@
 # Date:    2014-08-27
 # Usage:   Copy/rename this file to '../jsoncpp.conf' and run setup.sh
 
-# Neural NEt installation prefix
+# Neural Net installation prefix
 
 # Global install: /usr/local, env install: "$ENV_DIR"
 # By default, setup will download and install Anguelov's neural net library under your env directory.
@@ -28,14 +28,15 @@
 # NEURALNET_INSTALL_PREFIX to what was used for installation (likely /usr/local).
 NEURALNET_INSTALL_PREFIX="$ENV_DIR"
 
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+NEURALNET_PACKAGE_DIR="$ENV_DIR/neuralNet"
+
 # Location where Anguelov's neural net library is to be built if necessary, or where it was built if 
 # you're using an existing package. This doesn't need to be set unless Anguelov's neural net library is
 # not already installed. 
-NEURALNET_BUILD_DIR="$ENV_DIR/build/nnImplementationV2"
-
-# This is the location where you unzipped the package (or, where it will
-# be unzipped if necessary). 
-NEURALNET_PACKAGE_DIR="$NEURALNET_BUILD_DIR"
+# This library has subfolders in its zip, so if you're unpacking, the subfolder will be set for you
+NEURALNET_BUILD_DIR="$NEURALNET_PACKAGE_DIR/nnImplementationV2/Neural Network v2"
 
 # NEURALNET_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
