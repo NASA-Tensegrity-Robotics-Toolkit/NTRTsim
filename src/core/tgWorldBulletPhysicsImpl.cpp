@@ -98,6 +98,8 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 
 tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 {
+    removeConstraints();
+
     // Delete all the collision objects. The dynamics world must exist.
     // Delete in reverse order of creation.
     removeConstraints();
@@ -155,6 +157,21 @@ void tgWorldBulletPhysicsImpl::removeConstraints()
     assert(m_pDynamicsWorld->getNumConstraints() == 0);
 }
 
+void tgWorldBulletPhysicsImpl::removeConstraints()
+{
+    const size_t nc = m_pDynamicsWorld->getNumConstraints();
+    for (int i = nc - 1; i >= 0; --i)
+    {
+      btTypedConstraint * const pTypedConstraint = m_pDynamicsWorld->getConstraint(i);
+
+      // Remove the constraint from the dynamics world
+      m_pDynamicsWorld->removeConstraint(pTypedConstraint);
+    }
+    // All constraints have been removed and deleted
+    assert(m_pDynamicsWorld->getNumConstraints() == 0);
+}
+
+
 /**
  * Create and return a new instance of a btSoftRigidDynamicsWorld.
  * @return a pointer to a new instance of a btSoftRigidDynamicsWorld
@@ -203,6 +220,20 @@ void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
       {
             m_constraints.push_back(pConstraint);
             m_pDynamicsWorld->addConstraint(pConstraint);
+      }
+
+      // Postcondition
+      assert(invariant());
+}
+
+void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
+{
+      assert(invariant());
+
+      if (pConstraint)
+      {
+        m_constraints.push_back(pConstraint);
+        m_pDynamicsWorld->addConstraint(pConstraint);
       }
 
       // Postcondition
