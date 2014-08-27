@@ -1,0 +1,257 @@
+diff -rpuN nnImplementationV2/Neural Network v2/CMakeLists.txt neuralNet/nnImplementationV2/Neural Network v2/CMakeLists.txt
+--- nnImplementationV2/Neural Network v2/CMakeLists.txt	1969-12-31 19:00:00.000000000 -0500
++++ neuralNet/nnImplementationV2/Neural Network v2/CMakeLists.txt	2014-08-27 16:15:39.984826790 -0400
+@@ -0,0 +1,19 @@
++CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
++project(neuralNetwork)
++
++ADD_LIBRARY( ${PROJECT_NAME}
++dataReader.cpp
++neuralNetwork.cpp
++neuralNetworkTrainer.cpp
++)
++
++target_link_libraries(${PROJECT_NAME})
++
++# Install instructions for this target
++INSTALL( TARGETS neuralNetwork
++         RUNTIME DESTINATION bin
++         LIBRARY DESTINATION lib
++         ARCHIVE DESTINATION lib
++)
++INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
++DESTINATION ${CMAKE_INSTALL_PREFIX}/include/neuralNet FILES_MATCHING PATTERN "*.h" PATTERN ".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
+diff -rpuN nnImplementationV2/Neural Network v2/dataReader.cpp neuralNet/nnImplementationV2/Neural Network v2/dataReader.cpp
+--- nnImplementationV2/Neural Network v2/dataReader.cpp	2011-09-25 23:06:24.000000000 -0400
++++ neuralNet/nnImplementationV2/Neural Network v2/dataReader.cpp	2014-08-27 15:33:21.488841390 -0400
+@@ -6,6 +6,8 @@
+ #include <string>
+ #include <math.h>
+ #include <algorithm>
++#include <string>
++#include <cstring>
+ 
+ using namespace std;
+ 
+Binary files nnImplementationV2/Neural Network v2/libneuralNetwork.a and neuralNet/nnImplementationV2/Neural Network v2/libneuralNetwork.a differ
+diff -rpuN nnImplementationV2/Neural Network v2/neuralNetwork.cpp neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.cpp
+--- nnImplementationV2/Neural Network v2/neuralNetwork.cpp	2011-09-25 23:04:40.000000000 -0400
++++ neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.cpp	2014-08-27 16:03:10.356831102 -0400
+@@ -3,6 +3,7 @@
+ #include <vector>
+ #include <fstream>
+ #include <math.h>
++#include <cstring>
+ 
+ //include definition file
+ #include "neuralNetwork.h"
+@@ -12,11 +13,19 @@ using namespace std;
+ /*******************************************************************
+ * Constructor
+ ********************************************************************/
+-neuralNetwork::neuralNetwork(int nI, int nH, int nO) : nInput(nI), nHidden(nH), nOutput(nO)
+-{				
++neuralNetwork::neuralNetwork(int nI, int nH, int nO) :
++  nInput(nI), nHidden(nH), nOutput(nO),
++  inputNeurons(new double[nInput + 1]),
++  hiddenNeurons(new double[nHidden + 1]),
++  outputNeurons(new double[nOutput]),
++  wInputHidden(new double*[nInput + 1]),
++  wHiddenOutput(new double*[nHidden + 1])
++{
++	cout<<"create NN with "<<nI<<" "<<nH<<" "<<nO<<endl;
++
+ 	//create neuron lists
+-	//--------------------------------------------------------------------------------------------------------
+-	inputNeurons = new( double[nInput + 1] );
++	//----------------------------------------------------------------------
++	
+ 	for ( int i=0; i < nInput; i++ ) inputNeurons[i] = 0;
+ 
+ 	//create input bias neuron
+@@ -32,23 +41,23 @@ neuralNetwork::neuralNetwork(int nI, int
+ 	for ( int i=0; i < nOutput; i++ ) outputNeurons[i] = 0;
+ 
+ 	//create weight lists (include bias neuron weights)
+-	//--------------------------------------------------------------------------------------------------------
+-	wInputHidden = new( double*[nInput + 1] );
++	//----------------------------------------------------------------------
++	
+ 	for ( int i=0; i <= nInput; i++ ) 
+ 	{
+-		wInputHidden[i] = new (double[nHidden]);
++		wInputHidden[i] = new double[nHidden];
+ 		for ( int j=0; j < nHidden; j++ ) wInputHidden[i][j] = 0;		
+ 	}
+ 
+ 	wHiddenOutput = new( double*[nHidden + 1] );
+ 	for ( int i=0; i <= nHidden; i++ ) 
+ 	{
+-		wHiddenOutput[i] = new (double[nOutput]);			
++		wHiddenOutput[i] = new double[nOutput];			
+ 		for ( int j=0; j < nOutput; j++ ) wHiddenOutput[i][j] = 0;		
+ 	}	
+ 	
+ 	//initialize weights
+-	//--------------------------------------------------------------------------------------------------------
++	//----------------------------------------------------------------------
+ 	initializeWeights();			
+ }
+ 
+@@ -72,7 +81,7 @@ neuralNetwork::~neuralNetwork()
+ /*******************************************************************
+ * Load Neuron Weights
+ ********************************************************************/
+-bool neuralNetwork::loadWeights(char* filename)
++bool neuralNetwork::loadWeights(const char* filename)
+ {
+ 	//open file for reading
+ 	fstream inputFile;
+@@ -163,7 +172,7 @@ bool neuralNetwork::loadWeights(char* fi
+ /*******************************************************************
+ * Save Neuron Weights
+ ********************************************************************/
+-bool neuralNetwork::saveWeights(char* filename)
++bool neuralNetwork::saveWeights(const char* filename)
+ {
+ 	//open file for reading
+ 	fstream outputFile;
+@@ -208,15 +217,16 @@ bool neuralNetwork::saveWeights(char* fi
+ /*******************************************************************
+ * Feed pattern through network and return results
+ ********************************************************************/
+-int* neuralNetwork::feedForwardPattern(double *pattern)
++double* neuralNetwork::feedForwardPattern(double *pattern)
+ {
+ 	feedForward(pattern);
++	return outputNeurons;
+ 
+ 	//create copy of output results
+-	int* results = new int[nOutput];
+-	for (int i=0; i < nOutput; i++ ) results[i] = clampOutput(outputNeurons[i]);
+-
+-	return results;
++//	int* results = new int[nOutput];
++//	for (int i=0; i < nOutput; i++ ) results[i] = clampOutput(outputNeurons[i]);
++//
++//	return results;
+ }
+ /*******************************************************************
+ * Return the NN accuracy on the set
+@@ -290,7 +300,8 @@ void neuralNetwork::initializeWeights()
+ 		for(int j = 0; j < nHidden; j++) 
+ 		{
+ 			//set weights to random values
+-			wInputHidden[i][j] = ( ( (double)(rand()%100)+1)/100  * 2 * rH ) - rH;			
++			wInputHidden[i][j] = ( ( (double)(rand()%100)+1)/100  * 2 * rH ) - rH;
++			cout<<"weight set: "<<wInputHidden[i][j]<<endl;
+ 		}
+ 	}
+ 	
+@@ -359,4 +370,69 @@ void neuralNetwork::feedForward(double*
+ 	}
+ }
+ 
++/*******************************************************************
++* Copy Weights from another NN
++********************************************************************/
++void neuralNetwork::copyWeightFrom(neuralNetwork * nn)
++{
++	//delete weight storage
++	for (int i=0; i <= nInput; i++) delete[] wInputHidden[i];
++	delete[] wInputHidden;
++
++	for (int j=0; j <= nHidden; j++) delete[] wHiddenOutput[j];
++	delete[] wHiddenOutput;
++
++	//copy numbers
++	this->nInput=nn->nInput;
++	this->nHidden=nn->nHidden;
++	this->nOutput=nn->nOutput;
++
++	//reallocate and copy weights
++	wInputHidden = new double*[nInput + 1];
++	for ( int i=0; i <= nInput; i++ )
++	{
++		wInputHidden[i] = new double[nHidden];
++		for ( int j=0; j < nHidden; j++ ) wInputHidden[i][j] = nn->wInputHidden[i][j];
++	}
++
++	wHiddenOutput = new double*[nHidden + 1];
++	for ( int i=0; i <= nHidden; i++ )
++	{
++		wHiddenOutput[i] = new double[nOutput];
++		for ( int j=0; j < nOutput; j++ ) wHiddenOutput[i][j] = nn->wHiddenOutput[i][j];
++	}
++}
++
++void neuralNetwork::mutate(std::tr1::ranlux64_base_01 *eng)
++{
++	std::tr1::uniform_real<double> unif(0, 1);
++	for ( int i=0; i <= nInput; i++ )
++	{
++		for ( int j=0; j < nHidden; j++ )
++		{
++			if(unif(*eng)  > 0.5)
++				continue;
++			double range=10.0; //range of the variable
++			double dev = 10.0 * range / 100.0;  //10% of the range
++			std::tr1::normal_distribution<double> normal(0, dev);
++			double mutAmount = normal(*eng);
++			cout<<"mutated weight from: "<<wInputHidden[i][j]<<" with"<<mutAmount<<endl;
++			wInputHidden[i][j]+=mutAmount;
++		}
++	}
+ 
++	for ( int i=0; i <= nHidden; i++ )
++	{
++		for ( int j=0; j < nOutput; j++ )
++		{
++			if(unif(*eng)  > 0.5)
++				continue;
++			double range=10.0; //range of the variable
++			double dev = 10.0 * range / 100.0;  //10% of the range
++			std::tr1::normal_distribution<double> normal(0, dev);
++			double mutAmount = normal(*eng);
++			cout<<"mutated weight from: "<<wHiddenOutput[i][j]<<" with "<<mutAmount<<endl;
++			wHiddenOutput[i][j] = mutAmount;
++		}
++	}
++}
+diff -rpuN nnImplementationV2/Neural Network v2/neuralNetwork.h neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h
+--- nnImplementationV2/Neural Network v2/neuralNetwork.h	2008-06-21 16:25:28.000000000 -0400
++++ neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h	2014-08-27 16:03:08.656831111 -0400
+@@ -9,6 +9,7 @@
+ #define NNetwork
+ 
+ #include "dataReader.h"
++#include <tr1/random>
+ 
+ class neuralNetworkTrainer;
+ 
+@@ -32,7 +33,7 @@ private:
+ 		
+ 	//Friends
+ 	//--------------------------------------------------------------------------------------------
+-	friend neuralNetworkTrainer;
++	friend class neuralNetworkTrainer;
+ 	
+ 	//public methods
+ 	//--------------------------------------------------------------------------------------------
+@@ -44,11 +45,13 @@ public:
+ 	~neuralNetwork();
+ 
+ 	//weight operations
+-	bool loadWeights(char* inputFilename);
+-	bool saveWeights(char* outputFilename);
+-	int* feedForwardPattern( double* pattern );
++	bool loadWeights(const char* inputFilename);
++	bool saveWeights(const char* outputFilename);
++	double* feedForwardPattern( double* pattern );
+ 	double getSetAccuracy( std::vector<dataEntry*>& set );
+ 	double getSetMSE( std::vector<dataEntry*>& set );
++	void copyWeightFrom(neuralNetwork * nn);
++	void mutate(std::tr1::ranlux64_base_01 *eng);
+ 
+ 	//private methods
+ 	//--------------------------------------------------------------------------------------------

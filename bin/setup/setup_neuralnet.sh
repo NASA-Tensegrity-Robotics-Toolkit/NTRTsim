@@ -103,6 +103,17 @@ function unpack_neuralnet()
     popd > /dev/null
 }
 
+# Patch the neural network to include Atil's mods
+function patch_neuralnet()
+{
+    pushd "$NEURALNET_BUILD_DIR" > /dev/null
+	
+    # Patch them
+    patch -p3 < "$SETUP_DIR/patches/neuralNet/nnPatch.diff" || { echo "- ERROR: Failed to patch NeuralNet"; exit 1; }
+
+    popd > /dev/null
+}
+
 # Build the package under the build directory specified in in install.conf
 function build_neuralnet()
 {
@@ -198,6 +209,7 @@ function main()
     if check_file_exists "$DOWNLOADS_DIR/$neuralnet_pkg"; then
         echo "- NeuralNet package already exists under env/downloads -- skipping download."
         unpack_neuralnet
+        patch_neuralnet
         build_neuralnet
         install_neuralnet
         env_link_neuralnet
@@ -207,6 +219,7 @@ function main()
     # If we haven't returned by now, we have to do everything
     download_neuralnet
     unpack_neuralnet
+    patch_neuralnet
     build_neuralnet
     install_neuralnet
     env_link_neuralnet
