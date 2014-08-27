@@ -50,7 +50,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf" "gmocktest.conf") 
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf" "gmocktest.conf" "neuralnet.conf") 
 
 function banner() 
 {

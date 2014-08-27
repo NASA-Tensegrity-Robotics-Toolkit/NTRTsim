@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+# 
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Define configuration directives for setup_neuralnet.sh. 
+# Date:    2014-08-27
+# Usage:   Copy/rename this file to '../jsoncpp.conf' and run setup.sh
+
+# Neural NEt installation prefix
+
+# Global install: /usr/local, env install: "$ENV_DIR"
+# By default, setup will download and install Anguelov's neural net library under your env directory.
+# If you have an existing install, you should change 
+# NEURALNET_INSTALL_PREFIX to what was used for installation (likely /usr/local).
+NEURALNET_INSTALL_PREFIX="$ENV_DIR"
+
+# Location where Anguelov's neural net library is to be built if necessary, or where it was built if 
+# you're using an existing package. This doesn't need to be set unless Anguelov's neural net library is
+# not already installed. 
+NEURALNET_BUILD_DIR="$ENV_DIR/build/nnImplementationV2"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary). 
+NEURALNET_PACKAGE_DIR="$NEURALNET_BUILD_DIR"
+
+# NEURALNET_URL can be either a web address or a local file address,
+# e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
+NEURALNET_URL="http://dl.dropbox.com/u/18209754/Blog/nnImplementationV2.zip"
