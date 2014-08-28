@@ -79,13 +79,12 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			const btVector3		vr = vb - va;
 			const btScalar		dn = btDot(vr,c.m_cti.m_normal);
 			const btVector3		fv = vr - c.m_cti.m_normal*dn;
-			const btScalar		fc = psb->m_cfg.kDF*m_colObj1Wrap->getCollisionObject()->getFriction();
+			const btScalar		fc = psb->m_friction*m_colObj1Wrap->getCollisionObject()->getFriction();
 			c.m_node	=	&n;
 			c.m_c0		=	tgUtil::ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
 			c.m_c1		=	ra;
 			c.m_c2		=	ima*psb->m_sst.sdt;
 			c.m_c3		=	fv.length2()<(dn*fc*dn*fc)?0:1-fc;
-			c.m_c4		=	m_colObj1Wrap->getCollisionObject()->isStaticOrKinematicObject()?psb->m_cfg.kKHR:psb->m_cfg.kCHR;
 			psb->m_rcontacts.push_back(c);
 			if (m_rigidBody)
 				m_rigidBody->activate();

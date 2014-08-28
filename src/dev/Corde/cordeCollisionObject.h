@@ -104,7 +104,7 @@ public:
 		btVector3				m_c1;			// Relative anchor
 		btScalar				m_c2;			// ima*dt
 		btScalar				m_c3;			// Friction
-		btScalar				m_c4;			// Hardness
+		/// Removed Contact Hardness
 	};
 	/* SContact		*/ 
 	struct	SContact
