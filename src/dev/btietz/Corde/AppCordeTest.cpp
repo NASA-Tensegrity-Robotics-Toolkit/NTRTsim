@@ -33,6 +33,10 @@
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 #include "tgcreator/tgUtil.h"
+
+// Something to Collide With
+#include "NestedStructureTestModel.h"
+
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
@@ -73,13 +77,17 @@ int main(int argc, char** argv)
 
     // Third create the simulation
     tgSimulation simulation(view);
-
+	
+	    const int segments = 1;
+    NestedStructureTestModel* tenseModel = new NestedStructureTestModel(segments);
+	
 	    // Fourth create the models with their controllers and add the models to the
     // simulation
     tgCordeModel* const myModel = new tgCordeModel();
     
     // Add the model to the world
     simulation.addModel(myModel);
+    simulation.addModel(tenseModel);
     
     simulation.run();
 	

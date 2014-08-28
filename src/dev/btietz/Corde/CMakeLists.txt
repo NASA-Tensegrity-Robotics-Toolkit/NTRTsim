@@ -11,6 +11,7 @@ link_libraries(btietz
 
 
 add_executable(AppCordeTest
+    NestedStructureTestModel.cpp
     AppCordeTest.cpp
 )
 
