@@ -94,16 +94,17 @@ public:
 		const btCollisionObject*	m_colObj;		/* Rigid body			*/ 
 		btVector3		m_normal;	/* Outward normal		*/ 
 		btScalar		m_offset;	/* Offset from origin	*/ 
+		btScalar		m_dist; 	/* Interpenitration distance? */
 	};		
 	/* RContact		*/ 
 	struct	RContact
 	{
 		sCti		m_cti;			// Contact infos
 		CordePositionElement*	m_node;			// Owner node
-		btMatrix3x3				m_c0;			// Impulse matrix
-		btVector3				m_c1;			// Relative anchor
-		btScalar				m_c2;			// ima*dt
-		btScalar				m_c3;			// Friction
+		btMatrix3x3				m_c0;			// Impulse matrix (8/28/14 - unused)
+		btVector3				m_c1;			// Relative anchor (contact point)
+		btScalar				m_c2;			// Mass ratio
+		btScalar				m_c3;			// Friction (8/28/14 - unused)
 		/// Removed Contact Hardness
 	};
 	/* SContact		*/ 
@@ -130,8 +131,8 @@ public:
 	// Final part of step loop
 	void integrateMotion(btScalar dt);
 	
-	// Constrained motion - anchors etc
-	void solveConstraints() { }
+	// Constrained motion - anchors, apply contact forces (8/28 just rigid)
+	void solveConstraints();
 	
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	
@@ -198,6 +199,8 @@ private:
 	 * Update the collision bounds of the AABB
 	 */
 	void updateAABBBounds();
+	
+	void solveRContacts();
 	
 	/**
 	 * The solver that handles this softbody. 

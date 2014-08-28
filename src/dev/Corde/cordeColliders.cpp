@@ -63,7 +63,7 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 
 	/// @todo original bullet code checked if this was an anchor too, consider restoring
 	/// Check contact populates values of m_cti
-	if(	psb->checkContact(m_colObj1Wrap, n.pos, m, c.m_cti))
+	if(	psb->checkContact(m_colObj1Wrap, n.pos_new, m, c.m_cti))
 	{
 		const btScalar	ima = 1.0 / n.mass; // Already established mass is positive
 		const btScalar	imb = m_rigidBody? m_rigidBody->getInvMass() : 0.f;
@@ -73,18 +73,32 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			const btTransform&	wtr=m_rigidBody?m_rigidBody->getWorldTransform() : m_colObj1Wrap->getCollisionObject()->getWorldTransform();
 			static const btMatrix3x3	iwiStatic(0,0,0,0,0,0,0,0,0);
 			const btMatrix3x3&	iwi = m_rigidBody?m_rigidBody->getInvInertiaTensorWorld() : iwiStatic;
-			const btVector3		ra = n.pos - wtr.getOrigin();
+			const btVector3		ra = n.pos_new - wtr.getOrigin();
+			
+			///@todo compute and use friction information
 			const btVector3		va = m_rigidBody ? m_rigidBody->getVelocityInLocalPoint(ra) * psb->m_sst.sdt : btVector3(0,0,0);
-			const btVector3		vb = n.vel;	
+			const btVector3		vb = n.vel_new;	
 			const btVector3		vr = vb - va;
 			const btScalar		dn = btDot(vr,c.m_cti.m_normal);
 			const btVector3		fv = vr - c.m_cti.m_normal*dn;
 			const btScalar		fc = psb->m_friction*m_colObj1Wrap->getCollisionObject()->getFriction();
+			
 			c.m_node	=	&n;
 			c.m_c0		=	tgUtil::ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
 			c.m_c1		=	ra;
-			c.m_c2		=	ima*psb->m_sst.sdt;
+			
+			// No mass means immobile object, so softbody gets all the force
+			if (imb == 0)
+			{
+				c.m_c2	= 1.f;
+			}
+			else
+			{
+				c.m_c2 = (1.0 / imb) * ms;
+			}
+			
 			c.m_c3		=	fv.length2()<(dn*fc*dn*fc)?0:1-fc;
+			
 			psb->m_rcontacts.push_back(c);
 			if (m_rigidBody)
 				m_rigidBody->activate();

@@ -203,7 +203,7 @@ void CordeModel::applyForce(const btVector3& force, const std::size_t segN)
     }
     else
     {
-        m_massPoints[segN]->force += force;
+        m_massPoints[segN]->applyForce(force);
     }
 }
 
@@ -213,7 +213,7 @@ void CordeModel::applyUniformForce(const btVector3& force)
     
     for(std::size_t i = 0; i < n; i++)
     {
-        m_massPoints[i]->force += force;
+        m_massPoints[i]->applyForce(force);
     }
 }
 
@@ -223,7 +223,7 @@ void CordeModel::applyUniformAcc(const btVector3& acc)
     
     for(std::size_t i = 0; i < n; i++)
     {
-        m_massPoints[i]->force += m_massPoints[i]->mass * acc;
+        m_massPoints[i]->applyForce(m_massPoints[i]->mass * acc);
     }
 }
 
@@ -235,7 +235,7 @@ void CordeModel::applyVecTorque(const btVector3& tq, const std::size_t segN)
     }
     else
     {
-        m_centerlines[segN]->torques += tq;
+        m_centerlines[segN]->appTorques += tq;
     }
 }
 
@@ -251,6 +251,7 @@ void CordeModel::applyQuatTorque(const btQuaternion& qtq, const std::size_t segN
     }
 }
 
+#if (0)
 void CordeModel::step (btScalar dt)
 {
     if (dt <= 0.0)
@@ -290,6 +291,8 @@ void CordeModel::step (btScalar dt)
     
     assert(invariant());
 }
+#endif
+
 
 void CordeModel::computeConstants()
 {
@@ -362,6 +365,8 @@ void CordeModel::stepPrerequisites()
     {
         CordePositionElement* r_0 = m_massPoints[i];
         r_0->force.setZero();
+        r_0->pos_new = r_0->pos;
+        r_0->vel_new = r_0->vel;
     }
     
     n = m_centerlines.size();
@@ -370,6 +375,9 @@ void CordeModel::stepPrerequisites()
         CordeQuaternionElement* q_0 = m_centerlines[i];
         q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
         q_0->torques.setZero();
+        q_0->q_new = q_0->q;
+        q_0->qdot_new = q_0->qdot;
+        q_0->omega_new = q_0->omega;
     }
 }
 
@@ -698,6 +706,51 @@ void CordeModel::unconstrainedMotion(double dt)
 #endif 
         
         // Velocity update - semi-implicit Euler
+        p_0->vel_new += dt / p_0->mass * p_0->force;
+        // Position update, uses v(t + dt)
+        p_0->pos_new += dt * p_0->vel_new;
+    }
+    for (std::size_t i = 0; i < m_centerlines.size(); i++)
+    {   
+        CordeQuaternionElement* quat_0 = m_centerlines[i];        
+        const btVector3 omega = quat_0->omega;
+        // Since I is diagonal, we can use elementwise multiplication of vectors
+        quat_0->omega_new += quat_0->inverseInertia * (quat_0->torques - 
+            omega.cross(quat_0->computedInertia * omega)) * dt;
+        quat_0->updateQDotNew();
+        if (quat_0->q.dot(quat_0->qdot_new*dt + quat_0->q) < 0)
+        {
+            // This'll probably never happen. But if it does and the physics are otherwise mostly reasonable, see
+            // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
+            // for solution
+            throw std::runtime_error("Tripped quaternion condition.");
+        }
+        quat_0->q_new = (quat_0->qdot_new*dt + quat_0->q);
+        quat_0->q_new /= quat_0->q_new.length();
+        if (quat_0->q_new.length() <= 0.99999 || quat_0->q_new.length() >= 1.00001)
+        {
+            throw std::runtime_error("Tripped quaternion length condition.");
+        }
+    }
+}
+
+/// @todo consider combining with unconstrained motion via a flag
+void CordeModel::constrainMotion (double dt)
+{
+    for (std::size_t i = 0; i < m_massPoints.size(); i++)
+    {
+        CordePositionElement* p_0 = m_massPoints[i];
+        
+#if (1) 
+	   // Eliminate vibrations due to imprecision
+		for (std::size_t i = 0; i < 3; i++)
+		{
+			double a = DBL_EPSILON;
+			p_0->force[i] = std::abs(p_0->force[i]) < FLT_EPSILON ? 0.0 : p_0->force[i];
+		}
+#endif 
+        
+        // Velocity update - semi-implicit Euler
         p_0->vel += dt / p_0->mass * p_0->force;
         // Position update, uses v(t + dt)
         p_0->pos += dt * p_0->vel;
@@ -719,26 +772,11 @@ void CordeModel::unconstrainedMotion(double dt)
         }
         quat_0->q = (quat_0->qdot*dt + quat_0->q);
         quat_0->q /= quat_0->q.length();
-        if (quat_0->q.length() <= 0.99999 || quat_0->q.length() >= 1.00001)
+        if (quat_0->q_new.length() <= 0.99999 || quat_0->q_new.length() >= 1.00001)
         {
             throw std::runtime_error("Tripped quaternion length condition.");
         }
     }
-}
-
-void CordeModel::constrainMotion (double dt)
-{
-#if (0)	
-	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
-	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
-
-	m_centerlines[18]->q = btQuaternion( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-	m_centerlines[18]->qdot = btQuaternion( 0.0, 0.0, 0.0, 0.0);
-	m_centerlines[18]->omega = btVector3(0.0, 0.0, 0.0);
-
-	m_massPoints[19]->pos = btVector3(10.0, 10.0, 0.0);
-	m_massPoints[19]->vel = btVector3(0.0, 0.0, 0.0);
-#endif
 }
 
 void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
@@ -785,6 +823,11 @@ CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
     }
 }
 
+void CordeModel::CordePositionElement::applyForce(const btVector3& f)
+{	
+	force += f;
+}
+
 CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1, btVector3 inertia) :
     q(q1.normalize()),
 	qdot(0.0, 0.0, 0.0, 0.0),
@@ -803,9 +846,11 @@ CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1, btVe
 
 void CordeModel::CordeQuaternionElement::transposeTorques()
 {
-	torques[0] += 1.0/2.0 * (q[2] * tprime[1] - q[1] * tprime[2] - q[0] * tprime[3] + q[3] * tprime[0]);
-    torques[1] += 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
-    torques[2] += 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
+	torques[0] = 1.0/2.0 * (q[2] * tprime[1] - q[1] * tprime[2] - q[0] * tprime[3] + q[3] * tprime[0]);
+    torques[1] = 1.0/2.0 * (q[0] * tprime[2] - q[2] * tprime[0] - q[1] * tprime[3] + q[3] * tprime[1]);
+    torques[2] = 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
+
+	torques += appTorques;
 #if (1) 
    // Eliminate vibrations due to imprecision
     for (std::size_t i = 0; i < 3; i++)
@@ -823,6 +868,15 @@ void CordeModel::CordeQuaternionElement::updateQDot()
     qdot[1] = 1.0/2.0 * (q[2] * omega[0] - q[0] * omega[2] + q[3] * omega[1]);
     qdot[2] = 1.0/2.0 * (q[0] * omega[1] - q[1] * omega[0] + q[3] * omega[2]);
     qdot[3] = 1.0/2.0 * (-1.0*q[0] * omega[0] - q[1] * omega[1] - q[2] * omega[2]);
+}
+
+// omega holds history.
+void CordeModel::CordeQuaternionElement::updateQDotNew()
+{
+    qdot_new[0] = 1.0/2.0 * (q[1] * omega_new[2] - q[2] * omega_new[1] + q[3] * omega_new[0]);
+    qdot_new[1] = 1.0/2.0 * (q[2] * omega_new[0] - q[0] * omega_new[2] + q[3] * omega_new[1]);
+    qdot_new[2] = 1.0/2.0 * (q[0] * omega_new[1] - q[1] * omega_new[0] + q[3] * omega_new[2]);
+    qdot_new[3] = 1.0/2.0 * (-1.0*q[0] * omega_new[0] - q[1] * omega_new[1] - q[2] * omega_new[2]);
 }
 
 /// Checks lengths of vectors. @todo add additional invariants

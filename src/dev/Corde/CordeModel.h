@@ -71,8 +71,12 @@ public:
 		 */
 		CordePositionElement(btVector3 p1, double m);
 		
+		void applyForce(const btVector3& f);
+		
 		btVector3 pos;
+		btVector3 pos_new;
 		btVector3 vel;
+		btVector3 vel_new;
 		btVector3 force;
 		double mass;
 	};
@@ -93,14 +97,21 @@ public:
 		 */
 		void updateQDot();
 		
+		void updateQDotNew();
+		
 		btQuaternion q;
 		btQuaternion qdot;
+		btQuaternion q_new;
+		btQuaternion qdot_new;
 		/**
 		 * Just a 4x1 vector, but easier to store this way.
 		 */
 		btQuaternion tprime;
+		// Hold these so we can overwrite torques between predict and constrained
+		btVector3 appTorques;
 		btVector3 torques;
 		btVector3 omega;
+		btVector3 omega_new;
 		
 		/**
 		 * Computed based on the values in config. Should have length 3
@@ -151,9 +162,10 @@ public:
     virtual void applyQuatTorque(const btQuaternion& qtq, const std::size_t segN);
     
     /// TODO: apply uniform torques?
-    
+
+#if (0) // Depricated -> no collision handling  
 	virtual void step (btScalar dt);
-	
+#endif	
 protected:
 	void computeConstants();
 	

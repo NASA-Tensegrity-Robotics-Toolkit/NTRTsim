@@ -99,7 +99,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	
 	/* Prepare				*/ 
 	m_sst.sdt		=	dt;
-	m_sst.isdt		=	1/m_sst.sdt;
+	m_sst.isdt		=	1.0 / m_sst.sdt;
 	m_sst.velmrg	=	m_sst.sdt*3; ///@todo investigate
 	m_sst.radmrg	=	getCollisionShape()->getMargin();
 	m_sst.updmrg	=	m_sst.radmrg*(btScalar)0.25;
@@ -113,12 +113,16 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	for(std::size_t i=0, ni= m_massPoints.size(); i<ni; ++i)
 	{
 		CordePositionElement&	n = *m_massPoints[i];
-		vol = btDbvtVolume::FromCR(n.pos, m_sst.radmrg);
+		vol = btDbvtVolume::FromCR(n.pos_new, m_sst.radmrg);
 		m_ndbvt.update(	m_leaves[i],
 			vol,
-			n.vel * m_sst.velmrg,
+			n.vel_new * m_sst.velmrg,
 			m_sst.updmrg);
 	}
+	
+	/* Clear Contacts */
+	m_rcontacts.resize(0);
+	m_scontacts.resize(0);
 	
 	/* Optimize dbvt's		*/ 
 	m_ndbvt.optimizeIncremental(1);
@@ -131,10 +135,17 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 	stepPrerequisites();
 }
 
+void cordeCollisionObject::solveConstraints()
+{
+	if (m_rcontacts.size() > 0)
+	{
+		std::cout << "Collisions!" << std::endl;
+	}
+	solveRContacts();
+}
+
 void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap) 
 { 
-	std::cout << "Handling rigid collision!" << std::endl;
-	
 	cordeColliders::CollideSDF_RS	docollide;		
 	btRigidBody*		prb1=(btRigidBody*) btRigidBody::upcast(pcoWrap->getCollisionObject());
 	btTransform	wtr = pcoWrap->getWorldTransform();
@@ -178,6 +189,7 @@ bool	cordeCollisionObject::checkContact(	const btCollisionObjectWrapper* colObjW
 			margin);
 	if(dst<0)
 	{
+		cti.m_dist 	 = -dst;
 		cti.m_colObj = colObjWrap->getCollisionObject();
 		cti.m_normal = wtr.getBasis()*nrm;
 		cti.m_offset = -btDot( cti.m_normal, x - cti.m_normal * dst );
@@ -210,5 +222,34 @@ void cordeCollisionObject::updateAABBBounds()
 	{
 		m_bounds[0]=
 			m_bounds[1]=btVector3(0,0,0);
+	}
+}
+
+void cordeCollisionObject::solveRContacts()
+{
+	const btScalar	idt = m_sst.isdt;
+	const btScalar	mrg = getCollisionShape()->getMargin();
+	for(int i = 0,ni = m_rcontacts.size(); i < ni; ++i)
+	{
+		const RContact&		c = m_rcontacts[i];
+		const sCti&			cti = c.m_cti;	 
+		
+		// Normal * mass ratio * penetration distance
+		btVector3 rSoft = cti.m_normal * c.m_c2 * cti.m_dist;
+		btVector3 rRigid =  cti.m_normal * (1.f - c.m_c2) * cti.m_dist;
+		
+		btVector3 fSoft = pow(idt, 2.0) * c.m_node->mass * rSoft;
+		c.m_node->applyForce(fSoft);
+		
+		btRigidBody* rBody = (btRigidBody*) btRigidBody::upcast(cti.m_colObj);
+		
+		btScalar rMass = rBody->getInvMass() > 0.0 ? 1.0 / rBody->getInvMass() : 0.0;
+		
+		btVector3 fRigid = pow(idt, 2.0) * rMass * rRigid;
+		
+		if (rBody)
+		{
+			rBody->applyForce(fRigid, c.m_c1);
+		}
 	}
 }
