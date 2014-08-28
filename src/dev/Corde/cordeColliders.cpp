@@ -37,6 +37,8 @@ subject to the following restrictions:
 
 #include "cordeCollisionObject.h"
 
+#include "tgcreator/tgUtil.h"
+
 #include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
@@ -59,8 +61,9 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 	const btScalar			m = n.mass > 0 ? dynmargin:stamargin;
 	cordeCollisionObject::RContact	c;
 
-	if(	(!n.m_battach)&&
-		psb->checkContact(m_colObj1Wrap, n.pos, m, c.m_cti))
+	/// @todo original bullet code checked if this was an anchor too, consider restoring
+	/// Check contact populates values of m_cti
+	if(	psb->checkContact(m_colObj1Wrap, n.pos, m, c.m_cti))
 	{
 		const btScalar	ima = 1.0 / n.mass; // Already established mass is positive
 		const btScalar	imb = m_rigidBody? m_rigidBody->getInvMass() : 0.f;
@@ -78,7 +81,7 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			const btVector3		fv = vr - c.m_cti.m_normal*dn;
 			const btScalar		fc = psb->m_cfg.kDF*m_colObj1Wrap->getCollisionObject()->getFriction();
 			c.m_node	=	&n;
-			c.m_c0		=	ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
+			c.m_c0		=	tgUtil::ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
 			c.m_c1		=	ra;
 			c.m_c2		=	ima*psb->m_sst.sdt;
 			c.m_c3		=	fv.length2()<(dn*fc*dn*fc)?0:1-fc;

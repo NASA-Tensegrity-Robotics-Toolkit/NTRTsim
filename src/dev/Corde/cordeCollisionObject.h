@@ -49,6 +49,7 @@ subject to the following restrictions:
 // Bullet Physics
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletCollision/BroadphaseCollision/btDbvt.h"
+#include "BulletSoftBody/btSparseSDF.h"
 
 // Bullet Linear Algebra
 #include "LinearMath/btScalar.h"
@@ -135,9 +136,12 @@ public:
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	
 	// Just adds contact points etc, still need to process collisions elsewhere
-	void defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap );
+	void defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap);
 	
-	
+	bool	checkContact(	const btCollisionObjectWrapper* colObjWrap,
+									 const btVector3& x,
+									 btScalar margin,
+									 cordeCollisionObject::sCti& cti);
 
 	//
 	// Set the solver that handles this soft body
@@ -205,10 +209,12 @@ private:
 	 */
 	btBroadphaseInterface* m_broadphase;
 	btDispatcher* m_dispatcher;
-	
+	/// If you store this elsewhere, checkContacts becomes const
+	btSparseSdf<3>			m_sparsesdf;
 	/**
 	 * Collision Data
 	 */
+	 /// @todo consider adding struct info about whether or not there is an anchor
 	SolverState					m_sst;			// Solver state
 	std::vector<btDbvtNode*> 	m_leaves;		// Leaves, should have length same as m_massPoints
 	btDbvt						m_ndbvt;		// Nodes tree

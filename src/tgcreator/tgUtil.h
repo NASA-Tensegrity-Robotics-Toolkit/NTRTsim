@@ -32,6 +32,7 @@
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btMatrix3x3.h"
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -310,6 +311,57 @@ public:
         const int m = static_cast<int>(pow(base, precision));
         return floor(d * m + 0.5)/m;
     }
+	
+	// Matrix math from btSoftBodyInternals.h
+	static inline btMatrix3x3	Add(const btMatrix3x3& a,
+									const btMatrix3x3& b)
+	{
+		btMatrix3x3	r;
+		for(int i=0;i<3;++i) r[i]=a[i]+b[i];
+		return(r);
+	}
+	//
+	static inline btMatrix3x3	Sub(const btMatrix3x3& a,
+								const btMatrix3x3& b)
+	{
+		btMatrix3x3	r;
+		for(int i=0;i<3;++i) r[i]=a[i]-b[i];
+		return(r);
+	}
+	//
+	static inline btMatrix3x3	Diagonal(btScalar x)
+	{
+		btMatrix3x3	m;
+		m[0]=btVector3(x,0,0);
+		m[1]=btVector3(0,x,0);
+		m[2]=btVector3(0,0,x);
+		return(m);
+	}
+	//
+	static inline btMatrix3x3	Cross(const btVector3& v)
+	{
+		btMatrix3x3	m;
+		m[0]=btVector3(0,-v.z(),+v.y());
+		m[1]=btVector3(+v.z(),0,-v.x());
+		m[2]=btVector3(-v.y(),+v.x(),0);
+		return(m);
+	}
+	//
+	static inline btMatrix3x3	MassMatrix(btScalar im,const btMatrix3x3& iwi,const btVector3& r)
+	{
+		const btMatrix3x3	cr=Cross(r);
+		return(Sub(Diagonal(im),cr*iwi*cr));
+	}
+		
+	//
+	static inline btMatrix3x3	ImpulseMatrix(	btScalar dt,
+											  btScalar ima,
+											  btScalar imb,
+											  const btMatrix3x3& iwi,
+											  const btVector3& r)
+	{
+		return(Diagonal(1/dt)*Add(Diagonal(ima),MassMatrix(imb,iwi,r)).inverse());
+	}
 
 };
 

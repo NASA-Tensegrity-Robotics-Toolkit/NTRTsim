@@ -53,6 +53,7 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 
 //The C++ Standard Library
 #include <iostream>
@@ -78,6 +79,9 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 		CordePositionElement&	n = *m_massPoints[i];
 		m_leaves.push_back( m_ndbvt.insert(btDbvtVolume::FromCR(n.pos, margin),&n) );
 	}
+	
+	/// In btSoftBody this was passsed in from outside and initialized in the world. Check for compatability
+	m_sparsesdf.Initialize();
 	
 	updateAABBBounds();
 	stepPrerequisites();
@@ -127,13 +131,13 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 	stepPrerequisites();
 }
 
-void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* collisionObjectWrap ) 
+void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap) 
 { 
 	std::cout << "Handling rigid collision!" << std::endl;
 	
 	cordeColliders::CollideSDF_RS	docollide;		
 	btRigidBody*		prb1=(btRigidBody*) btRigidBody::upcast(pcoWrap->getCollisionObject());
-	btTransform	wtr=pcoWrap->getWorldTransform();
+	btTransform	wtr = pcoWrap->getWorldTransform();
 
 	const btTransform	ctr=pcoWrap->getWorldTransform();
 	const btScalar		timemargin=(wtr.getOrigin()-ctr.getOrigin()).length();
@@ -153,6 +157,33 @@ void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrappe
 	docollide.dynmargin	=	basemargin+timemargin;
 	docollide.stamargin	=	basemargin;
 	m_ndbvt.collideTV(m_ndbvt.m_root,volume,docollide);
+}
+
+bool	cordeCollisionObject::checkContact(	const btCollisionObjectWrapper* colObjWrap,
+											 const btVector3& x,
+											 btScalar margin,
+											 cordeCollisionObject::sCti& cti)
+{
+	btVector3 nrm;
+	const btCollisionShape *shp = colObjWrap->getCollisionShape();
+
+	const btTransform &wtr = colObjWrap->getWorldTransform();
+	//todo: check which transform is needed here
+
+	btScalar dst = 
+		m_sparsesdf.Evaluate(	
+			wtr.invXform(x),
+			shp,
+			nrm,
+			margin);
+	if(dst<0)
+	{
+		cti.m_colObj = colObjWrap->getCollisionObject();
+		cti.m_normal = wtr.getBasis()*nrm;
+		cti.m_offset = -btDot( cti.m_normal, x - cti.m_normal * dst );
+		return(true);
+	}
+	return(false);
 }
 
 void cordeCollisionObject::updateAABBBounds()
