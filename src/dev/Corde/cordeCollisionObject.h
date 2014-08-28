@@ -219,6 +219,10 @@ private:
 	 */
 	 /// @todo consider adding struct info about whether or not there is an anchor
 	SolverState					m_sst;			// Solver state
+	
+	/**
+	 * @todo look at how this should be cleared out. Delete causes double free error
+	 */
 	std::vector<btDbvtNode*> 	m_leaves;		// Leaves, should have length same as m_massPoints
 	btDbvt						m_ndbvt;		// Nodes tree
 	btVector3					m_bounds[2];	// Spatial bounds

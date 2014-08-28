@@ -39,8 +39,8 @@ tgCordeModel::~tgCordeModel()
 void tgCordeModel::setup(tgWorld& world)
 {
 
-	btVector3 startPos(0.0, 10.0, 0.0);
-	btVector3 endPos  (10.0, 10.0, 0.0);
+	btVector3 startPos(0.0, 5.0, 0.0);
+	btVector3 endPos  (10.0, 5.0, 0.0);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
@@ -51,13 +51,13 @@ void tgCordeModel::setup(tgWorld& world)
 	
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 40;
-	const double radius = 0.01;
-	const double density = 1300;
+	const std::size_t resolution = 10;
+	const double radius = 0.1;
+	const double density = 13000;
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 10.0 * pow(10, 1);
+	const double springConst = 0.0 * pow(10, 1);
 	const double gammaT = 100.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
@@ -70,6 +70,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double stretchMod = 0.02 * pow(10, 6);
 	const double springConst = 0.1 * pow(10, 0);
 	const double gammaT = 1.0 * pow(10, -6); // Position Damping
+	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #endif
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
