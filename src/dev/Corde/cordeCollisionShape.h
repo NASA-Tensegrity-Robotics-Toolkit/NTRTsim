@@ -58,7 +58,10 @@ public:
 
 	cordeCollisionShape(cordeCollisionObject* objectShape);
 	
-	virtual ~cordeCollisionShape() { }
+	virtual ~cordeCollisionShape()
+	{ 
+		p_objectShape = NULL;
+	}
 	
 	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 	

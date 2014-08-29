@@ -181,6 +181,9 @@ CordeModel::~CordeModel()
     {
         delete m_centerlines[i];
     }
+    
+    m_massPoints.clear();
+    m_centerlines.clear();
 }
 
 btVector3& CordeModel::getPosition(const std::size_t i) const
@@ -316,8 +319,16 @@ void CordeModel::computeCenterlines()
 	for (std::size_t i = 0; i < n; i++)
 	{
 		std::vector<btVector3> directorAxes;
-				
-		double length = (linkLengths[i] + linkLengths[i+1]) / 2.0;
+		
+		double length;
+		if (i != n-1)
+		{		
+			length = (linkLengths[i] + linkLengths[i+1]) / 2.0;
+		}
+		else
+		{
+			length = (linkLengths[i-1] + linkLengths[i]) / 2.0;
+		}
 		
 		btVector3 zAxis(0.0, 0.0, 1.0);
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
@@ -375,6 +386,7 @@ void CordeModel::stepPrerequisites()
         CordeQuaternionElement* q_0 = m_centerlines[i];
         q_0->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
         q_0->torques.setZero();
+        q_0->appTorques.setZero();
         q_0->q_new = q_0->q;
         q_0->qdot_new = q_0->qdot;
         q_0->omega_new = q_0->omega;
@@ -812,7 +824,9 @@ void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
 
 CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
 	pos(p1),
+	pos_new(p1),
 	vel(0.0, 0.0, 0.0),
+	vel_new(0.0, 0.0, 0.0),
 	force(0.0, 0.0, 0.0),
 	mass(m)
 {
@@ -830,10 +844,14 @@ void CordeModel::CordePositionElement::applyForce(const btVector3& f)
 
 CordeModel::CordeQuaternionElement::CordeQuaternionElement(btQuaternion q1, btVector3 inertia) :
     q(q1.normalize()),
+    q_new(q),
 	qdot(0.0, 0.0, 0.0, 0.0),
+	qdot_new(qdot),
     tprime(0.0, 0.0, 0.0, 0.0),
 	torques(0.0, 0.0, 0.0),
 	omega(0.0, 0.0, 0.0),
+	omega_new(omega),
+	appTorques(0.0, 0.0, 0.0),
 	computedInertia(inertia),
 	inverseInertia(1.0/computedInertia[0],
                     1.0/computedInertia[1],

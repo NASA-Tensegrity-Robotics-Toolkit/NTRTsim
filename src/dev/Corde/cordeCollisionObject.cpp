@@ -91,7 +91,7 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 cordeCollisionObject::~cordeCollisionObject() 
 {
 	delete m_collisionShape;	
-
+	
 }
 
 void cordeCollisionObject::predictMotion(btScalar dt)
