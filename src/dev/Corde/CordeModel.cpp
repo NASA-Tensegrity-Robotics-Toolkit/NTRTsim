@@ -736,8 +736,12 @@ void CordeModel::unconstrainedMotion(double dt)
             // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
             // for solution
             throw std::runtime_error("Tripped quaternion condition.");
+            quat_0->q_new = (-quat_0->qdot_new*dt - quat_0->q);
         }
-        quat_0->q_new = (quat_0->qdot_new*dt + quat_0->q);
+        else
+        {
+			quat_0->q_new = (quat_0->qdot_new*dt + quat_0->q);
+		}
         quat_0->q_new /= quat_0->q_new.length();
         if (quat_0->q_new.length() <= 0.99999 || quat_0->q_new.length() >= 1.00001)
         {
@@ -781,10 +785,14 @@ void CordeModel::constrainMotion (double dt)
             // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
             // for solution
             throw std::runtime_error("Tripped quaternion condition.");
+			quat_0->q = (-quat_0->qdot*dt + -quat_0->q);
         }
-        quat_0->q = (quat_0->qdot*dt + quat_0->q);
+        else
+        {
+			quat_0->q = (quat_0->qdot*dt + quat_0->q);
+		}
         quat_0->q /= quat_0->q.length();
-        if (quat_0->q_new.length() <= 0.99999 || quat_0->q_new.length() >= 1.00001)
+        if (quat_0->q.length() <= 0.99999 || quat_0->q_new.length() >= 1.00001)
         {
             throw std::runtime_error("Tripped quaternion length condition.");
         }
