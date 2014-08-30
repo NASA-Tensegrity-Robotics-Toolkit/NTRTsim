@@ -22,7 +22,9 @@ BIN_DIR="${BASE_DIR}/bin"
 CONF_DIR="${BASE_DIR}/conf"
 ENV_DIR="${BASE_DIR}/env"
 SRC_DIR="${BASE_DIR}/src"
+TEST_DIR="${BASE_DIR}/test"
 BUILD_DIR="${BASE_DIR}/build"
+BUILD_TEST_DIR="${BASE_DIR}/build_test"
 
 SETUP_DIR="${BIN_DIR}/setup"
 
