@@ -8,5 +8,9 @@ include_directories("../src/")
 include_directories(../env/include/)
 link_directories(../env/lib/)
 
+SET(ENV_DIR ${PROJECT_SOURCE_DIR}/../env)
+SET(ENV_INC_DIR ${ENV_DIR}/include)
+SET(ENV_LIB_DIR ${ENV_DIR}/lib)
+
 subdirs(
  helpers)
