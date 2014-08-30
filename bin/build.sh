@@ -55,7 +55,7 @@ popd > /dev/null
 
 function usage
 {
-    echo "usage: $0 [-h] [-c] [-l] [-s] [-w] [build_path]"
+    echo "usage: $0 [-h] [-c] [-w] [build_path]"
     echo ""
     echo "positional arguments:"
     echo "  build_path            Path to build (relative to src, e.g. 'BasicApp' or"
@@ -64,8 +64,6 @@ function usage
     echo "optional arguments:"
     echo "  -h       Show this help message and exit"
     echo "  -c       Run 'make clean' before make/make install on non-library sources"
-    echo "  -l       Run 'make clean' before make/make install on libraries"
-    echo "  -s       Don't automatically build the libraries"
     echo "  -w       Show compiler warnings when building"
 }
 
@@ -95,11 +93,9 @@ fi
 
 # Handle Arguments
 MAKE_CLEAN_FLAG=false
-MAKE_CLEAN_LIB_FLAG=false
-MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
 
-while getopts ":hclsw" opt; do
+while getopts ":hcw" opt; do
     case $opt in
         h)
             usage;
@@ -107,12 +103,6 @@ while getopts ":hclsw" opt; do
             ;;
         c)
             MAKE_CLEAN_FLAG=true
-            ;;
-        l)
-            MAKE_CLEAN_LIB_FLAG=true
-            ;;
-        s)
-            MAKE_LIB_FLAG=false
             ;;
         w)
             CMAKE_COMPILER_WARNINGS_FLAG=true
@@ -134,10 +124,6 @@ if [ "$TO_BUILD" != "" ]; then
     echo "Building src/$TO_BUILD => build/$TO_BUILD";
 else
     echo "Building src/ => build/";
-    if $MAKE_CLEAN_FLAG; then
-        MAKE_LIB_FLAG=true  # have to make the libs if we're doing a full clean
-        MAKE_CLEAN_LIB_FLAG=true
-    fi
 fi
 
 if [ ! -d "$SRC_DIR/$TO_BUILD" ]; then
