@@ -1,4 +1,5 @@
 #include <iostream>
+#include "gtest/gtest.h"
 #include "helpers/FileHelpers.h"
 
 using namespace std;
