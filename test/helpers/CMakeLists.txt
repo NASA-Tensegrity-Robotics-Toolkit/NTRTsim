@@ -1,7 +1,8 @@
 configure_file(test_file.txt test_file.txt COPYONLY)
 
 add_library(FileHelpers SHARED
-	../../src/helpers/FileHelpers.cpp)
+	${SRC_DIR}/helpers/FileHelpers.cpp)
+
 add_executable(FileHelpers_test
     FileHelpers_test.cpp)
 
