@@ -83,20 +83,16 @@ function init_config()
         return
     fi
 
-    message="One or more package files do not exist. Would you like setup to create them now?"
-    options=("Y" "n")
-    default="Y"
-    result=$(read_options "$message" $options $default)
-    if [ "$result" == "Y" ]; then
-        for file_name in "${to_create[@]}"
-        do
-            echo "Creating conf/$file_name"
-            cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
-        done
-        echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
-    else
-        echo "Please create all necessary conf files before running set up. See conf/default/* for a list of the needed files, as well as a base configuration."
-    fi
+    echo "You are missing one or more required conf files. Setup will now generate them."
+    
+    for file_name in "${to_create[@]}"
+    do
+        echo "Creating conf/$file_name"
+        cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
+    done
+
+    echo "=== CONF FILES CREATED ==="
+    echo "**All missing configuration files have been created in conf/. Please edit as needed and then re-run setup.sh.**"
 
     exit 0
 }
