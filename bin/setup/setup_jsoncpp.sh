@@ -158,9 +158,9 @@ function env_link_jsoncpp()
     if str_contains "$JSONCPP_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$JSONCPP_BUILD_DIR" )
-        ln -s "$rel_path" jsoncpp
+        create_exist_symlink "$rel_path" jsoncpp
     else
-        ln -s "$JSONCPP_BUILD_DIR" jsoncpp  # this links directly to the most recent build...
+        create_exist_symlink "$JSONCPP_BUILD_DIR" jsoncpp  # this links directly to the most recent build...
     fi
 
     popd > /dev/null

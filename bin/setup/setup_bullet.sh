@@ -196,9 +196,9 @@ function env_link_bullet()
     if str_contains "$BULLET_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$BULLET_BUILD_DIR" )
-        ln -s "$rel_path" bullet
+        create_exist_symlink "$rel_path" bullet
     else
-        ln -s "$BULLET_BUILD_DIR" bullet  # this links directly to the most recent build...
+        create_exist_symlink "$BULLET_BUILD_DIR" bullet  # this links directly to the most recent build...
     fi
 
     popd > /dev/null
@@ -207,7 +207,7 @@ function env_link_bullet()
     pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "bullet" ]; then  # We may have built here, so only create a symlink if not
         rm bullet 2>/dev/null
-        ln -s "$BULLET_INSTALL_PREFIX/include/bullet" bullet
+        create_exist_symlink "$BULLET_INSTALL_PREFIX/include/bullet" bullet
     fi
     popd > /dev/null
 
