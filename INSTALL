@@ -32,6 +32,7 @@ anything.
 	- freeglut3-dev (glut for bullet graphics)
 	- cmake
 	- build-essential
+        - unzip
 
     Fedora/CentOS (you can use sudo yum install):
 	- gcc-c++ (the compiler for cmake)
