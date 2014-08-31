@@ -141,11 +141,11 @@ function install_gmocktest()
 
     pushd "$GMOCKTEST_BUILD_DIR" > /dev/null
 
-    ln -s $GMOCKTEST_BUILD_DIR/libgmock.a $LIB_DIR/
-    ln -s $GMOCKTEST_BUILD_DIR/libgmock_main.a $LIB_DIR/
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/libgmock.a $LIB_DIR/
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/libgmock_main.a $LIB_DIR/
 
-    ln -s $GMOCKTEST_BUILD_DIR/gtest/libgtest.a $LIB_DIR/
-    ln -s $GMOCKTEST_BUILD_DIR/gtest/libgtest_main.a $LIB_DIR/
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/gtest/libgtest.a $LIB_DIR/
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/gtest/libgtest_main.a $LIB_DIR/
 
    popd > /dev/null
 }
@@ -162,14 +162,14 @@ function env_link_gmocktest()
     if str_contains "$GMOCKTEST_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$GMOCKTEST_BUILD_DIR" )
-        ln -s "$rel_path" gmocktest
+        create_exist_symlink "$rel_path" gmocktest
     else
-        ln -s "$GMOCKTEST_BUILD_DIR" gmocktest  # this links directly to the most recent build...
+        create_exist_symlink "$GMOCKTEST_BUILD_DIR" gmocktest  # this links directly to the most recent build...
     fi
 
     # Symlink our header files in
-    ln -s $GMOCKTEST_BUILD_DIR/gtest/include/gtest $INCLUDE_DIR/gtest
-    ln -s $GMOCKTEST_BUILD_DIR/include/gmock $INCLUDE_DIR/gmock
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/gtest/include/gtest $INCLUDE_DIR/gtest
+    create_exist_symlink $GMOCKTEST_BUILD_DIR/include/gmock $INCLUDE_DIR/gmock
 
     popd > /dev/null
 
