@@ -209,6 +209,11 @@ function download_file()
 # If a symlink is invalid, we delete it and attempt to re-create it.
 # If symlink creation fails (after creating the symlink it points to
 # an invalid location) we exit with an error code of 1.
+#
+# NOTE: This function should only be used when you're making a direct
+# symlink to a *single* file. If you're attempting to create a symlink
+# using a wildcard in order to hit every file in a directory
+# (e.g. ln -s /usr/bin/* .) you should *NOT* use this function. It will fail.
 function create_exist_symlink()
 {
     link_target=$1
