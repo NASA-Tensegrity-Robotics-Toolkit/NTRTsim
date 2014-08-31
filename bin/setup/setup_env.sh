@@ -69,4 +69,4 @@ create_directory_if_noexist "$INCLUDE_DIR"
 create_directory_if_noexist "$LIB_DIR"
 popd > /dev/null
 
-ln -s `which g++` "${ENV_BIN_DIR}/g++"
+create_exist_symlink `which g++` "${ENV_BIN_DIR}/g++"
