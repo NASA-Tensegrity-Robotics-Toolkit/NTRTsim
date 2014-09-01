@@ -40,6 +40,9 @@ anything.
 	- curl
 	- freeglut
 	- freeglut-devel
+	- cmake
+	- build-essential
+	- unzip
 
     MAC OSX (please read the detailed instructions below for OSX 10.9 at the end of this file)
 	-gcc/g++ 4.5 (via Macports or Homebrew)
