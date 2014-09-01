@@ -24,6 +24,9 @@ More information can be found at:
 
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
 
+Documentation
+--------
+
 DOxygen documentation can be compiled in the source directory
 (run "doxygen Doxyfile" when in src).
 Under Ubuntu 14.04, installing doxygen and graphviz (required) can be
