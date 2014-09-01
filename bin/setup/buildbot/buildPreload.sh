@@ -17,7 +17,7 @@
 # governing permissions and limitations under the License.
 
 ENV_SRC_DIR="/home/bbadmin/env_BOOSTBULLET"
-BUILDBOT_BUILD_DIR="/home/bbadmin/buildbot/master/build/"
+BUILDBOT_BUILD_DIR="/home/bbadmin/buildbot/slave/master/build"
 
 if [ ! -d $ENV_SRC_DIR ]; then
     echo "Could not find environment source for Bullet and Boost. Searched at ${ENV_SRC_DIR}"
