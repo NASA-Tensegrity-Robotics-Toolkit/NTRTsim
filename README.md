@@ -37,5 +37,5 @@ Build Status
 
 NTRTsim's automated build system (BuildBot) can be found at:
 
-http://ntrt-bb.perryb.ca/
+http://ntrt-bb.perryb.ca/waterfall
 
