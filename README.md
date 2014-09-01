@@ -21,6 +21,7 @@ examples can be found in example folders NestedTetrahedrons, SUPERball,
 learningSpines or development folders: dev/tests and dev/btietz.
 
 More information can be found at:
+
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
 
 DOxygen documentation can be compiled in the source directory
@@ -34,5 +35,7 @@ http://www.magicalrobot.org/NTRT/Docs/NTRTv1.0.0-beta/html/index.html
 Build Status
 ---------
 
-BuildBot: http://ntrt-bb.perryb.ca/
+NTRTsim's automated build system (BuildBot) can be found at:
+
+http://ntrt-bb.perryb.ca/
 
