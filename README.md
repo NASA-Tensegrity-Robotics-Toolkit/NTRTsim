@@ -27,12 +27,14 @@ http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
 Documentation
 --------
 
-DOxygen documentation can be compiled in the source directory
-(run "doxygen Doxyfile" when in src).
-Under Ubuntu 14.04, installing doxygen and graphviz (required) can be
-done by running "sudo apt-get install doxygen graphviz".
-HTML-based documentation can then be found under src/DoxyDocs/index.html
+Doxygen documentation can be compiled in the source directory
+(run "doxygen Doxyfile" when in src). Under Ubuntu 14.04, installing 
+doxygen and graphviz (required) can be done by running "sudo apt-get 
+install doxygen graphviz". HTML-based documentation can then be found 
+under src/DoxyDocs/index.html.
+
 Pre-built documentation for our beta release can be found here:
+
 http://www.magicalrobot.org/NTRT/Docs/NTRTv1.0.0-beta/html/index.html
 
 Build Status
