@@ -39,8 +39,8 @@ tgCordeModel::~tgCordeModel()
 void tgCordeModel::setup(tgWorld& world)
 {
 
-	btVector3 startPos(0.0, 5.0, 0.0);
-	btVector3 endPos  (10.0, 5.0, 0.0);
+	btVector3 startPos(0.0, 15.0, 0.0);
+	btVector3 endPos  (0.0, 5.0, 0.1);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
@@ -57,7 +57,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 1); // Can't quite accomplish paper level stiffness without things blowing up.
+	const double springConst = 100.0 * pow(10, 3); // Can't quite accomplish paper level stiffness without things blowing up.
 	const double gammaT = 100.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
@@ -68,7 +68,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 1.0 * pow(10, 1);
 	const double shearMod = 1.0 * pow(10, 1);
 	const double stretchMod = 0.02 * pow(10, 6);
-	const double springConst = 0.1 * pow(10, 0);
+	const double springConst = 0.0 * pow(10, 0);
 	const double gammaT = 1.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #endif

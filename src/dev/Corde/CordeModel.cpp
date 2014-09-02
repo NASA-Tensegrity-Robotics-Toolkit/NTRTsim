@@ -460,7 +460,7 @@ void CordeModel::computeInternalForces()
         r_1->force[0] +=  (x1 - x2) * (-1.0 * spring_common + diss_common);
         
         /* Apply Y forces */
-        r_0->force[1] += -1.0 * (y1 - y2) * (-1.0 * spring_common + diss_common);
+        r_0->force[1] += -1.0 * (y1 - y2) * (-1.0 * spring_common  + diss_common);
         
         r_1->force[1] += (y1 - y2) * (-1.0 * spring_common + diss_common);
         
@@ -471,6 +471,37 @@ void CordeModel::computeInternalForces()
 
         /* Apply constraint equation with boundry conditions */
         /* 8/5/14 - need was confirmed once equations corrected */
+#if (0) // "reversed" sign 
+        if (i == 0)
+        {
+           r_1->force[0] -= quat_cons_x;
+            
+            
+           r_1->force[1] -= quat_cons_y;
+            
+            
+           r_1->force[2] -= quat_cons_z; 
+        }
+        else if (i == n - 1)
+        {
+            r_0->force[0] += quat_cons_x;
+
+            r_0->force[1] += quat_cons_y;
+            
+            r_0->force[2] += quat_cons_z;       
+        }
+        else
+        {
+            r_0->force[0] += quat_cons_x;
+            r_1->force[0] -= quat_cons_x;
+            
+            r_0->force[1] += quat_cons_y;
+            r_1->force[1] -= quat_cons_y;
+            
+            r_0->force[2] += quat_cons_z;
+            r_1->force[2] -= quat_cons_z;            
+        }
+#else
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -500,6 +531,7 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
+#endif
 
 #if (0) // Original derivation
         /* Torques resulting from quaternion alignment constraints */
@@ -676,21 +708,21 @@ void CordeModel::computeInternalForces()
          q23 * (q23 * qdot24 + q11 * qdot12 - q12 * qdot11 - q13 * qdot14 + q14 * qdot13 - q24 * qdot23));
       
         /* Apply torques */ /// @todo - check with theory!
-        quat_0->tprime[0] -= q11_stiffness - q11_damping;
+        quat_0->tprime[0] -= q11_stiffness + q11_damping;
        
-        quat_1->tprime[0] -= q21_stiffness - q21_damping;
+        quat_1->tprime[0] -= q21_stiffness + q21_damping;
         
-        quat_0->tprime[1] -= q12_stiffness - q12_damping;
+        quat_0->tprime[1] -= q12_stiffness + q12_damping;
     
-        quat_1->tprime[1] -= q22_stiffness - q22_damping;
+        quat_1->tprime[1] -= q22_stiffness + q22_damping;
         
-        quat_0->tprime[2] -= q13_stiffness - q13_damping;
+        quat_0->tprime[2] -= q13_stiffness + q13_damping;
         
-        quat_1->tprime[2] -= q23_stiffness - q23_damping;
+        quat_1->tprime[2] -= q23_stiffness + q23_damping;
         
-        quat_0->tprime[3] -= q14_stiffness - q14_damping;
+        quat_0->tprime[3] -= q14_stiffness + q14_damping;
         
-        quat_1->tprime[3] -= q24_stiffness - q24_damping;
+        quat_1->tprime[3] -= q24_stiffness + q24_damping;
 
     }
     
