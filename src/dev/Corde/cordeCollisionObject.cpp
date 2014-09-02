@@ -240,17 +240,19 @@ void cordeCollisionObject::solveRContacts()
 		btVector3 rRigid =  cti.m_normal * (1.f - c.m_c2) * cti.m_dist;
 		
 		btVector3 fSoft = pow(idt, 2.0) * c.m_node->mass * rSoft;
-		c.m_node->applyForce(fSoft);
+		btScalar  magSoft = fSoft.length();
+		c.m_node->applyForce(fSoft - c.m_c3 * magSoft);
 		
 		btRigidBody* rBody = (btRigidBody*) btRigidBody::upcast(cti.m_colObj);
 		
 		btScalar rMass = rBody->getInvMass() > 0.0 ? 1.0 / rBody->getInvMass() : 0.0;
 		
 		btVector3 fRigid = pow(idt, 2.0) * rMass * rRigid;
+		btScalar  magRigid = fRigid.length();
 		
 		if (rBody)
 		{
-			rBody->applyForce(fRigid, c.m_c1);
+			rBody->applyForce(fRigid + c.m_c3 * magRigid, c.m_c1);
 		}
 	}
 }

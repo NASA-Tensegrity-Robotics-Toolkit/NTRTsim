@@ -104,7 +104,7 @@ public:
 		btMatrix3x3				m_c0;			// Impulse matrix (8/28/14 - unused)
 		btVector3				m_c1;			// Relative anchor (contact point)
 		btScalar				m_c2;			// Mass ratio
-		btScalar				m_c3;			// Friction (8/28/14 - unused)
+		btVector3				m_c3;			// Friction Vector and coefficient (@todo, consider seperating)
 		/// Removed Contact Hardness
 	};
 	/* SContact		*/ 

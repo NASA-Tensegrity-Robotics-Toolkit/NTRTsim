@@ -75,13 +75,17 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			const btMatrix3x3&	iwi = m_rigidBody?m_rigidBody->getInvInertiaTensorWorld() : iwiStatic;
 			const btVector3		ra = n.pos_new - wtr.getOrigin();
 			
-			///@todo compute and use friction information
+			/// A is the rigid body, B is the soft body
 			const btVector3		va = m_rigidBody ? m_rigidBody->getVelocityInLocalPoint(ra) * psb->m_sst.sdt : btVector3(0,0,0);
 			const btVector3		vb = n.vel_new;	
 			const btVector3		vr = vb - va;
-			const btScalar		dn = btDot(vr,c.m_cti.m_normal);
-			const btVector3		fv = vr - c.m_cti.m_normal*dn;
-			const btScalar		fc = psb->m_friction*m_colObj1Wrap->getCollisionObject()->getFriction();
+			const btScalar		dn = btDot(vr,c.m_cti.m_normal); // Magnitude of normal
+			btVector3			fv = vr - c.m_cti.m_normal * dn; // Orthogonal velocity?
+			
+			// Use lower of two friction values
+			const btScalar 		f1 = psb->m_friction;
+			const btScalar		f2 = m_colObj1Wrap->getCollisionObject()->getFriction();
+			const btScalar		fc = f1 < f2 ? f1 : f2;
 			
 			c.m_node	=	&n;
 			c.m_c0		=	tgUtil::ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
@@ -97,7 +101,14 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 				c.m_c2 = (1.0 / imb) * ms;
 			}
 			
-			c.m_c3		=	fv.length2()<(dn*fc*dn*fc)?0:1-fc;
+			if (fv.length() != 0.0)
+			{
+				c.m_c3		=	fv.normalize() * fc;
+			}
+			else
+			{
+				c.m_c3 		= btVector3(0.0, 0.0, 0.0);
+			}
 			
 			psb->m_rcontacts.push_back(c);
 			if (m_rigidBody)
