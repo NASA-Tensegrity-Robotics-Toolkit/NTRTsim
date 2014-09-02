@@ -50,7 +50,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf" "gmocktest.conf") 
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf" "gmocktest.conf" "neuralnet.conf") 
 
 function banner() 
 {
@@ -138,6 +138,7 @@ run_setupscript "env" "Env directory"
 run_setupscript "cmake" "CMake"
 run_setupscript "gmocktest" "GMockTest"
 run_setupscript "jsoncpp" "JsonCPP"
+run_setupscript "neuralnet" "Neural Net"
 run_setupscript "bullet" "Bullet Physics Library"
 run_setupscript "boost" "Boost"
 
