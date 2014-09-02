@@ -15,23 +15,16 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
-helper_pwd=`pwd`
-BASE_DIR="${helper_pwd}/../../.."
 
-BIN_DIR="${BASE_DIR}/bin"
-CONF_DIR="${BASE_DIR}/conf"
-ENV_DIR="${BASE_DIR}/env"
-SRC_DIR="${BASE_DIR}/src"
-TEST_DIR="${BASE_DIR}/test"
-BUILD_DIR="${BASE_DIR}/build"
-BUILD_TEST_DIR="${BASE_DIR}/build_test"
+ENV_SRC_DIR="/home/bbadmin/env_BOOSTBULLET"
+BUILDBOT_BUILD_DIR="/home/bbadmin/buildbot/slave/master/build"
 
-SETUP_DIR="${BIN_DIR}/setup"
+if [ ! -d $ENV_SRC_DIR ]; then
+    echo "Could not find environment source for Bullet and Boost. Searched at ${ENV_SRC_DIR}"
+fi
 
-DOWNLOADS_DIR="${ENV_DIR}/downloads"
-ENV_BUILD_DIR="${ENV_DIR}/build"
-ENV_BIN_DIR="${ENV_DIR}/bin"
-LIB_DIR="${ENV_DIR}/lib"
-INCLUDE_DIR="${ENV_DIR}/include"
+if [ ! -d $BUILDBOT_BUILD_DIR ]; then
+    echo "Could not find slave build directory. Searched at ${BUILDBOT_BUILD_DIR}"
+fi
 
-ENV_NAME='env'
+cp -r $ENV_SRC_DIR/env $BUILDBOT_BUILD_DIR || { echo "Encountered failure while copying Boost and Bullet environment pre-compile to BuildBot build directory."; exit 1; }

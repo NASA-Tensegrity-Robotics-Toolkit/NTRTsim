@@ -138,10 +138,12 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 
 void cordeCollisionObject::solveConstraints()
 {
+#if (0)
 	if (m_rcontacts.size() > 0)
 	{
 		std::cout << "Collisions!" << std::endl;
 	}
+#endif
 	solveRContacts();
 }
 

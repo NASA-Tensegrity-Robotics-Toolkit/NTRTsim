@@ -73,7 +73,7 @@ function ensure_bullet_openglsupport()
     result=$(count_files "$BULLET_BUILD_DIR/Demos/OpenGL/libOpenGLSupport.*")
     if [ "$result" == "0" ]; then
         echo "ERROR: It seems that bullet has been installed under prefix $BULLET_INSTALL_PREFIX, \
-but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR/Demos/OpenGL)."
+            but libOpenGLSupport was not found under the BULLET_BUILD_DIR ($BULLET_BUILD_DIR/Demos/OpenGL)."
         echo "  Option 1: Make sure that BULLET_BUILD_DIR in install.conf points to the location where you built bullet."
         echo "  Option 2: Change BULLET_INSTALL_PREFIX in install.conf to something besides $BULLET_INSTALL_PREFIX (see install.conf for more details)."
         echo "  Option 3: Remove the bullet files from the existing install location to have setup build bullet for you. To do this:"
@@ -120,42 +120,33 @@ function unpack_bullet()
 # Patch Bullet to include OpenGL Directories
 function patch_bullet()
 {
-	pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
+    pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
-	# Copy the files we're going to change
-        create_directory_if_noexist "OpenGL_FreeGlut"
-	cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
-	cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
-	cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
-	cp "OpenGL/GLDebugDrawer.h" "OpenGL_FreeGlut/tgGLDebugDrawer.h"
-	cp "OpenGL/GLDebugDrawer.cpp" "OpenGL_FreeGlut/tgGLDebugDrawer.cpp"
-	cp "OpenGL/GlutDemoApplication.h" "OpenGL_FreeGlut/tgGlutDemoApplication.h"
-	cp "OpenGL/GlutDemoApplication.cpp" "OpenGL_FreeGlut/tgGlutDemoApplication.cpp"
-	cp "OpenGL/GlutStuff.h" "OpenGL_FreeGlut/tgGlutStuff.h"
-	cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
+    # Copy the files we're going to change
+    create_directory_if_noexist "OpenGL_FreeGlut"
+    cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
+    cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
+    cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
+    cp "OpenGL/GLDebugDrawer.h" "OpenGL_FreeGlut/tgGLDebugDrawer.h"
+    cp "OpenGL/GLDebugDrawer.cpp" "OpenGL_FreeGlut/tgGLDebugDrawer.cpp"
+    cp "OpenGL/GlutDemoApplication.h" "OpenGL_FreeGlut/tgGlutDemoApplication.h"
+    cp "OpenGL/GlutDemoApplication.cpp" "OpenGL_FreeGlut/tgGlutDemoApplication.cpp"
+    cp "OpenGL/GlutStuff.h" "OpenGL_FreeGlut/tgGlutStuff.h"
+    cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
 
-	# Patch them
-	patch -p5 < "$SETUP_DIR/patches/CMakePatch.diff"
-	patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
+    # Patch them
+    patch -p5 < "$SETUP_DIR/patches/CMakePatch.diff"
+    patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
 
-	popd > /dev/null
+    popd > /dev/null
 }
 
 # Build the package under the build directory specified in in install.conf
 function build_bullet()
 {
-    
+
     echo "- Building Bullet Physics under $BULLET_BUILD_DIR"
     pushd "$BULLET_BUILD_DIR" > /dev/null
-    
-    # Drew Sabelhaus Edit 4-28-14
-    # Call cmake from a different place depending on if you've custom installed it,
-    # or want to use the version that comes with your distribution of linux.
-    if [ $USE_DISTRO_CMAKE == 1 ]; then
-    CMAKECOMMAND="cmake"
-    else
-    CMAKECOMMAND="$ENV_DIR/bin/cmake"
-    fi
 
     # Additional Change 4-28-14: trying to pass in the -fPIC option to solve GLUT issues on linux
     # This appears to work. Need second opinion from Ryan: does this actually add definitions 
@@ -181,22 +172,21 @@ function build_bullet()
         # -DFRAMEWORK=ON
         # -DBUILD_DEMOS=ON
     
-                
     make || { echo "- ERROR: Bullet build failed"; exit 1; }
-    
+
     popd > /dev/null
 }
 
 # Install the package under the package install prefix from install.conf
 function install_bullet()
 {
-    
+
     echo "- Installing Bullet Physics under $BULLET_INSTALL_PREFIX"
-    
+
     pushd "$BULLET_BUILD_DIR" > /dev/null
 
     make install || { echo "Install failed -- maybe you need to use sudo when running setup?"; exit 1; }
-    
+
     popd > /dev/null
 }
 
@@ -212,18 +202,18 @@ function env_link_bullet()
     if str_contains "$BULLET_BUILD_DIR" "$ENV_DIR"; then
         current_pwd=`pwd`
         rel_path=$(get_relative_path "$current_pwd" "$BULLET_BUILD_DIR" )
-        ln -s "$rel_path" bullet
+        create_exist_symlink "$rel_path" bullet
     else
-        ln -s "$BULLET_BUILD_DIR" bullet  # this links directly to the most recent build...
+        create_exist_symlink "$BULLET_BUILD_DIR" bullet  # this links directly to the most recent build...
     fi
-    
+
     popd > /dev/null
-        
+
     # Header Files
     pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "bullet" ]; then  # We may have built here, so only create a symlink if not
         rm bullet 2>/dev/null
-        ln -s "$BULLET_INSTALL_PREFIX/include/bullet" bullet
+        create_exist_symlink "$BULLET_INSTALL_PREFIX/include/bullet" bullet
     fi
     popd > /dev/null
 
@@ -231,16 +221,16 @@ function env_link_bullet()
 
 function main()
 {
-        
+
     ensure_install_prefix_writable $BULLET_INSTALL_PREFIX
-    
+
     if check_package_installed "$BULLET_INSTALL_PREFIX/lib/libBulletDynamics*"; then
         echo "- Bullet Physics is installed under prefix $BULLET_INSTALL_PREFIX -- skipping."
         ensure_bullet_openglsupport
         env_link_bullet
         return
     fi
-    
+
     if check_bullet_built; then
         echo "- Bullet Physics is already built under $BULLET_BUILD_DIR -- skipping."
         ensure_bullet_openglsupport
@@ -248,9 +238,9 @@ function main()
         env_link_bullet
         return
     fi
-    
+
     # @todo: add check bullet patched
-    
+
     if check_file_exists "$BULLET_PACKAGE_DIR/CMakeLists.txt"; then
         echo "- Bullet Physics is already unpacked to $BULLET_BUILD_DIR -- skipping."
         patch_bullet
@@ -259,7 +249,7 @@ function main()
         env_link_bullet
         return
     fi
-    
+
     if check_file_exists "$DOWNLOADS_DIR/$bullet_pkg"; then
         echo "- Bullet Physics package already exists under env/downloads -- skipping download."
         unpack_bullet
@@ -269,7 +259,7 @@ function main()
         env_link_bullet
         return
     fi
-    
+
     # If we haven't returned by now, we have to do everything
     download_bullet
     unpack_bullet

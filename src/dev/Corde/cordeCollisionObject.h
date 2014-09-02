@@ -60,6 +60,7 @@ subject to the following restrictions:
 // The C++ Standard Library
 #include <vector>
 
+class cordeAnchor;
 class cordeSolver;
 class cordeCollisionShape;
 class btCollisionObjectWrapper;
@@ -187,13 +188,14 @@ public:
 		return 0;
 	}
 
-public:
+private:
 	typedef btAlignedObjectArray<RContact>		tRContactArray;
 	typedef btAlignedObjectArray<SContact>		tSContactArray;
 
 	tRContactArray			m_rcontacts;	// Rigid contacts
 	tSContactArray			m_scontacts;	// Soft contacts
-private:
+	
+	std::vector<cordeAnchor*> m_anchors;
 	
 	/**
 	 * Update the collision bounds of the AABB

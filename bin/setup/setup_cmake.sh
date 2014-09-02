@@ -57,7 +57,7 @@ if type cmake >/dev/null 2>&1; then
     # Make a symlink under env to the existing cmake install
     pushd "$ENV_BIN_DIR" > /dev/null
     rm cmake 2>/dev/null  # delete any existing symlink
-    ln -s `which cmake` cmake
+    create_exist_symlink `which cmake` cmake
     popd > /dev/null
 else
     echo "ERROR: CMake must be installed and available on the path before continuing."
