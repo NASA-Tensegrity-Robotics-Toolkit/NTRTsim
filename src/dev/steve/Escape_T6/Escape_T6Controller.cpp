@@ -30,6 +30,8 @@
 #include "Escape_T6Model.h"
 // This library
 #include "core/tgLinearString.h"
+// For AnnealEvolution
+#include "learning/Configuration/configuration.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -45,9 +47,10 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength)
     this->m_totalTime=0.0;
 }
 
-//Fetch all the muscles and set their preferred length
+/** Set the lengths of the muscles and initialize the learning adapter */
 void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
+    //Fetch all the muscles and set their preferred length
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i)
     {
@@ -55,6 +58,8 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
         assert(pMuscle != NULL);
         pMuscle->setRestLength(this->m_initialLengths,0.0001);
     }
+
+    setupAdapter();
 }
 
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
@@ -120,9 +125,7 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
 //Pick particular muscles (according to the structure's state) and apply the given actions one by one
 void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <double> > act)
 {
-    //Get All the muscles of the subject
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    //Check if the number of the actions match the number of the muscles
     if(act.size() != muscles.size())
     {
         cout<<"Warning: # of muscles: "<< muscles.size() << " != # of actions: "<< act.size()<<endl;
@@ -133,7 +136,19 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <
     {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        //cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
         pMuscle->setPrefLength(act[i][0]);
     }
 }
+
+void Escape_T6Controller::setupAdapter() {
+    //TODO: initialize both strings
+    string suffix = "_Escape";
+    string configAnnealEvolution = "Config.ini";
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    bool isLearning = true;
+    configuration configEvolutionAdapter;
+    configEvolutionAdapter.readFile("Config.ini");
+
+    evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
+}
+

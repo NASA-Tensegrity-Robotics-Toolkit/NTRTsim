@@ -50,7 +50,7 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
          */
 
         // Note that currently this is calibrated for decimeters.
-        Escape_T6Controller(const double prefLength=5);
+        Escape_T6Controller(const double prefLength=5.0);
 
         /**
          * Nothing to delete, destructor must be virtual
@@ -70,9 +70,10 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
     private:
         double m_initialLengths;
         double m_totalTime;
-
         AnnealAdapter evolutionAdapter;
 
+        /** Initialize the evolution adapter as well as its own parameters */
+        void setupAdapter();
 };
 
 #endif // ESCAPE_T6CONTROLLER
