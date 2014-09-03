@@ -116,6 +116,8 @@ function build_jsoncpp()
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_EXTRAS=ON \
         -DCMAKE_INSTALL_PREFIX="$JSONCPP_INSTALL_PREFIX" \
+        -DCMAKE_C_COMPILER="gcc" \
+        -DCMAKE_CXX_COMPILER="g++" \
         -DCMAKE_C_FLAGS="-fPIC" \
         -DCMAKE_CXX_FLAGS="-fPIC" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
