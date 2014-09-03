@@ -7,6 +7,7 @@ def isExecutable(filePath):
     return os.path.isfile(filePath) and os.access(filePath, os.X_OK)
 
 def runTest(filePath):
+    print "\n*** Running tests executable %s ***\n" % (filePath)
     return os.system(filePath)
 
 # We set this to true if a single test fails.
