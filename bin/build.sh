@@ -66,6 +66,7 @@ function usage
     echo "  -c       Run 'make clean' before make/make install on non-library sources"
     echo "  -w       Show compiler warnings when building"
     echo "  -t       Build test/ rather than src/" 
+    echo "  -r       Build test/ rather than src/ *and* run all tests after compilation."
 }
 
 function cmake_cross_platform()
@@ -91,8 +92,9 @@ build_src=$SRC_DIR
 # Handle Arguments
 MAKE_CLEAN_FLAG=false
 CMAKE_COMPILER_WARNINGS_FLAG=false
+RUN_ALL_TESTS=false
 
-while getopts ":hcwt" opt; do
+while getopts ":hcwtr" opt; do
     case $opt in
         h)
             usage;
@@ -107,6 +109,11 @@ while getopts ":hcwt" opt; do
         t)
             build_target=$BUILD_TEST_DIR 
             build_src=$TEST_DIR
+            ;;
+        r)
+            build_target=$BUILD_TEST_DIR 
+            build_src=$TEST_DIR
+            RUN_ALL_TESTS=true
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -188,3 +195,16 @@ popd > /dev/null  # exit make dir
 
 popd > /dev/null  # exit base dir
 
+# Run all tests if necessary
+if $RUN_ALL_TESTS; then
+    if [ ! -d $BUILD_TEST_DIR ]; then
+        echo "Build test directory does not exist. Have the tests been compiled?"
+        exit 1
+    fi
+
+    pushd $BUILD_TEST_DIR > /dev/null
+
+    python ${SHELL_UTILITIES_DIR}/runAllTests.py
+
+    popd > /dev/null
+fi
