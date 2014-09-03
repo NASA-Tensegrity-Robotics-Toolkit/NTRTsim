@@ -39,8 +39,8 @@ tgCordeModel::~tgCordeModel()
 void tgCordeModel::setup(tgWorld& world)
 {
 
-	btVector3 startPos(0.0, 15.0, 0.0);
-	btVector3 endPos  (0.0, 5.0, 0.1);
+	btVector3 startPos(0.0, 5.0, 0.0);
+	btVector3 endPos  (10.0, 15.0, 1.0);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
@@ -51,7 +51,7 @@ void tgCordeModel::setup(tgWorld& world)
 	
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 100;
+	const std::size_t resolution = 10;
 	const double radius = 0.1;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 6);

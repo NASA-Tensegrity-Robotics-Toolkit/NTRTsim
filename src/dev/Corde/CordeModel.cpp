@@ -440,7 +440,7 @@ void CordeModel::computeInternalForces()
                         posNorm_2 * posDiff.dot(velDiff) / pow (linkLengths[i] , 5);
         
         /* Quaternion Constraint X */
-        const btScalar quat_cons_x = m_config.ConsSpringConst * linkLengths[i] *
+        const btScalar quat_cons_x = -1.0 * m_config.ConsSpringConst * linkLengths[i] *
         ( director[2] * (x1 - x2) * (z1 - z2) - director[0] * ( pow( posDiff[1], 2) + pow( posDiff[2], 2) )
         + director[1] * (x1 - x2) * (y1 - y2) ) / ( pow (posNorm, 3) );
         
@@ -471,6 +471,7 @@ void CordeModel::computeInternalForces()
 
         /* Apply constraint equation with boundry conditions */
         /* 8/5/14 - need was confirmed once equations corrected */
+        
 #if (0) // "reversed" sign 
         if (i == 0)
         {
@@ -502,6 +503,7 @@ void CordeModel::computeInternalForces()
             r_1->force[2] -= quat_cons_z;            
         }
 #else
+	#if (1)
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -522,6 +524,7 @@ void CordeModel::computeInternalForces()
         }
         else
         {
+	#endif
             r_0->force[0] -= quat_cons_x;
             r_1->force[0] += quat_cons_x;
             
@@ -619,44 +622,44 @@ void CordeModel::computeInternalForces()
         const btScalar stiffness_common = 2.0 / lj;
         
         const btScalar q11_stiffness = stiffness_common * 
-        (k1 * q24 * (-1.0 * c_mu1 + lj * mu1) +
-         k2 * q23 * (c_mu2 - lj * mu2) +
-         k3 * q22 * (-1.0 * c_mu3 + lj * mu3));
+        (k1 * q24 * (-1.0 * c_mu1 + mu1) +
+         k2 * q23 * (c_mu2 - mu2) +
+         k3 * q22 * (-1.0 * c_mu3 + mu3));
          
         const btScalar q12_stiffness = stiffness_common * 
-        (k1 * q23 * (-1.0 * c_mu1 + lj * mu1) +
-         k2 * q24 * (-1.0 * c_mu2 + lj * mu2) +
-         k3 * q21 * (c_mu3 - lj * mu3));
+        (k1 * q23 * (-1.0 * c_mu1 + mu1) +
+         k2 * q24 * (-1.0 * c_mu2 + mu2) +
+         k3 * q21 * (c_mu3 - mu3));
          
         const btScalar q13_stiffness = stiffness_common * 
-        (k1 * q22 * (c_mu1 - lj * mu1) +
-         k2 * q21 * (-1.0 * c_mu2 + lj * mu2) +
-         k3 * q24 * (-1.0 * c_mu3 + lj * mu3));
+        (k1 * q22 * (c_mu1 - mu1) +
+         k2 * q21 * (-1.0 * c_mu2 + mu2) +
+         k3 * q24 * (-1.0 * c_mu3 + mu3));
          
         const btScalar q14_stiffness = stiffness_common * 
-        (k1 * q21 * (c_mu1 - lj * mu1) +
-         k2 * q22 * (c_mu2 - lj * mu2) +
-         k3 * q23 * (c_mu3 - lj * mu3)); 
+        (k1 * q21 * (c_mu1 - mu1) +
+         k2 * q22 * (c_mu2 - mu2) +
+         k3 * q23 * (c_mu3 - mu3)); 
         
         const btScalar q21_stiffness = stiffness_common *
-        (k1 * q14 * (c_mu1  - lj * mu1) +
-         k2 * q13 * (-1.0 * c_mu2 + lj * mu2)+
-         k3 * q12 * (c_mu3 - lj * mu3));
+        (k1 * q14 * (c_mu1  - mu1) +
+         k2 * q13 * (-1.0 * c_mu2 + mu2)+
+         k3 * q12 * (c_mu3 -  mu3));
         
         const btScalar q22_stiffness = stiffness_common *
-        (k1 * q13 * (c_mu1 - lj * mu1) + 
-         k2 * q14 * (c_mu2 - lj * mu2) +
-         k3 * q11 * (-1.0 * c_mu3 + lj * mu3));
+        (k1 * q13 * (c_mu1 -  mu1) + 
+         k2 * q14 * (c_mu2 - mu2) +
+         k3 * q11 * (-1.0 * c_mu3 + mu3));
          
         const btScalar q23_stiffness = stiffness_common *
-        (k1 * q12 * (-1.0 * c_mu1 + lj * mu1) +
-         k2 * q11 * (c_mu2 - lj * mu2) +
-         k3 * q14 * (c_mu3 - lj * mu3));
+        (k1 * q12 * (-1.0 * c_mu1 +  mu1) +
+         k2 * q11 * (c_mu2 -  mu2) +
+         k3 * q14 * (c_mu3 -  mu3));
          
         const btScalar q24_stiffness = stiffness_common *
-        (k1 * q11 * (-1.0 * c_mu1 + lj * mu1) +
-         k2 * q12 * (-1.0 * c_mu2 + lj * mu2) +
-         k3 * q13 * (-1.0 * c_mu3 + lj * mu3));
+        (k1 * q11 * (-1.0 * c_mu1 + mu1) +
+         k2 * q12 * (-1.0 * c_mu2 +  mu2) +
+         k3 * q13 * (-1.0 * c_mu3 + mu3));
          
         /* I apologize for the mess below - the derivatives involved
          * here do not leave a lot of common factors. If you see
@@ -851,7 +854,7 @@ void CordeModel::computeQuaternionShapes(std::size_t i, double lj)
 	const btScalar q23 = quat_1->q[2];
 	const btScalar q24 = quat_1->q[3];
 	
-	btScalar c = - 2.0 / lj;
+	btScalar c = - 2.0;
 	btScalar mu1 = c * (q11 * q24 + q12 * q23 - q13 * q22 - q14 * q21);
 	btScalar mu2 = -1.0 * c * (q11 * q23 - q13 * q21 - q12 * q24 + q14 * q22);
 	btScalar mu3 = c * (q11 * q22 - q12 * q21 + q13 * q24 - q14 * q23);
