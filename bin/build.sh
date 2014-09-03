@@ -202,9 +202,27 @@ if $RUN_ALL_TESTS; then
         exit 1
     fi
 
+    if ! has_command "python"; then
+        echo "=== MISSING DEPENDENCY ==="
+        echo "Python 2.7 is required for automated test running. You don't appear to have it installed."
+        exit 1
+    fi
+
     pushd $BUILD_TEST_DIR > /dev/null
 
-    python ${SHELL_UTILITIES_DIR}/runAllTests.py
+    python ${SHELL_UTILITIES_DIR}/runAllTests.py || { 
+        echo ""
+        echo "=== TEST FAILURE(S) ==="
+        echo ""
+        echo "One or more tests have failed!"
+        echo "Search the console output for 'FAILED' to find each failing test."
+        echo "Or search for 'FAILED TEST' to find each failing test group."
+        exit 1
+    }
+
+    echo ""
+    echo "*** All tests succeeded! ***"
+    echo ""
 
     popd > /dev/null
 fi
