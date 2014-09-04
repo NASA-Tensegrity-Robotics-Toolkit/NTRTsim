@@ -17,21 +17,22 @@
 */
 
 /**
- * @file tgRodInfo.cpp
- * @brief Implementation of class tgRodInfo 
+ * @file tgSphereInfo.cpp
+ * @brief Implementation of class tgSphereInfo 
  * @author Ryan Adams
  * @date January 2014
  * $Id$
  */
 
 // This Module
-#include "tgRodInfo.h"
+#include "tgSphereInfo.h"
 
 // The NTRT Core library
 #include "core/tgWorldBulletPhysicsImpl.h"
 
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
+#include "BulletCollision/CollisionShapes/btSphereShape.h"
 
 // The C++ Standard Library
 #include <algorithm>
@@ -40,36 +41,36 @@
 
 // @todo: Need to take tags into account...
 
-tgRodInfo::tgRodInfo(const tgRod::Config& config) : 
-    m_pair(), 
+tgSphereInfo::tgSphereInfo(const tgSphere::Config& config) : 
+    m_node(), 
     m_config(config),
     tgRigidInfo()
 {}
 
-tgRodInfo::tgRodInfo(const tgRod::Config& config, tgTags tags) : 
-    m_pair(), 
+tgSphereInfo::tgSphereInfo(const tgSphere::Config& config, tgTags tags) : 
+    m_node(), 
     m_config(config),
     tgRigidInfo(tags)
 {}
 
-tgRodInfo::tgRodInfo(const tgRod::Config& config, const tgPair& pair) :
-    m_pair(pair),
+tgSphereInfo::tgSphereInfo(const tgSphere::Config& config, const tgNode& node) :
+    m_node(node),
     m_config(config),
-    tgRigidInfo(pair.getTags())
+    tgRigidInfo(node.getTags())
 {}
 
-tgRodInfo::tgRodInfo(const tgRod::Config& config, tgTags tags, const tgPair& pair) :
-    m_pair(pair),
+tgSphereInfo::tgSphereInfo(const tgSphere::Config& config, tgTags tags, const tgNode& node) :
+    m_node(node),
     m_config(config),
-    tgRigidInfo( tags + pair.getTags() )
+    tgRigidInfo( tags + node.getTags() )
 {}
 
-tgRigidInfo* tgRodInfo::createRigidInfo(const tgPair& pair)
+tgRigidInfo* tgSphereInfo::createRigidInfo(const tgNode& node)
 {
-    return new tgRodInfo(m_config, pair);
+    return new tgSphereInfo(m_config, node);
 }
 
-void tgRodInfo::initRigidBody(tgWorld& world)
+void tgSphereInfo::initRigidBody(tgWorld& world)
 {
     tgRigidInfo::initRigidBody(world);
     assert(m_rigidBody != NULL);
@@ -78,7 +79,7 @@ void tgRodInfo::initRigidBody(tgWorld& world)
     m_rigidBody->setRestitution(m_config.restitution);
 }
 
-tgModel* tgRodInfo::createModel(tgWorld& world)
+tgModel* tgSphereInfo::createModel(tgWorld& world)
 {
     // @todo: handle tags -> model
     // @todo: check to make sure the rigidBody has been built
@@ -88,22 +89,21 @@ tgModel* tgRodInfo::createModel(tgWorld& world)
     initRigidBody(world); 
     
     #if (0)
-    std::cout << "creating rod with tags " << getTags() << std::endl; 
+    std::cout << "creating sphere with tags " << getTags() << std::endl; 
     #endif
     
-    tgRod* rod = new tgRod(getRigidBody(), getTags(), getLength());
+    tgSphere* sphere = new tgSphere(getRigidBody(), getTags());
 
-    return rod;
+    return sphere;
 }
 
-btCollisionShape* tgRodInfo::getCollisionShape(tgWorld& world) const
+btCollisionShape* tgSphereInfo::getCollisionShape(tgWorld& world) const
 {
     if (m_collisionShape == NULL) 
     {
         const double radius = m_config.radius;
-        const double length = getLength();
         m_collisionShape =
-            new btCylinderShape(btVector3(radius, length / 2.0, radius));
+            new btSphereShape(radius);
     
         // Add the collision shape to the array so we can delete it later
         tgWorldBulletPhysicsImpl& bulletWorld =
@@ -113,24 +113,23 @@ btCollisionShape* tgRodInfo::getCollisionShape(tgWorld& world) const
     return m_collisionShape;
 }
 
-double tgRodInfo::getMass() const
+double tgSphereInfo::getMass() const
 {
-    const double length = getLength();
     const double radius = m_config.radius;
     const double density = m_config.density;
-    const double volume =  M_PI * radius * radius * length;
+    const double volume =  4.0 / 3.0 * M_PI * radius * radius * radius;
     return volume * density;
 }
 
 btVector3 
-tgRodInfo::getConnectionPoint(const btVector3& referencePoint,
+tgSphereInfo::getConnectionPoint(const btVector3& referencePoint,
                    const btVector3& destinationPoint) const
 {
     return  getConnectionPoint(referencePoint, destinationPoint, 0);
 }
 
 btVector3 
-tgRodInfo::getConnectionPoint(const btVector3& referencePoint,
+tgSphereInfo::getConnectionPoint(const btVector3& referencePoint,
                    const btVector3& destinationPoint,
                    const double rotation) const
 {
@@ -139,53 +138,38 @@ tgRodInfo::getConnectionPoint(const btVector3& referencePoint,
       throw 
         std::invalid_argument("Destination point is the reference point.");
     }
-    // Find the closest point on the radius from the referencePoint
-    const btVector3 cylinderAxis = (getTo() - getFrom()).normalize();
-    const btVector3 cylinderAxis2 = (getTo() - getFrom()).normalize();
+    
+    if (rotation != 0)
+    {
+		std::cerr << "Rotation not yet supported due to lack of central axis" << std::endl;
+	}
+    
+    // Get the center point
+    const btVector3 startPoint = (getNode());
     // Vector from reference point to destination point
     const btVector3 refToDest =
         (referencePoint - destinationPoint).normalize();
 
-    // Find a vector perpendicular to both the cylinder axis and refToDest
-    btVector3 rotationAxis = cylinderAxis.cross(refToDest);
+    // Project along the radius to the destination point
     
-    // Handle a vector crossed with itself
-    if (rotationAxis.length() == 0.0)
-    {
-        btScalar a = cylinderAxis[0];
-        btScalar b = cylinderAxis[1];
-        btScalar c = cylinderAxis[2];
-        // Find an arbitrary perpendicular vector
-        rotationAxis = btVector3(b - c, -a, a).normalize(); 
-    }
-
-    const btVector3 directional =
-        cylinderAxis.rotate(rotationAxis, -M_PI / 2.0).normalize();
-
-    // Apply one additional rotation so we can end up anywhere we
-    // want on the radius of the rod
-    
-    // When added to any point along the cylinder axis, this will take you
-    // to the surface in the direction of the destinationPoint
-    
-    const btVector3 surfaceVector = directional.rotate(cylinderAxis2, rotation).normalize()
+    const btVector3 surfaceVector = refToDest
                                     * m_config.radius;
 
     // Return the the surface point closest to the reference point in the
     // direction of the destination point. 
-    return referencePoint + surfaceVector;
+    return startPoint + surfaceVector;
 }
 
-std::set<tgRigidInfo*> tgRodInfo::getLeafRigids() 
+std::set<tgRigidInfo*> tgSphereInfo::getLeafRigids() 
 {
     std::set<tgRigidInfo*> leaves;
     leaves.insert(this);
     return leaves;
 }
 
-std::set<btVector3> tgRodInfo::getContainedNodes() const {
+std::set<btVector3> tgSphereInfo::getContainedNodes() const {
     std::set<btVector3> contained;
-    contained.insert(getFrom());
-    contained.insert(getTo());
+    contained.insert(getNode());
+    contained.insert(getNode());
     return contained;
 }
