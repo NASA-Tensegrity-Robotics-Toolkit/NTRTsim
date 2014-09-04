@@ -30,6 +30,7 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -73,6 +74,10 @@ NeuroEvolution::NeuroEvolution(string suff, string config)
 		populations.push_back(new NeuroEvoPopulation(populationSize,myconfigdataaa));
 	}
 	evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
+	if (!evolutionLog.is_open())
+	{
+		throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+	}
 }
 
 NeuroEvolution::~NeuroEvolution()
