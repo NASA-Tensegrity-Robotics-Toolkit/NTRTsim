@@ -18,7 +18,7 @@
 
 /**
  * @file FileHelpers.cpp
- * @brief Contains helper methods for file I/O. 
+ * @brief Contains helper methods for file I/O. This version is specific to tests. 
  * $Id$
  */
 
