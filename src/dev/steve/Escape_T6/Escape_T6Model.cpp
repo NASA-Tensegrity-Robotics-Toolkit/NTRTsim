@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012, United States Government, as represented by the
+ * Copyright © 2014, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  * 
@@ -134,18 +134,18 @@ void Escape_T6Model::addNodes(tgStructure& s)
 {
     const double half_length = c.rod_length / 2;
 
-    nodePositions.push_back(btVector3(-half_length,   c.rod_space, 0));            // 0
-    nodePositions.push_back(btVector3( half_length,   c.rod_space, 0));            // 1
-    nodePositions.push_back(btVector3(0,            half_length,   -c.rod_space)); // 2
-    nodePositions.push_back(btVector3(-c.rod_space, 0,           -half_length));   // 3
-    nodePositions.push_back(btVector3( c.rod_space, 0,           -half_length));   // 4
-    nodePositions.push_back(btVector3(0,           -half_length,   -c.rod_space)); // 5
-    nodePositions.push_back(btVector3(-half_length,  -c.rod_space, 0));            // 6
-    nodePositions.push_back(btVector3( half_length,  -c.rod_space, 0));            // 7
-    nodePositions.push_back(btVector3(0,            half_length,    c.rod_space)); // 8
-    nodePositions.push_back(btVector3(-c.rod_space, 0,            half_length));   // 9
-    nodePositions.push_back(btVector3( c.rod_space, 0,            half_length));   // 10
-    nodePositions.push_back(btVector3(0,           -half_length,    c.rod_space)); // 11
+    nodePositions.push_back(btVector3(-half_length, c.rod_space, 0));            // 0
+    nodePositions.push_back(btVector3( half_length, c.rod_space, 0));            // 1
+    nodePositions.push_back(btVector3(0,            half_length, -c.rod_space)); // 2
+    nodePositions.push_back(btVector3(-c.rod_space, 0,           -half_length)); // 3
+    nodePositions.push_back(btVector3( c.rod_space, 0,           -half_length)); // 4
+    nodePositions.push_back(btVector3(0,            -half_length, -c.rod_space));// 5
+    nodePositions.push_back(btVector3(-half_length, -c.rod_space, 0));           // 6
+    nodePositions.push_back(btVector3( half_length, -c.rod_space, 0));           // 7
+    nodePositions.push_back(btVector3(0,            half_length,  c.rod_space)); // 8
+    nodePositions.push_back(btVector3(-c.rod_space, 0,            half_length)); // 9
+    nodePositions.push_back(btVector3( c.rod_space, 0,            half_length)); // 10
+    nodePositions.push_back(btVector3(0,            -half_length, c.rod_space)); // 11
 
     for(int i=0;i<12;i++)
     {
@@ -161,9 +161,7 @@ void Escape_T6Model::addRods(tgStructure& s)
     s.addPair( 3,  4, "r4 rod");
     s.addPair( 5, 11, "r5 rod");
     s.addPair( 9, 10, "r6 rod");
-
 }
-
 
 void Escape_T6Model::addMarkers(tgStructure &s)
 {
@@ -181,17 +179,17 @@ void Escape_T6Model::addMarkers(tgStructure &s)
 
 void Escape_T6Model::addMuscles(tgStructure& s)
 {
-
-    int muscleConnections[13][13];
-    musclesPerNodes.resize(13);
-    for(int i=0;i<13;i++)
+    int nMuscles = 13;
+    int muscleConnections[nMuscles][nMuscles];
+    musclesPerNodes.resize(nMuscles);
+    for(int i=0;i<nMuscles;i++)
     {
-        musclesPerNodes[i].resize(13);
-        for(int j=0;j<13;j++)
+        musclesPerNodes[i].resize(nMuscles);
+        for(int j=0;j<nMuscles;j++)
             musclesPerNodes[i][j]=NULL;
     }
-    for(int i=0;i<13;i++)
-        for(int j=0;j<13;j++)
+    for(int i=0;i<nMuscles;i++)
+        for(int j=0;j<nMuscles;j++)
             muscleConnections[i][j]=-1;
 
     muscleConnections[0][3]=0;
@@ -219,9 +217,9 @@ void Escape_T6Model::addMuscles(tgStructure& s)
     muscleConnections[7][10]=1;
     muscleConnections[10][11]=1;
 
-    for(int i=0;i<13;i++)
+    for(int i=0;i<nMuscles;i++)
     {
-        for(int j=0;j<13;j++)
+        for(int j=0;j<nMuscles;j++)
         {
             if(muscleConnections[i][j]>=0)
             {
@@ -287,7 +285,6 @@ void Escape_T6Model::setup(tgWorld& world)
     btVector3 location(0,50.0,0);
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
-    //btVector3 speed(0,20,100);
     this->moveModel(location,rotation,speed);
 }
 
@@ -318,6 +315,7 @@ const std::vector<tgLinearString*>& Escape_T6Model::getAllMuscles() const
 
 void Escape_T6Model::teardown()
 {
+    notifyTeardown();
     tgModel::teardown();
 }
 
