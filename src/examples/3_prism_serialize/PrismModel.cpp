@@ -18,7 +18,7 @@
 
 /**
  * @file PrismModel.cpp
- * @brief Contains the definition of the members of the class PrismModel.
+ * @brief Contains a modified version of 3_prism to use JSON in place of a Config struct for structure configuration.
  * $Id$
  */
 
