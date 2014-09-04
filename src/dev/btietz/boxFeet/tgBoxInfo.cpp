@@ -104,8 +104,9 @@ btCollisionShape* tgBoxInfo::getCollisionShape(tgWorld& world) const
         const double width = m_config.width;
         const double height = m_config.height;
         const double length = getLength();
+        // Nominally x, y, z should we adjust here or the transform?
         m_collisionShape =
-            new btBoxShape(btVector3(length, width, height));
+            new btBoxShape(btVector3(width, length / 2.0, height));
     
         // Add the collision shape to the array so we can delete it later
         tgWorldBulletPhysicsImpl& bulletWorld =

@@ -28,11 +28,13 @@
 // This library
 #include "core/tgCast.h"
 #include "core/tgLinearString.h"
+#include "tgBox.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
@@ -155,10 +157,11 @@ void NestedBoxTestModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2 / 300.0; // kg / length^3 - see app for length
-    const double radius  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
+    const double width = 0.5;
+    const double h  = 0.5;
+    const tgBox::Config boxConfig(width, h, density);
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("rod", new tgBoxInfo(boxConfig));
     
     tgLinearString::Config muscleConfig(1000, 10);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
