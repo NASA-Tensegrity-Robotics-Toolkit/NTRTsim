@@ -4,4 +4,5 @@ add_executable(AppSuperBallLearning
     SuperBallModel.cpp
     SuperBallLearningController.cpp
     AppSUPERball.cpp
+    heightSensor.cpp
 ) 

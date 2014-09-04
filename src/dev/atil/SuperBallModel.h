@@ -31,6 +31,7 @@
 #include "core/tgRod.h"
 // The C++ Standard Library
 #include <vector>
+#include "heightSensor.h"
 
 // Forward declarations
 class tgLinearString;
@@ -50,7 +51,7 @@ public:
      * Configuration parameters are within the .cpp file in this case,
      * not passed in. 
      */
-    SuperBallModel();
+    SuperBallModel(tgWorld& world);
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -95,6 +96,12 @@ public:
      */
     const std::vector<tgLinearString*>& getAllMuscles() const;
     
+    /**
+     * Returns the values from all the 12 height sensors.
+     **/
+    std::vector<double> getSensorInfo();
+
+
 private:
 	
 	/**
@@ -123,7 +130,13 @@ private:
      * Adds the 12 markers to the end of the rods so that we can visualize
      * them and track their position
      */
-    void addMarkers(tgStructure& s);
+    void addMarkers();
+
+    /**
+     * Adds the 12 height sensors to the end of the rods that are used as an input for controllers.
+     **/
+    void addSensors();
+
 
     /*
 	 * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
@@ -133,6 +146,8 @@ private:
 	 * (muscles and markers are moved automatically since they are attached).
 	 */
      void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
+
+
 
 private:
 	
@@ -145,6 +160,9 @@ private:
 	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
 	std::vector<btVector3> nodePositions;
+	std::vector<heightSensor> heightSensors;
+
+	tgWorld& m_world;
 };
 
 #endif  // SUPERBALL_MODEL_H

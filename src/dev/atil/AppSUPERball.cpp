@@ -28,6 +28,7 @@
 #include "SuperBallLearningController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgPlaneGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -51,11 +52,16 @@ int main(int argc, char** argv)
     
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
+    const double pitch = 0.0;//M_PI/15.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+//    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+//    // the world will delete this
+//    tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    const tgPlaneGround::Config groundConfig(btVector3(0.0,1.0,0.0));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    tgPlaneGround* ground = new tgPlaneGround(groundConfig);
+
     
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've
@@ -72,7 +78,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    SuperBallModel* const myModel = new SuperBallModel();
+    SuperBallModel* const myModel = new SuperBallModel(world);
 
     // Fifth, select the controller to use. Uncomment desired controller.
 
