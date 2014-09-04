@@ -87,7 +87,8 @@ void tgBox::onVisit(const tgModelVisitor& v) const
 void tgBox::teardown()
 {
 
-  tgBaseRigid:teardown();
+   m_pRigidBody = NULL;
+   tgModel::teardown();
 
   // Postcondition
   // This does not preserve the invariant

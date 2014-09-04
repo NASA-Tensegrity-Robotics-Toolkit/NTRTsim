@@ -61,9 +61,7 @@ void tgBaseRigid::onVisit(const tgModelVisitor& v) const
 
 void tgBaseRigid::teardown()
 {
-  // World should delete the body
-  m_pRigidBody = NULL;
-  tgModel::teardown();
+  // This does not appear to be called
 
   // Postcondition
   // This does not preserve the invariant
