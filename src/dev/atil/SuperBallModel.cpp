@@ -36,6 +36,8 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
 namespace
 {
@@ -106,8 +108,9 @@ const int otherEndOfTheRod[13]={6,7,8,4,3,11,0,1,2,10,9,5,12};
  */
 const int parallelNode[13]={1,0,5,9,10,2,7,6,11,3,4,8,12};
 
-SuperBallModel::SuperBallModel() : tgModel() 
+SuperBallModel::SuperBallModel(tgWorld& world) : tgModel(),m_world(world)
 {
+	this->m_world=world;
 }
 
 SuperBallModel::~SuperBallModel()
@@ -165,7 +168,7 @@ void SuperBallModel::addRods(tgStructure& s)
 }
 
 
-void SuperBallModel::addMarkers(tgStructure &s)
+void SuperBallModel::addMarkers()
 {
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
@@ -177,6 +180,31 @@ void SuperBallModel::addMarkers(tgStructure &s)
 		abstractMarker tmp=abstractMarker(bt,pos,btVector3(0.08*i,1.0 - 0.08*i,.0),i);
 		this->addMarker(tmp);
 	}
+}
+
+void SuperBallModel::addSensors()
+{
+    std::vector<tgRod *> rods=find<tgRod>("rod");
+
+	for(int i=0;i<12;i++)
+	{
+		const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
+		btTransform inverseTransform = bt->getWorldTransform().inverse();
+		btVector3 pos = inverseTransform * (nodePositions[i]);
+		heightSensor tmp=heightSensor(bt,pos,i,m_world);
+		this->heightSensors.push_back(tmp);
+	}
+}
+
+std::vector<double> SuperBallModel::getSensorInfo()
+{
+	std::vector<double> sensorInfo;
+	for(int i=0;i<heightSensors.size();i++)
+	{
+		sensorInfo.push_back(heightSensors.at(i).getHeight());
+	}
+
+	return sensorInfo;
 }
 
 void SuperBallModel::addMuscles(tgStructure& s)
@@ -282,12 +310,16 @@ void SuperBallModel::setup(tgWorld& world)
     tgModel::setup(world);
 
     //map the rods and add the markers to them
-    addMarkers(s);
+    addMarkers();
+    addSensors();
 
-    btVector3 location(0,10.0,0);
+    //move rotate and give initial speed to the structure
+    btVector3 location(0,20.0,0);
     btVector3 rotation(0.0,0.6,0.8);
-  	btVector3 speed(0,20,100);
+  	btVector3 speed(0,40,0);
     this->moveModel(location,rotation,speed);
+
+    this->m_world = world;
 }
 
 void SuperBallModel::step(double dt)
