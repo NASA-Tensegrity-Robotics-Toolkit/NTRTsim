@@ -156,9 +156,9 @@ void SerializedSineWaves::onStep(BaseSpineModelLearning& subject, double dt)
     applyImpedanceControlInside(subject.getMuscles("inner left") , dt);
     applyImpedanceControlInside(subject.getMuscles("inner right"), dt);
     
-    applyImpedanceControlOutside(subject.getMuscles("inner top"), dt, 0);
-    applyImpedanceControlOutside(subject.getMuscles("inner left"), dt, 1);
-    applyImpedanceControlOutside(subject.getMuscles("inner right"), dt, 2);
+    applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
+    applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
+    applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
 }
     
 
