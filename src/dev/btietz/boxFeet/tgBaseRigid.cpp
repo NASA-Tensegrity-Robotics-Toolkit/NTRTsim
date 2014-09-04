@@ -25,7 +25,7 @@
 
 // This module
 #include "tgBaseRigid.h"
-#include "tgModelVisitor.h"
+#include "core/tgModelVisitor.h"
 // The Bullet Physics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "btBulletDynamicsCommon.h"
@@ -34,8 +34,7 @@
 #include <stdexcept>
 
 tgBaseRigid::tgBaseRigid(btRigidBody* pRigidBody, 
-                const tgTags& tags,
-                const double length) : 
+                const tgTags& tags) : 
   tgModel(tags),
   m_pRigidBody(pRigidBody),
   m_mass((m_pRigidBody->getInvMass() > 0.0) ? 

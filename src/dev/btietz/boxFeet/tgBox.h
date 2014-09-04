@@ -34,7 +34,7 @@
 #include <vector>
 
 // Forward declarations
-class btRigidBody;
+//class btRigidBody;
 
 /**
  * A rod is a rigid body. Length is defined by nodes, radius and density
@@ -65,7 +65,7 @@ public:
 
 
             /** The box's width; must be nonnegative. */
-            const double length;
+            const double width;
 
             /** The rod's height; must be nonnegative. */
             const double height;
@@ -84,6 +84,7 @@ public:
             /** The rod's coefficient of restitution; 
              * must be between 0 and 1 (inclusive). */
             const double restitution;
+    };
     
         tgBox(btRigidBody* pRigidBody,
                 const tgTags& tags,

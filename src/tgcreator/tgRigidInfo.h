@@ -121,8 +121,6 @@ public:
 
     virtual std::vector<tgRigidInfo*> createRigidInfos(const tgPairs& pairs, const tgTagSearch& tagSearch);
 
-
-    // @todo: move this to .cpp file
     virtual void initRigidBody(tgWorld& world);
 
     virtual tgModel* createModel(tgWorld& world) = 0;

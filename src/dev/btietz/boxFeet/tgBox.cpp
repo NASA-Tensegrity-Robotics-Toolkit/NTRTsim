@@ -25,7 +25,7 @@
 
 // This module
 #include "tgBox.h"
-#include "tgModelVisitor.h"
+#include "core/tgModelVisitor.h"
 // The Bullet Physics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "btBulletDynamicsCommon.h"

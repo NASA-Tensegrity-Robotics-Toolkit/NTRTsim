@@ -27,7 +27,7 @@
  */
 
 // This application
-#include "tgModel.h" // @todo: forward declare and move to tgRod.cpp (to be created)
+#include "core/tgModel.h" // @todo: forward declare and move to tgRod.cpp (to be created)
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
