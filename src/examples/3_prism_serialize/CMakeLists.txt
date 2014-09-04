@@ -14,6 +14,3 @@ link_libraries(controllers
 ) 
 
 target_link_libraries(AppPrismModel_Serialize ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
-configure_file("config.json" "config.json" COPYONLY)
-
-
