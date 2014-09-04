@@ -16,18 +16,29 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef FILE_HELPERS_H 
-#define FILE_HELPERS_H 
- 
-// The C++ Standard Library
-#include <vector>
+/**
+ * @file FileHelpers.cpp
+ * @brief Contains helper methods for file I/O. This version is specific to tests. 
+ * $Id$
+ */
 
-class FileHelpers 
-{
-public: 
-    
-    static std::string getFileString(std::string fileName);
-    static std::string getResourcePath(std::string relPath);
-    
-};
-#endif  // File_Helpers_H 
+#include <string>
+#include <fstream>
+#include <sstream>
+#include "FileHelpers.h"
+#include "resources.h"
+
+using namespace std;
+
+std::string FileHelpers::getFileString(std::string fileName) {
+    std::ifstream fileInput(fileName.c_str());
+    stringstream buffer;
+    buffer << fileInput.rdbuf();
+    return buffer.str();
+}
+
+std::string FileHelpers::getResourcePath(std::string relPath) {
+    stringstream buffer;
+    buffer << RESOURCE_PATH << "/" << relPath;
+    return buffer.str();
+}

@@ -128,6 +128,8 @@ function build_neuralnet()
         -DBUILD_EXTRAS=ON \
         -DCMAKE_INSTALL_PREFIX="$NEURALNET_INSTALL_PREFIX" \
         -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_C_COMPILER="gcc" \
+        -DCMAKE_CXX_COMPILER="g++" \
         -DCMAKE_CXX_FLAGS="-fPIC" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
