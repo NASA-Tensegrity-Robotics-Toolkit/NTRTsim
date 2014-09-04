@@ -28,11 +28,11 @@
  */
 
 // This library
-#include "tgcreator/tgPairs.h"
-#include "tgcreator/tgRigidInfo.h"
+#include "tgPairs.h"
+#include "tgRigidInfo.h"
 // The NTRT Core Library
-#include "tgcreator/tgUtil.h"
-#include "tgBox.h"
+#include "tgUtil.h"
+#include "core/tgBox.h"
 
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"

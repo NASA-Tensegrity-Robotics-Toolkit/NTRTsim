@@ -4,6 +4,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgNodes.cpp
     tgRigidInfo.cpp
     tgRodInfo.cpp
+    tgBoxInfo.cpp
     tgStructure.cpp
     tgBuildSpec.cpp
     tgStructureInfo.cpp
