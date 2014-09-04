@@ -61,6 +61,8 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 
         virtual void onStep(Escape_T6Model& subject, double dt);
 
+        virtual void onTeardown(Escape_T6Model& subject);
+
     protected:
 
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
@@ -74,6 +76,9 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
+
+        /** Returns amount of energy spent by each muscle in subject */
+        double totalEnergySpent(Escape_T6Model& subject);
 };
 
 #endif // ESCAPE_T6CONTROLLER
