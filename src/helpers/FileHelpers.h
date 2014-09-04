@@ -27,6 +27,7 @@ class FileHelpers
 public: 
     
     static std::string getFileString(std::string fileName);
+    static std::string getResourcePath(std::string relPath);
     
 };
 #endif  // File_Helpers_H 

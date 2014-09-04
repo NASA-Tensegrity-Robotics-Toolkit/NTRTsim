@@ -26,6 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include "FileHelpers.h"
+#include "resources.h"
 
 using namespace std;
 
@@ -33,5 +34,11 @@ std::string FileHelpers::getFileString(std::string fileName) {
     std::ifstream fileInput(fileName.c_str());
     stringstream buffer;
     buffer << fileInput.rdbuf();
+    return buffer.str();
+}
+
+std::string FileHelpers::getResourcePath(std::string relPath) {
+    stringstream buffer;
+    buffer << RESOURCE_PATH << "/" << relPath;
     return buffer.str();
 }
