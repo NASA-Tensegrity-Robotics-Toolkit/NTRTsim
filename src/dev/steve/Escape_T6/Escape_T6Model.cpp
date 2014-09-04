@@ -297,7 +297,7 @@ void Escape_T6Model::step(double dt)
     }
     else
     {
-        // Notify observers (controllers) of the step so that they can take action
+        //Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
     }

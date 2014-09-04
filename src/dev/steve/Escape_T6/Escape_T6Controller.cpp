@@ -34,9 +34,12 @@
 #include "learning/Configuration/configuration.h"
 // The C++ Standard Library
 #include <cassert>
+#include <cmath>
 #include <stdexcept>
 #include <vector>
 
+# define M_PI 3.14159265358979323846 
+                               
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
@@ -50,13 +53,15 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength)
 /** Set the lengths of the muscles and initialize the learning adapter */
 void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
-    //Fetch all the muscles and set their preferred length
+    double dt = 0.0001;
+
+    //Fetch all the muscles and set their initial lengths
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i)
     {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setRestLength(this->m_initialLengths,0.0001);
+        pMuscle->setRestLength(this->m_initialLengths, dt);
     }
 
     setupAdapter();
@@ -70,8 +75,16 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     }
     m_totalTime+=dt;
 
-    //Move motors for all the muscles
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    // Set new preferred lengths of muscles
+    for (size_t i = 0; i < muscles.size(); i++) {
+        tgLinearString *const pMuscle = muscles[i];
+        assert(pMuscle != NULL);
+        double currentLength = pMuscle->getRestLength();
+        pMuscle->setRestLength(currentLength * (1 + sin((m_totalTime * 100) + (i/muscles.size()))), dt); //TODO: Temporary test
+    }
+
+    //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
         tgLinearString * const pMuscle = muscles[i];
@@ -163,7 +176,7 @@ void Escape_T6Controller::setupAdapter() {
     AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
     bool isLearning = true;
     configuration configEvolutionAdapter;
-    configEvolutionAdapter.readFile("Config.ini");
+    configEvolutionAdapter.readFile(configAnnealEvolution);
 
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 }
