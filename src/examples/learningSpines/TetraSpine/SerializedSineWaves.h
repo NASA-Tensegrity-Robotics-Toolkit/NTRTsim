@@ -79,6 +79,11 @@ struct Config
      * Units are radians
      */
     std::vector<double> phaseOffsets;
+    
+    /**
+     * How often to send a sine wave signal
+     */
+     double updateFrequency;
 	
 };
 	

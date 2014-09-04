@@ -78,13 +78,17 @@ SerializedSineWaves::Config::Config(std::string fileName)
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
     cpgFrequency = root.get("cpg_frequency", "UTF-8").asDouble();
     bodyWaves = root.get("bodyWaves", "UTF-8").asDouble();
-
+	
+	updateFrequency = root.get("updateFrequency", "UTF-8").asDouble();
+	
     phaseOffsets.clear();
     phaseOffsets.push_back(root.get("top_offset", "UTF-8").asDouble());
     phaseOffsets.push_back(root.get("left_offset", "UTF-8").asDouble());
     phaseOffsets.push_back(root.get("right_offset", "UTF-8").asDouble());
 	
 	//END SERIALIZING
+	
+	/// @todo verify data!
 }
 
 SerializedSineWaves::Config::~Config()
@@ -149,16 +153,21 @@ void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgLinea
 void SerializedSineWaves::onStep(BaseSpineModelLearning& subject, double dt)
 {
     simTime += dt;
-    
-    segments = subject.getSegments();
-    
-    applyImpedanceControlInside(subject.getMuscles("inner top"), dt);
-    applyImpedanceControlInside(subject.getMuscles("inner left") , dt);
-    applyImpedanceControlInside(subject.getMuscles("inner right"), dt);
-    
-    applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
-    applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
-    applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
+
+	if (simTime >= 1.0/m_config.updateFrequency)
+	{
+		segments = subject.getSegments();
+		
+		applyImpedanceControlInside(subject.getMuscles("inner top"), dt);
+		applyImpedanceControlInside(subject.getMuscles("inner left") , dt);
+		applyImpedanceControlInside(subject.getMuscles("inner right"), dt);
+		
+		applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
+		applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
+		applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
+
+		simTime = 0.0;
+	}
 }
     
 
