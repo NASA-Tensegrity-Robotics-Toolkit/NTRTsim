@@ -154,7 +154,7 @@ void NestedStructureTestModel::setup(tgWorld& world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
-    const double density = 4.2 / 300.0; // kg / length^3 - see app for length
+    const double density = .00311; // kg / length^3 - see app for length
     const double radius  = 0.5;
     const tgRod::Config rodConfig(radius, density);
     tgBuildSpec spec;

@@ -36,15 +36,15 @@
 #include "tgcreator/tgUtil.h"
 
 NestedStructureSineWaves::NestedStructureSineWaves() :
-    in_controller(new ImpedanceControl(300, 0, 0)),
-    out_controller(new ImpedanceControl(100, 200, 400)),
+    in_controller(new ImpedanceControl(100, 500, 50)),
+    out_controller(new ImpedanceControl(100, 500, 100)),
     segments(1.0),
-    insideLength(20.0),
-    outsideLength(15.0),
+    insideLength(16.5),
+    outsideLength(19.5),
     offsetSpeed(0.0),
-    cpgAmplitude(20.0),
+    cpgAmplitude(50.0),
     cpgFrequency(2.51),
-    bodyWaves(1.0),
+    bodyWaves(2.0),
     simTime(0.0),
     cycle(0.0),
     target(0.0)
