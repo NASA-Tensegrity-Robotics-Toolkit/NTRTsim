@@ -76,14 +76,8 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     m_totalTime+=dt;
 
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    // Set new preferred lengths of muscles
-    for (size_t i = 0; i < muscles.size(); i++) {
-        tgLinearString *const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        double currentLength = pMuscle->getRestLength();
-        pMuscle->setRestLength(currentLength * (1 + sin((m_totalTime * 100) + (i/muscles.size()))), dt); //TODO: Temporary test
-    }
-
+    setPreferredMuscleLengths(muscles, dt);
+    
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
@@ -203,4 +197,20 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
         }
     }
     return totalEnergySpent;
+}
+
+// Pre-condition: every element in muscles must be defined
+// Post-condition: every muscle will have a new target length
+void Escape_T6Controller::setPreferredMuscleLengths(std::vector<tgLinearString*> muscles, double dt) {
+    for (size_t i = 0; i < muscles.size(); i++) {
+        tgLinearString *const pMuscle = muscles[i];
+        assert(pMuscle != NULL);
+
+        double amplitude = 0.95 * m_initialLengths;
+        double angularFrequency = 1000 * dt;
+        double phase = 0; //TODO: Determined based on cluster
+        double newLength = m_initialLengths;//TODO: Change to: amplitude * sin(angularFrequency * m_totalTime + phase);
+
+        pMuscle->setRestLength(newLength, dt);
+    }
 }

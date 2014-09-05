@@ -34,6 +34,7 @@
 
 // Forward declarations
 class Escape_T6Model;
+class tgLinearString;
 
 //namespace std for vectors
 using namespace std;
@@ -79,6 +80,9 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 
         /** Returns amount of energy spent by each muscle in subject */
         double totalEnergySpent(Escape_T6Model& subject);
+
+        /** Sets target lengths for each muscle */
+        void setPreferredMuscleLengths(vector<tgLinearString*> muscles, double dt);
 };
 
 #endif // ESCAPE_T6CONTROLLER
