@@ -29,12 +29,15 @@
 #include "core/tgCast.h"
 #include "core/tgLinearString.h"
 #include "core/tgBox.h"
+#include "core/tgRod.h"
+#include "core/tgSphere.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
@@ -58,13 +61,13 @@ namespace
     void addNodes(tgStructure& tetra, double edge, double height)
     {
         // right
-        tetra.addNode(-edge / 2.0, 0, 0);
+        tetra.addNode(-edge / 2.0, 0, 0, "heavy");
         // left
-        tetra.addNode( edge / 2.0, 0, 0);
+        tetra.addNode( edge / 2.0, 0, 0, "heavy");
         // top
-        tetra.addNode(0, height, 0);
+        tetra.addNode(0, height, -1.0 * tgUtil::round(std::sqrt(3.0) / 2.0 * height), "light");
         // front
-        tetra.addNode(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+        tetra.addNode(0, height, tgUtil::round(std::sqrt(3.0) / 2.0 * height), "heavy");
     }
 
     void addPairs(tgStructure& tetra)
@@ -81,7 +84,7 @@ namespace
              size_t segmentCount)
     {
 
-        const btVector3 offset(0, 0, -edge * 1);
+        const btVector3 offset(0, 0, -edge * 2);
         for (size_t i = 0; i < segmentCount; ++i)
         {
             tgStructure* const t = new tgStructure(tetra);
@@ -156,15 +159,21 @@ void NestedBoxTestModel::setup(tgWorld& world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
-    const double density = 4.2 / 300.0; // kg / length^3 - see app for length
-    const double width = 0.5;
+    const double density = 4.2 / 3000.0; // kg / length^3 - see app for length
+    const double radius = 0.5;
     const double h  = 0.5;
-    const tgBox::Config boxConfig(width, h, density);
+    const tgRod::Config rodConfig(radius, density);
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgBoxInfo(boxConfig));
+    spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     tgLinearString::Config muscleConfig(1000, 10);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    
+    const tgSphere::Config sphereConfig(0.5, 0.5);
+    spec.addBuilder("light", new tgSphereInfo(sphereConfig));
+    
+    const tgSphere::Config sphereConfig2(0.5, 2.5);
+    spec.addBuilder("light", new tgSphereInfo(sphereConfig2));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);

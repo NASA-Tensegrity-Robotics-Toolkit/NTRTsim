@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 3;
     NestedBoxTestModel* myModel = new NestedBoxTestModel(segments);
 
     simulation.addModel(myModel);

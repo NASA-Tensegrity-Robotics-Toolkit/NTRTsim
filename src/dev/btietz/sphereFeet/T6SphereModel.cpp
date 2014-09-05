@@ -106,18 +106,18 @@ void T6SphereModel::addNodes(tgStructure& s)
 {
     const double half_length = c.rod_length / 2;
 
-    s.addNode(-c.rod_space,  -half_length, 0, "sphere");            // 0
-    s.addNode(-c.rod_space,   half_length, 0, "sphere");            // 1
-    s.addNode( c.rod_space,  -half_length, 0, "sphere");            // 2
-    s.addNode( c.rod_space,   half_length, 0, "sphere");            // 3
-    s.addNode(0,           -c.rod_space,   -half_length, "sphere"); // 4
-    s.addNode(0,           -c.rod_space,    half_length, "sphere"); // 5
-    s.addNode(0,            c.rod_space,   -half_length, "sphere"); // 6
-    s.addNode(0,            c.rod_space,    half_length, "sphere"); // 7
-    s.addNode(-half_length, 0,            c.rod_space, "sphere");   // 8
-    s.addNode( half_length, 0,            c.rod_space, "sphere");   // 9
-    s.addNode(-half_length, 0,           -c.rod_space, "sphere");   // 10
-    s.addNode( half_length, 0,           -c.rod_space, "sphere");   // 11
+    s.addNode(-c.rod_space,  -half_length, 0, "sphere1");            // 0
+    s.addNode(-c.rod_space,   half_length, 0, "sphere2");            // 1
+    s.addNode( c.rod_space,  -half_length, 0, "sphere1");            // 2
+    s.addNode( c.rod_space,   half_length, 0, "sphere2");            // 3
+    s.addNode(0,           -c.rod_space,   -half_length, "sphere1"); // 4
+    s.addNode(0,           -c.rod_space,    half_length, "sphere1"); // 5
+    s.addNode(0,            c.rod_space,   -half_length, "sphere2"); // 6
+    s.addNode(0,            c.rod_space,    half_length, "sphere1"); // 7
+    s.addNode(-half_length, 0,            c.rod_space, "sphere2");   // 8
+    s.addNode( half_length, 0,            c.rod_space, "sphere1");   // 9
+    s.addNode(-half_length, 0,           -c.rod_space, "sphere2");   // 10
+    s.addNode( half_length, 0,           -c.rod_space, "sphere2");   // 11
 }
 
 void T6SphereModel::addRods(tgStructure& s)
@@ -178,6 +178,8 @@ void T6SphereModel::setup(tgWorld& world)
 					    c.maxAcc);
     
     const tgSphere::Config sphereConfig(0.5, 0.5);
+    
+    const tgSphere::Config sphereConfig2(0.5, 2.5);
             
     // Start creating the structure
     tgStructure s;
@@ -196,8 +198,9 @@ void T6SphereModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
+    spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
