@@ -104,7 +104,7 @@ function build_boost()
         return
     fi
 
-    #For MAC and gcc
+    #To make gcc as the default compiler, this line uncomments the line ';using gcc' in user-config.jam file of the boost library.
     sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
 
     # Perform the build
