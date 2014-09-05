@@ -37,8 +37,8 @@
 class btRigidBody;
 
 /**
- * A rod is a rigid body. Length is defined by nodes, radius and density
- * are defined by config.
+ * A sphere is a rigid body. Its center is placed by tagging a node
+ * and the radius is determined by its config struct.
  */
 class tgSphere : public tgBaseRigid
 {
@@ -46,15 +46,15 @@ public:
 
     /**
      * Holds two public member variables, density and radius, describing a
-     * rod configuration.
+     * sphere configuration.
      * A constructor allows them to be set together and to default.
      */
     struct Config
     {
             /**
          * Initialize with radius and density, which may default.
-         * @param[in] radius the rod's radius; must be non-negative
-         * @param[in] density the rod's density; must be non-negative
+         * @param[in] radius the sphere's radius; must be non-negative
+         * @param[in] density the sphere's density; must be non-negative
          */
             Config(double r = 0.5,
                     double d = 1.0,
@@ -64,31 +64,40 @@ public:
 
 
 
-            /** The rod's radius; must be nonnegative. */
+            /** The sphere's radius; must be nonnegative. */
             const double radius;
 
-            /** The rod's density; must be nonnegative. */
+            /** The sphere's density; must be nonnegative. */
             const double density;
             
-            /** The rod's friction; 
+            /** The sphere's friction; 
              * must be between 0 and 1 (inclusive). */
             const double friction;
 
-            /** The rod's rolling friction; 
+            /** The sphere's rolling friction; 
              * must be between 0 and 1 (inclusive). */
             const double rollFriction;
             
-            /** The rod's coefficient of restitution; 
+            /** The sphere's coefficient of restitution; 
              * must be between 0 and 1 (inclusive). */
             const double restitution;
     };
     
+    /**
+     * A container for a sphere shaped rigid body. Spheres are defined
+     * at single nodes, and get their rigid bodies from the tgSphereInfo
+     * class in tgcreator.
+     */
         tgSphere(btRigidBody* pRigidBody,
                 const tgTags& tags);
     
         /** A class with a virtual memeber function requires a virtual destructor. */
         virtual ~tgSphere();
     
+    /**
+     * Set the pointer to the rigid body to NULL, as it will be destroied
+     * by the world.
+     */
     virtual void teardown();
     
     virtual void onVisit(const tgModelVisitor& v) const;

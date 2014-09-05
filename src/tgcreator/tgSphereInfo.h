@@ -49,23 +49,22 @@ class tgSphereInfo : public tgRigidInfo {
 public:
 
     /**
-     * Construct a tgSphereInfo with just a config. The pair must be filled in 
+     * Construct a tgSphereInfo with just a config. The node must be filled in 
      * later, or factory methods can be used to create instances with
-     * pairs.
+     * nodes.
      */
     tgSphereInfo(const tgSphere::Config& config);
 
     /**
-     * Construct a tgSphereInfo with just a config and tags. The pair must 
+     * Construct a tgSphereInfo with just a config and tags. The node must 
      * be filled in later, or factory methods can be used to create instances 
-     * with pairs.
+     * with nodes.
      */
     tgSphereInfo(const tgSphere::Config& config, tgTags tags);
 
     /**
      * Construct a tgSphereInfo from its center point, radius and density.
      * @param[in] the center point
-     * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
