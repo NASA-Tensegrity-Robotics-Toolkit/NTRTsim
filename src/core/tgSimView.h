@@ -53,7 +53,7 @@ public:
      * less than stepSize
      */
     tgSimView(tgWorld& world,
-          double stepSize = 1.0/120.0,
+          double stepSize = 1.0/1000.0,
           double renderRate = 1.0/60.0);
 
     ~tgSimView();
@@ -165,13 +165,20 @@ protected:
     /**
      * The interval in seconds at which the simulation is advanced.
      * It must be positive and it must be less than or equal to
-     * m_renderRate.
+     * m_renderRate. Typically between 1/1000 and 1/4000 will run
+     * close to real time. Slower simulations will run faster but
+     * be less accurate.
      */
     double m_stepSize;
 
     /**
      * The interval in seconds at which the graphics are rendered.
      * It must be be greater than or equal to m_stepSize.
+     * Note that Bullet is set to render at 60 hz (60 fps), so changing
+     * this from 60 may cause the simulation to run faster or slower
+     * than real time.
+     * @todo See about maintaining real time simulation with a different
+     * rendering rate
      */
     double m_renderRate;
     

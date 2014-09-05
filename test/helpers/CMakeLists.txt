@@ -1,9 +1,10 @@
-configure_file(test_file.txt test_file.txt COPYONLY)
+project(helpers)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# Compose our header file for resource inclusion
+set(RESOURCE_PATH "${CMAKE_SOURCE_DIR}/../resources/test")
+configure_file("${helpers_SOURCE_DIR}/resources.h.in" "${helpers_BINARY_DIR}/resources.h")
 
 add_library(FileHelpers SHARED
-	${SRC_DIR}/helpers/FileHelpers.cpp)
-
-add_executable(FileHelpers_test
-    FileHelpers_test.cpp)
-
-target_link_libraries(FileHelpers_test ${ENV_LIB_DIR}/libgtest.a pthread FileHelpers)
+    FileHelpers.cpp)

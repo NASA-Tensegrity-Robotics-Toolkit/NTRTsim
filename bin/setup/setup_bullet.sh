@@ -148,31 +148,36 @@ function build_bullet()
     echo "- Building Bullet Physics under $BULLET_BUILD_DIR"
     pushd "$BULLET_BUILD_DIR" > /dev/null
 
-    # Additional Change 4-28-14: trying to pass in the -fPIC option to solve GLUT issues on linux
-    # This appears to work. Need second opinion from Ryan: does this actually add definitions 
-    # correctly?
-    # Mac 
-
-	# Perform the build
-	# If you turn double precision on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
- "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
-	$CMAKECOMMAND . -G "Unix Makefiles" \
-	-DBUILD_SHARED_LIBS=OFF \
-	-DBUILD_EXTRAS=ON \
-	-DCMAKE_BUILD_TYPE=Debug \
-	-DCMAKE_INSTALL_PREFIX="$BULLET_INSTALL_PREFIX" \
-	-DCMAKE_C_FLAGS="-fPIC" \
-	-DCMAKE_CXX_FLAGS="-fPIC" \
-	-DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-	-DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-	-DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-	-DUSE_DOUBLE_PRECISION=ON \
-	-DCMAKE_INSTALL_NAME_DIR="$BULLET_INSTALL_PREFIX" || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+    # Perform the build
+    # If you turn double precision on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
+    "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_EXTRAS=ON \
+        -DCMAKE_INSTALL_PREFIX="$BULLET_INSTALL_PREFIX" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_C_COMPILER="gcc" \
+        -DCMAKE_CXX_COMPILER="g++" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
+        -DUSE_DOUBLE_PRECISION=ON \
+        -DCMAKE_INSTALL_NAME_DIR="$BULLET_INSTALL_PREFIX" || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
+    #If you turn this on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
     # Additional bullet options: 
-        # -DFRAMEWORK=ON
-        # -DBUILD_DEMOS=ON
-    
-    make || { echo "- ERROR: Bullet build failed"; exit 1; }
+    # -DFRAMEWORK=ON
+    # -DBUILD_DEMOS=ON
+
+    make || { echo "- ERROR: Bullet build failed. Attempting to explicitly make from directory."; make_bullet_local; }
+
+    popd > /dev/null
+}
+
+function make_bullet_local()
+{
+    pushd "$BULLET_BUILD_DIR" > /dev/null
+
+    make || { echo "Explicit make of Bullet failed as well."; exit 1; }
 
     popd > /dev/null
 }

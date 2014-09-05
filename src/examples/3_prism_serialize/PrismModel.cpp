@@ -18,7 +18,7 @@
 
 /**
  * @file PrismModel.cpp
- * @brief Contains the definition of the members of the class PrismModel.
+ * @brief Contains a modified version of 3_prism to use JSON in place of a Config struct for structure configuration.
  * $Id$
  */
 
@@ -145,7 +145,8 @@ void PrismModel::setup(tgWorld& world)
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("config.json"), root );
+    std::string configPath = FileHelpers::getResourcePath("3_prism_serialize/config.json");
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(configPath), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.

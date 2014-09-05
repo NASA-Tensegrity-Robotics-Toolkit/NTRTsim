@@ -30,11 +30,16 @@
 #include "Escape_T6Model.h"
 // This library
 #include "core/tgLinearString.h"
+// For AnnealEvolution
+#include "learning/Configuration/configuration.h"
 // The C++ Standard Library
 #include <cassert>
+#include <cmath>
 #include <stdexcept>
 #include <vector>
 
+# define M_PI 3.14159265358979323846 
+                               
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
@@ -45,16 +50,21 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength)
     this->m_totalTime=0.0;
 }
 
-//Fetch all the muscles and set their preferred length
+/** Set the lengths of the muscles and initialize the learning adapter */
 void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
+    double dt = 0.0001;
+
+    //Fetch all the muscles and set their initial lengths
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i)
     {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setRestLength(this->m_initialLengths,0.0001);
+        pMuscle->setRestLength(this->m_initialLengths, dt);
     }
+
+    setupAdapter();
 }
 
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
@@ -65,8 +75,16 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     }
     m_totalTime+=dt;
 
-    //Move motors for all the muscles
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    // Set new preferred lengths of muscles
+    for (size_t i = 0; i < muscles.size(); i++) {
+        tgLinearString *const pMuscle = muscles[i];
+        assert(pMuscle != NULL);
+        double currentLength = pMuscle->getRestLength();
+        pMuscle->setRestLength(currentLength * (1 + sin((m_totalTime * 100) + (i/muscles.size()))), dt); //TODO: Temporary test
+    }
+
+    //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
         tgLinearString * const pMuscle = muscles[i];
@@ -81,7 +99,7 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     //actions=evolutionAdapter.step(dt,state);
 
     //instead, generate it here for now!
-    for(int i=0;i<24;i++)
+    for(int i=0; i<muscles.size(); i++)
     {
         vector<double> tmp;
         for(int j=0;j<2;j++)
@@ -97,6 +115,23 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     //apply these actions to the appropriate muscles according to the sensor values
     //	applyActions(subject,actions);
 
+}
+
+// So far, only score used for eventual fitness calculation of an Escape Model
+// is the maximum distance from the origin reached during that subject's episode
+void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
+    std::vector<double> scores; //scores[0] == maxDistReached, scores[1] == energySpent
+    double maxDistReached = 60.0; //TODO: Change to variable
+    double energySpent = totalEnergySpent(subject);
+
+    //Invariant: For now, scores must be of size 2 (as required by endEpisode())
+    scores.push_back(maxDistReached);
+    scores.push_back(energySpent);
+
+    std::cout << "Tearing down" << std::endl;
+    evolutionAdapter.endEpisode(scores);
+
+    // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
 
 //Scale actions according to Min and Max length of muscles.
@@ -120,9 +155,7 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
 //Pick particular muscles (according to the structure's state) and apply the given actions one by one
 void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <double> > act)
 {
-    //Get All the muscles of the subject
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    //Check if the number of the actions match the number of the muscles
     if(act.size() != muscles.size())
     {
         cout<<"Warning: # of muscles: "<< muscles.size() << " != # of actions: "<< act.size()<<endl;
@@ -133,7 +166,41 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <
     {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        //cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
         pMuscle->setPrefLength(act[i][0]);
     }
+}
+
+void Escape_T6Controller::setupAdapter() {
+    string suffix = "_Escape";
+    string configAnnealEvolution = "Config.ini";
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    bool isLearning = true;
+    configuration configEvolutionAdapter;
+    configEvolutionAdapter.readFile(configAnnealEvolution);
+
+    evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
+}
+
+double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
+    double totalEnergySpent=0;
+
+    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    for(int i=0; i<tmpStrings.size(); i++)
+    {
+        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+
+        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power         
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    return totalEnergySpent;
 }

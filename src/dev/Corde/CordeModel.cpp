@@ -455,19 +455,19 @@ void CordeModel::computeInternalForces()
         - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
 
         /* Apply X forces */
-        r_0->force[0] += (x1 - x2) * (spring_common + diss_common);
+        r_0->force[0] -= (x1 - x2) * (spring_common + diss_common);
         
-        r_1->force[0] -=  (x1 - x2) * (spring_common + diss_common);
+        r_1->force[0] +=  (x1 - x2) * (spring_common + diss_common);
         
         /* Apply Y forces */
-        r_0->force[1] += (y1 - y2) * (spring_common  + diss_common);
+        r_0->force[1] -= (y1 - y2) * (spring_common  + diss_common);
         
-        r_1->force[1] -= (y1 - y2) * (spring_common + diss_common);
+        r_1->force[1] += (y1 - y2) * (spring_common + diss_common);
         
         /* Apply Z Forces */
-        r_0->force[2] += (z1 - z2) * (spring_common + diss_common);
+        r_0->force[2] -= (z1 - z2) * (spring_common + diss_common);
         
-        r_1->force[2] -= (z1 - z2) * (spring_common + diss_common);
+        r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
 
         /* Apply constraint equation with boundry conditions */
         /* 8/5/14 - need was confirmed once equations corrected */
@@ -602,8 +602,6 @@ void CordeModel::computeInternalForces()
         const btScalar qdot22 = quat_1->qdot[1];
         const btScalar qdot23 = quat_1->qdot[2];
         const btScalar qdot24 = quat_1->qdot[3];
-        
-        const btScalar u1 = quat_0->qdot[0];
         
         const btScalar k1 = computedStiffness[1];
         const btScalar k2 = computedStiffness[2];

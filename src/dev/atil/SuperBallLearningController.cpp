@@ -73,7 +73,15 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 		pMuscle->moveMotors(dt);
 	}
 
-	//vector<double> state=getState();
+	vector<double> state=subject.getSensorInfo();
+
+	std::cout<<m_totalTime;
+	for(int i=0;i<state.size();i++)
+	{
+		std::cout<<","<<state[i];
+	}
+	std::cout<<endl;
+
 	vector< vector<double> > actions;
 
 	//get the actions (between 0 and 1) from evolution (todo)
@@ -94,7 +102,7 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 	actions = transformActions(actions);
 
 	//apply these actions to the appropriate muscles according to the sensor values
-//	applyActions(subject,actions);
+	applyActions(subject,actions);
 
 }
 

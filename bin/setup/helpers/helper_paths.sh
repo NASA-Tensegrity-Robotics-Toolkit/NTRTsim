@@ -27,6 +27,7 @@ BUILD_DIR="${BASE_DIR}/build"
 BUILD_TEST_DIR="${BASE_DIR}/build_test"
 
 SETUP_DIR="${BIN_DIR}/setup"
+SHELL_UTILITIES_DIR="${BIN_DIR}/utilities"
 
 DOWNLOADS_DIR="${ENV_DIR}/downloads"
 ENV_BUILD_DIR="${ENV_DIR}/build"

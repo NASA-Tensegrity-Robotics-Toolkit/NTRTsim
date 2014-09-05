@@ -57,7 +57,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 0.0 * pow(10, 2); // Can't quite accomplish paper level stiffness without things blowing up.
+	const double springConst = 100.0 * pow(10, 2); // Can't quite accomplish paper level stiffness without things blowing up.
 	const double gammaT = 100.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
