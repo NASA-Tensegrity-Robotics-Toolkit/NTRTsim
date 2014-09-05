@@ -113,8 +113,9 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
         static void addRods(tgStructure& s);
 
         /**
-         * A function called during setup that creates muscles (Strings) from
-         * the relevant nodes. Rewrite this function for your own models.
+         * A function called during setup that creates muscles
+         * (tgLinearStrings) from the relevant nodes. 
+         * Also collates muscles into clusters of 3 for actuation purposes
          * @param[in] s A tgStructure that we're building into
          */
         void addMuscles(tgStructure& s);
