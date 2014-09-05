@@ -55,4 +55,4 @@ doxygen Doxyfile || { echo "Failure while building Doxygen documents."; exit 1; 
 
 popd > /dev/null
 
-cp -r ${SRC_DIR}/DoxyDocs/html/* $DOXYGEN_DIR || { echo "Failure while copying Doxygen documents."; exit 1; }
+cp -r ${SRC_DIR}/DoxyDocs/html/* "${DOXYGEN_DIR}/" || { echo "Failure while copying Doxygen documents."; exit 1; }
