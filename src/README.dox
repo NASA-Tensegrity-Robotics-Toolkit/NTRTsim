@@ -34,8 +34,9 @@
 	exterior points of the prism as six nodes. The nodes are then
 	paired into the three rods that cross through the interior of the
 	prism, and the nine muscles that line the outside. Specifications
-	are then given for the rods and muscles. Finally the PretensionController
-	is applied to each string.
+	are then given for the rods and muscles. Similar specifications
+	can also be used to create boxes and spheres.
+	Finally the PretensionController is applied to each string.
 	
 	The following examples demonstrate more features of \ref tgcreator
 	and our core library.

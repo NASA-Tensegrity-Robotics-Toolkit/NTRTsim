@@ -16,14 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef BTEN_ROD_H
-#define BTEN_ROD_H
+#ifndef BTEN_BOX_H
+#define BTEN_BOX_H
 
 /**
- * @file tgRodInfo.h
- * @brief Definition of class tgRodInfo 
- * @author Ryan Adams
- * @date January 2014
+ * @file tgBoxInfo.h
+ * @brief Class that interfaces with Bullet to build the boxes
+ * @author Brian Mirletz and Ryan Adams
+ * @date September 2014
  * $Id$
  */
 
@@ -32,7 +32,7 @@
 #include "tgRigidInfo.h"
 // The NTRT Core Library
 #include "tgUtil.h"
-#include "core/tgRod.h"
+#include "core/tgBox.h"
 
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
@@ -42,48 +42,48 @@ class btVector3;
 // @todo: Need to take tags into account...
 
 /**
- * Implementation of a cylinder shape as defined by a 'from' point and a 'to'
- * point. It also has radius and density.
+ * Implementation of a box shape as defined by a 'from' point and a 'to'
+ * point. It also has length, width and density.
  */ 
-class tgRodInfo : public tgRigidInfo {
+class tgBoxInfo : public tgRigidInfo {
 public:
 
     /**
-     * Construct a tgRodInfo with just a config. The pair must be filled in 
+     * Construct a tgBoxInfo with just a config. The pair must be filled in 
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgRodInfo(const tgRod::Config& config);
+    tgBoxInfo(const tgBox::Config& config);
 
     /**
-     * Construct a tgRodInfo with just a config and tags. The pair must 
+     * Construct a tgBoxInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgRodInfo(const tgRod::Config& config, tgTags tags);
+    tgBoxInfo(const tgBox::Config& config, tgTags tags);
 
     /**
-     * Construct a tgRodInfo from its endpoints, radius and density.
+     * Construct a tgBoxInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgRodInfo(const tgRod::Config& config, const tgPair& pair);
+    tgBoxInfo(const tgBox::Config& config, const tgPair& pair);
 
     /**
-     * Construct a tgRodInfo from its endpoints, radius and density.
+     * Construct a tgBoxInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgRodInfo(const tgRod::Config& config, tgTags tags, const tgPair& pair);
+    tgBoxInfo(const tgBox::Config& config, tgTags tags, const tgPair& pair);
     
     /**
      * World will destroy the rigid body
      */
-    virtual ~tgRodInfo() {} 
+    virtual ~tgBoxInfo() {} 
     
     /**
      * Create a tgRigidInfo* from a tgPair
@@ -104,7 +104,7 @@ public:
      * Return a const reference to the container of the radius and density.
      * @return a const reference to the container of the radius and density
      */
-    const tgRod::Config& getConfig() const { return m_config; }
+    const tgBox::Config& getConfig() const { return m_config; }
 
     /** Return a const reference to the first endpoint. */
     const btVector3& getFrom() const { return m_pair.getFrom(); }
@@ -128,15 +128,15 @@ public:
     }
     
     /**
-     * Return the rod's mass.
+     * Return the Box's mass.
      * The mass is the volume times the density.
-     * @return the mass of the rod
+     * @return the mass of the Box
      */
     virtual double getMass() const;
     /**
-     * Return the rod's center of mass.
+     * Return the Box's center of mass.
      * The center of mass is a point halfway between the endpoints.
-     * @return the rod's center of mass
+     * @return the Box's center of mass
      */
     virtual btVector3 getCenterOfMass() const
     {
@@ -169,22 +169,22 @@ public:
                        const double rotation) const;
     
     /**
-     * Since a rod is not a compound shape, there is no compound shape object to
+     * Since a Box is not a compound shape, there is no compound shape object to
      * return.
      * @retval NULL
      */
     virtual tgCompoundRigidInfo* getCompound() { return 0; }
 
     /**
-     * Since a rod is not a compound shape, there is no compound shape object to
+     * Since a Box is not a compound shape, there is no compound shape object to
      * return.
      * @retval NULL
      */
     virtual const tgCompoundRigidInfo* getCompound() const { return 0; }
 
     /**
-     * Return a set containing only a pointer to this rod.
-     * @retval a set containing only a pointer to this rod
+     * Return a set containing only a pointer to this Box.
+     * @retval a set containing only a pointer to this Box
      * @todo This function can't be const unless the return value is
      * std::set<const tgRigidInfo*>.
      */
@@ -217,30 +217,30 @@ public:
 private:
 
     /** Disable the copy constructor. */
-    tgRodInfo(const tgRodInfo&);
+    tgBoxInfo(const tgBoxInfo&);
 
     /** Disable the assignment operator. */
-    tgRodInfo& operator=(const tgRodInfo&);  
+    tgBoxInfo& operator=(const tgBoxInfo&);  
     
 private:
 
-    /** The pair representing the endpoints of the rod. */
+    /** The pair representing the endpoints of the Box. */
     const tgPair m_pair;
     
     /** Radius and density values. */
-    const tgRod::Config& m_config;     
+    const tgBox::Config& m_config;     
 
 };
 
 /**
- * Overload operator<<() to handle a tgRodInfo.
+ * Overload operator<<() to handle a tgBoxInfo.
  * @param[in,out] os an ostream
- * @param[in] q a tgRodInfo
+ * @param[in] q a tgBoxInfo
  * @return os
  */
-inline std::ostream& operator<<(std::ostream& os, const tgRodInfo& rod)
+inline std::ostream& operator<<(std::ostream& os, const tgBoxInfo& box)
 {
-    os << "tgRodInfo(" << rod.getFrom() << ", " << rod.getTo() <<")";
+    os << "tgBoxInfo(" << box.getFrom() << ", " << box.getTo() <<")";
     return os;
 }
 

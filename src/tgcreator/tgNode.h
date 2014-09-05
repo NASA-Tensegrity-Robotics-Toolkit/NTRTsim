@@ -40,6 +40,7 @@
 /**
  * An extension of btVector3 that adds taggability,
  * rotation, and other editing features (to be added).
+ * Tagging just a node can allow a tgSphere to be placed there.
  */
 class tgNode : public btVector3, public tgTaggable
 {

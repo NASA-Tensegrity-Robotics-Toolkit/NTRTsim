@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgRod.cpp
- * @brief Contains the definitions of members of class tgRod
+ * @file tgSphere.cpp
+ * @brief Contains the definitions of members of class tgSphere
  * @author Ryan Adams
  * $Id$
  */
 
 // This module
-#include "tgRod.h"
+#include "tgSphere.h"
 #include "tgModelVisitor.h"
 // The Bullet Physics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
@@ -33,7 +33,7 @@
 #include <cassert>
 #include <stdexcept>
 
-tgRod::Config::Config(double r, double d,
+tgSphere::Config::Config(double r, double d,
                         double f, double rf, double res) :
   radius(r),
   density(d),
@@ -57,11 +57,9 @@ tgRod::Config::Config(double r, double d,
     assert((restitution >= 0.0) && (restitution <= 1.0));
 }
 
-tgRod::tgRod(btRigidBody* pRigidBody, 
-                const tgTags& tags,
-                const double length) : 
-  tgBaseRigid(pRigidBody, tags),
-  m_length(length)
+tgSphere::tgSphere(btRigidBody* pRigidBody, 
+                const tgTags& tags) : 
+  tgBaseRigid(pRigidBody, tags)
 {
         if (pRigidBody == NULL)
     {
@@ -73,15 +71,15 @@ tgRod::tgRod(btRigidBody* pRigidBody,
     assert(m_pRigidBody == pRigidBody);
 }
 
-tgRod::~tgRod() { }
+tgSphere::~tgSphere() { }
 
-void tgRod::onVisit(const tgModelVisitor& v) const
+void tgSphere::onVisit(const tgModelVisitor& v) const
 {
     v.render(*this);
     
 }
 
-void tgRod::teardown()
+void tgSphere::teardown()
 {
   // World should delete the body
   m_pRigidBody = NULL;
@@ -91,10 +89,9 @@ void tgRod::teardown()
   // This does not preserve the invariant
 }
 
-bool tgRod::invariant() const
+bool tgSphere::invariant() const
 {
   return
     (m_pRigidBody != NULL) &&
-    (m_mass >= 0.0) &&
-    (m_length >= 0.0);
+    (m_mass >= 0.0);
 }

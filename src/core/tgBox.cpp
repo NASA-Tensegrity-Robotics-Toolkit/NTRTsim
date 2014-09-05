@@ -24,8 +24,8 @@
  */
 
 // This module
-#include "tgRod.h"
-#include "tgModelVisitor.h"
+#include "tgBox.h"
+#include "core/tgModelVisitor.h"
 // The Bullet Physics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "btBulletDynamicsCommon.h"
@@ -33,16 +33,18 @@
 #include <cassert>
 #include <stdexcept>
 
-tgRod::Config::Config(double r, double d,
+tgBox::Config::Config(double w, double h, double d,
                         double f, double rf, double res) :
-  radius(r),
+  width(w),
+  height(h),
   density(d),
   friction(f),
   rollFriction(rf),
   restitution(res)
 {
         if (density < 0.0) { throw std::range_error("Negative density"); }
-        if (radius < 0.0)  { throw std::range_error("Negative radius");  }
+        if (width < 0.0)  { throw std::range_error("Negative width");  }
+        if (height < 0.0)  { throw std::range_error("Negative height");  }
         if (friction < 0.0)  { throw std::range_error("Negative friction");  }
         if (rollFriction < 0.0)  { throw std::range_error("Negative roll friction");  }
         if (restitution < 0.0)  { throw std::range_error("Negative restitution");  }
@@ -51,13 +53,14 @@ tgRod::Config::Config(double r, double d,
         if (restitution > 1.0)  { throw std::range_error("Restitution > 1");  }
     // Postcondition
     assert(density >= 0.0);
-    assert(radius >= 0.0);
+    assert(width >= 0.0);
+    assert(height >= 0.0);
     assert((friction >= 0.0) && (friction <= 1.0));
     assert((rollFriction >= 0.0) && (rollFriction <= 1.0));
     assert((restitution >= 0.0) && (restitution <= 1.0));
 }
 
-tgRod::tgRod(btRigidBody* pRigidBody, 
+tgBox::tgBox(btRigidBody* pRigidBody, 
                 const tgTags& tags,
                 const double length) : 
   tgBaseRigid(pRigidBody, tags),
@@ -73,28 +76,26 @@ tgRod::tgRod(btRigidBody* pRigidBody,
     assert(m_pRigidBody == pRigidBody);
 }
 
-tgRod::~tgRod() { }
+tgBox::~tgBox() { }
 
-void tgRod::onVisit(const tgModelVisitor& v) const
+void tgBox::onVisit(const tgModelVisitor& v) const
 {
     v.render(*this);
-    
+    // Do we need to render the base class?
 }
 
-void tgRod::teardown()
+void tgBox::teardown()
 {
-  // World should delete the body
-  m_pRigidBody = NULL;
-  tgModel::teardown();
+
+   m_pRigidBody = NULL;
+   tgModel::teardown();
 
   // Postcondition
   // This does not preserve the invariant
 }
 
-bool tgRod::invariant() const
+bool tgBox::invariant() const
 {
   return
-    (m_pRigidBody != NULL) &&
-    (m_mass >= 0.0) &&
     (m_length >= 0.0);
 }

@@ -16,31 +16,31 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_ROD_H
-#define TG_ROD_H
+#ifndef TG_BOX_H
+#define TG_BOX_H
 
 /**
- * @file tgRod.h
- * @brief Contains the definition of class tgRod
- * @author Ryan Adams
+ * @file tgBox.h
+ * @brief Create a box shape as an obstacle or add it to your tensegrity
+ * @author Brian Mirletz and Ryan Adams
  * $Id$
  */
 
 // This application
-#include "tgBaseRigid.h" // @todo: forward declare and move to tgRod.cpp (to be created)
+#include "tgBaseRigid.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <vector>
 
 // Forward declarations
-class btRigidBody;
+//class btRigidBody;
 
 /**
- * A rod is a rigid body. Length is defined by nodes, radius and density
+ * A rod is a rigid body. Length is defined by nodes, width, height and density
  * are defined by config.
  */
-class tgRod : public tgBaseRigid
+class tgBox : public tgBaseRigid
 {
 public:
 
@@ -56,18 +56,21 @@ public:
          * @param[in] radius the rod's radius; must be non-negative
          * @param[in] density the rod's density; must be non-negative
          */
-            Config(double r = 0.5,
+            Config(double w = 1.0,
+                    double h = 1.0,
                     double d = 1.0,
-                    double f = 1.0,
+					double f = 1.0,
                     double rf = 0.0,
                     double res = 0.2);
 
 
+            /** The box's width; must be nonnegative. */
+            const double width;
 
-            /** The rod's radius; must be nonnegative. */
-            const double radius;
-
-            /** The rod's density; must be nonnegative. */
+            /** The rod's height; must be nonnegative. */
+            const double height;
+            
+			/** The rod's density; must be nonnegative. */
             const double density;
             
             /** The rod's friction; 
@@ -83,13 +86,13 @@ public:
             const double restitution;
     };
     
-        tgRod(btRigidBody* pRigidBody,
+        tgBox(btRigidBody* pRigidBody,
                 const tgTags& tags,
                 const double length);
     
-        /** A class with a virtual memeber function requires a virtual destructor. */
-        virtual ~tgRod();
-    
+	/** A class with a virtual memeber function requires a virtual destructor. */
+	virtual ~tgBox();
+
     virtual void teardown();
     
     virtual void onVisit(const tgModelVisitor& v) const;
@@ -99,6 +102,7 @@ public:
      * @return the rod's length in application-dependent units
      */
     double length() const { return m_length; }
+
 
 private:
 
