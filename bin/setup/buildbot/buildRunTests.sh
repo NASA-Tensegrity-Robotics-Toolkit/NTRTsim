@@ -47,4 +47,4 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-${BIN_DIR}/build.sh -r
+${BIN_DIR}/build.sh -r || { echo "Test build and run failed."; exit 1; }
