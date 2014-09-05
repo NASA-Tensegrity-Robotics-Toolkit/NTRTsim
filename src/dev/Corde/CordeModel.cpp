@@ -289,18 +289,19 @@ void CordeModel::computeCenterlines()
 		
 		btVector3 zAxis(0.0, 0.0, 1.0);
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
-
-		std::cout << zAxis.cross(axisVec).normalize() << std::endl;
-		std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		
 		btQuaternion currentAngle;
 		if (zAxis.dot(axisVec) != 1.0)
 		{
 			currentAngle.setRotation( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
+			std::cout << zAxis.cross(axisVec).normalize() << std::endl;
+			std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		}
 		else
 		{
 			currentAngle.setRotation( zAxis, 0.0);
+			std::cout << zAxis << std::endl;
+			std::cout << acos(zAxis.dot(axisVec)) << std::endl;
 		}
 		
 		double mass = m_config.density * length * M_PI * pow(m_config.radius, 2);
@@ -408,8 +409,8 @@ void CordeModel::computeInternalForces()
         
         /* Quaternion Constraint Z */
         const btScalar quat_cons_z = m_config.ConsSpringConst * linkLengths[i] *
-        ( -1.0 * director[0] * (y1 - y2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
-        - director[1] * (x1 - x2) * (z1 - z2) ) / ( pow (posNorm, 3) );
+        ( -1.0 * director[0] * (x1 - x2) * (z1 - z2) + director[2] * ( pow( posDiff[0], 2) + pow( posDiff[1], 2) )
+        - director[1] * (y1 - y2) * (z1 - z2) ) / ( pow (posNorm, 3) );
 
         /* Apply X forces */
         r_0->force[0] -= (x1 - x2) * (spring_common + diss_common);
