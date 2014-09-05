@@ -55,4 +55,6 @@ doxygen Doxyfile || { echo "Failure while building Doxygen documents."; exit 1; 
 
 popd > /dev/null
 
+rm -rf "${DOXYGEN_DIR}/*"
 cp -r ${SRC_DIR}/DoxyDocs/html/* "${DOXYGEN_DIR}" || { echo "Failure while copying Doxygen documents."; exit 1; }
+chmod -R 775 $DOXYGEN_DIR
