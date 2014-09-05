@@ -168,7 +168,16 @@ function build_bullet()
     # -DFRAMEWORK=ON
     # -DBUILD_DEMOS=ON
 
-    make || { echo "- ERROR: Bullet build failed"; exit 1; }
+    make || { echo "- ERROR: Bullet build failed. Attempting to explicitly make from directory."; make_bullet_local; }
+
+    popd > /dev/null
+}
+
+function make_bullet_local()
+{
+    pushd "$BULLET_BUILD_DIR" > /dev/null
+
+    make || { echo "Explicit make of Bullet failed as well."; exit 1; }
 
     popd > /dev/null
 }
