@@ -79,7 +79,7 @@ namespace
              size_t segmentCount)
     {
 
-        const btVector3 offset(0, 0, -edge * 1.15);
+        const btVector3 offset(0, 0, -edge * 0.6);
         for (size_t i = 0; i < segmentCount; ++i)
         {
             tgStructure* const t = new tgStructure(tetra);
