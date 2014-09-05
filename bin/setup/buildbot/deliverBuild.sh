@@ -16,11 +16,43 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+SCRIPT_PATH="`dirname \"$0\"`"
+SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
+# Add the relative path from this script to the helpers folder.
+pushd "${SCRIPT_PATH}/../helpers/" > /dev/null
+
+##############################################################################
+#                         START DO NOT MODIFY                                #
+##############################################################################
+if [ ! -f "helper_functions.sh" ]; then
+    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
+    exit 1;
+fi
+
+# Import our common files
+source "helper_functions.sh"
+source "helper_paths.sh"
+source "helper_definitions.sh"
+
+# Get out of the bash helpers folder.
+popd > /dev/null
+##############################################################################
+#                          END DO NOT MODIFY                                 #
+##############################################################################
+
 DOXYGEN_DIR="~/www/doxygen"
 
 pushd ${SRC_DIR} > /dev/null
 
 doxygen Doxyfile || { echo "Failure while building Doxygen documents."; exit 1; }
+
 popd > /dev/null
 
 cp -r ${SRC_DIR}/DoxyDocs/html/* $DOXYGEN_DIR/. || { echo "Failure while copying Doxygen documents."; exit 1; }
