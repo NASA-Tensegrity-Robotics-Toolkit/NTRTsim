@@ -16,37 +16,6 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-##############################################################################
-#                         START DO NOT MODIFY                                #
-##############################################################################
-SCRIPT_PATH="`dirname \"$0\"`"
-SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
-##############################################################################
-#                          END DO NOT MODIFY                                 #
-##############################################################################
-
-# Add the relative path from this script to the helpers folder.
-pushd "${SCRIPT_PATH}/../helpers/" > /dev/null
-
-##############################################################################
-#                         START DO NOT MODIFY                                #
-##############################################################################
-if [ ! -f "helper_functions.sh" ]; then
-    echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
-    exit 1;
-fi
-
-# Import our common files
-source "helper_functions.sh"
-source "helper_paths.sh"
-source "helper_definitions.sh"
-
-# Get out of the bash helpers folder.
-popd > /dev/null
-##############################################################################
-#                          END DO NOT MODIFY                                 #
-##############################################################################
-
 ENV_SRC_DIR="/home/bbadmin/env_BOOSTBULLET"
 BUILDBOT_BUILD_DIR="/home/bbadmin/buildbot/slave/master/build"
 
