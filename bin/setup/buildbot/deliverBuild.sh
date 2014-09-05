@@ -47,7 +47,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-DOXYGEN_DIR="~/www/doxygen"
+DOXYGEN_DIR="~/www/html/doxygen"
 
 pushd ${SRC_DIR} > /dev/null
 
