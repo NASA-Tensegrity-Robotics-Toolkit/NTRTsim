@@ -49,6 +49,9 @@ subject to the following restrictions:
 #include "core/tgWorld.h"
 #include "core/tgBulletUtil.h"
 
+// Builder library (printing)
+#include "tgcreator/tgUtil.h"
+
 // The Bullet Physics Library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
@@ -132,6 +135,27 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
+	
+	if (simTime >= 1.0/100.0)
+    {
+        size_t n = m_massPoints.size();
+        for (std::size_t i = 0; i < n; i++)
+        {
+            std::cout << "Position " << i << " " << m_massPoints[i]->pos << std::endl
+					  << "Velocity " << i << " " << m_massPoints[i]->vel << std::endl
+                      << "Force " << i << " " << m_massPoints[i]->force << std::endl;
+            if (i < n - 1)
+            {
+            std::cout << "Quaternion " << i << " " << m_centerlines[i]->q << std::endl
+                      << "Qdot " << i << " " << m_centerlines[i]->qdot << std::endl
+                      << "Omega " << i << " " << m_centerlines[i]->omega << std::endl
+                      << "Force " << i << " " << m_centerlines[i]->tprime << std::endl
+                      << "Torque " << i << " " << m_centerlines[i]->torques << std::endl;
+            }       
+        }
+        simTime = 0.0;
+    }
+	
     simTime += dt;
 	stepPrerequisites();
 }

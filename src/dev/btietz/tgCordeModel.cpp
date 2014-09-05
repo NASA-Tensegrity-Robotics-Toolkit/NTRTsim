@@ -39,8 +39,8 @@ tgCordeModel::~tgCordeModel()
 void tgCordeModel::setup(tgWorld& world)
 {
 
-	btVector3 startPos(0.0, 5.0, 0.0);
-	btVector3 endPos  (10.0, 15.0, 1.0);
+	btVector3 startPos(0.0, 6.0, 0.0);
+	btVector3 endPos  (5.0, 8.0, 0.0);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
@@ -57,7 +57,7 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 2); // Can't quite accomplish paper level stiffness without things blowing up.
+	const double springConst = 100.0 * pow(10, 3); // Can't quite accomplish paper level stiffness without things blowing up.
 	const double gammaT = 100.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
@@ -94,9 +94,9 @@ void tgCordeModel::teardown()
     
 void tgCordeModel::step(double dt)
 {
-	//testString->applyForce(btVector3(0.0, -9.0, 0.0), 0);
-	//testString->applyForce(btVector3(0.0, 9.0, 0.0), 19);
-	testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
+	testString->applyForce(btVector3(0.0, -90.0, 0.0), 0);
+	testString->applyForce(btVector3(0.0, 90.0, 0.0), 9);
+	//testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
 	//testString->applyVecTorque(btVector3(0.0, -100.0, 0.0), 0);
 	//testString->applyVecTorque(btVector3(0.0, 10.0, 0.0), 18);
     //testString->step(dt);

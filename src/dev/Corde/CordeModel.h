@@ -163,9 +163,6 @@ public:
     
     /// TODO: apply uniform torques?
 
-#if (0) // Depricated -> no collision handling  
-	virtual void step (btScalar dt);
-#endif	
 protected:
 	void computeConstants();
 	
