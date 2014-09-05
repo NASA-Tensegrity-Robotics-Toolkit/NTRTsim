@@ -178,85 +178,48 @@ void Escape_T6Model::addMarkers(tgStructure &s)
 }
 
 /** 
- * Defines muscles in the structure as well as the cluster they belong to
+ * Defines muscles in the structure by their end nodes 
+ * as well as the cluster to which they belong
  * A cluster is any three muscles that form a triangle (with nodes as vertices)
  */
 void Escape_T6Model::addMuscles(tgStructure& s)
 {
-    int nNodes = 13;
-    int muscleConnections[nNodes][nNodes];
-    musclesPerNodes.resize(nNodes);
-
-    for(int i=0;i<nNodes;i++) {
-        musclesPerNodes[i].resize(nNodes);
-        for(int j=0;j<nNodes;j++)
-            musclesPerNodes[i][j]=NULL;
-    }
-
-    for(int i=0;i<nNodes;i++)
-        for(int j=0;j<nNodes;j++)
-            muscleConnections[i][j]=-1;
-
     // Cluster 1
-    muscleConnections[0][3]=0;
-    muscleConnections[3][2]=0;
-    muscleConnections[2][0]=0;
     s.addPair(0, 3, "muscle cluster1");
     s.addPair(3, 2, "muscle cluster1");
     s.addPair(2, 0, "muscle cluster1");
 
     // Cluster 2
-    muscleConnections[4][5]=0;
-    muscleConnections[5][7]=0;
-    muscleConnections[7][4]=0;
     s.addPair(4, 5, "muscle cluster2");
     s.addPair(5, 7, "muscle cluster2");
     s.addPair(7, 4, "muscle cluster2");
 
     // Cluster 3
-    muscleConnections[1][8]=0;
-    muscleConnections[8][10]=0;
-    muscleConnections[10][1]=0;
     s.addPair(1, 8, "muscle cluster3");
     s.addPair(8, 10, "muscle cluster3");
     s.addPair(10, 1, "muscle cluster3");
 
     //Cluster 4
-    muscleConnections[9][11]=0;
-    muscleConnections[11][6]=0;
-    muscleConnections[6][9]=0;
     s.addPair(9, 11, "muscle cluster4");
     s.addPair(11, 6, "muscle cluster4");
     s.addPair(6, 9, "muscle cluster4");
 
     // Cluster 5
-    muscleConnections[1][2]=1;
-    muscleConnections[2][4]=1;
-    muscleConnections[4][1]=1;
     s.addPair(1, 2, "muscle cluster5");
     s.addPair(2, 4, "muscle cluster5");
     s.addPair(4, 1, "muscle cluster5");
 
     // Cluster 6
-    muscleConnections[3][5]=1;
-    muscleConnections[5][6]=1;
-    muscleConnections[6][3]=1;
     s.addPair(3, 5, "muscle cluster6");
     s.addPair(5, 6, "muscle cluster6");
     s.addPair(6, 3, "muscle cluster6");
 
     // Cluster 7
-    muscleConnections[0][8]=1;
-    muscleConnections[8][9]=1;
-    muscleConnections[9][0]=1;
     s.addPair(0, 8, "muscle cluster7");
     s.addPair(8, 9, "muscle cluster7");
     s.addPair(0, 9, "muscle cluster7");
 
     // Cluster 8
-    muscleConnections[11][7]=1;
-    muscleConnections[7][10]=1;
-    muscleConnections[10][11]=1;
     s.addPair(11, 7, "muscle cluster8");
     s.addPair(7, 10, "muscle cluster8");
     s.addPair(10, 11, "muscle cluster8");

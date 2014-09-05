@@ -209,7 +209,7 @@ void Escape_T6Controller::setPreferredMuscleLengths(std::vector<tgLinearString*>
         double amplitude = 0.95 * m_initialLengths;
         double angularFrequency = 1000 * dt;
         double phase = 0; //TODO: Determined based on cluster
-        double newLength = m_initialLengths;//TODO: Change to: amplitude * sin(angularFrequency * m_totalTime + phase);
+        double newLength = amplitude * (1 + sin(angularFrequency * m_totalTime + phase));
 
         pMuscle->setRestLength(newLength, dt);
     }
