@@ -49,7 +49,7 @@ void tgCordeModel::setup(tgWorld& world)
 	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
 #endif
 	
-#if (1)	
+#if (0)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 10;
 	const double radius = 0.1;
@@ -57,20 +57,20 @@ void tgCordeModel::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 3); // Can't quite accomplish paper level stiffness without things blowing up.
+	const double springConst = 100.0 * pow(10, 3); 
 	const double gammaT = 100.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
-	// Values for thread
+	// Values for wire
 		const std::size_t resolution = 20;
 	const double radius = 0.001;
-	const double density = 1300;
-	const double youngMod = 1.0 * pow(10, 1);
-	const double shearMod = 1.0 * pow(10, 1);
-	const double stretchMod = 0.02 * pow(10, 6);
-	const double springConst = 0.0 * pow(10, 0);
-	const double gammaT = 1.0 * pow(10, -6); // Position Damping
-	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
+	const double density = 7860;
+	const double youngMod = 200.0 * pow(10, 6);
+	const double shearMod = 100.0 * pow(10, 6);
+	const double stretchMod = 100.0 * pow(10, 6);
+	const double springConst = 300.0 * pow(10, 3);
+	const double gammaT = 0.05 * pow(10, -6); // Position Damping
+	const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
 #endif
 	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);

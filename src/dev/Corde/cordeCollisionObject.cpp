@@ -135,7 +135,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
-	
+#if (1)	
 	if (simTime >= 1.0/100.0)
     {
         size_t n = m_massPoints.size();
@@ -155,7 +155,7 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
         }
         simTime = 0.0;
     }
-	
+#endif	
     simTime += dt;
 	stepPrerequisites();
 }

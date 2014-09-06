@@ -429,39 +429,6 @@ void CordeModel::computeInternalForces()
 
         /* Apply constraint equation with boundry conditions */
         /* 8/5/14 - need was confirmed once equations corrected */
-        
-#if (0) // "reversed" sign 
-        if (i == 0)
-        {
-           r_1->force[0] -= quat_cons_x;
-            
-            
-           r_1->force[1] -= quat_cons_y;
-            
-            
-           r_1->force[2] -= quat_cons_z; 
-        }
-        else if (i == n - 1)
-        {
-            r_0->force[0] += quat_cons_x;
-
-            r_0->force[1] += quat_cons_y;
-            
-            r_0->force[2] += quat_cons_z;       
-        }
-        else
-        {
-            r_0->force[0] += quat_cons_x;
-            r_1->force[0] -= quat_cons_x;
-            
-            r_0->force[1] += quat_cons_y;
-            r_1->force[1] -= quat_cons_y;
-            
-            r_0->force[2] += quat_cons_z;
-            r_1->force[2] -= quat_cons_z;            
-        }
-#else
-	#if (1)
         if (i == 0)
         {
            r_1->force[0] += quat_cons_x;
@@ -482,7 +449,6 @@ void CordeModel::computeInternalForces()
         }
         else
         {
-	#endif
             r_0->force[0] -= quat_cons_x;
             r_1->force[0] += quat_cons_x;
             
@@ -492,26 +458,10 @@ void CordeModel::computeInternalForces()
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
         }
-#endif
 
-#if (0) // Original derivation
+		// Original derivation
         /* Torques resulting from quaternion alignment constraints */
-        quat_0->tprime[0] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q11 * quat_0->q.length2() + (q13 * posDiff[0] -
-            q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
-        
-        quat_0->tprime[1] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q12 * quat_0->q.length2() + (q14 * posDiff[0] +
-            q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
-            
-        quat_0->tprime[2] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q13 * quat_0->q.length2() + (q11 * posDiff[0] +
-            q12 * posDiff[1] + q13 * posDiff[2]) / posNorm);
-            
-        quat_0->tprime[3] += 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q14 * quat_0->q.length2() + (q12 * posDiff[0] -
-            q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
-#else // quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
+		// quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
         // The simulation is much more stable if we just assume its one.
         quat_0->tprime[0] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q11 + (q13 * posDiff[0] -
@@ -528,7 +478,6 @@ void CordeModel::computeInternalForces()
         quat_0->tprime[3] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
             * ( q14 + (q12 * posDiff[0] -
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
-#endif
 
     }
     
