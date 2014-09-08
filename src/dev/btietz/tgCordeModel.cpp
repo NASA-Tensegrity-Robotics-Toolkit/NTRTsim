@@ -40,7 +40,7 @@ void tgCordeModel::setup(tgWorld& world)
 {
 
 	btVector3 startPos(0.0, 10.0, 0.0);
-	btVector3 endPos  (0.0, 5.0, 10.0);
+	btVector3 endPos  (10.0, 10.0, 0.0);
 	
 #if (0)	// Unused reference implementations from previous constructors
 	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
@@ -49,7 +49,7 @@ void tgCordeModel::setup(tgWorld& world)
 	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
 #endif
 	
-#if (0)	
+#if (1)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 10;
 	const double radius = 0.1;
@@ -58,8 +58,8 @@ void tgCordeModel::setup(tgWorld& world)
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
 	const double springConst = 100.0 * pow(10, 3); 
-	const double gammaT = 100.0 * pow(10, -6); // Position Damping
-	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
+	const double gammaT = 100.0 * pow(10, 3); // Position Damping
+	const double gammaR = 1.0 * pow(10, 3); // Rotation Damping
 #else
 	// Values for wire
 		const std::size_t resolution = 20;

@@ -129,12 +129,17 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	m_scontacts.resize(0);
 	
 	/* Optimize dbvt's		*/ 
+	// Argument is number of passes
 	m_ndbvt.optimizeIncremental(1);
 }
 
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
+	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
+	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
+	m_massPoints[9]->pos = btVector3(10.0, 10.0, 0.0);
+	m_massPoints[9]->vel = btVector3(0.0, 0.0, 0.0);
 #if (1)	
 	if (simTime >= 1.0/100.0)
     {
@@ -186,13 +191,13 @@ void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrappe
 	pcoWrap->getCollisionShape()->getAabb(	pcoWrap->getWorldTransform(),
 		mins,
 		maxs);
-	volume=btDbvtVolume::FromMM(mins,maxs);
+	volume = btDbvtVolume::FromMM(mins,maxs);
 	volume.Expand(btVector3(basemargin,basemargin,basemargin));		
 	docollide.psb		=	this;
 	docollide.m_colObj1Wrap = pcoWrap;
 	docollide.m_rigidBody = prb1;
 
-	docollide.dynmargin	=	basemargin+timemargin;
+	docollide.dynmargin	=	basemargin + timemargin;
 	docollide.stamargin	=	basemargin;
 	m_ndbvt.collideTV(m_ndbvt.m_root,volume,docollide);
 }

@@ -573,7 +573,7 @@ void CordeModel::computeInternalForces()
          */
          
         /* Torsional Damping */
-        const btScalar damping_common = 4.0 * m_config.gammaR / lj;
+        const btScalar damping_common = -4.0 * m_config.gammaR / lj;
         
         // Refactored Successfully
         const btScalar q11_damping = damping_common *
@@ -625,7 +625,7 @@ void CordeModel::computeInternalForces()
         - q13*q21*qdot12 + q13*q22*qdot11 + q14*q21*qdot11 - q12*q22*qdot14 + q14*q22*qdot12 
         - q13*q23*qdot14 + q14*q23*qdot13 - q21*q24*qdot21 - q22*q24*qdot22 - q23*q24*qdot23));
       
-        /* Apply torques */ /// @todo - check with theory! (still have no idea what proper sign is)
+        /* Apply torques */ /// Damping sign confirmed 9/8/14. Set damping to 10^+3, it'll actually chill out.
         quat_0->tprime[0] -= q11_stiffness - q11_damping;
        
         quat_1->tprime[0] -= q21_stiffness - q21_damping;
