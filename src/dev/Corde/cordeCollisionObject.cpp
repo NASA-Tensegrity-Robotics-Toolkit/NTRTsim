@@ -72,7 +72,7 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
-	m_collisionShape->setMargin(0.25f);
+	m_collisionShape->setMargin(0.0f);
 	
 	const btScalar		margin=getCollisionShape()->getMargin();
 	
