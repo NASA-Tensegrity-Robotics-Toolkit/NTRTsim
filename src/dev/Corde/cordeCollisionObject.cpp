@@ -72,7 +72,7 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
-	m_collisionShape->setMargin(0.0f);
+	m_collisionShape->setMargin(0.1f);
 	
 	const btScalar		margin=getCollisionShape()->getMargin();
 	
@@ -136,11 +136,14 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
+#if (0)
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
-	m_massPoints[9]->pos = btVector3(10.0, 10.0, 0.0);
-	m_massPoints[9]->vel = btVector3(0.0, 0.0, 0.0);
-#if (1)	
+	m_massPoints[29]->pos = btVector3(10.0, 10.0, 0.0);
+	m_massPoints[29]->vel = btVector3(0.0, 0.0, 0.0);
+#endif
+	
+#if (0)	
 	if (simTime >= 1.0/100.0)
     {
         size_t n = m_massPoints.size();
@@ -268,7 +271,7 @@ void cordeCollisionObject::solveRContacts()
 		
 		// Normal * mass ratio * penetration distance
 		btVector3 rSoft = cti.m_normal * c.m_c2 * cti.m_dist;
-		btVector3 rRigid =  cti.m_normal * (1.f - c.m_c2) * cti.m_dist;
+		btVector3 rRigid =  -cti.m_normal * (1.f - c.m_c2) * cti.m_dist;
 		
 		btVector3 fSoft = pow(idt, 2.0) * c.m_node->mass * rSoft;
 		btScalar  magSoft = fSoft.length();

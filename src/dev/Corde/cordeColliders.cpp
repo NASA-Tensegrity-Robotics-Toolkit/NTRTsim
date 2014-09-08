@@ -98,7 +98,8 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			}
 			else
 			{
-				c.m_c2 = (1.0 / imb) * ms;
+				// mr / (ms + mr)
+				c.m_c2 = (1.0 / imb) * 1.0 / (1.0 / imb + n.mass);
 			}
 			
 			if (fv.length() != 0.0)
