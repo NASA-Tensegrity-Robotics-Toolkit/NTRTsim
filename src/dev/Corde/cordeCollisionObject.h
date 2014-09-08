@@ -133,7 +133,7 @@ public:
 	void integrateMotion(btScalar dt);
 	
 	// Constrained motion - anchors, apply contact forces (8/28 just rigid)
-	void solveConstraints();
+	void solveConstraints(btScalar dt);
 	
 	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
 	
@@ -203,6 +203,8 @@ private:
 	void updateAABBBounds();
 	
 	void solveRContacts();
+	
+	void solveAnchors(const double dt);
 	
 	/**
 	 * The solver that handles this softbody. 

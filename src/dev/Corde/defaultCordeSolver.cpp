@@ -92,7 +92,7 @@ void defaultCordeSolver::solveConstraints( float solverdt )
 		cordeCollisionObject*	psb = static_cast<cordeCollisionObject*>(m_softBodySet[i]);
 		if (psb->isActive())
 		{
-			psb->solveConstraints();
+			psb->solveConstraints(solverdt );
 		}
 	}	
 } // defaultCordeSolver::solveConstraints

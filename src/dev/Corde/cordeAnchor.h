@@ -19,6 +19,8 @@
 #ifndef CORDE_ANCHOR
 #define CORDE_ANCHOR
 
+#include "CordeModel.h"
+
 // The Bullet Physics library
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
@@ -28,7 +30,7 @@ class btRigidBody;
 class cordeAnchor
 {
 public:
-    cordeAnchor(btRigidBody *body, btVector3 pos);
+    cordeAnchor(btRigidBody* body, CordeModel::CordePositionElement* element, btVector3 pos);
     
     ~cordeAnchor();
     
@@ -37,19 +39,18 @@ public:
     // Relative to the body
     btVector3 getRelativePosition();
 	
-	/**
-	 * Pointer is const.
-	 * @todo Should we make this private? How many other classes
-	 * need to know about it?
-	 */
-    const btRigidBody * attachedBody;
+	void solve(const double dt);  
 
+private:
+ 
+	cordeAnchor();
+
+    btRigidBody* attachedBody;
+	
+	CordeModel::CordePositionElement* m_attachedElement;
+	
     // Relative to the body when it is first constructed
     const btVector3 attachedRelativeOriginalPosition;
-    
-
- private:
-	cordeAnchor();
 
 };
 

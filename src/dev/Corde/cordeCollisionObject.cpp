@@ -41,6 +41,7 @@ subject to the following restrictions:
  */
 
 // This Module
+#include "cordeAnchor.h"
 #include "cordeCollisionObject.h"
 #include "cordeCollisionShape.h"
 #include "cordeColliders.h"
@@ -136,11 +137,11 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
-#if (0)
+#if (1)
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
-	m_massPoints[29]->pos = btVector3(10.0, 10.0, 0.0);
-	m_massPoints[29]->vel = btVector3(0.0, 0.0, 0.0);
+	//m_massPoints[29]->pos = btVector3(10.0, 10.0, 0.0);
+	//m_massPoints[29]->vel = btVector3(0.0, 0.0, 0.0);
 #endif
 	
 #if (0)	
@@ -168,7 +169,7 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 	stepPrerequisites();
 }
 
-void cordeCollisionObject::solveConstraints()
+void cordeCollisionObject::solveConstraints(btScalar dt)
 {
 #if (0)
 	if (m_rcontacts.size() > 0)
@@ -176,6 +177,9 @@ void cordeCollisionObject::solveConstraints()
 		std::cout << "Collisions!" << std::endl;
 	}
 #endif
+	// How would one iterate on this step such that constraints are not violated?
+	// How are rigid bodies involved?
+	solveAnchors(dt);
 	solveRContacts();
 }
 
@@ -288,5 +292,13 @@ void cordeCollisionObject::solveRContacts()
 		{
 			rBody->applyForce(fRigid + c.m_c3 * magRigid, c.m_c1);
 		}
+	}
+}
+
+void cordeCollisionObject::solveAnchors(const double dt)
+{
+	for( std::size_t i = 0; i < m_anchors.size(); i++)
+	{
+		m_anchors[i]->solve(dt);
 	}
 }
