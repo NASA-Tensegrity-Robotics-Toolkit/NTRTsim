@@ -56,6 +56,7 @@ namespace
         double density;
         double radius;
         double stiffness;
+        bool   history;
         double damping;
         double rod_length;
         double rod_space;    
@@ -71,6 +72,7 @@ namespace
         0.825,    // density (kg / length^3)
         0.31,     // radius (length)
         3000.0,   // stiffness (kg / sec^2)
+        true,     // history (record?)
         200.0,    // damping (kg / sec)
         15.0,     // rod_length (length)
         7.5,      // rod_space (length)
@@ -231,8 +233,8 @@ void Escape_T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
             c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
-            c.maxTens, c.targetVelocity, 
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
+            c.history, c.rotation, c.maxTens, c.targetVelocity, 
             c.maxAcc);
 
     // Start creating the structure
