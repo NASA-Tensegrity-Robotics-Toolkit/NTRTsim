@@ -50,15 +50,15 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 {
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 30;
-	const double radius = 0.1;
+	const std::size_t resolution = 10;
+	const double radius = 0.01;
 	const double density = 1300;
-	const double youngMod = 0.5 * pow(10, 5);
-	const double shearMod = 0.5 * pow(10, 5);
+	const double youngMod = 0.5 * pow(10, 6);
+	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
 	const double springConst = 100.0 * pow(10, 2); 
-	const double gammaT = 100.0 * pow(10, 1); // Position Damping
-	const double gammaR = 1.0 * pow(10, 1); // Rotation Damping
+	const double gammaT = 100.0 * pow(10, -2); // Position Damping
+	const double gammaR = 1.0 * pow(10, -2); // Rotation Damping
 #else
 	// Values for wire
 		const std::size_t resolution = 20;
@@ -74,10 +74,12 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	CordeModel::Config cordeConfig(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 								
-    const double rodDensity = 4.2/300.0;  // Note: This needs to be high enough or things fly apart...
-    const double rodRadius  = 0.5;
+    const double rodDensity = 1;  // Note: This needs to be high enough or things fly apart...
+    const double rodRadius  = 0.25;
     const tgRod::Config rodConfig(rodRadius, rodDensity);
-
+	
+	const tgRod::Config rodConfig2(rodRadius, 0.0);
+	
 	tgStructure s;
 #if (0)
 	s.addNode(0,0,0);
@@ -102,24 +104,25 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addPair(3, 7, "muscle");
 	s.addPair(2, 7, "muscle");
 	s.addPair(3, 6, "muscle");
-#endif
+#else
 
-	s.addNode(10, 10, 0);
-	s.addNode(10, 5, 0);
-	s.addNode(0, 10, 0);
+	s.addNode(-5, 5, 0);
 	s.addNode(0, 5, 0);
+	s.addNode(5, 5, 0);
+	s.addNode(10, 5, 0);
 	
-	s.addPair(0, 1, "rod");
+	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod");
 	
-	s.addPair(0, 2, "muscle");
-	
+	s.addPair(1, 2, "muscle");
+#endif	
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 0, 0));
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
     spec.addBuilder("muscle", new tgCordeStringInfo(cordeConfig));
     
     // Create your structureInfo

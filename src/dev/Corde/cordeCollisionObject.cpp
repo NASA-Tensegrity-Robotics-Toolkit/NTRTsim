@@ -160,15 +160,9 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
-#if (0)
-	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
-	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
-	//m_massPoints[29]->pos = btVector3(10.0, 10.0, 0.0);
-	//m_massPoints[29]->vel = btVector3(0.0, 0.0, 0.0);
-#endif
 	
-#if (0)	
-	if (simTime >= 1.0/100.0)
+#if (1)	
+	if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();
         for (std::size_t i = 0; i < n; i++)
@@ -310,12 +304,12 @@ void cordeCollisionObject::solveRContacts()
 		
 		btScalar rMass = rBody->getInvMass() > 0.0 ? 1.0 / rBody->getInvMass() : 0.0;
 		
-		btVector3 fRigid = pow(idt, 2.0) * rMass * rRigid;
+		btVector3 fRigid = pow(idt, 1.0) * rMass * rRigid;
 		btScalar  magRigid = fRigid.length();
 		
 		if (rBody)
 		{
-			rBody->applyForce(fRigid + c.m_c3 * magRigid, c.m_c1);
+			rBody->applyImpulse(fRigid + c.m_c3 * magRigid, c.m_c1);
 		}
 	}
 }

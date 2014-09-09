@@ -88,8 +88,10 @@ void cordeAnchor::solve(const double dt)
 	
 	m_attachedElement->applyForce(fSoft);
 	
-	btVector3 fRigid = pow(idt, 2.0) * rMass * rRigid;
-
-	attachedBody->applyForce(fRigid, rbPos);
+	// Impulse instead of force
+	btVector3 fRigid = pow(idt, 1.0) * rMass * rRigid;
+	
+	attachedBody->activate();
+	attachedBody->applyImpulse(fRigid, getRelativePosition());
 	
 }
