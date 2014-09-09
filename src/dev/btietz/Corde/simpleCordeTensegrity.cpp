@@ -48,29 +48,42 @@ simpleCordeTensegrity::~simpleCordeTensegrity()
     
 void simpleCordeTensegrity::setup(tgWorld& world)
 {
-#if (1)	
+#if (0)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 10;
+	const std::size_t resolution = 30;
 	const double radius = 0.01;
 	const double density = 1300;
-	const double youngMod = 0.5 * pow(10, 6);
-	const double shearMod = 0.5 * pow(10, 6);
-	const double stretchMod = 20.0 * pow(10, 6);
+	const double youngMod = 0.5 * pow(10, 5);
+	const double shearMod = 0.5 * pow(10, 5);
+	const double stretchMod = 20.0 * pow(10, 5);
 	const double springConst = 100.0 * pow(10, 2); 
 	const double gammaT = 100.0 * pow(10, -2); // Position Damping
 	const double gammaR = 1.0 * pow(10, -2); // Rotation Damping
 #else
-	// Values for wire
-		const std::size_t resolution = 20;
-	const double radius = 0.001;
-	const double density = 7860;
-	const double youngMod = 200.0 * pow(10, 6);
-	const double shearMod = 100.0 * pow(10, 6);
-	const double stretchMod = 100.0 * pow(10, 6);
-	const double springConst = 300.0 * pow(10, 3);
-	const double gammaT = 0.05 * pow(10, -6); // Position Damping
-	const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
-#endif
+	#if (0)
+		// Values for wire
+			const std::size_t resolution = 20;
+		const double radius = 0.001;
+		const double density = 7860;
+		const double youngMod = 200.0 * pow(10, 6);
+		const double shearMod = 100.0 * pow(10, 6);
+		const double stretchMod = 100.0 * pow(10, 6);
+		const double springConst = 300.0 * pow(10, 3);
+		const double gammaT = 0.05 * pow(10, -6); // Position Damping
+		const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
+	#else
+		// Values for thread
+		const std::size_t resolution = 10;
+		const double radius = 0.001;
+		const double density = 1300;
+		const double youngMod = 1 * pow(10, 3);
+		const double shearMod = 1 * pow(10, 3);
+		const double stretchMod = 2.0 * pow(10, 6);
+		const double springConst = 0.1 * pow(10, 0); 
+		const double gammaT = 5.0 * pow(10, -6); // Position Damping
+		const double gammaR = 0.5 * pow(10, -6); // Rotation Damping
+	#endif // Wire vs thread
+#endif // Rope vs others
 	CordeModel::Config cordeConfig(resolution, radius, density, youngMod, shearMod,
 								stretchMod, springConst, gammaT, gammaR);
 								
@@ -104,17 +117,21 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addPair(3, 7, "muscle");
 	s.addPair(2, 7, "muscle");
 	s.addPair(3, 6, "muscle");
+	
+	s.move(btVector3(0, 10, 0));
 #else
 
 	s.addNode(-5, 5, 0);
 	s.addNode(0, 5, 0);
 	s.addNode(5, 5, 0);
-	s.addNode(10, 5, 0);
+	s.addNode(6, 5, 0);
 	
 	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod");
 	
 	s.addPair(1, 2, "muscle");
+	
+	s.move(btVector3(0, 0, 0));
 #endif	
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 0, 0));

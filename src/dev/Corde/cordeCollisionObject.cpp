@@ -75,7 +75,7 @@ m_gravity(tgBulletUtil::worldToDynamicsWorld(world).getGravity()) // Note, if gr
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
-	m_collisionShape->setMargin(0.0f);
+	m_collisionShape->setMargin(Config.radius);
 	
 	const btScalar		margin=getCollisionShape()->getMargin();
 	
@@ -161,7 +161,7 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
 	
-#if (1)	
+#if (0)	
 	if (simTime >= 1.0/10.0)
     {
         size_t n = m_massPoints.size();

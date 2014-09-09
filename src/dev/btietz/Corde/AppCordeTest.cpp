@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(9.81); // gravity, cm/sec^2
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2
     
     tgWorld world(config, ground);
 
