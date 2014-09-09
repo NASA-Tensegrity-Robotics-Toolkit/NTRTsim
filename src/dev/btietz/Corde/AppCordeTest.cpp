@@ -83,10 +83,10 @@ int main(int argc, char** argv)
 	
 	    // Fourth create the models with their controllers and add the models to the
     // simulation
-    tgCordeModel* const myModel = new tgCordeModel();
+    //tgCordeModel* const myModel = new tgCordeModel();
     
     // Add the model to the world
-    simulation.addModel(myModel);
+    //simulation.addModel(myModel);
     //simulation.addModel(tenseModel);
     
     simulation.run();

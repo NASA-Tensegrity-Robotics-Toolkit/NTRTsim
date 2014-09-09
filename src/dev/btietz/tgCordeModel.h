@@ -20,22 +20,24 @@
 #define TG_CORDE_MODEL
 
 #include "core/tgModel.h"
+#include "core/tgSubject.h"
 
 // Forward Declaration
 class cordeCollisionObject;
 
-class tgCordeModel : public tgModel
+/// @todo make this a base string so it can be controlled
+class tgCordeModel : public tgModel, public tgSubject <tgCordeModel>
 {
+	
+	/// @todo Consider making CordeModel::config a nested member of a tgCordeModel config (that includes a base string config)
 public:
-    tgCordeModel();
+    tgCordeModel(cordeCollisionObject* string, const tgTags& tags);
     
     ~tgCordeModel();
     
     virtual void setup(tgWorld& world);
     
     virtual void teardown();
-    
-    virtual void step(double dt);
     
     /**
     * Call tgModelVisitor::render() on self and all descendants.
@@ -47,13 +49,13 @@ public:
     
     const cordeCollisionObject* const getModel() const
     {
-        return testString;
+        return m_string;
     }
     
 private:
-    cordeCollisionObject* testString;
+    cordeCollisionObject* m_string;
     
-    std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
+
 };
 
 #endif //TG_CORDE_MODEL

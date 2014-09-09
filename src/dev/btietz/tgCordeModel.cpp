@@ -19,15 +19,17 @@
 #include "tgCordeModel.h"
 
 #include "core/tgModelVisitor.h"
-#include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
 
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
-#include "dev/Corde/cordeDynamicsWorld.h"
 
-tgCordeModel::tgCordeModel()
-{
+
+tgCordeModel::tgCordeModel(cordeCollisionObject* string,
+							const tgTags& tags) :
+m_string(string),
+tgModel(tags)
+{	
 
 }
     
@@ -38,60 +40,18 @@ tgCordeModel::~tgCordeModel()
     
 void tgCordeModel::setup(tgWorld& world)
 {
-
-	btVector3 startPos(0.0, 10.0, 0.0);
-	btVector3 endPos  (10.0, 10.0, 0.0);
-	
-#if (0)	// Unused reference implementations from previous constructors
-	// Setup for neither bending nor rotation note that (0, 0, 0, -1) fails to produce no bending
-	btQuaternion startRot( 0.0, sqrt(2)/2.0, sqrt(2)/2.0, 0.0); // Y axis
-	btQuaternion startRot( 0.0, 0.0, 0.0, 1.0); // Z axis
-	btQuaternion startRot( 0.0, sqrt(2)/2.0, 0.0, sqrt(2)/2.0);
-#endif
-	
-#if (1)	
-	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 30;
-	const double radius = 0.1;
-	const double density = 1300;
-	const double youngMod = 0.5 * pow(10, 5);
-	const double shearMod = 0.5 * pow(10, 5);
-	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 2); 
-	const double gammaT = 100.0 * pow(10, 1); // Position Damping
-	const double gammaR = 1.0 * pow(10, 1); // Rotation Damping
-#else
-	// Values for wire
-		const std::size_t resolution = 20;
-	const double radius = 0.001;
-	const double density = 7860;
-	const double youngMod = 200.0 * pow(10, 6);
-	const double shearMod = 100.0 * pow(10, 6);
-	const double stretchMod = 100.0 * pow(10, 6);
-	const double springConst = 300.0 * pow(10, 3);
-	const double gammaT = 0.05 * pow(10, -6); // Position Damping
-	const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
-#endif
-	CordeModel::Config config(resolution, radius, density, youngMod, shearMod,
-								stretchMod, springConst, gammaT, gammaR);
-	
-    std::vector<btVector3> startPositions = generatePoints(startPos, endPos, resolution);
-    
-    cordeDynamicsWorld& dynamicsWorld =
-                tgBulletUtil::worldToCordeDynamicsWorld(world);
-    
-	testString = new cordeCollisionObject(startPositions, world, config);
-	
-	dynamicsWorld.addSoftBody(testString);
+    notifySetup();
+    tgModel::setup(world);
 }
 
 void tgCordeModel::teardown()
 {
     // World handles deleting collision object
-    testString = NULL;
+    m_string = NULL;
     tgModel::teardown();
 }
-    
+
+#if (0)    
 void tgCordeModel::step(double dt)
 {
 	//testString->applyForce(btVector3(0, 0.0, -90.0), 0);
@@ -101,6 +61,7 @@ void tgCordeModel::step(double dt)
 	//testString->applyVecTorque(btVector3(0.0, 0.0, -100.0), 28);
     //testString->step(dt);
 }
+#endif
 /**
 * Call tgModelVisitor::render() on self and all descendants.
 * @param[in,out] r a reference to a tgModelVisitor
@@ -108,28 +69,4 @@ void tgCordeModel::step(double dt)
 void tgCordeModel::onVisit(const tgModelVisitor& r) const
 {
     r.render(*this);
-}
-
-std::vector<btVector3> tgCordeModel::generatePoints(btVector3& point1, 
-													btVector3& point2,
-													std::size_t resolution)
-{
-	std::vector<btVector3> points;
-	
-	points.push_back(point1);
-	
-    btVector3 rodLength(point2 - point1);
-    btVector3 unitLength( rodLength / ((double) resolution - 1) );
-    
-    btVector3 massPos(point1);
-    
-    for (std::size_t i = 1; i < resolution; i++)
-    {
-		massPos += unitLength;
-        points.push_back(massPos);
-	}
-    
-    assert(points.size() == resolution);
-
-    return points;
 }

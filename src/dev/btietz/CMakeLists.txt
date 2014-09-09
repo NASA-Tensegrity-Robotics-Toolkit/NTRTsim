@@ -9,6 +9,7 @@ link_libraries(sensors
 
 add_library(${PROJECT_NAME} SHARED
 			tgCordeModel.cpp
+			tgCordeStringInfo.cpp
             tgRBString.cpp
             tgRBStringInfo.cpp
             )

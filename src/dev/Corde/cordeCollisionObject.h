@@ -66,6 +66,7 @@ class cordeCollisionShape;
 class btCollisionObjectWrapper;
 class btBroadphaseInterface;
 class btDispatcher;
+class btRigidBody;
 class tgWorld;
 
 class cordeCollisionObject : public CordeModel, public btCollisionObject
