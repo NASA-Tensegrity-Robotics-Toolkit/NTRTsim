@@ -44,12 +44,12 @@ using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-Escape_T6Controller::Escape_T6Controller(const double initialLength)
+Escape_T6Controller::Escape_T6Controller(const double initialLength) :
+    m_initialLengths(initialLength),
+    m_totalTime(0.0),
+    nClusters(8),
+    musclesPerCluster(3)
 {
-    this->m_initialLengths=initialLength;
-    this->m_totalTime=0.0;
-    this->nClusters=8;
-    this->musclesPerCluster=3;
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++) {
         clusters[i].resize(musclesPerCluster);
@@ -61,10 +61,9 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
     double dt = 0.0001;
 
-    //Fetch all the muscles and set their initial lengths
+    //Set the initial length of every muscle in the subject
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
+    for (size_t i = 0; i < muscles.size(); ++i) {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->setRestLength(this->m_initialLengths, dt);
@@ -87,8 +86,7 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
 {
-    if (dt <= 0.0)
-    {
+    if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
     }
     m_totalTime+=dt;
@@ -208,18 +206,20 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
 void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, double dt) {
-    double amplitude = 0.95 * m_initialLengths;
+    double amplitude = 0.30 * m_initialLengths;
     double angularFrequency = 1000 * dt;
-    double phase = 0;
+    double phase = 0; // Phase of cluster1
+    double phaseChange = M_PI/4;
+    double dcOffset = m_initialLengths;
 
     for(int cluster=0; cluster<nClusters; cluster++) {
         for(int node=0; node<musclesPerCluster; node++) {
             tgLinearString *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
-            double newLength = amplitude * (1 + sin(angularFrequency * m_totalTime + phase));
+            double newLength = amplitude * sin(angularFrequency * m_totalTime + phase) + dcOffset ;
             pMuscle->setRestLength(newLength, dt);
         }
-        phase += M_PI/8;
+        phase += phaseChange;
     }
 }
 

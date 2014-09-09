@@ -62,8 +62,8 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    //tgSimView       *view = createView(world);         // For running multiple episodes
+    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    tgSimView       *view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     Escape_T6Model* const model = new Escape_T6Model();
 
     // Fifth create controller and attach it to the model
-    double initialLength = 9; // decimeters
+    double initialLength = 9.0; // decimeters
     Escape_T6Controller* const controller = new Escape_T6Controller(initialLength);
     model->attach(controller);
 
@@ -81,6 +81,7 @@ int main(int argc, char** argv)
 
     simulate(simulation);
 
+    delete controller;
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }
@@ -99,7 +100,7 @@ tgHillyGround *createGround() {
     const size_t ny = 50; // Default: 50
     const double margin = 0.5; // Default: 0.5
     const double triangleSize = 5.0; // Default: 5.0
-    const double waveHeight = 2.0; // Default: 5.0
+    const double waveHeight = 3.5; // Default: 5.0
     const double offset = 0.5; // Default: 0.5
     const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution, size, origin, 
                                              nx, ny, margin, triangleSize, waveHeight, offset);
@@ -132,7 +133,7 @@ tgSimView *createView(tgWorld *world) {
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation) {
-    int nEpisodes = 10; // Number of episodes ("trial runs")
+    int nEpisodes = 3; // Number of episodes ("trial runs")
     int nSteps = 60000; // Number of steps in each episode
     for (int i=0; i<nEpisodes; i++)
     {   

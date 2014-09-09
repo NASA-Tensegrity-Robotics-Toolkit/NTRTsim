@@ -62,7 +62,7 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 
     private:
         vector< vector<double> > actions; // For modifications between episodes
-        double m_initialLengths;
+        const double m_initialLengths;
         double m_totalTime;
         AnnealAdapter evolutionAdapter;
         int nClusters;
