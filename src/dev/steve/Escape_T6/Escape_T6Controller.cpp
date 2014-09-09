@@ -48,6 +48,12 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength)
 {
     this->m_initialLengths=initialLength;
     this->m_totalTime=0.0;
+    this->nClusters=8;
+    this->musclesPerCluster=3;
+    clusters.resize(nClusters);
+    for (int i=0; i<nClusters; i++) {
+        clusters[i].resize(musclesPerCluster);
+    }
 }
 
 /** Set the lengths of the muscles and initialize the learning adapter */
@@ -64,7 +70,19 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
         pMuscle->setRestLength(this->m_initialLengths, dt);
     }
 
+    populateClusters(subject);
     setupAdapter();
+    /* TODO: Uncomment to run monte carlo style
+    vector<double> state; 
+
+    //get the actions (between 0 and 1) from evolution (todo)
+    actions=evolutionAdapter.step(dt,state);
+ 
+    //transform them to the size of the structure
+    actions = transformActions(actions);
+
+    //apply these actions to the appropriate muscles according to the sensor values
+    applyActions(subject,actions);*/
 }
 
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
@@ -75,8 +93,8 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     }
     m_totalTime+=dt;
 
+    setPreferredMuscleLengths(subject, dt);
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    setPreferredMuscleLengths(muscles, dt);
     
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
@@ -85,12 +103,6 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
-
-    //vector<double> state=getState();
-    vector< vector<double> > actions;
-
-    //get the actions (between 0 and 1) from evolution (todo)
-    //actions=evolutionAdapter.step(dt,state);
 
     //instead, generate it here for now!
     for(int i=0; i<muscles.size(); i++)
@@ -102,12 +114,6 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         }
         actions.push_back(tmp);
     }
-
-    //transform them to the size of the structure
-    actions = transformActions(actions);
-
-    //apply these actions to the appropriate muscles according to the sensor values
-    //	applyActions(subject,actions);
 
 }
 
@@ -201,16 +207,29 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
 
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
-void Escape_T6Controller::setPreferredMuscleLengths(std::vector<tgLinearString*> muscles, double dt) {
-    for (size_t i = 0; i < muscles.size(); i++) {
-        tgLinearString *const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
+void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, double dt) {
+    double amplitude = 0.95 * m_initialLengths;
+    double angularFrequency = 1000 * dt;
+    double phase = 0;
 
-        double amplitude = 0.95 * m_initialLengths;
-        double angularFrequency = 1000 * dt;
-        double phase = 0; //TODO: Determined based on cluster
-        double newLength = amplitude * (1 + sin(angularFrequency * m_totalTime + phase));
-
-        pMuscle->setRestLength(newLength, dt);
+    for(int cluster=0; cluster<nClusters; cluster++) {
+        for(int node=0; node<musclesPerCluster; node++) {
+            tgLinearString *const pMuscle = clusters[cluster][node];
+            assert(pMuscle != NULL);
+            double newLength = amplitude * (1 + sin(angularFrequency * m_totalTime + phase));
+            pMuscle->setRestLength(newLength, dt);
+        }
+        phase += M_PI/8;
     }
 }
+
+void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
+    for(int cluster=0; cluster < nClusters; cluster++) {
+        ostringstream ss;
+        ss << (cluster + 1);
+        string suffix = ss.str();
+        std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("muscle cluster" + suffix);
+        clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
+    }
+}
+

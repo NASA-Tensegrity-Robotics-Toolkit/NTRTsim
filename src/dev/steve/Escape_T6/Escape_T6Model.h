@@ -142,7 +142,6 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * through setup
          */
         std::vector<tgLinearString*> allMuscles;
-        std::vector<std::vector <tgLinearString *> > musclesPerNodes;
         std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
         std::vector<btVector3> nodePositions;

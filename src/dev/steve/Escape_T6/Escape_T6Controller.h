@@ -27,10 +27,10 @@
  * $Id$
  */
 
-// This library
+#include <vector>
+
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
-#include <vector>
 
 // Forward declarations
 class Escape_T6Model;
@@ -39,23 +39,14 @@ class tgLinearString;
 //namespace std for vectors
 using namespace std;
 
-/**
- * Escape Controller for T6.
- */
+/** Escape Controller for T6 */
 class Escape_T6Controller : public tgObserver<Escape_T6Model>
 {
     public:
-
-        /**
-         * Construct a T6PrefLengthController with the initial preferred length.
-         */
-
         // Note that currently this is calibrated for decimeters.
         Escape_T6Controller(const double prefLength=5.0);
 
-        /**
-         * Nothing to delete, destructor must be virtual
-         */
+        /** Nothing to delete, destructor must be virtual */
         virtual ~Escape_T6Controller() { }
 
         virtual void onSetup(Escape_T6Model& subject);
@@ -65,15 +56,18 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         virtual void onTeardown(Escape_T6Model& subject);
 
     protected:
-
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
-        virtual void applyActions (Escape_T6Model& subject, vector< vector <double> > act);
+        virtual void applyActions(Escape_T6Model& subject, vector< vector <double> > act);
 
     private:
+        vector< vector<double> > actions; // For modifications between episodes
         double m_initialLengths;
         double m_totalTime;
         AnnealAdapter evolutionAdapter;
+        int nClusters;
+        int musclesPerCluster;
+        vector<vector<tgLinearString*> > clusters;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
@@ -82,7 +76,11 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         double totalEnergySpent(Escape_T6Model& subject);
 
         /** Sets target lengths for each muscle */
-        void setPreferredMuscleLengths(vector<tgLinearString*> muscles, double dt);
+        void setPreferredMuscleLengths(Escape_T6Model& subject, double dt);
+
+        /** Divides the 24 muscles of an Escape_T6Model 
+         * into 8 clusters of 3 muscles */
+        void populateClusters(Escape_T6Model& subject);
 };
 
 #endif // ESCAPE_T6CONTROLLER
