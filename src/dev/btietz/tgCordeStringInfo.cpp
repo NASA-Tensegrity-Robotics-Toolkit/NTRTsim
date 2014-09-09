@@ -58,13 +58,16 @@ tgConnectorInfo* tgCordeStringInfo::createConnectorInfo(const tgPair& pair)
 
 void tgCordeStringInfo::initConnector(tgWorld& world)
 {
-    // Note: Muscle2P holds pointers to things in the world, but it doesn't actually have any in-world representation.
+	// Ensure we aren't leaking a previous pointer
+    assert(!m_cordeString);
+    
     m_cordeString = createCordeString(world);
     
     cordeDynamicsWorld& dynamicsWorld =
                 tgBulletUtil::worldToCordeDynamicsWorld(world);
 	
 	dynamicsWorld.addSoftBody(m_cordeString);
+	
 }
 
 tgModel* tgCordeStringInfo::createModel(tgWorld& world)
@@ -87,14 +90,15 @@ double tgCordeStringInfo::getMass()
 
 cordeCollisionObject* tgCordeStringInfo::createCordeString(tgWorld& world)
 {
-    //std::cout << "tgLinearStringInfo::createMuscle2P()" << std::endl;
-    
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
-    
+ 
     // @todo: need to check somewhere that the rigid bodies have been set...
-    btRigidBody* fromBody = getFromRigidBody();
+	
+	btRigidBody* fromBody = getFromRigidBody();
     btRigidBody* toBody = getToRigidBody();
+	
+	// Check that bodies are initalized
+	assert(fromBody);
+	assert(toBody);
 	
 	/// @todo restore rotation parameters
     btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0.0);
@@ -102,7 +106,13 @@ cordeCollisionObject* tgCordeStringInfo::createCordeString(tgWorld& world)
 	
 	std::vector<btVector3> startPositions = generatePoints(from, to, m_config.resolution);
 	
-    return new cordeCollisionObject(startPositions, world, m_config);
+	cordeCollisionObject* tempCorde = new cordeCollisionObject(startPositions, world, m_config);
+	
+	///@todo is this always the assumption we want to make with the builder tools? How would we make this more configurable?
+	tempCorde->appendAnchor(0, fromBody, from);
+	tempCorde->appendAnchor(m_config.resolution - 1, toBody, to);
+	
+    return tempCorde;
 }
     
 std::vector<btVector3> tgCordeStringInfo::generatePoints(btVector3& point1, 

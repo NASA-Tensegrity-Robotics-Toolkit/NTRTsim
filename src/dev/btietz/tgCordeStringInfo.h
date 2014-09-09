@@ -68,7 +68,7 @@ public:
      */
     tgCordeStringInfo(const CordeModel::Config& config, const tgPair& pair);
     
-
+	/// @todo should we null our pointers here?
     virtual ~tgCordeStringInfo() {}
     
     /**

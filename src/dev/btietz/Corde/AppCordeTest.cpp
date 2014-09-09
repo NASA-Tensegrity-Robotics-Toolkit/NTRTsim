@@ -25,7 +25,7 @@
  */
 
 // This application
-#include "dev/btietz/tgCordeModel.h"
+#include "simpleCordeTensegrity.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -83,10 +83,10 @@ int main(int argc, char** argv)
 	
 	    // Fourth create the models with their controllers and add the models to the
     // simulation
-    //tgCordeModel* const myModel = new tgCordeModel();
+    simpleCordeTensegrity* const myModel = new simpleCordeTensegrity();
     
     // Add the model to the world
-    //simulation.addModel(myModel);
+    simulation.addModel(myModel);
     //simulation.addModel(tenseModel);
     
     simulation.run();
