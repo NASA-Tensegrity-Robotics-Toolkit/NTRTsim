@@ -22,12 +22,15 @@ cordeAnchor::cordeAnchor(btRigidBody * body,
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos)
 {
+	m_attachedElement->isAnchor = true;
 	assert(body);
 	assert(element);
 }
 
 cordeAnchor::~cordeAnchor()
 {
+	m_attachedElement->isAnchor = false;
+	
     // World should delete this
     attachedBody = NULL;
     m_attachedElement = NULL;

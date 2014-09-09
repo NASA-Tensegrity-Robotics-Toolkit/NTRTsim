@@ -104,18 +104,18 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addPair(3, 6, "muscle");
 #endif
 
-	s.addNode(12, 5, 0);
-	s.addNode(8, 5, 0);
-	s.addNode(2, 5, 0);
-	s.addNode(-2, 5, 0);
+	s.addNode(10, 10, 0);
+	s.addNode(10, 5, 0);
+	s.addNode(0, 10, 0);
+	s.addNode(0, 5, 0);
 	
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");
 	
-	s.addPair(1, 2, "muscle");
+	s.addPair(0, 2, "muscle");
 	
     // Move the structure so it doesn't start in the ground
-    s.move(btVector3(0, 3, 0));
+    s.move(btVector3(0, 0, 0));
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
@@ -149,4 +149,5 @@ void simpleCordeTensegrity::step(double dt)
 void simpleCordeTensegrity::onVisit(const tgModelVisitor& r) const
 {
     r.render(*this);
+    tgModel::onVisit(r);
 }

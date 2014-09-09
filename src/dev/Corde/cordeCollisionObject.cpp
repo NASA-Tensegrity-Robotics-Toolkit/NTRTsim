@@ -74,7 +74,7 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
-	m_collisionShape->setMargin(0.1f);
+	m_collisionShape->setMargin(0.0f);
 	
 	const btScalar		margin=getCollisionShape()->getMargin();
 	
@@ -114,7 +114,7 @@ void cordeCollisionObject::appendAnchor (std::size_t node,
     
 	cordeAnchor* anchor = new cordeAnchor(body, m_massPoints[node], pos);
 	
-	
+	m_anchors.push_back(anchor);
 }
 
 void cordeCollisionObject::predictMotion(btScalar dt)
@@ -156,7 +156,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
 	constrainMotion(dt);
-#if (1)
+#if (0)
 	m_massPoints[0]->pos = btVector3(0.0, 10.0, 0.0);
 	m_massPoints[0]->vel = btVector3(0.0, 0.0, 0.0);
 	//m_massPoints[29]->pos = btVector3(10.0, 10.0, 0.0);
@@ -198,7 +198,9 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 #endif
 	// How would one iterate on this step such that constraints are not violated?
 	// How are rigid bodies involved?
+#if (1)
 	solveAnchors(dt);
+#endif
 	solveRContacts();
 }
 

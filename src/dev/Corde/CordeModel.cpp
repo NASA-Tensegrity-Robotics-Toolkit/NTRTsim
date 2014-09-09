@@ -786,7 +786,8 @@ CordeModel::CordePositionElement::CordePositionElement(btVector3 p1, double m) :
 	vel(0.0, 0.0, 0.0),
 	vel_new(0.0, 0.0, 0.0),
 	force(0.0, 0.0, 0.0),
-	mass(m)
+	mass(m),
+	isAnchor(false)
 {
 	/// @todo get consistency on what this allowed to be with cordeColliders.cpp
     if (m < 0.0)

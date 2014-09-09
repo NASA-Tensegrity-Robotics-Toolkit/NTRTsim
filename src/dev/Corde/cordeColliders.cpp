@@ -63,7 +63,7 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 
 	/// @todo original bullet code checked if this was an anchor too, consider restoring
 	/// Check contact populates values of m_cti
-	if(	psb->checkContact(m_colObj1Wrap, n.pos_new, m, c.m_cti))
+	if(	psb->checkContact(m_colObj1Wrap, n.pos_new, m, c.m_cti) && !n.isAnchor)
 	{
 		const btScalar	ima = 1.0 / n.mass; // Already established mass is positive
 		const btScalar	imb = m_rigidBody? m_rigidBody->getInvMass() : 0.f;

@@ -79,6 +79,7 @@ public:
 		btVector3 vel_new;
 		btVector3 force;
 		double mass;
+		bool isAnchor;
 	};
 	
 	/**
