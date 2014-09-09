@@ -127,7 +127,11 @@ public:
 	
 	virtual ~cordeCollisionObject();
 	
-	void predictMotion(btScalar dt); // Will likely eventually call cordeModels final (post collision) update step
+	void appendAnchor (std::size_t node, btRigidBody* body, btVector3 pos);
+	
+	// Remove anchor??
+	
+	void predictMotion(btScalar dt); // Calls initial position estimate
 	
 	// Final part of step loop
 	void integrateMotion(btScalar dt);

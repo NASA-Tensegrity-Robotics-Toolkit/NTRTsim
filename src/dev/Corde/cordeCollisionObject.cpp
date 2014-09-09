@@ -61,6 +61,7 @@ subject to the following restrictions:
 
 //The C++ Standard Library
 #include <iostream>
+#include <stdexcept>
 
 cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config) :
 CordeModel(centerLine, Config),
@@ -95,6 +96,24 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
 cordeCollisionObject::~cordeCollisionObject() 
 {
 	delete m_collisionShape;	
+	
+}
+
+void cordeCollisionObject::appendAnchor (std::size_t node,
+											btRigidBody* body,
+											btVector3 pos)
+{
+    if (node >= m_massPoints.size())
+    {
+        throw std::invalid_argument("Node index is greater than size of m_massPoints");
+    }
+    if (!body)
+    {
+		throw std::invalid_argument("Invalid pointer for rigid body");
+	}
+    
+	cordeAnchor* anchor = new cordeAnchor(body, m_massPoints[node], pos);
+	
 	
 }
 
