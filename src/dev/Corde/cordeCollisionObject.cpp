@@ -66,7 +66,8 @@ subject to the following restrictions:
 cordeCollisionObject::cordeCollisionObject(std::vector<btVector3>& centerLine, tgWorld& world, CordeModel::Config& Config) :
 CordeModel(centerLine, Config),
 m_broadphase(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
-m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher())
+m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
+m_gravity(tgBulletUtil::worldToDynamicsWorld(world).getGravity()) // Note, if gravity ever needs to change, we're screwed with this method
 {
 	// Enum from btCollisionObject
 	m_internalType		=	CO_USER_TYPE;
@@ -129,6 +130,9 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	m_sst.updmrg	=	m_sst.radmrg*(btScalar)0.25;
 	
 	computeInternalForces();
+	
+	applyUniformAcc(m_gravity);
+	
     unconstrainedMotion(dt);
 	
 	updateAABBBounds();	

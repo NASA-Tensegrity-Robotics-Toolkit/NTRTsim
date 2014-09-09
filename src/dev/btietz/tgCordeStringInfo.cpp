@@ -37,16 +37,19 @@
 
 tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config) : 
 m_config(config),
+m_cordeString(NULL),
 tgConnectorInfo()
 {}
 
 tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config, tgTags tags) : 
 m_config(config),
+m_cordeString(NULL),
 tgConnectorInfo(tags)
 {}
 
 tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config, const tgPair& pair) :
 m_config(config),
+m_cordeString(NULL),
 tgConnectorInfo(pair)
 {}
     
@@ -58,8 +61,8 @@ tgConnectorInfo* tgCordeStringInfo::createConnectorInfo(const tgPair& pair)
 
 void tgCordeStringInfo::initConnector(tgWorld& world)
 {
-	// Ensure we aren't leaking a previous pointer
-    assert(!m_cordeString);
+	/// @todo Ensure we aren't leaking a previous pointer
+    assert(m_cordeString == NULL);
     
     m_cordeString = createCordeString(world);
     

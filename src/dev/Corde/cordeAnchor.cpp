@@ -58,7 +58,7 @@ void cordeAnchor::solve(const double dt)
 	const btScalar	idt = 1.0 / dt;
 	
 	// Difference between pos_new and getRelativePosition
-	const btVector3 rbPos = getRelativePosition();
+	const btVector3 rbPos = getWorldPosition();
 	const btVector3 softPos = m_attachedElement->pos_new;
 	
 	const btVector3 posDiff = rbPos - softPos;

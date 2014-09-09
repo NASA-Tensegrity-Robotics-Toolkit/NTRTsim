@@ -51,6 +51,8 @@ tgConnectorInfo* tgLinearStringInfo::createConnectorInfo(const tgPair& pair)
 
 void tgLinearStringInfo::initConnector(tgWorld& world)
 {
+	///@todo confirm m_muscle2P isn't occupied. See example in Corde
+	
     // Note: Muscle2P holds pointers to things in the world, but it doesn't actually have any in-world representation.
     m_muscle2P = createMuscle2P();
 }

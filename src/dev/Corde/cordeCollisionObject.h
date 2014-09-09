@@ -229,6 +229,8 @@ private:
 	 /// @todo consider adding struct info about whether or not there is an anchor
 	SolverState					m_sst;			// Solver state
 	
+	const btVector3					m_gravity;		
+	
 	/**
 	 * @todo look at how this should be cleared out. Delete causes double free error
 	 */

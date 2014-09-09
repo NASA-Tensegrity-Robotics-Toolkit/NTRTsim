@@ -50,7 +50,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 {
 #if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 10;
+	const std::size_t resolution = 30;
 	const double radius = 0.1;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 5);
