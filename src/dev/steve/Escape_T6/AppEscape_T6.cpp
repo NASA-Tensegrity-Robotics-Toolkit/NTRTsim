@@ -99,11 +99,12 @@ tgHillyGround *createGround() {
     const size_t nx = 50; // Default: 50
     const size_t ny = 50; // Default: 50
     const double margin = 0.5; // Default: 0.5
-    const double triangleSize = 5.0; // Default: 5.0
-    const double waveHeight = 3.5; // Default: 5.0
+    const double triangleSize = 10.0; // Default: 5.0
+    const double waveHeight = 8.0; // Default: 5.0
     const double offset = 0.5; // Default: 0.5
-    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution, size, origin, 
-                                             nx, ny, margin, triangleSize, waveHeight, offset);
+    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
+                                             size, origin, nx, ny, margin, 
+                                             triangleSize, waveHeight, offset);
     // the world will delete this
     return new tgHillyGround(groundConfig);
 }
