@@ -27,6 +27,7 @@
 #include "tgCordeStringInfo.h"
 
 #include "core/tgWorld.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
 #include "core/tgBulletUtil.h"
 
 #include "dev/Corde/CordeModel.h"
@@ -111,10 +112,13 @@ cordeCollisionObject* tgCordeStringInfo::createCordeString(tgWorld& world)
 	
 	cordeCollisionObject* tempCorde = new cordeCollisionObject(startPositions, world, m_config);
 	
+	// cordeCollisionObject handles deleting the shape, so no need to pass it to the world
+	
 	///@todo is this always the assumption we want to make with the builder tools? How would we make this more configurable?
+#if (1) // In case anchors need to be switched off for testing
 	tempCorde->appendAnchor(0, fromBody, from);
 	tempCorde->appendAnchor(m_config.resolution - 1, toBody, to);
-	
+#endif	
     return tempCorde;
 }
     

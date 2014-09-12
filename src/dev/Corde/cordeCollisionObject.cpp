@@ -70,8 +70,8 @@ m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
 m_gravity(tgBulletUtil::worldToDynamicsWorld(world).getGravity()) // Note, if gravity ever needs to change, we're screwed with this method
 {
 	// Enum from btCollisionObject
-	m_internalType		=	CO_USER_TYPE;
-	m_collisionFlags =  CF_KINEMATIC_OBJECT;
+	//m_internalType		=	CO_USER_TYPE;
+	//m_collisionFlags =  CF_KINEMATIC_OBJECT;
 	
 	// Apparently a hack...
 	m_collisionShape = new cordeCollisionShape(this);
@@ -138,7 +138,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	updateAABBBounds();	
 	
 	ATTRIBUTE_ALIGNED16(btDbvtVolume)	vol;
-	for(std::size_t i=0, ni= m_massPoints.size(); i<ni; ++i)
+	for(std::size_t i = 0, ni= m_massPoints.size(); i<ni; ++i)
 	{
 		CordePositionElement&	n = *m_massPoints[i];
 		vol = btDbvtVolume::FromCR(n.pos_new, m_sst.radmrg);
@@ -200,12 +200,14 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 	solveAnchors(dt);
 #endif
 	solveRContacts();
+	//solveSContacts();
 }
 
 void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
 {
 	
 	cordeColliders::CollideSDF_SS	docollide;
+	//std::cout << "Soft soft collisions!" << std::endl;
 	docollide.ProcessSoftSoft(this, otherSoftBody);
 }
 

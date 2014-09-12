@@ -676,17 +676,18 @@ void CordeModel::unconstrainedMotion(double dt)
     {   
         CordeQuaternionElement* quat_0 = m_centerlines[i];        
         const btVector3 omega = quat_0->omega;
-        // Since I is diagonal, we can use elementwise multiplication of vectors
-        quat_0->omega_new += quat_0->inverseInertia * (quat_0->torques - 
-            omega.cross(quat_0->computedInertia * omega)) * dt;
+        // Since I is diagonal, we can use elementwise multiplication of vectors   
+        quat_0->omega_new += quat_0->inverseInertia * (quat_0->torques) * dt;
         quat_0->updateQDotNew();
         if (quat_0->q.dot(quat_0->qdot_new*dt + quat_0->q) < 0)
         {
             // This'll probably never happen. But if it does and the physics are otherwise mostly reasonable, see
             // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
             // for solution
+            #if (1)
             throw std::runtime_error("Tripped quaternion condition.");
             quat_0->q_new = (-quat_0->qdot_new*dt - quat_0->q);
+            #endif
         }
         else
         {
@@ -726,16 +727,17 @@ void CordeModel::constrainMotion (double dt)
         CordeQuaternionElement* quat_0 = m_centerlines[i];        
         const btVector3 omega = quat_0->omega;
         // Since I is diagonal, we can use elementwise multiplication of vectors
-        quat_0->omega += quat_0->inverseInertia * (quat_0->torques - 
-            omega.cross(quat_0->computedInertia * omega)) * dt;
+        quat_0->omega += quat_0->inverseInertia * (quat_0->torques) * dt;
         quat_0->updateQDot();
         if (quat_0->q.dot(quat_0->qdot*dt + quat_0->q) < 0)
         {
             // This'll probably never happen. But if it does and the physics are otherwise mostly reasonable, see
             // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=9632
             // for solution
+            #if (1)
             throw std::runtime_error("Tripped quaternion condition.");
 			quat_0->q = (-quat_0->qdot*dt + -quat_0->q);
+			#endif
         }
         else
         {

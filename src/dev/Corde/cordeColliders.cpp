@@ -149,6 +149,7 @@ void cordeColliders::CollideSDF_SS::Process(const btDbvtNode* leafa, const btDbv
 	bool connected = false;
 	
 	// Determine if the nodes are connected by checking their indicies in m_massPoints. This is a friend class, so we have access
+	// Eep, this gets called A LOT! consider refactoring to save cycles
 	if (bodies[0] == bodies[1])
 	{
 		int i = 0;
