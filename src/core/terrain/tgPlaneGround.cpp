@@ -61,7 +61,6 @@ tgPlaneGround::tgPlaneGround(const tgPlaneGround::Config& config) :
 m_config(config)
 {
     pGroundShape = new btStaticPlaneShape(m_config.m_normalVector,0);
-
 }
 
 

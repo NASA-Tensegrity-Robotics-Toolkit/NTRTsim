@@ -31,6 +31,7 @@
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
 #include <vector>
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 
 // Forward declarations
 class SuperBallModel;
@@ -69,11 +70,12 @@ protected:
 
   virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
-  virtual void applyActions (SuperBallModel& subject, vector< vector <double> > act);
+  virtual void applyActions (SuperBallModel& subject, vector< vector <double> > act, vector<double> state);
 
 private:
   double m_initialLengths;
   double m_totalTime;
+  btRigidBody *goalPoint;
 
   AnnealAdapter evolutionAdapter;
 	

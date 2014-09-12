@@ -45,6 +45,7 @@ double heightSensor::getHeight() const
 	btVector3 origin=this->getWorldPosition();
 	btVector3 end = origin;
 	end.setY(-5000.0f);
+	origin.setY(origin.getY()-1);
 	btCollisionWorld::AllHitsRayResultCallback rayCallback(origin, end);
 	btworld->rayTest(origin, end, rayCallback);
 	if(rayCallback.hasHit())
