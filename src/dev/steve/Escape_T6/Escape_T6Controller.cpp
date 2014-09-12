@@ -70,6 +70,7 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
     }
 
     populateClusters(subject);
+    initPosition = subject.getBallCOM();
     setupAdapter();
     initializeSineWaves(); // For muscle actuation
 
@@ -118,12 +119,12 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
 // So far, only score used for eventual fitness calculation of an Escape Model
 // is the maximum distance from the origin reached during that subject's episode
 void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
-    std::vector<double> scores; //scores[0] == maxDistReached, scores[1] == energySpent
-    double maxDistReached = 60.0; //TODO: Change to variable
+    std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
+    double distance = displacement(subject);
     double energySpent = totalEnergySpent(subject);
 
     //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    scores.push_back(maxDistReached);
+    scores.push_back(distance);
     scores.push_back(energySpent);
 
     std::cout << "Tearing down" << std::endl;
@@ -132,7 +133,6 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
 
-//TODO: Change below function's values
 /** 
  * Returns the modified actions 2D vector such that 
  *   each action value is now scaled to fit the model
@@ -246,3 +246,15 @@ void Escape_T6Controller::initializeSineWaves() {
     dcOffset = new double[nClusters];    
 }
 
+double Escape_T6Controller::displacement(Escape_T6Model& subject) {
+    vector<double> finalPosition = subject.getBallCOM();
+
+    const double newX = finalPosition[0];
+    const double newZ = finalPosition[2];
+    const double oldX = initPosition[0];
+    const double oldZ = initPosition[2];
+
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                      (newZ-oldZ) * (newZ-oldZ));
+    return distanceMoved;
+}

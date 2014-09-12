@@ -95,6 +95,11 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          */
         const std::vector<tgLinearString*>& getAllMuscles() const;
 
+        /**
+         * @param[in]: nRods
+         */
+        std::vector<double> getBallCOM();
+
     private:
 
         /**
@@ -120,13 +125,13 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          */
         void addMuscles(tgStructure& s);
 
-        /*
+        /**
          * Adds the 12 markers to the end of the rods so that we can visualize
          * them and track their position
          */
         void addMarkers(tgStructure& s);
 
-        /*
+        /**
          * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
          * First rotates the structure around 3 axises given 3 angles.
          * Moves the structure to the target point.
@@ -134,8 +139,6 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * (muscles and markers are moved automatically since they are attached).
          */
         void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
-
-    private:
 
         /**
          * A list of all of the muscles. Will be empty until most of the way

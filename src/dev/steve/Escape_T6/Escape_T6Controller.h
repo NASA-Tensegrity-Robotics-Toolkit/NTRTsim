@@ -61,10 +61,15 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         virtual void applyActions(Escape_T6Model& subject, vector< vector <double> > act);
 
     private:
-        vector< vector<double> > actions; // For modifications between episodes
+        vector<double> initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
+
+        // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
+        vector< vector<double> > actions; // For modifications between episodes
+
+        // Muscle Clusters
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
@@ -92,6 +97,10 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         /** Sets the amplitude, angularFrequency, phase change, and dcOffset 
          * for each sine wave used in muscle actuation */
         void initializeSineWaves();
+
+        /** Difference in position between initPosition and finalPosition
+         * of subject */
+        double displacement(Escape_T6Model& subject);
 };
 
 #endif // ESCAPE_T6CONTROLLER
