@@ -249,9 +249,9 @@ void Escape_T6Controller::initializeSineWaves() {
 double Escape_T6Controller::displacement(Escape_T6Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
-    const double newX = finalPosition[0];
+    const double newX = finalPosition[1];
     const double newZ = finalPosition[2];
-    const double oldX = initPosition[0];
+    const double oldX = initPosition[1];
     const double oldZ = initPosition[2];
 
     const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
