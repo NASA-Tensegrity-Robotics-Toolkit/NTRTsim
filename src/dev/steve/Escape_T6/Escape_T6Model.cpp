@@ -276,7 +276,7 @@ void Escape_T6Model::setup(tgWorld& world)
     //map the rods and add the markers to them
     addMarkers(s);
 
-    btVector3 location(0,50.0,0);
+    btVector3 location(-15.0,20.0,0);
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
