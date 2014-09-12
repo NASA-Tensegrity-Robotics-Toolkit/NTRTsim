@@ -128,6 +128,102 @@ threshold(0.0)
 
 }
 
+void cordeColliders::CollideSDF_SS::Process(const btDbvtNode* leafa, const btDbvtNode* leafb)
+{
+	/// @todo consider making these references
+	CordeModel::CordePositionElement*	nodea = (CordeModel::CordePositionElement*)leafa->data;
+	CordeModel::CordePositionElement*	nodeb = (CordeModel::CordePositionElement*)leafb->data;
+	
+	assert(nodea);
+	assert(nodeb);
+	
+	if (nodea->mass <= 0.0)
+    {
+        throw std::runtime_error("Mass of element a is not positive.");
+    }
+    if (nodeb->mass <= 0.0)
+    {
+		throw std::runtime_error("Mass of element b is not positive.");
+	}
+	
+	bool connected = false;
+	
+	// Determine if the nodes are connected by checking their indicies in m_massPoints. This is a friend class, so we have access
+	if (bodies[0] == bodies[1])
+	{
+		int i = 0;
+		const int n = bodies[0]->m_massPoints.size();
+		while (nodea != bodies[0]->m_massPoints[i] && i < n)
+		{
+			i++;
+		}
+		if (i == n)
+		{
+			throw std::runtime_error("Didn't find collsion node, bodies must not be the same!");
+		}
+		else if(i == 0)
+		{
+			if (nodeb != bodies[0]->m_massPoints[i + 1])
+			{
+				connected = true;
+			}
+		}
+		else if(i == n - 1)
+		{
+			if(nodeb != bodies[0]->m_massPoints[i - 1])
+			{
+				connected = true;
+			}
+		}
+		else
+		{
+			if(nodeb != bodies[0]->m_massPoints[i + 1] && nodeb != bodies[0]->m_massPoints[i - 1])
+			{
+				connected = true;
+			}
+		}
+	}
+	
+	if(!connected)
+	{
+		// Copy a bunch of data
+		cordeCollisionObject::SContact	c;
+		c.m_nodea = nodea;
+		c.m_nodeb = nodeb;
+		c.m_margin = m_margin;
+		
+		btVector3 dist = nodea->pos_new - nodeb->pos_new;
+		
+		c.m_depth = c.m_margin - dist.length();
+		c.m_normal = dist.normalize();
+		
+		if (c.m_depth < 0) // Presumably this has already been checked...
+		{
+		
+			const btScalar ma = nodea->mass;
+			const btScalar mb = nodeb->mass;
+			
+			c.m_massRatio = mb / (ma + mb);
+			
+			const btVector3		va = nodea->vel_new;
+			const btVector3		vb = nodeb->vel_new;
+			const btVector3		vr = vb - va;
+			btVector3			fv = vr - c.m_normal * c.m_depth; // Orthogonal velocity?
+			
+			if (fv.length() != 0.0)
+			{
+				c.m_friction		=	fv.normalize() * friction;
+			}
+			else
+			{
+				c.m_friction		= btVector3(0.0, 0.0, 0.0);
+			}
+			
+			bodies[0]->m_scontacts.push_back(c);
+		}
+	}
+}
+
 void cordeColliders::CollideSDF_SS::ProcessSoftSoft(cordeCollisionObject* psa, cordeCollisionObject* psb)
 {
 	idt			=	psa->m_sst.isdt;

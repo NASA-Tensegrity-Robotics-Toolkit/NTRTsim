@@ -112,12 +112,13 @@ public:
 	/* SContact		*/ 
 	struct	SContact
 	{
-		CordePositionElement*	m_node;			// Node
-		btVector3				m_weights;		// Weigths
+		CordePositionElement*	m_nodea;		// Node
+		CordePositionElement*	m_nodeb;		// Node
 		btVector3				m_normal;		// Normal
+		btVector3				m_friction;		// Friction
 		btScalar				m_margin;		// Margin
-		btScalar				m_friction;		// Friction
-		btScalar				m_cfm[2];		// Constraint force mixing
+		btScalar				m_depth;		// Depth of collision
+		btScalar				m_massRatio;	// Mass Ratio
 	};
 	
 public:
@@ -208,6 +209,8 @@ private:
 	void updateAABBBounds();
 	
 	void solveRContacts();
+	
+	void solveSContacts();
 	
 	void solveAnchors(const double dt);
 	

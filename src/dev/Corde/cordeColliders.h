@@ -71,6 +71,8 @@ struct  CollideSDF_SS : btDbvt::ICollide
 		
 		cordeCollisionObject*	bodies[2];
 		
+		void		Process(const btDbvtNode* leafa, const btDbvtNode* leafb);
+		
 		void ProcessSoftSoft(cordeCollisionObject* psa, cordeCollisionObject* psb);
 		
 	};

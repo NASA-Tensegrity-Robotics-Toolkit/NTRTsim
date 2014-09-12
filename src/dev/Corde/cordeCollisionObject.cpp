@@ -321,6 +321,27 @@ void cordeCollisionObject::solveRContacts()
 	}
 }
 
+void cordeCollisionObject::solveSContacts()
+{
+	const btScalar	idt = m_sst.isdt;
+	for(int i = 0, ni = m_scontacts.size(); i < ni; ++i)
+	{
+		const SContact&		c = m_scontacts[i];
+		
+		// Normal * mass ratio * penetration distance
+		btVector3 rA = c.m_normal * c.m_massRatio * c.m_depth;
+		btVector3 rB =  -c.m_normal * (1.f - c.m_massRatio) * c.m_depth;
+		
+		btVector3 fA = pow(idt, 2.0) * c.m_nodea->mass * rA;
+		btScalar  magA = fA.length();
+		c.m_nodea->applyForce(fA - c.m_friction * magA);
+	
+		btVector3 fB = pow(idt, 2.0) * c.m_nodeb->mass * rB;
+		btScalar  magB = fB.length();
+		c.m_nodeb->applyForce(fB - c.m_friction * magB);			
+	}
+}
+
 void cordeCollisionObject::solveAnchors(const double dt)
 {
 	for( std::size_t i = 0; i < m_anchors.size(); i++)
