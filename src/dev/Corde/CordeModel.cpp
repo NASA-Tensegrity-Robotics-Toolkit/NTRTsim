@@ -291,7 +291,7 @@ void CordeModel::computeCenterlines()
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
 		
 		btQuaternion currentAngle;
-		if (zAxis.dot(axisVec) != 1.0)
+		if (zAxis.dot(axisVec) < 1.0 - FLT_EPSILON)
 		{
 			currentAngle.setRotation( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
 			std::cout << zAxis.cross(axisVec).normalize() << std::endl;

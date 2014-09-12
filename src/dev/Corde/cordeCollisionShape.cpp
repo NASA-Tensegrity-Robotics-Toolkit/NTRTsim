@@ -47,7 +47,7 @@ subject to the following restrictions:
 
 cordeCollisionShape::cordeCollisionShape(cordeCollisionObject* objectShape) :
 localScaling(1, 1, 1),
-m_collisionMargin( 0.04), // Default by Bullet's user manual
+m_collisionMargin( 0.04), // Default by Bullet's user manual, gets overwritten by cordeCollisionObject
 p_objectShape(objectShape)
 {
 	m_shapeType = SOFTBODY_SHAPE_PROXYTYPE;

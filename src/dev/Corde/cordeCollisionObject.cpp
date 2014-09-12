@@ -77,13 +77,26 @@ m_gravity(tgBulletUtil::worldToDynamicsWorld(world).getGravity()) // Note, if gr
 	m_collisionShape = new cordeCollisionShape(this);
 	m_collisionShape->setMargin(Config.radius);
 	
-	const btScalar		margin=getCollisionShape()->getMargin();
+	const btScalar		margin = getCollisionShape()->getMargin();
 	
 	// Get cordeModel data into collision object
-	for (std::size_t i = 0; i < m_massPoints.size(); i++)
+	for (std::size_t i = 0, ni = m_massPoints.size(); i < ni; i++)
 	{
 		CordePositionElement&	n = *m_massPoints[i];
-		m_leaves.push_back( m_ndbvt.insert(btDbvtVolume::FromCR(n.pos, margin),&n) );
+		
+		int j = i;
+		if (i == ni - 1)
+		{
+			j = i - 1;
+		}
+		btVector3 box = btVector3(margin, margin, linkLengths[j]/2.0);
+			
+		CordeQuaternionElement& q = *m_centerlines[j];
+		btScalar angle = q.q_new.getAngle();
+		btVector3 axis = q.q_new.getAxis();
+		box.rotate(axis, angle);
+		
+		m_leaves.push_back( m_ndbvt.insert(btDbvtVolume::FromCE(n.pos, box),&n) );
 	}
 	
 	/// In btSoftBody this was passsed in from outside and initialized in the world. Check for compatability
@@ -127,7 +140,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	m_sst.isdt		=	1.0 / m_sst.sdt;
 	m_sst.velmrg	=	m_sst.sdt*3; ///@todo investigate
 	m_sst.radmrg	=	getCollisionShape()->getMargin();
-	m_sst.updmrg	=	m_sst.radmrg*(btScalar)0.25;
+	m_sst.updmrg	=	m_sst.radmrg;
 	
 	computeInternalForces();
 	
@@ -141,8 +154,21 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 	for(std::size_t i = 0, ni= m_massPoints.size(); i<ni; ++i)
 	{
 		CordePositionElement&	n = *m_massPoints[i];
-		vol = btDbvtVolume::FromCR(n.pos_new, m_sst.radmrg);
-		m_ndbvt.update(	m_leaves[i],
+		
+		int j = i;
+		if (i == ni - 1)
+		{
+			j = i - 1;
+		}
+		btVector3 box = btVector3(m_sst.radmrg, m_sst.radmrg, linkLengths[j]/2.0);
+			
+		CordeQuaternionElement& q = *m_centerlines[j];
+		btScalar angle = q.q_new.getAngle();
+		btVector3 axis = q.q_new.getAxis();
+		box.rotate(axis, angle);
+		
+		vol = btDbvtVolume::FromCE(n.pos_new, box);
+		m_ndbvt.update(	m_leaves[i], 
 			vol,
 			n.vel_new * m_sst.velmrg,
 			m_sst.updmrg);
@@ -200,7 +226,7 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 	solveAnchors(dt);
 #endif
 	solveRContacts();
-	//solveSContacts();
+	solveSContacts();
 }
 
 void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
@@ -325,14 +351,16 @@ void cordeCollisionObject::solveRContacts()
 
 void cordeCollisionObject::solveSContacts()
 {
+	/// This is a compromise between Spillman's algorithm and Bullet's collision detection
+	/// Ideally we would find the exact point of a collision.
 	const btScalar	idt = m_sst.isdt;
 	for(int i = 0, ni = m_scontacts.size(); i < ni; ++i)
 	{
 		const SContact&		c = m_scontacts[i];
 		
 		// Normal * mass ratio * penetration distance
-		btVector3 rA = c.m_normal * c.m_massRatio * c.m_depth;
-		btVector3 rB =  -c.m_normal * (1.f - c.m_massRatio) * c.m_depth;
+		btVector3 rA = -c.m_normal * c.m_massRatio * c.m_depth;
+		btVector3 rB =  c.m_normal * (1.f - c.m_massRatio) * c.m_depth;
 		
 		btVector3 fA = pow(idt, 2.0) * c.m_nodea->mass * rA;
 		btScalar  magA = fA.length();
@@ -340,7 +368,7 @@ void cordeCollisionObject::solveSContacts()
 	
 		btVector3 fB = pow(idt, 2.0) * c.m_nodeb->mass * rB;
 		btScalar  magB = fB.length();
-		c.m_nodeb->applyForce(fB - c.m_friction * magB);			
+		c.m_nodeb->applyForce(fB + c.m_friction * magB);			
 	}
 }
 
