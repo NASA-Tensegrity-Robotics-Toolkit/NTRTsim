@@ -143,15 +143,15 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
 {
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
     double mins[4]  = {m_initialLengths * 0.70, 
-                       2, 
+                       1.8, 
                        M_PI/2, 
-                       m_initialLengths};
+                       m_initialLengths * 0.70};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths, 
-                       2, 
+    double maxes[4] = {m_initialLengths * 1.30, 
+                       2.2, 
                        M_PI/8, 
-                       m_initialLengths}; 
+                       m_initialLengths * 1.30}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     for(int i=0;i<actions.size();i++) { //8x
@@ -223,6 +223,13 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             tgLinearString *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+            double minLength = m_initialLengths * 0.70;
+            double maxLength = m_initialLengths * 1.30;
+            if (newLength <= minLength) {
+                newLength = minLength;
+            } else if (newLength >= maxLength) {
+                newLength = maxLength;
+            }
             pMuscle->setRestLength(newLength, dt);
         }
         phase += phaseChange[cluster];
