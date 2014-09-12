@@ -58,6 +58,22 @@ struct	CollideSDF_RS : btDbvt::ICollide
 		btScalar		dynmargin;
 		btScalar		stamargin;
 	};
+
+struct  CollideSDF_SS : btDbvt::ICollide
+	{
+		btScalar			erp;
+		btScalar			idt;
+		btScalar			m_margin;
+		btScalar			friction;
+		btScalar			threshold;
+		
+		CollideSDF_SS();
+		
+		cordeCollisionObject*	bodies[2];
+		
+		void ProcessSoftSoft(cordeCollisionObject* psa, cordeCollisionObject* psb);
+		
+	};
 	
 };
 

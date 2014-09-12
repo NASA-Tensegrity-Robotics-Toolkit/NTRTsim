@@ -202,6 +202,13 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 	solveRContacts();
 }
 
+void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
+{
+	
+	cordeColliders::CollideSDF_SS	docollide;
+	docollide.ProcessSoftSoft(this, otherSoftBody);
+}
+
 void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap) 
 { 
 	cordeColliders::CollideSDF_RS	docollide;		

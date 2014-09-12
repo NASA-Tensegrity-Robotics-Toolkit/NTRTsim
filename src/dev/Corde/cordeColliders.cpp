@@ -117,3 +117,24 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 		}
 	}
 }
+
+cordeColliders::CollideSDF_SS::CollideSDF_SS() :
+erp(1),
+idt(0.0),
+m_margin(0.0),
+friction(0.0),
+threshold(0.0)
+{
+
+}
+
+void cordeColliders::CollideSDF_SS::ProcessSoftSoft(cordeCollisionObject* psa, cordeCollisionObject* psb)
+{
+	idt			=	psa->m_sst.isdt;
+	//m_margin		=	(psa->getCollisionShape()->getMargin()+psb->getCollisionShape()->getMargin())/2;
+	m_margin		=	(psa->getCollisionShape()->getMargin()+psb->getCollisionShape()->getMargin());
+	friction	=	btMin(psa->getFriction(), psb->getFriction());
+	bodies[0]	=	psa;
+	bodies[1]	=	psb;
+	psa->m_ndbvt.collideTT(psa->m_ndbvt.m_root,psb->m_ndbvt.m_root,*this);
+}

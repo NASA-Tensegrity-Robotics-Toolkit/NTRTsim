@@ -140,7 +140,7 @@ public:
 	// Constrained motion - anchors, apply contact forces (8/28 just rigid)
 	void solveConstraints(btScalar dt);
 	
-	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody) { }
+	void defaultCollisionHandler(cordeCollisionObject* otherSoftBody);
 	
 	// Just adds contact points etc, still need to process collisions elsewhere
 	void defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap);
