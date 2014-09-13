@@ -35,8 +35,9 @@
 #include <stdexcept>
 #include <vector>
 
-T6RestLengthController::T6RestLengthController(const double restLengthDiff) :
-    m_restLengthDiff(restLengthDiff) 
+T6RestLengthController::T6RestLengthController(T6Model* subject, const double restLengthDiff) :
+    m_restLengthDiff(restLengthDiff),
+	m_controllerMuscleRatio(subject->muscleRatio())
 {
     if (restLengthDiff < 0.0)
     {
@@ -71,7 +72,7 @@ void T6RestLengthController::onSetup(T6Model& subject)
 // each timestep... but just including it in onSetup doesn't seem to work.
 void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
-    if (dt <= 0.0)
+    /*if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive");
     }
@@ -91,5 +92,36 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 	    double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
 	    pMuscle->setRestLength(desiredRestLength, dt);
 	}
-    }
+    }*/
+	if (dt <= 0.0)
+	{
+		throw std::invalid_argument("dt is not positive");
+	}
+	else
+	{
+		// Do an update of all cable rest lengths
+		// First, get all muscles (cables)
+		const std::vector<tgLinearString*> passiveMuscles = subject.getPassiveMuscles();
+		const std::vector<tgLinearString*> activeMuscles = subject.getActiveMuscles();
+
+		// then, iterate over all muscles
+		for (size_t i = 0; i < passiveMuscles.size(); ++i)
+		{
+			tgLinearString * const pMuscle = passiveMuscles[i];
+			assert(pMuscle != NULL);
+
+			// set rest length of the i-th muscle
+			double desiredRestLength = pMuscle->getStartLength() - (m_restLengthDiff*m_controllerMuscleRatio);
+			pMuscle->setRestLength(desiredRestLength, dt);
+		}
+		for (size_t i = 0; i < activeMuscles.size(); ++i)
+		{
+			tgLinearString * const pMuscle = activeMuscles[i];
+			assert(pMuscle != NULL);
+
+			// set rest length of the i-th muscle
+			double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
+			pMuscle->setRestLength(desiredRestLength, dt);
+		}
+	}
 }

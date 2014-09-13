@@ -94,6 +94,25 @@ public:
      */
     const std::vector<tgLinearString*>& getAllMuscles() const;
     
+    /**
+	 * Return a vector of passive muscles for the controllers to work with.
+	 * @return A vector of all of the muscles
+	 */
+	const std::vector<tgLinearString*>& getPassiveMuscles() const;
+
+	/**
+	 * Return a vector of active muscles for the controllers to work with.
+	 * @return A vector of all of the muscles
+	 */
+	const std::vector<tgLinearString*>& getActiveMuscles() const;
+
+	/**
+	 * Return a const of the ratio of spring constants for active and passive
+	 * muscles for the controllers to work with.
+	 * @return A vector of all of the muscles
+	 */
+	virtual const double muscleRatio();
+
 private:
 	
 	/**
@@ -125,6 +144,18 @@ private:
      * through setup
      */
     std::vector<tgLinearString*> allMuscles;
+
+	/**
+     * A list of passively actuated muscles. Will be empty until most of the way
+     * through setup
+     */
+    std::vector<tgLinearString*> passiveMuscles;
+
+    /**
+	 * A list of passively actuated muscles. Will be empty until most of the way
+	 * through setup
+	 */
+	std::vector<tgLinearString*> activeMuscles;
 };
 
 #endif  // T6_MODEL_H

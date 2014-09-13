@@ -51,7 +51,7 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-  T6RestLengthController(const double restLengthDiff = 4);
+  T6RestLengthController(T6Model* subject, const double restLengthDiff = 4);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -81,6 +81,13 @@ private:
    * in the constructor.
    */
   const double m_restLengthDiff;
+
+  /**
+   * This is the percentage ratio between active and passive muscles.
+   * It will be applied to m_restLengthDiff for passive muscles.
+   * Set in the constructor.
+   */
+  const double m_controllerMuscleRatio;
 
   // For data logging. TO-DO: implement this fully.
   // tgDataObserver m_dataObserver;

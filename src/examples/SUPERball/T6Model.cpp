@@ -39,23 +39,27 @@
 
 namespace
 {
+    // Note: This current model of the SUPERball rod is 1.5m long by 4.5cm (0.045m) radius,
+    // which is 1.5m*(0.045m)^2 = 0.0030375m^3.
+    // For SUPERball v1.5, mass = 3.5kg per strut, which density [kg/m^3] comes out to:
+    // density = 3.5kg/0.0030375m^3 = 1152.2634kg/m^3.
+
     // see tgBaseString.h for a descripton of some of these rod parameters
     // (specifically, those related to the motor moving the strings.)
     // NOTE that any parameter that depends on units of length will scale
-    // with the current gravity scaling. E.g., with gravity as 98.1,
-    // the length units below are in decimeters.
-
-    // Note: This current model of the SUPERball rod is 1.5m long by 3 cm radius,
-    // which is 0.00424 m^3.
-    // For SUPERball v1.5, mass = 3.5kg per strut, which comes out to 
-    // 0.825 kg / (decimeter^3).
+    // with the current gravity scaling. E.g., with gravity as 98.1
+    // Thus,
+    // Rod Length = 15
+    // Rod Radius = 0.45
+    // density = 1.152 (length is cubed, so decimal moves 3 places)
 
     // similarly, frictional parameters are for the tgRod objects.
     const struct Config
     {
         double density;
         double radius;
-        double stiffness;
+        double stiffness_passive;
+        double stiffness_active;
         double damping;
         double rod_length;
         double rod_space;    
@@ -68,9 +72,10 @@ namespace
         double maxAcc;
     } c =
    {
-     0.825,    // density (kg / length^3)
-     0.31,     // radius (length)
-     1500.0,   // stiffness (kg / sec^2)
+     1.152,    // density (kg / length^3)
+     0.45,     // radius (length)
+     613.0,    // stiffness_passive (kg / sec^2)
+     2854.5,   // stiffness_active (kg / sec^2)
      200.0,    // damping (kg / sec)
      15.0,     // rod_length (length)
      7.5,      // rod_space (length)
@@ -130,38 +135,39 @@ void T6Model::addRods(tgStructure& s)
 
 void T6Model::addMuscles(tgStructure& s)
 {
-    s.addPair(0, 4,  "muscle");
-    s.addPair(0, 5,  "muscle");
-    s.addPair(0, 8,  "muscle");
-    s.addPair(0, 10, "muscle");
+	// Added ability to have two muscles in a structure.
+	// Configuration currently is random, at the moment [27 June 2014]
+    s.addPair(0, 4,  "muscle_active");
+    s.addPair(0, 5,  "muscle_passive");
+    s.addPair(0, 8,  "muscle_active");
+    s.addPair(0, 10, "muscle_passive");
 
-    s.addPair(1, 6,  "muscle");
-    s.addPair(1, 7,  "muscle");
-    s.addPair(1, 8,  "muscle");
-    s.addPair(1, 10, "muscle");
+    s.addPair(1, 6,  "muscle_active");
+    s.addPair(1, 7,  "muscle_passive");
+    s.addPair(1, 8,  "muscle_passive");
+    s.addPair(1, 10, "muscle_active");
 
-    s.addPair(2, 4,  "muscle");
-    s.addPair(2, 5,  "muscle");
-    s.addPair(2, 9,  "muscle");
-    s.addPair(2, 11, "muscle");
+    s.addPair(2, 4,  "muscle_passive");
+    s.addPair(2, 5,  "muscle_active");
+    s.addPair(2, 9,  "muscle_active");
+    s.addPair(2, 11, "muscle_passive");
 
-    s.addPair(3, 7,  "muscle");
-    s.addPair(3, 6,  "muscle");
-    s.addPair(3, 9,  "muscle");
-    s.addPair(3, 11, "muscle");
+    s.addPair(3, 7,  "muscle_active");
+    s.addPair(3, 6,  "muscle_passive");
+    s.addPair(3, 9,  "muscle_passive");
+    s.addPair(3, 11, "muscle_active");
 
-    s.addPair(4, 2,  "muscle");
-    s.addPair(4, 10, "muscle");
-    s.addPair(4, 11, "muscle");
+    s.addPair(4, 10, "muscle_active");
+    s.addPair(4, 11, "muscle_passive");
 
-    s.addPair(5, 8,  "muscle");
-    s.addPair(5, 9,  "muscle");
+    s.addPair(5, 8,  "muscle_active");
+    s.addPair(5, 9,  "muscle_passive");
 
-    s.addPair(6, 10, "muscle");
-    s.addPair(6, 11, "muscle");
+    s.addPair(6, 10, "muscle_passive");
+    s.addPair(6, 11, "muscle_active");
 
-    s.addPair(7, 8,  "muscle");
-    s.addPair(7, 9,  "muscle");
+    s.addPair(7, 8,  "muscle_passive");
+    s.addPair(7, 9,  "muscle_active");
 
 }
 
@@ -171,9 +177,13 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
+
+    tgLinearString::Config muscleConfig_active(c.stiffness_active, c.damping, c.rotation,
+    					    c.maxTens, c.targetVelocity,
+    					    c.maxAcc);
             
     // Start creating the structure
     tgStructure s;
@@ -192,7 +202,8 @@ void T6Model::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle_passive", new tgLinearStringInfo(muscleConfig_passive));
+    spec.addBuilder("muscle_active", new tgLinearStringInfo(muscleConfig_active));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -203,6 +214,9 @@ void T6Model::setup(tgWorld& world)
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    // Not really sure how to use the find() function in tgModel.h
+    passiveMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_passive"), getDescendants());
+    activeMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_active"), getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -234,6 +248,22 @@ void T6Model::onVisit(tgModelVisitor& r)
 const std::vector<tgLinearString*>& T6Model::getAllMuscles() const
 {
     return allMuscles;
+}
+
+const std::vector<tgLinearString*>& T6Model::getPassiveMuscles() const
+{
+    return passiveMuscles;
+}
+
+const std::vector<tgLinearString*>& T6Model::getActiveMuscles() const
+{
+    return activeMuscles;
+}
+
+const double T6Model::muscleRatio()
+{
+	//return (c.stiffness_active/c.stiffness_passive);
+	return 2.5;
 }
     
 void T6Model::teardown()
