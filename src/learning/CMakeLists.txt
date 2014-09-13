@@ -5,5 +5,6 @@ subdirs(
     Configuration
     AnnealEvolution
     Adapters
+    NeuroEvolution
 )
 

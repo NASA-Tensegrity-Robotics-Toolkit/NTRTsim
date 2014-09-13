@@ -16,7 +16,12 @@ add_library( ${PROJECT_NAME} SHARED
     tgSimViewGraphics.cpp
     
     tgBulletUtil.cpp
+    tgBaseRigid.cpp
     tgRod.cpp
+    tgBox.cpp
+    tgSphere.cpp
+    
+    abstractMarker.cpp
 )
 
 link_directories(${LIB_DIR})

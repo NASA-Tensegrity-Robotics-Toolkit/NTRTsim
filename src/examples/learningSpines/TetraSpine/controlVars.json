@@ -1,0 +1,19 @@
+{
+    "inside_imp_ten" : 100.0,
+    "inside_imp_pos" : 500.0,
+    "inside_imp_vel" : 50.0,
+    "outside_imp_ten" : 100.0,
+    "outside_imp_pos" : 500.0,
+    "outside_imp_vel" : 100.0,
+    "inside_length" : 16.5,
+    "outside_length" : 19.5,
+    "offset_speed" : 0.0,
+    "cpg_amplitude" : 50.0,
+    "cpg_frequency" : 2.51,
+    "bodyWaves" : 0.5,
+    "insideMod" : -0.8,
+    "top_offset" : 0.0,
+    "left_offset" : 0.0,
+    "right_offset" : 0.0,
+    "updateFrequency" : 20.0
+}

@@ -19,7 +19,8 @@
 /**
  * @file tgStructureInfo.cpp
  * @brief Implementation of class tgStructureInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

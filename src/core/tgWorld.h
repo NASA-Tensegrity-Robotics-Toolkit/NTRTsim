@@ -44,12 +44,18 @@ public:
    */
   struct Config
   {
+	Config(double g = 9.81, double ws = 1000);
     /**
      * Gravitational acceleration.
      * The units are application depenent.
      * Whether negative values are accepted is application dependent.
      */
     double gravity;
+    /**
+     * Size of the world for broadphase collision detection. Indicates
+     * the length of one side of the detection cube. Must be positive.
+     */
+    double worldSize;
   };
 
   /** Construct with the default configuration. */

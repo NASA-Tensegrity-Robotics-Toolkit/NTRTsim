@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 
 /**
@@ -32,10 +32,13 @@
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
+#include "BulletCollision/BroadphaseCollision/btAxisSweep3.h" // New broadphase
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
@@ -50,81 +53,92 @@
  */
 class IntermediateBuildProducts
 {
-public:
-  IntermediateBuildProducts() : dispatcher(&collisionConfiguration)
+    public:
+        IntermediateBuildProducts(double worldSize) : 
+            corner1 (-worldSize,-worldSize, -worldSize),
+            corner2 (worldSize, worldSize, worldSize),
+            dispatcher(&collisionConfiguration),
+#if (1) // More acc broadphase - remeber the comma
+            broadphase(corner1, corner2, 16384)
+#endif
   {
   }
+  const btVector3 corner1;
+  const btVector3 corner2;
   btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
   btCollisionDispatcher dispatcher;
-  btDbvtBroadphase broadphase;
-  btSequentialImpulseConstraintSolver solver;
+#if (0) // Default broadphase
+        btDbvtBroadphase broadphase;
+#else
+        // More accurate broadphase:
+        btAxisSweep3 broadphase;
+#endif
+        btSequentialImpulseConstraintSolver solver;
 };
 
 tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
-                                                    tgBulletGround* ground) :
+        tgBulletGround* ground) :
     tgWorldImpl(config, ground),
-    m_pIntermediateBuildProducts(new IntermediateBuildProducts),
+    m_pIntermediateBuildProducts(new IntermediateBuildProducts(config.worldSize)),
     m_pDynamicsWorld(createDynamicsWorld())
 {
-  // Gravitational acceleration is down on the Y axis
-  const btVector3 gravityVector(0, -config.gravity, 0);
-  m_pDynamicsWorld->setGravity(gravityVector);
+    // Gravitational acceleration is down on the Y axis
+    const btVector3 gravityVector(0, -config.gravity, 0);
+    m_pDynamicsWorld->setGravity(gravityVector);
 
-  // Create and add the ground rigid body
-  #if (0)
-  btRigidBody * const pGroundRigidBody = createGroundRigidBody();
-  m_pDynamicsWorld->addRigidBody(pGroundRigidBody);
-  #else
-  m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
-  #endif
+	m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
 
-  // Postcondition
-  assert(invariant());
+    #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
+        m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
+    #endif	
+    // Postcondition
+    assert(invariant());
 }
 
 tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 {
-  // Delete all the collision objects. The dynamics world must exist.
-  // Delete in reverse order of creation.
-  const size_t nco = m_pDynamicsWorld->getNumCollisionObjects();
-  btCollisionObjectArray& oa = m_pDynamicsWorld->getCollisionObjectArray();
-  for (int i = nco - 1; i >= 0; --i)
-  {
-    btCollisionObject * const pCollisionObject = oa[i];
-
-    // If the collision object is a rigid body, delete its motion state
-    const btRigidBody* const pRigidBody =
-      btRigidBody::upcast(pCollisionObject);
-    if (pRigidBody)
+    // Delete all the collision objects. The dynamics world must exist.
+    // Delete in reverse order of creation.
+    const size_t nco = m_pDynamicsWorld->getNumCollisionObjects();
+    btCollisionObjectArray& oa = m_pDynamicsWorld->getCollisionObjectArray();
+    for (int i = nco - 1; i >= 0; --i)
     {
-      delete pRigidBody->getMotionState();
+        btCollisionObject * const pCollisionObject = oa[i];
+
+        // If the collision object is a rigid body, delete its motion state
+        const btRigidBody* const pRigidBody =
+            btRigidBody::upcast(pCollisionObject);
+        if (pRigidBody)
+        {
+            delete pRigidBody->getMotionState();
+        }
+
+        // Remove the collision object from the dynamics world
+        m_pDynamicsWorld->removeCollisionObject(pCollisionObject);
+        // Delete the collision object
+        delete pCollisionObject;
     }
+    // All collision objects have been removed and deleted
+    assert(m_pDynamicsWorld->getNumCollisionObjects() == 0);
 
-    // Remove the collision object from the dynamics world
-    m_pDynamicsWorld->removeCollisionObject(pCollisionObject);
-    // Delete the collision object
-    delete pCollisionObject;
-  }
-  // All collision objects have been removed and deleted
-  assert(m_pDynamicsWorld->getNumCollisionObjects() == 0);
-  
-  // Delete all the collision shapes. This can be done at any time.
-  const size_t ncs = m_collisionShapes.size();
-  for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
+    // Delete all the collision shapes. This can be done at any time.
+    const size_t ncs = m_collisionShapes.size();
+    
+    for (size_t i = 0; i < ncs; ++i) { delete m_collisionShapes[i]; }
 
-  delete m_pDynamicsWorld;
+    delete m_pDynamicsWorld;
 
-  // Delete the intermediate build products, which are now orphaned
-  delete m_pIntermediateBuildProducts;
+    // Delete the intermediate build products, which are now orphaned
+    delete m_pIntermediateBuildProducts;
 }
 
 /**
  * Create and return a new instance of a btSoftRigidDynamicsWorld.
  * @return a pointer to a new instance of a btSoftRigidDynamicsWorld
  */
-btSoftRigidDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
+btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
 {    
-  btSoftRigidDynamicsWorld * const result =
+  btSoftRigidDynamicsWorld* const result =
     new btSoftRigidDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
                  &m_pIntermediateBuildProducts->broadphase,
                  &m_pIntermediateBuildProducts->solver, 
@@ -133,58 +147,26 @@ btSoftRigidDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
   return result;
 }
 
-/**
-* Create and return a new instance of a btRigidBody for the ground shape.
-* This will be added to the btSoftRigidDynamicsWorld.
-*/
-btRigidBody* tgWorldBulletPhysicsImpl::createGroundRigidBody()
-{
-const btScalar mass = 0.0;
-
-    btTransform groundTransform;
-    groundTransform.setIdentity();
-    groundTransform.setOrigin(btVector3(0, -0.5, 0));
-
-    // Using motionstate is recommended
-    // It provides interpolation capabilities, and only synchronizes 'active' objects
-    btDefaultMotionState* const pMotionState =
-      new btDefaultMotionState(groundTransform);
-
-    const btVector3 groundDimensions(btScalar(500.0), btScalar(0.5), btScalar(500.0));
-    btBoxShape* const pGroundShape = new btBoxShape(groundDimensions);
-    
-    addCollisionShape(pGroundShape);
-    
-    const btVector3 localInertia(0, 0, 0);
-
-    btRigidBody::btRigidBodyConstructionInfo const rbInfo(mass, pMotionState, pGroundShape, localInertia);
-
-    btRigidBody* const pGroundRigidBody = new btRigidBody(rbInfo);
-
-    return pGroundRigidBody;
-}
-
-
 void tgWorldBulletPhysicsImpl::step(double dt)
 {
-  // Precondition
-  assert(dt > 0.0);
+    // Precondition
+    assert(dt > 0.0);
 
-  const btScalar timeStep = dt;
-  const int maxSubSteps = 1;
-  const btScalar fixedTimeStep = dt;
-  m_pDynamicsWorld->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
+    const btScalar timeStep = dt;
+    const int maxSubSteps = 1;
+    const btScalar fixedTimeStep = dt;
+    m_pDynamicsWorld->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
 
-  // Postcondition
-  assert(invariant());
+    // Postcondition
+    assert(invariant());
 }
 
 void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 {
-      if (pShape)
-      {
+    if (pShape)
+    {
         m_collisionShapes.push_back(pShape);
-      }
+    }
 
       // Postcondition
       assert(invariant());
@@ -192,5 +174,6 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 
 bool tgWorldBulletPhysicsImpl::invariant() const
 {
-        return (m_pDynamicsWorld != 0);
+    return (m_pDynamicsWorld != 0);
 }
+

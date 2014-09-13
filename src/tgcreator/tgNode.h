@@ -22,7 +22,8 @@
 /**
  * @file tgNode.h
  * @brief Definition of class tgNode
- * @date March 21, 2014
+ * @author Ryan Adams
+ * @date March 2014
  * $Id$
  */
 
@@ -39,6 +40,7 @@
 /**
  * An extension of btVector3 that adds taggability,
  * rotation, and other editing features (to be added).
+ * Tagging just a node can allow a tgSphere to be placed there.
  */
 class tgNode : public btVector3, public tgTaggable
 {

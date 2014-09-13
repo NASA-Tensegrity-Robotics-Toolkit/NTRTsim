@@ -22,11 +22,12 @@
 /**
  * @file tgRod.h
  * @brief Contains the definition of class tgRod
+ * @author Ryan Adams
  * $Id$
  */
 
 // This application
-#include "tgModel.h" // @todo: forward declare and move to tgRod.cpp (to be created)
+#include "tgBaseRigid.h" // @todo: forward declare and move to tgRod.cpp (to be created)
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -39,7 +40,7 @@ class btRigidBody;
  * A rod is a rigid body. Length is defined by nodes, radius and density
  * are defined by config.
  */
-class tgRod : public tgModel
+class tgRod : public tgBaseRigid
 {
 public:
 
@@ -57,10 +58,12 @@ public:
          */
             Config(double r = 0.5,
                     double d = 1.0,
-                    double f = 0.5,
+                    double f = 1.0,
                     double rf = 0.0,
-                    double res = 0.0);
-        
+                    double res = 0.2);
+
+
+
             /** The rod's radius; must be nonnegative. */
             const double radius;
 
@@ -92,22 +95,10 @@ public:
     virtual void onVisit(const tgModelVisitor& v) const;
     
     /**
-     * Return the rod's mass in application-dependent units.
-     * @return the rod's mass in application-dependent units
-     */
-    double mass() const { return m_mass; }
-    
-    /**
      * Return the rod's length in application-dependent units.
      * @return the rod's length in application-dependent units
      */
     double length() const { return m_length; }
-
-    /**
-     * Return the center of mass of the rod, a vector in 3-space.
-     * @return the center of mass of the rod, a vector in 3-space
-     */
-    btVector3 centerOfMass() const;
 
 private:
 
@@ -115,14 +106,6 @@ private:
     bool invariant() const;
 
 private:
-    
-    /**
-     * The Bullet Physics implementation of the rod.
-     */
-    btRigidBody* m_pRigidBody;
-    
-    /** The rod's mass. The units are application dependent. */
-    const double m_mass;
     
     /** The rod's length. The units are application dependent. */
     const double m_length;

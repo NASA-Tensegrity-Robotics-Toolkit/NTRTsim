@@ -34,6 +34,7 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -49,10 +50,7 @@ int main(int argc, char** argv)
     std::cout << "AppNestedStructureTest" << std::endl;
 
     // First create the world
-    const tgWorld::Config config = 
-    {
-        981 // gravity, cm/sec^2
-    };
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view
@@ -82,13 +80,18 @@ int main(int argc, char** argv)
     TetraSpineCPGControl* const myControl =
       new TetraSpineCPGControl(control_config, suffix);
     myModel->attach(myControl);
+    /*
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+    */
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 4000)
+    while (i < 10000)
     {
-        simulation.run(30000);
+        simulation.run(60000);
         simulation.reset();
         i++;
     }

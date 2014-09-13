@@ -34,10 +34,14 @@
 
 // Forward declarations
 class btCollisionShape;
-class btSoftRigidDynamicsWorld;
+class btTypedConstraint;
+class btDynamicsWorld;
 class btRigidBody;
 class IntermediateBuildProducts;
+class btBroadphaseInterface;
+class btDispatcher;
 class tgBulletGround;
+class tgHillyGround;
 
 /**
  * Concrete class derived from tgWorldImpl for Bullet Physics
@@ -46,13 +50,13 @@ class tgBulletGround;
 class tgWorldBulletPhysicsImpl : public tgWorldImpl
 {
  public:
-
+ 
   /** 
    * The only constructor.
    * @param[in] gravity the gravitational acceleration in m/sec^2
    */
   tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
-                            tgBulletGround* ground);
+                           tgBulletGround* ground);
 
   /** Clean up Bullet Physics state. */
   ~tgWorldBulletPhysicsImpl();
@@ -68,32 +72,44 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
    * Return a reference to the dynamics world.
    * @return a reference to the dynamics world
    */
-  btSoftRigidDynamicsWorld& dynamicsWorld() const
+  btDynamicsWorld& dynamicsWorld() const
   {
     return *m_pDynamicsWorld;
   }
   
-        /**
-     * Add a btCollisionShape the a collection for deletion upon
-     * destruction.
-     * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
-     */
-        void addCollisionShape(btCollisionShape* pShape);
+	/**
+	 * Add a btCollisionShape the a collection for deletion upon
+	 * destruction.
+	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
+	 */
+	void addCollisionShape(btCollisionShape* pShape);
 
- private:
-    
+        /**
+     * Add a btTypedConstraint to a collection for deletion upon
+     * destruction. Also add to the physics.
+     * @param[in] pConstraint a pointer to a btTypedConstraint; do nothing if NULL
+     */
+        void addConstraint(btTypedConstraint* pConstaint);
+private:
+
+    /**
+     * Delete all the collision objects. The dynamics world must exist.
+     * Delete in reverse order of creation.
+     */
+    void removeCollisionShapes();
+
+    /**
+     * Delete all the constraint objects. The dynamics world must exist.
+     * Delete in reverse order of creation.
+     */
+    void removeConstraints();
+
         /**
      * Create a new dynamics world. Needs to be in the namespace so we
      * can free the pointers it creates.
      * @return the newly-created btSoftRigidDynamicsWorld
      */
-        btSoftRigidDynamicsWorld* createDynamicsWorld() const;
-    
-    /**
-     * Create the ground - needs to be in the namespace so we can
-     * free the pointers it creates
-     */
-    btRigidBody* createGroundRigidBody();
+        btDynamicsWorld* createDynamicsWorld() const;
     
     /** Integrity predicate. */
     bool invariant() const;
@@ -103,8 +119,11 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
     /** Used to build the btSoftRigidDynamicsWorld. */
     IntermediateBuildProducts * const m_pIntermediateBuildProducts;
     
-    /** The Bullet Physics representation of the tgWorld. */
-    btSoftRigidDynamicsWorld* m_pDynamicsWorld;
+
+
+    /** The Bullet Physics representation of the tgWorld. 
+     */
+   btDynamicsWorld* m_pDynamicsWorld;
     
     /* 
      * A vector of collision shapes for easy reference. Does not affect
@@ -113,6 +132,13 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
      * for efficiency.
      */
     btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
+
+    /* 
+     * A vector of constraints for easy reference. Does not affect
+     * physics or rendering unles the constraint is placed into the dynamics
+     * world.
+     */
+    btAlignedObjectArray<btTypedConstraint*> m_constraints;
 };
 
 #endif  // TG_WORLDBULLETPHYSICSIMPL_H

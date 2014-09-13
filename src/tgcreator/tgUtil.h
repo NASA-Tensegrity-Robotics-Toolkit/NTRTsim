@@ -24,6 +24,7 @@
  * @brief Contains the definition of class tgUtil and overloaded
  * operator<<() free functions.
  * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -110,6 +111,15 @@ public:
     {
         return getTransform(upVector(), start, end);
     }
+
+	inline static btTransform getTransform(const btVector3& center)
+	{
+		btTransform t = btTransform();
+        t.setIdentity();
+        t.setOrigin(center);
+		// No point in rotating, keep identity
+        return t;
+	}
 
     /**
      * Get a vector that points from a to b.

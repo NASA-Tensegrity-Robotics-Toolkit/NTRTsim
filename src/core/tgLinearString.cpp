@@ -185,12 +185,24 @@ void tgLinearString::setRestLength(double newLength, float dt)
         // moveMotors can change m_preferred length, so this goes here for now
         assert(m_preferredLength == newLength);
               
-    moveMotors(dt);
+	moveMotors(dt);
     }
 
     // Postcondition
     assert(invariant());
     
+}
+
+void tgLinearString::setPrefLength(double newLength)
+{
+    if (newLength < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = newLength;
+    }
 }
 
 void tgLinearString::moveMotors(double dt)
@@ -272,6 +284,38 @@ void tgLinearString::moveMotors(double dt)
      prevVel = (m_restLength  -m_muscle->getRestLength()) / dt ;
      #endif
      m_muscle->setRestLength(m_restLength);
+    
+}
+
+/* A modified version of setRestLength that performs said operation
+ * in a single call, as opposed to the original method, which requires
+ * multiple calls, since it relies on moveMotors.
+ * @param newLength the new rest length of the string.
+ */
+void tgLinearString::setRestLengthSingleStep(double newLength)
+{
+    if (newLength < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = newLength;
+        
+        // moveMotors can change m_preferred length, so this goes here for now
+        assert(m_preferredLength == newLength);
+
+	// we should assert something to confirm consistency since we're
+	// not calling moveMotors anymore. Does anything else need to
+	// change when restLength is changed? -Drew 7-1-14
+
+	m_muscle->setRestLength(newLength);
+	m_restLength = newLength;
+	m_preferredLength = newLength;
+    }
+
+    // Postcondition
+    assert(invariant());
     
 }
 

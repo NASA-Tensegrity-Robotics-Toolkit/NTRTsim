@@ -19,6 +19,7 @@
 /**
  * @file tgRigidInfo.cpp
  * @brief Contains the definitions of members of class tgRigidInfo
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -113,3 +114,28 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
             }
         }
     }
+    
+bool tgRigidInfo::sharesNodesWith(const tgRigidInfo& other) const
+{
+    const std::set<btVector3> s1 = getContainedNodes();
+    const std::set<btVector3> s2 = other.getContainedNodes();
+#if (0)
+    // This would have been preferable, but the compiler barfs
+    std::set<btVector3> intersection;
+    // Ignore the return value
+    std::set_intersection(s1.begin(), s1.end(),
+                          s2.begin(), s2.end(),
+                          intersection.begin());
+    return intersection.empty();
+#else    
+    std::set<btVector3>::const_iterator ii;
+    std::set<btVector3>::const_iterator ij;
+    for (ii = s1.begin(); ii != s1.end(); ++ii) {
+        for (ij = s2.begin(); ij != s2.end(); ++ij) {
+            if (*ii == *ij)
+                return true;                
+        }
+    }
+    return false;
+#endif
+}

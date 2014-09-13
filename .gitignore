@@ -1,4 +1,10 @@
 env
 build
-conf/install.conf
+build_test
+conf/*.conf
 src/DoxyDocs
+src/examples/learningSpines/TetraSpine/logs
+
+.cproject
+
+.project

@@ -52,7 +52,14 @@ public:
     
     /** Returns the rigid body to the bullet physics implementation */
     virtual btRigidBody* getGroundRigidBody() const = 0;
-    
+	
+	/** 
+	 * Returns a pointer to the collision shape for the list of 
+	 * collision objects in tgWorldBulletPhysicsImpl
+	 * Collision shape must not be null
+	 */
+    btCollisionShape* const getCollisionShape() const;    
+
 protected:
     // Will take care of deleting this ourselves.
     btCollisionShape* pGroundShape;

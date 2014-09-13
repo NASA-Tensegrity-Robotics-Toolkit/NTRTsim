@@ -72,14 +72,13 @@ namespace
         double maxAcc;
     } c =
    {
-     1.152,    // density (kg / length^3)
-     0.45,     // radius (length)
-     613.0,    // stiffness_passive (kg / sec^2)
-     2854.5,   // stiffness_active (kg / sec^2)
+     0.688,    // density (kg / length^3)
+     0.31,     // radius (length)
+     613.0,   // stiffness (kg / sec^2) was 1500
      200.0,    // damping (kg / sec)
-     15.0,     // rod_length (length)
+     16.84,     // rod_length (length)
      7.5,      // rod_space (length)
-     1.0,      // friction (unitless)
+     0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
      0,        // rotation
@@ -88,12 +87,10 @@ namespace
      20000     // maxAcc
 
      // Use the below values for earlier versions of simulation.
-     // 1.006,    
-     // 0.31,     
-     // 300000.0, 
-     // 3000.0,   
-     // 15.0,     
-     // 7.5,      
+     // 1.152,    // density (kg / length^3)
+     //	0.45,     // radius (length)
+     //	613.0,    // stiffness_passive (kg / sec^2)
+     //	2854.5,   // stiffness_active (kg / sec^2)
   };
 } // namespace
 

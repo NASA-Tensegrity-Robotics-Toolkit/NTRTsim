@@ -21,5 +21,14 @@ add_executable(AppTetraSpineLearning
     
 ) 
 
+add_executable(AppTetraSpineSerial
+	SerializedSineWaves.cpp	
+    TetraSpineLearningModel.cpp
+	AppTetraSpineSerial.cpp
+)
+
+target_link_libraries(AppTetraSpineSerial ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
+configure_file("controlVars.json" "controlVars.json" COPYONLY)
+
 add_custom_command(TARGET AppTetraSpineLearning POST_BUILD
 					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/logs)

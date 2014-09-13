@@ -57,19 +57,13 @@ void T6RestLengthController::onSetup(T6Model& subject)
         tgLinearString * const pMuscle = muscles[i];
 	assert(pMuscle != NULL);
 
-	// set rest length of the i-th muscle
-	// NOTE that we don't technically have a dt here: this is pre-simualtion.
-	// However, the dt is only used in tgLinearString for upper-bounding
-	// velocity and acceleration of our imaginary "motors," so we can
-	// choose whatever we want here.
-	double dt = 0.01;
 	double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
-	pMuscle->setRestLength(desiredRestLength, dt);
+	// Note that the single step version of setRestLength is used here,
+	// since we only want to call it once (not iteratively like the original.)
+	pMuscle->setRestLengthSingleStep(desiredRestLength);
     }
 }
 
-// This method is included for now: this SHOULD really work without the update
-// each timestep... but just including it in onSetup doesn't seem to work.
 void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
     /*if (dt <= 0.0)
@@ -93,35 +87,37 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 	    pMuscle->setRestLength(desiredRestLength, dt);
 	}
     }*/
-	if (dt <= 0.0)
-	{
-		throw std::invalid_argument("dt is not positive");
-	}
-	else
-	{
-		// Do an update of all cable rest lengths
-		// First, get all muscles (cables)
-		const std::vector<tgLinearString*> passiveMuscles = subject.getPassiveMuscles();
-		const std::vector<tgLinearString*> activeMuscles = subject.getActiveMuscles();
-
-		// then, iterate over all muscles
-		for (size_t i = 0; i < passiveMuscles.size(); ++i)
-		{
-			tgLinearString * const pMuscle = passiveMuscles[i];
-			assert(pMuscle != NULL);
-
-			// set rest length of the i-th muscle
-			double desiredRestLength = pMuscle->getStartLength() - (m_restLengthDiff*m_controllerMuscleRatio);
-			pMuscle->setRestLength(desiredRestLength, dt);
-		}
-		for (size_t i = 0; i < activeMuscles.size(); ++i)
-		{
-			tgLinearString * const pMuscle = activeMuscles[i];
-			assert(pMuscle != NULL);
-
-			// set rest length of the i-th muscle
-			double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
-			pMuscle->setRestLength(desiredRestLength, dt);
-		}
-	}
+//	if (dt <= 0.0)
+//	{
+//		throw std::invalid_argument("dt is not positive");
+//	}
+//	else
+//	{
+//		// Do an update of all cable rest lengths
+//		// First, get all muscles (cables)
+//		const std::vector<tgLinearString*> passiveMuscles = subject.getPassiveMuscles();
+//		const std::vector<tgLinearString*> activeMuscles = subject.getActiveMuscles();
+//
+//		// then, iterate over all muscles
+//		for (size_t i = 0; i < passiveMuscles.size(); ++i)
+//		{
+//			tgLinearString * const pMuscle = passiveMuscles[i];
+//			assert(pMuscle != NULL);
+//
+//			// set rest length of the i-th muscle
+//			double desiredRestLength = pMuscle->getStartLength() - (m_restLengthDiff*m_controllerMuscleRatio);
+//			pMuscle->setRestLength(desiredRestLength, dt);
+//		}
+//		for (size_t i = 0; i < activeMuscles.size(); ++i)
+//		{
+//			tgLinearString * const pMuscle = activeMuscles[i];
+//			assert(pMuscle != NULL);
+//
+//			// set rest length of the i-th muscle
+//			double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
+//			pMuscle->setRestLength(desiredRestLength, dt);
+//		}
+//	}
+      // Nothing!!
+//    }
 }

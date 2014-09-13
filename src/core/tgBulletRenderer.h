@@ -31,7 +31,6 @@
 
 // Forward declarations
 class tgLinearString;
-class tgLinearStringCPG;
 class tgModel;
 class tgRod;
 class tgWorld;

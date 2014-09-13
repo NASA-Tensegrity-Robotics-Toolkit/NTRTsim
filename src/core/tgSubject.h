@@ -22,7 +22,8 @@
 /**
  * @file tgSubject.h
  * @brief Definition of tgSubject class
- * @date March 4, 2014
+ * @author Ryan Adams
+ * @date March 2014
  * $Id$
  */
 

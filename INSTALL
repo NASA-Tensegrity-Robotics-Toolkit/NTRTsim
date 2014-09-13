@@ -30,13 +30,22 @@ anything.
 	- curl
 	- freeglut3
 	- freeglut3-dev (glut for bullet graphics)
+	- cmake
+	- build-essential
+        - unzip
 
     Fedora/CentOS (you can use sudo yum install):
 	- gcc-c++ (the compiler for cmake)
 	- glib2-devel and glib2-devel.i686
 	- curl
 	- freeglut
-	- freeglut-devel 
+	- freeglut-devel
+	- cmake
+	- build-essential
+	- unzip
+
+    MAC OSX (please read the detailed instructions below for OSX 10.9 at the end of this file)
+	-gcc/g++ 4.5 (via Macports or Homebrew)
 		
   - Also if available, it's sometimes easier to install cmake (and/or boost)
     from your distro. On ubuntu, sudo apt-get install cmake.
@@ -116,6 +125,20 @@ anything.
         /usr/lib
         /usr/local/lib
 
+** Build Options **
+
+  - After the first install, note the following options are available with build.sh (run build.sh -h for an up to date list)
+  
+    positional arguments:
+    build_path            Path to build (relative to src, e.g. 'BasicApp' or
+                           'lib/Example'). Defaults to all if not specified, includes dependancies.
+   
+    optional arguments:
+    -h       Show this help message and exit
+    -c       Run 'make clean' before make/make install on non-library sources
+    -l       Run 'make clean' before make/make install on libraries
+    -s       Don't automatically build the libraries
+    -w       Show compiler warnings when building
 
 ** Manual Installation **
 
@@ -143,7 +166,7 @@ anything.
   - Download and build Bullet Physics:
     
     cd env/downloads
-    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.81-rev2613.tgz
+    curl -k -L -O http://bullet.googlecode.com/files/bullet-2.82-r2704.tgz
     cd ../build
     tar xzvf ../downloads/bullet-2.82-r2704.tgz
 
@@ -234,4 +257,17 @@ anything.
     delete the empty folders in build/examples/... if you encounter this error
     when running build.sh
 
+
+** MAC OSX 10.9 installation problem **
+
+	Due to the defaul library being stdlibc++ instead of stdc++, NTRT and 
+	also all the dependencies (boost and bullet) has to be compiled using 
+	gcc. As a temporary solution, please follow these steps:
+
+	1) Install gcc, g++ using macports or homebrew (I used with gcc 4.5.4 through macports).
+	2) Download the github directory
+	3) Edit bin/setup/setup_boost.sh and uncomment this line by deleting '#':
+		#sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+	4)run setup.sh
+	5)run bin/build.sh
 
