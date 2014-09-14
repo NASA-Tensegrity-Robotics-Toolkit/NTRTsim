@@ -167,7 +167,7 @@ void Escape_T6Model::addRods(tgStructure& s)
 
 void Escape_T6Model::addMarkers(tgStructure &s)
 {
-    std::vector<tgRod *> rods=find<tgRod>("rod");
+    std::vector <tgRod*> rods=find<tgRod>("rod");
 
     for(int i=0;i<12;i++)
     {
@@ -276,7 +276,7 @@ void Escape_T6Model::setup(tgWorld& world)
     //map the rods and add the markers to them
     addMarkers(s);
 
-    btVector3 location(0,50.0,0);
+    btVector3 location(-15.0,20.0,0);
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
@@ -329,3 +329,31 @@ void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector
         rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
     }
 }
+
+//Return the center of mass of this model
+// Invariant: This model has 6 rods
+std::vector<double> Escape_T6Model::getBallCOM() {   
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 ballCenterOfMass(0, 0, 0);
+    double ballMass = 0.0; 
+    for (std::size_t i = 0; i < rods.size(); i++) {   
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        ballCenterOfMass += rodCenterOfMass * rodMass;
+        ballMass += rodMass;
+    }
+
+    assert(ballMass > 0.0);
+    ballCenterOfMass /= ballMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+
+    return result;
+}
+
