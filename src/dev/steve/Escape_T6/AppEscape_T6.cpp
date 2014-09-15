@@ -94,7 +94,7 @@ tgHillyGround *createGround() {
     const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
     const double friction = 0.5; // Default: 0.5
     const double restitution = 0.0;  // Default: 0.0
-    const btVector3 size = btVector3(500.0, 1.5, 500.0); // Default: (500.0, 1.5, 500.0)
+    const btVector3 size = btVector3(10000.0, 1.5, 10000.0); // Default: (500.0, 1.5, 500.0)
     const btVector3 origin = btVector3(0.0, 0.0, 0.0); // Default: (0.0, 0.0, 0.0)
     const size_t nx = 50; // Default: 50
     const size_t ny = 50; // Default: 50
@@ -134,7 +134,7 @@ tgSimView *createView(tgWorld *world) {
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation) {
-    int nEpisodes = 3; // Number of episodes ("trial runs")
+    int nEpisodes = 1; // Number of episodes ("trial runs")
     int nSteps = 60000; // Number of steps in each episode
     for (int i=0; i<nEpisodes; i++)
     {   
