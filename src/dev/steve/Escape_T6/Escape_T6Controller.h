@@ -101,6 +101,9 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         /** Difference in position between initPosition and finalPosition
          * of subject */
         double displacement(Escape_T6Model& subject);
+
+        /** Select action paramters from a comma-separated line in a file */
+        std::vector<double> readManualParams(int lineNumber, string filename);
 };
 
 #endif // ESCAPE_T6CONTROLLER
