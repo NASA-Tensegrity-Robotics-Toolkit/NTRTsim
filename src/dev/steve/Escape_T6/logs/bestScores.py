@@ -3,7 +3,7 @@
 import sys
 
 bestDistances = []
-threshold = 25.0 # Score (distance traveled)
+threshold = 20.0 # Score (distance traveled)
 
 try:
     f = open(sys.argv[1], 'r')
