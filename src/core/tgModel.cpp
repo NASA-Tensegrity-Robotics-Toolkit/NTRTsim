@@ -45,12 +45,6 @@ tgModel::tgModel(const tgTags& tags) :
   assert(invariant());
 }
 
-tgModel::tgModel(std::string space_separated_tags) : 
-  tgTaggable(space_separated_tags)
-{
-  assert(invariant());
-}
-
 tgModel::~tgModel()
 {
   const size_t n = m_children.size();

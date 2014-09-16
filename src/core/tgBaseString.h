@@ -209,11 +209,6 @@ protected:
            tgBaseString::Config& config,
            double restLength,
            double actualLength);
-    
-    tgBaseString(std::string space_separated_tags,
-           tgBaseString::Config& config,
-           double restLength,
-           double actualLength);
            
 protected:
     /**
