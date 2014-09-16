@@ -104,6 +104,8 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, string filename);
+
+        void printSineParams();
 };
 
 #endif // ESCAPE_T6CONTROLLER
