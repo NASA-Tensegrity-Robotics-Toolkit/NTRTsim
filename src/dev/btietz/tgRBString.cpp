@@ -63,17 +63,6 @@ m_config(config)
 {
 }
 
-tgRBString::tgRBString(std::string space_separated_tags,
-           tgRBString::Config& config,
-           double restLength) :
-tgBaseString(space_separated_tags, 
-            config.m_stringConfig, 
-            restLength,
-            restLength),
-m_config(config)
-{
-}
-
 void tgRBString::setup(tgWorld& world)
 {
     // These occur after the build process

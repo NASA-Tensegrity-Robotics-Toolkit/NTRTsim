@@ -128,25 +128,6 @@ tgBaseString::tgBaseString(const tgTags& tags,
     assert(m_preferredLength == m_restLength);
 }
 
-tgBaseString::tgBaseString(std::string space_separated_tags,
-                   tgBaseString::Config& config,
-                   double restLength,
-                   double actualLength) :
-    tgModel(space_separated_tags),
-    m_pHistory(new BaseStringHistory()),
-    m_config(config),
-    m_restLength(restLength),
-    m_preferredLength(m_restLength),
-    m_startLength(actualLength),
-    m_prevVelocity(0.0)
-{
-    constructorAux();
-
-    // Postcondition
-    assert(invariant());
-    assert(m_preferredLength == m_restLength);
-}
-
 tgBaseString::~tgBaseString()
 {
     delete m_pHistory;
