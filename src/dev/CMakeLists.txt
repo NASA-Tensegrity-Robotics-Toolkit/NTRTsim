@@ -5,6 +5,7 @@ subdirs(
 	Corde
     axydes
     btietz
+    radams
     tests
     atil
     steve

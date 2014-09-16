@@ -37,6 +37,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include <string>
 
 # define M_PI 3.14159265358979323846 
                                
@@ -44,10 +45,16 @@ using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-Escape_T6Controller::Escape_T6Controller(const double initialLength)
+Escape_T6Controller::Escape_T6Controller(const double initialLength) :
+    m_initialLengths(initialLength),
+    m_totalTime(0.0),
+    nClusters(8),
+    musclesPerCluster(3)
 {
-    this->m_initialLengths=initialLength;
-    this->m_totalTime=0.0;
+    clusters.resize(nClusters);
+    for (int i=0; i<nClusters; i++) {
+        clusters[i].resize(musclesPerCluster);
+    }
 }
 
 /** Set the lengths of the muscles and initialize the learning adapter */
@@ -55,35 +62,41 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
     double dt = 0.0001;
 
-    //Fetch all the muscles and set their initial lengths
+    //Set the initial length of every muscle in the subject
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
+    for (size_t i = 0; i < muscles.size(); ++i) {
         tgLinearString * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->setRestLength(this->m_initialLengths, dt);
     }
 
+    populateClusters(subject);
+    initPosition = subject.getBallCOM();
     setupAdapter();
+    initializeSineWaves(); // For muscle actuation
+
+    vector<double> state; // For config file usage (including Monte Carlo simulations)
+
+    //get the actions (between 0 and 1) from evolution (todo)
+    actions = evolutionAdapter.step(dt,state);
+ 
+    //transform them to the size of the structure
+    actions = transformActions(actions);
+
+    //apply these actions to the appropriate muscles according to the sensor values
+    applyActions(subject,actions);
 }
 
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
 {
-    if (dt <= 0.0)
-    {
+    if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
     }
     m_totalTime+=dt;
 
+    setPreferredMuscleLengths(subject, dt);
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    // Set new preferred lengths of muscles
-    for (size_t i = 0; i < muscles.size(); i++) {
-        tgLinearString *const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        double currentLength = pMuscle->getRestLength();
-        pMuscle->setRestLength(currentLength * (1 + sin((m_totalTime * 100) + (i/muscles.size()))), dt); //TODO: Temporary test
-    }
-
+    
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
@@ -91,12 +104,6 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
-
-    //vector<double> state=getState();
-    vector< vector<double> > actions;
-
-    //get the actions (between 0 and 1) from evolution (todo)
-    //actions=evolutionAdapter.step(dt,state);
 
     //instead, generate it here for now!
     for(int i=0; i<muscles.size(); i++)
@@ -108,24 +115,17 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         }
         actions.push_back(tmp);
     }
-
-    //transform them to the size of the structure
-    actions = transformActions(actions);
-
-    //apply these actions to the appropriate muscles according to the sensor values
-    //	applyActions(subject,actions);
-
 }
 
 // So far, only score used for eventual fitness calculation of an Escape Model
 // is the maximum distance from the origin reached during that subject's episode
 void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
-    std::vector<double> scores; //scores[0] == maxDistReached, scores[1] == energySpent
-    double maxDistReached = 60.0; //TODO: Change to variable
+    std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
+    double distance = displacement(subject);
     double energySpent = totalEnergySpent(subject);
 
     //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    scores.push_back(maxDistReached);
+    scores.push_back(distance);
     scores.push_back(energySpent);
 
     std::cout << "Tearing down" << std::endl;
@@ -134,40 +134,62 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
 
-//Scale actions according to Min and Max length of muscles.
+/** 
+ * Returns the modified actions 2D vector such that 
+ *   each action value is now scaled to fit the model
+ * Invariant: actions[x].size() == 4 for all legal values of x
+ * Invariant: Each actions[] contains: amplitude, angularFrequency, phaseChange, dcOffset
+ */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    double min=6;
-    double max=11;
-    double range=max-min;
-    double scaledAct;
-    for(int i=0;i<actions.size();i++)
-    {
-        for(int j=0;j<actions[i].size();j++)
-        {
-            scaledAct=actions[i][j]*(range)+min;
-            actions[i][j]=scaledAct;
+    bool usingManualParams = true;
+    if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
+    int lineNumber = 20;
+    string filename = "logs/bestParams.dat";
+    vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
+    manualParams = readManualParams(lineNumber, filename);
+
+    // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
+    double maxStringLengthFactor = 0.50; // Proportion of string's initial length a given actuator can increase/decrease by
+    double mins[4]  = {m_initialLengths * (1 - maxStringLengthFactor), 
+                       1.8, 
+                       M_PI/2, 
+                       m_initialLengths * (1 - maxStringLengthFactor)};
+
+    // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+    double maxes[4] = {m_initialLengths * (1 + maxStringLengthFactor), 
+                       2.2, 
+                       M_PI/8, 
+                       m_initialLengths * (1 + maxStringLengthFactor)}; 
+    double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+
+    for(int i=0;i<actions.size();i++) { //8x
+        for (int j=0; j<actions[i].size(); j++) { //4x
+            if (usingManualParams) {
+                actions[i][j] = manualParams[i*actions[i].size() + j];
+            } else {
+                actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+            }
         }
     }
     return actions;
 }
 
-//Pick particular muscles (according to the structure's state) and apply the given actions one by one
-void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <double> > act)
+/**
+ * Defines each cluster's sine wave according to actions
+ */
+void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <double> > actions)
 {
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    if(act.size() != muscles.size())
-    {
-        cout<<"Warning: # of muscles: "<< muscles.size() << " != # of actions: "<< act.size()<<endl;
-        return;
+    assert(actions.size() == clusters.size());
+
+    // Apply actions by cluster
+    for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
+        amplitude[cluster] = actions[cluster][0];
+        angularFrequency[cluster] = actions[cluster][1];
+        phaseChange[cluster] = actions[cluster][2];
+        dcOffset[cluster] = actions[cluster][3];
     }
-    //Apply actions (currently in a random order)
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
-        tgLinearString * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        pMuscle->setPrefLength(act[i][0]);
-    }
+    printSineParams();
 }
 
 void Escape_T6Controller::setupAdapter() {
@@ -204,3 +226,88 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     }
     return totalEnergySpent;
 }
+
+// Pre-condition: every element in muscles must be defined
+// Post-condition: every muscle will have a new target length
+void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, double dt) {
+    double phase = 0; // Phase of cluster1
+
+    for(int cluster=0; cluster<nClusters; cluster++) {
+        for(int node=0; node<musclesPerCluster; node++) {
+            tgLinearString *const pMuscle = clusters[cluster][node];
+            assert(pMuscle != NULL);
+            double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+            double minLength = m_initialLengths * 0.50;
+            double maxLength = m_initialLengths * 1.50;
+            if (newLength <= minLength) {
+                newLength = minLength;
+            } else if (newLength >= maxLength) {
+                newLength = maxLength;
+            }
+            pMuscle->setRestLength(newLength, dt);
+        }
+        phase += phaseChange[cluster];
+    }
+}
+
+void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
+    for(int cluster=0; cluster < nClusters; cluster++) {
+        ostringstream ss;
+        ss << (cluster + 1);
+        string suffix = ss.str();
+        std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("muscle cluster" + suffix);
+        clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
+    }
+}
+
+void Escape_T6Controller::initializeSineWaves() {
+    amplitude = new double[nClusters];
+    angularFrequency = new double[nClusters];
+    phaseChange = new double[nClusters]; // Does not use last value stored in array
+    dcOffset = new double[nClusters];    
+}
+
+double Escape_T6Controller::displacement(Escape_T6Model& subject) {
+    vector<double> finalPosition = subject.getBallCOM();
+
+    // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
+    const double newX = finalPosition[1];
+    const double newZ = finalPosition[2];
+    const double oldX = initPosition[1];
+    const double oldZ = initPosition[2];
+
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                      (newZ-oldZ) * (newZ-oldZ));
+    return distanceMoved;
+}
+
+std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string filename) {
+    assert(lineNumber > 0);
+    vector<double> result;
+    string line;
+    ifstream infile(filename.c_str());
+    for (int i=1; i < lineNumber; i++) {
+        infile >> line;
+    }
+
+    stringstream lineStream(line);
+    string cell;
+    string::size_type sz;
+
+    while(std::getline(lineStream,cell,','))
+    {
+        result.push_back(atof(cell.c_str()));
+    }
+
+    return result;
+}
+
+void Escape_T6Controller::printSineParams() {
+    for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
+        std::cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << std::endl;
+        std::cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << std::endl;
+        std::cout << "phaseChange[" << cluster << "]: " << phaseChange[cluster] << std::endl;
+        std::cout << "dcOffset[" << cluster << "]: " << dcOffset[cluster] << std::endl;
+    }    
+}
+

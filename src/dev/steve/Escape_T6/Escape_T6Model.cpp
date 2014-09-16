@@ -56,6 +56,7 @@ namespace
         double density;
         double radius;
         double stiffness;
+        bool   history;
         double damping;
         double rod_length;
         double rod_space;    
@@ -71,6 +72,7 @@ namespace
         0.825,    // density (kg / length^3)
         0.31,     // radius (length)
         3000.0,   // stiffness (kg / sec^2)
+        true,     // history (record?)
         200.0,    // damping (kg / sec)
         15.0,     // rod_length (length)
         7.5,      // rod_space (length)
@@ -165,7 +167,7 @@ void Escape_T6Model::addRods(tgStructure& s)
 
 void Escape_T6Model::addMarkers(tgStructure &s)
 {
-    std::vector<tgRod *> rods=find<tgRod>("rod");
+    std::vector <tgRod*> rods=find<tgRod>("rod");
 
     for(int i=0;i<12;i++)
     {
@@ -177,60 +179,52 @@ void Escape_T6Model::addMarkers(tgStructure &s)
     }
 }
 
+/** 
+ * Defines muscles in the structure by their end nodes 
+ * as well as the cluster to which they belong
+ * A cluster is any three muscles that form a triangle (with nodes as vertices)
+ */
 void Escape_T6Model::addMuscles(tgStructure& s)
 {
-    int nMuscles = 13;
-    int muscleConnections[nMuscles][nMuscles];
-    musclesPerNodes.resize(nMuscles);
-    for(int i=0;i<nMuscles;i++)
-    {
-        musclesPerNodes[i].resize(nMuscles);
-        for(int j=0;j<nMuscles;j++)
-            musclesPerNodes[i][j]=NULL;
-    }
-    for(int i=0;i<nMuscles;i++)
-        for(int j=0;j<nMuscles;j++)
-            muscleConnections[i][j]=-1;
+    // Cluster 1
+    s.addPair(0, 3, "muscle cluster1");
+    s.addPair(3, 2, "muscle cluster1");
+    s.addPair(2, 0, "muscle cluster1");
 
-    muscleConnections[0][3]=0;
-    muscleConnections[3][2]=0;
-    muscleConnections[2][0]=0;
-    muscleConnections[4][5]=0;
-    muscleConnections[5][7]=0;
-    muscleConnections[7][4]=0;
-    muscleConnections[1][8]=0;
-    muscleConnections[8][10]=0;
-    muscleConnections[10][1]=0;
-    muscleConnections[9][11]=0;
-    muscleConnections[11][6]=0;
-    muscleConnections[6][9]=0;
-    muscleConnections[1][2]=1;
-    muscleConnections[2][4]=1;
-    muscleConnections[4][1]=1;
-    muscleConnections[3][5]=1;
-    muscleConnections[5][6]=1;
-    muscleConnections[6][3]=1;
-    muscleConnections[0][8]=1;
-    muscleConnections[8][9]=1;
-    muscleConnections[9][0]=1;
-    muscleConnections[11][7]=1;
-    muscleConnections[7][10]=1;
-    muscleConnections[10][11]=1;
+    // Cluster 2
+    s.addPair(4, 5, "muscle cluster2");
+    s.addPair(5, 7, "muscle cluster2");
+    s.addPair(7, 4, "muscle cluster2");
 
-    for(int i=0;i<nMuscles;i++)
-    {
-        for(int j=0;j<nMuscles;j++)
-        {
-            if(muscleConnections[i][j]>=0)
-            {
-                std::stringstream tag;
-                tag<<"muscle-"<<i<<"-"<<j;
-                s.addPair(i, j, "muscle");
-                //musclesPerNodes[i][j]=s.addPair(i, j,  tag);
-                //musclesPerNodes[j][i]=musclesPerNodes[i][j];
-            }
-        }
-    }
+    // Cluster 3
+    s.addPair(1, 8, "muscle cluster3");
+    s.addPair(8, 10, "muscle cluster3");
+    s.addPair(10, 1, "muscle cluster3");
+
+    //Cluster 4
+    s.addPair(9, 11, "muscle cluster4");
+    s.addPair(11, 6, "muscle cluster4");
+    s.addPair(6, 9, "muscle cluster4");
+
+    // Cluster 5
+    s.addPair(1, 2, "muscle cluster5");
+    s.addPair(2, 4, "muscle cluster5");
+    s.addPair(4, 1, "muscle cluster5");
+
+    // Cluster 6
+    s.addPair(3, 5, "muscle cluster6");
+    s.addPair(5, 6, "muscle cluster6");
+    s.addPair(6, 3, "muscle cluster6");
+
+    // Cluster 7
+    s.addPair(0, 8, "muscle cluster7");
+    s.addPair(8, 9, "muscle cluster7");
+    s.addPair(0, 9, "muscle cluster7");
+
+    // Cluster 8
+    s.addPair(11, 7, "muscle cluster8");
+    s.addPair(7, 10, "muscle cluster8");
+    s.addPair(10, 11, "muscle cluster8");
 }
 
 void Escape_T6Model::setup(tgWorld& world)
@@ -239,8 +233,8 @@ void Escape_T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
             c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
-            c.maxTens, c.targetVelocity, 
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
+            c.history, c.rotation, c.maxTens, c.targetVelocity, 
             c.maxAcc);
 
     // Start creating the structure
@@ -282,7 +276,7 @@ void Escape_T6Model::setup(tgWorld& world)
     //map the rods and add the markers to them
     addMarkers(s);
 
-    btVector3 location(0,50.0,0);
+    btVector3 location(-15.0,20.0,0);
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
@@ -335,3 +329,31 @@ void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector
         rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
     }
 }
+
+//Return the center of mass of this model
+// Invariant: This model has 6 rods
+std::vector<double> Escape_T6Model::getBallCOM() {   
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 ballCenterOfMass(0, 0, 0);
+    double ballMass = 0.0; 
+    for (std::size_t i = 0; i < rods.size(); i++) {   
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        ballCenterOfMass += rodCenterOfMass * rodMass;
+        ballMass += rodMass;
+    }
+
+    assert(ballMass > 0.0);
+    ballCenterOfMass /= ballMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+
+    return result;
+}
+

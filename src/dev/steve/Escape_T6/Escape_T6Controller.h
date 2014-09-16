@@ -27,34 +27,26 @@
  * $Id$
  */
 
-// This library
+#include <vector>
+
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
-#include <vector>
 
 // Forward declarations
 class Escape_T6Model;
+class tgLinearString;
 
 //namespace std for vectors
 using namespace std;
 
-/**
- * Escape Controller for T6.
- */
+/** Escape Controller for T6 */
 class Escape_T6Controller : public tgObserver<Escape_T6Model>
 {
     public:
-
-        /**
-         * Construct a T6PrefLengthController with the initial preferred length.
-         */
-
         // Note that currently this is calibrated for decimeters.
         Escape_T6Controller(const double prefLength=5.0);
 
-        /**
-         * Nothing to delete, destructor must be virtual
-         */
+        /** Nothing to delete, destructor must be virtual */
         virtual ~Escape_T6Controller() { }
 
         virtual void onSetup(Escape_T6Model& subject);
@@ -64,21 +56,56 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         virtual void onTeardown(Escape_T6Model& subject);
 
     protected:
-
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
-        virtual void applyActions (Escape_T6Model& subject, vector< vector <double> > act);
+        virtual void applyActions(Escape_T6Model& subject, vector< vector <double> > act);
 
     private:
-        double m_initialLengths;
+        vector<double> initPosition; // Initial position of model
+        const double m_initialLengths;
         double m_totalTime;
+
+        // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
+        vector< vector<double> > actions; // For modifications between episodes
+
+        // Muscle Clusters
+        int nClusters;
+        int musclesPerCluster;
+        /** A vector clusters, each of which contains a vector of muscles */
+        vector<vector<tgLinearString*> > clusters; 
+
+        // Sine Wave Data
+        double* amplitude;
+        double* angularFrequency;
+        double* phaseChange;
+        double* dcOffset;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
 
         /** Returns amount of energy spent by each muscle in subject */
         double totalEnergySpent(Escape_T6Model& subject);
+
+        /** Sets target lengths for each muscle */
+        void setPreferredMuscleLengths(Escape_T6Model& subject, double dt);
+
+        /** Divides the 24 muscles of an Escape_T6Model 
+         * into 8 clusters of 3 muscles */
+        void populateClusters(Escape_T6Model& subject);
+
+        /** Sets the amplitude, angularFrequency, phase change, and dcOffset 
+         * for each sine wave used in muscle actuation */
+        void initializeSineWaves();
+
+        /** Difference in position between initPosition and finalPosition
+         * of subject */
+        double displacement(Escape_T6Model& subject);
+
+        /** Select action paramters from a comma-separated line in a file */
+        std::vector<double> readManualParams(int lineNumber, string filename);
+
+        void printSineParams();
 };
 
 #endif // ESCAPE_T6CONTROLLER
