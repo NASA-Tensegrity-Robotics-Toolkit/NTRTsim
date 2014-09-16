@@ -143,28 +143,29 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
     bool usingManualParams = true;
-    int lineNumber = 5;
-    string filename = "bestParams.dat";
-    vector <double> manualParams(32);
+    if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
+    int lineNumber = 20;
+    string filename = "logs/bestParams.dat";
+    vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
     manualParams = readManualParams(lineNumber, filename);
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths * 0.70, 
+    double maxStringLengthFactor = 0.50; // Proportion of string's initial length a given actuator can increase/decrease by
+    double mins[4]  = {m_initialLengths * (1 - maxStringLengthFactor), 
                        1.8, 
                        M_PI/2, 
-                       m_initialLengths * 0.70};
+                       m_initialLengths * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths * 1.30, 
+    double maxes[4] = {m_initialLengths * (1 + maxStringLengthFactor), 
                        2.2, 
                        M_PI/8, 
-                       m_initialLengths * 1.30}; 
+                       m_initialLengths * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     for(int i=0;i<actions.size();i++) { //8x
         for (int j=0; j<actions[i].size(); j++) { //4x
             if (usingManualParams) {
-                std::cout << "Using manually set parameters\n";
                 actions[i][j] = manualParams[i*actions[i].size() + j];
             } else {
                 actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
@@ -188,6 +189,7 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
     }
+    printSineParams();
 }
 
 void Escape_T6Controller::setupAdapter() {
@@ -235,8 +237,8 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             tgLinearString *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-            double minLength = m_initialLengths * 0.70;
-            double maxLength = m_initialLengths * 1.30;
+            double minLength = m_initialLengths * 0.50;
+            double maxLength = m_initialLengths * 1.50;
             if (newLength <= minLength) {
                 newLength = minLength;
             } else if (newLength >= maxLength) {
@@ -268,6 +270,7 @@ void Escape_T6Controller::initializeSineWaves() {
 double Escape_T6Controller::displacement(Escape_T6Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
+    // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
     const double newX = finalPosition[1];
     const double newZ = finalPosition[2];
     const double oldX = initPosition[1];
@@ -280,21 +283,31 @@ double Escape_T6Controller::displacement(Escape_T6Model& subject) {
 
 std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    std::vector<double> result;
+    vector<double> result;
     string line;
-    std::ifstream file(filename.c_str());
+    ifstream infile(filename.c_str());
     for (int i=1; i < lineNumber; i++) {
-        std::getline(file,line);
+        infile >> line;
     }
 
-    std::stringstream lineStream(line);
-    std::string cell;
-    std::string::size_type sz;
+    stringstream lineStream(line);
+    string cell;
+    string::size_type sz;
 
     while(std::getline(lineStream,cell,','))
     {
         result.push_back(atof(cell.c_str()));
     }
+
     return result;
+}
+
+void Escape_T6Controller::printSineParams() {
+    for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
+        std::cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << std::endl;
+        std::cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << std::endl;
+        std::cout << "phaseChange[" << cluster << "]: " << phaseChange[cluster] << std::endl;
+        std::cout << "dcOffset[" << cluster << "]: " << dcOffset[cluster] << std::endl;
+    }    
 }
 
