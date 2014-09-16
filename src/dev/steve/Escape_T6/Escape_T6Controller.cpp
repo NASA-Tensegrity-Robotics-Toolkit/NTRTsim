@@ -37,6 +37,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include <string>
 
 # define M_PI 3.14159265358979323846 
                                
@@ -141,6 +142,12 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
+    bool usingManualParams = true;
+    int lineNumber = 5;
+    string filename = "bestParams.dat";
+    vector <double> manualParams(32);
+    manualParams = readManualParams(lineNumber, filename);
+
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
     double mins[4]  = {m_initialLengths * 0.70, 
                        1.8, 
@@ -156,7 +163,12 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
 
     for(int i=0;i<actions.size();i++) { //8x
         for (int j=0; j<actions[i].size(); j++) { //4x
-            actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+            if (usingManualParams) {
+                std::cout << "Using manually set parameters\n";
+                actions[i][j] = manualParams[i*actions[i].size() + j];
+            } else {
+                actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+            }
         }
     }
     return actions;
@@ -265,3 +277,24 @@ double Escape_T6Controller::displacement(Escape_T6Model& subject) {
                                       (newZ-oldZ) * (newZ-oldZ));
     return distanceMoved;
 }
+
+std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string filename) {
+    assert(lineNumber > 0);
+    std::vector<double> result;
+    string line;
+    std::ifstream file(filename.c_str());
+    for (int i=1; i < lineNumber; i++) {
+        std::getline(file,line);
+    }
+
+    std::stringstream lineStream(line);
+    std::string cell;
+    std::string::size_type sz;
+
+    while(std::getline(lineStream,cell,','))
+    {
+        result.push_back(atof(cell.c_str()));
+    }
+    return result;
+}
+
