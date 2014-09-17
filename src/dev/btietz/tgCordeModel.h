@@ -20,20 +20,31 @@
 #define TG_CORDE_MODEL
 
 #include "core/tgModel.h"
+#include "core/tgBaseString.h"
 #include "core/tgSubject.h"
+
+#include "dev/Corde/CordeModel.h"
 
 // Forward Declaration
 class cordeCollisionObject;
 
-/// @todo make this a base string so it can be controlled
-class tgCordeModel : public tgModel, public tgSubject <tgCordeModel>
+class tgCordeModel : public tgBaseString, public tgSubject <tgCordeModel>
 {
+public:
+	struct Config
+	{
+		Config(tgBaseString::Config motor_config, CordeModel::Config string_config);
+		
+		tgBaseString::Config motorConfig;
+		CordeModel::Config stringConfig;
+		
+	};
 	
 	/// @todo Consider making CordeModel::config a nested member of a tgCordeModel config (that includes a base string config)
 public:
-    tgCordeModel(cordeCollisionObject* string, const tgTags& tags);
+    tgCordeModel(cordeCollisionObject* string, tgBaseString::Config motor_config, const tgTags& tags);
     
-    ~tgCordeModel();
+    virtual ~tgCordeModel();
     
     virtual void setup(tgWorld& world);
     
@@ -51,6 +62,30 @@ public:
     {
         return m_string;
     }
+    
+        /**
+     * Functions for interfacing with muscle2P, and higher level controllers
+     */
+     
+    // Called from controller class, it makes the restLength get closer to preferredlength.
+    virtual void moveMotors(double dt);
+    
+    // @todo look into a base class implementation of this. Wouldn't be
+    // difficult with existing get functions
+    virtual void tensionMinLengthController(const double targetTension,
+                                            float dt);
+    
+    virtual void setRestLength(double newLength, float dt);
+      
+    virtual const double getStartLength() const;
+    
+    virtual const double getCurrentLength() const;
+    
+    virtual const double getTension() const;
+    
+    virtual const double getRestLength() const;
+    
+    virtual const double getVelocity() const;
     
 private:
     cordeCollisionObject* m_string;

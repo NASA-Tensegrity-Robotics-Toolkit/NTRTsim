@@ -50,14 +50,14 @@ public:
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgCordeStringInfo(const CordeModel::Config& config);
+    tgCordeStringInfo(const tgCordeModel::Config& config);
 
     /**
      * Construct a tgCordeStringInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgCordeStringInfo(const CordeModel::Config& config, tgTags tags);
+    tgCordeStringInfo(const tgCordeModel::Config& config, tgTags tags);
 
     /**
      * Construct a tgCordeStringInfo from its endpoints, radius and density.
@@ -66,7 +66,7 @@ public:
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgCordeStringInfo(const CordeModel::Config& config, const tgPair& pair);
+    tgCordeStringInfo(const tgCordeModel::Config& config, const tgPair& pair);
     
 	/// @todo should we null our pointers here?
     virtual ~tgCordeStringInfo() {}
@@ -90,7 +90,7 @@ private:
     
 private:
     
-    CordeModel::Config m_config;
+    tgCordeModel::Config m_config;
     cordeCollisionObject* m_cordeString;
 };
 

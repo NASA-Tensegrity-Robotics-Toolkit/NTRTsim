@@ -22,6 +22,7 @@
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
 #include "core/tgLinearString.h"
+#include "core/tgBaseString.h"
 
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
@@ -138,7 +139,9 @@ void simpleCordeTensegrity::setup(tgWorld& world)
     s.move(btVector3(0, 0, 0));
     
     
-    tgLinearString::Config muscleConfig(1000, 0);
+    tgBaseString::Config muscleConfig(1000, 0);
+    
+    tgCordeModel::Config cordeModelConfig ( muscleConfig, cordeConfig);
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
@@ -148,7 +151,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 #if (0)
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #else    
-    spec.addBuilder("muscle", new tgCordeStringInfo(cordeConfig));
+    spec.addBuilder("muscle", new tgCordeStringInfo(cordeModelConfig));
 #endif    
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

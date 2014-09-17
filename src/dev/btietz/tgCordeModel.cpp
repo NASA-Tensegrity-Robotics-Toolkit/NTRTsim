@@ -24,11 +24,19 @@
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
 
+tgCordeModel::Config::Config(tgBaseString::Config motor_config,
+								CordeModel::Config string_config) :
+motorConfig(motor_config),
+stringConfig(string_config)
+{
+	// Assertions should be handled by the respective configs.
+}
 
 tgCordeModel::tgCordeModel(cordeCollisionObject* string,
+							tgBaseString::Config motor_config,
 							const tgTags& tags) :
 m_string(string),
-tgModel(tags)
+tgBaseString(tags, motor_config, string->getRestLength(), string->getActualLength())
 {	
 
 }
@@ -69,4 +77,48 @@ void tgCordeModel::step(double dt)
 void tgCordeModel::onVisit(const tgModelVisitor& r) const
 {
     r.render(*this);
+}
+
+ // Called from controller class, it makes the restLength get closer to preferredlength.
+void tgCordeModel::moveMotors(double dt)
+{
+	
+}
+
+// @todo look into a base class implementation of this. Wouldn't be
+// difficult with existing get functions
+void tgCordeModel::tensionMinLengthController(const double targetTension,
+										float dt)
+{
+	
+}
+
+void tgCordeModel::setRestLength(double newLength, float dt)
+{
+	
+}
+  
+const double tgCordeModel::getStartLength() const
+{
+	
+}
+
+const double tgCordeModel::getCurrentLength() const 
+{
+	
+}
+
+const double tgCordeModel::getTension() const
+{
+	
+}
+
+const double tgCordeModel::getRestLength() const
+{
+	
+}
+
+const double tgCordeModel::getVelocity() const
+{
+	
 }

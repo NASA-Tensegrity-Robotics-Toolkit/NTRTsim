@@ -113,6 +113,41 @@ cordeCollisionObject::~cordeCollisionObject()
 	
 }
 
+const double cordeCollisionObject::getRestLength() const
+{
+	std::size_t ni = linkLengths.size();
+	double length = 0;
+	for (std::size_t i = 0; i < ni; i++)
+	{
+		length += linkLengths[i];
+	}
+}
+
+const double cordeCollisionObject::getActualLength() const
+{
+	std::size_t ni = m_massPoints.size() - 1;
+	double length = 0;
+	for (std::size_t i = 0; i < ni; i++)
+	{
+		length += (m_massPoints[i + 1]->pos - m_massPoints[i]->pos).length();
+	} 		
+}
+
+void cordeCollisionObject::setRestLength(const double newLength)
+{
+	const double percentChange = newLength / getRestLength();
+	std::size_t ni = linkLengths.size();
+	for (std::size_t i = 0; i < ni; i++)
+	{
+		linkLengths[i] *= percentChange;
+		
+		if (i <= ni - 1)
+		{
+			quaternionShapes[i].setX( quaternionShapes[i].getX() * percentChange );
+		}
+	}
+}
+
 void cordeCollisionObject::appendAnchor (std::size_t node,
 											btRigidBody* body,
 											btVector3 pos)
@@ -181,6 +216,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 			vol,
 			n.vel_new * m_sst.velmrg,
 			m_sst.updmrg);
+			 
 	}
 	
 	/* Clear Contacts */

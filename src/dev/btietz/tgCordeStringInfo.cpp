@@ -36,19 +36,19 @@
 
 #include "tgCordeModel.h"
 
-tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config) : 
+tgCordeStringInfo::tgCordeStringInfo(const tgCordeModel::Config& config) : 
 m_config(config),
 m_cordeString(NULL),
 tgConnectorInfo()
 {}
 
-tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config, tgTags tags) : 
+tgCordeStringInfo::tgCordeStringInfo(const tgCordeModel::Config& config, tgTags tags) : 
 m_config(config),
 m_cordeString(NULL),
 tgConnectorInfo(tags)
 {}
 
-tgCordeStringInfo::tgCordeStringInfo(const CordeModel::Config& config, const tgPair& pair) :
+tgCordeStringInfo::tgCordeStringInfo(const tgCordeModel::Config& config, const tgPair& pair) :
 m_config(config),
 m_cordeString(NULL),
 tgConnectorInfo(pair)
@@ -82,7 +82,7 @@ tgModel* tgCordeStringInfo::createModel(tgWorld& world)
     
     // ensure connector has been initialized
     assert(m_cordeString);
-    return new tgCordeModel(m_cordeString, getTags());
+    return new tgCordeModel(m_cordeString, m_config.motorConfig, getTags());
 }
 
 double tgCordeStringInfo::getMass() 
@@ -108,16 +108,16 @@ cordeCollisionObject* tgCordeStringInfo::createCordeString(tgWorld& world)
     btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0.0);
     btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0.0);
 	
-	std::vector<btVector3> startPositions = generatePoints(from, to, m_config.resolution);
+	std::vector<btVector3> startPositions = generatePoints(from, to, m_config.stringConfig.resolution);
 	
-	cordeCollisionObject* tempCorde = new cordeCollisionObject(startPositions, world, m_config);
+	cordeCollisionObject* tempCorde = new cordeCollisionObject(startPositions, world, m_config.stringConfig);
 	
 	// cordeCollisionObject handles deleting the shape, so no need to pass it to the world
 	
 	///@todo is this always the assumption we want to make with the builder tools? How would we make this more configurable?
 #if (1) // In case anchors need to be switched off for testing
 	tempCorde->appendAnchor(0, fromBody, from);
-	tempCorde->appendAnchor(m_config.resolution - 1, toBody, to);
+	tempCorde->appendAnchor(m_config.stringConfig.resolution - 1, toBody, to);
 #endif	
     return tempCorde;
 }

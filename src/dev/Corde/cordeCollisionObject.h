@@ -129,6 +129,12 @@ public:
 	
 	virtual ~cordeCollisionObject();
 	
+	const double getRestLength() const;
+	
+	const double getActualLength() const;
+	
+	void setRestLength(const double newLength);
+	
 	void appendAnchor (std::size_t node, btRigidBody* body, btVector3 pos);
 	
 	// Remove anchor??
