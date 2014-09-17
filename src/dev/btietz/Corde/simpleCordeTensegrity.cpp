@@ -128,7 +128,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addNode(10, 5, 0);
 	s.addNode(15, 5, 0);
 
-	s.addPair(0, 1, "rod2");
+	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod2");
 	
 	s.addPair(1, 2, "muscle");
@@ -139,7 +139,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
     s.move(btVector3(0, 0, 0));
     
     
-    tgBaseString::Config muscleConfig(1000, 0, false, 0);
+    tgBaseString::Config muscleConfig(1000, 0, false, 0, 600000000);
     
     tgCordeModel::Config cordeModelConfig ( muscleConfig, cordeConfig);
     
@@ -175,7 +175,7 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
-	allMuscles[0]->setRestLength(14.0, dt);
+	allMuscles[0]->setRestLength(5.0, dt);
 	tgModel::step(dt);
 }
 /**

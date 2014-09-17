@@ -141,8 +141,6 @@ void cordeCollisionObject::setRestLength(const double newLength)
 {
 	const double percentChange = newLength / getRestLength();
 	
-	std::cout << percentChange << std::endl;
-	
 	std::size_t ni = linkLengths.size();
 	for (std::size_t i = 0; i < ni; i++)
 	{

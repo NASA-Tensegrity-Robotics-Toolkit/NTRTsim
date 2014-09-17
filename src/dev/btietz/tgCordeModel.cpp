@@ -97,7 +97,7 @@ void tgCordeModel::moveMotors(double dt)
     const double actualLength = m_string->getActualLength();
     const double mostRecentVelocity = m_prevVelocity;
     
-    
+    /// @todo figure out how to re-calculate this, this is "too stiff"
     // First, change preferred length so we don't go over max tension
     if ((actualLength - m_preferredLength) * stiffness
             > m_config.maxTens)
