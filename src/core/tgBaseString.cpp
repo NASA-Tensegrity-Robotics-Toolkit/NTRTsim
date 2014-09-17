@@ -77,6 +77,10 @@ tgBaseString::Config::Config(double s,
     {
         throw std::invalid_argument("min Rest Length is negative.");
     }
+    else if (abs(rot) > M_PI * 2.0)
+    {
+		throw std::invalid_argument("Abs of rotation is greater than 2pi. Are you sure you're setting the right parameters?");
+	}
 }
 
 void tgBaseString::Config::scale (double sf)

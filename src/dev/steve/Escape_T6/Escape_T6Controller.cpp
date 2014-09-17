@@ -48,6 +48,7 @@ using namespace std;
 Escape_T6Controller::Escape_T6Controller(const double initialLength) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
+    maxStringLengthFactor(0.50),
     nClusters(8),
     musclesPerCluster(3)
 {
@@ -142,31 +143,30 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = true;
+    bool usingManualParams = false;
     if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
-    int lineNumber = 20;
+    int lineNumber = 4;
     string filename = "logs/bestParams.dat";
     vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
     manualParams = readManualParams(lineNumber, filename);
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxStringLengthFactor = 0.50; // Proportion of string's initial length a given actuator can increase/decrease by
     double mins[4]  = {m_initialLengths * (1 - maxStringLengthFactor), 
-                       1.8, 
-                       M_PI/2, 
+                       0.3, //Hz
+                       -1 * M_PI, 
                        m_initialLengths * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
     double maxes[4] = {m_initialLengths * (1 + maxStringLengthFactor), 
-                       2.2, 
-                       M_PI/8, 
+                       20, //Hz (can cheat to 50Hz, if feeling immoral)
+                       M_PI, 
                        m_initialLengths * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     for(int i=0;i<actions.size();i++) { //8x
         for (int j=0; j<actions[i].size(); j++) { //4x
             if (usingManualParams) {
-                actions[i][j] = manualParams[i*actions[i].size() + j];
+                actions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
             } else {
                 actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
             }
@@ -237,8 +237,8 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             tgLinearString *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-            double minLength = m_initialLengths * 0.50;
-            double maxLength = m_initialLengths * 1.50;
+            double minLength = m_initialLengths * (1-maxStringLengthFactor);
+            double maxLength = m_initialLengths * (1+maxStringLengthFactor);
             if (newLength <= minLength) {
                 newLength = minLength;
             } else if (newLength >= maxLength) {

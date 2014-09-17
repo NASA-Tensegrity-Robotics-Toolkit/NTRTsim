@@ -1,14 +1,14 @@
-""" Filter out the best trials from argv[1] as dictated by their distance traveled """
+""" Filter out trials from argv[1] that have 'traveled' more than 100 """
 
 import sys
 
 bestDistances = []
-threshold = 20.0 # Score (distance traveled)
+threshold = 100.0 # Score (distance traveled)
 
 try:
     f = open(sys.argv[1], 'r')
     for line in f: 
-        if (float(line.partition(',')[0]) > threshold):
+        if (float(line.partition(',')[0]) < threshold):
             bestDistances.append(line)
 finally:
     f.close()

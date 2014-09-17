@@ -64,6 +64,7 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         vector<double> initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
+        double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
 
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
