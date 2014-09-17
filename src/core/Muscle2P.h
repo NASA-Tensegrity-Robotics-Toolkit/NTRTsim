@@ -67,6 +67,8 @@ public:
         return m_coefK;
     }
     
+    /// @todo is this right? i.e. do we want to be using the material strain change
+    /// to determine the control changes our motors can administer?
     const double getVelocity() const
     {
         return m_velocity;

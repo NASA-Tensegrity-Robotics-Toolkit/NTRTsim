@@ -24,6 +24,8 @@
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
 
+#include <stdexcept>
+
 tgCordeModel::Config::Config(tgBaseString::Config motor_config,
 								CordeModel::Config string_config) :
 motorConfig(motor_config),
@@ -36,7 +38,8 @@ tgCordeModel::tgCordeModel(cordeCollisionObject* string,
 							tgBaseString::Config motor_config,
 							const tgTags& tags) :
 m_string(string),
-tgBaseString(tags, motor_config, string->getRestLength(), string->getActualLength())
+tgBaseString(tags, motor_config, string->getRestLength(), string->getActualLength()),
+m_prevLength(string->getRestLength())
 {	
 
 }
@@ -59,17 +62,13 @@ void tgCordeModel::teardown()
     tgModel::teardown();
 }
 
-#if (0)    
-void tgCordeModel::step(double dt)
+void tgCordeModel::step(const double dt)
 {
-	//testString->applyForce(btVector3(0, 0.0, -90.0), 0);
-	//testString->applyForce(btVector3(0.0, 0.0, 90.0), 9);
-	testString->applyUniformAcc(btVector3(0.0, -9.81, 0.0));
-	//testString->applyVecTorque(btVector3(100.0, 100.0, 0.0), 0);
-	//testString->applyVecTorque(btVector3(0.0, 0.0, -100.0), 28);
-    //testString->step(dt);
+	notifyStep(dt);
+	tgModel::step(dt);
+	logHistory(dt);
 }
-#endif
+
 /**
 * Call tgModelVisitor::render() on self and all descendants.
 * @param[in,out] r a reference to a tgModelVisitor
@@ -82,7 +81,84 @@ void tgCordeModel::onVisit(const tgModelVisitor& r) const
  // Called from controller class, it makes the restLength get closer to preferredlength.
 void tgCordeModel::moveMotors(double dt)
 {
-	
+   // @todo add functions from muscle2P Bounded
+    
+    
+    const double stiffness = m_string->getStiffness();
+    // @todo: write invariant that checks this;
+    assert(stiffness > 0.0);
+    
+    // Reverse the sign if restLength >= preferredLength
+    // Velocity limiter
+    double stepSize = m_config.targetVelocity * dt;
+    // Acceleration limiter
+    const double velChange = m_config.maxAcc * dt;
+    const double actualLength = m_string->getActualLength();
+    const double mostRecentVelocity = m_prevVelocity;
+    
+    
+    // First, change preferred length so we don't go over max tension
+    if ((actualLength - m_preferredLength) * stiffness
+            > m_config.maxTens)
+    {
+        m_preferredLength = actualLength - m_config.maxTens / stiffness;
+    }
+    
+    double diff =  m_preferredLength - m_restLength;
+    const double fabsDiff = abs(diff);
+    
+    // If below actual length, don't shorten any more
+    if ((actualLength > m_config.minActualLength) || 
+    (diff > 0))
+    {
+        if (abs(diff) > stepSize)
+    {
+        //Cap Velocity
+      if (abs((diff/fabsDiff) * m_config.targetVelocity -
+          mostRecentVelocity) >
+          velChange)
+      {
+          // Cap Acceleration
+          stepSize = velChange * dt;
+      }
+      m_restLength += (diff/fabsDiff)*stepSize;
+    }
+    else
+    {
+        if (abs(diff/dt - mostRecentVelocity) > velChange)
+        {
+            // Cap Acceleration
+            if (diff != 0) 
+            {
+              diff = (diff/fabsDiff) * velChange * dt;
+            }
+            else
+            { 
+                // If m_prevVelocity was zero, it would be smaller than
+                // velChange. Therefore preVelocity is valid for 
+                // figuring out direction
+              diff = -(mostRecentVelocity / abs(mostRecentVelocity)) *
+                     velChange * dt;
+            }
+        }
+        m_restLength += diff;
+    }
+    }
+    
+     m_restLength =
+      (m_restLength > m_config.minRestLength) ? m_restLength : m_config.minRestLength;
+     #if (0)
+     std::cout << "RL: " << m_restLength << " M2P RL: " << m_muscle->getRestLength() << std::endl;
+     
+     
+     std::cout  << "RL: " << m_restLength
+     << " Vel: " << (m_restLength  - m_muscle->getRestLength()) / dt 
+     << " prev Vel: " << prevVel
+     << " force " << (actualLength - m_restLength)*stiffness << std::endl;
+     prevVel = (m_restLength  - m_muscle->getRestLength()) / dt ;
+     #endif
+     m_string->setRestLength(m_restLength);
+    	
 }
 
 // @todo look into a base class implementation of this. Wouldn't be
@@ -95,17 +171,34 @@ void tgCordeModel::tensionMinLengthController(const double targetTension,
 
 void tgCordeModel::setRestLength(double newLength, float dt)
 {
-	
+	if (newLength < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = newLength;
+        
+        // moveMotors can change m_preferred length, so this goes here for now
+        assert(m_preferredLength == newLength);
+              
+		moveMotors(dt);
+    }
+
+    // Postcondition
+    /// @todo
+    //assert(invariant());
+    
 }
   
 const double tgCordeModel::getStartLength() const
 {
-	
+	return m_startLength;
 }
 
 const double tgCordeModel::getCurrentLength() const 
 {
-	
+	return m_string->getActualLength();
 }
 
 const double tgCordeModel::getTension() const
@@ -115,10 +208,29 @@ const double tgCordeModel::getTension() const
 
 const double tgCordeModel::getRestLength() const
 {
-	
+	return m_string->getRestLength();
 }
 
+/// Velocity here is set up by logHistory. Material strain is not considered.
 const double tgCordeModel::getVelocity() const
 {
+	return m_prevVelocity;
+}
+
+void tgCordeModel::logHistory(const double dt)
+{
+	/// @todo assert about dt, etc.
 	
+	m_prevVelocity = (getRestLength () - m_prevLength) / dt;
+	
+	if (m_config.hist)
+    {
+        m_pHistory->lastLengths.push_back(m_string->getActualLength());
+        m_pHistory->lastVelocities.push_back(m_prevVelocity );
+        /// @todo do we need this?: m_pHistory->dampingHistory.push_back(m_muscle->getDamping());
+        m_pHistory->restLengths.push_back(m_string->getRestLength());
+        /// @todo m_pHistory->tensionHistory.push_back(m_string->getTension());
+    }
+    
+    m_prevLength = m_string->getRestLength();
 }

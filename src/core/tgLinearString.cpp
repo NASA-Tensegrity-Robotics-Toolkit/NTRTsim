@@ -40,7 +40,6 @@ void tgLinearString::constructorAux()
 {
   // Precondition
     assert(m_pHistory != NULL);
-    prevVel = 0.0;
     if (m_muscle == NULL)
     {
         throw std::invalid_argument("Pointer to Muscle2P is NULL.");

@@ -135,6 +135,11 @@ public:
 	
 	void setRestLength(const double newLength);
 	
+	const double getStiffness() const
+	{
+		return m_config.StretchMod;
+	}
+	
 	void appendAnchor (std::size_t node, btRigidBody* body, btVector3 pos);
 	
 	// Remove anchor??

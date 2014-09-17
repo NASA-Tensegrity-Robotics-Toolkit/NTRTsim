@@ -170,11 +170,6 @@ private:
     /** Integrity predicate. */
     bool invariant() const;
     
-    /**
-     * Hold the previous value so history can be turned off
-     */
-    double prevVel;
-    
 };
 
 

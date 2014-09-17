@@ -56,6 +56,8 @@ public:
     */
     virtual void onVisit(const tgModelVisitor& r) const;
     
+    virtual void step(const double dt);
+    
     /** @todo consider adding a toString method **/
     
     const cordeCollisionObject* const getModel() const
@@ -88,7 +90,11 @@ public:
     virtual const double getVelocity() const;
     
 private:
+	void logHistory(const double dt);
+	
     cordeCollisionObject* m_string;
+    
+    double m_prevLength;
     
 
 };
