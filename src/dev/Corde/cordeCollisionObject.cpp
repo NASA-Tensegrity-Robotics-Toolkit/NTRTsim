@@ -121,6 +121,8 @@ const double cordeCollisionObject::getRestLength() const
 	{
 		length += linkLengths[i];
 	}
+	
+	return length;
 }
 
 const double cordeCollisionObject::getActualLength() const
@@ -131,15 +133,21 @@ const double cordeCollisionObject::getActualLength() const
 	{
 		length += (m_massPoints[i + 1]->pos - m_massPoints[i]->pos).length();
 	} 		
+	
+	return length;
 }
 
 void cordeCollisionObject::setRestLength(const double newLength)
 {
 	const double percentChange = newLength / getRestLength();
+	
+	std::cout << percentChange << std::endl;
+	
 	std::size_t ni = linkLengths.size();
 	for (std::size_t i = 0; i < ni; i++)
 	{
 		linkLengths[i] *= percentChange;
+		
 		
 		if (i <= ni - 1)
 		{
@@ -233,7 +241,7 @@ void cordeCollisionObject::integrateMotion (btScalar dt)
 	constrainMotion(dt);
 	
 #if (0)	
-	if (simTime >= 1.0/10.0)
+	if (simTime >= 1.0/100.0)
     {
         size_t n = m_massPoints.size();
         for (std::size_t i = 0; i < n; i++)

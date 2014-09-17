@@ -25,6 +25,7 @@
 #include "dev/Corde/cordeCollisionObject.h"
 
 #include <stdexcept>
+#include <complex> // std::abs (just abs has issues below 1)
 
 tgCordeModel::Config::Config(tgBaseString::Config motor_config,
 								CordeModel::Config string_config) :
@@ -105,7 +106,7 @@ void tgCordeModel::moveMotors(double dt)
     }
     
     double diff =  m_preferredLength - m_restLength;
-    const double fabsDiff = abs(diff);
+    const double fabsDiff = std::abs(diff);
     
     // If below actual length, don't shorten any more
     if ((actualLength > m_config.minActualLength) || 

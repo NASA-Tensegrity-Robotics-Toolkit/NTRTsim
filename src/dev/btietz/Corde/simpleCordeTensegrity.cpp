@@ -123,13 +123,13 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.move(btVector3(0, 10, 0));
 #else
 
-	s.addNode(0, 20, 0);
-	s.addNode(0, 15, 0);
-	s.addNode(2, 10, 0);
-	s.addNode(2, 5, 0);
+	s.addNode(-5, 5, 0);
+	s.addNode(0, 5, 0);
+	s.addNode(10, 5, 0);
+	s.addNode(15, 5, 0);
 
 	s.addPair(0, 1, "rod2");
-	s.addPair(2, 3, "rod");
+	s.addPair(2, 3, "rod2");
 	
 	s.addPair(1, 2, "muscle");
 	
@@ -139,7 +139,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
     s.move(btVector3(0, 0, 0));
     
     
-    tgBaseString::Config muscleConfig(1000, 0);
+    tgBaseString::Config muscleConfig(1000, 0, false, 0);
     
     tgCordeModel::Config cordeModelConfig ( muscleConfig, cordeConfig);
     
@@ -159,6 +159,10 @@ void simpleCordeTensegrity::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
 
+	// We could now use tgCast::filter or similar to pull out the
+    // models (e.g. muscles) that we want to control. 
+    allMuscles = tgCast::filter<tgModel, tgCordeModel> (getDescendants());
+
     notifySetup();
     tgModel::setup(world);
 }
@@ -171,6 +175,7 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
+	allMuscles[0]->setRestLength(14.0, dt);
 	tgModel::step(dt);
 }
 /**

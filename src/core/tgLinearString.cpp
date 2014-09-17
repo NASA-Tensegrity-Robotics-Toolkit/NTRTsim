@@ -33,6 +33,7 @@
 #include <deque> // For history
 #include <iostream>
 #include <stdexcept>
+#include <complex> // std::abs (just abs has issues below 1)
 
 using namespace std;
 
@@ -213,16 +214,16 @@ void tgLinearString::moveMotors(double dt)
     }
     
     double diff =  m_preferredLength - m_restLength;
-    const double fabsDiff = abs(diff);
+    const double fabsDiff = std::abs(diff);
     
     // If below actual length, don't shorten any more
     if ((actualLength > m_config.minActualLength) || 
     (diff > 0))
     {
-        if (abs(diff) > stepSize)
+        if (std::abs(diff) > stepSize)
     {
         //Cap Velocity
-      if (abs((diff/fabsDiff) * m_config.targetVelocity -
+      if (std::abs((diff/fabsDiff) * m_config.targetVelocity -
           mostRecentVelocity) >
           velChange)
       {
@@ -233,7 +234,7 @@ void tgLinearString::moveMotors(double dt)
     }
     else
     {
-        if (abs(diff/dt - mostRecentVelocity) > velChange)
+        if (std::abs(diff/dt - mostRecentVelocity) > velChange)
         {
             // Cap Acceleration
             if (diff != 0) 
@@ -245,7 +246,7 @@ void tgLinearString::moveMotors(double dt)
                 // If m_prevVelocity was zero, it would be smaller than
                 // velChange. Therefore preVelocity is valid for 
                 // figuring out direction
-              diff = -(mostRecentVelocity / abs(mostRecentVelocity)) *
+              diff = -(mostRecentVelocity / std::abs(mostRecentVelocity)) *
                      velChange * dt;
             }
         }

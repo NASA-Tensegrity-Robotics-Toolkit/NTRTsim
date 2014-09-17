@@ -29,6 +29,7 @@
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include <iostream>
+#include <complex> // std::abs (just abs has issues below 1)
 
 Muscle2P::Muscle2P(btRigidBody * body1,
            btVector3 pos1,
@@ -67,7 +68,7 @@ btVector3 Muscle2P::calculateAndApplyForce(double dt)
     
     m_damping =  m_dampingCoefficient * m_velocity;
     
-    if (abs(magnitude) * 1.0 < abs(m_damping))
+    if (std::abs(magnitude) * 1.0 < std::abs(m_damping))
     {
         m_damping =
           (m_damping > 0.0 ? magnitude * 1.0 : -magnitude * 1.0);
