@@ -126,7 +126,16 @@ void cordeCollisionObject::appendAnchor (std::size_t node,
 		throw std::invalid_argument("Invalid pointer for rigid body");
 	}
     
-	cordeAnchor* anchor = new cordeAnchor(body, m_massPoints[node], pos);
+    
+    cordeAnchor* anchor;
+    if (node != m_massPoints.size() - 1)
+    {
+		 anchor = new cordeAnchor(body, m_massPoints[node], m_centerlines[node], pos);
+	}
+	else
+	{
+		anchor = new cordeAnchor(body, m_massPoints[node], m_centerlines[node - 1], pos);
+	}
 	
 	m_anchors.push_back(anchor);
 }

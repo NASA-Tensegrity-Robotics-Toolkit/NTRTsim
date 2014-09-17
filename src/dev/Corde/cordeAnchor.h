@@ -30,7 +30,7 @@ class btRigidBody;
 class cordeAnchor
 {
 public:
-    cordeAnchor(btRigidBody* body, CordeModel::CordePositionElement* element, btVector3 pos);
+    cordeAnchor(btRigidBody* body, CordeModel::CordePositionElement* element, CordeModel::CordeQuaternionElement* qElement, btVector3 pos);
     
     ~cordeAnchor();
     
@@ -48,6 +48,11 @@ private:
     btRigidBody* attachedBody;
 	
 	CordeModel::CordePositionElement* m_attachedElement;
+	
+	/**
+	 * For future use. May be deleted if this becomes a 3DOF constraint
+	 */
+	CordeModel::CordeQuaternionElement* m_attachedQuaternion;
 	
     // Relative to the body when it is first constructed
     const btVector3 attachedRelativeOriginalPosition;
