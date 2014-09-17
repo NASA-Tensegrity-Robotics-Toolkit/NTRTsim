@@ -352,7 +352,7 @@ void cordeCollisionObject::solveRContacts()
 void cordeCollisionObject::solveSContacts()
 {
 	/// This is a compromise between Spillman's algorithm and Bullet's collision detection
-	/// Ideally we would find the exact point of a collision.
+	/// Ideally we would find the exact point of a collision. It may be possible that Bullet can do this
 	const btScalar	idt = m_sst.isdt;
 	for(int i = 0, ni = m_scontacts.size(); i < ni; ++i)
 	{

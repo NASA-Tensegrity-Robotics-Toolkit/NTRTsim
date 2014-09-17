@@ -21,6 +21,7 @@
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
+#include "core/tgLinearString.h"
 
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
@@ -48,7 +49,7 @@ simpleCordeTensegrity::~simpleCordeTensegrity()
     
 void simpleCordeTensegrity::setup(tgWorld& world)
 {
-#if (1)	
+#if (0)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 20;
 	const double radius = 0.01;
@@ -56,9 +57,9 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 4);
 	const double shearMod = 0.5 * pow(10, 4);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 1); 
-	const double gammaT = 100.0 * pow(10, -2); // Position Damping
-	const double gammaR = 1.0 * pow(10, -2); // Rotation Damping
+	const double springConst = 10.0 * pow(10, 1); 
+	const double gammaT = 100.0 * pow(10, -4); // Position Damping
+	const double gammaR = 1.0 * pow(10, -4); // Rotation Damping
 #else
 	#if (0)
 		// Values for wire
@@ -76,12 +77,12 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 		const std::size_t resolution = 10;
 		const double radius = 0.001;
 		const double density = 1300;
-		const double youngMod = 1 * pow(10, 3);
-		const double shearMod = 1 * pow(10, 3);
-		const double stretchMod = 2.0 * pow(10, 6);
+		const double youngMod = 1 * pow(10, 1);
+		const double shearMod = 1 * pow(10, 1);
+		const double stretchMod = 60.0 * pow(10, 6);
 		const double springConst = 0.1 * pow(10, 0); 
-		const double gammaT = 5.0 * pow(10, -6); // Position Damping
-		const double gammaR = 0.5 * pow(10, -6); // Rotation Damping
+		const double gammaT = 5.0 * pow(10, -4); // Position Damping
+		const double gammaR = 0.5 * pow(10, -4); // Rotation Damping
 	#endif // Wire vs thread
 #endif // Rope vs others
 	CordeModel::Config cordeConfig(resolution, radius, density, youngMod, shearMod,
@@ -121,36 +122,34 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.move(btVector3(0, 10, 0));
 #else
 
-	s.addNode(-5, 5, 0);
-	s.addNode(0, 5, 0);
-	s.addNode(5, 5, 0);
-	s.addNode(10, 5, 0);
-	
-	s.addNode(3, 10, -11);
-	s.addNode(3, 10, -6);
-	s.addNode(3, 10, 5);
-	s.addNode(3, 10, 10);
-	
+	s.addNode(0, 20, 0);
+	s.addNode(0, 15, 0);
+	s.addNode(2, 10, 0);
+	s.addNode(2, 5, 0);
+
 	s.addPair(0, 1, "rod2");
-	s.addPair(2, 3, "rod2");
-	
-	s.addPair(4, 5, "rod");
-	s.addPair(6, 7, "rod2");
+	s.addPair(2, 3, "rod");
 	
 	s.addPair(1, 2, "muscle");
-	s.addPair(5, 6, "muscle");
 	
 	s.move(btVector3(0, 0, 0));
 #endif	
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 0, 0));
     
+    
+    tgLinearString::Config muscleConfig(1000, 0);
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
+       
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
+#if (0)
+    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+#else    
     spec.addBuilder("muscle", new tgCordeStringInfo(cordeConfig));
-    
+#endif    
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
