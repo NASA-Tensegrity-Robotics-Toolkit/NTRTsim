@@ -31,9 +31,9 @@
 // This library
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 
-
 // Forward Declarations
 class tgWorld;
+
 
 /**
  * Basically the same structure as NestedStructureTestModel
@@ -54,7 +54,8 @@ public:
     
     virtual void step(const double dt);
 
-
+	// Write getter, etc
+	btVector3 forcePoint;
 };
 
 #endif

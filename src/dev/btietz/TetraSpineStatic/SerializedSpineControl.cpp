@@ -32,6 +32,7 @@
 
 // NTRTSim
 #include "core/tgLinearString.h"
+#include "core/tgBaseRigid.h"
 #include "core/ImpedanceControl.h"
 #include "tgcreator/tgUtil.h"
 
@@ -181,7 +182,17 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
 	applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
 	applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
-
+	
+	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
+	btRigidBody* seg1Body = rigids[0]->getPRigidBody();
+	
+	// Find way to read this out of the model
+	const double edge = 38.1;
+    const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
+	btVector3 forcePoint = btVector3(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+	
+	btVector3 force(0.0, -1000.0, 0.0);
+	seg1Body->applyForce(force, forcePoint);
 }
     
 
