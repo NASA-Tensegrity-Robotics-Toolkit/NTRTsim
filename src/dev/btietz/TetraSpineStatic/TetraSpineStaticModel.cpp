@@ -74,22 +74,58 @@ namespace
     tetra.addPair(1, 3, "front left rod");
     tetra.addPair(2, 3, "front top rod");
     }
-
+	
+	void addTagsToPairs (tgPairs& pairs, std::string space_seperated_tags)
+	{
+		// If I make it a reference, it has to be const, which doesn't work to add tags
+		std::vector<tgPair>& myPairs = pairs.getPairs();
+		
+		std::size_t ni = myPairs.size();
+		for (std::size_t i = 0; i < ni; i++)
+		{
+			tgPair& thisPair = myPairs[i];
+			thisPair.addTags(space_seperated_tags);
+		}
+	}
+	void readTagsFromPairs (const tgPairs& pairs)
+	{
+		// If I make it a reference, it has to be const, which doesn't work to add tags
+		std::vector<tgPair> myPairs = pairs.getPairs();
+		
+		std::size_t ni = myPairs.size();
+		for (std::size_t i = 0; i < ni; i++)
+		{
+			std::cout << myPairs[i] << std::endl;
+		}
+	}
+	
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        /// @todo: there seems to be an issue with Muscle2P connections if the front of a
-        /// tetra is inside the next one.
         const btVector3 offset(0, 0, -edge * 0.75);
     for (size_t i = 0; i < segmentCount; ++i)
     {
             /// @todo: the snake is a temporary variable -- will its destructor be called?
         /// If not, where do we delete its children?
       tgStructure* const t = new tgStructure(tetra);
-      t->addTags(tgString("segment num", i + 1));
-      t->move((i + 1) * offset);
-      // Add a child to the snake
-      snake.addChild(t);
+      if (i == 0)
+      {
+		  tgPairs& segPairs = t->getPairs();
+		  addTagsToPairs(segPairs, "mobile");
+		  
+	  }
+	  else
+	  {
+		  tgPairs& segPairs = t->getPairs();
+		  addTagsToPairs(segPairs, "static");
+	  }
+			const tgPairs& readPairs = t->getPairs();
+			readTagsFromPairs(readPairs);
+		  t->addTags(tgString("segment num", i + 1));
+		  t->move((i + 1) * offset);
+		  
+		  // Add a child to the snake
+		  snake.addChild(t);
     }
     }
 
@@ -185,7 +221,11 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("mobile", new tgRodInfo(rodConfig));
+    
+    const tgRod::Config staticConfig(radius, 0.0, friction);
+    spec.addBuilder("static", new tgRodInfo(staticConfig));
+    
     
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
@@ -202,7 +242,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
     
-    #if (0)
+    #if (1)
     trace(structureInfo, *this);
     #endif
     
