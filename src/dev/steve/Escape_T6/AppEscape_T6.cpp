@@ -28,7 +28,8 @@
 #include "Escape_T6Controller.h"
 
 // This library
-#include "core/terrain/tgHillyGround.h"
+#include "core/terrain/tgBoxGround.h"
+#include "Crater.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -40,7 +41,7 @@
 // The C++ Standard Library
 #include <iostream>
 
-tgHillyGround *createGround();
+tgBoxGround *createGround();
 tgWorld *createWorld();
 tgSimViewGraphics *createGraphicsView(tgWorld *world);
 tgSimView *createView(tgWorld *world);
@@ -79,6 +80,11 @@ int main(int argc, char** argv)
     //Sixth add model (with controller) to simulation
     simulation->addModel(model);
 
+    //Seventh add crater to simulation
+    btVector3 origin1 = btVector3(0,0,0);
+    Crater* crater1 = new Crater(origin1);
+    simulation->addModel(crater1);
+
     simulate(simulation);
 
     delete controller;
@@ -86,7 +92,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-tgHillyGround *createGround() {
+tgBoxGround *createGround() {
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -94,19 +100,12 @@ tgHillyGround *createGround() {
     const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
     const double friction = 0.5; // Default: 0.5
     const double restitution = 0.0;  // Default: 0.0
-    const btVector3 size = btVector3(10000.0, 15, 10000.0); // Default: (500.0, 1.5, 500.0)
+    const btVector3 size = btVector3(10000.0, 2, 10000.0); // Default: (500.0, 1.5, 500.0)
     const btVector3 origin = btVector3(0.0, 0.0, 0.0); // Default: (0.0, 0.0, 0.0)
-    const size_t nx = 50; // Default: 50
-    const size_t ny = 50; // Default: 50
-    const double margin = 0.5; // Default: 0.5
-    const double triangleSize = 10.0; // Default: 5.0
-    const double waveHeight = 8.0; // Default: 5.0
-    const double offset = 0.5; // Default: 0.5
-    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
-                                             size, origin, nx, ny, margin, 
-                                             triangleSize, waveHeight, offset);
+    const tgBoxGround::Config groundConfig(eulerAngles, friction, restitution,
+                                           size, origin);
     // the world will delete this
-    return new tgHillyGround(groundConfig);
+    return new tgBoxGround(groundConfig);
 }
 
 tgWorld *createWorld() {
@@ -114,7 +113,7 @@ tgWorld *createWorld() {
     // NB: by changing the setting below from 981 to 98.1, we've
     // scaled the world length scale to decimeters not cm.
 
-    tgHillyGround* ground = createGround();
+    tgBoxGround* ground = createGround();
     return new tgWorld(config, ground);
 }
 
