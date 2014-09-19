@@ -87,40 +87,14 @@ void Crater::addNodes(tgStructure& s)
     addBoxNodes();
     addBoxNodes();
     addBoxNodes();
-    /*// Box 2
-    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);
-
-    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);
     
-    // Box 3
-    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);
-    
-    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);
-    
-    // Box 4
-    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);
-    
-    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
-    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
-    nodes.push_back(node);*/
-
     for(int i=0;i<nodes.size();i+=2) {
         s.addNode(nodes[i]);
         s.addNode(nodes[i+1]);
         s.addRotation(rotationPoint, rotationAxis, rotationAngle);
         s.addPair(i, i+1, "box");
     }
-    s.move(btVector3(0, -5, 0));
+    s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
 }
                       
 void Crater::setup(tgWorld& world) {
