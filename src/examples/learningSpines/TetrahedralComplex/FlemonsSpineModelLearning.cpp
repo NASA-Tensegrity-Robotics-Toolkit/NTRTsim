@@ -64,7 +64,10 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2/300.0;
     const double radius  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
+    const double friction = 0.5;
+    const double rollFriction = 0.0;
+    const double restitution = 0.0;
+    const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
     tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 12, 4000);
     
