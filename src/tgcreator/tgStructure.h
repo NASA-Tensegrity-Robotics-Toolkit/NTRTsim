@@ -125,16 +125,6 @@ public:
         return m_pairs;
     }
 	
-	 /**
-     * Get all of our pairs - non const version for adding tags to the whole structure.
-     * Note: This only includes nodes owned by this structure. Use 'findPairs' 
-     * to search child nodes as well. 
-     */
-    tgPairs& getPairs()
-    {
-        return m_pairs;
-    }
-	
     /**
      * Return our child structures
      */

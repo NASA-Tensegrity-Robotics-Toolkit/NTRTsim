@@ -76,29 +76,6 @@ namespace
     tetra.addPair(2, 3, "front top rod");
     }
 	
-	void addTagsToPairs (tgPairs& pairs, std::string space_seperated_tags)
-	{
-		// If I make it a reference, it has to be const, which doesn't work to add tags
-		std::vector<tgPair>& myPairs = pairs.getPairs();
-		
-		std::size_t ni = myPairs.size();
-		for (std::size_t i = 0; i < ni; i++)
-		{
-			tgPair& thisPair = myPairs[i];
-			thisPair.addTags(space_seperated_tags);
-		}
-	}
-	void readTagsFromPairs (const tgPairs& pairs)
-	{
-		// If I make it a reference, it has to be const, which doesn't work to add tags
-		std::vector<tgPair> myPairs = pairs.getPairs();
-		
-		std::size_t ni = myPairs.size();
-		for (std::size_t i = 0; i < ni; i++)
-		{
-			std::cout << myPairs[i] << std::endl;
-		}
-	}
 	
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
@@ -109,23 +86,6 @@ namespace
             /// @todo: the snake is a temporary variable -- will its destructor be called?
         /// If not, where do we delete its children?
       tgStructure* const t = new tgStructure(tetra);
-#if (1)
-      if (i == 0)
-      {
-		  tgPairs& segPairs = t->getPairs();
-		  addTagsToPairs(segPairs, "mobile");
-		  
-	  }
-	  else
-	  {
-		  tgPairs& segPairs = t->getPairs();
-		  addTagsToPairs(segPairs, "static");
-	  }
-
-			const tgPairs& readPairs = t->getPairs();
-			readTagsFromPairs(readPairs);
-		  t->addTags(tgString("segment num", i + 1));
-#else
 	  if (i == 0)
       {
 		  t->addTags(tgString("mobile segment num", i + 1));
@@ -135,7 +95,7 @@ namespace
 	  {
 		  t->addTags(tgString("static segment num", i + 1));
 	  }
-#endif
+
 		  t->move((i + 1) * offset);
 		  
 		  // Add a child to the snake
