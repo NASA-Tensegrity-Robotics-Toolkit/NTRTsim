@@ -174,7 +174,12 @@ namespace
     muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
     muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
     }
-
+	
+	void addMarkers(tgStructure& structure, tgModel& model)
+	{
+		const std::vector<tgStructure*> children = structure.getChildren();
+	}
+	
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
     {
         std::cout << "StructureInfo:" << std::endl
@@ -232,7 +237,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
 #else // Params for In Won
     const double density = .00311;
     const double radius  = 0.635;
-    const double friction = 0.5;
+    const double friction = 0.8;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("mobile rod", new tgRodInfo(rodConfig));

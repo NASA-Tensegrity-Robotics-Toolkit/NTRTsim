@@ -60,6 +60,14 @@ struct Config
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
 	
+	/**
+	 * Definitions to find muscle length parameters
+	 */
+	double rod_edge;
+	double rod_front;
+	double rod_offset;
+	
+	
 	 /**
      * Muscle Length Parameters
      */

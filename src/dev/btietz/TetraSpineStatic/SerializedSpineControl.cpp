@@ -72,9 +72,14 @@ SerializedSpineControl::Config::Config(std::string fileName)
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
     out_controller = new ImpedanceControl(kTen, kPos, kVel);
-
-    insideLength = root.get("inside_length", "UTF-8").asDouble();
-    outsideLength = root.get("outside_length", "UTF-8").asDouble();
+	
+	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
+	rod_front = tgUtil::round(std::sqrt(3.0)/2 * rod_edge);
+    rod_offset = root.get("rod_offset", "UTF-8").asDouble();
+	
+	
+    insideLength = sqrt(pow( (rod_edge / cos(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
+    outsideLength = rod_offset;
     offsetSpeed = root.get("offset_speed", "UTF-8").asDouble();
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
     cpgFrequency = root.get("cpg_frequency", "UTF-8").asDouble();
