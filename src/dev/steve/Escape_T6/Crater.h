@@ -34,6 +34,7 @@ class tgLinearString;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
+class tgNode;
 
 /**
  * Class that creates box "model" for the sake of 
@@ -98,9 +99,11 @@ class Crater : public tgSubject<Crater>, public tgModel
          */
         void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
 
+        void addBoxNodes();
+
         std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
-        std::vector<btVector3> nodePositions;
+        std::vector <tgNode> nodes;
         btVector3 origin;
 };
 

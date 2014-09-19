@@ -25,16 +25,17 @@
 // This module
 #include "Crater.h"
 // This library
-#include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+#include "tgcreator/tgNode.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
+#include <vector>
 
 namespace
 {
@@ -76,33 +77,46 @@ Crater::~Crater()
 void Crater::addNodes(tgStructure& s)
 {                                      
     const int nBoxes = 4; 
-    const double shift = 20;
-    const double vshift = 2;
-    const double node_h = c.height/2 + vshift;
-    const double node_w = c.width/2;
-
-    // Box 1
-    nodePositions.push_back(btVector3(-shift-node_w, -node_h, -shift-node_w));
-    nodePositions.push_back(btVector3( shift+node_w,  node_h,  shift+node_w));
-    // Box 2
-    nodePositions.push_back(btVector3(-shift-node_w, -node_h, -shift-node_w));
-    nodePositions.push_back(btVector3( shift+node_w,  node_h,  shift+node_w));
-    // Box 3
-    nodePositions.push_back(btVector3(-shift-node_w, -node_h, -shift-node_w));
-    nodePositions.push_back(btVector3( shift+node_w,  node_h,  shift+node_w));
-    // Box 4
-    nodePositions.push_back(btVector3(-shift-node_w, -node_h, -shift-node_w));
-    nodePositions.push_back(btVector3( shift+node_w,  node_h,  shift+node_w));
 
     // Accumulating rotation on boxes
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
 
-    // 2 * nBoxes == nodePositions.size()
-    for(int i=0;i<nodePositions.size();i+=2) {
-        s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
-        s.addNode(nodePositions[i+1][0],nodePositions[i+1][1],nodePositions[i+1][2]);
+    addBoxNodes();
+    addBoxNodes();
+    addBoxNodes();
+    addBoxNodes();
+    /*// Box 2
+    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+
+    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+    
+    // Box 3
+    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+    
+    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+    
+    // Box 4
+    node = tgNode(         -shift-node_w, -node_h, -shift-node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+    
+    node = tgNode(          shift+node_w,  node_h,  shift+node_w, "node");
+    node.addRotation(nodeRotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);*/
+
+    for(int i=0;i<nodes.size();i+=2) {
+        s.addNode(nodes[i]);
+        s.addNode(nodes[i+1]);
         s.addRotation(rotationPoint, rotationAxis, rotationAngle);
         s.addPair(i, i+1, "box");
     }
@@ -153,4 +167,33 @@ void Crater::teardown() {
     notifyTeardown();
     tgModel::teardown();
 }
+
+void Crater::addBoxNodes() {
+    tgNode node;
+    const double shift = 20;
+    const double vshift = 2;
+    const double node_h = c.height/2 + vshift;
+    const double node_w = c.width/2; 
+    
+    double x1 = -shift-node_w;
+    double x2 =  shift+node_w;
+    double y1 = -node_h;
+    double y2 =  node_h;
+    double z1 = -shift-node_w;
+    double z2 =  shift+node_w;
+
+    btVector3 rotationPoint = btVector3((x2-x1)/2, (y2-y1)/2, (z2-z1)/2); //Halfway between nodes
+    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    double rotationAngle = M_PI/4;
+
+    node = tgNode(x1, y1, z1, "node");
+    node.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+
+    node = tgNode(x2, y2, z2, "node");
+    node.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    nodes.push_back(node);
+     
+}
+
 
