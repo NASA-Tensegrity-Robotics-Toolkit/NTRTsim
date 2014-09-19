@@ -103,11 +103,14 @@ SerializedSpineControl::Config::~Config()
 SerializedSpineControl::SerializedSpineControl(std::string fileName) :
 m_config(fileName),
 segments(1.0),
+m_dataObserver("logs/TCData"),
 simTime(0.0),
 updateTime(0.0),
 cycle(0.0),
 target(0.0)
 {
+
+
 
 }
 
@@ -162,15 +165,27 @@ void SerializedSpineControl::applyImpedanceControlOutside(const std::vector<tgLi
     }    
 }
 
+void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
+{
+	#if (1) // Conditional compile for data logging    
+    m_dataObserver.onSetup(subject);
+	#endif   
+}
+
 void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 {
 
     updateTime += dt;
 
+	
 	if (updateTime >= 1.0/m_config.updateFrequency)
 	{
 		simTime += updateTime;
 		updateTime = 0.0;
+		
+		#if (1) // Conditional compile for data logging        
+        m_dataObserver.onStep(subject, simTime);
+		#endif
 	}
 	
 	segments = subject.getSegments();

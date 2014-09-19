@@ -29,6 +29,7 @@
 
 // NTRTSim
 #include "core/tgObserver.h"
+#include "sensors/tgDataObserver.h"
 
 // The C++ Standard Library
 #include <vector>
@@ -113,6 +114,7 @@ public:
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
+     * @todo - why is this public? It probably should be private
      */
     void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
                                                             double dt,
@@ -130,6 +132,8 @@ public:
                                     double dt,
                                     std::size_t phase);
     
+    virtual void onSetup(BaseSpineModelLearning& subject);
+    
     /**
      * Apply the sineWave controller. Called my notifyStep(dt) of its
      * subject. Calls the applyImpedanceControl functions of this class
@@ -144,6 +148,8 @@ private:
     const Config m_config;
     
     std::size_t segments;
+    
+   tgDataObserver m_dataObserver;
     
     /**
      * Parameters that consolidate the sine wave computations within
