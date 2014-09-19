@@ -127,10 +127,16 @@ void tgStructureInfo::initRigidInfo()
     for (int i = 0; i < rigidAgents.size(); i++)
     {
         tgBuildSpec::RigidAgent * const pRigidAgent = rigidAgents[i];
-    assert(pRigidAgent != NULL);
-        tgTagSearch& tagSearch = pRigidAgent->tagSearch;
+        assert(pRigidAgent != NULL);
+        //tgTagSearch& tagSearch = pRigidAgent->tagSearch;
+
+        tgTagSearch tagSearch = tgTagSearch(pRigidAgent->tagSearch);
+
+        // Remove our tags so that subcomponents 'inherit' them (because of the way tags work, removing a tag from the search is the same as adding the tag to children)
+        tagSearch.remove(getTags());
+
         tgRigidInfo* pRigidInfo = pRigidAgent->infoFactory;
-    assert(pRigidInfo != NULL);
+        assert(pRigidInfo != NULL);
 
         // Nodes
         std::vector<tgRigidInfo*> nodeRigids =
@@ -147,8 +153,9 @@ void tgStructureInfo::initRigidInfo()
     // Children
     for (int i = 0; i < m_children.size(); i++)
     {
-        tgStructureInfo * const pStructureInfo = m_children[i];
-    assert(pStructureInfo != NULL);
+        tgStructureInfo* const pStructureInfo = m_children[i];
+        
+        assert(pStructureInfo != NULL);
         pStructureInfo->initRigidInfo();
     }
 }
@@ -170,10 +177,16 @@ void tgStructureInfo::initConnectorInfo()
     for (int i = 0; i < connectorAgents.size(); i++)
     {
         tgBuildSpec::ConnectorAgent* const pConnectorAgent = connectorAgents[i];
-    assert(pConnectorAgent != NULL);
-        tgTagSearch& tagSearch = pConnectorAgent->tagSearch;
+        assert(pConnectorAgent != NULL);
+        //tgTagSearch& tagSearch = pConnectorAgent->tagSearch;
+        
+        tgTagSearch tagSearch = tgTagSearch(pConnectorAgent->tagSearch);
+
+        // Remove our tags so that subcomponents 'inherit' them (because of the way tags work, removing a tag from the search is the same as adding the tag to children)
+        tagSearch.remove(getTags());
+        
         tgConnectorInfo* const pConnectorInfo = pConnectorAgent->infoFactory;
-    assert(pConnectorInfo != NULL);
+        assert(pConnectorInfo != NULL);
 
         // Note: we don't have to do nodes here since connectors are always based on pairs.
 
@@ -189,7 +202,7 @@ void tgStructureInfo::initConnectorInfo()
     for (int i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
-    assert(pStructureInfo != NULL);
+        assert(pStructureInfo != NULL);
         pStructureInfo->initConnectorInfo();
     }
 }
