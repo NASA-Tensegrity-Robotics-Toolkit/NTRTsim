@@ -109,6 +109,7 @@ namespace
             /// @todo: the snake is a temporary variable -- will its destructor be called?
         /// If not, where do we delete its children?
       tgStructure* const t = new tgStructure(tetra);
+#if (1)
       if (i == 0)
       {
 		  tgPairs& segPairs = t->getPairs();
@@ -120,9 +121,21 @@ namespace
 		  tgPairs& segPairs = t->getPairs();
 		  addTagsToPairs(segPairs, "static");
 	  }
+
 			const tgPairs& readPairs = t->getPairs();
 			readTagsFromPairs(readPairs);
 		  t->addTags(tgString("segment num", i + 1));
+#else
+	  if (i == 0)
+      {
+		  t->addTags(tgString("mobile segment num", i + 1));
+		  
+	  }
+	  else
+	  {
+		  t->addTags(tgString("static segment num", i + 1));
+	  }
+#endif
 		  t->move((i + 1) * offset);
 		  
 		  // Add a child to the snake
@@ -222,10 +235,10 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
-    spec.addBuilder("mobile", new tgRodInfo(rodConfig));
+    spec.addBuilder("mobile rod", new tgRodInfo(rodConfig));
     
     const tgRod::Config staticConfig(radius, 0.0, friction);
-    spec.addBuilder("static", new tgRodInfo(staticConfig));
+    spec.addBuilder("static rod", new tgRodInfo(staticConfig));
     
     
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);

@@ -157,7 +157,7 @@ void SerializedSpineControl::applyImpedanceControlOutside(const std::vector<tgLi
 																m_config.outsideLength,
 																target
 																);
-        #if(0) // Conditional compile for verbose control
+        #if (0) // Conditional compile for verbose control
         std::cout << "Outside String " << i << " com tension " << setTension
         << " act tension " << stringList[i]->getMuscle()->getTension()
         << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
@@ -167,7 +167,7 @@ void SerializedSpineControl::applyImpedanceControlOutside(const std::vector<tgLi
 
 void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 {
-	#if (1) // Conditional compile for data logging    
+	#if (0) // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 	#endif   
 }
@@ -183,7 +183,7 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 		simTime += updateTime;
 		updateTime = 0.0;
 		
-		#if (1) // Conditional compile for data logging        
+		#if (0) // Conditional compile for data logging        
         m_dataObserver.onStep(subject, simTime);
 		#endif
 	}
