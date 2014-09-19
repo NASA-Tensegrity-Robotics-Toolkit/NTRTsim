@@ -128,11 +128,12 @@ void tgStructureInfo::initRigidInfo()
     {
         tgBuildSpec::RigidAgent * const pRigidAgent = rigidAgents[i];
         assert(pRigidAgent != NULL);
-        //tgTagSearch& tagSearch = pRigidAgent->tagSearch;
 
         tgTagSearch tagSearch = tgTagSearch(pRigidAgent->tagSearch);
 
-        // Remove our tags so that subcomponents 'inherit' them (because of the way tags work, removing a tag from the search is the same as adding the tag to children)
+        // Remove our tags so that subcomponents 'inherit' them (because of the
+        // way tags work, removing a tag from the search is the same as adding 
+        // the tag to children to be searched)
         tagSearch.remove(getTags());
 
         tgRigidInfo* pRigidInfo = pRigidAgent->infoFactory;
@@ -178,11 +179,12 @@ void tgStructureInfo::initConnectorInfo()
     {
         tgBuildSpec::ConnectorAgent* const pConnectorAgent = connectorAgents[i];
         assert(pConnectorAgent != NULL);
-        //tgTagSearch& tagSearch = pConnectorAgent->tagSearch;
         
         tgTagSearch tagSearch = tgTagSearch(pConnectorAgent->tagSearch);
 
-        // Remove our tags so that subcomponents 'inherit' them (because of the way tags work, removing a tag from the search is the same as adding the tag to children)
+        // Remove our tags so that subcomponents 'inherit' them (because of the
+        // way tags work, removing a tag from the search is the same as adding 
+        // the tag to children to be searched)
         tagSearch.remove(getTags());
         
         tgConnectorInfo* const pConnectorInfo = pConnectorAgent->infoFactory;
