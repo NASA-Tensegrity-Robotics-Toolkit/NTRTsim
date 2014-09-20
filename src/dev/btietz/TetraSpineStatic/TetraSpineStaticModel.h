@@ -54,8 +54,6 @@ public:
     
     virtual void step(const double dt);
 
-	// Write getter, etc
-	btVector3 forcePoint;
 };
 
 #endif

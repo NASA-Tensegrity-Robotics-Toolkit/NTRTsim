@@ -34,6 +34,7 @@
 #include "core/tgLinearString.h"
 #include "core/tgBaseRigid.h"
 #include "core/ImpedanceControl.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgUtil.h"
 
 // The C++ Standard Library
@@ -206,15 +207,10 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
 	btRigidBody* seg1Body = rigids[0]->getPRigidBody();
 	
-	// Find way to read this out of the model
-	// This is not the right place! This is relative to the node coordinate system, not the COM
-	// Will need to update if we change the COM by adding point masses =(
-	const double edge = 38.1;
-    const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
-	btVector3 forcePoint = btVector3(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+	const abstractMarker marker = subject.getMarkers()[0];
 	
-	btVector3 force(0.0, 0.0, 0.0);
-	seg1Body->applyForce(force, forcePoint);
+	btVector3 force(0.0, 0.0, 00.0);
+	seg1Body->applyForce(force, marker.getRelativePosition());
 }
     
 
