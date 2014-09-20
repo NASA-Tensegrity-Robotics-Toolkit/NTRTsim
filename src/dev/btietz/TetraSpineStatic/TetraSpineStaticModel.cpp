@@ -135,9 +135,16 @@ namespace
     muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
     }
 	
-	void addMarkers(tgStructure& structure, tgModel& model)
+	void addMarkers(tgStructure& structure, TetraSpineStaticModel& model)
 	{
 		const std::vector<tgStructure*> children = structure.getChildren();
+		tgNodes n0 = children[0]->getNodes();
+		
+		btRigidBody* firstBody = model.getAllRigids()[0]->getPRigidBody();
+		
+		abstractMarker marker1(firstBody, n0[3] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+		model.addMarker(marker1);
 	}
 	
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -220,6 +227,8 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     m_allMuscles = this->find<tgLinearString> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
+    
+    addMarkers(snake, *this);
     
     #if (1)
     trace(structureInfo, *this);
