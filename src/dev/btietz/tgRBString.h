@@ -65,10 +65,6 @@ public:
     tgRBString(const tgTags& tags,
            tgRBString::Config& config,
            double restLength);
-    
-    tgRBString(std::string space_separated_tags,
-           tgRBString::Config& config,
-           double restLength);
 
     virtual ~tgRBString() {}
     

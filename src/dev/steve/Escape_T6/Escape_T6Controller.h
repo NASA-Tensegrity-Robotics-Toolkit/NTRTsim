@@ -64,6 +64,7 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         vector<double> initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
+        double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
 
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
@@ -101,6 +102,11 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         /** Difference in position between initPosition and finalPosition
          * of subject */
         double displacement(Escape_T6Model& subject);
+
+        /** Select action paramters from a comma-separated line in a file */
+        std::vector<double> readManualParams(int lineNumber, string filename);
+
+        void printSineParams();
 };
 
 #endif // ESCAPE_T6CONTROLLER

@@ -20,4 +20,5 @@ subdirs(
     boxFeet
     RBTests
     sphereFeet
+    TetraSpineStatic
     )

@@ -56,12 +56,6 @@ public:
     tgLinearString(Muscle2P* muscle,
            const tgTags& tags,
            tgBaseString::Config& config);
-    /**
-     * Same as other constructor, just a different type of tags
-     */
-    tgLinearString(Muscle2P* muscle,
-           std::string space_separated_tags,
-           tgBaseString::Config& config);
     
     /**
      * Destructor deletes the Muscle2P

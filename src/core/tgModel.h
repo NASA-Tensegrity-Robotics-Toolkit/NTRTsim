@@ -65,12 +65,6 @@ public:
     tgModel(const tgTags& tags);
 
     /**
-    * Constructor for sace seperated tags
-    * @param[in] space_seperated_tags, tags for the tgTaggable parent class
-    */  
-    tgModel(std::string space_separated_tags);
-
-    /**
     * Destructor. Deletes the children, if they weren't already deleted
     * by teardown()
     */

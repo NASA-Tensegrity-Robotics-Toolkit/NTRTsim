@@ -80,8 +80,8 @@ namespace
         0.01,     // rollFriction (unitless)
         0.2,      // restitution (?)
         0,        // rotation
-        100000,   // maxTens
-        10000,    // targetVelocity
+        5000,      // maxTens (dN)
+        2.6,      // targetVelocity (dm/s)
         20000     // maxAcc
 
             // Use the below values for earlier versions of simulation.
