@@ -40,18 +40,18 @@
 namespace
 {
     // Note: This current model of the SUPERball rod is 1.5m long by 4.5cm (0.045m) radius,
-    // which is 1.5m*(0.045m)^2 = 0.0030375m^3.
+    // which is 1.684m*pi*(0.040m)^2 = 0.008545132m^3.
     // For SUPERball v1.5, mass = 3.5kg per strut, which density [kg/m^3] comes out to:
-    // density = 3.5kg/0.0030375m^3 = 1152.2634kg/m^3.
+    // density = 3.45kg/0.008545132m^3 = 403.738642402kg/m^3 = 0.403738642402 kg/dm^3
 
     // see tgBaseString.h for a descripton of some of these rod parameters
     // (specifically, those related to the motor moving the strings.)
     // NOTE that any parameter that depends on units of length will scale
     // with the current gravity scaling. E.g., with gravity as 98.1
     // Thus,
-    // Rod Length = 15
-    // Rod Radius = 0.45
-    // density = 1.152 (length is cubed, so decimal moves 3 places)
+    // Rod Length = 17.00
+    // Rod Radius = 0.40
+    // density = 0.40374 (length is cubed, so decimal moves 3 places)
 
     // similarly, frictional parameters are for the tgRod objects.
     const struct Config
@@ -72,19 +72,20 @@ namespace
         double maxAcc;
     } c =
    {
-     0.688,    // density (kg / length^3)
-     0.31,     // radius (length)
-     613.0,   // stiffness (kg / sec^2) was 1500
-     200.0,    // damping (kg / sec)
-     16.84,     // rod_length (length)
-     7.5,      // rod_space (length)
+	 0.40374,   // density (kg / length^3)
+     0.40,      // radius (length)
+     998.25,    // stiffness_passive (kg / sec^2)
+     3152.36,   // stiffness_active (kg / sec^2)
+     50.0,      // damping (kg / sec)
+     17.00,     // rod_length (length)
+     17.00/4,   // rod_space (length)
      0.99,      // friction (unitless)
-     0.01,     // rollFriction (unitless)
-     0.0,      // restitution (?)
-     0,        // rotation
-     100000,   // maxTens
-     10000,    // targetVelocity
-     20000     // maxAcc
+     0.01,      // rollFriction (unitless)
+     0.0,       // restitution (?)
+     0,         // rotation
+     12500,     // maxTens
+     10000,     // targetVelocity
+     20000      // maxAcc
 
      // Use the below values for earlier versions of simulation.
      // 1.152,    // density (kg / length^3)
@@ -174,11 +175,11 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, 0, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
 
-    tgLinearString::Config muscleConfig_active(c.stiffness_active, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig_active(c.stiffness_active, c.damping, 0, c.rotation,
     					    c.maxTens, c.targetVelocity,
     					    c.maxAcc);
             
@@ -259,8 +260,8 @@ const std::vector<tgLinearString*>& T6Model::getActiveMuscles() const
 
 const double T6Model::muscleRatio()
 {
-	//return (c.stiffness_active/c.stiffness_passive);
-	return 2.5;
+	return (c.stiffness_passive/c.stiffness_active);
+	//return 2.5;
 }
     
 void T6Model::teardown()
