@@ -76,23 +76,6 @@ tgLinearString::tgLinearString(Muscle2P* muscle,
     assert(m_preferredLength == m_restLength);
 }
 
-tgLinearString::tgLinearString(Muscle2P* muscle,
-                   std::string space_separated_tags,
-                   tgBaseString::Config& config) :
-    m_muscle(muscle),
-    tgBaseString(space_separated_tags, 
-                    config,
-                    muscle->getRestLength(),
-                    muscle->getActualLength())
-{
-    constructorAux();
-
-    // Postcondition
-    assert(invariant());
-    assert(m_muscle == muscle);
-    assert(m_preferredLength == m_restLength);
-}
-
 tgLinearString::~tgLinearString()
 {
     //std::cout << "deleting linear string" << std::endl;

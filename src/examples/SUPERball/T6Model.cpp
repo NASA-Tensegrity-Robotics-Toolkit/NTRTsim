@@ -62,6 +62,7 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
+        bool   hist;
         double rotation;  
         double maxTens;
         double targetVelocity;
@@ -77,6 +78,7 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
+     0,			// History logging (boolean)
      0,        // rotation
      100000,   // maxTens
      10000,    // targetVelocity
@@ -171,7 +173,7 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             

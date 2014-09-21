@@ -77,6 +77,10 @@ tgBaseString::Config::Config(double s,
     {
         throw std::invalid_argument("min Rest Length is negative.");
     }
+    else if (abs(rot) > M_PI * 2.0)
+    {
+		throw std::invalid_argument("Abs of rotation is greater than 2pi. Are you sure you're setting the right parameters?");
+	}
 }
 
 void tgBaseString::Config::scale (double sf)
@@ -114,25 +118,6 @@ tgBaseString::tgBaseString(const tgTags& tags,
                    double restLength,
                    double actualLength) :
     tgModel(tags),
-    m_pHistory(new BaseStringHistory()),
-    m_config(config),
-    m_restLength(restLength),
-    m_preferredLength(m_restLength),
-    m_startLength(actualLength),
-    m_prevVelocity(0.0)
-{
-    constructorAux();
-
-    // Postcondition
-    assert(invariant());
-    assert(m_preferredLength == m_restLength);
-}
-
-tgBaseString::tgBaseString(std::string space_separated_tags,
-                   tgBaseString::Config& config,
-                   double restLength,
-                   double actualLength) :
-    tgModel(space_separated_tags),
     m_pHistory(new BaseStringHistory()),
     m_config(config),
     m_restLength(restLength),
