@@ -80,7 +80,7 @@ namespace
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        const btVector3 offset(0, 0, -edge * 0.75);
+        const btVector3 offset(0, 0, -21.5);
     for (size_t i = 0; i < segmentCount; ++i)
     {
             /// @todo: the snake is a temporary variable -- will its destructor be called?
