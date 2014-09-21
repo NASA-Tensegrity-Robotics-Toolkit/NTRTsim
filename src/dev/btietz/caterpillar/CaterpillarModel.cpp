@@ -108,9 +108,30 @@ namespace
             snake.addChild(t);
         }
     }
-    
+
       // Add muscles that connect the segments
     void addSegmentMuscles(tgStructure& snake)
+    {
+        const std::vector<tgStructure*> children = snake.getChildren();
+        
+		for (size_t i = 1; i < children.size(); ++i)
+		{
+			    tgNodes n0 = children[i-1]->getNodes();
+                tgNodes n1 = children[i  ]->getNodes();
+                
+                if (i % 2 == 0)
+                {
+					snake.addPair(n0[4], n1[5], "segment rod");
+				}
+				else
+				{
+					snake.addPair(n0[6], n1[7], "segment rod");
+				}	
+		}
+	}
+    
+      // Add muscles that connect the segments
+    void addSegmentMusclesOld(tgStructure& snake)
     {
         const std::vector<tgStructure*> children = snake.getChildren();
             for (size_t i = 1; i < children.size(); ++i)
