@@ -59,6 +59,7 @@ struct Config
 	 */
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
+    ImpedanceControl* top_controller;
 	
 	/**
 	 * Definitions to find muscle length parameters
@@ -115,30 +116,7 @@ public:
      */
     ~SerializedSpineControl();
     
-    /**
-     * Applies the impedance controllers using a velocity setpoint of 0.
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     * @todo - why is this public? It probably should be private
-     */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
-                                                            double dt,
-                                                            std::size_t phase);
-    /**
-     * Applies the impedance controllers using a velocity setpoint determined.
-     * by the phase parameter and 
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     */                                    
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase);
+
     
     virtual void onSetup(BaseSpineModelLearning& subject);
     
@@ -152,6 +130,39 @@ public:
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
 private:
+
+    /**
+     * Applies the impedance controllers using a velocity setpoint of 0.
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
+     * @todo - why is this public? It probably should be private
+     */
+    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+                                                            double dt,
+                                                            std::size_t phase);
+                                                            
+	void applyImpedanceControlTopInside(const std::vector<tgLinearString*> stringList,
+												double dt,
+												std::size_t phase);
+    /**
+     * Applies the impedance controllers using a velocity setpoint determined.
+     * by the phase parameter and 
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
+     */                                    
+    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase);
+    
+    void applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase);
     
     const Config m_config;
     

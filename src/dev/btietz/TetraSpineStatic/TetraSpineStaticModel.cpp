@@ -214,7 +214,10 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     
     
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    tgLinearString::Config muscleConfig2(1355.8, 10, false, 0, 7000, 7.0, 9500);
+    spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
+    spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));
 #endif
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);

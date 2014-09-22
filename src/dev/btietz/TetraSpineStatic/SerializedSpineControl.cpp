@@ -35,6 +35,7 @@
 #include "core/tgBaseRigid.h"
 #include "core/ImpedanceControl.h"
 #include "core/abstractMarker.h"
+#include "core/Muscle2P.h"
 #include "tgcreator/tgUtil.h"
 
 // The C++ Standard Library
@@ -44,6 +45,9 @@
 // JSON Serialization
 #include "helpers/FileHelpers.h"
 #include <json/json.h>
+
+//#define VERBOSE
+#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -73,14 +77,24 @@ SerializedSpineControl::Config::Config(std::string fileName)
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
     out_controller = new ImpedanceControl(kTen, kPos, kVel);
+
+    kTen = root.get("top_imp_ten", "UTF-8").asDouble();
+	kPos = root.get("top_imp_pos", "UTF-8").asDouble();
+	kVel = root.get("top_imp_vel", "UTF-8").asDouble();
+    top_controller = new ImpedanceControl(kTen, kPos, kVel);
 	
 	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
 	rod_front = tgUtil::round(std::sqrt(3.0)/2 * rod_edge);
     rod_offset = root.get("rod_offset", "UTF-8").asDouble();
 	
-	
+#if (0)	
     insideLength = sqrt(pow( (rod_edge / cos(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
     outsideLength = rod_offset;
+#else
+	insideLength = root.get("inside_length", "UTF-8").asDouble();	
+	outsideLength = root.get("outside_length", "UTF-8").asDouble();	
+	
+#endif
     offsetSpeed = root.get("offset_speed", "UTF-8").asDouble();
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
     cpgFrequency = root.get("cpg_frequency", "UTF-8").asDouble();
@@ -140,11 +154,36 @@ void SerializedSpineControl::applyImpedanceControlInside(const std::vector<tgLin
 																m_config.insideLength,
 																m_config.insideMod * target
 																);
-        #if (0) // Conditional compile for verbose control
-        std::cout << "Inside String " << i << " tension " << setTension
+#ifdef VERBOSE // Conditional compile for verbose control
+        std::cout << "Inside String " << i
+        << " phase " << phase
+         << " tension " << setTension
         << " act tension " << stringList[i]->getMuscle()->getTension()
         << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-        #endif
+#endif
+    }    
+}
+
+void SerializedSpineControl::applyImpedanceControlTopInside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase)
+{
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		// This will reproduce the same value until simTime is updated. See onStep
+        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
+        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
+        
+        double setTension = m_config.top_controller->control(stringList[i],
+																dt,
+																m_config.insideLength,
+																m_config.insideMod * target
+																);
+#ifdef VERBOSE																
+        std::cout << "Top Inside String " << i << " com tension " << setTension
+        << " act tension " << stringList[i]->getMuscle()->getTension()
+        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
+#endif
     }    
 }
 
@@ -163,19 +202,44 @@ void SerializedSpineControl::applyImpedanceControlOutside(const std::vector<tgLi
 																m_config.outsideLength,
 																target
 																);
-        #if (0) // Conditional compile for verbose control
-        std::cout << "Outside String " << i << " com tension " << setTension
+#ifdef VERBOSE // Conditional compile for verbose control
+        std::cout << "Outside String " << i
+        << " phase " << phase
+         << " com tension " << setTension
         << " act tension " << stringList[i]->getMuscle()->getTension()
         << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-        #endif
+#endif
+    }    
+}
+
+void SerializedSpineControl::applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase)
+{
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		// This will reproduce the same value until simTime is updated. See onStep
+        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
+        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
+        
+        double setTension = m_config.top_controller->control(stringList[i],
+																dt,
+																m_config.outsideLength,
+																target
+																);
+#ifdef VERBOSE // Conditional compile for verbose control
+        std::cout << "Top Outside String " << i << " com tension " << setTension
+        << " act tension " << stringList[i]->getMuscle()->getTension()
+        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
+#endif
     }    
 }
 
 void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 {
-	#if (0) // Conditional compile for data logging    
+#ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
-	#endif   
+#endif   
 }
 
 void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -189,18 +253,18 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 		simTime += updateTime;
 		updateTime = 0.0;
 		
-		#if (0) // Conditional compile for data logging        
-        m_dataObserver.onStep(subject, simTime);
-		#endif
+#ifdef LOGGING // Conditional compile for data logging        
+        m_dataObserver.onStep(subject, updateTime);
+#endif
 	}
 	
 	segments = subject.getSegments();
 	
-	applyImpedanceControlInside(subject.getMuscles("inner top"), dt, 0);
+	applyImpedanceControlTopInside(subject.getMuscles("inner top"), dt, 0);
 	applyImpedanceControlInside(subject.getMuscles("inner left") , dt, 1);
 	applyImpedanceControlInside(subject.getMuscles("inner right"), dt, 2);
 	
-	applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
+	applyImpedanceControlTopOutside(subject.getMuscles("outer top"), dt, 0);
 	applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
 	applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
 	
