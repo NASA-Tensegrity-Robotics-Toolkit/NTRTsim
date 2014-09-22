@@ -30,6 +30,7 @@
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "Crater.h"
+#include "CraterDeep.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -82,7 +83,8 @@ int main(int argc, char** argv)
 
     //Seventh add crater to simulation
     btVector3 originCrater = btVector3(0,0,0);
-    Crater* crater = new Crater(originCrater);
+    //Crater* crater = new Crater(originCrater);
+    CraterDeep* crater = new CraterDeep(originCrater);
     simulation->addModel(crater);
 
     simulate(simulation);
