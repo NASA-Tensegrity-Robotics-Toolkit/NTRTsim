@@ -143,7 +143,7 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = true;
+    bool usingManualParams = false;
     if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
     int lineNumber = 11;
     string filename = "logs/round7/bestParamsNoOutliersSorted.dat";
