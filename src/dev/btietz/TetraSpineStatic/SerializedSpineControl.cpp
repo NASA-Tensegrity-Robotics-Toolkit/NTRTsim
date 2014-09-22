@@ -251,11 +251,12 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	if (updateTime >= 1.0/m_config.updateFrequency)
 	{
 		simTime += updateTime;
-		updateTime = 0.0;
+		
 		
 #ifdef LOGGING // Conditional compile for data logging        
         m_dataObserver.onStep(subject, updateTime);
 #endif
+		updateTime = 0.0;
 	}
 	
 	segments = subject.getSegments();
@@ -270,8 +271,12 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	
 	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
 	btRigidBody* seg1Body = rigids[0]->getPRigidBody();
+	btRigidBody* seg2Body = rigids[6]->getPRigidBody();
 	
 	const abstractMarker marker = subject.getMarkers()[0];
+	const abstractMarker marker2 = subject.getMarkers()[1];
+	const abstractMarker marker3 = subject.getMarkers()[2];
+	const abstractMarker marker4 = subject.getMarkers()[3];
 	
 	btVector3 force(0.0, 0.0, 0.0);
 	// 2 kg times gravity
@@ -292,6 +297,9 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 		force = btVector3(0.0, 0.0, 0.0);
 	}
 	seg1Body->applyForce(force, marker.getRelativePosition());
+	seg2Body->applyForce(-force, marker2.getRelativePosition());
+	//seg2Body->applyForce(-force / 2.0, marker3.getRelativePosition());
+	//seg2Body->applyForce(-force / 2.0, marker4.getRelativePosition());
 }
     
 

@@ -86,16 +86,16 @@ namespace
             /// @todo: the snake is a temporary variable -- will its destructor be called?
         /// If not, where do we delete its children?
       tgStructure* const t = new tgStructure(tetra);
-	  if (i == 0)
-      {
+	  //if (i == 0 || i == 1)
+      //{
 		  t->addTags(tgString("mobile segment num", i + 1));
 		  
-	  }
+	/*  }
 	  else
 	  {
 		  t->addTags(tgString("static segment num", i + 1));
 	  }
-
+	*/
 		  t->move((i + 1) * offset);
 		  
 		  // Add a child to the snake
@@ -145,6 +145,22 @@ namespace
 		abstractMarker marker1(firstBody, n0[3] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker1);
+		
+		tgNodes n1 = children[1]->getNodes();
+		
+		btRigidBody* secondBody = model.getAllRigids()[6]->getPRigidBody();
+		
+		abstractMarker marker2(secondBody, n1[2] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+		model.addMarker(marker2);
+		
+		abstractMarker marker3(secondBody, n1[1] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+		model.addMarker(marker3);
+		
+		abstractMarker marker4(secondBody, n1[0] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+		model.addMarker(marker4);
 	}
 	
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
