@@ -1,5 +1,5 @@
 #!/bin/bash
-max=10
+max=9000
 for i in `seq 1 $max`
 do
     echo "Trial $i"
