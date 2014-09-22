@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012, United States Government, as represented by the
+ * Copyright © 2014, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  * 
@@ -19,13 +19,14 @@
 /**
  * @file Crater.h
  * @brief Contains the definition of class Crater.
+ * Specifically, a crater is defined as a series of boxes which
+ * form a barrier. It is designed to test escape algorithms for tensegrities
  * $Id$
  */
 
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
-#include "core/tgRod.h"
 // The C++ Standard Library
 #include <vector>
 
@@ -37,14 +38,21 @@ class tgWorld;
 class tgNode;
 
 /**
- * Class that creates box "model" for the sake of 
- * levelling off the existing ground
+ * Class that creates box "models" that act as crater walls
  */
 class Crater : public tgSubject<Crater>, public tgModel
 {
     public: 
 
+        /**
+         * Default constructor. Sets center point of crater to (0,0,0)
+         */
         Crater();
+
+        /**
+         * Origin constructor. Sets center point to input param 'origin'.
+         * @param[in] origin - the center point of the Crater object
+         */
         Crater(btVector3 origin);
 
         /**
@@ -60,12 +68,6 @@ class Crater : public tgSubject<Crater>, public tgModel
         virtual void setup(tgWorld& world);
 
         /**
-         * Undoes setup. Deletes child models. Called automatically on
-         * reset and end of simulation. Notifies controllers of teardown
-         */
-        void teardown();
-
-        /**
          * Step the model, its children. Notifies controllers of step.
          * @param[in] dt, the timestep. Must be positive.
          */
@@ -79,29 +81,28 @@ class Crater : public tgSubject<Crater>, public tgModel
          * to itself 
          */
         virtual void onVisit(tgModelVisitor& r);
+ 
+        /**
+         * Undoes setup. Deletes child models. Called automatically on
+         * reset and end of simulation. Notifies controllers of teardown
+         */
+        void teardown();  
 
     private:
 
         /**
          * A function called during setup that determines the positions of
-         * the nodes based on construction parameters. Rewrite this function
-         * for your own models
-         * @param[in] tetra: A tgStructure that we're building into
+         * the nodes (cetner points of opposing box faces) 
+         * based on construction parameters.
+         * @param[in] s: the tgStructure that we're building into
          */
         void addNodes(tgStructure& s);
 
         /**
-         * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
-         * First rotates the structure around 3 axises given 3 angles.
-         * Moves the structure to the target point.
-         * Sets all the bars speed to the given speed vector.
-         * (muscles and markers are moved automatically since they are attached).
+         * Determines the box nodes (center points of opposing box faces
+         * Adds nodes to 'nodes' vector
          */
-        void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
-
         void addBoxNodes();
-
-        std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
         std::vector <tgNode> nodes;
         btVector3 origin;

@@ -51,11 +51,11 @@ namespace
     } c =
     {
         10.0, // width (dm?)
-        10.0,   // height (dm?)
-        0.0,      // density (kg / length^3)
-        1.0,      // friction (unitless)
-        0.01,     // rollFriction (unitless)
-        0.2,      // restitution (?)
+        10.0, // height (dm?)
+        0.0,  // density (kg / length^3)
+        1.0,  // friction (unitless)
+        0.01, // rollFriction (unitless)
+        0.2,  // restitution (?)
     };
 } // namespace
 
@@ -72,31 +72,7 @@ Crater::Crater(btVector3 center) : tgModel()
 Crater::~Crater()
 {
 }
-              
-// Nodes: center points of opposing faces of rectangles
-void Crater::addNodes(tgStructure& s)
-{                                      
-    const int nBoxes = 4; 
-
-    // Accumulating rotation on boxes
-    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-    double rotationAngle = M_PI/2;
-
-    addBoxNodes();
-    addBoxNodes();
-    addBoxNodes();
-    addBoxNodes();
-    
-    for(int i=0;i<nodes.size();i+=2) {
-        s.addNode(nodes[i]);
-        s.addNode(nodes[i+1]);
-        s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-        s.addPair(i, i+1, "box");
-    }
-    s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
-}
-                      
+                     
 void Crater::setup(tgWorld& world) {
 
     const tgBox::Config boxConfig(c.width, c.height, c.density, c.friction, c.rollFriction, c.restitution);
@@ -140,12 +116,35 @@ void Crater::onVisit(tgModelVisitor& r) {
 void Crater::teardown() {
     notifyTeardown();
     tgModel::teardown();
+} 
+
+// Nodes: center points of opposing faces of rectangles
+void Crater::addNodes(tgStructure& s) {
+    const int nBoxes = 4; 
+
+    // Accumulating rotation on boxes
+    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    double rotationAngle = M_PI/2;
+
+    addBoxNodes();
+    addBoxNodes();
+    addBoxNodes();
+    addBoxNodes();
+    
+    for(int i=0;i<nodes.size();i+=2) {
+        s.addNode(nodes[i]);
+        s.addNode(nodes[i+1]);
+        s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+        s.addPair(i, i+1, "box");
+    }
+    s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
 }
 
 void Crater::addBoxNodes() {
     tgNode node;
-    const double shift = 20;
-    const double vshift = 2;
+    const double shift = 20; // Arbitrary
+    const double vshift = 2; 
     const double node_h = c.height/2 + vshift;
     const double node_w = c.width/2; 
     
@@ -169,5 +168,4 @@ void Crater::addBoxNodes() {
     nodes.push_back(node);
      
 }
-
 
