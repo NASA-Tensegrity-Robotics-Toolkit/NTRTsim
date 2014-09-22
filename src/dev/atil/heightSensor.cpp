@@ -16,7 +16,6 @@ heightSensor::heightSensor(){
 heightSensor::heightSensor(const btRigidBody *body,btVector3 worldPos,int nodeNumber,tgWorld& world)
 {
 	btworld=&(tgBulletUtil::worldToDynamicsWorld(world));
-//	btSoftRigidDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 	attachedBody=body;
 	//find relative position
 	attachedRelativeOriginalPosition=worldPos;//Use local transform;

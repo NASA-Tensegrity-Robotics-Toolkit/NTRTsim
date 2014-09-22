@@ -101,8 +101,14 @@ int main(int argc, char** argv)
     myModel->attach(pTC);
     simulation.addModel(myModel);
     
-    // Run until the user stops
-    simulation.run();
+    // Run for 60 secs
+    int i = 0;
+    while (i < 10000)
+    {
+        simulation.run(60000);
+        simulation.reset();
+        i++;
+    }
 
     //Teardown is handled by delete, so that should be automatic
     return 0;

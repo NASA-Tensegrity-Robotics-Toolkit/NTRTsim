@@ -197,7 +197,6 @@ private:
 	std::vector<btVector3> nodePositions;
 	std::vector<heightSensor> heightSensors;
 
-
 	tgWorld& m_world;
 };
 

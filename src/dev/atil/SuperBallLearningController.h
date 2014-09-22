@@ -66,6 +66,8 @@ public:
     
   virtual void onStep(SuperBallModel& subject, double dt);
 
+  virtual void onTeardown(SuperBallModel& subject);
+
 protected:
 
   virtual vector< vector <double> > transformActions(vector< vector <double> > act);

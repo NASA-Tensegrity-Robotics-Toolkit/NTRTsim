@@ -48,6 +48,7 @@ SuperBallPrefLengthController::SuperBallPrefLengthController(const double initia
 //Fetch all the muscles and set their preferred length
 void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 {
+	m_totalTime=0;
 	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
@@ -66,7 +67,7 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 	randomAngle=0.0;
 
 	btDynamicsWorld *btworld=subject.getWorld();
-	boxTr.setOrigin(btVector3(1000*cos(randomAngle),500,1000*sin(randomAngle)));
+	boxTr.setOrigin(btVector3(100*cos(randomAngle),500,100*sin(randomAngle)));
 	btDefaultMotionState* motSt = new btDefaultMotionState(boxTr);
     btRigidBody::btRigidBodyConstructionInfo const rbInfo1(1,motSt, new btBoxShape(btVector3(1.0,1.0,1.0)));
 	goalPoint = new btRigidBody(rbInfo1);
@@ -78,6 +79,9 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
     btRigidBody::btRigidBodyConstructionInfo const rbInfo2(0.0,motSt2,new btBoxShape(btVector3(500.0,0.1,500.0)));
 	btRigidBody *groundBox = new btRigidBody(rbInfo2);
 	btworld->addRigidBody(groundBox);
+
+	std::cout<<"Initialized the controller"<<std::endl;
+
 }
 
 void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
@@ -99,7 +103,7 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 
 	vector<double> state=subject.getSensorInfo();
 
-//  Output sensor values for testing purposes.
+////  Output sensor values for testing purposes.
 //	std::cout<<m_totalTime;
 //	for(int i=0;i<state.size();i++)
 //	{
@@ -110,18 +114,18 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 	vector< vector<double> > actions;
 
 	//get the actions (between 0 and 1) from evolution (todo)
-	//actions=evolutionAdapter.step(dt,state);
+	actions=evolutionAdapter.step(dt,state);
 
-	//instead, generate it here for now!
-	for(int i=0;i<24;i++)
-	{
-		vector<double> tmp;
-		for(int j=0;j<2;j++)
-		{
-			tmp.push_back(0.5);
-		}
-		actions.push_back(tmp);
-	}
+//	//instead, generate it here for now!
+//	for(int i=0;i<24;i++)
+//	{
+//		vector<double> tmp;
+//		for(int j=0;j<2;j++)
+//		{
+//			tmp.push_back(0.5);
+//		}
+//		actions.push_back(tmp);
+//	}
 
 	//transform them from 0-1 to the size of the structure
 	actions = transformActions(actions);
@@ -347,5 +351,10 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 			}
 		}
 	}
+}
+
+void SuperBallPrefLengthController::onTeardown(SuperBallModel& subject)
+{
+	std::cout<<"TEARDOWN CALLED"<<std::endl;
 }
 

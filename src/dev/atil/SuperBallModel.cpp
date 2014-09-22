@@ -184,6 +184,7 @@ void SuperBallModel::addMarkers()
 
 void SuperBallModel::addSensors()
 {
+	std::cout<<"Adding sensors"<<std::endl;
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
 	for(int i=0;i<12;i++)
@@ -306,6 +307,8 @@ void SuperBallModel::setup(tgWorld& world)
     // Actually setup the children
     tgModel::setup(world);
 
+    this->m_world = world;
+
     //map the rods and add the markers to them
     addMarkers();
     addSensors();
@@ -319,7 +322,6 @@ void SuperBallModel::setup(tgWorld& world)
   	btVector3 speed(0,40,0);
     this->moveModel(location,rotation,speed);
 
-    this->m_world = world;
 }
 
 void SuperBallModel::step(double dt)
@@ -349,6 +351,13 @@ const std::vector<tgLinearString*>& SuperBallModel::getAllMuscles() const
     
 void SuperBallModel::teardown()
 {
+	notifyTeardown();
+
+	std::cout<<"Tearing down model"<<std::endl;
+	this->nodeNumberingSchema.clear();
+	this->heightSensors.clear();
+	this->nodePositions.clear();
+
     tgModel::teardown();
 }
 
