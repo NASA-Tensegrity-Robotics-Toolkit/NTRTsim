@@ -50,17 +50,17 @@ simpleCordeTensegrity::~simpleCordeTensegrity()
     
 void simpleCordeTensegrity::setup(tgWorld& world)
 {
-#if (0)	
+#if (1)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 20;
+	const std::size_t resolution = 40;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 4);
 	const double shearMod = 0.5 * pow(10, 4);
 	const double stretchMod = 20.0 * pow(10, 6);
 	const double springConst = 10.0 * pow(10, 1); 
-	const double gammaT = 100.0 * pow(10, -4); // Position Damping
-	const double gammaR = 1.0 * pow(10, -4); // Rotation Damping
+	const double gammaT = 100.0 * pow(10, -3); // Position Damping
+	const double gammaR = 1.0 * pow(10, -3); // Rotation Damping
 #else
 	#if (0)
 		// Values for wire
@@ -127,9 +127,13 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addNode(0, 5, 0);
 	s.addNode(10, 5, 0);
 	s.addNode(15, 5, 0);
-
+	
+	s.addNode(5, 3, -2);
+	s.addNode(5, 3, 2);
+	
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod2");
+	s.addPair(4, 5, "rod2");
 	
 	s.addPair(1, 2, "muscle");
 	
