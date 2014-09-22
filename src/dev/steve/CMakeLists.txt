@@ -10,6 +10,7 @@ file(COPY Escape_T6/Config.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(AppEscape_T6
     Escape_T6/Crater.cpp
+    Escape_T6/CraterDeep.cpp
     Escape_T6/Escape_T6Model.cpp
     Escape_T6/Escape_T6Controller.cpp
     Escape_T6/AppEscape_T6.cpp
