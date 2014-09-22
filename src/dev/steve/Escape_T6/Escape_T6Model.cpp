@@ -80,8 +80,8 @@ namespace
         0.01,     // rollFriction (unitless)
         0.2,      // restitution (?)
         0,        // rotation
-        5000,      // maxTens (dN)
-        2.6,      // targetVelocity (dm/s)
+        500000,   // maxTens (dN)
+        26000,    // targetVelocity (dm/s)
         20000     // maxAcc
 
             // Use the below values for earlier versions of simulation.
@@ -276,7 +276,7 @@ void Escape_T6Model::setup(tgWorld& world)
     //map the rods and add the markers to them
     addMarkers(s);
 
-    btVector3 location(-15.0,20.0,0);
+    btVector3 location(0.0,40.0,0);
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
