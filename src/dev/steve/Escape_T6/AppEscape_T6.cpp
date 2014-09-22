@@ -63,8 +63,8 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    tgSimView       *view = createView(world);         // For running multiple episodes
+    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    //tgSimView       *view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);

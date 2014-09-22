@@ -143,10 +143,10 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = false;
+    bool usingManualParams = true;
     if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
-    int lineNumber = 11;
-    string filename = "logs/round7/bestParamsNoOutliersSorted.dat";
+    int lineNumber = 237;
+    string filename = "logs/round8/bestParamsSorted.dat";
     vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
     manualParams = readManualParams(lineNumber, filename);
 

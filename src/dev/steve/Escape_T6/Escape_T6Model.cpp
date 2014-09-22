@@ -80,8 +80,8 @@ namespace
         0.01,     // rollFriction (unitless)
         0.2,      // restitution (?)
         0,        // rotation
-        500000,   // maxTens (dN)
-        26000,    // targetVelocity (dm/s)
+        500000,   // maxTens (dN)           // Ideally as low as 5000
+        26000,    // targetVelocity (dm/s)  // Ideally as low as 2.6
         20000     // maxAcc
 
             // Use the below values for earlier versions of simulation.
@@ -108,13 +108,9 @@ const int otherEndOfTheRod[13]={6,7,8,4,3,11,0,1,2,10,9,5,12};
  */
 const int parallelNode[13]={1,0,5,9,10,2,7,6,11,3,4,8,12};
 
-Escape_T6Model::Escape_T6Model() : tgModel() 
-{
-}
+Escape_T6Model::Escape_T6Model() : tgModel() {}
 
-Escape_T6Model::~Escape_T6Model()
-{
-}
+Escape_T6Model::~Escape_T6Model() {}
 
 //Node numbers seen from Front
 // -----0-------1------
@@ -130,10 +126,104 @@ Escape_T6Model::~Escape_T6Model()
 // ---------11---------
 // -----6-------7------
 //
+ 
+void Escape_T6Model::setup(tgWorld& world) {
+    const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
+            c.rollFriction, c.restitution);
 
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
+            c.history, c.rotation, c.maxTens, c.targetVelocity, 
+            c.maxAcc);
 
-void Escape_T6Model::addNodes(tgStructure& s)
-{
+    // Start creating the structure
+    tgStructure s;
+    addNodes(s);
+    addRods(s);
+    addMuscles(s);
+
+    // Create the build spec that uses tags to turn the structure into a real model
+    tgBuildSpec spec;
+    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+
+    // Create your structureInfo
+    tgStructureInfo structureInfo(s, spec);
+
+    // Use the structureInfo to build ourselves
+    structureInfo.buildInto(*this, world);
+
+    // We could now use tgCast::filter or similar to pull out the
+    // models (e.g. muscles) that we want to control. 
+    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+
+    // call the onSetup methods of all observed things e.g. controllers
+    notifySetup();
+
+    // Actually setup the children
+    tgModel::setup(world);
+
+    //map the rods and add the markers to them
+    addMarkers(s);
+
+    btVector3 location(0.0,40.0,0); // Start above ground (positive y)
+    btVector3 rotation(0.0,0.6,0.8);
+    btVector3 speed(0,0,0);
+    this->moveModel(location,rotation,speed);
+}
+ 
+void Escape_T6Model::step(double dt) {
+    // Precondition
+    if (dt <= 0.0) {
+        throw std::invalid_argument("dt is not positive");
+    }
+    else {
+        // Notify observers (controllers) of the step so that they can take action
+        notifyStep(dt);
+        tgModel::step(dt);  // Step any children
+    }
+}
+
+void Escape_T6Model::onVisit(tgModelVisitor& r) {
+    tgModel::onVisit(r);
+}
+                      
+void Escape_T6Model::teardown() {
+    notifyTeardown();
+    tgModel::teardown();
+}
+                      
+const std::vector<tgLinearString*>& Escape_T6Model::getAllMuscles() const {
+    return allMuscles;
+}
+                                                     
+// Return the center of mass of this model
+// Pre-condition: This model has 6 rods
+std::vector<double> Escape_T6Model::getBallCOM() {   
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 ballCenterOfMass(0, 0, 0);
+    double ballMass = 0.0; 
+    for (std::size_t i = 0; i < rods.size(); i++) {   
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        ballCenterOfMass += rodCenterOfMass * rodMass;
+        ballMass += rodMass;
+    }
+
+    assert(ballMass > 0.0);
+    ballCenterOfMass /= ballMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+
+    return result;
+}
+                                     
+void Escape_T6Model::addNodes(tgStructure& s) {
     const double half_length = c.rod_length / 2;
 
     nodePositions.push_back(btVector3(-half_length, c.rod_space, 0));            // 0
@@ -149,14 +239,13 @@ void Escape_T6Model::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3( c.rod_space, 0,            half_length)); // 10
     nodePositions.push_back(btVector3(0,            -half_length, c.rod_space)); // 11
 
-    for(int i=0;i<12;i++)
+    for(int i=0;i<nodePositions.size();i++)
     {
         s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
     }
 }
 
-void Escape_T6Model::addRods(tgStructure& s)
-{
+void Escape_T6Model::addRods(tgStructure& s) {
     s.addPair( 0,  6, "r1 rod");
     s.addPair( 1,  7, "r2 rod");
     s.addPair( 2,  8, "r3 rod");
@@ -165,12 +254,11 @@ void Escape_T6Model::addRods(tgStructure& s)
     s.addPair( 9, 10, "r6 rod");
 }
 
-void Escape_T6Model::addMarkers(tgStructure &s)
-{
+void Escape_T6Model::addMarkers(tgStructure &s) {
+    const int nNodes = 12; // 2*nRods
     std::vector <tgRod*> rods=find<tgRod>("rod");
 
-    for(int i=0;i<12;i++)
-    {
+    for(int i=0;i<nNodes;i++) {
         const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
         btTransform inverseTransform = bt->getWorldTransform().inverse();
         btVector3 pos = inverseTransform * (nodePositions[i]);
@@ -182,10 +270,10 @@ void Escape_T6Model::addMarkers(tgStructure &s)
 /** 
  * Defines muscles in the structure by their end nodes 
  * as well as the cluster to which they belong
- * A cluster is any three muscles that form a triangle (with nodes as vertices)
+ * A cluster is any three muscles that form a triangle 
+ * (with nodes as vertices)
  */
-void Escape_T6Model::addMuscles(tgStructure& s)
-{
+void Escape_T6Model::addMuscles(tgStructure& s) {
     // Cluster 1
     s.addPair(0, 3, "muscle cluster1");
     s.addPair(3, 2, "muscle cluster1");
@@ -227,94 +315,7 @@ void Escape_T6Model::addMuscles(tgStructure& s)
     s.addPair(10, 11, "muscle cluster8");
 }
 
-void Escape_T6Model::setup(tgWorld& world)
-{
-
-    const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
-            c.rollFriction, c.restitution);
-
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
-            c.history, c.rotation, c.maxTens, c.targetVelocity, 
-            c.maxAcc);
-
-    // Start creating the structure
-    tgStructure s;
-    addNodes(s);
-    addRods(s);
-    addMuscles(s);
-
-    //    // Add a rotation. This is needed if the ground slopes too much,
-    //    // otherwise  glitches put a rod below the ground.
-    //    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    //    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-    //    double rotationAngle = M_PI/2;
-    //    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
-    //s.move(btVector3(0,30,0));
-
-    // Create the build spec that uses tags to turn the structure into a real model
-    tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-
-    // Create your structureInfo
-    tgStructureInfo structureInfo(s, spec);
-
-    // Use the structureInfo to build ourselves
-    structureInfo.buildInto(*this, world);
-
-    // We could now use tgCast::filter or similar to pull out the
-    // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-
-    // call the onSetup methods of all observed things e.g. controllers
-    notifySetup();
-
-    // Actually setup the children
-    tgModel::setup(world);
-
-    //map the rods and add the markers to them
-    addMarkers(s);
-
-    btVector3 location(0.0,40.0,0);
-    btVector3 rotation(0.0,0.6,0.8);
-    btVector3 speed(0,0,0);
-    this->moveModel(location,rotation,speed);
-}
-
-void Escape_T6Model::step(double dt)
-{
-    // Precondition
-    if (dt <= 0.0)
-    {
-        throw std::invalid_argument("dt is not positive");
-    }
-    else
-    {
-        //Notify observers (controllers) of the step so that they can take action
-        notifyStep(dt);
-        tgModel::step(dt);  // Step any children
-    }
-}
-
-void Escape_T6Model::onVisit(tgModelVisitor& r)
-{
-    tgModel::onVisit(r);
-}
-
-const std::vector<tgLinearString*>& Escape_T6Model::getAllMuscles() const
-{
-    return allMuscles;
-}
-
-void Escape_T6Model::teardown()
-{
-    notifyTeardown();
-    tgModel::teardown();
-}
-
-void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector,btVector3 speedVector)
-{
+void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector,btVector3 speedVector) {
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
     btQuaternion initialRotationQuat;
@@ -323,37 +324,9 @@ void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector
     initialTransform.setIdentity();
     initialTransform.setRotation(initialRotationQuat);
     initialTransform.setOrigin(positionVector);
-    for(int i=0;i<rods.size();i++)
-    {
+    for(int i=0;i<rods.size();i++) {
         rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
         rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
     }
-}
-
-//Return the center of mass of this model
-// Invariant: This model has 6 rods
-std::vector<double> Escape_T6Model::getBallCOM() {   
-    std::vector <tgRod*> rods = find<tgRod>("rod");
-    assert(!rods.empty());
-
-    btVector3 ballCenterOfMass(0, 0, 0);
-    double ballMass = 0.0; 
-    for (std::size_t i = 0; i < rods.size(); i++) {   
-        const tgRod* const rod = rods[i];
-        assert(rod != NULL);
-        const double rodMass = rod->mass();
-        const btVector3 rodCenterOfMass = rod->centerOfMass();
-        ballCenterOfMass += rodCenterOfMass * rodMass;
-        ballMass += rodMass;
-    }
-
-    assert(ballMass > 0.0);
-    ballCenterOfMass /= ballMass;
-
-    // Copy to the result std::vector
-    std::vector<double> result(3);
-    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
-
-    return result;
 }
 
