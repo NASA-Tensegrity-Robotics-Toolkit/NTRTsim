@@ -51,7 +51,7 @@ namespace
     } c =
     {
         10.0, // width (dm?)
-        100.0, // height (dm?)
+        10.0, // height (dm?)
         0.0,  // density (kg / length^3)
         1.0,  // friction (unitless)
         0.01, // rollFriction (unitless)
@@ -123,7 +123,7 @@ void CraterDeep::addNodes(tgStructure& s) {
     const int nBoxes = 4; 
 
     // Accumulating rotation on boxes
-    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationPoint = origin;
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
 
@@ -144,20 +144,20 @@ void CraterDeep::addNodes(tgStructure& s) {
 void CraterDeep::addBoxNodes() {
     tgNode node;
     const double shift = 20; // Arbitrary
-    const double vshift = 2; 
+    const double vshift = 10; 
     const double node_h = c.height/2 + vshift;
     const double node_w = c.width/2; 
     
-    double x1 = -shift-node_w;
-    double x2 =  shift+node_w;
-    double y1 = -node_h;
-    double y2 =  node_h;
-    double z1 = -shift-node_w;
-    double z2 =  shift+node_w;
+    double x1 = 20;//-shift-node_w;
+    double x2 = 20;//shift+node_w;
+    double y1 = -10;//-node_h;
+    double y2 = 20;// node_h;
+    double z1 = 0;//-shift-node_w;
+    double z2 = 0;// shift+node_w;
 
     btVector3 rotationPoint = btVector3((x2-x1)/2, (y2-y1)/2, (z2-z1)/2); //Halfway between nodes
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-    double rotationAngle = M_PI/4;
+    double rotationAngle = 0; // Must != 0 for actual change
 
     node = tgNode(x1, y1, z1, "node");
     node.addRotation(rotationPoint, rotationAxis, rotationAngle);
