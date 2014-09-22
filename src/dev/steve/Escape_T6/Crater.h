@@ -92,7 +92,7 @@ class Crater : public tgSubject<Crater>, public tgModel
 
         /**
          * A function called during setup that determines the positions of
-         * the nodes (cetner points of opposing box faces) 
+         * the nodes (center points of opposing box faces) 
          * based on construction parameters.
          * @param[in] s: the tgStructure that we're building into
          */
