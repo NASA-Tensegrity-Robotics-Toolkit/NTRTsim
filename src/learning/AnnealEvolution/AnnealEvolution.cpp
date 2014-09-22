@@ -75,7 +75,6 @@ Temp(1.0)
 
     for(int j=0;j<numberOfControllers;j++)
     {
-        cout<<"creating Populations"<<endl;
         populations.push_back(new AnnealEvoPopulation(populationSize,myconfigdataaa));
     }
     
