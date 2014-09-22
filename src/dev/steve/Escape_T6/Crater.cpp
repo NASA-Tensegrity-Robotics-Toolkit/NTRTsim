@@ -123,7 +123,7 @@ void Crater::addNodes(tgStructure& s) {
     const int nBoxes = 4; 
 
     // Accumulating rotation on boxes
-    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationPoint = origin;
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
 
