@@ -17,8 +17,8 @@
 */
 
 /**
- * @file AppFlemonsSpineLearning.cpp
- * @brief Contains the definition function main() for the Flemons Spine Learning
+ * @file AppFlemonsSpineStatic.cpp
+ * @brief Contains the definition function main() for the Tetra Spine Static
  * application.
  * @author Brian Tietz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
@@ -26,14 +26,15 @@
  */
 
 // This application
-#include "FlemonsSpineModelLearning.h"
-#include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "TetraSpineStaticModel.h"
+#include "SerializedSpineControl.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -46,7 +47,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppNestedStructureTest" << std::endl;
+    std::cout << "AppTetraSpineSerial" << std::endl;
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
@@ -55,41 +56,35 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
-    FlemonsSpineModelLearning* myModel =
-      new FlemonsSpineModelLearning(segments);
-
-    /* Required for setting up learning file input/output. */
-    const std::string suffix((argc > 1) ? argv[1] : "default");
+    const int segments = 3;
+    TetraSpineStaticModel* myModel =
+      new TetraSpineStaticModel(segments);
     
-    const int segmentSpan = 3;
-    const int numMuscles = 8;
-    const int numParams = 2;
-    const int segNumber = 6; // For learning results
-    const double controlTime = .001;
-    const double lowPhase = -1 * M_PI;
-    const double highPhase = M_PI;
-    const double lowAmplitude = -30.0;
-    const double highAmplitude = 30.0;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
-												lowAmplitude, highAmplitude, lowPhase, highPhase);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix);
+    /* Required for setting up serialization file input/output. */
+    const std::string suffix((argc > 1) ? argv[1] : "controlVars.json");
+      
+    SerializedSpineControl* const myControl =
+      new SerializedSpineControl(suffix);
     myModel->attach(myControl);
+    /*
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+    */
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 3000)
+    while (i < 10000)
     {
-        simulation.run(30000);
+        simulation.run(60000);
         simulation.reset();
         i++;
     }
