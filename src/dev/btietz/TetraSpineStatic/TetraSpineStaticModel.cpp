@@ -150,7 +150,7 @@ namespace
 		
 		btRigidBody* secondBody = model.getAllRigids()[6]->getPRigidBody();
 		
-		abstractMarker marker2(secondBody, n1[2] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		abstractMarker marker2(secondBody, n1[3] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker2);
 		
