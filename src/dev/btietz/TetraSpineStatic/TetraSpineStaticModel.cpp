@@ -22,9 +22,11 @@
 #include "core/tgCast.h"
 #include "core/tgLinearString.h"
 #include "core/tgString.h"
+#include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
@@ -63,7 +65,7 @@ namespace
         // top
 		tetra.addNode(0, height, 0, "base");
 		// front
-		tetra.addNode(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height), "tip");
+		tetra.addNode(0, height / 2.0, 27.0, "tip");
 		
 		// Get the next two nodes from existing nodes:
 		tgNodes oldNodes = tetra.getNodes();
@@ -73,6 +75,8 @@ namespace
 		tgNode nn2 = (oldNodes[1] + oldNodes[2])/2.0; // 5 mid
 		nn2.addTags("PCB");
 		tetra.addNode(nn2);
+		
+		std::cout << (oldNodes[3] - oldNodes[2]).length() << std::endl;
 		
     }
 
@@ -98,7 +102,7 @@ namespace
 				/// @todo: the snake is a temporary variable -- will its destructor be called?
 			/// If not, where do we delete its children?
 		  tgStructure* const t = new tgStructure(tetra);
-		  t->addTags(tgString("segment num", i + 1)); // Use num0, num1, num2 as a tag!!
+		  t->addTags(tgString("segment num", i )); // Use num0, num1, num2 as a tag!!
 		  
 		  t->move((i + 1) * offset);
 		  
@@ -142,10 +146,19 @@ namespace
 	
 	void addMarkers(tgStructure& structure, TetraSpineStaticModel& model)
 	{
+		
 		const std::vector<tgStructure*> children = structure.getChildren();
 		tgNodes n0 = children[0]->getNodes();
 		
+		// TODO: consider using the segments vector here
 		btRigidBody* firstBody = model.getAllRigids()[0]->getPRigidBody();
+		
+		std::vector<tgBaseRigid*> myRigids = model.getAllRigids();
+		for (int i =0; i < myRigids.size(); i++)
+		{
+			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
+		}
+			
 		
 		abstractMarker marker1(firstBody, n0[3] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
@@ -153,7 +166,7 @@ namespace
 		
 		tgNodes n1 = children[1]->getNodes();
 		
-		btRigidBody* secondBody = model.getAllRigids()[9]->getPRigidBody();
+		btRigidBody* secondBody = model.getAllRigids()[15]->getPRigidBody();
 		
 		abstractMarker marker2(secondBody, n1[3] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
@@ -191,7 +204,7 @@ namespace
 // There are things that do this for us (@todo: reference the things that do this for us)
 void TetraSpineStaticModel::setup(tgWorld& world)
 {
-    const double edge = 38.1;
+    const double edge = 43.0;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
     std::cout << "edge: " << edge << "; height: " << height << std::endl;
 	
@@ -212,34 +225,51 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
     
-#if (0) // Original parameters
-    const double density = 4.2 / 300.0;
-    const double radius  = 0.5;
-    const double friction = 0.5;
-    const tgRod::Config rodConfig(radius, density, friction);
-    tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    
-    tgLinearString::Config muscleConfig(1000, 100, false, 0, 7000, 24, 10000);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-#else // Params for In Won
-    const double density = .00311;
+
+    // Params for In Won
+    const double oldDensity = .00311;
     const double radius  = 0.635;
+    const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
     const double friction = 0.8;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    const tgRod::Config staticConfig(radius, 0.0, friction);
-    spec.addBuilder("static rod", new tgRodInfo(staticConfig));
+    // 1000 is so the units below can be in grams
+    const double sphereVolume = 1000.0 * 4.0 / 3.0 * M_PI * pow(radius, 3);
     
+    const double baseCornerFrontD = 140.0 / sphereVolume;
+    const tgSphere::Config baseCornerFrontConfig(radius, baseCornerFrontD, friction);
+    spec.addBuilder("num0 base", new tgSphereInfo(baseCornerFrontConfig));
+
+    const double baseCornerMidD = 180.0 / sphereVolume;
+    const tgSphere::Config baseCornerMidConfig(radius, baseCornerMidD, friction);
+    spec.addBuilder("num1 base", new tgSphereInfo(baseCornerMidConfig));
+
+    const double baseCornerRearD = 100.0 / sphereVolume;
+    const tgSphere::Config baseCornerRearConfig(radius, baseCornerRearD, friction);
+    spec.addBuilder("num2 base", new tgSphereInfo(baseCornerRearConfig));
+
+    const double tipCornerFrontD = 40.0 / sphereVolume;
+    const tgSphere::Config tipCornerFrontConfig(radius, tipCornerFrontD, friction);
+    spec.addBuilder("num0 tip", new tgSphereInfo(tipCornerFrontConfig));
+
+    const double tipCornerMidD = 120.0 / sphereVolume;
+    const tgSphere::Config tipCornerMidConfig(radius, tipCornerMidD, friction);
+    spec.addBuilder("num1 tip", new tgSphereInfo(tipCornerMidConfig));
+    spec.addBuilder("num2 tip", new tgSphereInfo(tipCornerMidConfig));
     
+    const double PCBD = 70.0 / sphereVolume;
+    const tgSphere::Config PCBConfig(radius, PCBD, friction);
+    spec.addBuilder("PCB", new tgSphereInfo(PCBConfig));
+    
+    // Two different string configs
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
     tgLinearString::Config muscleConfig2(1355.8, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));
-#endif
+
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
 
@@ -254,7 +284,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     
     addMarkers(snake, *this);
     
-    #if (1)
+    #if (0)
     trace(structureInfo, *this);
     #endif
     

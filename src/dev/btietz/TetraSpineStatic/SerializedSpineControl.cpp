@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-//#define LOGGING
+#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -87,8 +87,8 @@ SerializedSpineControl::Config::Config(std::string fileName)
 	rod_front = tgUtil::round(std::sqrt(3.0)/2 * rod_edge);
     rod_offset = root.get("rod_offset", "UTF-8").asDouble();
 	
-#if (0)	
-    insideLength = sqrt(pow( (rod_edge / cos(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
+#if (1)	
+    insideLength = sqrt(pow( (rod_edge * sin(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
     outsideLength = rod_offset;
 #else
 	insideLength = root.get("inside_length", "UTF-8").asDouble();	
@@ -271,7 +271,7 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	
 	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
 	btRigidBody* seg1Body = rigids[0]->getPRigidBody();
-	btRigidBody* seg2Body = rigids[6]->getPRigidBody();
+	btRigidBody* seg2Body = rigids[15]->getPRigidBody();
 	
 	const abstractMarker marker = subject.getMarkers()[0];
 	const abstractMarker marker2 = subject.getMarkers()[1];
