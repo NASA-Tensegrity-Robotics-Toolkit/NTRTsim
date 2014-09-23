@@ -65,7 +65,7 @@ namespace
         // top
 		tetra.addNode(0, height, 0, "base");
 		// front
-		tetra.addNode(0, height / 2.0, 27.0, "tip");
+		tetra.addNode(0, height / 2.0, 25.0, "tip");
 		
 		// Get the next two nodes from existing nodes:
 		tgNodes oldNodes = tetra.getNodes();
@@ -204,7 +204,7 @@ namespace
 // There are things that do this for us (@todo: reference the things that do this for us)
 void TetraSpineStaticModel::setup(tgWorld& world)
 {
-    const double edge = 43.0;
+    const double edge = 37.5;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
     std::cout << "edge: " << edge << "; height: " << height << std::endl;
 	
