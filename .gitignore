@@ -8,3 +8,5 @@ src/examples/learningSpines/TetraSpine/logs
 .cproject
 
 .project
+
+src/.settings/org.eclipse.cdt.codan.core.prefs
