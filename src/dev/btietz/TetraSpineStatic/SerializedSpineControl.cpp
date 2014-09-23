@@ -84,11 +84,12 @@ SerializedSpineControl::Config::Config(std::string fileName)
     top_controller = new ImpedanceControl(kTen, kPos, kVel);
 	
 	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
-	rod_front = tgUtil::round(std::sqrt(3.0)/2 * rod_edge);
+	rod_front = root.get("rod_front", "UTF-8").asDouble();
     rod_offset = root.get("rod_offset", "UTF-8").asDouble();
 	
-#if (1)	
+#if (0)	
     insideLength = sqrt(pow( (rod_edge * sin(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
+    std::cout << "Computed inside length: " << insideLength << std::endl;
     outsideLength = rod_offset;
 #else
 	insideLength = root.get("inside_length", "UTF-8").asDouble();	
