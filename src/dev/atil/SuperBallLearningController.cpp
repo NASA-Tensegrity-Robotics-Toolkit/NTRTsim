@@ -43,6 +43,8 @@ SuperBallPrefLengthController::SuperBallPrefLengthController(const double initia
 	this->m_initialLengths=initialLength;
 	this->m_totalTime=0.0;
 
+	evolution = new AnnealEvolution("superball");
+
 }
 
 //Fetch all the muscles and set their preferred length
@@ -57,17 +59,14 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 		pMuscle->setRestLength(this->m_initialLengths,0.0001);
 	}
 
-	std::cout<<"Initializing the controller"<<std::endl;
-
     btTransform boxTr;
     boxTr.setIdentity();
-    boxTr.setOrigin(btVector3(0,0,100)+subject.getCenter());
 	double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 3.1415;
 	randomAngle=3.1415/2.0;
 	randomAngle=0.0;
 
 	btDynamicsWorld *btworld=subject.getWorld();
-	boxTr.setOrigin(btVector3(100*cos(randomAngle),500,100*sin(randomAngle)));
+	boxTr.setOrigin(btVector3(1000*cos(randomAngle),50,1000*sin(randomAngle)));
 	btDefaultMotionState* motSt = new btDefaultMotionState(boxTr);
     btRigidBody::btRigidBodyConstructionInfo const rbInfo1(1,motSt, new btBoxShape(btVector3(1.0,1.0,1.0)));
 	goalPoint = new btRigidBody(rbInfo1);
@@ -80,17 +79,25 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 	btRigidBody *groundBox = new btRigidBody(rbInfo2);
 	btworld->addRigidBody(groundBox);
 
-	std::cout<<"Initialized the controller"<<std::endl;
+	m_subject = &subject;
 
 }
 
 void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 {
-    if (dt <= 0.0)
+	if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive");
     }
     m_totalTime+=dt;
+
+	//Store the initial position if the first step
+    if(initialPosition.empty())
+    {
+    	btVector3 pos= subject.getCenter();
+		initialPosition.push_back(pos[0]);
+		initialPosition.push_back(pos[2]);
+    }
 
     //Move motors for all the muscles
 	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
@@ -111,21 +118,8 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 //	}
 //	std::cout<<endl;
 
-	vector< vector<double> > actions;
 
-	//get the actions (between 0 and 1) from evolution (todo)
-	actions=evolutionAdapter.step(dt,state);
-
-//	//instead, generate it here for now!
-//	for(int i=0;i<24;i++)
-//	{
-//		vector<double> tmp;
-//		for(int j=0;j<2;j++)
-//		{
-//			tmp.push_back(0.5);
-//		}
-//		actions.push_back(tmp);
-//	}
+	vector< vector< double> > actions = receiveActionsFromEvolution();
 
 	//transform them from 0-1 to the size of the structure
 	actions = transformActions(actions);
@@ -356,5 +350,41 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 void SuperBallPrefLengthController::onTeardown(SuperBallModel& subject)
 {
 	std::cout<<"TEARDOWN CALLED"<<std::endl;
+	vector<double> scores;
+	scores.push_back(calculateDistanceMoved());
+	evolution->updateScores(scores);
+	std::cout<<"Distance moved: "<<scores[0]<<std::endl;
+
+	initialPosition.clear();
 }
 
+vector<vector<double> > SuperBallPrefLengthController::receiveActionsFromEvolution()
+{
+	vector<vector <double> > actions;
+
+	vector<AnnealEvoMember *> members = evolution->nextSetOfControllers();
+	for(int i=0;i<members.size();i++)
+	{
+		actions.push_back(members[i]->statelessParameters);
+	}
+	return actions;
+}
+
+
+
+double SuperBallPrefLengthController::calculateDistanceMoved()
+{
+	vector<double> scores;
+	double x= m_subject->getCenter()[0] - goalPoint->getCenterOfMassPosition().getX();
+	double z= m_subject->getCenter()[2] - goalPoint->getCenterOfMassPosition().getZ();
+	double distanceNew=sqrt(x*x+z*z);
+	double xx=initialPosition[0]-goalPoint->getCenterOfMassPosition().getX();
+	double zz=initialPosition[1]-goalPoint->getCenterOfMassPosition().getZ();
+	double distanceOld=sqrt(xx*xx+zz*zz);
+	double distanceMoved=distanceOld-distanceNew;
+
+	//If you want to calculate only the distance moved independent of the target:
+//	distanceMoved=sqrt((x-xx)*(x-xx)+(z-zz)*(z-zz));
+
+	return distanceMoved;
+}

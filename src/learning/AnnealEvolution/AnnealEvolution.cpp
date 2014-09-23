@@ -145,6 +145,7 @@ void AnnealEvolution::orderAllPopulations()
     
     // what if member at 0 isn't the best of all time for some reason? 
     // This seems biased towards average scores
+    // We actually order the populations, so member 0 is the current best according to the assigned fitness
     ofstream logfileLeader;
     for(int i=0;i<populations.size();i++)
     {
@@ -175,7 +176,7 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
         orderAllPopulations();
         mutateEveryController();
         Temp -= 0.0; // @todo - make this a parameter
-        cout<<"mutated the populations"<<endl;
+//        cout<<"mutated the populations"<<endl;
         this->scoresOfTheGeneration.clear();
 
         if(coevolution)

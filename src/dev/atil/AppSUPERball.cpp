@@ -71,7 +71,9 @@ int main(int argc, char** argv)
     // Second create the view
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
     const double timestep_graphics = 1.f /60.f; // Seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+
+//    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -102,10 +104,11 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
     
     // Run for 60 secs
+    int simLength=60/timestep_physics;
     int i = 0;
     while (i < 10000)
     {
-        simulation.run(60000);
+        simulation.run(simLength);
         simulation.reset();
         i++;
     }

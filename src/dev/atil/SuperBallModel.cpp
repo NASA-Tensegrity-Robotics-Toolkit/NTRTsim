@@ -317,9 +317,9 @@ void SuperBallModel::setup(tgWorld& world)
     fillMusclesPerNode();
 
     //move rotate and give initial speed to the structure
-    btVector3 location(0,20.0,0);
+    btVector3 location(0,13.0,0);
     btVector3 rotation(0.0,0.6,0.8);
-  	btVector3 speed(0,40,0);
+  	btVector3 speed(0,10,0);
     this->moveModel(location,rotation,speed);
 
 }
