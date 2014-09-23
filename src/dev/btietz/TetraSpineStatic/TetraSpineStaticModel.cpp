@@ -228,7 +228,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
 
     // Params for In Won
     const double oldDensity = .00311;
-    const double radius  = 0.635;
+    const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
     const double friction = 0.8;
     const tgRod::Config rodConfig(radius, density, friction);
@@ -260,8 +260,13 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     spec.addBuilder("num2 tip", new tgSphereInfo(tipCornerMidConfig));
     
     const double PCBD = 70.0 / sphereVolume;
-    const tgSphere::Config PCBConfig(radius, PCBD, friction);
-    spec.addBuilder("PCB", new tgSphereInfo(PCBConfig));
+    const tgSphere::Config PCB_1_Config(radius, PCBD, friction);
+    spec.addBuilder("PCB num0", new tgSphereInfo(PCB_1_Config));
+    spec.addBuilder("PCB num1", new tgSphereInfo(PCB_1_Config));
+    
+    const double PCB2D = 95.0 / sphereVolume;
+    const tgSphere::Config PCB_2_Config(radius, PCB2D, friction);
+    spec.addBuilder("PCB num2", new tgSphereInfo(PCB_2_Config));
     
     // Two different string configs
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
