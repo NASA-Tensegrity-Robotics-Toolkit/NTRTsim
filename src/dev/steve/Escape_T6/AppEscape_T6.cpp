@@ -122,7 +122,7 @@ tgWorld *createWorld() {
 /** Use for displaying tensegrities in simulation */
 tgSimViewGraphics *createGraphicsView(tgWorld *world) {
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics); 
 }
 
@@ -136,7 +136,7 @@ tgSimView *createView(tgWorld *world) {
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation) {
     int nEpisodes = 1; // Number of episodes ("trial runs")
-    int nSteps = 60000; // Number of steps in each episode, 60k is 60 seconds
+    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     for (int i=0; i<nEpisodes; i++)
     {   
         simulation->run(nSteps);

@@ -145,8 +145,8 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
 {
     bool usingManualParams = true;
     if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
-    int lineNumber = 237;
-    string filename = "logs/round8/bestParamsSorted.dat";
+    int lineNumber = 10;
+    string filename = "logs/roundCraterDeep2/bestParamsSorted.dat";
     vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
     manualParams = readManualParams(lineNumber, filename);
 
@@ -273,9 +273,9 @@ double Escape_T6Controller::displacement(Escape_T6Model& subject) {
     // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
     //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
-    const double newX = finalPosition[1];
+    const double newX = finalPosition[0];
     const double newZ = finalPosition[2];
-    const double oldX = initPosition[1];
+    const double oldX = initPosition[0];
     const double oldZ = initPosition[2];
 
     const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 

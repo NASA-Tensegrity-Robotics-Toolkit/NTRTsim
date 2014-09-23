@@ -80,17 +80,9 @@ namespace
         0.01,     // rollFriction (unitless)
         0.2,      // restitution (?)
         0,        // rotation
-        5000,   // maxTens (dN)           // Ideally as low as 5000, if more power is required, up to 500000
-        2.6,    // targetVelocity (dm/s)  // Ideally as low as 2.6, if more power is required, up to 26000
+        1000,     // maxTens (dN)           // Ideally as low as 1000
+        0.45,     // targetVelocity (dm/s)  // Ideally as low as 2.6
         20000     // maxAcc
-
-            // Use the below values for earlier versions of simulation.
-            // 1.006,    
-            // 0.31,     
-            // 300000.0, 
-            // 3000.0,   
-            // 15.0,     
-            // 7.5,      
     };
 } // namespace
 
@@ -165,7 +157,7 @@ void Escape_T6Model::setup(tgWorld& world) {
     //map the rods and add the markers to them
     addMarkers(s);
 
-    btVector3 location(0.0,40.0,0); // Start above ground (positive y)
+    btVector3 location(0.0,28.0,0); // Start above ground (positive y)
     btVector3 rotation(0.0,0.6,0.8);
     btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
@@ -219,6 +211,7 @@ std::vector<double> Escape_T6Model::getBallCOM() {
     // Copy to the result std::vector
     std::vector<double> result(3);
     for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+    //std::cout<<"COM: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
 
     return result;
 }

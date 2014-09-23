@@ -50,8 +50,8 @@ namespace
         double restitution;
     } c =
     {
-        10.0, // width (dm?)
-        10.0, // height (dm?)
+        15.0, // width (dm?)
+        15.0, // height (dm?)
         0.0,  // density (kg / length^3)
         1.0,  // friction (unitless)
         0.01, // rollFriction (unitless)
@@ -151,7 +151,7 @@ void CraterDeep::addBoxNodes() {
     double x1 = 20;//-shift-node_w;
     double x2 = 20;//shift+node_w;
     double y1 = -10;//-node_h;
-    double y2 = 20;// node_h;
+    double y2 = 25;// node_h;
     double z1 = 0;//-shift-node_w;
     double z2 = 0;// shift+node_w;
 

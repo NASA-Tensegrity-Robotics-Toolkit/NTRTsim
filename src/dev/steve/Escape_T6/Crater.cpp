@@ -59,22 +59,17 @@ namespace
     };
 } // namespace
 
-Crater::Crater() : tgModel() 
-{
+Crater::Crater() : tgModel() {
     origin = btVector3(0,0,0);
 }
 
-Crater::Crater(btVector3 center) : tgModel() 
-{
+Crater::Crater(btVector3 center) : tgModel() {
     origin = btVector3(center.getX(), center.getY(), center.getZ());
 }
 
-Crater::~Crater()
-{
-}
+Crater::~Crater() {}
                      
 void Crater::setup(tgWorld& world) {
-
     const tgBox::Config boxConfig(c.width, c.height, c.density, c.friction, c.rollFriction, c.restitution);
 
     // Start creating the structure
