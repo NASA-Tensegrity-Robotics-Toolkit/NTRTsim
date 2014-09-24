@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-#define LOGGING
+//#define LOGGING
 
 SerializedStaticControl::Config::Config(std::string fileName)
 {
@@ -148,7 +148,7 @@ void SerializedStaticControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 	
@@ -156,14 +156,14 @@ void SerializedStaticControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 	stringList = subject.getMuscles("inner right");
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 	
@@ -171,7 +171,7 @@ void SerializedStaticControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 	
@@ -179,7 +179,7 @@ void SerializedStaticControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 	
@@ -187,7 +187,7 @@ void SerializedStaticControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j] - m_config.tensParams[j]/stiffness);
+		stringList[i]->setRestLengthSingleStep(m_config.lengthParams[j]);// - m_config.tensParams[j]/stiffness);
 		j++;
 	}
 #endif	

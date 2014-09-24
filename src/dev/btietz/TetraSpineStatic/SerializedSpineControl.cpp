@@ -68,23 +68,20 @@ SerializedSpineControl::Config::Config(std::string fileName)
     }
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
-	insideTens = root.get("inside_imp_ten", "UTF-8").asDouble();
+	double kTens = root.get("inside_imp_ten", "UTF-8").asDouble();
 	double kPos = root.get("inside_imp_pos", "UTF-8").asDouble();
 	double kVel = root.get("inside_imp_vel", "UTF-8").asDouble();
-    in_controller = new ImpedanceControl(insideTens, kPos, kVel);
+    in_controller = new ImpedanceControl(kTens, kPos, kVel);
     
-    outsideTens = root.get("outside_imp_ten", "UTF-8").asDouble();
+    kTens = root.get("outside_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
-    out_controller = new ImpedanceControl(outsideTens, kPos, kVel);
+    out_controller = new ImpedanceControl(kTens, kPos, kVel);
 
-    insideTopTens = root.get("top_in_imp_ten", "UTF-8").asDouble();
+    kTens = root.get("top_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("top_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("top_imp_vel", "UTF-8").asDouble();
-    in_top_controller = new ImpedanceControl(insideTopTens, kPos, kVel);
-	
-	outsideTopTens = root.get("top_out_imp_ten", "UTF-8").asDouble();
-	out_top_controller = new ImpedanceControl(outsideTopTens, kPos, kVel);
+    top_controller = new ImpedanceControl(kTens, kPos, kVel);
 	
 	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
 	rod_front = root.get("rod_front", "UTF-8").asDouble();
@@ -96,12 +93,50 @@ SerializedSpineControl::Config::Config(std::string fileName)
     insideTopLength = insideLength;
     outsideLength = rod_offset;
     outsideTopLength = rod_offset;
-#else
-	insideLength = root.get("inside_length", "UTF-8").asDouble();	
-	outsideLength = root.get("outside_length", "UTF-8").asDouble();	
-	insideTopLength = root.get("inside_top_length", "UTF-8").asDouble();	
-	outsideTopLength = root.get("outside_top_length", "UTF-8").asDouble();	
 #endif
+    
+    insideTopTens.clear();
+    insideTopTens.push_back(root.get("in_top_tens_a", "UTF-8").asDouble());
+    insideTopTens.push_back(root.get("in_top_tens_b", "UTF-8").asDouble());
+    insideLeftTens.clear();
+    insideLeftTens.push_back(root.get("in_left_tens_a", "UTF-8").asDouble());
+    insideLeftTens.push_back(root.get("in_left_tens_b", "UTF-8").asDouble());
+    insideRightTens.clear();
+    insideRightTens.push_back(root.get("in_right_tens_a", "UTF-8").asDouble());
+    insideRightTens.push_back(root.get("in_right_tens_b", "UTF-8").asDouble());
+    
+    outsideTopTens.clear();
+    outsideTopTens.push_back(root.get("out_top_tens_a", "UTF-8").asDouble());
+    outsideTopTens.push_back(root.get("out_top_tens_b", "UTF-8").asDouble());
+    outsideLeftTens.clear();
+    outsideLeftTens.push_back(root.get("out_left_tens_a", "UTF-8").asDouble());
+    outsideLeftTens.push_back(root.get("out_left_tens_b", "UTF-8").asDouble());
+    outsideRightTens.clear();
+    outsideRightTens.push_back(root.get("out_right_tens_a", "UTF-8").asDouble());
+    outsideRightTens.push_back(root.get("out_right_tens_b", "UTF-8").asDouble());
+
+    insideTopLength.clear();
+    insideTopLength.push_back(root.get("in_top_length_a", "UTF-8").asDouble());
+    insideTopLength.push_back(root.get("in_top_length_b", "UTF-8").asDouble());
+    insideLeftLength.clear();
+    insideLeftLength.push_back(root.get("in_left_length_a", "UTF-8").asDouble());
+    insideLeftLength.push_back(root.get("in_left_length_b", "UTF-8").asDouble());
+    insideRightLength.clear();
+    insideRightLength.push_back(root.get("in_right_length_a", "UTF-8").asDouble());
+    insideRightLength.push_back(root.get("in_right_length_b", "UTF-8").asDouble());
+    
+    outsideTopLength.clear();
+    outsideTopLength.push_back(root.get("out_top_length_a", "UTF-8").asDouble());
+    outsideTopLength.push_back(root.get("out_top_length_b", "UTF-8").asDouble());
+    outsideLeftLength.clear();
+    outsideLeftLength.push_back(root.get("out_left_length_a", "UTF-8").asDouble());
+    outsideLeftLength.push_back(root.get("out_left_length_b", "UTF-8").asDouble());
+    outsideRightLength.clear();
+    outsideRightLength.push_back(root.get("out_right_length_a", "UTF-8").asDouble());
+    outsideRightLength.push_back(root.get("out_right_length_b", "UTF-8").asDouble());
+    
+	
+    
     offsetSpeed = root.get("offset_speed", "UTF-8").asDouble();
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
     cpgFrequency = root.get("cpg_frequency", "UTF-8").asDouble();
@@ -145,6 +180,7 @@ SerializedSpineControl::~SerializedSpineControl()
 {
 }
 
+#if (0) // TODO: Get these working with new param sets
 void SerializedSpineControl::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
                                                             double dt,
                                                             std::size_t phase)
@@ -241,6 +277,38 @@ void SerializedSpineControl::applyImpedanceControlTopOutside(const std::vector<t
 #endif
     }    
 }
+#endif //Non generic controllers
+
+void SerializedSpineControl::applyImpedanceControlGeneric(ImpedanceControl* controller,	
+										const std::vector<tgLinearString*> stringList,
+										const std::vector<double> stringLengths,
+										const std::vector<double> tensions,
+										double dt,
+										std::size_t phase)
+{
+	assert(stringList.size() == stringLengths.size() && stringList.size() == tensions.size());
+	assert(controller);
+	
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		// This will reproduce the same value until simTime is updated. See onStep
+		// TODO : consider making inside mod a parameter as well...
+        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
+        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
+        
+        double setTension = controller->controlTension(stringList[i],
+																dt,
+																stringLengths[i],
+																tensions[i],
+																target
+																);
+#ifdef VERBOSE // Conditional compile for verbose control
+        std::cout << "Top Outside String " << i << " com tension " << setTension
+        << " act tension " << stringList[i]->getMuscle()->getTension()
+        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
+#endif
+    }    
+}
 
 void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 {
@@ -314,13 +382,48 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	
 	segments = subject.getSegments();
 #if (1)	
-	applyImpedanceControlTopInside(subject.getMuscles("inner top"), dt, 0);
-	applyImpedanceControlInside(subject.getMuscles("inner left") , dt, 1);
-	applyImpedanceControlInside(subject.getMuscles("inner right"), dt, 2);
+	applyImpedanceControlGeneric(m_config.top_controller, 
+									subject.getMuscles("inner top"), 
+									m_config.insideTopLength, 
+									m_config.insideTopTens,
+									dt,
+									0);
+									
+	applyImpedanceControlGeneric(m_config.in_controller,
+									subject.getMuscles("inner left"),
+									m_config.insideLeftLength, 
+									m_config.insideLeftTens,
+									dt,
+									1);
+									
+	applyImpedanceControlGeneric(m_config.in_controller,
+									subject.getMuscles("inner right"),
+									m_config.insideRightLength, 
+									m_config.insideRightTens,
+									dt,
+									2);
+									
+	applyImpedanceControlGeneric(m_config.top_controller, 
+									subject.getMuscles("outer top"), 
+									m_config.outsideTopLength, 
+									m_config.outsideTopTens,
+									dt,
+									0);
+									
+	applyImpedanceControlGeneric(m_config.out_controller,
+									subject.getMuscles("outer left"),
+									m_config.outsideLeftLength, 
+									m_config.outsideLeftTens,
+									dt,
+									1);
+									
+	applyImpedanceControlGeneric(m_config.out_controller,
+									subject.getMuscles("outer right"),
+									m_config.outsideRightLength, 
+									m_config.outsideRightTens,
+									dt,
+									2);
 	
-	applyImpedanceControlTopOutside(subject.getMuscles("outer top"), dt, 0);
-	applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
-	applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
 #endif	
 	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
 	btRigidBody* seg1Body = rigids[0]->getPRigidBody();

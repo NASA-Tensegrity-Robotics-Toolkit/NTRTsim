@@ -59,8 +59,7 @@ struct Config
 	 */
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
-    ImpedanceControl* in_top_controller;
-    ImpedanceControl* out_top_controller;
+    ImpedanceControl* top_controller;
 	
 	/**
 	 * Definitions to find muscle length parameters
@@ -74,19 +73,23 @@ struct Config
      * Muscle Length Parameters
      */
     
-    double insideLength;
-    double outsideLength;
-    double insideTopLength;
-    double outsideTopLength;
+    std::vector<double> insideTopLength;
+    std::vector<double> insideLeftLength;
+    std::vector<double> insideRightLength;
+    std::vector<double> outsideTopLength;
+    std::vector<double> outsideLeftLength;
+    std::vector<double> outsideRightLength;
     
 	 /**
      * Muscle Tension Parameters
      */
     
-    double insideTens;
-    double outsideTens;
-    double insideTopTens;
-    double outsideTopTens;
+    std::vector<double> insideTopTens;
+    std::vector<double> insideLeftTens;
+    std::vector<double> insideRightTens;
+    std::vector<double> outsideTopTens;
+    std::vector<double> outsideLeftTens;
+    std::vector<double> outsideRightTens;
     
     /**
      * CPG related parameters.
@@ -143,6 +146,7 @@ public:
     
 private:
 
+#if (0)
     /**
      * Applies the impedance controllers using a velocity setpoint of 0.
      * Called during this classes onStep function.
@@ -175,6 +179,16 @@ private:
     void applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
                                     double dt,
                                     std::size_t phase);
+#endif //Non generic controllers    
+    /**
+     * Because sometimes you give up and specify everything
+     */
+    void applyImpedanceControlGeneric(ImpedanceControl* controller,	
+										const std::vector<tgLinearString*> stringList,
+										const std::vector<double> stringLengths,
+										const std::vector<double> tensions,
+										double dt,
+										std::size_t phase);
     
     const Config m_config;
     
