@@ -55,6 +55,7 @@ ISSUES TO BE RESOLVED
 ---------------------
 - The energy spent calculation in the controller does not seem to correctly
   calculate how much energy each muscle spends (may be wrong units)
+- Change pretension to be a Monte Carlo variable (add it to actions<>)
 
 QUESTIONS
 ---------
