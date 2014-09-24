@@ -68,20 +68,23 @@ SerializedSpineControl::Config::Config(std::string fileName)
     }
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
-	double kTen = root.get("inside_imp_ten", "UTF-8").asDouble();
+	insideTens = root.get("inside_imp_ten", "UTF-8").asDouble();
 	double kPos = root.get("inside_imp_pos", "UTF-8").asDouble();
 	double kVel = root.get("inside_imp_vel", "UTF-8").asDouble();
-    in_controller = new ImpedanceControl(kTen, kPos, kVel);
+    in_controller = new ImpedanceControl(insideTens, kPos, kVel);
     
-    kTen = root.get("outside_imp_ten", "UTF-8").asDouble();
+    outsideTens = root.get("outside_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
-    out_controller = new ImpedanceControl(kTen, kPos, kVel);
+    out_controller = new ImpedanceControl(outsideTens, kPos, kVel);
 
-    kTen = root.get("top_imp_ten", "UTF-8").asDouble();
+    insideTopTens = root.get("top_in_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("top_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("top_imp_vel", "UTF-8").asDouble();
-    top_controller = new ImpedanceControl(kTen, kPos, kVel);
+    in_top_controller = new ImpedanceControl(insideTopTens, kPos, kVel);
+	
+	outsideTopTens = root.get("top_out_imp_ten", "UTF-8").asDouble();
+	out_top_controller = new ImpedanceControl(outsideTopTens, kPos, kVel);
 	
 	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
 	rod_front = root.get("rod_front", "UTF-8").asDouble();
@@ -90,11 +93,14 @@ SerializedSpineControl::Config::Config(std::string fileName)
 #if (0)	
     insideLength = sqrt(pow( (rod_edge * sin(M_PI/6)), 2) + pow( (rod_front - rod_offset), 2));
     std::cout << "Computed inside length: " << insideLength << std::endl;
+    insideTopLength = insideLength;
     outsideLength = rod_offset;
+    outsideTopLength = rod_offset;
 #else
 	insideLength = root.get("inside_length", "UTF-8").asDouble();	
 	outsideLength = root.get("outside_length", "UTF-8").asDouble();	
-	
+	insideTopLength = root.get("inside_top_length", "UTF-8").asDouble();	
+	outsideTopLength = root.get("outside_top_length", "UTF-8").asDouble();	
 #endif
     offsetSpeed = root.get("offset_speed", "UTF-8").asDouble();
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
@@ -175,9 +181,9 @@ void SerializedSpineControl::applyImpedanceControlTopInside(const std::vector<tg
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = m_config.top_controller->control(stringList[i],
+        double setTension = m_config.in_top_controller->control(stringList[i],
 																dt,
-																m_config.insideLength,
+																m_config.insideTopLength,
 																m_config.insideMod * target
 																);
 #ifdef VERBOSE																
@@ -223,9 +229,9 @@ void SerializedSpineControl::applyImpedanceControlTopOutside(const std::vector<t
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = m_config.top_controller->control(stringList[i],
+        double setTension = m_config.out_top_controller->control(stringList[i],
 																dt,
-																m_config.outsideLength,
+																m_config.outsideTopLength,
 																target
 																);
 #ifdef VERBOSE // Conditional compile for verbose control
@@ -240,7 +246,53 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 {
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
-#endif   
+#endif  
+
+#if (0)
+	// Setup initial lengths
+	std::vector<tgLinearString*> stringList;
+	
+	stringList = subject.getMuscles("inner top");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.insideTopLength - m_config.insideTopTens/stiffness);
+	}
+	
+	stringList = subject.getMuscles("inner left");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.insideLength - m_config.insideTens/stiffness);
+	}
+	stringList = subject.getMuscles("inner right");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.insideLength - m_config.insideTens/stiffness);
+	}
+	
+	stringList = subject.getMuscles("outer top");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.outsideTopLength - m_config.outsideTopTens/stiffness);
+	}
+	
+	stringList = subject.getMuscles("outer left");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.outsideLength  - m_config.outsideTens/stiffness);
+	}
+	
+	stringList = subject.getMuscles("outer right");
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		const double stiffness = stringList[i]->getMuscle()->getCoefK();
+		stringList[i]->setRestLengthSingleStep(m_config.outsideLength  - m_config.outsideTens/stiffness);
+	}
+#endif	
 }
 
 void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -261,7 +313,7 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 	
 	segments = subject.getSegments();
-	
+#if (1)	
 	applyImpedanceControlTopInside(subject.getMuscles("inner top"), dt, 0);
 	applyImpedanceControlInside(subject.getMuscles("inner left") , dt, 1);
 	applyImpedanceControlInside(subject.getMuscles("inner right"), dt, 2);
@@ -269,15 +321,17 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	applyImpedanceControlTopOutside(subject.getMuscles("outer top"), dt, 0);
 	applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
 	applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
-	
+#endif	
 	std::vector<tgBaseRigid*> rigids = subject.getAllRigids();
 	btRigidBody* seg1Body = rigids[0]->getPRigidBody();
 	btRigidBody* seg2Body = rigids[15]->getPRigidBody();
+	btRigidBody* seg3Body = rigids[29]->getPRigidBody();
 	
 	const abstractMarker marker = subject.getMarkers()[0];
 	const abstractMarker marker2 = subject.getMarkers()[1];
 	const abstractMarker marker3 = subject.getMarkers()[2];
 	const abstractMarker marker4 = subject.getMarkers()[3];
+	const abstractMarker marker5 = subject.getMarkers()[4];
 	
 	btVector3 force(0.0, 0.0, 0.0);
 	// 2 kg times gravity
@@ -298,8 +352,8 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 		force = btVector3(0.0, 0.0, 0.0);
 	}
 	seg1Body->applyForce(force, marker.getRelativePosition());
-	seg2Body->applyForce(-force, marker2.getRelativePosition());
-	//seg2Body->applyForce(-force / 2.0, marker3.getRelativePosition());
+	seg2Body->applyForce(-force / 2.0, marker2.getRelativePosition());
+	seg3Body->applyForce(-force / 2.0, marker5.getRelativePosition());
 	//seg2Body->applyForce(-force / 2.0, marker4.getRelativePosition());
 }
     

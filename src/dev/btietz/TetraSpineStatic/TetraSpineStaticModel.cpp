@@ -65,7 +65,7 @@ namespace
         // top
 		tetra.addNode(0, height, 0, "base");
 		// front
-		tetra.addNode(0, height / 2.0, 25.0, "tip");
+		tetra.addNode(0, edge / 2.0 * tan(M_PI / 6.0), 25.0, "tip");
 		
 		// Get the next two nodes from existing nodes:
 		tgNodes oldNodes = tetra.getNodes();
@@ -77,6 +77,8 @@ namespace
 		tetra.addNode(nn2);
 		
 		std::cout << (oldNodes[3] - oldNodes[2]).length() << std::endl;
+		std::cout << (oldNodes[3] - oldNodes[1]).length() << std::endl;
+		std::cout << (oldNodes[3] - oldNodes[0]).length() << std::endl;
 		
     }
 
@@ -96,7 +98,7 @@ namespace
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        const btVector3 offset(0, 0, -21.5);
+        const btVector3 offset(0, 0, -20.0);
 		for (size_t i = 0; i < segmentCount; ++i)
 		{
 				/// @todo: the snake is a temporary variable -- will its destructor be called?
@@ -168,7 +170,7 @@ namespace
 		
 		btRigidBody* secondBody = model.getAllRigids()[15]->getPRigidBody();
 		
-		abstractMarker marker2(secondBody, n1[3] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		abstractMarker marker2(secondBody, n1[2] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker2);
 		
@@ -179,6 +181,14 @@ namespace
 		abstractMarker marker4(secondBody, n1[0] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker4);
+		
+		tgNodes n2 = children[2]->getNodes();
+		
+		btRigidBody* thirdBody = model.getAllRigids()[29]->getPRigidBody();
+		
+		abstractMarker marker5(thirdBody, n2[2] - thirdBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+		model.addMarker(marker5);
 	}
 	
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -204,7 +214,7 @@ namespace
 // There are things that do this for us (@todo: reference the things that do this for us)
 void TetraSpineStaticModel::setup(tgWorld& world)
 {
-    const double edge = 37.5;
+    const double edge = 38;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
     std::cout << "edge: " << edge << "; height: " << height << std::endl;
 	
@@ -230,7 +240,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double oldDensity = .00311;
     const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
-    const double friction = 0.8;
+    const double friction = 1.0;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -270,7 +280,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     
     // Two different string configs
     tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
-    tgLinearString::Config muscleConfig2(1355.8, 10, false, 0, 7000, 7.0, 9500);
+    tgLinearString::Config muscleConfig2(210.15, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));

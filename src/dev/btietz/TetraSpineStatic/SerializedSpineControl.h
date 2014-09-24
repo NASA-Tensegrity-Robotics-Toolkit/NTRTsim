@@ -59,7 +59,8 @@ struct Config
 	 */
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
-    ImpedanceControl* top_controller;
+    ImpedanceControl* in_top_controller;
+    ImpedanceControl* out_top_controller;
 	
 	/**
 	 * Definitions to find muscle length parameters
@@ -75,6 +76,17 @@ struct Config
     
     double insideLength;
     double outsideLength;
+    double insideTopLength;
+    double outsideTopLength;
+    
+	 /**
+     * Muscle Tension Parameters
+     */
+    
+    double insideTens;
+    double outsideTens;
+    double insideTopTens;
+    double outsideTopTens;
     
     /**
      * CPG related parameters.
