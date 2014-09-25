@@ -47,9 +47,15 @@
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
 
+#define MCLP_SOLVER
+
+#ifdef MLCP_SOLVER
+
 #include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
 #include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
 #include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+
+#endif //MLCP_SOLVER
 
 /**
  * Helper class to bundle objects that have the same life cycle, so they can be
@@ -62,12 +68,14 @@ class IntermediateBuildProducts
             corner1 (-worldSize,-worldSize, -worldSize),
             corner2 (worldSize, worldSize, worldSize),
             dispatcher(&collisionConfiguration),
-#if (1) // More acc broadphase - remeber the comma
-            broadphase(corner1, corner2, 16384),
-#endif
-#if (1)
+#ifndef   MLCP_SOLVER       
+	#if (1) // More acc broadphase - remeber the comma (consider doing ifndef)
+				broadphase(corner1, corner2, 16384)
+	#endif // Broadphase
+#else
+			broadphase(corner1, corner2, 16384),
 			solver(&mlcp)
-#endif
+#endif //MLCP_SOLVER  
 			
   {
   }
@@ -82,7 +90,7 @@ class IntermediateBuildProducts
         btAxisSweep3 broadphase;
 #endif
 
-#if (1)
+#ifdef MLCP_SOLVER
 		//btDantzigSolver mlcp;
 		btSolveProjectedGaussSeidel mlcp;
 		btMLCPSolver solver;
@@ -159,7 +167,7 @@ btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
                  &m_pIntermediateBuildProducts->broadphase,
                  &m_pIntermediateBuildProducts->solver, 
                  &m_pIntermediateBuildProducts->collisionConfiguration);
-#if (1)	
+#ifdef MLCPSOLVER	
 		result ->getSolverInfo().m_minimumSolverBatchSize = 1;//for direct solver it is better to have a small A matrix
 #endif	
   return result;
