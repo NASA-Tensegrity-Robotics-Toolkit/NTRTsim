@@ -315,31 +315,32 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif  
+	
 
-#if (0)
 	// Setup initial lengths
 	std::vector<tgLinearString*> stringList;
 	
 	stringList = subject.getMuscles("inner top");
+	m_config.insideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.insideTopLength - m_config.insideTopTens/stiffness);
+		m_config.insideTopLength.push_back(stringList[i]->getStartLength());
 	}
 	
 	stringList = subject.getMuscles("inner left");
+	 m_config.insideLeftLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.insideLength - m_config.insideTens/stiffness);
-	}
-	stringList = subject.getMuscles("inner right");
-	for(std::size_t i = 0; i < stringList.size(); i++)
-    {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.insideLength - m_config.insideTens/stiffness);
+		m_config.insideLeftLength.push_back(stringList[i]->getStartLength());
 	}
 	
+	stringList = subject.getMuscles("inner right");
+	m_config.insideRightLength.clear();
+	for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+		m_config.insideRightLength.push_back(stringList[i]->getStartLength());
+	}
+#if (0)	
 	stringList = subject.getMuscles("outer top");
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {

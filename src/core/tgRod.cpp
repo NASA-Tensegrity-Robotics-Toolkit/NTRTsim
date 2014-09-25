@@ -46,13 +46,13 @@ tgRod::Config::Config(double r, double d,
         if (friction < 0.0)  { throw std::range_error("Negative friction");  }
         if (rollFriction < 0.0)  { throw std::range_error("Negative roll friction");  }
         if (restitution < 0.0)  { throw std::range_error("Negative restitution");  }
-        if (friction > 1.0)  { throw std::range_error("Friction > 1");  }
+        //if (friction > 1.0)  { throw std::range_error("Friction > 1");  }
         if (rollFriction > 1.0)  { throw std::range_error("Roll Friction > 1");  }
         if (restitution > 1.0)  { throw std::range_error("Restitution > 1");  }
     // Postcondition
     assert(density >= 0.0);
     assert(radius >= 0.0);
-    assert((friction >= 0.0) && (friction <= 1.0));
+    //assert((friction >= 0.0) && (friction <= 1.0));
     assert((rollFriction >= 0.0) && (rollFriction <= 1.0));
     assert((restitution >= 0.0) && (restitution <= 1.0));
 }

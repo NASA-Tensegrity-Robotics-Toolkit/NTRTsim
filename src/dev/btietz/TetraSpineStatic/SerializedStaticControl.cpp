@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-//#define LOGGING
+#define LOGGING
 
 SerializedStaticControl::Config::Config(std::string fileName)
 {

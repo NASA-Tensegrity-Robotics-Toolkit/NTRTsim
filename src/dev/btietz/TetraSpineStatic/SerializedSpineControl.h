@@ -190,7 +190,7 @@ private:
 										double dt,
 										std::size_t phase);
     
-    const Config m_config;
+    Config m_config;
     
     std::size_t segments;
     

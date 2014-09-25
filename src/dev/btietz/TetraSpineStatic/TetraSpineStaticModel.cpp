@@ -98,7 +98,7 @@ namespace
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        const btVector3 offset(0, 0, -20.0);
+        const btVector3 offset(0, 0, -23.0);
 		for (size_t i = 0; i < segmentCount; ++i)
 		{
 				/// @todo: the snake is a temporary variable -- will its destructor be called?
@@ -240,7 +240,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double oldDensity = .00311;
     const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
-    const double friction = 1.0;
+    const double friction = 100.0;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
