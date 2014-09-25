@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-//#define LOGGING
+#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -340,28 +340,28 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     {
 		m_config.insideRightLength.push_back(stringList[i]->getStartLength());
 	}
-#if (0)	
+#if (0)
 	stringList = subject.getMuscles("outer top");
+	m_config.outsideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.outsideTopLength - m_config.outsideTopTens/stiffness);
+		m_config.outsideTopLength.push_back(stringList[i]->getStartLength());
 	}
 	
 	stringList = subject.getMuscles("outer left");
+	 m_config.outsideLeftLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.outsideLength  - m_config.outsideTens/stiffness);
+		m_config.outsideLeftLength.push_back(stringList[i]->getStartLength());
 	}
 	
 	stringList = subject.getMuscles("outer right");
+	m_config.outsideRightLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		const double stiffness = stringList[i]->getMuscle()->getCoefK();
-		stringList[i]->setRestLengthSingleStep(m_config.outsideLength  - m_config.outsideTens/stiffness);
+		m_config.outsideRightLength.push_back(stringList[i]->getStartLength());
 	}
-#endif	
+#endif
 }
 
 void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -441,23 +441,23 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	// 2 kg times gravity
 	if (simTime > 30.0 && simTime < 37.0)
 	{
-		force = btVector3(0.0, 0.0, 2*981.0 * ((simTime - 30)/7.0));
+		force = btVector3(0.0, 0.0, 2.1 * 981.0 * ((simTime - 30)/7.0));
 	}
 	else if (simTime >= 37.0 && simTime < 41.0)
 	{
-		force = btVector3(0.0, 0.0, 2*981.0);
+		force = btVector3(0.0, 0.0, 2.1 * 981.0);
 	}
 	else if (simTime >= 41.0 && simTime < 48.0)
 	{
-		force = btVector3(0.0, 0.0, 2*981.0 * (48 - simTime)/7.0);
+		force = btVector3(0.0, 0.0, 2.1 * 981.0 * (48 - simTime)/7.0);
 	}
 	else
 	{
 		force = btVector3(0.0, 0.0, 0.0);
 	}
-	seg1Body->applyForce(force, marker.getRelativePosition());
-	//seg2Body->applyForce(-force / 2.0, marker2.getRelativePosition());
-	seg3Body->applyForce(-force, marker5.getRelativePosition());
+	seg1Body->applyImpulse(force * dt, marker.getRelativePosition());
+	seg2Body->applyImpulse(-force / 2.0 * 0.9 * dt, marker2.getRelativePosition());
+	seg3Body->applyImpulse(-force / 2.0 * 1.1 * dt, marker5.getRelativePosition());
 	//seg2Body->applyForce(-force / 2.0, marker4.getRelativePosition());
 }
     

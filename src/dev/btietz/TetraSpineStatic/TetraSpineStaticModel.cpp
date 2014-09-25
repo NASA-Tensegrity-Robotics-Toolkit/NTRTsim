@@ -170,7 +170,7 @@ namespace
 		
 		btRigidBody* secondBody = model.getAllRigids()[15]->getPRigidBody();
 		
-		abstractMarker marker2(secondBody, n1[2] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		abstractMarker marker2(secondBody, n1[3] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker2);
 		
@@ -186,7 +186,7 @@ namespace
 		
 		btRigidBody* thirdBody = model.getAllRigids()[29]->getPRigidBody();
 		
-		abstractMarker marker5(thirdBody, n2[2] - thirdBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		abstractMarker marker5(thirdBody, n2[3] - thirdBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
 		model.addMarker(marker5);
 	}
@@ -240,7 +240,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double oldDensity = .00311;
     const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
-    const double friction = 1.0;
+    const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -279,7 +279,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     spec.addBuilder("PCB num2", new tgSphereInfo(PCB_2_Config));
     
     // Two different string configs
-    tgLinearString::Config muscleConfig(210.15 * 2.0, 2, false, 0, 7000, 7.0, 9500);
+    tgLinearString::Config muscleConfig(210.15 * 50.0, 10, false, 0, 7000, 7.0, 9500);
     tgLinearString::Config muscleConfig2(210.15, 2, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
