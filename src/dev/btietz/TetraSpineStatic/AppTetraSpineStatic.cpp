@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     while (i < 1)
     {
         simulation.run(120000);
-        simulation.reset();
+        //simulation.reset();
         i++;
     }
     

@@ -83,8 +83,8 @@ class IntermediateBuildProducts
 #endif
 
 #if (1)
-		btDantzigSolver mlcp;
-		//btSolveProjectedGaussSeidel* mlcp = new btSolveProjectedGaussSeidel;
+		//btDantzigSolver mlcp;
+		btSolveProjectedGaussSeidel mlcp;
 		btMLCPSolver solver;
 #else
 		btSequentialImpulseConstraintSolver solver;
