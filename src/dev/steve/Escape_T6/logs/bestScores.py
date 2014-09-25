@@ -1,4 +1,5 @@
-""" Filter out the best trials from argv[1] as dictated by their distance traveled """
+""" Filter out the best episodes from argv[1] as dictated by their distance traveled """
+""" Note: prints entire episode data, including parameters, as opposed to just distances """
 
 import sys
 
