@@ -148,19 +148,20 @@ vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <
     int lineNumber = 10;
     string filename = "logs/roundCraterDeep2/bestParamsSorted.dat";
     vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
+    double pretension = 0.90;// * actions[XXX]; //TODO: Play with this value
     manualParams = readManualParams(lineNumber, filename);
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths * (1 - maxStringLengthFactor), 
+    double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
                        0.3, //Hz
                        -1 * M_PI, 
-                       m_initialLengths * (1 - maxStringLengthFactor)};
+                       m_initialLengths};// * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths * (1 + maxStringLengthFactor), 
+    double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
                        20, //Hz (can cheat to 50Hz, if feeling immoral)
                        M_PI, 
-                       m_initialLengths * (1 + maxStringLengthFactor)}; 
+                       m_initialLengths};// * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     for(int i=0;i<actions.size();i++) { //8x
@@ -203,6 +204,7 @@ void Escape_T6Controller::setupAdapter() {
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 }
 
+//TODO: Doesn't seem to correctly calculate energy spent by tensegrity
 double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     double totalEnergySpent=0;
 

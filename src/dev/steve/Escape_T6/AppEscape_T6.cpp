@@ -64,8 +64,8 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    //tgSimView       *view = createView(world);         // For running multiple episodes
+    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    tgSimView       *view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
@@ -129,7 +129,7 @@ tgSimViewGraphics *createGraphicsView(tgWorld *world) {
 /** Use for trial episodes of many tensegrities in an experiment */
 tgSimView *createView(tgWorld *world) {
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimView(*world, timestep_physics, timestep_graphics); 
 }
 
@@ -137,8 +137,7 @@ tgSimView *createView(tgWorld *world) {
 void simulate(tgSimulation *simulation) {
     int nEpisodes = 1; // Number of episodes ("trial runs")
     int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
-    for (int i=0; i<nEpisodes; i++)
-    {   
+    for (int i=0; i<nEpisodes; i++) {
         simulation->run(nSteps);
         simulation->reset();
     }

@@ -143,17 +143,13 @@ void CraterDeep::addNodes(tgStructure& s) {
 
 void CraterDeep::addBoxNodes() {
     tgNode node;
-    const double shift = 20; // Arbitrary
-    const double vshift = 10; 
-    const double node_h = c.height/2 + vshift;
-    const double node_w = c.width/2; 
     
-    double x1 = 20;//-shift-node_w;
-    double x2 = 20;//shift+node_w;
-    double y1 = -10;//-node_h;
-    double y2 = 25;// node_h;
-    double z1 = 0;//-shift-node_w;
-    double z2 = 0;// shift+node_w;
+    double x1 = 20; // Smaller x values leads to a narrower crater
+    double x2 = 20;
+    double y1 = -10;
+    double y2 = 25;
+    double z1 = 0;
+    double z2 = 0;
 
     btVector3 rotationPoint = btVector3((x2-x1)/2, (y2-y1)/2, (z2-z1)/2); //Halfway between nodes
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis

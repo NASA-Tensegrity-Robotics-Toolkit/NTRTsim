@@ -80,8 +80,8 @@ namespace
         0.01,     // rollFriction (unitless)
         0.2,      // restitution (?)
         0,        // rotation
-        1000,     // maxTens (dN)           // Ideally as low as 1000
-        0.45,     // targetVelocity (dm/s)  // Ideally as low as 2.6
+        5054,     // maxTens (dN)           // Ideally as low as 1000
+        10.0,     // targetVelocity (dm/s)  // Ideally as low as 2.6, can be 5.2
         20000     // maxAcc
     };
 } // namespace
