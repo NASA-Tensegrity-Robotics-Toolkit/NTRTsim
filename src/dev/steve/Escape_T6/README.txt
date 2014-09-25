@@ -51,6 +51,17 @@ truly random monte carlo, either the Config.ini file may be edited (speak to
 Brian Merlitz) or the existing mechanism in Escape_T6Controller.cpp may be
 toggled (see the function 'transformActions').
 
+RE-RUNNING BEST PARAMETERS
+--------------------------
+Once the initial Monte Carlo simulation has been run and the best controller
+parameters have been determined empirically, re-running the simulation using
+those best parameters will generate even better controller values. To re-run
+simulations on this data:
+1. In Config.ini, set startSeed to 1 and MonteCarlo to 0 (opposite from MC)
+2. Ensure that logs/bestParameters.prm is populated (see LearningSpines for
+    a sample format)
+3. Re-run the data as normal
+
 PYTHON PARSING TEST DATA
 ------------------------
 Four python scripts in logs are used to parse test data (scores.csv).
