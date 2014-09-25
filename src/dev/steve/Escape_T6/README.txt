@@ -51,6 +51,22 @@ truly random monte carlo, either the Config.ini file may be edited (speak to
 Brian Merlitz) or the existing mechanism in Escape_T6Controller.cpp may be
 toggled (see the function 'transformActions').
 
+PYTHON PARSING TEST DATA
+------------------------
+Four python scripts in logs are used to parse test data (scores.csv).
+It is recommended that you copy the contents of scores.csv to a separate file
+before parsing and manipulating the data.
+The four python scripts used are:
+    - bestScores.py
+    - cutOutliers.py
+    - printDistances.py
+    - printParams.py
+
+These four files allow for the conversion of a comma-separated episodes list to 
+reformatted data useful for re-running tests. The exact function of each script
+is detailed in its header comments, but the syntax for running any of them is:
+`python [script].py scores.csv > results.csv`
+
 ISSUES TO BE RESOLVED
 ---------------------
 - The energy spent calculation in the controller does not seem to correctly
