@@ -9,6 +9,7 @@ link_libraries(learningSpines
                 tgOpenGLSupport)
 
 add_executable(AppTetraSpineStatic
+	SerializedStaticControl.cpp	
 	SerializedSpineControl.cpp	
     TetraSpineStaticModel.cpp
 	AppTetraSpineStatic.cpp
@@ -16,4 +17,5 @@ add_executable(AppTetraSpineStatic
 
 target_link_libraries(AppTetraSpineStatic ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
 configure_file("controlVars.json" "controlVars.json" COPYONLY)
+configure_file("controlVarsStatic.json" "controlVarsStatic.json" COPYONLY)
 
