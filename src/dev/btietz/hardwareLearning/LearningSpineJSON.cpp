@@ -112,7 +112,7 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
 			tension = 800.0;
             kPosition = 100.0;
             kVelocity = 100.0;
-            controlLength = 16.5 ;
+            controlLength = 19.5 ;
 		}
 		else
 		{
