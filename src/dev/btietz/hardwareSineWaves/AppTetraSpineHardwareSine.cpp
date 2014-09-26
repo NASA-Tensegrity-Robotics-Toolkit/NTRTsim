@@ -75,7 +75,40 @@ int main(int argc, char** argv)
     const int numParams = 2;
     const int segment = 1;
     const double controlTime = .001;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segment, controlTime);
+    const double lowAmp = 0;
+    const double highAmp = 90;
+    const double lowPhase = -1.0 * M_PI;
+    const double highPhase = M_PI;
+    
+    // Impedance control params will be overwritten
+     double kt = 0.0;
+        double kp = 1000.0;
+        double kv = 100.0;
+        bool def = true;
+    
+        double cl = 10.0;
+        double lf = 0.0;
+        double hf = 45.0;
+    
+    BaseSpineCPGControl::Config control_config(segmentSpan, 
+												numMuscles,
+												numMuscles,
+												numParams, 
+												segment, 
+												controlTime,
+												lowAmp,
+												highAmp,
+												lowPhase,
+												highPhase,
+												kt,
+												kp,
+												kv,
+												def,
+												cl,
+												lf,
+												hf
+												);
+    
     
     LearningSpineSine* const myControl =
       new LearningSpineSine(control_config, suffix);
