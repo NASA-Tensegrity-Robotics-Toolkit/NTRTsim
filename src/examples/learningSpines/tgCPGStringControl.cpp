@@ -60,9 +60,13 @@ void tgCPGStringControl::onStep(tgLinearString& subject, double dt)
     /// is there a way to track _global_ time at this level
     if (m_controlTime >= m_controlStep)
     {
-		m_commandedTension = motorControl().control(&subject, dt, controlLength(), getCPGValue());
+		m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
         m_controlTime = 0;
     }
+    else
+    {
+		subject.moveMotors(dt);
+	}
 }
 
 void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams)
