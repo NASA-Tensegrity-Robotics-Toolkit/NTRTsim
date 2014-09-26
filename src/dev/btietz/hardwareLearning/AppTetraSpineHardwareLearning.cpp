@@ -17,8 +17,8 @@
 */
 
 /**
- * @file AppFlemonsSpineStatic.cpp
- * @brief Contains the definition function main() for the Tetra Spine Static
+ * @file AppFlemonsSpineLearning.cpp
+ * @brief Contains the definition function main() for the Tetra Spine Learning
  * application.
  * @author Brian Tietz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
@@ -26,9 +26,8 @@
  */
 
 // This application
-#include "TetraSpineStaticModel.h"
-#include "SerializedSpineControl.h"
-#include "SerializedStaticControl.h"
+#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
+#include "LearningSpineJSON.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -48,14 +47,14 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppTetraSpineSerial" << std::endl;
+    std::cout << "AppTetraSpineHardwareLearning" << std::endl;
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view
-    const double stepSize = 1.0/2000.0; // Seconds
+    const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
     tgSimViewGraphics view(world, stepSize, renderRate);
 
@@ -68,15 +67,18 @@ int main(int argc, char** argv)
     TetraSpineStaticModel* myModel =
       new TetraSpineStaticModel(segments);
     
-    /* Required for setting up serialization file input/output. */
-    const std::string suffix((argc > 1) ? argv[1] : "controlVarsStatic.json");
-#if (1)      
-    SerializedSpineControl* const myControl =
-      new SerializedSpineControl(suffix);
-#else
-    SerializedStaticControl* const myControl =
-      new SerializedStaticControl(suffix);
-#endif
+    /* Required for setting up learning file input/output. */
+    const std::string suffix((argc > 1) ? argv[1] : "default");
+    
+        const int segmentSpan = 3;
+    const int numMuscles = 6;
+    const int numParams = 2;
+    const int segment = 1;
+    const double controlTime = .001;
+    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segment, controlTime);
+    
+    LearningSpineJSON* const myControl =
+      new LearningSpineJSON(control_config, suffix);
     myModel->attach(myControl);
     /*
     tgCPGLogger* const myLogger = 
@@ -87,10 +89,10 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 1)
+    while (i < 10000)
     {
-        simulation.run(120000);
-        //simulation.reset();
+        simulation.run(60000);
+        simulation.reset();
         i++;
     }
     

@@ -22,4 +22,5 @@ subdirs(
     RBTests
     sphereFeet
     TetraSpineStatic
+    hardwareLearning
     )
