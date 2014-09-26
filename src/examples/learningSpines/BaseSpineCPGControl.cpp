@@ -57,7 +57,9 @@ BaseSpineCPGControl::Config::Config(int ss,
 										double kp,
 										double kv,
 										bool def,
-										double cl) :
+										double cl,
+										double lf,
+										double hf) :
 	segmentSpan(ss),
 	theirMuscles(tm),
 	ourMuscles(om),
@@ -72,7 +74,9 @@ BaseSpineCPGControl::Config::Config(int ss,
 	kPosition(kp),
 	kVelocity(kv),
 	useDefault(def),
-	controlLength(cl)
+	controlLength(cl),
+	lowFreq(lf),
+	highFreq(hf)
 {
     if (ss <= 0)
     {

@@ -23,4 +23,5 @@ subdirs(
     sphereFeet
     TetraSpineStatic
     hardwareLearning
+    hardwareSineWaves
     )
