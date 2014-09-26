@@ -50,7 +50,6 @@ LearningSpineJSON::LearningSpineJSON(BaseSpineCPGControl::Config config,
 												std::string args,
                                                 std::string ec,
                                                 std::string nc) :
-m_config("throw_away"),
 BaseSpineCPGControl(config, args, ec, nc)
 
 {    
@@ -66,6 +65,8 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
         allMuscles[i]->attach(pStringControl);
         m_allControllers.push_back(pStringControl);
     }
+    
+    assert(m_allControllers.size() == allMuscles.size());
     
     /// @todo: redo with for_each
     // First assign node numbers to the info Classes 
@@ -85,20 +86,38 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
-        if (allMuscles[i]->hasTag("outer"))
+        if (allMuscles[i]->hasTag("inner top"))
         {
-            tension = 100.0;
-            kPosition = 100.0;
-            kVelocity = 200.0;
+			tension = 2000.0;
+            kPosition = 500.0;
+            kVelocity = 100.0;
+            controlLength = allMuscles[i]->getStartLength();
+		}
+        else if (allMuscles[i]->hasTag("outer top"))
+        {
+            tension = 1000.0;
+            kPosition = 500.0;
+            kVelocity = 100.0;
             controlLength = 19.5;
         }
-        else
+        else if (allMuscles[i]->hasTag("inner"))
         {
-            tension = 100.0;
-            kPosition = 500.0;
-            kVelocity = 200.0;
-            controlLength = 16.5 ;
+            tension = 1500.0;
+            kPosition = 100.0;
+            kVelocity = 100.0;
+            controlLength = allMuscles[i]->getStartLength();
         }
+        else if (allMuscles[i]->hasTag("outer"))
+        {
+			tension = 800.0;
+            kPosition = 100.0;
+            kVelocity = 100.0;
+            controlLength = 16.5 ;
+		}
+		else
+		{
+			throw std::runtime_error("Missing tags!");
+		}
 
         ImpedanceControl* p_ipc = new ImpedanceControl( tension,
                                                         kPosition,

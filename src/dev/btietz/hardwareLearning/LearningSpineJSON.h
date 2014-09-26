@@ -30,7 +30,6 @@
 
 #include "examples/learningSpines/BaseSpineCPGControl.h"
 
-#include "dev/btietz/TetraSpineStatic/SerializedSpineControl.h"
 
 /**
  * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
@@ -49,7 +48,6 @@ public:
 
 	virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
 	
-	SerializedSpineControl::Config m_config;
 };
 
 #endif // FLEMONS_SPINE_CPG_CONTROL_H
