@@ -70,7 +70,7 @@ public:
 
 protected:
 
-  vector< vector <double> > receiveActionsFromEvolution();
+  vector< vector <double> > receiveParametersFromEvolution();
 
   virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
@@ -87,6 +87,7 @@ private:
 	
   vector<double> initialPosition;
   SuperBallModel *m_subject;
+  vector< vector< double> > controlParameters;
 };
 
 #endif // SUPERBALL_LEARNINGCONTROLLER_H

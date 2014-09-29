@@ -80,8 +80,8 @@ namespace
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
      0,        // rotation
-     100000,   // maxTens
-     10000,    // targetVelocity
+     300,   // maxTens
+     20000,    // targetVelocity
      20000     // maxAcc
 
      // Use the below values for earlier versions of simulation.
@@ -276,15 +276,6 @@ void SuperBallModel::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addMuscles(s);
-
-//    // Add a rotation. This is needed if the ground slopes too much,
-//    // otherwise  glitches put a rod below the ground.
-//    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-//    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-//    double rotationAngle = M_PI/2;
-//    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
-    //s.move(btVector3(0,30,0));
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;

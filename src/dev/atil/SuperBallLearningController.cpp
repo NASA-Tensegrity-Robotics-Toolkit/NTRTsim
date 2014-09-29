@@ -81,6 +81,10 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 
 	m_subject = &subject;
 
+	//Receive parameters from evolution
+	controlParameters = receiveParametersFromEvolution();
+
+
 }
 
 void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
@@ -119,10 +123,9 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
 //	std::cout<<endl;
 
 
-	vector< vector< double> > actions = receiveActionsFromEvolution();
 
 	//transform them from 0-1 to the size of the structure
-	actions = transformActions(actions);
+	vector< vector <double> > actions = transformActions(controlParameters);
 
 	//apply these actions to the appropriate muscles according to the sensor values
 	applyActions(subject,actions,state);
@@ -349,6 +352,8 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 
 void SuperBallPrefLengthController::onTeardown(SuperBallModel& subject)
 {
+
+
 	std::cout<<"TEARDOWN CALLED"<<std::endl;
 	vector<double> scores;
 	scores.push_back(calculateDistanceMoved());
@@ -356,18 +361,40 @@ void SuperBallPrefLengthController::onTeardown(SuperBallModel& subject)
 	std::cout<<"Distance moved: "<<scores[0]<<std::endl;
 
 	initialPosition.clear();
+
+	for(int i=0;i<13;i++)
+	{
+		for(int j=i+1;j<13;j++)
+		{
+			if(subject.musclesPerNodes[i][j]!=NULL)
+			{
+			    ofstream logtension;
+			    stringstream ss;
+				ss<<"logs/tensions"<<i<<"-"<<j<<".csv";
+			    logtension.open(ss.str().c_str(),ios::out);
+			    double time=0;
+				tgLinearString * mscl = subject.musclesPerNodes[i][j];
+				deque<double> hist = mscl->getHistory().tensionHistory;
+			    double timestep=m_totalTime / hist.size();
+				for(int i=0;i<hist.size();i++)
+				{
+					logtension<<time<<","<<hist[i]<<endl;
+				}
+			}
+		}
+	}
 }
 
-vector<vector<double> > SuperBallPrefLengthController::receiveActionsFromEvolution()
+vector<vector<double> > SuperBallPrefLengthController::receiveParametersFromEvolution()
 {
-	vector<vector <double> > actions;
+	vector<vector <double> > params;
 
 	vector<AnnealEvoMember *> members = evolution->nextSetOfControllers();
 	for(int i=0;i<members.size();i++)
 	{
-		actions.push_back(members[i]->statelessParameters);
+		params.push_back(members[i]->statelessParameters);
 	}
-	return actions;
+	return params;
 }
 
 
