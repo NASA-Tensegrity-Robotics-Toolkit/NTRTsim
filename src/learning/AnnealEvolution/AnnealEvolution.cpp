@@ -31,6 +31,7 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -74,7 +75,6 @@ Temp(1.0)
 
     for(int j=0;j<numberOfControllers;j++)
     {
-        cout<<"creating Populations"<<endl;
         populations.push_back(new AnnealEvoPopulation(populationSize,myconfigdataaa));
     }
     
@@ -92,6 +92,10 @@ Temp(1.0)
     if(learning)
     {
         evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
+        if (!evolutionLog.is_open())
+        {
+			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+		}
     }
 }
 

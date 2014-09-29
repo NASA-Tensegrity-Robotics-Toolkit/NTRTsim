@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012, United States Government, as represented by the
+ * Copyright © 2014, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  * 
@@ -69,12 +69,6 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
         virtual void setup(tgWorld& world);
 
         /**
-         * Undoes setup. Deletes child models. Called automatically on
-         * reset and end of simulation. Notifies controllers of teardown
-         */
-        void teardown();
-
-        /**
          * Step the model, its children. Notifies controllers of step.
          * @param[in] dt, the timestep. Must be positive.
          */
@@ -88,12 +82,23 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * to itself 
          */
         virtual void onVisit(tgModelVisitor& r);
-
+          
+        /**
+         * Undoes setup. Deletes child models. Called automatically on
+         * reset and end of simulation. Notifies controllers of teardown
+         */
+        void teardown();
+         
         /**
          * Return a vector of all muscles for the controllers to work with.
          * @return A vector of all of the muscles
          */
         const std::vector<tgLinearString*>& getAllMuscles() const;
+
+        /**
+         * Returns the center of mass of this model as an <x,y,z>
+         */
+        std::vector<double> getBallCOM();
 
     private:
 
@@ -101,50 +106,48 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * A function called during setup that determines the positions of
          * the nodes based on construction parameters. Rewrite this function
          * for your own models
-         * @param[in] tetra: A tgStructure that we're building into
+         * @param[in] s: the tgStructure that we're building into
          */
         void addNodes(tgStructure& s);
 
         /**
          * A function called during setup that creates rods from the
          * relevant nodes. Rewrite this function for your own models.
-         * @param[in] s A tgStructure that we're building into
+         * @param[in] s: A tgStructure that we're building into
          */
         static void addRods(tgStructure& s);
-
+ 
         /**
-         * A function called during setup that creates muscles (Strings) from
-         * the relevant nodes. Rewrite this function for your own models.
-         * @param[in] s A tgStructure that we're building into
-         */
-        void addMuscles(tgStructure& s);
-
-        /*
          * Adds the 12 markers to the end of the rods so that we can visualize
          * them and track their position
          */
         void addMarkers(tgStructure& s);
+         
+        /**
+         * A function called during setup that creates muscles
+         * (tgLinearStrings) from the relevant nodes. 
+         * Also collates muscles into clusters of 3 for actuation purposes
+         * @param[in] s: A tgStructure that we're building into
+         */
+        void addMuscles(tgStructure& s);
 
-        /*
-         * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
-         * First rotates the structure around 3 axises given 3 angles.
+        /**
+         * Moves every rod (i.e. the rigid bodies) according to its arguments.
+         * First rotates the structure around 3 axes given 3 angles.
          * Moves the structure to the target point.
-         * Sets all the bars speed to the given speed vector.
+         * Sets the speed of each bar to the given speed vector.
          * (muscles and markers are moved automatically since they are attached).
          */
-        void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
-
-    private:
+        void moveModel(btVector3 targetPositionVector, btVector3 rotationVector,
+                       btVector3 speedVector);
 
         /**
          * A list of all of the muscles. Will be empty until most of the way
          * through setup
          */
         std::vector<tgLinearString*> allMuscles;
-        std::vector<std::vector <tgLinearString *> > musclesPerNodes;
-        std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
-
         std::vector<btVector3> nodePositions;
 };
 
 #endif  // SUPERBALL_MODEL_H
+

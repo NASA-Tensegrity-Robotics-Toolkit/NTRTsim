@@ -28,7 +28,9 @@
 #include "Escape_T6Controller.h"
 
 // This library
-#include "core/terrain/tgHillyGround.h"
+#include "core/terrain/tgBoxGround.h"
+#include "Crater.h"
+#include "CraterDeep.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -40,7 +42,7 @@
 // The C++ Standard Library
 #include <iostream>
 
-tgHillyGround *createGround();
+tgBoxGround *createGround();
 tgWorld *createWorld();
 tgSimViewGraphics *createGraphicsView(tgWorld *world);
 tgSimView *createView(tgWorld *world);
@@ -62,8 +64,8 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    //tgSimView       *view = createView(world);         // For running multiple episodes
+    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    tgSimView       *view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
@@ -72,20 +74,27 @@ int main(int argc, char** argv)
     Escape_T6Model* const model = new Escape_T6Model();
 
     // Fifth create controller and attach it to the model
-    double initialLength = 9; // decimeters
+    double initialLength = 9.0; // decimeters
     Escape_T6Controller* const controller = new Escape_T6Controller(initialLength);
     model->attach(controller);
 
     //Sixth add model (with controller) to simulation
     simulation->addModel(model);
 
+    //Seventh add crater to simulation
+    btVector3 originCrater = btVector3(0,0,0);
+    //Crater* crater = new Crater(originCrater);
+    CraterDeep* crater = new CraterDeep(originCrater);
+    simulation->addModel(crater);
+
     simulate(simulation);
 
+    delete controller;
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }
 
-tgHillyGround *createGround() {
+tgBoxGround *createGround() {
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -93,18 +102,12 @@ tgHillyGround *createGround() {
     const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
     const double friction = 0.5; // Default: 0.5
     const double restitution = 0.0;  // Default: 0.0
-    const btVector3 size = btVector3(500.0, 1.5, 500.0); // Default: (500.0, 1.5, 500.0)
+    const btVector3 size = btVector3(10000.0, 2, 10000.0); // Default: (500.0, 1.5, 500.0)
     const btVector3 origin = btVector3(0.0, 0.0, 0.0); // Default: (0.0, 0.0, 0.0)
-    const size_t nx = 50; // Default: 50
-    const size_t ny = 50; // Default: 50
-    const double margin = 0.5; // Default: 0.5
-    const double triangleSize = 5.0; // Default: 5.0
-    const double waveHeight = 2.0; // Default: 5.0
-    const double offset = 0.5; // Default: 0.5
-    const tgHillyGround::Config groundConfig(eulerAngles, friction, restitution, size, origin, 
-                                             nx, ny, margin, triangleSize, waveHeight, offset);
+    const tgBoxGround::Config groundConfig(eulerAngles, friction, restitution,
+                                           size, origin);
     // the world will delete this
-    return new tgHillyGround(groundConfig);
+    return new tgBoxGround(groundConfig);
 }
 
 tgWorld *createWorld() {
@@ -112,30 +115,29 @@ tgWorld *createWorld() {
     // NB: by changing the setting below from 981 to 98.1, we've
     // scaled the world length scale to decimeters not cm.
 
-    tgHillyGround* ground = createGround();
+    tgBoxGround* ground = createGround();
     return new tgWorld(config, ground);
 }
 
 /** Use for displaying tensegrities in simulation */
 tgSimViewGraphics *createGraphicsView(tgWorld *world) {
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics); 
 }
 
 /** Use for trial episodes of many tensegrities in an experiment */
 tgSimView *createView(tgWorld *world) {
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
-    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate
+    const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimView(*world, timestep_physics, timestep_graphics); 
 }
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation) {
-    int nEpisodes = 10; // Number of episodes ("trial runs")
-    int nSteps = 60000; // Number of steps in each episode
-    for (int i=0; i<nEpisodes; i++)
-    {   
+    int nEpisodes = 1; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    for (int i=0; i<nEpisodes; i++) {
         simulation->run(nSteps);
         simulation->reset();
     }

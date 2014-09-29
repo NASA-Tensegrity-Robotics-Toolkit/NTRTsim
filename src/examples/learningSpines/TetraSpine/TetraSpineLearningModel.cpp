@@ -187,7 +187,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 7.0, 9500);
+    tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #endif
     // Create your structureInfo

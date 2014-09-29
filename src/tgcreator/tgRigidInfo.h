@@ -121,8 +121,6 @@ public:
 
     virtual std::vector<tgRigidInfo*> createRigidInfos(const tgPairs& pairs, const tgTagSearch& tagSearch);
 
-
-    // @todo: move this to .cpp file
     virtual void initRigidBody(tgWorld& world);
 
     virtual tgModel* createModel(tgWorld& world) = 0;
@@ -296,14 +294,13 @@ public:
     virtual std::set<btVector3> getContainedNodes() const = 0;
 
     /**
-     * Does this tgRigidInfo have any nodes in common with the given tgRigidInfo
-     * object?
+     * Does this rigid have any nodes in common with the given tgRigidInfo object?
      * @param]in] other a reference to a tgRigidInfo object
-     * @retval true if any node in this rigid body is also in other
-     * @retval false if no node in this rigid body is also in other
+     * @retval true if any node in this sphere is also in other
+     * @retval false if no node in this sphere is also in other
      */
-    virtual bool sharesNodesWith(const tgRigidInfo& other) const = 0;
-    
+    virtual bool sharesNodesWith(const tgRigidInfo& other) const;
+   
     // Need these in order to see if we've already build a pair/node
     // @todo: maybe -- don't like having to know about pairs and nodes here...
     // virtual bool matches(const tgPair& pair) = 0;

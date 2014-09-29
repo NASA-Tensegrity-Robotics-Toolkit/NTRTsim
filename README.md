@@ -35,12 +35,12 @@ under src/DoxyDocs/index.html.
 
 Pre-built documentation for our beta release can be found here:
 
-http://www.magicalrobot.org/NTRT/Docs/NTRTv1.0.0-beta/html/index.html
+http://ntrt.perryb.ca/doxygen
 
 Build Status
 ---------
 
 NTRTsim's automated build system (BuildBot) can be found at:
 
-http://ntrt-bb.perryb.ca/waterfall
+http://ntrt.perryb.ca/bb/waterfall
 

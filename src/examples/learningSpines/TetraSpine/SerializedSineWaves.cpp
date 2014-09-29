@@ -78,6 +78,7 @@ SerializedSineWaves::Config::Config(std::string fileName)
     cpgAmplitude = root.get("cpg_amplitude", "UTF-8").asDouble();
     cpgFrequency = root.get("cpg_frequency", "UTF-8").asDouble();
     bodyWaves = root.get("bodyWaves", "UTF-8").asDouble();
+	insideMod = root.get("insideMod", "UTF-8").asDouble();
 	
 	updateFrequency = root.get("updateFrequency", "UTF-8").asDouble();
 	
@@ -102,6 +103,7 @@ SerializedSineWaves::SerializedSineWaves(std::string fileName) :
 m_config(fileName),
 segments(1.0),
 simTime(0.0),
+updateTime(0.0),
 cycle(0.0),
 target(0.0)
 {
@@ -112,13 +114,21 @@ SerializedSineWaves::~SerializedSineWaves()
 {
 }
 
-void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList, double dt)
+void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+                                                            double dt,
+                                                            std::size_t phase)
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
+		// This will reproduce the same value until simTime is updated. See onStep
+        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
+        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
+        
+		
         double setTension = m_config.in_controller->control(stringList[i],
 																dt,
-																m_config.insideLength
+																m_config.insideLength,
+																m_config.insideMod * target
 																);
         #if (0) // Conditional compile for verbose control
         std::cout << "Inside String " << i << " tension " << setTension
@@ -134,6 +144,7 @@ void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgLinea
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
+		// This will reproduce the same value until simTime is updated. See onStep
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
@@ -152,22 +163,25 @@ void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgLinea
 
 void SerializedSineWaves::onStep(BaseSpineModelLearning& subject, double dt)
 {
-    simTime += dt;
 
-	if (simTime >= 1.0/m_config.updateFrequency)
+    updateTime += dt;
+
+	if (updateTime >= 1.0/m_config.updateFrequency)
 	{
-		segments = subject.getSegments();
-		
-		applyImpedanceControlInside(subject.getMuscles("inner top"), dt);
-		applyImpedanceControlInside(subject.getMuscles("inner left") , dt);
-		applyImpedanceControlInside(subject.getMuscles("inner right"), dt);
-		
-		applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
-		applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
-		applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
-
-		simTime = 0.0;
+		simTime += updateTime;
+		updateTime = 0.0;
 	}
+	
+	segments = subject.getSegments();
+	
+	applyImpedanceControlInside(subject.getMuscles("inner top"), dt, 0);
+	applyImpedanceControlInside(subject.getMuscles("inner left") , dt, 1);
+	applyImpedanceControlInside(subject.getMuscles("inner right"), dt, 2);
+	
+	applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
+	applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
+	applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
+
 }
     
 

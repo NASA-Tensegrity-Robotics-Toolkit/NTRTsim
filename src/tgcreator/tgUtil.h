@@ -112,6 +112,15 @@ public:
         return getTransform(upVector(), start, end);
     }
 
+	inline static btTransform getTransform(const btVector3& center)
+	{
+		btTransform t = btTransform();
+        t.setIdentity();
+        t.setOrigin(center);
+		// No point in rotating, keep identity
+        return t;
+	}
+
     /**
      * Get a vector that points from a to b.
      * @param[in] from a btVector3

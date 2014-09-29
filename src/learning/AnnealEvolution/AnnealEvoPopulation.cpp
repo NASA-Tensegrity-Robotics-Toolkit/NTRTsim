@@ -44,7 +44,7 @@ AnnealEvoPopulation::AnnealEvoPopulation(int populationSize,configuration config
 
     for(int i=0;i<populationSize;i++)
     {
-        cout<<"  creating members"<<endl;
+        //cout<<"  creating members"<<endl;
         controllers.push_back(new AnnealEvoMember(config));
     }
 }

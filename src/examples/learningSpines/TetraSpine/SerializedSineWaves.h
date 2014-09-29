@@ -75,6 +75,11 @@ struct Config
     double bodyWaves;
     
     /**
+     * How the inside strings re-interpret the signal
+     */
+    double insideMod;
+    
+    /**
      * Phase offsets for the CPGs.
      * Units are radians
      */
@@ -107,9 +112,11 @@ public:
      * @param[in] stringList a std::vector of strings taken from the
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
      */
     void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
-									double dt);
+                                                            double dt,
+                                                            std::size_t phase);
     /**
      * Applies the impedance controllers using a velocity setpoint determined.
      * by the phase parameter and 
@@ -144,6 +151,7 @@ private:
      * offset + amplitude * cycle
      */
     double simTime;
+    double updateTime;
     double cycle;
     double target;
 };
