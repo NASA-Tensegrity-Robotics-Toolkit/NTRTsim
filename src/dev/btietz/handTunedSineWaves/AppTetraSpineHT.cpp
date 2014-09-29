@@ -26,7 +26,7 @@
  */
 
 // This application
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
+#include "TetraSpineStaticModel_hf.h"
 #include "htSpineSine.h"
 // This library
 #include "core/tgModel.h"
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 3;
-    TetraSpineStaticModel* myModel =
-      new TetraSpineStaticModel(segments);
+    TetraSpineStaticModel_hf* myModel =
+      new TetraSpineStaticModel_hf(segments);
     
     htSpineSine* const myControl =
       new htSpineSine();

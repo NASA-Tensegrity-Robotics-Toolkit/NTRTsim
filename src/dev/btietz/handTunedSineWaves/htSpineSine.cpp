@@ -151,16 +151,19 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
             tension = 1000.0;
             kPosition = 500.0;
             kVelocity = 150.0;
-            controlLength = 19.0;
+            
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("out_top_amp_a", "UTF-8").asDouble();
 				phase = root.get("front_offset", "UTF-8").asDouble();
+			
+				controlLength = 18.5;
 			}
 			else if(allMuscles[i]->hasTag("seg2"))
 			{
 				amplitude = root.get("out_top_amp_b", "UTF-8").asDouble();
 				phase = root.get("back_offset", "UTF-8").asDouble();
+				controlLength = 19.8;
 			}
 			else
 			{
@@ -193,7 +196,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
 			tension = 800.0;
             kPosition = 300.0;
             kVelocity = 100.0;
-            controlLength = 19.5 ;
+            controlLength = 19.0 ;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();

@@ -15,6 +15,7 @@ link_libraries(tetraSpineLearningSine
                 tgOpenGLSupport)
 
 add_executable(AppTetraSpineHT
+	TetraSpineStaticModel_hf.cpp
 	htSpineSine.cpp
 	AppTetraSpineHT.cpp
 )

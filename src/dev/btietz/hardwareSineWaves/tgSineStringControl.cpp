@@ -68,9 +68,14 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
     if (m_controlTime >= m_controlStep)
     {
 		// Yep, its a misnomer. Had to change it for In Won
-		cycle = cos(m_totalTime  * 2.0 * M_PI / cpgFrequency + phaseOffset);
+		cycle = cos(m_totalTime  * 2.0 * M_PI * cpgFrequency + phaseOffset);
         target = cycle*cpgAmplitude + offsetSpeed;
-		
+	#if (0)	
+		if (phaseOffset == 0.0 && m_totalTime < 4.0)
+		{
+			target = 0.0;
+		}
+	#endif	
 		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, target);
         m_controlTime = 0;
     }

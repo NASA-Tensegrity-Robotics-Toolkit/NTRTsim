@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     const int segment = 1;
     const double controlTime = .001;
     const double lowAmp = 0;
-    const double highAmp = 90;
+    const double highAmp = 50;
     const double lowPhase = -1.0 * M_PI;
     const double highPhase = M_PI;
     
