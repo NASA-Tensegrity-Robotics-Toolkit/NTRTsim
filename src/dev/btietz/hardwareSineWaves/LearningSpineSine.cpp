@@ -145,7 +145,7 @@ void LearningSpineSine::onTeardown(BaseSpineModelLearning& subject)
     edgeAdapter.endEpisode(scores);
     nodeAdapter.endEpisode(scores);
 
-    for(size_t i = 0; i < m_allControllers.size(); i++)
+    for(size_t i = 0; i < m_sineControllers.size(); i++)
     {
 		delete m_sineControllers[i];
 	}
@@ -206,6 +206,7 @@ void LearningSpineSine::setupWaves(BaseSpineModelLearning& subject, array_2D nod
 																		nodeActions[0][0],
 																		nodeActions[0][1],
 																		edgeActions[i][0],
+																		0.0, // Repeat learning this too? Unlikely to be helpful
 																		controlLength);
 
 		

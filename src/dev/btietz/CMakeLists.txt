@@ -24,4 +24,5 @@ subdirs(
     TetraSpineStatic
     hardwareLearning
     hardwareSineWaves
+    handTunedSineWaves
     )

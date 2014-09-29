@@ -29,6 +29,7 @@ tgSineStringControl::tgSineStringControl(const double controlStep,
 											const double amplitude,
 											const double frequency,
 											const double phase,
+											const double offset,
 											const double length) :
 m_controlTime(0.0),
 m_totalTime(0.0),
@@ -37,6 +38,7 @@ m_commandedTension(0.0),
 cpgAmplitude(amplitude),
 cpgFrequency(frequency),
 phaseOffset(phase),
+offsetSpeed(offset),
 cycle(0.0),
 target (0.0),
 m_controlLength(length),
@@ -65,10 +67,15 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
     /// is there a way to track _global_ time at this level
     if (m_controlTime >= m_controlStep)
     {
-		cycle = sin(m_totalTime  * cpgFrequency + phaseOffset);
-        target = cycle*cpgAmplitude;
+		// Yep, its a misnomer. Had to change it for In Won
+		cycle = cos(m_totalTime  * 2.0 * M_PI / cpgFrequency + phaseOffset);
+        target = cycle*cpgAmplitude + offsetSpeed;
 		
 		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, cycle);
         m_controlTime = 0;
     }
+    else
+    {
+		subject.moveMotors(dt);
+	}
 }

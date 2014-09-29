@@ -34,6 +34,7 @@ public:
 							const double amplitude,
 							const double frequency,
 							const double phase,
+							const double offset,
 							const double length);
     
     virtual ~tgSineStringControl();
@@ -68,6 +69,7 @@ private:
     const double cpgAmplitude;
     const double cpgFrequency;
     const double phaseOffset;
+    const double offsetSpeed;
     /**
      * Phase offsets for the Sine Waves
      */

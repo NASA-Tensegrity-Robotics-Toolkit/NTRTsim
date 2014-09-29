@@ -63,6 +63,7 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
     {
 		tgCPGStringControl* pStringControl = new tgCPGStringControl();
         allMuscles[i]->attach(pStringControl);
+        std::cout << allMuscles[i]->getTags() << std::endl;
         m_allControllers.push_back(pStringControl);
     }
     

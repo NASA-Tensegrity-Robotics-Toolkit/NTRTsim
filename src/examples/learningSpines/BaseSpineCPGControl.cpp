@@ -191,6 +191,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
     {
 		tgCPGStringControl* pStringControl = new tgCPGStringControl();
         allMuscles[i]->attach(pStringControl);
+        
         m_allControllers.push_back(pStringControl);
     }
     

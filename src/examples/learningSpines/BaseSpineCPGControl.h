@@ -126,6 +126,7 @@ struct Config
     virtual void onTeardown(BaseSpineModelLearning& subject);
 
 	const double getCPGValue(std::size_t i) const;
+	
 protected:
     /**
      * Takes a vector of parameters reported by learning, and then 

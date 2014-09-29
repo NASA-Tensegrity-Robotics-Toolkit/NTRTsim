@@ -17,17 +17,17 @@
 */
 
 /**
- * @file AppFlemonsSpineLearning.cpp
- * @brief Contains the definition function main() for the Tetra Spine Learning
+ * @file AppTetraSpineHT.cpp
+ * @brief Contains the definition function main() for the Tetra Spine Static
  * application.
- * @author Brian Tietz
+ * @author Brian Mirletz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
 #include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
-#include "LearningSpineJSON.h"
+#include "htSpineSine.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -47,7 +47,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppTetraSpineHardwareLearning" << std::endl;
+    std::cout << "AppTetraSpineHT" << std::endl;
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
@@ -67,32 +67,23 @@ int main(int argc, char** argv)
     TetraSpineStaticModel* myModel =
       new TetraSpineStaticModel(segments);
     
-    /* Required for setting up learning file input/output. */
-    const std::string suffix((argc > 1) ? argv[1] : "default");
-    
-        const int segmentSpan = 3;
-    const int numMuscles = 6;
-    const int numParams = 2;
-    const int segment = 1;
-    const double controlTime = .001;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segment, controlTime);
-    
-    LearningSpineJSON* const myControl =
-      new LearningSpineJSON(control_config, suffix);
+    htSpineSine* const myControl =
+      new htSpineSine();
+
     myModel->attach(myControl);
-    
+    /*
     tgCPGLogger* const myLogger = 
       new tgCPGLogger("logs/CPGValues.txt");
     
     myControl->attach(myLogger);
-    
+    */
     simulation.addModel(myModel);
     
     int i = 0;
     while (i < 1)
     {
-        simulation.run(60000);
-        simulation.reset();
+        simulation.run(120000);
+        //simulation.reset();
         i++;
     }
     

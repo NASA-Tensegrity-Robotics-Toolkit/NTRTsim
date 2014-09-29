@@ -1,0 +1,14 @@
+{
+    "in_top_amp_a" : -80.0,
+    "in_top_amp_b" : -40.0,
+    "in_bottom_amp_a" : -80.0,
+    "in_bottom_amp_b" : -40.0,
+    "out_top_amp_a" : 60.0,
+    "out_top_amp_b" : 60.0,
+    "out_bottom_amp_a" : 30.0,
+    "out_bottom_amp_b" : 30.0,
+    "cpg_frequency" : 2,
+    "front_offset" : -1.570796,
+    "back_offset" : 0.0,
+    "updateFrequency" : 0.001
+}
