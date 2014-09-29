@@ -71,7 +71,7 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
 		cycle = cos(m_totalTime  * 2.0 * M_PI / cpgFrequency + phaseOffset);
         target = cycle*cpgAmplitude + offsetSpeed;
 		
-		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, cycle);
+		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, target);
         m_controlTime = 0;
     }
     else

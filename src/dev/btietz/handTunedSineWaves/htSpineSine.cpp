@@ -129,7 +129,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
 			tension = 2000.0;
             kPosition = 500.0;
-            kVelocity = 100.0;
+            kVelocity = 150.0;
             controlLength = allMuscles[i]->getStartLength();
             if (allMuscles[i]->hasTag("seg1"))
             {
@@ -150,8 +150,8 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
             tension = 1000.0;
             kPosition = 500.0;
-            kVelocity = 100.0;
-            controlLength = 19.5;
+            kVelocity = 150.0;
+            controlLength = 19.0;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("out_top_amp_a", "UTF-8").asDouble();
@@ -170,7 +170,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         else if (allMuscles[i]->hasTag("inner"))
         {
             tension = 1500.0;
-            kPosition = 100.0;
+            kPosition = 300.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
             if (allMuscles[i]->hasTag("seg1"))
@@ -191,7 +191,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         else if (allMuscles[i]->hasTag("outer"))
         {
 			tension = 800.0;
-            kPosition = 100.0;
+            kPosition = 300.0;
             kVelocity = 100.0;
             controlLength = 19.5 ;
             if (allMuscles[i]->hasTag("seg1"))
