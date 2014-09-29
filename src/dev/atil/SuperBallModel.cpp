@@ -70,18 +70,18 @@ namespace
         double maxAcc;
     } c =
    {
-     0.825,    // density (kg / length^3)
-     0.31,     // radius (length)
+     0.40374,    // density (kg / length^3)
+     0.4,     // radius (length)
      3000.0,   // stiffness (kg / sec^2)
      200.0,    // damping (kg / sec)
-     15.0,     // rod_length (length)
-     7.5,      // rod_space (length)
+     17.0,     // rod_length (length)
+     17.0/2.0, // rod_space (length)
      1.0,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
-     0,        // rotation
-     300,   // maxTens
-     20000,    // targetVelocity
+     0.0,        // rotation
+     5000,   // maxTens
+     2,    // targetVelocity
      20000     // maxAcc
 
      // Use the below values for earlier versions of simulation.
@@ -267,7 +267,7 @@ void SuperBallModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, true, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             
@@ -310,7 +310,7 @@ void SuperBallModel::setup(tgWorld& world)
     //move rotate and give initial speed to the structure
     btVector3 location(0,13.0,0);
     btVector3 rotation(0.0,0.6,0.8);
-  	btVector3 speed(0,10,0);
+  	btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
 
 }

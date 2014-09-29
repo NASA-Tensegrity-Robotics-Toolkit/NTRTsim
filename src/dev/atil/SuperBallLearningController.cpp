@@ -83,7 +83,12 @@ void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 
 	//Receive parameters from evolution
 	controlParameters = receiveParametersFromEvolution();
-
+	for(int i=0;i<controlParameters.size();i++)
+	{
+		controlParameters[i][0]=0.81;
+		controlParameters[i][1]=0.81;
+	}
+	controlParameters[3][0]=0.2;
 
 }
 
@@ -221,14 +226,14 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 			else
 				groundNodesInOrder[0]=groundNodes[i];
 		}
-//		cout<<"ground nodes in order: "<<groundNodesInOrder[0]<<" "<<groundNodesInOrder[1]<<" "<<groundNodesInOrder[2]<<" "<<endl;
+		cout<<"ground nodes in order: "<<groundNodesInOrder[0]<<" "<<groundNodesInOrder[1]<<" "<<groundNodesInOrder[2]<<" "<<endl;
 		//fill node mapping according to these new base points
 		subject.fillNodeMappingFromBasePoints(groundNodesInOrder[0],groundNodesInOrder[1],groundNodesInOrder[2]);
 
 		int actionNo=0;
 		for(int i=0;i<13;i++)
 		{
-			for(int j=i+1;j<13;j++)
+			for(int j=0;j<13;j++)
 			{
 				if(subject.muscleConnections[i][j]>=0)
 				{
@@ -249,6 +254,8 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 						continue;
 					}
 					correspondingMuscle->setPrefLength(actions[actionNo][0]);
+					cout<<"From "<<nodeStartNew<<" to "<<nodeEndNew<<" : "<<actions[actionNo][0]<<endl;
+					actionNo++;
 				}
 			}
 		}
@@ -372,13 +379,15 @@ void SuperBallPrefLengthController::onTeardown(SuperBallModel& subject)
 			    stringstream ss;
 				ss<<"logs/tensions"<<i<<"-"<<j<<".csv";
 			    logtension.open(ss.str().c_str(),ios::out);
-			    double time=0;
-				tgLinearString * mscl = subject.musclesPerNodes[i][j];
+			    tgLinearString * mscl = subject.musclesPerNodes[i][j];
 				deque<double> hist = mscl->getHistory().tensionHistory;
-			    double timestep=m_totalTime / hist.size();
+				deque<double> hist2 = mscl->getHistory().restLengths;
+				double time=0;
+				double timestep=m_totalTime / hist.size();
 				for(int i=0;i<hist.size();i++)
 				{
-					logtension<<time<<","<<hist[i]<<endl;
+					logtension<<time<<","<<hist[i]<<","<<hist2[i]<<endl;
+					time+=timestep;
 				}
 			}
 		}
