@@ -16,22 +16,20 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef SUPERBALL_MODEL_H
-#define SUPERBALL_MODEL_H
+#ifndef Caterpillar_MODEL_H
+#define Caterpillar_MODEL_H
 
 /**
- * @file SuperBallModel.h
- * @brief Contains the definition of class SuperBallModel.
+ * @file CaterpillarModel.h
+ * @brief Contains the definition of class CaterpillarModel.
  * $Id$
  */
 
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
-#include "core/tgRod.h"
 // The C++ Standard Library
 #include <vector>
-#include "heightSensor.h"
 
 // Forward declarations
 class tgLinearString;
@@ -42,7 +40,7 @@ class tgWorld;
 /**
  * Class that creates the six strut "superball" model using tgcreator
  */
-class SuperBallModel : public tgSubject<SuperBallModel>, public tgModel
+class CaterpillarModel : public tgSubject<CaterpillarModel>, public tgModel
 {
 public: 
 	
@@ -51,13 +49,13 @@ public:
      * Configuration parameters are within the .cpp file in this case,
      * not passed in. 
      */
-    SuperBallModel(tgWorld& world);
+    CaterpillarModel();
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~SuperBallModel();
+    virtual ~CaterpillarModel();
     
     /**
      * Create the model. Place the rods and strings into the world
@@ -96,53 +94,6 @@ public:
      */
     const std::vector<tgLinearString*>& getAllMuscles() const;
     
-    /**
-     * Returns the values from all the 12 height sensors.
-     **/
-    std::vector<double> getSensorInfo();
-
-
-    /**
-     * Returns the positions of the sensors
-     */
-    std::vector< btVector3 > getSensorPositions();
-
-    /**
-     * Returns the vector from the center of the robot to the sensor.
-     */
-    std::vector< btVector3 > getSensorOrientations();
-
-    //Return the center of the sensor positions
-    btVector3 getCenter();
-
-    //Return the physical world
-    btDynamicsWorld *getWorld();
-
-    //Given the base 3 nodes, it fills the default node numbering schema
-    void fillNodeNumberingSchema(int a,int b,int c);
-
-    //Given the new base points fill the map from the new nodes what they would match in default node numbering
-    void fillNodeMappingFromBasePoints(int a,int b,int c);
-
-    //Fill the list of pointers to the muscles for each node.
-	void fillMusclesPerNode();
-
-	const std::vector<std::vector<tgLinearString*> >& getMusclesPerNodes() const {
-		return musclesPerNodes;
-	}
-
-	//Returns the node number that is at the same rod with the node i
-	int getOtherEndOfTheRod(int i);
-
-	//nodeMapping that maps the nodes in current orientation to the nodes in the default orientation
-	int nodeMapping[13];
-	//nodeMapping that maps the nodes in default orientation to the nodes in the current orientation
-	int nodeMappingReverse[13];
-	//muscle connections between the nodes.
-	int muscleConnections[13][13];
-	//contains pointer to the muscle for a given pair of nodes
-	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
-
 private:
 	
 	/**
@@ -151,7 +102,7 @@ private:
      * for your own models
      * @param[in] tetra: A tgStructure that we're building into
      */
-     void addNodes(tgStructure& s);
+    static void addNodes(tgStructure& s);
 	
 	/**
      * A function called during setup that creates rods from the
@@ -165,39 +116,15 @@ private:
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    void addMuscles(tgStructure& s);
+    static void addMuscles(tgStructure& s);
 
-    /*
-     * Adds the 12 markers to the end of the rods so that we can visualize
-     * them and track their position
-     */
-    void addMarkers();
-
-    /**
-     * Adds the 12 height sensors to the end of the rods that are used as an input for controllers.
-     **/
-    void addSensors();
-
-
-    /*
-	 * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
-	 * First rotates the structure around 3 axises given 3 angles.
-	 * Moves the structure to the target point.
-	 * Sets all the bars speed to the given speed vector.
-	 * (muscles and markers are moved automatically since they are attached).
-	 */
-     void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
+private:
 	
 	/**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
     std::vector<tgLinearString*> allMuscles;
-	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
-	std::vector<btVector3> nodePositions;
-	std::vector<heightSensor> heightSensors;
-
-	tgWorld& m_world;
 };
 
-#endif  // SUPERBALL_MODEL_H
+#endif  // Caterpillar_MODEL_H

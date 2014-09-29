@@ -8,3 +8,4 @@ try:
         print line.partition(',')[0] # Implicit '\n' printed as well
 finally:
     f.close()
+

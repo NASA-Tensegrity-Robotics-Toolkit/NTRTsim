@@ -143,24 +143,25 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = false;
+    bool usingManualParams = true;
     if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
-    int lineNumber = 4;
-    string filename = "logs/bestParams.dat";
+    int lineNumber = 10;
+    string filename = "logs/roundCraterDeep2/bestParamsSorted.dat";
     vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
+    double pretension = 0.90;// * actions[XXX]; //TODO: Play with this value
     manualParams = readManualParams(lineNumber, filename);
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths * (1 - maxStringLengthFactor), 
+    double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
                        0.3, //Hz
                        -1 * M_PI, 
-                       m_initialLengths * (1 - maxStringLengthFactor)};
+                       m_initialLengths};// * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths * (1 + maxStringLengthFactor), 
+    double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
                        20, //Hz (can cheat to 50Hz, if feeling immoral)
                        M_PI, 
-                       m_initialLengths * (1 + maxStringLengthFactor)}; 
+                       m_initialLengths};// * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     for(int i=0;i<actions.size();i++) { //8x
@@ -203,6 +204,7 @@ void Escape_T6Controller::setupAdapter() {
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 }
 
+//TODO: Doesn't seem to correctly calculate energy spent by tensegrity
 double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     double totalEnergySpent=0;
 
@@ -271,9 +273,11 @@ double Escape_T6Controller::displacement(Escape_T6Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
     // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
-    const double newX = finalPosition[1];
+    //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
+
+    const double newX = finalPosition[0];
     const double newZ = finalPosition[2];
-    const double oldX = initPosition[1];
+    const double oldX = initPosition[0];
     const double oldZ = initPosition[2];
 
     const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 

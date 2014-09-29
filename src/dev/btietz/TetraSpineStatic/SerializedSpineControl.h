@@ -59,6 +59,7 @@ struct Config
 	 */
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
+    ImpedanceControl* top_controller;
 	
 	/**
 	 * Definitions to find muscle length parameters
@@ -72,8 +73,23 @@ struct Config
      * Muscle Length Parameters
      */
     
-    double insideLength;
-    double outsideLength;
+    std::vector<double> insideTopLength;
+    std::vector<double> insideLeftLength;
+    std::vector<double> insideRightLength;
+    std::vector<double> outsideTopLength;
+    std::vector<double> outsideLeftLength;
+    std::vector<double> outsideRightLength;
+    
+	 /**
+     * Muscle Tension Parameters
+     */
+    
+    std::vector<double> insideTopTens;
+    std::vector<double> insideLeftTens;
+    std::vector<double> insideRightTens;
+    std::vector<double> outsideTopTens;
+    std::vector<double> outsideLeftTens;
+    std::vector<double> outsideRightTens;
     
     /**
      * CPG related parameters.
@@ -115,30 +131,7 @@ public:
      */
     ~SerializedSpineControl();
     
-    /**
-     * Applies the impedance controllers using a velocity setpoint of 0.
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     * @todo - why is this public? It probably should be private
-     */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
-                                                            double dt,
-                                                            std::size_t phase);
-    /**
-     * Applies the impedance controllers using a velocity setpoint determined.
-     * by the phase parameter and 
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     */                                    
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase);
+
     
     virtual void onSetup(BaseSpineModelLearning& subject);
     
@@ -152,8 +145,52 @@ public:
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
 private:
+
+#if (0)
+    /**
+     * Applies the impedance controllers using a velocity setpoint of 0.
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
+     * @todo - why is this public? It probably should be private
+     */
+    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+                                                            double dt,
+                                                            std::size_t phase);
+                                                            
+	void applyImpedanceControlTopInside(const std::vector<tgLinearString*> stringList,
+												double dt,
+												std::size_t phase);
+    /**
+     * Applies the impedance controllers using a velocity setpoint determined.
+     * by the phase parameter and 
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
+     */                                    
+    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase);
     
-    const Config m_config;
+    void applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase);
+#endif //Non generic controllers    
+    /**
+     * Because sometimes you give up and specify everything
+     */
+    void applyImpedanceControlGeneric(ImpedanceControl* controller,	
+										const std::vector<tgLinearString*> stringList,
+										const std::vector<double> stringLengths,
+										const std::vector<double> tensions,
+										double dt,
+										std::size_t phase);
+    
+    Config m_config;
     
     std::size_t segments;
     

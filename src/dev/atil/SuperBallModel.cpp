@@ -184,6 +184,7 @@ void SuperBallModel::addMarkers()
 
 void SuperBallModel::addSensors()
 {
+	std::cout<<"Adding sensors"<<std::endl;
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
 	for(int i=0;i<12;i++)
@@ -209,8 +210,6 @@ std::vector<double> SuperBallModel::getSensorInfo()
 
 void SuperBallModel::addMuscles(tgStructure& s)
 {
-
-	int muscleConnections[13][13];
 	musclesPerNodes.resize(13);
 	for(int i=0;i<13;i++)
 	{
@@ -254,14 +253,13 @@ void SuperBallModel::addMuscles(tgStructure& s)
 			if(muscleConnections[i][j]>=0)
 			{
 				std::stringstream tag;
-				tag<<"muscle-"<<i<<"-"<<j;
-				s.addPair(i, j, "muscle");
-				//musclesPerNodes[i][j]=s.addPair(i, j,  tag);
-				//musclesPerNodes[j][i]=musclesPerNodes[i][j];
+				tag<<"muscle "<<i<<"-"<<j;
+				s.addPair(i, j, tag.str());
 			}
 		}
 	}
 }
+
 
 void SuperBallModel::setup(tgWorld& world)
 {
@@ -309,17 +307,21 @@ void SuperBallModel::setup(tgWorld& world)
     // Actually setup the children
     tgModel::setup(world);
 
+    this->m_world = world;
+
     //map the rods and add the markers to them
     addMarkers();
     addSensors();
 
+    fillNodeNumberingSchema(6,11,9);
+    fillMusclesPerNode();
+
     //move rotate and give initial speed to the structure
-    btVector3 location(0,20.0,0);
+    btVector3 location(0,13.0,0);
     btVector3 rotation(0.0,0.6,0.8);
-  	btVector3 speed(0,40,0);
+  	btVector3 speed(0,10,0);
     this->moveModel(location,rotation,speed);
 
-    this->m_world = world;
 }
 
 void SuperBallModel::step(double dt)
@@ -349,6 +351,13 @@ const std::vector<tgLinearString*>& SuperBallModel::getAllMuscles() const
     
 void SuperBallModel::teardown()
 {
+	notifyTeardown();
+
+	std::cout<<"Tearing down model"<<std::endl;
+	this->nodeNumberingSchema.clear();
+	this->heightSensors.clear();
+	this->nodePositions.clear();
+
     tgModel::teardown();
 }
 
@@ -366,5 +375,140 @@ void SuperBallModel::moveModel(btVector3 positionVector,btVector3 rotationVector
 	{
 			rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
 			rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
+	}
+}
+
+std::vector< btVector3 > SuperBallModel::getSensorPositions()
+{
+	std::vector<btVector3 > positions;
+	for(int i=0;i<heightSensors.size();i++)
+	{
+		positions.push_back(heightSensors[i].getWorldPosition());
+	}
+	return positions;
+}
+
+std::vector< btVector3 > SuperBallModel::getSensorOrientations()
+{
+	btVector3 temp;
+	std::vector<btVector3 > directions;
+	for(int i=0;i<12;i++)
+	{
+		temp = heightSensors[i].getWorldPosition() - heightSensors[otherEndOfTheRod[i]].getWorldPosition();
+		temp /= temp.length();
+		directions.push_back(temp);
+	}
+	return directions;
+}
+
+
+btVector3 SuperBallModel::getCenter()
+{
+	btVector3 pos(0.0,0.0,0.0);
+	for(int i=0;i< heightSensors.size();i++)
+	{
+		pos +=  heightSensors[i].getWorldPosition();
+	}
+	pos /= heightSensors.size();
+	return pos;
+}
+
+
+btDynamicsWorld *SuperBallModel::getWorld()
+{
+	return &(tgBulletUtil::worldToDynamicsWorld(this->m_world));
+}
+
+void SuperBallModel::fillNodeNumberingSchema(int base1,int base2,int base3)
+{
+	nodeNumberingSchema.resize(3);
+	for (int i = 0; i < 3; ++i)
+	{
+		nodeNumberingSchema[i].resize(2);
+		for (int j = 0; j < 2; ++j)
+		{
+			nodeNumberingSchema[i][j].resize(2);
+			for (int k=0;k<2;k++)
+			{
+				nodeNumberingSchema[i][j][k]=-1;
+			}
+		}
+	}
+
+	nodeNumberingSchema[0][0][0]=base1;
+	nodeNumberingSchema[1][0][0]=base2;
+	nodeNumberingSchema[2][0][0]=base3;
+	//For each base node
+	for(int i=0;i<3;i++)
+	{
+		//Other end of the rod that this node is in
+		nodeNumberingSchema[i][0][1]=otherEndOfTheRod[nodeNumberingSchema[i][0][0]];
+		//Same end of the parallel rod
+		nodeNumberingSchema[i][1][0]=parallelNode[nodeNumberingSchema[i][0][0]];
+		//Other end of the parallel rod
+		nodeNumberingSchema[i][1][1]=otherEndOfTheRod[nodeNumberingSchema[i][1][0]];
+	}
+}
+
+void SuperBallModel::fillNodeMappingFromBasePoints(int a,int b,int c)
+{
+	for(int i=0;i<13;i++)
+	{
+		nodeMapping[i]=-1;
+		nodeMappingReverse[i]=-1;
+	}
+	nodeMapping[12]=12;
+
+	nodeMapping[a]=nodeNumberingSchema[0][0][0];
+	nodeMapping[b]=nodeNumberingSchema[1][0][0];
+	nodeMapping[c]=nodeNumberingSchema[2][0][0];
+
+	nodeMapping[otherEndOfTheRod[a]]=nodeNumberingSchema[0][0][1];
+	nodeMapping[otherEndOfTheRod[b]]=nodeNumberingSchema[1][0][1];
+	nodeMapping[otherEndOfTheRod[c]]=nodeNumberingSchema[2][0][1];
+
+	nodeMapping[parallelNode[a]]=nodeNumberingSchema[0][1][0];
+	nodeMapping[parallelNode[b]]=nodeNumberingSchema[1][1][0];
+	nodeMapping[parallelNode[c]]=nodeNumberingSchema[2][1][0];
+
+	nodeMapping[otherEndOfTheRod[parallelNode[a]]]=nodeNumberingSchema[0][1][1];
+	nodeMapping[otherEndOfTheRod[parallelNode[b]]]=nodeNumberingSchema[1][1][1];
+	nodeMapping[otherEndOfTheRod[parallelNode[c]]]=nodeNumberingSchema[2][1][1];
+
+	for(int i=0;i<13;i++)
+	{
+//		cout<<"mapping old: "<<i<<" new: "<<nodeMapping[i]<<endl;
+		nodeMappingReverse[nodeMapping[i]]=i;
+	}
+}
+
+
+int SuperBallModel::getOtherEndOfTheRod(int i)
+{
+	if(i>=0 && i<13)
+		return otherEndOfTheRod[i];
+	else
+		return -1;
+}
+
+void SuperBallModel::fillMusclesPerNode()
+{
+	for(int i=0;i<13;i++)
+	{
+		for(int j=0;j<13;j++)
+		{
+			if(muscleConnections[i][j]>=0)
+			{
+				std::stringstream tag;
+				tag<<"muscle "<<i<<"-"<<j;
+				std::vector<tgLinearString*> foundStr = this->find<tgLinearString>(tag.str());
+				if(!foundStr.empty())
+				{
+//					std::cout<<"Found muscle "<<tag.str()<<std::endl;
+					musclesPerNodes[i][j]=foundStr[0];
+					musclesPerNodes[j][i]=musclesPerNodes[i][j];
+				}
+			}
+		}
 	}
 }
