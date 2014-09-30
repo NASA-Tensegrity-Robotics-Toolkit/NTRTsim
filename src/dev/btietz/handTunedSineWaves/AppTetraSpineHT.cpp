@@ -26,7 +26,7 @@
  */
 
 // This application
-#include "TetraSpineStaticModel_hf.h"
+#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel_hf.h"
 #include "htSpineSine.h"
 // This library
 #include "core/tgModel.h"

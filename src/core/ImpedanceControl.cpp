@@ -137,7 +137,7 @@ ImpedanceControl::controlTension(tgBaseString* const mString,
     // Precondition
     assert(mString != NULL);
 
-    const double actualLength = mString->getRestLength();
+    const double actualLength = mString->getCurrentLength();
     const double vel = mString->getVelocity();
 
     const double setTension = 

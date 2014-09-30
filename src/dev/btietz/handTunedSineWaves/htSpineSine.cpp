@@ -224,7 +224,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
                                                         kVelocity);
         
         // In Won's convention
-		#if (1)
+		#if (0)
         offset = amplitude;
         #else
         offset = 0.0;
