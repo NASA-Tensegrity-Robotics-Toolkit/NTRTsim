@@ -280,8 +280,8 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     spec.addBuilder("PCB num2", new tgSphereInfo(PCB_2_Config));
     
     // Two different string configs
-    tgLinearString::Config muscleConfig(210.15 * 2.0, 3, false, 0, 5000, 7.0, 1500, 10.0, 10.0);
-    tgLinearString::Config muscleConfig2(210.15, 2, false, 0, 5000, 7.0, 1500, 10.0, 10.0);
+    tgLinearString::Config muscleConfig(229.16 * 2.0, 10, false, 0, 5000, 7.0, 9500, 10.0, 10.0);
+    tgLinearString::Config muscleConfig2(229.16, 10, false, 0, 5000, 7.0, 9500, 10.0, 10.0);
     spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));

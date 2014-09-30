@@ -48,12 +48,15 @@
 // The C++ Standard Library
 #include <stdexcept>
 
+#define LOGGING
+
 /**
  * Defining the adapters here assumes the controller is around and
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-htSpineSine::htSpineSine()
+htSpineSine::htSpineSine() :
+m_dataObserver("logs/TCData")
 {    
 }
 
@@ -62,7 +65,7 @@ void htSpineSine::onSetup(BaseSpineModelLearning& subject)
 
     setupWaves(subject);
     
-#if (0) // Conditional compile for data logging    
+#ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif    
     
@@ -77,7 +80,7 @@ void htSpineSine::onStep(BaseSpineModelLearning& subject, double dt)
     if (m_updateTime >= m_controlTime)
     {
 
-#if (0) // Conditional compile for data logging        
+#ifdef LOGGING // Conditional compile for data logging        
         m_dataObserver.onStep(subject, m_updateTime);
 #endif
         m_updateTime = 0;
@@ -120,7 +123,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         throw std::invalid_argument("Bad JSON filename");
     }
     
-    double m_controlTime = root.get("updateFrequency", "UTF-8").asDouble();
+    m_controlTime = root.get("updateFrequency", "UTF-8").asDouble();
     double frequency = root.get("cpg_frequency", "UTF-8").asDouble();
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
@@ -129,18 +132,20 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
 			tension = 2000.0;
             kPosition = 500.0;
-            kVelocity = 150.0;
+            
             controlLength = allMuscles[i]->getStartLength();
             //controlLength = 19.0;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 				phase = root.get("front_offset", "UTF-8").asDouble();
+				kVelocity = 50;
 			}
 			else if(allMuscles[i]->hasTag("seg2"))
 			{
 				amplitude = root.get("in_top_amp_b", "UTF-8").asDouble();
 				phase = root.get("back_offset", "UTF-8").asDouble();
+				kVelocity = 100.0;
 			}
 			else
 			{
@@ -151,7 +156,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
             tension = 1000.0;
             kPosition = 500.0;
-            kVelocity = 150.0;
+            kVelocity = 100.0;
             
             if (allMuscles[i]->hasTag("seg1"))
             {
@@ -173,7 +178,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("inner"))
         {
-            tension = 1500.0;
+            tension = 1000.0;
             kPosition = 300.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();

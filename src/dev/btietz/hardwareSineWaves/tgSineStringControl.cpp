@@ -77,6 +77,7 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
 		}
 	#endif	
 		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, target);
+		std::cout << m_commandedTension << std::endl;
         m_controlTime = 0;
     }
     else
