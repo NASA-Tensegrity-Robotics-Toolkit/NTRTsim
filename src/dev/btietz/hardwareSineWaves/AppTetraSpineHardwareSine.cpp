@@ -27,6 +27,7 @@
 
 // This application
 #include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
+#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel_hf.h"
 #include "LearningSpineSine.h"
 // This library
 #include "core/tgModel.h"
@@ -64,8 +65,8 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 3;
-    TetraSpineStaticModel* myModel =
-      new TetraSpineStaticModel(segments);
+    TetraSpineStaticModel_hf* myModel =
+      new TetraSpineStaticModel_hf(segments);
     
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
@@ -88,7 +89,8 @@ int main(int argc, char** argv)
     
         double cl = 10.0;
         double lf = 0.0;
-        double hf = 3.0;
+        double hf = 2.0;
+
     
     BaseSpineCPGControl::Config control_config(segmentSpan, 
 												numMuscles,
