@@ -9,4 +9,8 @@ src/examples/learningSpines/TetraSpine/logs
 
 .project
 
+.idea
+
+*.pyc
+
 src/.settings/org.eclipse.cdt.codan.core.prefs
