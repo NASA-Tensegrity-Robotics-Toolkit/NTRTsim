@@ -88,7 +88,7 @@ int main(int argc, char** argv)
     
         double cl = 10.0;
         double lf = 0.0;
-        double hf = 45.0;
+        double hf = 3.0;
     
     BaseSpineCPGControl::Config control_config(segmentSpan, 
 												numMuscles,
