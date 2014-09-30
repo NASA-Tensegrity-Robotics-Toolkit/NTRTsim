@@ -16,8 +16,8 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-# Purpose: Boost library Setup
-# Date:    2013-05-01
+# Purpose: Setup for python virtualenv (without root access)
+# Date:    2013-09-29
 
 ##############################################################################
 #                         START DO NOT MODIFY                                #
