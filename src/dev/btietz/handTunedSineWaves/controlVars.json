@@ -1,8 +1,8 @@
 {
-    "in_top_amp_a" : 80.0,
-    "in_top_amp_b" : 40.0,
-    "in_bottom_amp_a" : 80.0,
-    "in_bottom_amp_b" : 40.0,
+    "in_top_amp_a" : -80.0,
+    "in_top_amp_b" : -40.0,
+    "in_bottom_amp_a" : -80.0,
+    "in_bottom_amp_b" : -40.0,
     "out_top_amp_a" : 60.0,
     "out_top_amp_b" : 30.0,
     "out_bottom_amp_a" : 60.0,
