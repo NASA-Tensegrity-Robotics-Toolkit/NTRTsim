@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 1)
+    while (i < 30000)
     {
         simulation.run(60000);
         simulation.reset();
