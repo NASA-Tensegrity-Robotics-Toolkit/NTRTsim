@@ -33,7 +33,6 @@ if [ ! -f "helper_functions.sh" ]; then
     exit 1;
 fi
 
-
 # Import our common files
 source "helper_functions.sh"
 source "helper_paths.sh"
@@ -46,18 +45,77 @@ popd > /dev/null
 ##############################################################################
 
 
-# Call virtualenv.py with --no-setuptools to create a new virtualenv
-python "$SETUP_DIR/helpers/virtualenv.py" --no-setuptools "$ENV_DIR/venv"
-
-# Activate the new virtualenv
-source "$ENV_DIR/venv/bin/activate"
-
-# Install pip
-easy_install pip
-
-# Anything else?
-
-# Deactivate the virtualenv
-deactivate
+#Source this package's configuration
+source_conf "general.conf"
+source_conf "virtualenv.conf"
 
 
+# Variables
+virtualenv_pkg=`echo $VENV_URL|awk -F/ '{print $NF}'`  # get the package name from the url
+
+# Download the package to env/downloads
+function download_virtualenv()
+{
+    virtualenv_pkg_path="$DOWNLOADS_DIR/$virtualenv_pkg"
+
+    if [ -f "$virtualenv_pkg_path" ]; then
+        echo "- Virtualenv package already exists ('$virtualenv_pkg_path') -- skipping download."
+        return
+    fi
+
+    echo "Downloading $virtualenv_pkg to $virtualenv_pkg_path"
+    download_file "$VENV_URL" "$virtualenv_pkg_path"
+}
+
+# Unpack to the build directory specified in the appropriate .conf file
+function unpack_virtualenv()
+{
+    # Create directory and unpack
+    if check_directory_exists "$VENV_BUILD_DIR"; then
+        echo "- Virtualenv is already unpacked to '$VENV_BUILD_DIR' -- skipping."
+        return
+    fi
+
+    echo "Unpacking virtualenv to $VENV_BUILD_DIR (this may take a minute...)"
+    # TODO: Do we need to remove the dir if it already exists?
+    create_directory_if_noexist "$VENV_BUILD_DIR"
+
+    # Unzip
+    pushd "$VENV_BUILD_DIR" > /dev/null
+    tar xf "$DOWNLOADS_DIR/$virtualenv_pkg" --strip 1 
+    popd > /dev/null
+
+}
+
+# Create a local virtualenv (note: this does not require sudo access)
+function install_virtualenv()
+{
+
+    if [ -d "$VENV_PATH" ]; then
+        echo "- Virtualenv has already been created ('$VENV_PATH') -- skipping install."
+        echo "  NOTE: If you want to have setup re-create the virtualenv, delete $VENV_PATH and re-run setup.sh"
+        return
+    fi
+    
+    echo "- Creating new virtualenv under $VENV_INSTALL_PREFIX"
+    
+    pushd "$VENV_BUILD_DIR" > /dev/null
+    "$VENV_PYTHON_INTERPRETER" "virtualenv.py" "$VENV_PATH"
+    popd > /dev/null
+}
+
+
+function main()
+{
+
+    ensure_install_prefix_writable $VENV_INSTALL_PREFIX
+
+    # Create the virtualenv
+    download_virtualenv
+    unpack_virtualenv
+    install_virtualenv
+
+}
+
+
+main
