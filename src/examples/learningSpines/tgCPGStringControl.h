@@ -104,6 +104,8 @@ private:
      */
     const double m_controlStep;
     
+    double m_totalTime;
+    
     double m_commandedTension;
     
     btRigidBody* m_pFromBody;

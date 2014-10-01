@@ -27,6 +27,7 @@
 
 tgCPGStringControl::tgCPGStringControl(const double controlStep) :
 m_controlTime(0.0),
+m_totalTime(0.0),
 m_controlStep(controlStep),
 m_commandedTension(0.0),
 m_pFromBody(NULL),
@@ -55,12 +56,20 @@ void tgCPGStringControl::onAttach(tgLinearString& subject)
 void tgCPGStringControl::onStep(tgLinearString& subject, double dt)
 {
     m_controlTime += dt;
-
+	m_totalTime += dt;
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
     if (m_controlTime >= m_controlStep)
     {
-		m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
+		// Encoder inversion for hardware comparison. TODO - remove from the general code
+		if (m_nodeNumber == 2 || m_nodeNumber == 4 || m_nodeNumber == 5 || m_nodeNumber == 6 || m_nodeNumber == 7 || m_nodeNumber == 8||m_nodeNumber == 9|| m_nodeNumber == 10 )
+		{
+			m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), -getCPGValue());
+		}
+		else
+		{
+			m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
+		}
         m_controlTime = 0;
     }
     else
