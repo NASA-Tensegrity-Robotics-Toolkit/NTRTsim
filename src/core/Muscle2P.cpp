@@ -95,11 +95,11 @@ btVector3 Muscle2P::calculateAndApplyForce(double dt)
     //Now Apply it to the connected two bodies
     btVector3 point1 = this->anchor1->getRelativePosition();
     this->anchor1->attachedBody->activate();
-    this->anchor1->attachedBody->applyForce(force,point1);
+    this->anchor1->attachedBody->applyImpulse(force*dt,point1);
 
     btVector3 point2 = this->anchor2->getRelativePosition();
     this->anchor2->attachedBody->activate();
-    this->anchor2->attachedBody->applyForce(-force,point2);
+    this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
 
     return force;
 }

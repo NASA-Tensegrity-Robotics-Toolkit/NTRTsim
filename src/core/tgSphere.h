@@ -71,11 +71,11 @@ public:
             const double density;
             
             /** The sphere's friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double friction;
 
             /** The sphere's rolling friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double rollFriction;
             
             /** The sphere's coefficient of restitution; 

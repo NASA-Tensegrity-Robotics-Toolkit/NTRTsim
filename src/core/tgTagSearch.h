@@ -82,7 +82,16 @@ public:
         s.append(tags);
         return matches(s);
     }
-        
+    
+    /**
+     * Remove the given tags from the search
+     */
+    bool remove(const tgTags& tags)
+    {
+        tgTags s(tags);
+        m_search.remove(tags);
+    }
+    
 private:
     
     // @todo: change this to a parsed representation of the and/or/not setup

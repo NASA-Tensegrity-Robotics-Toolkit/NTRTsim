@@ -38,6 +38,7 @@
 #include <iostream>
 #include <sstream>  
 #include <time.h>
+#include <stdexcept>
 
 tgDataObserver::tgDataObserver(std::string filePrefix) :
 m_totalTime(0.0),
@@ -84,6 +85,11 @@ void tgDataObserver::onSetup(tgModel& model)
     
     // First time opening this, so nothing to append to
     tgOutput.open(m_fileName.c_str());
+    
+	if (!tgOutput.is_open())
+	{
+		throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+	}
     
     std::vector<tgModel*> children = model.getDescendants();
     

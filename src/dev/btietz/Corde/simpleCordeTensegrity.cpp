@@ -96,7 +96,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
 	
 	tgStructure s;
-#if (0)
+#if (1)
 	s.addNode(0,0,0);
 	s.addNode(0,3,0);
 	s.addNode(2,5,0);
@@ -179,7 +179,7 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
-	allMuscles[0]->setRestLength(5.0, dt);
+	//allMuscles[0]->setRestLength(5.0, dt);
 	tgModel::step(dt);
 }
 /**

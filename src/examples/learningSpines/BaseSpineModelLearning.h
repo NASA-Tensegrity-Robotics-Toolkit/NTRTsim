@@ -38,6 +38,7 @@
 class tgWorld;
 class tgStructureInfo;
 class tgLinearString;
+class tgBaseRigid;
 
 /**
  * Provides all of the interfaces for a learning spine model, which
@@ -63,6 +64,8 @@ public:
     virtual const std::vector<tgLinearString*>& getMuscles(const std::string& key) const;
     
     virtual const std::vector<tgLinearString*>& getAllMuscles();
+    
+    virtual const std::vector<tgBaseRigid*> getAllRigids();
     
     virtual const int getSegments();
     
