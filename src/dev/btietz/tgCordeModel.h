@@ -66,6 +66,10 @@ public:
     {
         return m_string;
     }
+    cordeCollisionObject* getModel()
+    {
+        return m_string;
+    }
     
     btVector3 centerOfMass() const;
     

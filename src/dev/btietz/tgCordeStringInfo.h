@@ -82,11 +82,15 @@ public:
 
     double getMass();
 
+	/** Helper function - useful for others to have access 
+	 * @todo move to a util class or similar
+	 * **/
+	std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
 private:    
     
     cordeCollisionObject* createCordeString(tgWorld& world);
     
-    std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
+    
     
 private:
     

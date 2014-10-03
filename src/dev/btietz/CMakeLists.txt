@@ -16,6 +16,7 @@ add_library(${PROJECT_NAME} SHARED
 
 subdirs(
 	Corde
+	cordeNoRB
     boxFeet
     caterpillar
     RBTests

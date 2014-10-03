@@ -100,7 +100,7 @@ void cordeAnchor::solve(const double dt)
 	
 	m_attachedElement->applyForce(fSoft);
 	// Impulse instead of force
-	btVector3 fRigid = pow(idt, 1.0) * rMass * rRigid;// + m_attachedElement->force * dt;
+	btVector3 fRigid = pow(idt, 1.0) * rMass * rRigid + m_attachedElement->force * dt; // Transferring internal forces appears to be a little better
 	//m_attachedQuaternion->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
 
 
