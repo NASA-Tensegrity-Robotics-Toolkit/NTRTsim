@@ -73,7 +73,11 @@ public:
     
     btVector3 centerOfMass() const;
     
+    btVector3 momentum() const;
+    
     btScalar mass() const;
+    
+    btScalar energy() const;
     
         /**
      * Functions for interfacing with muscle2P, and higher level controllers

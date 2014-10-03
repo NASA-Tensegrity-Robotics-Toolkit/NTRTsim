@@ -88,6 +88,15 @@ btScalar tgCordeModel::mass() const
 {
 	return m_string->getMass();
 }
+
+btVector3 tgCordeModel::momentum() const
+{
+	return m_string->getMomentum();
+}
+btScalar tgCordeModel::energy() const
+{
+	return m_string->getEnergy();
+}
  // Called from controller class, it makes the restLength get closer to preferredlength.
 void tgCordeModel::moveMotors(double dt)
 {

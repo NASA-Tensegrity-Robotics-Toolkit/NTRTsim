@@ -168,6 +168,10 @@ public:
 	
 	virtual btScalar getMass() const;
 	
+	virtual btVector3 getMomentum() const;
+	
+	virtual btScalar getEnergy() const;
+	
 protected:
 	void computeConstants();
 	

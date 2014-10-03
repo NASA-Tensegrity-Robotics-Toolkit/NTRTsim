@@ -32,6 +32,8 @@
 // The C++ Standard Library
 #include <stdexcept>
 
+#define NUMERICAL_DAMPING
+
 CordeModel::Config::Config(const std::size_t res,
                             const double r, const double d,
                             const double ym, const double shm,
@@ -282,6 +284,40 @@ btScalar CordeModel::getMass() const
 	}
 	
 	return mass;
+}
+
+btVector3 CordeModel::getMomentum() const
+{
+	btVector3 vel(0.0, 0.0, 0.0);
+	
+	for(std::size_t i = 0; i < m_massPoints.size(); i++)
+	{
+		CordePositionElement& n = *(m_massPoints[i]);
+		vel += n.vel * n.mass;
+	}
+
+	return vel;
+}
+
+btScalar CordeModel::getEnergy() const
+{
+	btScalar energy = 0.0;
+	
+	std::size_t ni = m_massPoints.size();
+	for(std::size_t i = 0; i < ni; i++)
+	{
+		CordePositionElement& n = *(m_massPoints[i]);
+		energy += n.vel.length2() * n.mass;
+		if (i > ni - 1)
+		{
+			CordeQuaternionElement& q = *(m_centerlines[i]);
+			
+			// wIw - scalar multiplication since the matrix is diagonal
+			energy += (q.omega * q.computedInertia).dot(q.omega);
+		} 
+	}
+
+	return energy;
 }
 
 void CordeModel::computeConstants()
@@ -688,12 +724,12 @@ void CordeModel::unconstrainedMotion(double dt)
     {
         CordePositionElement* p_0 = m_massPoints[i];
         
-#if (1) 
+#ifdef NUMERICAL_DAMPING
 	   // Eliminate vibrations due to imprecision
 		for (std::size_t i = 0; i < 3; i++)
 		{
 			double a = DBL_EPSILON;
-			p_0->force[i] = std::abs(p_0->force[i]) < FLT_EPSILON ? 0.0 : p_0->force[i];
+			p_0->force[i] = std::abs(p_0->force[i]) < a ? 0.0 : p_0->force[i];
 		}
 #endif 
         
@@ -738,12 +774,12 @@ void CordeModel::constrainMotion (double dt)
     {
         CordePositionElement* p_0 = m_massPoints[i];
         
-#if (1) 
+#ifdef NUMERICAL_DAMPING 
 	   // Eliminate vibrations due to imprecision
 		for (std::size_t i = 0; i < 3; i++)
 		{
 			double a = DBL_EPSILON;
-			p_0->force[i] = std::abs(p_0->force[i]) < FLT_EPSILON ? 0.0 : p_0->force[i];
+			p_0->force[i] = std::abs(p_0->force[i]) < a ? 0.0 : p_0->force[i];
 		}
 #endif 
         
@@ -860,12 +896,12 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
     torques[2] = 1.0/2.0 * (q[1] * tprime[0] - q[0] * tprime[1] - q[2] * tprime[3] + q[3] * tprime[2]);
 
 	torques += appTorques;
-#if (1) 
+#ifdef NUMERICAL_DAMPING
    // Eliminate vibrations due to imprecision
     for (std::size_t i = 0; i < 3; i++)
     {
 		double a = DBL_EPSILON;
-		torques[i] = std::abs(torques[i]) < FLT_EPSILON ? 0.0 : torques[i];
+		torques[i] = std::abs(torques[i]) < a ? 0.0 : torques[i];
 	}
 #endif  
 }
