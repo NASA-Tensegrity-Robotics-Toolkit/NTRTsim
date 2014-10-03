@@ -163,7 +163,11 @@ public:
     virtual void applyQuatTorque(const btQuaternion& qtq, const std::size_t segN);
     
     /// TODO: apply uniform torques?
-
+	
+	virtual btVector3 getCenterOfMass() const;
+	
+	virtual btScalar getMass() const;
+	
 protected:
 	void computeConstants();
 	

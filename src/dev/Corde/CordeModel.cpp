@@ -254,6 +254,36 @@ void CordeModel::applyQuatTorque(const btQuaternion& qtq, const std::size_t segN
     }
 }
 
+btVector3 CordeModel::getCenterOfMass() const
+{
+	btVector3 com(0.0, 0.0, 0.0);
+	btScalar mass = 0.0;
+	
+	for(std::size_t i = 0; i < m_massPoints.size(); i++)
+	{
+		CordePositionElement& n = *(m_massPoints[i]);
+		com += n.pos * n.mass;
+		mass += n.mass;
+	}
+	
+	assert(mass > 0.0);
+	
+	return com/mass;
+}
+
+btScalar CordeModel::getMass() const
+{
+	btScalar mass = 0.0;
+	
+	for(std::size_t i = 0; i < m_massPoints.size(); i++)
+	{
+		CordePositionElement& n = *(m_massPoints[i]);
+		mass += n.mass;
+	}
+	
+	return mass;
+}
+
 void CordeModel::computeConstants()
 {
     assert(computedStiffness.empty());

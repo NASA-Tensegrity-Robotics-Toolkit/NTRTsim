@@ -25,6 +25,8 @@
 
 #include "dev/Corde/CordeModel.h"
 
+#include "LinearMath/btVector3.h"
+
 // Forward Declaration
 class cordeCollisionObject;
 
@@ -64,6 +66,10 @@ public:
     {
         return m_string;
     }
+    
+    btVector3 centerOfMass() const;
+    
+    btScalar mass() const;
     
         /**
      * Functions for interfacing with muscle2P, and higher level controllers

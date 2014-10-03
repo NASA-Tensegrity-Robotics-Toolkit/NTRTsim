@@ -115,7 +115,7 @@ cordeCollisionObject* tgCordeStringInfo::createCordeString(tgWorld& world)
 	// cordeCollisionObject handles deleting the shape, so no need to pass it to the world
 	
 	///@todo is this always the assumption we want to make with the builder tools? How would we make this more configurable?
-#if (1) // In case anchors need to be switched off for testing
+#if (0) // In case anchors need to be switched off for testing
 	tempCorde->appendAnchor(0, fromBody, from);
 	tempCorde->appendAnchor(m_config.stringConfig.resolution - 1, toBody, to);
 #endif	

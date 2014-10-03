@@ -129,6 +129,9 @@ public:
 	
 	virtual ~cordeCollisionObject();
 	
+	/**
+	 * A few of these are engine independent. Should they be moved to CordeModel??
+	 */
 	const double getRestLength() const;
 	
 	const double getActualLength() const;

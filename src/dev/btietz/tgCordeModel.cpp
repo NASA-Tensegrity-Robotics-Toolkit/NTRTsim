@@ -79,6 +79,15 @@ void tgCordeModel::onVisit(const tgModelVisitor& r) const
     r.render(*this);
 }
 
+btVector3 tgCordeModel::centerOfMass() const
+{
+	return m_string->getCenterOfMass();
+}
+
+btScalar tgCordeModel::mass() const
+{
+	return m_string->getMass();
+}
  // Called from controller class, it makes the restLength get closer to preferredlength.
 void tgCordeModel::moveMotors(double dt)
 {

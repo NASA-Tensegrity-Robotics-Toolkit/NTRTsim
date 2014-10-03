@@ -23,6 +23,7 @@
 #include "core/tgWorld.h"
 #include "core/tgLinearString.h"
 #include "core/tgBaseString.h"
+#include "core/tgRod.h"
 
 #include "dev/Corde/CordeModel.h"
 #include "dev/Corde/cordeCollisionObject.h"
@@ -133,7 +134,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod");
+	//s.addPair(4, 5, "rod");
 	
 	s.addPair(1, 2, "muscle");
 	
@@ -166,6 +167,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	// We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
     allMuscles = tgCast::filter<tgModel, tgCordeModel> (getDescendants());
+    allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 
     notifySetup();
     tgModel::setup(world);
@@ -181,6 +183,28 @@ void simpleCordeTensegrity::step(double dt)
 {
 	allMuscles[0]->setRestLength(20.0, dt);
 	//allMuscles[1]->setRestLength(3.0, dt);
+	
+	btVector3 com(0, 0, 0);
+	btScalar mass = 0;
+	
+	for (std::size_t i = 0; i < allRods.size(); i++)
+	{
+		tgRod& ri = *(allRods[i]);
+		com += ri.centerOfMass() * ri.mass();
+		mass += ri.mass();
+	}
+	
+	for (std::size_t i = 0; i < allMuscles.size(); i++)
+	{
+		tgCordeModel& ci = *(allMuscles[i]);
+		com += ci.centerOfMass() * ci.mass();
+		mass += ci.mass();
+	}
+	
+	assert(mass > 0);
+	
+	std::cout << com/mass << std::endl;
+	
 	tgModel::step(dt);
 }
 /**
