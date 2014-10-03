@@ -50,7 +50,7 @@ simpleCordeTensegrity::~simpleCordeTensegrity()
     
 void simpleCordeTensegrity::setup(tgWorld& world)
 {
-#if (1)	
+#if (0)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 40;
 	const double radius = 0.01;
@@ -75,7 +75,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 		const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
 	#else
 		// Values for thread
-		const std::size_t resolution = 10;
+		const std::size_t resolution = 40;
 		const double radius = 0.001;
 		const double density = 1300;
 		const double youngMod = 1 * pow(10, 1);
@@ -96,7 +96,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
 	
 	tgStructure s;
-#if (1)
+#if (0)
 	s.addNode(0,0,0);
 	s.addNode(0,3,0);
 	s.addNode(2,5,0);
@@ -132,8 +132,8 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addNode(5, 3, 2);
 	
 	s.addPair(0, 1, "rod");
-	s.addPair(2, 3, "rod2");
-	s.addPair(4, 5, "rod2");
+	s.addPair(2, 3, "rod");
+	s.addPair(4, 5, "rod");
 	
 	s.addPair(1, 2, "muscle");
 	
@@ -179,7 +179,8 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
-	//allMuscles[0]->setRestLength(5.0, dt);
+	allMuscles[0]->setRestLength(20.0, dt);
+	//allMuscles[1]->setRestLength(3.0, dt);
 	tgModel::step(dt);
 }
 /**
