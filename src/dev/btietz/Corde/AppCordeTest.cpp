@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     
     const tgWorld::Config config(0.0); // gravity, cm/sec^2
     
-    tgWorld world(config, ground);
+    tgWorld world(config, NULL);
 
     // Second create the view
     const double timestep_physics = 1.0/10000.0; // seconds
