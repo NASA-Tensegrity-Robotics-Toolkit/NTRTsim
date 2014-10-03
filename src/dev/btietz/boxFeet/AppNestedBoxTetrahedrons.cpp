@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-    tgWorld world(config); 
+    tgWorld world(config, NULL); 
 
     // Second create the view
     const double stepSize = 1.0/1000.0; //Seconds
