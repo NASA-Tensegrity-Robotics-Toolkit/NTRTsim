@@ -47,12 +47,12 @@ void soloCorde::setup(tgWorld& world)
 	const std::size_t resolution = 40;
 	const double radius = 0.01;
 	const double density = 1300;
-	const double youngMod = 0.5 * pow(10, 4);
-	const double shearMod = 0.5 * pow(10, 4);
+	const double youngMod = 0.5 * pow(10, 6);
+	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 0.0 * pow(10, 3); 
-	const double gammaT = 100.0 * pow(10, -3); // Position Damping
-	const double gammaR = 1.0 * pow(10, -3); // Rotation Damping
+	const double springConst = 10.0 * pow(10, 0); 
+	const double gammaT = 0.0 * pow(10, -3); // Position Damping
+	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
 	#if (0)
 		// Values for wire

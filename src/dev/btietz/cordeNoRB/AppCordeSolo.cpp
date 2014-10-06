@@ -27,7 +27,7 @@
 // This application
 #include "soloCorde.h"
 // This library
-#include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgEmptyGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -56,16 +56,20 @@ int main(int argc, char** argv)
     std::cout << "AppCordeModelTest" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
+#if (0)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
+#else
+	tgEmptyGround* ground = new tgEmptyGround();
+
+#endif    
     const tgWorld::Config config(0.0); // gravity, cm/sec^2
     
-    tgWorld world(config, NULL);
+    tgWorld world(config, ground);
 
     // Second create the view
     const double timestep_physics = 1.0/10000.0; // seconds

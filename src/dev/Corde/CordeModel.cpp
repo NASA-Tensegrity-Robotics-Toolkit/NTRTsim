@@ -32,7 +32,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define NUMERICAL_DAMPING
+//#define NUMERICAL_DAMPING
 
 CordeModel::Config::Config(const std::size_t res,
                             const double r, const double d,
@@ -301,19 +301,89 @@ btVector3 CordeModel::getMomentum() const
 
 btScalar CordeModel::getEnergy() const
 {
+	return getPotentialEnergy() + getKineticEnergy();
+}
+
+btScalar CordeModel::getPotentialEnergy() const
+{
+	btScalar pEnergy = 0;
+	
+	std::size_t n = m_massPoints.size() - 1;
+    
+    // Position based stiffness energy
+	for (std::size_t i = 0; i < n; i++)
+    {
+        const CordePositionElement* const r_0 = m_massPoints[i];
+        const CordePositionElement* const r_1 = m_massPoints[i + 1];
+
+        // Get position elements in standard variable names
+        const btScalar dist = (r_1->pos - r_0->pos).length();
+        
+        assert(linkLengths[i] > 0);
+        
+        pEnergy += 0.5 * linkLengths[i] * computedStiffness[0] *
+					pow((dist / linkLengths[i] - 1), 2);
+	} 
+	
+	n = m_centerlines.size() - 1;
+    
+    // Update quaternion elements
+	for (std::size_t i = 0; i < n; i++)
+    {
+        CordeQuaternionElement* quat_0 = m_centerlines[i];
+        CordeQuaternionElement* quat_1 = m_centerlines[i + 1];
+			
+		/* Setup Variables */
+        const btScalar q11 = quat_0->q[0];
+        const btScalar q12 = quat_0->q[1];
+        const btScalar q13 = quat_0->q[2];
+        const btScalar q14 = quat_0->q[3];
+        
+        const btScalar q21 = quat_1->q[0];
+        const btScalar q22 = quat_1->q[1];
+        const btScalar q23 = quat_1->q[2];
+        const btScalar q24 = quat_1->q[3];
+        
+        const btScalar k1 = computedStiffness[1];
+        const btScalar k2 = computedStiffness[2];
+        const btScalar k3 = computedStiffness[3];
+        
+        const btScalar lj = quaternionShapes[i][0];
+        const btScalar mu1 = quaternionShapes[i][1];
+        const btScalar mu2 = quaternionShapes[i][2];
+        const btScalar mu3 = quaternionShapes[i][3];
+		
+		// An equation straight from muPad. Sorry...
+		pEnergy += (k1 * lj * lj * mu1 * mu1 + k2* lj * lj * mu2 * mu2 + k3 * lj * lj * mu3 * mu3 
+		 + 4*k1*q11 * q11 *q24 * q24 + 4*k1*q12 *q12 * q23 *q23 + 4*k1*q13 * q13 *q22 *q22 + 4*k1*q14 *q14 *q21 *q21 
+		 + 4*k2*q11 * q11 *q23 * q23 + 4*k2*q13 *q13 *q21 *q21 + 4*k3*q11 *q11 *q22 *q22 + 4*k3*q12 * q12 *q21 *q21
+		 + 4*k2*q12 *q12 *q24 *q24 + 4*k2*q14 *q14 *q22 *q22 + 4*k3*q13 * q13*q24 *q24 + 4*k3*q14 *q14 *q23 *q23 
+		 + 4*k1*lj*q11*q24*mu1 + 4*k1*lj*q12*q23*mu1 - 4*k1*lj*q13*q22*mu1 - 4*k1*lj*q14*q21*mu1 - 4*k2*lj*q11*q23*mu2 
+		 + 4*k2*lj*q13*q21*mu2 + 4*k3*lj*q11*q22*mu3 - 4*k3*lj*q12*q21*mu3 + 4*k2*lj*q12*q24*mu2 - 4*k2*lj*q14*q22*mu2 
+		 + 4*k3*lj*q13*q24*mu3 - 4*k3*lj*q14*q23*mu3 - 8*k3*q11*q12*q21*q22 - 8*k2*q11*q13*q21*q23 + 8*k1*q11*q12*q23*q24 
+		 - 8*k1*q11*q13*q22*q24 - 8*k1*q11*q14*q21*q24 - 8*k1*q12*q13*q22*q23 - 8*k1*q12*q14*q21*q23 + 8*k1*q13*q14*q21*q22 
+		 - 8*k2*q11*q12*q23*q24 + 8*k2*q11*q14*q22*q23 + 8*k2*q12*q13*q21*q24 - 8*k2*q13*q14*q21*q22 + 8*k3*q11*q13*q22*q24 
+		 - 8*k3*q11*q14*q22*q23 - 8*k3*q12*q13*q21*q24 + 8*k3*q12*q14*q21*q23 - 8*k2*q12*q14*q22*q24 - 8*k3*q13*q14*q23*q24)/(2*lj);
+	}
+	
+	return pEnergy;
+}
+
+btScalar CordeModel::getKineticEnergy() const
+{
 	btScalar energy = 0.0;
 	
 	std::size_t ni = m_massPoints.size();
 	for(std::size_t i = 0; i < ni; i++)
 	{
 		CordePositionElement& n = *(m_massPoints[i]);
-		energy += n.vel.length2() * n.mass;
-		if (i > ni - 1)
+		energy += 0.5 * n.vel.length2() * n.mass;
+		if (i < ni - 1)
 		{
 			CordeQuaternionElement& q = *(m_centerlines[i]);
 			
 			// wIw - scalar multiplication since the matrix is diagonal
-			energy += (q.omega * q.computedInertia).dot(q.omega);
+			energy += 0.5 * (q.omega * q.computedInertia).dot(q.omega);
 		} 
 	}
 

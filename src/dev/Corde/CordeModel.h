@@ -172,6 +172,10 @@ public:
 	
 	virtual btScalar getEnergy() const;
 	
+	virtual btScalar getPotentialEnergy() const;
+	
+	virtual btScalar getKineticEnergy() const;
+	
 protected:
 	void computeConstants();
 	
