@@ -72,8 +72,7 @@ public:
    * Construct with a supplied configuration and a supplied ground
    * @param[in] config a tgWorld::Config
    * @param[in] ground a tgGround, stored in pointer m_pGround
-   * A NULL pointer results in no ground.
-   * Ground is currently not const because it needs to be cast to tgBulletGround*
+   * @todo can we make the ground const?
    */
   tgWorld(const Config& config, tgGround* ground);
 

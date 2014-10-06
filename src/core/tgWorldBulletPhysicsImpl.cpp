@@ -28,9 +28,12 @@
 #include "tgWorldBulletPhysicsImpl.h"
 // This application
 #include "tgWorld.h"
+#include "tgCast.h"
 #include "terrain/tgBulletGround.h"
+#include "terrain/tgEmptyGround.h"
 #include "dev/Corde/cordeDynamicsWorld.h"
 #include "dev/Corde/cordeRigidBodyCollisionConfiguration.h"
+
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
@@ -111,7 +114,7 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     const btVector3 gravityVector(0, -config.gravity, 0);
     m_pDynamicsWorld->setGravity(gravityVector);
 	
-	if (ground != NULL)
+	if (!tgCast::cast<tgBulletGround, tgEmptyGround>(ground) && ground != NULL)
 	{
 		m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
 	}

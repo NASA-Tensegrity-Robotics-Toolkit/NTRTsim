@@ -32,6 +32,7 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "core/terrain/tgEmptyGround.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -45,9 +46,11 @@ int main(int argc, char** argv)
 {
     std::cout << "AppNestedBoxTest" << std::endl;
 
+	tgEmptyGround* ground = new tgEmptyGround();
+
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-    tgWorld world(config, NULL); 
+    tgWorld world(config, ground); 
 
     // Second create the view
     const double stepSize = 1.0/1000.0; //Seconds
