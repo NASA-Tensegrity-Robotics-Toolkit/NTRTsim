@@ -121,7 +121,7 @@ void soloCorde::step(double dt)
 	totalTime += dt;
 	msgTime += dt;
 
-	if (totalTime <= 0.5)
+	if (totalTime <= 5.5)
 	{	
 		//allMuscles[0]->setRestLength(5.0, dt);
 		
@@ -132,7 +132,7 @@ void soloCorde::step(double dt)
 	#else
 
 		m_string->getModel()->applyForce(btVector3(0.0, 0.0, 0.0), 0);
-		m_string->getModel()->applyForce(btVector3(0.0, 0.0, 0.0), 9);	
+		m_string->getModel()->applyForce(btVector3(0.0, 20.0, 0.0), 9);	
 	#endif
 	}
 	
