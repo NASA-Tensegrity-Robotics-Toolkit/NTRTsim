@@ -93,6 +93,7 @@ public:
 private:
 	
 	double totalTime;
+	double msgTime;
 	
 	std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
 	

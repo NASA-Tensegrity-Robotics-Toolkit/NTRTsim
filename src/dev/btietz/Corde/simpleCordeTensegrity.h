@@ -92,6 +92,7 @@ public:
     virtual void onVisit(const tgModelVisitor& r) const;
     
 private:
+	double totalTime;
 
 	std::vector<tgCordeModel*> allMuscles;
 	std::vector<tgRod*> allRods;

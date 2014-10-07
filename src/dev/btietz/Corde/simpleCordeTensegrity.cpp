@@ -51,9 +51,9 @@ simpleCordeTensegrity::~simpleCordeTensegrity()
     
 void simpleCordeTensegrity::setup(tgWorld& world)
 {
-#if (1)	
+#if (0)	
 	// Values for Rope from Spillman's paper
-	const std::size_t resolution = 40;
+	const std::size_t resolution = 10;
 	const double radius = 0.01;
 	const double density = 1300;
 	const double youngMod = 0.5 * pow(10, 4);
@@ -76,15 +76,15 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 		const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
 	#else
 		// Values for thread
-		const std::size_t resolution = 40;
+		const std::size_t resolution = 10;
 		const double radius = 0.001;
 		const double density = 1300;
 		const double youngMod = 1 * pow(10, 1);
 		const double shearMod = 1 * pow(10, 1);
-		const double stretchMod = 60.0 * pow(10, 6);
+		const double stretchMod = 2.0 * pow(10, 6);
 		const double springConst = 0.1 * pow(10, 0); 
-		const double gammaT = 5.0 * pow(10, -4); // Position Damping
-		const double gammaR = 0.5 * pow(10, -4); // Rotation Damping
+		const double gammaT = 10.0 * pow(10, -6); // Position Damping
+		const double gammaR = 0.1 * pow(10, -6); // Rotation Damping
 	#endif // Wire vs thread
 #endif // Rope vs others
 	CordeModel::Config cordeConfig(resolution, radius, density, youngMod, shearMod,
@@ -97,7 +97,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
 	
 	tgStructure s;
-#if (0)
+#if (1)
 	s.addNode(0,0,0);
 	s.addNode(0,3,0);
 	s.addNode(2,5,0);
@@ -132,9 +132,9 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addNode(5, 3, -2);
 	s.addNode(5, 3, 2);
 	
-	s.addPair(0, 1, "rod");
+	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod");
-	//s.addPair(4, 5, "rod");
+	s.addPair(4, 5, "rod2");
 	
 	s.addPair(1, 2, "muscle");
 	
@@ -170,6 +170,8 @@ void simpleCordeTensegrity::setup(tgWorld& world)
     allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 
     notifySetup();
+     totalTime = 0.0;
+    
     tgModel::setup(world);
 }
 
@@ -181,7 +183,9 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
-	//allMuscles[0]->setRestLength(5.0, dt);
+	 totalTime += dt;
+	
+	allMuscles[0]->setRestLength(5.0, dt);
 	
 	//allMuscles[1]->setRestLength(3.0, dt);
 	
@@ -204,7 +208,7 @@ void simpleCordeTensegrity::step(double dt)
 	
 	assert(mass > 0);
 	
-	std::cout << allMuscles[0]->energy() << std::endl;
+	//std::cout << allMuscles[0]->getTension() << std::endl;
 	
 	tgModel::step(dt);
 }

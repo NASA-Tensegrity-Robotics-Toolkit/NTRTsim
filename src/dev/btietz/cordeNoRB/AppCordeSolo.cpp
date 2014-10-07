@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
     
-    simulation.run();
+    simulation.run(100000);
 	
     return 0;
 }

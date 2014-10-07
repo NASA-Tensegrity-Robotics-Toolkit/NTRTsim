@@ -222,7 +222,7 @@ const double tgCordeModel::getCurrentLength() const
 
 const double tgCordeModel::getTension() const
 {
-	
+	return m_string->getTension();
 }
 
 const double tgCordeModel::getRestLength() const

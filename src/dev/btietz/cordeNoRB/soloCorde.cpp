@@ -83,7 +83,7 @@ void soloCorde::setup(tgWorld& world)
 								stretchMod, springConst, gammaT, gammaR);
 
 	btVector3 to(0, 5, 0);
-	btVector3 from(0.01, 15, 0);
+	btVector3 from(10, 5, 0);
 
     tgBaseString::Config muscleConfig(1000, 0, false, 0, 600000000);
     
@@ -106,17 +106,20 @@ void soloCorde::setup(tgWorld& world)
     tgModel::setup(world);
     
     totalTime = 0.0;
+    msgTime = 0.0;
 }
 
 void soloCorde::teardown()
 {
-
+	delete m_string;
+	
     tgModel::teardown();
 }
     
 void soloCorde::step(double dt)
 {
 	totalTime += dt;
+	msgTime += dt;
 
 	if (totalTime <= 0.5)
 	{	
@@ -132,11 +135,18 @@ void soloCorde::step(double dt)
 		m_string->getModel()->applyForce(btVector3(0.0, 0.0, 0.0), 9);	
 	#endif
 	}
+	
+	if (msgTime >= 1.0)
+	{ 
 #if (0)	
 	std::cout << m_string->centerOfMass() << std::endl;
 #else
 	std::cout << totalTime << " " << m_string->energy() << std::endl;
 #endif	
+
+		msgTime = 0.0;
+	}
+	
 	tgModel::step(dt);
 }
 /**

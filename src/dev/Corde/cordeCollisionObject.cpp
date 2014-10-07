@@ -137,6 +137,13 @@ const double cordeCollisionObject::getActualLength() const
 	return length;
 }
 
+const double cordeCollisionObject::getTension() const
+{
+	double tension = (getActualLength() - getRestLength()) * computedStiffness[0];
+	
+	return tension >= 0.0 ? tension : 0.0;
+}
+
 void cordeCollisionObject::setRestLength(const double newLength)
 {
 	const double percentChange = newLength / getRestLength();

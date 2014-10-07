@@ -103,7 +103,6 @@ public:
 	{
 		sCti		m_cti;			// Contact infos
 		CordePositionElement*	m_node;			// Owner node
-		btMatrix3x3				m_c0;			// Impulse matrix (8/28/14 - unused)
 		btVector3				m_c1;			// Relative anchor (contact point)
 		btScalar				m_c2;			// Mass ratio
 		btVector3				m_c3;			// Friction Vector and coefficient (@todo, consider seperating)
@@ -135,6 +134,8 @@ public:
 	const double getRestLength() const;
 	
 	const double getActualLength() const;
+	
+	const double getTension() const;
 	
 	void setRestLength(const double newLength);
 	

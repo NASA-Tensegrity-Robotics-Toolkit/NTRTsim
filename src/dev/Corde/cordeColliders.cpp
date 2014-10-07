@@ -71,8 +71,6 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 		if(ms>0)
 		{
 			const btTransform&	wtr=m_rigidBody?m_rigidBody->getWorldTransform() : m_colObj1Wrap->getCollisionObject()->getWorldTransform();
-			static const btMatrix3x3	iwiStatic(0,0,0,0,0,0,0,0,0);
-			const btMatrix3x3&	iwi = m_rigidBody?m_rigidBody->getInvInertiaTensorWorld() : iwiStatic;
 			const btVector3		ra = n.pos_new - wtr.getOrigin();
 			
 			/// A is the rigid body, B is the soft body
@@ -88,7 +86,6 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 			const btScalar		fc = f1 < f2 ? f1 : f2;
 			
 			c.m_node	=	&n;
-			c.m_c0		=	tgUtil::ImpulseMatrix(psb->m_sst.sdt,ima,imb,iwi,ra);
 			c.m_c1		=	ra;
 			
 			// No mass means immobile object, so softbody gets all the force
