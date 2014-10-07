@@ -92,6 +92,8 @@ public:
     
 private:
 	
+	double totalTime;
+	
 	std::vector<btVector3> generatePoints(btVector3& point1, btVector3& point2, std::size_t resolution);
 	
 	tgCordeModel* m_string;

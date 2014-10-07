@@ -30,7 +30,8 @@
 #include "dev/btietz/tgCordeModel.h"
 #include "dev/btietz/tgCordeStringInfo.h"
 
-soloCorde::soloCorde()
+soloCorde::soloCorde() :
+totalTime(0.0)
 {
 	
 }
@@ -50,8 +51,8 @@ void soloCorde::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 6);
 	const double shearMod = 0.5 * pow(10, 6);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 10.0 * pow(10, 0); 
-	const double gammaT = 0.0 * pow(10, -3); // Position Damping
+	const double springConst = 10.0 * pow(10, 3); 
+	const double gammaT = 1.0 * pow(10, -6); // Position Damping
 	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
 	#if (0)
@@ -103,6 +104,8 @@ void soloCorde::setup(tgWorld& world)
 	
     notifySetup();
     tgModel::setup(world);
+    
+    totalTime = 0.0;
 }
 
 void soloCorde::teardown()
@@ -113,17 +116,26 @@ void soloCorde::teardown()
     
 void soloCorde::step(double dt)
 {
-	//allMuscles[0]->setRestLength(5.0, dt);
-	
-	//allMuscles[1]->setRestLength(3.0, dt);
-	
-	//m_string->getModel()->applyForce(btVector3(10.0, 0.0, 0.0), 0);
-	//m_string->getModel()->applyForce(btVector3(-10.0, 0.0, 0.0), 39);
+	totalTime += dt;
 
+	if (totalTime <= 0.5)
+	{	
+		//allMuscles[0]->setRestLength(5.0, dt);
+		
+		//allMuscles[1]->setRestLength(3.0, dt);
+	#if (0)	
+		m_string->getModel()->applyVecTorque(btVector3(0.0, 10.0, 0.0), 0);
+		m_string->getModel()->applyVecTorque(btVector3(0.0, 10.0, 0.0), 38);
+	#else
+
+		m_string->getModel()->applyForce(btVector3(0.0, 0.0, 0.0), 0);
+		m_string->getModel()->applyForce(btVector3(0.0, 10.0, 0.0), 39);	
+	#endif
+	}
 #if (0)	
 	std::cout << m_string->centerOfMass() << std::endl;
 #else
-	std::cout << m_string->energy() << std::endl;
+	std::cout << totalTime << " " << m_string->energy() << std::endl;
 #endif	
 	tgModel::step(dt);
 }

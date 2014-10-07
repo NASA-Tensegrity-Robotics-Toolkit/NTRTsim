@@ -383,6 +383,7 @@ btScalar CordeModel::getKineticEnergy() const
 			CordeQuaternionElement& q = *(m_centerlines[i]);
 			
 			// wIw - scalar multiplication since the matrix is diagonal
+			// Consider transition to quaternion based energy formulation
 			energy += 0.5 * (q.omega * q.computedInertia).dot(q.omega);
 		} 
 	}
@@ -563,28 +564,8 @@ void CordeModel::computeInternalForces()
         
         r_1->force[2] += (z1 - z2) * (spring_common + diss_common);
 
-        /* Apply constraint equation with boundry conditions */
-        /* 8/5/14 - need was confirmed once equations corrected */
-        if (i == 0)
-        {
-           r_1->force[0] += quat_cons_x;
-            
-            
-           r_1->force[1] += quat_cons_y;
-            
-            
-           r_1->force[2] += quat_cons_z; 
-        }
-        else if (i == n - 1)
-        {
-            r_0->force[0] -= quat_cons_x;
-
-            r_0->force[1] -= quat_cons_y;
-            
-            r_0->force[2] -= quat_cons_z;       
-        }
-        else
-        {
+        /* Apply constraint equation
+         * @todo consider merging with above */
             r_0->force[0] -= quat_cons_x;
             r_1->force[0] += quat_cons_x;
             
@@ -593,26 +574,25 @@ void CordeModel::computeInternalForces()
             
             r_0->force[2] -= quat_cons_z;
             r_1->force[2] += quat_cons_z;            
-        }
 
 		// Original derivation
         /* Torques resulting from quaternion alignment constraints */
 		// quat_0->q.length2() should always be 1, but sometimes numerical precision renders it slightly greater
-        // The simulation is much more stable if we just assume its one.
+        // The simulation is much more stable if we just assume its one. (debatable as of 10/6)
         quat_0->tprime[0] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q11 + (q13 * posDiff[0] -
+            * ( q11 * quat_0->q.length2() + (q13 * posDiff[0] -
             q14 * posDiff[1] - q11 * posDiff[2]) / posNorm);
         
         quat_0->tprime[1] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q12 + (q14 * posDiff[0] +
+            * ( q12 * quat_0->q.length2() + (q14 * posDiff[0] +
             q13 * posDiff[1] - q12 * posDiff[2]) / posNorm);
             
         quat_0->tprime[2] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q13 + (q11 * posDiff[0] +
+            * ( q13 * quat_0->q.length2() + (q11 * posDiff[0] +
             q12 * posDiff[1] + q13 * posDiff[2]) / posNorm);
             
         quat_0->tprime[3] -= 2.0 * m_config.ConsSpringConst * linkLengths[i]
-            * ( q14 + (q12 * posDiff[0] -
+            * ( q14 * quat_0->q.length2() + (q12 * posDiff[0] -
             q11 * posDiff[1] + q14 * posDiff[2]) / posNorm);
 
     }
