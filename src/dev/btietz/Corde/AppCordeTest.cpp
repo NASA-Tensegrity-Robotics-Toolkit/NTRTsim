@@ -66,9 +66,9 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(0.0); // gravity, cm/sec^2
+    const tgWorld::Config config(9.81); // gravity, cm/sec^2
     
-    tgWorld world(config, NULL);
+    tgWorld world(config, ground);
 
     // Second create the view
     const double timestep_physics = 1.0/10000.0; // seconds

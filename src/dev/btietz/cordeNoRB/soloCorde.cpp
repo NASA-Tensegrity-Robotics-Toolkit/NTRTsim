@@ -43,17 +43,17 @@ soloCorde::~soloCorde()
     
 void soloCorde::setup(tgWorld& world)
 {
-#if (0)	
+#if (1)	
 	// Values for Rope from Spillman's paper
 	const std::size_t resolution = 40;
 	const double radius = 0.01;
 	const double density = 1300;
-	const double youngMod = 0.5 * pow(10, 6);
-	const double shearMod = 0.5 * pow(10, 6);
-	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 100.0 * pow(10, 3); 
-	const double gammaT = 1.0 * pow(10, -6); // Position Damping
-	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
+	const double youngMod = 0.5 * pow(10, 4);
+	const double shearMod = 0.5 * pow(10, 4);
+	const double stretchMod = 20.0 * pow(10, 4);
+	const double springConst = 100.0 * pow(10, 1); 
+	const double gammaT = 100.0 * pow(10, -7); // Position Damping
+	const double gammaR = 1.0 * pow(10, -7); // Rotation Damping
 #else
 	#if (1)
 		// Values for wire
@@ -83,7 +83,7 @@ void soloCorde::setup(tgWorld& world)
 								stretchMod, springConst, gammaT, gammaR);
 
 	btVector3 to(0, 5, 0);
-	btVector3 from(10, 5, 0);
+	btVector3 from(0.01, 15, 0);
 
     tgBaseString::Config muscleConfig(1000, 0, false, 0, 600000000);
     

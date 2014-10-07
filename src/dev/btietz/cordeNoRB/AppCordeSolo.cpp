@@ -28,6 +28,7 @@
 #include "soloCorde.h"
 // This library
 #include "core/terrain/tgEmptyGround.h"
+#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
     std::cout << "AppCordeModelTest" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
-#if (0)
+#if (1)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
@@ -67,12 +68,12 @@ int main(int argc, char** argv)
 	tgEmptyGround* ground = new tgEmptyGround();
 
 #endif    
-    const tgWorld::Config config(0.0); // gravity, cm/sec^2
+    const tgWorld::Config config(9.81); // gravity, cm/sec^2
     
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 1.0/10000.0; // seconds
+    const double timestep_physics = 1.0/1000.0; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
