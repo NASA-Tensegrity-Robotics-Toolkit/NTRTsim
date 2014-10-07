@@ -59,9 +59,9 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const double youngMod = 0.5 * pow(10, 4);
 	const double shearMod = 0.5 * pow(10, 4);
 	const double stretchMod = 20.0 * pow(10, 6);
-	const double springConst = 10.0 * pow(10, 1); 
-	const double gammaT = 100.0 * pow(10, -3); // Position Damping
-	const double gammaR = 1.0 * pow(10, -3); // Rotation Damping
+	const double springConst = 100.0 * pow(10, 3); 
+	const double gammaT = 100.0 * pow(10, -6); // Position Damping
+	const double gammaR = 1.0 * pow(10, -6); // Rotation Damping
 #else
 	#if (0)
 		// Values for wire
@@ -181,23 +181,20 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
-	//allMuscles[0]->setRestLength(5.0, dt);
+	allMuscles[0]->setRestLength(5.0, dt);
 	
 	//allMuscles[1]->setRestLength(3.0, dt);
 	
-	allMuscles[0]->getModel()->applyForce(btVector3(0.0, 0.0, 10.0), 0);
-	allMuscles[0]->getModel()->applyForce(btVector3(0.0, 0.0, -10.0), 39);
-	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;
-	/*
+	
 	for (std::size_t i = 0; i < allRods.size(); i++)
 	{
 		tgRod& ri = *(allRods[i]);
 		com += ri.centerOfMass() * ri.mass();
 		mass += ri.mass();
 	}
-	*/
+	
 	for (std::size_t i = 0; i < allMuscles.size(); i++)
 	{
 		tgCordeModel& ci = *(allMuscles[i]);
