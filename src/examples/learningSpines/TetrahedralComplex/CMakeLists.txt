@@ -14,6 +14,10 @@ link_libraries(learningSpines
 file(COPY nodeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+add_library(TetrahedralComplex SHARED
+	FlemonsSpineModelLearning.cpp)
+   
+
 add_executable(AppFlemonsSpineLearning
     FlemonsSpineModelLearning.cpp
     AppFlemonsSpineLearning.cpp
