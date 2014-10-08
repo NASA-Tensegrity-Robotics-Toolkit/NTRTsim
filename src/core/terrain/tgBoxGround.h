@@ -111,4 +111,4 @@ private:
 };
 
 
-#endif  // TG_WORLDIMPL_H
+#endif  // TG_BOX_GROUND_H
