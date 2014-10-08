@@ -229,11 +229,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
                                                         kVelocity);
         
         // In Won's convention
-		#if (1)
         offset = amplitude;
-        #else
-        offset = 0.0;
-        #endif
         
         tgSineStringControl* pStringControl = new tgSineStringControl(m_controlTime,
 																		p_ipc,

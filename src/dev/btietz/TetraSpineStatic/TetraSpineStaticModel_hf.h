@@ -38,6 +38,8 @@ class tgWorld;
 /**
  * Basically the same structure as NestedStructureTestModel
  * just with different parameters and learning capabilities.
+ * This is the model used to generate data for the ICRA 2015
+ * Tetraspine paper
  */
 class TetraSpineStaticModel_hf: public BaseSpineModelLearning
 {
