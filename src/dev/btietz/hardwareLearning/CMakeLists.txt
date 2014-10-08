@@ -13,6 +13,7 @@ link_libraries(tetraSpineHardware
                 tgOpenGLSupport)
 
 add_executable(AppTetraSpineHardware
+	tgCPGStringControl_mod.cpp
 	LearningSpineJSON.cpp
 	AppTetraSpineHardwareLearning.cpp
 )

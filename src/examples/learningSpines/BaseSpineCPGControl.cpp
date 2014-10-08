@@ -43,6 +43,8 @@
 #include "util/CPGEquations.h"
 #include "util/CPGNode.h"
 
+//#define LOGGING
+
 BaseSpineCPGControl::Config::Config(int ss,
 										int tm,
 										int om,
@@ -172,7 +174,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
     setupCPGs(subject, nodeParams, edgeParams);
     
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
-#if (1) // Conditional compile for data logging    
+#ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif    
     
@@ -236,7 +238,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
         std::vector<double> desComs (numControllers, descendingCommand);
         
         m_pCPGSys->update(desComs, m_updateTime);
-#if (1) // Conditional compile for data logging        
+#ifdef LOGGING // Conditional compile for data logging        
         m_dataObserver.onStep(subject, m_updateTime);
 #endif
 		notifyStep(m_updateTime);

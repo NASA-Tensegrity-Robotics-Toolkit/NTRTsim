@@ -39,7 +39,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "examples/learningSpines/tgCPGStringControl.h"
+#include "tgCPGStringControl_mod.h"
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -61,7 +61,7 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgCPGStringControl* pStringControl = new tgCPGStringControl();
+		tgCPGStringControl_mod* pStringControl = new tgCPGStringControl_mod();
         allMuscles[i]->attach(pStringControl);
         std::cout << allMuscles[i]->getTags() << std::endl;
         m_allControllers.push_back(pStringControl);
