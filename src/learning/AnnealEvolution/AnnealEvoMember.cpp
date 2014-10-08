@@ -120,11 +120,11 @@ void AnnealEvoMember::loadFromFile(const char * outputFilename)
 	{
 		while(!ss.eof())
 		{
-			cout<<"success opening file"<<endl;
+			//cout<<"success opening file"<<endl;
 			// @todo fix the infinite loop that occurs here!
 			if(getline ( ss, value, ',' )>0)
 			{
-				cout<<"value read as string: "<<value<<endl;
+				//cout<<"value read as string: "<<value<<endl;
 				statelessParameters[i++]=atof(value.c_str());
 				cout<<statelessParameters[i-1]<<",";
 			}

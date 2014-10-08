@@ -27,6 +27,7 @@
 
 // This application
 #include "TetraSpineStaticModel.h"
+#include "TetraSpineStaticModel_hf.h"
 #include "SerializedSpineControl.h"
 #include "SerializedStaticControl.h"
 // This library
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/2000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -65,8 +66,8 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 3;
-    TetraSpineStaticModel* myModel =
-      new TetraSpineStaticModel(segments);
+    TetraSpineStaticModel_hf* myModel =
+      new TetraSpineStaticModel_hf(segments);
     
     /* Required for setting up serialization file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "controlVarsStatic.json");
