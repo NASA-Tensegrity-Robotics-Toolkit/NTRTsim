@@ -26,23 +26,15 @@
  * $Id$
  */
 
-/**
- * \dir core/terrain
- * @brief The terrain library gives terrain options for the world.
- * 
- * Allows for a variety of terrain. This class gets tested by
- * tgWorldBulletPhysicsImpl. If it is used, the ground will not exist.
- */
 #include "tgBulletGround.h"
 
-#include "LinearMath/btScalar.h"
-#include "LinearMath/btVector3.h"
 // Forward declarations
 class btRigidBody;
 
 /**
- * Simplest ground implementation - a flat box. Can be put at an angle
- * to allow for an incline
+ * An empty ground implementation. tgWorldBulletPhysicsImpl checks if
+ * this class is present with a tgCast call, and skips calling
+ * getGroundRigidBody if it is.
  */
 class tgEmptyGround : public tgBulletGround
 {
@@ -66,4 +58,4 @@ public:
 };
 
 
-#endif  // TG_WORLDIMPL_H
+#endif  // TG_EMPTY_GROUND_H
