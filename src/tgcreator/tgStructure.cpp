@@ -58,6 +58,11 @@ void tgStructure::addNode(double x, double y, double z, std::string tags)
     m_nodes.addNode(x, y, z, tags);
 }
 
+void tgStructure::addNode(btVector3& newNode)
+{
+    m_nodes.addNode(newNode);
+}
+
 void tgStructure::addNode(tgNode& newNode)
 {
     m_nodes.addNode(newNode);

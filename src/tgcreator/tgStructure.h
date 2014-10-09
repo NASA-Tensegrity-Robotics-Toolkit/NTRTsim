@@ -71,6 +71,7 @@ public:
      * Add a node using a node - since keeping track of nodes seems
      * more useful than pairs for string attachments
      */
+    void addNode(btVector3& newNode);
     void addNode(tgNode& newNode);
 
     /**

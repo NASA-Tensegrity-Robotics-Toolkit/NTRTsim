@@ -27,6 +27,7 @@
  */
 
 // This library
+#include "tgHingeInfo.h"
 #include "tgPrismaticInfo.h"
 
 #include "core/tgModel.h"

@@ -69,6 +69,7 @@ btSliderConstraint* tgPrismaticInfo::createSlider()
 {
     btRigidBody* fromBody = getFromRigidBody();
     btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
+
     btTransform transATop;
     transATop.setIdentity();
     transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
@@ -76,6 +77,7 @@ btSliderConstraint* tgPrismaticInfo::createSlider()
 
     btRigidBody* toBody = getToRigidBody();
     btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);
+
     btTransform transBTop;
     transBTop.setIdentity();
     transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);

@@ -46,6 +46,8 @@ tgHinge::Config::Config()
 tgHinge::Config::Config(
                 double maximum,
                 double minimum,
+                int axisFrom,
+                int axisTo,
                 bool useMotor,
                 double maxMotorImpulse,
                 double maxMotorVelocity,
@@ -53,6 +55,8 @@ tgHinge::Config::Config(
         ) :
 m_maximum(maximum),
 m_minimum(minimum),
+m_axisFrom(axisFrom),
+m_axisTo(axisTo),
 m_useMotor(useMotor),
 m_maxMotorImpulse(maxMotorImpulse),
 m_maxMotorVelocity(maxMotorVelocity),
@@ -65,17 +69,6 @@ tgHinge::tgHinge(
         const tgTags& tags,
         tgHinge::Config& config) :
     tgModel(tags),
-    m_hinge(constraint),
-    m_config(config)
-{
-    init();
-}
-
-tgHinge::tgHinge(
-        btHingeConstraint* constraint,
-        std::string space_separated_tags,
-        tgHinge::Config& config) :
-    tgModel(space_separated_tags),
     m_hinge(constraint),
     m_config(config)
 {

@@ -173,12 +173,14 @@ void DuCTTTestModel::setup(tgWorld& world)
     const double radius  = 0.5;
     const tgRod::Config rodConfig(radius, density, 0.5, 0, 0.2);
     const tgPrismatic::Config prismConfig(3);
-    tgLinearString::Config muscleConfig(1000, 10);
+    const tgLinearString::Config muscleConfig(1000, 10);
+    const tgHinge::Config hingeConfig(-SIMD_PI, SIMD_PI);
 
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("hinge", new tgHingeInfo(hingeConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);

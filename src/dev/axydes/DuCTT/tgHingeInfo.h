@@ -30,6 +30,8 @@
 #include "tgHinge.h"
 #include "tgcreator/tgConnectorInfo.h"
 
+#include "LinearMath/btVector3.h"
+
 class btHingeConstraint;
 
 class tgHingeInfo: public tgConnectorInfo
@@ -74,6 +76,7 @@ public:
 
     btHingeConstraint* createHinge();
 
+    btVector3 getRigidVector(bool isCompound, std::set<btVector3> fromNodes);
 protected:
     tgHinge::Config m_config;
 };

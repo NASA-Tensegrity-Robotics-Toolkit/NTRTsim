@@ -69,16 +69,6 @@ tgPrismatic::tgPrismatic(
     init();
 }
 
-tgPrismatic::tgPrismatic(
-        btSliderConstraint* constraint,
-        std::string space_separated_tags,
-        tgPrismatic::Config& config) :
-    tgModel(space_separated_tags),
-    m_slider(constraint),
-    m_config(config)
-{
-    init();
-}
 
 tgPrismatic::~tgPrismatic()
 {

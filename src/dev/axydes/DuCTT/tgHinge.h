@@ -46,6 +46,8 @@ public:
         Config(
                 double minimum,
                 double maximum,
+                int axisFrom = 2,
+                int axisTo = 2,
                 bool useMotor = false,
                 double maxMotorVelocity = 0.01,
                 double maxMotorImpulse = 20,
@@ -63,6 +65,13 @@ public:
          * Units are radians
          */
         double m_minimum;
+
+        /**
+         * Axis to rotate the hinge around, by default Z axis
+         * X=0,Y=1, Z=2
+         */
+        int m_axisFrom;
+        int m_axisTo;
 
         /**
          * Enable the joint motor.
@@ -101,14 +110,6 @@ public:
         const tgTags& tags,
         tgHinge::Config& config);
     
-    /**
-     * Same as other constructor, just a different type of tags
-     */
-    tgHinge(
-        btHingeConstraint* constraint,
-        std::string space_separated_tags,
-        tgHinge::Config& config);
-
     /**
      * Calls teardown
      */

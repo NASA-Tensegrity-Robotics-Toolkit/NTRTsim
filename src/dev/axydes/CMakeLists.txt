@@ -1,3 +1,6 @@
 Project(axydes)
 
-subdirs(DuCTT)
+subdirs(
+    DuCTT
+    Hinge
+)

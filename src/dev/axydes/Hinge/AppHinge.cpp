@@ -17,21 +17,23 @@
 */
 
 /**
- * @file AppDuCTT.cpp
- * @brief Contains the definition function main() for the DuCTT app
- * @author Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @file AppPrismModel.cpp
+ * @brief Contains the definition function main() for the Three strut
+ * tensegrity prism example application
+ * @author Brian Tietz
  * $Id$
  */
 
 // This application
-#include "DuCTTModel.h"
-#include "DuCTTSineWaves.h"
+#include "HingeModel.h"
 // This library
+#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+// Bullet Physics
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -43,29 +45,34 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppDuCTT" << std::endl;
-    // First create the world
-    const tgWorld::Config config(
-        981 // gravity, cm/sec^2
-    );
-    tgWorld world(config);
+    std::cout << "AppHinge" << std::endl;
+
+    // First create the ground and world. Specify ground rotation in radians
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // the world will delete this
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    
+    const tgWorld::Config config(981);
+    tgWorld world(config, ground);
 
     // Second create the view
-    const double stepSize = 1.0/120.0; //Seconds
-    tgSimViewGraphics view(world, stepSize);
+    const double timestep_physics = 0.0001; // seconds
+    const double timestep_graphics = 1.f/60.f; // seconds
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    DuCTTModel* myModel = new DuCTTModel();
-    DuCTTSineWaves* const pPrismControl =
-      new DuCTTSineWaves();
-//    myModel->attach(pPrismControl);
+    HingeModel* const myModel = new HingeModel();
+    
+    // Add the model to the world
     simulation.addModel(myModel);
-	
-	// Run until the user stops
+    
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

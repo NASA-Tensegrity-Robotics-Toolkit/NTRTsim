@@ -96,14 +96,6 @@ public:
         tgPrismatic::Config& config);
     
     /**
-     * Same as other constructor, just a different type of tags
-     */
-    tgPrismatic(
-        btSliderConstraint* constraint,
-        std::string space_separated_tags,
-        tgPrismatic::Config& config);
-
-    /**
      * Calls teardown
      */
     virtual ~tgPrismatic();

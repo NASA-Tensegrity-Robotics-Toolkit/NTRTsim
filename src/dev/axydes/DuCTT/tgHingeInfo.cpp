@@ -28,7 +28,6 @@
 
 #include "btBulletDynamicsCommon.h"
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
-#include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
 
 #include <iostream>
@@ -65,38 +64,125 @@ void tgHingeInfo::initConnector(tgWorld& world)
 {
 }
 
+btVector3 tgHingeInfo::getRigidVector(bool isCompound, std::set<btVector3> fromNodes)
+{
+    btVector3 vect;
+    if (!isCompound && fromNodes.size() == 2)
+    {
+        std::set<btVector3>::iterator itr;
+        int i=0;
+        for (itr = fromNodes.begin(); itr != fromNodes.end(); itr++)
+        {
+            btVector3 temp = *itr;
+            switch(i)
+            {
+            case 0:
+                vect += temp;
+                break;
+            case 1:
+                vect -= temp;
+                break;
+            }
+            i++;
+        }
+    }
+    return vect;
+}
+
 btHingeConstraint* tgHingeInfo::createHinge()
 {
+    btVector3 axisA = btVector3(0,0,1);
+    switch (m_config.m_axisFrom)
+    {
+    case 0:
+        axisA = btVector3(1,0,0);
+        break;
+    case 1:
+        axisA = btVector3(0,1,0);
+        break;
+    case 2:
+        axisA = btVector3(0,0,1);
+        break;
+    }
+    btVector3 axisB = btVector3(0,0,1);
+    switch (m_config.m_axisTo)
+    {
+    case 0:
+        axisB = btVector3(1,0,0);
+        break;
+    case 1:
+        axisB = btVector3(0,1,0);
+        break;
+    case 2:
+        axisB = btVector3(0,0,1);
+        break;
+    }
+
+    std::set<btVector3> fromNodes = getFromRigidInfo()->getContainedNodes();
     btRigidBody* fromBody = getFromRigidBody();
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
-    btTransform transATop;
-    transATop.setIdentity();
-    transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
-    transATop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
+    btVector3 from = getFrom();
 
+    std::set<btVector3> toNodes = getToRigidInfo()->getContainedNodes();
     btRigidBody* toBody = getToRigidBody();
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);
-    btTransform transBTop;
-    transBTop.setIdentity();
-    transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);
-    transBTop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
+    btVector3 to = getTo();
 
-    btHingeConstraint* slider = new btHingeConstraint(*fromBody, transATop);
+    if (from != to)
+    {
+//        from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
+//        to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);
+    }
 
-    return slider;
+    btVector3 fromVect = getRigidVector(getFromRigidInfo()->isCompound(), fromNodes);
+    btVector3 toVect = getRigidVector(getToRigidInfo()->isCompound(), toNodes);
+//    btVector3 fromVect = fromBody->getOrientation().getAxis();
+//    btVector3 toVect = toBody->getOrientation().getAxis();
+
+    std::cout << fromNodes.size() << " " << fromVect << " " << from << std::endl;
+    std::cout << toNodes.size() << " " << toVect << " " << to << std::endl;
+
+    btVector3 crossVect = toVect.cross(fromVect).safeNormalize();
+    std::cout << crossVect << std::endl;
+    axisA = crossVect;
+
+    btVector3 crossVect2 = fromVect.cross(toVect).safeNormalize();
+    std::cout << crossVect2 << std::endl;
+    axisB = crossVect2;
+
+    btVector3 oriA;
+//    oriA = to;
+//    oriA = from;
+    oriA = from + 0.01*fromVect;
+//    oriA = from - ((to - from) / 2.0);
+//    oriA = fromBody->getWorldTransform().inverse() * from;
+//    oriA = fromBody->getWorldTransform().inverse() * to;
+//    oriA = fromBody->getWorldTransform().inverse() * fromBody->getCenterOfMassTransform().getOrigin();
+    oriA = fromBody->getWorldTransform().inverse() * oriA;
+
+    btVector3 oriB;
+//    oriB = from;
+//    oriB = to;
+    oriB = to + 0.01*toVect;
+//    oriB = to + ((from - to) / 2.0);
+//    oriB = toBody->getWorldTransform().inverse() * to;
+//    oriB = toBody->getWorldTransform().inverse() * from;
+//    oriB = toBody->getWorldTransform().inverse() * toBody->getCenterOfMassTransform().getOrigin();
+    oriB = toBody->getWorldTransform().inverse() * oriB;
+
+//    std::cout << oriA << oriB << std::endl;
+    std::cout << std::endl;
+
+    btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisB);
+//    btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisA);
+
+    hinge->setDbgDrawSize(btScalar(5.f));
+    return hinge;
 }
 
 tgModel* tgHingeInfo::createModel(tgWorld& world)
 {  
-    tgNode startNode = this->getFrom();
-    tgNode endNode = this->getTo();
-    
-    btVector3 buildVec = (endNode - startNode);
-    double m_startLength = buildVec.length();
+    btHingeConstraint* hingeC = createHinge();
 
-    btHingeConstraint* slider = createHinge();
-
-    tgHinge* hinge = new tgHinge(slider, getTags(), m_config);
+    tgHinge* hinge = new tgHinge(hingeC, getTags(), m_config);
     hinge->setup(world);
     return hinge;
 } 
