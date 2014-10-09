@@ -27,7 +27,7 @@
  */
 
 // This application
-#include "tgModel.h" // @todo: forward declare and move to tgRod.cpp (to be created)
+#include "tgBaseRigid.h" // @todo: forward declare and move to tgRod.cpp (to be created)
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -40,7 +40,7 @@ class btRigidBody;
  * A rod is a rigid body. Length is defined by nodes, radius and density
  * are defined by config.
  */
-class tgRod : public tgModel
+class tgRod : public tgBaseRigid
 {
 public:
 
@@ -71,11 +71,12 @@ public:
             const double density;
             
             /** The rod's friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
+             /// @todo values greater than 1 seem to be useful for scaling, given NTRT 0.1. Investigate further
             const double friction;
 
             /** The rod's rolling friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double rollFriction;
             
             /** The rod's coefficient of restitution; 
@@ -95,36 +96,10 @@ public:
     virtual void onVisit(const tgModelVisitor& v) const;
     
     /**
-     * Return the rod's mass in application-dependent units.
-     * @return the rod's mass in application-dependent units
-     */
-    double mass() const { return m_mass; }
-    
-    /**
      * Return the rod's length in application-dependent units.
      * @return the rod's length in application-dependent units
      */
     double length() const { return m_length; }
-
-    /**
-     * Return the center of mass of the rod, a vector in 3-space.
-     * @return the center of mass of the rod, a vector in 3-space
-     */
-    btVector3 centerOfMass() const;
-
-    /**
-     * Getter for rigid body
-     */
-    btRigidBody* getPRigidBody() 
-    {
-        return m_pRigidBody;
-    }
-
-    /**
-     * Return the rod's orientation in Euler angles.
-     * @return 3-vector of these euler angles
-     */
-    btVector3 orientation() const;
 
 private:
 
@@ -132,14 +107,6 @@ private:
     bool invariant() const;
 
 private:
-    
-    /**
-     * The Bullet Physics implementation of the rod.
-     */
-    btRigidBody* m_pRigidBody;
-    
-    /** The rod's mass. The units are application dependent. */
-    const double m_mass;
     
     /** The rod's length. The units are application dependent. */
     const double m_length;

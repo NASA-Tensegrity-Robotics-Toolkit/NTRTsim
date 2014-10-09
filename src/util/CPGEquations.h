@@ -23,7 +23,7 @@
  * @file CPGEquations.h
  * @brief Definition of class CPGEquations
  * @date March 2014
- * @author Brian Tietz
+ * @author Brian Mirletz
  * $Id$
  */
 
@@ -58,10 +58,7 @@ class CPGEquations
 				 std::vector<double> newWeights,
 				 std::vector<double> newPhaseOffsets);
 	
-	double operator[](const int i)
-	{		
-		return nodeList[i]->nodeValue;
-	}
+	const double operator[](const std::size_t i) const;
 
 	std::vector<double> getXVars();
 	

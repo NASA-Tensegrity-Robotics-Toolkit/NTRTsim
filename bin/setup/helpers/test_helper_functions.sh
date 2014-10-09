@@ -69,3 +69,9 @@ function test_get_valid_link()
     download_file "http://www.perryb.ca/test.txt" "/home/perry/sandbox/404.txt"
     download_file "http://google.com:81/test.txt" "/home/perry/sandbox/timeout.txt"
 }
+
+function test_create_exist_symlink()
+{
+    create_exist_symlink "helper_paths.sh" "works"
+    create_exist_symlink "helper_pathsinvalid.sh" "doesnotwork"
+}

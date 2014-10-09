@@ -20,7 +20,7 @@
  * @file CPGEquations.cpp
  * @brief Implementation of class CPGEquations
  * @date March 2014
- * @author Brian Tietz
+ * @author Brian Mirletz
  * $Id$
  */
 
@@ -28,6 +28,9 @@
 
 #include "boost/array.hpp"
 #include "boost/numeric/odeint.hpp"
+
+// The C++ Standard Library
+#include <stdexcept>
 
 using namespace boost::numeric::odeint;
 
@@ -80,6 +83,22 @@ void CPGEquations::defineConnections (	int nodeIndex,
 	for(int i = 0; i != connections.size(); i++){
 		nodeList[nodeIndex]->addCoupling(nodeList[connections[i]], newWeights[i], newPhaseOffsets[i]); 
 	}
+}
+
+const double CPGEquations::operator[](const std::size_t i) const
+{
+	double nodeValue;
+	if (i >= nodeList.size())
+	{
+		nodeValue = NAN;
+		throw std::invalid_argument("Node index out of bounds");
+	}
+	else
+	{
+		nodeValue = (*nodeList[i]).nodeValue;
+	}
+	
+	return nodeValue;
 }
 
 std::vector<double> CPGEquations::getXVars() {

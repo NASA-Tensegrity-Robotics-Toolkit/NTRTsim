@@ -28,6 +28,7 @@
 #include "SuperBallLearningController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgPlaneGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -51,11 +52,16 @@ int main(int argc, char** argv)
     
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
+    const double pitch = 0.0;//M_PI/15.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+//    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+//    // the world will delete this
+//    tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    const tgPlaneGround::Config groundConfig(btVector3(0.0,1.0,0.0));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    tgPlaneGround* ground = new tgPlaneGround(groundConfig);
+
     
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've
@@ -65,14 +71,16 @@ int main(int argc, char** argv)
     // Second create the view
     const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
     const double timestep_graphics = 1.f /60.f; // Seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+
+//    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    SuperBallModel* const myModel = new SuperBallModel();
+    SuperBallModel* const myModel = new SuperBallModel(world);
 
     // Fifth, select the controller to use. Uncomment desired controller.
 
@@ -95,8 +103,15 @@ int main(int argc, char** argv)
     myModel->attach(pTC);
     simulation.addModel(myModel);
     
-    // Run until the user stops
-    simulation.run();
+    // Run for 60 secs
+    int simLength=60/timestep_physics;
+    int i = 0;
+    while (i < 10000)
+    {
+        simulation.run(simLength);
+        simulation.reset();
+        i++;
+    }
 
     //Teardown is handled by delete, so that should be automatic
     return 0;

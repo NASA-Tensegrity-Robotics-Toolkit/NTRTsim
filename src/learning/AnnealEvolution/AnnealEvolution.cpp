@@ -31,6 +31,7 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -74,7 +75,6 @@ Temp(1.0)
 
     for(int j=0;j<numberOfControllers;j++)
     {
-        cout<<"creating Populations"<<endl;
         populations.push_back(new AnnealEvoPopulation(populationSize,myconfigdataaa));
     }
     
@@ -92,6 +92,10 @@ Temp(1.0)
     if(learning)
     {
         evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
+        if (!evolutionLog.is_open())
+        {
+			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+		}
     }
 }
 
@@ -145,6 +149,7 @@ void AnnealEvolution::orderAllPopulations()
     
     // what if member at 0 isn't the best of all time for some reason? 
     // This seems biased towards average scores
+    // We actually order the populations, so member 0 is the current best according to the assigned fitness
     ofstream logfileLeader;
     for(int i=0;i<populations.size();i++)
     {
@@ -175,7 +180,7 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
         orderAllPopulations();
         mutateEveryController();
         Temp -= 0.0; // @todo - make this a parameter
-        cout<<"mutated the populations"<<endl;
+//        cout<<"mutated the populations"<<endl;
         this->scoresOfTheGeneration.clear();
 
         if(coevolution)

@@ -30,6 +30,7 @@
 #include <vector>
 #include "boost/multi_array.hpp"
 
+#include "core/tgSubject.h"
 #include "core/tgObserver.h"
 #include "sensors/tgDataObserver.h"
 
@@ -44,6 +45,7 @@ class AnnealEvolution;
 class configuration;
 class tgCPGStringControl;
 class CPGEquations;
+class tgCPGLogger;
 
 typedef boost::multi_array<double, 2> array_2D;
 typedef boost::multi_array<double, 4> array_4D;
@@ -56,7 +58,7 @@ typedef boost::multi_array<double, 4> array_4D;
  * Due to the number of parameters, the learned parameters are split
  * into one config file for the nodes and another for the CPG's "edges"
  */
-class BaseSpineCPGControl : public tgObserver<BaseSpineModelLearning>
+class BaseSpineCPGControl : public tgObserver<BaseSpineModelLearning>, public tgSubject <BaseSpineCPGControl>
 {
 public:
 
@@ -80,7 +82,9 @@ struct Config
         double kp = 1000.0,
         double kv = 100.0,
         bool def = true,
-        double cl = 10.0);
+        double cl = 10.0,
+        double lf = 0.0,
+        double hf = 2.0 * M_PI);
       
 		// Learning Parameters
 		const int segmentSpan; // 3 possible muscles touching two rigid bodies
@@ -95,6 +99,8 @@ struct Config
         // Limit Params
         const double lowAmp;
         const double highAmp;
+        const double lowFreq;
+        const double highFreq;
         const double lowPhase;
         const double highPhase;
         
@@ -119,6 +125,8 @@ struct Config
     
     virtual void onTeardown(BaseSpineModelLearning& subject);
 
+	const double getCPGValue(std::size_t i) const;
+	
 protected:
     /**
      * Takes a vector of parameters reported by learning, and then 
@@ -134,9 +142,8 @@ protected:
     
     std::vector<tgCPGStringControl*> m_allControllers;
     
-private:  
-	BaseSpineCPGControl::Config m_config;
-
+    BaseSpineCPGControl::Config m_config;
+    
     std::string edgeConfigFilename;
     std::string nodeConfigFilename;
     

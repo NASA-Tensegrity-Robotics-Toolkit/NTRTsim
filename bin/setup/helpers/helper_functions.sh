@@ -189,16 +189,53 @@ function download_file()
     connect_timeout=30
 
     curl -k -f --connect-timeout $connect_timeout -L "$download_url" > "$save_to" || 
-        { 
-            rm "$save_to"
-            echo "======== DOWNLOAD FAILURE ========="
-            echo "Encountered a failure while downloading:"
-            echo ""
-            echo "Target URL: $download_url"
-            echo "Local URL: $save_to"
-            echo ""
-            echo "Exiting now."
-            echo "======== DOWNLOAD FAILURE ========="
-            exit 1 
-        }
+    { 
+        rm "$save_to"
+        echo "======== DOWNLOAD FAILURE ========="
+        echo "Encountered a failure while downloading:"
+        echo ""
+        echo "Target URL: $download_url"
+        echo "Local URL: $save_to"
+        echo ""
+        echo "Exiting now."
+        echo "======== DOWNLOAD FAILURE ========="
+        exit 1 
+    }
+}
+
+# Creates a symlink from link_location to link_target.
+# If the symlink already exists, we verify that it's a
+# valid symlink (that is, we verify that it points to a valid target).
+# If a symlink is invalid, we delete it and attempt to re-create it.
+# If symlink creation fails (after creating the symlink it points to
+# an invalid location) we exit with an error code of 1.
+#
+# NOTE: This function should only be used when you're making a direct
+# symlink to a *single* file. If you're attempting to create a symlink
+# using a wildcard in order to hit every file in a directory
+# (e.g. ln -s /usr/bin/* .) you should *NOT* use this function. It will fail.
+function create_exist_symlink()
+{
+    link_target=$1
+    link_location=$2
+
+    # Check that the symbolic link exists (may not be valid).
+    if [ -h $link_location ]; then
+        # Now check whether the symlink is valid.
+        if [ -e $link_location ]; then
+            return
+        else
+            #Delete the symlink. It's broken.
+            rm $link_location 
+        fi
+    fi
+
+    # At this point there is no symbolic link file. We need to create it.
+    ln -s $link_target $link_location
+
+    # Now verify that our symlink exists and points to a valid location. 
+    if [ ! -e $link_location ]; then
+        echo "Failure while creating symlink from $link_location to $link_target. This is a fatal error."
+        exit 1
+    fi
 }

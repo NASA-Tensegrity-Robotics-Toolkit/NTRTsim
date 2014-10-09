@@ -20,3 +20,28 @@
 TRUE=0  # Yes, TRUE is 0 (e.g., no errors)
 FALSE=1 # Ditto, FALSE is non-zero
 
+script_name=$(basename $0)
+
+# This runs make with either the total number of cores
+# specified by the user in build.conf, or using the maximum
+# number of cores in the user's system.
+function set_multicore_make()
+{
+    source_conf "build.conf"
+    if [ -n "$MAX_BUILD_CORES" ]; then
+        max_cores=$MAX_BUILD_CORES
+    elif [ -f /proc/cpuinfo ]; then
+        # Linux
+        max_cores=`grep -c ^processor /proc/cpuinfo`
+    else
+        # Mac
+        max_cores=`sysctl -n hw.ncpu`
+    fi
+
+    shopt -s expand_aliases
+    alias make="make -j$max_cores"
+}
+
+if [[ "$script_name" != "setup.sh" ]]; then
+    set_multicore_make
+fi

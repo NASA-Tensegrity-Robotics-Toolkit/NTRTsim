@@ -28,7 +28,9 @@
 #include "tgWorldBulletPhysicsImpl.h"
 // This application
 #include "tgWorld.h"
+#include "tgCast.h"
 #include "terrain/tgBulletGround.h"
+#include "terrain/tgEmptyGround.h"
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
@@ -48,6 +50,16 @@
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
 
+#define MCLP_SOLVER
+
+#ifdef MLCP_SOLVER
+
+#include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
+#include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
+#include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+
+#endif //MLCP_SOLVER
+
 /**
  * Helper class to bundle objects that have the same life cycle, so they can be
  * constructed and destructed together.
@@ -59,9 +71,15 @@ class IntermediateBuildProducts
             corner1 (-worldSize,-worldSize, -worldSize),
             corner2 (worldSize, worldSize, worldSize),
             dispatcher(&collisionConfiguration),
-#if (1) // More acc broadphase - remeber the comma
-            broadphase(corner1, corner2, 16384)
-#endif
+#ifndef   MLCP_SOLVER       
+	#if (1) // More acc broadphase - remeber the comma (consider doing ifndef)
+				broadphase(corner1, corner2, 16384)
+	#endif // Broadphase
+#else
+			broadphase(corner1, corner2, 16384),
+			solver(&mlcp)
+#endif //MLCP_SOLVER  
+			
   {
   }
   const btVector3 corner1;
@@ -74,7 +92,14 @@ class IntermediateBuildProducts
         // More accurate broadphase:
         btAxisSweep3 broadphase;
 #endif
-        btSequentialImpulseConstraintSolver solver;
+
+#ifdef MLCP_SOLVER
+		//btDantzigSolver mlcp;
+		btSolveProjectedGaussSeidel mlcp;
+		btMLCPSolver solver;
+#else
+		btSequentialImpulseConstraintSolver solver;
+#endif
 };
 
 tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
@@ -83,12 +108,16 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     m_pIntermediateBuildProducts(new IntermediateBuildProducts(config.worldSize)),
     m_pDynamicsWorld(createDynamicsWorld())
 {
+
     // Gravitational acceleration is down on the Y axis
     const btVector3 gravityVector(0, -config.gravity, 0);
     m_pDynamicsWorld->setGravity(gravityVector);
-
-	m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
-
+	
+	if (!tgCast::cast<tgBulletGround, tgEmptyGround>(ground) && ground != NULL)
+	{
+		m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
+	}
+	
     #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
     #endif	
@@ -98,10 +127,6 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 
 tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
 {
-    removeConstraints();
-
-    // Delete all the collision objects. The dynamics world must exist.
-    // Delete in reverse order of creation.
     removeConstraints();
     removeCollisionShapes();
 
@@ -168,7 +193,9 @@ btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
                  &m_pIntermediateBuildProducts->broadphase,
                  &m_pIntermediateBuildProducts->solver, 
                  &m_pIntermediateBuildProducts->collisionConfiguration);
-
+#ifdef MLCPSOLVER	
+		result ->getSolverInfo().m_minimumSolverBatchSize = 1;//for direct solver it is better to have a small A matrix
+#endif	
   return result;
 }
 

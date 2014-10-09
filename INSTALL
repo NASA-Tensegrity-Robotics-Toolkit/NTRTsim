@@ -32,6 +32,7 @@ anything.
 	- freeglut3-dev (glut for bullet graphics)
 	- cmake
 	- build-essential
+        - unzip
 
     Fedora/CentOS (you can use sudo yum install):
 	- gcc-c++ (the compiler for cmake)
@@ -39,6 +40,9 @@ anything.
 	- curl
 	- freeglut
 	- freeglut-devel
+	- cmake
+	- build-essential
+	- unzip
 
     MAC OSX (please read the detailed instructions below for OSX 10.9 at the end of this file)
 	-gcc/g++ 4.5 (via Macports or Homebrew)
@@ -121,6 +125,20 @@ anything.
         /usr/lib
         /usr/local/lib
 
+** Build Options **
+
+  - After the first install, note the following options are available with build.sh (run build.sh -h for an up to date list)
+  
+    positional arguments:
+    build_path            Path to build (relative to src, e.g. 'BasicApp' or
+                           'lib/Example'). Defaults to all if not specified, includes dependancies.
+   
+    optional arguments:
+    -h       Show this help message and exit
+    -c       Run 'make clean' before make/make install on non-library sources
+    -l       Run 'make clean' before make/make install on libraries
+    -s       Don't automatically build the libraries
+    -w       Show compiler warnings when building
 
 ** Manual Installation **
 

@@ -55,7 +55,7 @@ popd > /dev/null
 
 function usage
 {
-    echo "usage: $0 [-h] [-c] [-l] [-s] [-w] [build_path]"
+    echo "usage: $0 [-h] [-c] [-w] [build_path]"
     echo ""
     echo "positional arguments:"
     echo "  build_path            Path to build (relative to src, e.g. 'BasicApp' or"
@@ -64,24 +64,20 @@ function usage
     echo "optional arguments:"
     echo "  -h       Show this help message and exit"
     echo "  -c       Run 'make clean' before make/make install on non-library sources"
-    echo "  -l       Run 'make clean' before make/make install on libraries"
-    echo "  -s       Don't automatically build the libraries"
     echo "  -w       Show compiler warnings when building"
+    echo "  -t       Build test/ rather than src/" 
+    echo "  -r       Build test/ rather than src/ *and* run all tests after compilation."
 }
 
-# Since OS X Mavericks places the g++ compiler in a different place than
-# Linux, and since we want CMake to automatically find g++ on linux distros,
-# run one of two possible functions for actually compiling.
-# Functions for calling CMake, depending on operating system
-function cmake_OSX()
+function cmake_cross_platform()
 {
-    "$ENV_BIN_DIR/cmake" $SRC_DIR \
+    "$ENV_BIN_DIR/cmake" $build_src \
         -G "$build_type" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
         -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
         -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-        -DCMAKE_CXX_COMPILER="g++" \
+        -DCMAKE_CXX_COMPILER="$ENV_BIN_DIR/g++" \
         -DCMAKE_C_FLAGS="-fPIC" \
         -DCMAKE_CXX_FLAGS="-fPIC" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
@@ -90,37 +86,15 @@ function cmake_OSX()
         || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
 }
 
-function cmake_linux()
-{
-    "$ENV_BIN_DIR/cmake" $SRC_DIR \
-        -G "$build_type" \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_INSTALL_PREFIX="$BASE_DIR/env" \
-        -DCMAKE_INSTALL_NAME_DIR="$BASE_DIR/env" \
-        -DCMAKE_CXX_FLAGS="$cmake_cxx_flags" \
-        -DCMAKE_C_FLAGS="-fPIC" \
-        -DCMAKE_CXX_FLAGS="-fPIC" \
-        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
-        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
-        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
-        || { echo "- ERROR: CMake for Bullet Physics failed."; exit 1; }
-
-}
-
-# Make sure the build directory exists
-create_directory_if_noexist $BUILD_DIR
-if [ ! -d "$BUILD_DIR" ]; then
-    echo "Unable to create build directory '$BUILD_DIR' -- exiting."
-    exit 2
-fi
+build_target=$BUILD_DIR
+build_src=$SRC_DIR
 
 # Handle Arguments
 MAKE_CLEAN_FLAG=false
-MAKE_CLEAN_LIB_FLAG=false
-MAKE_LIB_FLAG=true
 CMAKE_COMPILER_WARNINGS_FLAG=false
+RUN_ALL_TESTS=false
 
-while getopts ":hclsw" opt; do
+while getopts ":hcwtr" opt; do
     case $opt in
         h)
             usage;
@@ -129,14 +103,17 @@ while getopts ":hclsw" opt; do
         c)
             MAKE_CLEAN_FLAG=true
             ;;
-        l)
-            MAKE_CLEAN_LIB_FLAG=true
-            ;;
-        s)
-            MAKE_LIB_FLAG=false
-            ;;
         w)
             CMAKE_COMPILER_WARNINGS_FLAG=true
+            ;;
+        t)
+            build_target=$BUILD_TEST_DIR 
+            build_src=$TEST_DIR
+            ;;
+        r)
+            build_target=$BUILD_TEST_DIR 
+            build_src=$TEST_DIR
+            RUN_ALL_TESTS=true
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -149,16 +126,21 @@ while getopts ":hclsw" opt; do
     esac
 done
 
+
+# Make sure the build directory exists
+create_directory_if_noexist $build_target
+if [ ! -d "$build_target" ]; then
+    echo "Unable to create build directory '$build_target' -- exiting."
+    exit 2
+fi
+
+
 TO_BUILD=${@:$OPTIND:1}
 
 if [ "$TO_BUILD" != "" ]; then
     echo "Building src/$TO_BUILD => build/$TO_BUILD";
 else
     echo "Building src/ => build/";
-    if $MAKE_CLEAN_FLAG; then
-        MAKE_LIB_FLAG=true  # have to make the libs if we're doing a full clean
-        MAKE_CLEAN_LIB_FLAG=true
-    fi
 fi
 
 if [ ! -d "$SRC_DIR/$TO_BUILD" ]; then
@@ -178,7 +160,7 @@ fi
 ### COMPILING STEP
 
 # CMake everything (@todo: can we just have it cmake certain things?)
-pushd "$BUILD_DIR" > /dev/null
+pushd "$build_target" > /dev/null
 
 # Uncomment this to create standard unix makefiles
 build_type="Unix Makefiles"
@@ -191,22 +173,15 @@ else
     cmake_cxx_flags=""
 fi
 
-
-if [ $(uname) == 'Darwin' ]
-then
-    cmake_OSX
-else
-    cmake_linux
-fi
-
+cmake_cross_platform
 
 popd > /dev/null # exit build dir (done with cmake)
 
 # Make / install
 if [ "$TO_BUILD" != "" ]; then
-    pushd "$BUILD_DIR/$TO_BUILD" > /dev/null
+    pushd "$build_target/$TO_BUILD" > /dev/null
 else
-    pushd "$BUILD_DIR" > /dev/null
+    pushd "$build_target" > /dev/null
 fi    
 
 # Make clean if requested
@@ -219,3 +194,35 @@ make || exit 1
 popd > /dev/null  # exit make dir
 
 popd > /dev/null  # exit base dir
+
+# Run all tests if necessary
+if $RUN_ALL_TESTS; then
+    if [ ! -d $BUILD_TEST_DIR ]; then
+        echo "Build test directory does not exist. Have the tests been compiled?"
+        exit 1
+    fi
+
+    if ! has_command "python"; then
+        echo "=== MISSING DEPENDENCY ==="
+        echo "Python 2.7 is required for automated test running. You don't appear to have it installed."
+        exit 1
+    fi
+
+    pushd $BUILD_TEST_DIR > /dev/null
+
+    python ${SHELL_UTILITIES_DIR}/runAllTests.py || { 
+        echo ""
+        echo "=== TEST FAILURE(S) ==="
+        echo ""
+        echo "One or more tests have failed!"
+        echo "Search the console output for 'FAILED' to find each failing test."
+        echo "Or search for 'FAILED TEST' to find each failing test group."
+        exit 1
+    }
+
+    echo ""
+    echo "*** All tests succeeded! ***"
+    echo ""
+
+    popd > /dev/null
+fi

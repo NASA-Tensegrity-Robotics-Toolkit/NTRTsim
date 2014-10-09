@@ -50,7 +50,7 @@ popd > /dev/null
 #                          END DO NOT MODIFY                                 #
 ##############################################################################
 
-CONF_FILES=("general.conf" "boost.conf" "bullet.conf") 
+CONF_FILES=("general.conf" "boost.conf" "bullet.conf" "build.conf" "jsoncpp.conf" "gmocktest.conf" "neuralnet.conf") 
 
 function banner() 
 {
@@ -83,20 +83,16 @@ function init_config()
         return
     fi
 
-    message="One or more package files do not exist. Would you like setup to create them now?"
-    options=("Y" "n")
-    default="Y"
-    result=$(read_options "$message" $options $default)
-    if [ "$result" == "Y" ]; then
-        for file_name in "${to_create[@]}"
-        do
-            echo "Creating conf/$file_name"
-            cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
-        done
-        echo "All missing package configuration files have been created in conf/*. Please edit as needed and then re-run setup.sh."
-    else
-        echo "Please create all necessary conf files before running set up. See conf/default/* for a list of the needed files, as well as a base configuration."
-    fi
+    echo "You are missing one or more required conf files. Setup will now generate them."
+    
+    for file_name in "${to_create[@]}"
+    do
+        echo "Creating conf/$file_name"
+        cp "$CONF_DIR/default/${file_name}.default" "$CONF_DIR/$file_name"  || { echo "Could not find default conf file ${file_name}.default in conf/default -- exiting now."; exit 1; }  
+    done
+
+    echo "=== CONF FILES CREATED ==="
+    echo "**All missing configuration files have been created in conf/. Please edit as needed and then re-run setup.sh.**"
 
     exit 0
 }
@@ -136,8 +132,13 @@ banner
 init_config
 init_scripts
 
+set_multicore_make
+
 run_setupscript "env" "Env directory"
 run_setupscript "cmake" "CMake"
+run_setupscript "gmocktest" "GMockTest"
+run_setupscript "jsoncpp" "JsonCPP"
+run_setupscript "neuralnet" "Neural Net"
 run_setupscript "bullet" "Bullet Physics Library"
 run_setupscript "boost" "Boost"
 

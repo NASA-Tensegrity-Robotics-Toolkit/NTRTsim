@@ -1,5 +1,15 @@
 env
 build
+build_test
 conf/*.conf
 src/DoxyDocs
-src/examples/learningSpines/TetraSpine/logs
+
+.cproject
+
+.project
+
+.idea
+
+*.pyc
+
+src/.settings/org.eclipse.cdt.codan.core.prefs

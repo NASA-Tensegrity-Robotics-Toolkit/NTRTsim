@@ -46,13 +46,11 @@ tgRod::Config::Config(double r, double d,
         if (friction < 0.0)  { throw std::range_error("Negative friction");  }
         if (rollFriction < 0.0)  { throw std::range_error("Negative roll friction");  }
         if (restitution < 0.0)  { throw std::range_error("Negative restitution");  }
-        if (friction > 1.0)  { throw std::range_error("Friction > 1");  }
-        if (rollFriction > 1.0)  { throw std::range_error("Roll Friction > 1");  }
         if (restitution > 1.0)  { throw std::range_error("Restitution > 1");  }
     // Postcondition
     assert(density >= 0.0);
     assert(radius >= 0.0);
-    assert((friction >= 0.0) && (friction <= 1.0));
+    assert(friction >= 0.0);
     assert((rollFriction >= 0.0) && (rollFriction <= 1.0));
     assert((restitution >= 0.0) && (restitution <= 1.0));
 }
@@ -60,11 +58,7 @@ tgRod::Config::Config(double r, double d,
 tgRod::tgRod(btRigidBody* pRigidBody, 
                 const tgTags& tags,
                 const double length) : 
-  tgModel(tags),
-  m_pRigidBody(pRigidBody),
-  m_mass((m_pRigidBody->getInvMass() > 0.0) ? 
-     1.0 / (m_pRigidBody->getInvMass()) :
-     0.0), // The object is static
+  tgBaseRigid(pRigidBody, tags),
   m_length(length)
 {
         if (pRigidBody == NULL)
@@ -93,37 +87,6 @@ void tgRod::teardown()
 
   // Postcondition
   // This does not preserve the invariant
-}
-
-btVector3 tgRod::centerOfMass() const
-{
-  // Precondition
-  assert(m_pRigidBody->getMotionState() != NULL);
-
-  btTransform transform;
-  m_pRigidBody->getMotionState()->getWorldTransform(transform);
-  const btVector3& result = transform.getOrigin();
-   
-  // Return a copy
-  return result;
-}
-
-btVector3 tgRod::orientation() const
-{
-  //Precondition
-  assert(invariant());
-
-  // get the orientation of this rod w.r.t. the world's refernce coorinate system
-  // oddly enough, there isn't a getEuler method for btQuaternion, which is
-  // returned by getOrientation from RigidBody, so convert it
-  // into a rotation matrix first.
-  btMatrix3x3 rot = btMatrix3x3(m_pRigidBody->getOrientation());
-  btScalar yaw = 0.0;
-  btScalar pitch = 0.0;
-  btScalar roll = 0.0;
-  rot.getEulerYPR(yaw, pitch, roll);
-  btVector3 *result = new btVector3(yaw, pitch, roll);
-  return *result;
 }
 
 bool tgRod::invariant() const

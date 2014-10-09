@@ -8,6 +8,7 @@
  \section tgcreator Library
  tgcreator a specification of tgNodes and tgPairs to build a tensegrity structure.
  Nodes are first placed into a tgStructure, and then those nodes are paired and tagged.
+ Nodes can be tagged directly, and then become a tgSphereInfo.
  A tgPair can either become a tgRigidInfo or a tgConnectorInfo based on
  its tgTag structure. This is determined by the config (from tgRodInfo or tgLinearStringInfo)
  that is passed into a tgBuildSpec.

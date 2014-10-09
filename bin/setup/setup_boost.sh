@@ -104,8 +104,8 @@ function build_boost()
         return
     fi
 
-    #For MAC and gcc
-    #sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+    #To make gcc as the default compiler, this line uncomments the line ';using gcc' in user-config.jam file of the boost library.
+    sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
 
     # Perform the build
     #./bootstrap.sh --prefix="$BOOST_INSTALL_PREFIX" --with-libraries=system || { echo "Boost bootstrap failed."; exit 1; } # Lite
@@ -139,9 +139,9 @@ function env_link_boost()
         if str_contains "$BOOST_BUILD_DIR" "$ENV_DIR"; then
             current_pwd=`pwd`
             rel_path=$(get_relative_path "$current_pwd" "$BOOST_BUILD_DIR" )
-            ln -s "$rel_path" boost
+            create_exist_symlink "$rel_path" boost
         else
-            ln -s "$BOOST_BUILD_DIR" boost  # this links directly to the most recent build...
+            create_exist_symlink "$BOOST_BUILD_DIR" boost  # this links directly to the most recent build...
         fi
 
     fi
@@ -151,7 +151,7 @@ function env_link_boost()
     pushd "$ENV_DIR/include" > /dev/null
     if [ ! -d "boost" ]; then  # We may have built boost here, so only create a symlink if not
         rm boost 2>/dev/null
-        ln -s "$BOOST_INSTALL_PREFIX/include/boost" boost
+        create_exist_symlink "$BOOST_INSTALL_PREFIX/include/boost" boost
     fi
     popd > /dev/null
 

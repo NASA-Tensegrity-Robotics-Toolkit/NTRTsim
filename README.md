@@ -1,3 +1,9 @@
+NASA Tensegrity Robotics Toolkit
+===============
+
+About NTRT
+---------
+
 The NASA Tensegrity Robotics Toolkit (NTRT) is a collection of C++ and
 MATLAB software modules for the modeling, simulation, and control of
 Tensegrity Robots. The NTRT Simulator is a tensegrity-specific simulator
@@ -7,20 +13,34 @@ See INSTALL for instructions on how to install the library and build
 from source. A getting started guide is available in src/README.dox,
 which contains the main page of the DOxygen documentation.
 
-The most accessable examples of tensegrity structures are in the
+The most accessible examples of tensegrity structures are in the
 examples directory, we recommend starting with src/examples/3_prism
 Additional README.dox files can be found in each folder with
-additional information about that applicaiton or library. Additional 
+additional information about that application or library. Additional 
 examples can be found in example folders NestedTetrahedrons, SUPERball,
 learningSpines or development folders: dev/tests and dev/btietz.
 
 More information can be found at:
+
 http://ti.arc.nasa.gov/tech/asr/intelligent-robotics/tensegrity/ntrt/
 
-DOxygen documentation can be compiled in the source directory
-(run "doxygen Doxyfile" when in src).
-Under Ubuntu 14.04, installing doxygen and graphviz (required) can be
-done by running "sudo apt-get install doxygen graphviz".
-HTML-based documentation can then be found under src/DoxyDocs/index.html
+Documentation
+--------
+
+Doxygen documentation can be compiled in the source directory
+(run "doxygen Doxyfile" when in src). Under Ubuntu 14.04, installing 
+doxygen and graphviz (required) can be done by running "sudo apt-get 
+install doxygen graphviz". HTML-based documentation can then be found 
+under src/DoxyDocs/index.html.
+
 Pre-built documentation for our beta release can be found here:
-http://www.magicalrobot.org/NTRT/Docs/NTRTv1.0.0-beta/html/index.html
+
+http://ntrt.perryb.ca/doxygen
+
+Build Status
+---------
+
+NTRTsim's automated build system (BuildBot) can be found at:
+
+http://ntrt.perryb.ca/bb/waterfall
+

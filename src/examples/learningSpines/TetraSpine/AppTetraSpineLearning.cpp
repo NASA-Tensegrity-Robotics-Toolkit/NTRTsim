@@ -34,6 +34,7 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -79,7 +80,12 @@ int main(int argc, char** argv)
     TetraSpineCPGControl* const myControl =
       new TetraSpineCPGControl(control_config, suffix);
     myModel->attach(myControl);
+    /*
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+    */
     simulation.addModel(myModel);
     
     int i = 0;

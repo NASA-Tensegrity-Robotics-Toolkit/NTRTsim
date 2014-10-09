@@ -12,7 +12,7 @@
  - views of the simulation: tgSimView and tgSimViewGraphics
  - rendering functions tgBulletRenderer, based on tgModelVisitor
  - the base class for models tgModel,
- - components of models such as tgRod and tgLinearString
+ - components of models such as tgRod, tgBox, tgSphere, and tgLinearString
  - the ability to tag models and components with tgTags and tgTaggable
  - basic components of controllers tgSubject and tgObserver
  

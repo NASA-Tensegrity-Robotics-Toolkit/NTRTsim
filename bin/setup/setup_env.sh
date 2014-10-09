@@ -62,24 +62,11 @@ function get_primary_group()
 
 create_directory_if_noexist "$ENV_DIR"
 pushd "$ENV_DIR" > /dev/null
-create_directory_if_noexist "bin"
-create_directory_if_noexist "build"
-create_directory_if_noexist "downloads"
-create_directory_if_noexist "include"
-create_directory_if_noexist "lib"
+create_directory_if_noexist "$ENV_BIN_DIR"
+create_directory_if_noexist "$ENV_BUILD_DIR"
+create_directory_if_noexist "$DOWNLOADS_DIR"
+create_directory_if_noexist "$INCLUDE_DIR"
+create_directory_if_noexist "$LIB_DIR"
 popd > /dev/null
 
-
-# Permissions (change the env dir to be owned by the real current user)
-# @todo: do we need to use this? We may not need sudo now...
-actual_user=$(get_actual_user)
-primary_group=$(get_primary_group $actual_user)
-echo "- Changing ownership of env to current user ($actual_user:$primary_group)"
-# Test for sudo (try a non-recursive change for speed)
-chown $actual_user:$primary_group "$ENV_DIR" 2>/dev/null
-if [ ! $? -eq 0 ]; then
-    echo "  - ERROR: sudo required -- please re-run the command with sudo."
-    exit 1;
-fi
-# Actually change the permissions
-chown -R -P $actual_user:$primary_group "$ENV_DIR"
+create_exist_symlink `which g++` "${ENV_BIN_DIR}/g++"

@@ -172,22 +172,22 @@ void TetraSpineLearningModel::setup(tgWorld& world)
 #if (0) // Original parameters
     const double density = 4.2 / 300.0;
     const double radius  = 0.5;
-    const double friction = 1.0;
+    const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 24, 10000);
+    tgLinearString::Config muscleConfig(1000, 100, false, 0, 7000, 24, 10000);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #else // Params for In Won
     const double density = .00311;
     const double radius  = 0.635;
-    const double friction = 1.0;
+    const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 7.0, 9500);
+    tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #endif
     // Create your structureInfo

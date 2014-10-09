@@ -17,5 +17,12 @@ add_library(${PROJECT_NAME} SHARED
             )
 
 subdirs(
+    boxFeet
+    caterpillar
     RBTests
+    sphereFeet
+    TetraSpineStatic
+    hardwareLearning
+    hardwareSineWaves
+    handTunedSineWaves
     )
