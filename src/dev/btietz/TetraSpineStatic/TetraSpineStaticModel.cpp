@@ -123,13 +123,13 @@ namespace
 			tgNodes n0 = children[i-1]->getNodes();
 			tgNodes n1 = children[i  ]->getNodes();
 
-			snake.addPair(n0[0], n1[0], "outer right muscle");
-			snake.addPair(n0[1], n1[1], "outer left muscle");
-			snake.addPair(n0[2], n1[2], "outer top muscle");
+			snake.addPair(n0[0], n1[0], tgString("outer right muscle seg", i));
+			snake.addPair(n0[1], n1[1], tgString("outer left muscle seg", i));
+			snake.addPair(n0[2], n1[2], tgString("outer top muscle seg", i));
 
-			snake.addPair(n0[0], n1[3], "inner right muscle");
-			snake.addPair(n0[1], n1[3], "inner left muscle");
-			snake.addPair(n0[2], n1[3], "inner top muscle");
+			snake.addPair(n0[0], n1[3], tgString("inner right muscle seg", i));
+			snake.addPair(n0[1], n1[3], tgString("inner left muscle seg", i));
+			snake.addPair(n0[2], n1[3], tgString("inner top muscle seg", i));
 		}
     }
 
@@ -156,11 +156,12 @@ namespace
 		btRigidBody* firstBody = model.getAllRigids()[0]->getPRigidBody();
 		
 		std::vector<tgBaseRigid*> myRigids = model.getAllRigids();
+#if (0)
 		for (int i =0; i < myRigids.size(); i++)
 		{
 			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
 		}
-			
+#endif			
 		
 		abstractMarker marker1(firstBody, n0[3] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
 		
@@ -240,7 +241,7 @@ void TetraSpineStaticModel::setup(tgWorld& world)
     const double oldDensity = .00311;
     const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
-    const double friction = 0.5;
+    const double friction = 0.25;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));

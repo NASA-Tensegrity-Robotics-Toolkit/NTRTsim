@@ -44,7 +44,6 @@ m_fileName(fileName)
 tgCPGLogger::~tgCPGLogger()
 { }
 
-
 void tgCPGLogger::onStep(BaseSpineCPGControl& subject, double dt)
 {
 	time += dt;

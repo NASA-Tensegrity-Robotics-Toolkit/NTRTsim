@@ -28,7 +28,9 @@
 #include "tgWorldBulletPhysicsImpl.h"
 // This application
 #include "tgWorld.h"
+#include "tgCast.h"
 #include "terrain/tgBulletGround.h"
+#include "terrain/tgEmptyGround.h"
 // The Bullet Physics library
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
@@ -109,9 +111,12 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
     // Gravitational acceleration is down on the Y axis
     const btVector3 gravityVector(0, -config.gravity, 0);
     m_pDynamicsWorld->setGravity(gravityVector);
-
-	m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
-
+	
+	if (!tgCast::cast<tgBulletGround, tgEmptyGround>(ground) && ground != NULL)
+	{
+		m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
+	}
+	
     #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
     #endif	
