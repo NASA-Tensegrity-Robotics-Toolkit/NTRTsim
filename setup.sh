@@ -141,6 +141,9 @@ run_setupscript "jsoncpp" "JsonCPP"
 run_setupscript "neuralnet" "Neural Net"
 run_setupscript "bullet" "Bullet Physics Library"
 run_setupscript "boost" "Boost"
+run_setupscript "virtualenv" "Python Virtualenv"
+run_setupscript "zeromq" "ZeroMQ"
+
 
 echo ""
 echo "Setup Complete!"
