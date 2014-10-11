@@ -51,11 +51,11 @@ DuCTTSineWaves::DuCTTSineWaves() :
 
 void DuCTTSineWaves::applySineWave(std::vector<tgPrismatic*> prisms, double dt)
 {
+    simTime += dt;
+    cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[0]);
+    target = offsetSpeed + cycle*cpgAmplitude;
     for (std::size_t i=0; i<prisms.size(); i++)
     {
-        simTime += dt;
-        cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[0]);
-        target = offsetSpeed + cycle*cpgAmplitude;
         prisms[i]->setPreferredLength(target);
     }
 }

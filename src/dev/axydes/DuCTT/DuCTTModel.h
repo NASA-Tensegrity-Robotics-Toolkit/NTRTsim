@@ -121,17 +121,16 @@ private:
      * A function called during setup that creates rods from the
      * relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
+     * @param[in] startNode Number of node to start with
      */
-    static void addRodsB(tgStructure& s);
-    
-    static void addRodsT(tgStructure& s);
+    static void addRods(tgStructure& s, int startNode = 0);
     
     /**
      * A function called during setup that creates muscles (Strings) from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addMuscles(tgStructure& s);
+    static void addMuscles(tgStructure& s, int topNodesStart);
 
 private:
     /**

@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgHingeInfo.cpp
+ * @file tgRodHingeInfo.cpp
  * @brief Contains the definition of members of the class tgHinge. A prismatic actuator builder.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "tgHingeInfo.h"
+#include "tgRodHingeInfo.h"
 
 #include "btBulletDynamicsCommon.h"
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
@@ -35,36 +35,36 @@
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgStructureInfo.h"
 
-tgHingeInfo::tgHingeInfo(const tgHinge::Config& config) :
+tgRodHingeInfo::tgRodHingeInfo(const tgRodHinge::Config& config) :
     m_config(config),
     tgConnectorInfo() 
 {
 }
 
-tgHingeInfo::tgHingeInfo(const tgHinge::Config& config, tgTags tags) :
+tgRodHingeInfo::tgRodHingeInfo(const tgRodHinge::Config& config, tgTags tags) :
     m_config(config),
     tgConnectorInfo(tags)
 {}
 
-tgHingeInfo::tgHingeInfo(const tgHinge::Config& config, const tgPair& pair) :
+tgRodHingeInfo::tgRodHingeInfo(const tgRodHinge::Config& config, const tgPair& pair) :
     m_config(config),
     tgConnectorInfo(pair)
 {}
 
-tgHingeInfo::~tgHingeInfo()
+tgRodHingeInfo::~tgRodHingeInfo()
 {
 }
 
-tgConnectorInfo* tgHingeInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgRodHingeInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgHingeInfo(m_config, pair);
+    return new tgRodHingeInfo(m_config, pair);
 }
 
-void tgHingeInfo::initConnector(tgWorld& world)
+void tgRodHingeInfo::initConnector(tgWorld& world)
 {
 }
 
-btVector3 tgHingeInfo::getRigidVector(bool isCompound, std::set<btVector3> fromNodes)
+btVector3 tgRodHingeInfo::getRigidVector(bool isCompound, std::set<btVector3> fromNodes)
 {
     btVector3 vect;
     if (!isCompound && fromNodes.size() == 2)
@@ -89,35 +89,8 @@ btVector3 tgHingeInfo::getRigidVector(bool isCompound, std::set<btVector3> fromN
     return vect;
 }
 
-btHingeConstraint* tgHingeInfo::createHinge()
+btHingeConstraint* tgRodHingeInfo::createHinge()
 {
-    btVector3 axisA = btVector3(0,0,1);
-    switch (m_config.m_axisFrom)
-    {
-    case 0:
-        axisA = btVector3(1,0,0);
-        break;
-    case 1:
-        axisA = btVector3(0,1,0);
-        break;
-    case 2:
-        axisA = btVector3(0,0,1);
-        break;
-    }
-    btVector3 axisB = btVector3(0,0,1);
-    switch (m_config.m_axisTo)
-    {
-    case 0:
-        axisB = btVector3(1,0,0);
-        break;
-    case 1:
-        axisB = btVector3(0,1,0);
-        break;
-    case 2:
-        axisB = btVector3(0,0,1);
-        break;
-    }
-
     std::set<btVector3> fromNodes = getFromRigidInfo()->getContainedNodes();
     btRigidBody* fromBody = getFromRigidBody();
     btVector3 from = getFrom();
@@ -126,68 +99,52 @@ btHingeConstraint* tgHingeInfo::createHinge()
     btRigidBody* toBody = getToRigidBody();
     btVector3 to = getTo();
 
-    if (from != to)
-    {
-//        from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
-//        to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);
-    }
-
     btVector3 fromVect = getRigidVector(getFromRigidInfo()->isCompound(), fromNodes);
     btVector3 toVect = getRigidVector(getToRigidInfo()->isCompound(), toNodes);
-//    btVector3 fromVect = fromBody->getOrientation().getAxis();
-//    btVector3 toVect = toBody->getOrientation().getAxis();
-
-    std::cout << fromNodes.size() << " " << fromVect << " " << from << std::endl;
-    std::cout << toNodes.size() << " " << toVect << " " << to << std::endl;
 
     btVector3 crossVect = toVect.cross(fromVect).safeNormalize();
-    std::cout << crossVect << std::endl;
-    axisA = crossVect;
+    btVector3 axisA = crossVect;
 
     btVector3 crossVect2 = fromVect.cross(toVect).safeNormalize();
-    std::cout << crossVect2 << std::endl;
-    axisB = crossVect2;
+    btVector3 axisB = crossVect2;
 
     btVector3 oriA;
-//    oriA = to;
-//    oriA = from;
-    oriA = from + 0.01*fromVect;
-//    oriA = from - ((to - from) / 2.0);
-//    oriA = fromBody->getWorldTransform().inverse() * from;
-//    oriA = fromBody->getWorldTransform().inverse() * to;
-//    oriA = fromBody->getWorldTransform().inverse() * fromBody->getCenterOfMassTransform().getOrigin();
+    oriA = from + 0.001*fromVect;
     oriA = fromBody->getWorldTransform().inverse() * oriA;
 
     btVector3 oriB;
-//    oriB = from;
-//    oriB = to;
-    oriB = to + 0.01*toVect;
-//    oriB = to + ((from - to) / 2.0);
-//    oriB = toBody->getWorldTransform().inverse() * to;
-//    oriB = toBody->getWorldTransform().inverse() * from;
-//    oriB = toBody->getWorldTransform().inverse() * toBody->getCenterOfMassTransform().getOrigin();
+    oriB = to + 0.001*toVect;
     oriB = toBody->getWorldTransform().inverse() * oriB;
 
-//    std::cout << oriA << oriB << std::endl;
-    std::cout << std::endl;
-
     btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisB);
-//    btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisA);
+
+    //this is essential to getting the right axis of rotation
+    if (m_config.m_axis == 0)
+    {
+        //this is good for right/front hinges
+        hinge->setAxis(axisA);
+    }
+    else if (m_config.m_axis == 1)
+    {
+        //need something for back/left, rotated by 90 degrees
+        axisB = crossVect.cross(fromVect).safeNormalize();
+        hinge->setAxis(axisB);
+    }
 
     hinge->setDbgDrawSize(btScalar(5.f));
     return hinge;
 }
 
-tgModel* tgHingeInfo::createModel(tgWorld& world)
+tgModel* tgRodHingeInfo::createModel(tgWorld& world)
 {  
     btHingeConstraint* hingeC = createHinge();
 
-    tgHinge* hinge = new tgHinge(hingeC, getTags(), m_config);
+    tgRodHinge* hinge = new tgRodHinge(hingeC, getTags(), m_config);
     hinge->setup(world);
     return hinge;
 } 
 
-double tgHingeInfo::getMass()
+double tgRodHingeInfo::getMass()
 {
     // @todo: add up the rigid bodies
     return 0;

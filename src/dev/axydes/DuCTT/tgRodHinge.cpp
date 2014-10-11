@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgHinge.cpp
+ * @file tgRodHinge.cpp
  * @brief Contains the definition of class tgHinge. A hinge actuator.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "tgHinge.h"
+#include "tgRodHinge.h"
 
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
 #include "core/tgBulletUtil.h"
@@ -38,16 +38,15 @@
  * Dummy constructor to make the compiler happy.
  * @todo remove this
  */
-tgHinge::Config::Config()
+tgRodHinge::Config::Config()
 {
     throw std::invalid_argument("Failed to provide arguments to tgHinge::Config");
 }
 
-tgHinge::Config::Config(
+tgRodHinge::Config::Config(
                 double maximum,
                 double minimum,
-                int axisFrom,
-                int axisTo,
+                int axis,
                 bool useMotor,
                 double maxMotorImpulse,
                 double maxMotorVelocity,
@@ -55,8 +54,7 @@ tgHinge::Config::Config(
         ) :
 m_maximum(maximum),
 m_minimum(minimum),
-m_axisFrom(axisFrom),
-m_axisTo(axisTo),
+m_axis(axis),
 m_useMotor(useMotor),
 m_maxMotorImpulse(maxMotorImpulse),
 m_maxMotorVelocity(maxMotorVelocity),
@@ -64,10 +62,10 @@ m_eps(eps)
 {
 }
 
-tgHinge::tgHinge(
+tgRodHinge::tgRodHinge(
         btHingeConstraint* constraint,
         const tgTags& tags,
-        tgHinge::Config& config) :
+        tgRodHinge::Config& config) :
     tgModel(tags),
     m_hinge(constraint),
     m_config(config)
@@ -75,19 +73,19 @@ tgHinge::tgHinge(
     init();
 }
 
-tgHinge::~tgHinge()
+tgRodHinge::~tgRodHinge()
 {
     teardown();
 }
 
-void tgHinge::init()
+void tgRodHinge::init()
 {
     m_hinge->setLimit(m_config.m_minimum, m_config.m_maximum);
     m_hinge->setMaxMotorImpulse(m_config.m_maxMotorImpulse);
     m_preferredAngle = m_config.m_minimum;
 }
 
-void tgHinge::setup(tgWorld& world)
+void tgRodHinge::setup(tgWorld& world)
 {
     assert(m_hinge != NULL);
 
@@ -101,13 +99,13 @@ void tgHinge::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void tgHinge::teardown()
+void tgRodHinge::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
 }
 
-void tgHinge::step(double dt)
+void tgRodHinge::step(double dt)
 {
     if (dt <= 0.0)
     {
@@ -124,7 +122,7 @@ void tgHinge::step(double dt)
     }
 }
 
-bool tgHinge::setPreferredAngle(double angle)
+bool tgRodHinge::setPreferredAngle(double angle)
 {
     bool success = true;
     if (angle > m_config.m_maximum)
@@ -145,17 +143,17 @@ bool tgHinge::setPreferredAngle(double angle)
     return success;
 }
 
-void tgHinge::setMaxVelocity(double vel)
+void tgRodHinge::setMaxVelocity(double vel)
 {
     m_config.m_maxMotorVelocity = vel;
 }
 
-void tgHinge::setMaxImpulse(double impulse)
+void tgRodHinge::setMaxImpulse(double impulse)
 {
     m_config.m_maxMotorImpulse = impulse;
 }
 
-void tgHinge::moveMotors(double dt)
+void tgRodHinge::moveMotors(double dt)
 {
     double jntAngle = 0;
 

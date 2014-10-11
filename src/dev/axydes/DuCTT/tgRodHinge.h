@@ -16,11 +16,11 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_HINGE_H
-#define TG_HINGE_H
+#ifndef TG_ROD_HINGE_H
+#define TG_ROD_HINGE_H
 
 /**
- * @file tgHinge.h
+ * @file tgRodHinge.h
  * @brief Contains the definition of class tgHinge. A hinge joint.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
@@ -33,7 +33,7 @@
 class tgWorld;
 class btHingeConstraint;
 
-class tgHinge: public tgSubject<tgHinge>, public tgModel
+class tgRodHinge: public tgSubject<tgRodHinge>, public tgModel
 {
 public: 
     
@@ -46,8 +46,7 @@ public:
         Config(
                 double minimum,
                 double maximum,
-                int axisFrom = 2,
-                int axisTo = 2,
+                int axis = 0,
                 bool useMotor = false,
                 double maxMotorVelocity = 0.01,
                 double maxMotorImpulse = 20,
@@ -68,10 +67,10 @@ public:
 
         /**
          * Axis to rotate the hinge around, by default Z axis
-         * X=0,Y=1, Z=2
+         * 0 = vector perpendicular to the rods
+         * 1 = vector from 0 crossed with the from rod axis
          */
-        int m_axisFrom;
-        int m_axisTo;
+        int m_axis;
 
         /**
          * Enable the joint motor.
@@ -105,15 +104,15 @@ public:
      * @param[in] config Holds member variables like min/max length, max force
      * and velocity, and the epsilon value to use when comparing joint distance.
      */
-    tgHinge(
+    tgRodHinge(
         btHingeConstraint* constraint,
         const tgTags& tags,
-        tgHinge::Config& config);
+        tgRodHinge::Config& config);
     
     /**
      * Calls teardown
      */
-    virtual ~tgHinge();
+    virtual ~tgRodHinge();
 
     /**
      * Uses the Config object to set the maximum/minimum limits of the joint,

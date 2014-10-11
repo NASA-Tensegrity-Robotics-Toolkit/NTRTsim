@@ -16,25 +16,25 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_HINGE_INFO_H
-#define TG_HINGE_INFO_H
+#ifndef TG_ROD_HINGE_INFO_H
+#define TG_ROD_HINGE_INFO_H
 
 /**
- * @file tgHingeInfo.h
+ * @file tgRodHingeInfo.h
  * @brief Contains the definition of class tgHingeInfo. A hinge joint builder.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "tgHinge.h"
+#include "tgRodHinge.h"
 #include "tgcreator/tgConnectorInfo.h"
 
 #include "LinearMath/btVector3.h"
 
 class btHingeConstraint;
 
-class tgHingeInfo: public tgConnectorInfo
+class tgRodHingeInfo: public tgConnectorInfo
 {
 public: 
        
@@ -43,14 +43,14 @@ public:
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgHingeInfo(const tgHinge::Config& config);
+    tgRodHingeInfo(const tgRodHinge::Config& config);
     
     /**
      * Construct a tgHingeInfo with just a config and tags. The pair must
      * be filled in later, or factory methods can be used to create instances
      * with pairs.
      */
-    tgHingeInfo(const tgHinge::Config& config, tgTags tags);
+    tgRodHingeInfo(const tgRodHinge::Config& config, tgTags tags);
 
     /**
      * Construct a tgHingeInfo from its Config
@@ -59,9 +59,9 @@ public:
      * @param[in] config
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgHingeInfo(const tgHinge::Config& config, const tgPair& pair);
+    tgRodHingeInfo(const tgRodHinge::Config& config, const tgPair& pair);
     
-    ~tgHingeInfo();
+    ~tgRodHingeInfo();
     
     /**
      * Create a tgConnectorInfo* from a tgPair
@@ -78,7 +78,7 @@ public:
 
     btVector3 getRigidVector(bool isCompound, std::set<btVector3> fromNodes);
 protected:
-    tgHinge::Config m_config;
+    tgRodHinge::Config m_config;
 };
 
 #endif

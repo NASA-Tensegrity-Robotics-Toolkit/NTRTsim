@@ -29,7 +29,7 @@
 #include "core/tgLinearString.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgHingeInfo.h"
+#include "tgRodHingeInfo.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgPrismaticInfo.h"
 #include "tgcreator/tgRodInfo.h"
@@ -115,8 +115,6 @@ void DuCTTModel::addNodes(tgStructure& tetra,
     btVector3 topMidFront = btVector3(0, distance+height, 0.01);
     btVector3 topMidBack = btVector3(0, distance+height, -0.01);
 
-    std::cout << bottomRight << " " << bottomLeft << " " << topFront << " " << topBack << std::endl;
-
     //bottom Hinge nodes
     btVector3 RightFrontSlope = topFront - bottomRight;
     btVector3 LeftFrontSlope = topFront - bottomLeft;
@@ -137,12 +135,6 @@ void DuCTTModel::addNodes(tgStructure& tetra,
     btVector3 topLeftBack = topBack - distBtHinges*LeftBackSlope;
     topFront = topFront - btVector3(0,0,distBtNodes);
     topBack = topBack + btVector3(0,0,distBtNodes);
-
-    std::cout << bottomRight << " " << bottomRightFront << " " << bottomRightBack << std::endl;
-    std::cout << bottomLeft << " " << bottomLeftFront << " " << bottomLeftBack << std::endl;
-    std::cout << topFront << " " << topRightFront << " " << topRightBack << std::endl;
-    std::cout << topBack << " " << topLeftFront << " " << topLeftBack << std::endl;
-    std::cout << std::endl;
 
     tetra.addNode(bottomRight); // 0
     tetra.addNode(bottomLeft); // 1
@@ -169,71 +161,52 @@ void DuCTTModel::addNodes(tgStructure& tetra,
     tetra.addNode(topLeftBack); // 15
 }
 
-void DuCTTModel::addRodsB(tgStructure& s)
+void DuCTTModel::addRods(tgStructure& s, int startNode)
 {
     // bottom tetra
-    s.addPair( 0,  4, "rodT");
-    s.addPair( 5,  1, "rodB");
+    s.addPair( startNode+0, startNode+4, "rodT");
+    s.addPair( startNode+5, startNode+1, "rodB");
 
-    s.addPair( 8,  12, "rodB");
-    s.addPair( 10,  14, "rodB");
+    s.addPair( startNode+8, startNode+12, "rodB");
+    s.addPair( startNode+10, startNode+14, "rodB");
 
-    s.addPair( 9,  13, "rodB");
-    s.addPair(11,  15, "rodB");
+    s.addPair( startNode+9, startNode+13, "rodB");
+    s.addPair( startNode+11, startNode+15, "rodB");
 
-    s.addPair( 2,  6, "rodT");
-    s.addPair( 7,  3, "rodB");
+    s.addPair( startNode+2, startNode+6, "rodT");
+    s.addPair( startNode+7, startNode+3, "rodB");
 
-    s.addPair( 4,  5, "prismatic");
-    s.addPair( 6,  7, "prismatic");
+    s.addPair( startNode+4, startNode+5, "prismatic");
+    s.addPair( startNode+6, startNode+7, "prismatic");
 
     //bottom right hinges
-    s.addPair( 0,  8, "hinge");
-    s.addPair( 0,  10, "hinge");
+    s.addPair( startNode+0, startNode+8, "hinge");
+    s.addPair( startNode+0, startNode+10, "hinge");
 
     //bottom left hinges
-    s.addPair( 1,  9, "hinge");
-    s.addPair( 1,  11, "hinge");
+    s.addPair( startNode+1, startNode+9, "hinge2");
+    s.addPair( startNode+1, startNode+11, "hinge2");
 
     //top front hinges
-    s.addPair( 3,  12, "hinge");
-    s.addPair( 3,  13, "hinge");
+    s.addPair( startNode+3, startNode+12, "hinge");
+    s.addPair( startNode+3, startNode+13, "hinge");
 
     //top back hinges
-    s.addPair( 2,  14, "hinge");
-    s.addPair( 2,  15, "hinge");
+    s.addPair( startNode+2, startNode+14, "hinge2");
+    s.addPair( startNode+2, startNode+15, "hinge2");
 }
 
-void DuCTTModel::addRodsT(tgStructure& s)
+void DuCTTModel::addMuscles(tgStructure& s, int topNodesStart)
 {
-    // top tetra
-    s.addPair( 8,  12, "rodT");
-    s.addPair( 13,  9, "rodT");
-
-    s.addPair( 8,  10, "rodT");
-    s.addPair( 8,  11, "rodT");
-
-    s.addPair( 9,  10, "rodT");
-    s.addPair( 9,  11, "rodT");
-
-    s.addPair( 10,  14, "rodT");
-    s.addPair( 15,  11, "rodT");
-
-    s.addPair( 12,  13, "prismatic");
-    s.addPair( 14, 15, "prismatic");
-}
-
-void DuCTTModel::addMuscles(tgStructure& s)
-{
-    s.addPair(0, 8,  "muscle one"); //0
-    s.addPair(1, 9,  "muscle two"); //1
-    s.addPair(2, 10,  "muscle three"); //2
-    s.addPair(3, 11,  "muscle four"); //3
+    s.addPair(0, topNodesStart+0,  "muscle one"); //0
+    s.addPair(1, topNodesStart+1,  "muscle two"); //1
+    s.addPair(2, topNodesStart+2,  "muscle three"); //2
+    s.addPair(3, topNodesStart+3,  "muscle four"); //3
     
-    s.addPair(3, 8,  "muscle five"); //4
-    s.addPair(2, 8,  "muscle six"); //5
-    s.addPair(3, 9,  "muscle seven"); //6
-    s.addPair(2, 9,  "muscle eight"); //7
+    s.addPair(3, topNodesStart+0,  "muscle five"); //4
+    s.addPair(2, topNodesStart+0,  "muscle six"); //5
+    s.addPair(3, topNodesStart+1,  "muscle seven"); //6
+    s.addPair(2, topNodesStart+1,  "muscle eight"); //7
 }
 
 void DuCTTModel::setup(tgWorld& world)
@@ -243,9 +216,9 @@ void DuCTTModel::setup(tgWorld& world)
     const tgRod::Config rodConfigB(c.radius, c.density);
     const tgRod::Config rodConfigT(c.radius, 0);
     const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-    const tgPrismatic::Config prismConfig(.1);
-//    const tgHinge::Config hingeConfig(-SIMD_PI, SIMD_PI);
-    const tgHinge::Config hingeConfig(-0.15,0);
+    const tgPrismatic::Config prismConfig(20);
+    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, 0);
+    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,1);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -254,16 +227,16 @@ void DuCTTModel::setup(tgWorld& world)
     addNodes(s, c.triangle_length, 0, c.duct_height);
     
     // Add rods to the bottom tetrahedron
-    addRodsB(s);
+    addRods(s);
     
     // Add nodes to top tetrahedron
-//    addNodes(s, c.triangle_length, c.duct_distance, c.duct_height);
+    addNodes(s, c.triangle_length, c.duct_distance, c.duct_height);
     
     // Add rods to the top tetrahedron
-//    addRodsT(s);
+    addRods(s, 16);
     
     // Add muscles to the structure
-//    addMuscles(s);
+    addMuscles(s, 16);
     
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
@@ -274,7 +247,8 @@ void DuCTTModel::setup(tgWorld& world)
     spec.addBuilder("rodT", new tgRodInfo(rodConfigT));
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
-    spec.addBuilder("hinge", new tgHingeInfo(hingeConfig));
+    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
+    spec.addBuilder("hinge2", new tgRodHingeInfo(hingeConfig2));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

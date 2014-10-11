@@ -1,8 +1,8 @@
 link_libraries(tgcreator core)
 
 add_executable(AppHinge
-    ../DuCTT/tgHinge.cpp
-    ../DuCTT/tgHingeInfo.cpp
+    ../DuCTT/tgRodHinge.cpp
+    ../DuCTT/tgRodHingeInfo.cpp
     HingeModel.cpp
     AppHinge.cpp
 )

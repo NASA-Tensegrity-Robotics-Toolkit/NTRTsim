@@ -106,7 +106,7 @@ void HingeModel::setup(tgWorld& world)
     const tgRod::Config rodConfig2(c.radius, 0);
     const tgRod::Config rodConfig(c.radius, c.density);
 //    const tgHinge::Config hingeConfig(-SIMD_PI, SIMD_PI);
-    const tgHinge::Config hingeConfig(0, 0.1745329);
+    const tgRodHinge::Config hingeConfig(0, 0.1745329);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -147,7 +147,7 @@ void HingeModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("b rod", new tgRodInfo(rodConfig));
     spec.addBuilder("t rod", new tgRodInfo(rodConfig2));
-    spec.addBuilder("hinge", new tgHingeInfo(hingeConfig));
+    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
