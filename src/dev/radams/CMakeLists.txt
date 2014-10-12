@@ -1,5 +1,6 @@
-Project(btietz)
+Project(radams)
 
 subdirs(
     chrono
+    zeromq
 )

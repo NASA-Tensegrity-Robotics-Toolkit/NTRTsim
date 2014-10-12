@@ -20,7 +20,9 @@
 # Author:  Ryan Adams
 # Date:    2014-10-08
 
-# @todo: zeromq installs .h files directly under env/include. That's not the behavior of other things, but it may be ok. No need to do env_link on it then...
+# @todo: zeromq installs .h files directly under env/include -- is this ok? 
+# Note: this is also the only 'standard' package (configure/make/make install)
+# that we currently have. In any case, it works...
 
 
 ##############################################################################
@@ -30,9 +32,7 @@ SCRIPT_PATH="`dirname \"$0\"`"
 SCRIPT_PATH="`( cd \"$SCRIPT_PATH\" && pwd )`"
 
 # Add the relative path from this script to the helpers folder.
-
-# @todo: Change this to work with standard setup locations (this will work for src/dev/radams)
-pushd "${SCRIPT_PATH}/helpers/" > /dev/null  # for standard location setup
+pushd "${SCRIPT_PATH}/helpers/" > /dev/null
 
 if [ ! -f "helper_functions.sh" ]; then
     echo "Could not find helper_functions.sh. Are we in the bash helpers folder?"
@@ -60,13 +60,19 @@ zeromq_pkg=`echo $ZEROMQ_URL|awk -F/ '{print $NF}'`  # get the package name from
 # Check to see if zeromq has been built already
 function check_zeromq_built()
 {
-    # Check for a library that's created when zeromq is built   
-    # @todo: make this work for zeromq
-    fname=$(find "$ZEROMQ_BUILD_DIR" -iname config.status* 2>/dev/null)
-    if [ -f "$fname" ]; then
-        return $TRUE
+    # Check for a file that's created when zeromq is configured   
+    fname=$(find "$ZEROMQ_BUILD_DIR" -iname config.status 2>/dev/null)
+    if [ ! -f "$fname" ]; then
+        return $FALSE
     fi
-    return $FALSE
+    
+    # Check for a file that's created when zeromq is made
+    fname=$(find "$ZEROMQ_BUILD_DIR/src" -iname *.o 2>/dev/null)
+    if [ ! -f "$fname" ]; then
+        return $FALSE
+    fi
+    
+    return $TRUE
 }
 
 
@@ -132,67 +138,67 @@ function install_zeromq()
     popd > /dev/null
 }
 
-# Create symlinks under env for building our applications and IDE integration
-# @todo: remove this or make it work (don't think we need it...)
-function env_link_zeromq()
+
+# Download the package to env/downloads
+function download_cppzmq()
 {
 
-    # Build
-    pushd "$ENV_DIR/build" > /dev/null
-    rm zeromq 2>/dev/null   # Note: this will fail if 'zeromq' is a directory, which is what we want.
+    zeromq_cppzmq_path="$ZEROMQ_CPPZMQ_DOWNLOADS_DIR/zmq.hpp"
 
-    # If we're building under env, use a relative path for the link; otherwise use an absolute one.
-    if str_contains "$ZEROMQ_BUILD_DIR" "$ENV_DIR"; then
-        current_pwd=`pwd`
-        rel_path=$(get_relative_path "$current_pwd" "$ZEROMQ_BUILD_DIR" )
-        create_exist_symlink "$rel_path" zeromq
-    else
-        create_exist_symlink "$ZEROMQ_BUILD_DIR" zeromq  # this links directly to the most recent build...
+    if [ -f "$zeromq_cppzmq_path" ]; then
+        echo "- ZeroMQ C++ Binding file already exists ('$zeromq_cppzmq_path') -- skipping download."
+        return
     fi
 
-    popd > /dev/null
-
-    # Header Files
-    pushd "$ENV_DIR/include" > /dev/null
-    if [ ! -d "zeromq" ]; then  # We may have built here, so only create a symlink if not
-        rm zeromq 2>/dev/null
-        create_exist_symlink "$ZEROMQ_INSTALL_PREFIX/include/zeromq" zeromq
+    if [ ! -d "$ZEROMQ_CPPZMQ_DOWNLOADS_DIR" ]; then
+        /bin/mkdir -p "$ZEROMQ_CPPZMQ_DOWNLOADS_DIR"
     fi
-    popd > /dev/null
+
+    echo "Downloading ZeroMQ C++ Bindings to $ZEROMQ_CPPZMQ_DOWNLOADS_DIR"
+    download_file "$ZEROMQ_CPPZMQ_URL" "$ZEROMQ_CPPZMQ_DOWNLOADS_DIR/zmq.hpp"
+}
+
+function install_cppzmq()
+{
+    if [ -f "$ZEROMQ_INSTALL_PREFIX/includes/zmq.hpp" ]; then
+        echo "- ZeroMQ C++ Bindings already exist ('$ZEROMQ_INSTALL_PREFIX/includes/zmq.hpp') -- skipping install."
+        return
+    fi
+    
+    echo "- Installing ZeroMQ C++ Bindings under $ZEROMQ_INSTALL_PREFIX"
+    
+    /bin/cp "$ZEROMQ_CPPZMQ_DOWNLOADS_DIR/zmq.hpp" "$ZEROMQ_INSTALL_PREFIX/include/"
 
 }
+
+
 
 function main()
 {
 
     ensure_install_prefix_writable $ZEROMQ_INSTALL_PREFIX
-
-    # Testing only
-    # download_zeromq
-    # unpack_zeromq
-    # build_zeromq
-    # install_zeromq
-
-    #exit 1
     
-    
-    # @todo: does this work? What actually gets installed under lib?
     if check_package_installed "$ZEROMQ_INSTALL_PREFIX/lib/libzmq*"; then
         echo "- ZeroMQ is installed under prefix $ZEROMQ_INSTALL_PREFIX -- skipping."
+        download_cppzmq
+        install_cppzmq
         return
     fi
 
     if check_zeromq_built; then
         echo "- ZeroMQ is already built under $ZEROMQ_BUILD_DIR -- skipping."
         install_zeromq
+        download_cppzmq
+        install_cppzmq
         return
     fi
 
-    # @todo: make this work for zeromq
-    if check_file_exists "$ZEROMQ_PACKAGE_DIR/CMakeLists.txt"; then
+    if check_file_exists "$ZEROMQ_PACKAGE_DIR/configure"; then
         echo "- ZeroMQ is already unpacked to $ZEROMQ_BUILD_DIR -- skipping."
         build_zeromq
         install_zeromq
+        download_cppzmq
+        install_cppzmq
         return
     fi
 
@@ -201,8 +207,11 @@ function main()
         unpack_zeromq
         build_zeromq
         install_zeromq
+        download_cppzmq
+        install_cppzmq
         return
     fi
+
 
 
     # If we haven't returned by now, we have to do everything
@@ -210,6 +219,9 @@ function main()
     unpack_zeromq
     build_zeromq
     install_zeromq
+
+    download_cppzmq
+    install_cppzmq
 
 }
 
