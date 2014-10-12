@@ -143,7 +143,7 @@ run_setupscript "bullet" "Bullet Physics Library"
 run_setupscript "boost" "Boost"
 run_setupscript "virtualenv" "Python Virtualenv"
 run_setupscript "zeromq" "ZeroMQ"
-
+run_setupscript "msgpack" "MessagePack"
 
 echo ""
 echo "Setup Complete!"
