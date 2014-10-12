@@ -11,4 +11,14 @@ add_executable(ZmqHelloWorldServer
 
 add_executable(ZmqHelloWorldClient
     helloWorldClient.cpp
-) 
+)
+
+# Weather Update Example
+# http://zguide.zeromq.org/page:all#basics
+add_executable(wuserver
+    wuserver.cpp
+)
+add_executable(wuclient
+    wuclient.cpp
+)
+ 
