@@ -35,7 +35,7 @@
 class AnnealEvolution
 {
 public:
-    AnnealEvolution(string suffix, string config = "config.ini");
+    AnnealEvolution(string suffix, string path, string config = "config.ini");
     ~AnnealEvolution();
     void mutateEveryController();
     void orderAllPopulations();
@@ -50,6 +50,7 @@ private:
     vector< AnnealEvoPopulation *> populations;
     vector <AnnealEvoMember *>  selectedControllers;
     vector< vector< double > > scoresOfTheGeneration;
+    std::string resourcePath;
 //  double minValue;
 //  double maxValue;
     double leniencyCoef;

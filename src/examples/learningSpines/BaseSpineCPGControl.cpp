@@ -36,6 +36,8 @@
 #include "core/ImpedanceControl.h"
 #include "tgCPGStringControl.h"
 
+#include "helpers/FileHelpers.h"
+
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
@@ -129,14 +131,16 @@ BaseSpineCPGControl::Config::Config(int ss,
  */
 BaseSpineCPGControl::BaseSpineCPGControl(BaseSpineCPGControl::Config config,	
 												std::string args,
+												std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc) :
 m_config(config),
-edgeConfigFilename(ec),
-nodeConfigFilename(nc),
-edgeEvolution(args + "_edge", edgeConfigFilename),
+edgeConfigFilename(FileHelpers::getResourcePath(resourcePath + ec)),
+nodeConfigFilename(FileHelpers::getResourcePath(resourcePath + nc)),
+// Evolution assumes no pre-processing was done on these names
+edgeEvolution(args + "_edge", resourcePath, ec),
 // Can't have identical args or they'll overwrite each other
-nodeEvolution(args + "_node", nodeConfigFilename),
+nodeEvolution(args + "_node", resourcePath, nc),
 // Will be overwritten by configuration data
 nodeLearning(false),
 edgeLearning(false),

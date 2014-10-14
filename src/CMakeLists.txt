@@ -11,7 +11,7 @@ subdirs(
     sensors
     tgcreator
     controllers
-    dev
+    #dev
     examples
 )
 

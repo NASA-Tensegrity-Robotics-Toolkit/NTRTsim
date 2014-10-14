@@ -8,6 +8,7 @@ link_libraries(sensors
                 Adapters
                 Configuration
                 AnnealEvolution
+                FileHelpers
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED
@@ -17,8 +18,8 @@ add_library(${PROJECT_NAME} SHARED
             tgCPGLogger.cpp
             )
 
-subdirs(    OctahedralComplex
-    ribDemo
+subdirs(    #OctahedralComplex
+    #ribDemo
     TetrahedralComplex
-    TetraSpine
+    #TetraSpine
     )
