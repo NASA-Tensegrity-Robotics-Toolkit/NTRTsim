@@ -55,9 +55,9 @@ unsigned long long rdtsc(){
 
 AnnealEvolution::AnnealEvolution(string suff, string path, string config) :
 Temp(1.0),
+suffix(suff),
 resourcePath(FileHelpers::getResourcePath(path))
 {
-    suffix=suff;
     currentTest=0;
     generationNumber=0;
 	

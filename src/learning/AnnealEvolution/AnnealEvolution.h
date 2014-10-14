@@ -42,7 +42,9 @@ public:
     void evaluatePopulation();
     vector< AnnealEvoMember *> nextSetOfControllers();
     void updateScores(vector<double> scores);
-    string suffix;
+    const string suffix;
+    const std::string resourcePath;
+    
 private:
     int populationSize;
     int numberOfControllers;
@@ -50,7 +52,7 @@ private:
     vector< AnnealEvoPopulation *> populations;
     vector <AnnealEvoMember *>  selectedControllers;
     vector< vector< double > > scoresOfTheGeneration;
-    std::string resourcePath;
+    
 //  double minValue;
 //  double maxValue;
     double leniencyCoef;
