@@ -163,21 +163,39 @@ void DuCTTModel::addNodes(tgStructure& tetra,
 
 void DuCTTModel::addRods(tgStructure& s, int startNode)
 {
-    // bottom tetra
-    s.addPair( startNode+0, startNode+4, "rodT");
-    s.addPair( startNode+5, startNode+1, "rodB");
-
+    // for one tetra
+    //right rods
     s.addPair( startNode+8, startNode+12, "rodB");
     s.addPair( startNode+10, startNode+14, "rodB");
 
+    //left rods
     s.addPair( startNode+9, startNode+13, "rodB");
     s.addPair( startNode+11, startNode+15, "rodB");
 
-    s.addPair( startNode+2, startNode+6, "rodT");
-    s.addPair( startNode+7, startNode+3, "rodB");
+    if (startNode == 0)
+    {
+        //bottom tetra
+        // bottom rods
+        s.addPair( startNode+0, startNode+4, "rodT");
+        s.addPair( startNode+5, startNode+1, "rodB");
 
-    s.addPair( startNode+4, startNode+5, "prismatic");
-    s.addPair( startNode+6, startNode+7, "prismatic");
+        //top rods
+        s.addPair( startNode+2, startNode+3, "rodB");
+
+	    s.addPair( startNode+4, startNode+5, "prismatic");
+    }
+    else
+    {
+        //top tetra
+        // bottom rods
+	    s.addPair( startNode+0, startNode+1, "rodB");
+
+        //top rods
+        s.addPair( startNode+2, startNode+6, "rodT");
+        s.addPair( startNode+7, startNode+3, "rodB");
+
+	    s.addPair( startNode+6, startNode+7, "prismatic");
+    }
 
     //bottom right hinges
     s.addPair( startNode+0, startNode+8, "hinge");
@@ -216,7 +234,7 @@ void DuCTTModel::setup(tgWorld& world)
     const tgRod::Config rodConfigB(c.radius, c.density);
     const tgRod::Config rodConfigT(c.radius, 0);
     const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-    const tgPrismatic::Config prismConfig(20);
+    const tgPrismatic::Config prismConfig(50);
     const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, 0);
     const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,1);
     
