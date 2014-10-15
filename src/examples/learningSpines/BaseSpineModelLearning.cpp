@@ -148,7 +148,7 @@ std::vector<double> BaseSpineModelLearning::getSegmentCOM(const int n) const
         const tgRod* const pRod = p_rods[i];
         assert(pRod != NULL);
         const double rodMass = pRod->mass();
-        std::cout << "mass " << rodMass;
+        //std::cout << "mass " << rodMass;
         const btVector3 rodCenterOfMass = pRod->centerOfMass();
         segmentCenterOfMass += rodCenterOfMass * rodMass;
         segmentMass += rodMass;

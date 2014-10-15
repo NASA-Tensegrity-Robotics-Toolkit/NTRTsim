@@ -262,7 +262,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 
 void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
 {
-    std::vector<double> scores;
+    scores.clear();
     // @todo - check to make sure we ran for the right amount of time
     
     std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
@@ -320,6 +320,19 @@ const double BaseSpineCPGControl::getCPGValue(std::size_t i) const
 	// Error handling on input done in CPG_Equations
 	return (*m_pCPGSys)[i];
 }
+
+double BaseSpineCPGControl::getScore() const
+{
+	if (scores.size() == 2)
+	{
+		return scores[0];
+	}
+	else
+	{
+		throw std::runtime_error("Called before scores were obtained!");
+	}
+}
+	
 
 array_4D BaseSpineCPGControl::scaleEdgeActions  
                             (vector< vector <double> > actions)

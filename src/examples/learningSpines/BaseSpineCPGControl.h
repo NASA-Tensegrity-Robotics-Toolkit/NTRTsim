@@ -128,6 +128,8 @@ struct Config
 
 	const double getCPGValue(std::size_t i) const;
 	
+	double getScore() const;
+	
 protected:
     /**
      * Takes a vector of parameters reported by learning, and then 
@@ -168,6 +170,7 @@ protected:
     
     double m_updateTime;
     
+    std::vector<double> scores;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H

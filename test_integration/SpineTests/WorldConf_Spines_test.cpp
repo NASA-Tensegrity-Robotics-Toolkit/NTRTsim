@@ -31,10 +31,13 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "helpers/FileHelpers.h"
 // The C++ Standard Library
 #include <iostream>
+#include <fstream>
+// Google Test
 #include "gtest/gtest.h"
-#include "helpers/FileHelpers.h"
+
 
 using namespace std;
 
@@ -70,6 +73,14 @@ namespace {
 	};
 
 	TEST_F(SpinesTest, WorldConf_Spines) {
+				std::string filePath = FileHelpers::getResourcePath("learningSpines/TetrahedralComplex/logs/scores.csv");
+				
+				// Clear the file before we start
+				ofstream clearResults;
+				clearResults.open(filePath.c_str(), ios::trunc);
+				
+				clearResults.close();
+
 						// First create the world
 				const tgWorld::Config config(981); // gravity, cm/sec^2
 				tgWorld world(config); 
@@ -103,11 +114,19 @@ namespace {
 				BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
 															lowAmplitude, highAmplitude, lowPhase, highPhase);
 				BaseSpineCPGControl* const myControl =
-				  new BaseSpineCPGControl(control_config, suffix);
+				  new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
 				myModel->attach(myControl);
 				
 				simulation.addModel(myModel);
-		//EXPECT_EQ("test string\n", fileData);
+				
+				simulation.run(30000);
+				simulation.reset();
+				
+				double dist = FileHelpers::getFinalScore(filePath);
+				
+				EXPECT_EQ(dist, 188.694);
+				
+				// Will print out another set of dist moved on teardown
 	}
 
 } // namespace
