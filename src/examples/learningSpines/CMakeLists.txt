@@ -19,7 +19,7 @@ add_library(${PROJECT_NAME} SHARED
             )
 
 subdirs(    OctahedralComplex
-    #ribDemo
+    ribDemo
     TetrahedralComplex
-    #TetraSpine
+    TetraSpine
     )

@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segment, controlTime);
     
     TetraSpineCPGControl* const myControl =
-      new TetraSpineCPGControl(control_config, suffix);
+      new TetraSpineCPGControl(control_config, suffix, "learningSpines/TetraSpine/");
     myModel->attach(myControl);
     /*
     tgCPGLogger* const myLogger = 
