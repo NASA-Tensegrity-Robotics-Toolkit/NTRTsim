@@ -135,8 +135,8 @@ BaseSpineCPGControl::BaseSpineCPGControl(BaseSpineCPGControl::Config config,
                                                 std::string ec,
                                                 std::string nc) :
 m_config(config),
-edgeConfigFilename(FileHelpers::getResourcePath(resourcePath + ec)),
-nodeConfigFilename(FileHelpers::getResourcePath(resourcePath + nc)),
+edgeConfigFilename(ec),
+nodeConfigFilename(nc),
 // Evolution assumes no pre-processing was done on these names
 edgeEvolution(args + "_edge", ec, resourcePath),
 // Can't have identical args or they'll overwrite each other
@@ -148,8 +148,18 @@ m_dataObserver("logs/TCData"),
 m_pCPGSys(NULL),
 m_updateTime(0.0)
 {
-    nodeConfigData.readFile(nodeConfigFilename);
-    edgeConfigData.readFile(edgeConfigFilename);
+	std::string path;
+	if (resourcePath != "")
+	{
+		path = FileHelpers::getResourcePath(resourcePath);
+	}
+	else
+	{
+		path = "";
+	}
+	
+    nodeConfigData.readFile(path + nodeConfigFilename);
+    edgeConfigData.readFile(path + edgeConfigFilename);
     nodeLearning = nodeConfigData.getintvalue("learning");
     edgeLearning = edgeConfigData.getintvalue("learning");
     

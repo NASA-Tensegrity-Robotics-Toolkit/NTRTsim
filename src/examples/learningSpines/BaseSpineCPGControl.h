@@ -114,7 +114,7 @@ struct Config
 
     BaseSpineCPGControl(BaseSpineCPGControl::Config config,	
 							std::string args,
-							std::string resourcePath,
+							std::string resourcePath = "",
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini");
     
