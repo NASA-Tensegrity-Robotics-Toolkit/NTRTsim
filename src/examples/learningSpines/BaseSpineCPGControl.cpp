@@ -138,9 +138,9 @@ m_config(config),
 edgeConfigFilename(FileHelpers::getResourcePath(resourcePath + ec)),
 nodeConfigFilename(FileHelpers::getResourcePath(resourcePath + nc)),
 // Evolution assumes no pre-processing was done on these names
-edgeEvolution(args + "_edge", resourcePath, ec),
+edgeEvolution(args + "_edge", ec, resourcePath),
 // Can't have identical args or they'll overwrite each other
-nodeEvolution(args + "_node", resourcePath, nc),
+nodeEvolution(args + "_node", nc, resourcePath),
 // Will be overwritten by configuration data
 nodeLearning(false),
 edgeLearning(false),

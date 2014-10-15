@@ -53,13 +53,22 @@ unsigned long long rdtsc(){
 
 #endif
 
-AnnealEvolution::AnnealEvolution(string suff, string path, string config) :
+AnnealEvolution::AnnealEvolution(string suff, string config, string path) :
 Temp(1.0),
-suffix(suff),
-resourcePath(FileHelpers::getResourcePath(path))
+suffix(suff)
+
 {
     currentTest=0;
     generationNumber=0;
+	
+	if (path != "")
+	{
+		resourcePath = FileHelpers::getResourcePath(path);
+	}
+	else
+	{
+		resourcePath = "";
+	}
 	
 	std::string configPath = resourcePath + config;
 	
