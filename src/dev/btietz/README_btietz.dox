@@ -1,0 +1,10 @@
+/**
+ \page btietz Brian Mirletz's Dev Folder
+ This folder currently contains a number of folders and classes that
+ were used as a part of the ICRA 2015 submission entitled 
+ "Towards bridging the reality gap between tensegrity simulation and
+ robotic hardware"
+ In particular, the applications in handTunedSineWaves, hardwareLearning
+ and TetraSpineStatic all generated data for the paper.
+ \version 1.0.0 (beta)
+*/

@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 												lowAmplitude, highAmplitude, lowPhase, highPhase,
 												tension, kPosition, kVelocity);
     BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix);
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/OctahedralComplex/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);

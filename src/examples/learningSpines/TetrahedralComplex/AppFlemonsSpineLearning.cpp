@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
 												lowAmplitude, highAmplitude, lowPhase, highPhase);
     BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix);
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);

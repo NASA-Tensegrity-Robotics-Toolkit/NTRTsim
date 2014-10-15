@@ -55,7 +55,8 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
    * The only constructor.
    * @param[in] gravity the gravitational acceleration in m/sec^2
    * @param[in] ground - a container class that holds a rigid body and
-   * collsion object for the ground. A NULL pointer results in no ground.
+   * collsion object for the ground. tgEmptyGround can be used to create
+   * a ground free simulation
    */
   tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
                            tgBulletGround* ground);

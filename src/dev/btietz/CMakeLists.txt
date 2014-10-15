@@ -22,4 +22,7 @@ subdirs(
     RBTests
     sphereFeet
     TetraSpineStatic
+    hardwareLearning
+    hardwareSineWaves
+    handTunedSineWaves
     )

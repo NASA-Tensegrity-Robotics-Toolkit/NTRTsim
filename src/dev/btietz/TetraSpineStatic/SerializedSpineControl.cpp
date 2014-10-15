@@ -439,25 +439,25 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	
 	btVector3 force(0.0, 0.0, 0.0);
 	// 2 kg times gravity
-	if (simTime > 30.0 && simTime < 37.0)
+	if (simTime > 30.0 && simTime < 35.0)
 	{
-		force = btVector3(0.0, 0.0, 2.1 * 981.0 * ((simTime - 30)/7.0));
+		force = btVector3(0.0, 0.0, 2.3 * 981.0 * (simTime - 30) / 5.0);
 	}
-	else if (simTime >= 37.0 && simTime < 41.0)
+	else if (simTime >= 35.0 && simTime < 40.0)
 	{
-		force = btVector3(0.0, 0.0, 2.1 * 981.0);
+		force = btVector3(0.0, 0.0, 2.3 * 981.0);
 	}
-	else if (simTime >= 41.0 && simTime < 48.0)
+	else if (simTime >= 40.0 && simTime < 45.0)
 	{
-		force = btVector3(0.0, 0.0, 2.1 * 981.0 * (48 - simTime)/7.0);
+		force = btVector3(0.0, 0.0, 2.3 * 981.0 * (45 - simTime)/5.0);
 	}
 	else
 	{
 		force = btVector3(0.0, 0.0, 0.0);
 	}
-	seg1Body->applyImpulse(force * dt, marker.getRelativePosition());
-	seg2Body->applyImpulse(-force / 2.0 * 0.9 * dt, marker2.getRelativePosition());
-	seg3Body->applyImpulse(-force / 2.0 * 1.1 * dt, marker5.getRelativePosition());
+	seg1Body->applyForce(force, marker.getRelativePosition());
+	seg2Body->applyForce(-force / 2.0 * 0.9, marker2.getRelativePosition());
+	seg3Body->applyForce(-force / 2.0 * 1.1, marker5.getRelativePosition());
 	//seg2Body->applyForce(-force / 2.0, marker4.getRelativePosition());
 }
     
