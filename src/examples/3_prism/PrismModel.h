@@ -103,12 +103,12 @@ private:
      * A function called during setup that determines the positions of
      * the nodes based on construction parameters. Rewrite this function
      * for your own models
-     * @param[in] tetra: A tgStructure that we're building into
+     * @param[in] s: A tgStructure that we're building into
      * @param[in] edge: the X distance of the base points
      * @param[in] width: the Z distance of the base triangle
      * @param[in] height: the Y distance along the axis of the prism
      */
-    static void addNodes(tgStructure& tetra,
+    static void addNodes(tgStructure& s,
                             double edge,
                             double width,
                             double height);

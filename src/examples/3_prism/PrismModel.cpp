@@ -82,23 +82,23 @@ PrismModel::~PrismModel()
     delete m_pStringController;
 }
 
-void PrismModel::addNodes(tgStructure& tetra,
+void PrismModel::addNodes(tgStructure& s,
                             double edge,
                             double width,
                             double height)
 {
     // bottom right
-    tetra.addNode(-edge / 2.0, 0, 0); // 1
+    s.addNode(-edge / 2.0, 0, 0); // 1
     // bottom left
-    tetra.addNode( edge / 2.0, 0, 0); // 2
+    s.addNode( edge / 2.0, 0, 0); // 2
     // bottom front
-    tetra.addNode(0, 0, width); // 3
+    s.addNode(0, 0, width); // 3
     // top right
-    tetra.addNode(-edge / 2.0, height, 0); // 4
+    s.addNode(-edge / 2.0, height, 0); // 4
     // top left
-    tetra.addNode( edge / 2.0, height, 0); // 5
+    s.addNode( edge / 2.0, height, 0); // 5
     // top front
-    tetra.addNode(0, height, width); // 6
+    s.addNode(0, height, width); // 6
 }
 
 void PrismModel::addRods(tgStructure& s)
