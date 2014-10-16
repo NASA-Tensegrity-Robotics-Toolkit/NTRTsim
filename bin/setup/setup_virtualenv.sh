@@ -91,16 +91,16 @@ function unpack_virtualenv()
 function install_virtualenv()
 {
 
-    if [ -d "$VENV_PATH" ]; then
-        echo "- Virtualenv has already been created ('$VENV_PATH') -- skipping install."
-        echo "  NOTE: If you want to have setup re-create the virtualenv, delete $VENV_PATH and re-run setup.sh"
+    if [ -d "$VENV_DIR" ]; then
+        echo "- Virtualenv has already been created ('$VENV_DIR') -- skipping install."
+        echo "  NOTE: If you want to have setup re-create the virtualenv, delete $VENV_DIR and re-run setup.sh"
         return
     fi
     
     echo "- Creating new virtualenv under $VENV_INSTALL_PREFIX"
     
     pushd "$VENV_BUILD_DIR" > /dev/null
-    "$VENV_PYTHON_INTERPRETER" "virtualenv.py" "$VENV_PATH"
+    "$VENV_PYTHON_INTERPRETER" "virtualenv.py" "$VENV_DIR"
     popd > /dev/null
 }
 
