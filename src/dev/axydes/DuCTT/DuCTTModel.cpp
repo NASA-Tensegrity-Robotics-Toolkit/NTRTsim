@@ -63,22 +63,32 @@ namespace
      */
     const struct Config
     {
+        //tetra prams
+        double triangle_length;
+        double duct_distance;
+        double duct_height;
+        //rod params
         double density;
         double prismRadius;
         double prismExtent;
         double vertRodRadius;
         double innerRodRadius;
+        //sphere tip params
         double tipRad;
         double tipDens;
         double tipFric;
+        //string params
         double stiffness;
         double damping;
-        double triangle_length;
-        double duct_distance;
-        double duct_height;
-        double pretension;     
+        double pretension;
+        double maxVertStringVel;
+        double maxSaddleStringVel;
+        double maxStringForce;
     } c =
    {
+       30,     // triangle_length (length) 30 cm
+       15,     // duct_distance (distance between tetrahedrons) 15 cm
+       22,    // duct_height (length)
        0.00164,     // density (mass / length^3) kg/cm^3 0.00164
        1.524, // prismatic joint radius 1.524 cm
        10.16, // prismatic joint max extension 10.16 cm
@@ -89,10 +99,10 @@ namespace
        1, // prismatic joint tip friction
        10000.0,   // stiffness (mass / sec^2) vectran string
        100.0,     // damping (mass / sec)
-       30,     // triangle_length (length) 30 cm
-       15,     // duct_distance (distance between tetrahedrons) 15 cm
-       22,     // duct_height (length)
-       0.05      // Pretension (percentage)
+       0.05,     // Pretension (percentage)
+       25.4, // max velocity of vertical string motors (cm/s) 25.4cm/s
+       8.5, // max velocity of saddle string motors (cm/s) 8.5cm/s
+       50 // max force to exert on all strings (Newtons) 50 N
    }
     ;
 } // namespace
@@ -246,15 +256,17 @@ void DuCTTModel::addRods(tgStructure& s, int startNode)
 
 void DuCTTModel::addMuscles(tgStructure& s, int topNodesStart)
 {
-    s.addPair(0, topNodesStart+0,  "muscle one"); //0
-    s.addPair(1, topNodesStart+1,  "muscle two"); //1
-    s.addPair(2, topNodesStart+2,  "muscle three"); //2
-    s.addPair(3, topNodesStart+3,  "muscle four"); //3
+    //vertical strings
+    s.addPair(0, topNodesStart+0,  "vert string one"); //0
+    s.addPair(1, topNodesStart+1,  "vert string two"); //1
+    s.addPair(2, topNodesStart+2,  "vert string three"); //2
+    s.addPair(3, topNodesStart+3,  "vert string four"); //3
     
-    s.addPair(3, topNodesStart+0,  "muscle five"); //4
-    s.addPair(2, topNodesStart+0,  "muscle six"); //5
-    s.addPair(3, topNodesStart+1,  "muscle seven"); //6
-    s.addPair(2, topNodesStart+1,  "muscle eight"); //7
+    //saddle strings
+    s.addPair(3, topNodesStart+0,  "saddle string five"); //4
+    s.addPair(2, topNodesStart+0,  "saddle string six"); //5
+    s.addPair(3, topNodesStart+1,  "saddle string seven"); //6
+    s.addPair(2, topNodesStart+1,  "saddle string eight"); //7
 }
 
 void DuCTTModel::setup(tgWorld& world)
@@ -266,13 +278,14 @@ void DuCTTModel::setup(tgWorld& world)
     const tgRod::Config vertRodConfig(c.vertRodRadius, c.density);
     const tgRod::Config innerRodConfig(c.innerRodRadius, c.density);
 
-    const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
+    const tgLinearString::Config vertStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxVertStringVel);
+    const tgLinearString::Config saddleStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxSaddleStringVel);
 
     const tgPrismatic::Config prismConfig(c.prismExtent);
+    const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
+
     const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, 0);
     const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,1);
-
-    const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -302,11 +315,14 @@ void DuCTTModel::setup(tgWorld& world)
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
 
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
+    spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
+
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
+    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+
     spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
     spec.addBuilder("hinge2", new tgRodHingeInfo(hingeConfig2));
-    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
