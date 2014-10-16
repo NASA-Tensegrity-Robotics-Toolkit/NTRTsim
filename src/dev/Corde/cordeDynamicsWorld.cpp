@@ -82,7 +82,7 @@ void	cordeDynamicsWorld::predictUnconstraintMotion(btScalar timeStep)
 
 void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 {
-
+	BT_PROFILE("cordeInternalSingleStep");
 	// Let the solver grab the soft bodies and if necessary optimize for it
 	m_softBodySolver->optimize( getSoftBodyArray() );
 

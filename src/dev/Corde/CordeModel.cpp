@@ -29,6 +29,8 @@
 // This library
 #include "tgcreator/tgUtil.h"
 
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -466,6 +468,7 @@ void CordeModel::computeCenterlines()
  */
 void CordeModel::stepPrerequisites()
 {
+	BT_PROFILE("Step Prerequisites");
     std::size_t n = m_massPoints.size();
 	for (std::size_t i = 0; i < n; i++)
     {
@@ -490,6 +493,7 @@ void CordeModel::stepPrerequisites()
 
 void CordeModel::computeInternalForces()
 {
+	BT_PROFILE("Compute Internal Forces");
     std::size_t n = m_massPoints.size() - 1;
     
     // Update position elements
@@ -770,6 +774,7 @@ void CordeModel::computeInternalForces()
 
 void CordeModel::unconstrainedMotion(double dt)
 {
+	BT_PROFILE("UnconstrainedMotion");
     for (std::size_t i = 0; i < m_massPoints.size(); i++)
     {
         CordePositionElement* p_0 = m_massPoints[i];
@@ -820,6 +825,7 @@ void CordeModel::unconstrainedMotion(double dt)
 /// @todo consider combining with unconstrained motion via a flag
 void CordeModel::constrainMotion (double dt)
 {
+	BT_PROFILE("Constrain Motion");
     for (std::size_t i = 0; i < m_massPoints.size(); i++)
     {
         CordePositionElement* p_0 = m_massPoints[i];

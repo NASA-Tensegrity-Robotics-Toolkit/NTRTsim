@@ -58,6 +58,7 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "LinearMath/btQuickprof.h"
 
 //The C++ Standard Library
 #include <iostream>
@@ -243,6 +244,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
+	BT_PROFILE("IntegrateMotion");
 	constrainMotion(dt);
 	
 #if (0)	
@@ -289,7 +291,7 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 
 void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
 {
-	
+	BT_PROFILE("Soft Collision Handler");
 	cordeColliders::CollideSDF_SS	docollide;
 	//std::cout << "Soft soft collisions!" << std::endl;
 	docollide.ProcessSoftSoft(this, otherSoftBody);
@@ -297,6 +299,7 @@ void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSo
 
 void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap) 
 { 
+	BT_PROFILE("Rigid Collision Handler");
 	cordeColliders::CollideSDF_RS	docollide;		
 	btRigidBody*		prb1=(btRigidBody*) btRigidBody::upcast(pcoWrap->getCollisionObject());
 	btTransform	wtr = pcoWrap->getWorldTransform();
@@ -378,6 +381,7 @@ void cordeCollisionObject::updateAABBBounds()
 
 void cordeCollisionObject::solveRContacts()
 {
+	BT_PROFILE("SolveRContacts");
 	const btScalar	idt = m_sst.isdt;
 	const btScalar	mrg = getCollisionShape()->getMargin();
 	for(int i = 0,ni = m_rcontacts.size(); i < ni; ++i)
@@ -409,6 +413,7 @@ void cordeCollisionObject::solveRContacts()
 
 void cordeCollisionObject::solveSContacts()
 {
+	BT_PROFILE("Solve S Contacts");
 	/// This is a compromise between Spillman's algorithm and Bullet's collision detection
 	/// Ideally we would find the exact point of a collision. It may be possible that Bullet can do this
 	const btScalar	idt = m_sst.isdt;
@@ -432,6 +437,7 @@ void cordeCollisionObject::solveSContacts()
 
 void cordeCollisionObject::solveAnchors(const double dt)
 {
+	BT_PROFILE("Solve anchors");
 	for( std::size_t i = 0; i < m_anchors.size(); i++)
 	{
 		m_anchors[i]->solve(dt);
