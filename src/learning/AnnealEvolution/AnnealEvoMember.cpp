@@ -126,7 +126,7 @@ void AnnealEvoMember::loadFromFile(const char * outputFilename)
 			{
 				//cout<<"value read as string: "<<value<<endl;
 				statelessParameters[i++]=atof(value.c_str());
-				cout<<statelessParameters[i-1]<<",";
+				//cout<<statelessParameters[i-1]<<",";
 			}
 		}
 	}

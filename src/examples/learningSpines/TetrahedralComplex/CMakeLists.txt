@@ -11,14 +11,12 @@ link_libraries(learningSpines
                 AnnealEvolution
                 tgOpenGLSupport)
 
-file(COPY nodeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_library(TetrahedralComplex SHARED
+	FlemonsSpineModelLearning.cpp)
+   
 
 add_executable(AppFlemonsSpineLearning
     FlemonsSpineModelLearning.cpp
     AppFlemonsSpineLearning.cpp
     
 ) 
-
-add_custom_command(TARGET AppFlemonsSpineLearning POST_BUILD
-					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/logs)
