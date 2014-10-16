@@ -30,6 +30,8 @@
 #include "tgSimView.h"
 #include "tgSimViewGraphics.h"
 #include "tgWorld.h"
+// Bullet Physics - for the onscreen profiling
+#include "LinearMath/btQuickprof.h"
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -75,6 +77,9 @@ void tgSimulation::addModel(tgModel* pModel)
 
 void tgSimulation::onVisit(const tgModelVisitor& r) const
 {
+#ifndef BT_NO_PROFILE
+	BT_PROFILE("Visitor Dispatch");
+#endif //BT_NO_PROFILE
         // Removed sending the visitor to the world since it wasn't used
         // Write a worldVisitor if its necessary
         for (int i = 0; i < m_models.size(); i++) {

@@ -244,7 +244,9 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 
 void cordeCollisionObject::integrateMotion (btScalar dt)
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("IntegrateMotion");
+#endif 	//BT_NO_PROFILE
 	constrainMotion(dt);
 	
 #if (0)	
@@ -291,7 +293,9 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 
 void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("Soft Collision Handler");
+#endif //BT_NO_PROFILE
 	cordeColliders::CollideSDF_SS	docollide;
 	//std::cout << "Soft soft collisions!" << std::endl;
 	docollide.ProcessSoftSoft(this, otherSoftBody);
@@ -299,7 +303,9 @@ void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSo
 
 void cordeCollisionObject::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap) 
 { 
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("Rigid Collision Handler");
+#endif //BT_NO_PROFILE
 	cordeColliders::CollideSDF_RS	docollide;		
 	btRigidBody*		prb1=(btRigidBody*) btRigidBody::upcast(pcoWrap->getCollisionObject());
 	btTransform	wtr = pcoWrap->getWorldTransform();
@@ -381,7 +387,9 @@ void cordeCollisionObject::updateAABBBounds()
 
 void cordeCollisionObject::solveRContacts()
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("SolveRContacts");
+#endif //BT_NO_PROFILE
 	const btScalar	idt = m_sst.isdt;
 	const btScalar	mrg = getCollisionShape()->getMargin();
 	for(int i = 0,ni = m_rcontacts.size(); i < ni; ++i)
@@ -413,7 +421,9 @@ void cordeCollisionObject::solveRContacts()
 
 void cordeCollisionObject::solveSContacts()
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("Solve S Contacts");
+#endif //BT_NO_PROFILE
 	/// This is a compromise between Spillman's algorithm and Bullet's collision detection
 	/// Ideally we would find the exact point of a collision. It may be possible that Bullet can do this
 	const btScalar	idt = m_sst.isdt;
@@ -437,7 +447,9 @@ void cordeCollisionObject::solveSContacts()
 
 void cordeCollisionObject::solveAnchors(const double dt)
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("Solve anchors");
+#endif //BT_NO_PROFILE
 	for( std::size_t i = 0; i < m_anchors.size(); i++)
 	{
 		m_anchors[i]->solve(dt);

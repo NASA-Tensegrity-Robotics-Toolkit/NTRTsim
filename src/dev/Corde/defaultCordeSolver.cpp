@@ -64,7 +64,9 @@ void defaultCordeSolver::copyBackToSoftBodies(bool bMove)
 
 void defaultCordeSolver::optimize( btAlignedObjectArray< cordeCollisionObject * > &softBodies , bool forceUpdate)
 {
+#ifndef BT_NO_PROFILE
 	BT_PROFILE("optimize");
+#endif //BT_NO_PROFILE
 	m_softBodySet.copyFromArray( softBodies );
 }
 
@@ -91,7 +93,9 @@ void defaultCordeSolver::solveConstraints( float solverdt )
 	// Solve constraints for non-solver softbodies
 	for(int i=0; i < m_softBodySet.size(); ++i)
 	{
+#ifndef BT_NO_PROFILE		
 		BT_PROFILE("SolveConstraints");
+#endif //BT_NO_PROFILE
 		cordeCollisionObject*	psb = static_cast<cordeCollisionObject*>(m_softBodySet[i]);
 		if (psb->isActive())
 		{
@@ -153,21 +157,27 @@ void defaultCordeSolver::copySoftBodyToVertexBuffer( const cordeCollisionObject 
 
 void defaultCordeSolver::processCollision( cordeCollisionObject* softBody, cordeCollisionObject* otherSoftBody)
 {
+#ifndef BT_NO_PROFILE	
 	BT_PROFILE("ProcessSoftSoftCollision");
+#endif // BT_NO_PROFILE	
 	softBody->defaultCollisionHandler( otherSoftBody);
 }
 
 // For the default solver just leave the soft body to do its collision processing
 void defaultCordeSolver::processCollision( cordeCollisionObject* softBody, const btCollisionObjectWrapper* collisionObjectWrap )
 {
+#ifndef BT_NO_PROFILE	
 	BT_PROFILE("ProcessSoftHardCollsion");
+#endif // BT_NO_PROFILE
 	softBody->defaultCollisionHandler( collisionObjectWrap );
 } // defaultCordeSolver::processCollision
 
 
 void defaultCordeSolver::predictMotion( float timeStep )
 {
+#ifndef BT_NO_PROFILE
 	BT_PROFILE("Predict Motion");
+#endif // BT_NO_PROFILE	
 	for ( int i=0; i < m_softBodySet.size(); ++i)
 	{
 		cordeCollisionObject*	psb = m_softBodySet[i];

@@ -468,7 +468,9 @@ void CordeModel::computeCenterlines()
  */
 void CordeModel::stepPrerequisites()
 {
+#ifndef BT_NO_PROFILE	
 	BT_PROFILE("Step Prerequisites");
+#endif // BT_NO_PROFILE
     std::size_t n = m_massPoints.size();
 	for (std::size_t i = 0; i < n; i++)
     {
@@ -493,7 +495,9 @@ void CordeModel::stepPrerequisites()
 
 void CordeModel::computeInternalForces()
 {
+#ifndef BT_NO_PROFILE
 	BT_PROFILE("Compute Internal Forces");
+#endif //BT_NO_PROFILE
     std::size_t n = m_massPoints.size() - 1;
     
     // Update position elements
@@ -774,7 +778,9 @@ void CordeModel::computeInternalForces()
 
 void CordeModel::unconstrainedMotion(double dt)
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("UnconstrainedMotion");
+#endif //BT_NO_PROFILE
     for (std::size_t i = 0; i < m_massPoints.size(); i++)
     {
         CordePositionElement* p_0 = m_massPoints[i];
@@ -825,7 +831,9 @@ void CordeModel::unconstrainedMotion(double dt)
 /// @todo consider combining with unconstrained motion via a flag
 void CordeModel::constrainMotion (double dt)
 {
+#ifndef BT_NO_PROFILE	
 	BT_PROFILE("Constrain Motion");
+#endif //BT_NO_PROFILE
     for (std::size_t i = 0; i < m_massPoints.size(); i++)
     {
         CordePositionElement* p_0 = m_massPoints[i];

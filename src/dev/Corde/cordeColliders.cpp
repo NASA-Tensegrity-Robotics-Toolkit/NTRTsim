@@ -43,6 +43,8 @@ subject to the following restrictions:
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -53,6 +55,10 @@ void cordeColliders::CollideSDF_RS::Process(const btDbvtNode* leaf)
 }
 void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) const
 {
+#ifndef BT_NO_PROFILE	
+	BT_PROFILE("Rigid Contact: DoNode");
+#endif //BT_NO_PROFILE	
+	
 	if (n.mass <= 0.0)
     {
         throw std::runtime_error("Mass of element is not positive.");
@@ -127,6 +133,10 @@ threshold(0.0)
 
 void cordeColliders::CollideSDF_SS::Process(const btDbvtNode* leafa, const btDbvtNode* leafb)
 {
+#ifndef BT_NO_PROFILE	
+	BT_PROFILE("SoftContact: Process");
+#endif //BT_NO_PROFILE
+
 	/// @todo consider making these references
 	CordeModel::CordePositionElement*	nodea = (CordeModel::CordePositionElement*)leafa->data;
 	CordeModel::CordePositionElement*	nodeb = (CordeModel::CordePositionElement*)leafb->data;
@@ -224,6 +234,10 @@ void cordeColliders::CollideSDF_SS::Process(const btDbvtNode* leafa, const btDbv
 
 void cordeColliders::CollideSDF_SS::ProcessSoftSoft(cordeCollisionObject* psa, cordeCollisionObject* psb)
 {
+#ifndef BT_NO_PROFILE
+	BT_PROFILE("SoftContact: Initial Process");
+#endif // BT_NO_PROFILE
+	
 	idt			=	psa->m_sst.isdt;
 	//m_margin		=	(psa->getCollisionShape()->getMargin()+psb->getCollisionShape()->getMargin())/2;
 	m_margin		=	(psa->getCollisionShape()->getMargin()+psb->getCollisionShape()->getMargin());

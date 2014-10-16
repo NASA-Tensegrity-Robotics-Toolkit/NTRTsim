@@ -76,7 +76,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 		const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
 	#else
 		// Values for thread
-		const std::size_t resolution = 200;
+		const std::size_t resolution = 20;
 		const double radius = 0.01;
 		const double density = 1300;
 		const double youngMod = 1 * pow(10, 1);
@@ -183,6 +183,9 @@ void simpleCordeTensegrity::teardown()
     
 void simpleCordeTensegrity::step(double dt)
 {
+#ifndef BT_NO_PROFILE		
+	BT_PROFILE("Tensegrity Step");
+#endif //BT_NO_PROFILE
 	 totalTime += dt;
 	
 	//allMuscles[0]->setRestLength(5.0, dt);
@@ -204,7 +207,7 @@ void simpleCordeTensegrity::step(double dt)
 	{
 		tgCordeModel& ci = *(allMuscles[i]);
 		
-		std::cout << i << " " << ci.energy() << std::endl;
+		//std::cout << i << " " << ci.energy() << std::endl;
 		
 		com += ci.centerOfMass() * ci.mass();
 		mass += ci.mass();

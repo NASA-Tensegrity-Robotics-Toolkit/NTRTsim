@@ -57,7 +57,9 @@ void cordeSelfCollisionAlgorithm::processCollision (const btCollisionObjectWrapp
 {
 	cordeCollisionObject* soft0 =	(cordeCollisionObject*)body0Wrap->getCollisionObject();
 	cordeCollisionObject* soft1 =	(cordeCollisionObject*)body1Wrap->getCollisionObject();
+	
 	soft0->getSoftBodySolver()->processCollision(soft0, soft1);
+
 }
 
 btScalar cordeSelfCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* /*body0*/,btCollisionObject* /*body1*/,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)

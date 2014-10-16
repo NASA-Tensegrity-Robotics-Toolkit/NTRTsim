@@ -37,7 +37,7 @@
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 // The C++ Standard Library
 #include <cassert>
 

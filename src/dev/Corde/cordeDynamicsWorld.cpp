@@ -75,14 +75,18 @@ void	cordeDynamicsWorld::predictUnconstraintMotion(btScalar timeStep)
 {
 	btDiscreteDynamicsWorld::predictUnconstraintMotion( timeStep );
 	{
+#ifndef BT_NO_PROFILE			
 		BT_PROFILE("predictUnconstraintMotionSoftBody");
+#endif //BT_NO_PROFILE
 		m_softBodySolver->predictMotion( timeStep );
 	}
 }
 
 void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("cordeInternalSingleStep");
+#endif //BT_NO_PROFILE	
 	// Let the solver grab the soft bodies and if necessary optimize for it
 	m_softBodySolver->optimize( getSoftBodyArray() );
 
@@ -97,12 +101,14 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 	///solve soft bodies constraints (anchors and such)
 	solveSoftBodiesConstraints( timeStep );
 
-	//self collisions
+	//self collisions - Really slow! one call per object per node!
+#if (0)
 	for ( int i=0;i<m_cordeObjects.size();i++)
 	{
 		cordeCollisionObject*	psb=(cordeCollisionObject*)m_cordeObjects[i];
 		psb->defaultCollisionHandler(psb);
 	}
+#endif
 	
 	///update soft bodies
 	m_softBodySolver->updateSoftBodies(timeStep );
@@ -114,8 +120,9 @@ void	cordeDynamicsWorld::internalSingleStepSimulation( btScalar timeStep )
 
 void	cordeDynamicsWorld::solveSoftBodiesConstraints( btScalar timeStep )
 {
+#ifndef BT_NO_PROFILE		
 	BT_PROFILE("solveSoftConstraints");
-
+#endif //BT_NO_PROFILE
 	// Solve constraints solver-wise
 	m_softBodySolver->solveConstraints( timeStep * m_softBodySolver->getTimeScale() );
 
@@ -240,7 +247,9 @@ struct btSoftSingleRayCallback : public btBroadphaseRayCallback
 
 void	cordeDynamicsWorld::rayTest(const btVector3& rayFromWorld, const btVector3& rayToWorld, RayResultCallback& resultCallback) const
 {
+#ifdef BT_NO_PROFILE		
 	BT_PROFILE("rayTest");
+#endif //BT_NO_PROFILE	
 	/// use the broadphase to accelerate the search for objects, based on their aabb
 	/// and for each object with ray-aabb overlap, perform an exact ray test
 	btSoftSingleRayCallback rayCB(rayFromWorld,rayToWorld,this,resultCallback);

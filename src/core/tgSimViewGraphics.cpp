@@ -31,7 +31,8 @@
 // Bullet OpenGL_FreeGlut (patched files)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "LinearMath/btQuickprof.h"
 
 tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
                      double stepSize,
