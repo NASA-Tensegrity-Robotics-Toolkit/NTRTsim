@@ -53,13 +53,11 @@ public:
         
         /**
          * Specifies the maximum length of the joint.
-         * Units are meters
          */
         double m_maxLength;
 
         /**
          * Specifies the minimum length of the joint.
-         * Units are meters
          */
         double m_minLength;
 
@@ -70,14 +68,12 @@ public:
 
         /**
          * Specifies the maximum velocity of the joint motor.
-         * Units are meters/second
          */
         double m_maxVelocity;
 
         /**
          * Specifies the maximum distance allowed between joint lengths to be
          * considered equal.
-         * Units are meters
          */
         double m_eps;
     };

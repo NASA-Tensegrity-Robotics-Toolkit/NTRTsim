@@ -28,11 +28,13 @@
 #include "controllers/PretensionController.h"
 #include "core/tgLinearString.h"
 #include "core/tgRod.h"
+#include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgRodHingeInfo.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgPrismaticInfo.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 // The Bullet Physics library
@@ -62,7 +64,13 @@ namespace
     const struct Config
     {
         double density;
-        double radius;
+        double prismRadius;
+        double prismExtent;
+        double vertRodRadius;
+        double innerRodRadius;
+        double tipRad;
+        double tipDens;
+        double tipFric;
         double stiffness;
         double damping;
         double triangle_length;
@@ -72,7 +80,13 @@ namespace
     } c =
    {
        0.00164,     // density (mass / length^3) kg/cm^3 0.00164
-       1.27,     // radius (length) 1.27 cm
+       1.524, // prismatic joint radius 1.524 cm
+       10.16, // prismatic joint max extension 10.16 cm
+       1.27, // vertical rod radius 1.27 cm
+       2.0955, // inner rod radius 2.0955 cm
+       1.524, // prismatic joint tip radius 1.524 cm
+       1, // prismatic joint tip density (mas / length^3) kg/cm^3
+       1, // prismatic joint tip friction
        10000.0,   // stiffness (mass / sec^2) vectran string
        100.0,     // damping (mass / sec)
        30,     // triangle_length (length) 30 cm
@@ -136,11 +150,26 @@ void DuCTTModel::addNodes(tgStructure& tetra,
     topFront = topFront - btVector3(0,0,distBtNodes);
     topBack = topBack + btVector3(0,0,distBtNodes);
 
-    tetra.addNode(bottomRight); // 0
-    tetra.addNode(bottomLeft); // 1
+    if (distance == 0)
+    {
+        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere"); // 0
+        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere"); // 1
+        tetra.addNode(topBack); // 2
+        tetra.addNode(topFront); // 3
+    }
+    else
+    {
+        tetra.addNode(bottomRight); // 0
+        tetra.addNode(bottomLeft); // 1
 
-    tetra.addNode(topBack); // 2
-    tetra.addNode(topFront); // 3
+        tetra.addNode(topBack); // 2
+        tetra.addNode(topFront); // 3
+
+    //commented out until i can figure out why they cause AABB overflow in Bullet
+//        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere"); // 2
+//        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere"); // 3
+    }
+
 
     tetra.addNode(bottomMidRight); // 4
     tetra.addNode(bottomMidLeft); // 5
@@ -165,22 +194,22 @@ void DuCTTModel::addRods(tgStructure& s, int startNode)
 {
     // for one tetra
     //right rods
-    s.addPair( startNode+8, startNode+12, "rodB");
-    s.addPair( startNode+10, startNode+14, "rodB");
+    s.addPair( startNode+8, startNode+12, "vert rod");
+    s.addPair( startNode+10, startNode+14, "vert rod");
 
     //left rods
-    s.addPair( startNode+9, startNode+13, "rodB");
-    s.addPair( startNode+11, startNode+15, "rodB");
+    s.addPair( startNode+9, startNode+13, "vert rod");
+    s.addPair( startNode+11, startNode+15, "vert rod");
 
     if (startNode == 0)
     {
         //bottom tetra
         // bottom rods
-        s.addPair( startNode+0, startNode+4, "rodT");
-        s.addPair( startNode+5, startNode+1, "rodB");
+        s.addPair( startNode+0, startNode+4, "prism rod");
+        s.addPair( startNode+5, startNode+1, "prism rod");
 
         //top rods
-        s.addPair( startNode+2, startNode+3, "rodB");
+        s.addPair( startNode+2, startNode+3, "inner rod");
 
 	    s.addPair( startNode+4, startNode+5, "prismatic");
     }
@@ -188,11 +217,12 @@ void DuCTTModel::addRods(tgStructure& s, int startNode)
     {
         //top tetra
         // bottom rods
-	    s.addPair( startNode+0, startNode+1, "rodB");
+        s.addPair( startNode+0, startNode+1, "inner rod");
 
         //top rods
-        s.addPair( startNode+2, startNode+6, "rodT");
-        s.addPair( startNode+7, startNode+3, "rodB");
+//        s.addPair( startNode+2, startNode+6, "prism rod");
+        s.addPair( startNode+2, startNode+6, "static rodT");
+        s.addPair( startNode+7, startNode+3, "prism rod");
 
 	    s.addPair( startNode+6, startNode+7, "prismatic");
     }
@@ -231,12 +261,18 @@ void DuCTTModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
-    const tgRod::Config rodConfigB(c.radius, c.density);
-    const tgRod::Config rodConfigT(c.radius, 0);
+    const tgRod::Config prismRodConfig(c.prismRadius, c.density);
+    const tgRod::Config prismRodConfigT(c.prismRadius, 0);
+    const tgRod::Config vertRodConfig(c.vertRodRadius, c.density);
+    const tgRod::Config innerRodConfig(c.innerRodRadius, c.density);
+
     const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-    const tgPrismatic::Config prismConfig(50);
+
+    const tgPrismatic::Config prismConfig(c.prismExtent);
     const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, 0);
     const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,1);
+
+    const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -261,12 +297,16 @@ void DuCTTModel::setup(tgWorld& world)
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
-    spec.addBuilder("rodT", new tgRodInfo(rodConfigT));
+    spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
+    spec.addBuilder("static rodT", new tgRodInfo(prismRodConfigT));
+    spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
+    spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
+
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
     spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
     spec.addBuilder("hinge2", new tgRodHingeInfo(hingeConfig2));
+    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
