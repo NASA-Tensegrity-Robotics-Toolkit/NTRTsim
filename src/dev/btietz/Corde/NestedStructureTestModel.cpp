@@ -29,6 +29,8 @@
 #include "core/tgCast.h"
 #include "core/tgLinearString.h"
 #include "core/tgString.h"
+#include "core/tgSphere.h"
+#include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
@@ -36,11 +38,17 @@
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
+
+
+#include "dev/btietz/tgCordeModel.h"
+#include "dev/btietz/tgCordeStringInfo.h"
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
+
+#define USE_CORDE
 
 NestedStructureTestModel::NestedStructureTestModel(size_t segments) : 
     m_segments(segments),
@@ -56,13 +64,13 @@ namespace
     void addNodes(tgStructure& tetra, double edge, double height)
     {
         // right
-        tetra.addNode(-edge / 2.0, 0, 0);
+        tetra.addNode(-edge / 2.0, 0, 0, "sphere");
         // left
-        tetra.addNode( edge / 2.0, 0, 0);
+        tetra.addNode( edge / 2.0, 0, 0, "sphere");
         // top
-        tetra.addNode(0, height, 0);
+        tetra.addNode(0, height, 0, "sphere");
         // front
-        tetra.addNode(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height));
+        tetra.addNode(0, height / 2.0, tgUtil::round(std::sqrt(3.0) / 2.0 * height), "sphere");
     }
 
     void addPairs(tgStructure& tetra)
@@ -79,7 +87,7 @@ namespace
              size_t segmentCount)
     {
 
-        const btVector3 offset(0, 0, -edge * 1.15);
+        const btVector3 offset(0, 0, -edge * 0.8);
         for (size_t i = 0; i < segmentCount; ++i)
         {
             tgStructure* const t = new tgStructure(tetra);
@@ -114,12 +122,12 @@ namespace
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-        muscleMap["inner left"]  = model.find<tgLinearString>("inner left muscle");
-        muscleMap["inner right"] = model.find<tgLinearString>("inner right muscle");
-        muscleMap["inner top"]   = model.find<tgLinearString>("inner top muscle");
-        muscleMap["outer left"]  = model.find<tgLinearString>("outer left muscle");
-        muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
-        muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
+        muscleMap["inner left"]  = model.find<tgBaseString>("inner left muscle");
+        muscleMap["inner right"] = model.find<tgBaseString>("inner right muscle");
+        muscleMap["inner top"]   = model.find<tgBaseString>("inner top muscle");
+        muscleMap["outer left"]  = model.find<tgBaseString>("outer left muscle");
+        muscleMap["outer right"] = model.find<tgBaseString>("outer right muscle");
+        muscleMap["outer top"]   = model.find<tgBaseString>("outer top muscle");
     }
 
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -154,14 +162,42 @@ void NestedStructureTestModel::setup(tgWorld& world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
-    const double density = 4.2 / 300.0; // kg / length^3 - see app for length
-    const double radius  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
+    const double rDensity = 4.2 / 300.0; // kg / length^3 - see app for length
+    const double rRadius  = 0.5;
+    const tgRod::Config rodConfig(rRadius, rDensity);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
+    
+    // Values for Rope from Spillman's paper
+	const std::size_t resolution = 40;
+	const double radius = 0.01;
+	const double density = 1300;
+	const double youngMod = 0.5 * pow(10, 4);
+	const double shearMod = 0.5 * pow(10, 4);
+	const double stretchMod = 20.0 * pow(10, 4);
+	const double springConst = 100.0 * pow(10, 1); 
+	const double gammaT = 100.0 * pow(10, -7); // Position Damping
+	const double gammaR = 1.0 * pow(10, -7); // Rotation Damping
+    
+	CordeModel::Config cordeConfig(resolution, radius, density, youngMod, shearMod,
+							stretchMod, springConst, gammaT, gammaR);
+  
     tgLinearString::Config muscleConfig(1000, 10);
+    
+    tgCordeModel::Config cordeModelConfig ( muscleConfig, cordeConfig);
+    
+#ifndef USE_CORDE
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+#else    
+    spec.addBuilder("muscle", new tgCordeStringInfo(cordeModelConfig));
+#endif
+    
+    const double sphereVolume = 1000.0 * 4.0 / 3.0 * M_PI * pow(radius, 3);
+    
+    const double baseCornerFrontD = 140.0 / sphereVolume;
+    const tgSphere::Config baseCornerFrontConfig(radius, baseCornerFrontD);
+    spec.addBuilder("sphere", new tgSphereInfo(baseCornerFrontConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -169,9 +205,12 @@ void NestedStructureTestModel::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
-    // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    // that we want to control.
+    allMuscles = tgCast::filter<tgModel, tgBaseString> (getDescendants());
+
+
     mapMuscles(muscleMap, *this);
+    
 
     trace(structureInfo, *this);
 
@@ -194,7 +233,7 @@ void NestedStructureTestModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
+const std::vector<tgBaseString*>&
 NestedStructureTestModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);

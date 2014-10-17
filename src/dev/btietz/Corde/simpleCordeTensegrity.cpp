@@ -25,10 +25,6 @@
 #include "core/tgBaseString.h"
 #include "core/tgRod.h"
 
-#include "dev/Corde/CordeModel.h"
-#include "dev/Corde/cordeCollisionObject.h"
-#include "dev/Corde/cordeDynamicsWorld.h"
-
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
@@ -77,7 +73,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	#else
 		// Values for thread
 		const std::size_t resolution = 20;
-		const double radius = 0.01;
+		const double radius = 0.005;
 		const double density = 1300;
 		const double youngMod = 1 * pow(10, 1);
 		const double shearMod = 1 * pow(10, 1);
@@ -97,7 +93,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
 	
 	tgStructure s;
-#if (1)
+#if (0)
 	s.addNode(0,0,0);
 	s.addNode(0,3,0);
 	s.addNode(2,5,0);
@@ -134,7 +130,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod2");
-	s.addPair(4, 5, "rod2");
+	//s.addPair(4, 5, "rod");
 	
 	s.addPair(1, 2, "muscle");
 	
@@ -207,7 +203,7 @@ void simpleCordeTensegrity::step(double dt)
 	{
 		tgCordeModel& ci = *(allMuscles[i]);
 		
-		//std::cout << i << " " << ci.energy() << std::endl;
+		std::cout << i << " " << ci.energy() << std::endl;
 		
 		com += ci.centerOfMass() * ci.mass();
 		mass += ci.mass();

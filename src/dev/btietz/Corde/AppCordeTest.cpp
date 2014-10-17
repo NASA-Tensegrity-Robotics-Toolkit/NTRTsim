@@ -36,6 +36,7 @@
 
 // Something to Collide With
 #include "NestedStructureTestModel.h"
+#include "T6Model.h"
 
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
@@ -78,8 +79,10 @@ int main(int argc, char** argv)
     // Third create the simulation
     tgSimulation simulation(view);
 	
-	    const int segments = 1;
+	    const int segments = 2;
     NestedStructureTestModel* tenseModel = new NestedStructureTestModel(segments);
+	
+	T6Model* const superModel = new T6Model();
 	
 	    // Fourth create the models with their controllers and add the models to the
     // simulation
@@ -87,7 +90,7 @@ int main(int argc, char** argv)
     
     // Add the model to the world
     simulation.addModel(myModel);
-    //simulation.addModel(tenseModel);
+    //simulation.addModel(superModel);
     
     simulation.run();
 	

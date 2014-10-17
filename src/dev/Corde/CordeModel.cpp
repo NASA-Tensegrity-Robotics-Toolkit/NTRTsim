@@ -430,7 +430,7 @@ void CordeModel::computeCenterlines()
 		btVector3 axisVec = (m_massPoints[i+1]->pos - m_massPoints[i]->pos).normalize();
 		
 		btQuaternion currentAngle;
-		if (zAxis.dot(axisVec) < 1.0 - FLT_EPSILON)
+		if (std::abs(zAxis.dot(axisVec)) < 1.0 - FLT_EPSILON)
 		{
 			currentAngle.setRotation( zAxis.cross(axisVec).normalize(), acos(zAxis.dot(axisVec)));
 			std::cout << zAxis.cross(axisVec).normalize() << std::endl;
@@ -842,7 +842,7 @@ void CordeModel::constrainMotion (double dt)
 	   // Eliminate vibrations due to imprecision
 		for (std::size_t i = 0; i < 3; i++)
 		{
-			double a = DBL_EPSILON;
+			double a = FLT_EPSILON;
 			p_0->force[i] = std::abs(p_0->force[i]) < a ? 0.0 : p_0->force[i];
 		}
 #endif 
@@ -964,7 +964,7 @@ void CordeModel::CordeQuaternionElement::transposeTorques()
    // Eliminate vibrations due to imprecision
     for (std::size_t i = 0; i < 3; i++)
     {
-		double a = DBL_EPSILON;
+		double a = FLT_EPSILON;
 		torques[i] = std::abs(torques[i]) < a ? 0.0 : torques[i];
 	}
 #endif  

@@ -396,7 +396,8 @@ void cordeCollisionObject::solveRContacts()
 	{
 		const RContact&		c = m_rcontacts[i];
 		const sCti&			cti = c.m_cti;	 
-		
+//#define VEL_CONTACT		
+#ifndef VEL_CONTACT
 		// Normal * mass ratio * penetration distance
 		btVector3 rSoft = cti.m_normal * c.m_c2 * cti.m_dist;
 		btVector3 rRigid =  -cti.m_normal * (1.f - c.m_c2) * cti.m_dist;
@@ -416,6 +417,44 @@ void cordeCollisionObject::solveRContacts()
 		{
 			rBody->applyImpulse(fRigid + c.m_c3 * magRigid, c.m_c1);
 		}
+#else
+		// This is the same as the anchor, which means its a sticking contact. We only want to apply this in one direction...
+		// Checking the normal doesn't really help. Best thing is probably to actually iterate on the positional contacts
+		
+			btRigidBody* rBody = (btRigidBody*) btRigidBody::upcast(cti.m_colObj);
+
+			// Difference between pos_new and getRelativePosition
+			const btVector3 rbVel = rBody->getVelocityInLocalPoint(c.m_c1);
+			const btVector3 softVel = c.m_node->vel_new;
+
+			btVector3 nDir = cti.m_normal;
+			btVector3 velDiff = (rbVel - softVel);
+			//velDiff = (rbVel - softVel).normalize()* cti.m_normal.dot (rbVel - softVel);
+			
+			if ( cti.m_normal.dot (rbVel - softVel) > 0)
+			{
+				// Apply forces based on mass ratio, that difference
+				
+				const btScalar rMass = rBody->getInvMass() > 0.0 ? 1.0 / rBody->getInvMass() : 0.0;
+				const btScalar sMass = c.m_node->mass;
+				
+				// Normal * mass ratio * penetration distance
+				btVector3 vSoft = velDiff * c.m_c2;
+				btVector3 vRigid =  -velDiff  * (1.f - c.m_c2);
+
+				btVector3 fSoft = idt * sMass * vSoft;
+				
+				btScalar  magSoft = fSoft.length();
+				c.m_node->applyForce(fSoft - c.m_c3 * magSoft);;
+				// Impulse instead of force
+				btVector3 fRigid = rMass * vRigid;// + m_attachedElement->force * dt; // Transferring internal forces appears to be a little better
+				//m_attachedQuaternion->tprime = btQuaternion(0.0, 0.0, 0.0, 0.0);
+				btScalar  magRigid = fRigid.length();
+
+				rBody->activate();
+				rBody->applyImpulse(fRigid + c.m_c3 * magRigid, c.m_c1);
+			}
+#endif // VEL_CONTACT	
 	}
 }
 

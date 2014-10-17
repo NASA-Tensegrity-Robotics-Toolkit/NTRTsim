@@ -73,9 +73,9 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 1.0/10000.0; // seconds
+    const double timestep_physics = 1.0/5000.0; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
     
-    simulation.run(100000);
+    simulation.run(10);
 	
     return 0;
 }

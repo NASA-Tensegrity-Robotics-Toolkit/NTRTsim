@@ -67,7 +67,6 @@ void cordeColliders::CollideSDF_RS::DoNode(CordeModel::CordePositionElement& n) 
 	const btScalar			m = n.mass > 0 ? dynmargin:stamargin;
 	cordeCollisionObject::RContact	c;
 
-	/// @todo original bullet code checked if this was an anchor too, consider restoring
 	/// Check contact populates values of m_cti
 	if(	psb->checkContact(m_colObj1Wrap, n.pos_new, m, c.m_cti) && !n.isAnchor)
 	{
@@ -203,10 +202,10 @@ void cordeColliders::CollideSDF_SS::Process(const btDbvtNode* leafa, const btDbv
 		btVector3 dist = nodea->pos_new - nodeb->pos_new;
 		
 		c.m_depth = c.m_margin - dist.length();
-		c.m_normal = dist.normalize();
 		
 		if (c.m_depth < 0) // Presumably this has already been checked...
 		{
+			c.m_normal = dist.normalize();
 		
 			const btScalar ma = nodea->mass;
 			const btScalar mb = nodeb->mass;
