@@ -86,7 +86,7 @@ public:
     /**
      * Remove the given tags from the search
      */
-    bool remove(const tgTags& tags)
+    void remove(const tgTags& tags)
     {
         tgTags s(tags);
         m_search.remove(tags);

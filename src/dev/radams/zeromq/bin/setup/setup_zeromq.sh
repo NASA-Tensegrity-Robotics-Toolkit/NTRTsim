@@ -20,7 +20,9 @@
 # Author:  Ryan Adams
 # Date:    2014-10-08
 
-# @todo: zeromq installs .h files directly under env/include. That's not the behavior of other things, but it may be ok. No need to do env_link on it then...
+# @todo: zeromq installs .h files directly under env/include. 
+# That's not the behavior of other packages, but it may be ok. 
+# It seems to be the only ./configure / make / make install that we do...
 
 
 ##############################################################################
