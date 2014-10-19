@@ -34,15 +34,15 @@
 
 // Forward declarations
 class tgPrismatic;
-class DuCTTModel;
+class DuCTTRobotModel;
 
-class DuCTTSineWaves : public tgObserver<DuCTTModel>
+class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
 {
 public:
 
     DuCTTSineWaves();
     
-    virtual void onStep(DuCTTModel& subject, double dt);
+    virtual void onStep(DuCTTRobotModel& subject, double dt);
     
     void applySineWave(std::vector<tgPrismatic*> prisms, double dt);
 

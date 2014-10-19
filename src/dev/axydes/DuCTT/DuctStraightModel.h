@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef DUCTT_MODEL_H
-#define DUCTT_MODEL_H
+#ifndef DUCT_STRAIGHT_MODEL_H
+#define DUCT_STRAIGHT_MODEL_H
 
 /**
  * @file DuCTTModel.h
@@ -37,15 +37,13 @@
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
-class tgPrismatic;
-class tgLinearString;
-class PretensionController;
+class tgBox;
 
 /**
  * A class that constructs a three bar tensegrity DuCTT using the tools
  * in tgcreator.
  */
-class DuCTTModel : public tgSubject<DuCTTModel>, public tgModel
+class DuctStraightModel : public tgModel
 {
 public: 
     
@@ -53,14 +51,14 @@ public:
      * The only constructor. Configuration parameters are within the
      * .cpp file in this case, not passed in. 
      */
-    DuCTTModel();
+    DuctStraightModel();
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~DuCTTModel();
-    
+    virtual ~DuctStraightModel();
+
     /**
      * Create the model. Place the rods and strings into the world
      * that is passed into the simulation. This is triggered
@@ -91,59 +89,24 @@ public:
      * to itself 
      */
     virtual void onVisit(tgModelVisitor& r);
-    
-    /**
-     * Return a vector of all muscles for the controllers to work with.
-     * @return A vector of all of the muscles
-     */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
-      
-    std::vector<tgPrismatic*> allPrisms;
 private:
-    
     /**
      * A function called during setup that determines the positions of
      * the nodes based on construction parameters. Rewrite this function
      * for your own models
-     * @param[in] tetra: A tgStructure that we're building into
-     * @param[in] edge: the X distance of the base points
-     * @param[in] width: the Z distance of the base triangle
-     * @param[in] height: the Y distance along the axis of the DuCTT
+     * @param[in] s: A tgStructure that we're building into
      */
-    static void addNodes(tgStructure& tetra,
-                            double edge,
-                            double width,
-                            double height,
-                            double distBtHinges = 0.1,
-                            double distBtNodes = 0.1);
+    static void addNodes(tgStructure& s);
+
+    static void addNodesXAxis(tgStructure &s);
+    static void addNodesYAxis(tgStructure &s);
+    static void addNodesZAxis(tgStructure &s);
 
     /**
-     * A function called during setup that creates rods from the
-     * relevant nodes. Rewrite this function for your own models.
-     * @param[in] s A tgStructure that we're building into
-     * @param[in] startNode Number of node to start with
+     * Adds tags to the node pairs for the boxes of the duct.
+     * @param[in] s: A tgStructure that we're building into
      */
-    static void addRods(tgStructure& s, int startNode = 0);
-    
-    /**
-     * A function called during setup that creates muscles (Strings) from
-     * the relevant nodes. Rewrite this function for your own models.
-     * @param[in] s A tgStructure that we're building into
-     */
-    static void addMuscles(tgStructure& s, int topNodesStart);
-
-private:
-    /**
-     * A controller that is attached to all of the strings which applies
-     * pretension to the muscles.
-     */
-    PretensionController* m_pStringController;
-    
-    /**
-     * A list of all of the muscles. Will be empty until most of the way
-     * through setup when it is filled using tgModel's find methods
-     */
-    std::vector<tgLinearString*> allMuscles;
+    static void addBoxes(tgStructure& s);
 };
 
 #endif  // DuCTT_MODEL_H

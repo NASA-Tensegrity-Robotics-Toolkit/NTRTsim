@@ -25,7 +25,12 @@
  */
 
 // This application
-#include "DuCTTModel.h"
+
+//models
+#include "DuCTTRobotModel.h"
+#include "DuctStraightModel.h"
+
+//controllers
 #include "DuCTTSineWaves.h"
 // This library
 #include "core/tgModel.h"
@@ -59,13 +64,16 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    DuCTTModel* myModel = new DuCTTModel();
+    DuCTTRobotModel* myRobotModel = new DuCTTRobotModel();
     DuCTTSineWaves* const pPrismControl =
       new DuCTTSineWaves();
-//    myModel->attach(pPrismControl);
-    simulation.addModel(myModel);
+//    myRobotModel->attach(pPrismControl);
+    simulation.addModel(myRobotModel);
 	
-	// Run until the user stops
+    DuctStraightModel* myDuctModel = new DuctStraightModel();
+//    simulation.addModel(myDuctModel);
+
+    // Run until the user stops
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

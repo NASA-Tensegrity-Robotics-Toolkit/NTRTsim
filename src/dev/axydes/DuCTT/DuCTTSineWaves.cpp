@@ -26,7 +26,7 @@
 // This module
 #include "DuCTTSineWaves.h"
 // Its subject
-#include "DuCTTModel.h"
+#include "DuCTTRobotModel.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -60,7 +60,7 @@ void DuCTTSineWaves::applySineWave(std::vector<tgPrismatic*> prisms, double dt)
     }
 }
 
-void DuCTTSineWaves::onStep(DuCTTModel& subject, double dt)
+void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
 {
     if (dt <= 0.0)
     {

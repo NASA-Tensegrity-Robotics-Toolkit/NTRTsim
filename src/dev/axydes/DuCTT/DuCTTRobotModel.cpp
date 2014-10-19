@@ -23,7 +23,7 @@
  */
 
 // This module
-#include "DuCTTModel.h"
+#include "DuCTTRobotModel.h"
 // This library
 #include "controllers/PretensionController.h"
 #include "core/tgLinearString.h"
@@ -107,18 +107,18 @@ namespace
     ;
 } // namespace
 
-DuCTTModel::DuCTTModel() :
-//m_pStringController(new PretensionController(c.pretension)),
+DuCTTRobotModel::DuCTTRobotModel() :
+m_pStringController(new PretensionController(c.pretension)),
 tgModel()
 {
 }
 
-DuCTTModel::~DuCTTModel()
+DuCTTRobotModel::~DuCTTRobotModel()
 {
     delete m_pStringController;
 }
 
-void DuCTTModel::addNodes(tgStructure& tetra,
+void DuCTTRobotModel::addNodes(tgStructure& tetra,
                             double edge,
                             double distance,
                             double height,
@@ -200,7 +200,7 @@ void DuCTTModel::addNodes(tgStructure& tetra,
     tetra.addNode(topLeftBack); // 15
 }
 
-void DuCTTModel::addRods(tgStructure& s, int startNode)
+void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
 {
     // for one tetra
     //right rods
@@ -254,7 +254,7 @@ void DuCTTModel::addRods(tgStructure& s, int startNode)
     s.addPair( startNode+2, startNode+15, "hinge2");
 }
 
-void DuCTTModel::addMuscles(tgStructure& s, int topNodesStart)
+void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
 {
     //vertical strings
     s.addPair(0, topNodesStart+0,  "vert string one"); //0
@@ -269,12 +269,12 @@ void DuCTTModel::addMuscles(tgStructure& s, int topNodesStart)
     s.addPair(2, topNodesStart+1,  "saddle string eight"); //7
 }
 
-void DuCTTModel::setup(tgWorld& world)
+void DuCTTRobotModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
     const tgRod::Config prismRodConfig(c.prismRadius, c.density);
-    const tgRod::Config prismRodConfigT(c.prismRadius, 0);
+    const tgRod::Config staticRodConfigT(c.prismRadius, 0);
     const tgRod::Config vertRodConfig(c.vertRodRadius, c.density);
     const tgRod::Config innerRodConfig(c.innerRodRadius, c.density);
 
@@ -311,7 +311,7 @@ void DuCTTModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
-    spec.addBuilder("static rodT", new tgRodInfo(prismRodConfigT));
+    spec.addBuilder("static rodT", new tgRodInfo(staticRodConfigT));
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
 
@@ -349,7 +349,7 @@ void DuCTTModel::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void DuCTTModel::step(double dt)
+void DuCTTRobotModel::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -364,18 +364,18 @@ void DuCTTModel::step(double dt)
     }
 }
 
-void DuCTTModel::onVisit(tgModelVisitor& r)
+void DuCTTRobotModel::onVisit(tgModelVisitor& r)
 {
     // Example: m_rod->getRigidBody()->dosomething()...
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& DuCTTModel::getAllMuscles() const
+const std::vector<tgLinearString*>& DuCTTRobotModel::getAllMuscles() const
 {
     return allMuscles;
 }
     
-void DuCTTModel::teardown()
+void DuCTTRobotModel::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
