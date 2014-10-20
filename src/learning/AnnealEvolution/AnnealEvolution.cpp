@@ -27,10 +27,13 @@
  
 #include "AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
+#include "core/tgString.h"
+#include "helpers/FileHelpers.h"
 #include <iostream>
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -50,15 +53,27 @@ unsigned long long rdtsc(){
 
 #endif
 
-AnnealEvolution::AnnealEvolution(string suff, string config) :
-Temp(1.0)
+AnnealEvolution::AnnealEvolution(string suff, string config, string path) :
+Temp(1.0),
+suffix(suff)
+
 {
-    suffix=suff;
     currentTest=0;
     generationNumber=0;
-
+	
+	if (path != "")
+	{
+		resourcePath = FileHelpers::getResourcePath(path);
+	}
+	else
+	{
+		resourcePath = "";
+	}
+	
+	std::string configPath = resourcePath + config;
+	
     configuration myconfigdataaa;
-    myconfigdataaa.readFile(config);
+    myconfigdataaa.readFile(configPath);
     populationSize=myconfigdataaa.getintvalue("populationSize");
     numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
     numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
@@ -74,7 +89,6 @@ Temp(1.0)
 
     for(int j=0;j<numberOfControllers;j++)
     {
-        cout<<"creating Populations"<<endl;
         populations.push_back(new AnnealEvoPopulation(populationSize,myconfigdataaa));
     }
     
@@ -85,13 +99,17 @@ Temp(1.0)
         {
             AnnealEvoMember* seededPop = populations[i]->controllers.back();
             stringstream ss;
-            ss<<"logs/bestParameters-"<<this->suffix<<"-"<<i<<".nnw";
+            ss<< resourcePath <<"logs/bestParameters-"<<this->suffix<<"-"<<i<<".nnw";
             seededPop->loadFromFile(ss.str().c_str());
         }
     }
     if(learning)
     {
-        evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
+        evolutionLog.open((resourcePath + "logs/evolution" + suffix + ".csv").c_str(),ios::out);
+        if (!evolutionLog.is_open())
+        {
+			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+		}
     }
 }
 
@@ -145,22 +163,25 @@ void AnnealEvolution::orderAllPopulations()
     
     // what if member at 0 isn't the best of all time for some reason? 
     // This seems biased towards average scores
+    // We actually order the populations, so member 0 is the current best according to the assigned fitness
     ofstream logfileLeader;
     for(int i=0;i<populations.size();i++)
     {
         stringstream ss;
-        ss<<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
+        ss << resourcePath << "logs/bestParameters-" << suffix << "-" << i << ".nnw";
 
         populations[i]->getMember(0)->saveToFile(ss.str().c_str());
     }
 }
 
+#if (0)
 double diffclock(clock_t clock1,clock_t clock2)
 {
     double diffticks=clock1-clock2;
     double diffms=(diffticks*10)/CLOCKS_PER_SEC;
     return diffms;
 }
+#endif
 
 vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
 {
@@ -175,7 +196,7 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
         orderAllPopulations();
         mutateEveryController();
         Temp -= 0.0; // @todo - make this a parameter
-        cout<<"mutated the populations"<<endl;
+//        cout<<"mutated the populations"<<endl;
         this->scoresOfTheGeneration.clear();
 
         if(coevolution)
@@ -212,7 +233,7 @@ void AnnealEvolution::updateScores(vector <double> multiscore)
     
     //Record it to the file
     ofstream payloadLog;
-    payloadLog.open("logs/scores.csv",ios::app);
+    payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);
     payloadLog<<multiscore[0]<<","<<multiscore[1];
     
     for(int oneElem=0;oneElem<selectedControllers.size();oneElem++)

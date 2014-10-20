@@ -19,6 +19,7 @@
 /**
  * @file tgTags.h
  * @brief Contains the definition of class tgTags
+ * @author Ryan Adams
  * $Id$
  */
 

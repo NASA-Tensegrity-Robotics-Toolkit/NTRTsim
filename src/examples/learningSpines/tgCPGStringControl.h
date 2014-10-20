@@ -92,7 +92,7 @@ public:
 		return m_pToBody;
 	}
 	
-private:
+protected:
     /**
      * Member variable for keeping track of how long its been since the 
      * last update step
@@ -104,8 +104,10 @@ private:
      */
     const double m_controlStep;
     
-    double m_commandedTension;
+    double m_totalTime;
     
+    double m_commandedTension;
+private:    
     btRigidBody* m_pFromBody;
     
     btRigidBody* m_pToBody;

@@ -50,16 +50,13 @@ int main(int argc, char** argv)
     std::cout << "AppNestedStructureTest" << std::endl;
 
     // First create the world
-    const tgWorld::Config config = 
-    {
-        981 // gravity, cm/sec^2
-    };
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimViewGraphics view(world, stepSize, renderRate);
+    tgSimView view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -77,7 +74,7 @@ int main(int argc, char** argv)
     const int numParams = 2;
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams);
     BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix);
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/ribDemo/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);

@@ -31,6 +31,7 @@
 #include <fstream>
 #include "AnnealAdapter.h"
 #include "learning/Configuration/configuration.h"
+#include "helpers/FileHelpers.h"
 
 using namespace std;
 
@@ -59,7 +60,7 @@ void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuratio
         for(int i=0;i<currentControllers.size();i++)
         {
             stringstream ss;
-            ss<<"logs/bestParameters-"<<this->annealEvo->suffix<<"-"<<i<<".nnw";
+            ss << annealEvo->resourcePath << "logs/bestParameters-" << this->annealEvo->suffix << "-" << i << ".nnw";
             currentControllers[i]->loadFromFile(ss.str().c_str());
 //          currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
         }

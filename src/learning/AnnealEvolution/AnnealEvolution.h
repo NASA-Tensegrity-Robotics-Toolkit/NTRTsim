@@ -35,14 +35,17 @@
 class AnnealEvolution
 {
 public:
-    AnnealEvolution(string suffix, string config = "config.ini");
+    AnnealEvolution(string suffix, string config = "config.ini", string path = "");
     ~AnnealEvolution();
     void mutateEveryController();
     void orderAllPopulations();
     void evaluatePopulation();
     vector< AnnealEvoMember *> nextSetOfControllers();
     void updateScores(vector<double> scores);
-    string suffix;
+    const string suffix;
+    /// @todo make this const if we decide to force everyone to put their logs in resources
+    std::string resourcePath;
+    
 private:
     int populationSize;
     int numberOfControllers;
@@ -50,6 +53,7 @@ private:
     vector< AnnealEvoPopulation *> populations;
     vector <AnnealEvoMember *>  selectedControllers;
     vector< vector< double > > scoresOfTheGeneration;
+    
 //  double minValue;
 //  double maxValue;
     double leniencyCoef;

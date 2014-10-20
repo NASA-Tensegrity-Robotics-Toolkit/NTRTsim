@@ -8,12 +8,14 @@ link_libraries(sensors
                 Adapters
                 Configuration
                 AnnealEvolution
+                FileHelpers
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED
 			BaseSpineModelLearning.cpp
 			BaseSpineCPGControl.cpp
             tgCPGStringControl.cpp    
+            tgCPGLogger.cpp
             )
 
 subdirs(    OctahedralComplex

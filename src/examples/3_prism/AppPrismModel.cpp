@@ -45,7 +45,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppT6ModelTest" << std::endl;
+    std::cout << "AppPrismModelTest" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -55,14 +55,11 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config = 
-    {
-        981 // gravity, cm/sec^2
-    };
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 0.001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 

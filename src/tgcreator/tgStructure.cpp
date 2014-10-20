@@ -19,7 +19,8 @@
 /**
  * @file tgStructure.cpp
  * @brief Implementation of class tgStructure
- * @date March 21, 2014
+ * @author Ryan Adams
+ * @date March 2014
  * $Id$
  */
 
@@ -59,7 +60,7 @@ void tgStructure::addNode(double x, double y, double z, std::string tags)
 
 void tgStructure::addNode(tgNode& newNode)
 {
-    m_nodes.addNode(newNode);;
+    m_nodes.addNode(newNode);
 }
 
 void tgStructure::addPair(int fromNodeIdx, int toNodeIdx, std::string tags)
@@ -117,6 +118,7 @@ void tgStructure::addRotation(const btVector3& fixedPoint,
 {
     m_nodes.addRotation(fixedPoint, rotation);
     m_pairs.addRotation(fixedPoint, rotation);
+
     for (std::size_t i = 0; i < m_children.size(); ++i)
     {
         tgStructure * const pStructure = m_children[i];

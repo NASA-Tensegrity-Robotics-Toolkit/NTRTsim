@@ -15,6 +15,6 @@ add_library( ${PROJECT_NAME} SHARED
     AnnealEvoPopulation.cpp
 )
 
-target_link_libraries(AnnealEvolution Configuration)
+target_link_libraries(AnnealEvolution Configuration FileHelpers)
 
 

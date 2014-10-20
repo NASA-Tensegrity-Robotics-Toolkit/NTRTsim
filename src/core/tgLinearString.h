@@ -56,12 +56,6 @@ public:
     tgLinearString(Muscle2P* muscle,
            const tgTags& tags,
            tgBaseString::Config& config);
-    /**
-     * Same as other constructor, just a different type of tags
-     */
-    tgLinearString(Muscle2P* muscle,
-           std::string space_separated_tags,
-           tgBaseString::Config& config);
     
     /**
      * Destructor deletes the Muscle2P
@@ -113,6 +107,18 @@ public:
      * Calls moveMotors(dt) to adjust the rest length of Muscle2P
      */
     void setRestLength(double newLength, float dt);
+
+    /**
+     * Directly set m_preferredLength (see base class tgBaseString)
+     * Does not call moveMotors.
+     */
+    void setPrefLength(double newLength);
+
+    /**
+     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly adjusts the rest length of Muscle2P, not using moveMotors.
+     */
+    void setRestLengthSingleStep(double newLength);
     
     /**
      * Returns a pointer the string's Muscle2P. Used for rendering in
@@ -138,13 +144,14 @@ public:
     
     virtual const tgBaseString::BaseStringHistory& getHistory() const;
     
-protected: 
     
     /** Called from public functions, it makes the restLength get closer
      * to preferredlength, according to config constraints.
      */
     virtual void moveMotors(double dt);
-    
+
+protected:
+
     Muscle2P* m_muscle;
 
 private:

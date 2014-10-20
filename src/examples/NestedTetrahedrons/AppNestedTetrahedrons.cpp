@@ -47,14 +47,11 @@ int main(int argc, char** argv)
     std::cout << "AppNestedStructureTest" << std::endl;
 
     // First create the world
-    const tgWorld::Config config = 
-    {
-        981 // gravity, cm/sec^2
-    };
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view
-    const double stepSize = 1.0/120.0; //Seconds
+    const double stepSize = 1.0/1000.0; //Seconds
     tgSimViewGraphics view(world, stepSize);
 
     // Third create the simulation

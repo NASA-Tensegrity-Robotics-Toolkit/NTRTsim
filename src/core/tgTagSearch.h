@@ -19,6 +19,7 @@
 /**
  * @file tgTagSearch.h
  * @brief Contains the definition of class tgTagSearch
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -81,7 +82,16 @@ public:
         s.append(tags);
         return matches(s);
     }
-        
+    
+    /**
+     * Remove the given tags from the search
+     */
+    void remove(const tgTags& tags)
+    {
+        tgTags s(tags);
+        m_search.remove(tags);
+    }
+    
 private:
     
     // @todo: change this to a parsed representation of the and/or/not setup

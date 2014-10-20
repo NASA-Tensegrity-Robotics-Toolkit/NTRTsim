@@ -29,6 +29,7 @@
 // This library
 #include "core/tgCast.h"
 #include "core/tgLinearString.h"
+#include "core/tgBaseRigid.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
 // The C++ Standard Library
@@ -96,6 +97,24 @@ const std::vector<tgLinearString*>& BaseSpineModelLearning::getAllMuscles()
     return m_allMuscles;
 }
 
+const std::vector<tgBaseRigid*> BaseSpineModelLearning::getAllRigids()
+{
+	if (m_allSegments.size() != m_segments)
+    {
+        throw std::runtime_error("Not initialized");
+    }
+	
+	std::vector<tgBaseRigid*> p_rods;
+	
+	for (std::size_t i = 0; i < m_allSegments.size(); i++)
+	{
+		std::vector<tgBaseRigid*> temp = tgCast::filter<tgModel, tgBaseRigid> (m_allSegments[i]->getDescendants());
+        p_rods.insert(p_rods.end(), temp.begin(), temp.end());
+	}
+	
+	return p_rods;
+}
+
 const int BaseSpineModelLearning::getSegments()
 {
     return m_segments;
@@ -129,7 +148,7 @@ std::vector<double> BaseSpineModelLearning::getSegmentCOM(const int n) const
         const tgRod* const pRod = p_rods[i];
         assert(pRod != NULL);
         const double rodMass = pRod->mass();
-        std::cout << "mass " << rodMass;
+        //std::cout << "mass " << rodMass;
         const btVector3 rodCenterOfMass = pRod->centerOfMass();
         segmentCenterOfMass += rodCenterOfMass * rodMass;
         segmentMass += rodMass;

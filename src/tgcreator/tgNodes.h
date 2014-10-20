@@ -22,7 +22,8 @@
 /**
  * @file tgNodes.h
  * @brief Definition of class tgNodes 
- * @date January 19, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 

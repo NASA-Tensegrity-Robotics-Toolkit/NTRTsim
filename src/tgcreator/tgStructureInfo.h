@@ -19,6 +19,7 @@
 /**
  * @file tgStructureInfo.h
  * @brief Definition of class tgStructureInfo
+ * @author Ryan Adams
  * @date March 2014
  * $Id$
  */

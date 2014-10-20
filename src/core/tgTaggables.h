@@ -19,6 +19,7 @@
 /**
  * @file tgTaggables.h
  * @brief Contains the definition of class tgTaggables
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -114,10 +115,10 @@ public:
     
     
     /**
-     * Return a non-const reference to the btVector3 that is indexed by the
+     * Return a non-const reference to the element that is indexed by the
      * int key. It must be in m_elements.
-     * @param[in] key the key of the btVector3 to retrieve
-     * @reeturn a const reference to the btVector3 that is indexed by idx
+     * @param[in] key the key of the element to retrieve
+     * @reeturn a const reference to the element that is indexed by idx
      */
     T& operator[](int key) { 
         assertKeyExists(key);

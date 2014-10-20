@@ -62,21 +62,23 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
+        bool   hist;
         double rotation;  
         double maxTens;
         double targetVelocity;
         double maxAcc;
     } c =
    {
-     0.825,    // density (kg / length^3)
+     0.688,    // density (kg / length^3)
      0.31,     // radius (length)
-     1500.0,   // stiffness (kg / sec^2)
+     613.0,   // stiffness (kg / sec^2) was 1500
      200.0,    // damping (kg / sec)
-     15.0,     // rod_length (length)
+     16.84,     // rod_length (length)
      7.5,      // rod_space (length)
-     1.0,      // friction (unitless)
+     0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
+     0,			// History logging (boolean)
      0,        // rotation
      100000,   // maxTens
      10000,    // targetVelocity
@@ -171,7 +173,7 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             

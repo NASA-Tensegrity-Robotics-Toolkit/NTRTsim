@@ -75,13 +75,27 @@ public:
 
     /**
      * Attempt a dynamic cast to the provided type. If it fails, return 0
+     * This method is designed for const pointers
+     */ 
+    template <typename T_FROM, typename T_TO>
+    static const T_TO* cast(const T_FROM* obj)
+    {
+        // @todo: dynamic_cast may just return 0 on fail...
+        try {
+            return dynamic_cast<const T_TO*>(obj);
+        } catch (std::exception& e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Attempt a dynamic cast to the provided type. If it fails, return 0
      */ 
     template <typename T_FROM, typename T_TO>
     static T_TO* cast(T_FROM& obj)
     {
         return cast<T_FROM, T_TO>(&obj);
     }
-
     
     template <typename T_FROM, typename T_TO>
     static std::vector<T_TO*> find(const tgTagSearch& tagSearch, const std::vector<T_FROM*> haystack)

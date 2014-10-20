@@ -22,7 +22,8 @@
 /**
  * @file tgRodInfo.h
  * @brief Definition of class tgRodInfo 
- * @date January 21, 2014
+ * @author Ryan Adams
+ * @date January 2014
  * $Id$
  */
 
@@ -198,15 +199,6 @@ public:
     {
         return (getFrom() == nodeVector) || (getTo() == nodeVector);
     }
-
-    /**
-     * @todo: Move this to tgRigidInfo
-     * Does this rod have any nodes in common with the given tgRigidInfo object?
-     * @param]in] other a reference to a tgRigidInfo object
-     * @retval true if any node in this rod is also in other
-     * @retval false if no node in this rod is also in other
-     */
-    virtual bool sharesNodesWith(const tgRigidInfo& other) const;
 
     /**
      * Return a set contiaining the two endpoints.

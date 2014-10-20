@@ -22,6 +22,7 @@
 /**
  * @file tgModel.h
  * @brief Contains the definition of class tgModel.
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -29,6 +30,7 @@
 #include "tgCast.h"
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
+#include "abstractMarker.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
@@ -36,6 +38,10 @@
 // Forward declarations
 class tgModelVisitor;
 class tgWorld;
+
+// Forward declaration for use with the data logger redesign
+class tgModelVisitor_tgDLR;
+// end forward declarations for the tgDLR
 
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
@@ -57,12 +63,6 @@ public:
     * @param[in] tgTags, tags for the tgTaggable parent class
     */
     tgModel(const tgTags& tags);
-
-    /**
-    * Constructor for sace seperated tags
-    * @param[in] space_seperated_tags, tags for the tgTaggable parent class
-    */  
-    tgModel(std::string space_separated_tags);
 
     /**
     * Destructor. Deletes the children, if they weren't already deleted
@@ -152,6 +152,58 @@ public:
      */
     std::vector<tgModel*> getDescendants() const;
 
+    const std::vector<abstractMarker>& getMarkers() const {
+        return m_markers;
+    }
+
+    void addMarker(abstractMarker a){
+        m_markers.push_back(a);
+    }
+
+    // Below this line are all the tgDataObserver hacks.
+
+    /**
+     * Attach an tgModel observer to the subject of the observer.
+     * @param[in,out] pObserver a pointer to an observer for the subject;
+     * do nothing if the pointer is NULL
+     */
+    void attachtgModel(tgObserver<tgModel>* pObserver);
+
+    /**
+     * Call tgObserver<tgModel>::onStep() on all observers in the 
+     * order in which they were attached, on those specific to tgModel.
+     * @param[in] dt the number of seconds since the previous call; do nothing
+     * if not positive
+     */
+    void notifySteptgModel(double dt);
+
+    /**
+     * Call tgObserver<tgModel>::onSetup() on all observers in the order 
+     * in which they were attached, on those specific to tgModel
+     */
+    void notifySetuptgModel();
+
+    /**
+     * Call tgObserver<tgModel>::onTeardown() on all observers in the order 
+     * in which they were attached, on those specific to tgModel.
+     */
+    void notifyTeardowntgModel();
+
+    // remove the above once we make everything actually polymorphic
+
+    // below this line are functions that will not be needed once the data logger
+    // redesign code is merged into the main core - for now, if it was changed,
+    // others' loggers would break!
+
+    /**
+     * Call tgModelVisitor::render() on self and all descendants.
+     * @param[in,out] r a reference to a tgModelVisitor
+     */
+    virtual void onVisit(const tgModelVisitor_tgDLR& r) const;
+
+    // end data logger redesign methods
+	
+
 private:
 
     /** Integrity predicate. */
@@ -165,6 +217,17 @@ private:
      * iterating without using an algorithm.
      */
     std::vector<tgModel*> m_children;
+
+    std::vector<abstractMarker> m_markers;
+
+    /**
+     * A sequence of observers called in the order in which they were attached.
+     * The subject does not own the observers and must not deallocate them.
+     * Note that though this looks the same as in tgSubject, it'll be different
+     * because of namespaces.
+     */
+     std::vector<tgObserver<tgModel> * > m_observers;
+
 };
 
 /**

@@ -76,7 +76,7 @@ btRigidBody* tgBulletUtil::createRigidBody(btDynamicsWorld* dynamicsWorld,
     return body;
 }
 
-btSoftRigidDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(tgWorld& world)
+btDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(tgWorld& world)
 {
   // Fetch the world's implementation.
   tgWorldImpl& impl = world.implementation();
@@ -85,6 +85,6 @@ btSoftRigidDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(tgWorld& world)
   /// @todo Use typeinfo to verify that this is correct.
   tgWorldBulletPhysicsImpl& bulletPhysicsImpl =
     static_cast<tgWorldBulletPhysicsImpl&>(impl);
-  btSoftRigidDynamicsWorld& result = bulletPhysicsImpl.dynamicsWorld();
+  btDynamicsWorld& result = bulletPhysicsImpl.dynamicsWorld();
   return result;
 }

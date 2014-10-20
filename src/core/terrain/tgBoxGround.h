@@ -54,7 +54,7 @@ public:
         Config( btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0),
                 btScalar friction = 0.5,
                 btScalar restitution = 0.0,
-                btVector3 size = btVector3(500.0, 0.5, 500.0),
+                btVector3 size = btVector3(500.0, 1.5, 500.0),
                 btVector3 origin = btVector3(0.0, 0.0, 0.0) );
       /**
        * Euler angles are specified as yaw pitch and roll
@@ -111,4 +111,4 @@ private:
 };
 
 
-#endif  // TG_WORLDIMPL_H
+#endif  // TG_BOX_GROUND_H

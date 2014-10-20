@@ -19,6 +19,7 @@
 /**
  * @file tgRod.cpp
  * @brief Contains the definitions of members of class tgRod
+ * @author Ryan Adams
  * $Id$
  */
 
@@ -45,13 +46,11 @@ tgRod::Config::Config(double r, double d,
         if (friction < 0.0)  { throw std::range_error("Negative friction");  }
         if (rollFriction < 0.0)  { throw std::range_error("Negative roll friction");  }
         if (restitution < 0.0)  { throw std::range_error("Negative restitution");  }
-        if (friction > 1.0)  { throw std::range_error("Friction > 1");  }
-        if (rollFriction > 1.0)  { throw std::range_error("Roll Friction > 1");  }
         if (restitution > 1.0)  { throw std::range_error("Restitution > 1");  }
     // Postcondition
     assert(density >= 0.0);
     assert(radius >= 0.0);
-    assert((friction >= 0.0) && (friction <= 1.0));
+    assert(friction >= 0.0);
     assert((rollFriction >= 0.0) && (rollFriction <= 1.0));
     assert((restitution >= 0.0) && (restitution <= 1.0));
 }
@@ -59,11 +58,7 @@ tgRod::Config::Config(double r, double d,
 tgRod::tgRod(btRigidBody* pRigidBody, 
                 const tgTags& tags,
                 const double length) : 
-  tgModel(tags),
-  m_pRigidBody(pRigidBody),
-  m_mass((m_pRigidBody->getInvMass() > 0.0) ? 
-     1.0 / (m_pRigidBody->getInvMass()) :
-     0.0), // The object is static
+  tgBaseRigid(pRigidBody, tags),
   m_length(length)
 {
         if (pRigidBody == NULL)
@@ -86,31 +81,18 @@ void tgRod::onVisit(const tgModelVisitor& v) const
 
 void tgRod::teardown()
 {
-        // World should delete the body
-        m_pRigidBody = NULL;
-    tgModel::teardown();
+  // World should delete the body
+  m_pRigidBody = NULL;
+  tgModel::teardown();
 
-    // Postcondition
-    // This does not preserve the invariant
-}
-
-btVector3 tgRod::centerOfMass() const
-{
-        // Precondition
-        assert(m_pRigidBody->getMotionState() != NULL);
-
-        btTransform transform;
-        m_pRigidBody->getMotionState()->getWorldTransform(transform);
-    const btVector3& result = transform.getOrigin();
-   
-    // Return a copy
-    return result;
+  // Postcondition
+  // This does not preserve the invariant
 }
 
 bool tgRod::invariant() const
 {
-        return
-            (m_pRigidBody != NULL) &&
-            (m_mass >= 0.0) &&
-            (m_length >= 0.0);
+  return
+    (m_pRigidBody != NULL) &&
+    (m_mass >= 0.0) &&
+    (m_length >= 0.0);
 }
