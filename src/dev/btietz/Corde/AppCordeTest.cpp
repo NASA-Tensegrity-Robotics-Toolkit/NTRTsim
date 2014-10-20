@@ -37,7 +37,7 @@
 // Something to Collide With
 #include "NestedStructureTestModel.h"
 #include "T6Model.h"
-
+#include "T6RestLengthController.h"
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
@@ -67,12 +67,12 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(9.81); // gravity, cm/sec^2
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2
     
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 1.0/10000.0; // seconds
+    const double timestep_physics = 1.0/5000.0; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -83,14 +83,15 @@ int main(int argc, char** argv)
     NestedStructureTestModel* tenseModel = new NestedStructureTestModel(segments);
 	
 	T6Model* const superModel = new T6Model();
-	
+	T6RestLengthController* const pTC = new T6RestLengthController(4);
+	superModel->attach(pTC);
 	    // Fourth create the models with their controllers and add the models to the
     // simulation
     simpleCordeTensegrity* const myModel = new simpleCordeTensegrity();
     
     // Add the model to the world
-    simulation.addModel(myModel);
-    //simulation.addModel(superModel);
+    //simulation.addModel(myModel);
+    simulation.addModel(superModel);
     
     simulation.run();
 	

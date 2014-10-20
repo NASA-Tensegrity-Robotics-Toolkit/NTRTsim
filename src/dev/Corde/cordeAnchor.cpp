@@ -62,7 +62,7 @@ void cordeAnchor::solve(const double dt)
 	assert(m_attachedElement);
 
 	const btScalar	idt = 1.0 / dt;
-#define SOLVE_VELOCITY	
+//#define SOLVE_VELOCITY	
 #ifndef SOLVE_VELOCITY	
 	// Difference between pos_new and getRelativePosition
 	const btVector3 rbPos = getWorldPosition();

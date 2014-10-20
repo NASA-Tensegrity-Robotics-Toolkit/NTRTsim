@@ -177,9 +177,7 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgBaseString::Config muscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
+    tgBaseString::Config muscleConfig(c.stiffness, 0, false, 0, 600000000);
             
     // Start creating the structure
     tgStructure s;
@@ -201,7 +199,7 @@ void T6Model::setup(tgWorld& world)
 #ifndef USE_CORDE
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #else
-    // Values for Rope from Spillman's paper
+		// Values for thread
 		const std::size_t resolution = 20;
 		const double radius = 0.005;
 		const double density = 1300;

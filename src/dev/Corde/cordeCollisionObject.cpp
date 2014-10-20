@@ -288,7 +288,7 @@ void cordeCollisionObject::solveConstraints(btScalar dt)
 	solveAnchors(dt);
 #endif
 	solveRContacts();
-	solveSContacts();
+	//solveSContacts();
 }
 
 void cordeCollisionObject::defaultCollisionHandler(cordeCollisionObject* otherSoftBody)
