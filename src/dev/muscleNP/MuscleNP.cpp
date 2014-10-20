@@ -28,6 +28,8 @@
 // The Bullet Physics library
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
+#include <iostream>
+
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  btRigidBody * body1,
  btVector3 pos1,
@@ -46,3 +48,9 @@ MuscleNP::~MuscleNP()
 	
 }
 
+btVector3 MuscleNP::calculateAndApplyForce(double dt)
+{
+	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
+	
+	Muscle2P::calculateAndApplyForce(dt);
+}

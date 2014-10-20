@@ -52,7 +52,10 @@ public:
          double dampingCoefficient);
          
    virtual ~MuscleNP();
-
+	
+	///@todo change this to update(dt) or similar, since that's the role its serving
+	virtual btVector3 calculateAndApplyForce(double dt);
+	
 protected:    
    btPairCachingGhostObject* m_ghostObject;
 };

@@ -34,6 +34,7 @@
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+#include "dev/muscleNP/tgMultiPointStringInfo.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -173,7 +174,7 @@ void T6SphereModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, false, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
     
@@ -198,7 +199,7 @@ void T6SphereModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
     spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
     spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
     
