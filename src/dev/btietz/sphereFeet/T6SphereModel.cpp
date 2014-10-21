@@ -200,7 +200,7 @@ void T6SphereModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscleN", new tgMultiPointStringInfo(muscleConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
     spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
     

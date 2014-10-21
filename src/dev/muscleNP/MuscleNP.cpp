@@ -28,7 +28,9 @@
 // NTRT
 #include "tgcreator/tgUtil.h"
 #include "core/MuscleAnchor.h"
+#include "core/tgCast.h"
 // The Bullet Physics library
+#include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
 #include <iostream>
@@ -64,7 +66,19 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
+	std::cout << (to - from).length()/2.0 << std::endl;
+	
 	m_ghostObject->setWorldTransform(transform);
+	
+	btScalar radius = 0.1;
+	
+	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
+	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
+	 * 2) we had to remove it from DemoApplication in order for it to render properly
+	 * changing from a non-contact object will break that behavior.
+	 */ 
+	shape->setImplicitShapeDimensions(btVector3(radius, (to - from).length()/2.0, radius));
+	m_ghostObject->setCollisionShape(shape);
 	
 	Muscle2P::calculateAndApplyForce(dt);
 }

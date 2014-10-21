@@ -110,10 +110,10 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
             new btCylinderShape(btVector3(radius, (to - from).length()/2.0, radius));
 	ghostObject->setCollisionShape (collisionShape);
 	ghostObject->setWorldTransform(transform);
-	ghostObject->setCollisionFlags (btCollisionObject::CO_GHOST_OBJECT);
+	ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	
 	// @todo look up what the second and third arguments of this are
-	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::SensorTrigger, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
     return new MuscleNP(ghostObject, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
 }
