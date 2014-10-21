@@ -54,8 +54,7 @@ public:
     btVector3 attachedRelativeOriginalPosition;
 
     btScalar height;
- private:
-  muscleAnchor();
+
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_

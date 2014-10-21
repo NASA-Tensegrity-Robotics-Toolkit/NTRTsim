@@ -27,10 +27,6 @@
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
  
-muscleAnchor::muscleAnchor()
-{
-}
-
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos) :
   attachedBody(body),

@@ -106,6 +106,7 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
+	// Consider making this a box. That way when you have N anchors they can all remain inside of the box
 	btCollisionShape* collisionShape =
             new btCylinderShape(btVector3(radius, (to - from).length()/2.0, radius));
 	ghostObject->setCollisionShape (collisionShape);

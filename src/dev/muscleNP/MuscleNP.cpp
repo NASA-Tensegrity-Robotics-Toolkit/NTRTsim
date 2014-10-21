@@ -32,6 +32,11 @@
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
+#include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
+#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
+#include "BulletDynamics/Dynamics/btActionInterface.h"
+#include "LinearMath/btDefaultMotionState.h"
 
 #include <iostream>
 
@@ -55,10 +60,55 @@ MuscleNP::~MuscleNP()
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
+	btManifoldArray	m_manifoldArray;
+	btVector3 m_touchingNormal;
+	
 	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
-	if (m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() > 0)
+	btScalar maxPen = btScalar(0.0);
+	
+	/* Based on recoverFromPenitration btKinematicCharacterController */
+	for (int i = 0; i < m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
 	{
-		std::cout << m_ghostObject->getOverlappingObject(0) << std::endl;
+		m_manifoldArray.resize(0);
+
+		btBroadphasePair* collisionPair = &(m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray()[i]);
+
+		btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
+                btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
+
+		// todo - check we don't already have interactions for these objects
+		
+		if (collisionPair->m_algorithm)
+			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
+
+		
+		for (int j=0;j<m_manifoldArray.size();j++)
+		{
+			btPersistentManifold* manifold = m_manifoldArray[j];
+			btScalar directionSign = manifold->getBody0() == m_ghostObject ? btScalar(-1.0) : btScalar(1.0);
+			for (int p=0;p<manifold->getNumContacts();p++)
+			{
+				const btManifoldPoint&pt = manifold->getContactPoint(p);
+
+				btScalar dist = pt.getDistance();
+
+				if (dist < 0.0)
+				{
+					if (dist < maxPen)
+					{
+						maxPen = dist;
+						m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+						std::cout << m_touchingNormal << std::endl;
+					}
+					
+
+				} else {
+					printf("touching %f\n", dist);
+				}
+			}
+			
+			//manifold->clearManifold();
+		}
 	}
 	
 	btVector3 from = anchor1->getWorldPosition();
@@ -74,7 +124,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
 	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
-	 * 2) we had to remove it from DemoApplication in order for it to render properly
+	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
 	 * changing from a non-contact object will break that behavior.
 	 */ 
 	shape->setImplicitShapeDimensions(btVector3(radius, (to - from).length()/2.0, radius));

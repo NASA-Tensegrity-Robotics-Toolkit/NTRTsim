@@ -58,6 +58,8 @@ public:
 	
 protected:    
    btPairCachingGhostObject* m_ghostObject;
+   
+
 };
 
 #endif  // NTRT_MUSCLENP_H_
