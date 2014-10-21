@@ -97,7 +97,20 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 	
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
-	//TODO: give your ghost object a collision shape!!
+	
+	assert((to - from).length() != 0);
+	
+	// Until we get a proper config
+	btScalar radius = 0.1;
+	
+	btTransform transform = tgUtil::getTransform(from, to);
+	
+	btCollisionShape* collisionShape =
+            new btCylinderShape(btVector3(radius, (to - from).length()/2.0, radius));
+	ghostObject->setCollisionShape (collisionShape);
+	ghostObject->setWorldTransform(transform);
+	ghostObject->setCollisionFlags (btCollisionObject::CO_GHOST_OBJECT);
+	
 	
 	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	

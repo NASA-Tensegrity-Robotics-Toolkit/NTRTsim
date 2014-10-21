@@ -49,6 +49,10 @@
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
 
+// Ghost objects
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
+
 #define MCLP_SOLVER
 
 #ifdef MLCP_SOLVER
@@ -80,6 +84,7 @@ class IntermediateBuildProducts
 #endif //MLCP_SOLVER  
 			
   {
+	  broadphase.getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
   }
   const btVector3 corner1;
   const btVector3 corner2;
