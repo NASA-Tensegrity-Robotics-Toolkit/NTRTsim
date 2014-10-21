@@ -34,7 +34,13 @@
 #include "core/tgBulletUtil.h"
 #include "core/tgTagSearch.h"
 #include "tgUtil.h"
+#include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
+
+
+// The Bullet Physics library
+#include "btBulletDynamicsCommon.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 
 tgRigidInfo* tgRigidInfo::createRigidInfo(const tgNode& node, const tgTagSearch& tagSearch)
 {

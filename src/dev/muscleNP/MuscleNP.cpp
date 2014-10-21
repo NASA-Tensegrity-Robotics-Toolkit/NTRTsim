@@ -25,6 +25,9 @@
 // This object
 #include "MuscleNP.h"
 
+// NTRT
+#include "tgcreator/tgUtil.h"
+#include "core/MuscleAnchor.h"
 // The Bullet Physics library
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
@@ -55,7 +58,13 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	{
 		std::cout << m_ghostObject->getOverlappingObject(0) << std::endl;
 	}
-	// Update the transform so it moves with its anchors. - How will splitting it up affect this??
+	
+	btVector3 from = anchor1->getWorldPosition();
+	btVector3 to = anchor2->getWorldPosition();
+	
+	btTransform transform = tgUtil::getTransform(from, to);
+	
+	m_ghostObject->setWorldTransform(transform);
 	
 	Muscle2P::calculateAndApplyForce(dt);
 }

@@ -29,6 +29,7 @@
 #include "MuscleNP.h"
 
 #include "core/tgBulletUtil.h"
+#include "tgcreator/tgUtil.h"
 
 // The Bullet Physics Library
 #include "btBulletDynamicsCommon.h"

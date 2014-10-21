@@ -27,29 +27,27 @@
  * $Id$
  */
 
-// The Bullet Physics library
-#include "btBulletDynamicsCommon.h"
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 // The C++ Standard Library
 #include <set>
 // This library
-
-// @todo: move these includes to tgRigidInfo.cpp
 #include "core/tgTaggable.h"
-#include "core/tgBulletUtil.h"
-#include "core/tgWorld.h"
 #include "core/tgModel.h"
+//Bullet Physics
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 
 // Forward references
 class tgCompoundRigidInfo;
-class tgTaggable;
 class tgNode;
 class tgNodes;
 class tgPair;
 class tgPairs;
 class tgTagSearch;
+class tgWorld;
 
-#include "tgUtil.h" // Testing/debugging only
+class btRigidBody;
+class btCollisionShape;
+class btTransform;
 
 /**
  * A collector for keeping track of all of the necessary components of a
