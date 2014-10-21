@@ -109,27 +109,4 @@ public:
     bool invariant(void) const;
 };
 
-class muscleAnchor
-{
-public:
-    muscleAnchor();
-
-    muscleAnchor(btRigidBody *body, btVector3 pos);
-    
-    ~muscleAnchor();
-    
-    btVector3 getWorldPosition();
-
-    // Relative to the body
-    btVector3 getRelativePosition();
-
-    btRigidBody * attachedBody;
-
-    // Relative to the body when it is first constructed
-    btVector3 attachedRelativeOriginalPosition;
-
-    btScalar height;
- private:
-};
-
 #endif  // NTRT_MUSCLE2P_H_

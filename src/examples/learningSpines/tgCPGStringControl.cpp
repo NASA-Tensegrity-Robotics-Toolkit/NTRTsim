@@ -19,6 +19,7 @@
 #include "tgCPGStringControl.h"
 
 #include "core/Muscle2P.h"
+#include "core/MuscleAnchor.h"
 #include "core/ImpedanceControl.h"
 #include "util/CPGEquations.h"
 
