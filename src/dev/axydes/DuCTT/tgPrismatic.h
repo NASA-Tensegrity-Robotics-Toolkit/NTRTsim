@@ -148,6 +148,18 @@ public:
      */
     virtual void moveMotors(double dt);
 
+    /**
+     * Return the current actual length of the joint.
+     * @return length, the current actual length of the joint.
+     */
+    virtual double getActualLength();
+
+    /**
+     * Test to see if the joint is at the length the user specified to reach.
+     * @return true, if the joint reached the target length.
+     */
+    virtual bool isAtPreferredLength();
+
 private:
     /**
      * A copy of the configuration POD supplied at constuction.

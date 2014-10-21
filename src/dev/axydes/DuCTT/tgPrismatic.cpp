@@ -151,9 +151,9 @@ void tgPrismatic::setMaxForce(double force)
 
 void tgPrismatic::moveMotors(double dt)
 {
-    btScalar linDepth = m_slider->getLinearPos();
+    double linDepth = getActualLength();
 
-    if (fabs(linDepth - m_preferredLength) <= m_config.m_eps)
+    if (isAtPreferredLength())
     {
         m_slider->setLowerLinLimit(linDepth);
         m_slider->setUpperLinLimit(linDepth);
@@ -177,4 +177,14 @@ void tgPrismatic::moveMotors(double dt)
         m_slider->setUpperLinLimit(linDepth);
         m_slider->setTargetLinMotorVelocity(0);
     }
+}
+
+double tgPrismatic::getActualLength()
+{
+    return m_slider->getLinearPos();
+}
+
+bool tgPrismatic::isAtPreferredLength()
+{
+    return fabs(getActualLength() - m_preferredLength) <= m_config.m_eps;
 }

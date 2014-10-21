@@ -219,7 +219,8 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         s.addPair( startNode+5, startNode+1, "prism rod");
 
         //top rods
-        s.addPair( startNode+2, startNode+3, "inner rod");
+//        s.addPair( startNode+2, startNode+3, "inner rod");
+        s.addPair( startNode+2, startNode+3, "static rodT");
 
 	    s.addPair( startNode+4, startNode+5, "prismatic");
     }
