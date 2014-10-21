@@ -164,7 +164,7 @@ void T6SphereModel::addMuscles(tgStructure& s)
     s.addPair(6, 11, "muscle");
 
     s.addPair(7, 8,  "muscle");
-    s.addPair(7, 9,  "muscle");
+    s.addPair(7, 9,  "muscleN");
 
 }
 
@@ -199,7 +199,8 @@ void T6SphereModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
+    spec.addBuilder("muscleN", new tgMultiPointStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
     spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
     

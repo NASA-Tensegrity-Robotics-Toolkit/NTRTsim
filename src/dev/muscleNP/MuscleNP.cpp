@@ -51,7 +51,10 @@ MuscleNP::~MuscleNP()
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
 	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
-	
+	if (m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() > 0)
+	{
+		std::cout << m_ghostObject->getOverlappingObject(0) << std::endl;
+	}
 	// Update the transform so it moves with its anchors. - How will splitting it up affect this??
 	
 	Muscle2P::calculateAndApplyForce(dt);

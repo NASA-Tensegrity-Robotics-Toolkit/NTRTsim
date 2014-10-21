@@ -111,7 +111,7 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	ghostObject->setWorldTransform(transform);
 	ghostObject->setCollisionFlags (btCollisionObject::CO_GHOST_OBJECT);
 	
-	
+	// @todo look up what the second and third arguments of this are
 	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
     return new MuscleNP(ghostObject, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
