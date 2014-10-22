@@ -78,6 +78,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 		// todo - check we don't already have interactions for these objects
 		
+		// We need to write a collision algorithm for this type of object to determine the collision point...
+		// Going to be very similar to Corde from here on out
 		if (collisionPair->m_algorithm)
 			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
 
