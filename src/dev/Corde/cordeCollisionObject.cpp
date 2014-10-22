@@ -90,7 +90,7 @@ m_gravity(tgBulletUtil::worldToDynamicsWorld(world).getGravity()) // Note, if gr
 		{
 			j = i - 1;
 		}
-		btVector3 box = btVector3(margin, margin, linkLengths[j]/2.0);
+		btVector3 box = btVector3(linkLengths[j]/2.0, margin, margin);
 			
 		CordeQuaternionElement& q = *m_centerlines[j];
 		btScalar angle = q.q_new.getAngle();
@@ -218,7 +218,7 @@ void cordeCollisionObject::predictMotion(btScalar dt)
 		{
 			j = i - 1;
 		}
-		btVector3 box = btVector3(m_sst.radmrg, m_sst.radmrg, linkLengths[j]/2.0);
+		btVector3 box = btVector3(linkLengths[j]/2.0, m_sst.radmrg, m_sst.radmrg);
 			
 		CordeQuaternionElement& q = *m_centerlines[j];
 		btScalar angle = q.q_new.getAngle();

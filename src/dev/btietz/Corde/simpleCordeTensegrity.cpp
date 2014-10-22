@@ -72,7 +72,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 		const double gammaR = 0.01 * pow(10, -6); // Rotation Damping
 	#else
 		// Values for thread
-		const std::size_t resolution = 20;
+		const std::size_t resolution = 3;
 		const double radius = 0.005;
 		const double density = 1300;
 		const double youngMod = 1 * pow(10, 1);
@@ -128,7 +128,7 @@ void simpleCordeTensegrity::setup(tgWorld& world)
 	s.addNode(5, 3, -2);
 	s.addNode(5, 3, 2);
 	
-	s.addPair(0, 1, "rod");
+	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod2");
 	//s.addPair(4, 5, "rod");
 	
