@@ -73,7 +73,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
-	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
+	//std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
 
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
@@ -91,46 +91,10 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
                 btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
 
-// Manual mode - limited to convex
-#if (0)
-
-   btVoronoiSimplexSolver sGjkSimplexSolver;
-   btGjkEpaPenetrationDepthSolver epaSolver;
-   btPointCollector gjkOutput; 
-
-   {
-	   btConvexShape* shape0 = static_cast<btConvexShape*>(obj0->getCollisionShape());
-	   btConvexShape* shape1 = static_cast<btConvexShape*>(obj1->getCollisionShape());
-	   
-	   btGjkPairDetector convexConvex(shape0, shape1,&sGjkSimplexSolver,&epaSolver); 
-	   
-	   btGjkPairDetector::ClosestPointInput input; 
-	   input.m_transformA = obj0->getWorldTransform(); 
-	   input.m_transformB = obj1->getWorldTransform(); 
-	    
-		
-	   convexConvex.getClosestPoints(input, gjkOutput, 0); 
-   }
-	
-	if (gjkOutput.m_hasResult) 
-   { 
-        //printf("original  distance: %10.4f\n", gjkOutput.m_distance);
-        
-        btVector3 endPt = gjkOutput.m_pointInWorld +
-		gjkOutput.m_normalOnBInWorld*gjkOutput.m_distance;
-		
-		std::cout << "Contact at: " << endPt << std::endl;
-	}
-
-#else
-		// todo - check we don't already have interactions for these objects
-		
-		// We need to write a collision algorithm for this type of object to determine the collision point...
-		// Going to be very similar to Corde from here on out
 		if (collisionPair->m_algorithm)
 			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
 		
-		std::cout  << m_manifoldArray.size() << std::endl;
+		//std::cout  << m_manifoldArray.size() << std::endl;
 		
 		for (int j=0;j<m_manifoldArray.size();j++)
 		{
@@ -146,15 +110,32 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 				{
 					
 					m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
-					std::cout << pt.m_positionWorldOnB << " " << m_touchingNormal << std::endl;
-
+					
+					btRigidBody* rb = NULL;
+					
+					if (directionSign < 0)
+					{
+						rb = btRigidBody::upcast(obj1);
+					}
+					else
+					{
+						rb = btRigidBody::upcast(obj0);
+					}
+					if ( rb != anchor1->attachedBody || rb != anchor2->attachedBody)
+					{
+						//std::cout << pt.m_positionWorldOnB << " " << m_touchingNormal << std::endl;
+					
+						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
+						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * dist;
+						rb->applyImpulse(impulse, pt.m_positionWorldOnB);
+					}
+					
 				}
 			}
 			
 			//manifold->clearManifold();
 		}
 	
-#endif	
 	}
 	
 	btVector3 from = anchor1->getWorldPosition();
@@ -162,7 +143,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
-	std::cout << (to - from).length()/2.0 << std::endl;
+	//std::cout << (to - from).length()/2.0 << std::endl;
 	
 	m_ghostObject->setWorldTransform(transform);
 	
