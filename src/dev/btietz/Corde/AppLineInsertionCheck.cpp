@@ -1,0 +1,59 @@
+/*
+ * Copyright © 2012, United States Government, as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ * 
+ * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+*/
+
+/**
+ * @file AppLineInsertionCheck.cpp
+ * @brief Simple tests for determining the order of points in space
+ * @author Brian Mirletz
+ * $Id$
+ */
+
+#include "tgcreator/tgUtil.h"
+
+// The Bullet Physics Library
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
+// The C++ Standard Library
+#include <iostream>
+
+using namespace std;
+
+/**
+ * The entry point.
+ * @param[in] argc the number of command-line arguments
+ * @param[in] argv argv[0] is the executable name
+ * @return 0
+ */
+int main(int argc, char** argv)
+{
+	btVector3 point1(atof(argv[1]), atof(argv[2]), atof(argv[3]));
+	btVector3 point2(atof(argv[4]), atof(argv[5]), atof(argv[6]));
+
+	btVector3 point3(atof(argv[7]), atof(argv[8]), atof(argv[9]));
+#if (0)
+	btVector3 point4(atof(argv[10]), atof(argv[11]), atof(argv[12]));
+#else
+	btVector3 point4(0.0, 0.0, 0.0);	
+#endif
+	cout << point1 << " " << point2 << " " << point3 << endl;
+
+	cout << "new point " << (point3 - point1).dot(point2) << endl;
+	cout << "old point " << (point3 - point1).dot(point3) << endl;
+	
+    return 0;
+}

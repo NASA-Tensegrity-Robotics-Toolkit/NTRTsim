@@ -74,8 +74,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	btVector3 m_touchingNormal;
 	
 	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
-	btScalar maxPen = btScalar(0.0);
-	
+
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
 	int numPairs = pairArray.size();
@@ -130,7 +129,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		// Going to be very similar to Corde from here on out
 		if (collisionPair->m_algorithm)
 			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
-
+		
+		std::cout  << m_manifoldArray.size() << std::endl;
 		
 		for (int j=0;j<m_manifoldArray.size();j++)
 		{
@@ -141,19 +141,13 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 				const btManifoldPoint&pt = manifold->getContactPoint(p);
 
 				btScalar dist = pt.getDistance();
-
+				
 				if (dist < 0.0)
 				{
-					if (dist < maxPen)
-					{
-						maxPen = dist;
-						m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
-						std::cout << m_touchingNormal << std::endl;
-					}
 					
+					m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+					std::cout << pt.m_positionWorldOnB << " " << m_touchingNormal << std::endl;
 
-				} else {
-					printf("touching %f\n", dist);
 				}
 			}
 			
@@ -172,7 +166,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	m_ghostObject->setWorldTransform(transform);
 	
-	btScalar radius = 0.1;
+	btScalar radius = 0.01;
 	
 	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
 	/* Note that 1) this is listed as "use with care" in Bullet's documentation and

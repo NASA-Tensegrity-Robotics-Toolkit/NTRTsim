@@ -13,3 +13,7 @@ add_executable(AppCordeTest
     CordeModel.cpp
     AppCordeTest.cpp
 ) 
+
+add_executable(AppLineInsertionCheck
+	AppLineInsertionCheck.cpp
+)
