@@ -38,9 +38,18 @@
 #include "BulletDynamics/Dynamics/btActionInterface.h"
 #include "LinearMath/btDefaultMotionState.h"
 
+// Classes for manual collision detection - will likely remove later
+#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
+#include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
+#include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
+#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
+#include "BulletCollision/NarrowPhaseCollision/btConvexPenetrationDepthSolver.h"
+#include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
+
 #include <iostream>
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
+btBroadphaseInterface* broadphase,
  btRigidBody * body1,
  btVector3 pos1,
  btRigidBody * body2,
@@ -48,7 +57,8 @@ MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  double coefK,
  double dampingCoefficient) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
-m_ghostObject(ghostObject)
+m_ghostObject(ghostObject),
+m_overlappingPairCache(broadphase)
 {
 	
 }
@@ -66,16 +76,54 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
 	btScalar maxPen = btScalar(0.0);
 	
-	/* Based on recoverFromPenitration btKinematicCharacterController */
-	for (int i = 0; i < m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
-	{
-		m_manifoldArray.resize(0);
+	// Only caches the pairs, they don't have a lot of useful information
+	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
+	int numPairs = pairArray.size();
 
-		btBroadphasePair* collisionPair = &(m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray()[i]);
+	for (int i=0;i<numPairs;i++)
+	{
+		m_manifoldArray.clear();
+
+		const btBroadphasePair& pair = pairArray[i];
+		
+		// The real broadphase's pair cache has the useful info
+		btBroadphasePair* collisionPair = m_overlappingPairCache->getOverlappingPairCache()->findPair(pair.m_pProxy0,pair.m_pProxy1);
 
 		btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
                 btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
 
+// Manual mode - limited to convex
+#if (0)
+
+   btVoronoiSimplexSolver sGjkSimplexSolver;
+   btGjkEpaPenetrationDepthSolver epaSolver;
+   btPointCollector gjkOutput; 
+
+   {
+	   btConvexShape* shape0 = static_cast<btConvexShape*>(obj0->getCollisionShape());
+	   btConvexShape* shape1 = static_cast<btConvexShape*>(obj1->getCollisionShape());
+	   
+	   btGjkPairDetector convexConvex(shape0, shape1,&sGjkSimplexSolver,&epaSolver); 
+	   
+	   btGjkPairDetector::ClosestPointInput input; 
+	   input.m_transformA = obj0->getWorldTransform(); 
+	   input.m_transformB = obj1->getWorldTransform(); 
+	    
+		
+	   convexConvex.getClosestPoints(input, gjkOutput, 0); 
+   }
+	
+	if (gjkOutput.m_hasResult) 
+   { 
+        //printf("original  distance: %10.4f\n", gjkOutput.m_distance);
+        
+        btVector3 endPt = gjkOutput.m_pointInWorld +
+		gjkOutput.m_normalOnBInWorld*gjkOutput.m_distance;
+		
+		std::cout << "Contact at: " << endPt << std::endl;
+	}
+
+#else
 		// todo - check we don't already have interactions for these objects
 		
 		// We need to write a collision algorithm for this type of object to determine the collision point...
@@ -111,6 +159,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			
 			//manifold->clearManifold();
 		}
+	
+#endif	
 	}
 	
 	btVector3 from = anchor1->getWorldPosition();

@@ -38,12 +38,14 @@
 class btRigidBody;
 class muscleAnchor;
 class btPairCachingGhostObject;
+class btBroadphaseInterface;
 
 class MuscleNP : public Muscle2P
 {
 public:
 
 	MuscleNP(btPairCachingGhostObject* ghostObject,
+			btBroadphaseInterface* broadphase,
 		 btRigidBody * body1,
          btVector3 pos1,
          btRigidBody * body2,
@@ -59,7 +61,7 @@ public:
 protected:    
    btPairCachingGhostObject* m_ghostObject;
    
-
+   btBroadphaseInterface*	m_overlappingPairCache;
 };
 
 #endif  // NTRT_MUSCLENP_H_
