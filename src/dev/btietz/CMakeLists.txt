@@ -26,4 +26,5 @@ subdirs(
     hardwareLearning
     hardwareSineWaves
     handTunedSineWaves
+    muscleNPTests
     )
