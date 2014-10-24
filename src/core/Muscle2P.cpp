@@ -46,6 +46,10 @@ anchor2(new muscleAnchor(body2, pos2))
 {
     m_restLength = pos1.distance(pos2);
     m_prevLength = m_restLength;
+    
+    // In case getActualLength() gets called before updateAnchorList
+    m_anchors.insert(m_anchors.begin(), anchor1);
+	m_anchors.insert(m_anchors.end(), anchor2);
 }
 
 btVector3 Muscle2P::calculateAndApplyForce(double dt)
@@ -138,4 +142,6 @@ Muscle2P::~Muscle2P()
     #endif
     delete anchor1;
     delete anchor2;
+    
+    m_anchors.clear();
 }

@@ -33,7 +33,7 @@
 // The C++ Standard Library
 
 #include <string>
-#include <set>
+#include <vector>
 
 // Forward references
 class muscleAnchor;
@@ -55,6 +55,8 @@ public:
          double dampingCoefficient);
          
    virtual ~MuscleNP();
+    
+    virtual const btScalar getActualLength() const;
     
     ///@todo change this to update(dt) or similar, since that's the role its serving
     virtual btVector3 calculateAndApplyForce(double dt);
@@ -79,8 +81,6 @@ protected:
    btPairCachingGhostObject* m_ghostObject;
    
    btBroadphaseInterface*   m_overlappingPairCache;
-   
-   std::set<const muscleAnchor*> m_anchors;
   
    anchorCompare m_ac;
 

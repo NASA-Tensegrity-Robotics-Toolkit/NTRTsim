@@ -32,6 +32,7 @@
 // The C++ Standard Library
 
 #include <string>
+#include <vector>
 
 // Forward references
 class btRigidBody;
@@ -58,7 +59,7 @@ public:
     
     void setRestLength( const double newRestLength); 
 
-    const btScalar getActualLength() const;
+    virtual const btScalar getActualLength() const;
 
     const double getTension() const;
     
@@ -85,10 +86,20 @@ public:
 
     const muscleAnchor * const anchor2;
 
+	const std::vector<const muscleAnchor*>& getAnchors() const
+    {
+        return m_anchors;
+    }
+
     std::string name;
 
     bool recordHistory;
 
+protected:
+
+   // Wanted to do a set, but need random access iterator to sort
+   // Needs to be stored here for consistent rendering
+   std::vector<const muscleAnchor*> m_anchors;
 
  private:
     // Necessary for computations

@@ -47,6 +47,7 @@
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
 
 #include <iostream>
+#include <algorithm>    // std::sort
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
 btBroadphaseInterface* broadphase,
@@ -61,6 +62,7 @@ m_ghostObject(ghostObject),
 m_overlappingPairCache(broadphase),
 m_ac(anchor1, anchor2)
 {
+
 }
          
 MuscleNP::~MuscleNP()
@@ -68,11 +70,28 @@ MuscleNP::~MuscleNP()
 	
 }
 
+const btScalar MuscleNP::getActualLength() const
+{
+    btScalar length = 0;
+    
+    std::size_t n = m_anchors.size() - 1;
+    for (std::size_t i = 0; i < n; i++)
+    {
+        length += (m_anchors[i]->getWorldPosition() - m_anchors[i+1]->getWorldPosition()).length(); 
+    }
+    
+    return length;
+}
+
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
 	
 	updateAnchorList(dt);
 	
+    // Apply forces
+    
+    
+    
 	btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
@@ -82,7 +101,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	m_ghostObject->setWorldTransform(transform);
 	
-	btScalar radius = 0.01;
+	btScalar radius = 0.1;
 	
 	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
 	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
@@ -97,10 +116,22 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 void MuscleNP::updateAnchorList(double dt)
 {
+	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
+    muscleAnchor* temp;
+	for (it = m_anchors.begin(); it != m_anchors.end(); it++)
+	{
+		if ((*it)->permanent == false)
+        {
+            delete *it;
+        }
+	}
+	
+    m_anchors.clear();
+    
 	m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
 	
-	std::set<const muscleAnchor*>::iterator it = m_anchors.begin();
+	
 	
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
@@ -138,7 +169,7 @@ void MuscleNP::updateAnchorList(double dt)
 
 				btScalar dist = pt.getDistance();
 				
-				// Ensures the force is pointed outwards?
+				// Ensures the force is pointed outwards - may need to double check
 				if (dist < 0.0)
 				{
 					
@@ -161,7 +192,7 @@ void MuscleNP::updateAnchorList(double dt)
 					if(rb)
 					{
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
-						it = m_anchors.insert(it, newAnchor);
+						m_anchors.push_back(newAnchor);
 						
 						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
 						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
@@ -172,7 +203,10 @@ void MuscleNP::updateAnchorList(double dt)
 			}
 		}
 	
-	}	
+	}
+    
+    std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
+    
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :

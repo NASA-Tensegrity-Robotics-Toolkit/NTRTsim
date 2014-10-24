@@ -32,6 +32,10 @@
 #include "tgLinearString.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
+
+#include "dev/muscleNP/MuscleNP.h"
+#include "tgCast.h"
+
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -59,24 +63,28 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
     
     const Muscle2P* const pMuscle = linString.getMuscle();
     
-    if (pDrawer && pMuscle)
+    if(pDrawer && pMuscle)
     {
-    
-      const btVector3 lineFrom =
-        pMuscle->anchor1->getWorldPosition();
-      const btVector3 lineTo = 
-        pMuscle->anchor2->getWorldPosition();
-       // Should this be normalized??
-      const double stretch = 
-        linString.getCurrentLength() - pMuscle->getRestLength();
-      const btVector3 color =
-        (stretch < 0.0) ?
-        btVector3(0.0, 0.0, 1.0) :
-        btVector3(0.5 + stretch / 3.0, 
-              0.5 - stretch / 2.0, 
-              0.0);
-      pDrawer->drawLine(lineFrom, lineTo, color);
-    }
+		const std::vector<const muscleAnchor*>& anchors = pMuscle->getAnchors();
+		std::size_t n = anchors.size() - 1;
+		for (std::size_t i = 0; i < n; i++)
+		{
+			const btVector3 lineFrom =
+			anchors[i]->getWorldPosition();
+		  const btVector3 lineTo = 
+			anchors[i+1]->getWorldPosition();
+		   // Should this be normalized??
+		  const double stretch = 
+			linString.getCurrentLength() - pMuscle->getRestLength();
+		  const btVector3 color =
+			(stretch < 0.0) ?
+			btVector3(0.0, 0.0, 1.0) :
+			btVector3(0.5 + stretch / 3.0, 
+				  0.5 - stretch / 2.0, 
+				  0.0);
+		  pDrawer->drawLine(lineFrom, lineTo, color);
+		}
+	}
 }
 
 void tgBulletRenderer::render(const tgModel& model) const

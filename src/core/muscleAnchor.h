@@ -63,8 +63,16 @@ public:
 	
     btScalar height;
     
+    /**
+     * A boolean value indicating where this anchor should be stored.
+     * False implies it will be deleted after one update step
+     */
     const bool permanent;
     
+    /**
+     * How the force is applied to the rigid body. True applies along the
+     * contact normal, false is applied towards the next anchor
+     */
     const bool sliding;
 
 };
