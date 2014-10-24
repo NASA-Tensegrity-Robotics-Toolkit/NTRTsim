@@ -27,7 +27,7 @@
 
 // NTRT
 #include "tgcreator/tgUtil.h"
-#include "core/MuscleAnchor.h"
+#include "core/muscleAnchor.h"
 #include "core/tgCast.h"
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
@@ -58,11 +58,9 @@ btBroadphaseInterface* broadphase,
  double dampingCoefficient) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
-m_overlappingPairCache(broadphase)
+m_overlappingPairCache(broadphase),
+m_ac(anchor1, anchor2)
 {
-	m_anchors.insert(m_anchors.begin(), anchor1);
-	m_anchors.insert(m_anchors.end(), anchor2);
-	
 }
          
 MuscleNP::~MuscleNP()
@@ -72,6 +70,38 @@ MuscleNP::~MuscleNP()
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
+	
+	updateAnchorList(dt);
+	
+	btVector3 from = anchor1->getWorldPosition();
+	btVector3 to = anchor2->getWorldPosition();
+	
+	btTransform transform = tgUtil::getTransform(from, to);
+	
+	//std::cout << (to - from).length()/2.0 << std::endl;
+	
+	m_ghostObject->setWorldTransform(transform);
+	
+	btScalar radius = 0.01;
+	
+	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
+	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
+	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
+	 * changing from a non-contact object will break that behavior.
+	 */ 
+	shape->setImplicitShapeDimensions(btVector3(radius, (to - from).length()/2.0, radius));
+	m_ghostObject->setCollisionShape(shape);
+	
+	Muscle2P::calculateAndApplyForce(dt);
+}
+
+void MuscleNP::updateAnchorList(double dt)
+{
+	m_anchors.insert(m_anchors.begin(), anchor1);
+	m_anchors.insert(m_anchors.end(), anchor2);
+	
+	std::set<const muscleAnchor*>::iterator it = m_anchors.begin();
+	
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
@@ -108,6 +138,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 				btScalar dist = pt.getDistance();
 				
+				// Ensures the force is pointed outwards?
 				if (dist < 0.0)
 				{
 					
@@ -125,60 +156,39 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 					{
 						rb = btRigidBody::upcast(obj0);
 						pos = pt.m_localPointB;
-					}
-					//if ( rb != anchor1->attachedBody && rb != anchor2->attachedBody)
-					//{
-						//std::cout << pt.m_positionWorldOnB << " " << m_touchingNormal << std::endl;
+					}	
 					
+					if(rb)
+					{
+						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
+						it = m_anchors.insert(it, newAnchor);
+						
 						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
 						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
 						rb->applyImpulse(impulse, pos);
-					//}
+					}
 					
 				}
 			}
-			
-			//manifold->clearManifold();
 		}
 	
-	}
-	
-	btVector3 from = anchor1->getWorldPosition();
-	btVector3 to = anchor2->getWorldPosition();
-	
-	btTransform transform = tgUtil::getTransform(from, to);
-	
-	//std::cout << (to - from).length()/2.0 << std::endl;
-	
-	m_ghostObject->setWorldTransform(transform);
-	
-	btScalar radius = 0.01;
-	
-	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
-	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
-	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
-	 * changing from a non-contact object will break that behavior.
-	 */ 
-	shape->setImplicitShapeDimensions(btVector3(radius, (to - from).length()/2.0, radius));
-	m_ghostObject->setCollisionShape(shape);
-	
-	Muscle2P::calculateAndApplyForce(dt);
+	}	
 }
 
-MuscleNP::anchorCompare::anchorCompare(muscleAnchor* m1, muscleAnchor* m2) :
+MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
 ma1(m1),
 ma2(m2)
 {
 	
 }
 
-bool MuscleNP::anchorCompare::operator() (const muscleAnchor& lhs, const muscleAnchor& rhs)
+bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleAnchor* rhs)
 {
    btVector3 pt1 = ma1->getWorldPosition();
    btVector3 ptN = ma2->getWorldPosition();
    
-   btVector3 pt2 = lhs.getWorldPosition();
-   btVector3 pt3 = rhs.getWorldPosition();
+   btVector3 pt2 = lhs->getWorldPosition();
+   btVector3 pt3 = rhs->getWorldPosition();
    
    btScalar lhDot = (ptN - pt1).dot(pt2);
    btScalar rhDot = (ptN - pt1).dot(pt3);

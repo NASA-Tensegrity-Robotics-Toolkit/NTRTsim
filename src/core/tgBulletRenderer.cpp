@@ -27,7 +27,7 @@
 #include "tgBulletRenderer.h"
 // This application
 #include "Muscle2P.h"
-#include "MuscleAnchor.h"
+#include "muscleAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgLinearString.h"
 #include "tgWorld.h"

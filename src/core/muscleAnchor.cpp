@@ -22,13 +22,14 @@
  * $Id$
  */
  
-#include "MuscleAnchor.h"
+#include "muscleAnchor.h"
 
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
  
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
+               btVector3 cn,
                bool perm,
                bool slide) :
   attachedBody(body),
@@ -36,6 +37,7 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
+  contactNormal(cn),
   height(999.0),
   permanent(perm),
   sliding(slide)

@@ -39,7 +39,11 @@ class muscleAnchor
 public:
    
 
-    muscleAnchor(btRigidBody *body, btVector3 pos, bool perm = true, bool slide = false);
+    muscleAnchor(btRigidBody *body, 
+					btVector3 pos, 
+					btVector3 cn = btVector3(0.0, 0.0, 0.0),
+					bool perm = true, 
+					bool slide = false);
     
     ~muscleAnchor();
     
@@ -53,7 +57,10 @@ public:
 
     // Relative to the body when it is first constructed
     const btVector3 attachedRelativeOriginalPosition;
-
+	
+	// todo: write an accessor that asserts this is necessary and accurate
+	const btVector3 contactNormal;
+	
     btScalar height;
     
     const bool permanent;

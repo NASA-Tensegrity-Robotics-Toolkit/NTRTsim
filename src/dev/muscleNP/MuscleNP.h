@@ -36,7 +36,7 @@
 #include <set>
 
 // Forward references
-class MuscleAnchor;
+class muscleAnchor;
 class btRigidBody;
 class btPairCachingGhostObject;
 class btBroadphaseInterface;
@@ -63,16 +63,18 @@ private:
   
     struct anchorCompare
     {
-        anchorCompare(muscleAnchor* m1, muscleAnchor* m2);
+        anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
         
-        bool operator() (const muscleAnchor& lhs, const muscleAnchor& rhs);
+        bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs);
         
         
         private:
            const muscleAnchor* const ma1;
            const muscleAnchor* const ma2;
     };
- 
+    
+    void updateAnchorList(double dt);
+    
 protected:    
    btPairCachingGhostObject* m_ghostObject;
    
@@ -80,6 +82,7 @@ protected:
    
    std::set<const muscleAnchor*> m_anchors;
   
+   anchorCompare m_ac;
 
     
    

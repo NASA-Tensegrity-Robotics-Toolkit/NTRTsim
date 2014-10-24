@@ -25,7 +25,7 @@
 
 // This module
 #include "Muscle2P.h"
-#include "MuscleAnchor.h"
+#include "muscleAnchor.h"
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
