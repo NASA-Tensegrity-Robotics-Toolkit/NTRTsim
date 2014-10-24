@@ -64,7 +64,10 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    DuCTTRobotModel* myRobotModel = new DuCTTRobotModel();
+    DuCTTRobotModel::Config c = DuCTTRobotModel::Config(
+                btVector3(0,20,0));
+    DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
+
     DuCTTSineWaves* const pPrismControl =
       new DuCTTSineWaves();
 //    myRobotModel->attach(pPrismControl);

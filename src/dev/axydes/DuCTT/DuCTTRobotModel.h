@@ -48,12 +48,71 @@ class PretensionController;
 class DuCTTRobotModel : public tgSubject<DuCTTRobotModel>, public tgModel
 {
 public: 
-    
     /**
-     * The only constructor. Configuration parameters are within the
-     * .cpp file in this case, not passed in. 
+     * Configuration parameters so they're easily accessable.
+     * All parameters must be positive.
+     //
+     // see tgBaseString.h for a descripton of some of these rod parameters
+     // (specifically, those related to the motor moving the strings.)
+     //
+     // NOTE that any parameter that depends on units of length will scale
+     // with the current gravity scaling. E.g., with gravity as 981,
+     // the length units below are in centimeters.
      */
+    struct Config
+    {
+        Config(
+                btVector3 startPos = btVector3(0,10,0),//so it doesn't start in the floor
+                btVector3 startRotAxis = btVector3(0,0,1),
+                double startRotAngle = 0,
+                double triangle_length = 30,
+                double duct_distance = 15,
+                double duct_height = 22,
+                double density = 0.00164,
+                double prismRadius = 1.524,
+                double prismExtent = 10.16,
+                double vertRodRadius = 1.27,
+                double innerRodRadius = 2.0955,
+                double tipRad = 1.524,
+                double tipDens = 1,
+                double tipFric = 1,
+                double stiffness = 10000.0,
+                double damping = 100.0,
+                double pretension = 0.05,
+                double maxVertStringVel = 25.4,
+                double maxSaddleStringVel = 8.5,
+                double maxStringForce = 50
+              );
+
+        //robot params
+        btVector3 m_startPos;
+        btVector3 m_startRotAxis;
+        double m_startRotAngle;
+        //tetra prams
+        double m_triangle_length;     // triangle_length (length) 30 cm
+        double m_duct_distance;     // duct_distance (distance between tetrahedrons) 15 cm
+        double m_duct_height;    // duct_height (length)
+        //rod params
+        double m_density;     // density (mass / length^3) kg/cm^3 0.00164
+        double m_prismRadius; // prismatic joint radius 1.524 cm
+        double m_prismExtent; // prismatic joint max extension 10.16 cm
+        double m_vertRodRadius; // vertical rod radius 1.27 cm
+        double m_innerRodRadius; // inner rod radius 2.0955 cm
+        //sphere tip params
+        double m_tipRad; // prismatic joint tip radius 1.524 cm
+        double m_tipDens; // prismatic joint tip density (mas / length^3) kg/cm^3
+        double m_tipFric; // prismatic joint tip friction
+        //string params
+        double m_stiffness;   // stiffness (mass / sec^2) vectran string
+        double m_damping;     // damping (mass / sec)
+        double m_pretension;     // Pretension (percentage)
+        double m_maxVertStringVel; // max velocity of vertical string motors (cm/s) 25.4cm/s
+        double m_maxSaddleStringVel; // max velocity of saddle string motors (cm/s) 8.5cm/s
+        double m_maxStringForce; // max force to exert on all strings (Newtons) 50 N
+    };
+
     DuCTTRobotModel();
+    DuCTTRobotModel(DuCTTRobotModel::Config &config);
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -154,6 +213,8 @@ private:
      * through setup when it is filled using tgModel's find methods
      */
     std::vector<tgPrismatic*> allPrisms;
+
+    DuCTTRobotModel::Config m_config;
 };
 
 #endif  // DuCTT_MODEL_H

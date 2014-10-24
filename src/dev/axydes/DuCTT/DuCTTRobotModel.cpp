@@ -42,74 +42,67 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-/**
- * Anonomous namespace so we don't have to declare the config in
- * the header.
- */
-namespace
+DuCTTRobotModel::Config::Config(
+    //robot params
+    btVector3 startPos,
+    btVector3 startRotAxis,
+    double startRotAngle,
+    //tetra prams
+    double triangle_length,
+    double duct_distance,
+    double duct_height,
+    //rod params
+    double density,
+    double prismRadius,
+    double prismExtent,
+    double vertRodRadius,
+    double innerRodRadius,
+    //sphere tip params
+    double tipRad,
+    double tipDens,
+    double tipFric,
+    //string params
+    double stiffness,
+    double damping,
+    double pretension,
+    double maxVertStringVel,
+    double maxSaddleStringVel,
+    double maxStringForce
+    ) :
+m_startPos(startPos),
+m_startRotAxis(startRotAxis),
+m_startRotAngle(startRotAngle),
+m_triangle_length(triangle_length),
+m_duct_distance(duct_distance),
+m_duct_height(duct_height),
+m_density(density),
+m_prismRadius(prismRadius),
+m_prismExtent(prismExtent),
+m_vertRodRadius(vertRodRadius),
+m_innerRodRadius(innerRodRadius),
+m_tipRad(tipRad),
+m_tipDens(tipDens),
+m_tipFric(tipFric),
+m_stiffness(stiffness),
+m_damping(damping),
+m_pretension(pretension),
+m_maxVertStringVel(maxVertStringVel),
+m_maxSaddleStringVel(maxSaddleStringVel),
+m_maxStringForce(maxStringForce)
 {
-    /**
-     * Configuration parameters so they're easily accessable.
-     * All parameters must be positive.
-     //
-     // see tgBaseString.h for a descripton of some of these rod parameters
-     // (specifically, those related to the motor moving the strings.)
-     //
-     // NOTE that any parameter that depends on units of length will scale
-     // with the current gravity scaling. E.g., with gravity as 981,
-     // the length units below are in centimeters.
-     //
-     // Total mass of bars is about 1.5 kg.  Total
-     */
-    const struct Config
-    {
-        //tetra prams
-        double triangle_length;
-        double duct_distance;
-        double duct_height;
-        //rod params
-        double density;
-        double prismRadius;
-        double prismExtent;
-        double vertRodRadius;
-        double innerRodRadius;
-        //sphere tip params
-        double tipRad;
-        double tipDens;
-        double tipFric;
-        //string params
-        double stiffness;
-        double damping;
-        double pretension;
-        double maxVertStringVel;
-        double maxSaddleStringVel;
-        double maxStringForce;
-    } c =
-   {
-       30,     // triangle_length (length) 30 cm
-       15,     // duct_distance (distance between tetrahedrons) 15 cm
-       22,    // duct_height (length)
-       0.00164,     // density (mass / length^3) kg/cm^3 0.00164
-       1.524, // prismatic joint radius 1.524 cm
-       10.16, // prismatic joint max extension 10.16 cm
-       1.27, // vertical rod radius 1.27 cm
-       2.0955, // inner rod radius 2.0955 cm
-       1.524, // prismatic joint tip radius 1.524 cm
-       1, // prismatic joint tip density (mas / length^3) kg/cm^3
-       1, // prismatic joint tip friction
-       10000.0,   // stiffness (mass / sec^2) vectran string
-       100.0,     // damping (mass / sec)
-       0.05,     // Pretension (percentage)
-       25.4, // max velocity of vertical string motors (cm/s) 25.4cm/s
-       8.5, // max velocity of saddle string motors (cm/s) 8.5cm/s
-       50 // max force to exert on all strings (Newtons) 50 N
-   }
-    ;
-} // namespace
+}
 
 DuCTTRobotModel::DuCTTRobotModel() :
-m_pStringController(new PretensionController(c.pretension)),
-tgModel()
+    m_config(DuCTTRobotModel::Config()),
+    m_pStringController(new PretensionController(m_config.m_pretension)),
+    tgModel()
+{
+}
+
+DuCTTRobotModel::DuCTTRobotModel(DuCTTRobotModel::Config &config) :
+    m_config(config),
+    m_pStringController(new PretensionController(m_config.m_pretension)),
+    tgModel()
 {
 }
 
@@ -282,18 +275,18 @@ void DuCTTRobotModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
-    const tgRod::Config prismRodConfig(c.prismRadius, c.density);
-    const tgRod::Config staticRodConfig(c.prismRadius, 0);
-    const tgRod::Config vertRodConfig(c.vertRodRadius, c.density);
-    const tgRod::Config innerRodConfig(c.innerRodRadius, c.density);
+    const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_density);
+    const tgRod::Config staticRodConfig(m_config.m_prismRadius, 0);
+    const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_density);
+    const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_density);
 
-    const tgLinearString::Config vertStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxVertStringVel);
-    const tgLinearString::Config saddleStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxSaddleStringVel);
+    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel);
+    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel);
 
-    const tgPrismatic::Config prismConfig(2, 0, 0.1, c.prismExtent, 20, 0.5, 0.2);
-    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, c.prismExtent, 20, 0.5, 0.2);
+    const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 20, 0.5, 0.2);
+    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 20, 0.5, 0.2);
 
-    const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
+    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
     const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
     const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
@@ -303,13 +296,13 @@ void DuCTTRobotModel::setup(tgWorld& world)
     tgStructure s;
     
     // Add nodes to the bottom tetrahedron
-    addNodes(s, c.triangle_length, 0, c.duct_height);
+    addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height);
     
     // Add rods to the bottom tetrahedron
     addRods(s);
     
     // Add nodes to top tetrahedron
-    addNodes(s, c.triangle_length, c.duct_distance, c.duct_height);
+    addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height);
     
     // Add rods to the top tetrahedron
     addRods(s, 16);
@@ -318,7 +311,8 @@ void DuCTTRobotModel::setup(tgWorld& world)
     addMuscles(s, 16);
     
     // Move the structure so it doesn't start in the ground
-    s.move(btVector3(0, 15, 0));
+    s.move(m_config.m_startPos);
+    s.addRotation(m_config.m_startPos, m_config.m_startRotAxis, m_config.m_startRotAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
