@@ -30,6 +30,7 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+#include "tgPrismatic.h"
 // The C++ Standard Library
 #include <vector>
 
@@ -37,7 +38,6 @@
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
-class tgPrismatic;
 class tgLinearString;
 class PretensionController;
 
@@ -162,8 +162,18 @@ public:
      * @return A vector of all of the prismatic joints
      */
     const std::vector<tgPrismatic*>& getAllPrismatics() const;
+
+    /**
+     * @return the bottom tetra's prismatic actuator
+     */
+    const tgPrismatic* getBottomPrismatic() const;
+
+    /**
+     * @return the top tetra's prismatic actuator
+     */
+    const tgPrismatic* getTopPrismatic() const;
+
 private:
-    
     /**
      * A function called during setup that determines the positions of
      * the nodes based on construction parameters. Rewrite this function
@@ -215,6 +225,9 @@ private:
     std::vector<tgPrismatic*> allPrisms;
 
     DuCTTRobotModel::Config m_config;
+
+    tgPrismatic *m_pBottomPrismatic;
+    tgPrismatic *m_pTopPrismatic;
 };
 
 #endif  // DuCTT_MODEL_H

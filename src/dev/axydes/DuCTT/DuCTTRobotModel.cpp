@@ -349,6 +349,18 @@ void DuCTTRobotModel::setup(tgWorld& world)
     {
         allMuscles[i]->attach(m_pStringController);
     }
+
+    std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");
+    if (bottomPrisms.size() == 1)
+    {
+        m_pBottomPrismatic = bottomPrisms[0];
+    }
+
+    std::vector<tgPrismatic*> topPrisms = find<tgPrismatic>("prismatic2");
+    if (topPrisms.size() == 1)
+    {
+        m_pTopPrismatic = topPrisms[0];
+    }
     
     // Notify controllers that setup has finished.
     notifySetup();
@@ -387,7 +399,17 @@ const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const
 {
     return allPrisms;
 }
-    
+
+const tgPrismatic* DuCTTRobotModel::getBottomPrismatic() const
+{
+    return m_pBottomPrismatic;
+}
+
+const tgPrismatic* DuCTTRobotModel::getTopPrismatic() const
+{
+    return m_pTopPrismatic;
+}
+
 void DuCTTRobotModel::teardown()
 {
     notifyTeardown();
