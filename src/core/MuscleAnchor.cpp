@@ -28,20 +28,23 @@
 #include "BulletDynamics/Dynamics/btRigidBody.h"
  
 muscleAnchor::muscleAnchor(btRigidBody * body,
-               btVector3 worldPos) :
+               btVector3 worldPos,
+               bool perm,
+               bool slide) :
   attachedBody(body),
   // Find relative position
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
-  height(999.0)
+  height(999.0),
+  permanent(perm),
+  sliding(slide)
 {
 }
 
 muscleAnchor::~muscleAnchor()
 {
-    // World should delete this
-    attachedBody = NULL;
+    // World will delete attached body
     
 }
 

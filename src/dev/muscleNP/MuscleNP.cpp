@@ -124,14 +124,14 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 						rb = btRigidBody::upcast(obj0);
 						pos = pt.m_localPointB;
 					}
-					if ( rb != anchor1->attachedBody && rb != anchor2->attachedBody)
-					{
+					//if ( rb != anchor1->attachedBody && rb != anchor2->attachedBody)
+					//{
 						//std::cout << pt.m_positionWorldOnB << " " << m_touchingNormal << std::endl;
 					
 						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
 						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
 						rb->applyImpulse(impulse, pos);
-					}
+					//}
 					
 				}
 			}

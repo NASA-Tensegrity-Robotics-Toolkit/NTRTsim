@@ -70,14 +70,14 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addPair(3, 6, "muscle");
 	s.move(btVector3(0, 10, 0));
 #else
-	s.addNode(-5, 2, 0);
-	s.addNode(0, 2, 0);
+	s.addNode(-2, 7, 0);
+	s.addNode(0, 7, 0);
 	s.addNode(10, 2, 0);
-	s.addNode(15, 2, 0);
+	s.addNode(12, 2, 0);
 	s.addNode(5, 3, -2);
 	s.addNode(5, 3, 2);
 	s.addPair(0, 1, "rod2");
-	s.addPair(2, 3, "rod2");
+	s.addPair(2, 3, "rod");
 	//s.addPair(4, 5, "rod");
 	s.addPair(1, 2, "muscle");
 	s.move(btVector3(0, 0, 0));
@@ -85,15 +85,17 @@ void simpleMuscleNP::setup(tgWorld& world)
 
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
-	tgBaseString::Config muscleConfig(1000, 0, false, 0, 600000000);
+	tgBaseString::Config muscleConfig(1000, 10, false, 0, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
 	spec.addBuilder("rod", new tgRodInfo(rodConfig));
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
-
+#if (1)
 	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-
+#else
+	spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+#endif
 	// Create your structureInfo
 	tgStructureInfo structureInfo(s, spec);
 	// Use the structureInfo to build ourselves
