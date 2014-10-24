@@ -345,10 +345,10 @@ void DuCTTRobotModel::setup(tgWorld& world)
 
     // Then attach the pretension controller to each of these muscles to keep
     // the tensegrity's shape
-    for (std::size_t i = 0; i < allMuscles.size(); i++)
-    {
-        allMuscles[i]->attach(m_pStringController);
-    }
+//    for (std::size_t i = 0; i < allMuscles.size(); i++)
+//    {
+//        allMuscles[i]->attach(m_pStringController);
+//    }
 
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");
     if (bottomPrisms.size() == 1)

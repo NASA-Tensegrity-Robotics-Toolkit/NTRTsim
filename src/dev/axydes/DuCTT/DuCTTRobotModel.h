@@ -78,7 +78,7 @@ public:
                 double tipFric = 1,
                 double stiffness = 10000.0,
                 double damping = 100.0,
-                double pretension = 0.05,
+                double pretension = 0.001,
                 double maxVertStringVel = 25.4,
                 double maxSaddleStringVel = 8.5,
                 double maxStringForce = 50
