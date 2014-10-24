@@ -101,7 +101,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	m_ghostObject->setWorldTransform(transform);
 	
-	btScalar radius = 0.1;
+	btScalar radius = 0.01;
 	
 	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
 	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
@@ -181,12 +181,12 @@ void MuscleNP::updateAnchorList(double dt)
 					if (directionSign < 0)
 					{
 						rb = btRigidBody::upcast(obj1);
-						pos = pt.m_localPointA;
+						pos = pt.m_positionWorldOnA;
 					}
 					else
 					{
 						rb = btRigidBody::upcast(obj0);
-						pos = pt.m_localPointB;
+						pos = pt.m_positionWorldOnB;
 					}	
 					
 					if(rb)
@@ -194,9 +194,11 @@ void MuscleNP::updateAnchorList(double dt)
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);
 						
+                        /*
 						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
 						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
 						rb->applyImpulse(impulse, pos);
+                        */
 					}
 					
 				}
@@ -206,6 +208,12 @@ void MuscleNP::updateAnchorList(double dt)
 	}
     
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
+    
+    std::size_t n = m_anchors.size();
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << m_anchors[i]->getWorldPosition() << std::endl;
+    }
     
 }
 
