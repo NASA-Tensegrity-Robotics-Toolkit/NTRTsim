@@ -50,7 +50,10 @@ tgRodHinge::Config::Config(
                 bool useMotor,
                 double maxMotorImpulse,
                 double maxMotorVelocity,
-                double eps
+                double eps,
+                double softness,
+                double bias,
+                double relaxation
         ) :
 m_maximum(maximum),
 m_minimum(minimum),
@@ -58,7 +61,10 @@ m_axis(axis),
 m_useMotor(useMotor),
 m_maxMotorImpulse(maxMotorImpulse),
 m_maxMotorVelocity(maxMotorVelocity),
-m_eps(eps)
+m_eps(eps),
+m_softness(softness),
+m_bias(bias),
+m_relaxation(relaxation)
 {
 }
 
@@ -80,7 +86,7 @@ tgRodHinge::~tgRodHinge()
 
 void tgRodHinge::init()
 {
-    m_hinge->setLimit(m_config.m_minimum, m_config.m_maximum);
+    m_hinge->setLimit(m_config.m_minimum, m_config.m_maximum, m_config.m_softness, m_config.m_bias, m_config.m_relaxation);
     m_hinge->setMaxMotorImpulse(m_config.m_maxMotorImpulse);
     m_preferredAngle = m_config.m_minimum;
 }

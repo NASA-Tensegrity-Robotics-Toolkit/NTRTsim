@@ -283,21 +283,21 @@ void DuCTTRobotModel::setup(tgWorld& world)
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
     const tgRod::Config prismRodConfig(c.prismRadius, c.density);
-    const tgRod::Config staticRodConfigT(c.prismRadius, 0);
+    const tgRod::Config staticRodConfig(c.prismRadius, 0);
     const tgRod::Config vertRodConfig(c.vertRodRadius, c.density);
     const tgRod::Config innerRodConfig(c.innerRodRadius, c.density);
 
     const tgLinearString::Config vertStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxVertStringVel);
     const tgLinearString::Config saddleStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxSaddleStringVel);
 
-    const tgPrismatic::Config prismConfig(2, 0, 0.1, c.prismExtent, 20, 0.5);
-    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, c.prismExtent, 20, 0.5);
+    const tgPrismatic::Config prismConfig(2, 0, 0.1, c.prismExtent, 20, 0.5, 0.2);
+    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, c.prismExtent, 20, 0.5, 0.2);
 
     const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
 
-    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2);
-    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0);
-    const tgRodHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI,1);
+    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
+    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
+    const tgRodHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI,1, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -318,12 +318,12 @@ void DuCTTRobotModel::setup(tgWorld& world)
     addMuscles(s, 16);
     
     // Move the structure so it doesn't start in the ground
-    s.move(btVector3(0, 10, 0));
-    
+    s.move(btVector3(0, 15, 0));
+
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
-    spec.addBuilder("static rodT", new tgRodInfo(staticRodConfigT));
+    spec.addBuilder("static rod", new tgRodInfo(staticRodConfig));
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
 
@@ -349,12 +349,12 @@ void DuCTTRobotModel::setup(tgWorld& world)
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
     allPrisms = tgCast::filter<tgModel, tgPrismatic> (getDescendants());
 
-//    // Then attach the pretension controller to each of these muscles to keep
-//    // the tensegrity's shape
-//    for (std::size_t i = 0; i < allMuscles.size(); i++)
-//    {
-//        allMuscles[i]->attach(m_pStringController);
-//    }
+    // Then attach the pretension controller to each of these muscles to keep
+    // the tensegrity's shape
+    for (std::size_t i = 0; i < allMuscles.size(); i++)
+    {
+        allMuscles[i]->attach(m_pStringController);
+    }
     
     // Notify controllers that setup has finished.
     notifySetup();

@@ -50,7 +50,10 @@ public:
                 bool useMotor = false,
                 double maxMotorVelocity = 0.01,
                 double maxMotorImpulse = 20,
-                double eps = 0.01
+                double eps = 0.01,
+                double softness = 0.9,
+                double bias = 0.3,
+                double relaxation = 1.0
                 );
 
         /**
@@ -94,6 +97,28 @@ public:
          * Units are radians
          */
         double m_eps;
+
+        /**
+         * Bullet Hinge constraint limit param: softness
+         * 0->1
+         * Not sure what this is for.
+         */
+        double m_softness;
+
+        /**
+         * Bullet Hinge constraint limit param: biasFactor
+         * 0->1
+         * Multiplier for constraint error, (constraint becomes more "soft" when
+         * this factor is close to zero.
+         */
+        double m_bias;
+
+        /**
+         * Bullet Hinge constraint limit param: relaxationFactor
+         * 0->1
+         * Used to control bounce: 1.0 means full bounce, 0.0 means no bounce
+         */
+        double m_relaxation;
     };
     
     /**

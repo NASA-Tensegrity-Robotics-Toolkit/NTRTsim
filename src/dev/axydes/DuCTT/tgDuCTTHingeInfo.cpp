@@ -118,22 +118,18 @@ btHingeConstraint* tgDuCTTHingeInfo::createHinge()
 
     btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisB);
 
-    //this is essential to getting the right axis of rotation
     if (m_config.m_axis == 0)
     {
-        //this is good for right/front hinges
         axisB = btVector3(1,0,0);
         hinge->setAxis(axisB);
     }
     else if (m_config.m_axis == 1)
     {
-        //need something for back/left, rotated by 90 degrees
         axisB = btVector3(0,1,0);
         hinge->setAxis(axisB);
     }
     else if (m_config.m_axis == 2)
     {
-        //need something for back/left, rotated by 90 degrees
         axisA = btVector3(0,0,1);
         hinge->setAxis(axisA);
     }
