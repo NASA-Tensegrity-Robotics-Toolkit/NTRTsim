@@ -388,6 +388,11 @@ const std::vector<tgLinearString*>& DuCTTRobotModel::getAllMuscles() const
 {
     return allMuscles;
 }
+
+const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const
+{
+    return allPrisms;
+}
     
 void DuCTTRobotModel::teardown()
 {

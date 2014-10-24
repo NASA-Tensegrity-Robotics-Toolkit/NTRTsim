@@ -91,14 +91,18 @@ public:
      * to itself 
      */
     virtual void onVisit(tgModelVisitor& r);
-    
+
     /**
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
     const std::vector<tgLinearString*>& getAllMuscles() const;
-      
-    std::vector<tgPrismatic*> allPrisms;
+
+    /**
+     * Return a vector of all prismatic joints for the controllers to work with.
+     * @return A vector of all of the prismatic joints
+     */
+    const std::vector<tgPrismatic*>& getAllPrismatics() const;
 private:
     
     /**
@@ -144,6 +148,12 @@ private:
      * through setup when it is filled using tgModel's find methods
      */
     std::vector<tgLinearString*> allMuscles;
+
+    /**
+     * A list of all of the prismatic joints. Will be empty until most of the way
+     * through setup when it is filled using tgModel's find methods
+     */
+    std::vector<tgPrismatic*> allPrisms;
 };
 
 #endif  // DuCTT_MODEL_H

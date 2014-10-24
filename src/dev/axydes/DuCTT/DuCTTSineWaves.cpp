@@ -68,6 +68,6 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     }
     else
     {
-        applySineWave(subject.allPrisms, dt);
+        applySineWave(subject.getAllPrismatics(), dt);
     }
 }
