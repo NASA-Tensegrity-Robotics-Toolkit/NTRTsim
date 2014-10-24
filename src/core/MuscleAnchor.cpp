@@ -49,14 +49,14 @@ muscleAnchor::~muscleAnchor()
 }
 
 // This returns current position relative to the rigidbody.
-btVector3 muscleAnchor::getRelativePosition()
+btVector3 muscleAnchor::getRelativePosition() const
 {
     const btTransform tr = attachedBody->getWorldTransform();
     const btVector3 worldPos = tr * attachedRelativeOriginalPosition;
     return worldPos-this->attachedBody->getCenterOfMassPosition();
 }
 
-btVector3 muscleAnchor::getWorldPosition()
+btVector3 muscleAnchor::getWorldPosition() const
 {
     const btTransform tr = attachedBody->getWorldTransform();
     return tr * attachedRelativeOriginalPosition;

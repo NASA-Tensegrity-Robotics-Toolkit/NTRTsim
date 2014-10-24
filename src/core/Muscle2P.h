@@ -81,9 +81,9 @@ public:
         return name;
     }
     
-    muscleAnchor * anchor1;
+    const muscleAnchor * const anchor1;
 
-    muscleAnchor * anchor2;
+    const muscleAnchor * const anchor2;
 
     std::string name;
 

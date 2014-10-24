@@ -60,6 +60,8 @@ Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
 m_overlappingPairCache(broadphase)
 {
+	m_anchors.insert(m_anchors.begin(), anchor1);
+	m_anchors.insert(m_anchors.end(), anchor2);
 	
 }
          
@@ -162,3 +164,25 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	Muscle2P::calculateAndApplyForce(dt);
 }
+
+MuscleNP::anchorCompare::anchorCompare(muscleAnchor* m1, muscleAnchor* m2) :
+ma1(m1),
+ma2(m2)
+{
+	
+}
+
+bool MuscleNP::anchorCompare::operator() (const muscleAnchor& lhs, const muscleAnchor& rhs)
+{
+   btVector3 pt1 = ma1->getWorldPosition();
+   btVector3 ptN = ma2->getWorldPosition();
+   
+   btVector3 pt2 = lhs.getWorldPosition();
+   btVector3 pt3 = rhs.getWorldPosition();
+   
+   btScalar lhDot = (ptN - pt1).dot(pt2);
+   btScalar rhDot = (ptN - pt1).dot(pt3);
+   
+   return lhDot < rhDot;
+}  
+

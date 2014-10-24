@@ -33,10 +33,11 @@
 // The C++ Standard Library
 
 #include <string>
+#include <set>
 
 // Forward references
+class MuscleAnchor;
 class btRigidBody;
-class muscleAnchor;
 class btPairCachingGhostObject;
 class btBroadphaseInterface;
 
@@ -44,9 +45,9 @@ class MuscleNP : public Muscle2P
 {
 public:
 
-	MuscleNP(btPairCachingGhostObject* ghostObject,
-			btBroadphaseInterface* broadphase,
-		 btRigidBody * body1,
+    MuscleNP(btPairCachingGhostObject* ghostObject,
+            btBroadphaseInterface* broadphase,
+         btRigidBody * body1,
          btVector3 pos1,
          btRigidBody * body2,
          btVector3 pos2,
@@ -54,14 +55,34 @@ public:
          double dampingCoefficient);
          
    virtual ~MuscleNP();
-	
-	///@todo change this to update(dt) or similar, since that's the role its serving
-	virtual btVector3 calculateAndApplyForce(double dt);
-	
+    
+    ///@todo change this to update(dt) or similar, since that's the role its serving
+    virtual btVector3 calculateAndApplyForce(double dt);
+    
+private:
+  
+    struct anchorCompare
+    {
+        anchorCompare(muscleAnchor* m1, muscleAnchor* m2);
+        
+        bool operator() (const muscleAnchor& lhs, const muscleAnchor& rhs);
+        
+        
+        private:
+           const muscleAnchor* const ma1;
+           const muscleAnchor* const ma2;
+    };
+ 
 protected:    
    btPairCachingGhostObject* m_ghostObject;
    
-   btBroadphaseInterface*	m_overlappingPairCache;
+   btBroadphaseInterface*   m_overlappingPairCache;
+   
+   std::set<const muscleAnchor*> m_anchors;
+  
+
+    
+   
 };
 
 #endif  // NTRT_MUSCLENP_H_

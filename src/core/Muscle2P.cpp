@@ -40,11 +40,10 @@ Muscle2P::Muscle2P(btRigidBody * body1,
 m_velocity(0.0),
 m_damping(0.0),
 m_coefK (coefK),
-m_dampingCoefficient(dampingCoefficient)
-
+m_dampingCoefficient(dampingCoefficient),
+anchor1(new muscleAnchor(body1, pos1)),
+anchor2(new muscleAnchor(body2, pos2))
 {
-    anchor1 = new muscleAnchor(body1, pos1);
-    anchor2 = new muscleAnchor(body2, pos2);
     m_restLength = pos1.distance(pos2);
     m_prevLength = m_restLength;
 }

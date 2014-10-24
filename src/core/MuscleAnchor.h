@@ -43,10 +43,10 @@ public:
     
     ~muscleAnchor();
     
-    btVector3 getWorldPosition();
+    btVector3 getWorldPosition() const;
 
     // Relative to the body
-    btVector3 getRelativePosition();
+    btVector3 getRelativePosition() const;
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
