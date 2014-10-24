@@ -30,7 +30,7 @@
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgRodHingeInfo.h"
+#include "tgDuCTTHingeInfo.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgPrismaticInfo.h"
 #include "tgcreator/tgRodInfo.h"
@@ -171,15 +171,9 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
     {
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
-
-        tetra.addNode(topBack); // 2
-        tetra.addNode(topFront); // 3
-
-    //commented out until i can figure out why they cause AABB overflow in Bullet
-//        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere"); // 2
-//        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere"); // 3
+        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere"); // 2
+        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere"); // 3
     }
-
 
     tetra.addNode(bottomMidRight); // 4
     tetra.addNode(bottomMidLeft); // 5
@@ -219,10 +213,25 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         s.addPair( startNode+5, startNode+1, "prism rod");
 
         //top rods
-//        s.addPair( startNode+2, startNode+3, "inner rod");
-        s.addPair( startNode+2, startNode+3, "static rodT");
+        s.addPair( startNode+2, startNode+3, "inner rod");
 
-	    s.addPair( startNode+4, startNode+5, "prismatic");
+        s.addPair( startNode+4, startNode+5, "prismatic");
+
+        //bottom right hinges
+        s.addPair( startNode+0, startNode+8, "hinge");
+        s.addPair( startNode+0, startNode+10, "hinge");
+
+        //bottom left hinges
+        s.addPair( startNode+1, startNode+9, "hinge");
+        s.addPair( startNode+1, startNode+11, "hinge");
+
+        //top front hinges
+        s.addPair( startNode+3, startNode+12, "hinge3");
+        s.addPair( startNode+3, startNode+13, "hinge3");
+
+        //top back hinges
+        s.addPair( startNode+2, startNode+14, "hinge3");
+        s.addPair( startNode+2, startNode+15, "hinge3");
     }
     else
     {
@@ -231,28 +240,27 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         s.addPair( startNode+0, startNode+1, "inner rod");
 
         //top rods
-//        s.addPair( startNode+2, startNode+6, "prism rod");
-        s.addPair( startNode+2, startNode+6, "static rodT");
+        s.addPair( startNode+2, startNode+6, "prism rod");
         s.addPair( startNode+7, startNode+3, "prism rod");
 
-	    s.addPair( startNode+6, startNode+7, "prismatic");
+        s.addPair( startNode+6, startNode+7, "prismatic2");
+
+        //bottom right hinges
+        s.addPair( startNode+0, startNode+8, "hinge3");
+        s.addPair( startNode+0, startNode+10, "hinge3");
+
+        //bottom left hinges
+        s.addPair( startNode+1, startNode+9, "hinge3");
+        s.addPair( startNode+1, startNode+11, "hinge3");
+
+        //top front hinges
+        s.addPair( startNode+3, startNode+12, "hinge2");
+        s.addPair( startNode+3, startNode+13, "hinge2");
+
+        //top back hinges
+        s.addPair( startNode+2, startNode+14, "hinge2");
+        s.addPair( startNode+2, startNode+15, "hinge2");
     }
-
-    //bottom right hinges
-    s.addPair( startNode+0, startNode+8, "hinge");
-    s.addPair( startNode+0, startNode+10, "hinge");
-
-    //bottom left hinges
-    s.addPair( startNode+1, startNode+9, "hinge2");
-    s.addPair( startNode+1, startNode+11, "hinge2");
-
-    //top front hinges
-    s.addPair( startNode+3, startNode+12, "hinge");
-    s.addPair( startNode+3, startNode+13, "hinge");
-
-    //top back hinges
-    s.addPair( startNode+2, startNode+14, "hinge2");
-    s.addPair( startNode+2, startNode+15, "hinge2");
 }
 
 void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
@@ -282,11 +290,14 @@ void DuCTTRobotModel::setup(tgWorld& world)
     const tgLinearString::Config vertStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxVertStringVel);
     const tgLinearString::Config saddleStringConfig(c.stiffness, c.damping, false, 0, c.maxStringForce, c.maxSaddleStringVel);
 
-    const tgPrismatic::Config prismConfig(c.prismExtent);
+    const tgPrismatic::Config prismConfig(2, 0, 0.1, c.prismExtent, 20, 0.5);
+    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, c.prismExtent, 20, 0.5);
+
     const tgSphere::Config sphereConfig(c.tipRad, c.tipDens, c.tipFric);
 
-    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, 0);
-    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,1);
+    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2);
+    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0);
+    const tgRodHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI,1);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -320,10 +331,12 @@ void DuCTTRobotModel::setup(tgWorld& world)
     spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
 
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
+    spec.addBuilder("prismatic2", new tgPrismaticInfo(prismConfig2));
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
-    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
-    spec.addBuilder("hinge2", new tgRodHingeInfo(hingeConfig2));
+    spec.addBuilder("hinge", new tgDuCTTHingeInfo(hingeConfig));
+    spec.addBuilder("hinge2", new tgDuCTTHingeInfo(hingeConfig2));
+    spec.addBuilder("hinge3", new tgDuCTTHingeInfo(hingeConfig3));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

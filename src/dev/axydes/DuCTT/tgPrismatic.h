@@ -44,12 +44,26 @@ public:
         Config();
         
         Config(
-                double maxLength = 5,
+                double axis = 0,
+                double rotation = 0,
                 double minLength = 0.1,
+                double maxLength = 5,
                 double maxMotorForce = 20,
                 double maxVelocity = 0.01,
                 double eps = 0.01
                 );
+
+        /**
+         * Specifies the axis to rotate the transform around
+         * 0=X, 1=Y, 2=Z
+         */
+        double m_axis;
+
+        /**
+         * Specifies amount to rotate around the axis
+         * Units are radians
+         */
+        double m_rotation;
         
         /**
          * Specifies the maximum length of the joint.

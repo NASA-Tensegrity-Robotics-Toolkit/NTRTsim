@@ -44,14 +44,18 @@ tgPrismatic::Config::Config()
 }
 
 tgPrismatic::Config::Config(
-                double maxLength,
+                double axis,
+                double rotation,
                 double minLength,
+                double maxLength,
                 double maxMotorForce,
                 double maxVelocity,
                 double eps
         ) :
-m_maxLength(maxLength),
+m_axis(axis),
+m_rotation(rotation),
 m_minLength(minLength),
+m_maxLength(maxLength),
 m_maxMotorForce(maxMotorForce),
 m_maxVelocity(maxVelocity),
 m_eps(eps)

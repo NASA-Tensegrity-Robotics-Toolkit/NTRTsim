@@ -68,34 +68,45 @@ void tgPrismaticInfo::initConnector(tgWorld& world)
 btSliderConstraint* tgPrismaticInfo::createSlider()
 {
     btRigidBody* fromBody = getFromRigidBody();
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), 0);
+    btVector3 from = getFrom();
 
     btTransform transATop;
     transATop.setIdentity();
-    transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
-    transATop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
 
     btRigidBody* toBody = getToRigidBody();
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), 0);
+    btVector3 to = getTo();
 
     btTransform transBTop;
     transBTop.setIdentity();
+
+    if (m_config.m_axis == 0)
+    {
+        transATop.setRotation(btQuaternion(btVector3(1,0,0),m_config.m_rotation));
+        transBTop.setRotation(btQuaternion(btVector3(1,0,0),m_config.m_rotation));
+    }
+    else if (m_config.m_axis == 1)
+    {
+        transATop.setRotation(btQuaternion(btVector3(0,1,0),m_config.m_rotation));
+        transBTop.setRotation(btQuaternion(btVector3(0,1,0),m_config.m_rotation));
+    }
+    else if (m_config.m_axis == 2)
+    {
+        transATop.setRotation(btQuaternion(btVector3(0,0,1),m_config.m_rotation));
+        transBTop.setRotation(btQuaternion(btVector3(0,0,1),m_config.m_rotation));
+    }
+
+    transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
     transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);
-    transBTop.setRotation(btQuaternion(btVector3(0,0,1),M_PI/2));
 
-    btSliderConstraint* slider = new btSliderConstraint(*fromBody, *toBody, transATop, transBTop, true);
+    btSliderConstraint* slider = new btSliderConstraint(*toBody, *fromBody, transBTop, transATop, true);
+    slider->setFrames(transBTop, transATop);
 
+    slider->setDbgDrawSize(btScalar(5.f));
     return slider;
 }
 
 tgModel* tgPrismaticInfo::createModel(tgWorld& world)
 {  
-    tgNode startNode = this->getFrom();
-    tgNode endNode = this->getTo();
-    
-    btVector3 buildVec = (endNode - startNode);
-    double m_startLength = buildVec.length();
-
     btSliderConstraint* slider = createSlider();
 
     tgPrismatic* prism = new tgPrismatic(slider, getTags(), m_config);
