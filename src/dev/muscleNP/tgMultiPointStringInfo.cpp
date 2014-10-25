@@ -102,13 +102,13 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	assert((to - from).length() != 0);
 	
 	// Until we get a proper config
-	btScalar radius = 0.1;
+	btScalar radius = 0.01;
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
 	// Consider making this a box. That way when you have N anchors they can all remain inside of the box
 	btCollisionShape* collisionShape =
-            new btCylinderShape(btVector3(radius, (to - from).length()/2.0, radius));
+            new btBoxShape(btVector3(radius, (to - from).length()/2.0, radius));
 	ghostObject->setCollisionShape (collisionShape);
 	ghostObject->setWorldTransform(transform);
 	ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
@@ -116,6 +116,6 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	// @todo look up what the second and third arguments of this are
 	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
-    return new MuscleNP(ghostObject, m_dynamicsWorld.getBroadphase(), fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
+    return new MuscleNP(ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
 }
     

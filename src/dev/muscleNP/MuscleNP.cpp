@@ -29,28 +29,26 @@
 #include "tgcreator/tgUtil.h"
 #include "core/muscleAnchor.h"
 #include "core/tgCast.h"
+#include "core/tgBulletUtil.h"
+#include "core/tgWorld.h"
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
 #include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
+#include "BulletCollision/BroadphaseCollision/btDispatcher.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btActionInterface.h"
 #include "LinearMath/btDefaultMotionState.h"
+#include "LinearMath/btQuaternion.h"
 
-// Classes for manual collision detection - will likely remove later
-#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
-#include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
-#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btConvexPenetrationDepthSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
-
+// The C++ Standard Library
 #include <iostream>
 #include <algorithm>    // std::sort
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
-btBroadphaseInterface* broadphase,
+ tgWorld& world,
  btRigidBody * body1,
  btVector3 pos1,
  btRigidBody * body2,
@@ -59,7 +57,8 @@ btBroadphaseInterface* broadphase,
  double dampingCoefficient) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
-m_overlappingPairCache(broadphase),
+m_overlappingPairCache(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
+m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
 m_ac(anchor1, anchor2)
 {
 
@@ -90,28 +89,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
     // Apply forces
     
-    
-    
-	btVector3 from = anchor1->getWorldPosition();
-	btVector3 to = anchor2->getWorldPosition();
-	
-	btTransform transform = tgUtil::getTransform(from, to);
-	
-	//std::cout << (to - from).length()/2.0 << std::endl;
-	
-	m_ghostObject->setWorldTransform(transform);
-	
-	btScalar radius = 0.01;
-	
-	btCylinderShape* shape = tgCast::cast<btCollisionShape,  btCylinderShape>(*m_ghostObject->getCollisionShape());
-	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
-	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
-	 * changing from a non-contact object will break that behavior.
-	 */ 
-	shape->setImplicitShapeDimensions(btVector3(radius, (to - from).length()/2.0, radius));
-	m_ghostObject->setCollisionShape(shape);
-	
-	Muscle2P::calculateAndApplyForce(dt);
+    updateCollisionObject();
 }
 
 void MuscleNP::updateAnchorList(double dt)
@@ -181,12 +159,12 @@ void MuscleNP::updateAnchorList(double dt)
 					if (directionSign < 0)
 					{
 						rb = btRigidBody::upcast(obj1);
-						pos = pt.m_positionWorldOnA;
+						pos = pt.m_positionWorldOnB;
 					}
 					else
 					{
 						rb = btRigidBody::upcast(obj0);
-						pos = pt.m_positionWorldOnB;
+						pos = pt.m_positionWorldOnA;
 					}	
 					
 					if(rb)
@@ -194,7 +172,7 @@ void MuscleNP::updateAnchorList(double dt)
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);
 						
-                        /*
+                       /* 
 						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
 						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
 						rb->applyImpulse(impulse, pos);
@@ -215,6 +193,71 @@ void MuscleNP::updateAnchorList(double dt)
         std::cout << m_anchors[i]->getWorldPosition() << std::endl;
     }
     
+}
+
+// This works ok at the moment. Need an effective way of determining if the rope is under an object
+void MuscleNP::updateCollisionObject()
+{
+    btVector3 maxes(anchor2->getWorldPosition());
+    btVector3 mins(anchor1->getWorldPosition());
+    
+    std::size_t n = m_anchors.size();
+    for (std::size_t i = 1; i < n; i++)
+    {
+        btVector3 worldPos = m_anchors[i]->getWorldPosition();
+        for (std::size_t j = 0; j < 3; j++)
+        {
+            if (worldPos[j] > maxes[j])
+            {
+                maxes[j] = worldPos[j];
+            }
+            else if (worldPos[j] < mins[j])
+            {
+                mins[j] = worldPos[j];
+            }
+        }
+    }
+	
+    btVector3 from = anchor1->getWorldPosition();
+	btVector3 to = anchor2->getWorldPosition();
+	
+	btTransform transform = tgUtil::getTransform(from, to);
+	
+	//std::cout << (to - from).length()/2.0 << std::endl;
+
+    
+    btQuaternion rot = transform.getRotation();
+    
+    btVector3 newDimensions = (maxes - mins).rotate(rot.getAxis(), rot.getAngle()) / 2.0;
+    
+    for (std::size_t i = 0; i < 3; i++)
+    {
+        ///@todo make configurable
+        if (std::abs(newDimensions[i]) < 0.01)
+        {
+            newDimensions[i] = 0.01;
+        }
+        else
+        {
+            newDimensions[i] = std::abs(newDimensions[i]);
+        }
+    }
+    
+	btBoxShape* shape = tgCast::cast<btCollisionShape,  btBoxShape>(*m_ghostObject->getCollisionShape());
+	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
+	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
+	 * changing from a non-contact object will break that behavior.
+	 */ 
+	shape->setImplicitShapeDimensions(newDimensions);
+	m_ghostObject->setCollisionShape(shape);
+	
+
+    m_ghostObject->setWorldTransform(transform);
+
+    // Erwin recommends this after changing collision shape: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4611
+    // Doesn't seem to make much of a difference for us
+    //m_ghostObject->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(), m_dispatcher);
+ 
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :

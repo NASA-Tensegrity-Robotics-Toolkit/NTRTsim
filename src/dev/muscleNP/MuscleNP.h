@@ -36,17 +36,19 @@
 #include <vector>
 
 // Forward references
+class tgWorld;
 class muscleAnchor;
 class btRigidBody;
 class btPairCachingGhostObject;
 class btBroadphaseInterface;
+class btDispatcher;
 
 class MuscleNP : public Muscle2P
 {
 public:
 
     MuscleNP(btPairCachingGhostObject* ghostObject,
-            btBroadphaseInterface* broadphase,
+            tgWorld& world,
          btRigidBody * body1,
          btVector3 pos1,
          btRigidBody * body2,
@@ -77,10 +79,14 @@ private:
     
     void updateAnchorList(double dt);
     
+    void updateCollisionObject();
+    
 protected:    
    btPairCachingGhostObject* m_ghostObject;
    
    btBroadphaseInterface*   m_overlappingPairCache;
+  
+  btDispatcher* m_dispatcher;
   
    anchorCompare m_ac;
 
