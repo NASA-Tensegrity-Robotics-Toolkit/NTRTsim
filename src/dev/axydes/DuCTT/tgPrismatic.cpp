@@ -157,6 +157,12 @@ void tgPrismatic::moveMotors(double dt)
 {
     double linDepth = getActualLength();
 
+    double targetVel = m_preferredLength - linDepth;
+    if (targetVel > m_config.m_maxVelocity)
+        targetVel = m_config.m_maxVelocity;
+    if (targetVel < -m_config.m_maxVelocity)
+        targetVel = -m_config.m_maxVelocity;
+
     if (isAtPreferredLength())
     {
         m_slider->setLowerLinLimit(linDepth);
@@ -167,13 +173,13 @@ void tgPrismatic::moveMotors(double dt)
     {
         m_slider->setLowerLinLimit(m_config.m_minLength);
         m_slider->setUpperLinLimit(m_config.m_maxLength);
-        m_slider->setTargetLinMotorVelocity(m_config.m_maxVelocity/dt);
+        m_slider->setTargetLinMotorVelocity(targetVel/dt);
     }
     else if (linDepth > m_preferredLength)
     {
         m_slider->setLowerLinLimit(m_config.m_minLength);
         m_slider->setUpperLinLimit(m_config.m_maxLength);
-        m_slider->setTargetLinMotorVelocity(-m_config.m_maxVelocity/dt);
+        m_slider->setTargetLinMotorVelocity(targetVel/dt);
     }
     else
     {

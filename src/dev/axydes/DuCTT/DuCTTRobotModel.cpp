@@ -286,8 +286,8 @@ void DuCTTRobotModel::setup(tgWorld& world)
     const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel);
     const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel);
 
-    const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 20, 0.5, 0.2);
-    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 20, 0.5, 0.2);
+    const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
