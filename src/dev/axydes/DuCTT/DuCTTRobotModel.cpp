@@ -353,6 +353,9 @@ void DuCTTRobotModel::setup(tgWorld& world)
 //        allMuscles[i]->attach(m_pStringController);
 //    }
 
+    vertMuscles = find<tgLinearString>("vert string");
+    saddleMuscles = find<tgLinearString>("saddle string");
+
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");
     if (bottomPrisms.size() == 1)
     {
@@ -396,6 +399,16 @@ void DuCTTRobotModel::onVisit(tgModelVisitor& r)
 const std::vector<tgLinearString*>& DuCTTRobotModel::getAllMuscles() const
 {
     return allMuscles;
+}
+
+const std::vector<tgLinearString*>& DuCTTRobotModel::getVertMuscles() const
+{
+    return vertMuscles;
+}
+
+const std::vector<tgLinearString*>& DuCTTRobotModel::getSaddleMuscles() const
+{
+    return saddleMuscles;
 }
 
 const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const

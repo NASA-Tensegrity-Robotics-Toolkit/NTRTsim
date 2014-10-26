@@ -159,6 +159,18 @@ public:
     const std::vector<tgLinearString*>& getAllMuscles() const;
 
     /**
+     * Return a vector of all the vertical muscles for the controllers to work with.
+     * @return A vector of all of the vertical muscles
+     */
+    const std::vector<tgLinearString*>& getVertMuscles() const;
+
+    /**
+     * Return a vector of all saddle muscles for the controllers to work with.
+     * @return A vector of all of the saddle muscles
+     */
+    const std::vector<tgLinearString*>& getSaddleMuscles() const;
+
+    /**
      * Return a vector of all prismatic joints for the controllers to work with.
      * @return A vector of all of the prismatic joints
      */
@@ -230,6 +242,18 @@ private:
      * through setup when it is filled using tgModel's find methods
      */
     std::vector<tgLinearString*> allMuscles;
+
+    /**
+     * A list of all of the vertical muscles. Will be empty until most of the way
+     * through setup when it is filled using tgModel's find methods
+     */
+    std::vector<tgLinearString*> vertMuscles;
+
+    /**
+     * A list of all of the saddle muscles. Will be empty until most of the way
+     * through setup when it is filled using tgModel's find methods
+     */
+    std::vector<tgLinearString*> saddleMuscles;
 
     /**
      * A list of all of the prismatic joints. Will be empty until most of the way
