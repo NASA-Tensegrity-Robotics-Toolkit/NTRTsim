@@ -40,6 +40,7 @@ class tgStructure;
 class tgWorld;
 class tgLinearString;
 class PretensionController;
+class btVector3;
 
 /**
  * A class that constructs a three bar tensegrity DuCTT using the tools
@@ -173,6 +174,19 @@ public:
      */
     const tgPrismatic* getTopPrismatic() const;
 
+    /**
+     * Calculate the Center of Mass (COM) for the entire model.
+     * @return btVector3 COM of the model
+     */
+    btVector3 getCOM();
+
+    /**
+     * Calculate the Center of Mass (COM) for one of the tetras.
+     * @param bottom true if you want the COM for the bottom tetra, false if you want it for the top
+     * @return btVector3 COM of the specified tetra
+     */
+    btVector3 getTetraCOM(bool bottom = true);
+
 private:
     /**
      * A function called during setup that determines the positions of
@@ -205,7 +219,6 @@ private:
      */
     static void addMuscles(tgStructure& s, int topNodesStart);
 
-private:
     /**
      * A controller that is attached to all of the strings which applies
      * pretension to the muscles.

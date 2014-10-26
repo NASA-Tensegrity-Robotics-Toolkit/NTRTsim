@@ -189,70 +189,73 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
 void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
 {
+    std::string tetra = " bottom";
+    if (startNode != 0)
+        tetra = " top";
     // for one tetra
     //right rods
-    s.addPair( startNode+8, startNode+12, "vert rod");
-    s.addPair( startNode+10, startNode+14, "vert rod");
+    s.addPair( startNode+8, startNode+12, "vert rod"+tetra);
+    s.addPair( startNode+10, startNode+14, "vert rod"+tetra);
 
     //left rods
-    s.addPair( startNode+9, startNode+13, "vert rod");
-    s.addPair( startNode+11, startNode+15, "vert rod");
+    s.addPair( startNode+9, startNode+13, "vert rod"+tetra);
+    s.addPair( startNode+11, startNode+15, "vert rod"+tetra);
 
     if (startNode == 0)
     {
         //bottom tetra
         // bottom rods
-        s.addPair( startNode+0, startNode+4, "prism rod");
-        s.addPair( startNode+5, startNode+1, "prism rod");
+        s.addPair( startNode+0, startNode+4, "prism rod"+tetra);
+        s.addPair( startNode+5, startNode+1, "prism rod"+tetra);
 
         //top rods
-        s.addPair( startNode+2, startNode+3, "inner rod");
+        s.addPair( startNode+2, startNode+3, "inner rod"+tetra);
 
-        s.addPair( startNode+4, startNode+5, "prismatic");
+        s.addPair( startNode+4, startNode+5, "prismatic"+tetra);
 
         //bottom right hinges
-        s.addPair( startNode+0, startNode+8, "hinge");
-        s.addPair( startNode+0, startNode+10, "hinge");
+        s.addPair( startNode+0, startNode+8, "hinge"+tetra);
+        s.addPair( startNode+0, startNode+10, "hinge"+tetra);
 
         //bottom left hinges
-        s.addPair( startNode+1, startNode+9, "hinge");
-        s.addPair( startNode+1, startNode+11, "hinge");
+        s.addPair( startNode+1, startNode+9, "hinge"+tetra);
+        s.addPair( startNode+1, startNode+11, "hinge"+tetra);
 
         //top front hinges
-        s.addPair( startNode+3, startNode+12, "hinge3");
-        s.addPair( startNode+3, startNode+13, "hinge3");
+        s.addPair( startNode+3, startNode+12, "hinge3"+tetra);
+        s.addPair( startNode+3, startNode+13, "hinge3"+tetra);
 
         //top back hinges
-        s.addPair( startNode+2, startNode+14, "hinge3");
-        s.addPair( startNode+2, startNode+15, "hinge3");
+        s.addPair( startNode+2, startNode+14, "hinge3"+tetra);
+        s.addPair( startNode+2, startNode+15, "hinge3"+tetra);
     }
     else
     {
         //top tetra
         // bottom rods
-        s.addPair( startNode+0, startNode+1, "inner rod");
+        s.addPair( startNode+0, startNode+1, "inner rod"+tetra);
 
         //top rods
-        s.addPair( startNode+2, startNode+6, "prism rod");
-        s.addPair( startNode+7, startNode+3, "prism rod");
+        s.addPair( startNode+2, startNode+6, "prism rod"+tetra);
+        s.addPair( startNode+7, startNode+3, "prism rod"+tetra);
 
-        s.addPair( startNode+6, startNode+7, "prismatic2");
+        s.addPair( startNode+6, startNode+7, "prismatic2"+tetra);
 
         //bottom right hinges
-        s.addPair( startNode+0, startNode+8, "hinge3");
-        s.addPair( startNode+0, startNode+10, "hinge3");
+        s.addPair( startNode+0, startNode+8, "hinge3"+tetra);
+        s.addPair( startNode+0, startNode+10, "hinge3"+tetra);
 
         //bottom left hinges
-        s.addPair( startNode+1, startNode+9, "hinge3");
-        s.addPair( startNode+1, startNode+11, "hinge3");
+        s.addPair( startNode+1, startNode+9, "hinge3"+tetra);
+        s.addPair( startNode+1, startNode+11, "hinge3"+tetra);
 
         //top front hinges
-        s.addPair( startNode+3, startNode+12, "hinge2");
-        s.addPair( startNode+3, startNode+13, "hinge2");
+        s.addPair( startNode+3, startNode+12, "hinge2"+tetra);
+        s.addPair( startNode+3, startNode+13, "hinge2"+tetra);
 
         //top back hinges
-        s.addPair( startNode+2, startNode+14, "hinge2");
-        s.addPair( startNode+2, startNode+15, "hinge2");
+        s.addPair( startNode+2, startNode+14, "hinge2"+tetra);
+        s.addPair( startNode+2, startNode+15, "hinge2"+tetra);
     }
 }
 
@@ -408,6 +411,58 @@ const tgPrismatic* DuCTTRobotModel::getBottomPrismatic() const
 const tgPrismatic* DuCTTRobotModel::getTopPrismatic() const
 {
     return m_pTopPrismatic;
+}
+
+btVector3 DuCTTRobotModel::getCOM()
+{
+    std::vector<tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 tetraCenterOfMass(0, 0, 0);
+    double tetraMass = 0.0;
+    for (std::size_t i = 0; i < rods.size(); i++) {
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        tetraCenterOfMass += rodCenterOfMass * rodMass;
+        tetraMass += rodMass;
+    }
+
+    assert(tetraMass > 0.0);
+    tetraCenterOfMass /= tetraMass;
+
+    return tetraCenterOfMass;
+}
+
+btVector3 DuCTTRobotModel::getTetraCOM(bool bottom)
+{
+    std::vector<tgRod*> rods;
+    if (bottom)
+    {
+        rods = find<tgRod>("rod bottom");
+    }
+    else
+    {
+        rods = find<tgRod>("rod top");
+    }
+    assert(!rods.empty());
+
+    btVector3 tetraCenterOfMass(0, 0, 0);
+    double tetraMass = 0.0;
+    for (std::size_t i = 0; i < rods.size(); i++) {
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        tetraCenterOfMass += rodCenterOfMass * rodMass;
+        tetraMass += rodMass;
+    }
+
+    assert(tetraMass > 0.0);
+    tetraCenterOfMass /= tetraMass;
+
+    return tetraCenterOfMass;
 }
 
 void DuCTTRobotModel::teardown()
