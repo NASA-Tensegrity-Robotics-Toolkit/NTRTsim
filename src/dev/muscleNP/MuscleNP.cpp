@@ -46,6 +46,7 @@
 // The C++ Standard Library
 #include <iostream>
 #include <algorithm>    // std::sort
+#include <cmath>
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
@@ -106,11 +107,6 @@ void MuscleNP::updateAnchorList(double dt)
 	
     m_anchors.clear();
     
-	m_anchors.insert(m_anchors.begin(), anchor1);
-	m_anchors.insert(m_anchors.end(), anchor2);
-	
-	
-	
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
@@ -187,10 +183,70 @@ void MuscleNP::updateAnchorList(double dt)
     
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
     
-    std::size_t n = m_anchors.size();
-    for (int i = 0; i < n; i++)
+    // Add these last to ensure we're in the right order
+    m_anchors.insert(m_anchors.begin(), anchor1);
+	m_anchors.insert(m_anchors.end(), anchor2);
+    
+    // Find way to enter the loop without BS data
+    int numPruned = 1;
+    std::size_t i;
+    while (numPruned > 0)
     {
-        std::cout << m_anchors[i]->getWorldPosition() << std::endl;
+        numPruned = 0;
+        i = 1;
+        while (i < m_anchors.size() - 1)
+        {
+            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+            
+            btVector3 line = forward - back;
+            
+            // Maybe change to double if Bullet uses double?
+            //std::cout << "Normals " <<  std::abs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
+            btScalar normalValue = std::abs(line.dot( m_anchors[i]->contactNormal));
+            if (normalValue > 0.1)
+            {   
+                std::cout << "Erased: " << normalValue << " "; 
+                delete m_anchors[i];
+                m_anchors.erase(m_anchors.begin() + i);
+                numPruned++;
+            }      
+            /// @todo make configurable! 
+            #if (0)
+            else if((m_anchors[i]->getWorldPosition() - m_anchors[i-1]->getWorldPosition()).length() < 0.01)
+            {
+                delete m_anchors[i];
+                m_anchors.erase(m_anchors.begin() + i);
+                numPruned++;
+            }
+            #endif
+            else
+            {
+                i++;
+            }
+            std::cout << m_anchors.size() << " ";
+            
+        }
+        
+        std::cout << "Pruned: " << numPruned << std::endl;
+    }
+    
+    std::size_t n = m_anchors.size();
+    for (i = 0; i < n; i++)
+    {      
+        std::cout << m_anchors[i]->getWorldPosition(); 
+        
+        if (i != 0 && i != n-1)
+        {
+            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+            
+            btVector3 line = forward - back;
+            
+            std::cout << " " <<  line.dot( m_anchors[i]->contactNormal);
+        }   
+        
+        std::cout << std::endl;
     }
     
 }
