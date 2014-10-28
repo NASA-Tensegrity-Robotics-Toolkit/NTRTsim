@@ -101,7 +101,6 @@ protected:
    // Needs to be stored here for consistent rendering
    std::vector<const muscleAnchor*> m_anchors;
 
- private:
     // Necessary for computations
     double m_restLength;
  
@@ -116,7 +115,8 @@ protected:
     const btScalar m_dampingCoefficient;
     
     const btScalar m_coefK;
- 
+
+ private: 
     bool invariant(void) const;
 };
 

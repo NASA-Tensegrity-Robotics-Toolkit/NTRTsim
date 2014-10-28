@@ -47,6 +47,7 @@
 #include <iostream>
 #include <algorithm>    // std::sort
 #include <cmath>
+#include <stdexcept>
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
@@ -86,17 +87,69 @@ const btScalar MuscleNP::getActualLength() const
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
 	
+    updateCollisionObject();
+    
 	updateAnchorList(dt);
 	
-    // Apply forces
+    const double tension = getTension();
+    const double currLength = getActualLength();
     
-    updateCollisionObject();
+    const double deltaStretch = currLength - m_prevLength;
+    m_velocity = deltaStretch / dt;
+    
+    m_damping =  m_dampingCoefficient * m_velocity;
+    
+    if (abs(tension) * 1.0 < abs(m_damping))
+    {
+        m_damping =
+          (m_damping > 0.0 ? tension * 1.0 : -tension * 1.0);
+    }
+    
+    const double magnitude = tension + m_damping;
+    
+    // Apply forces
+    std::size_t n = m_anchors.size();
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+        btVector3 force = btVector3 (0.0, 0.0, 0.0);
+        if (i == 0)
+        {
+            btVector3 direction = m_anchors[i + 1]->getWorldPosition() - m_anchors[i]->getWorldPosition();
+            force = direction.normalize() * magnitude;
+        }
+        // Will likely only be true for the last anchor
+        else if (m_anchors[i]->sliding == false)
+        {
+            btVector3 direction = m_anchors[i]->getWorldPosition() - m_anchors[i - 1]->getWorldPosition();
+            force = direction.normalize() * magnitude;
+        }
+        else if (i < n - 1)
+        {
+            btVector3 direction = m_anchors[i]->contactNormal;
+            
+            // Find distance from main string line for restoring force can use law of cosines or vector math
+            
+        }
+        else
+        {
+            throw std::runtime_error("MuscleNP: First or last anchor not a sliding constraint!!");
+        }
+        
+        btVector3 contactPoint = m_anchors[i]->getRelativePosition();
+        m_anchors[i]->attachedBody->activate();
+        m_anchors[i]->attachedBody->applyImpulse(force * dt, contactPoint);
+    }
+    
+    // Finished calculating, so can store things
+    m_prevLength = currLength;
+    
+    
 }
 
 void MuscleNP::updateAnchorList(double dt)
 {
 	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
-    muscleAnchor* temp;
 	for (it = m_anchors.begin(); it != m_anchors.end(); it++)
 	{
 		if ((*it)->permanent == false)
@@ -165,6 +218,7 @@ void MuscleNP::updateAnchorList(double dt)
 					
 					if(rb)
 					{
+                        // Not permanent, sliding contact
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);
 						
@@ -190,6 +244,8 @@ void MuscleNP::updateAnchorList(double dt)
     // Find way to enter the loop without BS data
     int numPruned = 1;
     std::size_t i;
+    
+    // Attempt to eliminate points that would cause the string to push
     while (numPruned > 0)
     {
         numPruned = 0;
@@ -199,27 +255,18 @@ void MuscleNP::updateAnchorList(double dt)
             btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
             
-            btVector3 line = forward - back;
+            btVector3 line = (forward - back).normalize();
             
             // Maybe change to double if Bullet uses double?
             //std::cout << "Normals " <<  std::abs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
             btScalar normalValue = std::abs(line.dot( m_anchors[i]->contactNormal));
-            if (normalValue > 0.1)
+            if (normalValue > FLT_EPSILON)
             {   
                 std::cout << "Erased: " << normalValue << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }      
-            /// @todo make configurable! 
-            #if (0)
-            else if((m_anchors[i]->getWorldPosition() - m_anchors[i-1]->getWorldPosition()).length() < 0.01)
-            {
-                delete m_anchors[i];
-                m_anchors.erase(m_anchors.begin() + i);
-                numPruned++;
-            }
-            #endif
             else
             {
                 i++;
@@ -257,8 +304,10 @@ void MuscleNP::updateCollisionObject()
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
     
+    btVector3 center = btVector3(0.0, 0.0, 0.0);
+    
     std::size_t n = m_anchors.size();
-    for (std::size_t i = 1; i < n; i++)
+    for (std::size_t i = 0; i < n; i++)
     {
         btVector3 worldPos = m_anchors[i]->getWorldPosition();
         for (std::size_t j = 0; j < 3; j++)
@@ -272,13 +321,17 @@ void MuscleNP::updateCollisionObject()
                 mins[j] = worldPos[j];
             }
         }
+        center += worldPos;
     }
+    
+    center /= (double) n;
 	
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
+    transform.setOrigin(center);
 	//std::cout << (to - from).length()/2.0 << std::endl;
 
     
