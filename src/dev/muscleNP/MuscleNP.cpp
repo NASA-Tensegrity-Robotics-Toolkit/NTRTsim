@@ -68,7 +68,7 @@ m_ac(anchor1, anchor2)
          
 MuscleNP::~MuscleNP()
 {
-	
+
 }
 
 const btScalar MuscleNP::getActualLength() const
@@ -122,18 +122,36 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
         else if (m_anchors[i]->sliding == false)
         {
             btVector3 direction = m_anchors[i]->getWorldPosition() - m_anchors[i - 1]->getWorldPosition();
-            force = direction.normalize() * magnitude;
+            force = -direction.normalize() * magnitude;
         }
         else if (i < n - 1)
         {
+            // Already normalized
             btVector3 direction = m_anchors[i]->contactNormal;
             
-            // Find distance from main string line for restoring force can use law of cosines or vector math
+            // Law of cosines to get cos(angle)
+            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+            btVector3 current = m_anchors[i]->getWorldPosition(); 
+            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+            
+            btScalar Asqr = (forward - current).length2();
+            btScalar A = (forward - current).length();
+            btScalar Bsqr = (back - current).length2();
+            btScalar B = (back - current).length();
+            btScalar Csqr = (forward - back).length2();
+            btScalar C = (forward - back).length();
+            
+           
+            btScalar ang = btAcos((Asqr + Csqr - Bsqr) / (2.0 * A * C));
+             // Cos(angle) * hyp = normal
+            btScalar x = btSin(ang) * B;
+            
+            force = direction * (tension / A + tension / B) * x;       
             
         }
         else
         {
-            throw std::runtime_error("MuscleNP: First or last anchor not a sliding constraint!!");
+            throw std::runtime_error("MuscleNP: First or last anchor is a sliding constraint!!");
         }
         
         btVector3 contactPoint = m_anchors[i]->getRelativePosition();
@@ -148,7 +166,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 void MuscleNP::updateAnchorList(double dt)
 {
 	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
-	for (it = m_anchors.begin(); it != m_anchors.end(); it++)
+	
+    for (it = m_anchors.begin(); it != m_anchors.end(); it++)
 	{
 		if ((*it)->permanent == false)
         {
@@ -372,7 +391,7 @@ void MuscleNP::updateCollisionObject()
 	 * changing from a non-contact object will break that behavior.
 	 */ 
 	shape->setImplicitShapeDimensions(newDimensions);
-	m_ghostObject->setCollisionShape(shape);
+	//m_ghostObject->setCollisionShape(shape);
 	
 
     m_ghostObject->setWorldTransform(transform);
