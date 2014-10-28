@@ -26,12 +26,12 @@
 #include "tgcreator/tgUtil.h"
 
 // The Bullet Physics Library
+#include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
 // The C++ Standard Library
 #include <iostream>
-
-using namespace std;
+#include <cmath>
 
 /**
  * The entry point.
@@ -50,10 +50,14 @@ int main(int argc, char** argv)
 #else
 	btVector3 point4(0.0, 0.0, 0.0);	
 #endif
-	cout << point1 << " " << point2 << " " << point3 << endl;
+	std::cout << point1 << " " << point2 << " " << point3 << std::endl;
 
-	cout << "new point " << (point3 - point1).dot(point2) << endl;
-	cout << "old point " << (point3 - point1).dot(point3) << endl;
+	std::cout << "new point " << (point3 - point1).dot(point2) << std::endl;
+	std::cout << "old point " << (point3 - point1).dot(point3) << std::endl;
+	
+	std::cout << "std::abs " << std::abs(point1[0]) << std::endl;
+	std::cout << "abs " << abs(point1[0]) << std::endl;
+	std::cout << "btFabs " << btFabs(point1[0]) << std::endl;
 	
     return 0;
 }

@@ -86,7 +86,7 @@ const btScalar MuscleNP::getActualLength() const
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
-	
+    // Best to do this first, so we have world positions from the current step
     updateCollisionObject();
     
 	updateAnchorList(dt);
@@ -99,7 +99,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     
     m_damping =  m_dampingCoefficient * m_velocity;
     
-    if (abs(tension) * 1.0 < abs(m_damping))
+    if (btFabs(tension) * 1.0 < btFabs(m_damping))
     {
         m_damping =
           (m_damping > 0.0 ? tension * 1.0 : -tension * 1.0);
@@ -143,8 +143,6 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     
     // Finished calculating, so can store things
     m_prevLength = currLength;
-    
-    
 }
 
 void MuscleNP::updateAnchorList(double dt)
@@ -253,22 +251,40 @@ void MuscleNP::updateAnchorList(double dt)
         while (i < m_anchors.size() - 1)
         {
             btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+            btVector3 current = m_anchors[i]->getWorldPosition(); 
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
             
-            btVector3 line = (forward - back).normalize();
+            btVector3 lineA = (forward - current);
+            btVector3 lineB = (back - current);
             
+            btScalar normalValue1;
+            btScalar normalValue2;
+            if (lineA.length() == 0.0 || lineB.length() == 0.0)
+            {
+                // Random value that deletes the nodes
+                normalValue1 = -1.0;
+                normalValue2 = -1.0;
+                std::cout << "Length tripped!" << std::endl;
+            }
+            else
+            {
+                lineA.normalize();
+                lineB.normalize();
+                //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
+                normalValue1 = (lineA).dot( m_anchors[i]->contactNormal);
+                normalValue2 = (lineB).dot( m_anchors[i]->contactNormal);
+            }
             // Maybe change to double if Bullet uses double?
-            //std::cout << "Normals " <<  std::abs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-            btScalar normalValue = std::abs(line.dot( m_anchors[i]->contactNormal));
-            if (normalValue > FLT_EPSILON)
+            if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                std::cout << "Erased: " << normalValue << " "; 
+                std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }      
             else
             {
+                //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
                 i++;
             }
             std::cout << m_anchors.size() << " ";
@@ -277,24 +293,25 @@ void MuscleNP::updateAnchorList(double dt)
         
         std::cout << "Pruned: " << numPruned << std::endl;
     }
-    
+   
     std::size_t n = m_anchors.size();
     for (i = 0; i < n; i++)
     {      
         std::cout << m_anchors[i]->getWorldPosition(); 
-        
+#if (0)         
         if (i != 0 && i != n-1)
         {
             btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
             
-            btVector3 line = forward - back;
+            btVector3 line = (forward - back).normalize();
             
             std::cout << " " <<  line.dot( m_anchors[i]->contactNormal);
         }   
-        
+#endif        
         std::cout << std::endl;
     }
+
     
 }
 
@@ -303,8 +320,6 @@ void MuscleNP::updateCollisionObject()
 {
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
-    
-    btVector3 center = btVector3(0.0, 0.0, 0.0);
     
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i++)
@@ -321,10 +336,9 @@ void MuscleNP::updateCollisionObject()
                 mins[j] = worldPos[j];
             }
         }
-        center += worldPos;
     }
     
-    center /= (double) n;
+    btVector3 center = (maxes + mins)/2.0;
 	
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
@@ -342,13 +356,13 @@ void MuscleNP::updateCollisionObject()
     for (std::size_t i = 0; i < 3; i++)
     {
         ///@todo make configurable
-        if (std::abs(newDimensions[i]) < 0.01)
+        if (btFabs(newDimensions[i]) < 0.01)
         {
             newDimensions[i] = 0.01;
         }
         else
-        {
-            newDimensions[i] = std::abs(newDimensions[i]);
+        {   
+            newDimensions[i] = btFabs(newDimensions[i]);
         }
     }
     
@@ -365,8 +379,9 @@ void MuscleNP::updateCollisionObject()
 
     // Erwin recommends this after changing collision shape: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4611
     // Doesn't seem to make much of a difference for us
-    //m_ghostObject->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(), m_dispatcher);
- 
+#if (0)
+    m_ghostObject->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(), m_dispatcher);
+#endif // cleanProxyFromPairs 
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
