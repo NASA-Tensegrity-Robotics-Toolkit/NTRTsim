@@ -53,11 +53,11 @@ tgGhostInfo::tgGhostInfo(const tgBox::Config& config, tgTags tags) :
 {}
 
 tgGhostInfo::tgGhostInfo(const tgBox::Config& config, const tgPair& pair) :
-    tgBoxInfo(config, pair.getTags())
+    tgBoxInfo(config, pair)
 {}
 
 tgGhostInfo::tgGhostInfo(const tgBox::Config& config, tgTags tags, const tgPair& pair) :
-    tgBoxInfo(config, tags + pair.getTags() )
+    tgBoxInfo(config, tags, pair)
 {}
 
 tgRigidInfo* tgGhostInfo::createRigidInfo(const tgPair& pair)

@@ -107,7 +107,7 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	
 	tgStructure s;
 	
-	tgModel ghostModel;
+	tgModel ectoplasm;
 	
 	s.addNode(from);
 	s.addNode(to);
@@ -120,10 +120,12 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	// Create your structureInfo
 	tgStructureInfo structureInfo(s, spec);
 	// Use the structureInfo to build ourselves
-	structureInfo.buildInto(ghostModel, world);
+	structureInfo.buildInto(ectoplasm, world);
 	
+	std::vector<tgGhostModel*> m_hauntedHouse = tgCast::filter<tgModel, tgGhostModel> (ectoplasm.getDescendants());
+	assert(m_hauntedHouse.size() > 0);
 	// @todo figure out getting descendants for the ghost object
-	btPairCachingGhostObject* ghostObject = NULL;// ghostModel.getPGhostObject();
+	btPairCachingGhostObject* ghostObject = m_hauntedHouse[0]->getPGhostObject();
 	
     return new MuscleNP(ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
 }
