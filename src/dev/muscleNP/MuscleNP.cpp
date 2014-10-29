@@ -370,7 +370,7 @@ void MuscleNP::updateCollisionObject()
     
     btQuaternion rot = transform.getRotation();
     
-    btVector3 newDimensions = (maxes - mins).rotate(rot.getAxis(), rot.getAngle()) / 2.0;
+    btVector3 newDimensions = ((maxes - mins)/ 2.0 ).rotate(rot.getAxis(), rot.getAngle()) ;
     
     for (std::size_t i = 0; i < 3; i++)
     {
@@ -391,7 +391,7 @@ void MuscleNP::updateCollisionObject()
 	 * changing from a non-contact object will break that behavior.
 	 */ 
 	shape->setImplicitShapeDimensions(newDimensions);
-	//m_ghostObject->setCollisionShape(shape);
+	m_ghostObject->setCollisionShape(shape);
 	
 
     m_ghostObject->setWorldTransform(transform);
