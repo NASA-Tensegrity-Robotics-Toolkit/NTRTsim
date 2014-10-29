@@ -120,6 +120,17 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
             }
         }
     }
+
+btRigidBody* tgRigidInfo::getRigidBody() 
+{ 
+	btRigidBody* body = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return body;
+}
+
+const btRigidBody* tgRigidInfo::getRigidBody() const { 
+	const btRigidBody* body = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return body;
+}
     
 bool tgRigidInfo::sharesNodesWith(const tgRigidInfo& other) const
 {

@@ -77,21 +77,21 @@ public:
     tgRigidInfo() : 
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable()
     {}    
 
     tgRigidInfo(tgTags tags) : 
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable(tags)
     {}    
 
     tgRigidInfo(const std::string& space_separated_tags) :
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable(space_separated_tags)
     {}    
     
@@ -167,19 +167,16 @@ public:
     /**
      * Return a pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
+     * @todo is this a const function?
      */
-    virtual btRigidBody* getRigidBody() 
-    { 
-        return m_rigidBody;
-    }
+    virtual btRigidBody* getRigidBody();
 
     /**
      * Return a const pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
+     * @todo add additional safety checks that this is actually a rigid body
      */
-    virtual const btRigidBody* getRigidBody() const { 
-        return m_rigidBody; 
-    }
+    virtual const btRigidBody* getRigidBody() const;
     
     /**
      * Set the corresponding btRigidBody.
@@ -187,8 +184,8 @@ public:
      */
     virtual void setRigidBody(btRigidBody* rigidBody)
     {
-        /// @todo Does this leak any previous value of m_rigidBody?
-        m_rigidBody = rigidBody;
+        /// @todo Does this leak any previous value of m_collisionObject?
+        m_collisionObject = rigidBody;
     }
         
     /**
@@ -321,9 +318,10 @@ protected:  // Protected, not private -- subclasses need access
     mutable tgRigidInfo* m_rigidInfoGroup;
 
     /**
-     * A pointer to the corresponding btRigidBody.
+     * A pointer to the corresponding btCollisionObject.
+     * Typically a btRigidBody, but can also be a btGhostObject
      */
-    mutable btRigidBody* m_rigidBody;
+    mutable btCollisionObject* m_collisionObject;
     
 };
 
