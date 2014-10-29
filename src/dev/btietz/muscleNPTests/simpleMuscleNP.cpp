@@ -89,6 +89,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
+	s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), M_PI/4.0);
 	tgBaseString::Config muscleConfig(1000, 10, false, 0, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model

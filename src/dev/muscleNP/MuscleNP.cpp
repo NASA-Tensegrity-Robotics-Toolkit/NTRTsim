@@ -390,8 +390,8 @@ void MuscleNP::updateCollisionObject()
 	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
 	 * changing from a non-contact object will break that behavior.
 	 */ 
-	shape->setImplicitShapeDimensions(newDimensions);
-	m_ghostObject->setCollisionShape(shape);
+	//shape->setImplicitShapeDimensions(newDimensions);
+	//m_ghostObject->setCollisionShape(shape);
 	
 
     m_ghostObject->setWorldTransform(transform);
