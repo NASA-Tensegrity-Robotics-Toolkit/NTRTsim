@@ -167,14 +167,12 @@ public:
     /**
      * Return a pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
-     * @todo is this a const function?
      */
     virtual btRigidBody* getRigidBody();
 
     /**
      * Return a const pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
-     * @todo add additional safety checks that this is actually a rigid body
      */
     virtual const btRigidBody* getRigidBody() const;
     
@@ -187,6 +185,34 @@ public:
         /// @todo Does this leak any previous value of m_collisionObject?
         m_collisionObject = rigidBody;
     }
+    
+    /**
+     * Return a pointer to the collisionObject without upcasting
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual btCollisionObject* getCollisionObject()
+    {
+		return m_collisionObject;
+	}
+	
+    /**
+     * Return a pointer to the collisionObject without upcasting
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual const btCollisionObject* getCollisionObject() const
+    {
+		return m_collisionObject;
+	}
+	
+    /**
+     * Set the collision object to a new collision object
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual const btCollisionObject* setCollisionObject(btCollisionObject* collisionObject) const
+    {
+		/// @todo Does this leak any previous value of m_collisionObject?
+		m_collisionObject = collisionObject;
+	}
         
     /**
      * Return a btTransform.

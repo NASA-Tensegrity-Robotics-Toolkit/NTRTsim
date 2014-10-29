@@ -27,9 +27,17 @@
 #include "tgMultiPointStringInfo.h"
 
 #include "MuscleNP.h"
+#include "tgGhostModel.h"
+#include "tgGhostInfo.h"
 
 #include "core/tgBulletUtil.h"
 #include "tgcreator/tgUtil.h"
+#include "tgcreator/tgBuildSpec.h"
+#include "tgcreator/tgNode.h"
+#include "tgcreator/tgNodes.h"
+#include "tgcreator/tgPair.h"
+#include "tgcreator/tgStructure.h"
+#include "tgcreator/tgStructureInfo.h"
 
 // The Bullet Physics Library
 #include "btBulletDynamicsCommon.h"
@@ -75,7 +83,7 @@ tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
 
 double tgMultiPointStringInfo::getMass() 
 {
-    // @todo: calculate a mass? MuscleNP doesn't have physics...
+    // @todo: calculate a mass? MuscleNP doesn't have mass...
     return 0;
 }
 
@@ -90,31 +98,32 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     // @todo: need to check somewhere that the rigid bodies have been set...
     btRigidBody* fromBody = getFromRigidBody();
     btRigidBody* toBody = getToRigidBody();
-
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
-	// Dynamics world will own this
-	btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+    tgNode from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
+    tgNode to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
-	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
+	// @todo import this! Only the first two params matter
+	tgBox::Config config(0.01, 0.01);
 	
-	assert((to - from).length() != 0);
+	tgStructure s;
 	
-	// Until we get a proper config
-	btScalar radius = 0.01;
+	tgModel ghostModel;
 	
-	btTransform transform = tgUtil::getTransform(from, to);
+	s.addNode(from);
+	s.addNode(to);
 	
-	// Consider making this a box. That way when you have N anchors they can all remain inside of the box
-	btCollisionShape* collisionShape =
-            new btBoxShape(btVector3(radius, (to - from).length()/2.0, radius));
-	ghostObject->setCollisionShape (collisionShape);
-	ghostObject->setWorldTransform(transform);
-	ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	s.addPair(0, 1, "box");
 	
-	// @todo look up what the second and third arguments of this are
-	m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+	tgBuildSpec spec;
+	spec.addBuilder("box", new tgGhostInfo(config));
+	
+	// Create your structureInfo
+	tgStructureInfo structureInfo(s, spec);
+	// Use the structureInfo to build ourselves
+	structureInfo.buildInto(ghostModel, world);
+	
+	// @todo figure out getting descendants for the ghost object
+	btPairCachingGhostObject* ghostObject = NULL;// ghostModel.getPGhostObject();
 	
     return new MuscleNP(ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
 }

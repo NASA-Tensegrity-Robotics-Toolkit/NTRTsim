@@ -26,21 +26,44 @@
 // This module
 #include "tgGhostInfo.h"
 // This application
-#include "tgNode.h"
-#include "tgNodes.h"
-#include "tgPair.h"
-#include "tgPairs.h"
+#include "tgGhostModel.h"
+#include "tgcreator/tgNode.h"
+#include "tgcreator/tgNodes.h"
+#include "tgcreator/tgPair.h"
+#include "tgcreator/tgPairs.h"
 // The NTRT Core Libary
 #include "core/tgBulletUtil.h"
 #include "core/tgTagSearch.h"
-#include "tgUtil.h"
+#include "tgcreator/tgUtil.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
 
 
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
-#include "BulletDynamics/btDynamicsWorld.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+
+tgGhostInfo::tgGhostInfo(const tgBox::Config& config) : 
+    tgBoxInfo(config)
+{}
+
+tgGhostInfo::tgGhostInfo(const tgBox::Config& config, tgTags tags) : 
+    tgBoxInfo(config, tags)
+{}
+
+tgGhostInfo::tgGhostInfo(const tgBox::Config& config, const tgPair& pair) :
+    tgBoxInfo(config, pair.getTags())
+{}
+
+tgGhostInfo::tgGhostInfo(const tgBox::Config& config, tgTags tags, const tgPair& pair) :
+    tgBoxInfo(config, tags + pair.getTags() )
+{}
+
+tgRigidInfo* tgGhostInfo::createRigidInfo(const tgPair& pair)
+{
+    return new tgGhostInfo(getConfig(), pair);
+}
 
 
 /// @todo This is the key class to override
@@ -57,20 +80,45 @@ void tgGhostInfo::initRigidBody(tgWorld& world)
 			rigid = this;
 		}
 
-		if (rigid->getRigidBody() == NULL) { // Init only if it doesn't have a btRigidBody (has already been initialized)
-
-			double mass = rigid->getMass();
+		if (rigid->getCollisionObject() == NULL) // Init only if it doesn't have a btRigidBody (has already been initialized)
+		{ 
+		
+			btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
+			
 			btTransform transform = rigid->getTransform();
 			btCollisionShape* shape = rigid->getCollisionShape(world);
 			
-			btRigidBody* body = 
-	  tgBulletUtil::createRigidBody(&tgBulletUtil::worldToDynamicsWorld(world),
-					mass,
-					transform,
-					shape);
-
-			rigid->setRigidBody(body);
+			// Dynamics world will own this
+			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+	
+			ghostObject->setCollisionShape (shape);
+			ghostObject->setWorldTransform(transform);
+			ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			
+			// @todo look up what the second and third arguments of this are
+			m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+			
+			rigid->setCollisionObject(ghostObject);
 		}
 	}
 }
 
+tgModel* tgGhostInfo::createModel(tgWorld& world)
+{
+    // @todo: handle tags -> model
+    // @todo: check to make sure the rigidBody has been built
+    // @todo: Do we need to use the group here?
+
+    // Just in case it hasn't been done already...
+    initRigidBody(world); 
+    
+    #if (0)
+    std::cout << "creating box with tags " << getTags() << std::endl; 
+    #endif
+    
+    btPairCachingGhostObject* ghostObject = tgCast::cast<btCollisionObject, btPairCachingGhostObject> (getCollisionObject());
+    
+    tgGhostModel* slimer = new tgGhostModel(ghostObject, getTags());
+
+    return slimer;
+}

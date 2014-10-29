@@ -98,7 +98,7 @@ public:
      */
     virtual void initRigidBody(tgWorld& world);
     
-    tgModel* createModel(tgWorld& world);
+    virtual tgModel* createModel(tgWorld& world);
     
     /**
      * Return a const reference to the container of the radius and density.
