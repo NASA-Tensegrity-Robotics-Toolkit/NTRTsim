@@ -155,7 +155,12 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
              // Cos(angle) * hyp = normal
             btScalar x = btSin(ang) * B;
             
-            force = direction * (tension / A + tension / B) * x;       
+            btScalar magnitude = (tension / A + tension / B) * x;
+            
+            magnitude = magnitude > tension ? tension : magnitude;
+            
+            force = direction * magnitude;
+            
             
         }
         else
@@ -177,6 +182,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 void MuscleNP::updateAnchorList(double dt)
 {
+#if (0)
 	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
 	
     for (it = m_anchors.begin(); it != m_anchors.end(); it++)
@@ -188,7 +194,13 @@ void MuscleNP::updateAnchorList(double dt)
 	}
 	
     m_anchors.clear();
+#else
     
+    // Remove the permanaent anchors for sorting
+    m_anchors.erase(m_anchors.begin());
+    m_anchors.erase(m_anchors.end() - 1);
+
+#endif
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
@@ -267,6 +279,7 @@ void MuscleNP::updateAnchorList(double dt)
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
     
     // Add these last to ensure we're in the right order
+
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
     
@@ -306,7 +319,7 @@ void MuscleNP::updateAnchorList(double dt)
                 normalValue2 = (lineB).dot( m_anchors[i]->contactNormal);
             }
             // Maybe change to double if Bullet uses double?
-            if ((normalValue1 <= FLT_EPSILON) || (normalValue2 <= FLT_EPSILON))
+            if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
                 std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
@@ -365,7 +378,7 @@ void MuscleNP::updateCollisionObject()
 	
 	tgModel ectoplasm;
 
-#if (0)	
+#if (1)	
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i ++)
     {

@@ -70,14 +70,13 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addPair(3, 6, "muscle");
 	s.move(btVector3(0, 10, 0));
 #else
-	s.addNode(-2, 2.0, 0);
-	s.addNode(0, 2.0, 0);
-	s.addNode(10, 2.0, 0);
-	s.addNode(12, 2.0, 0);
-	s.addNode(22, 2.0, 0);
-	s.addNode(34, 2.0, 0);
-	s.addNode(5, 3, -2);
-	s.addNode(5, 3, 2);
+	s.addNode(-2, 2.1, 0);
+	s.addNode(0, 2.1, 0);
+	s.addNode(10, 2.1, 0);
+	s.addNode(12, 2.1, 0);
+	s.addNode(22, 2.1, 0);
+	s.addNode(24, 2.1, 0);
+
 	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod");
 	s.addPair(4, 5, "rod2");
@@ -124,8 +123,8 @@ void simpleMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-	//allMuscles[0]->setRestLength(9.5, dt);
-	//allMuscles[1]->setRestLength(9.5, dt);
+	allMuscles[0]->setRestLength(9.9, dt);
+	allMuscles[1]->setRestLength(9.9, dt);
 	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;

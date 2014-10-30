@@ -25,6 +25,7 @@
 
 // This application
 #include "T6SphereModel.h"
+#include "examples/SUPERball/T6TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -87,7 +88,7 @@ int main(int argc, char** argv)
     // Set the tension of the controller units of kg * length / s^2
     // So 10000 units at this scale is 1000 N
 
-    // T6TensionController* const pTC = new T6TensionController(10000);
+     //T6TensionController* const pTC = new T6TensionController(100);
 
     //myModel->attach(pTC);
     simulation.addModel(myModel);
