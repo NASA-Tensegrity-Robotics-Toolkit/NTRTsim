@@ -62,7 +62,7 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
 {
     if (m_compoundShape == 0)
     {
-        // Deallocated in the destructor
+        // Deallocated by the world implementation
         m_compoundShape = new btCompoundShape(&world);
 
         const btVector3 com = getCenterOfMass();

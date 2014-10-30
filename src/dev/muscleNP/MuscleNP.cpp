@@ -366,7 +366,6 @@ void MuscleNP::updateAnchorList(double dt)
 void MuscleNP::updateCollisionObject()
 {
     BT_PROFILE("updateCollisionObject");
-#if (1)
     
     btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
     tgWorldBulletPhysicsImpl& bulletWorld =
@@ -375,7 +374,7 @@ void MuscleNP::updateCollisionObject()
     m_dynamicsWorld.removeCollisionObject(m_ghostObject);
     bulletWorld.deleteCollisionShape(m_ghostObject->getCollisionShape());
     delete m_ghostObject;
-    
+#if (0)    
     // @todo import this! Only the first two params matter
 	tgBox::Config config(0.001, 0.001);
 
@@ -383,7 +382,7 @@ void MuscleNP::updateCollisionObject()
 	
 	tgModel ectoplasm;
 
-#if (1)	
+#if (0)	
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i ++)
     {
@@ -419,73 +418,38 @@ void MuscleNP::updateCollisionObject()
 	m_ghostObject = m_hauntedHouse[0]->getPGhostObject();
 
     
-#else // Old method
-    btVector3 maxes(anchor2->getWorldPosition());
-    btVector3 mins(anchor1->getWorldPosition());
+#else // Stripped down version
     
+    btVector3 center (0.0, 0.0, 0.0);
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i++)
     {
-        btVector3 worldPos = m_anchors[i]->getWorldPosition();
-        for (std::size_t j = 0; j < 3; j++)
-        {
-            if (worldPos[j] > maxes[j])
-            {
-                maxes[j] = worldPos[j];
-            }
-            else if (worldPos[j] < mins[j])
-            {
-                mins[j] = worldPos[j];
-            }
-        }
+        center += m_anchors[i]->getWorldPosition();
     }
     
-    btVector3 center = (maxes + mins)/2.0;
-	
+    center /= (double) n;
+    
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
     transform.setOrigin(center);
-	//std::cout << (to - from).length()/2.0 << std::endl;
-
     
-    btQuaternion rot = transform.getRotation();
+    btScalar radius = 0.001;
+    btScalar length = (to - from).length() / 2.0;
+    btBoxShape* shape = new btBoxShape(btVector3(radius, length, radius));
     
-    btVector3 newDimensions = ((maxes - mins)/ 2.0 ).rotate(rot.getAxis(), rot.getAngle()) ;
-    
-    for (std::size_t i = 0; i < 3; i++)
-    {
-        ///@todo make configurable
-        if (btFabs(newDimensions[i]) < 0.01)
-        {
-            newDimensions[i] = 0.01;
-        }
-        else
-        {   
-            newDimensions[i] = btFabs(newDimensions[i]);
-        }
-    }
-    
-	btBoxShape* shape = tgCast::cast<btCollisionShape,  btBoxShape>(*m_ghostObject->getCollisionShape());
-	/* Note that 1) this is listed as "use with care" in Bullet's documentation and
-	 * 2) we had to remove the object from DemoApplication's render function in order for it to render properly
-	 * changing from a non-contact object will break that behavior.
-	 */ 
-	//shape->setImplicitShapeDimensions(newDimensions);
-	//m_ghostObject->setCollisionShape(shape);
+    m_ghostObject = new btPairCachingGhostObject();
 	
-
+    m_ghostObject->setCollisionShape (shape);
     m_ghostObject->setWorldTransform(transform);
+    m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    
+    // @todo look up what the second and third arguments of this are
+    m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 
-    // Erwin recommends this after changing collision shape: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4611
-    // Doesn't seem to make much of a difference for us
-#if (0)
-    m_ghostObject->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(), m_dispatcher);
-#endif // cleanProxyFromPairs 
-
-#endif // Builder tools vs changing collision shape
+#endif // Builder tools vs other method
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
