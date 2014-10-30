@@ -53,6 +53,7 @@
 #include "BulletDynamics/Dynamics/btActionInterface.h"
 #include "LinearMath/btDefaultMotionState.h"
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btQuickprof.h"
 
 // The C++ Standard Library
 #include <iostream>
@@ -98,6 +99,7 @@ const btScalar MuscleNP::getActualLength() const
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
+    BT_PROFILE("calculateAndApplyForce");
 	updateAnchorList(dt);
 	
     const double tension = getTension();
@@ -182,6 +184,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 void MuscleNP::updateAnchorList(double dt)
 {
+    BT_PROFILE("updateAnchorList");
 #if (0)
 	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
 	
@@ -362,6 +365,7 @@ void MuscleNP::updateAnchorList(double dt)
 // This works ok at the moment. Need an effective way of determining if the rope is under an object
 void MuscleNP::updateCollisionObject()
 {
+    BT_PROFILE("updateCollisionObject");
 #if (1)
     btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
     tgWorldBulletPhysicsImpl& bulletWorld =
