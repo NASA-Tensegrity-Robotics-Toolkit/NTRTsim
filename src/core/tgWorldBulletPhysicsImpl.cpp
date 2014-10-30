@@ -39,6 +39,7 @@
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
@@ -74,6 +75,7 @@ class IntermediateBuildProducts
             corner1 (-worldSize,-worldSize, -worldSize),
             corner2 (worldSize, worldSize, worldSize),
             dispatcher(&collisionConfiguration),
+            ghostCallback(),
 #ifndef   MLCP_SOLVER       
 	#if (1) // More acc broadphase - remeber the comma (consider doing ifndef)
 				broadphase(corner1, corner2, 16384)
@@ -84,12 +86,13 @@ class IntermediateBuildProducts
 #endif //MLCP_SOLVER  
 			
   {
-	  broadphase.getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+	  broadphase.getOverlappingPairCache()->setInternalGhostPairCallback(&ghostCallback);
   }
   const btVector3 corner1;
   const btVector3 corner2;
   btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
   btCollisionDispatcher dispatcher;
+  btGhostPairCallback ghostCallback;
 #if (0) // Default broadphase
         btDbvtBroadphase broadphase;
 #else
@@ -104,6 +107,7 @@ class IntermediateBuildProducts
 #else
 		btSequentialImpulseConstraintSolver solver;
 #endif
+	
 };
 
 tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
@@ -202,6 +206,27 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
     if (pShape)
     {
         m_collisionShapes.push_back(pShape);
+    }
+
+      // Postcondition
+      assert(invariant());
+}
+
+void tgWorldBulletPhysicsImpl::deleteCollisionShape(btCollisionShape* pShape)
+{
+    if (pShape)
+    {
+		btCompoundShape* cShape = tgCast::cast<btCollisionShape, btCompoundShape>(pShape);
+		if (cShape)
+		{
+			std::size_t n = cShape->getNumChildShapes();
+			for( std::size_t i = 0; i < n; i++)
+			{
+				deleteCollisionShape(cShape->getChildShape(i));
+			}
+		}
+		m_collisionShapes.remove(pShape);
+        delete pShape;
     }
 
       // Postcondition

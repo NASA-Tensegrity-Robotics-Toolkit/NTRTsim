@@ -34,6 +34,7 @@
 #include "core/tgCast.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
 
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgNode.h"
@@ -307,7 +308,7 @@ void MuscleNP::updateAnchorList(double dt)
             // Maybe change to double if Bullet uses double?
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
+                //std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
@@ -317,17 +318,17 @@ void MuscleNP::updateAnchorList(double dt)
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
                 i++;
             }
-            std::cout << m_anchors.size() << " ";
+            //std::cout << m_anchors.size() << " ";
             
         }
         
-        std::cout << "Pruned: " << numPruned << std::endl;
+        //std::cout << "Pruned: " << numPruned << std::endl;
     }
    
     std::size_t n = m_anchors.size();
     for (i = 0; i < n; i++)
     {      
-        std::cout << m_anchors[i]->getWorldPosition(); 
+        //std::cout << m_anchors[i]->getWorldPosition(); 
 #if (0)         
         if (i != 0 && i != n-1)
         {
@@ -339,7 +340,7 @@ void MuscleNP::updateAnchorList(double dt)
             std::cout << " " <<  line.dot( m_anchors[i]->contactNormal);
         }   
 #endif        
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     
@@ -350,8 +351,11 @@ void MuscleNP::updateCollisionObject()
 {
 #if (1)
     btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
-
+    tgWorldBulletPhysicsImpl& bulletWorld =
+      (tgWorldBulletPhysicsImpl&)m_world.implementation();
+    
     m_dynamicsWorld.removeCollisionObject(m_ghostObject);
+    bulletWorld.deleteCollisionShape(m_ghostObject->getCollisionShape());
     delete m_ghostObject;
     
     // @todo import this! Only the first two params matter

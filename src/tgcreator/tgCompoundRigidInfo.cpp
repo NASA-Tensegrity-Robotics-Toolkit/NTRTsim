@@ -74,11 +74,12 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
             t.setOrigin(t.getOrigin() - com);
             m_compoundShape->addChildShape(t, rigid->getCollisionShape(world));
         }
-        
+#if (1)        
         // Add the collision shape to the array so we can delete it later
         tgWorldBulletPhysicsImpl& bulletWorld =
           (tgWorldBulletPhysicsImpl&)world.implementation();
         bulletWorld.addCollisionShape(m_compoundShape);
+#endif
     }
     return m_compoundShape;
 }
