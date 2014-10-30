@@ -40,6 +40,7 @@ class tgWorld;
 class muscleAnchor;
 class btRigidBody;
 class btPairCachingGhostObject;
+class btDynamicsWorld;
 class btBroadphaseInterface;
 class btDispatcher;
 
@@ -69,7 +70,7 @@ private:
     {
         anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
         
-        bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs);
+        bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
         
         
         private:
@@ -81,14 +82,18 @@ private:
     
     void updateCollisionObject();
     
-protected:    
+protected:  
+    
+  
    btPairCachingGhostObject* m_ghostObject;
    
-   btBroadphaseInterface*   m_overlappingPairCache;
+   tgWorld&  m_world;
+   
+   btBroadphaseInterface* const m_overlappingPairCache;
   
-  btDispatcher* m_dispatcher;
+  btDispatcher* const m_dispatcher;
   
-   anchorCompare m_ac;
+   const anchorCompare m_ac;
 
     
    

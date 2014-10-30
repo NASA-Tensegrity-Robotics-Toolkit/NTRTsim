@@ -66,9 +66,9 @@ std::vector< tgRigidInfo* > tgRigidAutoCompound::execute() {
        
 // @todo: we probably don't need this any more -- this will be taken care of in the tgRigidInfo => tgModel step
 // @todo: NOTE: we need to have a way to check to see if a rigid has already been instantiated -- maybe just check get
-void tgRigidAutoCompound::setRigidBodyForGroup(btRigidBody* body, std::deque<tgRigidInfo*>& group) {
+void tgRigidAutoCompound::setRigidBodyForGroup(btCollisionObject* body, std::deque<tgRigidInfo*>& group) {
     for(int i = 0; i < group.size(); i++) {
-        group[i]->setRigidBody(body);
+        group[i]->setCollisionObject(body);
     }
 }
 

@@ -106,6 +106,7 @@ public:
 
     virtual tgModel* createModel(tgWorld& world);
 
+#if (0) // Default to box's com so we can do compounding
 	/**
      * Return the ghost object's mass
      * Ghost objects have no mass
@@ -115,6 +116,7 @@ public:
     {
 		return 0;
 	}
+#endif
 };
 
 /**
