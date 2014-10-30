@@ -49,6 +49,7 @@
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuickprof.h"
 
 // Ghost objects
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
@@ -203,6 +204,7 @@ void tgWorldBulletPhysicsImpl::step(double dt)
 
 void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 {
+	BT_PROFILE("addCollisionShape");
     if (pShape)
     {
         m_collisionShapes.push_back(pShape);
@@ -214,6 +216,7 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 
 void tgWorldBulletPhysicsImpl::deleteCollisionShape(btCollisionShape* pShape)
 {
+	BT_PROFILE("deleteCollisionShape");
     if (pShape)
     {
 		btCompoundShape* cShape = tgCast::cast<btCollisionShape, btCompoundShape>(pShape);

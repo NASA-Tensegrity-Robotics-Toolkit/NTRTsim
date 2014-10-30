@@ -367,6 +367,7 @@ void MuscleNP::updateCollisionObject()
 {
     BT_PROFILE("updateCollisionObject");
 #if (1)
+    
     btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
     tgWorldBulletPhysicsImpl& bulletWorld =
       (tgWorldBulletPhysicsImpl&)m_world.implementation();
