@@ -124,8 +124,8 @@ void simpleMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-	allMuscles[0]->setRestLength(11.0, dt);
-	allMuscles[1]->setRestLength(11.0, dt);
+	//allMuscles[0]->setRestLength(9.5, dt);
+	//allMuscles[1]->setRestLength(9.5, dt);
 	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;

@@ -178,7 +178,7 @@ void T6SphereModel::setup(tgWorld& world)
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
     
-    const tgSphere::Config sphereConfig(0.5, 0.5);
+    const tgSphere::Config sphereConfig(0.5, 0.25);
     
     const tgSphere::Config sphereConfig2(0.5, 2.5);
             
@@ -201,8 +201,8 @@ void T6SphereModel::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
     //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
-    spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
+    //spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
+    //spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

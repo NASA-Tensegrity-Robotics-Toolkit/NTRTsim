@@ -306,9 +306,9 @@ void MuscleNP::updateAnchorList(double dt)
                 normalValue2 = (lineB).dot( m_anchors[i]->contactNormal);
             }
             // Maybe change to double if Bullet uses double?
-            if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
+            if ((normalValue1 <= FLT_EPSILON) || (normalValue2 <= FLT_EPSILON))
             {   
-                //std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
+                std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
@@ -318,17 +318,17 @@ void MuscleNP::updateAnchorList(double dt)
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
                 i++;
             }
-            //std::cout << m_anchors.size() << " ";
+            std::cout << m_anchors.size() << " ";
             
         }
         
-        //std::cout << "Pruned: " << numPruned << std::endl;
+        std::cout << "Pruned: " << numPruned << std::endl;
     }
    
     std::size_t n = m_anchors.size();
     for (i = 0; i < n; i++)
     {      
-        //std::cout << m_anchors[i]->getWorldPosition(); 
+        std::cout << m_anchors[i]->getWorldPosition(); 
 #if (0)         
         if (i != 0 && i != n-1)
         {
@@ -340,7 +340,7 @@ void MuscleNP::updateAnchorList(double dt)
             std::cout << " " <<  line.dot( m_anchors[i]->contactNormal);
         }   
 #endif        
-        //std::cout << std::endl;
+        std::cout << std::endl;
     }
 
     
@@ -359,12 +359,13 @@ void MuscleNP::updateCollisionObject()
     delete m_ghostObject;
     
     // @todo import this! Only the first two params matter
-	tgBox::Config config(0.01, 0.01);
-	
+	tgBox::Config config(0.001, 0.001);
+
 	tgStructure s;
 	
 	tgModel ectoplasm;
-	
+
+#if (0)	
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i ++)
     {
@@ -375,6 +376,16 @@ void MuscleNP::updateCollisionObject()
             s.addPair(i - 1, i, "box");
         }
     }
+#else  
+    tgNode from = anchor1->getWorldPosition();
+	tgNode to = anchor2->getWorldPosition();
+    
+    s.addNode(from);
+	s.addNode(to);
+	
+	s.addPair(0, 1, "box");
+    
+#endif // Single vs multi box methods
 	
 	tgBuildSpec spec;
 	spec.addBuilder("box", new tgGhostInfo(config));
@@ -388,6 +399,7 @@ void MuscleNP::updateCollisionObject()
 	assert(m_hauntedHouse.size() > 0);
 
 	m_ghostObject = m_hauntedHouse[0]->getPGhostObject();
+
     
 #else // Old method
     btVector3 maxes(anchor2->getWorldPosition());
