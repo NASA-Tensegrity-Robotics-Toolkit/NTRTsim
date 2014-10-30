@@ -39,6 +39,7 @@
 class tgWorld;
 class muscleAnchor;
 class btRigidBody;
+class btCollisionShape;
 class btPairCachingGhostObject;
 class btDynamicsWorld;
 class btBroadphaseInterface;
@@ -81,6 +82,8 @@ private:
     void updateAnchorList(double dt);
     
     void updateCollisionObject();
+    
+    void deleteCollisionShape(btCollisionShape* pShape);
     
 protected:  
     

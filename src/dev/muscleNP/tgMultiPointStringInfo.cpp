@@ -102,31 +102,19 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     tgNode from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
     tgNode to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
+	btTransform transform = tgUtil::getTransform(from, to);
+	
 	// @todo import this! Only the first two params matter
-	tgBox::Config config(0.01, 0.01);
+	btScalar radius = 0.001;
+	btScalar length = (from - to).length() / 2.0;
+	btBoxShape* box = new btBoxShape(btVector3(radius, length, radius));
 	
-	tgStructure s;
+	btPairCachingGhostObject* m_ghostObject = new btPairCachingGhostObject();
 	
-	tgModel ectoplasm;
+    m_ghostObject->setCollisionShape (box);
+    m_ghostObject->setWorldTransform(transform);
+    m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	
-	s.addNode(from);
-	s.addNode(to);
-	
-	s.addPair(0, 1, "box");
-	
-	tgBuildSpec spec;
-	spec.addBuilder("box", new tgGhostInfo(config));
-	
-	// Create your structureInfo
-	tgStructureInfo structureInfo(s, spec);
-	// Use the structureInfo to build ourselves
-	structureInfo.buildInto(ectoplasm, world);
-	
-	std::vector<tgGhostModel*> m_hauntedHouse = tgCast::filter<tgModel, tgGhostModel> (ectoplasm.getDescendants());
-	assert(m_hauntedHouse.size() > 0);
-	
-	btPairCachingGhostObject* ghostObject = m_hauntedHouse[0]->getPGhostObject();
-	
-    return new MuscleNP(ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
+    return new MuscleNP(m_ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
 }
     

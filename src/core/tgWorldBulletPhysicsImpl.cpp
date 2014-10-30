@@ -204,7 +204,10 @@ void tgWorldBulletPhysicsImpl::step(double dt)
 
 void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 {
-	BT_PROFILE("addCollisionShape");
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("addCollisionShape");
+#endif //BT_NO_PROFILE   	
+	
     if (pShape)
     {
         m_collisionShapes.push_back(pShape);
@@ -216,7 +219,10 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 
 void tgWorldBulletPhysicsImpl::deleteCollisionShape(btCollisionShape* pShape)
 {
-	BT_PROFILE("deleteCollisionShape");
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("deleteCollisionShape");
+#endif //BT_NO_PROFILE
+	
     if (pShape)
     {
 		btCompoundShape* cShape = tgCast::cast<btCollisionShape, btCompoundShape>(pShape);

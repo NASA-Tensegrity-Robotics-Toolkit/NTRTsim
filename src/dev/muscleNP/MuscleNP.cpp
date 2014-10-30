@@ -99,7 +99,10 @@ const btScalar MuscleNP::getActualLength() const
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
+#ifndef BT_NO_PROFILE 
     BT_PROFILE("calculateAndApplyForce");
+#endif //BT_NO_PROFILE    
+    
 	updateAnchorList(dt);
 	
     const double tension = getTension();
@@ -184,7 +187,11 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 void MuscleNP::updateAnchorList(double dt)
 {
+    
+#ifndef BT_NO_PROFILE 
     BT_PROFILE("updateAnchorList");
+#endif //BT_NO_PROFILE      
+    
 #if (0)
 	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
 	
@@ -365,14 +372,17 @@ void MuscleNP::updateAnchorList(double dt)
 // This works ok at the moment. Need an effective way of determining if the rope is under an object
 void MuscleNP::updateCollisionObject()
 {
+#ifndef BT_NO_PROFILE 
     BT_PROFILE("updateCollisionObject");
-    
+#endif //BT_NO_PROFILE    
     btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
     tgWorldBulletPhysicsImpl& bulletWorld =
       (tgWorldBulletPhysicsImpl&)m_world.implementation();
     
     m_dynamicsWorld.removeCollisionObject(m_ghostObject);
-    bulletWorld.deleteCollisionShape(m_ghostObject->getCollisionShape());
+    // Consider managing this more locally
+    btCollisionShape* shape = m_ghostObject->getCollisionShape();
+    deleteCollisionShape(shape);
     delete m_ghostObject;
 #if (0)    
     // @todo import this! Only the first two params matter
@@ -382,7 +392,7 @@ void MuscleNP::updateCollisionObject()
 	
 	tgModel ectoplasm;
 
-#if (0)	
+#if (1)	
     std::size_t n = m_anchors.size();
     for (std::size_t i = 0; i < n; i ++)
     {
@@ -420,14 +430,27 @@ void MuscleNP::updateCollisionObject()
     
 #else // Stripped down version
     
-    btVector3 center (0.0, 0.0, 0.0);
+    btVector3 maxes(anchor2->getWorldPosition());
+    btVector3 mins(anchor1->getWorldPosition());
+    
     std::size_t n = m_anchors.size();
+    
     for (std::size_t i = 0; i < n; i++)
     {
-        center += m_anchors[i]->getWorldPosition();
+        btVector3 worldPos = m_anchors[i]->getWorldPosition();
+        for (std::size_t j = 0; j < 3; j++)
+        {
+            if (worldPos[j] > maxes[j])
+            {
+                maxes[j] = worldPos[j];
+            }
+            if (worldPos[j] < mins[j])
+            {
+                mins[j] = worldPos[j];
+            }
+        }
     }
-    
-    center /= (double) n;
+    btVector3 center = (maxes + mins)/2.0;
     
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
@@ -435,14 +458,28 @@ void MuscleNP::updateCollisionObject()
 	btTransform transform = tgUtil::getTransform(from, to);
 	
     transform.setOrigin(center);
+    transform.setRotation(btQuaternion::getIdentity());
     
     btScalar radius = 0.001;
-    btScalar length = (to - from).length() / 2.0;
-    btBoxShape* shape = new btBoxShape(btVector3(radius, length, radius));
+
+    btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
     
+    for (std::size_t i = 0; i < n-1; i++)
+    {
+        btVector3 pos1 = m_anchors[i]->getWorldPosition();
+        btVector3 pos2 = m_anchors[i+1]->getWorldPosition();
+        
+        btTransform t = tgUtil::getTransform(pos2, pos1);
+        t.setOrigin(t.getOrigin() - center);
+        
+        btScalar length = (pos2 - pos1).length() / 2.0;
+        btBoxShape* box = new btBoxShape(btVector3(radius, length, radius));
+        
+        m_compoundShape->addChildShape(t, box);
+    }
     m_ghostObject = new btPairCachingGhostObject();
 	
-    m_ghostObject->setCollisionShape (shape);
+    m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
     m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
@@ -450,6 +487,28 @@ void MuscleNP::updateCollisionObject()
     m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 
 #endif // Builder tools vs other method
+}
+
+void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("deleteCollisionShape");
+#endif //BT_NO_PROFILE
+	
+    if (pShape)
+    {
+		btCompoundShape* cShape = tgCast::cast<btCollisionShape, btCompoundShape>(pShape);
+		if (cShape)
+		{
+			std::size_t n = cShape->getNumChildShapes();
+			for( std::size_t i = 0; i < n; i++)
+			{
+				deleteCollisionShape(cShape->getChildShape(i));
+			}
+		}
+
+        delete pShape;
+    }
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
