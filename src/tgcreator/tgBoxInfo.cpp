@@ -109,11 +109,9 @@ btCollisionShape* tgBoxInfo::getCollisionShape(tgWorld& world) const
             new btBoxShape(btVector3(width, length / 2.0, height));
     
         // Add the collision shape to the array so we can delete it later
-#if (1)
         tgWorldBulletPhysicsImpl& bulletWorld =
       (tgWorldBulletPhysicsImpl&)world.implementation();
         bulletWorld.addCollisionShape(m_collisionShape);
-#endif
     }
     return m_collisionShape;
 }
