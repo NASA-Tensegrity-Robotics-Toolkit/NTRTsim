@@ -208,7 +208,7 @@ public:
      * Set the collision object to a new collision object
      * @return a pointer to the corresponding btCollisionObject
      */
-    virtual const btCollisionObject* setCollisionObject(btCollisionObject* collisionObject) const
+    virtual void setCollisionObject(btCollisionObject* collisionObject)
     {
 		/// @todo Does this leak any previous value of m_collisionObject?
 		m_collisionObject = collisionObject;

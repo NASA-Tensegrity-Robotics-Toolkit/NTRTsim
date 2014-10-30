@@ -124,7 +124,7 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	
 	std::vector<tgGhostModel*> m_hauntedHouse = tgCast::filter<tgModel, tgGhostModel> (ectoplasm.getDescendants());
 	assert(m_hauntedHouse.size() > 0);
-	// @todo figure out getting descendants for the ghost object
+	
 	btPairCachingGhostObject* ghostObject = m_hauntedHouse[0]->getPGhostObject();
 	
     return new MuscleNP(ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);

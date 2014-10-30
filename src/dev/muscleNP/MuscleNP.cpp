@@ -26,11 +26,21 @@
 #include "MuscleNP.h"
 
 // NTRT
+#include "tgGhostModel.h"
+#include "tgGhostInfo.h"
+
 #include "tgcreator/tgUtil.h"
 #include "core/muscleAnchor.h"
 #include "core/tgCast.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
+
+#include "tgcreator/tgBuildSpec.h"
+#include "tgcreator/tgNode.h"
+#include "tgcreator/tgNodes.h"
+#include "tgcreator/tgPair.h"
+#include "tgcreator/tgStructure.h"
+#include "tgcreator/tgStructureInfo.h"
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
@@ -59,6 +69,7 @@ MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  double dampingCoefficient) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
+m_world(world),
 m_overlappingPairCache(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
 m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
 m_ac(anchor1, anchor2)
@@ -86,9 +97,6 @@ const btScalar MuscleNP::getActualLength() const
 
 btVector3 MuscleNP::calculateAndApplyForce(double dt)
 {
-    // Best to do this first, so we have world positions from the current step
-    updateCollisionObject();
-    
 	updateAnchorList(dt);
 	
     const double tension = getTension();
@@ -161,6 +169,9 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     
     // Finished calculating, so can store things
     m_prevLength = currLength;
+    
+    // Do this last so the ghost object gets populated with collisions before it is deleted
+    updateCollisionObject();
 }
 
 void MuscleNP::updateAnchorList(double dt)
@@ -337,6 +348,44 @@ void MuscleNP::updateAnchorList(double dt)
 // This works ok at the moment. Need an effective way of determining if the rope is under an object
 void MuscleNP::updateCollisionObject()
 {
+#if (1)
+    btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+
+    m_dynamicsWorld.removeCollisionObject(m_ghostObject);
+    delete m_ghostObject;
+    
+    // @todo import this! Only the first two params matter
+	tgBox::Config config(0.01, 0.01);
+	
+	tgStructure s;
+	
+	tgModel ectoplasm;
+	
+    std::size_t n = m_anchors.size();
+    for (std::size_t i = 0; i < n; i ++)
+    {
+        tgNode anchorPos = m_anchors[i]->getWorldPosition();
+        s.addNode(anchorPos);
+        if (i > 0)
+        {
+            s.addPair(i - 1, i, "box");
+        }
+    }
+	
+	tgBuildSpec spec;
+	spec.addBuilder("box", new tgGhostInfo(config));
+	
+	// Create your structureInfo
+	tgStructureInfo structureInfo(s, spec);
+	// Use the structureInfo to build ourselves - this adds the new ghost object to the world
+	structureInfo.buildInto(ectoplasm, m_world);
+	
+	std::vector<tgGhostModel*> m_hauntedHouse = tgCast::filter<tgModel, tgGhostModel> (ectoplasm.getDescendants());
+	assert(m_hauntedHouse.size() > 0);
+
+	m_ghostObject = m_hauntedHouse[0]->getPGhostObject();
+    
+#else // Old method
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
     
@@ -401,6 +450,8 @@ void MuscleNP::updateCollisionObject()
 #if (0)
     m_ghostObject->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(), m_dispatcher);
 #endif // cleanProxyFromPairs 
+
+#endif // Builder tools vs changing collision shape
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
@@ -410,7 +461,7 @@ ma2(m2)
 	
 }
 
-bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleAnchor* rhs)
+bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const
 {
    btVector3 pt1 = ma1->getWorldPosition();
    btVector3 ptN = ma2->getWorldPosition();

@@ -69,7 +69,7 @@ tgRigidInfo* tgGhostInfo::createRigidInfo(const tgPair& pair)
 /// @todo This is the key class to override
 void tgGhostInfo::initRigidBody(tgWorld& world)
 {
-	if(!getRigidBody()) {
+	if(!getCollisionObject()) {
 
 		// we want to do this based on group instead the rigid itself; otherwise we throw away autocompounding.
 		tgRigidInfo* rigid = getRigidInfoGroup();
@@ -100,6 +100,7 @@ void tgGhostInfo::initRigidBody(tgWorld& world)
 			
 			rigid->setCollisionObject(ghostObject);
 		}
+
 	}
 }
 
