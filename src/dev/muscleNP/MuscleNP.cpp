@@ -298,11 +298,12 @@ void MuscleNP::updateAnchorList()
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
     
-    std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
+    //std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
     
     pruneAnchors();
     
-    std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
+    //std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
+    
 }
 
 void MuscleNP::pruneAnchors()
@@ -348,9 +349,9 @@ void MuscleNP::pruneAnchors()
 
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                //#ifdef VERBOSE
+                #ifdef VERBOSE
                     std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
-                //#endif
+                #endif
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
@@ -362,6 +363,8 @@ void MuscleNP::pruneAnchors()
             }
         }
     }
+    
+    //std::cout << " Good Normal " << m_anchors.size();
     
     // Attempt to eliminate redudnant points
     numPruned = 1;
@@ -387,13 +390,14 @@ void MuscleNP::pruneAnchors()
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }
+#if (0)            
             else if ((m_anchors[i]->getRelativePosition() - m_anchors[i - 1]->getRelativePosition()).length() < 0.001)
             {
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }
-            
+#endif            
             /*
              * Need to optimize this based on something. Right now we're likely to pass through really small objects
              * and this still allows a number of redundant contacts
