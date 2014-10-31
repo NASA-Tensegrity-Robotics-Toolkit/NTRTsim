@@ -37,7 +37,7 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
-  contactNormal(attachedBody->getWorldTransform().inverse() * cn),
+  contactNormal(attachedBody->getWorldTransform().inverse().getBasis() * cn),
   height(999.0),
   permanent(perm),
   sliding(slide)
@@ -67,6 +67,7 @@ btVector3 muscleAnchor::getWorldPosition() const
 btVector3 muscleAnchor::getContactNormal() const
 {
 	const btTransform tr = attachedBody->getWorldTransform();
-    const btVector3 newNormal = tr * contactNormal;
+    const btVector3 newNormal = (tr.getBasis() * contactNormal).normalize();
+    //assert(newNormal.length() == 1.0);
     return newNormal;
 }

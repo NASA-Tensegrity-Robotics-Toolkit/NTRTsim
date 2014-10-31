@@ -251,6 +251,7 @@ void MuscleNP::updateAnchorList(double dt)
 		{
 			btPersistentManifold* manifold = m_manifoldArray[j];
 			btScalar directionSign = manifold->getBody0() == m_ghostObject ? btScalar(-1.0) : btScalar(1.0);
+            
 			for (int p=0;p<manifold->getNumContacts();p++)
 			{
 				const btManifoldPoint&pt = manifold->getContactPoint(p);
@@ -277,7 +278,7 @@ void MuscleNP::updateAnchorList(double dt)
 					}	
 					
 					if(rb)
-					{
+					{   
                         // Not permanent, sliding contact
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);

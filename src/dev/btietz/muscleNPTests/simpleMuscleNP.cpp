@@ -47,63 +47,42 @@ void simpleMuscleNP::setup(tgWorld& world)
 	const double rodRadius = 0.25;
 	const tgRod::Config rodConfig(rodRadius, rodDensity);
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
-	const tgBox::Config boxConfig(rodRadius, rodRadius, 0.0);
+	const tgBox::Config boxConfig(rodRadius, rodRadius, rodDensity);
 	
 	tgStructure s;
 	
-#if (0)
-	s.addNode(0,0,0);
-	s.addNode(0,3,0);
-	s.addNode(2,5,0);
-	s.addNode(-2,5,0);
-	s.addNode(0, 10, 0);
-	s.addNode(0, 7, 0);
-	s.addNode(0, 5, 2);
-	s.addNode(0, 5,-2);
-	s.addPair(0, 1, "rod");
-	s.addPair(1, 2, "rod");
-	s.addPair(1, 3, "rod");
-	s.addPair(4, 5, "rod");
-	s.addPair(5, 6, "rod");
-	s.addPair(5, 7, "rod");
-	s.addPair(2, 6, "muscle");
-	s.addPair(3, 7, "muscle");
-	s.addPair(2, 7, "muscle");
-	s.addPair(3, 6, "muscle");
-	s.move(btVector3(0, 10, 0));
+#if (1)
+	s.addNode(-2, 2.1, 0);
+	s.addNode(0, 2.1, 0);
+	s.addNode(10, 2.1, 0);
+	s.addNode(12, 2.1, 0);
+	s.addNode(22, 2.1, 0);
+	s.addNode(24, 2.1, 0);
+
+	s.addPair(0, 1, "rod2");
+	s.addPair(2, 3, "rod2");
+	s.addPair(4, 5, "rod2");
+
+	s.addPair(1, 2, "muscle");
+	s.addPair(3, 4, "muscle");
+	s.move(btVector3(0, 0, 0));
 #else
-	#if (1)
-		s.addNode(-2, 2.1, 0);
-		s.addNode(0, 2.1, 0);
-		s.addNode(10, 2.1, 0);
-		s.addNode(12, 2.1, 0);
-		s.addNode(22, 2.1, 0);
-		s.addNode(24, 2.1, 0);
+	s.addNode(-2, 5, 0);
+	s.addNode(0, 5, 0);
+	s.addNode(10, 5, 0);
+	s.addNode(12, 5, 0);
+	s.addNode(5, 8, -5);
+	s.addNode(5, 8, 5);
 
-		s.addPair(0, 1, "rod2");
-		s.addPair(2, 3, "rod2");
-		s.addPair(4, 5, "rod2");
+	s.addPair(0, 1, "rod2");
+	s.addPair(2, 3, "rod");
+	s.addPair(4, 5, "box");
 
-		s.addPair(1, 2, "muscle");
-		s.addPair(3, 4, "muscle");
-		s.move(btVector3(0, 0, 0));
-	#else
-		s.addNode(-2, 5, 0);
-		s.addNode(0, 5, 0);
-		s.addNode(10, 5, 0);
-		s.addNode(12, 5, 0);
-		s.addNode(5, 4, -5);
-		s.addNode(5, 4, 5);
-
-		s.addPair(0, 1, "rod2");
-		s.addPair(2, 3, "rod");
-		s.addPair(4, 5, "box");
-
-		s.addPair(1, 2, "muscle");
-		//s.addPair(3, 4, "muscle");
-		s.move(btVector3(0, 0, 0));
-	#endif
+	s.addPair(1, 2, "muscle");
+	//s.addPair(3, 4, "muscle");
+	s.move(btVector3(0, 0, 0));
 #endif
+
 
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
@@ -144,7 +123,7 @@ void simpleMuscleNP::step(double dt)
 	totalTime += dt;
 	
 	allMuscles[0]->setRestLength(11, dt);
-	allMuscles[1]->setRestLength(11, dt);
+//	allMuscles[1]->setRestLength(11, dt);
 	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;
