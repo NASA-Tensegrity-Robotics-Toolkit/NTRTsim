@@ -352,15 +352,25 @@ void MuscleNP::updateAnchorList(double dt)
             }
             /*
              * Need to optimize this based on something. Right now we're likely to pass through really small objects
+             * and this still allows a number of redundant contacts
              * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
              * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
              */
             else if(lengthA < 0.1 && lengthB < 0.1)
             {
                 std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
-                delete m_anchors[i];
-                m_anchors.erase(m_anchors.begin() + i);
-                numPruned++;
+                if (m_anchors[i-1]->permanent != true)
+                {
+                    delete m_anchors[i-1];
+                    m_anchors.erase(m_anchors.begin() + i - 1);
+                    numPruned++;
+                }
+                if (m_anchors[i+1]->permanent != true)
+                {
+                    delete m_anchors[i+1];
+                    m_anchors.erase(m_anchors.begin() + i + 1);
+                    numPruned++;
+                }
             }
             else
             {
@@ -504,6 +514,7 @@ void MuscleNP::updateCollisionObject()
             
             //throw std::runtime_error("Teeny tiny contact object!!");
         }
+        /// @todo - seriously examine box vs cylinder shapes
         btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));
         
         m_compoundShape->addChildShape(t, box);

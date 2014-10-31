@@ -47,11 +47,11 @@ void simpleMuscleNP::setup(tgWorld& world)
 	const double rodRadius = 0.25;
 	const tgRod::Config rodConfig(rodRadius, rodDensity);
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
-	const tgBox::Config boxConfig(rodRadius, rodRadius, rodDensity);
+	const tgBox::Config boxConfig(rodRadius, rodRadius, 0.0);
 	
 	tgStructure s;
 	
-#if (1)
+#if (0)
 	s.addNode(-2, 2.1, 0);
 	s.addNode(0, 2.1, 0);
 	s.addNode(10, 2.1, 0);
@@ -60,7 +60,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addNode(24, 2.1, 0);
 
 	s.addPair(0, 1, "rod2");
-	s.addPair(2, 3, "rod2");
+	s.addPair(2, 3, "rod");
 	s.addPair(4, 5, "rod2");
 
 	s.addPair(1, 2, "muscle");
@@ -71,12 +71,12 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addNode(0, 5, 0);
 	s.addNode(10, 5, 0);
 	s.addNode(12, 5, 0);
-	s.addNode(5, 3, -5);
-	s.addNode(5, 3, 5);
+	s.addNode(5, 4, -5);
+	s.addNode(5, 4, 5);
 
 	s.addPair(0, 1, "rod2");
 	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod2");
+	s.addPair(4, 5, "box");
 
 	s.addPair(1, 2, "muscle");
 	//s.addPair(3, 4, "muscle");

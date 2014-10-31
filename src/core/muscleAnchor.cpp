@@ -67,7 +67,8 @@ btVector3 muscleAnchor::getWorldPosition() const
 btVector3 muscleAnchor::getContactNormal() const
 {
 	const btTransform tr = attachedBody->getWorldTransform();
-    const btVector3 newNormal = (tr.getBasis() * contactNormal).normalize();
+    btVector3 newNormal = (tr.getBasis() * contactNormal);
+    newNormal = newNormal.length() > 0.0 ? newNormal.normalize() : btVector3(0.0, 0.0, 0.0);
     //assert(newNormal.length() == 1.0);
     return newNormal;
 }
