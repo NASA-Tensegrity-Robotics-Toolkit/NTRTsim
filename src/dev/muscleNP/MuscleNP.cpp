@@ -352,18 +352,25 @@ void MuscleNP::pruneAnchors()
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }
+            else if (m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal()) >= 1.0 - FLT_EPSILON)
+            {
+                delete m_anchors[i];
+                m_anchors.erase(m_anchors.begin() + i);
+                numPruned++;
+            }
+            
             /*
              * Need to optimize this based on something. Right now we're likely to pass through really small objects
              * and this still allows a number of redundant contacts
              * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
              * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
              */
-            else if(lengthA < 0.1 && lengthB < 0.1)
+#if (1)             
+            else if(lengthA < 0.001 && lengthB < 0.001)
             {
                 #ifdef VERBOSE
                     std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
                 #endif
-
                 if (m_anchors[i-1]->permanent != true)
                 {
                     delete m_anchors[i-1];
@@ -376,7 +383,9 @@ void MuscleNP::pruneAnchors()
                     m_anchors.erase(m_anchors.begin() + i + 1);
                     numPruned++;
                 }
+
             }
+#endif // Length pruning
             else
             {
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
