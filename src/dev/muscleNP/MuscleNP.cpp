@@ -261,20 +261,19 @@ void MuscleNP::updateAnchorList(double dt)
 				if (dist < 0.0)
 				{
 					
-					m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+					m_touchingNormal = pt.m_normalWorldOnB * directionSign;
 					
+                    btVector3 pos = directionSign < 0 ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
+                    
 					btRigidBody* rb = NULL;
-					btVector3 pos;
 					
 					if (obj0 == m_ghostObject)
 					{
 						rb = btRigidBody::upcast(obj1);
-						pos = pt.m_positionWorldOnB;
 					}
 					else
 					{
 						rb = btRigidBody::upcast(obj0);
-						pos = pt.m_positionWorldOnA;
 					}	
 					
 					if(rb)
