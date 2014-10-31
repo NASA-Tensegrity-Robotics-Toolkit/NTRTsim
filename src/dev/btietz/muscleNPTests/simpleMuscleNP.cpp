@@ -23,10 +23,11 @@
 #include "core/tgLinearString.h"
 #include "core/tgBaseString.h"
 #include "core/tgRod.h"
-#include "core/tgRod.h"
+#include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "dev/muscleNP/tgMultiPointStringInfo.h"
@@ -46,6 +47,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 	const double rodRadius = 0.25;
 	const tgRod::Config rodConfig(rodRadius, rodDensity);
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
+	const tgBox::Config boxConfig(rodRadius, rodRadius, 0.0);
 	
 	tgStructure s;
 	
@@ -70,20 +72,37 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addPair(3, 6, "muscle");
 	s.move(btVector3(0, 10, 0));
 #else
-	s.addNode(-2, 2.1, 0);
-	s.addNode(0, 2.1, 0);
-	s.addNode(10, 2.1, 0);
-	s.addNode(12, 2.1, 0);
-	s.addNode(22, 2.1, 0);
-	s.addNode(24, 2.1, 0);
+	#if (1)
+		s.addNode(-2, 2.1, 0);
+		s.addNode(0, 2.1, 0);
+		s.addNode(10, 2.1, 0);
+		s.addNode(12, 2.1, 0);
+		s.addNode(22, 2.1, 0);
+		s.addNode(24, 2.1, 0);
 
-	s.addPair(0, 1, "rod2");
-	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod2");
+		s.addPair(0, 1, "rod2");
+		s.addPair(2, 3, "rod");
+		s.addPair(4, 5, "rod2");
 
-	s.addPair(1, 2, "muscle");
-	s.addPair(3, 4, "muscle");
-	s.move(btVector3(0, 0, 0));
+		s.addPair(1, 2, "muscle");
+		s.addPair(3, 4, "muscle");
+		s.move(btVector3(0, 0, 0));
+	#else
+		s.addNode(-2, 5, 0);
+		s.addNode(0, 5, 0);
+		s.addNode(10, 5, 0);
+		s.addNode(12, 5, 0);
+		s.addNode(5, 4, -5);
+		s.addNode(5, 4, 5);
+
+		s.addPair(0, 1, "rod2");
+		s.addPair(2, 3, "rod");
+		s.addPair(4, 5, "box");
+
+		s.addPair(1, 2, "muscle");
+		//s.addPair(3, 4, "muscle");
+		s.move(btVector3(0, 0, 0));
+	#endif
 #endif
 
 	// Move the structure so it doesn't start in the ground
@@ -95,6 +114,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 	tgBuildSpec spec;
 	spec.addBuilder("rod", new tgRodInfo(rodConfig));
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
+	spec.addBuilder("box", new tgBoxInfo(boxConfig));
 #if (1)
 	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
 #else
@@ -123,8 +143,8 @@ void simpleMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-	allMuscles[0]->setRestLength(9.9, dt);
-	allMuscles[1]->setRestLength(9.9, dt);
+	allMuscles[0]->setRestLength(11, dt);
+	allMuscles[1]->setRestLength(11, dt);
 	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;

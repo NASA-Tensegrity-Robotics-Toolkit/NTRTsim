@@ -256,7 +256,7 @@ void MuscleNP::updateAnchorList(double dt)
 					btRigidBody* rb = NULL;
 					btVector3 pos;
 					
-					if (directionSign < 0)
+					if (obj0 == m_ghostObject)
 					{
 						rb = btRigidBody::upcast(obj1);
 						pos = pt.m_positionWorldOnB;
@@ -331,7 +331,7 @@ void MuscleNP::updateAnchorList(double dt)
             // Maybe change to double if Bullet uses double?
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                //std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
+                std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
@@ -341,11 +341,11 @@ void MuscleNP::updateAnchorList(double dt)
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
                 i++;
             }
-            //std::cout << m_anchors.size() << " ";
+            std::cout << m_anchors.size() << " ";
             
         }
         
-        //std::cout << "Pruned: " << numPruned << std::endl;
+        std::cout << "Pruned: " << numPruned << std::endl;
     }
    
     std::size_t n = m_anchors.size();
@@ -460,7 +460,7 @@ void MuscleNP::updateCollisionObject()
     transform.setOrigin(center);
     transform.setRotation(btQuaternion::getIdentity());
     
-    btScalar radius = 0.001;
+    btScalar radius = 0.1;
 
     btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
     
@@ -473,7 +473,7 @@ void MuscleNP::updateCollisionObject()
         t.setOrigin(t.getOrigin() - center);
         
         btScalar length = (pos2 - pos1).length() / 2.0;
-        btBoxShape* box = new btBoxShape(btVector3(radius, length, radius));
+        btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));
         
         m_compoundShape->addChildShape(t, box);
     }
