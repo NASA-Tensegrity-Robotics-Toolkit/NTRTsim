@@ -229,7 +229,9 @@ void MuscleNP::updateAnchorList()
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
 	int numPairs = pairArray.size();
-
+    
+    int numContacts = 2;
+    
 	for (int i=0;i<numPairs;i++)
 	{
 		m_manifoldArray.clear();
@@ -279,6 +281,7 @@ void MuscleNP::updateAnchorList()
                         // Not permanent, sliding contact
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);
+                        numContacts++;
 						
 					}
 					
@@ -295,7 +298,11 @@ void MuscleNP::updateAnchorList()
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
     
+    std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
+    
     pruneAnchors();
+    
+    std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
 }
 
 void MuscleNP::pruneAnchors()
@@ -324,10 +331,6 @@ void MuscleNP::pruneAnchors()
             btScalar normalValue1;
             btScalar normalValue2;
             
-            // Store length values before we normalize
-            btScalar lengthA = lineA.length();
-            btScalar lengthB = lineB.length();
-            
             if (lineA.length() == 0.0 || lineB.length() == 0.0)
             {
                 // Arbitrary value that deletes the nodes
@@ -345,14 +348,46 @@ void MuscleNP::pruneAnchors()
 
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                #ifdef VERBOSE
+                //#ifdef VERBOSE
                     std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
-                #endif
+                //#endif
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }
-            else if (m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal()) >= 1.0 - FLT_EPSILON)
+            else
+            {
+                //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
+                i++;
+            }
+        }
+    }
+    
+    // Attempt to eliminate redudnant points
+    numPruned = 1;
+    while (numPruned > 0)
+    {
+        #ifndef BT_NO_PROFILE 
+            BT_PROFILE("pruneAnchors");
+        #endif //BT_NO_PROFILE   
+        numPruned = 0;
+        i = 1;
+        while (i < m_anchors.size() - 1)
+        {
+            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+            btVector3 current = m_anchors[i]->getWorldPosition(); 
+            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+            
+            btVector3 lineA = (forward - current);
+            btVector3 lineB = (back - current);
+            
+            if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
+            {
+                delete m_anchors[i];
+                m_anchors.erase(m_anchors.begin() + i);
+                numPruned++;
+            }
+            else if ((m_anchors[i]->getRelativePosition() - m_anchors[i - 1]->getRelativePosition()).length() < 0.001)
             {
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
@@ -366,7 +401,7 @@ void MuscleNP::pruneAnchors()
              * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
              */
 #if (1)             
-            else if(lengthA < 0.001 && lengthB < 0.001)
+            else if(lineA.length() < 0.01 && lineB.length() < 0.01)
             {
                 #ifdef VERBOSE
                     std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
