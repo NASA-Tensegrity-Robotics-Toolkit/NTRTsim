@@ -141,7 +141,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
         else if (i < n - 1)
         {
             // Already normalized
-            btVector3 direction = m_anchors[i]->contactNormal;
+            btVector3 direction = m_anchors[i]->getContactNormal();
             
             // Law of cosines to get cos(angle)
             btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
@@ -160,9 +160,11 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
              // Cos(angle) * hyp = normal
             btScalar x = btSin(ang) * B;
             
-            btScalar magnitude = (tension / A + tension / B) * x;
+            // Max of each should be 1, for max tension of 2*T
+            btScalar modA = x/A > 1.0 ? 1.0 : x/A;
+            btScalar modB = x/B > 1.0 ? 1.0 : x/B;
             
-            magnitude = magnitude > tension ? tension : magnitude;
+            btScalar magnitude = (tension * modA + tension * modB);
             
             force = direction * magnitude;
             
@@ -175,7 +177,15 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
         
         btVector3 contactPoint = m_anchors[i]->getRelativePosition();
         m_anchors[i]->attachedBody->activate();
-        m_anchors[i]->attachedBody->applyImpulse(force * dt, contactPoint);
+        
+        if (m_anchors[i]->sliding == false)
+        {
+            m_anchors[i]->attachedBody->applyImpulse(force * dt, contactPoint);
+        }
+        else
+        {
+             m_anchors[i]->attachedBody->applyForce(force, contactPoint);
+        }
     }
     
     // Finished calculating, so can store things
@@ -247,7 +257,6 @@ void MuscleNP::updateAnchorList(double dt)
 
 				btScalar dist = pt.getDistance();
 				
-				// Ensures the force is pointed outwards - may need to double check
 				if (dist < 0.0)
 				{
 					
@@ -313,9 +322,14 @@ void MuscleNP::updateAnchorList(double dt)
             
             btScalar normalValue1;
             btScalar normalValue2;
+            
+            // Store length values vefore we normalize
+            btScalar lengthA = lineA.length();
+            btScalar lengthB = lineB.length();
+            
             if (lineA.length() == 0.0 || lineB.length() == 0.0)
             {
-                // Random value that deletes the nodes
+                // Arbitrary value that deletes the nodes
                 normalValue1 = -1.0;
                 normalValue2 = -1.0;
                 //std::cout << "Length tripped!" << std::endl;
@@ -325,17 +339,29 @@ void MuscleNP::updateAnchorList(double dt)
                 lineA.normalize();
                 lineB.normalize();
                 //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-                normalValue1 = (lineA).dot( m_anchors[i]->contactNormal);
-                normalValue2 = (lineB).dot( m_anchors[i]->contactNormal);
+                normalValue1 = (lineA).dot( m_anchors[i]->getContactNormal());
+                normalValue2 = (lineB).dot( m_anchors[i]->getContactNormal());
             }
-            // Maybe change to double if Bullet uses double?
+
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                std::cout << "Erased: " << normalValue1 << " "  << normalValue2 << " "; 
+                std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
-            }      
+            }
+            /*
+             * Need to optimize this based on something. Right now we're likely to pass through really small objects
+             * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
+             * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
+             */
+            else if(lengthA < 0.1 && lengthB < 0.1)
+            {
+                std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
+                delete m_anchors[i];
+                m_anchors.erase(m_anchors.begin() + i);
+                numPruned++;
+            }
             else
             {
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
@@ -351,7 +377,7 @@ void MuscleNP::updateAnchorList(double dt)
     std::size_t n = m_anchors.size();
     for (i = 0; i < n; i++)
     {      
-        //std::cout << m_anchors[i]->getWorldPosition(); 
+        std::cout << m_anchors[i]->getWorldPosition(); 
 #if (0)         
         if (i != 0 && i != n-1)
         {
@@ -360,10 +386,10 @@ void MuscleNP::updateAnchorList(double dt)
             
             btVector3 line = (forward - back).normalize();
             
-            std::cout << " " <<  line.dot( m_anchors[i]->contactNormal);
+            std::cout << " " <<  line.dot( m_anchors[i]->getContactNormal());
         }   
 #endif        
-        //std::cout << std::endl;
+        std::cout << std::endl;
     }
 
     
@@ -460,7 +486,7 @@ void MuscleNP::updateCollisionObject()
     transform.setOrigin(center);
     transform.setRotation(btQuaternion::getIdentity());
     
-    btScalar radius = 0.1;
+    btScalar radius = 0.001;
 
     btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
     
@@ -473,10 +499,17 @@ void MuscleNP::updateCollisionObject()
         t.setOrigin(t.getOrigin() - center);
         
         btScalar length = (pos2 - pos1).length() / 2.0;
+        if (length < radius)
+        {
+            
+            //throw std::runtime_error("Teeny tiny contact object!!");
+        }
         btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));
         
         m_compoundShape->addChildShape(t, box);
     }
+    //m_compoundShape->setMargin(0.01);
+    
     m_ghostObject = new btPairCachingGhostObject();
 	
     m_ghostObject->setCollisionShape (m_compoundShape);

@@ -51,10 +51,12 @@ public:
 
     // Relative to the body
     btVector3 getRelativePosition() const;
+    
+    btVector3 getContactNormal() const;
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
-
+	
     // Relative to the body when it is first constructed
     const btVector3 attachedRelativeOriginalPosition;
 	
