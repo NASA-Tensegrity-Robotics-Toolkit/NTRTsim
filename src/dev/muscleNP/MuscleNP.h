@@ -79,7 +79,9 @@ private:
            const muscleAnchor* const ma2;
     };
     
-    void updateAnchorList(double dt);
+    void updateAnchorList();
+    
+    void pruneAnchors();
     
     void updateCollisionObject();
     

@@ -61,6 +61,8 @@
 #include <cmath>
 #include <stdexcept>
 
+//#define VERBOSE
+
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
  btRigidBody * body1,
@@ -103,7 +105,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     BT_PROFILE("calculateAndApplyForce");
 #endif //BT_NO_PROFILE    
     
-	updateAnchorList(dt);
+	updateAnchorList();
 	
     const double tension = getTension();
     const double currLength = getActualLength();
@@ -195,7 +197,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     updateCollisionObject();
 }
 
-void MuscleNP::updateAnchorList(double dt)
+void MuscleNP::updateAnchorList()
 {
     
 #ifndef BT_NO_PROFILE 
@@ -224,8 +226,6 @@ void MuscleNP::updateAnchorList(double dt)
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
-	//std::cout << m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs() << std::endl;
-
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
 	int numPairs = pairArray.size();
@@ -244,8 +244,6 @@ void MuscleNP::updateAnchorList(double dt)
 
 		if (collisionPair->m_algorithm)
 			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
-		
-		//std::cout  << m_manifoldArray.size() << std::endl;
 		
 		for (int j=0;j<m_manifoldArray.size();j++)
 		{
@@ -282,11 +280,6 @@ void MuscleNP::updateAnchorList(double dt)
 						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 						m_anchors.push_back(newAnchor);
 						
-                       /* 
-						btScalar mass = rb->getInvMass() == 0 ? 0.0 : 1.0 / rb->getInvMass();
-						btVector3 impulse = mass * dt * m_touchingNormal * getTension() / getActualLength() * -1.0* dist;
-						rb->applyImpulse(impulse, pos);
-                        */
 					}
 					
 				}
@@ -302,6 +295,11 @@ void MuscleNP::updateAnchorList(double dt)
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
     
+    pruneAnchors();
+}
+
+void MuscleNP::pruneAnchors()
+{    
     // Find way to enter the loop without BS data
     int numPruned = 1;
     std::size_t i;
@@ -309,6 +307,9 @@ void MuscleNP::updateAnchorList(double dt)
     // Attempt to eliminate points that would cause the string to push
     while (numPruned > 0)
     {
+        #ifndef BT_NO_PROFILE 
+            BT_PROFILE("pruneAnchors");
+        #endif //BT_NO_PROFILE   
         numPruned = 0;
         i = 1;
         while (i < m_anchors.size() - 1)
@@ -323,7 +324,7 @@ void MuscleNP::updateAnchorList(double dt)
             btScalar normalValue1;
             btScalar normalValue2;
             
-            // Store length values vefore we normalize
+            // Store length values before we normalize
             btScalar lengthA = lineA.length();
             btScalar lengthB = lineB.length();
             
@@ -332,7 +333,6 @@ void MuscleNP::updateAnchorList(double dt)
                 // Arbitrary value that deletes the nodes
                 normalValue1 = -1.0;
                 normalValue2 = -1.0;
-                //std::cout << "Length tripped!" << std::endl;
             }
             else
             {
@@ -345,7 +345,9 @@ void MuscleNP::updateAnchorList(double dt)
 
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
             {   
-                std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
+                #ifdef VERBOSE
+                    std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
+                #endif
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
@@ -358,7 +360,10 @@ void MuscleNP::updateAnchorList(double dt)
              */
             else if(lengthA < 0.1 && lengthB < 0.1)
             {
-                std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
+                #ifdef VERBOSE
+                    std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
+                #endif
+
                 if (m_anchors[i-1]->permanent != true)
                 {
                     delete m_anchors[i-1];
@@ -377,32 +382,24 @@ void MuscleNP::updateAnchorList(double dt)
                 //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
                 i++;
             }
+            #ifdef VERBOSE
             std::cout << m_anchors.size() << " ";
+            #endif
             
         }
-        
+        #ifdef VERBOSE
         std::cout << "Pruned: " << numPruned << std::endl;
+        #endif
     }
-   
+
+#ifdef VERBOSE   
     std::size_t n = m_anchors.size();
     for (i = 0; i < n; i++)
     {      
-        std::cout << m_anchors[i]->getWorldPosition(); 
-#if (0)         
-        if (i != 0 && i != n-1)
-        {
-            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
-            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-            
-            btVector3 line = (forward - back).normalize();
-            
-            std::cout << " " <<  line.dot( m_anchors[i]->getContactNormal());
-        }   
-#endif        
-        std::cout << std::endl;
+        std::cout << m_anchors[i]->getWorldPosition() << std::endl;
     }
-
-    
+#endif
+        
 }
 
 // This works ok at the moment. Need an effective way of determining if the rope is under an object
