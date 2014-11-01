@@ -384,13 +384,36 @@ void MuscleNP::pruneAnchors()
             btVector3 lineA = (forward - current);
             btVector3 lineB = (back - current);
             
-            if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
+            btScalar angle = lineA.angle(lineB);
+            btScalar radius = (forward - back).length() / (2 * btSin(angle));
+            
+            /*
+             *Another arbitrary method to prune with. 0.1 seemed good 
+             */
+            if (radius < 0.1)
+            {
+                if (m_anchors[i-1]->permanent != true)
+                {
+                    delete m_anchors[i-1];
+                    m_anchors.erase(m_anchors.begin() + i - 1);
+                    numPruned++;
+                }
+                if (m_anchors[i+1]->permanent != true)
+                {
+                    delete m_anchors[i+1];
+                    m_anchors.erase(m_anchors.begin() + i + 1);
+                    numPruned++;
+                }
+            }
+            
+            else if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
             {
                 delete m_anchors[i];
                 m_anchors.erase(m_anchors.begin() + i);
                 numPruned++;
             }
-#if (0)            
+#if (0)     
+            /* Asymmetric pruning is bad */       
             else if ((m_anchors[i]->getRelativePosition() - m_anchors[i - 1]->getRelativePosition()).length() < 0.001)
             {
                 delete m_anchors[i];
