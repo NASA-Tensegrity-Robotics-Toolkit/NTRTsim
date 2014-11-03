@@ -31,7 +31,8 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
                btVector3 cn,
                bool perm,
-               bool slide) :
+               bool slide,
+               btPersistentManifold* m) :
   attachedBody(body),
   // Find relative position
   // This should give relative position in a default orientation.
@@ -40,7 +41,8 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   contactNormal(attachedBody->getWorldTransform().inverse().getBasis() * cn),
   height(999.0),
   permanent(perm),
-  sliding(slide)
+  sliding(slide),
+  manifold(m)
 {
 }
 

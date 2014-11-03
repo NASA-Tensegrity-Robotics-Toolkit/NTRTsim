@@ -34,6 +34,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 // Forward references
 class tgWorld;
@@ -44,6 +45,7 @@ class btPairCachingGhostObject;
 class btDynamicsWorld;
 class btBroadphaseInterface;
 class btDispatcher;
+class btPersistentManifold;
 
 class MuscleNP : public Muscle2P
 {
@@ -86,6 +88,12 @@ private:
     void updateCollisionObject();
     
     void deleteCollisionShape(btCollisionShape* pShape);
+    
+    void deleteAnchor(int i);
+    
+    std::set<const btPersistentManifold*> m_contactManifolds;
+    
+    std::pair<std::set<const btPersistentManifold*>::iterator,bool> m_contactCheck;
     
 protected:  
     

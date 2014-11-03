@@ -33,6 +33,7 @@
 #include <string>
 
 class btRigidBody;
+class btPersistentManifold;
 
 class muscleAnchor
 {
@@ -43,7 +44,8 @@ public:
 					btVector3 pos, 
 					btVector3 cn = btVector3(0.0, 0.0, 0.0),
 					bool perm = true, 
-					bool slide = false);
+					bool slide = false,
+					btPersistentManifold* m = NULL);
     
     ~muscleAnchor();
     
@@ -76,6 +78,13 @@ public:
      * contact normal, false is applied towards the next anchor
      */
     const bool sliding;
+    
+    const btPersistentManifold* getManifold() const
+    {
+		return manifold;
+	}
+    
+    const btPersistentManifold* manifold;
 
 };
 

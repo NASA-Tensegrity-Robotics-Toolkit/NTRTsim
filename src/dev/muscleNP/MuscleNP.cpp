@@ -254,7 +254,7 @@ void MuscleNP::updateAnchorList()
             
 			for (int p=0;p<manifold->getNumContacts();p++)
 			{
-				const btManifoldPoint&pt = manifold->getContactPoint(p);
+				const btManifoldPoint& pt = manifold->getContactPoint(p);
 
 				btScalar dist = pt.getDistance();
 				
@@ -278,10 +278,15 @@ void MuscleNP::updateAnchorList()
 					
 					if(rb)
 					{   
-                        // Not permanent, sliding contact
-						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
-						m_anchors.push_back(newAnchor);
-                        numContacts++;
+                        m_contactCheck = m_contactManifolds.insert(manifold);
+                        if (m_contactCheck.second)
+                        {
+                            // Not permanent, sliding contact
+                            const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+                            m_anchors.push_back(newAnchor);
+                            
+                            numContacts++;
+                        }
 						
 					}
 					
@@ -352,8 +357,7 @@ void MuscleNP::pruneAnchors()
                 #ifdef VERBOSE
                     std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
                 #endif
-                delete m_anchors[i];
-                m_anchors.erase(m_anchors.begin() + i);
+                deleteAnchor(i);
                 numPruned++;
             }
             else
@@ -390,34 +394,33 @@ void MuscleNP::pruneAnchors()
             /*
              *Another arbitrary method to prune with. 0.1 seemed good 
              */
-            if (radius < 0.1)
+#if (1)             
+            if (radius < 0.01)
             {
                 if (m_anchors[i-1]->permanent != true)
                 {
-                    delete m_anchors[i-1];
-                    m_anchors.erase(m_anchors.begin() + i - 1);
+                    deleteAnchor(i - 1);
                     numPruned++;
                 }
                 if (m_anchors[i+1]->permanent != true)
                 {
-                    delete m_anchors[i+1];
-                    m_anchors.erase(m_anchors.begin() + i + 1);
+                    deleteAnchor(i + 1);
                     numPruned++;
                 }
             }
-            
-            else if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
+#endif         
+#if (1)   
+            if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
             {
-                delete m_anchors[i];
-                m_anchors.erase(m_anchors.begin() + i);
+                deleteAnchor(i);
                 numPruned++;
             }
+#endif
 #if (0)     
             /* Asymmetric pruning is bad */       
             else if ((m_anchors[i]->getRelativePosition() - m_anchors[i - 1]->getRelativePosition()).length() < 0.001)
             {
-                delete m_anchors[i];
-                m_anchors.erase(m_anchors.begin() + i);
+                deleteAnchor(i);
                 numPruned++;
             }
 #endif            
@@ -427,22 +430,20 @@ void MuscleNP::pruneAnchors()
              * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
              * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
              */
-#if (1)             
-            else if(lineA.length() < 0.01 && lineB.length() < 0.01)
+#if (0)             
+            else if(lineA.length() < 0.001 && lineB.length() < 0.001)
             {
                 #ifdef VERBOSE
                     std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
                 #endif
                 if (m_anchors[i-1]->permanent != true)
                 {
-                    delete m_anchors[i-1];
-                    m_anchors.erase(m_anchors.begin() + i - 1);
+                    deleteAnchor(i - 1);
                     numPruned++;
                 }
                 if (m_anchors[i+1]->permanent != true)
                 {
-                    delete m_anchors[i+1];
-                    m_anchors.erase(m_anchors.begin() + i + 1);
+                    deleteAnchor(i + 1);
                     numPruned++;
                 }
 
@@ -621,6 +622,20 @@ void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
 
         delete pShape;
     }
+}
+
+void MuscleNP::deleteAnchor(int i)
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("deleteAnchor");
+#endif //BT_NO_PROFILE 
+    assert(i < m_anchors.size() && i >= 0);
+    if (m_anchors[i]->manifold)
+    {
+        m_contactManifolds.erase(m_anchors[i]->getManifold());
+    }
+    delete m_anchors[i];
+    m_anchors.erase(m_anchors.begin() + i);
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
