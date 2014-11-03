@@ -74,7 +74,11 @@ private:
         anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
         
         bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
-        
+
+#if (0)        
+        void findPosition(std::vector<const muscleAnchor*> anchorList, std::vector<const muscleAnchor*>::Iterator it, const muscleAnchor* anc) const;
+#endif        
+        bool compareAnchors(const muscleAnchor* lhs, const muscleAnchor* rhs) const;
         
         private:
            const muscleAnchor* const ma1;
@@ -94,6 +98,8 @@ private:
     std::set<const btPersistentManifold*> m_contactManifolds;
     
     std::pair<std::set<const btPersistentManifold*>::iterator,bool> m_contactCheck;
+    
+    std::vector<const muscleAnchor*>::iterator m_anchorIt;
     
 protected:  
     

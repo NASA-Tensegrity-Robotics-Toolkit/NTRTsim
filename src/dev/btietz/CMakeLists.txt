@@ -27,4 +27,5 @@ subdirs(
     hardwareSineWaves
     handTunedSineWaves
     muscleNPTests
+    tetraCollisions
     )

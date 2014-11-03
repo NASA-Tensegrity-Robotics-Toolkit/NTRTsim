@@ -57,11 +57,12 @@
 
 // The C++ Standard Library
 #include <iostream>
-#include <algorithm>    // std::sort
+#include <algorithm>    // std::sort, std::find_if
 #include <cmath>
 #include <stdexcept>
 
 //#define VERBOSE
+//#define MANIFOLD_CHECK
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
@@ -232,6 +233,8 @@ void MuscleNP::updateAnchorList()
     
     int numContacts = 2;
     
+    m_anchorIt = m_anchors.begin();
+    
 	for (int i=0;i<numPairs;i++)
 	{
 		m_manifoldArray.clear();
@@ -277,7 +280,8 @@ void MuscleNP::updateAnchorList()
 					}	
 					
 					if(rb)
-					{   
+					{  	
+#ifdef MANIFOLD_CHECK
                         m_contactCheck = m_contactManifolds.insert(manifold);
                         if (m_contactCheck.second)
                         {
@@ -287,6 +291,55 @@ void MuscleNP::updateAnchorList()
                             
                             numContacts++;
                         }
+#else
+						// Not permanent, sliding contact
+						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+                        
+                        // Find position of new anchor
+                        while (m_anchorIt != m_anchors.end() && m_ac.operator()((*m_anchorIt), newAnchor))
+                        {
+							++m_anchorIt;
+						}
+						
+						btVector3 pos1 = newAnchor->getWorldPosition();
+						btVector3 pos2;
+						btScalar length1;
+						btScalar length2;
+						bool checkLength = true;
+						
+						if (m_anchorIt != m_anchors.end())
+						{
+							pos2 = (*m_anchorIt)->getWorldPosition();
+							length1 = (pos1 - pos2).length();
+						}
+						else
+						{
+							length1 = INFINITY;
+						}							
+						
+						if (m_anchorIt != m_anchors.begin())
+						{
+							pos2 = (*(m_anchorIt - 1))->getWorldPosition();
+							length2 = (pos1 - pos2).length();
+						}
+						else
+						{
+							length2 = INFINITY;
+						}
+
+						if (length1 < 0.1 || length2 < 0.1)
+						{
+							delete newAnchor;
+						}
+						else
+						{	
+													  
+							m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+							
+							numContacts++;
+						}					
+			
+#endif
 						
 					}
 					
@@ -371,12 +424,9 @@ void MuscleNP::pruneAnchors()
     //std::cout << " Good Normal " << m_anchors.size();
     
     // Attempt to eliminate redudnant points
-    numPruned = 1;
+    numPruned = 0;
     while (numPruned > 0)
-    {
-        #ifndef BT_NO_PROFILE 
-            BT_PROFILE("pruneAnchors");
-        #endif //BT_NO_PROFILE   
+    {  
         numPruned = 0;
         i = 1;
         while (i < m_anchors.size() - 1)
@@ -394,7 +444,7 @@ void MuscleNP::pruneAnchors()
             /*
              *Another arbitrary method to prune with. 0.1 seemed good 
              */
-#if (1)             
+#if (0)             
             if (radius < 0.01)
             {
                 if (m_anchors[i-1]->permanent != true)
@@ -409,7 +459,7 @@ void MuscleNP::pruneAnchors()
                 }
             }
 #endif         
-#if (1)   
+#if (0)   
             if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
             {
                 deleteAnchor(i);
@@ -430,8 +480,8 @@ void MuscleNP::pruneAnchors()
              * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
              * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
              */
-#if (0)             
-            else if(lineA.length() < 0.001 && lineB.length() < 0.001)
+#if (1)             
+            if(lineA.length() < 0.001 && lineB.length() < 0.001)
             {
                 #ifdef VERBOSE
                     std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
@@ -630,10 +680,12 @@ void MuscleNP::deleteAnchor(int i)
     BT_PROFILE("deleteAnchor");
 #endif //BT_NO_PROFILE 
     assert(i < m_anchors.size() && i >= 0);
+#ifdef MANIFOLD_CHECK
     if (m_anchors[i]->manifold)
     {
         m_contactManifolds.erase(m_anchors[i]->getManifold());
     }
+#endif
     delete m_anchors[i];
     m_anchors.erase(m_anchors.begin() + i);
 }
@@ -647,15 +699,34 @@ ma2(m2)
 
 bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const
 {
-   btVector3 pt1 = ma1->getWorldPosition();
-   btVector3 ptN = ma2->getWorldPosition();
-   
-   btVector3 pt2 = lhs->getWorldPosition();
-   btVector3 pt3 = rhs->getWorldPosition();
-   
-   btScalar lhDot = (ptN - pt1).dot(pt2);
-   btScalar rhDot = (ptN - pt1).dot(pt3);
-   
-   return lhDot < rhDot;
+	return compareAnchors(lhs, rhs);
 }  
 
+#if (0)
+void MuscleNP::anchorCompare::findPosition(std::vector<const muscleAnchor*> anchorList, std::vector<const muscleAnchor*>::Iterator it, const muscleAnchor* anc) const
+{
+	///@todo how do we ensure the iterator and the list are both the same??
+	
+	while(compareAnchors(*it, anc) && it != anchorList.end())
+	{
+		it++;
+	}
+
+}
+#endif
+
+bool MuscleNP::anchorCompare::compareAnchors(const muscleAnchor* lhs, const muscleAnchor* rhs) const
+{
+	// @todo make sure these are good anchors. Assert?
+	   btVector3 pt1 = ma1->getWorldPosition();
+	   btVector3 ptN = ma2->getWorldPosition();
+	   
+	   btVector3 pt2 = lhs->getWorldPosition();
+	   btVector3 pt3 = rhs->getWorldPosition();
+	   
+	   btScalar lhDot = (ptN - pt1).dot(pt2);
+	   btScalar rhDot = (ptN - pt1).dot(pt3);
+	   
+	   return lhDot < rhDot;
+
+}
