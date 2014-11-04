@@ -146,31 +146,20 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
             // Already normalized
             btVector3 direction = m_anchors[i]->getContactNormal();
             
-            // Law of cosines to get cos(angle)
+			// Get normal to string
             btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
             btVector3 current = m_anchors[i]->getWorldPosition(); 
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-            
-            btScalar Asqr = (forward - current).length2();
-            btScalar A = (forward - current).length();
-            btScalar Bsqr = (back - current).length2();
-            btScalar B = (back - current).length();
-            btScalar Csqr = (forward - back).length2();
-            btScalar C = (forward - back).length();
-            
-           
-            btScalar ang = btAcos((Asqr + Csqr - Bsqr) / (2.0 * A * C));
-             // Cos(angle) * hyp = normal
-            btScalar x = btSin(ang) * B;
-            
-            // Max of each should be 1, for max tension of 2*T
-            btScalar modA = x/A > 1.0 ? 1.0 : x/A;
-            btScalar modB = x/B > 1.0 ? 1.0 : x/B;
-            
-            btScalar magnitude = (tension * modA + tension * modB);
-            
-            force = direction * magnitude;
-            
+
+
+			btVector3 first = (current - forward);
+			btVector3 second = (current - back);
+			
+			btVector3 forceDir = (first + second).normalize();
+			
+			// Apply dot of contact normal with string's normal
+			force = (tension * direction).dot(forceDir) * forceDir;
+
             
         }
         else
@@ -284,61 +273,62 @@ void MuscleNP::updateAnchorList()
 #ifdef MANIFOLD_CHECK
                         m_contactCheck = m_contactManifolds.insert(manifold);
                         if (m_contactCheck.second)
+#endif
                         {
-                            // Not permanent, sliding contact
-                            const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
-                            m_anchors.push_back(newAnchor);
-                            
-                            numContacts++;
-                        }
-#else
-						// Not permanent, sliding contact
-						const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
-                        
-                        // Find position of new anchor
-                        while (m_anchorIt != m_anchors.end() && m_ac.operator()((*m_anchorIt), newAnchor))
-                        {
-							++m_anchorIt;
-						}
-						
-						btVector3 pos1 = newAnchor->getWorldPosition();
-						btVector3 pos2;
-						btScalar length1;
-						btScalar length2;
-						bool checkLength = true;
-						
-						if (m_anchorIt != m_anchors.end())
-						{
-							pos2 = (*m_anchorIt)->getWorldPosition();
-							length1 = (pos1 - pos2).length();
-						}
-						else
-						{
-							length1 = INFINITY;
-						}							
-						
-						if (m_anchorIt != m_anchors.begin())
-						{
-							pos2 = (*(m_anchorIt - 1))->getWorldPosition();
-							length2 = (pos1 - pos2).length();
-						}
-						else
-						{
-							length2 = INFINITY;
-						}
+                    
 
-						if (length1 < 0.1 || length2 < 0.1)
-						{
-							delete newAnchor;
-						}
-						else
-						{	
-													  
-							m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+							// Not permanent, sliding contact
+							const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+#if (1)							
+							// Find position of new anchor
+							while (m_anchorIt != m_anchors.end() && m_ac.operator()((*m_anchorIt), newAnchor))
+							{
+								++m_anchorIt;
+							}
 							
-							numContacts++;
+							btVector3 pos1 = newAnchor->getWorldPosition();
+							btVector3 pos2;
+							btScalar length1;
+							btScalar length2;
+							bool checkLength = true;
+							
+							if (m_anchorIt != m_anchors.end())
+							{
+								pos2 = (*m_anchorIt)->getWorldPosition();
+								length1 = (pos1 - pos2).length();
+							}
+							else
+							{
+								length1 = INFINITY;
+							}							
+							
+							if (m_anchorIt != m_anchors.begin())
+							{
+								pos2 = (*(m_anchorIt - 1))->getWorldPosition();
+								length2 = (pos1 - pos2).length();
+							}
+							else
+							{
+								length2 = INFINITY;
+							}
+
+							if (length1 < 0.1 || length2 < 0.1)
+							{
+								delete newAnchor;
+							}
+							else
+							{	
+														  
+								m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+								
+								numContacts++;
+							}
 						}					
-			
+
+#else
+						
+						m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+						}
 #endif
 						
 					}
@@ -424,7 +414,7 @@ void MuscleNP::pruneAnchors()
     //std::cout << " Good Normal " << m_anchors.size();
     
     // Attempt to eliminate redudnant points
-    numPruned = 0;
+    numPruned = 1;
     while (numPruned > 0)
     {  
         numPruned = 0;
