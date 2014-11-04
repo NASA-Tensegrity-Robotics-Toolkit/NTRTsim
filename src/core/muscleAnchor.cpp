@@ -26,6 +26,9 @@
 
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+
+// The C++ Standard Library
+#include <iostream>
  
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
@@ -64,6 +67,19 @@ btVector3 muscleAnchor::getWorldPosition() const
 {
     const btTransform tr = attachedBody->getWorldTransform();
     return tr * attachedRelativeOriginalPosition;
+}
+
+void muscleAnchor::setWorldPosition(btVector3& newPos)
+{
+	if (sliding)
+	{
+		attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
+                   newPos;
+	}
+	else
+	{
+		std::cerr << "Tried to update a static anchor" << std::endl;
+	}
 }
 
 btVector3 muscleAnchor::getContactNormal() const

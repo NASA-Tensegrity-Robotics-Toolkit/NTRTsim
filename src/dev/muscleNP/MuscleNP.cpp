@@ -106,9 +106,11 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     BT_PROFILE("calculateAndApplyForce");
 #endif //BT_NO_PROFILE    
     
+    pruneAnchors();
+    
 	updateAnchorList();
 	
-    const double tension = getTension();
+	const double tension = getTension();
     const double currLength = getActualLength();
     
     const double deltaStretch = currLength - m_prevLength;
@@ -194,25 +196,6 @@ void MuscleNP::updateAnchorList()
     BT_PROFILE("updateAnchorList");
 #endif //BT_NO_PROFILE      
     
-#if (0)
-	std::vector<const muscleAnchor*>::iterator it = m_anchors.begin();
-	
-    for (it = m_anchors.begin(); it != m_anchors.end(); it++)
-	{
-		if ((*it)->permanent == false)
-        {
-            delete *it;
-        }
-	}
-	
-    m_anchors.clear();
-#else
-    
-    // Remove the permanaent anchors for sorting
-    m_anchors.erase(m_anchors.begin());
-    m_anchors.erase(m_anchors.end() - 1);
-
-#endif
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
 	
@@ -222,7 +205,7 @@ void MuscleNP::updateAnchorList()
     
     int numContacts = 2;
     
-    m_anchorIt = m_anchors.begin();
+    m_anchorIt = m_anchors.begin() + 1;
     
 	for (int i=0;i<numPairs;i++)
 	{
@@ -281,44 +264,33 @@ void MuscleNP::updateAnchorList()
 							const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 #if (1)							
 							// Find position of new anchor
-							while (m_anchorIt != m_anchors.end() && m_ac.operator()((*m_anchorIt), newAnchor))
+							while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
 							{
 								++m_anchorIt;
 							}
 							
+							btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
 							btVector3 pos1 = newAnchor->getWorldPosition();
-							btVector3 pos2;
-							btScalar length1;
-							btScalar length2;
-							bool checkLength = true;
+							btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
 							
-							if (m_anchorIt != m_anchors.end())
-							{
-								pos2 = (*m_anchorIt)->getWorldPosition();
-								length1 = (pos1 - pos2).length();
-							}
-							else
-							{
-								length1 = INFINITY;
-							}							
+							btVector3 lineA = (pos2 - pos1);
+							btVector3 lineB = (pos0 - pos1);
 							
-							if (m_anchorIt != m_anchors.begin())
-							{
-								pos2 = (*(m_anchorIt - 1))->getWorldPosition();
-								length2 = (pos1 - pos2).length();
-							}
-							else
-							{
-								length2 = INFINITY;
-							}
+							btScalar length1 = (pos0 - pos1).length();
+							btScalar length2 = (pos1 - pos2).length();
 
-							if (length1 < 0.1 || length2 < 0.1)
+							if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
+							{
+								delete newAnchor;
+							}
+							else if((lineA).dot( newAnchor->getContactNormal()) < 0.0 ||
+										(lineB).dot( newAnchor->getContactNormal()) < 0.0)
 							{
 								delete newAnchor;
 							}
 							else
 							{	
-														  
+													  
 								m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
 								
 								numContacts++;
@@ -339,6 +311,10 @@ void MuscleNP::updateAnchorList()
 	
 	}
     
+    // Remove the permanaent anchors for sorting
+    m_anchors.erase(m_anchors.begin());
+    m_anchors.erase(m_anchors.end() - 1);
+    
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
     
     // Add these last to ensure we're in the right order
@@ -347,8 +323,6 @@ void MuscleNP::updateAnchorList()
 	m_anchors.insert(m_anchors.end(), anchor2);
     
     //std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
-    
-    pruneAnchors();
     
     //std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
     
@@ -400,8 +374,10 @@ void MuscleNP::pruneAnchors()
                 #ifdef VERBOSE
                     std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
                 #endif
-                deleteAnchor(i);
-                numPruned++;
+                if (deleteAnchor(i))
+				{
+					numPruned++;
+				}
             }
             else
             {
@@ -530,51 +506,6 @@ void MuscleNP::updateCollisionObject()
     btCollisionShape* shape = m_ghostObject->getCollisionShape();
     deleteCollisionShape(shape);
     delete m_ghostObject;
-#if (0)    
-    // @todo import this! Only the first two params matter
-	tgBox::Config config(0.001, 0.001);
-
-	tgStructure s;
-	
-	tgModel ectoplasm;
-
-#if (1)	
-    std::size_t n = m_anchors.size();
-    for (std::size_t i = 0; i < n; i ++)
-    {
-        tgNode anchorPos = m_anchors[i]->getWorldPosition();
-        s.addNode(anchorPos);
-        if (i > 0)
-        {
-            s.addPair(i - 1, i, "box");
-        }
-    }
-#else  
-    tgNode from = anchor1->getWorldPosition();
-	tgNode to = anchor2->getWorldPosition();
-    
-    s.addNode(from);
-	s.addNode(to);
-	
-	s.addPair(0, 1, "box");
-    
-#endif // Single vs multi box methods
-	
-	tgBuildSpec spec;
-	spec.addBuilder("box", new tgGhostInfo(config));
-	
-	// Create your structureInfo
-	tgStructureInfo structureInfo(s, spec);
-	// Use the structureInfo to build ourselves - this adds the new ghost object to the world
-	structureInfo.buildInto(ectoplasm, m_world);
-	
-	std::vector<tgGhostModel*> m_hauntedHouse = tgCast::filter<tgModel, tgGhostModel> (ectoplasm.getDescendants());
-	assert(m_hauntedHouse.size() > 0);
-
-	m_ghostObject = m_hauntedHouse[0]->getPGhostObject();
-
-    
-#else // Stripped down version
     
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
@@ -640,7 +571,6 @@ void MuscleNP::updateCollisionObject()
     // @todo look up what the second and third arguments of this are
     m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 
-#endif // Builder tools vs other method
 }
 
 void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
@@ -665,7 +595,7 @@ void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
     }
 }
 
-void MuscleNP::deleteAnchor(int i)
+bool MuscleNP::deleteAnchor(int i)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("deleteAnchor");
@@ -677,8 +607,16 @@ void MuscleNP::deleteAnchor(int i)
         m_contactManifolds.erase(m_anchors[i]->getManifold());
     }
 #endif
-    delete m_anchors[i];
-    m_anchors.erase(m_anchors.begin() + i);
+	if (m_anchors[i]->permanent != true)
+	{
+		delete m_anchors[i];
+		m_anchors.erase(m_anchors.begin() + i);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :

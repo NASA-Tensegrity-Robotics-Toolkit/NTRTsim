@@ -50,7 +50,9 @@ public:
     ~muscleAnchor();
     
     btVector3 getWorldPosition() const;
-
+	
+	void setWorldPosition(btVector3& newPos);
+	
     // Relative to the body
     btVector3 getRelativePosition() const;
     
@@ -58,12 +60,6 @@ public:
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
-	
-    // Relative to the body when it is first constructed
-    const btVector3 attachedRelativeOriginalPosition;
-	
-	// todo: write an accessor that asserts this is necessary and accurate
-	const btVector3 contactNormal;
 	
     btScalar height;
     
@@ -85,7 +81,14 @@ public:
 	}
     
     const btPersistentManifold* manifold;
-
+	
+private:
+	 // Relative to the body when it is first constructed
+    btVector3 attachedRelativeOriginalPosition;
+	
+	// todo: write an accessor that asserts this is necessary and accurate
+	const btVector3 contactNormal;
+	
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_

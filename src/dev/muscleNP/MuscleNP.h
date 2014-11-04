@@ -85,6 +85,8 @@ private:
            const muscleAnchor* const ma2;
     };
     
+    void updateExistingAnchors();
+    
     void updateAnchorList();
     
     void pruneAnchors();
@@ -93,7 +95,8 @@ private:
     
     void deleteCollisionShape(btCollisionShape* pShape);
     
-    void deleteAnchor(int i);
+    // Returns whether the anchor was deleteable
+    bool deleteAnchor(int i);
     
     std::set<const btPersistentManifold*> m_contactManifolds;
     
