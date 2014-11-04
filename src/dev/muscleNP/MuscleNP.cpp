@@ -412,9 +412,9 @@ void MuscleNP::pruneAnchors()
     }
     
     //std::cout << " Good Normal " << m_anchors.size();
-    
+#if (0)    
     // Attempt to eliminate redudnant points
-    numPruned = 1;
+    numPruned = 0;
     while (numPruned > 0)
     {  
         numPruned = 0;
@@ -503,6 +503,7 @@ void MuscleNP::pruneAnchors()
         std::cout << "Pruned: " << numPruned << std::endl;
         #endif
     }
+#endif
 
 #ifdef VERBOSE   
     std::size_t n = m_anchors.size();
