@@ -36,12 +36,6 @@
 #include "core/tgWorld.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
 
-#include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgNode.h"
-#include "tgcreator/tgNodes.h"
-#include "tgcreator/tgPair.h"
-#include "tgcreator/tgStructure.h"
-#include "tgcreator/tgStructureInfo.h"
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
@@ -50,15 +44,14 @@
 #include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-#include "BulletDynamics/Dynamics/btActionInterface.h"
 #include "LinearMath/btDefaultMotionState.h"
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btQuickprof.h"
 
 // The C++ Standard Library
 #include <iostream>
-#include <algorithm>    // std::sort, std::find_if
-#include <cmath>
+#include <algorithm>    // std::sort
+#include <cmath>		// abs
 #include <stdexcept>
 
 //#define VERBOSE
@@ -305,7 +298,7 @@ void MuscleNP::updateAnchorList()
 						btScalar length1 = (pos0 - pos1).length();
 						btScalar length2 = (pos1 - pos2).length();
 
-						if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
+						if (lineA.length() <= 0.01 || lineB.length() <= 0.01)
 						{
 							delete newAnchor;
 						}

@@ -27,8 +27,6 @@
 #include "tgMultiPointStringInfo.h"
 
 #include "MuscleNP.h"
-#include "tgGhostModel.h"
-#include "tgGhostInfo.h"
 
 #include "core/tgBulletUtil.h"
 #include "tgcreator/tgUtil.h"
