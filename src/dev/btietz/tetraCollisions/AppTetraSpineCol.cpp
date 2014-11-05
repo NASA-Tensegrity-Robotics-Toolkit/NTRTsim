@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 4;
     TetraSpineCollisions* myModel =
       new TetraSpineCollisions(segments);
     

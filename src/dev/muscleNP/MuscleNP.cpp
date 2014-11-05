@@ -464,7 +464,6 @@ void MuscleNP::updateCollisionObject()
     // Consider managing this more locally
     btCollisionShape* shape = m_ghostObject->getCollisionShape();
     deleteCollisionShape(shape);
-    delete m_ghostObject;
     
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
@@ -521,12 +520,9 @@ void MuscleNP::updateCollisionObject()
     }
     //m_compoundShape->setMargin(0.01);
     
-    m_ghostObject = new btPairCachingGhostObject();
-	
     m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
-    m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    
+
     // @todo look up what the second and third arguments of this are
     m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 
