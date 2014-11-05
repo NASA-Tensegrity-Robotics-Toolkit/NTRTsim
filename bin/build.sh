@@ -55,7 +55,7 @@ popd > /dev/null
 
 function usage
 {
-    echo "usage: $0 [-h] [-c] [-w] [build_path]"
+    echo "usage: $0 [-h] [-c] [-w] [-t/r/i/g] [build_path]"
     echo ""
     echo "positional arguments:"
     echo "  build_path            Path to build (relative to src, e.g. 'BasicApp' or"
@@ -67,6 +67,8 @@ function usage
     echo "  -w       Show compiler warnings when building"
     echo "  -t       Build test/ rather than src/" 
     echo "  -r       Build test/ rather than src/ *and* run all tests after compilation."
+    echo "  -i       Build test_integration/ rather than src/" 
+    echo "  -g       Build test_integration/ rather than src/ *and* run all tests after compilation."
 }
 
 function cmake_cross_platform()
@@ -93,8 +95,9 @@ build_src=$SRC_DIR
 MAKE_CLEAN_FLAG=false
 CMAKE_COMPILER_WARNINGS_FLAG=false
 RUN_ALL_TESTS=false
+RUN_INTEGRATION_TESTS=false
 
-while getopts ":hcwtr" opt; do
+while getopts ":hcwtrig" opt; do
     case $opt in
         h)
             usage;
@@ -114,6 +117,15 @@ while getopts ":hcwtr" opt; do
             build_target=$BUILD_TEST_DIR 
             build_src=$TEST_DIR
             RUN_ALL_TESTS=true
+            ;;
+        i)
+            build_target=$BUILD_INTEGRATION_TEST_DIR 
+            build_src=$INTEGRATION_TEST_DIR
+            ;;
+        g)
+            build_target=$BUILD_INTEGRATION_TEST_DIR 
+            build_src=$INTEGRATION_TEST_DIR
+            RUN_INTEGRATION_TESTS=true
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -201,14 +213,25 @@ if $RUN_ALL_TESTS; then
         echo "Build test directory does not exist. Have the tests been compiled?"
         exit 1
     fi
+	
+	pushd $BUILD_TEST_DIR > /dev/null
+fi
 
+if $RUN_INTEGRATION_TESTS; then
+	if [ ! -d $BUILD_INTEGRATION_TEST_DIR ]; then
+        echo "Build integration test directory does not exist. Have the tests been compiled?"
+        exit 1
+    fi
+	
+	pushd $BUILD_INTEGRATION_TEST_DIR > /dev/null
+fi
+
+if $RUN_ALL_TESTS || $RUN_INTEGRATION_TESTS; then
     if ! has_command "python"; then
         echo "=== MISSING DEPENDENCY ==="
         echo "Python 2.7 is required for automated test running. You don't appear to have it installed."
         exit 1
     fi
-
-    pushd $BUILD_TEST_DIR > /dev/null
 
     python ${SHELL_UTILITIES_DIR}/runAllTests.py || { 
         echo ""

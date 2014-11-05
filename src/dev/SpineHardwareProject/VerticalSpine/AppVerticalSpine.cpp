@@ -17,23 +17,23 @@
 */
 
 /**
- * @file AppPrismModel.cpp
- * @brief Contains the definition function main() for the Three strut
- * tensegrity prism example application
+ * @file AppNestedTetrahedrons.cpp
+ * @brief Contains the definition function main() for the Nested Tetrahedrons
+ * application.
  * @author Brian Tietz
+ * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "PrismModel.h"
+#include "VerticalSpineModel.h"
+#include "VerticalSpineRestLengthController.h"
+//#include "AppSineWaves.h"
 // This library
-#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
-// Bullet Physics
-#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -45,21 +45,14 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppPrismModelTest" << std::endl;
+    std::cout << "AppVerticalSpine" << std::endl;
 
-    // First create the ground and world. Specify ground rotation in radians
-    const double yaw = 0.0;
-    const double pitch = 0.0;
-    const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
-    const tgWorld::Config config(981); // gravity, cm/sec^2
-    tgWorld world(config, ground);
+    // First create the world
+    const tgWorld::Config config(981);
+    tgWorld world(config); 
 
     // Second create the view
-    const double timestep_physics = 0.001; // seconds
+    const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -68,11 +61,24 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    PrismModel* const myModel = new PrismModel();
+    const int segments = 5;
+    VerticalSpineModel* myModel = new VerticalSpineModel(segments);
     
-    // Add the model to the world
+    //Pass in the amount of cable to contract in, the "rest length difference":
+    // the static offset of cable
+    // length between geometric length in equilibrium and the actual rest length
+    // of an individual cable.
+    //
+
+    VerticalSpineRestLengthController* const pTC = new VerticalSpineRestLengthController();
+    myModel->attach(pTC);
+
+    //NestedStructureSineWaves* const pMuscleControl =
+    //  new NestedStructureSineWaves();
+    //myModel->attach(pMuscleControl);
     simulation.addModel(myModel);
-    
+	
+	// Run until the user stops
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

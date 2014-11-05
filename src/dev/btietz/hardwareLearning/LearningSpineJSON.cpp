@@ -50,7 +50,7 @@ LearningSpineJSON::LearningSpineJSON(BaseSpineCPGControl::Config config,
 												std::string args,
                                                 std::string ec,
                                                 std::string nc) :
-BaseSpineCPGControl(config, args, ec, nc)
+BaseSpineCPGControl(config, args)
 
 {    
 }

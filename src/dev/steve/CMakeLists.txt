@@ -17,4 +17,4 @@ add_executable(AppEscape_T6
 ) 
 
 add_custom_command(TARGET AppEscape_T6 POST_BUILD
-					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/logs)
+					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/Escape_T6/logs)

@@ -114,6 +114,7 @@ struct Config
 
     BaseSpineCPGControl(BaseSpineCPGControl::Config config,	
 							std::string args,
+							std::string resourcePath = "",
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini");
     
@@ -126,6 +127,8 @@ struct Config
     virtual void onTeardown(BaseSpineModelLearning& subject);
 
 	const double getCPGValue(std::size_t i) const;
+	
+	double getScore() const;
 	
 protected:
     /**
@@ -167,6 +170,7 @@ protected:
     
     double m_updateTime;
     
+    std::vector<double> scores;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H

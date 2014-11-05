@@ -42,3 +42,24 @@ std::string FileHelpers::getResourcePath(std::string relPath) {
     buffer << RESOURCE_PATH << "/" << relPath;
     return buffer.str();
 }
+
+double FileHelpers::getFinalScore(std::string filePath)
+{
+	ifstream results;
+	results.open(filePath.c_str(), ios::in);
+	
+	std::string line;
+	// Return the last non-empty line
+	while (results >> std::ws && getline (results,line));;
+	
+	std::stringstream stream(line);
+	
+	double dist;
+	
+	// Get the first double from that line
+	stream >> dist;
+	
+	results.close();
+	
+	return dist;
+}
