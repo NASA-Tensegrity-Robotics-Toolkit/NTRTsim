@@ -69,20 +69,23 @@ public:
                 double triangle_length = 30,
                 double duct_distance = 15,
                 double duct_height = 22,
-                double density = 0.00164,
                 double prismRadius = 1.524,
                 double prismExtent = 10.16,
+                double prismDensity = 0.0109,
                 double vertRodRadius = 1.27,
+                double vertDensity = 0.00164,
                 double innerRodRadius = 2.0955,
+                double innerDensity = 0.00164,
                 double tipRad = 1.524,
                 double tipDens = 1,
-                double tipFric = 1,
+                double tipFric = 0.9,
                 double stiffness = 10000.0,
                 double damping = 100.0,
                 double pretension = 0.001,
                 double maxVertStringVel = 25.4,
                 double maxSaddleStringVel = 8.5,
-                double maxStringForce = 50
+                double maxStringForce = 50,
+                double minStringRestLength = 1.2
               );
 
         //robot params
@@ -94,11 +97,13 @@ public:
         double m_duct_distance;     // duct_distance (distance between tetrahedrons) 15 cm
         double m_duct_height;    // duct_height (length)
         //rod params
-        double m_density;     // density (mass / length^3) kg/cm^3 0.00164
         double m_prismRadius; // prismatic joint radius 1.524 cm
         double m_prismExtent; // prismatic joint max extension 10.16 cm
+        double m_prismDensity;     // density (mass / length^3) kg/cm^3 0.453592 / 41.6537cm^3 = 0.0109
         double m_vertRodRadius; // vertical rod radius 1.27 cm
+        double m_vertDensity;     // density (mass / length^3) kg/cm^3 0.12 /  =
         double m_innerRodRadius; // inner rod radius 2.0955 cm
+        double m_innerDensity;     // density (mass / length^3) kg/cm^3 0.6 /  =
         //sphere tip params
         double m_tipRad; // prismatic joint tip radius 1.524 cm
         double m_tipDens; // prismatic joint tip density (mas / length^3) kg/cm^3
@@ -110,6 +115,7 @@ public:
         double m_maxVertStringVel; // max velocity of vertical string motors (cm/s) 25.4cm/s
         double m_maxSaddleStringVel; // max velocity of saddle string motors (cm/s) 8.5cm/s
         double m_maxStringForce; // max force to exert on all strings (Newtons) 50 N
+        double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
     };
 
     DuCTTRobotModel();

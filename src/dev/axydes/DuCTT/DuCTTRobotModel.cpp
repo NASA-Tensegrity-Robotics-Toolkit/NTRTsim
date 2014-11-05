@@ -52,11 +52,13 @@ DuCTTRobotModel::Config::Config(
     double duct_distance,
     double duct_height,
     //rod params
-    double density,
     double prismRadius,
     double prismExtent,
+    double prismDensity,
     double vertRodRadius,
+    double vertDensity,
     double innerRodRadius,
+    double innerDensity,
     //sphere tip params
     double tipRad,
     double tipDens,
@@ -67,7 +69,8 @@ DuCTTRobotModel::Config::Config(
     double pretension,
     double maxVertStringVel,
     double maxSaddleStringVel,
-    double maxStringForce
+    double maxStringForce,
+    double minStringRestLength
     ) :
 m_startPos(startPos),
 m_startRotAxis(startRotAxis),
@@ -75,11 +78,13 @@ m_startRotAngle(startRotAngle),
 m_triangle_length(triangle_length),
 m_duct_distance(duct_distance),
 m_duct_height(duct_height),
-m_density(density),
+m_prismDensity(prismDensity),
 m_prismRadius(prismRadius),
 m_prismExtent(prismExtent),
 m_vertRodRadius(vertRodRadius),
+m_vertDensity(vertDensity),
 m_innerRodRadius(innerRodRadius),
+m_innerDensity(innerDensity),
 m_tipRad(tipRad),
 m_tipDens(tipDens),
 m_tipFric(tipFric),
@@ -88,7 +93,8 @@ m_damping(damping),
 m_pretension(pretension),
 m_maxVertStringVel(maxVertStringVel),
 m_maxSaddleStringVel(maxSaddleStringVel),
-m_maxStringForce(maxStringForce)
+m_maxStringForce(maxStringForce),
+m_minStringRestLength(minStringRestLength)
 {
 }
 
@@ -278,13 +284,17 @@ void DuCTTRobotModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
-    const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_density);
+    const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_prismDensity);
     const tgRod::Config staticRodConfig(m_config.m_prismRadius, 0);
-    const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_density);
-    const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_density);
+    const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
+    const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
 
-    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel);
-    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel);
+    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping,
+                                                  false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
+                                                  m_config.m_minStringRestLength, m_config.m_minStringRestLength);
+    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping,
+                                                    false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
+                                                    m_config.m_minStringRestLength, m_config.m_minStringRestLength);
 
     const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
     const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
