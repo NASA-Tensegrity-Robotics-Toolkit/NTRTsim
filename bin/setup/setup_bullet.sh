@@ -179,7 +179,6 @@ function make_bullet_local()
 
     make || { echo "Explicit make of Bullet failed as well."; exit 1; }
 
->>>>>>> c9bf7b730c6d13adfea0691f5a263349f8973e86
     popd > /dev/null
 }
 
