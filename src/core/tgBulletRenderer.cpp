@@ -36,6 +36,8 @@
 #include "dev/muscleNP/MuscleNP.h"
 #include "tgCast.h"
 
+#include "LinearMath/btQuickprof.h"
+
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -50,11 +52,17 @@ tgBulletRenderer::tgBulletRenderer(tgWorld& world) : m_world(world)
 
 void tgBulletRenderer::render(const tgRod& rod) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderRod");
+#endif //BT_NO_PROFILE 
         // render the rod (change color, etc. if we want)
 }
 
 void tgBulletRenderer::render(const tgLinearString& linString) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderString");
+#endif //BT_NO_PROFILE 
         // Fetch the btDynamicsWorld
         btDynamicsWorld& dynamicsWorld =
       tgBulletUtil::worldToDynamicsWorld(m_world);
@@ -89,7 +97,9 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 
 void tgBulletRenderer::render(const tgModel& model) const
 {
-
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderModel");
+#endif //BT_NO_PROFILE  
 	/**
 	 * Render the markers of the model using spheres.
 	 */
