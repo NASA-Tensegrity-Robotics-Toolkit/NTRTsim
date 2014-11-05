@@ -82,11 +82,11 @@ public:
         return name;
     }
     
-    const muscleAnchor * const anchor1;
+    muscleAnchor * const anchor1;
 
-    const muscleAnchor * const anchor2;
+    muscleAnchor * const anchor2;
 
-	const std::vector<const muscleAnchor*>& getAnchors() const
+	const std::vector<muscleAnchor*>& getAnchors() const
     {
         return m_anchors;
     }
@@ -99,7 +99,7 @@ protected:
 
    // Wanted to do a set, but need random access iterator to sort
    // Needs to be stored here for consistent rendering
-   std::vector<const muscleAnchor*> m_anchors;
+   std::vector<muscleAnchor*> m_anchors;
 
     // Necessary for computations
     double m_restLength;

@@ -261,7 +261,7 @@ void MuscleNP::updateAnchorList()
                     
 
 							// Not permanent, sliding contact
-							const muscleAnchor* newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+							muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 #if (1)							
 							// Find position of new anchor
 							while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
@@ -295,7 +295,7 @@ void MuscleNP::updateAnchorList()
 								
 								numContacts++;
 							}
-						}					
+						}
 
 #else
 						
@@ -354,7 +354,9 @@ void MuscleNP::pruneAnchors()
             btScalar normalValue1;
             btScalar normalValue2;
             
-            if (lineA.length() == 0.0 || lineB.length() == 0.0)
+            btVector3 contactNormal = m_anchors[i]->getContactNormal();
+            
+            if (lineA.length() <= 0.0 || lineB.length() <= 0.0)
             {
                 // Arbitrary value that deletes the nodes
                 normalValue1 = -1.0;
@@ -362,11 +364,11 @@ void MuscleNP::pruneAnchors()
             }
             else
             {
-                lineA.normalize();
-                lineB.normalize();
+                //lineA.normalize();
+                //lineB.normalize();
                 //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-                normalValue1 = (lineA).dot( m_anchors[i]->getContactNormal());
-                normalValue2 = (lineB).dot( m_anchors[i]->getContactNormal());
+                normalValue1 = (lineA).dot(contactNormal);
+                normalValue2 = (lineB).dot(contactNormal);
             }
 
             if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
@@ -380,9 +382,33 @@ void MuscleNP::pruneAnchors()
 				}
             }
             else
+            // Move anchor to best tangent position
             {
-                //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
-                i++;
+				if (!m_anchors[i]->permanent)
+				{
+					btVector3 tangentDir =( (lineB - lineA).cross(contactNormal)).normalize();
+					btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+					btVector3 newPos = current + tangentMove;
+#if (1)
+					// Check if new position is on body
+					if (m_anchors[i]->setWorldPosition(newPos))
+					{
+						i++;
+					}
+					else
+					{
+						deleteAnchor(i);
+						numPruned++;
+					}
+#else
+					m_anchors[i]->setWorldPosition(newPos);
+					i++;
+#endif
+				}
+                else
+                {
+					i++;
+				}
             }
         }
     }

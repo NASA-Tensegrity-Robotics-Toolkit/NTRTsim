@@ -85,8 +85,6 @@ private:
            const muscleAnchor* const ma2;
     };
     
-    void updateExistingAnchors();
-    
     void updateAnchorList();
     
     void pruneAnchors();
@@ -102,7 +100,7 @@ private:
     
     std::pair<std::set<const btPersistentManifold*>::iterator,bool> m_contactCheck;
     
-    std::vector<const muscleAnchor*>::iterator m_anchorIt;
+    std::vector<muscleAnchor*>::iterator m_anchorIt;
     
 protected:  
     

@@ -51,7 +51,8 @@ public:
     
     btVector3 getWorldPosition() const;
 	
-	void setWorldPosition(btVector3& newPos);
+	// Bool returns if this point is actually on the body
+	bool setWorldPosition(btVector3& newPos);
 	
     // Relative to the body
     btVector3 getRelativePosition() const;

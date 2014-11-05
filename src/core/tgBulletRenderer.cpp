@@ -65,7 +65,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
     
     if(pDrawer && pMuscle)
     {
-		const std::vector<const muscleAnchor*>& anchors = pMuscle->getAnchors();
+		const std::vector<muscleAnchor*>& anchors = pMuscle->getAnchors();
 		std::size_t n = anchors.size() - 1;
 		for (std::size_t i = 0; i < n; i++)
 		{

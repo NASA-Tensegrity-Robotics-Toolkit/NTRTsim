@@ -45,19 +45,27 @@ int main(int argc, char** argv)
 	btVector3 point2(atof(argv[4]), atof(argv[5]), atof(argv[6]));
 
 	btVector3 point3(atof(argv[7]), atof(argv[8]), atof(argv[9]));
-#if (0)
-	btVector3 point4(atof(argv[10]), atof(argv[11]), atof(argv[12]));
+#if (1)
+	btVector3 normal(atof(argv[10]), atof(argv[11]), atof(argv[12]));
 #else
 	btVector3 point4(0.0, 0.0, 0.0);	
 #endif
 	std::cout << point1 << " " << point2 << " " << point3 << std::endl;
 
-	std::cout << "new point " << (point3 - point1).dot(point2) << std::endl;
-	std::cout << "old point " << (point3 - point1).dot(point3) << std::endl;
+	//std::cout << "new point " << (point3 - point1).dot(point2) << std::endl;
+	//std::cout << "old point " << (point3 - point1).dot(point3) << std::endl;
 	
-	std::cout << "std::abs " << std::abs(point1[0]) << std::endl;
-	std::cout << "abs " << abs(point1[0]) << std::endl;
-	std::cout << "btFabs " << btFabs(point1[0]) << std::endl;
+	btVector3 lineA = point3 - point2;
+	btVector3 lineB = point1 - point2;
+	
+	
+	btVector3 tangentDir =( (lineB - lineA).cross(normal)).normalize();
+	btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+	btVector3 newPos = point2 + tangentMove;
+	
+	std::cout << "tangentDir " << tangentDir << std::endl;
+	std::cout << "tangentMove " << tangentMove << std::endl;
+	std::cout << "newPos " << newPos << std::endl;
 	
     return 0;
 }
