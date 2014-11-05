@@ -76,7 +76,12 @@ m_ac(anchor1, anchor2)
          
 MuscleNP::~MuscleNP()
 {
-
+	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+	m_dynamicsWorld.removeCollisionObject(m_ghostObject);
+    // Consider managing this more locally
+    btCollisionShape* shape = m_ghostObject->getCollisionShape();
+    deleteCollisionShape(shape);
+    delete m_ghostObject;
 }
 
 const btScalar MuscleNP::getActualLength() const
