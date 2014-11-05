@@ -36,8 +36,8 @@
 
 DuCTTSineWaves::DuCTTSineWaves() :
     offsetSpeed(0.0),
-    cpgAmplitude(50.0),
-    cpgFrequency(2.51),
+    cpgAmplitude(4.0),
+    cpgFrequency(1.00),
     bodyWaves(1.0),
     simTime(0.0),
     cycle(0.0),
