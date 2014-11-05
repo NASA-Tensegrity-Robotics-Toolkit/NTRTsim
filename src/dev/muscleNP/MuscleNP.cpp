@@ -62,7 +62,6 @@
 #include <stdexcept>
 
 //#define VERBOSE
-//#define MANIFOLD_CHECK
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
@@ -286,54 +285,47 @@ void MuscleNP::updateAnchorList()
 					
 					if(rb)
 					{  	
-#ifdef MANIFOLD_CHECK
-                        m_contactCheck = m_contactManifolds.insert(manifold);
-                        if (m_contactCheck.second)
-#endif
-                        {
-                    
 
-							// Not permanent, sliding contact
-							muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+						// Not permanent, sliding contact
+						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
 #if (1)							
-							// Find position of new anchor
-							while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
-							{
-								++m_anchorIt;
-							}
-							
-							btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
-							btVector3 pos1 = newAnchor->getWorldPosition();
-							btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
-							
-							btVector3 lineA = (pos2 - pos1);
-							btVector3 lineB = (pos0 - pos1);
-							
-							btScalar length1 = (pos0 - pos1).length();
-							btScalar length2 = (pos1 - pos2).length();
+						// Find position of new anchor
+						while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
+						{
+							++m_anchorIt;
+						}
+						
+						btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
+						btVector3 pos1 = newAnchor->getWorldPosition();
+						btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
+						
+						btVector3 lineA = (pos2 - pos1);
+						btVector3 lineB = (pos0 - pos1);
+						
+						btScalar length1 = (pos0 - pos1).length();
+						btScalar length2 = (pos1 - pos2).length();
 
-							if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
-							{
-								delete newAnchor;
-							}
-							else if((lineA).dot( newAnchor->getContactNormal()) < 0.0 ||
-										(lineB).dot( newAnchor->getContactNormal()) < 0.0)
-							{
-								delete newAnchor;
-							}
-							else
-							{	
-													  
-								m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-								
-								numContacts++;
-							}
+						if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
+						{
+							delete newAnchor;
+						}
+						else if((lineA).dot( newAnchor->getContactNormal()) < 0.0 ||
+									(lineB).dot( newAnchor->getContactNormal()) < 0.0)
+						{
+							delete newAnchor;
+						}
+						else
+						{	
+												  
+							m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+							
+							numContacts++;
 						}
 
 #else
 						
 						m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-						}
+						
 #endif
 						
 					}
@@ -570,12 +562,7 @@ bool MuscleNP::deleteAnchor(int i)
     BT_PROFILE("deleteAnchor");
 #endif //BT_NO_PROFILE 
     assert(i < m_anchors.size() && i >= 0);
-#ifdef MANIFOLD_CHECK
-    if (m_anchors[i]->manifold)
-    {
-        m_contactManifolds.erase(m_anchors[i]->getManifold());
-    }
-#endif
+	
 	if (m_anchors[i]->permanent != true)
 	{
 		delete m_anchors[i];

@@ -34,7 +34,6 @@
 
 #include <string>
 #include <vector>
-#include <set>
 #include <map>
 
 // Forward references
@@ -46,7 +45,6 @@ class btPairCachingGhostObject;
 class btDynamicsWorld;
 class btBroadphaseInterface;
 class btDispatcher;
-class btPersistentManifold;
 
 class MuscleNP : public Muscle2P
 {
@@ -96,10 +94,6 @@ private:
     
     // Returns whether the anchor was deleteable
     bool deleteAnchor(int i);
-    
-    std::set<const btPersistentManifold*> m_contactManifolds;
-    
-    std::pair<std::set<const btPersistentManifold*>::iterator,bool> m_contactCheck;
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
     

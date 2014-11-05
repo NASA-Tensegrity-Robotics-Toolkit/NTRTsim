@@ -30,13 +30,13 @@
 
 // The C++ Standard Library
 #include <iostream>
+#include <cassert>
  
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
                btVector3 cn,
                bool perm,
-               bool slide,
-               btPersistentManifold* m) :
+               bool slide) :
   attachedBody(body),
   // Find relative position
   // This should give relative position in a default orientation.
@@ -46,9 +46,9 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   height(999.0),
   permanent(perm),
   sliding(slide),
-  manifold(m),
   force(0.0, 0.0, 0.0)
 {
+	assert(body);
 }
 
 muscleAnchor::~muscleAnchor()

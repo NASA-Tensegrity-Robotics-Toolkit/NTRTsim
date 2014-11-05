@@ -44,8 +44,7 @@ public:
 					btVector3 pos, 
 					btVector3 cn = btVector3(0.0, 0.0, 0.0),
 					bool perm = true, 
-					bool slide = false,
-					btPersistentManifold* m = NULL);
+					bool slide = false);
     
     ~muscleAnchor();
     
@@ -79,13 +78,6 @@ public:
      */
     const bool sliding;
     
-    const btPersistentManifold* getManifold() const
-    {
-		return manifold;
-	}
-    
-    const btPersistentManifold* manifold;
-	
 private:
 	 // Relative to the body when it is first constructed
     btVector3 attachedRelativeOriginalPosition;
