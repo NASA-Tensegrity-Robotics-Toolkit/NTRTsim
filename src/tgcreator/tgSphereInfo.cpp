@@ -148,7 +148,7 @@ tgSphereInfo::getConnectionPoint(const btVector3& referencePoint,
     const btVector3 startPoint = (getNode());
     // Vector from reference point to destination point
     const btVector3 refToDest =
-        (referencePoint - destinationPoint).normalize();
+        (destinationPoint - referencePoint).normalize();
 
     // Project along the radius to the destination point
     
