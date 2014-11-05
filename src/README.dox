@@ -91,21 +91,21 @@
  number of students and others supported by various fellowships, institutes
  and internships. The following is a list of the main contributors to this software:
 
-| <center>Name </center> | <center>Organization</center> | <center>E-Mail</center> |
-| :----:| :----: | :----: |
-| <center>Ryan Adams</center> | <center><center>Cyan Data Systems</center></center> | <center><center>radams (at) cyandata.com</center></center> |
-| <center>Adrian Agogino</center> | <center>UC Santa Cruz/NASA Ames Research Center</center> | <center>adrian.k.agogino (at) nasa.gov</center> |
-| <center>Perry Bhandal</center> | <center>Queen's University</center> | <center>perry.bhandal (at) queensu.ca</center> |
-| <center>Lee Brownston</center> | <center>SGT Inc./NASA Ames Research Center</center> | <center>Lee.S.Brownston (at) nasa.gov</center> |
-| <center>Jonathan Bruce</center> | <center>USRA/UC Santa Cruz</center> | <center>jbruce (at) soe.ucsc.edu</center> |
-| <center>Ken Caluwaerts</center> | <center>Ghent University/FWO</center> | <center>ken (at) caluwaerts.eu</center> |
-| <center>Jérémie Despraz</center> | <center>Ecole Polytechnique Fédérale de Lausanne</center> | <center>jer.despraz (at) gmail.com</center> |
-| <center>Jeffrey Friesen</center> | <center>UC San Diego</center> | <center>jfriesen (at) ucsd.edu</center> |
-| <center>Atil Iscen</center> | <center>Oregon State University</center> | <center>atiliscen (at) gmail.com</center> |
-| <center>Brian Mirletz</center> | <center>Case Western Reserve University</center> | <center>brt6 (at) case.edu</center> |
-| <center>Alexie Pogue</center> | <center>UC San Diego</center> | <center>alexie.pogue (at) gmail.com</center> |
-| <center>Andrew Sabelhaus</center> | <center>UC Berkeley</center> | <center>apsabelhaus (at) berkeley.edu</center> |
-| <center>Vytas SunSpiral</center> | <center>SGT Inc./NASA Ames Research Center</center> | <center>vytas.sunspiral (at) nasa.gov</center> |
+| <center>Name</center> | <center>Organization</center> | <center>E-Mail</center> |
+| :---- | :----: | ----: |
+| Ryan Adams | Cyan Data Systems | radams (at) cyandata.com |
+| Adrian Agogino | UC Santa Cruz/NASA Ames Research Center | adrian.k.agogino (at) nasa.gov |
+| Perry Bhandal | Queen's University | perry.bhandal (at) queensu.ca |
+| Lee Brownston | SGT Inc./NASA Ames Research Center | Lee.S.Brownston (at) nasa.gov |
+| Jonathan Bruce | USRA/UC Santa Cruz | jbruce (at) soe.ucsc.edu |
+| Ken Caluwaerts | Ghent University/FWO | ken (at) caluwaerts.eu |
+| Jérémie Despraz | Ecole Polytechnique Fédérale de Lausanne | jer.despraz (at) gmail.com |
+| Jeffrey Friesen | UC San Diego | jfriesen (at) ucsd.edu |
+| Atil Iscen | Oregon State University | atiliscen (at) gmail.com |
+| Brian Mirletz | Case Western Reserve University | brt6 (at) case.edu |
+| Alexie Pogue | UC San Diego | alexie.pogue (at) gmail.com |
+| Andrew Sabelhaus | UC Berkeley | apsabelhaus (at) berkeley.edu |
+| Vytas SunSpiral | SGT Inc./NASA Ames Research Center | vytas.sunspiral (at) nasa.gov |
 */
 
 /** \page keys Keyboard Commands
