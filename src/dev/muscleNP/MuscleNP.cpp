@@ -110,6 +110,9 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     
 	updateAnchorList();
 	
+	m_rbForceMap.clear();
+    m_rbForceScales.clear();
+	
 	const double tension = getTension();
     const double currLength = getActualLength();
     
@@ -145,6 +148,9 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
         }
         else if (i < n - 1)
         {
+			// Will fail if we already have this rigid body, but makes sure we're properly initialized otherwise
+			m_rbForceMap.insert(std::pair<btRigidBody*, btVector3>(m_anchors[i]->attachedBody, btVector3(0.0, 0.0, 0.0)) );
+			
             // Already normalized
             btVector3 direction = m_anchors[i]->getContactNormal();
             
@@ -161,26 +167,53 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
-
             
+            // Only care about scaling sliding forces
+            m_rbForceMap[m_anchors[i]->attachedBody] += force;
+
         }
         else
         {
             throw std::runtime_error("MuscleNP: First or last anchor is a sliding constraint!!");
         }
         
-        btVector3 contactPoint = m_anchors[i]->getRelativePosition();
-        m_anchors[i]->attachedBody->activate();
-        
-        if (m_anchors[i]->sliding == false)
-        {
-            m_anchors[i]->attachedBody->applyImpulse(force * dt, contactPoint);
-        }
-        else
-        {
-             m_anchors[i]->attachedBody->applyForce(force, contactPoint);
-        }
+        m_anchors[i]->force = force;
+         
     }
+    
+	std::map<btRigidBody*, btVector3>::iterator m_forceMapIt;
+	
+	for(m_forceMapIt = m_rbForceMap.begin(); m_forceMapIt != m_rbForceMap.end(); ++m_forceMapIt)
+	{	
+		btScalar totalForce = m_forceMapIt->second.length();
+		btScalar forceScale = 1.0;
+		
+		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
+		if (totalForce > 2.0 * tension)
+		{
+			forceScale = 2.0 * tension / totalForce;
+		}
+		m_rbForceScales.insert(std::pair<btRigidBody*, btScalar> (m_forceMapIt->first, forceScale));
+	}
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+		btRigidBody* body = m_anchors[i]->attachedBody;
+		
+		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
+		body->activate();
+		
+		btScalar forceScale = 1.0;
+		// Scale the force of the sliding anchors
+		if (m_anchors[i]->sliding)
+		{
+			forceScale = m_rbForceScales[body];
+		}
+		
+		btVector3 impulse = m_anchors[i]->force * forceScale * dt;
+		
+		body->applyImpulse(impulse, contactPoint);
+	}
     
     // Finished calculating, so can store things
     m_prevLength = currLength;
@@ -310,7 +343,9 @@ void MuscleNP::updateAnchorList()
 		}
 	
 	}
-    
+
+// Sadly, even with the above insertion scheme, this is still a necessary sanity check
+#if (1)    
     // Remove the permanaent anchors for sorting
     m_anchors.erase(m_anchors.begin());
     m_anchors.erase(m_anchors.end() - 1);
@@ -321,7 +356,7 @@ void MuscleNP::updateAnchorList()
 
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
-    
+#endif    
     //std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
     
     //std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
@@ -414,98 +449,6 @@ void MuscleNP::pruneAnchors()
     }
     
     //std::cout << " Good Normal " << m_anchors.size();
-#if (0)    
-    // Attempt to eliminate redudnant points
-    numPruned = 0;
-    while (numPruned > 0)
-    {  
-        numPruned = 0;
-        i = 1;
-        while (i < m_anchors.size() - 1)
-        {
-            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
-            btVector3 current = m_anchors[i]->getWorldPosition(); 
-            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-            
-            btVector3 lineA = (forward - current);
-            btVector3 lineB = (back - current);
-            
-            btScalar angle = lineA.angle(lineB);
-            btScalar radius = (forward - back).length() / (2 * btSin(angle));
-            
-            /*
-             *Another arbitrary method to prune with. 0.1 seemed good 
-             */
-#if (0)             
-            if (radius < 0.01)
-            {
-                if (m_anchors[i-1]->permanent != true)
-                {
-                    deleteAnchor(i - 1);
-                    numPruned++;
-                }
-                if (m_anchors[i+1]->permanent != true)
-                {
-                    deleteAnchor(i + 1);
-                    numPruned++;
-                }
-            }
-#endif         
-#if (0)   
-            if (abs(m_anchors[i - 1]->getContactNormal().dot(m_anchors[i]->getContactNormal())) >= 1.0 - FLT_EPSILON)
-            {
-                deleteAnchor(i);
-                numPruned++;
-            }
-#endif
-#if (0)     
-            /* Asymmetric pruning is bad */       
-            else if ((m_anchors[i]->getRelativePosition() - m_anchors[i - 1]->getRelativePosition()).length() < 0.001)
-            {
-                deleteAnchor(i);
-                numPruned++;
-            }
-#endif            
-            /*
-             * Need to optimize this based on something. Right now we're likely to pass through really small objects
-             * and this still allows a number of redundant contacts
-             * Also need to figure out which is the _right_ contact, right now we may have two where we only should have one
-             * Though this may be desirable from a collision detection perspective, we should take it into account when applying forces
-             */
-#if (1)             
-            if(lineA.length() < 0.001 && lineB.length() < 0.001)
-            {
-                #ifdef VERBOSE
-                    std::cout << "Erased dist: " << lengthA << " "  << lengthB << " "; 
-                #endif
-                if (m_anchors[i-1]->permanent != true)
-                {
-                    deleteAnchor(i - 1);
-                    numPruned++;
-                }
-                if (m_anchors[i+1]->permanent != true)
-                {
-                    deleteAnchor(i + 1);
-                    numPruned++;
-                }
-
-            }
-#endif // Length pruning
-            else
-            {
-                //std::cout << "Kept: " << normalValue1 << " "  << normalValue2 << " ";
-                i++;
-            }
-            #ifdef VERBOSE
-            std::cout << m_anchors.size() << " ";
-            #endif
-            
-        }
-        #ifdef VERBOSE
-        std::cout << "Pruned: " << numPruned << std::endl;
-        #endif
-    }
-#endif
 
 #ifdef VERBOSE   
     std::size_t n = m_anchors.size();

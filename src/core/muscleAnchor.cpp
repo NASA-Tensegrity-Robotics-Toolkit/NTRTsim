@@ -46,7 +46,8 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   height(999.0),
   permanent(perm),
   sliding(slide),
-  manifold(m)
+  manifold(m),
+  force(0.0, 0.0, 0.0)
 {
 }
 

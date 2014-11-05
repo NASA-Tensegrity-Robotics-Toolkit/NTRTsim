@@ -62,6 +62,9 @@ public:
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
 	
+	// Store force so we can normalize it on a per-body basis
+	btVector3 force;
+	
     btScalar height;
     
     /**

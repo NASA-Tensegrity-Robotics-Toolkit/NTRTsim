@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
 
 // Forward references
 class tgWorld;
@@ -101,6 +102,9 @@ private:
     std::pair<std::set<const btPersistentManifold*>::iterator,bool> m_contactCheck;
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
+    
+    std::map<btRigidBody*, btVector3> m_rbForceMap;
+    std::map<btRigidBody*, btScalar> m_rbForceScales;
     
 protected:  
     
