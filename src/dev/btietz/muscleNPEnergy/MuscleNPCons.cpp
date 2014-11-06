@@ -59,23 +59,23 @@ void MuscleNPCons::setup(tgWorld& world)
 	
 	tgStructure s;
 	
-	s.addNode(-2, 2.1, 0);
-	s.addNode(0, 2.1, 0);
-	s.addNode(10, 2.1, 0);
-	s.addNode(12, 2.1, 0);
-	s.addNode(22, 2.1, 0);
-	s.addNode(24, 2.1, 0);
+	s.addNode(-2, 2, 0);
+	s.addNode(0, 2, 0);
+	s.addNode(10, 2, 0);
+	s.addNode(12, 2, 0);
+	s.addNode(22, 2, 0);
+	s.addNode(24, 2, 0);
 	
 	
 	// Free rod to which we will apply motion
-	s.addNode(15, 3, 5);
-	s.addNode(15, 1, 5);
+	s.addNode(16, 3, 5);
+	s.addNode(16, 1, 5);
 
 	//s.addPair(0, 1, "rod");
-	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod");
+	s.addPair(2, 3, "box");
+	s.addPair(4, 5, "box");
 	
-	s.addPair(6, 7, "rod");
+	s.addPair(6, 7, "box");
 
 	//s.addPair(1, 2, "muscle");
 	s.addPair(3, 4, "muscle");
@@ -126,6 +126,8 @@ void MuscleNPCons::step(double dt)
 {
 	totalTime += dt;
 	
+	tgModel::step(dt);
+	
 	btVector3 vCom(0, 0, 0);
 	btScalar mass = 0;
 	btScalar energy = 0;
@@ -148,7 +150,7 @@ void MuscleNPCons::step(double dt)
 	
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Force sum " << forceSum << std::endl;
-	tgModel::step(dt);
+	
 }
 
 /**

@@ -196,7 +196,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 #if (1)
 		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
-		if (totalForce != maxForce)
+		if (totalForce != maxForce && totalForce != 0.0)
 		{
 			forceScale = maxForce / totalForce;
 		}
@@ -218,7 +218,9 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			forceScale = m_rbForceScales[body];
 		}
 		
-		btVector3 impulse = m_anchors[i]->force * forceScale * dt;
+		m_anchors[i]->force *= forceScale ;
+		
+		btVector3 impulse = m_anchors[i]->force* dt;
 		
 		body->applyImpulse(impulse, contactPoint);
 	}
