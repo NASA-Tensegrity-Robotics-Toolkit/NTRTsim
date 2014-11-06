@@ -102,6 +102,47 @@ public:
     std::vector<double> getSensorInfo();
 
 
+    /**
+     * Returns the positions of the sensors
+     */
+    std::vector< btVector3 > getSensorPositions();
+
+    /**
+     * Returns the vector from the center of the robot to the sensor.
+     */
+    std::vector< btVector3 > getSensorOrientations();
+
+    //Return the center of the sensor positions
+    btVector3 getCenter();
+
+    //Return the physical world
+    btDynamicsWorld *getWorld();
+
+    //Given the base 3 nodes, it fills the default node numbering schema
+    void fillNodeNumberingSchema(int a,int b,int c);
+
+    //Given the new base points fill the map from the new nodes what they would match in default node numbering
+    void fillNodeMappingFromBasePoints(int a,int b,int c);
+
+    //Fill the list of pointers to the muscles for each node.
+	void fillMusclesPerNode();
+
+	const std::vector<std::vector<tgLinearString*> >& getMusclesPerNodes() const {
+		return musclesPerNodes;
+	}
+
+	//Returns the node number that is at the same rod with the node i
+	int getOtherEndOfTheRod(int i);
+
+	//nodeMapping that maps the nodes in current orientation to the nodes in the default orientation
+	int nodeMapping[13];
+	//nodeMapping that maps the nodes in default orientation to the nodes in the current orientation
+	int nodeMappingReverse[13];
+	//muscle connections between the nodes.
+	int muscleConnections[13][13];
+	//contains pointer to the muscle for a given pair of nodes
+	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
+
 private:
 	
 	/**
@@ -146,19 +187,13 @@ private:
 	 * (muscles and markers are moved automatically since they are attached).
 	 */
      void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
-
-
-
-private:
 	
 	/**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
     std::vector<tgLinearString*> allMuscles;
-	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
 	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
-
 	std::vector<btVector3> nodePositions;
 	std::vector<heightSensor> heightSensors;
 

@@ -8,6 +8,7 @@ link_libraries(sensors
                 Adapters
                 Configuration
                 AnnealEvolution
+                FileHelpers
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED

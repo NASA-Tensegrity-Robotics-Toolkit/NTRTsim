@@ -45,7 +45,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppT6ModelTest" << std::endl;
+    std::cout << "AppPrismModelTest" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;

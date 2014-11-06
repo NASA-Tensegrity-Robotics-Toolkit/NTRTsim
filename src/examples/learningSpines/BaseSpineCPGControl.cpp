@@ -36,12 +36,16 @@
 #include "core/ImpedanceControl.h"
 #include "tgCPGStringControl.h"
 
+#include "helpers/FileHelpers.h"
+
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
 #include "util/CPGEdge.h"
 #include "util/CPGEquations.h"
 #include "util/CPGNode.h"
+
+//#define LOGGING
 
 BaseSpineCPGControl::Config::Config(int ss,
 										int tm,
@@ -57,7 +61,9 @@ BaseSpineCPGControl::Config::Config(int ss,
 										double kp,
 										double kv,
 										bool def,
-										double cl) :
+										double cl,
+										double lf,
+										double hf) :
 	segmentSpan(ss),
 	theirMuscles(tm),
 	ourMuscles(om),
@@ -72,7 +78,9 @@ BaseSpineCPGControl::Config::Config(int ss,
 	kPosition(kp),
 	kVelocity(kv),
 	useDefault(def),
-	controlLength(cl)
+	controlLength(cl),
+	lowFreq(lf),
+	highFreq(hf)
 {
     if (ss <= 0)
     {
@@ -123,14 +131,16 @@ BaseSpineCPGControl::Config::Config(int ss,
  */
 BaseSpineCPGControl::BaseSpineCPGControl(BaseSpineCPGControl::Config config,	
 												std::string args,
+												std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc) :
 m_config(config),
 edgeConfigFilename(ec),
 nodeConfigFilename(nc),
-edgeEvolution(args + "_edge", edgeConfigFilename),
+// Evolution assumes no pre-processing was done on these names
+edgeEvolution(args + "_edge", ec, resourcePath),
 // Can't have identical args or they'll overwrite each other
-nodeEvolution(args + "_node", nodeConfigFilename),
+nodeEvolution(args + "_node", nc, resourcePath),
 // Will be overwritten by configuration data
 nodeLearning(false),
 edgeLearning(false),
@@ -138,8 +148,18 @@ m_dataObserver("logs/TCData"),
 m_pCPGSys(NULL),
 m_updateTime(0.0)
 {
-    nodeConfigData.readFile(nodeConfigFilename);
-    edgeConfigData.readFile(edgeConfigFilename);
+	std::string path;
+	if (resourcePath != "")
+	{
+		path = FileHelpers::getResourcePath(resourcePath);
+	}
+	else
+	{
+		path = "";
+	}
+	
+    nodeConfigData.readFile(path + nodeConfigFilename);
+    edgeConfigData.readFile(path + edgeConfigFilename);
     nodeLearning = nodeConfigData.getintvalue("learning");
     edgeLearning = edgeConfigData.getintvalue("learning");
     
@@ -168,7 +188,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
     setupCPGs(subject, nodeParams, edgeParams);
     
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
-#if (0) // Conditional compile for data logging    
+#ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif    
     
@@ -187,6 +207,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
     {
 		tgCPGStringControl* pStringControl = new tgCPGStringControl();
         allMuscles[i]->attach(pStringControl);
+        
         m_allControllers.push_back(pStringControl);
     }
     
@@ -231,7 +252,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
         std::vector<double> desComs (numControllers, descendingCommand);
         
         m_pCPGSys->update(desComs, m_updateTime);
-#if (0) // Conditional compile for data logging        
+#ifdef LOGGING // Conditional compile for data logging        
         m_dataObserver.onStep(subject, m_updateTime);
 #endif
 		notifyStep(m_updateTime);
@@ -241,7 +262,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 
 void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
 {
-    std::vector<double> scores;
+    scores.clear();
     // @todo - check to make sure we ran for the right amount of time
     
     std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
@@ -299,6 +320,19 @@ const double BaseSpineCPGControl::getCPGValue(std::size_t i) const
 	// Error handling on input done in CPG_Equations
 	return (*m_pCPGSys)[i];
 }
+
+double BaseSpineCPGControl::getScore() const
+{
+	if (scores.size() == 2)
+	{
+		return scores[0];
+	}
+	else
+	{
+		throw std::runtime_error("Called before scores were obtained!");
+	}
+}
+	
 
 array_4D BaseSpineCPGControl::scaleEdgeActions  
                             (vector< vector <double> > actions)

@@ -10,5 +10,6 @@ subdirs(
     steve
     kmorse
     apsabelhaus
+    SpineHardwareProject
 )
 

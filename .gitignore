@@ -1,10 +1,19 @@
 env
 build
 build_test
+build_test_integration
 conf/*.conf
 src/DoxyDocs
-src/examples/learningSpines/TetraSpine/logs
 
 .cproject
 
 .project
+
+.idea
+
+*.pyc
+
+src/.settings/org.eclipse.cdt.codan.core.prefs
+
+*~
+*#
