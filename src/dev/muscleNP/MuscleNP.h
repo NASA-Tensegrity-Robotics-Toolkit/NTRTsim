@@ -73,10 +73,7 @@ private:
         anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
         
         bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
-
-#if (0)        
-        void findPosition(std::vector<const muscleAnchor*> anchorList, std::vector<const muscleAnchor*>::Iterator it, const muscleAnchor* anc) const;
-#endif        
+    
         bool compareAnchors(const muscleAnchor* lhs, const muscleAnchor* rhs) const;
         
         private:

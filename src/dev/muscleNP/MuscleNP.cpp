@@ -303,7 +303,7 @@ void MuscleNP::updateAnchorList()
 						btScalar length1 = (pos0 - pos1).length();
 						btScalar length2 = (pos1 - pos2).length();
 
-						if (lineA.length() <= 0.01 || lineB.length() <= 0.01)
+						if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
 						{
 							delete newAnchor;
 						}
@@ -460,6 +460,8 @@ void MuscleNP::updateCollisionObject()
     tgWorldBulletPhysicsImpl& bulletWorld =
       (tgWorldBulletPhysicsImpl&)m_world.implementation();
     
+    // Removing/adding the collision object consumes about 75% of the computational time for this step
+    // Sadly, it is necessary since we delete and update the collision shape
     m_dynamicsWorld.removeCollisionObject(m_ghostObject);
     // Consider managing this more locally
     btCollisionShape* shape = m_ghostObject->getCollisionShape();
@@ -490,8 +492,7 @@ void MuscleNP::updateCollisionObject()
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
-	btTransform transform = tgUtil::getTransform(from, to);
-	
+	btTransform transform;
     transform.setOrigin(center);
     transform.setRotation(btQuaternion::getIdentity());
     
@@ -508,11 +509,13 @@ void MuscleNP::updateCollisionObject()
         t.setOrigin(t.getOrigin() - center);
         
         btScalar length = (pos2 - pos1).length() / 2.0;
-        if (length < radius)
-        {
-            
-            //throw std::runtime_error("Teeny tiny contact object!!");
-        }
+		
+		// This happened during a unit test, so we check. Doesn't actually solve the problem
+		if (length < FLT_EPSILON)
+		{
+			length = FLT_EPSILON;
+		}
+		
         /// @todo - seriously examine box vs cylinder shapes
         btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));
         
@@ -580,19 +583,6 @@ bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleA
 {
 	return compareAnchors(lhs, rhs);
 }  
-
-#if (0)
-void MuscleNP::anchorCompare::findPosition(std::vector<const muscleAnchor*> anchorList, std::vector<const muscleAnchor*>::Iterator it, const muscleAnchor* anc) const
-{
-	///@todo how do we ensure the iterator and the list are both the same??
-	
-	while(compareAnchors(*it, anc) && it != anchorList.end())
-	{
-		it++;
-	}
-
-}
-#endif
 
 bool MuscleNP::anchorCompare::compareAnchors(const muscleAnchor* lhs, const muscleAnchor* rhs) const
 {

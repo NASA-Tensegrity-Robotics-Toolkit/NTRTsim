@@ -16,11 +16,11 @@
 * governing permissions and limitations under the License.
 */
 
-#ifndef SIMPLE_MUSCLE_NP_H
-#define SIMPLE_MUSCLE_NP_H
+#ifndef MUSCLE_NP_CONS
+#define MUSCLE_NP_CONS
 
 /**
-* @file simpleMuscleNP.h
+* @file MuscleNPCons.h
 * @brief For testing MuscleNP contacts
 * @author Brian Mirletz
 * @version 1.0.0
@@ -43,19 +43,19 @@ class tgRod;
 * A class that constructs a three bar tensegrity prism using the tools
 * in tgcreator.
 */
-class simpleMuscleNP : public tgSubject<simpleMuscleNP>, public tgModel
+class MuscleNPCons : public tgSubject<MuscleNPCons>, public tgModel
 {
 public:
 	/**
 	* The only constructor. Configuration parameters are within the
 	* .cpp file in this case, not passed in.
 	*/
-	simpleMuscleNP();
+	MuscleNPCons();
 	/**
 	* Destructor. Deletes controllers, if any were added during setup.
 	* Teardown handles everything else.
 	*/
-	virtual ~simpleMuscleNP();
+	virtual ~MuscleNPCons();
 	/**
 	* Create the model. Place the rods and strings into the world
 	* that is passed into the simulation. This is triggered

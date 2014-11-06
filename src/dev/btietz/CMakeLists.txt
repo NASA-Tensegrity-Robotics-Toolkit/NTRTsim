@@ -28,4 +28,5 @@ subdirs(
     handTunedSineWaves
     muscleNPTests
     tetraCollisions
+    muscleNPEnergy
     )

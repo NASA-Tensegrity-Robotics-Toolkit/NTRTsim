@@ -96,8 +96,11 @@ public:
         btTransform t = btTransform();
         t.setIdentity();
         t.setOrigin(origin);
-        t.setRotation(getQuaternionBetween(startOrientation,
-                           getVector(start, end)));
+        // If they for some reason gave us the same vector, keep identity
+        
+		t.setRotation(getQuaternionBetween(startOrientation,
+					   getVector(start, end)));
+
         return t;
     }
     
@@ -188,6 +191,7 @@ public:
      * @param[in] b a btVector3, passed by value
      * @return a quaternion that, if applied, would rotate vector a to align
      * with vector b
+     * @todo get some sensible value if a or b = (0, 0, 0). See getTransform
      */
     static btQuaternion getQuaternionBetween(btVector3 a, btVector3 b) 
     {
@@ -196,7 +200,7 @@ public:
 
         // The return value
         btQuaternion result;
-
+		
         // Account for equal vectors (can't calculate c in this case)
         if (almostEqual(a, b)) {
             result = btQuaternion::getIdentity();
