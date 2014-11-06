@@ -44,8 +44,7 @@ public:
     * The only constructor. The base class initializes nothing.
     * @param[in] config configuration POD
     */
-    tgBulletGround() : tgGround()
-    { }
+    tgBulletGround();
 
     /** Clean up the implementation. Deletes the collision object */
     virtual ~tgBulletGround();

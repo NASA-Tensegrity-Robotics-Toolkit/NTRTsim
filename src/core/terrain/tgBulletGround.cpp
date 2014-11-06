@@ -32,6 +32,11 @@
 // The C++ Standard Library
 #include <cassert>
 
+tgBulletGround::tgBulletGround() :
+pGroundShape(NULL),
+tgGround()
+{ }
+
 tgBulletGround::~tgBulletGround() 
 { 
     delete pGroundShape;

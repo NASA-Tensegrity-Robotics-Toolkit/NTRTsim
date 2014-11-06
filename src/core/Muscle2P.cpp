@@ -140,8 +140,25 @@ Muscle2P::~Muscle2P()
     #if (0)
     std::cout << "Destroying Muscle2P" << std::endl;
     #endif
-    delete anchor1;
-    delete anchor2;
+	
+	std::size_t n = m_anchors.size();
+	
+    // Make absolutely sure these are deleted, in case we have a poorly timed reset
+    if (m_anchors[0] != anchor1)
+    {
+		delete anchor1;
+    }
     
+    if (m_anchors[n-1] != anchor2)
+    {
+		delete anchor2;
+	}
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+		delete m_anchors[i];
+	}
+
+	
     m_anchors.clear();
 }
