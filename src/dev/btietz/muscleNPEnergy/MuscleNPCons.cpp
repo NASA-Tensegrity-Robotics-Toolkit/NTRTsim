@@ -24,6 +24,7 @@
 #include "core/tgBaseString.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
+#include "core/tgBaseRigid.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
@@ -54,7 +55,7 @@ void MuscleNPCons::setup(tgWorld& world)
 	const double rodRadius = 0.25;
 	const tgRod::Config rodConfig(rodRadius, rodDensity);
 	const tgRod::Config rodConfig2(rodRadius, 0.0);
-	const tgBox::Config boxConfig(rodRadius, rodRadius, 0.0);
+	const tgBox::Config boxConfig(rodRadius, rodRadius, rodDensity);
 	
 	tgStructure s;
 	
@@ -103,12 +104,12 @@ void MuscleNPCons::setup(tgWorld& world)
 	// We could now use tgCast::filter or similar to pull out the
 	// models (e.g. muscles) that we want to control.
 	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-	allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
+	allRods = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
 	
-	btRigidBody* body = allRods[1]->getPRigidBody();
+	btRigidBody* body = allRods[2]->getPRigidBody();
 	
 	// Apply initial impulse
-	btVector3 impulse(-1.0, 0.0, 0.0);
+	btVector3 impulse(0.0, 0.0, -1.0);
 	body->applyCentralImpulse(impulse);
 	
 	notifySetup();
@@ -130,7 +131,7 @@ void MuscleNPCons::step(double dt)
 	btScalar energy = 0;
 	for (std::size_t i = 0; i < allRods.size(); i++)
 	{
-		tgRod& ri = *(allRods[i]);
+		tgBaseRigid& ri = *(allRods[i]);
 		btRigidBody* body = ri.getPRigidBody();
 		vCom += body->getVelocityInLocalPoint(btVector3(0.0, 0.0, 0.0)) * ri.mass();
 		mass += ri.mass();

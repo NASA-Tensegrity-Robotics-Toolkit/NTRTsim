@@ -37,7 +37,7 @@
 class tgLinearString;
 class tgModelVisitor;
 class tgWorld;
-class tgRod;
+class tgBaseRigid;
 
 /**
 * A class that constructs a three bar tensegrity prism using the tools
@@ -87,7 +87,7 @@ public:
 private:
 	double totalTime;
 	std::vector<tgLinearString*> allMuscles;
-	std::vector<tgRod*> allRods;
+	std::vector<tgBaseRigid*> allRods;
 	
 };
 #endif // SIMPLE_CORDE_TENSEGRITY_H

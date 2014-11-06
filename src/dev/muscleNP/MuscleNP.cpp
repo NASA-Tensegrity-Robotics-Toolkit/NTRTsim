@@ -161,10 +161,12 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			btVector3 second = (current - back);
 			
 			btVector3 forceDir = (first + second).normalize();
-			
+#if (1)			
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
-            
+#else
+			force = tension * forceDir;
+#endif            
             // Only care about scaling sliding forces
             m_rbForceMap[m_anchors[i]->attachedBody] += force;
 
@@ -184,12 +186,21 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	{	
 		btScalar totalForce = m_forceMapIt->second.length();
 		btScalar forceScale = 1.0;
-		
+
+#if (1)		
+		btScalar maxForce = (anchor1->force + anchor2->force).length();
+		std::cout << maxForce << std::endl;
+#else
+		btScalar maxForce = 2.0 * tension;
+#endif
+
+#if (1)
 		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
-		if (totalForce > 2.0 * tension)
+		if (totalForce != maxForce)
 		{
-			forceScale = 2.0 * tension / totalForce;
+			forceScale = maxForce / totalForce;
 		}
+#endif
 		m_rbForceScales.insert(std::pair<btRigidBody*, btScalar> (m_forceMapIt->first, forceScale));
 	}
     
@@ -407,11 +418,12 @@ void MuscleNP::pruneAnchors()
 				}
             }
             else
+#if (1)            
             // Move anchor to best tangent position
             {
 				if (!m_anchors[i]->permanent)
 				{
-					btVector3 tangentDir =( (lineB - lineA).cross(contactNormal)).normalize();
+					btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
 					btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
 					btVector3 newPos = current + tangentMove;
 #if (1)
@@ -428,13 +440,17 @@ void MuscleNP::pruneAnchors()
 #else
 					m_anchors[i]->setWorldPosition(newPos);
 					i++;
-#endif
+#endif // Checking if world pos is on body
 				}
                 else
                 {
 					i++;
 				}
             }
+#endif
+			{
+				i++;
+			}
         }
     }
     
@@ -509,12 +525,6 @@ void MuscleNP::updateCollisionObject()
         t.setOrigin(t.getOrigin() - center);
         
         btScalar length = (pos2 - pos1).length() / 2.0;
-		
-		// This happened during a unit test, so we check. Doesn't actually solve the problem
-		if (length < FLT_EPSILON)
-		{
-			length = FLT_EPSILON;
-		}
 		
         /// @todo - seriously examine box vs cylinder shapes
         btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));

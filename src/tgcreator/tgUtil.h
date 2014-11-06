@@ -205,6 +205,7 @@ public:
         if (almostEqual(a, b)) {
             result = btQuaternion::getIdentity();
         } else if (almostEqual(a, -b)) {
+#if (0)            
             // Account for opposing vectors (can't calculate c in
             // this case either)
             // What to do here?
@@ -212,6 +213,10 @@ public:
             a + getArbitraryNonParallelVector(a);
             const btVector3 c = (a.cross(arb)).normalize();
             result = btQuaternion(c, M_PI).normalize();;
+#else
+			result = -btQuaternion::getIdentity(); 
+#endif            
+            
         } else {
             // Create a vector normal to both a and b
             const btVector3 c = (a.cross(b)).normalize();

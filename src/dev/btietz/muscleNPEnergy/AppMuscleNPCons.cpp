@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	// Second create the view
 	const double timestep_physics = 1.0/500.0; // seconds
 	const double timestep_graphics = 1.f/60.f; // seconds
-	tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+	tgSimView view(world, timestep_physics, timestep_graphics);
 	
 	// Third create the simulation
 	tgSimulation simulation(view);
@@ -68,6 +68,12 @@ int main(int argc, char** argv)
 	MuscleNPCons* const myModel = new MuscleNPCons();
 	// Add the model to the world
 	simulation.addModel(myModel);
-	simulation.run();
+	int i = 0;
+	while (i<5)
+	{
+		simulation.run(4000);
+		simulation.reset();
+		i++;
+	}
 	return 0;
 }
