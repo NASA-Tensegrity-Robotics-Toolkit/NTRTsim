@@ -104,12 +104,16 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	
 	btCompoundShape* m_compoundShape = new btCompoundShape(&world);
 	
+	btTransform t = transform;
+	btVector3 origin(0.0, 0.0, 0.0);
+	t.setOrigin(origin);
+	
 	// @todo import this! Only the first two params matter
 	btScalar radius = 0.001;
 	btScalar length = (from - to).length() / 2.0;
 	btBoxShape* box = new btBoxShape(btVector3(radius, length, radius));
 	
-	m_compoundShape->addChildShape(transform, box);
+	m_compoundShape->addChildShape(t, box);
 	
 	btPairCachingGhostObject* m_ghostObject = new btPairCachingGhostObject();
 	

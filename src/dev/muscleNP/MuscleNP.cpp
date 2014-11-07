@@ -388,7 +388,7 @@ void MuscleNP::pruneAnchors()
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0 || passes <= 2)
+    while (numPruned > 0 || passes <= 3)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
