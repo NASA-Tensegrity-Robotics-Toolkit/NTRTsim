@@ -102,14 +102,21 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
+	btCompoundShape* m_compoundShape = new btCompoundShape(&world);
+	
 	// @todo import this! Only the first two params matter
 	btScalar radius = 0.001;
 	btScalar length = (from - to).length() / 2.0;
 	btBoxShape* box = new btBoxShape(btVector3(radius, length, radius));
 	
+	m_compoundShape->addChildShape(transform, box);
+	
 	btPairCachingGhostObject* m_ghostObject = new btPairCachingGhostObject();
 	
-    m_ghostObject->setCollisionShape (box);
+	// Don't double rotate
+	transform.setRotation(btQuaternion::getIdentity());
+	
+    m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
     m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	

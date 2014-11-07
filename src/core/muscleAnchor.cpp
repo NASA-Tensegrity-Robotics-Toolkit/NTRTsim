@@ -27,6 +27,7 @@
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
 
 // The C++ Standard Library
 #include <iostream>
@@ -36,7 +37,8 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
                btVector3 cn,
                bool perm,
-               bool slide) :
+               bool slide,
+               btPersistentManifold* m) :
   attachedBody(body),
   // Find relative position
   // This should give relative position in a default orientation.
@@ -50,9 +52,12 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   height(999.0),
   permanent(perm),
   sliding(slide),
-  force(0.0, 0.0, 0.0)
+  force(0.0, 0.0, 0.0),
+  manifold(m)
 {
 	assert(body);
+	
+	assert(manifold == NULL || body == manifold->getBody0() || body == manifold->getBody1());
 }
 
 muscleAnchor::~muscleAnchor()
@@ -79,26 +84,73 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
 	bool ret = true;
 	
+	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
+	
 	if (sliding)
 	{
-		btTransform t = attachedBody->getWorldTransform();
-		btVector3 aabbMin;
-		btVector3 aabbMax;
-		
-		attachedBody->getCollisionShape()->getAabb(t, aabbMin, aabbMax);
-		
-		for( int i = 0; i < 3; i++)
+		bool useB = true;
+		bool update = true;
+		bool colCheck = true;
+		if (manifold->getBody0() != attachedBody)
 		{
-			if (newPos[i] > aabbMax[i] || newPos[i] < aabbMin[i])
+			useB = false;			
+		}
+		if(!useB && manifold->getBody1() != attachedBody)
+		{
+			colCheck = false;
+		}
+		if (colCheck)
+		{	
+			btScalar length = INFINITY;
+			
+			
+			int n = manifold->getNumContacts();
+			
+			btVector3 contactPos = getWorldPosition();
+			btVector3 newNormal = contactNormal;
+			
+			for (int p = 0; p < n; p++)
+			{
+				const btManifoldPoint& pt = manifold->getContactPoint(p);
+				
+				// Original position picked at beginning
+				btVector3 pos = useB ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
+				
+				btScalar contactDist = (pos - newPos).length();
+				
+				if (contactDist < length)
+				{
+					length = contactDist;
+					contactPos = pos;
+					
+					btScalar directionSign = useB ? btScalar(-1.0) : btScalar(1.0);
+					
+					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+					
+				}
+				
+			}
+			
+			if (length > 0.1)
+			{
+				update = false;
+			}
+			
+			if (update)
+			{
+				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
+						   newPos;
+				contactNormal = newNormal;
+			}
+			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
 				ret = false;
 			}
 		}
-		
-		if (ret)
+		else
 		{
 			attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
-					   newPos;
+						   newPos;
 		}
 		
 		

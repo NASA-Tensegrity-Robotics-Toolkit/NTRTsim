@@ -142,7 +142,8 @@ void MuscleNPCons::step(double dt)
 	btVector3 forceSum(0.0, 0.0, 0.0);
 	
 	const std::vector<muscleAnchor*>& anchorList = allMuscles[0]->getMuscle()->getAnchors();
-	for (std::size_t i = 0; i < anchorList.size(); i++)
+	int n = anchorList.size();
+	for (std::size_t i = 0; i < n; i++)
 	{
 		forceSum += anchorList[i]->force;
 	}
@@ -150,7 +151,9 @@ void MuscleNPCons::step(double dt)
 	
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Force sum " << forceSum << std::endl;
-	
+	std::cout << "Length " << allMuscles[0]->getCurrentLength();
+	std::cout << " Dist " << (anchorList[0]->getWorldPosition() - anchorList[n-1]->getWorldPosition()).length() << std::endl;
+	std::cout << "Anchors: " << n << std::endl;
 }
 
 /**

@@ -41,6 +41,7 @@ class tgWorld;
 class muscleAnchor;
 class btRigidBody;
 class btCollisionShape;
+class btCompoundShape;
 class btPairCachingGhostObject;
 class btDynamicsWorld;
 class btBroadphaseInterface;
@@ -88,6 +89,8 @@ private:
     void updateCollisionObject();
     
     void deleteCollisionShape(btCollisionShape* pShape);
+    
+    void clearCompoundShape(btCompoundShape* pShape);
     
     // Returns whether the anchor was deleteable
     bool deleteAnchor(int i);

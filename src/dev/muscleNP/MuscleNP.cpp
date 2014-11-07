@@ -285,20 +285,34 @@ void MuscleNP::updateAnchorList()
                     
 					btRigidBody* rb = NULL;
 					
-					if (obj0 == m_ghostObject)
+					if (manifold->getBody0() == m_ghostObject)
 					{
-						rb = btRigidBody::upcast(obj1);
+						if (manifold->getBody1() == obj1)
+							rb = btRigidBody::upcast(obj1);
+						else if (manifold->getBody1() == obj0)
+							rb = btRigidBody::upcast(obj0);
+						else
+						{
+							throw std::runtime_error("Can't find the right object!!");
+						}
 					}
 					else
 					{
-						rb = btRigidBody::upcast(obj0);
+						if (manifold->getBody0() == obj0)
+							rb = btRigidBody::upcast(obj0);
+						else if (manifold->getBody0() == obj1)
+							rb = btRigidBody::upcast(obj1);
+						else
+						{
+							throw std::runtime_error("Can't find the right object!!");
+						}
 					}	
 					
 					if(rb)
 					{  	
 
 						// Not permanent, sliding contact
-						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true);
+						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 #if (1)							
 						// Find position of new anchor
 						while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
@@ -331,6 +345,7 @@ void MuscleNP::updateAnchorList()
 							m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
 							
 							numContacts++;
+							
 						}
 
 #else
@@ -368,12 +383,12 @@ void MuscleNP::updateAnchorList()
 
 void MuscleNP::pruneAnchors()
 {    
-    // Find way to enter the loop without BS data
-    int numPruned = 1;
+    int numPruned = 0;
+    int passes = 0;
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0)
+    while (numPruned > 0 || passes <= 2)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
@@ -426,9 +441,9 @@ void MuscleNP::pruneAnchors()
 				if (!m_anchors[i]->permanent)
 				{
 					btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
+					btScalar tangentDot = (lineB + lineA).dot(tangentDir);
 					btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
 					btVector3 newPos = current + tangentMove;
-#if (1)
 					// Check if new position is on body
 					if (m_anchors[i]->setWorldPosition(newPos))
 					{
@@ -439,10 +454,6 @@ void MuscleNP::pruneAnchors()
 						deleteAnchor(i);
 						numPruned++;
 					}
-#else
-					m_anchors[i]->setWorldPosition(newPos);
-					i++;
-#endif // Checking if world pos is on body
 				}
                 else
                 {
@@ -454,6 +465,7 @@ void MuscleNP::pruneAnchors()
 				i++;
 			}
         }
+        passes++;
     }
     
     //std::cout << " Good Normal " << m_anchors.size();
@@ -480,10 +492,10 @@ void MuscleNP::updateCollisionObject()
     
     // Removing/adding the collision object consumes about 75% of the computational time for this step
     // Sadly, it is necessary since we delete and update the collision shape
-    m_dynamicsWorld.removeCollisionObject(m_ghostObject);
+    //m_dynamicsWorld.removeCollisionObject(m_ghostObject);
     // Consider managing this more locally
-    btCollisionShape* shape = m_ghostObject->getCollisionShape();
-    deleteCollisionShape(shape);
+    btCompoundShape* m_compoundShape = tgCast::cast<btCollisionShape, btCompoundShape> (m_ghostObject->getCollisionShape());
+    clearCompoundShape(m_compoundShape);
     
     btVector3 maxes(anchor2->getWorldPosition());
     btVector3 mins(anchor1->getWorldPosition());
@@ -516,7 +528,7 @@ void MuscleNP::updateCollisionObject()
     
     btScalar radius = 0.001;
 
-    btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
+    //btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
     
     for (std::size_t i = 0; i < n-1; i++)
     {
@@ -539,7 +551,7 @@ void MuscleNP::updateCollisionObject()
     m_ghostObject->setWorldTransform(transform);
 
     // @todo look up what the second and third arguments of this are
-    m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+    //m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 
 }
 
@@ -563,6 +575,24 @@ void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
 
         delete pShape;
     }
+}
+
+void MuscleNP::clearCompoundShape(btCompoundShape* pShape)
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("clearCompoundShape");
+#endif //BT_NO_PROFILE
+
+	if (pShape)
+	{
+		while (pShape->getNumChildShapes() > 0)
+		{
+			btCollisionShape* pCShape = pShape->getChildShape(0);
+			deleteCollisionShape(pCShape);
+			pShape->removeChildShapeByIndex(0);
+		}
+	}
+	
 }
 
 bool MuscleNP::deleteAnchor(int i)

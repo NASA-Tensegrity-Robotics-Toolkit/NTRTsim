@@ -44,7 +44,8 @@ public:
 					btVector3 pos, 
 					btVector3 cn = btVector3(0.0, 0.0, 0.0),
 					bool perm = true, 
-					bool slide = false);
+					bool slide = false,
+					btPersistentManifold* m = NULL);
     
     ~muscleAnchor();
     
@@ -83,7 +84,9 @@ private:
     btVector3 attachedRelativeOriginalPosition;
 	
 	// todo: write an accessor that asserts this is necessary and accurate
-	const btVector3 contactNormal;
+	btVector3 contactNormal;
+	
+	btPersistentManifold* const manifold;
 	
 };
 
