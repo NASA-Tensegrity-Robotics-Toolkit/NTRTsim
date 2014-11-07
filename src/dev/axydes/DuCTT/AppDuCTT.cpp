@@ -54,6 +54,10 @@ double timestep_graphics = 1.0f/60.0f; // Seconds, AKA render rate. Leave at 1/6
 int nEpisodes = 1; // Number of episodes ("trial runs")
 int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
 
+double startX = 0;
+double startY = 20;
+double startZ = 0;
+
 void handleOptions(int argc, char**argv);
 tgWorld *createWorld();
 tgSimViewGraphics *createGraphicsView(tgWorld *world);
@@ -88,7 +92,7 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     DuCTTRobotModel::Config c = DuCTTRobotModel::Config(
-                btVector3(0,20,0));
+                btVector3(startX,startY,startZ));
     DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
 
     // Fifth create the controllers, attach to model
@@ -137,6 +141,9 @@ void handleOptions(int argc, char **argv)
         ("graph_time,g", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
         ("episodes,e", po::value<int>(&nEpisodes), "Number of episodes to run. Default=1")
         ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (100 seconds)")
+        ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
+        ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
+        ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
     ;
 
     po::variables_map vm;
