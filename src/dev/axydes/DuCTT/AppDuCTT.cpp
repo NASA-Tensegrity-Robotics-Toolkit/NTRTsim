@@ -28,6 +28,7 @@
 
 AppDuCTT::AppDuCTT(int argc, char** argv)
 {
+    bSetup = false;
     use_graphics = true;
     add_controller = false;
     add_duct = false;
@@ -82,7 +83,8 @@ bool AppDuCTT::setup()
         simulation->addModel(myDuctModel);
     }
 
-    return true;
+    bSetup = true;
+    return bSetup;
 }
 
 void AppDuCTT::handleOptions(int argc, char **argv)
@@ -136,13 +138,11 @@ tgWorld* AppDuCTT::createWorld()
     return new tgWorld(config);
 }
 
-/** Use for displaying tensegrities in simulation */
 tgSimViewGraphics *AppDuCTT::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-/** Use for trial episodes of many tensegrities in an experiment */
 tgSimView *AppDuCTT::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
@@ -150,6 +150,11 @@ tgSimView *AppDuCTT::createView(tgWorld *world)
 
 bool AppDuCTT::run()
 {
+    if (!bSetup)
+    {
+        setup();
+    }
+
     if (use_graphics)
     {
         // Run until the user stops
@@ -164,7 +169,6 @@ bool AppDuCTT::run()
     return true;
 }
 
-/** Run a series of episodes for nSteps each */
 void AppDuCTT::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {

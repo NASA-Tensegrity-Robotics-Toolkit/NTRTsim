@@ -54,14 +54,25 @@ class AppDuCTT
 public:
     AppDuCTT(int argc, char** argv);
 
+    /** Setup the simulation */
     bool setup();
+    /** Run the simulation */
     bool run();
 
 private:
+    /** Parse command line options */
     void handleOptions(int argc, char** argv);
+
+    /** Create the tgWorld object */
     tgWorld *createWorld();
+
+    /** Use for displaying tensegrities in simulation */
     tgSimViewGraphics *createGraphicsView(tgWorld *world);
+
+    /** Use for trial episodes of many tensegrities in an experiment */
     tgSimView *createView(tgWorld *world);
+
+    /** Run a series of episodes for nSteps each */
     void simulate(tgSimulation *simulation);
 
     tgSimulation* simulation;
@@ -77,6 +88,8 @@ private:
     double startX;
     double startY;
     double startZ;
+
+    bool bSetup;
 };
 
 #endif  // APP_DUCTT
