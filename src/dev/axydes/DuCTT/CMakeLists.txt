@@ -1,4 +1,4 @@
-link_libraries(tgcreator core controllers)
+link_libraries(tgcreator core controllers boost_program_options)
 
 add_executable(AppDuCTT
     tgRodHinge.cpp
