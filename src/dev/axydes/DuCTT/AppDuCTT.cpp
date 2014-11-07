@@ -24,58 +24,27 @@
  * $Id$
  */
 
-// This application
-//models
-#include "DuCTTRobotModel.h"
-#include "DuctStraightModel.h"
+#include "AppDuCTT.h"
 
-//controllers
-#include "DuCTTSineWaves.h"
-
-// This library
-#include "core/tgModel.h"
-#include "core/tgSimViewGraphics.h"
-#include "core/tgSimulation.h"
-#include "core/tgWorld.h"
-
-// Boost
-#include <boost/program_options.hpp>
-
-// The C++ Standard Library
-#include <iostream>
-
-namespace po = boost::program_options;
-
-bool use_graphics = true;
-bool add_controller = false;
-bool add_duct = false;
-double timestep_physics = 1.0f/60.0f/10.0f; //Seconds
-double timestep_graphics = 1.0f/60.0f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
-int nEpisodes = 1; // Number of episodes ("trial runs")
-int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
-
-double startX = 0;
-double startY = 20;
-double startZ = 0;
-
-void handleOptions(int argc, char**argv);
-tgWorld *createWorld();
-tgSimViewGraphics *createGraphicsView(tgWorld *world);
-tgSimView *createView(tgWorld *world);
-void simulate(tgSimulation *simulation);
-
-/**
- * The entry point.
- * @param[in] argc the number of command-line arguments
- * @param[in] argv argv[0] is the executable name
- * @return 0
- */
-int main(int argc, char** argv)
+AppDuCTT::AppDuCTT(int argc, char** argv)
 {
-    std::cout << "AppDuCTT" << std::endl;
+    use_graphics = true;
+    add_controller = false;
+    add_duct = false;
+    timestep_physics = 1.0f/60.0f/10.0f;
+    timestep_graphics = 1.0f/60.0f;
+    nEpisodes = 1;
+    nSteps = 60000;
+
+    startX = 0;
+    startY = 20;
+    startZ = 0;
 
     handleOptions(argc, argv);
+}
 
+bool AppDuCTT::setup()
+{
     // First create the world
     tgWorld* world = createWorld();
 
@@ -87,7 +56,7 @@ int main(int argc, char** argv)
         view = createView(world);         // For running multiple episodes
 
     // Third create the simulation
-    tgSimulation* simulation = new tgSimulation(*view);
+    simulation = new tgSimulation(*view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
@@ -105,7 +74,7 @@ int main(int argc, char** argv)
 
     // Sixth add model & controller to simulation
     simulation->addModel(myRobotModel);
-	
+
     // Seventh add duct to simulation
     if (add_duct)
     {
@@ -113,22 +82,10 @@ int main(int argc, char** argv)
         simulation->addModel(myDuctModel);
     }
 
-    if (use_graphics)
-    {
-        // Run until the user stops
-        simulation->run();
-    }
-    else
-    {
-        // or run for a specific number of steps
-        simulate(simulation);
-    }
-
-    //Teardown is handled by delete, so that should be automatic
-    return 0;
+    return true;
 }
 
-void handleOptions(int argc, char **argv)
+void AppDuCTT::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -170,7 +127,7 @@ void handleOptions(int argc, char **argv)
     }
 }
 
-tgWorld *createWorld()
+tgWorld* AppDuCTT::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -180,19 +137,35 @@ tgWorld *createWorld()
 }
 
 /** Use for displaying tensegrities in simulation */
-tgSimViewGraphics *createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppDuCTT::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
 /** Use for trial episodes of many tensegrities in an experiment */
-tgSimView *createView(tgWorld *world)
+tgSimView *AppDuCTT::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
+bool AppDuCTT::run()
+{
+    if (use_graphics)
+    {
+        // Run until the user stops
+        simulation->run();
+    }
+    else
+    {
+        // or run for a specific number of steps
+        simulate(simulation);
+    }
+
+    return true;
+}
+
 /** Run a series of episodes for nSteps each */
-void simulate(tgSimulation *simulation)
+void AppDuCTT::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -200,3 +173,22 @@ void simulate(tgSimulation *simulation)
         simulation->reset();
     }
 }
+
+/**
+ * The entry point.
+ * @param[in] argc the number of command-line arguments
+ * @param[in] argv argv[0] is the executable name
+ * @return 0
+ */
+int main(int argc, char** argv)
+{
+    std::cout << "AppDuCTT" << std::endl;
+    AppDuCTT app (argc, argv);
+
+    if (app.setup())
+        app.run();
+
+    //Teardown is handled by delete, so that should be automatic
+    return 0;
+}
+
