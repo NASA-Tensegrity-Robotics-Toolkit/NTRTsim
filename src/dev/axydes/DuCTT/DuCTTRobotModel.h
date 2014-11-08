@@ -16,11 +16,11 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef DUCTT_MODEL_H
-#define DUCTT_MODEL_H
+#ifndef DUCTT_ROBOT_MODEL_H
+#define DUCTT_ROBOT_MODEL_H
 
 /**
- * @file DuCTTModel.h
+ * @file DuCTTRobotModel.h
  * @brief Defines a 3 strut 9 string tensegrity model
  * @author Brian Tietz
  * @version 1.0.0
@@ -28,9 +28,12 @@
  */
 
 // This library
+#include "tgPrismatic.h"
+
+// The NTRT Core Libary
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
-#include "tgPrismatic.h"
+
 // The C++ Standard Library
 #include <vector>
 
@@ -41,7 +44,6 @@ class tgWorld;
 class tgLinearString;
 class tgRod;
 class tgSphere;
-class PretensionController;
 class btVector3;
 
 /**
@@ -214,6 +216,11 @@ private:
     virtual void setupStructure(tgWorld &world);
 
     /**
+     * Sets up the tgStructure containing the Ghost model of the robot (just touch sensors).
+     */
+    virtual void setupGhostStructure(tgWorld &world);
+
+    /**
      * Sets up the internal variables used to make accessing parts of the robot easier.
      */
     virtual void setupVariables();
@@ -248,12 +255,6 @@ private:
      * @param[in] s A tgStructure that we're building into
      */
     static void addMuscles(tgStructure& s, int topNodesStart);
-
-    /**
-     * A controller that is attached to all of the strings which applies
-     * pretension to the muscles.
-     */
-    PretensionController* m_pStringController;
     
     /**
      * A list of all of the muscles. Will be empty until most of the way

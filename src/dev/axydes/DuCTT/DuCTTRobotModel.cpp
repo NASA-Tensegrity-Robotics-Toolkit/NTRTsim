@@ -17,28 +17,35 @@
 */
 
 /**
- * @file DuCTTModel.cpp
+ * @file DuCTTRobotModel.cpp
  * @brief Contains the definition of the members of the class DuCTTModel.
  * $Id$
  */
 
 // This module
 #include "DuCTTRobotModel.h"
-// This library
-#include "controllers/PretensionController.h"
+#include "tgDuCTTHingeInfo.h"
+#include "tgPrismaticInfo.h"
+#include "tgTouchSensorSphereInfo.h"
+#include "tgTouchSensorSphereModel.h"
+
+// The NTRT Core Libary
 #include "core/tgLinearString.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
+
+// The NTRT Creator Libary
 #include "tgcreator/tgBuildSpec.h"
-#include "tgDuCTTHingeInfo.h"
 #include "tgcreator/tgLinearStringInfo.h"
-#include "tgPrismaticInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -100,21 +107,18 @@ m_minStringRestLength(minStringRestLength)
 
 DuCTTRobotModel::DuCTTRobotModel() :
     m_config(DuCTTRobotModel::Config()),
-    m_pStringController(new PretensionController(m_config.m_pretension)),
     tgModel()
 {
 }
 
 DuCTTRobotModel::DuCTTRobotModel(DuCTTRobotModel::Config &config) :
     m_config(config),
-    m_pStringController(new PretensionController(m_config.m_pretension)),
     tgModel()
 {
 }
 
 DuCTTRobotModel::~DuCTTRobotModel()
 {
-    delete m_pStringController;
 }
 
 void DuCTTRobotModel::addNodes(tgStructure& tetra,
@@ -283,6 +287,7 @@ void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
 void DuCTTRobotModel::setup(tgWorld& world)
 {
     setupStructure(world);
+    setupGhostStructure(world);
     setupVariables();
     
     // Notify controllers that setup has finished.
@@ -364,6 +369,34 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     structureInfo.buildInto(*this, world);
 }
 
+void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
+{
+    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
+
+    // Create a structure that will hold the details of this model
+    tgStructure s;
+
+    // Add nodes to the bottom tetrahedron
+    addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height);
+
+    // Add nodes to top tetrahedron
+    addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height);
+
+    // Move the structure so it doesn't start in the ground
+    s.move(m_config.m_startPos);
+    s.addRotation(m_config.m_startPos, m_config.m_startRotAxis, m_config.m_startRotAngle);
+
+    // Create the build spec that uses tags to turn the structure into a real model
+    tgBuildSpec spec;
+    spec.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
+
+    // Create your structureInfo
+    tgStructureInfo structureInfo(s, spec);
+
+    // Use the structureInfo to build ourselves
+    structureInfo.buildInto(*this, world);
+}
+
 void DuCTTRobotModel::setupVariables()
 {
     // We could now use tgCast::filter or similar to pull out the
@@ -379,11 +412,18 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgLinearString>("saddle string");
 
     spheres = find<tgSphere>("sphere");
-
     for (int i=0; i<spheres.size(); i++)
     {
         btVector3 com = spheres[i]->centerOfMass();
         std::cerr << "Sphere " << i << " COM: <";
+        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
+    }
+
+    std::vector<tgTouchSensorSphereModel*> touchSensors = find<tgTouchSensorSphereModel>("sphere");
+    for (int i=0; i<touchSensors.size(); i++)
+    {
+        btVector3 com = touchSensors[i]->getPGhostObject()->getWorldTransform().getOrigin();
+        std::cerr << "Touch Sensor " << i << " COM: <";
         std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
     }
 

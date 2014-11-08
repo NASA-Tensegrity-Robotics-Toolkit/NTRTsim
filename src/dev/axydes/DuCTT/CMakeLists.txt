@@ -6,6 +6,8 @@ add_executable(AppDuCTT
     tgDuCTTHingeInfo.cpp
     tgPrismatic.cpp
     tgPrismaticInfo.cpp
+    tgTouchSensorSphereInfo.cpp
+    tgTouchSensorSphereModel.cpp
     DuctStraightModel.cpp
     DuCTTSineWaves.cpp
     DuCTTRobotModel.cpp
