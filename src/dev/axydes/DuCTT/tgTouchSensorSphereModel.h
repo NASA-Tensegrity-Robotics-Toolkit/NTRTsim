@@ -36,7 +36,6 @@
 
 // Forward declarations
 class btPairCachingGhostObject;
-class abstractMarker;
 
 /**
  * Holds a pointer to a btPairCachingGhostObject through the build process
@@ -56,14 +55,13 @@ public:
     virtual void teardown();
     
     virtual void onVisit(const tgModelVisitor& v) const;
-    
+
+    virtual void step(double dt);
+
     /**
      * Getter for rigid body
      */
-    virtual btPairCachingGhostObject* getPGhostObject()
-    {
-        return m_pCollisionObject;
-    }
+    virtual btPairCachingGhostObject* getPGhostObject();
 
 private:
 

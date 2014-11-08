@@ -45,6 +45,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "LinearMath/btVector3.h"
 
 tgTouchSensorSphereInfo::tgTouchSensorSphereInfo(const tgSphere::Config& config) :
     tgSphereInfo(config)
@@ -69,23 +70,23 @@ tgRigidInfo* tgTouchSensorSphereInfo::createRigidInfo(const tgNode& node)
 
 void tgTouchSensorSphereInfo::initRigidBody(tgWorld& world)
 {
-    if(!getCollisionObject()) {
-
+    if(!getCollisionObject())
+    {
 		// we want to do this based on group instead the rigid itself; otherwise we throw away autocompounding.
 		tgRigidInfo* rigid = getRigidInfoGroup();
 
 		// If we're not using autocompounding, use the rigid body itself.
 		// NOTE: This means that auto-compounding can be silently skipped, which means that your parts may not be joined correctly. Do we want that?
-		if(rigid == 0) { 
+        if(rigid == 0)
+        {
 			rigid = this;
 		}
 
         if (rigid->getCollisionObject() == NULL) // Init only if it doesn't have a btRigidBody (has already been initialized)
 		{ 
-		
 			btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 			
-			btTransform transform = rigid->getTransform();
+            btTransform transform = rigid->getTransform();
 			btCollisionShape* shape = rigid->getCollisionShape(world);
 			
 			// Dynamics world will own this
@@ -100,7 +101,6 @@ void tgTouchSensorSphereInfo::initRigidBody(tgWorld& world)
 			
             rigid->setCollisionObject(ghostObject);
 		}
-
 	}
 }
 

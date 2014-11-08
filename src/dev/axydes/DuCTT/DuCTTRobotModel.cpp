@@ -412,19 +412,21 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgLinearString>("saddle string");
 
     spheres = find<tgSphere>("sphere");
-    for (int i=0; i<spheres.size(); i++)
-    {
-        btVector3 com = spheres[i]->centerOfMass();
-        std::cerr << "Sphere " << i << " COM: <";
-        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
-    }
+//    for (int i=0; i<spheres.size(); i++)
+//    {
+//        btVector3 com = spheres[i]->centerOfMass();
+//        std::cerr << "Sphere " << i << " COM: <";
+//        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
+//    }
 
     std::vector<tgTouchSensorSphereModel*> touchSensors = find<tgTouchSensorSphereModel>("sphere");
     for (int i=0; i<touchSensors.size(); i++)
     {
-        btVector3 com = touchSensors[i]->getPGhostObject()->getWorldTransform().getOrigin();
-        std::cerr << "Touch Sensor " << i << " COM: <";
-        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
+        abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        touchSensors[i]->addMarker(marker);
+//        btVector3 com = touchSensors[i]->getPGhostObject()->getWorldTransform().getOrigin();
+//        std::cerr << "Touch Sensor " << i << " COM: <";
+//        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
     }
 
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");

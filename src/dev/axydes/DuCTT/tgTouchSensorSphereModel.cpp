@@ -50,18 +50,34 @@ tgTouchSensorSphereModel::tgTouchSensorSphereModel(btPairCachingGhostObject* pCo
 
 tgTouchSensorSphereModel::~tgTouchSensorSphereModel() { }
 
-void tgTouchSensorSphereModel::onVisit(const tgModelVisitor& v) const
-{
-    v.render(*this);
-    
-}
-
 void tgTouchSensorSphereModel::teardown()
 {
-  // This does not appear to be called
+    tgModel::teardown();
+}
 
-  // Postcondition
-  // This does not preserve the invariant
+void tgTouchSensorSphereModel::onVisit(const tgModelVisitor& v) const
+{
+//    v.render(*this);
+}
+
+void tgTouchSensorSphereModel::step(double dt)
+{
+    if (dt <= 0.0)
+    {
+        throw std::invalid_argument("dt is not positive.");
+    }
+    else
+    {
+        std::vector<abstractMarker> markers = getMarkers();
+        if (markers.size() == 1)
+            m_pCollisionObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
+        tgModel::step(dt);  // Step any children
+    }
+}
+
+btPairCachingGhostObject* tgTouchSensorSphereModel::getPGhostObject()
+{
+    return m_pCollisionObject;
 }
 
 bool tgTouchSensorSphereModel::invariant() const
