@@ -54,10 +54,15 @@ public:
 	// Bool returns if this point is actually on the body
 	bool setWorldPosition(btVector3& newPos);
 	
+	// Bool returns if body is still in contact (manifold still exists)
+	bool updateContactNormal();
+	
     // Relative to the body
     btVector3 getRelativePosition() const;
     
     btVector3 getContactNormal() const;
+    
+    
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;

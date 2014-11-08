@@ -58,7 +58,9 @@ int main(int argc, char** argv)
 	btVector3 lineA = point3 - point2;
 	btVector3 lineB = point1 - point2;
 	
+	normal.normalize();
 	
+#if (0)	
 	btVector3 tangentDir =( (lineB - lineA).cross(normal)).normalize();
 	btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
 	btVector3 newPos = point2 + tangentMove;
@@ -66,6 +68,38 @@ int main(int argc, char** argv)
 	std::cout << "tangentDir " << tangentDir << std::endl;
 	std::cout << "tangentMove " << tangentMove << std::endl;
 	std::cout << "newPos " << newPos << std::endl;
+#else
+	btQuaternion q1 = tgUtil::getQuaternionBetween(lineA, normal);
+	btQuaternion q2 = tgUtil::getQuaternionBetween(normal, lineB);
+	btQuaternion q3 = tgUtil::getQuaternionBetween(lineB, lineA);
 	
+	btVector3 lineACopy = lineA;
+	btVector3 lineBCopy = lineB;
+	btVector3 ab = lineA + lineB;
+	btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
+	
+	// Project normal into AB plane
+	btVector3 AN = lineA.dot(normal) * lineACopy.normalize();
+	btVector3 BN = lineB.dot(normal) * lineBCopy.normalize();
+	btVector3 normalProjection = abNorm.dot(normal) * abNorm;
+	
+	normalProjection.normalize();
+	
+	std::cout << "lineA Norm: " << lineACopy << std::endl;
+	std::cout << "lineB Norm: " << lineBCopy << std::endl;
+	std::cout << "Normal: " << normal << std::endl;
+	std::cout << "Projection: " << normalProjection << std::endl;
+	std::cout << "Angle AN: " << lineA.angle(normalProjection) << std::endl;
+	std::cout << "Angle BN " << lineB.angle(normalProjection) << std::endl;
+	std::cout << "Sum AN + BN " << lineA.angle(normalProjection) + lineB.angle(normalProjection) << std::endl;
+	std::cout << "Angle AB " << lineA.angle(lineB) << std::endl;
+	
+	std::cout << "Angle normal w/ x axis " << btVector3(1.0, 0.0, 0.0).angle(normal) << std::endl;
+	std::cout << "Angle lineA w/ x axis " << btVector3(1.0, 0.0, 0.0).angle(lineA) << std::endl;
+	std::cout << "Angle lineB w/ x axis " << btVector3(1.0, 0.0, 0.0).angle(lineB) << std::endl;
+	
+	std::cout << "Traditional: " << lineA.dot(normal) << " " << lineB.dot(normal) << std::endl;
+	
+#endif	
     return 0;
 }

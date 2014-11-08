@@ -160,12 +160,21 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			btVector3 first = (current - forward);
 			btVector3 second = (current - back);
 			
-			btVector3 forceDir = (first + second).normalize();
+			btVector3 forceDir = (first.normalize()  + second.normalize() ).normalize();
 #if (1)			
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
 #else
-			force = tension * forceDir;
+			btVector3 lineACopy = -first;
+			btVector3 lineBCopy = -second;
+			btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
+			
+			// Project normal into AB plane
+			btVector3 normalProjection = abNorm.dot(direction) * abNorm;
+			
+			force = tension * abNorm * direction;
+			
+			assert(force.length() <= tension);
 #endif            
             // Only care about scaling sliding forces
             m_rbForceMap[m_anchors[i]->attachedBody] += force;
@@ -248,7 +257,7 @@ void MuscleNP::updateAnchorList()
     
     int numContacts = 2;
     
-    m_anchorIt = m_anchors.begin() + 1;
+    std::vector<muscleAnchor*> rejectedAnchors;
     
 	for (int i=0;i<numPairs;i++)
 	{
@@ -313,6 +322,8 @@ void MuscleNP::updateAnchorList()
 
 						// Not permanent, sliding contact
 						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+						
+						m_anchorIt = m_anchors.begin() + 1;
 #if (1)							
 						// Find position of new anchor
 						while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
@@ -327,18 +338,51 @@ void MuscleNP::updateAnchorList()
 						btVector3 lineA = (pos2 - pos1);
 						btVector3 lineB = (pos0 - pos1);
 						
-						btScalar length1 = (pos0 - pos1).length();
-						btScalar length2 = (pos1 - pos2).length();
+						btScalar lengthA = lineA.length();
+						btScalar lengthB = lineB.length();
+						
+						btVector3 contactNormal = newAnchor->getContactNormal();
+						
+#if (1)						
+						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
+						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
+											
+						if (lengthA <= 0.1 || lengthB <= 0.1)
+						{
+							delete newAnchor;
+						}
+						else if(normalValue1 < 0.0 || normalValue2 < 0.0)
+						{
+							delete newAnchor;
+						}
 
-						if (lineA.length() <= 0.1 || lineB.length() <= 0.1)
+#else
+						btVector3 lineACopy = lineA;
+						btVector3 lineBCopy = lineB;
+						btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
+						
+						// Project normal into AB plane
+						btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
+						
+						normalProjection.normalize();			
+						
+						btScalar angleAN = lineA.angle(normalProjection);
+						btScalar angleBN = lineB.angle(normalProjection);
+						btScalar angleAB = lineA.angle(lineB);
+						
+						// Ensure we've projected correctly
+						// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
+						//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
+						
+						if (lengthA <= 0.1 || lengthB <= 0.1)
 						{
 							delete newAnchor;
 						}
-						else if((lineA).dot( newAnchor->getContactNormal()) < 0.0 ||
-									(lineB).dot( newAnchor->getContactNormal()) < 0.0)
+						else if(angleAN + angleBN > angleAB)
 						{
 							delete newAnchor;
 						}
+#endif // Normals vs angles
 						else
 						{	
 												  
@@ -388,7 +432,7 @@ void MuscleNP::pruneAnchors()
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0 || passes <= 3)
+    while (numPruned > 0 || passes <= 2)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
@@ -397,73 +441,117 @@ void MuscleNP::pruneAnchors()
         i = 1;
         while (i < m_anchors.size() - 1)
         {
-            btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
-            btVector3 current = m_anchors[i]->getWorldPosition(); 
-            btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-            
-            btVector3 lineA = (forward - current);
-            btVector3 lineB = (back - current);
-            
-            btScalar normalValue1;
-            btScalar normalValue2;
-            
-            btVector3 contactNormal = m_anchors[i]->getContactNormal();
-            
-            if (lineA.length() <= 0.0 || lineB.length() <= 0.0)
-            {
-                // Arbitrary value that deletes the nodes
-                normalValue1 = -1.0;
-                normalValue2 = -1.0;
-            }
-            else
-            {
-                //lineA.normalize();
-                //lineB.normalize();
-                //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-                normalValue1 = (lineA).dot(contactNormal);
-                normalValue2 = (lineB).dot(contactNormal);
-            }
+			bool keep = m_anchors[i]->updateContactNormal();
+			
+			numPruned = 0;
+			btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+			btVector3 current = m_anchors[i]->getWorldPosition(); 
+			btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+			
+			btVector3 lineA = (forward - current);
+			btVector3 lineB = (back - current);
+			
 
-            if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-            {   
-                #ifdef VERBOSE
-                    std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
-                #endif
-                if (deleteAnchor(i))
+			btVector3 contactNormal = m_anchors[i]->getContactNormal();
+			
+			if (!m_anchors[i]->permanent)
+			{
+				btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
+				btScalar tangentDot = (lineB + lineA).dot(tangentDir);
+				btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+				btVector3 newPos = current + tangentMove;
+				// Check if new position is on body
+				if (!keep || !m_anchors[i]->setWorldPosition(newPos))
 				{
+					deleteAnchor(i);
 					numPruned++;
 				}
-            }
-            else
-#if (1)            
-            // Move anchor to best tangent position
-            {
-				if (!m_anchors[i]->permanent)
-				{
-					btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
-					btScalar tangentDot = (lineB + lineA).dot(tangentDir);
-					btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
-					btVector3 newPos = current + tangentMove;
-					// Check if new position is on body
-					if (m_anchors[i]->setWorldPosition(newPos))
-					{
-						i++;
-					}
-					else
-					{
-						deleteAnchor(i);
-						numPruned++;
-					}
-				}
-                else
-                {
-					i++;
-				}
-            }
-#endif
+			}
+			else
 			{
 				i++;
 			}
+		
+			if (numPruned == 0 && !m_anchors[i]->permanent)
+			{
+				btScalar normalValue1;
+				btScalar normalValue2;
+				
+				// Get new values
+				
+				back = m_anchors[i - 1]->getWorldPosition(); 
+				current = m_anchors[i]->getWorldPosition(); 
+				forward = m_anchors[i + 1]->getWorldPosition(); 
+			
+				lineA = (forward - current);
+				lineB = (back - current);
+		
+				contactNormal = m_anchors[i]->getContactNormal();
+				
+				
+				if (lineA.length() <= 0.0 || lineB.length() <= 0.0)
+				{
+					// Arbitrary value that deletes the nodes
+					normalValue1 = -1.0;
+					normalValue2 = -1.0;
+				}
+#if (1)
+				else
+				{
+					//lineA.normalize();
+					//lineB.normalize();
+					//std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
+
+					normalValue1 = (lineA).dot(contactNormal);
+					normalValue2 = (lineB).dot(contactNormal);
+				}	
+				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
+				{  
+#else
+
+				btVector3 lineACopy = lineA;
+				btVector3 lineBCopy = lineB;
+				btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
+				
+				// Project normal into AB plane
+				btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
+				
+				normalProjection.normalize();			
+				
+				btScalar angleAN = lineA.angle(normalProjection);
+				btScalar angleBN = lineB.angle(normalProjection);
+				btScalar angleAB = lineA.angle(lineB);
+				
+				// Ensure we've projected correctly
+				// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
+				/// @todo add a scalar almostEqual to tgUtil
+				//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
+				
+				if(angleAN + angleBN > angleAB)
+				{
+					
+#endif // Normals vs angles
+				
+
+				 
+					#ifdef VERBOSE
+						std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
+					#endif
+					if (deleteAnchor(i))
+					{
+						numPruned++;
+					}
+					else
+					{
+						i++;
+					}
+				}
+				else
+				{
+					i++;
+				}
+			}
+			
         }
         passes++;
     }
@@ -549,7 +637,9 @@ void MuscleNP::updateCollisionObject()
     
     m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
-
+	
+	//m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
+	
     // @todo look up what the second and third arguments of this are
     //m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 

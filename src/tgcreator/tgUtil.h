@@ -128,7 +128,7 @@ public:
      * Get a vector that points from a to b.
      * @param[in] from a btVector3
      * @param[in] to a btVector3
-     * @return the vector difference to - from
+     * @return the vector difference to - fromn
      */
     static btVector3 getVector(const btVector3& from,
                    const btVector3& to)
@@ -260,7 +260,11 @@ public:
     {
         addRotation(v, fixedPoint, rotation.getAxis(), rotation.getAngle());
     }
-
+	
+	/**
+	 * @todo write a function that returns the normal of a vector without overwriting the original vector
+	 * line btVector3's .normalize() functions
+	 */
 
     /**
      * Convert radians to degrees.
