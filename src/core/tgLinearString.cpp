@@ -28,6 +28,9 @@
 #include "tgLinearString.h"
 #include "tgModelVisitor.h"
 #include "tgWorld.h"
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <cmath>
 #include <deque> // For history
@@ -97,6 +100,9 @@ void tgLinearString::teardown()
     
 void tgLinearString::step(double dt) 
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgLinearString::step");
+#endif //BT_NO_PROFILE   	
     if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive.");
@@ -113,6 +119,9 @@ void tgLinearString::step(double dt)
 
 void tgLinearString::onVisit(const tgModelVisitor& r) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgLinearString::onVisit");
+#endif //BT_NO_PROFILE	
     r.render(*this);
 }
     

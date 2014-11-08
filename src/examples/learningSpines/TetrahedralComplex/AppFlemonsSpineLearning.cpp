@@ -90,6 +90,11 @@ int main(int argc, char** argv)
     while (i < 3000)
     {
         simulation.run(30000);
+    	#ifdef BT_USE_DOUBLE_PRECISION
+		std::cout << "Double precision" << std::endl;
+	#else
+		std::cout << "Single Precision" << std::endl;
+	#endif
         simulation.reset();
         i++;
     }

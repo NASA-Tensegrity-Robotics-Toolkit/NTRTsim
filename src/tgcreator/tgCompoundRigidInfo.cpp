@@ -25,7 +25,7 @@
  */
 #include "tgCompoundRigidInfo.h"
 
-tgCompoundRigidInfo::tgCompoundRigidInfo() : m_compoundShape(NULL), m_rigidBody(NULL)
+tgCompoundRigidInfo::tgCompoundRigidInfo() : m_compoundShape(NULL), tgRigidInfo()
 {
 }
 
@@ -62,7 +62,7 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
 {
     if (m_compoundShape == 0)
     {
-        // Deallocated in the destructor
+        // Deallocated by the world implementation
         m_compoundShape = new btCompoundShape(&world);
 
         const btVector3 com = getCenterOfMass();
@@ -73,12 +73,12 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
             btTransform t = rigid->getTransform();
             t.setOrigin(t.getOrigin() - com);
             m_compoundShape->addChildShape(t, rigid->getCollisionShape(world));
-        }
-        
+        }        
         // Add the collision shape to the array so we can delete it later
         tgWorldBulletPhysicsImpl& bulletWorld =
           (tgWorldBulletPhysicsImpl&)world.implementation();
         bulletWorld.addCollisionShape(m_compoundShape);
+
     }
     return m_compoundShape;
 }
@@ -110,16 +110,39 @@ double tgCompoundRigidInfo::getMass() const
     }
     return mass;
 }
+
+btRigidBody* tgCompoundRigidInfo::getRigidBody()
+{
+	btRigidBody* rb = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return rb;
+}
+
+const btRigidBody* tgCompoundRigidInfo::getRigidBody() const
+{
+	btRigidBody* rb = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return rb;
+}
     
 void tgCompoundRigidInfo::setRigidBody(btRigidBody* const rigidBody)
 {
-    m_rigidBody = rigidBody;
+    m_collisionObject = rigidBody;
     // Set the rigid body for all components
     /// @todo Use std::for_each()
     for (int ii = 0; ii < m_rigids.size(); ii++) {
         m_rigids[ii]->setRigidBody(rigidBody);
     }
 }
+
+void tgCompoundRigidInfo::setCollisionObject(btCollisionObject* collisionObject)
+{
+	m_collisionObject = collisionObject;
+    // Set the rigid body for all components
+    /// @todo Use std::for_each()
+    for (int ii = 0; ii < m_rigids.size(); ii++) {
+        m_rigids[ii]->setCollisionObject(collisionObject);
+    }
+}
+      
     
 std::set<tgRigidInfo*> tgCompoundRigidInfo::getLeafRigids()
 {

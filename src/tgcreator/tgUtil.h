@@ -96,8 +96,11 @@ public:
         btTransform t = btTransform();
         t.setIdentity();
         t.setOrigin(origin);
-        t.setRotation(getQuaternionBetween(startOrientation,
-                           getVector(start, end)));
+        // If they for some reason gave us the same vector, keep identity
+        
+		t.setRotation(getQuaternionBetween(startOrientation,
+					   getVector(start, end)));
+
         return t;
     }
     
@@ -188,6 +191,7 @@ public:
      * @param[in] b a btVector3, passed by value
      * @return a quaternion that, if applied, would rotate vector a to align
      * with vector b
+     * @todo get some sensible value if a or b = (0, 0, 0). See getTransform
      */
     static btQuaternion getQuaternionBetween(btVector3 a, btVector3 b) 
     {
@@ -196,18 +200,14 @@ public:
 
         // The return value
         btQuaternion result;
-
+		
         // Account for equal vectors (can't calculate c in this case)
         if (almostEqual(a, b)) {
             result = btQuaternion::getIdentity();
         } else if (almostEqual(a, -b)) {
-            // Account for opposing vectors (can't calculate c in
-            // this case either)
-            // What to do here?
-            const btVector3 arb =
-            a + getArbitraryNonParallelVector(a);
-            const btVector3 c = (a.cross(arb)).normalize();
-            result = btQuaternion(c, M_PI).normalize();;
+
+			result = -btQuaternion::getIdentity();      
+            
         } else {
             // Create a vector normal to both a and b
             const btVector3 c = (a.cross(b)).normalize();
@@ -217,21 +217,6 @@ public:
             result = btQuaternion(c, acos(a.dot(b))).normalize();
         }
         return result;
-    }
-
-    /**
-     * Return a random btVector3 that is not parallel to v.
-     * @param[in] v a btVector3, passed by value
-     * @return a random btVector3 that is not parallel to v
-     */
-    inline static btVector3 getArbitraryNonParallelVector(btVector3 v)
-    {
-        btVector3 arb;
-        v.normalize();
-        do {
-            arb = btVector3(rand()%10, rand()%10, rand()%10).normalize();
-        } while (arb == v || arb == -v);
-        return arb;
     }
 
     /** 

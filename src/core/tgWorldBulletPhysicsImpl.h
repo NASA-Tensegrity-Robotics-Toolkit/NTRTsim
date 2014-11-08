@@ -32,6 +32,8 @@
 #include "tgWorldImpl.h"
 #include "LinearMath/btAlignedObjectArray.h"
 
+
+
 // Forward declarations
 class btCollisionShape;
 class btTypedConstraint;
@@ -86,7 +88,13 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
 	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
 	 */
 	void addCollisionShape(btCollisionShape* pShape);
-
+	
+	/**
+	 * Immediately delete a collision shape to avoid leaking memory during a rial
+	 * @param[in] pShape a pointer to a btCollisionShape; do nothing if NULL
+	 */
+	void deleteCollisionShape(btCollisionShape* pShape);
+	
         /**
      * Add a btTypedConstraint to a collection for deletion upon
      * destruction. Also add to the physics.
@@ -129,7 +137,7 @@ private:
    btDynamicsWorld* m_pDynamicsWorld;
     
     /* 
-     * A vector of collision shapes for easy reference. Does not affect
+     * A btAlignedObjectArray of collision shapes for easy reference. Does not affect
      * physics or rendering unles the shape is placed into the dynamics
      * world. Bullet encourages reuse of collision shapes when possible
      * for efficiency.

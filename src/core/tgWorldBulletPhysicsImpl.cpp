@@ -40,6 +40,7 @@
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 #include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
@@ -49,6 +50,11 @@
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuickprof.h"
+
+// Ghost objects
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
 
 #define MCLP_SOLVER
 
@@ -71,6 +77,7 @@ class IntermediateBuildProducts
             corner1 (-worldSize,-worldSize, -worldSize),
             corner2 (worldSize, worldSize, worldSize),
             dispatcher(&collisionConfiguration),
+            ghostCallback(),
 #ifndef   MLCP_SOLVER       
 	#if (1) // More acc broadphase - remeber the comma (consider doing ifndef)
 				broadphase(corner1, corner2, 16384)
@@ -81,11 +88,13 @@ class IntermediateBuildProducts
 #endif //MLCP_SOLVER  
 			
   {
+	  broadphase.getOverlappingPairCache()->setInternalGhostPairCallback(&ghostCallback);
   }
   const btVector3 corner1;
   const btVector3 corner2;
   btSoftBodyRigidBodyCollisionConfiguration collisionConfiguration;
   btCollisionDispatcher dispatcher;
+  btGhostPairCallback ghostCallback;
 #if (0) // Default broadphase
         btDbvtBroadphase broadphase;
 #else
@@ -100,6 +109,7 @@ class IntermediateBuildProducts
 #else
 		btSequentialImpulseConstraintSolver solver;
 #endif
+	
 };
 
 tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config,
@@ -215,6 +225,10 @@ void tgWorldBulletPhysicsImpl::step(double dt)
 
 void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("addCollisionShape");
+#endif //BT_NO_PROFILE   	
+	
     if (pShape)
     {
         m_collisionShapes.push_back(pShape);
@@ -233,6 +247,31 @@ void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
             m_constraints.push_back(pConstraint);
             m_pDynamicsWorld->addConstraint(pConstraint);
       }
+
+      // Postcondition
+      assert(invariant());
+}
+
+void tgWorldBulletPhysicsImpl::deleteCollisionShape(btCollisionShape* pShape)
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("deleteCollisionShape");
+#endif //BT_NO_PROFILE
+	
+    if (pShape)
+    {
+		btCompoundShape* cShape = tgCast::cast<btCollisionShape, btCompoundShape>(pShape);
+		if (cShape)
+		{
+			std::size_t n = cShape->getNumChildShapes();
+			for( std::size_t i = 0; i < n; i++)
+			{
+				deleteCollisionShape(cShape->getChildShape(i));
+			}
+		}
+		m_collisionShapes.remove(pShape);
+        delete pShape;
+    }
 
       // Postcondition
       assert(invariant());

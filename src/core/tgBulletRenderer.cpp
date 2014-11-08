@@ -27,10 +27,17 @@
 #include "tgBulletRenderer.h"
 // This application
 #include "Muscle2P.h"
+#include "muscleAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgLinearString.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
+
+#include "dev/muscleNP/MuscleNP.h"
+#include "tgCast.h"
+
+#include "LinearMath/btQuickprof.h"
+
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -45,11 +52,17 @@ tgBulletRenderer::tgBulletRenderer(tgWorld& world) : m_world(world)
 
 void tgBulletRenderer::render(const tgRod& rod) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderRod");
+#endif //BT_NO_PROFILE 
         // render the rod (change color, etc. if we want)
 }
 
 void tgBulletRenderer::render(const tgLinearString& linString) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderString");
+#endif //BT_NO_PROFILE 
         // Fetch the btDynamicsWorld
         btDynamicsWorld& dynamicsWorld =
       tgBulletUtil::worldToDynamicsWorld(m_world);
@@ -58,29 +71,35 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
     
     const Muscle2P* const pMuscle = linString.getMuscle();
     
-    if (pDrawer && pMuscle)
+    if(pDrawer && pMuscle)
     {
-    
-      const btVector3 lineFrom =
-        pMuscle->anchor1->getWorldPosition();
-      const btVector3 lineTo = 
-        pMuscle->anchor2->getWorldPosition();
-       // Should this be normalized??
-      const double stretch = 
-        linString.getCurrentLength() - pMuscle->getRestLength();
-      const btVector3 color =
-        (stretch < 0.0) ?
-        btVector3(0.0, 0.0, 1.0) :
-        btVector3(0.5 + stretch / 3.0, 
-              0.5 - stretch / 2.0, 
-              0.0);
-      pDrawer->drawLine(lineFrom, lineTo, color);
-    }
+		const std::vector<muscleAnchor*>& anchors = pMuscle->getAnchors();
+		std::size_t n = anchors.size() - 1;
+		for (std::size_t i = 0; i < n; i++)
+		{
+			const btVector3 lineFrom =
+			anchors[i]->getWorldPosition();
+		  const btVector3 lineTo = 
+			anchors[i+1]->getWorldPosition();
+		   // Should this be normalized??
+		  const double stretch = 
+			linString.getCurrentLength() - pMuscle->getRestLength();
+		  const btVector3 color =
+			(stretch < 0.0) ?
+			btVector3(0.0, 0.0, 1.0) :
+			btVector3(0.5 + stretch / 3.0, 
+				  0.5 - stretch / 2.0, 
+				  0.0);
+		  pDrawer->drawLine(lineFrom, lineTo, color);
+		}
+	}
 }
 
 void tgBulletRenderer::render(const tgModel& model) const
 {
-
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderModel");
+#endif //BT_NO_PROFILE  
 	/**
 	 * Render the markers of the model using spheres.
 	 */

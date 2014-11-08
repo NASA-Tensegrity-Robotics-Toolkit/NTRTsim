@@ -3,6 +3,7 @@ project(core)
 
 add_library( ${PROJECT_NAME} SHARED
   tgWorldBulletPhysicsImpl.cpp
+    muscleAnchor.cpp
     Muscle2P.cpp
     ImpedanceControl.cpp
     

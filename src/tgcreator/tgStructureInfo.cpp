@@ -31,6 +31,8 @@
 #include "tgConnectorInfo.h"
 #include "tgRigidAutoCompound.h"
 #include "tgStructure.h"
+#include "core/tgWorld.h"
+#include "core/tgModel.h"
 // The C++ Standard Library
 #include <stdexcept>
 

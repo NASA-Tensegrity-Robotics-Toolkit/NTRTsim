@@ -25,6 +25,7 @@
 
 // This application
 #include "T6SphereModel.h"
+#include "examples/SUPERball/T6TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
     
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
+    const double pitch = 0.0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 0.0001; // Seconds
+    const double timestep_physics = 0.001; // Seconds
     const double timestep_graphics = 1.f/60.f; // Seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -87,7 +88,7 @@ int main(int argc, char** argv)
     // Set the tension of the controller units of kg * length / s^2
     // So 10000 units at this scale is 1000 N
 
-    // T6TensionController* const pTC = new T6TensionController(10000);
+     //T6TensionController* const pTC = new T6TensionController(100);
 
     //myModel->attach(pTC);
     simulation.addModel(myModel);

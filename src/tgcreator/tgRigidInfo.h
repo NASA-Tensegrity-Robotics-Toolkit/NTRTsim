@@ -27,29 +27,27 @@
  * $Id$
  */
 
-// The Bullet Physics library
-#include "btBulletDynamicsCommon.h"
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 // The C++ Standard Library
 #include <set>
 // This library
-
-// @todo: move these includes to tgRigidInfo.cpp
 #include "core/tgTaggable.h"
-#include "core/tgBulletUtil.h"
-#include "core/tgWorld.h"
 #include "core/tgModel.h"
+//Bullet Physics
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 
 // Forward references
 class tgCompoundRigidInfo;
-class tgTaggable;
 class tgNode;
 class tgNodes;
 class tgPair;
 class tgPairs;
 class tgTagSearch;
+class tgWorld;
 
-#include "tgUtil.h" // Testing/debugging only
+class btRigidBody;
+class btCollisionShape;
+class btTransform;
 
 /**
  * A collector for keeping track of all of the necessary components of a
@@ -79,21 +77,21 @@ public:
     tgRigidInfo() : 
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable()
     {}    
 
     tgRigidInfo(tgTags tags) : 
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable(tags)
     {}    
 
     tgRigidInfo(const std::string& space_separated_tags) :
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_rigidBody(NULL), 
+        m_collisionObject(NULL), 
         tgTaggable(space_separated_tags)
     {}    
     
@@ -170,18 +168,13 @@ public:
      * Return a pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
      */
-    virtual btRigidBody* getRigidBody() 
-    { 
-        return m_rigidBody;
-    }
+    virtual btRigidBody* getRigidBody();
 
     /**
      * Return a const pointer to the corresponding btRigidBody.
      * @return a pointer to the corresponding btRigidBody
      */
-    virtual const btRigidBody* getRigidBody() const { 
-        return m_rigidBody; 
-    }
+    virtual const btRigidBody* getRigidBody() const;
     
     /**
      * Set the corresponding btRigidBody.
@@ -189,9 +182,37 @@ public:
      */
     virtual void setRigidBody(btRigidBody* rigidBody)
     {
-        /// @todo Does this leak any previous value of m_rigidBody?
-        m_rigidBody = rigidBody;
+        /// @todo Does this leak any previous value of m_collisionObject?
+        m_collisionObject = rigidBody;
     }
+    
+    /**
+     * Return a pointer to the collisionObject without upcasting
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual btCollisionObject* getCollisionObject()
+    {
+		return m_collisionObject;
+	}
+	
+    /**
+     * Return a pointer to the collisionObject without upcasting
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual const btCollisionObject* getCollisionObject() const
+    {
+		return m_collisionObject;
+	}
+	
+    /**
+     * Set the collision object to a new collision object
+     * @return a pointer to the corresponding btCollisionObject
+     */
+    virtual void setCollisionObject(btCollisionObject* collisionObject)
+    {
+		/// @todo Does this leak any previous value of m_collisionObject?
+		m_collisionObject = collisionObject;
+	}
         
     /**
      * Return a btTransform.
@@ -323,9 +344,10 @@ protected:  // Protected, not private -- subclasses need access
     mutable tgRigidInfo* m_rigidInfoGroup;
 
     /**
-     * A pointer to the corresponding btRigidBody.
+     * A pointer to the corresponding btCollisionObject.
+     * Typically a btRigidBody, but can also be a btGhostObject
      */
-    mutable btRigidBody* m_rigidBody;
+    mutable btCollisionObject* m_collisionObject;
     
 };
 

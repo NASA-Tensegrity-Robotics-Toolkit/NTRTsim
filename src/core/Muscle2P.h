@@ -32,6 +32,7 @@
 // The C++ Standard Library
 
 #include <string>
+#include <vector>
 
 // Forward references
 class btRigidBody;
@@ -58,7 +59,7 @@ public:
     
     void setRestLength( const double newRestLength); 
 
-    const btScalar getActualLength() const;
+    virtual const btScalar getActualLength() const;
 
     const double getTension() const;
     
@@ -81,16 +82,25 @@ public:
         return name;
     }
     
-    muscleAnchor * anchor1;
+    muscleAnchor * const anchor1;
 
-    muscleAnchor * anchor2;
+    muscleAnchor * const anchor2;
+
+	const std::vector<muscleAnchor*>& getAnchors() const
+    {
+        return m_anchors;
+    }
 
     std::string name;
 
     bool recordHistory;
 
+protected:
 
- private:
+   // Wanted to do a set, but need random access iterator to sort
+   // Needs to be stored here for consistent rendering
+   std::vector<muscleAnchor*> m_anchors;
+
     // Necessary for computations
     double m_restLength;
  
@@ -105,31 +115,9 @@ public:
     const btScalar m_dampingCoefficient;
     
     const btScalar m_coefK;
- 
+
+ private: 
     bool invariant(void) const;
-};
-
-class muscleAnchor
-{
-public:
-    muscleAnchor();
-
-    muscleAnchor(btRigidBody *body, btVector3 pos);
-    
-    ~muscleAnchor();
-    
-    btVector3 getWorldPosition();
-
-    // Relative to the body
-    btVector3 getRelativePosition();
-
-    btRigidBody * attachedBody;
-
-    // Relative to the body when it is first constructed
-    btVector3 attachedRelativeOriginalPosition;
-
-    btScalar height;
- private:
 };
 
 #endif  // NTRT_MUSCLE2P_H_

@@ -11,5 +11,6 @@ subdirs(
     kmorse
     apsabelhaus
     SpineHardwareProject
+    muscleNP
 )
 

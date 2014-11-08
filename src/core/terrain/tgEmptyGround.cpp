@@ -32,7 +32,8 @@
 // The C++ Standard Library
 #include <cassert>
 
-tgEmptyGround::tgEmptyGround() 
+tgEmptyGround::tgEmptyGround() :
+tgBulletGround()
 {
        
 }
