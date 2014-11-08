@@ -165,8 +165,8 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     if (distance == 0)
     {
-        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere"); // 0
-        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere"); // 1
+        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "bottom right sphere"); // 0
+        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "bottom left sphere"); // 1
         tetra.addNode(topBack); // 2
         tetra.addNode(topFront); // 3
     }
@@ -174,8 +174,8 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
     {
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
-        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere"); // 2
-        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere"); // 3
+        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "top back sphere"); // 2
+        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "top front sphere"); // 3
     }
 
     tetra.addNode(bottomMidRight); // 4
@@ -419,11 +419,13 @@ void DuCTTRobotModel::setupVariables()
 //        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
 //    }
 
-    std::vector<tgTouchSensorSphereModel*> touchSensors = find<tgTouchSensorSphereModel>("sphere");
-    for (int i=0; i<touchSensors.size(); i++)
+    //attach touch sensors to the appropriate spheres on the actual robot model
+    //add the appropriate rods to the touch sensor ignore list
+    allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
+    for (int i=0; i<allTouchSensors.size(); i++)
     {
         abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
-        touchSensors[i]->addMarker(marker);
+        allTouchSensors[i]->addMarker(marker);
 //        btVector3 com = touchSensors[i]->getPGhostObject()->getWorldTransform().getOrigin();
 //        std::cerr << "Touch Sensor " << i << " COM: <";
 //        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
@@ -481,6 +483,11 @@ const std::vector<tgLinearString*>& DuCTTRobotModel::getSaddleMuscles() const
 const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const
 {
     return allPrisms;
+}
+
+const std::vector<tgTouchSensorSphereModel*>& DuCTTRobotModel::getAllTouchSensors() const
+{
+    return allTouchSensors;
 }
 
 const tgPrismatic* DuCTTRobotModel::getBottomPrismatic() const

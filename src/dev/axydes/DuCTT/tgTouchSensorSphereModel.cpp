@@ -25,30 +25,54 @@
 
 // This module
 #include "tgTouchSensorSphereModel.h"
+
+// The NTRT Core library
+#include "core/tgBulletUtil.h"
 #include "core/tgModelVisitor.h"
+#include "core/tgWorld.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
+
+// The NTRT Creator library
+#include "tgcreator/tgUtil.h"
+
 // The Bullet Physics library
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
+#include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
+#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
+#include "BulletCollision/BroadphaseCollision/btDispatcher.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 
-tgTouchSensorSphereModel::tgTouchSensorSphereModel(btPairCachingGhostObject* pCollisionObject,
-                const tgTags& tags) : 
-  tgModel(tags),
-  m_pCollisionObject(pCollisionObject)
+tgTouchSensorSphereModel::tgTouchSensorSphereModel(btPairCachingGhostObject* pGhostObject,
+    tgWorld& world,
+    const tgTags& tags) :
+tgModel(tags),
+m_world(world),
+m_overlappingPairCache(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
+m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
+m_pGhostObject(pGhostObject)
 {
-    if (pCollisionObject == NULL)
+    if (pGhostObject == NULL)
     {
             throw std::invalid_argument("Pointer to ghostObject is NULL");
     }
 
     // Postcondition
     assert(invariant());
-    assert(m_pCollisionObject == pCollisionObject);
+    assert(m_pGhostObject == pGhostObject);
 }
 
-tgTouchSensorSphereModel::~tgTouchSensorSphereModel() { }
+tgTouchSensorSphereModel::~tgTouchSensorSphereModel()
+{
+    btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+    dynamicsWorld.removeCollisionObject(m_pGhostObject);
+    delete m_pGhostObject;
+}
 
 void tgTouchSensorSphereModel::teardown()
 {
@@ -68,20 +92,117 @@ void tgTouchSensorSphereModel::step(double dt)
     }
     else
     {
-        std::vector<abstractMarker> markers = getMarkers();
-        if (markers.size() == 1)
-            m_pCollisionObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
+        updatePosition();
+        checkCollisions();
         tgModel::step(dt);  // Step any children
+    }
+}
+
+void tgTouchSensorSphereModel::updatePosition()
+{
+    std::vector<abstractMarker> markers = getMarkers();
+    if (markers.size() == 1)
+        m_pGhostObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
+}
+
+void tgTouchSensorSphereModel::checkCollisions()
+{
+    btManifoldArray	m_manifoldArray;
+    btVector3 m_touchingNormal;
+
+    // Only caches the pairs, they don't have a lot of useful information
+    btBroadphasePairArray& pairArray = m_pGhostObject->getOverlappingPairCache()->getOverlappingPairArray();
+    int numPairs = pairArray.size();
+
+    int numContacts = 2;
+
+    for (int i=0;i<numPairs;i++)
+    {
+        m_manifoldArray.clear();
+
+        const btBroadphasePair& pair = pairArray[i];
+
+        // The real broadphase's pair cache has the useful info
+        btBroadphasePair* collisionPair = m_overlappingPairCache->getOverlappingPairCache()->findPair(pair.m_pProxy0,pair.m_pProxy1);
+
+        btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
+                btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
+
+        if (collisionPair->m_algorithm)
+            collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
+
+        for (int j=0;j<m_manifoldArray.size();j++)
+        {
+            btPersistentManifold* manifold = m_manifoldArray[j];
+            btScalar directionSign = manifold->getBody0() == m_pGhostObject ? btScalar(-1.0) : btScalar(1.0);
+
+            for (int p=0;p<manifold->getNumContacts();p++)
+            {
+                const btManifoldPoint& pt = manifold->getContactPoint(p);
+
+                btScalar dist = pt.getDistance();
+
+                if (dist < 0.0)
+                {
+
+                    m_touchingNormal = pt.m_normalWorldOnB * directionSign;
+
+                    btVector3 pos = directionSign < 0 ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
+
+                    btRigidBody* rb = NULL;
+
+                    if (manifold->getBody0() == m_pGhostObject)
+                    {
+                        if (manifold->getBody1() == obj1)
+                            rb = btRigidBody::upcast(obj1);
+                        else if (manifold->getBody1() == obj0)
+                            rb = btRigidBody::upcast(obj0);
+                        else
+                        {
+                            throw std::runtime_error("Can't find the right object!!");
+                        }
+                    }
+                    else
+                    {
+                        if (manifold->getBody0() == obj0)
+                            rb = btRigidBody::upcast(obj0);
+                        else if (manifold->getBody0() == obj1)
+                            rb = btRigidBody::upcast(obj1);
+                        else
+                        {
+                            throw std::runtime_error("Can't find the right object!!");
+                        }
+                    }
+
+                    if(rb)
+                    {
+
+                    }
+
+                }
+            }
+        }
+
     }
 }
 
 btPairCachingGhostObject* tgTouchSensorSphereModel::getPGhostObject()
 {
-    return m_pCollisionObject;
+    return m_pGhostObject;
+}
+
+std::vector<btCollisionObject*> tgTouchSensorSphereModel::getIgnoredObjects()
+{
+    return m_IgnoredObjects;
+}
+
+void tgTouchSensorSphereModel::addIgnoredObject(btCollisionObject *_objToIgnore)
+{
+    m_IgnoredObjects.push_back(_objToIgnore);
 }
 
 bool tgTouchSensorSphereModel::invariant() const
 {
   return
-    (m_pCollisionObject != NULL);
+    (m_pGhostObject != NULL);
 }

@@ -44,6 +44,7 @@ class tgWorld;
 class tgLinearString;
 class tgRod;
 class tgSphere;
+class tgTouchSensorSphereModel;
 class btVector3;
 
 /**
@@ -187,6 +188,12 @@ public:
     const std::vector<tgPrismatic*>& getAllPrismatics() const;
 
     /**
+     * Return a vector of all touch sensors for the controllers to work with.
+     * @return A vector of all of the touch sensors
+     */
+    const std::vector<tgTouchSensorSphereModel*>& getAllTouchSensors() const;
+
+    /**
      * @return the bottom tetra's prismatic actuator
      */
     const tgPrismatic* getBottomPrismatic() const;
@@ -285,6 +292,7 @@ private:
     std::vector<tgRod*> bottomRods;
     std::vector<tgRod*> prismRods;
     std::vector<tgSphere*> spheres;
+    std::vector<tgTouchSensorSphereModel*> allTouchSensors;
 
     DuCTTRobotModel::Config m_config;
 

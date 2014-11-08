@@ -92,7 +92,7 @@ void tgTouchSensorSphereInfo::initRigidBody(tgWorld& world)
 			// Dynamics world will own this
             btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 	
-			ghostObject->setCollisionShape (shape);
+            ghostObject->setCollisionShape(shape);
 			ghostObject->setWorldTransform(transform);
 			ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			
@@ -117,7 +117,7 @@ tgModel* tgTouchSensorSphereInfo::createModel(tgWorld& world)
     
     btPairCachingGhostObject* ghostObject = tgCast::cast<btCollisionObject, btPairCachingGhostObject> (getCollisionObject());
     
-    tgTouchSensorSphereModel* slimer = new tgTouchSensorSphereModel(ghostObject, getTags());
+    tgTouchSensorSphereModel* slimer = new tgTouchSensorSphereModel(ghostObject, world, getTags());
 
     return slimer;
 }

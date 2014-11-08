@@ -36,6 +36,9 @@
 
 // Forward declarations
 class btPairCachingGhostObject;
+class btBroadphaseInterface;
+class btDispatcher;
+class tgWorld;
 
 /**
  * Holds a pointer to a btPairCachingGhostObject through the build process
@@ -46,8 +49,9 @@ class tgTouchSensorSphereModel : public tgModel
 {
 public:
 	
-    tgTouchSensorSphereModel(btPairCachingGhostObject* pCollisionObject,
-		const tgTags& tags);
+    tgTouchSensorSphereModel(btPairCachingGhostObject* pGhostObject,
+                            tgWorld& world,
+                            const tgTags& tags);
 	
     /** A class with a virtual memeber function requires a virtual destructor. */
     virtual ~tgTouchSensorSphereModel();
@@ -58,23 +62,36 @@ public:
 
     virtual void step(double dt);
 
-    /**
-     * Getter for rigid body
-     */
     virtual btPairCachingGhostObject* getPGhostObject();
+
+    virtual std::vector<btCollisionObject*> getIgnoredObjects();
+
+    virtual void addIgnoredObject(btCollisionObject *_objToIgnore);
 
 private:
 
     /** Integrity predicate. */
     bool invariant() const;
 
-protected:
-    
+    void updatePosition();
+    void checkCollisions();
+
     /**
      * The Bullet Physics implementation of the collision object.
      */
-    btPairCachingGhostObject* m_pCollisionObject;
-    
+    btPairCachingGhostObject* m_pGhostObject;
+
+    /**
+     * Vector of objects to ignore in collision detection
+     */
+    std::vector<btCollisionObject*> m_IgnoredObjects;
+
+    tgWorld&  m_world;
+
+    btBroadphaseInterface* const m_overlappingPairCache;
+
+    btDispatcher* const m_dispatcher;
+
 };
 
 #endif
