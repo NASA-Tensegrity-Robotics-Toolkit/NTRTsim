@@ -39,6 +39,8 @@ class tgModelVisitor;
 class tgStructure;
 class tgWorld;
 class tgLinearString;
+class tgRod;
+class tgSphere;
 class PretensionController;
 class btVector3;
 
@@ -207,6 +209,16 @@ public:
 
 private:
     /**
+     * Sets up the tgStructure containing the actual model of the robot.
+     */
+    virtual void setupStructure(tgWorld &world);
+
+    /**
+     * Sets up the internal variables used to make accessing parts of the robot easier.
+     */
+    virtual void setupVariables();
+
+    /**
      * A function called during setup that determines the positions of
      * the nodes based on construction parameters. Rewrite this function
      * for your own models
@@ -266,6 +278,12 @@ private:
      * through setup when it is filled using tgModel's find methods
      */
     std::vector<tgPrismatic*> allPrisms;
+
+    std::vector<tgRod*> allRods;
+    std::vector<tgRod*> topRods;
+    std::vector<tgRod*> bottomRods;
+    std::vector<tgRod*> prismRods;
+    std::vector<tgSphere*> spheres;
 
     DuCTTRobotModel::Config m_config;
 

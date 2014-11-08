@@ -282,6 +282,18 @@ void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
 
 void DuCTTRobotModel::setup(tgWorld& world)
 {
+    setupStructure(world);
+    setupVariables();
+    
+    // Notify controllers that setup has finished.
+    notifySetup();
+    
+    // Actually setup the children
+    tgModel::setup(world);
+}
+
+void DuCTTRobotModel::setupStructure(tgWorld &world)
+{
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
     const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_prismDensity);
@@ -304,25 +316,25 @@ void DuCTTRobotModel::setup(tgWorld& world)
     const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
     const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
     const tgRodHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI,1, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
-    
+
     // Create a structure that will hold the details of this model
     tgStructure s;
-    
+
     // Add nodes to the bottom tetrahedron
     addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height);
-    
+
     // Add rods to the bottom tetrahedron
     addRods(s);
-    
+
     // Add nodes to top tetrahedron
     addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height);
-    
+
     // Add rods to the top tetrahedron
     addRods(s, 16);
-    
+
     // Add muscles to the structure
     addMuscles(s, 16);
-    
+
     // Move the structure so it doesn't start in the ground
     s.move(m_config.m_startPos);
     s.addRotation(m_config.m_startPos, m_config.m_startRotAxis, m_config.m_startRotAngle);
@@ -350,21 +362,30 @@ void DuCTTRobotModel::setup(tgWorld& world)
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
+}
 
+void DuCTTRobotModel::setupVariables()
+{
     // We could now use tgCast::filter or similar to pull out the
-    // models (e.g. muscles) that we want to control. 
+    // models (e.g. muscles) that we want to control.
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
     allPrisms = tgCast::filter<tgModel, tgPrismatic> (getDescendants());
+    allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 
-    // Then attach the pretension controller to each of these muscles to keep
-    // the tensegrity's shape
-//    for (std::size_t i = 0; i < allMuscles.size(); i++)
-//    {
-//        allMuscles[i]->attach(m_pStringController);
-//    }
-
+    bottomRods = find<tgRod>("rod bottom");
+    topRods = find<tgRod>("rod top");
+    prismRods = find<tgRod>("prism rod");
     vertMuscles = find<tgLinearString>("vert string");
     saddleMuscles = find<tgLinearString>("saddle string");
+
+    spheres = find<tgSphere>("sphere");
+
+    for (int i=0; i<spheres.size(); i++)
+    {
+        btVector3 com = spheres[i]->centerOfMass();
+        std::cerr << "Sphere " << i << " COM: <";
+        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
+    }
 
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");
     if (bottomPrisms.size() == 1)
@@ -377,12 +398,6 @@ void DuCTTRobotModel::setup(tgWorld& world)
     {
         m_pTopPrismatic = topPrisms[0];
     }
-    
-    // Notify controllers that setup has finished.
-    notifySetup();
-    
-    // Actually setup the children
-    tgModel::setup(world);
 }
 
 void DuCTTRobotModel::step(double dt)
