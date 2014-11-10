@@ -405,8 +405,7 @@ void MuscleNP::updateAnchorList()
 		btScalar lengthB = lineB.length();
 		
 		btVector3 contactNormal = newAnchor->getContactNormal();
-		
-#if (1)		// 11_9_14 Normals appear to be better, more precice				
+						
 		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 		
@@ -432,34 +431,6 @@ void MuscleNP::updateAnchorList()
 		{
 			delete newAnchor;
 		}
-
-#else
-		btVector3 lineACopy = lineA;
-		btVector3 lineBCopy = lineB;
-		btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
-		
-		// Project normal into AB plane
-		btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
-		
-		normalProjection.normalize();			
-		
-		btScalar angleAN = lineA.angle(normalProjection);
-		btScalar angleBN = lineB.angle(normalProjection);
-		btScalar angleAB = lineA.angle(lineB);
-		
-		// Ensure we've projected correctly
-		// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
-		//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
-		
-		if (lengthA <= 0.1 || lengthB <= 0.1)
-		{
-			delete newAnchor;
-		}
-		else if((angleAN + angleBN - angleAB) > 0.0001)
-		{
-			delete newAnchor;
-		}
-#endif // Normals vs angles
 		else
 		{	
 								  
@@ -552,13 +523,12 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() <= 0.0 || lineB.length() <= 0.0)
+				if (lineA.length() <= 0.01 || lineB.length() <= 0.01)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
 					normalValue2 = -1.0;
 				}
-#if (1)
 				else
 				{
 					//lineA.normalize();
@@ -569,37 +539,7 @@ void MuscleNP::pruneAnchors()
 					normalValue2 = (lineB).dot(contactNormal);
 				}	
 				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-				{  
-#else
-				
-				normalValue1 = (lineA).dot(contactNormal);
-				normalValue2 = (lineB).dot(contactNormal);
-				
-				btVector3 lineACopy = lineA;
-				btVector3 lineBCopy = lineB;
-				btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
-				
-				// Project normal into AB plane
-				btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
-				
-				normalProjection.normalize();			
-				
-				btScalar angleAN = lineA.angle(normalProjection);
-				btScalar angleBN = lineB.angle(normalProjection);
-				btScalar angleAB = lineA.angle(lineB);
-				
-				// Ensure we've projected correctly
-				// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
-				/// @todo add a scalar almostEqual to tgUtil
-				//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
-				
-				if((angleAN + angleBN - angleAB) > 0.0001)
-				{
-					
-#endif // Normals vs angles
-				
-
-				 
+				{  		 
 					#ifdef VERBOSE
 						std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
 					#endif

@@ -132,11 +132,13 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				
 			}
 			
+			// Assume we've lost this contact for some reason
+			/*
 			if (length > 0.1)
 			{
 				update = false;
 			}
-			
+			*/
 			if (update)
 			{
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
