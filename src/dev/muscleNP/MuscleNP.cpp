@@ -103,6 +103,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     BT_PROFILE("calculateAndApplyForce");
 #endif //BT_NO_PROFILE    
     
+    updateManifolds();
+    
     pruneAnchors();
     
 	updateAnchorList();
@@ -164,7 +166,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 #if (1)			
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
-#else
+#else // Below is almost certainly wrong
 			btVector3 lineACopy = -first;
 			btVector3 lineBCopy = -second;
 			btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
@@ -241,12 +243,13 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     updateCollisionObject();
 }
 
-void MuscleNP::updateAnchorList()
+void MuscleNP::updateManifolds()
 {
-    
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("updateAnchorList");
 #endif //BT_NO_PROFILE      
+    
+    // Copy this vector so we can remove as necessary
     
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
@@ -254,8 +257,6 @@ void MuscleNP::updateAnchorList()
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
 	int numPairs = pairArray.size();
-    
-    int numContacts = 2;
     
     std::vector<muscleAnchor*> rejectedAnchors;
     
@@ -318,13 +319,12 @@ void MuscleNP::updateAnchorList()
 					}	
 					
 					if(rb)
-					{  	
-
-						// Not permanent, sliding contact
+					{  
+												// Not permanent, sliding contact
 						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 						
 						m_anchorIt = m_anchors.begin() + 1;
-#if (1)							
+	
 						// Find position of new anchor
 						while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
 						{
@@ -342,68 +342,118 @@ void MuscleNP::updateAnchorList()
 						btScalar lengthB = lineB.length();
 						
 						btVector3 contactNormal = newAnchor->getContactNormal();
-						
-#if (1)						
+									
 						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
-											
-						if (lengthA <= 0.1 || lengthB <= 0.1)
+						
+						bool del = false;					
+						if (lengthA <= 0.1 && rb == (*(m_anchorIt - 1))->attachedBody )
+						{
+							(*(m_anchorIt - 1))->updateManifold(manifold);
+							del = true;
+						}
+						if (lengthB <= 0.1 && rb == (*(m_anchorIt))->attachedBody)
+						{
+							(*(m_anchorIt ))->updateManifold(manifold);
+							del = true;
+						}
+						
+						if (del)
 						{
 							delete newAnchor;
 						}
-						else if(normalValue1 < 0.0 || normalValue2 < 0.0)
-						{
-							delete newAnchor;
-						}
-
-#else
-						btVector3 lineACopy = lineA;
-						btVector3 lineBCopy = lineB;
-						btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
-						
-						// Project normal into AB plane
-						btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
-						
-						normalProjection.normalize();			
-						
-						btScalar angleAN = lineA.angle(normalProjection);
-						btScalar angleBN = lineB.angle(normalProjection);
-						btScalar angleAB = lineA.angle(lineB);
-						
-						// Ensure we've projected correctly
-						// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
-						//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
-						
-						if (lengthA <= 0.1 || lengthB <= 0.1)
-						{
-							delete newAnchor;
-						}
-						else if(angleAN + angleBN > angleAB)
-						{
-							delete newAnchor;
-						}
-#endif // Normals vs angles
 						else
-						{	
-												  
-							m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-							
-							numContacts++;
-							
+						{
+							// Save it for after we've updated existing anchors, when we'll check normal directions
+							m_newAnchors.push_back(newAnchor);
 						}
-
-#else
-						
-						m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-						
-#endif
-						
 					}
-					
 				}
 			}
 		}
+	}
+
 	
+}
+
+void MuscleNP::updateAnchorList()
+{
+	int numContacts = 2;
+    
+	while (m_newAnchors.size() > 0)
+	{
+		// Not permanent, sliding contact
+		muscleAnchor* const newAnchor = m_newAnchors[0];
+		m_newAnchors.erase(m_newAnchors.begin());
+		
+		m_anchorIt = m_anchors.begin() + 1;
+						
+		// Find position of new anchor
+		while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
+		{
+			++m_anchorIt;
+		}
+		
+		btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
+		btVector3 pos1 = newAnchor->getWorldPosition();
+		btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
+		
+		btVector3 lineA = (pos2 - pos1);
+		btVector3 lineB = (pos0 - pos1);
+		
+		btScalar lengthA = lineA.length();
+		btScalar lengthB = lineB.length();
+		
+		btVector3 contactNormal = newAnchor->getContactNormal();
+		
+#if (1)		// 11_9_14 Normals appear to be better, more precice				
+		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
+		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
+			
+		// These may have changed, so check again				
+		if (lengthA <= 0.1 || lengthB <= 0.1)
+		{
+			delete newAnchor;
+		}
+		else if(normalValue1 < 0.0 || normalValue2 < 0.0)
+		{
+			delete newAnchor;
+		}
+
+#else
+		btVector3 lineACopy = lineA;
+		btVector3 lineBCopy = lineB;
+		btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
+		
+		// Project normal into AB plane
+		btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
+		
+		normalProjection.normalize();			
+		
+		btScalar angleAN = lineA.angle(normalProjection);
+		btScalar angleBN = lineB.angle(normalProjection);
+		btScalar angleAB = lineA.angle(lineB);
+		
+		// Ensure we've projected correctly
+		// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
+		//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
+		
+		if (lengthA <= 0.1 || lengthB <= 0.1)
+		{
+			delete newAnchor;
+		}
+		else if((angleAN + angleBN - angleAB) > 0.0001)
+		{
+			delete newAnchor;
+		}
+#endif // Normals vs angles
+		else
+		{	
+								  
+			m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+			
+			numContacts++;
+		}
 	}
 
 // Sadly, even with the above insertion scheme, this is still a necessary sanity check
@@ -441,7 +491,7 @@ void MuscleNP::pruneAnchors()
         i = 1;
         while (i < m_anchors.size() - 1)
         {
-			bool keep = m_anchors[i]->updateContactNormal();
+			bool keep = true; //m_anchors[i]->updateContactNormal();
 			
 			numPruned = 0;
 			btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
@@ -508,7 +558,10 @@ void MuscleNP::pruneAnchors()
 				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
 				{  
 #else
-
+				
+				normalValue1 = (lineA).dot(contactNormal);
+				normalValue2 = (lineB).dot(contactNormal);
+				
 				btVector3 lineACopy = lineA;
 				btVector3 lineBCopy = lineB;
 				btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
@@ -527,7 +580,7 @@ void MuscleNP::pruneAnchors()
 				/// @todo add a scalar almostEqual to tgUtil
 				//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
 				
-				if(angleAN + angleBN > angleAB)
+				if((angleAN + angleBN - angleAB) > 0.0001)
 				{
 					
 #endif // Normals vs angles
@@ -638,6 +691,7 @@ void MuscleNP::updateCollisionObject()
     m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
 	
+	// This also affects contact drawing
 	//m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
 	
     // @todo look up what the second and third arguments of this are
