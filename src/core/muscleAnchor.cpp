@@ -136,12 +136,12 @@ bool muscleAnchor::updateContactNormal()
 			
 			if ((newNormal + contactNormal).length() < 0.1)
 			{
-				std::cout << "Reversed normal" << std::endl;
-				ret = false;
+				//std::cout << "Reversed normal" << std::endl;
+				//ret = false;
 				
 			} 
 			
-			contactNormal = newNormal;
+			//contactNormal = newNormal;
 
 		}
 		else
@@ -213,12 +213,12 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				}
 				
 			}
-			/*
+			
 			if (length > 0.1)
 			{
 				update = false;
 			}
-			*/
+			
 			if (update)
 			{
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
@@ -226,14 +226,14 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				
 				if ((newNormal + contactNormal).length() < 0.1)
 				{
-					throw std::runtime_error ("Reversed normal");
+					//std::cout<< "Reversed normal" << std::endl;
 				}
 						   
-				contactNormal = newNormal;
+				//contactNormal = newNormal;
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
-				//ret = false;
+				ret = false;
 			}
 		}
 		else
@@ -270,4 +270,12 @@ btVector3 muscleAnchor::getContactNormal() const
 #else
     return contactNormal;
 #endif
+}
+
+void muscleAnchor::updateManifold(btPersistentManifold* m)
+{
+	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
+	{
+		manifold = m;
+	}
 }

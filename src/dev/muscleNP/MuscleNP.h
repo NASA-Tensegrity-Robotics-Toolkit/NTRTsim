@@ -45,6 +45,7 @@ class btCompoundShape;
 class btPairCachingGhostObject;
 class btDynamicsWorld;
 class btBroadphaseInterface;
+class btPersistentManifold;
 class btDispatcher;
 
 class MuscleNP : public Muscle2P
@@ -82,6 +83,8 @@ private:
            const muscleAnchor* const ma2;
     };
     
+    void updateManifolds();
+    
     void updateAnchorList();
     
     void pruneAnchors();
@@ -99,6 +102,8 @@ private:
     
     std::map<btRigidBody*, btVector3> m_rbForceMap;
     std::map<btRigidBody*, btScalar> m_rbForceScales;
+    
+    std::vector<muscleAnchor*> m_newAnchors;
     
 protected:  
     

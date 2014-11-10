@@ -62,7 +62,7 @@ public:
     
     btVector3 getContactNormal() const;
     
-    
+    void updateManifold(btPersistentManifold* m);
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
@@ -91,7 +91,7 @@ private:
 	// todo: write an accessor that asserts this is necessary and accurate
 	btVector3 contactNormal;
 	
-	btPersistentManifold* const manifold;
+	btPersistentManifold* manifold;
 	
 };
 

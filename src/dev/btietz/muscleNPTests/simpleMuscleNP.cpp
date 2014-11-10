@@ -51,7 +51,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 	
 	tgStructure s;
 	
-#if (1)
+#if (0)
 	s.addNode(-2, 2.1, 0);
 	s.addNode(0, 2.1, 0);
 	s.addNode(10, 2.1, 0);
