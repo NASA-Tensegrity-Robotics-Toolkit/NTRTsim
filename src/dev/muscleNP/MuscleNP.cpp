@@ -409,9 +409,22 @@ void MuscleNP::updateAnchorList()
 #if (1)		// 11_9_14 Normals appear to be better, more precice				
 		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
-			
+		
+		bool del = false;	
+		
 		// These may have changed, so check again				
-		if (lengthA <= 0.1 || lengthB <= 0.1)
+		if (lengthA <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
+		{
+			(*(m_anchorIt - 1))->updateManifold(newAnchor->getManifold());
+			del = true;
+		}
+		if (lengthB <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
+		{
+			(*(m_anchorIt ))->updateManifold(newAnchor->getManifold());
+			del = true;
+		}
+
+		if (del)
 		{
 			delete newAnchor;
 		}

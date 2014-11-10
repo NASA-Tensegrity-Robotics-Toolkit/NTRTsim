@@ -81,88 +81,6 @@ btVector3 muscleAnchor::getWorldPosition() const
     return tr * attachedRelativeOriginalPosition;
 }
 
-bool muscleAnchor::updateContactNormal()
-{
-	bool ret = true;
-	
-	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
-	
-	if (sliding)
-	{
-		bool useB = true;
-		bool update = true;
-		bool colCheck = true;
-		if (manifold->getBody0() != attachedBody)
-		{
-			useB = false;			
-		}
-		if(!useB && manifold->getBody1() != attachedBody)
-		{
-			colCheck = false;
-		}
-		if (colCheck)
-		{	
-			btScalar length = INFINITY;
-			
-			
-			int n = manifold->getNumContacts();
-			
-			btVector3 newPos = getWorldPosition();
-			btVector3 contactPos = getWorldPosition();
-			btVector3 newNormal = contactNormal;
-			
-			for (int p = 0; p < n; p++)
-			{
-				const btManifoldPoint& pt = manifold->getContactPoint(p);
-				
-				// Original position picked at beginning
-				btVector3 pos = useB ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
-				
-				btScalar contactDist = (pos - newPos).length();
-				
-				if (contactDist < length)
-				{
-					length = contactDist;
-					contactPos = pos;
-					
-					btScalar directionSign = useB ? btScalar(-1.0) : btScalar(1.0);
-					
-					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
-					
-					
-				}
-				
-			}
-			
-			if ((newNormal + contactNormal).length() < 0.1)
-			{
-				//std::cout << "Reversed normal" << std::endl;
-				//ret = false;
-				
-			} 
-			
-			//contactNormal = newNormal;
-
-		}
-		else
-		{
-
-			ret = false;
-
-		}	
-		
-	}
-	else
-	{
-		ret = false;
-		
-		std::cerr << "Tried to update a static anchor" << std::endl;
-		
-	}
-	
-	return ret;	
-}
-
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
 	bool ret = true;
@@ -233,7 +151,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
-				ret = false;
+				//ret = false;
 			}
 		}
 		else
