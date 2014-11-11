@@ -1,6 +1,6 @@
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/CMakeLists.txt Tensegrity/trunk/NTRT/src/core/bullet/CMakeLists.txt
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/CMakeLists.txt	2014-05-20 16:21:25.833574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/CMakeLists.txt	2014-05-20 16:18:50.277568956 -0400
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/CMakeLists.txt NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/CMakeLists.txt
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/CMakeLists.txt	2014-11-10 09:15:18.680913618 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/CMakeLists.txt	2014-08-18 20:29:02.998097341 -0700
 @@ -1,67 +1,36 @@
 -# This is basically the overall name of the project in Visual Studio this is the name of the Solution File
 -
@@ -93,774 +93,11 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/CMake
 +        ENDIF (INSTALL_EXTRA_LIBS)
  ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
 +
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/OpenGLPatch.diff.rej Tensegrity/trunk/NTRT/src/core/bullet/OpenGLPatch.diff.rej
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/OpenGLPatch.diff.rej	1969-12-31 19:00:00.000000000 -0500
-+++ Tensegrity/trunk/NTRT/src/core/bullet/OpenGLPatch.diff.rej	2014-05-20 15:58:12.465526976 -0400
-@@ -0,0 +1,760 @@
-+--- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/OpenGLPatch.diff	2014-05-20 15:46:12.269502551 -0400
-++++ Tensegrity/trunk/NTRT/src/core/bullet/OpenGLPatch.diff	1969-12-31 19:00:00.000000000 -0500
-+@@ -1,757 +0,0 @@
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/CMakeLists.txt Tensegrity/trunk/NTRT/src/core/bullet/CMakeLists.txt
-+-1,15d0
-+-< # This is basically the overall name of the project in Visual Studio this is the name of the Solution File
-+-< 
-+-< 
-+-< # For every executable you have with a main method you should have an add_executable line below.
-+-< # For every add executable line you should list every .cpp and .h file you have associated with that executable.  
-+-< 
-+-< 
-+-< 
-+-< 
-+-< # You shouldn't have to modify anything below this line 
-+-< ########################################################
-+-< 
-+-< 
-+-< 
-+-< 
-+-20,49c5,17
-+-< 		
-+-< ADD_LIBRARY(OpenGLSupport
-+-< 		GLDebugFont.cpp
-+-< 		GLDebugFont.h
-+-< 		GL_DialogDynamicsWorld.cpp
-+-< 		GL_DialogDynamicsWorld.h
-+-< 		GL_DialogWindow.cpp
-+-< 		GL_DialogWindow.h
-+-< 		GL_ShapeDrawer.cpp
-+-< 		GL_ShapeDrawer.h
-+-< 		GL_Simplex1to4.cpp
-+-< 		GL_Simplex1to4.h
-+-< 		GLDebugDrawer.cpp
-+-< 		GLDebugDrawer.h
-+-< 		
-+-< 		RenderTexture.cpp
-+-< 		RenderTexture.h
-+-< 		DemoApplication.cpp
-+-< 		DemoApplication.h
-+-< 		
-+-< 		GlutDemoApplication.cpp
-+-< 		GlutDemoApplication.h
-+-< 		GlutStuff.cpp
-+-< 		GlutStuff.h
-+-< 
-+-< 		stb_image.cpp
-+-< 		stb_image.h
-+-< 
-+-< 		Win32DemoApplication.cpp
-+-< 		Win32DemoApplication.h
-+----
-+->                 
-+-> ADD_LIBRARY(tgOpenGLSupport SHARED
-+->                 tgDemoApplication.cpp
-+->                 tgDemoApplication.h
-+->                 
-+->                 tgGlutDemoApplication.cpp
-+->                 tgGlutDemoApplication.h
-+->                 tgGlutStuff.cpp
-+->                 tgGlutStuff.h
-+-> 
-+->         tgGLDebugDrawer.cpp
-+->                 #Win32DemoApplication.cpp
-+->                 #Win32DemoApplication.h
-+-52d19
-+-< 
-+-54c21
-+-<   TARGET_LINK_LIBRARIES(OpenGLSupport BulletDynamics BulletCollision ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
-+----
-+->   TARGET_LINK_LIBRARIES(tgOpenGLSupport OpenGLSupport BulletDynamics BulletCollision ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
-+-59,66c26,33
-+-< 	IF(INSTALL_EXTRA_LIBS)
-+-< 		IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+-< 			INSTALL(TARGETS OpenGLSupport DESTINATION .)
-+-< 		ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+-< 		INSTALL(TARGETS OpenGLSupport DESTINATION lib)
-+-< 			INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h")
-+-< 		ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+-< 	ENDIF (INSTALL_EXTRA_LIBS)
-+----
-+->         IF(INSTALL_EXTRA_LIBS)
-+->                 IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+->                         INSTALL(TARGETS tgOpenGLSupport OpenGLSupport DESTINATION .)
-+->                 ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+->                 INSTALL(TARGETS tgOpenGLSupport OpenGLSupport DESTINATION lib)
-+->                         INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h")
-+->                 ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-+->         ENDIF (INSTALL_EXTRA_LIBS)
-+-67a35
-+-> 
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp
-+-17c17
-+-< #include "DemoApplication.h"
-+----
-+-> #include "tgDemoApplication.h"
-+-35a36
-+-> #include <iostream>
-+-58c59
-+-< DemoApplication::DemoApplication()
-+----
-+-> tgDemoApplication::tgDemoApplication()
-+-87a89,91
-+-> exitFlag(false),
-+-> m_autocam(false),
-+-> 
-+-104c108
-+-< DemoApplication::~DemoApplication()
-+----
-+-> tgDemoApplication::~tgDemoApplication()
-+-114a119,120
-+-> 		
-+-> 	std::cout<< "deleted tgDemoApplication" <<std::endl;
-+-118c124
-+-< void DemoApplication::overrideGLShapeDrawer (GL_ShapeDrawer* shapeDrawer)
-+----
-+-> void tgDemoApplication::overrideGLShapeDrawer (GL_ShapeDrawer* shapeDrawer)
-+-125c131
-+-< void DemoApplication::myinit(void)
-+----
-+-> void tgDemoApplication::myinit(void)
-+-161c167
-+-< void	DemoApplication::setCameraDistance(float dist)
-+----
-+-> void	tgDemoApplication::setCameraDistance(float dist)
-+-166c172
-+-< float	DemoApplication::getCameraDistance()
-+----
-+-> float	tgDemoApplication::getCameraDistance()
-+-173c179
-+-< void DemoApplication::toggleIdle() {
-+----
-+-> void tgDemoApplication::toggleIdle() {
-+-185c191
-+-< void DemoApplication::updateCamera() {
-+----
-+-> void tgDemoApplication::updateCamera() {
-+-257c263
-+-< void DemoApplication::stepLeft() 
-+----
-+-> void tgDemoApplication::stepLeft() 
-+-261c267
-+-< void DemoApplication::stepRight() 
-+----
-+-> void tgDemoApplication::stepRight() 
-+-265c271
-+-< void DemoApplication::stepFront() 
-+----
-+-> void tgDemoApplication::stepFront() 
-+-269c275
-+-< void DemoApplication::stepBack() 
-+----
-+-> void tgDemoApplication::stepBack() 
-+-273c279
-+-< void DemoApplication::zoomIn() 
-+----
-+-> void tgDemoApplication::zoomIn() 
-+-280c286
-+-< void DemoApplication::zoomOut() 
-+----
-+-> void tgDemoApplication::zoomOut() 
-+-295c301
-+-< void DemoApplication::reshape(int w, int h) 
-+----
-+-> void tgDemoApplication::reshape(int w, int h) 
-+-308c314
-+-< void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
-+----
-+-> void tgDemoApplication::keyboardCallback(unsigned char key, int x, int y)
-+-329,347d334
-+-< 	case 8:
-+-< 		{
-+-< 			int numObj = getDynamicsWorld()->getNumCollisionObjects();
-+-< 			if (numObj)
-+-< 			{
-+-< 				btCollisionObject* obj = getDynamicsWorld()->getCollisionObjectArray()[numObj-1];
-+-< 
-+-< 				getDynamicsWorld()->removeCollisionObject(obj);
-+-< 				btRigidBody* body = btRigidBody::upcast(obj);
-+-< 				if (body && body->getMotionState())
-+-< 				{
-+-< 					delete body->getMotionState();					
-+-< 				}
-+-< 				delete obj;
-+-< 
-+-< 
-+-< 			}
-+-< 			break;
-+-< 		}
-+-351a339
-+-> 		exitFlag = true;
-+-353c341
-+-< 		exit(0);
-+----
-+-> 	exit(0);
-+-509a498,503
-+-> 	
-+-> 	case	';':
-+-> 		{
-+-> 			m_autocam=!m_autocam;
-+-> 			break;
-+-> 		}
-+-523c517
-+-< void	DemoApplication::setDebugMode(int mode)
-+----
-+-> void	tgDemoApplication::setDebugMode(int mode)
-+-535c529
-+-< void DemoApplication::moveAndDisplay()
-+----
-+-> void tgDemoApplication::moveAndDisplay()
-+-546c540
-+-< void DemoApplication::displayCallback()
-+----
-+-> void tgDemoApplication::displayCallback()
-+-552c546
-+-< void	DemoApplication::setShootBoxShape ()
-+----
-+-> void	tgDemoApplication::setShootBoxShape ()
-+-562c556
-+-< void	DemoApplication::shootBox(const btVector3& destination)
-+----
-+-> void	tgDemoApplication::shootBox(const btVector3& destination)
-+-600c594
-+-< btScalar gOldPickingDist  = 0.f;
-+----
-+-> float gOldPickingDist  = 0.f;
-+-604c598
-+-< btVector3	DemoApplication::getRayTo(int x,int y)
-+----
-+-> btVector3	tgDemoApplication::getRayTo(int x,int y)
-+-677c671
-+-< void DemoApplication::mouseFunc(int button, int state, int x, int y)
-+----
-+-> void tgDemoApplication::mouseFunc(int button, int state, int x, int y)
-+-776,781d769
-+-< 						btVector3 pickPos = rayCallback.m_hitPointWorld;
-+-< 						
-+-< 						pickObject(pickPos, rayCallback.m_collisionObject);
-+-< 						
-+-< 						gOldPickingPos = rayTo;
-+-< 						gHitPos = pickPos;
-+-783c771,845
-+-< 						gOldPickingDist  = (pickPos-rayFrom).length();
-+----
-+-> 						btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
-+-> 						if (body)
-+-> 						{
-+-> 							//other exclusions?
-+-> 							if (!(body->isStaticObject() || body->isKinematicObject()))
-+-> 							{
-+-> 								pickedBody = body;
-+-> 								pickedBody->setActivationState(DISABLE_DEACTIVATION);
-+-> 
-+-> 
-+-> 								btVector3 pickPos = rayCallback.m_hitPointWorld;
-+-> 								//printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
-+-> 
-+-> 
-+-> 								btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
-+-> 
-+-> 								
-+-> 
-+-> 								
-+-> 
-+-> 
-+-> 								if ((m_modifierKeys& BT_ACTIVE_SHIFT)==0)
-+-> 								{
-+-> 									btTransform tr;
-+-> 									tr.setIdentity();
-+-> 									tr.setOrigin(localPivot);
-+-> 									btGeneric6DofConstraint* dof6 = new btGeneric6DofConstraint(*body, tr,false);
-+-> 									dof6->setLinearLowerLimit(btVector3(0,0,0));
-+-> 									dof6->setLinearUpperLimit(btVector3(0,0,0));
-+-> 									dof6->setAngularLowerLimit(btVector3(0,0,0));
-+-> 									dof6->setAngularUpperLimit(btVector3(0,0,0));
-+-> 
-+-> 									m_dynamicsWorld->addConstraint(dof6,true);
-+-> 									m_pickConstraint = dof6;
-+-> 
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,0);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,1);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,2);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,3);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,4);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,5);
-+-> 
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,0);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,1);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,2);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,3);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,4);
-+-> 									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,5);
-+-> 								} else
-+-> 								{
-+-> 									btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body,localPivot);
-+-> 									m_dynamicsWorld->addConstraint(p2p,true);
-+-> 									m_pickConstraint = p2p;
-+-> 									p2p->m_setting.m_impulseClamp = mousePickClamping;
-+-> 									//very weak constraint for picking
-+-> 									p2p->m_setting.m_tau = 0.001f;
-+-> /*
-+-> 									p2p->setParam(BT_CONSTRAINT_CFM,0.8,0);
-+-> 									p2p->setParam(BT_CONSTRAINT_CFM,0.8,1);
-+-> 									p2p->setParam(BT_CONSTRAINT_CFM,0.8,2);
-+-> 									p2p->setParam(BT_CONSTRAINT_ERP,0.1,0);
-+-> 									p2p->setParam(BT_CONSTRAINT_ERP,0.1,1);
-+-> 									p2p->setParam(BT_CONSTRAINT_ERP,0.1,2);
-+-> 									*/
-+-> 									
-+-> 
-+-> 								}
-+-> 					
-+-> 								//save mouse position for dragging
-+-> 								gOldPickingPos = rayTo;
-+-> 								gHitPos = pickPos;
-+-> 
-+-> 								gOldPickingDist  = (pickPos-rayFrom).length();
-+-> 							}
-+-> 						}
-+-802,874c864
-+-< void DemoApplication::pickObject(const btVector3& pickPos, const btCollisionObject* hitObj)
-+-< {
-+-< 	
-+-< 	btRigidBody* body = (btRigidBody*)btRigidBody::upcast(hitObj);
-+-< 	if (body)
-+-< 	{
-+-< 		//other exclusions?
-+-< 		if (!(body->isStaticObject() || body->isKinematicObject()))
-+-< 		{
-+-< 			pickedBody = body;
-+-< 			pickedBody->setActivationState(DISABLE_DEACTIVATION);
-+-< 
-+-< 
-+-< 			//printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
-+-< 
-+-< 
-+-< 			btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
-+-< 
-+-< 			if ((m_modifierKeys& BT_ACTIVE_SHIFT)!=0)
-+-< 			{
-+-< 				btTransform tr;
-+-< 				tr.setIdentity();
-+-< 				tr.setOrigin(localPivot);
-+-< 				btGeneric6DofConstraint* dof6 = new btGeneric6DofConstraint(*body, tr,false);
-+-< 				dof6->setLinearLowerLimit(btVector3(0,0,0));
-+-< 				dof6->setLinearUpperLimit(btVector3(0,0,0));
-+-< 				dof6->setAngularLowerLimit(btVector3(0,0,0));
-+-< 				dof6->setAngularUpperLimit(btVector3(0,0,0));
-+-< 
-+-< 				m_dynamicsWorld->addConstraint(dof6,true);
-+-< 				m_pickConstraint = dof6;
-+-< 
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,0);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,1);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,2);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,3);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,4);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,5);
-+-< 
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,0);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,1);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,2);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,3);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,4);
-+-< 				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,5);
-+-< 			} else
-+-< 			{
-+-< 				btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body,localPivot);
-+-< 				m_dynamicsWorld->addConstraint(p2p,true);
-+-< 				m_pickConstraint = p2p;
-+-< 				p2p->m_setting.m_impulseClamp = mousePickClamping;
-+-< 				//very weak constraint for picking
-+-< 				p2p->m_setting.m_tau = 0.001f;
-+-< 	/*
-+-< 				p2p->setParam(BT_CONSTRAINT_CFM,0.8,0);
-+-< 				p2p->setParam(BT_CONSTRAINT_CFM,0.8,1);
-+-< 				p2p->setParam(BT_CONSTRAINT_CFM,0.8,2);
-+-< 				p2p->setParam(BT_CONSTRAINT_ERP,0.1,0);
-+-< 				p2p->setParam(BT_CONSTRAINT_ERP,0.1,1);
-+-< 				p2p->setParam(BT_CONSTRAINT_ERP,0.1,2);
-+-< 				*/
-+-< 									
-+-< 
-+-< 			}
-+-< 					
-+-< 			//save mouse position for dragging
-+-< 					
-+-< 		}
-+-< 	}
-+-< 						
-+-< }
-+-< 
-+-< void DemoApplication::removePickingConstraint()
-+----
-+-> void tgDemoApplication::removePickingConstraint()
-+-888c878
-+-< void	DemoApplication::mouseMotionFunc(int x,int y)
-+----
-+-> void	tgDemoApplication::mouseMotionFunc(int x,int y)
-+-1009c999
-+-< btRigidBody*	DemoApplication::localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape)
-+----
-+-> btRigidBody*	tgDemoApplication::localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape)
-+-1042c1032
-+-< void DemoApplication::setOrthographicProjection() 
-+----
-+-> void tgDemoApplication::setOrthographicProjection() 
-+-1066c1056
-+-< void DemoApplication::resetPerspectiveProjection() 
-+----
-+-> void tgDemoApplication::resetPerspectiveProjection() 
-+-1080c1070
-+-< void DemoApplication::displayProfileString(int xOffset,int yStart,char* message)
-+----
-+-> void tgDemoApplication::displayProfileString(int xOffset,int yStart,char* message)
-+-1087c1077
-+-< void DemoApplication::showProfileInfo(int& xOffset,int& yStart, int yIncr)
-+----
-+-> void tgDemoApplication::showProfileInfo(int& xOffset,int& yStart, int yIncr)
-+-1161c1151
-+-< void	DemoApplication::renderscene(int pass)
-+----
-+-> void	tgDemoApplication::renderscene(int pass)
-+-1208,1209c1198,1199
-+-< 		btVector3 aabbMin(0,0,0),aabbMax(0,0,0);
-+-< 		//m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
-+----
-+-> 		btVector3 aabbMin,aabbMax;
-+-> 		m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
-+-1231c1221
-+-< void DemoApplication::renderme()
-+----
-+-> void tgDemoApplication::renderme()
-+-1233a1224,1225
-+-> 	
-+-> 	const btVector3 ps = getPs();
-+-1234a1227,1231
-+-> 	if (m_autocam)
-+-> 	{
-+-> 		m_cameraTargetPosition += (ps - m_cameraTargetPosition) * 0.05;
-+-> 	}
-+-> 	
-+-1336a1334,1358
-+-> btVector3 tgDemoApplication::getPs()
-+-> {
-+-> 	btVector3 ps(0.0, 0.0, 0.0);
-+-> 	size_t nps = 0;
-+-> 	
-+-> 	const btCollisionObjectArray btarr =
-+-> 	  getDynamicsWorld()->getCollisionObjectArray();
-+-> 	const size_t count = btarr.size();
-+-> 	nps += count;
-+-> 	/// @todo Use std::for_each()
-+-> 	for (int ib = 0; ib < count; ++ib)
-+-> 	{
-+-> 		const btRigidBody* const pRigid = 
-+-> 		        static_cast<btRigidBody*>(btarr[ib]);
-+-> 		ps += pRigid->getCenterOfMassPosition();
-+-> 	}
-+-> 
-+-> 	if (nps != 0)
-+-> 	{
-+-> 	        ps /= static_cast<double>(nps);
-+-> 	}
-+-> 
-+-> 	return ps;
-+-> }
-+-> 
-+-1340c1362
-+-< void	DemoApplication::clientResetScene()
-+----
-+-> void	tgDemoApplication::clientResetScene()
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.h Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.h
-+-16,17c16,17
-+-< #ifndef DEMO_APPLICATION_H
-+-< #define DEMO_APPLICATION_H
-+----
-+-> #ifndef TG_DEMO_APPLICATION_H
-+-> #define TG_DEMO_APPLICATION_H
-+-20c20
-+-< #include "GlutStuff.h"
-+----
-+-> #include "tgGlutStuff.h"
-+-41c41
-+-< class DemoApplication
-+----
-+-> class tgDemoApplication
-+-60,62d59
-+-< 	virtual void pickObject(const btVector3& pickPos, const class btCollisionObject* hitObj);
-+-< 
-+-< 
-+-75a73,74
-+-> 	
-+-> 	bool m_autocam;
-+-108a108,111
-+-> private:
-+-> 
-+-> 	bool exitFlag;
-+-> 
-+-111c114
-+-< 	DemoApplication();
-+----
-+-> 	tgDemoApplication();
-+-113c116
-+-< 	virtual ~DemoApplication();
-+----
-+-> 	virtual ~tgDemoApplication();
-+-120a124,125
-+-> 	
-+-> 	virtual void exitPhysics() = 0;
-+-155,159d159
-+-< 
-+-< 	void	setEle(float ele)
-+-< 	{
-+-< 		m_ele = ele;
-+-< 	}
-+-211c211
-+-< 	///Demo functions
-+----
-+-> 	///tgDemo functions
-+-260c260,266
-+-< 
-+----
-+-> 	
-+-> 	btVector3 getPs();
-+-> 	
-+-> 	bool getExitFlag()
-+-> 	{
-+-> 		return exitFlag;
-+-> 	}
-+-264c270
-+-< #endif //DEMO_APPLICATION_H
-+----
-+-> #endif //TG_DEMO_APPLICATION_H
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.cpp
-+-2c2
-+-< #include "GLDebugDrawer.h"
-+----
-+-> #include "tgGLDebugDrawer.h"
-+-4c4
-+-< #include "GlutStuff.h"
-+----
-+-> #include "tgGlutStuff.h"
-+-9c9
-+-< GLDebugDrawer::GLDebugDrawer()
-+----
-+-> tgGLDebugDrawer::tgGLDebugDrawer()
-+-15c15
-+-< GLDebugDrawer::~GLDebugDrawer()
-+----
-+-> tgGLDebugDrawer::~tgGLDebugDrawer()
-+-19c19
-+-< void	GLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& fromColor, const btVector3& toColor)
-+----
-+-> void	tgGLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& fromColor, const btVector3& toColor)
-+-29c29
-+-< void	GLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
-+----
-+-> void	tgGLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
-+-34c34
-+-< void GLDebugDrawer::drawSphere (const btVector3& p, btScalar radius, const btVector3& color)
-+----
-+-> void tgGLDebugDrawer::drawSphere (const btVector3& p, btScalar radius, const btVector3& color)
-+-72c72
-+-< void	GLDebugDrawer::drawTriangle(const btVector3& a,const btVector3& b,const btVector3& c,const btVector3& color,btScalar alpha)
-+----
-+-> void	tgGLDebugDrawer::drawTriangle(const btVector3& a,const btVector3& b,const btVector3& c,const btVector3& color,btScalar alpha)
-+-87c87
-+-< void	GLDebugDrawer::setDebugMode(int debugMode)
-+----
-+-> void	tgGLDebugDrawer::setDebugMode(int debugMode)
-+-93c93
-+-< void	GLDebugDrawer::draw3dText(const btVector3& location,const char* textString)
-+----
-+-> void	tgGLDebugDrawer::draw3dText(const btVector3& location,const char* textString)
-+-99c99
-+-< void	GLDebugDrawer::reportErrorWarning(const char* warningString)
-+----
-+-> void	tgGLDebugDrawer::reportErrorWarning(const char* warningString)
-+-104c104
-+-< void	GLDebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector3& normalOnB,btScalar distance,int lifeTime,const btVector3& color)
-+----
-+-> void	tgGLDebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector3& normalOnB,btScalar distance,int lifeTime,const btVector3& color)
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.h
-+-1,2c1,2
-+-< #ifndef GL_DEBUG_DRAWER_H
-+-< #define GL_DEBUG_DRAWER_H
-+----
-+-> #ifndef tgGL_DEBUG_DRAWER_H
-+-> #define tgGL_DEBUG_DRAWER_H
-+-8c8
-+-< class GLDebugDrawer : public btIDebugDraw
-+----
-+-> class tgGLDebugDrawer : public btIDebugDraw
-+-14,15c14,15
-+-< 	GLDebugDrawer();
-+-< 	virtual ~GLDebugDrawer(); 
-+----
-+-> 	tgGLDebugDrawer();
-+-> 	virtual ~tgGLDebugDrawer(); 
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.cpp
-+-4c4
-+-< #include "GlutDemoApplication.h"
-+----
-+-> #include "tgGlutDemoApplication.h"
-+-6c6
-+-< #include "GlutStuff.h"
-+----
-+-> #include "tgGlutStuff.h"
-+-11c11
-+-< void	GlutDemoApplication::updateModifierKeys()
-+----
-+-> void	tgGlutDemoApplication::updateModifierKeys()
-+-24c24
-+-< void GlutDemoApplication::specialKeyboard(int key, int x, int y)	
-+----
-+-> void tgGlutDemoApplication::specialKeyboard(int key, int x, int y)	
-+-46,60c46,47
-+-< 			int numObj = getDynamicsWorld()->getNumCollisionObjects();
-+-< 			if (numObj)
-+-< 			{
-+-< 				btCollisionObject* obj = getDynamicsWorld()->getCollisionObjectArray()[numObj-1];
-+-< 
-+-< 				getDynamicsWorld()->removeCollisionObject(obj);
-+-< 				btRigidBody* body = btRigidBody::upcast(obj);
-+-< 				if (body && body->getMotionState())
-+-< 				{
-+-< 					delete body->getMotionState();					
-+-< 				}
-+-< 				delete obj;
-+-< 
-+-< 
-+-< 			}
-+----
-+-> 			
-+-> 			exitPhysics();
-+-79c66
-+-< void GlutDemoApplication::swapBuffers()
-+----
-+-> void tgGlutDemoApplication::swapBuffers()
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.h
-+-17,18c17,18
-+-< #ifndef GLUT_DEMO_APPLICATION_H
-+-< #define GLUT_DEMO_APPLICATION_H
-+----
-+-> #ifndef TG_GLUT_DEMO_APPLICATION_H
-+-> #define TG_GLUT_DEMO_APPLICATION_H
-+-20c20
-+-< #include "DemoApplication.h"
-+----
-+-> #include "tgDemoApplication.h"
-+-22c22
-+-< ATTRIBUTE_ALIGNED16(class) GlutDemoApplication : public DemoApplication
-+----
-+-> ATTRIBUTE_ALIGNED16(class) tgGlutDemoApplication : public tgDemoApplication
-+-35c35
-+-< #endif //GLUT_DEMO_APPLICATION_H
-+----
-+-> #endif //TG_GLUT_DEMO_APPLICATION_H
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.cpp
-+-18c18,19
-+-< #include "DemoApplication.h"
-+----
-+-> #include "tgDemoApplication.h"
-+-> #include <iostream> // Debugging only
-+-20,21c21,22
-+-< //glut is C code, this global gDemoApplication links glut to the C++ demo
-+-< static DemoApplication* gDemoApplication = 0;
-+----
-+-> //glut is C code, this global gtgDemoApplication links glut to the C++ demo
-+-> static tgDemoApplication* gtgDemoApplication = 0;
-+-24c25
-+-< #include "GlutStuff.h"
-+----
-+-> #include "tgGlutStuff.h"
-+-28c29
-+-< 	gDemoApplication->keyboardCallback(key,x,y);
-+----
-+-> 	gtgDemoApplication->keyboardCallback(key,x,y);
-+-33c34
-+-<   gDemoApplication->keyboardUpCallback(key,x,y);
-+----
-+->   gtgDemoApplication->keyboardUpCallback(key,x,y);
-+-38c39
-+-< 	gDemoApplication->specialKeyboard(key,x,y);
-+----
-+-> 	gtgDemoApplication->specialKeyboard(key,x,y);
-+-43c44
-+-< 	gDemoApplication->specialKeyboardUp(key,x,y);
-+----
-+-> 	gtgDemoApplication->specialKeyboardUp(key,x,y);
-+-49c50
-+-< 	gDemoApplication->reshape(w,h);
-+----
-+-> 	gtgDemoApplication->reshape(w,h);
-+-54c55
-+-< 	gDemoApplication->moveAndDisplay();
-+----
-+-> 	gtgDemoApplication->moveAndDisplay();
-+-59c60
-+-< 	gDemoApplication->mouseFunc(button,state,x,y);
-+----
-+-> 	gtgDemoApplication->mouseFunc(button,state,x,y);
-+-65c66
-+-< 	gDemoApplication->mouseMotionFunc(x,y);
-+----
-+-> 	gtgDemoApplication->mouseMotionFunc(x,y);
-+-71c72
-+-< 	gDemoApplication->displayCallback();
-+----
-+-> 	gtgDemoApplication->displayCallback();
-+-75c76
-+-< int glutmain(int argc, char **argv,int width,int height,const char* title,DemoApplication* demoApp) {
-+----
-+-> void tgglutmain(int width,int height,const char* title,tgDemoApplication* demoApp) {
-+-77,78c78,83
-+-< 	gDemoApplication = demoApp;
-+-< 
-+----
-+-> 	gtgDemoApplication = demoApp;
-+-> 	
-+-> 	//Faking argc and argv since GLUT doesn't need to receive them
-+-> 	static char** argv = NULL;
-+-> 	static int argc = 0;
-+-> 	
-+-81c86
-+-<     glutInitWindowPosition(width/2, height/2);
-+----
-+->     glutInitWindowPosition(0, 0);
-+-88c93
-+-<     gDemoApplication->myinit();
-+----
-+->     gtgDemoApplication->myinit();
-+-113,116d117
-+-< 
-+-< 	
-+-<     glutMainLoop();
-+-<     return 0;
-+-118a120,125
-+-> #if (0)
-+-> void tgGlutMainEventLoop()
-+-> {
-+-> 	glutMainLoopEvent();
-+-> }
-+-> #endif
-+-diff -r SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.h Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.h
-+-43c43
-+-< #define BT_ACTIVE_SHIFT VK_LSHIFT
-+----
-+-> 
-+-70c70,72
-+-< class DemoApplication;
-+----
-+-> class tgDemoApplication;
-+-> 
-+-> void tgglutmain(int width,int height,const char* title,tgDemoApplication* demoApp);
-+-72c74
-+-< int glutmain(int argc, char **argv,int width,int height,const char* title,DemoApplication* demoApp);
-+----
-+-> void tgGlutMainEventLoop();
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp	2014-05-20 16:21:25.837574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp	2014-05-12 12:02:18.297093465 -0400
-@@ -14,7 +14,7 @@
+Binary files NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/libtgOpenGLSupport.a and NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/libtgOpenGLSupport.a differ
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp	2014-11-10 09:15:18.692913618 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp	2014-10-21 14:06:06.471590379 -0700
+@@ -14,7 +14,7 @@ subject to the following restrictions:
  */
  
  
@@ -869,7 +106,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  #include "LinearMath/btIDebugDraw.h"
  #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
  
-@@ -33,6 +33,7 @@
+@@ -33,6 +33,7 @@ subject to the following restrictions:
  #include "LinearMath/btSerializer.h"
  #include "GLDebugFont.h"
  
@@ -877,7 +114,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  extern bool gDisableDeactivation;
  int numObjects = 0;
-@@ -55,7 +56,7 @@
+@@ -55,7 +56,7 @@ extern int gTotalBytesAlignedAllocs;
  #endif //
  
  
@@ -886,7 +123,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  //see btIDebugDraw.h for modes
  :
  m_dynamicsWorld(0),
-@@ -85,6 +86,9 @@
+@@ -85,6 +86,9 @@ m_ShootBoxInitialSpeed(40.f),
  m_stepping(true),
  m_singleStep(false),
  m_idle(false),
@@ -896,7 +133,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  m_enableshadows(false),
  m_sundirection(btVector3(1,-2,1)*1000),
-@@ -101,7 +105,7 @@
+@@ -101,7 +105,7 @@ m_defaultContactProcessingThreshold(BT_L
  
  
  
@@ -905,7 +142,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  #ifndef BT_NO_PROFILE
  	CProfileManager::Release_Iterator(m_profileIterator);
-@@ -112,17 +116,19 @@
+@@ -112,17 +116,19 @@ DemoApplication::~DemoApplication()
  
  	if (m_shapeDrawer)
  		delete m_shapeDrawer;
@@ -927,7 +164,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
-@@ -158,19 +164,19 @@
+@@ -158,19 +164,19 @@ void DemoApplication::myinit(void)
  }
  
  
@@ -950,7 +187,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  	if (m_idle) {
  		m_idle = false;
  	}
-@@ -182,7 +188,7 @@
+@@ -182,7 +188,7 @@ void DemoApplication::toggleIdle() {
  
  
  
@@ -959,7 +196,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  
  	glMatrixMode(GL_PROJECTION);
-@@ -254,30 +260,30 @@
+@@ -254,30 +260,30 @@ void DemoApplication::updateCamera() {
  
  const float STEPSIZE = 5;
  
@@ -996,7 +233,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  { 
  	m_cameraDistance += btScalar(m_zoomStepSize); updateCamera(); 
  
-@@ -292,7 +298,7 @@
+@@ -292,7 +298,7 @@ void DemoApplication::zoomOut()
  
  
  
@@ -1005,7 +242,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	GLDebugResetFont(w,h);
  
-@@ -305,7 +311,7 @@
+@@ -305,7 +311,7 @@ void DemoApplication::reshape(int w, int
  
  
  
@@ -1014,7 +251,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	(void)x;
  	(void)y;
-@@ -326,31 +332,13 @@
+@@ -326,31 +332,13 @@ void DemoApplication::keyboardCallback(u
  
  	switch (key) 
  	{
@@ -1048,7 +285,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  #endif
  		break;
  
-@@ -507,6 +495,12 @@
+@@ -507,6 +495,12 @@ void DemoApplication::keyboardCallback(u
  			m_ShootBoxInitialSpeed -= 10.f;
  			break;
  		}
@@ -1061,7 +298,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  	default:
  		//        std::cout << "unused key : " << key << std::endl;
-@@ -520,7 +514,7 @@
+@@ -520,7 +514,7 @@ void DemoApplication::keyboardCallback(u
  
  }
  
@@ -1070,7 +307,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	m_debugMode = mode;
  	if (getDynamicsWorld() && getDynamicsWorld()->getDebugDrawer())
-@@ -532,7 +526,7 @@
+@@ -532,7 +526,7 @@ void	DemoApplication::setDebugMode(int m
  
  
  
@@ -1079,7 +316,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	if (!m_idle)
  		clientMoveAndDisplay();
-@@ -543,13 +537,13 @@
+@@ -543,13 +537,13 @@ void DemoApplication::moveAndDisplay()
  
  
  
@@ -1095,7 +332,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	if (!m_shootBoxShape)
  	{
-@@ -559,7 +553,7 @@
+@@ -559,7 +553,7 @@ void	DemoApplication::setShootBoxShape (
  	}
  }
  
@@ -1104,7 +341,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	if (m_dynamicsWorld)
-@@ -597,11 +591,11 @@
+@@ -597,11 +591,11 @@ void	DemoApplication::shootBox(const btV
  int gPickingConstraintId = 0;
  btVector3 gOldPickingPos;
  btVector3 gHitPos(-1,-1,-1);
@@ -1118,7 +355,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	
-@@ -674,7 +668,7 @@
+@@ -674,7 +668,7 @@ btVector3	DemoApplication::getRayTo(int
  btScalar mousePickClamping = 30.f;
  
  
@@ -1127,7 +364,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	if (state == 0) 
  	{
-@@ -773,14 +767,82 @@
+@@ -773,14 +767,82 @@ void DemoApplication::mouseFunc(int butt
  					if (rayCallback.hasHit())
  					{
  
@@ -1217,7 +454,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  					}
  				}
  
-@@ -799,79 +861,7 @@
+@@ -799,79 +861,7 @@ void DemoApplication::mouseFunc(int butt
  
  }
  
@@ -1298,7 +535,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	if (m_pickConstraint && m_dynamicsWorld)
  	{
-@@ -885,7 +875,7 @@
+@@ -885,7 +875,7 @@ void DemoApplication::removePickingConst
  	}
  }
  
@@ -1307,7 +544,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	if (m_pickConstraint)
-@@ -1006,7 +996,7 @@
+@@ -1006,7 +996,7 @@ void	DemoApplication::mouseMotionFunc(in
  
  
  
@@ -1316,7 +553,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
  
-@@ -1039,7 +1029,7 @@
+@@ -1039,7 +1029,7 @@ btRigidBody*	DemoApplication::localCreat
  }
  
  //See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
@@ -1325,7 +562,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	// switch to projection mode
-@@ -1063,7 +1053,7 @@
+@@ -1063,7 +1053,7 @@ void DemoApplication::setOrthographicPro
  
  }
  
@@ -1334,7 +571,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  
  	glMatrixMode(GL_PROJECTION);
-@@ -1077,14 +1067,14 @@
+@@ -1077,14 +1067,14 @@ void DemoApplication::resetPerspectivePr
  
  extern CProfileIterator * m_profileIterator;
  
@@ -1351,7 +588,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  #ifndef BT_NO_PROFILE
  
-@@ -1158,7 +1148,7 @@
+@@ -1158,7 +1148,7 @@ void DemoApplication::showProfileInfo(in
  
  
  //
@@ -1360,18 +597,114 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	btScalar	m[16];
  	btMatrix3x3	rot;rot.setIdentity();
-@@ -1205,8 +1195,8 @@
+@@ -1167,71 +1157,82 @@ void	DemoApplication::renderscene(int pa
+ 	for(int i=0;i<numObjects;i++)
+ 	{
+ 		btCollisionObject*	colObj=m_dynamicsWorld->getCollisionObjectArray()[i];
+-		btRigidBody*		body=btRigidBody::upcast(colObj);
+-		if(body&&body->getMotionState())
+-		{
+-			btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+-			myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+-			rot=myMotionState->m_graphicsWorldTrans.getBasis();
+-		}
+-		else
+-		{
+-			colObj->getWorldTransform().getOpenGLMatrix(m);
+-			rot=colObj->getWorldTransform().getBasis();
+-		}
+-		btVector3 wireColor(1.f,1.0f,0.5f); //wants deactivation
+-		if(i&1) wireColor=btVector3(0.f,0.0f,1.f);
+-		///color differently for active, sleeping, wantsdeactivation states
+-		if (colObj->getActivationState() == 1) //active
++		if ((colObj->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == 0)
+ 		{
+-			if (i & 1)
++			
++			btRigidBody*		body=btRigidBody::upcast(colObj);
++			if(body&&body->getMotionState())
+ 			{
+-				wireColor += btVector3 (1.f,0.f,0.f);
++				btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
++				myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
++				rot=myMotionState->m_graphicsWorldTrans.getBasis();
  			}
- 		}
+ 			else
+-			{			
+-				wireColor += btVector3 (.5f,0.f,0.f);
++			{
++				colObj->getWorldTransform().getOpenGLMatrix(m);
++				rot=colObj->getWorldTransform().getBasis();
+ 			}
+-		}
+-		if(colObj->getActivationState()==2) //ISLAND_SLEEPING
+-		{
+-			if(i&1)
++			btVector3 wireColor(1.f,1.0f,0.5f); //wants deactivation
++			if(i&1) wireColor=btVector3(0.f,0.0f,1.f);
++			///color differently for active, sleeping, wantsdeactivation states
++			if (colObj->getActivationState() == 1) //active
+ 			{
+-				wireColor += btVector3 (0.f,1.f, 0.f);
++				if (i & 1)
++				{
++					wireColor += btVector3 (1.f,0.f,0.f);
++				}
++				else
++				{			
++					wireColor += btVector3 (.5f,0.f,0.f);
++				}
+ 			}
+-			else
++			if(colObj->getActivationState()==2) //ISLAND_SLEEPING
+ 			{
+-				wireColor += btVector3 (0.f,0.5f,0.f);
++				if(i&1)
++				{
++					wireColor += btVector3 (0.f,1.f, 0.f);
++				}
++				else
++				{
++					wireColor += btVector3 (0.f,0.5f,0.f);
++				}
+ 			}
+-		}
  
 -		btVector3 aabbMin(0,0,0),aabbMax(0,0,0);
 -		//m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
-+		btVector3 aabbMin,aabbMax;
-+		m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
- 		
- 		aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
- 		aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
-@@ -1228,10 +1218,17 @@
+-		
+-		aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+-		aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+-//		printf("aabbMin=(%f,%f,%f)\n",aabbMin.getX(),aabbMin.getY(),aabbMin.getZ());
+-//		printf("aabbMax=(%f,%f,%f)\n",aabbMax.getX(),aabbMax.getY(),aabbMax.getZ());
+-//		m_dynamicsWorld->getDebugDrawer()->drawAabb(aabbMin,aabbMax,btVector3(1,1,1));
++			btVector3 aabbMin,aabbMax;
++			m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
++			
++			aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
++			aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
++	//		printf("aabbMin=(%f,%f,%f)\n",aabbMin.getX(),aabbMin.getY(),aabbMin.getZ());
++	//		printf("aabbMax=(%f,%f,%f)\n",aabbMax.getX(),aabbMax.getY(),aabbMax.getZ());
++	//		m_dynamicsWorld->getDebugDrawer()->drawAabb(aabbMin,aabbMax,btVector3(1,1,1));
+ 
+ 
+-		if (!(getDebugMode()& btIDebugDraw::DBG_DrawWireframe))
+-		{
+-			switch(pass)
++			if (!(getDebugMode()& btIDebugDraw::DBG_DrawWireframe))
+ 			{
+-			case	0:	m_shapeDrawer->drawOpenGL(m,colObj->getCollisionShape(),wireColor,getDebugMode(),aabbMin,aabbMax);break;
+-			case	1:	m_shapeDrawer->drawShadow(m,m_sundirection*rot,colObj->getCollisionShape(),aabbMin,aabbMax);break;
+-			case	2:	m_shapeDrawer->drawOpenGL(m,colObj->getCollisionShape(),wireColor*btScalar(0.3),0,aabbMin,aabbMax);break;
++				switch(pass)
++				{
++				case	0:	m_shapeDrawer->drawOpenGL(m,colObj->getCollisionShape(),wireColor,getDebugMode(),aabbMin,aabbMax);break;
++				case	1:	m_shapeDrawer->drawShadow(m,m_sundirection*rot,colObj->getCollisionShape(),aabbMin,aabbMax);break;
++				case	2:	m_shapeDrawer->drawOpenGL(m,colObj->getCollisionShape(),wireColor*btScalar(0.3),0,aabbMin,aabbMax);break;
++				}
+ 			}
+ 		}
+ 	}
  }
  
  //
@@ -1390,7 +723,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  	updateCamera();
  
  	if (m_dynamicsWorld)
-@@ -1334,10 +1331,35 @@
+@@ -1334,10 +1335,35 @@ void DemoApplication::renderme()
  
  }
  
@@ -1427,583 +760,10 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  	removePickingConstraint();
  
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp.rej Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp.rej
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp.rej	1969-12-31 19:00:00.000000000 -0500
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp.rej	2014-05-20 15:58:13.453527009 -0400
-@@ -0,0 +1,569 @@
-+--- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.cpp	2014-05-20 15:37:13.685484285 -0400
-++++ Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.cpp	2014-05-12 12:02:18.297093465 -0400
-+@@ -14,7 +14,7 @@
-+ */
-+ 
-+ 
-+-#include "DemoApplication.h"
-++#include "tgDemoApplication.h"
-+ #include "LinearMath/btIDebugDraw.h"
-+ #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-+ 
-+@@ -33,6 +33,7 @@
-+ #include "LinearMath/btSerializer.h"
-+ #include "GLDebugFont.h"
-+ 
-++#include <iostream>
-+ 
-+ extern bool gDisableDeactivation;
-+ int numObjects = 0;
-+@@ -55,7 +56,7 @@
-+ #endif //
-+ 
-+ 
-+-DemoApplication::DemoApplication()
-++tgDemoApplication::tgDemoApplication()
-+ //see btIDebugDraw.h for modes
-+ :
-+ m_dynamicsWorld(0),
-+@@ -85,6 +86,9 @@
-+ m_stepping(true),
-+ m_singleStep(false),
-+ m_idle(false),
-++exitFlag(false),
-++m_autocam(false),
-++
-+ 
-+ m_enableshadows(false),
-+ m_sundirection(btVector3(1,-2,1)*1000),
-+@@ -101,7 +105,7 @@
-+ 
-+ 
-+ 
-+-DemoApplication::~DemoApplication()
-++tgDemoApplication::~tgDemoApplication()
-+ {
-+ #ifndef BT_NO_PROFILE
-+ 	CProfileManager::Release_Iterator(m_profileIterator);
-+@@ -112,17 +116,19 @@
-+ 
-+ 	if (m_shapeDrawer)
-+ 		delete m_shapeDrawer;
-++		
-++	std::cout<< "deleted tgDemoApplication" <<std::endl;
-+ }
-+ 
-+ 
-+-void DemoApplication::overrideGLShapeDrawer (GL_ShapeDrawer* shapeDrawer)
-++void tgDemoApplication::overrideGLShapeDrawer (GL_ShapeDrawer* shapeDrawer)
-+ {
-+ 	shapeDrawer->enableTexture (m_shapeDrawer->hasTextureEnabled());
-+ 	delete m_shapeDrawer;
-+ 	m_shapeDrawer = shapeDrawer;
-+ }
-+ 
-+-void DemoApplication::myinit(void)
-++void tgDemoApplication::myinit(void)
-+ {
-+ 
-+ 	GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
-+@@ -158,19 +164,19 @@
-+ }
-+ 
-+ 
-+-void	DemoApplication::setCameraDistance(float dist)
-++void	tgDemoApplication::setCameraDistance(float dist)
-+ {
-+ 	m_cameraDistance  = dist;
-+ }
-+ 
-+-float	DemoApplication::getCameraDistance()
-++float	tgDemoApplication::getCameraDistance()
-+ {
-+ 	return m_cameraDistance;
-+ }
-+ 
-+ 
-+ 
-+-void DemoApplication::toggleIdle() {
-++void tgDemoApplication::toggleIdle() {
-+ 	if (m_idle) {
-+ 		m_idle = false;
-+ 	}
-+@@ -182,7 +188,7 @@
-+ 
-+ 
-+ 
-+-void DemoApplication::updateCamera() {
-++void tgDemoApplication::updateCamera() {
-+ 
-+ 
-+ 	glMatrixMode(GL_PROJECTION);
-+@@ -254,30 +260,30 @@
-+ 
-+ const float STEPSIZE = 5;
-+ 
-+-void DemoApplication::stepLeft() 
-++void tgDemoApplication::stepLeft() 
-+ { 
-+ 	m_azi -= STEPSIZE; if (m_azi < 0) m_azi += 360; updateCamera(); 
-+ }
-+-void DemoApplication::stepRight() 
-++void tgDemoApplication::stepRight() 
-+ { 
-+ 	m_azi += STEPSIZE; if (m_azi >= 360) m_azi -= 360; updateCamera(); 
-+ }
-+-void DemoApplication::stepFront() 
-++void tgDemoApplication::stepFront() 
-+ { 
-+ 	m_ele += STEPSIZE; if (m_ele >= 360) m_ele -= 360; updateCamera(); 
-+ }
-+-void DemoApplication::stepBack() 
-++void tgDemoApplication::stepBack() 
-+ { 
-+ 	m_ele -= STEPSIZE; if (m_ele < 0) m_ele += 360; updateCamera(); 
-+ }
-+-void DemoApplication::zoomIn() 
-++void tgDemoApplication::zoomIn() 
-+ { 
-+ 	m_cameraDistance -= btScalar(m_zoomStepSize); updateCamera(); 
-+ 	if (m_cameraDistance < btScalar(0.1))
-+ 		m_cameraDistance = btScalar(0.1);
-+ 
-+ }
-+-void DemoApplication::zoomOut() 
-++void tgDemoApplication::zoomOut() 
-+ { 
-+ 	m_cameraDistance += btScalar(m_zoomStepSize); updateCamera(); 
-+ 
-+@@ -292,7 +298,7 @@
-+ 
-+ 
-+ 
-+-void DemoApplication::reshape(int w, int h) 
-++void tgDemoApplication::reshape(int w, int h) 
-+ {
-+ 	GLDebugResetFont(w,h);
-+ 
-+@@ -305,7 +311,7 @@
-+ 
-+ 
-+ 
-+-void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
-++void tgDemoApplication::keyboardCallback(unsigned char key, int x, int y)
-+ {
-+ 	(void)x;
-+ 	(void)y;
-+@@ -326,31 +332,13 @@
-+ 
-+ 	switch (key) 
-+ 	{
-+-	case 8:
-+-		{
-+-			int numObj = getDynamicsWorld()->getNumCollisionObjects();
-+-			if (numObj)
-+-			{
-+-				btCollisionObject* obj = getDynamicsWorld()->getCollisionObjectArray()[numObj-1];
-+-
-+-				getDynamicsWorld()->removeCollisionObject(obj);
-+-				btRigidBody* body = btRigidBody::upcast(obj);
-+-				if (body && body->getMotionState())
-+-				{
-+-					delete body->getMotionState();					
-+-				}
-+-				delete obj;
-+-
-+-
-+-			}
-+-			break;
-+-		}
-+ 	case 'q' : 
-+ #ifdef BT_USE_FREEGLUT
-+ 		//return from glutMainLoop(), detect memory leaks etc.
-+ 		glutLeaveMainLoop();
-++		exitFlag = true;
-+ #else
-+-		exit(0);
-++	exit(0);
-+ #endif
-+ 		break;
-+ 
-+@@ -507,6 +495,12 @@
-+ 			m_ShootBoxInitialSpeed -= 10.f;
-+ 			break;
-+ 		}
-++	
-++	case	';':
-++		{
-++			m_autocam=!m_autocam;
-++			break;
-++		}
-+ 
-+ 	default:
-+ 		//        std::cout << "unused key : " << key << std::endl;
-+@@ -520,7 +514,7 @@
-+ 
-+ }
-+ 
-+-void	DemoApplication::setDebugMode(int mode)
-++void	tgDemoApplication::setDebugMode(int mode)
-+ {
-+ 	m_debugMode = mode;
-+ 	if (getDynamicsWorld() && getDynamicsWorld()->getDebugDrawer())
-+@@ -532,7 +526,7 @@
-+ 
-+ 
-+ 
-+-void DemoApplication::moveAndDisplay()
-++void tgDemoApplication::moveAndDisplay()
-+ {
-+ 	if (!m_idle)
-+ 		clientMoveAndDisplay();
-+@@ -543,13 +537,13 @@
-+ 
-+ 
-+ 
-+-void DemoApplication::displayCallback()
-++void tgDemoApplication::displayCallback()
-+ {
-+ }
-+ 
-+ #define NUM_SPHERES_ON_DIAGONAL 9
-+ 
-+-void	DemoApplication::setShootBoxShape ()
-++void	tgDemoApplication::setShootBoxShape ()
-+ {
-+ 	if (!m_shootBoxShape)
-+ 	{
-+@@ -559,7 +553,7 @@
-+ 	}
-+ }
-+ 
-+-void	DemoApplication::shootBox(const btVector3& destination)
-++void	tgDemoApplication::shootBox(const btVector3& destination)
-+ {
-+ 
-+ 	if (m_dynamicsWorld)
-+@@ -597,11 +591,11 @@
-+ int gPickingConstraintId = 0;
-+ btVector3 gOldPickingPos;
-+ btVector3 gHitPos(-1,-1,-1);
-+-btScalar gOldPickingDist  = 0.f;
-++float gOldPickingDist  = 0.f;
-+ btRigidBody* pickedBody = 0;//for deactivation state
-+ 
-+ 
-+-btVector3	DemoApplication::getRayTo(int x,int y)
-++btVector3	tgDemoApplication::getRayTo(int x,int y)
-+ {
-+ 
-+ 	
-+@@ -674,7 +668,7 @@
-+ btScalar mousePickClamping = 30.f;
-+ 
-+ 
-+-void DemoApplication::mouseFunc(int button, int state, int x, int y)
-++void tgDemoApplication::mouseFunc(int button, int state, int x, int y)
-+ {
-+ 	if (state == 0) 
-+ 	{
-+@@ -773,14 +767,82 @@
-+ 					if (rayCallback.hasHit())
-+ 					{
-+ 
-+-						btVector3 pickPos = rayCallback.m_hitPointWorld;
-+-						
-+-						pickObject(pickPos, rayCallback.m_collisionObject);
-+-						
-+-						gOldPickingPos = rayTo;
-+-						gHitPos = pickPos;
-+ 
-+-						gOldPickingDist  = (pickPos-rayFrom).length();
-++						btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
-++						if (body)
-++						{
-++							//other exclusions?
-++							if (!(body->isStaticObject() || body->isKinematicObject()))
-++							{
-++								pickedBody = body;
-++								pickedBody->setActivationState(DISABLE_DEACTIVATION);
-++
-++
-++								btVector3 pickPos = rayCallback.m_hitPointWorld;
-++								//printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
-++
-++
-++								btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
-++
-++								
-++
-++								
-++
-++
-++								if ((m_modifierKeys& BT_ACTIVE_SHIFT)==0)
-++								{
-++									btTransform tr;
-++									tr.setIdentity();
-++									tr.setOrigin(localPivot);
-++									btGeneric6DofConstraint* dof6 = new btGeneric6DofConstraint(*body, tr,false);
-++									dof6->setLinearLowerLimit(btVector3(0,0,0));
-++									dof6->setLinearUpperLimit(btVector3(0,0,0));
-++									dof6->setAngularLowerLimit(btVector3(0,0,0));
-++									dof6->setAngularUpperLimit(btVector3(0,0,0));
-++
-++									m_dynamicsWorld->addConstraint(dof6,true);
-++									m_pickConstraint = dof6;
-++
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,0);
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,1);
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,2);
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,3);
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,4);
-++									dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,5);
-++
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,0);
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,1);
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,2);
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,3);
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,4);
-++									dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,5);
-++								} else
-++								{
-++									btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body,localPivot);
-++									m_dynamicsWorld->addConstraint(p2p,true);
-++									m_pickConstraint = p2p;
-++									p2p->m_setting.m_impulseClamp = mousePickClamping;
-++									//very weak constraint for picking
-++									p2p->m_setting.m_tau = 0.001f;
-++/*
-++									p2p->setParam(BT_CONSTRAINT_CFM,0.8,0);
-++									p2p->setParam(BT_CONSTRAINT_CFM,0.8,1);
-++									p2p->setParam(BT_CONSTRAINT_CFM,0.8,2);
-++									p2p->setParam(BT_CONSTRAINT_ERP,0.1,0);
-++									p2p->setParam(BT_CONSTRAINT_ERP,0.1,1);
-++									p2p->setParam(BT_CONSTRAINT_ERP,0.1,2);
-++									*/
-++									
-++
-++								}
-++					
-++								//save mouse position for dragging
-++								gOldPickingPos = rayTo;
-++								gHitPos = pickPos;
-++
-++								gOldPickingDist  = (pickPos-rayFrom).length();
-++							}
-++						}
-+ 					}
-+ 				}
-+ 
-+@@ -799,79 +861,7 @@
-+ 
-+ }
-+ 
-+-void DemoApplication::pickObject(const btVector3& pickPos, const btCollisionObject* hitObj)
-+-{
-+-	
-+-	btRigidBody* body = (btRigidBody*)btRigidBody::upcast(hitObj);
-+-	if (body)
-+-	{
-+-		//other exclusions?
-+-		if (!(body->isStaticObject() || body->isKinematicObject()))
-+-		{
-+-			pickedBody = body;
-+-			pickedBody->setActivationState(DISABLE_DEACTIVATION);
-+-
-+-
-+-			//printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
-+-
-+-
-+-			btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
-+-
-+-			if ((m_modifierKeys& BT_ACTIVE_SHIFT)!=0)
-+-			{
-+-				btTransform tr;
-+-				tr.setIdentity();
-+-				tr.setOrigin(localPivot);
-+-				btGeneric6DofConstraint* dof6 = new btGeneric6DofConstraint(*body, tr,false);
-+-				dof6->setLinearLowerLimit(btVector3(0,0,0));
-+-				dof6->setLinearUpperLimit(btVector3(0,0,0));
-+-				dof6->setAngularLowerLimit(btVector3(0,0,0));
-+-				dof6->setAngularUpperLimit(btVector3(0,0,0));
-+-
-+-				m_dynamicsWorld->addConstraint(dof6,true);
-+-				m_pickConstraint = dof6;
-+-
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,0);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,1);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,2);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,3);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,4);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_CFM,0.8,5);
-+-
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,0);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,1);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,2);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,3);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,4);
-+-				dof6->setParam(BT_CONSTRAINT_STOP_ERP,0.1,5);
-+-			} else
-+-			{
-+-				btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body,localPivot);
-+-				m_dynamicsWorld->addConstraint(p2p,true);
-+-				m_pickConstraint = p2p;
-+-				p2p->m_setting.m_impulseClamp = mousePickClamping;
-+-				//very weak constraint for picking
-+-				p2p->m_setting.m_tau = 0.001f;
-+-	/*
-+-				p2p->setParam(BT_CONSTRAINT_CFM,0.8,0);
-+-				p2p->setParam(BT_CONSTRAINT_CFM,0.8,1);
-+-				p2p->setParam(BT_CONSTRAINT_CFM,0.8,2);
-+-				p2p->setParam(BT_CONSTRAINT_ERP,0.1,0);
-+-				p2p->setParam(BT_CONSTRAINT_ERP,0.1,1);
-+-				p2p->setParam(BT_CONSTRAINT_ERP,0.1,2);
-+-				*/
-+-									
-+-
-+-			}
-+-					
-+-			//save mouse position for dragging
-+-					
-+-		}
-+-	}
-+-						
-+-}
-+-
-+-void DemoApplication::removePickingConstraint()
-++void tgDemoApplication::removePickingConstraint()
-+ {
-+ 	if (m_pickConstraint && m_dynamicsWorld)
-+ 	{
-+@@ -885,7 +875,7 @@
-+ 	}
-+ }
-+ 
-+-void	DemoApplication::mouseMotionFunc(int x,int y)
-++void	tgDemoApplication::mouseMotionFunc(int x,int y)
-+ {
-+ 
-+ 	if (m_pickConstraint)
-+@@ -1006,7 +996,7 @@
-+ 
-+ 
-+ 
-+-btRigidBody*	DemoApplication::localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape)
-++btRigidBody*	tgDemoApplication::localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape)
-+ {
-+ 	btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
-+ 
-+@@ -1039,7 +1029,7 @@
-+ }
-+ 
-+ //See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
-+-void DemoApplication::setOrthographicProjection() 
-++void tgDemoApplication::setOrthographicProjection() 
-+ {
-+ 
-+ 	// switch to projection mode
-+@@ -1063,7 +1053,7 @@
-+ 
-+ }
-+ 
-+-void DemoApplication::resetPerspectiveProjection() 
-++void tgDemoApplication::resetPerspectiveProjection() 
-+ {
-+ 
-+ 	glMatrixMode(GL_PROJECTION);
-+@@ -1077,14 +1067,14 @@
-+ 
-+ extern CProfileIterator * m_profileIterator;
-+ 
-+-void DemoApplication::displayProfileString(int xOffset,int yStart,char* message)
-++void tgDemoApplication::displayProfileString(int xOffset,int yStart,char* message)
-+ {
-+ 	glRasterPos3f(btScalar(xOffset),btScalar(yStart),btScalar(0));
-+ 	GLDebugDrawString(xOffset,yStart,message);
-+ }
-+ 
-+ 
-+-void DemoApplication::showProfileInfo(int& xOffset,int& yStart, int yIncr)
-++void tgDemoApplication::showProfileInfo(int& xOffset,int& yStart, int yIncr)
-+ {
-+ #ifndef BT_NO_PROFILE
-+ 
-+@@ -1158,7 +1148,7 @@
-+ 
-+ 
-+ //
-+-void	DemoApplication::renderscene(int pass)
-++void	tgDemoApplication::renderscene(int pass)
-+ {
-+ 	btScalar	m[16];
-+ 	btMatrix3x3	rot;rot.setIdentity();
-+@@ -1205,8 +1195,8 @@
-+ 			}
-+ 		}
-+ 
-+-		btVector3 aabbMin(0,0,0),aabbMax(0,0,0);
-+-		//m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
-++		btVector3 aabbMin,aabbMax;
-++		m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
-+ 		
-+ 		aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
-+ 		aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
-+@@ -1228,10 +1218,17 @@
-+ }
-+ 
-+ //
-+-void DemoApplication::renderme()
-++void tgDemoApplication::renderme()
-+ {
-+ 	myinit();
-++	
-++	const btVector3 ps = getPs();
-+ 
-++	if (m_autocam)
-++	{
-++		m_cameraTargetPosition += (ps - m_cameraTargetPosition) * 0.05;
-++	}
-++	
-+ 	updateCamera();
-+ 
-+ 	if (m_dynamicsWorld)
-+@@ -1334,10 +1331,35 @@
-+ 
-+ }
-+ 
-++btVector3 tgDemoApplication::getPs()
-++{
-++	btVector3 ps(0.0, 0.0, 0.0);
-++	size_t nps = 0;
-++	
-++	const btCollisionObjectArray btarr =
-++	  getDynamicsWorld()->getCollisionObjectArray();
-++	const size_t count = btarr.size();
-++	nps += count;
-++	/// @todo Use std::for_each()
-++	for (int ib = 0; ib < count; ++ib)
-++	{
-++		const btRigidBody* const pRigid = 
-++		        static_cast<btRigidBody*>(btarr[ib]);
-++		ps += pRigid->getCenterOfMassPosition();
-++	}
-++
-++	if (nps != 0)
-++	{
-++	        ps /= static_cast<double>(nps);
-++	}
-++
-++	return ps;
-++}
-++
-+ #include "BulletCollision/BroadphaseCollision/btAxisSweep3.h"
-+ 
-+ 
-+-void	DemoApplication::clientResetScene()
-++void	tgDemoApplication::clientResetScene()
-+ {
-+ 	removePickingConstraint();
-+ 
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.h Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.h
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDemoApplication.h	2014-05-20 16:21:25.837574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgDemoApplication.h	2014-05-12 12:02:18.309093466 -0400
-@@ -13,11 +13,11 @@
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.h NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.h
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.h	2014-11-10 09:15:18.684913618 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.h	2014-08-18 20:29:03.002095342 -0700
+@@ -13,11 +13,11 @@ subject to the following restrictions:
  3. This notice may not be removed or altered from any source distribution.
  */
  
@@ -2018,7 +778,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  #include "GL_ShapeDrawer.h"
  
  #include <stdlib.h>
-@@ -38,7 +38,7 @@
+@@ -38,7 +38,7 @@ class	btTypedConstraint;
  
  
  
@@ -2027,7 +787,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  {
  protected:
  	void	displayProfileString(int xOffset,int yStart,char* message);
-@@ -57,9 +57,6 @@
+@@ -57,9 +57,6 @@ protected:
  
  	virtual void removePickingConstraint();
  
@@ -2037,7 +797,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  	btCollisionShape*	m_shootBoxShape;
  
  	float	m_cameraDistance;
-@@ -73,6 +70,8 @@
+@@ -73,6 +70,8 @@ protected:
  	int	m_mouseOldX;
  	int	m_mouseOldY;
  	int	m_mouseButtons;
@@ -2046,7 +806,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  public:
  	int	m_modifierKeys;
  protected:
-@@ -106,11 +105,15 @@
+@@ -106,11 +105,15 @@ protected:
  	btVector3		m_sundirection;
  	btScalar		m_defaultContactProcessingThreshold;
  
@@ -2064,7 +824,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  	btDynamicsWorld*		getDynamicsWorld()
  	{
-@@ -118,6 +121,8 @@
+@@ -118,6 +121,8 @@ public:
  	}
  
  	virtual	void initPhysics() = 0;
@@ -2073,7 +833,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  
  	virtual	void setDrawClusters(bool drawClusters)
  	{
-@@ -152,11 +157,6 @@
+@@ -152,11 +157,6 @@ public:
  	{
  		m_azi = azi;
  	}
@@ -2085,7 +845,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  	
  	void	setCameraUp(const btVector3& camUp)
  	{
-@@ -208,7 +208,7 @@
+@@ -208,7 +208,7 @@ public:
  
  	virtual void	clientResetScene();
  
@@ -2094,7 +854,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
  	virtual void setShootBoxShape ();
  	virtual void	shootBox(const btVector3& destination);
  
-@@ -257,10 +257,16 @@
+@@ -257,10 +257,16 @@ public:
  	{
  		m_idle = idle;
  	}
@@ -2113,9 +873,9 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgDem
 +#endif //TG_DEMO_APPLICATION_H
  
  
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.cpp
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp	2014-05-20 16:21:25.841574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.cpp	2014-05-12 12:02:18.309093466 -0400
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp	2014-11-10 09:15:18.704913617 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.cpp	2014-08-18 20:29:03.002095342 -0700
 @@ -1,22 +1,22 @@
  
 -#include "GLDebugDrawer.h"
@@ -2144,7 +904,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLD
  {
  	glBegin(GL_LINES);
  		glColor3f(fromColor.getX(), fromColor.getY(), fromColor.getZ());
-@@ -26,12 +26,12 @@
+@@ -26,12 +26,12 @@ void	GLDebugDrawer::drawLine(const btVec
  	glEnd();
  }
  
@@ -2159,7 +919,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLD
  {
  	glColor4f (color.getX(), color.getY(), color.getZ(), btScalar(1.0f));
  	glPushMatrix ();
-@@ -69,7 +69,7 @@
+@@ -69,7 +69,7 @@ void GLDebugDrawer::drawSphere (const bt
  
  
  
@@ -2168,7 +928,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLD
  {
  //	if (m_debugMode > 0)
  	{
-@@ -84,24 +84,24 @@
+@@ -84,24 +84,24 @@ void	GLDebugDrawer::drawTriangle(const b
  	}
  }
  
@@ -2197,9 +957,9 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLD
  {
  	
  	{
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.h
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h	2014-05-20 16:21:25.837574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGLDebugDrawer.h	2014-05-12 12:02:18.289093465 -0400
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h	2014-11-10 09:15:18.696913618 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGLDebugDrawer.h	2014-08-18 20:29:03.006093341 -0700
 @@ -1,18 +1,18 @@
 -#ifndef GL_DEBUG_DRAWER_H
 -#define GL_DEBUG_DRAWER_H
@@ -2224,9 +984,9 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGLD
  
  	virtual void	drawLine(const btVector3& from,const btVector3& to,const btVector3& fromColor, const btVector3& toColor);
  
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.cpp
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp	2014-05-20 16:21:25.841574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.cpp	2014-05-12 12:02:18.289093465 -0400
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp	2014-11-10 09:15:18.716913617 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.cpp	2014-08-18 20:29:03.006093341 -0700
 @@ -1,14 +1,14 @@
  
  #ifndef _WINDOWS
@@ -2245,7 +1005,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  {
  	m_modifierKeys = 0;
  	if (glutGetModifiers() & GLUT_ACTIVE_ALT)
-@@ -21,7 +21,7 @@
+@@ -21,7 +21,7 @@ void	GlutDemoApplication::updateModifier
  		m_modifierKeys |= BT_ACTIVE_SHIFT;
  }
  
@@ -2254,7 +1014,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  {
  	(void)x;
  	(void)y;
-@@ -43,21 +43,8 @@
+@@ -43,21 +43,8 @@ void GlutDemoApplication::specialKeyboar
  
  	case GLUT_KEY_END:
  		{
@@ -2278,7 +1038,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  			break;
  		}
  	case GLUT_KEY_LEFT : stepLeft(); break;
-@@ -76,7 +63,7 @@
+@@ -76,7 +63,7 @@ void GlutDemoApplication::specialKeyboar
  
  }
  
@@ -2287,10 +1047,10 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  {
  	glutSwapBuffers();
  
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.h
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h	2014-05-20 16:21:25.841574231 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGlutDemoApplication.h	2014-05-12 12:02:18.301093466 -0400
-@@ -14,12 +14,12 @@
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h	2014-11-10 09:15:18.708913617 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutDemoApplication.h	2014-08-18 20:29:03.006093341 -0700
+@@ -14,12 +14,12 @@ subject to the following restrictions:
  */
  
  
@@ -2307,17 +1067,17 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  {
  public:
  
-@@ -32,5 +32,5 @@
+@@ -32,5 +32,5 @@ public:
  	virtual	void	updateModifierKeys();
  
  };
 -#endif //GLUT_DEMO_APPLICATION_H
 +#endif //TG_GLUT_DEMO_APPLICATION_H
  
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.cpp
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp	2014-05-20 16:21:25.845574232 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.cpp	2014-05-12 12:02:18.289093465 -0400
-@@ -15,77 +15,82 @@
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp	2014-11-10 09:15:19.724913575 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.cpp	2014-08-18 20:29:03.006093341 -0700
+@@ -15,77 +15,82 @@ subject to the following restrictions:
  
  #ifndef _WINDOWS
  
@@ -2418,7 +1178,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  
  	glutKeyboardFunc(glutKeyboardCallback);
  	glutKeyboardUpFunc(glutKeyboardUpCallback);
-@@ -110,11 +115,13 @@
+@@ -110,11 +115,13 @@ CGLContextObj cgl_context = CGLGetCurren
  CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
  #endif
  
@@ -2436,10 +1196,10 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
 +#endif
  
  #endif //_WINDOWS
-diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.h Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.h
---- SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlutStuff.h	2014-05-20 16:21:25.845574232 -0400
-+++ Tensegrity/trunk/NTRT/src/core/bullet/tgGlutStuff.h	2014-05-12 12:02:18.297093465 -0400
-@@ -40,7 +40,7 @@
+diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.h NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.h
+--- NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.h	2014-11-10 09:15:18.720913617 -0800
++++ NTRTsim/env/build/bullet/Demos/OpenGL_FreeGlut/tgGlutStuff.h	2014-08-18 20:29:03.006093341 -0700
+@@ -40,7 +40,7 @@ subject to the following restrictions:
  
  #ifdef _WINDOWS
  #define BT_ACTIVE_ALT   VK_LMENU
@@ -2448,7 +1208,7 @@ diff -ruN SimulatorPatch/env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut/tgGlu
  #else
  #define BT_KEY_K 'k'
  #define BT_KEY_LEFT			GLUT_KEY_LEFT
-@@ -67,9 +67,11 @@
+@@ -67,9 +67,11 @@ subject to the following restrictions:
  
  
  
