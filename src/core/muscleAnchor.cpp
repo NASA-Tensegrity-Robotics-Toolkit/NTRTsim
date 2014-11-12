@@ -54,7 +54,8 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   permanent(perm),
   sliding(slide),
   force(0.0, 0.0, 0.0),
-  manifold(m)
+  manifold(m),
+  touching(true)
 {
 	assert(body);
 	
@@ -84,7 +85,7 @@ btVector3 muscleAnchor::getWorldPosition() const
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
 	bool ret = true;
-	
+	touching = true;
 	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
 	
 	if (sliding)
@@ -109,13 +110,13 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			
 			btVector3 contactPos = getWorldPosition();
 			btVector3 newNormal = contactNormal;
-			
+			btScalar dist = 0.0;
 			for (int p = 0; p < n; p++)
 			{
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
 				
 				// Original position picked at beginning
-				btVector3 pos = useB ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
+				btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
 				
 				btScalar contactDist = (pos - newPos).length();
 				
@@ -124,36 +125,39 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					length = contactDist;
 					contactPos = pos;
 					
-					btScalar directionSign = useB ? btScalar(-1.0) : btScalar(1.0);
+					btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
 					
 					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
-					
+					dist = pt.getDistance();
+				
 				}
 				
 			}
 			
 			// Assume we've lost this contact for some reason
-			/*
-			if (length > 0.1)
+			
+			if (dist > 0.0)
 			{
-				update = false;
+				touching = false;
 			}
-			*/
+			
 			if (update)
 			{
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
 						   newPos;
 				
-				if ((newNormal + contactNormal).length() < 0.1)
+				if (dist < 0 && (newNormal + contactNormal).length() < 0.1)
 				{
-					//std::cout<< "Reversed normal" << std::endl;
+					std::cout<< "Reversed normal" << std::endl;
 				}
-						   
-				//contactNormal = newNormal;
+				if (dist < 0 && length < 0.01)
+				{		   
+					contactNormal = newNormal;
+				}
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
-				//ret = false;
+				ret = false;
 			}
 		}
 		else

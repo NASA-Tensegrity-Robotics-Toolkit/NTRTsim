@@ -145,6 +145,10 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
             btVector3 direction = m_anchors[i]->getWorldPosition() - m_anchors[i - 1]->getWorldPosition();
             force = -direction.normalize() * magnitude;
         }
+        else if(m_anchors[i]->isTouching() == false)
+        {
+			// Do nothing, this anchor has temporarily lost contact
+		}
         else if (i < n - 1)
         {
 			// Will fail if we already have this rigid body, but makes sure we're properly initialized otherwise
@@ -202,13 +206,17 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		btScalar maxForce = (anchor1->force + anchor2->force).length();
 		std::cout << maxForce << std::endl;
 #else
-		btVector3 maxForce = (anchor1->force + anchor2->force).absolute();
+		btVector3 maxForce = (anchor1->force + anchor2->force);
 		
 		for (std::size_t i = 0; i < 3; i++)
 		{
 			if (totalForce[i] != maxForce[i] && totalForce[i] != 0.0)
 			{
-				forceScale[i] = maxForce[i] / totalForce[i];
+				forceScale[i] = btFabs(maxForce[i] / totalForce[i]);
+			}
+			else if (totalForce[i] == 0.0)
+			{
+				forceScale[i] = 0.0;
 			}
 		} 
 #endif
@@ -220,6 +228,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			forceScale = maxForce / totalForce;
 		}
 #endif
+		std::cout << forceScale << std::endl;
 		m_rbForceScales.insert(std::pair<btRigidBody*, btVector3> (m_forceMapIt->first, forceScale));
 	}
     
