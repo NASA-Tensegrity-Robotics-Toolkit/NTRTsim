@@ -363,8 +363,8 @@ void MuscleNP::updateManifolds()
 						
 						btVector3 contactNormal = newAnchor->getContactNormal();
 									
-						btScalar normalValue1 = (lineA.normalize()).dot( newAnchor->getContactNormal()); 
-						btScalar normalValue2 = (lineB.normalize()).dot( newAnchor->getContactNormal()); 
+						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
+						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 						
 						bool del = false;					
 						if (lengthA <= 0.1 && rb == (*(m_anchorIt - 1))->attachedBody )
@@ -426,8 +426,8 @@ void MuscleNP::updateAnchorList()
 		
 		btVector3 contactNormal = newAnchor->getContactNormal();
 						
-		btScalar normalValue1 = (lineA.normalize()).dot( newAnchor->getContactNormal()); 
-		btScalar normalValue2 = (lineB.normalize()).dot( newAnchor->getContactNormal()); 
+		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
+		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 		
 		bool del = false;	
 		
@@ -543,7 +543,7 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() <= 0.01 || lineB.length() <= 0.01)
+				if (lineA.length() < 0.1 || lineB.length() < 0.1)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
@@ -555,8 +555,8 @@ void MuscleNP::pruneAnchors()
 					//lineB.normalize();
 					//std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
 
-					normalValue1 = (lineA.normalize()).dot(contactNormal);
-					normalValue2 = (lineB.normalize()).dot(contactNormal);
+					normalValue1 = (lineA).dot(contactNormal);
+					normalValue2 = (lineB).dot(contactNormal);
 				}	
 				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
 				{  		 

@@ -138,7 +138,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			
 			if (dist > 0.0)
 			{
-				touching = false;
+				//touching = false;
 			}
 			
 			if (update)
