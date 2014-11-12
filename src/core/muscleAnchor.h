@@ -101,6 +101,8 @@ private:
 	// todo: should this be const?
 	btPersistentManifold* manifold;
 	
+	int manifoldIndex;
+	
 	bool touching;
 	
 };

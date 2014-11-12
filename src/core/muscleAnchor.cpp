@@ -58,7 +58,10 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   touching(true)
 {
 	assert(body);
-	
+	if (manifold)
+	{
+		manifoldIndex = m->m_index1a;
+	}
 	assert(manifold == NULL || body == manifold->getBody0() || body == manifold->getBody1());
 }
 
@@ -136,11 +139,19 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			
 			// Assume we've lost this contact for some reason
 			
-			if (dist > 0.0)
+			if (dist > 0.0 && length < 0.01)
 			{
-				//touching = false;
+				ret = false;
 			}
 			
+			
+			if (length > 0.2)
+			{
+				// This makes contact handling better in some cases and worse in other
+				// Better conservation of momentum without it, but contacts tend to exist a little too long
+				update = false;
+				std::cout << "Original: " << manifoldIndex << "current " << manifold-> m_index1a << std::endl;
+			}
 			if (update)
 			{
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
@@ -150,10 +161,10 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				{
 					std::cout<< "Reversed normal" << std::endl;
 				}
-				if (dist < 0 && length < 0.01)
-				{		   
+				//if (dist < 0 && length < 0.01)
+				//{		   
 					contactNormal = newNormal;
-				}
+				//}
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
@@ -201,5 +212,6 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
 		manifold = m;
+		manifoldIndex = m->m_index1a;
 	}
 }

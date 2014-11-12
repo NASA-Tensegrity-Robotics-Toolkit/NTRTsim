@@ -315,6 +315,8 @@ void MuscleNP::updateManifolds()
                     
 					btRigidBody* rb = NULL;
 					
+					std::cout << pos << " " << manifold << " " << manifold->m_index1a << std::endl;
+					
 					if (manifold->getBody0() == m_ghostObject)
 					{
 						if (manifold->getBody1() == obj1)
@@ -463,7 +465,9 @@ void MuscleNP::updateAnchorList()
 // Sadly, even with the above insertion scheme, this is still a necessary sanity check
 #if (1)    
     // Remove the permanaent anchors for sorting
+    assert(*m_anchors.begin() == anchor1);
     m_anchors.erase(m_anchors.begin());
+    assert(*(m_anchors.end() - 1) == anchor2);
     m_anchors.erase(m_anchors.end() - 1);
     
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
@@ -543,7 +547,7 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() < 0.1 || lineB.length() < 0.1)
+				if (lineA.length() < 0.01 || lineB.length() < 0.01)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
