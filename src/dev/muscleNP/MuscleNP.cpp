@@ -195,24 +195,32 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	for(m_forceMapIt = m_rbForceMap.begin(); m_forceMapIt != m_rbForceMap.end(); ++m_forceMapIt)
 	{	
-		btScalar totalForce = m_forceMapIt->second.length();
-		btScalar forceScale = 1.0;
+		btVector3 totalForce = m_forceMapIt->second;
+		btVector3 forceScale(1.0, 1.0, 1.0);
 
-#if (1)		
+#if (0)		
 		btScalar maxForce = (anchor1->force + anchor2->force).length();
 		std::cout << maxForce << std::endl;
 #else
-		btScalar maxForce = 2.0 * tension;
+		btVector3 maxForce = (anchor1->force + anchor2->force).absolute();
+		
+		for (std::size_t i = 0; i < 3; i++)
+		{
+			if (totalForce[i] != maxForce[i] && totalForce[i] != 0.0)
+			{
+				forceScale[i] = maxForce[i] / totalForce[i];
+			}
+		} 
 #endif
 
-#if (1)
+#if (0)
 		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
 		if (totalForce != maxForce && totalForce != 0.0)
 		{
 			forceScale = maxForce / totalForce;
 		}
 #endif
-		m_rbForceScales.insert(std::pair<btRigidBody*, btScalar> (m_forceMapIt->first, forceScale));
+		m_rbForceScales.insert(std::pair<btRigidBody*, btVector3> (m_forceMapIt->first, forceScale));
 	}
     
     for (std::size_t i = 0; i < n; i++)
@@ -222,13 +230,14 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
 		
-		btScalar forceScale = 1.0;
+		btVector3 forceScale(1.0, 1.0, 1.0);
 		// Scale the force of the sliding anchors
 		if (m_anchors[i]->sliding)
 		{
 			forceScale = m_rbForceScales[body];
 		}
 		
+		// Elementwise multiply
 		m_anchors[i]->force *= forceScale ;
 		
 		btVector3 impulse = m_anchors[i]->force* dt;
