@@ -147,10 +147,6 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
             btVector3 direction = m_anchors[i]->getWorldPosition() - m_anchors[i - 1]->getWorldPosition();
             force = -direction.normalize() * magnitude;
         }
-        else if(m_anchors[i]->isTouching() == false)
-        {
-			// Do nothing, this anchor has temporarily lost contact
-		}
         else if (i < n - 1)
         {
 			// Will fail if we already have this rigid body, but makes sure we're properly initialized otherwise
@@ -315,7 +311,7 @@ void MuscleNP::updateManifolds()
                     
 					btRigidBody* rb = NULL;
 					
-					std::cout << pos << " " << manifold << " " << manifold->m_index1a << std::endl;
+					//std::cout << pos << " " << manifold << " " << manifold->m_index1a << std::endl;
 					
 					if (manifold->getBody0() == m_ghostObject)
 					{
@@ -462,8 +458,7 @@ void MuscleNP::updateAnchorList()
 		}
 	}
 
-// Sadly, even with the above insertion scheme, this is still a necessary sanity check
-#if (1)    
+#if (0)    
     // Remove the permanaent anchors for sorting
     assert(*m_anchors.begin() == anchor1);
     m_anchors.erase(m_anchors.begin());

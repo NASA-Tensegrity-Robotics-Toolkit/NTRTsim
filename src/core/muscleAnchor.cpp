@@ -54,14 +54,10 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   permanent(perm),
   sliding(slide),
   force(0.0, 0.0, 0.0),
-  manifold(m),
-  touching(true)
+  manifold(m)
 {
 	assert(body);
-	if (manifold)
-	{
-		manifoldIndex = m->m_index1a;
-	}
+
 	assert(manifold == NULL || body == manifold->getBody0() || body == manifold->getBody1());
 }
 
@@ -87,8 +83,8 @@ btVector3 muscleAnchor::getWorldPosition() const
 
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
+	/// @todo reverse this so we can get rid of a lot of else statements
 	bool ret = true;
-	touching = true;
 	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
 	
 	if (sliding)
@@ -138,19 +134,19 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			}
 			
 			// Assume we've lost this contact for some reason
-			
+			/*
 			if (dist > 0.0 && length < 0.01)
 			{
 				ret = false;
 			}
-			
+			*/
 			
 			if (length > 0.2)
 			{
 				// This makes contact handling better in some cases and worse in other
 				// Better conservation of momentum without it, but contacts tend to exist a little too long
 				update = false;
-				std::cout << "Original: " << manifoldIndex << "current " << manifold-> m_index1a << std::endl;
+
 			}
 			if (update)
 			{
@@ -161,10 +157,9 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				{
 					std::cout<< "Reversed normal" << std::endl;
 				}
-				//if (dist < 0 && length < 0.01)
-				//{		   
-					contactNormal = newNormal;
-				//}
+   
+				contactNormal = newNormal;
+
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
@@ -173,12 +168,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 		}
 		else
 		{
-		#if (0)
-			attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
-						   newPos;
-		#else
 			ret = false;
-		#endif
 		}
 		
 		
@@ -196,15 +186,13 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 
 btVector3 muscleAnchor::getContactNormal() const
 {
-#if (1)	
+
 	const btTransform tr = attachedBody->getWorldTransform();
     btVector3 newNormal = (tr.getBasis() * contactNormal);
     newNormal = newNormal.length() > 0.0 ? newNormal.normalize() : btVector3(0.0, 0.0, 0.0);
     //assert(newNormal.length() == 1.0);
     return newNormal;
-#else
-    return contactNormal;
-#endif
+
 }
 
 void muscleAnchor::updateManifold(btPersistentManifold* m)
@@ -212,6 +200,5 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
 		manifold = m;
-		manifoldIndex = m->m_index1a;
 	}
 }

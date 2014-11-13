@@ -66,11 +66,6 @@ public:
 		return manifold;
 	}
 	
-	bool isTouching()
-	{
-		return touching;
-	}
-	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
 	
@@ -100,11 +95,6 @@ private:
 	
 	// todo: should this be const?
 	btPersistentManifold* manifold;
-	
-	int manifoldIndex;
-	
-	bool touching;
-	
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_
