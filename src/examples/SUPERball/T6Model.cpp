@@ -177,11 +177,7 @@ void T6Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-<<<<<<< HEAD
-    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, 0, c.rotation,
-=======
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
->>>>>>> bbfa822c24dc26498a3dfe94c7aba84d83f5d526
+    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.hist, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
 
