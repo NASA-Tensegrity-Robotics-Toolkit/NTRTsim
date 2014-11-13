@@ -412,23 +412,29 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgLinearString>("saddle string");
 
     spheres = find<tgSphere>("sphere");
-//    for (int i=0; i<spheres.size(); i++)
-//    {
-//        btVector3 com = spheres[i]->centerOfMass();
-//        std::cerr << "Sphere " << i << " COM: <";
-//        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
-//    }
 
     //attach touch sensors to the appropriate spheres on the actual robot model
     //add the appropriate rods to the touch sensor ignore list
     allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
-    for (int i=0; i<allTouchSensors.size(); i++)
+    for (size_t i=0; i<allTouchSensors.size(); i++)
     {
         abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
         allTouchSensors[i]->addMarker(marker);
-//        btVector3 com = touchSensors[i]->getPGhostObject()->getWorldTransform().getOrigin();
-//        std::cerr << "Touch Sensor " << i << " COM: <";
-//        std::cerr << com.x() << "," << com.y() << "," << com.z() << ">\n";
+
+        if (allTouchSensors[i]->toString().find("bottom") != std::string::npos)
+        {
+            for (size_t j=0; j<bottomRods.size(); j++)
+            {
+                allTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
+            }
+        }
+        else if (allTouchSensors[i]->toString().find("top") != std::string::npos)
+        {
+            for (size_t j=0; j<topRods.size(); j++)
+            {
+                allTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
+            }
+        }
     }
 
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");

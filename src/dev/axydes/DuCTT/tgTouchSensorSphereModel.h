@@ -64,9 +64,11 @@ public:
 
     virtual btPairCachingGhostObject* getPGhostObject();
 
-    virtual std::vector<btCollisionObject*> getIgnoredObjects();
+    virtual std::vector<const btCollisionObject*> getIgnoredObjects();
 
-    virtual void addIgnoredObject(btCollisionObject *_objToIgnore);
+    virtual void addIgnoredObject(const btCollisionObject *_objToIgnore);
+
+    virtual void addMarker(abstractMarker &marker);
 
 private:
 
@@ -75,6 +77,7 @@ private:
 
     void updatePosition();
     void checkCollisions();
+    bool isRBIgnored(const btCollisionObject *_rb);
 
     /**
      * The Bullet Physics implementation of the collision object.
@@ -84,7 +87,7 @@ private:
     /**
      * Vector of objects to ignore in collision detection
      */
-    std::vector<btCollisionObject*> m_IgnoredObjects;
+    std::vector<const btCollisionObject*> m_IgnoredObjects;
 
     tgWorld&  m_world;
 

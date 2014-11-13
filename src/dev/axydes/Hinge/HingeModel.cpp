@@ -24,6 +24,8 @@
 
 // This module
 #include "HingeModel.h"
+#include "../DuCTT/tgTouchSensorSphereInfo.h"
+#include "../DuCTT/tgTouchSensorSphereModel.h"
 // This library
 #include "controllers/PretensionController.h"
 #include "core/tgLinearString.h"
@@ -107,9 +109,11 @@ void HingeModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density);
 //    const tgHinge::Config hingeConfig(-SIMD_PI, SIMD_PI);
     const tgRodHinge::Config hingeConfig(0, 0.1745329);
+    const tgSphere::Config sphereConfig(1, 0.1, 0.5);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
+    tgStructure sGhost;
     
 //    s.addNode(9.5, 0, 0);
 //    s.addNode(0, 0, 0);
@@ -122,6 +126,9 @@ void HingeModel::setup(tgWorld& world)
 
 //    s.addNode(4, 9.5, 10);
 //    s.addNode(0, 1, 0);
+
+    s.addNode(0, 10, 0, "sphere");
+    sGhost.addNode(0, 10, 0, "sphere");
 
     //bottom
     s.addNode(-15, 0, 0);
@@ -145,9 +152,10 @@ void HingeModel::setup(tgWorld& world)
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("b rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("t rod", new tgRodInfo(rodConfig2));
-    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
+    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+//    spec.addBuilder("b rod", new tgRodInfo(rodConfig));
+//    spec.addBuilder("t rod", new tgRodInfo(rodConfig2));
+//    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -155,10 +163,24 @@ void HingeModel::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
 
+    tgBuildSpec specGhost;
+    specGhost.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
+    tgStructureInfo structureInfoGhost(sGhost, specGhost);
+    structureInfoGhost.buildInto(*this, world);
+
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
     allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-    
+    std::vector<tgSphere*> spheres = find<tgSphere>("sphere");
+
+    std::vector<tgTouchSensorSphereModel*> allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
+    for (size_t i=0; i<allTouchSensors.size(); i++)
+    {
+        abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        allTouchSensors[i]->addMarker(marker);
+        allTouchSensors[i]->addIgnoredObject(spheres[i]->getPRigidBody());
+    }
+
     // Then attach the pretension controller to each of these muscles to keep
     // the tensegrity's shape
    

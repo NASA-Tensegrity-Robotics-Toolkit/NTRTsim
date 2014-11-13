@@ -39,6 +39,10 @@ public:
 		return nodeNumber;
 	}
 
+    const btRigidBody* getAttachedBody() {
+        return attachedBody;
+    }
+
 private:
         btVector3 color;
         const btRigidBody *attachedBody;

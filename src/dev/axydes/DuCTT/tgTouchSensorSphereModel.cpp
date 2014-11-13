@@ -174,15 +174,30 @@ void tgTouchSensorSphereModel::checkCollisions()
                         }
                     }
 
-                    if(rb)
+                    if (isRBIgnored(rb))
                     {
-
+                        continue;
                     }
 
+                    if(rb)
+                    {
+                        std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
+                        std::cerr << toString() << std::endl;
+                    }
                 }
             }
         }
 
+    }
+}
+
+bool tgTouchSensorSphereModel::isRBIgnored(const btCollisionObject *_rb)
+{
+    if (_rb == m_pGhostObject) return true;
+    for (size_t i=0; i<m_IgnoredObjects.size(); i++)
+    {
+        if (_rb == m_IgnoredObjects[i])
+            return true;
     }
 }
 
@@ -191,14 +206,20 @@ btPairCachingGhostObject* tgTouchSensorSphereModel::getPGhostObject()
     return m_pGhostObject;
 }
 
-std::vector<btCollisionObject*> tgTouchSensorSphereModel::getIgnoredObjects()
+std::vector<const btCollisionObject*> tgTouchSensorSphereModel::getIgnoredObjects()
 {
     return m_IgnoredObjects;
 }
 
-void tgTouchSensorSphereModel::addIgnoredObject(btCollisionObject *_objToIgnore)
+void tgTouchSensorSphereModel::addIgnoredObject(const btCollisionObject *_objToIgnore)
 {
     m_IgnoredObjects.push_back(_objToIgnore);
+}
+
+void tgTouchSensorSphereModel::addMarker(abstractMarker &_a)
+{
+    tgModel::addMarker(_a);
+    addIgnoredObject(_a.getAttachedBody());
 }
 
 bool tgTouchSensorSphereModel::invariant() const
