@@ -101,7 +101,7 @@ private:
     std::vector<muscleAnchor*>::iterator m_anchorIt;
     
     std::map<btRigidBody*, btVector3> m_rbForceMap;
-    std::map<btRigidBody*, btScalar> m_rbForceScales;
+    std::map<btRigidBody*, btVector3> m_rbForceScales;
     
     std::vector<muscleAnchor*> m_newAnchors;
     

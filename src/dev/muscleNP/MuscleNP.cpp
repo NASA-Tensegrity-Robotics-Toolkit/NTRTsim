@@ -109,6 +109,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
     
 	updateAnchorList();
 	
+	pruneAnchors();
+	
 	m_rbForceMap.clear();
     m_rbForceScales.clear();
 	
@@ -195,24 +197,37 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	for(m_forceMapIt = m_rbForceMap.begin(); m_forceMapIt != m_rbForceMap.end(); ++m_forceMapIt)
 	{	
-		btScalar totalForce = m_forceMapIt->second.length();
-		btScalar forceScale = 1.0;
+		btVector3 totalForce = m_forceMapIt->second;
+		btVector3 forceScale(1.0, 1.0, 1.0);
 
-#if (1)		
+#if (0)		
 		btScalar maxForce = (anchor1->force + anchor2->force).length();
 		std::cout << maxForce << std::endl;
 #else
-		btScalar maxForce = 2.0 * tension;
+		btVector3 maxForce = (anchor1->force + anchor2->force);
+		
+		for (std::size_t i = 0; i < 3; i++)
+		{
+			if (totalForce[i] != maxForce[i] && totalForce[i] != 0.0)
+			{
+				forceScale[i] = btFabs(maxForce[i] / totalForce[i]);
+			}
+			else if (totalForce[i] == 0.0)
+			{
+				forceScale[i] = 0.0;
+			}
+		} 
 #endif
 
-#if (1)
+#if (0)
 		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
 		if (totalForce != maxForce && totalForce != 0.0)
 		{
 			forceScale = maxForce / totalForce;
 		}
 #endif
-		m_rbForceScales.insert(std::pair<btRigidBody*, btScalar> (m_forceMapIt->first, forceScale));
+		std::cout << forceScale << std::endl;
+		m_rbForceScales.insert(std::pair<btRigidBody*, btVector3> (m_forceMapIt->first, forceScale));
 	}
     
     for (std::size_t i = 0; i < n; i++)
@@ -222,13 +237,14 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
 		
-		btScalar forceScale = 1.0;
+		btVector3 forceScale(1.0, 1.0, 1.0);
 		// Scale the force of the sliding anchors
 		if (m_anchors[i]->sliding)
 		{
 			forceScale = m_rbForceScales[body];
 		}
 		
+		// Elementwise multiply
 		m_anchors[i]->force *= forceScale ;
 		
 		btVector3 impulse = m_anchors[i]->force* dt;
@@ -294,6 +310,8 @@ void MuscleNP::updateManifolds()
                     btVector3 pos = directionSign < 0 ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
                     
 					btRigidBody* rb = NULL;
+					
+					//std::cout << pos << " " << manifold << " " << manifold->m_index1a << std::endl;
 					
 					if (manifold->getBody0() == m_ghostObject)
 					{
@@ -405,13 +423,25 @@ void MuscleNP::updateAnchorList()
 		btScalar lengthB = lineB.length();
 		
 		btVector3 contactNormal = newAnchor->getContactNormal();
-		
-#if (1)		// 11_9_14 Normals appear to be better, more precice				
+						
 		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
-			
+		
+		bool del = false;	
+		
 		// These may have changed, so check again				
-		if (lengthA <= 0.1 || lengthB <= 0.1)
+		if (lengthA <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
+		{
+			(*(m_anchorIt - 1))->updateManifold(newAnchor->getManifold());
+			del = true;
+		}
+		if (lengthB <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
+		{
+			(*(m_anchorIt ))->updateManifold(newAnchor->getManifold());
+			del = true;
+		}
+
+		if (del)
 		{
 			delete newAnchor;
 		}
@@ -419,34 +449,6 @@ void MuscleNP::updateAnchorList()
 		{
 			delete newAnchor;
 		}
-
-#else
-		btVector3 lineACopy = lineA;
-		btVector3 lineBCopy = lineB;
-		btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
-		
-		// Project normal into AB plane
-		btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
-		
-		normalProjection.normalize();			
-		
-		btScalar angleAN = lineA.angle(normalProjection);
-		btScalar angleBN = lineB.angle(normalProjection);
-		btScalar angleAB = lineA.angle(lineB);
-		
-		// Ensure we've projected correctly
-		// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
-		//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
-		
-		if (lengthA <= 0.1 || lengthB <= 0.1)
-		{
-			delete newAnchor;
-		}
-		else if((angleAN + angleBN - angleAB) > 0.0001)
-		{
-			delete newAnchor;
-		}
-#endif // Normals vs angles
 		else
 		{	
 								  
@@ -456,10 +458,11 @@ void MuscleNP::updateAnchorList()
 		}
 	}
 
-// Sadly, even with the above insertion scheme, this is still a necessary sanity check
-#if (1)    
+#if (0)    
     // Remove the permanaent anchors for sorting
+    assert(*m_anchors.begin() == anchor1);
     m_anchors.erase(m_anchors.begin());
+    assert(*(m_anchors.end() - 1) == anchor2);
     m_anchors.erase(m_anchors.end() - 1);
     
     std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
@@ -539,13 +542,12 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() <= 0.0 || lineB.length() <= 0.0)
+				if (lineA.length() < 0.01 || lineB.length() < 0.01)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
 					normalValue2 = -1.0;
 				}
-#if (1)
 				else
 				{
 					//lineA.normalize();
@@ -556,37 +558,7 @@ void MuscleNP::pruneAnchors()
 					normalValue2 = (lineB).dot(contactNormal);
 				}	
 				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-				{  
-#else
-				
-				normalValue1 = (lineA).dot(contactNormal);
-				normalValue2 = (lineB).dot(contactNormal);
-				
-				btVector3 lineACopy = lineA;
-				btVector3 lineBCopy = lineB;
-				btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
-				
-				// Project normal into AB plane
-				btVector3 normalProjection = abNorm.dot(contactNormal) * abNorm;
-				
-				normalProjection.normalize();			
-				
-				btScalar angleAN = lineA.angle(normalProjection);
-				btScalar angleBN = lineB.angle(normalProjection);
-				btScalar angleAB = lineA.angle(lineB);
-				
-				// Ensure we've projected correctly
-				// @todo what to do if normalProjection is (0.0, 0.0, 0.0)??
-				/// @todo add a scalar almostEqual to tgUtil
-				//assert (abs(angleAN + angleBN + angleAB - 2.0 * M_PI) < 0.0001);
-				
-				if((angleAN + angleBN - angleAB) > 0.0001)
-				{
-					
-#endif // Normals vs angles
-				
-
-				 
+				{  		 
 					#ifdef VERBOSE
 						std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
 					#endif

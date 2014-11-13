@@ -76,7 +76,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "box");
+	s.addPair(4, 5, "rod2");
 
 	s.addPair(1, 2, "muscle");
 	//s.addPair(3, 4, "muscle");
@@ -86,7 +86,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
-	s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), 0.0);
+	//s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), M_PI_2);
 	tgBaseString::Config muscleConfig(1000, 10, false, 0, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model

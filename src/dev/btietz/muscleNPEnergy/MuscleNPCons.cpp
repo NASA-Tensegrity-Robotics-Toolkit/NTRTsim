@@ -84,7 +84,7 @@ void MuscleNPCons::setup(tgWorld& world)
 
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
-	s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), 0.0);
+	s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), M_PI/4);
 	tgBaseString::Config muscleConfig(1000, 0, false, 0, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model
@@ -106,11 +106,13 @@ void MuscleNPCons::setup(tgWorld& world)
 	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
 	allRods = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
 	
-	btRigidBody* body = allRods[2]->getPRigidBody();
+	btRigidBody* body = allRods[0]->getPRigidBody();
+	btRigidBody* body2 = allRods[1]->getPRigidBody();
 	
 	// Apply initial impulse
-	btVector3 impulse(0.0, 0.0, -1.0);
+	btVector3 impulse(0.5, 0.0, 0.5);
 	body->applyCentralImpulse(impulse);
+	body2->applyCentralImpulse(impulse);
 	
 	notifySetup();
 	totalTime = 0.0;
@@ -145,7 +147,7 @@ void MuscleNPCons::step(double dt)
 	int n = anchorList.size();
 	for (std::size_t i = 0; i < n; i++)
 	{
-		forceSum += anchorList[i]->force;
+		forceSum += anchorList[i]->getForce();
 	}
 	
 	
