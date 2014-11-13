@@ -34,11 +34,13 @@
 
 class btRigidBody;
 class btPersistentManifold;
+class MuscleNP;
 
 class muscleAnchor
 {
 public:
-   
+	// MuscleNP needs to scale the forces
+   friend class MuscleNP;
 
     muscleAnchor(btRigidBody *body, 
 					btVector3 pos, 
@@ -61,16 +63,21 @@ public:
     
     void updateManifold(btPersistentManifold* m);
 	
-	btPersistentManifold* getManifold()
+	btPersistentManifold* getManifold() const
 	{
 		return manifold;
+	}
+	
+	btVector3 getForce() const
+	{
+		return force;
 	}
 	
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
 	
 	// Store force so we can normalize it on a per-body basis
-	btVector3 force;
+	/// @todo make this private/protected, make MuscleNP a friend class so it can access and update
 	
     btScalar height;
     
@@ -82,7 +89,9 @@ public:
     
     /**
      * How the force is applied to the rigid body. True applies along the
-     * contact normal, false is applied towards the next anchor
+     * contact normal, false is applied towards the next anchor.
+     * Application depends on other classes
+     * @todo Do we want an internal apply force function? May simplify things (prevent Muscles from needing to include rigid bodies??)
      */
     const bool sliding;
     
@@ -90,11 +99,12 @@ private:
 	 // Relative to the body when it is first constructed
     btVector3 attachedRelativeOriginalPosition;
 	
-	// todo: write an accessor that asserts this is necessary and accurate
 	btVector3 contactNormal;
 	
-	// todo: should this be const?
+	// Not const
 	btPersistentManifold* manifold;
+	
+	btVector3 force;
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_

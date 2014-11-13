@@ -147,7 +147,7 @@ void MuscleNPCons::step(double dt)
 	int n = anchorList.size();
 	for (std::size_t i = 0; i < n; i++)
 	{
-		forceSum += anchorList[i]->force;
+		forceSum += anchorList[i]->getForce();
 	}
 	
 	

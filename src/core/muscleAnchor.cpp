@@ -200,5 +200,6 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
 		manifold = m;
+		// contact manifold updated once we confirm the correct manifold point in updateWorldPosition()
 	}
 }
