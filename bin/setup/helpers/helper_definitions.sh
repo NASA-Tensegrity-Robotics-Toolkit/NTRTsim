@@ -30,8 +30,12 @@ function set_multicore_make()
     source_conf "build.conf"
     if [ -n "$MAX_BUILD_CORES" ]; then
         max_cores=$MAX_BUILD_CORES
-    else
+    elif [ -f /proc/cpuinfo ]; then
+        # Linux
         max_cores=`grep -c ^processor /proc/cpuinfo`
+    else
+        # Mac
+        max_cores=`sysctl -n hw.ncpu`
     fi
 
     shopt -s expand_aliases

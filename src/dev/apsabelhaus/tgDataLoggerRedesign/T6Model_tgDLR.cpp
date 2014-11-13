@@ -168,11 +168,11 @@ void T6Model_tgDLR::addMuscles(tgStructure& s)
 
 void T6Model_tgDLR::setup(tgWorld& world)
 {
-
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    // TO-DO: check out this new config, what exactly are we passing as False?
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, false, c.rotation,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             

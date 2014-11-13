@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     const int numParams = 2;
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams);
     BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix);
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/ribDemo/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);

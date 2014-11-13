@@ -1,9 +1,10 @@
-""" Filter out the best trials from argv[1] as dictated by their distance traveled """
+""" Filter out the best episodes from argv[1] as dictated by their distance traveled """
+""" Note: prints entire episode data, including parameters, as opposed to just distances """
 
 import sys
 
 bestDistances = []
-threshold = 20.0 # Score (distance traveled)
+threshold = 25.0 # Score (distance traveled)
 
 try:
     f = open(sys.argv[1], 'r')

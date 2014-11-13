@@ -26,13 +26,6 @@
  * $Id$
  */
 
-/**
- * \dir core/terrain
- * @brief The terrain library gives terrain options for the world.
- * 
- * Allows for a variety of terrain. As of version 1.0.0, a box ground
- * which can be rotated into a slope is supported in tgCraterGround
- */
 #include "tgBulletGround.h"
 
 #include "LinearMath/btScalar.h"

@@ -74,11 +74,11 @@ public:
             const double density;
             
             /** The rod's friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double friction;
 
             /** The rod's rolling friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double rollFriction;
             
             /** The rod's coefficient of restitution; 

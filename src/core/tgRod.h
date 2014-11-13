@@ -71,11 +71,12 @@ public:
             const double density;
             
             /** The rod's friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
+             /// @todo values greater than 1 seem to be useful for scaling, given NTRT 0.1. Investigate further
             const double friction;
 
             /** The rod's rolling friction; 
-             * must be between 0 and 1 (inclusive). */
+             * must be greater than or equal to 0 */
             const double rollFriction;
             
             /** The rod's coefficient of restitution; 

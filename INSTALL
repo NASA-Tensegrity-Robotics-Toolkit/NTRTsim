@@ -136,9 +136,11 @@ anything.
     optional arguments:
     -h       Show this help message and exit
     -c       Run 'make clean' before make/make install on non-library sources
-    -l       Run 'make clean' before make/make install on libraries
-    -s       Don't automatically build the libraries
     -w       Show compiler warnings when building
+    -t       Build test/ rather than src/
+    -r       Build test/ rather than src/ *and* run all tests after compilation.
+    -i       Build test_integration/ rather than src/
+    -g       Build test_integration/ rather than src/ *and* run all tests after compilation.
 
 ** Manual Installation **
 

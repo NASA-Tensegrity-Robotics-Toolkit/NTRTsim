@@ -16,7 +16,6 @@ heightSensor::heightSensor(){
 heightSensor::heightSensor(const btRigidBody *body,btVector3 worldPos,int nodeNumber,tgWorld& world)
 {
 	btworld=&(tgBulletUtil::worldToDynamicsWorld(world));
-//	btSoftRigidDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 	attachedBody=body;
 	//find relative position
 	attachedRelativeOriginalPosition=worldPos;//Use local transform;
@@ -45,6 +44,7 @@ double heightSensor::getHeight() const
 	btVector3 origin=this->getWorldPosition();
 	btVector3 end = origin;
 	end.setY(-5000.0f);
+	origin.setY(origin.getY()-1);
 	btCollisionWorld::AllHitsRayResultCallback rayCallback(origin, end);
 	btworld->rayTest(origin, end, rayCallback);
 	if(rayCallback.hasHit())

@@ -48,9 +48,10 @@
  */
 TetraSpineCPGControl::TetraSpineCPGControl(BaseSpineCPGControl::Config config,
 												std::string args,
+												std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc) :
-BaseSpineCPGControl(config, args, ec, nc)
+BaseSpineCPGControl(config, args, resourcePath, ec, nc)
 {    
 }
 
