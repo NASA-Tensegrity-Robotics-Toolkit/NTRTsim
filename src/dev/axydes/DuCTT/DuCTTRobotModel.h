@@ -71,9 +71,9 @@ public:
                 btVector3 startPos = btVector3(0,10,0),//so it doesn't start in the floor
                 btVector3 startRotAxis = btVector3(0,0,1),
                 double startRotAngle = 0,
-                double triangle_length = 30,
+                double triangle_length = 32,
                 double duct_distance = 15,
-                double duct_height = 22,
+                double duct_height = 23,
                 double prismRadius = 1.524,
                 double prismExtent = 10.16,
                 double prismDensity = 0.0109,
