@@ -31,6 +31,7 @@
 // The C++ Standard Library
 
 #include <string>
+#include <utility> //std::pair
 
 class btRigidBody;
 class btPersistentManifold;
@@ -76,14 +77,12 @@ public:
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
 	
-	// Store force so we can normalize it on a per-body basis
-	/// @todo make this private/protected, make MuscleNP a friend class so it can access and update
-	
+	/// @todo remove this. Anchors and sensors should be seperate classes
     btScalar height;
     
     /**
-     * A boolean value indicating where this anchor should be stored.
-     * False implies it will be deleted after one update step
+     * A boolean value indicating whether this a temporary or permanent contact
+     * if permanent do not delete it until teardown!!
      */
     const bool permanent;
     
@@ -96,6 +95,8 @@ public:
     const bool sliding;
     
 private:
+
+	std::pair<btScalar, btVector3> getManifoldDistance(btPersistentManifold* m) const;
 	 // Relative to the body when it is first constructed
     btVector3 attachedRelativeOriginalPosition;
 	
@@ -104,6 +105,7 @@ private:
 	// Not const
 	btPersistentManifold* manifold;
 	
+	// Store force so we can normalize it on a per-body basis
 	btVector3 force;
 };
 

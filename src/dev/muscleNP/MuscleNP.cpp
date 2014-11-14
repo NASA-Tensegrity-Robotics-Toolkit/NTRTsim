@@ -365,15 +365,15 @@ void MuscleNP::updateManifolds()
 						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 						
 						bool del = false;					
-						if (lengthA <= 0.1 && rb == (*(m_anchorIt - 1))->attachedBody )
+						if (lengthB <= 0.1 && rb == (*(m_anchorIt - 1))->attachedBody )
 						{
 							(*(m_anchorIt - 1))->updateManifold(manifold);
-							del = true;
+							//del = true;
 						}
-						if (lengthB <= 0.1 && rb == (*(m_anchorIt))->attachedBody)
+						if (lengthA <= 0.1 && rb == (*(m_anchorIt))->attachedBody)
 						{
 							(*(m_anchorIt ))->updateManifold(manifold);
-							del = true;
+							//del = true;
 						}
 						
 						if (del)
@@ -430,12 +430,12 @@ void MuscleNP::updateAnchorList()
 		bool del = false;	
 		
 		// These may have changed, so check again				
-		if (lengthA <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
+		if (lengthB <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
 		{
 			(*(m_anchorIt - 1))->updateManifold(newAnchor->getManifold());
 			del = true;
 		}
-		if (lengthB <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
+		if (lengthA <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
 		{
 			(*(m_anchorIt ))->updateManifold(newAnchor->getManifold());
 			del = true;
