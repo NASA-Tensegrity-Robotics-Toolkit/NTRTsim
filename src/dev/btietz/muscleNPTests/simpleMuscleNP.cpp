@@ -72,7 +72,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 	s.addNode(10, 5, 0);
 	s.addNode(12, 5, 0);
 	s.addNode(5, 4, -5);
-	s.addNode(5, 4, 5);
+	s.addNode(5, 3, 5);
 
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");

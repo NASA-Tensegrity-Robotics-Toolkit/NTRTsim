@@ -160,6 +160,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				// This makes contact handling better in some cases and worse in other
 				// Better conservation of momentum without it, but contacts tend to exist a little too long
 				update = false;
+				// Just deleting at this stage is better for sliding, but worse for contact with multiple bodies
 			}
 			if (update)
 			{
