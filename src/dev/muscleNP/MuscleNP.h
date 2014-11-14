@@ -35,7 +35,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <utility> //std::pair
 
 // Forward references
 class tgWorld;

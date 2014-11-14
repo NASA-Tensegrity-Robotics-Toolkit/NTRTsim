@@ -29,8 +29,8 @@
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
-
 #include <string>
+#include <utility> //std::pair
 
 class btRigidBody;
 class btPersistentManifold;
@@ -101,7 +101,7 @@ public:
     
 private:
 
-	btScalar getManifoldDistance(btPersistentManifold* m) const;
+	std::pair<btScalar, btVector3> getManifoldDistance(btPersistentManifold* m) const;
 	 // Relative to the body when it is first constructed
     btVector3 attachedRelativeOriginalPosition;
 	

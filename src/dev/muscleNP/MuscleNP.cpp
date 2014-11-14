@@ -339,19 +339,15 @@ void MuscleNP::updateManifolds()
 					if(rb)
 					{  
 						btScalar anchorLength = 0.0;
-												// Not permanent, sliding contact
-						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, anchorLength, m_touchingNormal, false, true, manifold);
 						
-						m_anchorIt = m_anchors.begin() + 1;
-	
-						// Find position of new anchor
-						while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
-						{
-							++m_anchorIt;
-						}
+						int anchorPos = findNearestPastAnchor(pos);
+						assert(anchorPos < m_anchors.size() - 1);
 						
-						btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
-						btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
+						muscleAnchor* backAnchor = m_anchors[anchorPos];
+						muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+						
+						btVector3 pos0 = backAnchor->getWorldPosition();
+						btVector3 pos2 = forwardAnchor->getWorldPosition();
 						
 						btVector3 lineA = (pos2 - pos);
 						btVector3 lineB = (pos0 - pos);
@@ -359,21 +355,26 @@ void MuscleNP::updateManifolds()
 						btScalar lengthA = lineA.length();
 						btScalar lengthB = lineB.length();
 						
+						anchorLength = backAnchor->getCablePosition() + lengthB;
+						
+						// Not permanent, sliding contact
+						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, anchorLength, m_touchingNormal, false, true, manifold);
+						
 						btVector3 contactNormal = newAnchor->getContactNormal();
 									
 						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 						
 						bool del = false;					
-						if (lengthA <= 0.01 && rb == (*(m_anchorIt - 1))->attachedBody )
+						if (lengthB <= 0.1 && rb == backAnchor->attachedBody )
 						{
-							(*(m_anchorIt - 1))->updateManifold(manifold);
-							del = true;
+							backAnchor->updateManifold(manifold);
+							//del = true;
 						}
-						if (lengthB <= 0.01 && rb == (*(m_anchorIt))->attachedBody)
+						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody)
 						{
-							(*(m_anchorIt ))->updateManifold(manifold);
-							del = true;
+							forwardAnchor->updateManifold(manifold);
+							//del = true;
 						}
 						
 						if (del)
@@ -404,18 +405,18 @@ void MuscleNP::updateAnchorList()
 		muscleAnchor* const newAnchor = m_newAnchors[0];
 		m_newAnchors.erase(m_newAnchors.begin());
 		
-		m_anchorIt = m_anchors.begin();
-						
-		// Find position of new anchor
-		while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
-		{
-			++m_anchorIt;
-		}
-		
-		btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
 		btVector3 pos1 = newAnchor->getWorldPosition();
-		btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
-#if (1)
+
+		int anchorPos = findNearestPastAnchor(pos1);
+		
+		assert(anchorPos < m_anchors.size() - 1);
+		
+		muscleAnchor* backAnchor = m_anchors[anchorPos];
+		muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+		
+		btVector3 pos0 = backAnchor->getWorldPosition();
+		btVector3 pos2 = forwardAnchor->getWorldPosition();
+#if (0)
 		btVector3 pos3;
 		if (m_anchorIt != (m_anchors.end() - 1))
 		{
@@ -425,14 +426,13 @@ void MuscleNP::updateAnchorList()
 		{
 			pos3 = anchor2->getWorldPosition();
 		}
+		
+		btVector3 lineC = (pos3 - pos1);
 #endif		
-		int anchorPos = findNearestPastAnchor(pos1);
-		muscleAnchor* anchorTest = m_anchors[anchorPos];
-		muscleAnchor* otherTest = (*(m_anchorIt - 1));
-				
+			
 		btVector3 lineA = (pos2 - pos1);
 		btVector3 lineB = (pos0 - pos1);
-		btVector3 lineC = (pos3 - pos1);
+		
 		
 		btScalar lengthA = lineA.length();
 		btScalar lengthB = lineB.length();
@@ -442,19 +442,19 @@ void MuscleNP::updateAnchorList()
 		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 		
-		assert(anchorTest == otherTest);
-		
 		bool del = false;	
 		
+		newAnchor->m_cablePosition = backAnchor->getCablePosition() + lengthB;
+		
 		// These may have changed, so check again				
-		if (lengthA <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
+		if (lengthB <= 0.01 && newAnchor->attachedBody == backAnchor->attachedBody )
 		{
-			(*(m_anchorIt - 1))->updateManifold(newAnchor->getManifold());
+			backAnchor->updateManifold(newAnchor->getManifold());
 			del = true;
 		}
-		if (lengthB <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
+		if (lengthA <= 0.01 && newAnchor->attachedBody == forwardAnchor->attachedBody)
 		{
-			(*(m_anchorIt ))->updateManifold(newAnchor->getManifold());
+			forwardAnchor->updateManifold(newAnchor->getManifold());
 			del = true;
 		}
 
@@ -467,7 +467,9 @@ void MuscleNP::updateAnchorList()
 			delete newAnchor;
 		}
 		else
-		{	
+		{		
+			
+			m_anchorIt = m_anchors.begin() + anchorPos;
 								  
 			m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
 			
@@ -575,7 +577,7 @@ void MuscleNP::pruneAnchors()
 					normalValue2 = (lineB).dot(contactNormal);
 				}	
 				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-				{  		 
+				{
 					#ifdef VERBOSE
 						std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
 					#endif

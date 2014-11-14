@@ -162,6 +162,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					ret = false;
 				}
 				
+				// Update again here in case we have the original manifold??
 				if (length < 0.1)
 				{
 					contactNormal = newNormal;
@@ -205,23 +206,31 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 {
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
+		std::pair<btScalar, btVector3> manifoldValues = getManifoldDistance(m);
+		btScalar newDist = manifoldValues.first;
 		if (!manifold)
 		{
 			manifold = m;
 		}
-		else if (getManifoldDistance(manifold) >= getManifoldDistance(m))
+		else if (getManifoldDistance(manifold).first >= newDist)
 		{
 			manifold = m;
+		}
+		
+		if(manifold == m && newDist < 0.1)
+		{
+			contactNormal = manifoldValues.second;
 		}
 	}
 }
 
-btScalar muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
+std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
 {
 	bool useB = true;
 	bool colCheck = true;
 	
 	btScalar length = INFINITY;
+	btVector3 newNormal = contactNormal;
 	
 	if (manifold->getBody0() != attachedBody)
 	{
@@ -238,7 +247,6 @@ btScalar muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
 		int n = manifold->getNumContacts();
 		
 		btVector3 contactPos = getWorldPosition();
-		btVector3 newNormal = contactNormal;
 		btScalar dist = 0.0;
 		for (int p = 0; p < n; p++)
 		{
@@ -256,7 +264,11 @@ btScalar muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
 				
 				btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
 				
-				newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+				if (length < 0.1)
+				{
+					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+				}
+				
 				dist = pt.getDistance();
 				
 				if (n >= 2)
@@ -267,5 +279,5 @@ btScalar muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
 		}
 	}
 	
-	return length;
+	return std::make_pair<btScalar, btVector3> (length, newNormal);
 }
