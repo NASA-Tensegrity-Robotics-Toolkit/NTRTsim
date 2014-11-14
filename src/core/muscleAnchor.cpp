@@ -151,7 +151,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			
 			if (dist > 0.0 && length < 0.01)
 			{
-				//ret = false;
+				ret = false;
 			}
 			
 			
@@ -159,14 +159,14 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			{
 				// This makes contact handling better in some cases and worse in other
 				// Better conservation of momentum without it, but contacts tend to exist a little too long
-				ret = false;
+				update = false;
 			}
 			if (update)
 			{
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
 						   newPos;
 				
-				if ((newNormal + contactNormal).length() < 0.1)
+				if ((newNormal + contactNormal).length() < 0.5)
 				{
 					std::cout<< "Reversed normal" << std::endl;
 					ret = false;
