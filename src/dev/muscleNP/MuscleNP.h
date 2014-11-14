@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <utility> //std::pair
 
 // Forward references
 class tgWorld;
@@ -76,12 +77,17 @@ private:
         
         bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
     
-        bool compareAnchors(const muscleAnchor* lhs, const muscleAnchor* rhs) const;
+        bool comparePoints(btVector3& pt2, btVector3& pt3) const;
         
         private:
            const muscleAnchor* const ma1;
            const muscleAnchor* const ma2;
     };
+    
+    struct anchorPosCompare
+    {
+		bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
+	};
     
     void updateManifolds();
     
@@ -97,6 +103,8 @@ private:
     
     // Returns whether the anchor was deleteable
     bool deleteAnchor(int i);
+    
+    muscleAnchor* findNearestPastAnchor(btVector3& pos);
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
     

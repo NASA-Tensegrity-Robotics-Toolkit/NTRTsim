@@ -75,7 +75,7 @@ void MuscleNPCons::setup(tgWorld& world)
 	s.addPair(2, 3, "box");
 	s.addPair(4, 5, "box");
 	
-	s.addPair(6, 7, "box");
+	s.addPair(6, 7, "rod");
 
 	//s.addPair(1, 2, "muscle");
 	s.addPair(3, 4, "muscle");
@@ -89,9 +89,10 @@ void MuscleNPCons::setup(tgWorld& world)
 	
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
-	spec.addBuilder("rod", new tgRodInfo(rodConfig));
+	
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
 	spec.addBuilder("box", new tgBoxInfo(boxConfig));
+	spec.addBuilder("rod", new tgRodInfo(rodConfig));
 #if (1)
 	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
 #else
