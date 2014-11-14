@@ -369,12 +369,12 @@ void MuscleNP::updateManifolds()
 						if (lengthB <= 0.1 && rb == backAnchor->attachedBody )
 						{
 							backAnchor->updateManifold(manifold);
-							//del = true;
+							del = true;
 						}
 						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody)
 						{
 							forwardAnchor->updateManifold(manifold);
-							//del = true;
+							del = true;
 						}
 						
 						if (del)
@@ -469,7 +469,7 @@ void MuscleNP::updateAnchorList()
 		else
 		{		
 			
-			m_anchorIt = m_anchors.begin() + anchorPos;
+			m_anchorIt = m_anchors.begin() + anchorPos + 1;
 								  
 			m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
 			

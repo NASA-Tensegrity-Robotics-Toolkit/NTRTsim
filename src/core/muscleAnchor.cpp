@@ -232,11 +232,11 @@ std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentMan
 	btScalar length = INFINITY;
 	btVector3 newNormal = contactNormal;
 	
-	if (manifold->getBody0() != attachedBody)
+	if (m->getBody0() != attachedBody)
 	{
 		useB = false;			
 	}
-	if(!useB && manifold->getBody1() != attachedBody)
+	if(!useB && m->getBody1() != attachedBody)
 	{
 		colCheck = false;
 	}
@@ -244,13 +244,13 @@ std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentMan
 	{	
 	
 					
-		int n = manifold->getNumContacts();
+		int n = m->getNumContacts();
 		
 		btVector3 contactPos = getWorldPosition();
 		btScalar dist = 0.0;
 		for (int p = 0; p < n; p++)
 		{
-			const btManifoldPoint& pt = manifold->getContactPoint(p);
+			const btManifoldPoint& pt = m->getContactPoint(p);
 			
 			// Original position picked at beginning
 			btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
