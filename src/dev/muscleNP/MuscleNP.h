@@ -104,7 +104,7 @@ private:
     // Returns whether the anchor was deleteable
     bool deleteAnchor(int i);
     
-    muscleAnchor* findNearestPastAnchor(btVector3& pos);
+    int findNearestPastAnchor(btVector3& pos);
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
     

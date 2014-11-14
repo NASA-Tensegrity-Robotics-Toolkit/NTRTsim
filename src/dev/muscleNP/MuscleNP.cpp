@@ -365,12 +365,12 @@ void MuscleNP::updateManifolds()
 						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 						
 						bool del = false;					
-						if (lengthA <= 0.1 && rb == (*(m_anchorIt - 1))->attachedBody )
+						if (lengthA <= 0.01 && rb == (*(m_anchorIt - 1))->attachedBody )
 						{
 							(*(m_anchorIt - 1))->updateManifold(manifold);
 							del = true;
 						}
-						if (lengthB <= 0.1 && rb == (*(m_anchorIt))->attachedBody)
+						if (lengthB <= 0.01 && rb == (*(m_anchorIt))->attachedBody)
 						{
 							(*(m_anchorIt ))->updateManifold(manifold);
 							del = true;
@@ -404,7 +404,7 @@ void MuscleNP::updateAnchorList()
 		muscleAnchor* const newAnchor = m_newAnchors[0];
 		m_newAnchors.erase(m_newAnchors.begin());
 		
-		m_anchorIt = m_anchors.begin() + 1;
+		m_anchorIt = m_anchors.begin();
 						
 		// Find position of new anchor
 		while (m_anchorIt != (m_anchors.end() - 1) && m_ac.operator()((*m_anchorIt), newAnchor))
@@ -415,13 +415,24 @@ void MuscleNP::updateAnchorList()
 		btVector3 pos0 = (*(m_anchorIt - 1))->getWorldPosition();
 		btVector3 pos1 = newAnchor->getWorldPosition();
 		btVector3 pos2 = (*m_anchorIt)->getWorldPosition();
-		
-		muscleAnchor* anchorTest = findNearestPastAnchor(pos1);
+#if (1)
+		btVector3 pos3;
+		if (m_anchorIt != (m_anchors.end() - 1))
+		{
+			pos3 = (*(m_anchorIt + 1))->getWorldPosition();
+		}
+		else
+		{
+			pos3 = anchor2->getWorldPosition();
+		}
+#endif		
+		int anchorPos = findNearestPastAnchor(pos1);
+		muscleAnchor* anchorTest = m_anchors[anchorPos];
 		muscleAnchor* otherTest = (*(m_anchorIt - 1));
-		//assert(anchorTest == otherTest);
-		
+				
 		btVector3 lineA = (pos2 - pos1);
 		btVector3 lineB = (pos0 - pos1);
+		btVector3 lineC = (pos3 - pos1);
 		
 		btScalar lengthA = lineA.length();
 		btScalar lengthB = lineB.length();
@@ -431,15 +442,17 @@ void MuscleNP::updateAnchorList()
 		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 		
+		assert(anchorTest == otherTest);
+		
 		bool del = false;	
 		
 		// These may have changed, so check again				
-		if (lengthA <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
+		if (lengthA <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt - 1))->attachedBody )
 		{
 			(*(m_anchorIt - 1))->updateManifold(newAnchor->getManifold());
 			del = true;
 		}
-		if (lengthB <= 0.1 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
+		if (lengthB <= 0.01 && newAnchor->attachedBody == (*(m_anchorIt))->attachedBody)
 		{
 			(*(m_anchorIt ))->updateManifold(newAnchor->getManifold());
 			del = true;
@@ -734,7 +747,7 @@ bool MuscleNP::deleteAnchor(int i)
 	}
 }
 
-muscleAnchor* MuscleNP::findNearestPastAnchor(btVector3& pos)
+int MuscleNP::findNearestPastAnchor(btVector3& pos)
 {
 
 	std::size_t i = 0;
@@ -749,25 +762,28 @@ muscleAnchor* MuscleNP::findNearestPastAnchor(btVector3& pos)
 		i++;
 		btVector3 anchorPos = m_anchors[i]->getWorldPosition();
 		dist = (pos - anchorPos).length();
+		if (dist < startDist)
+		{
+			startDist = dist;
+		}
 	}
 	
 	// Check if we hit both break conditions at the same time
-	if (dist > startDist && i == n)
+	if (dist > startDist)
 	{
 		i--;
 	}
 	
-	muscleAnchor* prevAnchor = NULL;
+	if (i == n)
+	{
+		i--;
+	}
 	
 	if (i == 0)
 	{
-		prevAnchor = m_anchors[i];
+		// Do nothing
 	}
-	else if (i == n)
-	{
-		prevAnchor = m_anchors[i - 1];
-	}
-	else
+	else if (n > 1)
 	{
 		// Know we've got 3 anchors, so we need to compare along the line
 		muscleAnchor* a0 = m_anchors[i - 1];
@@ -777,12 +793,14 @@ muscleAnchor* MuscleNP::findNearestPastAnchor(btVector3& pos)
 		
 		btVector3 current = m_anchors[i]->getWorldPosition();
 		
-		prevAnchor = m_acTemp.comparePoints(pos, current) ? m_anchors[i - 1] : m_anchors[i];
+		m_acTemp.comparePoints(pos, current) ? i-- : i+=0;
+		
+		assert((m_anchors[i]->getWorldPosition() - pos).length() <= (a0->getWorldPosition() - pos).length()); 
 	}
-	
+	muscleAnchor* prevAnchor = m_anchors[i];
 	assert (prevAnchor);
 	 
-	return prevAnchor; 
+	return i; 
 
 }
 

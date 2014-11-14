@@ -156,7 +156,7 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
 						   newPos;
 				
-				if (dist < 0 && (newNormal + contactNormal).length() < 0.1)
+				if ((newNormal + contactNormal).length() < 0.1)
 				{
 					std::cout<< "Reversed normal" << std::endl;
 					ret = false;
@@ -169,12 +169,12 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
 			{
-				ret = false;
+				//ret = false;
 			}
 		}
 		else
 		{
-			//ret = false;
+			ret = false;
 		}
 		
 		
