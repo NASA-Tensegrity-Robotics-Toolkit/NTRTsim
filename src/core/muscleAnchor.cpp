@@ -33,9 +33,13 @@
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
- 
+
+#define USE_BASIS
+#define SKIP_CONTACT_UPDATE
+
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
+               btScalar cPos,
                btVector3 cn,
                bool perm,
                bool slide,
@@ -45,7 +49,12 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
+  m_cablePosition(cPos),
+#ifdef USE_BASIS
   contactNormal(attachedBody->getWorldTransform().inverse().getBasis() * cn),
+#else
+  contactNormal(cn),
+#endif
   height(999.0),
   permanent(perm),
   sliding(slide),
@@ -122,27 +131,35 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					
 					btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
 					
+					#ifdef USE_BASIS
 					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+					#else
+					newNormal = pt.m_normalWorldOnB * directionSign;
+					#endif
 					dist = pt.getDistance();
-				
+					
+					if (n >= 2)
+					{
+						std::cout << "Extra contacts!! " << dist << std::endl;
+					}
+					
 				}
 				
 			}
 			
 			// Assume we've lost this contact for some reason
-			/*
+			
 			if (dist > 0.0 && length < 0.01)
 			{
-				ret = false;
+				//ret = false;
 			}
-			*/
 			
-			if (length > 0.2)
+			
+			if (length > 0.1)
 			{
 				// This makes contact handling better in some cases and worse in other
 				// Better conservation of momentum without it, but contacts tend to exist a little too long
-				//update = false;
-
+				ret = false;
 			}
 			if (update)
 			{
@@ -158,7 +175,9 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				// Update again here in case we have the original manifold??
 				if (length < 0.1)
 				{
+					#ifndef SKIP_CONTACT_UPDATE
 					contactNormal = newNormal;
+					#endif
 				}
 			}
 			else if ((getWorldPosition() - contactPos).length() > 0.1)
@@ -187,11 +206,15 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 btVector3 muscleAnchor::getContactNormal() const
 {
 
+#ifdef USE_BASIS
 	const btTransform tr = attachedBody->getWorldTransform();
     btVector3 newNormal = (tr.getBasis() * contactNormal);
     newNormal = newNormal.length() > 0.0 ? newNormal.normalize() : btVector3(0.0, 0.0, 0.0);
     //assert(newNormal.length() == 1.0);
     return newNormal;
+#else
+	return contactNormal;
+#endif
 
 }
 
@@ -210,9 +233,16 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 			manifold = m;
 		}
 		
-		if(manifold == m && newDist < 0.1)
+		if(manifold == m)
 		{
-			//contactNormal = manifoldValues.second;
+			btVector3 newNormal = manifoldValues.second;
+			if ((newNormal + contactNormal).length() < 0.1)
+			{
+				 throw std::runtime_error("Reversed normal");
+			}
+			#ifndef SKIP_CONTACT_UPDATE
+			contactNormal = newNormal;
+			#endif
 		}
 	}
 }
@@ -259,7 +289,11 @@ std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentMan
 				
 				if (length < 0.1)
 				{
+					#ifdef USE_BASIS
 					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+					#else
+					newNormal = pt.m_normalWorldOnB * directionSign;
+					#endif
 				}
 				
 				dist = pt.getDistance();

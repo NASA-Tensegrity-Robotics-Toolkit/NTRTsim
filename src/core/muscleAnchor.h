@@ -29,7 +29,6 @@
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
-
 #include <string>
 #include <utility> //std::pair
 
@@ -44,7 +43,8 @@ public:
    friend class MuscleNP;
 
     muscleAnchor(btRigidBody *body, 
-					btVector3 pos, 
+					btVector3 pos,
+					btScalar cPos,
 					btVector3 cn = btVector3(0.0, 0.0, 0.0),
 					bool perm = true, 
 					bool slide = false,
@@ -72,6 +72,11 @@ public:
 	btVector3 getForce() const
 	{
 		return force;
+	}
+	
+	btScalar getCablePosition() const
+	{
+		return m_cablePosition;
 	}
 	
 	// Address should never be changed, body is not const
@@ -107,6 +112,9 @@ private:
 	
 	// Store force so we can normalize it on a per-body basis
 	btVector3 force;
+	
+	// The position of the cable along the string. Allows for global sort
+	btScalar m_cablePosition;
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_
