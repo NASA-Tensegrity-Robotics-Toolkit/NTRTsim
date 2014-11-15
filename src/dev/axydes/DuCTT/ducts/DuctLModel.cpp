@@ -23,7 +23,7 @@
  */
 
 // This module
-#include "DuctStraightModel.h"
+#include "DuctLModel.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -35,7 +35,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-DuctStraightModel::Config::Config(
+DuctLModel::Config::Config(
     double ductHeight,
     double ductWidth,
     double distance,
@@ -52,23 +52,23 @@ m_axis(axis)
 {
 }
 
-DuctStraightModel::DuctStraightModel() :
-    m_config(DuctStraightModel::Config()),
+DuctLModel::DuctLModel() :
+    m_config(DuctLModel::Config()),
     tgModel()
 {
 }
 
-DuctStraightModel::DuctStraightModel(DuctStraightModel::Config &config) :
+DuctLModel::DuctLModel(DuctLModel::Config &config) :
     m_config(config),
     tgModel()
 {
 }
 
-DuctStraightModel::~DuctStraightModel()
+DuctLModel::~DuctLModel()
 {
 }
 
-void DuctStraightModel::addNodesXAxis(tgStructure &s)
+void DuctLModel::addNodesXAxis(tgStructure &s)
 {
     s.addNode(0, 0, -m_config.m_ductHeight/2.0);
     s.addNode(m_config.m_distance, 0, -m_config.m_ductHeight/2.0);
@@ -83,22 +83,51 @@ void DuctStraightModel::addNodesXAxis(tgStructure &s)
     s.addNode(m_config.m_distance, m_config.m_ductWidth/2.0, 0);
 }
 
-void DuctStraightModel::addNodesYAxis(tgStructure &s)
+//void DuctLModel::addNodesYAxis(tgStructure &s)
+//{
+//    s.addNode(0, 0, -m_config.m_ductHeight/2.0);
+//    s.addNode(0, m_config.m_distance, -m_config.m_ductHeight/2.0);
+//
+//    s.addNode(0, 0, m_config.m_ductHeight/2.0);
+//    s.addNode(0, m_config.m_distance, m_config.m_ductHeight/2.0);
+//
+//    s.addNode(-m_config.m_ductWidth/2.0, 0, 0);
+//    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+//
+//    s.addNode(m_config.m_ductWidth/2.0, 0, 0);
+//    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+//}
+
+
+void DuctLModel::addNodesYAxis(tgStructure &s)
 {
     s.addNode(0, 0, -m_config.m_ductHeight/2.0);
     s.addNode(0, m_config.m_distance, -m_config.m_ductHeight/2.0);
-
+    
     s.addNode(0, 0, m_config.m_ductHeight/2.0);
     s.addNode(0, m_config.m_distance, m_config.m_ductHeight/2.0);
-
+    
     s.addNode(-m_config.m_ductWidth/2.0, 0, 0);
     s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
-
+    
     s.addNode(m_config.m_ductWidth/2.0, 0, 0);
-    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    s.addNode(m_config.m_distance+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(m_config.m_distance+m_config.m_ductWidth/2.0, m_config.m_distance, 0);
 }
 
-void DuctStraightModel::addNodesZAxis(tgStructure &s)
+
+void DuctLModel::addNodesZAxis(tgStructure &s)
 {
     s.addNode(0, -m_config.m_ductHeight/2.0, 0);
     s.addNode(0, -m_config.m_ductHeight/2.0, m_config.m_distance);
@@ -113,7 +142,7 @@ void DuctStraightModel::addNodesZAxis(tgStructure &s)
     s.addNode(m_config.m_ductWidth/2.0, 0, m_config.m_distance);
 }
 
-void DuctStraightModel::addNodes(tgStructure &s)
+void DuctLModel::addNodes(tgStructure &s)
 {
     switch(m_config.m_axis)
     {
@@ -132,15 +161,20 @@ void DuctStraightModel::addNodes(tgStructure &s)
     }
 }
 
-void DuctStraightModel::addBoxes(tgStructure &s)
+void DuctLModel::addBoxes(tgStructure &s)
 {
     s.addPair(0,1, "box");
     s.addPair(2,3, "box");
     s.addPair(4,5, "box2");
     s.addPair(6,7, "box2");
+    s.addPair(8,9, "box");
+    s.addPair(10,11, "box");
+    s.addPair(12,13, "box2");
+    s.addPair(14,15, "box2");
+    
 }
 
-void DuctStraightModel::setup(tgWorld& world)
+void DuctLModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     const tgBox::Config boxConfig(m_config.m_ductWidth/2.0, m_config.m_wallWidth, 0, m_config.m_friction);
@@ -177,7 +211,7 @@ void DuctStraightModel::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void DuctStraightModel::step(double dt)
+void DuctLModel::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -190,13 +224,13 @@ void DuctStraightModel::step(double dt)
     }
 }
 
-void DuctStraightModel::onVisit(tgModelVisitor& r)
+void DuctLModel::onVisit(tgModelVisitor& r)
 {
     // Example: m_rod->getRigidBody()->dosomething()...
     tgModel::onVisit(r);
 }
     
-void DuctStraightModel::teardown()
+void DuctLModel::teardown()
 {
     tgModel::teardown();
 }

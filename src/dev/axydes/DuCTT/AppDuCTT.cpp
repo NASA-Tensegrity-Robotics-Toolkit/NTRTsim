@@ -84,6 +84,15 @@ bool AppDuCTT::setup()
         ductConfig.m_ductHeight = 38;
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
+
+//        DuctCrossModel* myDuctModel = new DuctCrossModel();
+//        simulation->addModel(myDuctModel);
+
+//        DuctTeeModel* myDuctModel = new DuctTeeModel();
+//        simulation->addModel(myDuctModel);
+
+//        DuctLModel* myDuctModel = new DuctLModel();
+//        simulation->addModel(myDuctModel);
     }
 
     bSetup = true;

@@ -10,6 +10,9 @@ add_executable(AppDuCTT
     robot/tgTouchSensorSphereModel.cpp
     robot/DuCTTRobotModel.cpp
     controllers/DuCTTSineWaves.cpp
+    ducts/DuctCrossModel.cpp
+    ducts/DuctLModel.cpp
     ducts/DuctStraightModel.cpp
+    ducts/DuctTeeModel.cpp
     AppDuCTT.cpp
 )

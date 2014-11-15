@@ -27,10 +27,14 @@
  * $Id$
  */
 
-// This application
-//models
+//robot
 #include "robot/DuCTTRobotModel.h"
+
+//ducts
+#include "ducts/DuctCrossModel.h"
+#include "ducts/DuctLModel.h"
 #include "ducts/DuctStraightModel.h"
+#include "ducts/DuctTeeModel.h"
 
 //controllers
 #include "controllers/DuCTTSineWaves.h"

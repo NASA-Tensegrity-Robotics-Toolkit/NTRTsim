@@ -23,7 +23,7 @@
  */
 
 // This module
-#include "DuctStraightModel.h"
+#include "DuctCrossModel.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -35,7 +35,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-DuctStraightModel::Config::Config(
+DuctCrossModel::Config::Config(
     double ductHeight,
     double ductWidth,
     double distance,
@@ -52,23 +52,23 @@ m_axis(axis)
 {
 }
 
-DuctStraightModel::DuctStraightModel() :
-    m_config(DuctStraightModel::Config()),
+DuctCrossModel::DuctCrossModel() :
+    m_config(DuctCrossModel::Config()),
     tgModel()
 {
 }
 
-DuctStraightModel::DuctStraightModel(DuctStraightModel::Config &config) :
+DuctCrossModel::DuctCrossModel(DuctCrossModel::Config &config) :
     m_config(config),
     tgModel()
 {
 }
 
-DuctStraightModel::~DuctStraightModel()
+DuctCrossModel::~DuctCrossModel()
 {
 }
 
-void DuctStraightModel::addNodesXAxis(tgStructure &s)
+void DuctCrossModel::addNodesXAxis(tgStructure &s)
 {
     s.addNode(0, 0, -m_config.m_ductHeight/2.0);
     s.addNode(m_config.m_distance, 0, -m_config.m_ductHeight/2.0);
@@ -83,22 +83,68 @@ void DuctStraightModel::addNodesXAxis(tgStructure &s)
     s.addNode(m_config.m_distance, m_config.m_ductWidth/2.0, 0);
 }
 
-void DuctStraightModel::addNodesYAxis(tgStructure &s)
+
+
+void DuctCrossModel::addNodesYAxis(tgStructure &s)
 {
+    
+    // vertical boxes bottom
     s.addNode(0, 0, -m_config.m_ductHeight/2.0);
     s.addNode(0, m_config.m_distance, -m_config.m_ductHeight/2.0);
-
+    
     s.addNode(0, 0, m_config.m_ductHeight/2.0);
     s.addNode(0, m_config.m_distance, m_config.m_ductHeight/2.0);
-
+    
     s.addNode(-m_config.m_ductWidth/2.0, 0, 0);
-    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
-
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
     s.addNode(m_config.m_ductWidth/2.0, 0, 0);
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
+    // boxes to the left (positive x axis)
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance/2.0+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance/2.0+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    s.addNode(m_config.m_distance/2.0+m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
     s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(m_config.m_distance/2.0+m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    
+    // boxes to the right (negative x axis)
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    s.addNode(-m_config.m_distance/2.0-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, -m_config.m_ductHeight/2.0);
+    
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    s.addNode(-m_config.m_distance/2.0-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth/2.0, m_config.m_ductHeight/2.0);
+    
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    s.addNode(-m_config.m_distance/2.0-m_config.m_ductWidth/2.0, m_config.m_distance-m_config.m_ductWidth, 0);
+    
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(-m_config.m_distance/2.0-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    
+    // vertical boxes top
+    s.addNode(0, m_config.m_distance, -m_config.m_ductHeight/2.0);
+    s.addNode(0, m_config.m_distance+m_config.m_distance/2.0, -m_config.m_ductHeight/2.0);
+    
+    s.addNode(0, m_config.m_distance, m_config.m_ductHeight/2.0);
+    s.addNode(0, m_config.m_distance+m_config.m_distance/2.0, m_config.m_ductHeight/2.0);
+    
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance+m_config.m_distance/2.0, 0);
+    
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance, 0);
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance+m_config.m_distance/2.0, 0);
+
+
 }
 
-void DuctStraightModel::addNodesZAxis(tgStructure &s)
+
+void DuctCrossModel::addNodesZAxis(tgStructure &s)
 {
     s.addNode(0, -m_config.m_ductHeight/2.0, 0);
     s.addNode(0, -m_config.m_ductHeight/2.0, m_config.m_distance);
@@ -113,7 +159,7 @@ void DuctStraightModel::addNodesZAxis(tgStructure &s)
     s.addNode(m_config.m_ductWidth/2.0, 0, m_config.m_distance);
 }
 
-void DuctStraightModel::addNodes(tgStructure &s)
+void DuctCrossModel::addNodes(tgStructure &s)
 {
     switch(m_config.m_axis)
     {
@@ -132,15 +178,27 @@ void DuctStraightModel::addNodes(tgStructure &s)
     }
 }
 
-void DuctStraightModel::addBoxes(tgStructure &s)
+void DuctCrossModel::addBoxes(tgStructure &s)
 {
     s.addPair(0,1, "box");
     s.addPair(2,3, "box");
     s.addPair(4,5, "box2");
     s.addPair(6,7, "box2");
+    s.addPair(8,9, "box");
+    s.addPair(10,11, "box");
+    s.addPair(12,13, "box2");
+    s.addPair(14,15, "box2");
+    s.addPair(16,17, "box");
+    s.addPair(18,19, "box");
+    s.addPair(20,21, "box2");
+    s.addPair(22,23, "box2");
+    s.addPair(24,25, "box");
+    s.addPair(26,27, "box");
+    s.addPair(28,29, "box2");
+    s.addPair(30,31, "box2");
 }
 
-void DuctStraightModel::setup(tgWorld& world)
+void DuctCrossModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     const tgBox::Config boxConfig(m_config.m_ductWidth/2.0, m_config.m_wallWidth, 0, m_config.m_friction);
@@ -177,7 +235,7 @@ void DuctStraightModel::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void DuctStraightModel::step(double dt)
+void DuctCrossModel::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -190,13 +248,13 @@ void DuctStraightModel::step(double dt)
     }
 }
 
-void DuctStraightModel::onVisit(tgModelVisitor& r)
+void DuctCrossModel::onVisit(tgModelVisitor& r)
 {
     // Example: m_rod->getRigidBody()->dosomething()...
     tgModel::onVisit(r);
 }
     
-void DuctStraightModel::teardown()
+void DuctCrossModel::teardown()
 {
     tgModel::teardown();
 }

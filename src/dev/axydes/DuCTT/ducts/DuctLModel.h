@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef DUCT_STRAIGHT_MODEL_H
-#define DUCT_STRAIGHT_MODEL_H
+#ifndef DUCT_L_MODEL_H
+#define DUCT_L_MODEL_H
 
 /**
  * @file DuCTTModel.h
@@ -40,10 +40,10 @@ class tgWorld;
 class tgBox;
 
 /**
- * A class that constructs a straight rectangular duct using the tools
+ * A class that constructs a three bar tensegrity DuCTT using the tools
  * in tgcreator.
  */
-class DuctStraightModel : public tgModel
+class DuctLModel : public tgModel
 {
 public: 
     /**
@@ -82,14 +82,14 @@ public:
      * The only constructor. Configuration parameters are within the
      * .cpp file in this case, not passed in. 
      */
-    DuctStraightModel();
-    DuctStraightModel(DuctStraightModel::Config &config);
+    DuctLModel();
+    DuctLModel(DuctLModel::Config &config);
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~DuctStraightModel();
+    virtual ~DuctLModel();
 
     /**
      * Create the model. Place the rods and strings into the world
@@ -140,7 +140,7 @@ private:
      */
     void addBoxes(tgStructure& s);
 
-    DuctStraightModel::Config m_config;
+    DuctLModel::Config m_config;
 };
 
 #endif  // DuCTT_MODEL_H
