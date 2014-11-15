@@ -29,11 +29,11 @@
 
 // This application
 //models
-#include "DuCTTRobotModel.h"
-#include "DuctStraightModel.h"
+#include "robot/DuCTTRobotModel.h"
+#include "ducts/DuctStraightModel.h"
 
 //controllers
-#include "DuCTTSineWaves.h"
+#include "controllers/DuCTTSineWaves.h"
 
 // This library
 #include "core/tgModel.h"

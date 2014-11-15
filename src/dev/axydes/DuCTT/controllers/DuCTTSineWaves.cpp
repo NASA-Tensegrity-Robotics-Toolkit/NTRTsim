@@ -27,9 +27,9 @@
 #include "DuCTTSineWaves.h"
 
 // Its subject
-#include "DuCTTRobotModel.h"
-#include "tgPrismatic.h"
-#include "tgTouchSensorSphereModel.h"
+#include "../robot/DuCTTRobotModel.h"
+#include "../robot/tgPrismatic.h"
+#include "../robot/tgTouchSensorSphereModel.h"
 
 // The C++ Standard Library
 #include <cassert>

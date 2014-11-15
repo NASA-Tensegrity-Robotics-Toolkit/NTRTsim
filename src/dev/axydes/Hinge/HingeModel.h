@@ -28,7 +28,7 @@
  */
 
 // This library
-#include "../DuCTT/tgRodHingeInfo.h"
+#include "../DuCTT/robot/tgRodHingeInfo.h"
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
 // The C++ Standard Library

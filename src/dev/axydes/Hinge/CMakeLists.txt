@@ -1,10 +1,10 @@
 link_libraries(tgcreator core)
 
 add_executable(AppHinge
-    ../DuCTT/tgRodHinge.cpp
-    ../DuCTT/tgRodHingeInfo.cpp
-    ../DuCTT/tgTouchSensorSphereInfo.cpp
-    ../DuCTT/tgTouchSensorSphereModel.cpp
+    ../DuCTT/robot/tgRodHinge.cpp
+    ../DuCTT/robot/tgRodHingeInfo.cpp
+    ../DuCTT/robot/tgTouchSensorSphereInfo.cpp
+    ../DuCTT/robot/tgTouchSensorSphereModel.cpp
     HingeModel.cpp
     AppHinge.cpp
 )

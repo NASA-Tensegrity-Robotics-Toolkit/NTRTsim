@@ -24,8 +24,8 @@
 
 // This module
 #include "HingeModel.h"
-#include "../DuCTT/tgTouchSensorSphereInfo.h"
-#include "../DuCTT/tgTouchSensorSphereModel.h"
+#include "../DuCTT/robot/tgTouchSensorSphereInfo.h"
+#include "../DuCTT/robot/tgTouchSensorSphereModel.h"
 // This library
 #include "controllers/PretensionController.h"
 #include "core/tgLinearString.h"
