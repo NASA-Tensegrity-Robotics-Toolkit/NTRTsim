@@ -40,18 +40,50 @@ class tgWorld;
 class tgBox;
 
 /**
- * A class that constructs a three bar tensegrity DuCTT using the tools
+ * A class that constructs a straight rectangular duct using the tools
  * in tgcreator.
  */
 class DuctStraightModel : public tgModel
 {
 public: 
-    
+    /**
+     * Configuration parameters so they're easily accessable.
+     * All parameters must be positive.
+     //
+     // see tgBaseString.h for a descripton of some of these rod parameters
+     // (specifically, those related to the motor moving the strings.)
+     //
+     // NOTE that any parameter that depends on units of length will scale
+     // with the current gravity scaling. E.g., with gravity as 981,
+     // the length units below are in centimeters.
+     //
+     // Total mass of bars is about 1.5 kg.  Total
+     */
+    struct Config
+    {
+        Config(
+            double ductHeight = 40,
+            double ductWidth = 40,
+            double distance = 100,
+            double wallWidth = 0.5,
+            double friction = 1.0,
+            int axis = 1
+        );
+
+        double m_ductHeight;
+        double m_ductWidth;
+        double m_distance; //amount of distance to extend
+        double m_wallWidth;
+        double m_friction;
+        int m_axis; // which axis to extend along, defaults to y, 0=x, 1=y, 2=z
+    };
+
     /**
      * The only constructor. Configuration parameters are within the
      * .cpp file in this case, not passed in. 
      */
     DuctStraightModel();
+    DuctStraightModel(DuctStraightModel::Config &config);
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -96,17 +128,19 @@ private:
      * for your own models
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addNodes(tgStructure& s);
+    void addNodes(tgStructure& s);
 
-    static void addNodesXAxis(tgStructure &s);
-    static void addNodesYAxis(tgStructure &s);
-    static void addNodesZAxis(tgStructure &s);
+    void addNodesXAxis(tgStructure &s);
+    void addNodesYAxis(tgStructure &s);
+    void addNodesZAxis(tgStructure &s);
 
     /**
      * Adds tags to the node pairs for the boxes of the duct.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addBoxes(tgStructure& s);
+    void addBoxes(tgStructure& s);
+
+    DuctStraightModel::Config m_config;
 };
 
 #endif  // DuCTT_MODEL_H

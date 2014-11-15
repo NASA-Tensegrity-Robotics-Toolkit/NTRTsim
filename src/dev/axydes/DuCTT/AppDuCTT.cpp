@@ -79,7 +79,10 @@ bool AppDuCTT::setup()
     // Seventh add duct to simulation
     if (add_duct)
     {
-        DuctStraightModel* myDuctModel = new DuctStraightModel();
+        DuctStraightModel::Config ductConfig;
+        ductConfig.m_ductWidth = 38;
+        ductConfig.m_ductHeight = 38;
+        DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
     }
 

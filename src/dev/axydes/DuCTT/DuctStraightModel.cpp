@@ -35,47 +35,32 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-/**
- * Anonomous namespace so we don't have to declare the config in
- * the header.
- */
-namespace
+DuctStraightModel::Config::Config(
+    double ductHeight,
+    double ductWidth,
+    double distance,
+    double wallWidth,
+    double friction,
+    int axis
+    ) :
+m_ductHeight(ductHeight),
+m_ductWidth(ductWidth),
+m_distance(distance),
+m_wallWidth(wallWidth),
+m_friction(friction),
+m_axis(axis)
 {
-    /**
-     * Configuration parameters so they're easily accessable.
-     * All parameters must be positive.
-     //
-     // see tgBaseString.h for a descripton of some of these rod parameters
-     // (specifically, those related to the motor moving the strings.)
-     //
-     // NOTE that any parameter that depends on units of length will scale
-     // with the current gravity scaling. E.g., with gravity as 981,
-     // the length units below are in centimeters.
-     //
-     // Total mass of bars is about 1.5 kg.  Total
-     */
-    const struct Config
-    {
-        double ductHeight;
-        double ductWidth;
-        double distance; //amount of distance to extend
-        double wallWidth;
-        double friction;
-        int axis; // which axis to extend along, defaults to y, 0=x, 1=y, 2=z
-    } c =
-   {
-        34,
-        34,
-        100,
-        0.5,
-        1.0,
-        1
-   }
-    ;
-} // namespace
+}
 
 DuctStraightModel::DuctStraightModel() :
-tgModel()
+    m_config(DuctStraightModel::Config()),
+    tgModel()
+{
+}
+
+DuctStraightModel::DuctStraightModel(DuctStraightModel::Config &config) :
+    m_config(config),
+    tgModel()
 {
 }
 
@@ -85,52 +70,52 @@ DuctStraightModel::~DuctStraightModel()
 
 void DuctStraightModel::addNodesXAxis(tgStructure &s)
 {
-    s.addNode(0, 0, -c.ductHeight/2.0);
-    s.addNode(c.distance, 0, -c.ductHeight/2.0);
+    s.addNode(0, 0, -m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance, 0, -m_config.m_ductHeight/2.0);
 
-    s.addNode(0, 0, c.ductHeight/2.0);
-    s.addNode(c.distance, 0, c.ductHeight/2.0);
+    s.addNode(0, 0, m_config.m_ductHeight/2.0);
+    s.addNode(m_config.m_distance, 0, m_config.m_ductHeight/2.0);
 
-    s.addNode(0, -c.ductWidth/2.0, 0);
-    s.addNode(c.distance, -c.ductWidth/2.0, 0);
+    s.addNode(0, -m_config.m_ductWidth/2.0, 0);
+    s.addNode(m_config.m_distance, -m_config.m_ductWidth/2.0, 0);
 
-    s.addNode(0, c.ductWidth/2.0, 0);
-    s.addNode(c.distance, c.ductWidth/2.0, 0);
+    s.addNode(0, m_config.m_ductWidth/2.0, 0);
+    s.addNode(m_config.m_distance, m_config.m_ductWidth/2.0, 0);
 }
 
 void DuctStraightModel::addNodesYAxis(tgStructure &s)
 {
-    s.addNode(0, 0, -c.ductHeight/2.0);
-    s.addNode(0, c.distance, -c.ductHeight/2.0);
+    s.addNode(0, 0, -m_config.m_ductHeight/2.0);
+    s.addNode(0, m_config.m_distance, -m_config.m_ductHeight/2.0);
 
-    s.addNode(0, 0, c.ductHeight/2.0);
-    s.addNode(0, c.distance, c.ductHeight/2.0);
+    s.addNode(0, 0, m_config.m_ductHeight/2.0);
+    s.addNode(0, m_config.m_distance, m_config.m_ductHeight/2.0);
 
-    s.addNode(-c.ductWidth/2.0, 0, 0);
-    s.addNode(-c.ductWidth/2.0, c.distance, 0);
+    s.addNode(-m_config.m_ductWidth/2.0, 0, 0);
+    s.addNode(-m_config.m_ductWidth/2.0, m_config.m_distance, 0);
 
-    s.addNode(c.ductWidth/2.0, 0, 0);
-    s.addNode(c.ductWidth/2.0, c.distance, 0);
+    s.addNode(m_config.m_ductWidth/2.0, 0, 0);
+    s.addNode(m_config.m_ductWidth/2.0, m_config.m_distance, 0);
 }
 
 void DuctStraightModel::addNodesZAxis(tgStructure &s)
 {
-    s.addNode(0, -c.ductHeight/2.0, 0);
-    s.addNode(0, -c.ductHeight/2.0, c.distance);
+    s.addNode(0, -m_config.m_ductHeight/2.0, 0);
+    s.addNode(0, -m_config.m_ductHeight/2.0, m_config.m_distance);
 
-    s.addNode(0, c.ductHeight/2.0, 0);
-    s.addNode(0, c.ductHeight/2.0, c.distance);
+    s.addNode(0, m_config.m_ductHeight/2.0, 0);
+    s.addNode(0, m_config.m_ductHeight/2.0, m_config.m_distance);
 
-    s.addNode(-c.ductWidth/2.0, 0, 0);
-    s.addNode(-c.ductWidth/2.0, 0, c.distance);
+    s.addNode(-m_config.m_ductWidth/2.0, 0, 0);
+    s.addNode(-m_config.m_ductWidth/2.0, 0, m_config.m_distance);
 
-    s.addNode(c.ductWidth/2.0, 0, 0);
-    s.addNode(c.ductWidth/2.0, 0, c.distance);
+    s.addNode(m_config.m_ductWidth/2.0, 0, 0);
+    s.addNode(m_config.m_ductWidth/2.0, 0, m_config.m_distance);
 }
 
 void DuctStraightModel::addNodes(tgStructure &s)
 {
-    switch(c.axis)
+    switch(m_config.m_axis)
     {
     case 0:
         addNodesXAxis(s);
@@ -158,8 +143,8 @@ void DuctStraightModel::addBoxes(tgStructure &s)
 void DuctStraightModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
-    const tgBox::Config boxConfig(c.ductWidth/2.0, c.wallWidth, 0, c.friction);
-    const tgBox::Config boxConfig2(c.wallWidth, c.ductHeight/2.0, 0, c.friction);
+    const tgBox::Config boxConfig(m_config.m_ductWidth/2.0, m_config.m_wallWidth, 0, m_config.m_friction);
+    const tgBox::Config boxConfig2(m_config.m_wallWidth, m_config.m_ductHeight/2.0, 0, m_config.m_friction);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -168,13 +153,13 @@ void DuctStraightModel::setup(tgWorld& world)
     addBoxes(s);
 
     // Move the structure so it doesn't start in the ground
-    if (c.axis == 0)
+    if (m_config.m_axis == 0)
     {
-        s.move(btVector3(0, c.ductWidth/2.0+1, 0));
+        s.move(btVector3(0, m_config.m_ductWidth/2.0+1, 0));
     }
-    else if (c.axis == 2)
+    else if (m_config.m_axis == 2)
     {
-        s.move(btVector3(0, c.ductHeight/2.0+1, 0));
+        s.move(btVector3(0, m_config.m_ductHeight/2.0+1, 0));
     }
     
     // Create the build spec that uses tags to turn the structure into a real model
