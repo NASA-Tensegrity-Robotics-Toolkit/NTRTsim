@@ -196,12 +196,12 @@ public:
     /**
      * @return the bottom tetra's prismatic actuator
      */
-    const tgPrismatic* getBottomPrismatic() const;
+    tgPrismatic* getBottomPrismatic();
 
     /**
      * @return the top tetra's prismatic actuator
      */
-    const tgPrismatic* getTopPrismatic() const;
+    tgPrismatic* getTopPrismatic();
 
     /**
      * Calculate the Center of Mass (COM) for the entire model.
@@ -215,6 +215,12 @@ public:
      * @return btVector3 COM of the specified tetra
      */
     btVector3 getTetraCOM(bool bottom = true);
+    std::vector<tgSphere*> spheres;
+    std::vector<tgTouchSensorSphereModel*> allTouchSensors;
+    std::vector<tgSphere*> bottomSpheres;
+    std::vector<tgTouchSensorSphereModel*> bottomTouchSensors;
+    std::vector<tgSphere*> topSpheres;
+    std::vector<tgTouchSensorSphereModel*> topTouchSensors;
 
 private:
     /**
@@ -288,11 +294,9 @@ private:
     std::vector<tgPrismatic*> allPrisms;
 
     std::vector<tgRod*> allRods;
-    std::vector<tgRod*> topRods;
     std::vector<tgRod*> bottomRods;
+    std::vector<tgRod*> topRods;
     std::vector<tgRod*> prismRods;
-    std::vector<tgSphere*> spheres;
-    std::vector<tgTouchSensorSphereModel*> allTouchSensors;
 
     DuCTTRobotModel::Config m_config;
 

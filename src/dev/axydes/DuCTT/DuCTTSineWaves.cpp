@@ -25,14 +25,16 @@
 
 // This module
 #include "DuCTTSineWaves.h"
+
 // Its subject
 #include "DuCTTRobotModel.h"
+#include "tgPrismatic.h"
+#include "tgTouchSensorSphereModel.h"
+
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 #include <vector>
-
-#include "tgPrismatic.h"
 
 DuCTTSineWaves::DuCTTSineWaves() :
     offsetSpeed(0.0),
@@ -49,15 +51,32 @@ DuCTTSineWaves::DuCTTSineWaves() :
     phaseOffsets.push_back(0);
 }
 
-void DuCTTSineWaves::applySineWave(std::vector<tgPrismatic*> prisms, double dt)
+void DuCTTSineWaves::applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt)
 {
-    simTime += dt;
     cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[0]);
     target = offsetSpeed + cycle*cpgAmplitude;
-    for (std::size_t i=0; i<prisms.size(); i++)
+
+    if (!shouldPause && shouldUnPause)
     {
-        prisms[i]->setPreferredLength(target);
+        prism->setPreferredLength(target);
+        std::cerr << "MOVING\n";
     }
+    else
+    {
+        std::cerr << "PAUSING\n";
+    }
+}
+
+bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+{
+    bool shouldPause = true;
+
+    for (size_t i=0; i<touchSensors.size(); i++)
+    {
+        if (!touchSensors[i]->isTouching()) shouldPause = false;
+    }
+
+    return shouldPause;
 }
 
 void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
@@ -68,6 +87,8 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     }
     else
     {
-        applySineWave(subject.getAllPrismatics(), dt);
+        simTime += dt;
+//        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
+        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
     }
 }

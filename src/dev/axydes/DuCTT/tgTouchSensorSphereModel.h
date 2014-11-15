@@ -70,6 +70,8 @@ public:
 
     virtual void addMarker(abstractMarker &marker);
 
+    virtual bool isTouching();
+
 private:
 
     /** Integrity predicate. */
@@ -95,6 +97,7 @@ private:
 
     btDispatcher* const m_dispatcher;
 
+    bool m_bContact;
 };
 
 #endif

@@ -165,8 +165,8 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     if (distance == 0)
     {
-        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "bottom right sphere"); // 0
-        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "bottom left sphere"); // 1
+        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere bottom right"); // 0
+        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere bottom left"); // 1
         tetra.addNode(topBack); // 2
         tetra.addNode(topFront); // 3
     }
@@ -174,8 +174,8 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
     {
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
-        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "top back sphere"); // 2
-        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "top front sphere"); // 3
+        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere top back"); // 2
+        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere top front"); // 3
     }
 
     tetra.addNode(bottomMidRight); // 4
@@ -220,6 +220,7 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
 
         //top rods
         s.addPair( startNode+2, startNode+3, "inner rod"+tetra);
+//        s.addPair( startNode+2, startNode+3, "static rod"+tetra);
 
         s.addPair( startNode+4, startNode+5, "prismatic"+tetra);
 
@@ -249,7 +250,7 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         s.addPair( startNode+2, startNode+6, "prism rod"+tetra);
         s.addPair( startNode+7, startNode+3, "prism rod"+tetra);
 
-        s.addPair( startNode+6, startNode+7, "prismatic2"+tetra);
+        s.addPair( startNode+6, startNode+7, "prismatic"+tetra);
 
         //bottom right hinges
         s.addPair( startNode+0, startNode+8, "hinge3"+tetra);
@@ -354,8 +355,8 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
 
-    spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
-    spec.addBuilder("prismatic2", new tgPrismaticInfo(prismConfig2));
+    spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfig));
+    spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfig2));
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     spec.addBuilder("hinge", new tgDuCTTHingeInfo(hingeConfig));
@@ -412,38 +413,40 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgLinearString>("saddle string");
 
     spheres = find<tgSphere>("sphere");
+    allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
+    bottomSpheres = find<tgSphere>("sphere bottom");
+    topSpheres = find<tgSphere>("sphere top");
+    bottomTouchSensors = find<tgTouchSensorSphereModel>("sphere bottom");
+    topTouchSensors = find<tgTouchSensorSphereModel>("sphere top");
 
     //attach touch sensors to the appropriate spheres on the actual robot model
     //add the appropriate rods to the touch sensor ignore list
-    allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
-    for (size_t i=0; i<allTouchSensors.size(); i++)
+    for (size_t i=0; i<bottomTouchSensors.size(); i++)
     {
-        abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
-        allTouchSensors[i]->addMarker(marker);
-
-        if (allTouchSensors[i]->toString().find("bottom") != std::string::npos)
+        abstractMarker marker (bottomSpheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        bottomTouchSensors[i]->addMarker(marker);
+        for (size_t j=0; j<bottomRods.size(); j++)
         {
-            for (size_t j=0; j<bottomRods.size(); j++)
-            {
-                allTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
-            }
+            bottomTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
         }
-        else if (allTouchSensors[i]->toString().find("top") != std::string::npos)
+    }
+    for (size_t i=0; i<topTouchSensors.size(); i++)
+    {
+        abstractMarker marker (topSpheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        topTouchSensors[i]->addMarker(marker);
+        for (size_t j=0; j<topRods.size(); j++)
         {
-            for (size_t j=0; j<topRods.size(); j++)
-            {
-                allTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
-            }
+            topTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
         }
     }
 
-    std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic");
+    std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic bottom");
     if (bottomPrisms.size() == 1)
     {
         m_pBottomPrismatic = bottomPrisms[0];
     }
 
-    std::vector<tgPrismatic*> topPrisms = find<tgPrismatic>("prismatic2");
+    std::vector<tgPrismatic*> topPrisms = find<tgPrismatic>("prismatic top");
     if (topPrisms.size() == 1)
     {
         m_pTopPrismatic = topPrisms[0];
@@ -460,8 +463,8 @@ void DuCTTRobotModel::step(double dt)
     else
     {
         // Notify observers (controllers) of the step so that they can take action
-        notifyStep(dt);
         tgModel::step(dt);  // Step any children
+        notifyStep(dt);
     }
 }
 
@@ -496,12 +499,12 @@ const std::vector<tgTouchSensorSphereModel*>& DuCTTRobotModel::getAllTouchSensor
     return allTouchSensors;
 }
 
-const tgPrismatic* DuCTTRobotModel::getBottomPrismatic() const
+tgPrismatic* DuCTTRobotModel::getBottomPrismatic()
 {
     return m_pBottomPrismatic;
 }
 
-const tgPrismatic* DuCTTRobotModel::getTopPrismatic() const
+tgPrismatic* DuCTTRobotModel::getTopPrismatic()
 {
     return m_pTopPrismatic;
 }

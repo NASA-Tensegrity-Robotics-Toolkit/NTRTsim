@@ -55,7 +55,8 @@ tgModel(tags),
 m_world(world),
 m_overlappingPairCache(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
 m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
-m_pGhostObject(pGhostObject)
+m_pGhostObject(pGhostObject),
+m_bContact(false)
 {
     if (pGhostObject == NULL)
     {
@@ -95,11 +96,17 @@ void tgTouchSensorSphereModel::step(double dt)
         updatePosition();
         checkCollisions();
         tgModel::step(dt);  // Step any children
+
+        if (m_bContact)
+        {
+//            std::cerr << toString() << std::endl;
+        }
     }
 }
 
 void tgTouchSensorSphereModel::updatePosition()
 {
+    m_bContact = false;
     std::vector<abstractMarker> markers = getMarkers();
     if (markers.size() == 1)
         m_pGhostObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
@@ -181,8 +188,8 @@ void tgTouchSensorSphereModel::checkCollisions()
 
                     if(rb)
                     {
-                        std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
-                        std::cerr << toString() << std::endl;
+//                        std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
+                        m_bContact = true;
                     }
                 }
             }
@@ -220,6 +227,11 @@ void tgTouchSensorSphereModel::addMarker(abstractMarker &_a)
 {
     tgModel::addMarker(_a);
     addIgnoredObject(_a.getAttachedBody());
+}
+
+bool tgTouchSensorSphereModel::isTouching()
+{
+    return m_bContact;
 }
 
 bool tgTouchSensorSphereModel::invariant() const

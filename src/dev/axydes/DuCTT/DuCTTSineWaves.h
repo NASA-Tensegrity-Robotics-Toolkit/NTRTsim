@@ -34,6 +34,7 @@
 
 // Forward declarations
 class tgPrismatic;
+class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
 
 class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
@@ -44,7 +45,8 @@ public:
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
-    void applySineWave(std::vector<tgPrismatic*> prisms, double dt);
+    void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt);
+    bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
 
 private:
     double simTime;
