@@ -181,15 +181,16 @@ void tgTouchSensorSphereModel::checkCollisions()
                         }
                     }
 
-                    if (isRBIgnored(rb))
-                    {
-                        continue;
-                    }
-
                     if(rb)
                     {
-//                        std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
-                        m_bContact = true;
+                        if (isRBIgnored(rb))
+                        {
+                            continue;
+                        }
+                        else{
+//                            std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
+                            m_bContact = true;
+                        }
                     }
                 }
             }
