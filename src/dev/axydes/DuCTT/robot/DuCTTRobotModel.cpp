@@ -470,7 +470,6 @@ void DuCTTRobotModel::step(double dt)
 
 void DuCTTRobotModel::onVisit(tgModelVisitor& r)
 {
-    // Example: m_rod->getRigidBody()->dosomething()...
     tgModel::onVisit(r);
 }
 
@@ -565,4 +564,19 @@ void DuCTTRobotModel::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
+
+    allMuscles.clear();
+    vertMuscles.clear();
+    saddleMuscles.clear();
+    allPrisms.clear();
+    allRods.clear();
+    bottomRods.clear();
+    topRods.clear();
+    prismRods.clear();
+    spheres.clear();
+    bottomSpheres.clear();
+    topSpheres.clear();
+    allTouchSensors.clear();
+    bottomSpheres.clear();
+    topTouchSensors.clear();
 }
