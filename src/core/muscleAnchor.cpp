@@ -36,6 +36,7 @@
 
 #define USE_BASIS
 #define SKIP_CONTACT_UPDATE
+//#define VERBOSE
 
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
@@ -60,13 +61,14 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   manifold(m)
 {
 	assert(body);
-
+	
+	// Ensure we're either not using a manifold, or we currently have the right manifold
 	assert(manifold == NULL || body == manifold->getBody0() || body == manifold->getBody1());
 }
 
 muscleAnchor::~muscleAnchor()
 {
-    // World will delete attached body
+    // World will delete attached body, bullet owns the manifolds
     
 }
 
@@ -87,10 +89,12 @@ btVector3 muscleAnchor::getWorldPosition() const
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
 	bool ret = false;
-	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
-	
+
+	// Only sliding anchors should have their positions changed
 	if (sliding)
 	{
+		/// @todo - this is very similar to getManifoldDistance. Is there a good way to combine them??
+		// Figure out which body to use
 		bool useB = true;
 		if (manifold->getBody0() != attachedBody)
 		{
@@ -101,12 +105,13 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 		{	
 			btScalar length = INFINITY;
 			
-			
 			int n = manifold->getNumContacts();
 			
 			btVector3 contactPos = getWorldPosition();
 			btVector3 newNormal = contactNormal;
 			btScalar dist = 0.0;
+			
+			// Find closest contact point in this manifold
 			for (int p = 0; p < n; p++)
 			{
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
@@ -123,25 +128,27 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					
 					btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
 					
-					#ifdef USE_BASIS
+#ifdef USE_BASIS
 					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
-					#else
+#else
 					newNormal = pt.m_normalWorldOnB * directionSign;
-					#endif
+#endif
 					dist = pt.getDistance();
 					
+#if VERBOSE					
 					if (n >= 2)
 					{
 						std::cout << "Extra contacts!! " << dist << std::endl;
 					}
-					
+#endif					
 				}
 				
 			}
 			
 			// We've lost this contact for some reason, skip update and delete
 			if (!(dist > 0.0 && length < 0.01))
-			{
+			{	
+				// If contact is sufficiently close, update
 				if (length < 0.1)
 				{
 					// This makes contact handling better in some cases and worse in other
@@ -164,17 +171,19 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					contactNormal = newNormal;
 	#endif	
 				}
+				// Check if the update was bad based on the original position, if not delete
 				else if ( (getWorldPosition() - contactPos).length() <= 0.1)
 				{
 					ret = true;
 				}
 			}
 		}
-		
+		// Else: neither body is attached, delete
 	}
 	else
 	{
-		std::cerr << "Tried to update a static anchor" << std::endl;		
+		std::cerr << "Tried to update a static anchor" << std::endl;
+		// This will return as a delete, make sure you check the anchor is not permanent		
 	}
 	
 	return ret;
@@ -197,19 +206,23 @@ btVector3 muscleAnchor::getContactNormal() const
 
 void muscleAnchor::updateManifold(btPersistentManifold* m)
 {
+	// Does the new manifold actually affect the attached body
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
 		std::pair<btScalar, btVector3> manifoldValues = getManifoldDistance(m);
 		btScalar newDist = manifoldValues.first;
+		// If the original manifold is NULL, just use the new one
 		if (!manifold)
 		{
 			manifold = m;
 		}
+		// Use new manifold
 		else if (getManifoldDistance(manifold).first >= newDist)
 		{
 			manifold = m;
 		}
 		
+		// If we updated, ensure the new contact normal is good
 		if(manifold == m)
 		{
 			btVector3 newNormal = manifoldValues.second;
@@ -227,7 +240,6 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
 {
 	bool useB = true;
-	bool colCheck = true;
 	
 	btScalar length = INFINITY;
 	btVector3 newNormal = contactNormal;
@@ -236,14 +248,9 @@ std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentMan
 	{
 		useB = false;			
 	}
-	if(!useB && m->getBody1() != attachedBody)
-	{
-		colCheck = false;
-	}
-	if (colCheck)
+	if(useB || m->getBody1() == attachedBody)
 	{	
-	
-					
+			
 		int n = m->getNumContacts();
 		
 		btVector3 contactPos = getWorldPosition();

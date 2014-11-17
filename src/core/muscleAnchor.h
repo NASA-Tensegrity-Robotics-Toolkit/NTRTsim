@@ -101,7 +101,7 @@ private:
 	
 	btVector3 contactNormal;
 	
-	// Not const
+	// Not const, bullet owns this
 	btPersistentManifold* manifold;
 	
 	// Store force so we can normalize it on a per-body basis
