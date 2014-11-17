@@ -355,8 +355,6 @@ void MuscleNP::updateManifolds()
 						btScalar lengthA = lineA.length();
 						btScalar lengthB = lineB.length();
 						
-						anchorLength = backAnchor->getCablePosition() + lengthB;
-						
 						// Not permanent, sliding contact
 						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, anchorLength, m_touchingNormal, false, true, manifold);
 						
@@ -443,8 +441,6 @@ void MuscleNP::updateAnchorList()
 		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 		
 		bool del = false;	
-		
-		newAnchor->m_cablePosition = backAnchor->getCablePosition() + lengthB;
 		
 		// These may have changed, so check again				
 		if (lengthB <= 0.01 && newAnchor->attachedBody == backAnchor->attachedBody )
@@ -832,9 +828,4 @@ bool MuscleNP::anchorCompare::comparePoints(btVector3& pt2, btVector3& pt3) cons
 	   
 	   return lhDot < rhDot;
 
-}
-
-bool MuscleNP::anchorPosCompare::operator()(const muscleAnchor* lhs, const muscleAnchor* rhs) const
-{
-	return lhs->getCablePosition() < rhs->getCablePosition();
 }

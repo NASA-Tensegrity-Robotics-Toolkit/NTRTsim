@@ -73,12 +73,7 @@ public:
 	{
 		return force;
 	}
-	
-	btScalar getCablePosition() const
-	{
-		return m_cablePosition;
-	}
-	
+
 	// Address should never be changed, body is not const
     btRigidBody * const attachedBody;
 	

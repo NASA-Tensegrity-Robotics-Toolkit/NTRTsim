@@ -83,11 +83,6 @@ private:
            const muscleAnchor* const ma2;
     };
     
-    struct anchorPosCompare
-    {
-		bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
-	};
-    
     void updateManifolds();
     
     void updateAnchorList();
