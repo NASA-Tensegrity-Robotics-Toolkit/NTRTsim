@@ -338,8 +338,7 @@ void MuscleNP::updateManifolds()
 					
 					if(rb)
 					{  
-						btScalar anchorLength = 0.0;
-						
+
 						int anchorPos = findNearestPastAnchor(pos);
 						assert(anchorPos < m_anchors.size() - 1);
 						
@@ -356,7 +355,7 @@ void MuscleNP::updateManifolds()
 						btScalar lengthB = lineB.length();
 						
 						// Not permanent, sliding contact
-						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, anchorLength, m_touchingNormal, false, true, manifold);
+						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 						
 						btVector3 contactNormal = newAnchor->getContactNormal();
 									

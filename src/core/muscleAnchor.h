@@ -44,7 +44,6 @@ public:
 
     muscleAnchor(btRigidBody *body, 
 					btVector3 pos,
-					btScalar cPos,
 					btVector3 cn = btVector3(0.0, 0.0, 0.0),
 					bool perm = true, 
 					bool slide = false,
@@ -108,8 +107,6 @@ private:
 	// Store force so we can normalize it on a per-body basis
 	btVector3 force;
 	
-	// The position of the cable along the string. Allows for global sort
-	btScalar m_cablePosition;
 };
 
 #endif //NTRT_MUSCLE_ANCHOR_H_

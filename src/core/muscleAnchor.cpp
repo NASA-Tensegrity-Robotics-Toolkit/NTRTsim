@@ -39,7 +39,6 @@
 
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
-               btScalar cPos,
                btVector3 cn,
                bool perm,
                bool slide,
@@ -49,7 +48,6 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
-  m_cablePosition(cPos),
 #ifdef USE_BASIS
   contactNormal(attachedBody->getWorldTransform().inverse().getBasis() * cn),
 #else
