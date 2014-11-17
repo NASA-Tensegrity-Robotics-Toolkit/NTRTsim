@@ -50,10 +50,35 @@ class btBroadphaseInterface;
 class btPersistentManifold;
 class btDispatcher;
 
+/**
+ * An extension of Muscle2P that places a ghostObject into the bullet world
+ * and then uses that object to generate collision dynamics. The
+ * ghost object is updated every time step to account for the new
+ * shape of the string. Anchors track their associated btPersistentManifold
+ * to determine whether they are still in contact with the rigid object. The string
+ * is massless, but collision handling should conserve momentum (see unit tests)
+ * 
+ * This could eventually be merged with Corde for a massive, low node
+ * string.
+ */
 class MuscleNP : public Muscle2P
 {
 public:
-
+	
+	/**
+	 * The only constructor. Requires a number of parameters typically
+	 * provided by the builder tools, in this case tgMultiPointStringInfo
+	 * @param[in] ghostObject - the btPairCashingGhostObject that this interacts with
+	 * @param[in] world - the tgWorld - we need to keep access to the bullet 
+	 * dynamics world's broadphase so that we can determine collisions and contact points
+	 * @param[in] body1 - The rigid body associated with anchor1, a member variable of Muscle2P
+	 * @param[in] pos1 - The world position associated with anchor1, a member variable of Muscle2P
+	 * @param[in] body2 - The rigid body associated with anchor2, a member variable of Muscle2P
+	 * @param[in] coefK - The stiffness of this cable. Units are 
+	 * mass / sec^2, sets a member variable of Muscle2P
+	 * @param[in] dampingCofefficient - The damping coefficient of the force application equation.
+	 * Units are mass / sec, sets a member variable of Muscle2P
+	 */
     MuscleNP(btPairCachingGhostObject* ghostObject,
             tgWorld& world,
          btRigidBody * body1,
@@ -62,13 +87,34 @@ public:
          btVector3 pos2,
          double coefK,
          double dampingCoefficient);
-         
-   virtual ~MuscleNP();
     
+    /**
+     * The destructor. Removes the ghost object from the world,
+     * deletes its collision shape, and then deletes the object.
+     * Muscle2P ensures all anchors are deleted
+     */     
+	virtual ~MuscleNP();
+    
+    /**
+     * @return a btScalar of the string's actual length - the sum of the
+     * lengths between the anchors.
+     */
     virtual const btScalar getActualLength() const;
     
-    ///@todo change this to update(dt) or similar, since that's the role its serving
-    virtual btVector3 calculateAndApplyForce(double dt);
+    /**
+     * The "update" function for MuscleNP. In addition to calculating and
+     * applying the force, this calls:
+     * updateManifolds()
+     * pruneAnchors()
+     * updateAnchorList()
+     * pruneAnchors()
+     * THEN it calculates and applies the forces (calculating permanent anchors
+     * and sliding contacts slightly differently) and distributes them so momentum
+     * is conserved
+     * finally updateCollisionObject()
+     * @todo change this to update(dt) or similar, since that's the role its serving
+    */
+    virtual void calculateAndApplyForce(double dt);
     
 private:
   

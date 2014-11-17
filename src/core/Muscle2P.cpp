@@ -52,7 +52,7 @@ anchor2(new muscleAnchor(body2, pos2))
 	m_anchors.insert(m_anchors.end(), anchor2);
 }
 
-btVector3 Muscle2P::calculateAndApplyForce(double dt)
+void Muscle2P::calculateAndApplyForce(double dt)
 {
     btVector3 force(0.0, 0.0, 0.0);
     double magnitude = 0.0;
@@ -103,8 +103,6 @@ btVector3 Muscle2P::calculateAndApplyForce(double dt)
     btVector3 point2 = this->anchor2->getRelativePosition();
     this->anchor2->attachedBody->activate();
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
-
-    return force;
 }
 
 void Muscle2P::setRestLength( const double newRestLength)

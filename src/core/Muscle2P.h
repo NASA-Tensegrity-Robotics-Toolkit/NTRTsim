@@ -51,7 +51,7 @@ public:
     virtual ~Muscle2P();
 
     // Called by tensegrity class update function for each muscle2p
-    virtual btVector3 calculateAndApplyForce(double dt);
+    virtual void calculateAndApplyForce(double dt);
     
     void setName(std::string a) { name = a; }
     

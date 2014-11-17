@@ -96,7 +96,7 @@ const btScalar MuscleNP::getActualLength() const
     return length;
 }
 
-btVector3 MuscleNP::calculateAndApplyForce(double dt)
+void MuscleNP::calculateAndApplyForce(double dt)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("calculateAndApplyForce");
