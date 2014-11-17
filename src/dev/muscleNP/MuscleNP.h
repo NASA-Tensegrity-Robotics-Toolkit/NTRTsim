@@ -103,10 +103,10 @@ private:
     int findNearestPastAnchor(btVector3& pos);
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
-    
+   
     btVector3 m_forceTotals;
     btVector3 m_forceScales;
-    
+   
     std::vector<muscleAnchor*> m_newAnchors;
     
     tgWorld&  m_world;

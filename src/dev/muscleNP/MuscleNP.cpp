@@ -109,10 +109,10 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	updateAnchorList();
 	
 	pruneAnchors();
-	
+
 	m_forceTotals = btVector3(0.0, 0.0, 0.0);
     m_forceScales = btVector3(1.0, 1.0, 1.0);
-	
+
 	const double tension = getTension();
     const double currLength = getActualLength();
     
@@ -168,11 +168,9 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			if (getActualLength() >= 12.0)
 			{
 				std::cout << "Here! " << std::endl;
-			}
-			
+			}			
             // Only care about scaling sliding forces
             m_forceTotals += force;
-
         }
         else
         {
@@ -183,7 +181,6 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
          
     }
     
-
 	btVector3 maxForce = (anchor1->force + anchor2->force);
 	
 	for (std::size_t i = 0; i < 3; i++)
@@ -200,13 +197,14 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 
 	std::cout << m_forceScales << std::endl;
 
+
     for (std::size_t i = 0; i < n; i++)
     {
 		btRigidBody* body = m_anchors[i]->attachedBody;
 		
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
-		
+	
 		// Scale the force of the sliding anchors
 		if (m_anchors[i]->sliding)
 		{
@@ -639,8 +637,8 @@ void MuscleNP::updateCollisionObject()
     m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
 	
-	// Delete the existing contacts in bullet to prevent sticking
-	//m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
+	// Delete the existing contacts in bullet to prevent sticking - may exacerbate problems with rotations
+	m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
 }
 
 void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)

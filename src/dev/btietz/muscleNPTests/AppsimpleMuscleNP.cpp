@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 	const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
 	
 	// the world will delete this
-#if (0)
+#if (1)
 	tgBoxGround* ground = new tgBoxGround(groundConfig);
 #else
 	tgEmptyGround* ground = new tgEmptyGround();
