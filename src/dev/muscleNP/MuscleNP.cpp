@@ -19,6 +19,8 @@
 /**
  * @file MuscleNP.cpp
  * @brief Definition of a massless cable with contact dynamics
+ * @author Brian Mirletz
+ * @date November 2014
  * $Id$
  */
 
@@ -66,10 +68,7 @@ MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  double dampingCoefficient) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
-m_world(world),
-m_overlappingPairCache(tgBulletUtil::worldToDynamicsWorld(world).getBroadphase()),
-m_dispatcher(tgBulletUtil::worldToDynamicsWorld(world).getDispatcher()),
-m_ac(anchor1, anchor2)
+m_world(world)
 {
 
 }
@@ -111,8 +110,8 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 	
 	pruneAnchors();
 	
-	m_rbForceMap.clear();
-    m_rbForceScales.clear();
+	m_forceTotals = btVector3(0.0, 0.0, 0.0);
+    m_forceScales = btVector3(1.0, 1.0, 1.0);
 	
 	const double tension = getTension();
     const double currLength = getActualLength();
@@ -149,10 +148,7 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
         }
         else if (i < n - 1)
         {
-			// Will fail if we already have this rigid body, but makes sure we're properly initialized otherwise
-			m_rbForceMap.insert(std::pair<btRigidBody*, btVector3>(m_anchors[i]->attachedBody, btVector3(0.0, 0.0, 0.0)) );
-			
-            // Already normalized
+			// Already normalized
             btVector3 direction = m_anchors[i]->getContactNormal();
             
 			// Get normal to string
@@ -165,23 +161,17 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 			btVector3 second = (current - back);
 			
 			btVector3 forceDir = (first.normalize()  + second.normalize() ).normalize();
-#if (1)			
+		
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
-#else // Below is almost certainly wrong
-			btVector3 lineACopy = -first;
-			btVector3 lineBCopy = -second;
-			btVector3 abNorm = (lineACopy.normalize() + lineBCopy.normalize()).normalize();
 			
-			// Project normal into AB plane
-			btVector3 normalProjection = abNorm.dot(direction) * abNorm;
+			if (getActualLength() >= 12.0)
+			{
+				std::cout << "Here! " << std::endl;
+			}
 			
-			force = tension * abNorm * direction;
-			
-			assert(force.length() <= tension);
-#endif            
             // Only care about scaling sliding forces
-            m_rbForceMap[m_anchors[i]->attachedBody] += force;
+            m_forceTotals += force;
 
         }
         else
@@ -193,43 +183,23 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
          
     }
     
-	std::map<btRigidBody*, btVector3>::iterator m_forceMapIt;
+
+	btVector3 maxForce = (anchor1->force + anchor2->force);
 	
-	for(m_forceMapIt = m_rbForceMap.begin(); m_forceMapIt != m_rbForceMap.end(); ++m_forceMapIt)
-	{	
-		btVector3 totalForce = m_forceMapIt->second;
-		btVector3 forceScale(1.0, 1.0, 1.0);
-
-#if (0)		
-		btScalar maxForce = (anchor1->force + anchor2->force).length();
-		std::cout << maxForce << std::endl;
-#else
-		btVector3 maxForce = (anchor1->force + anchor2->force);
-		
-		for (std::size_t i = 0; i < 3; i++)
+	for (std::size_t i = 0; i < 3; i++)
+	{
+		if (m_forceTotals[i] != maxForce[i] && m_forceTotals[i] != 0.0)
 		{
-			if (totalForce[i] != maxForce[i] && totalForce[i] != 0.0)
-			{
-				forceScale[i] = btFabs(maxForce[i] / totalForce[i]);
-			}
-			else if (totalForce[i] == 0.0)
-			{
-				forceScale[i] = 0.0;
-			}
-		} 
-#endif
-
-#if (0)
-		// Might be able to come up with a more accurate than maximum. This is theoretical, but is a pretty special case
-		if (totalForce != maxForce && totalForce != 0.0)
-		{
-			forceScale = maxForce / totalForce;
+			m_forceScales[i] = btFabs(maxForce[i] / m_forceTotals[i]);
 		}
-#endif
-		std::cout << forceScale << std::endl;
-		m_rbForceScales.insert(std::pair<btRigidBody*, btVector3> (m_forceMapIt->first, forceScale));
-	}
-    
+		else if (m_forceTotals[i] == 0.0)
+		{
+			m_forceScales[i] = 1.0;
+		}
+	} 
+
+	std::cout << m_forceScales << std::endl;
+
     for (std::size_t i = 0; i < n; i++)
     {
 		btRigidBody* body = m_anchors[i]->attachedBody;
@@ -237,16 +207,13 @@ btVector3 MuscleNP::calculateAndApplyForce(double dt)
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
 		
-		btVector3 forceScale(1.0, 1.0, 1.0);
 		// Scale the force of the sliding anchors
 		if (m_anchors[i]->sliding)
 		{
-			forceScale = m_rbForceScales[body];
+			// Elementwise multiply
+			m_anchors[i]->force *= m_forceScales;
 		}
-		
-		// Elementwise multiply
-		m_anchors[i]->force *= forceScale ;
-		
+
 		btVector3 impulse = m_anchors[i]->force* dt;
 		
 		body->applyImpulse(impulse, contactPoint);
@@ -269,6 +236,8 @@ void MuscleNP::updateManifolds()
     
 	btManifoldArray	m_manifoldArray;
 	btVector3 m_touchingNormal;
+	
+	btBroadphaseInterface* const m_overlappingPairCache = tgBulletUtil::worldToDynamicsWorld(m_world).getBroadphase();
 	
 	// Only caches the pairs, they don't have a lot of useful information
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
@@ -362,32 +331,40 @@ void MuscleNP::updateManifolds()
 						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
 						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
 						
+						btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+						btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+						
+						std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
+						
 						bool del = false;					
-						if (lengthB <= 0.1 && rb == backAnchor->attachedBody )
+						if (lengthB <= 0.1 && rb == backAnchor->attachedBody && mDistB < mDistA)
 						{
-							backAnchor->updateManifold(manifold);
-							del = true;
+							if(backAnchor->updateManifold(manifold))
+								del = true;
+								std::cout << "UpdateB " << mDistB << std::endl;
 						}
-						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody)
+						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody && mDistA < mDistB)
 						{
-							forwardAnchor->updateManifold(manifold);
-							del = true;
+							if (forwardAnchor->updateManifold(manifold))
+								del = true;
+								std::cout << "UpdateA " << mDistA << std::endl;
 						}
 						
 						if (del)
 						{
+							/// @todo further examination of whether the anchors should be deleted here
 							delete newAnchor;
 						}
 						else
 						{
 											
 							m_newAnchors.push_back(newAnchor);
-						}
-					}
-				}
-			}
-		}
-	}
+						} // If anchor passes distance tests
+					} // If body is a rigid body
+				} // If distance less than 0.0
+			} // For number of contacts
+		} // For number of manifolds
+	} // For pairs of objects
 
 	
 }
@@ -413,23 +390,9 @@ void MuscleNP::updateAnchorList()
 		
 		btVector3 pos0 = backAnchor->getWorldPosition();
 		btVector3 pos2 = forwardAnchor->getWorldPosition();
-#if (0)
-		btVector3 pos3;
-		if (m_anchorIt != (m_anchors.end() - 1))
-		{
-			pos3 = (*(m_anchorIt + 1))->getWorldPosition();
-		}
-		else
-		{
-			pos3 = anchor2->getWorldPosition();
-		}
-		
-		btVector3 lineC = (pos3 - pos1);
-#endif		
 			
 		btVector3 lineA = (pos2 - pos1);
 		btVector3 lineB = (pos0 - pos1);
-		
 		
 		btScalar lengthA = lineA.length();
 		btScalar lengthB = lineB.length();
@@ -441,16 +404,25 @@ void MuscleNP::updateAnchorList()
 		
 		bool del = false;	
 		
+		btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+		btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+		
+		std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
+		
 		// These may have changed, so check again				
-		if (lengthB <= 0.01 && newAnchor->attachedBody == backAnchor->attachedBody )
+		if (lengthB <= 0.1 && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
 		{
-			backAnchor->updateManifold(newAnchor->getManifold());
-			del = true;
+			if(backAnchor->updateManifold(newAnchor->getManifold()))
+			{	
+				del = true;
+				std::cout << "UpdateB " << mDistB << std::endl;
+			}
 		}
-		if (lengthA <= 0.01 && newAnchor->attachedBody == forwardAnchor->attachedBody)
+		if (lengthA <= 0.1 && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
 		{
-			forwardAnchor->updateManifold(newAnchor->getManifold());
-			del = true;
+			if(forwardAnchor->updateManifold(newAnchor->getManifold()))
+				del = true;
+				std::cout << "UpdateA " << mDistA << std::endl;
 		}
 
 		if (del)
@@ -471,21 +443,7 @@ void MuscleNP::updateAnchorList()
 			numContacts++;
 		}
 	}
-
-#if (0)    
-    // Remove the permanaent anchors for sorting
-    assert(*m_anchors.begin() == anchor1);
-    m_anchors.erase(m_anchors.begin());
-    assert(*(m_anchors.end() - 1) == anchor2);
-    m_anchors.erase(m_anchors.end() - 1);
-    
-    std::sort (m_anchors.begin(), m_anchors.end(), m_ac);
-    
-    // Add these last to ensure we're in the right order
-
-    m_anchors.insert(m_anchors.begin(), anchor1);
-	m_anchors.insert(m_anchors.end(), anchor2);
-#endif    
+   
     //std::cout << "contacts " << numContacts << " unprunedAnchors " << m_anchors.size();
     
     //std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
@@ -499,7 +457,7 @@ void MuscleNP::pruneAnchors()
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0 || passes <= 2)
+    while (numPruned > 0 || passes <= 3)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
@@ -556,7 +514,7 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() < 0.01 || lineB.length() < 0.01)
+				if (lineA.length() < 0.05 || lineB.length() < 0.05)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
@@ -582,6 +540,7 @@ void MuscleNP::pruneAnchors()
 					}
 					else
 					{
+						// Permanent anchor, move on
 						i++;
 					}
 				}
@@ -592,7 +551,14 @@ void MuscleNP::pruneAnchors()
 			}
 			
         }
-        passes++;
+        if (numPruned == 0)
+        {
+			passes++;
+		}
+		else
+		{
+			passes = 0;
+		}
     }
     
     //std::cout << " Good Normal " << m_anchors.size();
@@ -613,14 +579,11 @@ void MuscleNP::updateCollisionObject()
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("updateCollisionObject");
 #endif //BT_NO_PROFILE    
-    btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
-    tgWorldBulletPhysicsImpl& bulletWorld =
-      (tgWorldBulletPhysicsImpl&)m_world.implementation();
-    
-    // Removing/adding the collision object consumes about 75% of the computational time for this step
-    // Sadly, it is necessary since we delete and update the collision shape
-    //m_dynamicsWorld.removeCollisionObject(m_ghostObject);
-    // Consider managing this more locally
+	
+	btDispatcher* m_dispatcher = tgBulletUtil::worldToDynamicsWorld(m_world).getDispatcher();
+	btBroadphaseInterface* const m_overlappingPairCache = tgBulletUtil::worldToDynamicsWorld(m_world).getBroadphase();
+	
+    // Clear the existing child shapes
     btCompoundShape* m_compoundShape = tgCast::cast<btCollisionShape, btCompoundShape> (m_ghostObject->getCollisionShape());
     clearCompoundShape(m_compoundShape);
     
@@ -649,19 +612,14 @@ void MuscleNP::updateCollisionObject()
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
-	btTransform transform;
-    transform.setOrigin(center);
-    transform.setRotation(btQuaternion::getIdentity());
-    
     btScalar radius = 0.001;
 
-    //btCompoundShape* m_compoundShape = new btCompoundShape(&m_world);
-    
     for (std::size_t i = 0; i < n-1; i++)
     {
         btVector3 pos1 = m_anchors[i]->getWorldPosition();
         btVector3 pos2 = m_anchors[i+1]->getWorldPosition();
         
+        // Children handles the orientation data
         btTransform t = tgUtil::getTransform(pos2, pos1);
         t.setOrigin(t.getOrigin() - center);
         
@@ -674,15 +632,15 @@ void MuscleNP::updateCollisionObject()
     }
     //m_compoundShape->setMargin(0.01);
     
+    btTransform transform;
+    transform.setOrigin(center);
+    transform.setRotation(btQuaternion::getIdentity());
+    
     m_ghostObject->setCollisionShape (m_compoundShape);
     m_ghostObject->setWorldTransform(transform);
 	
-	// This also affects contact drawing
+	// Delete the existing contacts in bullet to prevent sticking
 	//m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
-	
-    // @todo look up what the second and third arguments of this are
-    //m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
-
 }
 
 void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)

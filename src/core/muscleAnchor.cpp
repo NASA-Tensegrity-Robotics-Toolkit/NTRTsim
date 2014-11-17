@@ -34,7 +34,9 @@
 #include <cassert>
 #include <stdexcept>
 
+// Does the contact normal get updated using the body's rotation? (99% sure its yes)
 #define USE_BASIS
+// Do we update the contact based on the manifold?
 #define SKIP_CONTACT_UPDATE
 //#define VERBOSE
 
@@ -204,8 +206,9 @@ btVector3 muscleAnchor::getContactNormal() const
 
 }
 
-void muscleAnchor::updateManifold(btPersistentManifold* m)
+bool muscleAnchor::updateManifold(btPersistentManifold* m)
 {
+	bool ret = false;
 	// Does the new manifold actually affect the attached body
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
@@ -215,11 +218,13 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 		if (!manifold)
 		{
 			manifold = m;
+			ret = true;
 		}
 		// Use new manifold
 		else if (getManifoldDistance(manifold).first >= newDist)
 		{
 			manifold = m;
+			ret = true;
 		}
 		
 		// If we updated, ensure the new contact normal is good
@@ -231,10 +236,13 @@ void muscleAnchor::updateManifold(btPersistentManifold* m)
 				 throw std::runtime_error("Reversed normal");
 			}
 			#ifndef SKIP_CONTACT_UPDATE
-			contactNormal = newNormal;
+			// Updating here appears to break conservation of momentum
+			//contactNormal = newNormal;
 			#endif
 		}
 	}
+	
+	return ret;
 }
 
 std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentManifold* m) const

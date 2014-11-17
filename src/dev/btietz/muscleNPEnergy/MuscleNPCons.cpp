@@ -138,7 +138,9 @@ void MuscleNPCons::step(double dt)
 	{
 		tgBaseRigid& ri = *(allRods[i]);
 		btRigidBody* body = ri.getPRigidBody();
-		vCom += body->getVelocityInLocalPoint(btVector3(0.0, 0.0, 0.0)) * ri.mass();
+		btVector3 localVel = body->getVelocityInLocalPoint(btVector3(0.0, 0.0, 0.0));
+		vCom += localVel * ri.mass();
+		energy += localVel.length2() * ri.mass();
 		mass += ri.mass();
 	}
 	
@@ -153,6 +155,7 @@ void MuscleNPCons::step(double dt)
 	
 	
 	std::cout << "Momentum " << vCom << std::endl;
+	std::cout << "Energy " << energy << std::endl;
 	std::cout << "Force sum " << forceSum << std::endl;
 	std::cout << "Length " << allMuscles[0]->getCurrentLength();
 	std::cout << " Dist " << (anchorList[0]->getWorldPosition() - anchorList[n-1]->getWorldPosition()).length() << std::endl;

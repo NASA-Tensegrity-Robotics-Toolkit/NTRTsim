@@ -22,6 +22,8 @@
 /**
  * @file MuscleNP.h
  * @brief Definition of a massless cable with contact dynamics
+ * @author Brian Mirletz
+ * @date November 2014
  * $Id$
  */
 
@@ -102,26 +104,17 @@ private:
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;
     
-    std::map<btRigidBody*, btVector3> m_rbForceMap;
-    std::map<btRigidBody*, btVector3> m_rbForceScales;
+    btVector3 m_forceTotals;
+    btVector3 m_forceScales;
     
     std::vector<muscleAnchor*> m_newAnchors;
     
+    tgWorld&  m_world;
+    
 protected:  
     
-  
    btPairCachingGhostObject* m_ghostObject;
-   
-   tgWorld&  m_world;
-   
-   btBroadphaseInterface* const m_overlappingPairCache;
-  
-  btDispatcher* const m_dispatcher;
-  
-   const anchorCompare m_ac;
 
-    
-   
 };
 
 #endif  // NTRT_MUSCLENP_H_

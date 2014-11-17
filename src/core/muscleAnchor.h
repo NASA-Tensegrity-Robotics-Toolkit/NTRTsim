@@ -22,6 +22,7 @@
 /**
  * @file MuscleAnchor.h
  * @brief Definitions of class MuscleAnchor.
+ * @author Brian Mirletz and Atil Iscen
  * $Id$
  */
 
@@ -61,7 +62,7 @@ public:
     
     btVector3 getContactNormal() const;
     
-    void updateManifold(btPersistentManifold* m);
+    bool updateManifold(btPersistentManifold* m);
 	
 	btPersistentManifold* getManifold() const
 	{
@@ -93,9 +94,11 @@ public:
      */
     const bool sliding;
     
+    std::pair<btScalar, btVector3> getManifoldDistance(btPersistentManifold* m) const;
+    
 private:
 
-	std::pair<btScalar, btVector3> getManifoldDistance(btPersistentManifold* m) const;
+	
 	 // Relative to the body when it is first constructed
     btVector3 attachedRelativeOriginalPosition;
 	
