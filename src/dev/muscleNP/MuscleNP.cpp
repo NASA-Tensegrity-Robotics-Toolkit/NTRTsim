@@ -164,11 +164,7 @@ void MuscleNP::calculateAndApplyForce(double dt)
 		
 			// Apply dot of contact normal with string's normal
 			force = (tension * direction).dot(forceDir) * forceDir;
-			
-			if (getActualLength() >= 12.0)
-			{
-				std::cout << "Here! " << std::endl;
-			}			
+						
             // Only care about scaling sliding forces
             m_forceTotals += force;
         }
@@ -195,8 +191,9 @@ void MuscleNP::calculateAndApplyForce(double dt)
 		}
 	} 
 
-	std::cout << m_forceScales << std::endl;
-
+#ifdef VERBOSE
+	std::cout << "Force Scaling " <<  m_forceScales << std::endl;
+#endif
 
     for (std::size_t i = 0; i < n; i++)
     {
@@ -332,20 +329,20 @@ void MuscleNP::updateManifolds()
 						btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 						btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 						
-						std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
+						//std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
 						
 						bool del = false;					
 						if (lengthB <= 0.1 && rb == backAnchor->attachedBody && mDistB < mDistA)
 						{
 							if(backAnchor->updateManifold(manifold))
 								del = true;
-								std::cout << "UpdateB " << mDistB << std::endl;
+								//std::cout << "UpdateB " << mDistB << std::endl;
 						}
 						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody && mDistA < mDistB)
 						{
 							if (forwardAnchor->updateManifold(manifold))
 								del = true;
-								std::cout << "UpdateA " << mDistA << std::endl;
+								//std::cout << "UpdateA " << mDistA << std::endl;
 						}
 						
 						if (del)
@@ -405,7 +402,7 @@ void MuscleNP::updateAnchorList()
 		btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 		btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 		
-		std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
+		//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
 		
 		// These may have changed, so check again				
 		if (lengthB <= 0.1 && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
@@ -413,14 +410,14 @@ void MuscleNP::updateAnchorList()
 			if(backAnchor->updateManifold(newAnchor->getManifold()))
 			{	
 				del = true;
-				std::cout << "UpdateB " << mDistB << std::endl;
+				//std::cout << "UpdateB " << mDistB << std::endl;
 			}
 		}
 		if (lengthA <= 0.1 && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
 		{
 			if(forwardAnchor->updateManifold(newAnchor->getManifold()))
 				del = true;
-				std::cout << "UpdateA " << mDistA << std::endl;
+				//std::cout << "UpdateA " << mDistA << std::endl;
 		}
 
 		if (del)
