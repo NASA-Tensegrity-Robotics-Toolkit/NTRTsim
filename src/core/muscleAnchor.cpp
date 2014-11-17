@@ -86,24 +86,18 @@ btVector3 muscleAnchor::getWorldPosition() const
 
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
-	/// @todo reverse this so we can get rid of a lot of else statements
-	bool ret = true;
+	bool ret = false;
 	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
 	
 	if (sliding)
 	{
 		bool useB = true;
-		bool update = true;
-		bool colCheck = true;
 		if (manifold->getBody0() != attachedBody)
 		{
 			useB = false;			
 		}
-		if(!useB && manifold->getBody1() != attachedBody)
-		{
-			colCheck = false;
-		}
-		if (colCheck)
+		
+		if(useB || manifold->getBody1() == attachedBody)
 		{	
 			btScalar length = INFINITY;
 			
@@ -145,58 +139,42 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 				
 			}
 			
-			// Assume we've lost this contact for some reason
-			
-			if (dist > 0.0 && length < 0.01)
+			// We've lost this contact for some reason, skip update and delete
+			if (!(dist > 0.0 && length < 0.01))
 			{
-				ret = false;
-			}
-			
-			
-			if (length > 0.1)
-			{
-				// This makes contact handling better in some cases and worse in other
-				// Better conservation of momentum without it, but contacts tend to exist a little too long
-				update = false;
-				// Just deleting at this stage is better for sliding, but worse for contact with multiple bodies
-			}
-			if (update)
-			{
-				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
-						   newPos;
-				
-				if ((newNormal + contactNormal).length() < 0.5)
-				{
-					std::cout<< "Reversed normal" << std::endl;
-					ret = false;
-				}
-				
-				// Update again here in case we have the original manifold??
 				if (length < 0.1)
 				{
-					#ifndef SKIP_CONTACT_UPDATE
+					// This makes contact handling better in some cases and worse in other
+					// Better conservation of momentum without it, but contacts tend to exist a little too long
+					// Just deleting at this stage is better for sliding, but worse for contact with multiple bodies
+					attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
+							   newPos;
+					
+					if ((newNormal + contactNormal).length() < 0.5)
+					{
+						std::cout<< "Reversed normal" << std::endl;
+					}
+					else
+					{
+						ret = true;
+					}
+					
+	// Update again here in case we have the original manifold??			
+	#ifndef SKIP_CONTACT_UPDATE
 					contactNormal = newNormal;
-					#endif
+	#endif	
+				}
+				else if ( (getWorldPosition() - contactPos).length() <= 0.1)
+				{
+					ret = true;
 				}
 			}
-			else if ((getWorldPosition() - contactPos).length() > 0.1)
-			{
-				ret = false;
-			}
 		}
-		else
-		{
-			ret = false;
-		}
-		
 		
 	}
 	else
 	{
-		ret = false;
-		
-		std::cerr << "Tried to update a static anchor" << std::endl;
-		
+		std::cerr << "Tried to update a static anchor" << std::endl;		
 	}
 	
 	return ret;
