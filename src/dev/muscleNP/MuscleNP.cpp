@@ -763,6 +763,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	}
 	else
 	{
+		std::cout << "iterating backwards!" << std::endl;
 		// Start over, iterate from the back, see if its better
 		btScalar endDist = (pos - m_anchors[n]->getWorldPosition()).length();
 		btScalar dist2 = endDist;
