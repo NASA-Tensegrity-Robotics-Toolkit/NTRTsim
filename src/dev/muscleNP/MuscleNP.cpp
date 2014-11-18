@@ -770,9 +770,9 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		
 		int j = n;
 		
-		while (dist2 <= endDist && i > 0)
+		while (dist2 <= endDist && j > 0)
 		{
-			i--;
+			j--;
 			btVector3 anchorPos = m_anchors[j]->getWorldPosition();
 			dist2 = (pos - anchorPos).length();
 			if (dist2 < endDist)
@@ -780,12 +780,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 				endDist = dist2;
 			}
 		}
-		/*
-		if (dist2 > endDist)
-		{
-			j++;
-		}
-		*/
+		
 		if (j == n)
 		{
 			j--;
@@ -807,13 +802,8 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 			
 			m_acTemp.comparePoints(pos, current) ? j-- : j+=0;
 			
-			btScalar length1 = (m_anchors[j]->getWorldPosition() - pos).length();
-			btScalar length2 = (a0->getWorldPosition() - pos).length();
-			
-			if (length1 < length2)
-			{
-				std::cout << "Length issues in back iterations!! " << length1 << " " << length2 << std::endl;
-			}
+			// This assert doesn't work due to iteration order. Is there a comparable assert?
+			//assert((m_anchors[j]->getWorldPosition() - pos).length() <= (a0->getWorldPosition() - pos).length());
 		}
 		
 		// Check to make sure it's actually in this line
@@ -829,10 +819,12 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		}
 		else
 		{
-			i = j;
+			//i = j;
 			if ( i !=j )
+			{
 				std::cout << "First try: " << i << " Second Try: " << j << std::endl;
-			//throw std::runtime_error("Neither the front nor back iterations worked!");
+				//throw std::runtime_error("Neither the front nor back iterations worked!");
+			}
 		}
 	}
 	
