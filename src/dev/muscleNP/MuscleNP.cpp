@@ -28,9 +28,6 @@
 #include "MuscleNP.h"
 
 // NTRT
-#include "tgGhostModel.h"
-#include "tgGhostInfo.h"
-
 #include "tgcreator/tgUtil.h"
 #include "core/muscleAnchor.h"
 #include "core/tgCast.h"
@@ -52,7 +49,6 @@
 
 // The C++ Standard Library
 #include <iostream>
-#include <algorithm>    // std::sort
 #include <cmath>		// abs
 #include <stdexcept>
 
@@ -65,10 +61,14 @@ MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  btRigidBody * body2,
  btVector3 pos2,
  double coefK,
- double dampingCoefficient) :
+ double dampingCoefficient,
+ double thickness,
+ double resolution) :
 Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
 m_ghostObject(ghostObject),
-m_world(world)
+m_world(world),
+m_thickness(thickness),
+m_resolution(resolution)
 {
 
 }
@@ -77,7 +77,7 @@ MuscleNP::~MuscleNP()
 {
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
 	m_dynamicsWorld.removeCollisionObject(m_ghostObject);
-    // Consider managing this more locally
+    
     btCollisionShape* shape = m_ghostObject->getCollisionShape();
     deleteCollisionShape(shape);
     delete m_ghostObject;
@@ -108,6 +108,7 @@ void MuscleNP::calculateAndApplyForce(double dt)
     
 	updateAnchorList();
 	
+	// See if the new anchors change anything
 	pruneAnchors();
 
 	m_forceTotals = btVector3(0.0, 0.0, 0.0);
@@ -240,7 +241,7 @@ void MuscleNP::updateManifolds()
     
     std::vector<muscleAnchor*> rejectedAnchors;
     
-	for (int i=0;i<numPairs;i++)
+	for (int i = 0; i < numPairs; i++)
 	{
 		m_manifoldArray.clear();
 
@@ -255,12 +256,12 @@ void MuscleNP::updateManifolds()
 		if (collisionPair->m_algorithm)
 			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
 		
-		for (int j=0;j<m_manifoldArray.size();j++)
+		for (int j = 0; j < m_manifoldArray.size(); j++)
 		{
 			btPersistentManifold* manifold = m_manifoldArray[j];
 			btScalar directionSign = manifold->getBody0() == m_ghostObject ? btScalar(-1.0) : btScalar(1.0);
             
-			for (int p=0;p<manifold->getNumContacts();p++)
+			for (int p=0; p < manifold->getNumContacts(); p++)
 			{
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
 
@@ -302,7 +303,7 @@ void MuscleNP::updateManifolds()
 					
 					if(rb)
 					{  
-
+						
 						int anchorPos = findNearestPastAnchor(pos);
 						assert(anchorPos < m_anchors.size() - 1);
 						
@@ -320,25 +321,20 @@ void MuscleNP::updateManifolds()
 						
 						// Not permanent, sliding contact
 						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
-						
-						btVector3 contactNormal = newAnchor->getContactNormal();
-									
-						btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
-						btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
-						
+
 						btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 						btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 						
 						//std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
 						
 						bool del = false;					
-						if (lengthB <= 0.1 && rb == backAnchor->attachedBody && mDistB < mDistA)
+						if (lengthB <= m_resolution && rb == backAnchor->attachedBody && mDistB < mDistA)
 						{
 							if(backAnchor->updateManifold(manifold))
 								del = true;
 								//std::cout << "UpdateB " << mDistB << std::endl;
 						}
-						if (lengthA <= 0.1 && rb == forwardAnchor->attachedBody && mDistA < mDistB)
+						if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && mDistA < mDistB)
 						{
 							if (forwardAnchor->updateManifold(manifold))
 								del = true;
@@ -405,7 +401,7 @@ void MuscleNP::updateAnchorList()
 		//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
 		
 		// These may have changed, so check again				
-		if (lengthB <= 0.1 && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
+		if (lengthB <= m_resolution && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
 		{
 			if(backAnchor->updateManifold(newAnchor->getManifold()))
 			{	
@@ -413,7 +409,7 @@ void MuscleNP::updateAnchorList()
 				//std::cout << "UpdateB " << mDistB << std::endl;
 			}
 		}
-		if (lengthA <= 0.1 && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
+		if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
 		{
 			if(forwardAnchor->updateManifold(newAnchor->getManifold()))
 				del = true;
@@ -509,7 +505,7 @@ void MuscleNP::pruneAnchors()
 				contactNormal = m_anchors[i]->getContactNormal();
 				
 				
-				if (lineA.length() < 0.05 || lineB.length() < 0.05)
+				if (lineA.length() < m_resolution / 2.0 || lineB.length() < m_resolution / 2.0)
 				{
 					// Arbitrary value that deletes the nodes
 					normalValue1 = -1.0;
@@ -607,8 +603,6 @@ void MuscleNP::updateCollisionObject()
     btVector3 from = anchor1->getWorldPosition();
 	btVector3 to = anchor2->getWorldPosition();
 	
-    btScalar radius = 0.001;
-
     for (std::size_t i = 0; i < n-1; i++)
     {
         btVector3 pos1 = m_anchors[i]->getWorldPosition();
@@ -621,7 +615,7 @@ void MuscleNP::updateCollisionObject()
         btScalar length = (pos2 - pos1).length() / 2.0;
 		
         /// @todo - seriously examine box vs cylinder shapes
-        btCylinderShape* box = new btCylinderShape(btVector3(radius, length, radius));
+        btCylinderShape* box = new btCylinderShape(btVector3(m_thickness, length, m_thickness));
         
         m_compoundShape->addChildShape(t, box);
     }
@@ -763,7 +757,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	}
 	else
 	{
-		std::cout << "iterating backwards!" << std::endl;
+		//std::cout << "iterating backwards!" << std::endl;
 		// Start over, iterate from the back, see if its better
 		btScalar endDist = (pos - m_anchors[n]->getWorldPosition()).length();
 		btScalar dist2 = endDist;
@@ -822,7 +816,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 			//i = j;
 			if ( i !=j )
 			{
-				std::cout << "First try: " << i << " Second Try: " << j << std::endl;
+				std::cout << "Error in iteration order First try: " << i << " Second Try: " << j << std::endl;
 				//throw std::runtime_error("Neither the front nor back iterations worked!");
 			}
 		}
