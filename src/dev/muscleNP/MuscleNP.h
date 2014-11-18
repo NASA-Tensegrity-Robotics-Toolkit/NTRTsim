@@ -117,7 +117,11 @@ public:
     virtual void calculateAndApplyForce(double dt);
     
 private:
-  
+    
+    /**
+     * Function object to compare the spatial position of two anchors,
+     * given two other anchors of interest. Used to place new anchors
+     */
     struct anchorCompare
     {
         anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
@@ -146,6 +150,11 @@ private:
     // Returns whether the anchor was deleteable
     bool deleteAnchor(int i);
     
+    /**
+     * 
+     * @todo Introduce more flexibility to this function for contacts
+     * between the two anchors that are not along a line 
+     */
     int findNearestPastAnchor(btVector3& pos);
     
     std::vector<muscleAnchor*>::iterator m_anchorIt;

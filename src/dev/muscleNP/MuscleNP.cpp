@@ -704,6 +704,9 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	std::size_t n = m_anchors.size() - 1;
 	assert (n >= 1);
 	
+	/// @todo Find a way to make this bidirectional. If its actually closer to anchor2 you may want to integrate backwards
+	/// Also deal with the situation that its between anchors 1 and 2 in distance. How do you consider 3D space??
+	// Start by determining the "correct" position
 	btScalar startDist = (pos - m_anchors[i]->getWorldPosition()).length();
 	btScalar dist = startDist;
 	
@@ -747,6 +750,91 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		
 		assert((m_anchors[i]->getWorldPosition() - pos).length() <= (a0->getWorldPosition() - pos).length()); 
 	}
+	
+	// Check to make sure it's actually in this line
+	muscleAnchor* a0 = m_anchors[i];
+	muscleAnchor* an = m_anchors[i + 1];
+	
+	btVector3 current = a0->getWorldPosition();
+	MuscleNP::anchorCompare m_acTemp(a0, an);
+	if( m_acTemp.comparePoints(current, pos))
+	{
+		// Success! do nothing, move on
+	}
+	else
+	{
+		// Start over, iterate from the back, see if its better
+		btScalar endDist = (pos - m_anchors[n]->getWorldPosition()).length();
+		btScalar dist2 = endDist;
+		
+		int j = n;
+		
+		while (dist2 <= endDist && i > 0)
+		{
+			i--;
+			btVector3 anchorPos = m_anchors[j]->getWorldPosition();
+			dist2 = (pos - anchorPos).length();
+			if (dist2 < endDist)
+			{
+				endDist = dist2;
+			}
+		}
+		/*
+		if (dist2 > endDist)
+		{
+			j++;
+		}
+		*/
+		if (j == n)
+		{
+			j--;
+		}
+		
+		if (j == 0)
+		{
+			// Do nothing
+		}
+		else if (n > 1)
+		{
+			// Know we've got 3 anchors, so we need to compare along the line
+			muscleAnchor* a0 = m_anchors[j - 1];
+			muscleAnchor* an = m_anchors[j + 1];
+			
+			MuscleNP::anchorCompare m_acTemp(a0, an);
+			
+			btVector3 current = m_anchors[j]->getWorldPosition();
+			
+			m_acTemp.comparePoints(pos, current) ? j-- : j+=0;
+			
+			btScalar length1 = (m_anchors[j]->getWorldPosition() - pos).length();
+			btScalar length2 = (a0->getWorldPosition() - pos).length();
+			
+			if (length1 < length2)
+			{
+				std::cout << "Length issues in back iterations!! " << length1 << " " << length2 << std::endl;
+			}
+		}
+		
+		// Check to make sure it's actually in this line
+		muscleAnchor* a0 = m_anchors[j];
+		muscleAnchor* an = m_anchors[j + 1];
+		
+		btVector3 current = a0->getWorldPosition();
+		MuscleNP::anchorCompare m_acTemp(a0, an);
+		if( m_acTemp.comparePoints(current, pos))
+		{
+			// Success! Set i to j and return
+			i = j;
+		}
+		else
+		{
+			i = j;
+			if ( i !=j )
+				std::cout << "First try: " << i << " Second Try: " << j << std::endl;
+			//throw std::runtime_error("Neither the front nor back iterations worked!");
+		}
+	}
+	
 	muscleAnchor* prevAnchor = m_anchors[i];
 	assert (prevAnchor);
 	 
