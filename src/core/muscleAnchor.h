@@ -141,10 +141,7 @@ public:
 	 * be exposed
      */
     btRigidBody * const attachedBody;
-	
-	/// @todo remove this. Anchors and sensors should be seperate classes
-    btScalar height;
-    
+  
     /**
      * A boolean value indicating whether this a temporary or permanent contact
      * if permanent do not delete it until teardown!!

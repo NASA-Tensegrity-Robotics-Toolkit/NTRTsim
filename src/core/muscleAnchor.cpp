@@ -56,7 +56,6 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
 #else
   contactNormal(cn),
 #endif
-  height(999.0),
   permanent(perm),
   sliding(slide),
   force(0.0, 0.0, 0.0),
