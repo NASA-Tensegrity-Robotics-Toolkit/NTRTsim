@@ -232,7 +232,7 @@ bool muscleAnchor::updateManifold(btPersistentManifold* m)
 			btVector3 newNormal = manifoldValues.second;
 			if ((newNormal + contactNormal).length() < 0.1)
 			{
-				 throw std::runtime_error("Reversed normal");
+				 std::cout <<"Reversed normal during anchor update" << std::endl;
 			}
 			#ifndef SKIP_CONTACT_UPDATE
 			// Updating here appears to break conservation of momentum

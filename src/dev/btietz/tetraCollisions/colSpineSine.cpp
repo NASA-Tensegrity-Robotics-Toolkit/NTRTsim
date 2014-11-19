@@ -110,8 +110,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 	double phase;
 	double phaseOffset;
 	double offset;
-	double bodywaves;
-	
+		
 	Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
@@ -127,6 +126,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
     
     m_controlTime = root.get("updateFrequency", "UTF-8").asDouble();
     double frequency = root.get("cpg_frequency", "UTF-8").asDouble();
+    double bodywaves = root.get("body_waves", "UTF-8").asDouble() * 2.0 * M_PI / (allMuscles.size() / 6.0);
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
@@ -139,7 +139,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 
 			amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 			/// @todo get top, left, right offset, add bodywaves back in.
-			phase = root.get("front_offset", "UTF-8").asDouble();
+			phase = i * bodywaves + root.get("in_top_offset", "UTF-8").asDouble();
 			kVelocity = 100.0;
 
 		}
@@ -151,11 +151,11 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
             
 
 			amplitude = root.get("out_top_amp_a", "UTF-8").asDouble();
-			phase = root.get("front_offset", "UTF-8").asDouble();
-			controlLength = 19.8;
+			phase = i * bodywaves + root.get("out_top_offset", "UTF-8").asDouble();
+			controlLength = 1.98;
 
         }
-        else if (allMuscles[i]->hasTag("inner"))
+        else if (allMuscles[i]->hasTag("inner left"))
         {
             tension = 1000.0;
             kPosition = 300.0;
@@ -163,18 +163,42 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
-			phase = root.get("front_offset", "UTF-8").asDouble();
+			phase = i * bodywaves + root.get("in_left_offset", "UTF-8").asDouble();
 
         }
-        else if (allMuscles[i]->hasTag("outer"))
+        else if (allMuscles[i]->hasTag("outer left"))
         {
 			tension = 500.0;
             kPosition = 300.0;
             kVelocity = 100.0;
-            controlLength = 19.0 ;
+            controlLength = 1.90 ;
 
 			amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
-			phase = root.get("front_offset", "UTF-8").asDouble();
+			phase = i * bodywaves + root.get("out_left_offset", "UTF-8").asDouble();
+			
+			//2 * bodyWaves * M_PI * i / (segments) + phaseOffsets[phase]
+			
+		}
+        else if (allMuscles[i]->hasTag("inner right"))
+        {
+            tension = 1000.0;
+            kPosition = 300.0;
+            kVelocity = 100.0;
+            controlLength = allMuscles[i]->getStartLength();
+
+			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
+			phase = i * bodywaves + root.get("in_right_offset", "UTF-8").asDouble();
+
+        }
+        else if (allMuscles[i]->hasTag("outer right"))
+        {
+			tension = 500.0;
+            kPosition = 300.0;
+            kVelocity = 100.0;
+            controlLength = 1.90 ;
+
+			amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
+			phase = i * bodywaves + root.get("out_right_offset", "UTF-8").asDouble();
 			
 			//2 * bodyWaves * M_PI * i / (segments) + phaseOffsets[phase]
 			

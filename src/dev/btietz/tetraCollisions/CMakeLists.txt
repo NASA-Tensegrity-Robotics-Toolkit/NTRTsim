@@ -18,6 +18,7 @@ link_libraries(tetraSpineLearningSine
 add_executable(AppTetraSpineCol
 	TetraSpineCollisions.cpp
 	colSpineSine.cpp
+	Wall.cpp
 	AppTetraSpineCol.cpp
 )
 
