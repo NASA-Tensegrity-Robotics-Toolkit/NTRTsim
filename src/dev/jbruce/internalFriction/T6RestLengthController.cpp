@@ -30,6 +30,8 @@
 #include "T6Model.h"
 // This library
 #include "core/tgLinearString.h"
+#include "core/Muscle2P.h"
+#include "tgcreator/tgUtil.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -79,7 +81,7 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
 	static int count = 0;
 	const std::vector<tgLinearString*> strings = subject.getAllMuscles();
-//	Muscle2P* muscles;
+	const Muscle2P* muscles;
 
 	if(count > 100)
 	{
@@ -94,11 +96,11 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 			}
 		std::cout << "\n";
 //		for(size_t i=0; i<strings.size(); i++)
-//			strings = strings[i]->getMuscle();
+//			muscles = strings[i]->getMuscle();
 //			{
-////				std::cout << muscles->anchor1->getWorldPosition() << "\t";
+//				std::cout << getTransform(muscles->anchor1->getWorldPosition() - muscles->anchor2->getWorldPosition()) << "\t";
 //			}
-		std::cout << "\n";
+//		std::cout << "\n";
 	count = 0;
 	}
 	else
