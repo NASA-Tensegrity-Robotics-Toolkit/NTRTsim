@@ -79,7 +79,7 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
 	static int count = 0;
 	const std::vector<tgLinearString*> strings = subject.getAllMuscles();
-	Muscle2P* muscles;
+//	Muscle2P* muscles;
 
 	if(count > 100)
 	{
@@ -93,11 +93,11 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 				std::cout << (strings[i]->getCurrentLength())/10 << "\t";
 			}
 		std::cout << "\n";
-		for(size_t i=0; i<strings.size(); i++)
-			muscles = strings[i]->getMuscle();
-			{
-				std::cout << muscles-> << "\t";
-			}
+//		for(size_t i=0; i<strings.size(); i++)
+//			strings = strings[i]->getMuscle();
+//			{
+////				std::cout << muscles->anchor1->getWorldPosition() << "\t";
+//			}
 		std::cout << "\n";
 	count = 0;
 	}
