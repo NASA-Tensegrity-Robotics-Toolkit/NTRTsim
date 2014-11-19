@@ -4,4 +4,5 @@ link_libraries(tgcreator core)
 
 subdirs(
     twoSpringSUPERball
-    )
+    internalFriction    
+)
