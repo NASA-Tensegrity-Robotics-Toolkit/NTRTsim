@@ -136,18 +136,18 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 #endif
 					dist = pt.getDistance();
 					
-#if VERBOSE					
+#ifdef VERBOSE
 					if (n >= 2)
 					{
 						std::cout << "Extra contacts!! " << dist << std::endl;
 					}
-#endif					
+#endif
 				}
 				
 			}
 			
 			// We've lost this contact for some reason, skip update and delete
-			if (!(dist > 0.0 && length < 0.01))
+			//if (!(dist > 0.0 && length < 0.01))
 			{	
 				// If contact is sufficiently close, update
 				if (length < 0.1)
@@ -288,11 +288,12 @@ std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentMan
 				}
 				
 				dist = pt.getDistance();
-				
+#ifdef VERBOSE				
 				if (n >= 2)
 				{
-					std::cout << "Extra contacts!! " << dist << std::endl;
+					std::cout << "Extra contacts!! " << p << " length " << length << " dist: " << dist << std::endl;
 				}		
+#endif
 			}
 		}
 	}

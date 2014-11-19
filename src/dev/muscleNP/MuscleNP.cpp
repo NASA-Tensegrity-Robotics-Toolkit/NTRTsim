@@ -448,7 +448,7 @@ void MuscleNP::pruneAnchors()
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0 || passes <= 3)
+    while (numPruned > 0 || passes <= 5)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
@@ -813,12 +813,12 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		}
 		else
 		{
-			//i = j;
 			if ( i !=j )
 			{
 				std::cout << "Error in iteration order First try: " << i << " Second Try: " << j << std::endl;
 				//throw std::runtime_error("Neither the front nor back iterations worked!");
 			}
+			//i = j;
 		}
 	}
 	

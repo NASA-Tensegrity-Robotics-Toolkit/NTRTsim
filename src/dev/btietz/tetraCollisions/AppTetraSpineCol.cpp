@@ -52,16 +52,33 @@ int main(int argc, char** argv)
     std::cout << "AppTetraSpineHT" << std::endl;
 
     // First create the world
-    const tgWorld::Config config(98.1); // gravity, cm/sec^2
+    const tgWorld::Config config(981); // gravity, cm/sec^2
 
-	tgHillyGround* ground = new tgHillyGround();
-#if (1)
-    tgWorld world(config, ground); 
+	;
+#if (0)
+	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
+   btScalar friction = 0.5;
+   btScalar restitution = 0.0;
+   btVector3 size = btVector3(500.0, 1.5, 500.0);
+   btVector3 origin = btVector3(0.0, 0.0, 0.0);
+   size_t nx = 50;
+   size_t ny = 50;
+   double margin = 0.5;
+   double triangleSize = 7.5;
+   double waveHeight = 5.0;
+   double offset = 0.5;
+	tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
+									size, origin, nx, ny, margin, triangleSize,
+									waveHeight, offset);
+	
+	tgHillyGround* ground = new tgHillyGround(groundConfig);
+	
+   tgWorld world(config, ground); 
 #else
     tgWorld world(config); 
 #endif
     // Second create the view
-    const double stepSize = 1.0/500.0; // Seconds
+    const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
     tgSimViewGraphics view(world, stepSize, renderRate);
 
@@ -86,7 +103,7 @@ int main(int argc, char** argv)
     */
 	
 	// Add obstacles
-	btVector3 wallOrigin(0.0, 0.0, 100.0);
+	btVector3 wallOrigin(0.0, 0.0, 50.0);
 	Wall* myWall = new Wall(wallOrigin);
 
     simulation.addModel(myModel);

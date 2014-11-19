@@ -132,34 +132,34 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
     {
 		if (allMuscles[i]->hasTag("inner top"))
         {
-			tension = 2000.0;
-            kPosition = 500.0;
+			tension = 100.0;
+            kPosition = 300.0;
             
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 			/// @todo get top, left, right offset, add bodywaves back in.
 			phase = i * bodywaves + root.get("in_top_offset", "UTF-8").asDouble();
-			kVelocity = 100.0;
+			kVelocity = 50.0;
 
 		}
         else if (allMuscles[i]->hasTag("outer top"))
         {
-            tension = 1000.0;
-            kPosition = 500.0;
+            tension = 200.0;
+            kPosition = 200.0;
             kVelocity = 100.0;
             
 
 			amplitude = root.get("out_top_amp_a", "UTF-8").asDouble();
 			phase = i * bodywaves + root.get("out_top_offset", "UTF-8").asDouble();
-			controlLength = 1.98;
+			controlLength = allMuscles[i]->getStartLength();
 
         }
         else if (allMuscles[i]->hasTag("inner left"))
         {
-            tension = 1000.0;
+            tension = 100.0;
             kPosition = 300.0;
-            kVelocity = 100.0;
+            kVelocity = 50.0;
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
@@ -168,10 +168,10 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer left"))
         {
-			tension = 500.0;
-            kPosition = 300.0;
+			tension = 50.0;
+            kPosition = 200.0;
             kVelocity = 100.0;
-            controlLength = 1.90 ;
+            controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
 			phase = i * bodywaves + root.get("out_left_offset", "UTF-8").asDouble();
@@ -181,9 +181,9 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 		}
         else if (allMuscles[i]->hasTag("inner right"))
         {
-            tension = 1000.0;
+            tension = 100.0;
             kPosition = 300.0;
-            kVelocity = 100.0;
+            kVelocity = 50.0;
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
@@ -192,10 +192,10 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer right"))
         {
-			tension = 500.0;
-            kPosition = 300.0;
+			tension = 50.0;
+            kPosition = 200.0;
             kVelocity = 100.0;
-            controlLength = 1.90 ;
+            controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
 			phase = i * bodywaves + root.get("out_right_offset", "UTF-8").asDouble();
@@ -212,8 +212,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
                                                         kPosition,
                                                         kVelocity);
         
-        // In Won's convention
-        offset = amplitude;
+        offset = 0.0;
         
         tgSineStringControl* pStringControl = new tgSineStringControl(m_controlTime,
 																		p_ipc,
