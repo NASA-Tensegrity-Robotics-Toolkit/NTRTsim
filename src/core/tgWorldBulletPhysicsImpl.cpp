@@ -128,17 +128,17 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 	}
 	
 	/*
-	 * These are lines from the old BasicLearningApp.cpp that we weren't using.
-	 * Prior to 11/20/14
+	 * These are lines from the old BasicLearningApp.cpp that we aren't using.
 	 * http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo
 	 */
-	 
-	 m_pDynamicsWorld->getSolverInfo().m_numIterations = 20;
     #if (0) 
 		// Split impulse does not appear to apply to MLCP solver
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
         m_pDynamicsWorld->getSolverInfo().m_splitImpulsePenetrationThreshold = -0.02;
         
+        // Default is 10 - increases runtime but decreases odds of penetration
+        // Makes tetraspine sine waves more accurate and static test less accurate
+        m_pDynamicsWorld->getSolverInfo().m_numIterations = 20;
     #endif	
     
     // Postcondition
