@@ -127,9 +127,20 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 		m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
 	}
 	
-    #if (1) /// @todo This is a line from the old BasicLearningApp.cpp that we're not using. Investigate further
+	/*
+	 * These are lines from the old BasicLearningApp.cpp that we weren't using.
+	 * Prior to 11/20/14
+	 * http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo
+	 */
+	 
+	 m_pDynamicsWorld->getSolverInfo().m_numIterations = 20;
+    #if (0) 
+		// Split impulse does not appear to apply to MLCP solver
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
+        m_pDynamicsWorld->getSolverInfo().m_splitImpulsePenetrationThreshold = -0.02;
+        
     #endif	
+    
     // Postcondition
     assert(invariant());
 }

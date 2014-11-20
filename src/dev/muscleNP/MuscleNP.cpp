@@ -305,52 +305,61 @@ void MuscleNP::updateManifolds()
 					{  
 						
 						int anchorPos = findNearestPastAnchor(pos);
-						assert(anchorPos < m_anchors.size() - 1);
-						
-						muscleAnchor* backAnchor = m_anchors[anchorPos];
-						muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
-						
-						btVector3 pos0 = backAnchor->getWorldPosition();
-						btVector3 pos2 = forwardAnchor->getWorldPosition();
-						
-						btVector3 lineA = (pos2 - pos);
-						btVector3 lineB = (pos0 - pos);
-						
-						btScalar lengthA = lineA.length();
-						btScalar lengthB = lineB.length();
+						assert(anchorPos < (int)(m_anchors.size() - 1));
 						
 						// Not permanent, sliding contact
 						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
-
-						btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
-						btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 						
-						//std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
-						
-						bool del = false;					
-						if (lengthB <= m_resolution && rb == backAnchor->attachedBody && mDistB < mDistA)
+						if (anchorPos >= 0)
 						{
-							if(backAnchor->updateManifold(manifold))
-								del = true;
-								//std::cout << "UpdateB " << mDistB << std::endl;
-						}
-						if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && mDistA < mDistB)
-						{
-							if (forwardAnchor->updateManifold(manifold))
-								del = true;
-								//std::cout << "UpdateA " << mDistA << std::endl;
-						}
-						
-						if (del)
-						{
-							/// @todo further examination of whether the anchors should be deleted here
-							delete newAnchor;
-						}
+							muscleAnchor* backAnchor = m_anchors[anchorPos];
+							muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+							
+							btVector3 pos0 = backAnchor->getWorldPosition();
+							btVector3 pos2 = forwardAnchor->getWorldPosition();
+							
+							btVector3 lineA = (pos2 - pos);
+							btVector3 lineB = (pos0 - pos);
+							
+							btScalar lengthA = lineA.length();
+							btScalar lengthB = lineB.length();
+							
+							btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+							btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+							
+							//std::cout << "Update Manifolds " << newAnchor->getManifold() << std::endl;
+							
+							bool del = false;	
+										
+							if (lengthB <= m_resolution && rb == backAnchor->attachedBody && mDistB < mDistA)
+							{
+								if(backAnchor->updateManifold(manifold))
+									del = true;
+									//std::cout << "UpdateB " << mDistB << std::endl;
+							}
+							if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && mDistA < mDistB)
+							{
+								if (forwardAnchor->updateManifold(manifold))
+									del = true;
+									//std::cout << "UpdateA " << mDistA << std::endl;
+							}
+							
+							if (del)
+							{
+								/// @todo further examination of whether the anchors should be deleted here
+								delete newAnchor;
+							}
+							else
+							{
+												
+								m_newAnchors.push_back(newAnchor);
+							} // If anchor passes distance tests
+						} // If we could find the anchor's position
 						else
 						{
-											
+							// Just in case it gets better after we prune
 							m_newAnchors.push_back(newAnchor);
-						} // If anchor passes distance tests
+						}
 					} // If body is a rigid body
 				} // If distance less than 0.0
 			} // For number of contacts
@@ -374,64 +383,72 @@ void MuscleNP::updateAnchorList()
 
 		int anchorPos = findNearestPastAnchor(pos1);
 		
-		assert(anchorPos < m_anchors.size() - 1);
+		assert(anchorPos < (int) (m_anchors.size() - 1));
 		
-		muscleAnchor* backAnchor = m_anchors[anchorPos];
-		muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
-		
-		btVector3 pos0 = backAnchor->getWorldPosition();
-		btVector3 pos2 = forwardAnchor->getWorldPosition();
-			
-		btVector3 lineA = (pos2 - pos1);
-		btVector3 lineB = (pos0 - pos1);
-		
-		btScalar lengthA = lineA.length();
-		btScalar lengthB = lineB.length();
-		
-		btVector3 contactNormal = newAnchor->getContactNormal();
-						
-		btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
-		btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
-		
-		bool del = false;	
-		
-		btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
-		btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
-		
-		//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
-		
-		// These may have changed, so check again				
-		if (lengthB <= m_resolution && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
+		if (anchorPos >= 0)
 		{
-			if(backAnchor->updateManifold(newAnchor->getManifold()))
-			{	
-				del = true;
-				//std::cout << "UpdateB " << mDistB << std::endl;
+		
+			muscleAnchor* backAnchor = m_anchors[anchorPos];
+			muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+			
+			btVector3 pos0 = backAnchor->getWorldPosition();
+			btVector3 pos2 = forwardAnchor->getWorldPosition();
+				
+			btVector3 lineA = (pos2 - pos1);
+			btVector3 lineB = (pos0 - pos1);
+			
+			btScalar lengthA = lineA.length();
+			btScalar lengthB = lineB.length();
+			
+			btVector3 contactNormal = newAnchor->getContactNormal();
+							
+			btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
+			btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
+			
+			bool del = false;	
+			
+			btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+			btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
+			
+			//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
+			
+			// These may have changed, so check again				
+			if (lengthB <= m_resolution && newAnchor->attachedBody == backAnchor->attachedBody && mDistB < mDistA)
+			{
+				if(backAnchor->updateManifold(newAnchor->getManifold()))
+				{	
+					del = true;
+					//std::cout << "UpdateB " << mDistB << std::endl;
+				}
+			}
+			if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
+			{
+				if(forwardAnchor->updateManifold(newAnchor->getManifold()))
+					del = true;
+					//std::cout << "UpdateA " << mDistA << std::endl;
+			}
+
+			if (del)
+			{
+				delete newAnchor;
+			}
+			else if(normalValue1 < 0.0 || normalValue2 < 0.0)
+			{
+				delete newAnchor;
+			}
+			else
+			{		
+				
+				m_anchorIt = m_anchors.begin() + anchorPos + 1;
+									  
+				m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
+				
+				numContacts++;
 			}
 		}
-		if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
-		{
-			if(forwardAnchor->updateManifold(newAnchor->getManifold()))
-				del = true;
-				//std::cout << "UpdateA " << mDistA << std::endl;
-		}
-
-		if (del)
-		{
-			delete newAnchor;
-		}
-		else if(normalValue1 < 0.0 || normalValue2 < 0.0)
-		{
-			delete newAnchor;
-		}
 		else
-		{		
-			
-			m_anchorIt = m_anchors.begin() + anchorPos + 1;
-								  
-			m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-			
-			numContacts++;
+		{
+			delete newAnchor;
 		}
 	}
    
@@ -448,7 +465,7 @@ void MuscleNP::pruneAnchors()
     std::size_t i;
     
     // Attempt to eliminate points that would cause the string to push
-    while (numPruned > 0 || passes <= 5)
+    while (numPruned > 0 || passes <= 3)
     {
         #ifndef BT_NO_PROFILE 
             BT_PROFILE("pruneAnchors");
@@ -818,7 +835,9 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 				std::cout << "Error in iteration order First try: " << i << " Second Try: " << j << std::endl;
 				//throw std::runtime_error("Neither the front nor back iterations worked!");
 			}
-			//i = j;
+			
+			// Return failure
+			return -1;
 		}
 	}
 	

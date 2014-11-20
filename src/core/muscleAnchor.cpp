@@ -216,23 +216,28 @@ bool muscleAnchor::updateManifold(btPersistentManifold* m)
 		// If the original manifold is NULL, just use the new one
 		if (!manifold)
 		{
-			manifold = m;
+			//manifold = m;
 			ret = true;
 		}
 		// Use new manifold
 		else if (getManifoldDistance(manifold).first >= newDist)
 		{
-			manifold = m;
+			//manifold = m;
 			ret = true;
 		}
 		
 		// If we updated, ensure the new contact normal is good
-		if(manifold == m)
+		if(ret)
 		{
 			btVector3 newNormal = manifoldValues.second;
-			if ((newNormal + contactNormal).length() < 0.1)
+			if ((newNormal + contactNormal).length() < 0.5)
 			{
 				 std::cout <<"Reversed normal during anchor update" << std::endl;
+				 ret = false;
+			}
+			else
+			{
+				manifold = m;
 			}
 			#ifndef SKIP_CONTACT_UPDATE
 			// Updating here appears to break conservation of momentum

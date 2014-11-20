@@ -229,7 +229,7 @@ void TetraSpineCollisions::setup(tgWorld& world)
 
     // Move the first one so we can create a longer snake.
     // Or you could move the snake at the end, up to you. 
-    tetra.move(btVector3(0.0, 5.0, 10.0));
+    tetra.move(btVector3(0.0, 8.0, 10.0));
 
     // Create our snake segments
     tgStructure snake;
@@ -269,10 +269,15 @@ void TetraSpineCollisions::setup(tgWorld& world)
     // Two different string configs
     tgLinearString::Config muscleConfig(229.16 * 2.0, 20, false, 0, 500, 7.0, 9500, 0.1, 0.1);
     tgLinearString::Config muscleConfig2(229.16, 20, false, 0, 500, 7.0, 9500, 0.1, 0.1);
+#if (1)
     spec.addBuilder("top muscle", new tgMultiPointStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgMultiPointStringInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgMultiPointStringInfo(muscleConfig2));
-
+#else
+    spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
+    spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));
+#endif
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
 
