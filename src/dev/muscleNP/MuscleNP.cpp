@@ -307,11 +307,13 @@ void MuscleNP::updateManifolds()
 						int anchorPos = findNearestPastAnchor(pos);
 						assert(anchorPos < (int)(m_anchors.size() - 1));
 						
-						// Not permanent, sliding contact
-						muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
-						
+						// -1 means findNearestPastAnchor failed
 						if (anchorPos >= 0)
 						{
+							// Not permanent, sliding contact
+							muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+						
+							
 							muscleAnchor* backAnchor = m_anchors[anchorPos];
 							muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
 							
@@ -355,11 +357,6 @@ void MuscleNP::updateManifolds()
 								m_newAnchors.push_back(newAnchor);
 							} // If anchor passes distance tests
 						} // If we could find the anchor's position
-						else
-						{
-							// Just in case it gets better after we prune
-							m_newAnchors.push_back(newAnchor);
-						}
 					} // If body is a rigid body
 				} // If distance less than 0.0
 			} // For number of contacts
@@ -385,6 +382,7 @@ void MuscleNP::updateAnchorList()
 		
 		assert(anchorPos < (int) (m_anchors.size() - 1));
 		
+		// -1 means findNearestPastAnchor failed
 		if (anchorPos >= 0)
 		{
 		
@@ -636,7 +634,8 @@ void MuscleNP::updateCollisionObject()
         
         m_compoundShape->addChildShape(t, box);
     }
-    //m_compoundShape->setMargin(0.01);
+    // Default margin is 0.04, so larger than default thickness. Behavior is better with larger margin
+    //m_compoundShape->setMargin(m_thickness);
     
     btTransform transform;
     transform.setOrigin(center);

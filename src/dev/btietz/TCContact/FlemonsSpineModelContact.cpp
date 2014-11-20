@@ -146,6 +146,8 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     
 #if (1)
     spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
+#else    
+    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #endif
     
     // Create your structureInfo
