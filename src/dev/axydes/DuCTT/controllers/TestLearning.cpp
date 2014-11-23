@@ -204,9 +204,9 @@ void DuCTTRobotController::setupAdapter() {
     string suffix = "_DuCTT";
     string configAnnealEvolution = "Config.ini";
     AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
-    bool isLearning = true;
     configuration configEvolutionAdapter;
     configEvolutionAdapter.readFile(configAnnealEvolution);
+    bool isLearning = configEvolutionAdapter.getBoolValue("learning");
 
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 }

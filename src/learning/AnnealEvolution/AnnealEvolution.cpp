@@ -82,7 +82,7 @@ suffix(suff)
     coevolution=myconfigdataaa.getintvalue("coevolution");
     seeded = myconfigdataaa.getintvalue("startSeed");
     
-    bool learning = myconfigdataaa.getintvalue("learning");
+    bool learning = myconfigdataaa.getBoolValue("learning");
 
     srand(rdtsc());
     eng.seed(rdtsc());

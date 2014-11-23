@@ -35,24 +35,41 @@ using namespace std;
 configuration::configuration(){}
 configuration::~configuration(){}
 
-int configuration::getintvalue( const std::string& key )
+bool configuration::getBoolValue( const std::string& key )
 {
-	if (!iskey( key )){
-		std::cout<<"Cannot find the key in the config file, Key: "<<key<<endl;
-		throw 0;
-	}
-	std::istringstream ss( this->data.operator [] ( key ) );
-	int result;
-	ss >> result;
-	if (!ss.eof())
-	{
-		std::cout<<"Problematic key: "<<key<<endl;
-		std::cout<<"Error reading configuration file"<<endl;
-		throw 1;
-	}
-	return result;
+    if (!iskey( key )){
+        std::cout<<"Cannot find the key in the config file, Key: "<<key<<endl;
+        throw 0;
+    }
+    std::istringstream ss( this->data.operator [] ( key ) );
+    bool result;
+    ss >> result;
+    if (!ss.eof())
+    {
+        std::cout<<"Problematic key: "<<key<<endl;
+        std::cout<<"Error reading configuration file"<<endl;
+        throw 1;
+    }
+    return result;
 }
 
+int configuration::getintvalue( const std::string& key )
+{
+    if (!iskey( key )){
+        std::cout<<"Cannot find the key in the config file, Key: "<<key<<endl;
+        throw 0;
+    }
+    std::istringstream ss( this->data.operator [] ( key ) );
+    int result;
+    ss >> result;
+    if (!ss.eof())
+    {
+        std::cout<<"Problematic key: "<<key<<endl;
+        std::cout<<"Error reading configuration file"<<endl;
+        throw 1;
+    }
+    return result;
+}
 
 double configuration::getDoubleValue(const std::string& key )
 {

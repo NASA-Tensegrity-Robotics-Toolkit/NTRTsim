@@ -59,6 +59,7 @@ public:
       {
       return data.count( s ) != 0;
       }
+    bool getBoolValue(const std::string& key );
     // Gets an integer value from a key. If the key does not exist, or if the value
     // is not an integer, throws an int exception.
     //

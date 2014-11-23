@@ -1,7 +1,5 @@
 link_libraries(tgcreator core Adapters controllers boost_program_options)
 
-file(COPY controllers/Config.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 add_executable(AppDuCTT
     robot/tgRodHinge.cpp
     robot/tgRodHingeInfo.cpp
@@ -19,6 +17,9 @@ add_executable(AppDuCTT
     ducts/DuctTeeModel.cpp
     AppDuCTT.cpp
 )
+
+add_custom_command(TARGET AppDuCTT POST_BUILD
+    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/controllers/Config.ini ${CMAKE_CURRENT_BINARY_DIR}/Config.ini)
 
 add_custom_command(TARGET AppDuCTT POST_BUILD
     COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/controllers/logs)
