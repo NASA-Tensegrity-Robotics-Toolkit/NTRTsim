@@ -29,8 +29,10 @@
 
 // This application
 #include "core/tgModel.h" 
+
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
+
 // The C++ Standard Library
 #include <vector>
 
@@ -71,6 +73,12 @@ public:
     virtual void addMarker(abstractMarker &marker);
 
     virtual bool isTouching();
+
+    /**
+     * Return the center of mass, a vector in 3-space.
+     * @return the center of mass, a vector in 3-space
+     */
+    virtual btVector3 centerOfMass() const;
 
 private:
 

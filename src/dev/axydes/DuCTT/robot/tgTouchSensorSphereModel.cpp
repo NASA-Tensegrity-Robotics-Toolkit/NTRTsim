@@ -101,6 +101,9 @@ void tgTouchSensorSphereModel::step(double dt)
         {
 //            std::cerr << toString() << std::endl;
         }
+        else
+        {
+        }
     }
 }
 
@@ -149,7 +152,7 @@ void tgTouchSensorSphereModel::checkCollisions()
 
                 btScalar dist = pt.getDistance();
 
-                if (dist < 0.0)
+                if (dist <= 0.0)
                 {
 
                     m_touchingNormal = pt.m_normalWorldOnB * directionSign;
@@ -233,6 +236,15 @@ void tgTouchSensorSphereModel::addMarker(abstractMarker &_a)
 bool tgTouchSensorSphereModel::isTouching()
 {
     return m_bContact;
+}
+
+btVector3 tgTouchSensorSphereModel::centerOfMass() const
+{
+  btTransform transform = m_pGhostObject->getWorldTransform();
+  const btVector3& result = transform.getOrigin();
+
+  // Return a copy
+  return result;
 }
 
 bool tgTouchSensorSphereModel::invariant() const

@@ -132,6 +132,7 @@ void HingeModel::setup(tgWorld& world)
 
     //bottom
     s.addNode(-15, 0, 0);
+    sGhost.addNode(-15, 0, 0);
     s.addNode(15, 0, 0);
 
     //top
@@ -154,7 +155,7 @@ void HingeModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 //    spec.addBuilder("b rod", new tgRodInfo(rodConfig));
-//    spec.addBuilder("t rod", new tgRodInfo(rodConfig2));
+    spec.addBuilder("t rod", new tgRodInfo(rodConfig2));
 //    spec.addBuilder("hinge", new tgRodHingeInfo(hingeConfig));
     
     // Create your structureInfo
@@ -165,6 +166,7 @@ void HingeModel::setup(tgWorld& world)
 
     tgBuildSpec specGhost;
     specGhost.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
+    specGhost.addBuilder("t rod", new tgRodInfo(rodConfig2));
     tgStructureInfo structureInfoGhost(sGhost, specGhost);
     structureInfoGhost.buildInto(*this, world);
 
@@ -178,7 +180,6 @@ void HingeModel::setup(tgWorld& world)
     {
         abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
         allTouchSensors[i]->addMarker(marker);
-        allTouchSensors[i]->addIgnoredObject(spheres[i]->getPRigidBody());
     }
 
     // Then attach the pretension controller to each of these muscles to keep

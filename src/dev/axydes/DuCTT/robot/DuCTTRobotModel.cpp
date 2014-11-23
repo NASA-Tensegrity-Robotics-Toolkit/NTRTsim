@@ -423,7 +423,8 @@ void DuCTTRobotModel::setupVariables()
     //add the appropriate rods to the touch sensor ignore list
     for (size_t i=0; i<bottomTouchSensors.size(); i++)
     {
-        abstractMarker marker (bottomSpheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomSpheres[i]->centerOfMass();
+        abstractMarker marker (bottomSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         bottomTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<bottomRods.size(); j++)
         {
@@ -432,7 +433,8 @@ void DuCTTRobotModel::setupVariables()
     }
     for (size_t i=0; i<topTouchSensors.size(); i++)
     {
-        abstractMarker marker (topSpheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);
+        btVector3 offset = topTouchSensors[i]->centerOfMass() - topSpheres[i]->centerOfMass();
+        abstractMarker marker (topSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         topTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<topRods.size(); j++)
         {
