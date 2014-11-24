@@ -28,6 +28,7 @@
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btMatrix3x3.h"
 // The C++ Standard Library
 #include <iostream>
 #include <fstream>
@@ -70,12 +71,26 @@ namespace {
 
 	TEST_F(SpinesTest, WorldConf_Spines) {
 				
+				// This is a key test since we define btTransforms against the up axis
 				btVector3 up(0.0, 1.0, 0.0);
 				btVector3 down(0.0, -1.0, 0.0);
 				
-				EXPECT_EQ(up, -down);
+				btQuaternion testQuaternion = tgUtil::getQuaternionBetween(down, up);
 				
-				// Will print out another set of dist moved on teardown
+				btVector3 result = down.rotate(testQuaternion.getAxis(), testQuaternion.getAngle());				
+				
+				// Just comparing the vectors results in a floating point residual, which causes the test to fail
+				EXPECT_TRUE((up - result).fuzzyZero());
+				
+				// Test another arbitrary opposite vector
+				btVector3 start(1.0, -1.0, 2.0);
+				btVector3 end (-1.0, 1.0, -2.0);
+				
+				testQuaternion = tgUtil::getQuaternionBetween(start, end);
+				
+				result = end.rotate(testQuaternion.getAxis(), testQuaternion.getAngle());	
+
+				EXPECT_TRUE((start - result).fuzzyZero());
 	}
 
 } // namespace

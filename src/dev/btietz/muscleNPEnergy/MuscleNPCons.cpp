@@ -61,15 +61,15 @@ void MuscleNPCons::setup(tgWorld& world)
 	
 	s.addNode(-2, 2, 0);
 	s.addNode(0, 2, 0);
-	s.addNode(10, 2, 0);
-	s.addNode(12, 2, 0);
-	s.addNode(22, 2, 0);
-	s.addNode(24, 2, 0);
+	s.addNode(0, 2, 0);
+	s.addNode(0, 4, 0);
+	s.addNode(0, 12, 0);
+	s.addNode(0, 14, 0);
 	
 	
 	// Free rod to which we will apply motion
-	s.addNode(16, 3, 5);
-	s.addNode(16, 1, 5);
+	s.addNode(-1, 6, 5);
+	s.addNode(1, 6, 5);
 
 	//s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "box");
@@ -115,6 +115,10 @@ void MuscleNPCons::setup(tgWorld& world)
 	body->applyCentralImpulse(impulse);
 	body2->applyCentralImpulse(impulse);
 	
+	btRigidBody* body3 = allRods[2]->getPRigidBody();
+	
+	std::cout << body3->getCenterOfMassTransform () << std::endl;
+	
 	notifySetup();
 	totalTime = 0.0;
 	tgModel::setup(world);
@@ -153,14 +157,14 @@ void MuscleNPCons::step(double dt)
 		forceSum += anchorList[i]->getForce();
 	}
 	
-	
+#if (0)	
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Energy " << energy << std::endl;
 	std::cout << "Force sum " << forceSum << std::endl;
 	std::cout << "Length " << allMuscles[0]->getCurrentLength();
 	std::cout << " Dist " << (anchorList[0]->getWorldPosition() - anchorList[n-1]->getWorldPosition()).length() << std::endl;
 	std::cout << "Anchors: " << n << std::endl;
-	
+#endif	
 	if (energy > 20){
 		std::cout << "Here!" << std::endl;
 	}
