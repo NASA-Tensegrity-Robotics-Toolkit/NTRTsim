@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h" // stream operations for collision shapes
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"

@@ -18,7 +18,7 @@
 
 /**
 * @file WorldConf_Spines_test.cpp
-* @brief Contains a test suite for FileHelpers.
+* @brief Contains a test of the data presented at 6WCSCM
 * $Id$
 */
 
