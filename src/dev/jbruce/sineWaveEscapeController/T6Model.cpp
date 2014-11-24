@@ -37,6 +37,20 @@
 // The C++ Standard Library
 #include <stdexcept>
 
+/*
+ * helper arrays for node and rod numbering schema
+ */
+/*returns the number of the rod for a given node */
+const int rodNumbersPerNode[13]={0,0,1,1,2,2,3,3,4,4,5,5,6};
+
+/*returns the node that is at the other end of the given node */
+const int otherEndOfTheRod[13]={6,7,8,4,3,11,0,1,2,10,9,5,12};
+
+/*returns the node that is at the parallel rod
+ * and at the same end of the given node
+ */
+const int parallelNode[13]={1,0,5,9,10,2,7,6,11,3,4,8,12};
+
 namespace
 {
     // Note: This current model of the SUPERball rod is 1.5m long by 4.5cm (0.045m) radius,
@@ -81,19 +95,13 @@ namespace
      17.00,     // rod_length (length)
      17.00/4,   // rod_space (length)
      0.99,      // friction (unitless)
-     0.01,     // rollFriction (unitless)
-     0.0,      // restitution (?)
-     true,			// History logging (boolean)
-     0,        // rotation
-     100000,   // maxTens
-     10000,    // targetVelocity
-     20000     // maxAcc
-
-     // Use the below values for earlier versions of simulation.
-     // 1.152,    // density (kg / length^3)
-     //	0.45,     // radius (length)
-     //	613.0,    // stiffness_passive (kg / sec^2)
-     //	2854.5,   // stiffness_active (kg / sec^2)
+     0.01,      // rollFriction (unitless)
+     0.0,       // restitution (?)
+     true,		// History logging (boolean)
+     0,         // rotation
+     100000,    // maxTens
+     10000,     // targetVelocity
+     20000      // maxAcc
   };
 } // namespace
 
@@ -109,18 +117,23 @@ void T6Model::addNodes(tgStructure& s)
 {
     const double half_length = c.rod_length / 2;
 
-    s.addNode(-c.rod_space,  -half_length, 0);            // 0
-    s.addNode(-c.rod_space,   half_length, 0);            // 1
-    s.addNode( c.rod_space,  -half_length, 0);            // 2
-    s.addNode( c.rod_space,   half_length, 0);            // 3
-    s.addNode(0,           -c.rod_space,   -half_length); // 4
-    s.addNode(0,           -c.rod_space,    half_length); // 5
-    s.addNode(0,            c.rod_space,   -half_length); // 6
-    s.addNode(0,            c.rod_space,    half_length); // 7
-    s.addNode(-half_length, 0,            c.rod_space);   // 8
-    s.addNode( half_length, 0,            c.rod_space);   // 9
-    s.addNode(-half_length, 0,           -c.rod_space);   // 10
-    s.addNode( half_length, 0,           -c.rod_space);   // 11
+    nodePositions.push_back(btVector3(-c.rod_space,  -half_length, 0));            // 0
+    nodePositions.push_back(btVector3(-c.rod_space,   half_length, 0));            // 1
+    nodePositions.push_back(btVector3( c.rod_space,  -half_length, 0));            // 2
+    nodePositions.push_back(btVector3( c.rod_space,   half_length, 0));            // 3
+    nodePositions.push_back(btVector3(0,           -c.rod_space,   -half_length)); // 4
+    nodePositions.push_back(btVector3(0,           -c.rod_space,    half_length)); // 5
+    nodePositions.push_back(btVector3(0,            c.rod_space,   -half_length)); // 6
+    nodePositions.push_back(btVector3(0,            c.rod_space,    half_length)); // 7
+    nodePositions.push_back(btVector3(-half_length, 0,            c.rod_space));   // 8
+    nodePositions.push_back(btVector3( half_length, 0,            c.rod_space));   // 9
+    nodePositions.push_back(btVector3(-half_length, 0,           -c.rod_space));   // 10
+    nodePositions.push_back(btVector3( half_length, 0,           -c.rod_space));   // 11
+
+    for(int i=0;i<nodePositions.size();i++)
+	{
+		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
+	}
 }
 
 void T6Model::addRods(tgStructure& s)
@@ -131,6 +144,19 @@ void T6Model::addRods(tgStructure& s)
     s.addPair( 6,  7, "rod");
     s.addPair( 8,  9, "rod");
     s.addPair(10, 11, "rod");
+}
+
+void T6Model::addMarkers(tgStructure &s) {
+    const int nNodes = 12; // 2*nRods
+    std::vector <tgRod*> rods=find<tgRod>("rod");
+
+    for(int i=0;i<nNodes;i++) {
+        const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
+        btTransform inverseTransform = bt->getWorldTransform().inverse();
+        btVector3 pos = inverseTransform * (nodePositions[i]);
+        abstractMarker tmp=abstractMarker(bt,pos,btVector3(0.08*i,1.0 - 0.08*i,.0),i);
+        this->addMarker(tmp);
+    }
 }
 
 void T6Model::addMuscles(tgStructure& s)
@@ -223,6 +249,14 @@ void T6Model::setup(tgWorld& world)
 
     // Actually setup the children
     tgModel::setup(world);
+
+    //map the rods and add the markers to them
+	addMarkers(s);
+
+	btVector3 location(0.0,28.0,0); // Start above ground (positive y)
+	btVector3 rotation(0.0,0.6,0.8);
+	btVector3 speed(0,0,0);
+	this->moveModel(location,rotation,speed);
 }
 
 void T6Model::step(double dt)
@@ -243,6 +277,34 @@ void T6Model::step(double dt)
 void T6Model::onVisit(tgModelVisitor& r)
 {
     tgModel::onVisit(r);
+}
+
+// Return the center of mass of this model
+// Pre-condition: This model has 6 rods
+std::vector<double> T6Model::getBallCOM() {
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 ballCenterOfMass(0, 0, 0);
+    double ballMass = 0.0;
+    for (std::size_t i = 0; i < rods.size(); i++) {
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        ballCenterOfMass += rodCenterOfMass * rodMass;
+        ballMass += rodMass;
+    }
+
+    assert(ballMass > 0.0);
+    ballCenterOfMass /= ballMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+    //std::cout<<"COM: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
+
+    return result;
 }
 
 const std::vector<tgLinearString*>& T6Model::getAllMuscles() const
@@ -269,4 +331,19 @@ const double T6Model::muscleRatio()
 void T6Model::teardown()
 {
     tgModel::teardown();
+}
+
+void T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector,btVector3 speedVector) {
+    std::vector<tgRod *> rods=find<tgRod>("rod");
+
+    btQuaternion initialRotationQuat;
+    initialRotationQuat.setEuler(rotationVector[0],rotationVector[1],rotationVector[2]);
+    btTransform initialTransform;
+    initialTransform.setIdentity();
+    initialTransform.setRotation(initialRotationQuat);
+    initialTransform.setOrigin(positionVector);
+    for(int i=0;i<rods.size();i++) {
+        rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
+        rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
+    }
 }
