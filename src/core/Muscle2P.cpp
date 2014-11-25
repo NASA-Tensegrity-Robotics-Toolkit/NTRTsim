@@ -30,6 +30,7 @@
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include <iostream>
+#include <stdexcept>
 
 Muscle2P::Muscle2P(btRigidBody * body1,
            btVector3 pos1,
@@ -50,6 +51,35 @@ anchor2(new muscleAnchor(body2, pos2))
     // In case getActualLength() gets called before updateAnchorList
     m_anchors.insert(m_anchors.begin(), anchor1);
 	m_anchors.insert(m_anchors.end(), anchor2);
+}
+
+Muscle2P::Muscle2P( const std::vector<muscleAnchor*>& anchors,
+				double coefK,
+				double dampingCoefficient,
+				double pretension) :
+m_velocity(0.0),
+m_damping(0.0),
+m_coefK (coefK),
+m_dampingCoefficient(dampingCoefficient),
+m_anchors(anchors),
+anchor1(anchors.front()),
+anchor2(anchors.back())
+{
+	assert(m_anchors.size() >= 2);
+	assert(coefK > 0.0);
+	assert(dampingCoefficient >= 0.0);
+	
+	btVector3 pos1 = anchor1->getWorldPosition();
+	btVector3 pos2 = anchor2->getWorldPosition();
+	
+	m_restLength = pos1.distance(pos2) - pretension / coefK;
+	
+	if (m_restLength <= 0.0)
+	{
+		throw std::invalid_argument("Pretension causes string to shorten past rest length!");
+	}
+	
+	m_prevLength = m_restLength;
 }
 
 void Muscle2P::calculateAndApplyForce(double dt)
