@@ -41,16 +41,16 @@ using namespace std;
 namespace {
 
 	// The fixture for testing class FileHelpers.
-	class SpinesTest : public ::testing::Test {
+	class tgUtilTest : public ::testing::Test {
 		protected:
 			// You can remove any or all of the following functions if its body
 			// is empty.
 			
-			SpinesTest() {
+			tgUtilTest() {
 					
 			}
 			
-			virtual ~SpinesTest() {
+			virtual ~tgUtilTest() {
 				// You can do clean-up work that doesn't throw exceptions here.
 			}
 			
@@ -69,7 +69,7 @@ namespace {
 			// Objects declared here can be used by all tests in the test case for FileHelpers.
 	};
 
-	TEST_F(SpinesTest, WorldConf_Spines) {
+	TEST_F(tgUtilTest, testQuaternion) {
 				
 				// This is a key test since we define btTransforms against the up axis
 				btVector3 up(0.0, 1.0, 0.0);
