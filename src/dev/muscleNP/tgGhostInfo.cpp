@@ -19,7 +19,7 @@
 /**
  * @file tgGhostInfo.cpp
  * @brief Contains the definitions of members of class tgGhostInfo
- * @author Ryan Adams
+ * @author Brian Mirletz
  * $Id$
  */
 

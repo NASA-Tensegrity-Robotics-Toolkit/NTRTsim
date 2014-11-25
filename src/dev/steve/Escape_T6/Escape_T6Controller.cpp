@@ -144,13 +144,16 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
     bool usingManualParams = true;
-    if (usingManualParams) { std::cout << "Using manually set parameters\n"; }
-    int lineNumber = 10;
-    string filename = "logs/roundCraterDeep2/bestParamsSorted.dat";
-    vector <double> manualParams(4 * nClusters); // '4' for the number of sine wave parameters
-    double pretension = 0.90;// * actions[XXX]; //TODO: Play with this value
-    manualParams = readManualParams(lineNumber, filename);
+    vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
+    if (usingManualParams) { 
+        std::cout << "Using manually set parameters\n"; 
+        //string filename = "logs/trial_7/bestParametersNoOutliersSorted.dat";
+        string filename = "logs/trial_8/bestParamsSorted.dat";
+        int lineNumber = 1;
+        manualParams = readManualParams(lineNumber, filename);
+    } 
 
+    double pretension = 0.90; // Tweak this value if need be
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
     double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
                        0.3, //Hz
@@ -190,7 +193,7 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
     }
-    printSineParams();
+    //printSineParams();
 }
 
 void Escape_T6Controller::setupAdapter() {
@@ -284,23 +287,38 @@ double Escape_T6Controller::displacement(Escape_T6Model& subject) {
                                       (newZ-oldZ) * (newZ-oldZ));
     return distanceMoved;
 }
-
+                                         
 std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    vector<double> result;
+    vector<double> result(32, 1.0);
     string line;
-    ifstream infile(filename.c_str());
-    for (int i=1; i < lineNumber; i++) {
-        infile >> line;
+    ifstream infile(filename.c_str(), ifstream::in);
+
+    // Grab line from input file
+    if (infile.is_open()) {
+        for (int i=0; i<lineNumber; i++) {
+            getline(infile, line);
+        }
+        infile.close();
     }
 
+    //cout << "Using: " << line << " as input for starting parameter values\n";
+
+    // Split line into parameters
     stringstream lineStream(line);
     string cell;
-    string::size_type sz;
+    int iCell = 0;
+    while(getline(lineStream,cell,',')) {
+        result[iCell] = atof(cell.c_str());
+        iCell++;
+    }
 
-    while(std::getline(lineStream,cell,','))
-    {
-        result.push_back(atof(cell.c_str()));
+    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
+    for (int i=0; i < result.size(); i++) {
+        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+        double seed = ((double) (rand() % 100)) / 100;
+        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
     }
 
     return result;

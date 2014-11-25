@@ -17,8 +17,8 @@
 */
 
 /**
- * @file AppTetraSpineHT.cpp
- * @brief Contains the definition function main() for the Tetra Spine Static
+ * @file AppFlemonsSpineContact.cpp
+ * @brief Contains the definition function main() for the Flemons Spine Contact
  * application.
  * @author Brian Mirletz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
@@ -26,15 +26,15 @@
  */
 
 // This application
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel_hf.h"
-#include "htSpineSine.h"
+#include "FlemonsSpineModelContact.h"
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
-#include "examples/learningSpines/tgCPGLogger.h"
+#include "core/terrain/tgHillyGround.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -47,43 +47,77 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppTetraSpineHT" << std::endl;
+    std::cout << "AppFlemonsSpineContact" << std::endl;
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
+#if (1)
+	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
+   btScalar friction = 0.5;
+   btScalar restitution = 0.0;
+   btVector3 size = btVector3(500.0, 1.5, 500.0);
+   btVector3 origin = btVector3(0.0, 0.0, 0.0);
+   size_t nx = 50;
+   size_t ny = 50;
+   double margin = 0.5;
+   double triangleSize = 7.5;
+   double waveHeight = 5.0;
+   double offset = 0.0;
+	tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
+									size, origin, nx, ny, margin, triangleSize,
+									waveHeight, offset);
+	
+	tgHillyGround* ground = new tgHillyGround(groundConfig);
+	
+   tgWorld world(config, ground); 
+#else
     tgWorld world(config); 
+#endif
 
     // Second create the view
-    const double stepSize = 1.0/4000.0; // Seconds
+    const double stepSize = 1.0/500.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 3;
-    TetraSpineStaticModel_hf* myModel =
-      new TetraSpineStaticModel_hf(segments);
-    
-    htSpineSine* const myControl =
-      new htSpineSine();
+    const int segments = 12;
+    FlemonsSpineModelContact* myModel =
+      new FlemonsSpineModelContact(segments);
 
-    myModel->attach(myControl);
-    /*
-    tgCPGLogger* const myLogger = 
-      new tgCPGLogger("logs/CPGValues.txt");
+    /* Required for setting up learning file input/output. */
+    const std::string suffix((argc > 1) ? argv[1] : "default");
     
-    myControl->attach(myLogger);
-    */
+    const int segmentSpan = 3;
+    const int numMuscles = 8;
+    const int numParams = 2;
+    const int segNumber = 6; // For learning results
+    const double controlTime = .001;
+    const double lowPhase = -1 * M_PI;
+    const double highPhase = M_PI;
+    const double lowAmplitude = -30.0;
+    const double highAmplitude = 30.0;
+    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
+												lowAmplitude, highAmplitude, lowPhase, highPhase);
+    BaseSpineCPGControl* const myControl =
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+    myModel->attach(myControl);
+    
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 1)
+    while (i < 3000)
     {
-        simulation.run(240000);
-        //simulation.reset();
+        simulation.run(30000);
+    	#ifdef BT_USE_DOUBLE_PRECISION
+		std::cout << "Double precision" << std::endl;
+	#else
+		std::cout << "Single Precision" << std::endl;
+	#endif
+        simulation.reset();
         i++;
     }
     

@@ -40,18 +40,17 @@ class muscleAnchor;
 
 class Muscle2P
 {
-public:
-    Muscle2P(btRigidBody * body1,
-         btVector3 pos1,
-         btRigidBody * body2,
-         btVector3 pos2,
-         double coefK,
-         double dampingCoefficient);
-
+public:	
+	// Alternative constructor
+	Muscle2P( const std::vector<muscleAnchor*>& anchors,
+				double coefK,
+				double dampingCoefficient,
+				double pretension = 0.0);
+	
     virtual ~Muscle2P();
 
     // Called by tensegrity class update function for each muscle2p
-    virtual btVector3 calculateAndApplyForce(double dt);
+    virtual void calculateAndApplyForce(double dt);
     
     void setName(std::string a) { name = a; }
     

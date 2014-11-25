@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 	const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
 	
 	// the world will delete this
-#if (1)
+#if (0)
 	tgBoxGround* ground = new tgBoxGround(groundConfig);
 #else
 	tgEmptyGround* ground = new tgEmptyGround();
@@ -65,8 +65,8 @@ int main(int argc, char** argv)
 	tgWorld world(config, ground);
 	
 	// Second create the view
-	const double timestep_physics = 1.0/500.0; // seconds
-	const double timestep_graphics = 1.f/500.f; // seconds
+	const double timestep_physics = 1.0/1000.0; // seconds
+	const double timestep_graphics = 1.f/60.f; // seconds
 	tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 	
 	// Third create the simulation

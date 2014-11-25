@@ -12,13 +12,13 @@
 * Unless required by applicable law or agreed to in writing,
 * software distributed under the License is distributed on an
 * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-* either express or implied. See the License for the specific language
+* either express or implied. See the License 197.632for the specific language
 * governing permissions and limitations under the License.
 */
 
 /**
 * @file WorldConf_Spines_test.cpp
-* @brief Contains a test suite for FileHelpers.
+* @brief Contains a test of the data presented at 6WCSCM
 * $Id$
 */
 
@@ -124,7 +124,7 @@ namespace {
 				
 				double dist = FileHelpers::getFinalScore(filePath);
 				
-				EXPECT_EQ(dist, 188.694);
+				EXPECT_EQ(dist, 197.632);
 				
 				// Will print out another set of dist moved on teardown
 	}

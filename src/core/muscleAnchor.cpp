@@ -33,7 +33,13 @@
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
- 
+
+// Does the contact normal get updated using the body's rotation? (99% sure its yes)
+#define USE_BASIS
+// Do we update the contact based on the manifold? - Causes contacts to be missed, doesn't prevent angular energy from accumulating
+#define SKIP_CONTACT_UPDATE
+//#define VERBOSE
+
 muscleAnchor::muscleAnchor(btRigidBody * body,
                btVector3 worldPos,
                btVector3 cn,
@@ -45,12 +51,11 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
   // This should give relative position in a default orientation.
   attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
                    worldPos),
-#if (1)
+#ifdef USE_BASIS
   contactNormal(attachedBody->getWorldTransform().inverse().getBasis() * cn),
 #else
-	contactNormal(cn),
+  contactNormal(cn),
 #endif
-  height(999.0),
   permanent(perm),
   sliding(slide),
   force(0.0, 0.0, 0.0),
@@ -58,12 +63,13 @@ muscleAnchor::muscleAnchor(btRigidBody * body,
 {
 	assert(body);
 	
+	// Ensure we're either not using a manifold, or we currently have the right manifold
 	assert(manifold == NULL || body == manifold->getBody0() || body == manifold->getBody1());
 }
 
 muscleAnchor::~muscleAnchor()
 {
-    // World will delete attached body
+    // World will delete attached body, bullet owns the manifolds
     
 }
 
@@ -81,123 +87,38 @@ btVector3 muscleAnchor::getWorldPosition() const
     return tr * attachedRelativeOriginalPosition;
 }
 
-bool muscleAnchor::updateContactNormal()
-{
-	bool ret = true;
-	
-	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
-	
-	if (sliding)
-	{
-		bool useB = true;
-		bool update = true;
-		bool colCheck = true;
-		if (manifold->getBody0() != attachedBody)
-		{
-			useB = false;			
-		}
-		if(!useB && manifold->getBody1() != attachedBody)
-		{
-			colCheck = false;
-		}
-		if (colCheck)
-		{	
-			btScalar length = INFINITY;
-			
-			
-			int n = manifold->getNumContacts();
-			
-			btVector3 newPos = getWorldPosition();
-			btVector3 contactPos = getWorldPosition();
-			btVector3 newNormal = contactNormal;
-			
-			for (int p = 0; p < n; p++)
-			{
-				const btManifoldPoint& pt = manifold->getContactPoint(p);
-				
-				// Original position picked at beginning
-				btVector3 pos = useB ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
-				
-				btScalar contactDist = (pos - newPos).length();
-				
-				if (contactDist < length)
-				{
-					length = contactDist;
-					contactPos = pos;
-					
-					btScalar directionSign = useB ? btScalar(-1.0) : btScalar(1.0);
-					
-					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
-					
-					
-				}
-				
-			}
-			
-			if ((newNormal + contactNormal).length() < 0.1)
-			{
-				//std::cout << "Reversed normal" << std::endl;
-				//ret = false;
-				
-			} 
-			
-			//contactNormal = newNormal;
-
-		}
-		else
-		{
-
-			ret = false;
-
-		}	
-		
-	}
-	else
-	{
-		ret = false;
-		
-		std::cerr << "Tried to update a static anchor" << std::endl;
-		
-	}
-	
-	return ret;	
-}
-
 bool muscleAnchor::setWorldPosition(btVector3& newPos)
 {
-	bool ret = true;
-	
-	//assert(manifold == NULL || attachedBody == manifold->getBody0() || attachedBody == manifold->getBody1());
-	
+	bool ret = false;
+
+	// Only sliding anchors should have their positions changed
 	if (sliding)
 	{
+		/// @todo - this is very similar to getManifoldDistance. Is there a good way to combine them??
+		// Figure out which body to use
 		bool useB = true;
-		bool update = true;
-		bool colCheck = true;
 		if (manifold->getBody0() != attachedBody)
 		{
 			useB = false;			
 		}
-		if(!useB && manifold->getBody1() != attachedBody)
-		{
-			colCheck = false;
-		}
-		if (colCheck)
+		
+		if(useB || manifold->getBody1() == attachedBody)
 		{	
 			btScalar length = INFINITY;
-			
 			
 			int n = manifold->getNumContacts();
 			
 			btVector3 contactPos = getWorldPosition();
 			btVector3 newNormal = contactNormal;
+			btScalar dist = 0.0;
 			
+			// Find closest contact point in this manifold
 			for (int p = 0; p < n; p++)
 			{
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
 				
 				// Original position picked at beginning
-				btVector3 pos = useB ? pt.m_positionWorldOnB : pt.m_positionWorldOnA;
+				btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
 				
 				btScalar contactDist = (pos - newPos).length();
 				
@@ -206,54 +127,64 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 					length = contactDist;
 					contactPos = pos;
 					
-					btScalar directionSign = useB ? btScalar(-1.0) : btScalar(1.0);
+					btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
 					
+#ifdef USE_BASIS
 					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+#else
+					newNormal = pt.m_normalWorldOnB * directionSign;
+#endif
+					dist = pt.getDistance();
 					
+#ifdef VERBOSE
+					if (n >= 2)
+					{
+						std::cout << "Extra contacts!! " << dist << std::endl;
+					}
+#endif
 				}
 				
 			}
 			
-			if (length > 0.1)
-			{
-				update = false;
-			}
-			
-			if (update)
-			{
-				attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
-						   newPos;
-				
-				if ((newNormal + contactNormal).length() < 0.1)
+			// We've lost this contact for some reason, skip update and delete
+			//if (!(dist > 0.0 && length < 0.01))
+			{	
+				// If contact is sufficiently close, update
+				if (length < 0.1)
 				{
-					//std::cout<< "Reversed normal" << std::endl;
+					// This makes contact handling better in some cases and worse in other
+					// Better conservation of momentum without it, but contacts tend to exist a little too long
+					// Just deleting at this stage is better for sliding, but worse for contact with multiple bodies
+					attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
+							   newPos;
+					
+					if ((newNormal + contactNormal).length() < 0.5)
+					{
+						std::cout<< "Reversed normal" << std::endl;
+					}
+					else
+					{
+						ret = true;
+					}
+					
+	// Update again here in case we have the original manifold??			
+	#ifndef SKIP_CONTACT_UPDATE
+					contactNormal = newNormal;
+	#endif	
 				}
-						   
-				//contactNormal = newNormal;
-			}
-			else if ((getWorldPosition() - contactPos).length() > 0.1)
-			{
-				ret = false;
+				// Check if the update was bad based on the original position, if not delete
+				else if ( (getWorldPosition() - contactPos).length() <= 0.1)
+				{
+					ret = true;
+				}
 			}
 		}
-		else
-		{
-		#if (0)
-			attachedRelativeOriginalPosition = attachedBody->getWorldTransform().inverse() *
-						   newPos;
-		#else
-			ret = false;
-		#endif
-		}
-		
-		
+		// Else: neither body is attached, delete
 	}
 	else
 	{
-		ret = false;
-		
 		std::cerr << "Tried to update a static anchor" << std::endl;
-		
+		// This will return as a delete, make sure you check the anchor is not permanent		
 	}
 	
 	return ret;
@@ -261,21 +192,116 @@ bool muscleAnchor::setWorldPosition(btVector3& newPos)
 
 btVector3 muscleAnchor::getContactNormal() const
 {
-#if (1)	
+
+#ifdef USE_BASIS
 	const btTransform tr = attachedBody->getWorldTransform();
     btVector3 newNormal = (tr.getBasis() * contactNormal);
     newNormal = newNormal.length() > 0.0 ? newNormal.normalize() : btVector3(0.0, 0.0, 0.0);
     //assert(newNormal.length() == 1.0);
     return newNormal;
 #else
-    return contactNormal;
+	return contactNormal;
 #endif
+
 }
 
-void muscleAnchor::updateManifold(btPersistentManifold* m)
+bool muscleAnchor::updateManifold(btPersistentManifold* m)
 {
+	bool ret = false;
+	// Does the new manifold actually affect the attached body
 	if (m && (m->getBody0() == attachedBody || m->getBody1() == attachedBody ))
 	{
-		manifold = m;
+		std::pair<btScalar, btVector3> manifoldValues = getManifoldDistance(m);
+		btScalar newDist = manifoldValues.first;
+		// If the original manifold is NULL, just use the new one
+		if (!manifold)
+		{
+			//manifold = m;
+			ret = true;
+		}
+		// Use new manifold
+		else if (getManifoldDistance(manifold).first >= newDist)
+		{
+			//manifold = m;
+			ret = true;
+		}
+		
+		// If we updated, ensure the new contact normal is good
+		if(ret)
+		{
+			btVector3 newNormal = manifoldValues.second;
+			if ((newNormal + contactNormal).length() < 0.5)
+			{
+				 std::cout <<"Reversed normal during anchor update" << std::endl;
+				 ret = false;
+			}
+			else
+			{
+				manifold = m;
+			}
+			#ifndef SKIP_CONTACT_UPDATE
+			// Updating here appears to break conservation of momentum
+			//contactNormal = newNormal;
+			#endif
+		}
 	}
+	
+	return ret;
+}
+
+std::pair<btScalar, btVector3> muscleAnchor::getManifoldDistance(btPersistentManifold* m) const
+{
+	bool useB = true;
+	
+	btScalar length = INFINITY;
+	btVector3 newNormal = contactNormal;
+	
+	if (m->getBody0() != attachedBody)
+	{
+		useB = false;			
+	}
+	if(useB || m->getBody1() == attachedBody)
+	{	
+			
+		int n = m->getNumContacts();
+		
+		btVector3 contactPos = getWorldPosition();
+		btScalar dist = 0.0;
+		for (int p = 0; p < n; p++)
+		{
+			const btManifoldPoint& pt = m->getContactPoint(p);
+			
+			// Original position picked at beginning
+			btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
+			
+			btScalar contactDist = (pos - getWorldPosition()).length();
+			
+			if (contactDist < length)
+			{
+				length = contactDist;
+				contactPos = pos;
+				
+				btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
+				
+				if (length < 0.1)
+				{
+					#ifdef USE_BASIS
+					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+					#else
+					newNormal = pt.m_normalWorldOnB * directionSign;
+					#endif
+				}
+				
+				dist = pt.getDistance();
+#ifdef VERBOSE				
+				if (n >= 2)
+				{
+					std::cout << "Extra contacts!! " << p << " length " << length << " dist: " << dist << std::endl;
+				}		
+#endif
+			}
+		}
+	}
+	
+	return std::make_pair<btScalar, btVector3> (length, newNormal);
 }

@@ -29,4 +29,5 @@ subdirs(
     muscleNPTests
     tetraCollisions
     muscleNPEnergy
+    TCContact
     )

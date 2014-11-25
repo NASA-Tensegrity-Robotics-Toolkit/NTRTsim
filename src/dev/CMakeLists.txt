@@ -12,5 +12,6 @@ subdirs(
     apsabelhaus
     SpineHardwareProject
     muscleNP
+    jbruce
 )
 

@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h" // stream operations for collision shapes
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
@@ -205,9 +205,21 @@ public:
         if (almostEqual(a, b)) {
             result = btQuaternion::getIdentity();
         } else if (almostEqual(a, -b)) {
-
-			result = -btQuaternion::getIdentity();      
-            
+            // Account for opposing vectors (can't calculate c in
+            // this case either)
+            btVector3 xAxis(1.0, 0.0, 0.0);
+            if (a.dot(xAxis) == 0.0)
+            {
+				// Gets around bad btTransforms with an up vector
+				result = btQuaternion (-1.0, 0.0, 0.0, 0.0);
+			}
+			else
+			{	
+				const btVector3 arb =
+				a + getArbitraryNonParallelVector(a);
+				const btVector3 c = (a.cross(arb)).normalize();
+				result = btQuaternion(c, M_PI).normalize();
+			}
         } else {
             // Create a vector normal to both a and b
             const btVector3 c = (a.cross(b)).normalize();
@@ -217,6 +229,21 @@ public:
             result = btQuaternion(c, acos(a.dot(b))).normalize();
         }
         return result;
+    }
+
+    /**
+     * Return a random btVector3 that is not parallel to v.
+     * @param[in] v a btVector3, passed by value
+     * @return a random btVector3 that is not parallel to v
+     */
+    inline static btVector3 getArbitraryNonParallelVector(btVector3 v)
+    {
+        btVector3 arb;
+        v.normalize();
+        do {
+            arb = btVector3(rand()%10, rand()%10, rand()%10).normalize();
+        } while (arb == v || arb == -v);
+        return arb;
     }
 
     /** 

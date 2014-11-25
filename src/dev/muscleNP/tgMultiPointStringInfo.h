@@ -19,7 +19,7 @@
 /**
  * @file tgMultiPointStringInfo.h
  * @brief Definition of class tgMultiPointStringInfo
- * @author Ryan Adams
+ * @author Brian Mirletz and Ryan Adams
  * @date October 2014
  * $Id$
  */

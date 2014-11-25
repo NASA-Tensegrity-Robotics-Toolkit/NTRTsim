@@ -52,15 +52,15 @@ int main(int argc, char** argv)
 #endif
 	std::cout << point1 << " " << point2 << " " << point3 << std::endl;
 
-	//std::cout << "new point " << (point3 - point1).dot(point2) << std::endl;
-	//std::cout << "old point " << (point3 - point1).dot(point3) << std::endl;
+	std::cout << "new point " << (point3 - point1).dot(point2) << std::endl;
+	std::cout << "old point " << (point3 - point1).dot(point3) << std::endl;
 	
 	btVector3 lineA = point3 - point2;
 	btVector3 lineB = point1 - point2;
 	
 	normal.normalize();
 	
-#if (0)	
+#if (1)	
 	btVector3 tangentDir =( (lineB - lineA).cross(normal)).normalize();
 	btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
 	btVector3 newPos = point2 + tangentMove;
