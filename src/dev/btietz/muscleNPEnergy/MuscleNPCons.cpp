@@ -179,3 +179,45 @@ void MuscleNPCons::onVisit(const tgModelVisitor& r) const
 	r.render(*this);
 	tgModel::onVisit(r);
 }
+
+double MuscleNPCons::getEnergy()
+{
+	double energy = 0;
+	btScalar mass = 0;
+	for (std::size_t i = 0; i < allRods.size(); i++)
+	{
+		tgBaseRigid& ri = *(allRods[i]);
+		btRigidBody* body = ri.getPRigidBody();
+		btVector3 localVel = body->getLinearVelocity();
+		energy += localVel.length2() * ri.mass();// + body->getAngularVelocity().length2() ;
+		mass += ri.mass();
+	}
+	
+	return energy;
+}
+
+btVector3 MuscleNPCons::getMomentum()
+{
+	btVector3 vCom(0, 0, 0);
+	btScalar mass = 0;
+
+	for (std::size_t i = 0; i < allRods.size(); i++)
+	{
+		tgBaseRigid& ri = *(allRods[i]);
+		btRigidBody* body = ri.getPRigidBody();
+		btVector3 localVel = body->getLinearVelocity();
+		vCom += localVel * ri.mass();
+		mass += ri.mass();
+	}
+	
+	return vCom;
+}
+
+btVector3 MuscleNPCons::getVelocityOfBody(std::size_t body_num)
+{
+	assert(body_num < allRods.size() && body_num >= 0);
+	tgBaseRigid& ri = *(allRods[body_num]);
+	btRigidBody* body = ri.getPRigidBody();
+	
+	return body->getLinearVelocity();
+}

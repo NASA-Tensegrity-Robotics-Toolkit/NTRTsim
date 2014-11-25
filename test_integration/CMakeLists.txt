@@ -21,10 +21,12 @@ include_directories(${ENV_INC_DIR}
 					${ENV_INC_DIR}/boost
 					${ENV_INC_DIR}/tensegrity
 					${PROJECT_SOURCE_DIR}
+					${SRC_DIR}
 					${OPENGL_LIB}
 					${OPENGL_FG_LIB}
 					"/usr/include/glib-2.0")
 link_directories(${ENV_LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
 
 subdirs(
+ MuscleNP
  SpineTests)

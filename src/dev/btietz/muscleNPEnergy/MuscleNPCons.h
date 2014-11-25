@@ -84,6 +84,19 @@ public:
 	*/
 	virtual void onVisit(const tgModelVisitor& r) const;
 	
+		/**
+	 * Sums the square of the velocity times the mass
+	 * @todo account for rotational energy as well, and energy in the string
+	 */
+	double getEnergy();
+	
+	/**
+	 * Returns a btVector3 of the current center of mass velocity (momentum)
+	 */
+	btVector3 getMomentum();
+	
+	btVector3 getVelocityOfBody(std::size_t body_num);
+	
 private:
 	double totalTime;
 	std::vector<tgLinearString*> allMuscles;
