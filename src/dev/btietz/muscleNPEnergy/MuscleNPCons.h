@@ -30,6 +30,10 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+
+// The Bullet Physics Library
+#include "LinearMath/btVector3.h"
+
 // The C++ Standard Library
 #include <vector>
 
@@ -88,14 +92,14 @@ public:
 	 * Sums the square of the velocity times the mass
 	 * @todo account for rotational energy as well, and energy in the string
 	 */
-	double getEnergy();
+	virtual double getEnergy() const;
 	
 	/**
 	 * Returns a btVector3 of the current center of mass velocity (momentum)
 	 */
-	btVector3 getMomentum();
+	virtual btVector3 getMomentum() const;
 	
-	btVector3 getVelocityOfBody(std::size_t body_num);
+	virtual btVector3 getVelocityOfBody(int body_num) const;
 	
 private:
 	double totalTime;

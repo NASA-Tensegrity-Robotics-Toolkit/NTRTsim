@@ -68,12 +68,17 @@ int main(int argc, char** argv)
 	MuscleNPCons* const myModel = new MuscleNPCons();
 	// Add the model to the world
 	simulation.addModel(myModel);
-	int i = 0;
-	while (i<5)
-	{
-		simulation.run(4000);
-		simulation.reset();
-		i++;
-	}
+	
+	double energyStart = myModel->getEnergy();
+	btVector3 momentumStart = myModel->getMomentum();
+	btVector3 velocityStart = myModel->getVelocityOfBody(2);
+
+	simulation.run(4000);
+	simulation.reset();
+	
+	double energyEnd = myModel->getEnergy();
+	btVector3 momentumEnd = myModel->getMomentum();
+	btVector3 velocityEnd = myModel->getVelocityOfBody(2);
+
 	return 0;
 }

@@ -31,6 +31,9 @@
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 #include "core/terrain/tgEmptyGround.h"
+
+#include "LinearMath/btVector3.h"
+
 // The C++ Standard Library
 #include <iostream>
 #include <fstream>
@@ -71,7 +74,7 @@ namespace {
 			// Objects declared here can be used by all tests in the test case for FileHelpers.
 	};
 
-	TEST_F(MuscleNPTest, MuscleNP_momentum) {
+	TEST_F(MuscleNPTest, MuscleNPMomentum) {
 
 				// First create the world
 				const tgWorld::Config config(0.0); // gravity, cm/sec^2
@@ -88,8 +91,7 @@ namespace {
 
 				// Fourth create the models with their controllers and add the models to the
 				// simulation
-				MuscleNPCons* myModel =
-				  new MuscleNPCons();
+				MuscleNPCons* myModel = new MuscleNPCons();
 
 				simulation.addModel(myModel);
 				

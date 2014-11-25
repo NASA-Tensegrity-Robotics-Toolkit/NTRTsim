@@ -104,6 +104,8 @@ void MuscleNPCons::setup(tgWorld& world)
 	structureInfo.buildInto(*this, world);
 	// We could now use tgCast::filter or similar to pull out the
 	// models (e.g. muscles) that we want to control.
+	allRods.clear();
+	allMuscles.clear();
 	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
 	allRods = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
 	
@@ -157,17 +159,19 @@ void MuscleNPCons::step(double dt)
 		forceSum += anchorList[i]->getForce();
 	}
 	
-#if (0)	
+#if (1)	
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Energy " << energy << std::endl;
+	std::cout << "Other Momentum " << getMomentum() << std::endl;
 	std::cout << "Force sum " << forceSum << std::endl;
 	std::cout << "Length " << allMuscles[0]->getCurrentLength();
 	std::cout << " Dist " << (anchorList[0]->getWorldPosition() - anchorList[n-1]->getWorldPosition()).length() << std::endl;
 	std::cout << "Anchors: " << n << std::endl;
-#endif	
+	
 	if (energy > 20){
 		std::cout << "Here!" << std::endl;
 	}
+#endif
 }
 
 /**
@@ -180,44 +184,44 @@ void MuscleNPCons::onVisit(const tgModelVisitor& r) const
 	tgModel::onVisit(r);
 }
 
-double MuscleNPCons::getEnergy()
+double MuscleNPCons::getEnergy() const
 {
 	double energy = 0;
 	btScalar mass = 0;
 	for (std::size_t i = 0; i < allRods.size(); i++)
 	{
-		tgBaseRigid& ri = *(allRods[i]);
-		btRigidBody* body = ri.getPRigidBody();
+		tgBaseRigid* ri = allRods[i];
+		btRigidBody* body = ri->getPRigidBody();
 		btVector3 localVel = body->getLinearVelocity();
-		energy += localVel.length2() * ri.mass();// + body->getAngularVelocity().length2() ;
-		mass += ri.mass();
+		energy += localVel.length2() * ri->mass();// + body->getAngularVelocity().length2() ;
+		mass += ri->mass();
 	}
 	
 	return energy;
 }
 
-btVector3 MuscleNPCons::getMomentum()
+btVector3 MuscleNPCons::getMomentum() const
 {
 	btVector3 vCom(0, 0, 0);
 	btScalar mass = 0;
 
 	for (std::size_t i = 0; i < allRods.size(); i++)
 	{
-		tgBaseRigid& ri = *(allRods[i]);
-		btRigidBody* body = ri.getPRigidBody();
+		tgBaseRigid* ri = allRods[i];
+		btRigidBody* body = ri->getPRigidBody();
 		btVector3 localVel = body->getLinearVelocity();
-		vCom += localVel * ri.mass();
-		mass += ri.mass();
+		vCom += localVel * ri->mass();
+		mass += ri->mass();
 	}
 	
 	return vCom;
 }
 
-btVector3 MuscleNPCons::getVelocityOfBody(std::size_t body_num)
+btVector3 MuscleNPCons::getVelocityOfBody(int body_num) const
 {
 	assert(body_num < allRods.size() && body_num >= 0);
-	tgBaseRigid& ri = *(allRods[body_num]);
-	btRigidBody* body = ri.getPRigidBody();
+	tgBaseRigid* ri = allRods[body_num];
+	btRigidBody* body = ri->getPRigidBody();
 	
 	return body->getLinearVelocity();
 }
