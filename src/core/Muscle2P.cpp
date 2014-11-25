@@ -32,27 +32,6 @@
 #include <iostream>
 #include <stdexcept>
 
-Muscle2P::Muscle2P(btRigidBody * body1,
-           btVector3 pos1,
-           btRigidBody * body2,
-           btVector3 pos2,
-           double coefK,
-           double dampingCoefficient) :
-m_velocity(0.0),
-m_damping(0.0),
-m_coefK (coefK),
-m_dampingCoefficient(dampingCoefficient),
-anchor1(new muscleAnchor(body1, pos1)),
-anchor2(new muscleAnchor(body2, pos2))
-{
-    m_restLength = pos1.distance(pos2);
-    m_prevLength = m_restLength;
-    
-    // In case getActualLength() gets called before updateAnchorList
-    m_anchors.insert(m_anchors.begin(), anchor1);
-	m_anchors.insert(m_anchors.end(), anchor2);
-}
-
 Muscle2P::Muscle2P( const std::vector<muscleAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,

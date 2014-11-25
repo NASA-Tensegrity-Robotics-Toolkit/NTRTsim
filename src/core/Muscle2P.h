@@ -40,15 +40,7 @@ class muscleAnchor;
 
 class Muscle2P
 {
-public:
-	// Original constructor
-    Muscle2P(btRigidBody * body1,
-         btVector3 pos1,
-         btRigidBody * body2,
-         btVector3 pos2,
-         double coefK,
-         double dampingCoefficient);
-	
+public:	
 	// Alternative constructor
 	Muscle2P( const std::vector<muscleAnchor*>& anchors,
 				double coefK,

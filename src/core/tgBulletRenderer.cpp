@@ -33,7 +33,6 @@
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
 
-#include "dev/muscleNP/MuscleNP.h"
 #include "tgCast.h"
 
 #include "LinearMath/btQuickprof.h"

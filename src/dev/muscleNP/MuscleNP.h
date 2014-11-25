@@ -67,28 +67,19 @@ public:
 	 * @param[in] ghostObject - the btPairCashingGhostObject that this interacts with
 	 * @param[in] world - the tgWorld - we need to keep access to the bullet 
 	 * dynamics world's broadphase so that we can determine collisions and contact points
-	 * @param[in] body1 - The rigid body associated with anchor1, a member variable of Muscle2P
-	 * @param[in] pos1 - The world position associated with anchor1, a member variable of Muscle2P
-	 * @param[in] body2 - The rigid body associated with anchor2, a member variable of Muscle2P
+	 * @param[in] anchors - a reference to a list of anchors. Will be passed to Muscle2P
+	 * and form the initial (likely permanent) anchor list. Size must be 2 or greater
+	 * (enforced in Muscle2P)
 	 * @param[in] coefK - The stiffness of this cable. Units are 
 	 * mass / sec^2, sets a member variable of Muscle2P
 	 * @param[in] dampingCofefficient - The damping coefficient of the force application equation.
 	 * Units are mass / sec, sets a member variable of Muscle2P
+	 * @param[in] The pretension on the string, units are force. Must be small enough 
+	 * (based on stiffness) such that rest length > 0;
 	 * @param[in] thickness, the radius of the cylinder used for the btCollisionObject
 	 * @param[in] resolution, the spatial resultion used to prune new contacts. 
 	 * also affects runtime (lower corresponds to longer runtime)
 	 */
-    MuscleNP(btPairCachingGhostObject* ghostObject,
-            tgWorld& world,
-         btRigidBody * body1,
-         btVector3 pos1,
-         btRigidBody * body2,
-         btVector3 pos2,
-         double coefK,
-         double dampingCoefficient,
-         double thickness = 0.001,
-         double resolution = 0.1);
-    
     MuscleNP(btPairCachingGhostObject* ghostObject,
 				tgWorld& world,
 				const std::vector<muscleAnchor*>& anchors,

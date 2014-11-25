@@ -56,25 +56,6 @@
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
- btRigidBody * body1,
- btVector3 pos1,
- btRigidBody * body2,
- btVector3 pos2,
- double coefK,
- double dampingCoefficient,
- double thickness,
- double resolution) :
-Muscle2P (body1, pos1, body2, pos2, coefK, dampingCoefficient),
-m_ghostObject(ghostObject),
-m_world(world),
-m_thickness(thickness),
-m_resolution(resolution)
-{
-
-}
-
-MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
- tgWorld& world,
  const std::vector<muscleAnchor*>& anchors,
  double coefK,
  double dampingCoefficient,
