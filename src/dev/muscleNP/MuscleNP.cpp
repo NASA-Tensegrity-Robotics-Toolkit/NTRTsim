@@ -72,6 +72,23 @@ m_resolution(resolution)
 {
 
 }
+
+MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
+ tgWorld& world,
+ const std::vector<muscleAnchor*>& anchors,
+ double coefK,
+ double dampingCoefficient,
+ double pretension,
+ double thickness,
+ double resolution) :
+Muscle2P (anchors, coefK, dampingCoefficient, pretension),
+m_ghostObject(ghostObject),
+m_world(world),
+m_thickness(thickness),
+m_resolution(resolution)
+{
+
+}
          
 MuscleNP::~MuscleNP()
 {

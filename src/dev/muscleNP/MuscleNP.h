@@ -89,6 +89,14 @@ public:
          double thickness = 0.001,
          double resolution = 0.1);
     
+    MuscleNP(btPairCachingGhostObject* ghostObject,
+				tgWorld& world,
+				const std::vector<muscleAnchor*>& anchors,
+				double coefK,
+				double dampingCoefficient,
+				double pretension = 0.0,
+				double thickness = 0.001,
+				double resolution = 0.1);
     /**
      * The destructor. Removes the ghost object from the world,
      * deletes its collision shape, and then deletes the object.
