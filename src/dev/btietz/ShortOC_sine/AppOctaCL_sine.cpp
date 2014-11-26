@@ -17,16 +17,17 @@
 */
 
 /**
- * @file AppFlemonsSpineLearningCL.cpp
+ * @file AppOctaCL_sine.cpp
  * @brief Contains the definition function main() for the Flemons Spine Learning
  * application.
- * @author Brian Tietz
+ * @author Brian Mirletz
  * $Id$
  */
 
 // This application
 #include "examples/learningSpines/OctahedralComplex/FlemonsSpineModelLearningCL.h"
 // This library
+#include "OctaCLSine.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -86,8 +87,8 @@ int main(int argc, char** argv)
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
 												lowAmplitude, highAmplitude, lowPhase, highPhase,
 												tension, kPosition, kVelocity);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "bmirletz/OctaCL_CPG/");
+    OctaCLSine* const myControl =
+      new OctaCLSine(control_config, suffix, "bmirletz/OctaCL_sine/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);
