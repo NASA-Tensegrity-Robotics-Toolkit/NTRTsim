@@ -33,6 +33,7 @@
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
+#include "dev/muscleNP/tgMultiPointStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -73,9 +74,9 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
     const double pretension = 0.0;
-    //const int segments = 8;
+    
     const tgLinearString::Config stringConfig(stiffness, damping, pretension, false, 7000, 24, 10000);
-    //const tgRBString::Config rbConfig(segments, rodConfig2, stringConfig, 10.0);
+    
     
     const double passivePretension = 1000; // 10 N
     tgLinearString::Config muscleConfig(2000, 20, passivePretension);
@@ -191,6 +192,9 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     #if (1)
+    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgMultiPointStringInfo(stringConfig));
+    #else
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("muscle2", new tgLinearStringInfo(stringConfig));
     #endif
