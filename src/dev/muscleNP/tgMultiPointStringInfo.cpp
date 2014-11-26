@@ -136,6 +136,6 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 	m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
-    return new MuscleNP(m_ghostObject, world, anchorList, m_config.stiffness, m_config.damping);
+    return new MuscleNP(m_ghostObject, world, anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }
     

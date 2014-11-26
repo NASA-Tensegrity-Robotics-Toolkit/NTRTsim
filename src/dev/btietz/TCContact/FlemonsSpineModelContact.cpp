@@ -71,7 +71,7 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    tgLinearString::Config muscleConfig(1000, 10, false, 0, 7000, 12, 4000);
+    tgLinearString::Config muscleConfig(1000, 10, 0.0, false, 7000, 12, 4000);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;

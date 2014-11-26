@@ -177,7 +177,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 100, false, 0, 7000, 24, 10000);
+    tgLinearString::Config muscleConfig(1000, 100, 0, false, 7000, 24, 10000);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
 #else // Params for In Won
     const double density = .00311;

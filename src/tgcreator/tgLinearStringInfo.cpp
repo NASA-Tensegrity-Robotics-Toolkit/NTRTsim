@@ -96,6 +96,6 @@ Muscle2P* tgLinearStringInfo::createMuscle2P()
 	muscleAnchor* anchor2 = new muscleAnchor(toBody, to);
 	anchorList.push_back(anchor2);
 	
-    return new Muscle2P(anchorList, m_config.stiffness, m_config.damping);
+    return new Muscle2P(anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }
     

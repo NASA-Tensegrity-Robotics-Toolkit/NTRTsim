@@ -267,8 +267,8 @@ void TetraSpineCollisions::setup(tgWorld& world)
     
     
     // Two different string configs
-    tgLinearString::Config muscleConfig(229.16 * 2.0, 20, false, 0, 500, 7.0, 9500, 0.1, 0.1);
-    tgLinearString::Config muscleConfig2(229.16, 20, false, 0, 500, 7.0, 9500, 0.1, 0.1);
+    tgLinearString::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 500, 7.0, 9500, 0.1, 0.1);
+    tgLinearString::Config muscleConfig2(229.16, 20, 0.0, false, 500, 7.0, 9500, 0.1, 0.1);
 #if (1)
     spec.addBuilder("top muscle", new tgMultiPointStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgMultiPointStringInfo(muscleConfig2));
