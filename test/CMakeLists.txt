@@ -14,4 +14,5 @@ include_directories(${ENV_INC_DIR})
 link_directories(${ENV_LIB_DIR})
 
 subdirs(
- helpers)
+ helpers
+ tgcreator)

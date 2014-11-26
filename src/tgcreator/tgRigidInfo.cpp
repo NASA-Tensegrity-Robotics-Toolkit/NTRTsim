@@ -34,7 +34,13 @@
 #include "core/tgBulletUtil.h"
 #include "core/tgTagSearch.h"
 #include "tgUtil.h"
+#include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
+
+
+// The Bullet Physics library
+#include "btBulletDynamicsCommon.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 
 tgRigidInfo* tgRigidInfo::createRigidInfo(const tgNode& node, const tgTagSearch& tagSearch)
 {
@@ -114,6 +120,17 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
             }
         }
     }
+
+btRigidBody* tgRigidInfo::getRigidBody() 
+{ 
+	btRigidBody* body = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return body;
+}
+
+const btRigidBody* tgRigidInfo::getRigidBody() const { 
+	const btRigidBody* body = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
+	return body;
+}
     
 bool tgRigidInfo::sharesNodesWith(const tgRigidInfo& other) const
 {

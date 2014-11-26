@@ -64,7 +64,8 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
-        double rotation;  
+        double pretension;
+        bool   history;  
         double maxTens;
         double targetVelocity;
         double maxAcc;
@@ -80,6 +81,7 @@ namespace
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
      0,        // rotation
+     false,    // history
      100000,   // maxTens
      10000,    // targetVelocity
      20000     // maxAcc
@@ -267,8 +269,8 @@ void SuperBallModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
-					    c.maxTens, c.targetVelocity, 
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension,
+					    c.history, c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             
     // Start creating the structure

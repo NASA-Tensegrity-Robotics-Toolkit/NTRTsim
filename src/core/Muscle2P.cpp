@@ -25,30 +25,43 @@
 
 // This module
 #include "Muscle2P.h"
+#include "muscleAnchor.h"
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include <iostream>
+#include <stdexcept>
 
-Muscle2P::Muscle2P(btRigidBody * body1,
-           btVector3 pos1,
-           btRigidBody * body2,
-           btVector3 pos2,
-           double coefK,
-           double dampingCoefficient) :
+Muscle2P::Muscle2P( const std::vector<muscleAnchor*>& anchors,
+				double coefK,
+				double dampingCoefficient,
+				double pretension) :
 m_velocity(0.0),
 m_damping(0.0),
 m_coefK (coefK),
-m_dampingCoefficient(dampingCoefficient)
-
+m_dampingCoefficient(dampingCoefficient),
+m_anchors(anchors),
+anchor1(anchors.front()),
+anchor2(anchors.back())
 {
-    anchor1 = new muscleAnchor(body1, pos1);
-    anchor2 = new muscleAnchor(body2, pos2);
-    m_restLength = pos1.distance(pos2);
-    m_prevLength = m_restLength;
+	assert(m_anchors.size() >= 2);
+	assert(coefK > 0.0);
+	assert(dampingCoefficient >= 0.0);
+	
+	btVector3 pos1 = anchor1->getWorldPosition();
+	btVector3 pos2 = anchor2->getWorldPosition();
+	
+	m_restLength = pos1.distance(pos2) - pretension / coefK;
+	
+	if (m_restLength <= 0.0)
+	{
+		throw std::invalid_argument("Pretension causes string to shorten past rest length!");
+	}
+	
+	m_prevLength = m_restLength;
 }
 
-btVector3 Muscle2P::calculateAndApplyForce(double dt)
+void Muscle2P::calculateAndApplyForce(double dt)
 {
     btVector3 force(0.0, 0.0, 0.0);
     double magnitude = 0.0;
@@ -99,8 +112,6 @@ btVector3 Muscle2P::calculateAndApplyForce(double dt)
     btVector3 point2 = this->anchor2->getRelativePosition();
     this->anchor2->attachedBody->activate();
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
-
-    return force;
 }
 
 void Muscle2P::setRestLength( const double newRestLength)
@@ -136,44 +147,25 @@ Muscle2P::~Muscle2P()
     #if (0)
     std::cout << "Destroying Muscle2P" << std::endl;
     #endif
-    delete anchor1;
-    delete anchor2;
-}
-
-// todo: make seperate class
-
-muscleAnchor::muscleAnchor()
-{
-}
-
-muscleAnchor::muscleAnchor(btRigidBody * body,
-               btVector3 worldPos) :
-  attachedBody(body),
-  // Find relative position
-  // This should give relative position in a default orientation.
-  attachedRelativeOriginalPosition(attachedBody->getWorldTransform().inverse() *
-                   worldPos),
-  height(999.0)
-{
-}
-
-muscleAnchor::~muscleAnchor()
-{
-    // World should delete this
-    attachedBody = NULL;
+	
+	std::size_t n = m_anchors.size();
+	
+    // Make absolutely sure these are deleted, in case we have a poorly timed reset
+    if (m_anchors[0] != anchor1)
+    {
+		delete anchor1;
+    }
     
-}
+    if (m_anchors[n-1] != anchor2)
+    {
+		delete anchor2;
+	}
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+		delete m_anchors[i];
+	}
 
-// This returns current position relative to the rigidbody.
-btVector3 muscleAnchor::getRelativePosition()
-{
-    const btTransform tr = attachedBody->getWorldTransform();
-    const btVector3 worldPos = tr * attachedRelativeOriginalPosition;
-    return worldPos-this->attachedBody->getCenterOfMassPosition();
-}
-
-btVector3 muscleAnchor::getWorldPosition()
-{
-    const btTransform tr = attachedBody->getWorldTransform();
-    return tr * attachedRelativeOriginalPosition;
+	
+    m_anchors.clear();
 }

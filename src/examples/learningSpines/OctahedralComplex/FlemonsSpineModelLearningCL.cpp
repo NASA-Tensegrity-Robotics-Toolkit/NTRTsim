@@ -72,8 +72,9 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
+    const double pretension = 0.0;
     //const int segments = 8;
-    const tgLinearString::Config stringConfig(stiffness, damping, false, 0, 7000, 24, 10000);
+    const tgLinearString::Config stringConfig(stiffness, damping, pretension, false, 7000, 24, 10000);
     //const tgRBString::Config rbConfig(segments, rodConfig2, stringConfig, 10.0);
     
     tgLinearString::Config muscleConfig(2000, 20);

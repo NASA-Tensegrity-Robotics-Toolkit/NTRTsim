@@ -73,10 +73,10 @@ tgRigidInfo* tgBoxInfo::createRigidInfo(const tgPair& pair)
 void tgBoxInfo::initRigidBody(tgWorld& world)
 {
     tgRigidInfo::initRigidBody(world);
-    assert(m_rigidBody != NULL);
-    m_rigidBody->setFriction(m_config.friction);
-    m_rigidBody->setRollingFriction(m_config.rollFriction);
-    m_rigidBody->setRestitution(m_config.restitution);
+    assert(m_collisionObject != NULL);
+    getRigidBody()->setFriction(m_config.friction);
+    getRigidBody()->setRollingFriction(m_config.rollFriction);
+    getRigidBody()->setRestitution(m_config.restitution);
 }
 
 tgModel* tgBoxInfo::createModel(tgWorld& world)

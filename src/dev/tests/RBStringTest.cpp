@@ -60,10 +60,11 @@ void RBStringTest::setup(tgWorld& world)
     // todo - figure out a way to change only the one parameter with less code
     const double stiffness = m_config.m_stringConfig.stiffness;
     const double damping = m_config.m_stringConfig.damping;
-    tgLinearString::Config muscleConfig1(stiffness, damping, false, -M_PI / 2.0);
-    tgLinearString::Config muscleConfig2(stiffness, damping, false, M_PI / 2.0);
-    tgLinearString::Config muscleConfig3(stiffness, damping, false, M_PI);
-    tgLinearString::Config muscleConfig4(stiffness, damping, false, 0);
+    const double pretension = 0.0;
+    tgLinearString::Config muscleConfig1(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, -M_PI / 2.0);
+    tgLinearString::Config muscleConfig2(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, M_PI / 2.0);
+    tgLinearString::Config muscleConfig3(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, M_PI);
+    tgLinearString::Config muscleConfig4(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, 0);
     
     // Calculations for the flemons spine model
     double v_size = m_config.m_minTotalLength / (double) m_config.m_segments;

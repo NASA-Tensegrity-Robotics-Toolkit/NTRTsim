@@ -34,6 +34,7 @@
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+#include "dev/muscleNP/tgMultiPointStringInfo.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -64,7 +65,8 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
-        double rotation;  
+        double pretension;
+        bool   history;  
         double maxTens;
         double targetVelocity;
         double maxAcc;
@@ -79,7 +81,8 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0,        // rotation
+     0.0,        // pretension (force)
+     false,    // history (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
      20000     // maxAcc
@@ -163,7 +166,7 @@ void T6SphereModel::addMuscles(tgStructure& s)
     s.addPair(6, 11, "muscle");
 
     s.addPair(7, 8,  "muscle");
-    s.addPair(7, 9,  "muscle");
+    s.addPair(7, 9,  "muscleN");
 
 }
 
@@ -173,11 +176,11 @@ void T6SphereModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
     
-    const tgSphere::Config sphereConfig(0.5, 0.5);
+    const tgSphere::Config sphereConfig(0.5, 0.25);
     
     const tgSphere::Config sphereConfig2(0.5, 2.5);
             
@@ -198,9 +201,10 @@ void T6SphereModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
     //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
-    spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig2));
+    //spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
+    //spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

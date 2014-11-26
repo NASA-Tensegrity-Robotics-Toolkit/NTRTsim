@@ -254,11 +254,12 @@ void RibModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));  
     
+    const double pretension = 0.0;
     const bool	 hist = false;
     
-    tgLinearString::Config muscleConfig(500, 5, hist);
+    tgLinearString::Config muscleConfig(500, 5, pretension, hist);
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    tgLinearString::Config muscleConfigAct(1000, 10, hist, 0, 7000, 24, 10000);
+    tgLinearString::Config muscleConfigAct(1000, 10, pretension, hist, 7000, 24, 10000);
     spec.addBuilder("muscleAct", new tgLinearStringInfo(muscleConfigAct));
     
     #if (0) // Compliant Rib Attachments

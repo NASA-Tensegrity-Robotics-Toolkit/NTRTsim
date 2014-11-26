@@ -30,6 +30,9 @@
 #include "tgSimView.h"
 #include "tgSimViewGraphics.h"
 #include "tgWorld.h"
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -75,6 +78,9 @@ void tgSimulation::addModel(tgModel* pModel)
 
 void tgSimulation::onVisit(const tgModelVisitor& r) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgSimulation::onVisit");
+#endif //BT_NO_PROFILE	
         // Removed sending the visitor to the world since it wasn't used
         // Write a worldVisitor if its necessary
         for (int i = 0; i < m_models.size(); i++) {
@@ -105,6 +111,8 @@ tgWorld& tgSimulation::getWorld() const
 
 void tgSimulation::step(double dt) const
 {
+// Trying to profile here creates trouble for tgLinearString -  this is outside of the profile loop	
+	
         if (dt <= 0)
     {
         throw std::invalid_argument("dt for step is not positive");

@@ -17,6 +17,7 @@ add_library(${PROJECT_NAME} SHARED
             )
 
 subdirs(
+	Corde
     boxFeet
     caterpillar
     RBTests
@@ -25,4 +26,8 @@ subdirs(
     hardwareLearning
     hardwareSineWaves
     handTunedSineWaves
+    muscleNPTests
+    tetraCollisions
+    muscleNPEnergy
+    TCContact
     )

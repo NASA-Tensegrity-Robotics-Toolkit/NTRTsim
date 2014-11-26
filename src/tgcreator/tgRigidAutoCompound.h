@@ -31,6 +31,7 @@
 #include <deque>
 
 class tgRigidInfo;
+class btCollisionObject;
 class btRigidBody;
 
 /**
@@ -58,7 +59,7 @@ protected:
     
     // @todo: we probably don't need this any more -- this will be taken care of in the tgRigidInfo => tgModel step
     // @todo: NOTE: we need to have a way to check to see if a rigid has already been instantiated -- maybe just check get
-    void setRigidBodyForGroup(btRigidBody* body, std::deque<tgRigidInfo*>& group);
+    void setRigidBodyForGroup(btCollisionObject* body, std::deque<tgRigidInfo*>& group);
    
     void setRigidInfoForGroup(tgRigidInfo* rigidInfo, std::deque<tgRigidInfo*>& group);
     

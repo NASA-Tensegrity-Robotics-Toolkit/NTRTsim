@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h" // stream operations for collision shapes
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
@@ -96,8 +96,11 @@ public:
         btTransform t = btTransform();
         t.setIdentity();
         t.setOrigin(origin);
-        t.setRotation(getQuaternionBetween(startOrientation,
-                           getVector(start, end)));
+        // If they for some reason gave us the same vector, keep identity
+        
+		t.setRotation(getQuaternionBetween(startOrientation,
+					   getVector(start, end)));
+
         return t;
     }
     
@@ -125,7 +128,7 @@ public:
      * Get a vector that points from a to b.
      * @param[in] from a btVector3
      * @param[in] to a btVector3
-     * @return the vector difference to - from
+     * @return the vector difference to - fromn
      */
     static btVector3 getVector(const btVector3& from,
                    const btVector3& to)
@@ -188,6 +191,7 @@ public:
      * @param[in] b a btVector3, passed by value
      * @return a quaternion that, if applied, would rotate vector a to align
      * with vector b
+     * @todo get some sensible value if a or b = (0, 0, 0). See getTransform
      */
     static btQuaternion getQuaternionBetween(btVector3 a, btVector3 b) 
     {
@@ -196,18 +200,26 @@ public:
 
         // The return value
         btQuaternion result;
-
+		
         // Account for equal vectors (can't calculate c in this case)
         if (almostEqual(a, b)) {
             result = btQuaternion::getIdentity();
         } else if (almostEqual(a, -b)) {
             // Account for opposing vectors (can't calculate c in
             // this case either)
-            // What to do here?
-            const btVector3 arb =
-            a + getArbitraryNonParallelVector(a);
-            const btVector3 c = (a.cross(arb)).normalize();
-            result = btQuaternion(c, M_PI).normalize();;
+            btVector3 xAxis(1.0, 0.0, 0.0);
+            if (a.dot(xAxis) == 0.0)
+            {
+				// Gets around bad btTransforms with an up vector
+				result = btQuaternion (-1.0, 0.0, 0.0, 0.0);
+			}
+			else
+			{	
+				const btVector3 arb =
+				a + getArbitraryNonParallelVector(a);
+				const btVector3 c = (a.cross(arb)).normalize();
+				result = btQuaternion(c, M_PI).normalize();
+			}
         } else {
             // Create a vector normal to both a and b
             const btVector3 c = (a.cross(b)).normalize();
@@ -275,7 +287,11 @@ public:
     {
         addRotation(v, fixedPoint, rotation.getAxis(), rotation.getAngle());
     }
-
+	
+	/**
+	 * @todo write a function that returns the normal of a vector without overwriting the original vector
+	 * line btVector3's .normalize() functions
+	 */
 
     /**
      * Convert radians to degrees.

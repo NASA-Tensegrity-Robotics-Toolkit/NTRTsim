@@ -73,10 +73,10 @@ tgRigidInfo* tgSphereInfo::createRigidInfo(const tgNode& node)
 void tgSphereInfo::initRigidBody(tgWorld& world)
 {
     tgRigidInfo::initRigidBody(world);
-    assert(m_rigidBody != NULL);
-    m_rigidBody->setFriction(m_config.friction);
-    m_rigidBody->setRollingFriction(m_config.rollFriction);
-    m_rigidBody->setRestitution(m_config.restitution);
+    assert(m_collisionObject != NULL);
+    getRigidBody()->setFriction(m_config.friction);
+    getRigidBody()->setRollingFriction(m_config.rollFriction);
+    getRigidBody()->setRestitution(m_config.restitution);
 }
 
 tgModel* tgSphereInfo::createModel(tgWorld& world)
@@ -148,7 +148,7 @@ tgSphereInfo::getConnectionPoint(const btVector3& referencePoint,
     const btVector3 startPoint = (getNode());
     // Vector from reference point to destination point
     const btVector3 refToDest =
-        (referencePoint - destinationPoint).normalize();
+        (destinationPoint - referencePoint).normalize();
 
     // Project along the radius to the destination point
     
