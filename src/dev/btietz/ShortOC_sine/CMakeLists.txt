@@ -1,6 +1,8 @@
 link_directories(${LIB_DIR})
 
-link_libraries(learningSpines
+link_libraries(octahedralComplex
+				tetraSpineLearningSine
+				learningSpines
                 sensors
                 tgcreator
                 MuscleNP
@@ -12,12 +14,8 @@ link_libraries(learningSpines
                 AnnealEvolution
                 tgOpenGLSupport)
 
-add_library (octahedralComplex SHARED
-				FlemonsSpineModelLearningCL.cpp)
-
-add_executable(AppFlemonsSpineLearningCL
-    FlemonsSpineModelLearningCL.cpp
-    AppFlemonsSpineLearningCL.cpp
-    
+add_executable(AppOctaCL_sine
+    AppOctaCL_sine.cpp
+    OctaCLSine.cpp
 ) 
 

@@ -171,6 +171,8 @@ protected:
     double m_updateTime;
     
     std::vector<double> scores;
+    
+    bool bogus;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H

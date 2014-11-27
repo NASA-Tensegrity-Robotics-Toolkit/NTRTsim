@@ -30,4 +30,6 @@ subdirs(
     tetraCollisions
     muscleNPEnergy
     TCContact
+    ShortOC_CPG 
+    ShortOC_sine
     )

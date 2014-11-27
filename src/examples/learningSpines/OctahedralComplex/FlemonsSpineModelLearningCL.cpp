@@ -78,7 +78,7 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     const tgLinearString::Config stringConfig(stiffness, damping, pretension, false, 7000, 24, 10000);
     
     
-    const double passivePretension = 1000; // 10 N
+    const double passivePretension = 700; // 5 N
     tgLinearString::Config muscleConfig(2000, 20, passivePretension);
     
     // Calculations for the flemons spine model

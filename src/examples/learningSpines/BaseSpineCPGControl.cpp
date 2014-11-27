@@ -146,7 +146,8 @@ nodeLearning(false),
 edgeLearning(false),
 m_dataObserver("logs/TCData"),
 m_pCPGSys(NULL),
-m_updateTime(0.0)
+m_updateTime(0.0),
+bogus(false)
 {
 	std::string path;
 	if (resourcePath != "")
@@ -196,6 +197,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
     std::cout << *m_pCPGSys << std::endl;
 #endif    
     m_updateTime = 0.0;
+    bogus = false;
 }
 
 void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
@@ -238,7 +240,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
 			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
 		}
     }
-
+	
 }
 
 void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -258,6 +260,15 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 		notifyStep(m_updateTime);
         m_updateTime = 0;
     }
+    
+    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+    
+    /// @todo add to config
+    if (currentHeight > 25 || currentHeight < 1.0)
+    {
+		/// @todo if bogus, stop trial (reset simulation)
+		bogus = true;
+	}
 }
 
 void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
@@ -275,7 +286,14 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
                                         (newZ-oldZ) * (newZ-oldZ));
     
-    scores.push_back(distanceMoved);
+    if (bogus)
+    {
+		scores.push_back(-1.0);
+    }
+    else
+    {
+		scores.push_back(distanceMoved);
+	}
     
     /// @todo - consolidate with other controller classes. 
     /// @todo - return length scale as a parameter
