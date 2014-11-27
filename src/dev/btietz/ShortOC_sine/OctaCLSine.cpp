@@ -85,6 +85,7 @@ void OctaCLSine::onSetup(BaseSpineModelLearning& subject)
   
     m_updateTime = 0.0;
     bogus = false;
+
 }
 
 void OctaCLSine::onStep(BaseSpineModelLearning& subject, double dt)
@@ -101,12 +102,13 @@ void OctaCLSine::onStep(BaseSpineModelLearning& subject, double dt)
         m_updateTime = 0;
     }
     
-        /// @todo add to config
+    /// @todo add to config
     if (currentHeight > 25 || currentHeight < 1.0)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
 	}
+
 }
 
 void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
