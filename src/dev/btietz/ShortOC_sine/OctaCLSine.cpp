@@ -102,6 +102,8 @@ void OctaCLSine::onStep(BaseSpineModelLearning& subject, double dt)
         m_updateTime = 0;
     }
     
+    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+    
     /// @todo add to config
     if (currentHeight > 25 || currentHeight < 1.0)
     {
