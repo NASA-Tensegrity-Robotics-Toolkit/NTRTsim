@@ -27,6 +27,9 @@
 #include "CPGEdge.h"
 #include "CPGNode.h"
 
+// The C++ Standard Library
+#include <math.h> 
+
 CPGEdge::CPGEdge(	CPGNode* newTarget,
 					double newWeight,
 					double newPhase):

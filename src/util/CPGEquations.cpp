@@ -30,6 +30,7 @@
 #include "boost/numeric/odeint.hpp"
 
 // The C++ Standard Library
+#include <assert.h>
 #include <stdexcept>
 
 using namespace boost::numeric::odeint;

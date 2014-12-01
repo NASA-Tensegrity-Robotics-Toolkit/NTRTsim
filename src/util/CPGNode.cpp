@@ -27,6 +27,11 @@
 #include "CPGNode.h"
 #include "CPGEdge.h"
 
+// The C++ Standard Library
+#include <algorithm> //for_each
+#include <math.h> 
+#include <assert.h>
+
 CPGNode::CPGNode(int nodeNum, const std::vector<double> & params):
 nodeValue(0),
 phiValue(0),

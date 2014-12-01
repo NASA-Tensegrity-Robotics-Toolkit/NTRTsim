@@ -27,19 +27,18 @@
  * $Id$
  */
 
-#include <algorithm> //for_each
-#include <math.h> 
-#include <vector>
-#include <assert.h>
-#include <sstream>
 
-#include "CPGEdge.h"
+#include <vector>
+#include <sstream>
 
 //Forward Declaration
 class CPGEdge; 
 
 class CPGNode
 {
+	friend class CPGEdge;
+	friend class CPGEquations;
+	
 	public:
 	
 	/**
@@ -89,6 +88,8 @@ class CPGNode
 	
 	std::string toString(const std::string& prefix = "") const;
 	
+	protected:
+	
 	/**
 	 * Values for numerical integration
 	 */
@@ -98,8 +99,6 @@ class CPGNode
 	double rValue; //Radius
 	double rDotValue; //rDot for next update
 	double rDoubleDotValue; //Deriviative of RDot
-	
-	protected:
 	
 	std::vector<CPGEdge*> couplingList;
 	

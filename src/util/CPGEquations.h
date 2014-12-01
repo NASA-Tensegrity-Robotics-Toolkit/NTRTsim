@@ -28,7 +28,6 @@
  */
 
 #include <vector>
-#include <assert.h>
 #include <sstream>
 
 #include "CPGNode.h"

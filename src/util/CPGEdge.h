@@ -27,11 +27,8 @@
  * $Id$
  */
 
-#include <math.h> 
 #include <sstream>
 #include <vector>
-
-#include "CPGNode.h"
 
 class CPGNode; //Forward declaration
 
@@ -73,9 +70,9 @@ class CPGEdge
 };
 
 /**
- * Overload operator<<() to handle CPGNode
+ * Overload operator<<() to handle CPGEdge
  * @param[in,out] os an ostream
- * @param[in] a reference to a CPGNode
+ * @param[in] a reference to a CPGEdge
  * @return os
  * @todo Inlining this does no good; stream operations are slow.
  */
