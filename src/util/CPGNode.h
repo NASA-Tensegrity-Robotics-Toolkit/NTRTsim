@@ -46,7 +46,7 @@ class CPGNode
 	 * stability
 	 */
 	CPGNode(int nodeNum, const std::vector<double> & params);
-	~CPGNode();
+	virtual ~CPGNode();
 	
 	void addCoupling(CPGEdge* newEdge);
 	
@@ -61,7 +61,7 @@ class CPGNode
 	 * coupling equations
 	 * @todo better name?
 	 */
-	void updateDTs(	double descCom);
+	virtual void updateDTs(	double descCom);
 	
 	/**
 	 * Compute the base node equation for R and Phi
@@ -70,9 +70,9 @@ class CPGNode
 							double c0,
 							double c1);
 				
-	void updateNodeValues (	double newR,
-							double newRD,
-							double newPhi);
+	virtual void updateNodeValues (	double newR,
+									double newRD,
+									double newPhi);
 	// out of date since we're using pointers, but still potentially useful
 	#if (0)
 	std::vector<CPGNode*> getCoupling(){

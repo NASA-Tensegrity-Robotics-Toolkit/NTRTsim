@@ -44,7 +44,7 @@ class CPGEdge
 	/**
 	 * todo: double check cleanup and make sure this needs to delete its nodes
 	 */
-	~CPGEdge();
+	virtual ~CPGEdge();
 	
 	/**
 	 * Equation that affects the phase of the node based on the

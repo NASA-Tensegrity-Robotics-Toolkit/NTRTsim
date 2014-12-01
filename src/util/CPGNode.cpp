@@ -49,7 +49,7 @@ dMin(params[5]),
 dMax(params[6])
 {
 	//Precondition
-	assert(params.size() == 7);
+	assert(params.size() >= 7);
 }
 
 CPGNode::~CPGNode()
