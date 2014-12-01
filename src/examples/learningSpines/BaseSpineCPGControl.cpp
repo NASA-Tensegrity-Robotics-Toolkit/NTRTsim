@@ -441,13 +441,10 @@ array_2D BaseSpineCPGControl::scaleNodeActions
     // Check if we need to update limits
     assert(numActions == 2);
     
-    
-    for (int i = 0; i !=2; i++)
-    {
-
-        limits[0][i] = m_config.lowAmp;
-        limits[1][i] = m_config.highAmp;
-    }
+	limits[0][0] = m_config.lowFreq;
+	limits[1][0] = m_config.highFreq;
+	limits[0][1] = m_config.lowAmp;
+	limits[1][1] = m_config.highAmp;
     
     // This one is square
     for( std::size_t i = 0; i < numControllers; i++)

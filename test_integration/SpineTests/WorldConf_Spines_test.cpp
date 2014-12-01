@@ -111,8 +111,36 @@ namespace {
 				const double highPhase = M_PI;
 				const double lowAmplitude = -30.0;
 				const double highAmplitude = 30.0;
-				BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
-															lowAmplitude, highAmplitude, lowPhase, highPhase);
+				const double kt = 0.0;
+				const double kp = 1000.0;
+				const double kv = 100.0;
+				const bool def = true;
+					
+				// Overridden by def being true
+				const double cl = 10.0;
+				const double lf = -30.0;
+				const double hf = 30.0;
+
+    
+				BaseSpineCPGControl::Config control_config(segmentSpan, 
+															numMuscles,
+															numMuscles,
+															numParams, 
+															segNumber, 
+															controlTime,
+															lowAmplitude,
+															highAmplitude,
+															lowPhase,
+															highPhase,
+															kt,
+															kp,
+															kv,
+															def,
+															cl,
+															lf,
+															hf
+															);
+												
 				BaseSpineCPGControl* const myControl =
 				  new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
 				myModel->attach(myControl);

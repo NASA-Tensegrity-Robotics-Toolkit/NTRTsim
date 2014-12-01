@@ -28,6 +28,7 @@
 #include "examples/learningSpines/OctahedralComplex/FlemonsSpineModelLearningCL.h"
 // This library
 #include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
@@ -89,11 +90,16 @@ int main(int argc, char** argv)
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix, "bmirletz/OctaCL_CPG/");
     myModel->attach(myControl);
+#if (0)    
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+#endif    
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 40000)
+    while (i < 1)
     {
         simulation.run(60000);
         simulation.reset();
