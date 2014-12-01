@@ -78,15 +78,25 @@ int main(int argc, char** argv)
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
     const double lowAmplitude = 0.0;
-    const double highAmplitude = 30.0;
+    // Account for descending command
+    const double highAmplitude = 30.0 * 3;
     
     const double tension = 0.0;
     const double kPosition = 400.0;
     const double kVelocity = 40.0; 
+    
+    const bool def = true;
+					
+	// Overridden by def being true
+	const double cl = 10.0;
+	const double lf = 0.0;
+	// Account for descending command
+	const double hf = 30.0 * 3;
+
 
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
 												lowAmplitude, highAmplitude, lowPhase, highPhase,
-												tension, kPosition, kVelocity);
+												tension, kPosition, kVelocity, def, cl, lf, hf);
     OctaCLSine* const myControl =
       new OctaCLSine(control_config, suffix, "bmirletz/OctaCL_sine/");
     myModel->attach(myControl);
