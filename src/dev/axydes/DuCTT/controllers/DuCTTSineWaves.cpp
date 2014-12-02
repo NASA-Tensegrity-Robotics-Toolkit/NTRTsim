@@ -31,15 +31,23 @@
 #include "../robot/tgPrismatic.h"
 #include "../robot/tgTouchSensorSphereModel.h"
 
+#include "core/Muscle2P.h"
+#include "core/tgLinearString.h"
+#include "core/ImpedanceControl.h"
+
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 #include <vector>
 
 DuCTTSineWaves::DuCTTSineWaves() :
+    in_controller(new ImpedanceControl(100, 500, 50)),
+    out_controller(new ImpedanceControl(0.001, 5000, 10)),
+    insideLength(6.5),
+    outsideLength(4.5),
     offsetSpeed(0.0),
-    cpgAmplitude(10.0),
-    cpgFrequency(1.00),
+    cpgAmplitude(15.0),
+    cpgFrequency(0.10),
     bodyWaves(1.0),
     simTime(0.0),
     cycle(0.0),
@@ -67,6 +75,48 @@ void DuCTTSineWaves::applySineWave(tgPrismatic* prism, bool shouldPause, bool sh
     }
 }
 
+void DuCTTSineWaves::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList, double dt)
+{
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+        double setTension = in_controller->control(stringList[i],
+                                            dt,
+                                            insideLength
+                                            );
+        #if (0) // Conditional compile for verbose control
+        std::cout << "Inside String " << i << " tension " << setTension
+        << " act tension " << stringList[i]->getMuscle()->getTension()
+        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
+        #endif
+    }
+}
+
+void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+                                                            double dt,
+                                                            std::size_t phase)
+{
+    cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[phase]);
+    target = offsetSpeed + cycle*cpgAmplitude;
+
+//    if (target < 0) target *= -1;
+
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+        double setTension = out_controller->control(stringList[i],
+                                            dt,
+                                            outsideLength,
+                                            target
+                                            );
+//        stringList[i]->setRestLengthSingleStep(target);
+//        double setTension = stringList[i]->getMuscle()->getTension();
+        #if(1) // Conditional compile for verbose control
+        std::cout << "Outside String " << i << ", target: " << target << " com tension " << setTension
+        << " act tension " << stringList[i]->getMuscle()->getTension()
+        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
+        #endif
+    }
+}
+
 bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
 {
     bool shouldPause = true;
@@ -88,7 +138,18 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     else
     {
         simTime += dt;
-        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
-        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+
+//        applyImpedanceControlInside(subject.getSaddleMuscles(), dt);
+//        applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 1);
+
+//        applyImpedanceControlInside(subject.getVertMuscles(), dt);
+        applyImpedanceControlOutside(subject.getVertMuscles(), dt, 0);
+//        applyImpedanceControlOutside(subject.getAllMuscles(), dt, 0);
+
+//        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
+//        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+
+        btVector3 com = subject.getCOM();
+//        std::cerr << com.x() << ", " << com.y() << ", " << com.z() << std::endl;
     }
 }
