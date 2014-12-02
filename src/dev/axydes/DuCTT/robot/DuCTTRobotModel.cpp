@@ -307,10 +307,10 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
 
-    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping,
+    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
                                                   false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
                                                   m_config.m_minStringRestLength, m_config.m_minStringRestLength);
-    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping,
+    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
                                                     false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength);
 
