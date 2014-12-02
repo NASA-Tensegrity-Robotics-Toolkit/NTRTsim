@@ -33,6 +33,7 @@
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
+#include "dev/muscleNP/tgMultiPointStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -72,11 +73,13 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
-    //const int segments = 8;
-    const tgLinearString::Config stringConfig(stiffness, damping, false, 0, 7000, 24, 10000);
-    //const tgRBString::Config rbConfig(segments, rodConfig2, stringConfig, 10.0);
+    const double pretension = 0.0;
     
-    tgLinearString::Config muscleConfig(2000, 20);
+    const tgLinearString::Config stringConfig(stiffness, damping, pretension, false, 7000, 24, 10000);
+    
+    
+    const double passivePretension = 700; // 5 N
+    tgLinearString::Config muscleConfig(2000, 20, passivePretension);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -189,6 +192,9 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     #if (1)
+    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgMultiPointStringInfo(stringConfig));
+    #else
     spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("muscle2", new tgLinearStringInfo(stringConfig));
     #endif
@@ -229,14 +235,7 @@ void FlemonsSpineModelLearningCL::teardown()
 
 void FlemonsSpineModelLearningCL::step(double dt)
 {
-	
-	// Probably should go in a controller eventually
-	for(int i = 0; i < reflexMuscles.size(); i++)
-    {
-        reflexMuscles[i]->setRestLength(reflexMuscles[i]->getStartLength() - 0.5, dt);
-    }
-	
-    /* CPG update occurs in the controller so that we can decouple it
+   /* CPG update occurs in the controller so that we can decouple it
     * from the physics update
     */
     

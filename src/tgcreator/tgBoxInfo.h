@@ -197,7 +197,7 @@ public:
      */
     virtual bool containsNode(const btVector3& nodeVector) const 
     {
-        return (getFrom() == nodeVector) || (getTo() == nodeVector);
+        return ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero());
     }
 
     /**

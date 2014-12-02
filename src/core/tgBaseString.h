@@ -53,13 +53,14 @@ public:
          */
         Config( double s = 1000.0,
         double d = 10.0,
+        double p = 0.0,
         bool h = false,
-        double rot = 0,
         double mf = 1000.0,
         double tVel = 100.0,
         double mxAcc = 10000.0,
         double mnAL = 0.1,
-        double mnRL = 0.1);
+        double mnRL = 0.1,
+        double rot = 0);
       
       /**
        * Scale parameters that depend on the length of the simulation.
@@ -84,22 +85,21 @@ public:
        */
       double damping;
       
+      /**
+       * Specifies the amount of tension (in units of force) in the
+       * string at construction. Adjusts the rest length,
+       * Must be low enough (based on stiffness) to
+       * leave the rest length non-negitive
+       */
+      double pretension;
+      
       // History Parameters
       /**
        * Specifies whether data such as length and tension will be stored
        * in deque objects. Useful for computing the energy of a trial.
        */
       bool hist;
-      
-      // Construction Parameters
-      /**
-       * Specifies the rotation around the face of the object its attached
-       * to. Any value will work, but +/- PI is the most meaningful.
-       * Units are radians.
-       * @todo Is this meaningful for non-rod shapes?
-       */
-      double rotation;
-        
+              
       // Motor model parameters
       /**
        * The parameters that affect how the string can be controlled
@@ -143,7 +143,16 @@ public:
        * Units are length
        * Must be nonnegative
        */
-      double minRestLength;     
+      double minRestLength;
+      
+      // Construction Parameters
+      /**
+       * Specifies the rotation around the face of the object its attached
+       * to. Any value will work, but +/- PI is the most meaningful.
+       * Units are radians.
+       * @todo Is this meaningful for non-rod shapes?
+       */
+      double rotation;  
     };
     
     /** Encapsulate the history members. */

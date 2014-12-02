@@ -29,4 +29,7 @@ subdirs(
     muscleNPTests
     tetraCollisions
     muscleNPEnergy
+    TCContact
+    ShortOC_CPG 
+    ShortOC_sine
     )

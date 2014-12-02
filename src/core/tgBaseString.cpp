@@ -35,22 +35,24 @@ using namespace std;
 
 tgBaseString::Config::Config(double s,
                    double d,
+                   double p,
                    bool h,
-                   double rot,
                    double mf,
                    double tVel,
                    double mxAcc,
                    double mnAL,
-                   double mnRL) :
+                   double mnRL,
+                   double rot) :
   stiffness(s),
   damping(d),
+  pretension(p),
   hist(h),
-  rotation(rot),
   maxTens(mf),
   targetVelocity(tVel),
   maxAcc(mxAcc),
   minActualLength(mnAL),
-  minRestLength(mnRL)         
+  minRestLength(mnRL),
+  rotation(rot)        
 {
     ///@todo is this the right place for this, or the constructor of this class?
     if (s < 0.0)

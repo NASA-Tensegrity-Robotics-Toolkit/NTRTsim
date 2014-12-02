@@ -12,13 +12,13 @@
 * Unless required by applicable law or agreed to in writing,
 * software distributed under the License is distributed on an
 * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-* either express or implied. See the License for the specific language
+* either express or implied. See the License 197.632for the specific language
 * governing permissions and limitations under the License.
 */
 
 /**
 * @file WorldConf_Spines_test.cpp
-* @brief Contains a test suite for FileHelpers.
+* @brief Contains a test of the data presented at 6WCSCM
 * $Id$
 */
 
@@ -111,8 +111,36 @@ namespace {
 				const double highPhase = M_PI;
 				const double lowAmplitude = -30.0;
 				const double highAmplitude = 30.0;
-				BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
-															lowAmplitude, highAmplitude, lowPhase, highPhase);
+				const double kt = 0.0;
+				const double kp = 1000.0;
+				const double kv = 100.0;
+				const bool def = true;
+					
+				// Overridden by def being true
+				const double cl = 10.0;
+				const double lf = -30.0;
+				const double hf = 30.0;
+
+    
+				BaseSpineCPGControl::Config control_config(segmentSpan, 
+															numMuscles,
+															numMuscles,
+															numParams, 
+															segNumber, 
+															controlTime,
+															lowAmplitude,
+															highAmplitude,
+															lowPhase,
+															highPhase,
+															kt,
+															kp,
+															kv,
+															def,
+															cl,
+															lf,
+															hf
+															);
+												
 				BaseSpineCPGControl* const myControl =
 				  new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
 				myModel->attach(myControl);
@@ -124,7 +152,7 @@ namespace {
 				
 				double dist = FileHelpers::getFinalScore(filePath);
 				
-				EXPECT_EQ(dist, 188.694);
+				EXPECT_EQ(dist, 197.632);
 				
 				// Will print out another set of dist moved on teardown
 	}

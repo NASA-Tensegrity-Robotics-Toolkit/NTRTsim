@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -69,17 +69,44 @@ int main(int argc, char** argv)
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
     
-    const int segmentSpan = 3;
-    const int numMuscles = 8;
-    const int numParams = 2;
-    const int segNumber = 6; // For learning results
-    const double controlTime = .001;
-    const double lowPhase = -1 * M_PI;
-    const double highPhase = M_PI;
-    const double lowAmplitude = -30.0;
-    const double highAmplitude = 30.0;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
-												lowAmplitude, highAmplitude, lowPhase, highPhase);
+				const int segmentSpan = 3;
+				const int numMuscles = 8;
+				const int numParams = 2;
+				const int segNumber = 6; // For learning results
+				const double controlTime = .001;
+				const double lowPhase = -1 * M_PI;
+				const double highPhase = M_PI;
+				const double lowAmplitude = -30.0;
+				const double highAmplitude = 30.0;
+				const double kt = 0.0;
+				const double kp = 1000.0;
+				const double kv = 100.0;
+				const bool def = true;
+					
+				// Overridden by def being true
+				const double cl = 10.0;
+				const double lf = -30.0;
+				const double hf = 30.0;
+
+    
+				BaseSpineCPGControl::Config control_config(segmentSpan, 
+															numMuscles,
+															numMuscles,
+															numParams, 
+															segNumber, 
+															controlTime,
+															lowAmplitude,
+															highAmplitude,
+															lowPhase,
+															highPhase,
+															kt,
+															kp,
+															kv,
+															def,
+															cl,
+															lf,
+															hf
+															);
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);

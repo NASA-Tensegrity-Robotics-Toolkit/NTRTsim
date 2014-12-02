@@ -61,7 +61,7 @@ btRigidBody* tgBulletUtil::createRigidBody(btDynamicsWorld* dynamicsWorld,
 
     // This is defined in DemoApplication as BT_LARGE_FLOAT 1e30 if using
     // double precision, 1e18.f if using single
-    float defaultContactProcessingThreshold = 1e18;  // @TODO: What should this be? 
+    double defaultContactProcessingThreshold = 1.0e30;  // @TODO: What should this be? 
 
     btRigidBody* body = new btRigidBody(cInfo);
     body->setContactProcessingThreshold(defaultContactProcessingThreshold);

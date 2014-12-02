@@ -5,8 +5,8 @@ Summer 2014
 ABSTRACT
 --------
 This module (Escape_T6) contains the files necessary for creating escape algorithms
-for 6-bar tensegrities (SUPERBalls). The module includes Monte Carlo and
-Machine Learning platforms for optimizing specific parameters of the controller.
+for 6-bar tensegrities (SUPERBalls). The module includes a multi-level Monte Carlo
+platform for optimizing specific parameters of the controller.
 
 HOW DOES THE CONTROLLER WORK?
 -----------------------------
@@ -40,7 +40,7 @@ Running a monte carlo simulation for this module rapidly brute forces random,
 mechanically possible control patterns. Each trial run (an "episode") tests one
 unique set of parameters for one tensegrity over the course of 60,000 steps (as
 determined by the application). The results of each episode are stored in 
-logs/scores.csv. In logs/scores.csv, each line represents a unique episode.
+logs/scores.csv. In logs/scores.csv, each line represents an individual episode.
 Each episode stores its scores (the distance and the energy spent) as well as
 the 32 (4 sine wave parameters * 8 muscle clusters) unique monte carlo values
 (ranging from 0 to 1 inclusive). All 34 values associated with an episode are
@@ -61,6 +61,12 @@ simulations on this data:
 2. Ensure that logs/bestParameters.prm is populated (see LearningSpines for
     a sample format)
 3. Re-run the data as normal
+
+I have also added (Nov. 14) in Escape_T6 specific code that allows for
+running Monte Carlo on manual parameters. In these trials, parameters
+are set to be randomly within 0.5% of the manual parameters. The purpose
+of this is to optimize a parameter set that has already been shown to work
+(i.e. generate an escape path for the tensegrity structure).
 
 PYTHON PARSING TEST DATA
 ------------------------

@@ -29,13 +29,10 @@
 #include "MuscleNP.h"
 
 #include "core/tgBulletUtil.h"
-#include "tgcreator/tgUtil.h"
-#include "tgcreator/tgBuildSpec.h"
+#include "core/muscleAnchor.h"
+
 #include "tgcreator/tgNode.h"
-#include "tgcreator/tgNodes.h"
-#include "tgcreator/tgPair.h"
-#include "tgcreator/tgStructure.h"
-#include "tgcreator/tgStructureInfo.h"
+
 
 // The Bullet Physics Library
 #include "btBulletDynamicsCommon.h"
@@ -100,6 +97,16 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     tgNode from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
     tgNode to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
+	std::vector<muscleAnchor*> anchorList;
+	
+	muscleAnchor* anchor1 = new muscleAnchor(fromBody, from);
+	anchorList.push_back(anchor1);
+	
+	muscleAnchor* anchor2 = new muscleAnchor(toBody, to);
+	anchorList.push_back(anchor2);
+	
+	/// @todo generalize this to n anchors. May take a new info class 
+	
 	btTransform transform = tgUtil::getTransform(from, to);
 	
 	btCompoundShape* m_compoundShape = new btCompoundShape(&world);
@@ -125,9 +132,10 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	
 	// Add ghost object to world
+	// @todo MuscleNP handles deleting from world - should it handle adding too?
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 	m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
-    return new MuscleNP(m_ghostObject, world, fromBody, from, toBody, to, m_config.stiffness, m_config.damping);
+    return new MuscleNP(m_ghostObject, world, anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }
     

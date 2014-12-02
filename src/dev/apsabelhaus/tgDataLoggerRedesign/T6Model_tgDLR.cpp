@@ -63,7 +63,8 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
-        double rotation;  
+        double pretension;
+        bool   history;  
         double maxTens;
         double targetVelocity;
         double maxAcc;
@@ -78,7 +79,8 @@ namespace
      1.0,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0,        // rotation
+     0.0,        // pretension (force)
+     false,	   // history (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
      20000     // maxAcc
@@ -172,7 +174,7 @@ void T6Model_tgDLR::setup(tgWorld& world)
 				c.rollFriction, c.restitution);
 
     // TO-DO: check out this new config, what exactly are we passing as False?
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, false, c.rotation,
+    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, 
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
             
