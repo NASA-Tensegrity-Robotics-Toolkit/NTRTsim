@@ -30,6 +30,7 @@ typedef boost::multi_array<double, 4> array_4D;
 // Forward declarations
 class btRigidBody;
 class CPGEquations;
+class CPGEquationsFB;
 class ImpedanceControl;
 
 class tgCPGStringControl : public tgObserver<tgLinearString>,
@@ -51,6 +52,12 @@ public:
      */
     
     void assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams);
+    
+    /**
+     * Account for the larger number of parameters the nodes have
+     * with a feedback CPGSystem
+     */
+    void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
     
     /**
      * Iterate through all other tgLinearStringCPGInfos, and determine
