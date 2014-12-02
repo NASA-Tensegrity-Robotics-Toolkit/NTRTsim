@@ -84,7 +84,7 @@ struct Config
         bool def = true,
         double cl = 10.0,
         double lf = 0.0,
-        double hf = 2.0 * M_PI);
+        double hf = 30.0);
       
 		// Learning Parameters
 		const int segmentSpan; // 3 possible muscles touching two rigid bodies
@@ -171,6 +171,8 @@ protected:
     double m_updateTime;
     
     std::vector<double> scores;
+    
+    bool bogus;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H

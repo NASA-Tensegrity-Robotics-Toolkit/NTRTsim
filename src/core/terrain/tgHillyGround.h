@@ -51,7 +51,7 @@ class tgHillyGround : public tgBulletGround
                        btVector3 origin = btVector3(0.0, 0.0, 0.0),
                        size_t nx = 50,
                        size_t ny = 50,
-                       double margin = 0.5,
+                       double margin = 0.05,
                        double triangleSize = 5.0,
                        double waveHeight = 5.0,
                        double offset = 0.5);

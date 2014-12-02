@@ -3,6 +3,7 @@ link_directories(${LIB_DIR})
 link_libraries(learningSpines
                 sensors
                 tgcreator
+                MuscleNP
                 core
                 util
                 terrain
@@ -10,6 +11,9 @@ link_libraries(learningSpines
                 Configuration
                 AnnealEvolution
                 tgOpenGLSupport)
+
+add_library (octahedralComplex SHARED
+				FlemonsSpineModelLearningCL.cpp)
 
 add_executable(AppFlemonsSpineLearningCL
     FlemonsSpineModelLearningCL.cpp

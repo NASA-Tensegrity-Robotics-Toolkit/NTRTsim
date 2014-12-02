@@ -58,6 +58,7 @@ namespace
         double stiffness;
         bool   history;
         double damping;
+        double pretension;
         double rod_length;
         double rod_space;    
         double friction;
@@ -74,6 +75,7 @@ namespace
         3000.0,   // stiffness (kg / sec^2)
         true,     // history (record?)
         200.0,    // damping (kg / sec)
+        0.0,      // pretension (force)
         15.0,     // rod_length (length)
         7.5,      // rod_space (length)
         1.0,      // friction (unitless)
@@ -124,7 +126,7 @@ void Escape_T6Model::setup(tgWorld& world) {
             c.rollFriction, c.restitution);
 
     tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
-            c.history, c.rotation, c.maxTens, c.targetVelocity, 
+            c.pretension, c.history, c.maxTens, c.targetVelocity, 
             c.maxAcc);
 
     // Start creating the structure
