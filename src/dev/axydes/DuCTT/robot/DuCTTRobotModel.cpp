@@ -77,6 +77,7 @@ DuCTTRobotModel::Config::Config(
     double maxVertStringVel,
     double maxSaddleStringVel,
     double maxStringForce,
+    double maxStringAcc,
     double minStringRestLength
     ) :
 m_startPos(startPos),
@@ -101,6 +102,7 @@ m_pretension(pretension),
 m_maxVertStringVel(maxVertStringVel),
 m_maxSaddleStringVel(maxSaddleStringVel),
 m_maxStringForce(maxStringForce),
+m_maxStringAcc(maxStringAcc),
 m_minStringRestLength(minStringRestLength)
 {
 }
@@ -308,11 +310,11 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
 
     const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                  false, 0, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
-                                                  m_config.m_minStringRestLength, m_config.m_minStringRestLength);
+                                                  false, m_config.m_maxStringForce, m_config.m_maxVertStringVel, m_config.m_maxStringAcc,
+                                                  m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
     const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                    false, 0, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
-                                                    m_config.m_minStringRestLength, m_config.m_minStringRestLength);
+                                                    false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel, m_config.m_maxStringAcc,
+                                                    m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
     const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
     const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
@@ -348,9 +350,9 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
-    spec.addBuilder("static rod", new tgRodInfo(staticRodConfig));
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
+//    spec.addBuilder("inner rod", new tgRodInfo(staticRodConfig));
 
     spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
@@ -465,8 +467,8 @@ void DuCTTRobotModel::step(double dt)
     else
     {
         // Notify observers (controllers) of the step so that they can take action
-        tgModel::step(dt);  // Step any children
         notifyStep(dt);
+        tgModel::step(dt);  // Step any children
     }
 }
 

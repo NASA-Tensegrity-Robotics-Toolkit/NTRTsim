@@ -31,6 +31,10 @@
 #include "../robot/tgPrismatic.h"
 #include "../robot/tgTouchSensorSphereModel.h"
 
+#include "core/Muscle2P.h"
+#include "core/tgLinearString.h"
+#include "core/ImpedanceControl.h"
+
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -129,7 +133,18 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     else
     {
         simTime += dt;
-        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
-        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+
+//        applyImpedanceControlInside(subject.getSaddleMuscles(), dt);
+//        applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 1);
+
+//        applyImpedanceControlInside(subject.getVertMuscles(), dt);
+        applyImpedanceControlOutside(subject.getVertMuscles(), dt, 0);
+//        applyImpedanceControlOutside(subject.getAllMuscles(), dt, 0);
+
+//        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
+//        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+
+        btVector3 com = subject.getCOM();
+//        std::cerr << com.x() << ", " << com.y() << ", " << com.z() << std::endl;
     }
 }

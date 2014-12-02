@@ -89,7 +89,8 @@ public:
                 double pretension = 0.001,
                 double maxVertStringVel = 25.4,
                 double maxSaddleStringVel = 8.5,
-                double maxStringForce = 50,
+                double maxStringForce = 50.0,
+                double maxStringAcc = 10000.0,
                 double minStringRestLength = 1.2
               );
 
@@ -120,6 +121,7 @@ public:
         double m_maxVertStringVel; // max velocity of vertical string motors (cm/s) 25.4cm/s
         double m_maxSaddleStringVel; // max velocity of saddle string motors (cm/s) 8.5cm/s
         double m_maxStringForce; // max force to exert on all strings (Newtons) 50 N
+        double m_maxStringAcc; // max acceleration of string motors (length/s^2) 10000.0
         double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
     };
 

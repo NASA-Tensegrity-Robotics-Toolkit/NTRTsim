@@ -33,9 +33,11 @@
 #include <vector>
 
 // Forward declarations
+class tgLinearString;
 class tgPrismatic;
 class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
+class ImpedanceControl;
 
 class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
 {
@@ -48,7 +50,35 @@ public:
     void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt);
     bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
 
+    /**
+     * Applies the impedance controllers using a velocity setpoint of 0.
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     */
+    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+                                    double dt);
+    /**
+     * Applies the impedance controllers using a velocity setpoint determined.
+     * by the phase parameter and
+     * Called during this classes onStep function.
+     * @param[in] stringList a std::vector of strings taken from the
+     * subject's MuscleMap
+     * @param[in] dt - a timestep. Must be positive.
+     * @param[in] phase - reads the index out of the phaseOffsets vector
+     */
+    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+                                    double dt,
+                                    std::size_t phase);
+
 private:
+    /**
+     * Pointers to impedance controllers
+     */
+    ImpedanceControl* in_controller;
+    ImpedanceControl* out_controller;
+
     double simTime;
     double cycle;
     double target;
@@ -58,6 +88,13 @@ private:
     const double cpgAmplitude;
     const double cpgFrequency;
     const double bodyWaves;
+
+    /**
+     * Muscle Length Parameters
+     */
+
+    const double insideLength;
+    const double outsideLength;
 };
 
 #endif // PRETENSION_CONTROLLER_H
