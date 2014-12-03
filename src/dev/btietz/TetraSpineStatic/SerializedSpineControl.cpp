@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-#define LOGGING
+//#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -56,14 +56,16 @@ SerializedSpineControl::Config::Config(std::string fileName)
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
-
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVars.json"), root );
+	
+	std::string filePath = FileHelpers::getResourcePath("ICRA2015/static/controlVars.json");
+		
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(filePath), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.
         std::cout << "Failed to parse configuration\n"
             << reader.getFormattedErrorMessages();
-        /// @todo should this throw an exception instead??
+        throw std::invalid_argument("Bad config filename");
         return;
     }
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no

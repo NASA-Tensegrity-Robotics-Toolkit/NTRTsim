@@ -8,7 +8,9 @@ add_library(${PROJECT_NAME} SHARED
             SerializedSpineControl.cpp
             )
 
-link_libraries(learningSpines
+link_libraries(FileHelpers
+				${ENV_LIB_DIR}/libjsoncpp.a
+				learningSpines
                 sensors
                 tgcreator
                 core
@@ -16,16 +18,9 @@ link_libraries(learningSpines
                 terrain
                 tgOpenGLSupport)
 
-add_executable(AppTetraSpineStatic
-	SerializedStaticControl.cpp	
+add_executable(AppTetraSpineStatic	
 	SerializedSpineControl.cpp	
     TetraSpineStaticModel.cpp
     TetraSpineStaticModel_hf.cpp
 	AppTetraSpineStatic.cpp
 )
-
-target_link_libraries(AppTetraSpineStatic ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
-target_link_libraries(tetraSpineHardware ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
-configure_file("controlVars.json" "controlVars.json" COPYONLY)
-configure_file("controlVarsStatic.json" "controlVarsStatic.json" COPYONLY)
-

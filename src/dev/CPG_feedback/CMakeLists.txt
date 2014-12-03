@@ -3,7 +3,6 @@ project(CPG_feedback)
 add_library( ${PROJECT_NAME} SHARED
 	CPGNodeFB.cpp
 	CPGEquationsFB.cpp
-    #tgBaseCPGNodeFB.cpp
 )
 
 link_directories(${LIB_DIR})
