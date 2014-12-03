@@ -72,9 +72,9 @@ bool AppDuCTT::setup()
           new DuCTTSineWaves();
         myRobotModel->attach(pPrismControl);
 
-//        DuCTTRobotController* learningController =
-//            new DuCTTRobotController();
-//        myRobotModel->attach(learningController);
+        DuCTTRobotController* testLearningController =
+            new DuCTTRobotController();
+//        myRobotModel->attach(testLearningController);
     }
 
     // Sixth add model & controller to simulation

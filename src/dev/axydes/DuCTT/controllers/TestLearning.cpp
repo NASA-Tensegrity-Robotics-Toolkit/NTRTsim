@@ -240,14 +240,14 @@ double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
 // Post-condition: every muscle will have a new target length
 void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
+    const double minLength = m_initialLengths * (1-maxStringLengthFactor);
+    const double maxLength = m_initialLengths * (1+maxStringLengthFactor);
 
     for(int cluster=0; cluster<nClusters; cluster++) {
         for(int node=0; node<musclesPerCluster; node++) {
             tgLinearString *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-            double minLength = m_initialLengths * (1-maxStringLengthFactor);
-            double maxLength = m_initialLengths * (1+maxStringLengthFactor);
             if (newLength <= minLength) {
                 newLength = minLength;
             } else if (newLength >= maxLength) {
