@@ -28,6 +28,7 @@
 // This application
 #include "FlemonsSpineModelLearning.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -110,11 +111,16 @@ int main(int argc, char** argv)
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);
+#if (0)    
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+#endif    
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 3000)
+    while (i < 1)
     {
         simulation.run(30000);
     	#ifdef BT_USE_DOUBLE_PRECISION

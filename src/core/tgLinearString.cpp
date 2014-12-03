@@ -225,7 +225,10 @@ void tgLinearString::moveMotors(double dt)
     double diff =  m_preferredLength - m_restLength;
     const double fabsDiff = abs(diff);
     
-    // If below actual length, don't shorten any more
+    /*
+     * actualLength must be greater than minActualLength to shorten
+     * diff > 0 means can always lengthen.
+     */
     if ((actualLength > m_config.minActualLength) || 
     (diff > 0))
     {
