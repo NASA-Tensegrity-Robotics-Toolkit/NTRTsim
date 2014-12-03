@@ -42,12 +42,12 @@
 
 DuCTTSineWaves::DuCTTSineWaves() :
     in_controller(new ImpedanceControl(100, 500, 50)),
-    out_controller(new ImpedanceControl(0.001, 5000, 10)),
+    out_controller(new ImpedanceControl(0.01, 500, 10)),
     insideLength(6.5),
     outsideLength(4.5),
-    offsetSpeed(0.0),
-    cpgAmplitude(15.0),
-    cpgFrequency(0.10),
+    offsetSpeed(0.5),
+    cpgAmplitude(14.5),
+    cpgFrequency(1.0),
     bodyWaves(1.0),
     simTime(0.0),
     cycle(0.0),
@@ -98,18 +98,14 @@ void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgLinearStri
     cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[phase]);
     target = offsetSpeed + cycle*cpgAmplitude;
 
-//    if (target < 0) target *= -1;
+    if (target < 0) target *= -1;
 
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        double setTension = out_controller->control(stringList[i],
-                                            dt,
-                                            outsideLength,
-                                            target
-                                            );
-//        stringList[i]->setRestLengthSingleStep(target);
+        double setTension = out_controller->control(stringList[i], dt, target);
+//        stringList[i]->setRestLength(target,dt);
 //        double setTension = stringList[i]->getMuscle()->getTension();
-        #if(1) // Conditional compile for verbose control
+        #if(0) // Conditional compile for verbose control
         std::cout << "Outside String " << i << ", target: " << target << " com tension " << setTension
         << " act tension " << stringList[i]->getMuscle()->getTension()
         << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
@@ -139,15 +135,12 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     {
         simTime += dt;
 
-//        applyImpedanceControlInside(subject.getSaddleMuscles(), dt);
-//        applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 1);
+        applyImpedanceControlOutside(subject.getAllMuscles(), dt, 0);
+//        applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 0);
+//        applyImpedanceControlOutside(subject.getVertMuscles(), dt, 0);
 
-//        applyImpedanceControlInside(subject.getVertMuscles(), dt);
-        applyImpedanceControlOutside(subject.getVertMuscles(), dt, 0);
-//        applyImpedanceControlOutside(subject.getAllMuscles(), dt, 0);
-
-//        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
-//        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+        applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt);
+        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
 
         btVector3 com = subject.getCOM();
 //        std::cerr << com.x() << ", " << com.y() << ", " << com.z() << std::endl;
