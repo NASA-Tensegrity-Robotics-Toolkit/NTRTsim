@@ -112,11 +112,11 @@ void AppDuCTT::handleOptions(int argc, char **argv)
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("graphics,G", po::value<bool>(&use_graphics), "Test using graphical view")
+        ("graphics,g", po::value<bool>(&use_graphics), "Test using graphical view")
         ("controller,c", po::value<bool>(&add_controller)->implicit_value(true), "Attach the controller to the model.")
         ("duct,d", po::value<bool>(&add_duct)->implicit_value(true), "Add the duct to the simulation.")
         ("phys_time,p", po::value<double>(), "Physics timestep value (Hz). Default=1000")
-        ("graph_time,g", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
+        ("graph_time,G", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
         ("episodes,e", po::value<int>(&nEpisodes), "Number of episodes to run. Default=1")
         ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (100 seconds)")
         ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
@@ -151,6 +151,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
     if (vm.count("paramFile") && vm["paramFile"].as<string>() != "")
     {
         use_manual_params = true;
+        use_graphics = true;
     }
 }
 
