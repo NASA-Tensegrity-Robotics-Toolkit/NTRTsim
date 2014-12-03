@@ -85,10 +85,14 @@ private:
     bool use_graphics;
     bool add_controller;
     bool add_duct;
+    bool use_manual_params;
+
     double timestep_physics; //Seconds
     double timestep_graphics; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     int nEpisodes; // Number of episodes ("trial runs")
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+
+    std::string paramFile;
 
     double startX;
     double startY;

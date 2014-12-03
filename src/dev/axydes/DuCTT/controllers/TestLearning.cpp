@@ -49,8 +49,12 @@ using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-DuCTTRobotController::DuCTTRobotController(const double initialLength) :
+DuCTTRobotController::DuCTTRobotController(const double initialLength,
+                                           const bool useManualParams,
+                                           const string manParamFile) :
     m_initialLengths(initialLength),
+    m_usingManualParams(useManualParams),
+    m_manualParamFile(manParamFile),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nClusters(8),
@@ -147,14 +151,11 @@ void DuCTTRobotController::onTeardown(DuCTTRobotModel& subject) {
  */
 vector< vector <double> > DuCTTRobotController::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = true;
     vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
-    if (usingManualParams) { 
+    if (m_usingManualParams) {
         std::cout << "Using manually set parameters\n"; 
-        //string filename = "logs/trial_7/bestParametersNoOutliersSorted.dat";
-        string filename = "logs/trial_8/bestParamsSorted.dat";
         int lineNumber = 1;
-        manualParams = readManualParams(lineNumber, filename);
+        manualParams = readManualParams(lineNumber, m_manualParamFile);
     } 
 
     double pretension = 0.90; // Tweak this value if need be
@@ -173,7 +174,7 @@ vector< vector <double> > DuCTTRobotController::transformActions(vector< vector 
 
     for(int i=0;i<actions.size();i++) { //8x
         for (int j=0; j<actions[i].size(); j++) { //4x
-            if (usingManualParams) {
+            if (m_usingManualParams) {
                 actions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
             } else {
                 actions[i][j] = actions[i][j]*(ranges[j])+mins[j];

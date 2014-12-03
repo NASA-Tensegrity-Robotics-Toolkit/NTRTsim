@@ -47,8 +47,9 @@ using namespace std;
 class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
 {
     public:
-        // Note that currently this is calibrated for decimeters.
-        DuCTTRobotController(const double prefLength=5.0);
+        DuCTTRobotController(const double prefLength=5.0,
+                             const bool useManualParams=false,
+                             const string manParamFile="");
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~DuCTTRobotController() { }
@@ -65,10 +66,38 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         virtual void applyActions(DuCTTRobotModel& subject, vector< vector <double> > act);
 
     private:
+        /** Initialize the evolution adapter as well as its own parameters */
+        void setupAdapter();
+
+        /** Returns amount of energy spent by each muscle in subject */
+        double totalEnergySpent(DuCTTRobotModel& subject);
+
+        /** Sets target lengths for each muscle */
+        void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
+
+        /** Divides the 24 muscles of an DuCTTRobotModel
+         * into 8 clusters of 3 muscles */
+        void populateClusters(DuCTTRobotModel& subject);
+
+        /** Sets the amplitude, angularFrequency, phase change, and dcOffset
+         * for each sine wave used in muscle actuation */
+        void initializeSineWaves();
+
+        /** Difference in position between initPosition and finalPosition
+         * of subject */
+        double displacement(DuCTTRobotModel& subject);
+
+        /** Select action paramters from a comma-separated line in a file */
+        std::vector<double> readManualParams(int lineNumber, string filename);
+
+        void printSineParams();
+
         btVector3 initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
+        const bool m_usingManualParams;
+        const string m_manualParamFile;
 
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
@@ -85,32 +114,6 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         double* angularFrequency;
         double* phaseChange;
         double* dcOffset;
-
-        /** Initialize the evolution adapter as well as its own parameters */
-        void setupAdapter();
-
-        /** Returns amount of energy spent by each muscle in subject */
-        double totalEnergySpent(DuCTTRobotModel& subject);
-
-        /** Sets target lengths for each muscle */
-        void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
-
-        /** Divides the 24 muscles of an DuCTTRobotModel
-         * into 8 clusters of 3 muscles */
-        void populateClusters(DuCTTRobotModel& subject);
-
-        /** Sets the amplitude, angularFrequency, phase change, and dcOffset 
-         * for each sine wave used in muscle actuation */
-        void initializeSineWaves();
-
-        /** Difference in position between initPosition and finalPosition
-         * of subject */
-        double displacement(DuCTTRobotModel& subject);
-
-        /** Select action paramters from a comma-separated line in a file */
-        std::vector<double> readManualParams(int lineNumber, string filename);
-
-        void printSineParams();
 };
 
 #endif // ESCAPE_T6CONTROLLER

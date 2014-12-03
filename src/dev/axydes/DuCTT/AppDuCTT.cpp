@@ -32,6 +32,8 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     use_graphics = true;
     add_controller = false;
     add_duct = false;
+    use_manual_params = false;
+
     timestep_physics = 1.0f/60.0f/10.0f;
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
@@ -73,7 +75,7 @@ bool AppDuCTT::setup()
 //        myRobotModel->attach(pPrismControl);
 
         DuCTTRobotController* testLearningController =
-            new DuCTTRobotController();
+            new DuCTTRobotController(5.0, use_manual_params, paramFile);
         myRobotModel->attach(testLearningController);
     }
 
@@ -86,6 +88,7 @@ bool AppDuCTT::setup()
         DuctStraightModel::Config ductConfig;
         ductConfig.m_ductWidth = 38;
         ductConfig.m_ductHeight = 38;
+        ductConfig.m_distance = 1000;
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
 
@@ -119,6 +122,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
         ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
+        ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
     ;
 
     po::variables_map vm;
@@ -142,6 +146,11 @@ void AppDuCTT::handleOptions(int argc, char **argv)
     {
         timestep_graphics = 1/vm["graph_time"].as<double>();
         std::cout << "Graphics timestep set to: " << timestep_graphics << " seconds.\n";
+    }
+
+    if (vm.count("paramFile") && vm["paramFile"].as<string>() != "")
+    {
+        use_manual_params = true;
     }
 }
 
