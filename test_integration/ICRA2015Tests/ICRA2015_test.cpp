@@ -35,6 +35,8 @@
 // The C++ Standard Library
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <cmath>
 // Google Test
 #include "gtest/gtest.h"
 
@@ -120,6 +122,34 @@ namespace {
 				std::vector<double> simMaxTens = myModel->getStringMaxTensions();
 				ASSERT_GE(simMaxTens.size(), 12);
 				
+				/* 
+				 * The hardcoded values are from the robot
+				 * error = abs((actual - simulated)/actual)
+				 * Expected error values are a mix from double precision
+				 * results, the original paper errors and values
+				 * as of 12/3/14. Try to make them smaller!
+				 */
+				double error;
+				std::cout << "Inner front top max tension " << simMaxTens[1] / 100.0 << " N" << std::endl;
+				error = abs ((34.3954 - simMaxTens[1] / 100.0) / 34.3954);
+				EXPECT_LE(error, 0.1441);
+				std::cout << "Inner front left max tension " << simMaxTens[5] / 100.0 << " N" << std::endl;
+				error = abs ((18.0986 - simMaxTens[5] / 100.0) / 18.0986);
+				EXPECT_LE(error, 0.0256368);
+				std::cout << "Inner front right max tension " << simMaxTens[9] / 100.0 << " N" << std::endl;
+				error = abs ((22.0161 - simMaxTens[9] / 100.0) / 22.0161);
+				EXPECT_LE(error, 0.113424);
+				std::cout << "Outer front top max tension " << simMaxTens[0] / 100.0 << " N" << std::endl;
+				error = abs ((24.6800 - simMaxTens[0] / 100.0) / 24.6800);
+				EXPECT_LE(error, 0.3281);
+				std::cout << "Outer front left max tension " << simMaxTens[4] / 100.0 << " N" << std::endl;
+				error = abs ((15.5914 - simMaxTens[4] / 100.0) / 15.5914);
+				EXPECT_LE(error, 0.3337);
+				std::cout << "Outer front right max tension " << simMaxTens[8] / 100.0 << " N" << std::endl;
+				error = abs ((14.1811 - simMaxTens[8] / 100.0) / 14.1811);
+				EXPECT_LE(error, 0.1988);
+				
+				/** @todo test median tension as well, also maybe sum of errors **/
 	}
 
 } // namespace
