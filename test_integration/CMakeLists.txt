@@ -29,4 +29,5 @@ link_directories(${ENV_LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
 
 subdirs(
  #MuscleNP - Segmentation fault as of 11/26/14
- SpineTests)
+ SpineTests
+ ICRA2015Tests)

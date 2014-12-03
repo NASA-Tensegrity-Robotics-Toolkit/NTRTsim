@@ -35,6 +35,8 @@
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
+#include <deque>
 
 /**
  * @file TetraSpineStaticModel_hf.cpp
@@ -280,8 +282,8 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     spec.addBuilder("PCB num2", new tgSphereInfo(PCB_2_Config));
     
     // Two different string configs
-    tgLinearString::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 5000, 7.0, 9500, 10.0, 10.0);
-    tgLinearString::Config muscleConfig2(229.16, 20, 0.0, false, 5000, 7.0, 9500, 10.0, 10.0);
+    tgLinearString::Config muscleConfig(229.16 * 2.0, 20, 0.0, true, 5000, 7.0, 9500, 10.0, 10.0);
+    tgLinearString::Config muscleConfig2(229.16, 20, 0.0, true, 5000, 7.0, 9500, 10.0, 10.0);
     spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));
@@ -310,7 +312,7 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
       
 void TetraSpineStaticModel_hf::teardown()
 {
-
+	
     BaseSpineModelLearning::teardown();
     
 } 
@@ -326,4 +328,22 @@ void TetraSpineStaticModel_hf::step(double dt)
         // Step any children, notify observers
         BaseSpineModelLearning::step(dt);
     }
+}
+
+std::vector<double> TetraSpineStaticModel_hf::getStringMaxTensions() const
+{
+	std::vector<double> maxTens;
+	
+	/** @todo Consider setting up some iterators so you don't have to
+	 * search through the whole history every time this is called.
+	 * Assuming you find a need to call it more than once
+	 */
+    for(int i=0; i<m_allMuscles.size(); i++)
+    {
+        tgBaseString::BaseStringHistory stringHist = m_allMuscles[i]->getHistory();
+        std::deque<double>& tensionHist = stringHist.tensionHistory;
+        maxTens.push_back( *(std::max_element(tensionHist.begin(), tensionHist.end())) );
+    }
+	
+	return maxTens;
 }
