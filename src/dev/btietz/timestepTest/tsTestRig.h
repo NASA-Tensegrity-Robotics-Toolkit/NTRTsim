@@ -34,7 +34,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBaseString;
 class tgModelVisitor;
 class PretensionController;
 class tgStructure;
@@ -95,7 +95,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBaseString*>& getAllMuscles() const;
       
 private:
     
@@ -132,7 +132,7 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBaseString*> allMuscles;
     
     double totalTime;
     bool reached;

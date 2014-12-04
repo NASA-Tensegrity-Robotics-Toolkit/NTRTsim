@@ -4,6 +4,7 @@ link_libraries(controllers
 				tgcreator
                 util
                 sensors
+                KinematicString
                 core    
                 terrain 
                 tgOpenGLSupport)

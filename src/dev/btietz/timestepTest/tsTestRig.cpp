@@ -25,6 +25,9 @@
 // This module
 #include "tsTestRig.h"
 // This library
+#include "dev/btietz/kinematicString/tgKinematicString.h"
+#include "dev/btietz/kinematicString/tgKinematicStringInfo.h"
+
 #include "controllers/PretensionController.h"
 #include "core/tgLinearString.h"
 #include "core/tgRod.h"
@@ -109,7 +112,7 @@ void tsTestRig::setup(tgWorld& world)
     // Define the configurations of the rods and strings
     const tgRod::Config rodConfig(c.radius, c.density);
     const tgRod::Config rodConfig2(c.radius, 0.0);
-    const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
+    const tgKinematicString::Config muscleConfig(c.stiffness, c.damping);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -131,7 +134,7 @@ void tsTestRig::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgKinematicStringInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -141,7 +144,7 @@ void tsTestRig::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBaseString> (getDescendants());
     
     // Notify controllers that setup has finished.
     notifySetup();
@@ -167,11 +170,12 @@ void tsTestRig::step(double dt)
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
         allMuscles[0]->setRestLength(5.0, dt);
-        if (allMuscles[0]->getRestLength() == 5.0 && !reached)
+        if (allMuscles[0]->getRestLength() <= 5.0 && !reached)
         {
 			std::cout << totalTime << std::endl;
 			reached = true;
 		}
+		std::cout << allMuscles[0]->getRestLength() << std::endl;
     }
     
 }
@@ -182,7 +186,7 @@ void tsTestRig::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& tsTestRig::getAllMuscles() const
+const std::vector<tgBaseString*>& tsTestRig::getAllMuscles() const
 {
     return allMuscles;
 }

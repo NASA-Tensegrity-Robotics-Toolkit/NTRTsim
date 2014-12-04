@@ -63,6 +63,9 @@ tgBaseString::Config::Config(double s,
     {
         throw std::invalid_argument("damping is negative.");
     }
+    /* Pretension is checked in Muscle2P, and can be any value
+     * i.e. starting with a slack string
+     */
     else if (mf < 0.0)
     {
         throw std::invalid_argument("max tension is negative.");
@@ -87,6 +90,7 @@ tgBaseString::Config::Config(double s,
 
 void tgBaseString::Config::scale (double sf)
 {
+  pretension	  *= sf;
   maxTens         *= sf;
   targetVelocity  *= sf;
   maxAcc          *= sf;
