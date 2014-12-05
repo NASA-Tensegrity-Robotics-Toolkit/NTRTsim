@@ -38,6 +38,7 @@ class tgModelVisitor;
 class tgStructure;
 class tgWorld;
 class tgBox;
+class btVector3;
 
 /**
  * A class that constructs a straight rectangular duct using the tools
@@ -67,7 +68,8 @@ public:
             double distance = 100,
             double wallWidth = 0.5,
             double friction = 1.0,
-            int axis = 1
+            int axis = 1,
+            btVector3 startPos = btVector3(0,0,0)
         );
 
         double m_ductHeight;
@@ -76,6 +78,7 @@ public:
         double m_wallWidth;
         double m_friction;
         int m_axis; // which axis to extend along, defaults to y, 0=x, 1=y, 2=z
+        btVector3 m_startPos;
     };
 
     /**
