@@ -125,8 +125,9 @@ void AppDuCTT::handleOptions(int argc, char **argv)
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
         ("rot_x", po::value<double>(&startRotX), "X Coordinate of starting rotation axis for robot. Default = 0")
-        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
-        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
+        //Can only support rotation around the x axis for now.
+//        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
+//        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
     ;
