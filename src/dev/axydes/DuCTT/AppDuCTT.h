@@ -97,6 +97,12 @@ private:
     double startX;
     double startY;
     double startZ;
+    double startRotX;
+    double startRotY;
+    double startRotZ;
+    double startAngle;
+
+    double targetDist;
 
     bool bSetup;
 };

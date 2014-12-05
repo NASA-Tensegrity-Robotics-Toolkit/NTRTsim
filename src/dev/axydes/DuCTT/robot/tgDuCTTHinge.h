@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_PRISMATIC_H
-#define TG_PRISMATIC_H
+#ifndef TG_ROD_HINGE_H
+#define TG_ROD_HINGE_H
 
 /**
- * @file tgPrismatic.h
- * @brief Contains the definition of class tgPrismatic. A prismatic actuator.
+ * @file tgDuCTTHinge.h
+ * @brief Contains the definition of class tgHinge. A hinge joint.
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
@@ -31,10 +31,10 @@
 #include "core/tgSubject.h"
 
 class tgWorld;
-class btSliderConstraint;
+class btHingeConstraint;
 class btVector3;
 
-class tgPrismatic: public tgSubject<tgPrismatic>, public tgModel
+class tgDuCTTHinge: public tgSubject<tgDuCTTHinge>, public tgModel
 {
 public: 
     
@@ -43,73 +43,100 @@ public:
     public:
         // To make the complier happy. Probably should never be called
         Config();
-        
+
         Config(
+                double minimum,
+                double maximum,
                 btVector3 axis = btVector3(1,0,0),
-                double rotation = 0,
-                double minLength = 0.1,
-                double maxLength = 5,
-                double maxMotorForce = 20,
-                double maxVelocity = 0.01,
-                double eps = 0.01
+                bool useMotor = false,
+                double maxMotorVelocity = 0.01,
+                double maxMotorImpulse = 20,
+                double eps = 0.01,
+                double softness = 0.9,
+                double bias = 0.3,
+                double relaxation = 1.0
                 );
 
         /**
-         * Specifies the axis to rotate the transform around
-         * Defaults to X axis
+         * Specifies the maximum angle of the joint.
+         * Units are radians
+         */
+        double m_maximum;
+
+        /**
+         * Specifies the minimum angle of the joint.
+         * Units are radians
+         */
+        double m_minimum;
+
+        /**
+         * Axis to rotate the hinge around, by default X axis
          */
         btVector3 m_axis;
 
         /**
-         * Specifies amount to rotate around the axis
-         * Units are radians
+         * Enable the joint motor.
          */
-        double m_rotation;
-        
-        /**
-         * Specifies the maximum length of the joint.
-         */
-        double m_maxLength;
+        bool m_useMotor;
 
         /**
-         * Specifies the minimum length of the joint.
+         * Specifies the maximum impulse that the joint motor can expend.
          */
-        double m_minLength;
-
-        /**
-         * Specifies the maximum force that the joint motor can expend.
-         */
-        double m_maxMotorForce;
+        double m_maxMotorImpulse;
 
         /**
          * Specifies the maximum velocity of the joint motor.
+         * Units are radians/second
          */
-        double m_maxVelocity;
+        double m_maxMotorVelocity;
 
         /**
          * Specifies the maximum distance allowed between joint lengths to be
          * considered equal.
+         * Units are radians
          */
         double m_eps;
+
+        /**
+         * Bullet Hinge constraint limit param: softness
+         * 0->1
+         * Not sure what this is for.
+         */
+        double m_softness;
+
+        /**
+         * Bullet Hinge constraint limit param: biasFactor
+         * 0->1
+         * Multiplier for constraint error, (constraint becomes more "soft" when
+         * this factor is close to zero.
+         */
+        double m_bias;
+
+        /**
+         * Bullet Hinge constraint limit param: relaxationFactor
+         * 0->1
+         * Used to control bounce: 1.0 means full bounce, 0.0 means no bounce
+         */
+        double m_relaxation;
     };
     
     /**
      * Constructor using tags.
-     * @param[in] constraint The btSliderConstraint object that this controls and logs.
-     * Set up in tgPrismaticInfo.cpp
+     * @param[in] constraint The btHingeConstraint object that this controls and logs.
+     * Set up in tgHingeInfo.cpp
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      * @param[in] config Holds member variables like min/max length, max force
      * and velocity, and the epsilon value to use when comparing joint distance.
      */
-    tgPrismatic(
-        btSliderConstraint* constraint,
+    tgDuCTTHinge(
+        btHingeConstraint* constraint,
         const tgTags& tags,
-        tgPrismatic::Config& config);
+        tgDuCTTHinge::Config& config);
     
     /**
      * Calls teardown
      */
-    virtual ~tgPrismatic();
+    virtual ~tgDuCTTHinge();
 
     /**
      * Uses the Config object to set the maximum/minimum limits of the joint,
@@ -136,44 +163,32 @@ public:
     virtual void step(double dt);
 
     /**
-     * Directly set the desired length of the joint, does not call moveMotors
-     * @param length, desired length of the joint.
-     * @return true if successfully set desired length of the joint, false if it defaulted to
+     * Directly set the desired angle of the joint, does not call moveMotors
+     * @param angle, desired angle of the joint. Units are radians.
+     * @return true if successfully set desired angle of the joint, false if it defaulted to
      *      a maximum or minimum or failed.
      */
-    virtual bool setPreferredLength(double length);
+    virtual bool setPreferredAngle(double angle);
 
     /**
      * Directly set the maximum velocity of the motor attached
-     * to the prismatic joint. Does not call moveMotors.
+     * to the hinge joint. Does not call moveMotors.
      * @param vel, the desired max velocity of the joint motor
      */
     void setMaxVelocity(double vel);
 
     /**
-     * Directly set the maximum force of the motor attached
-     * to the prismatic joint. Does not call moveMotors.
+     * Directly set the maximum impulse of the motor attached
+     * to the hinge joint. Does not call moveMotors.
      * @param force, the desired max force of the joint motor
      */
-    void setMaxForce(double force);
+    void setMaxImpulse(double impulse);
 
     /**
      * Called from public functions, it makes the actual length get closer
      * to m_preferredlength, according to config constraints.
      */
     virtual void moveMotors(double dt);
-
-    /**
-     * Return the current actual length of the joint.
-     * @return length, the current actual length of the joint.
-     */
-    virtual double getActualLength();
-
-    /**
-     * Test to see if the joint is at the length the user specified to reach.
-     * @return true, if the joint reached the target length.
-     */
-    virtual bool isAtPreferredLength();
 
 private:
     /**
@@ -182,12 +197,12 @@ private:
      */
     Config m_config;
 
-    btSliderConstraint* m_slider;
+    btHingeConstraint* m_hinge;
 
     /**
-     * Hold the desired length of the joint.
+     * Hold the desired angle of the joint.
      */
-    double m_preferredLength;
+    double m_preferredAngle;
 };
 
-#endif // TG_PRISMATIC_H
+#endif // TG_HINGE_H

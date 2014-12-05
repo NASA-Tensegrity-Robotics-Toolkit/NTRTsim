@@ -316,14 +316,28 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
                                                     false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel, m_config.m_maxStringAcc,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
-    const tgPrismatic::Config prismConfig(2, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
-    const tgPrismatic::Config prismConfig2(1, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    btVector3 prism1Axis(0,0,1);
+    btVector3 prism2Axis(0,1,0);
+
+    prism1Axis = prism1Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prism2Axis = prism2Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+
+    const tgPrismatic::Config prismConfig(prism1Axis, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfig2(prism2Axis, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
-    const tgRodHinge::Config hingeConfig(-SIMD_PI, SIMD_PI,2, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
-    const tgRodHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI,0, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
-    const tgRodHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI,1, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
+    btVector3 hinge1Axis(0,0,1);
+    btVector3 hinge2Axis(1,0,0);
+    btVector3 hinge3Axis(0,1,0);
+
+    hinge1Axis = hinge1Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+//    hinge2Axis = hinge2Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+//    hinge3Axis = hinge3Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+
+    const tgDuCTTHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, hinge1Axis, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
+    const tgDuCTTHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI, hinge2Axis, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
+    const tgDuCTTHinge::Config hingeConfig3(-SIMD_PI, SIMD_PI, hinge3Axis, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -344,8 +358,8 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     addMuscles(s, 16);
 
     // Move the structure so it doesn't start in the ground
+    s.addRotation(btVector3(0,0,0), m_config.m_startRotAxis, m_config.m_startRotAngle);
     s.move(m_config.m_startPos);
-    s.addRotation(m_config.m_startPos, m_config.m_startRotAxis, m_config.m_startRotAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
