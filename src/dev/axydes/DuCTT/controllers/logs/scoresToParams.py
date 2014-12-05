@@ -4,6 +4,7 @@
 import sys
 import csv
 from operator import itemgetter
+import numpy as np
 
 def sortFile(inFile, outFile):
     sortedDistances = []
@@ -34,14 +35,29 @@ def sortFile(inFile, outFile):
 
     return
 
-def cutOuts(inFile, outFile, threshold):
+def cutOuts(inFile, outFile):
     # threshold = Score (distance traveled)
     bestDistances = []
+
+    dists = []
+    try:
+        f = open(inFile, 'r')
+        for line in f: 
+            dists.append(float(line.partition(',')[0]))
+    finally:
+        f.close()
+
+    mean = np.mean(dists)
+    std = np.std(dists)
+
+    lowerThresh = mean - 2*std
+    upperThresh = mean + 2*std
 
     try:
         f = open(inFile, 'r')
         for line in f: 
-            if (float(line.partition(',')[0]) < threshold):
+            dist = float(line.partition(',')[0])
+            if (dist <= upperThresh and dist >= lowerThresh):
                 bestDistances.append(line)
     finally:
         f.close()
@@ -100,7 +116,7 @@ if __name__=="__main__":
     bestParamFile = 'bestParams_'+scoreFile
 
     sortFile(scoreFile, sortedFile)
-    cutOuts(sortedFile, noOutsFile, 200)
-    bestScores(noOutsFile, bestFile, 80)
+    cutOuts(sortedFile, noOutsFile)
+    bestScores(noOutsFile, bestFile, 0)
     printParams(bestFile, bestParamFile)
 

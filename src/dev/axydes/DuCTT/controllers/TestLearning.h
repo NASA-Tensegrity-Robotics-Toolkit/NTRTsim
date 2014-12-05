@@ -74,6 +74,8 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
 
         /** Sets target lengths for each muscle */
         void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
+        /** Sets target lengths for each prismatic joint */
+        void setPrismaticLengths(DuCTTRobotModel& subject, double dt);
 
         /** Divides the 24 muscles of an DuCTTRobotModel
          * into 8 clusters of 3 muscles */
@@ -107,7 +109,10 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgLinearString*> > clusters; 
+        vector<vector<tgLinearString*> > clusters;
+        int nPrisms;
+        vector<tgPrismatic*> prisms;
+        int nActions;
 
         // Sine Wave Data
         double* amplitude;

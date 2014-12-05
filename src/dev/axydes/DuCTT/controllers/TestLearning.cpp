@@ -58,10 +58,14 @@ DuCTTRobotController::DuCTTRobotController(const double initialLength,
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nClusters(8),
-    musclesPerCluster(1)
+    musclesPerCluster(1),
+    nPrisms(2),
+    nActions(nClusters+nPrisms)
 {
+    prisms.resize(nPrisms);
     clusters.resize(nClusters);
-    for (int i=0; i<nClusters; i++) {
+    for (int i=0; i<nClusters; i++)
+    {
         clusters[i].resize(musclesPerCluster);
     }
 }
@@ -104,6 +108,7 @@ void DuCTTRobotController::onStep(DuCTTRobotModel& subject, double dt)
     m_totalTime+=dt;
 
     setPreferredMuscleLengths(subject, dt);
+    setPrismaticLengths(subject, dt);
     const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
     
     //Move motors for all the muscles
@@ -115,7 +120,7 @@ void DuCTTRobotController::onStep(DuCTTRobotModel& subject, double dt)
     }
 
     //instead, generate it here for now!
-    for(int i=0; i<muscles.size(); i++)
+    for(int i=0; i<nActions; i++)
     {
         vector<double> tmp;
         for(int j=0;j<2;j++)
@@ -151,7 +156,7 @@ void DuCTTRobotController::onTeardown(DuCTTRobotModel& subject) {
  */
 vector< vector <double> > DuCTTRobotController::transformActions(vector< vector <double> > actions)
 {
-    vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
+    vector <double> manualParams(4 * (nActions), 1); // '4' for the number of sine wave parameters
     if (m_usingManualParams) {
         std::cout << "Using manually set parameters\n"; 
         int lineNumber = 1;
@@ -189,7 +194,7 @@ vector< vector <double> > DuCTTRobotController::transformActions(vector< vector 
  */
 void DuCTTRobotController::applyActions(DuCTTRobotModel& subject, vector< vector <double> > actions)
 {
-    assert(actions.size() == clusters.size());
+    assert(actions.size() == nActions);
 
     // Apply actions by cluster
     for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
@@ -197,6 +202,14 @@ void DuCTTRobotController::applyActions(DuCTTRobotModel& subject, vector< vector
         angularFrequency[cluster] = actions[cluster][1];
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
+    }
+    // Apply prism actions
+    for (size_t prism = 0; prism < prisms.size(); prism++) {
+        size_t idx = prism + clusters.size()-1;
+        amplitude[idx] = actions[idx][0];
+        angularFrequency[idx] = actions[idx][1];
+        phaseChange[idx] = actions[idx][2];
+        dcOffset[idx] = actions[idx][3];
     }
     //printSineParams();
 }
@@ -213,6 +226,10 @@ void DuCTTRobotController::setupAdapter() {
 }
 
 //TODO: Doesn't seem to correctly calculate energy spent by tensegrity
+//TODO: punish slack strings
+//TODO: too much pretension
+//TODO: historisis effect of latching onto wall (need to come away from wall
+//      a certain amount to be unlocked
 double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
     double totalEnergySpent=0;
 
@@ -239,6 +256,7 @@ double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
 
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
+//TODO: impedence controllers?
 void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
     const double minLength = m_initialLengths * (1-maxStringLengthFactor);
@@ -260,6 +278,29 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
     }
 }
 
+// Pre-condition: every element in muscles must be defined
+// Post-condition: every muscle will have a new target length
+//TODO: saturation of sin wave by touch sensors
+//TODO: 'locking' of prismatics?
+void DuCTTRobotController::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
+    double phase = 0; // Phase of cluster1
+    const double minLength = m_initialLengths * (1-maxStringLengthFactor);
+    const double maxLength = m_initialLengths * (1+maxStringLengthFactor);
+
+    for(int prism=0; prism<nPrisms; prism++) {
+        tgPrismatic* const pPrism = prisms[prism];
+        size_t idx = prism + clusters.size()-1;
+        double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
+        if (newLength <= minLength) {
+            newLength = minLength;
+        } else if (newLength >= maxLength) {
+            newLength = maxLength;
+        }
+        pPrism->setPreferredLength(newLength);
+        phase += phaseChange[idx];
+    }
+}
+
 void DuCTTRobotController::populateClusters(DuCTTRobotModel& subject) {
     for(int cluster=0; cluster < nClusters; cluster++) {
         ostringstream ss;
@@ -268,13 +309,27 @@ void DuCTTRobotController::populateClusters(DuCTTRobotModel& subject) {
         std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("string cluster" + suffix);
         clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
     }
+    for(int prism=0; prism < nPrisms; prism++) {
+        switch(prism)
+        {
+        case 0:
+            prisms[prism] = subject.getBottomPrismatic();
+            break;
+        case 1:
+            prisms[prism] = subject.getTopPrismatic();
+            break;
+        default:
+            std::cerr << "ERROR: Too many prismatic joints!" << std::endl;
+            break;
+        }
+    }
 }
 
 void DuCTTRobotController::initializeSineWaves() {
-    amplitude = new double[nClusters];
-    angularFrequency = new double[nClusters];
-    phaseChange = new double[nClusters]; // Does not use last value stored in array
-    dcOffset = new double[nClusters];    
+    amplitude = new double[nActions];
+    angularFrequency = new double[nActions];
+    phaseChange = new double[nActions]; // Does not use last value stored in array
+    dcOffset = new double[nActions];
 }
 
 double DuCTTRobotController::displacement(DuCTTRobotModel& subject) {
@@ -298,7 +353,7 @@ double DuCTTRobotController::displacement(DuCTTRobotModel& subject) {
                                          
 std::vector<double> DuCTTRobotController::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    vector<double> result(32, 1.0);
+    vector<double> result(nActions*4, 1.0);
     string line;
     ifstream infile(filename.c_str(), ifstream::in);
 
@@ -333,10 +388,10 @@ std::vector<double> DuCTTRobotController::readManualParams(int lineNumber, strin
 }
 
 void DuCTTRobotController::printSineParams() {
-    for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
-        std::cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << std::endl;
-        std::cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << std::endl;
-        std::cout << "phaseChange[" << cluster << "]: " << phaseChange[cluster] << std::endl;
-        std::cout << "dcOffset[" << cluster << "]: " << dcOffset[cluster] << std::endl;
-    }    
+    for (size_t idx = 0; idx < nActions; idx++) {
+        std::cout << "amplitude[" << idx << "]: " << amplitude[idx] << std::endl;
+        std::cout << "angularFrequency[" << idx << "]: " << angularFrequency[idx] << std::endl;
+        std::cout << "phaseChange[" << idx << "]: " << phaseChange[idx] << std::endl;
+        std::cout << "dcOffset[" << idx << "]: " << dcOffset[idx] << std::endl;
+    }
 }

@@ -95,9 +95,9 @@ bool AppDuCTT::setup()
         DuctStraightModel::Config ductConfig;
         ductConfig.m_ductWidth = 45;
         ductConfig.m_ductHeight = 45;
-        ductConfig.m_distance = 1000;
+        ductConfig.m_distance = 10000;
         ductConfig.m_axis = 2;
-        ductConfig.m_startPos = btVector3(0,0,-100);
+        ductConfig.m_startPos = btVector3(0,0,-1000);
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
 
