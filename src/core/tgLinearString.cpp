@@ -37,6 +37,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#define ACCELERATION_CAP
+
 using namespace std;
 
 void tgLinearString::constructorAux()
@@ -235,6 +237,7 @@ void tgLinearString::moveMotors(double dt)
         if (abs(diff) > stepSize)
     {
         //Cap Velocity
+#ifdef ACCELERATION_CAP
       if (abs((diff/fabsDiff) * m_config.targetVelocity -
           mostRecentVelocity) >
           velChange)
@@ -242,10 +245,12 @@ void tgLinearString::moveMotors(double dt)
           // Cap Acceleration
           stepSize = velChange * dt;
       }
+#endif      
       m_restLength += (diff/fabsDiff)*stepSize;
     }
     else
     {
+#ifdef ACCELERATION_CAP
         if (abs(diff/dt - mostRecentVelocity) > velChange)
         {
             // Cap Acceleration
@@ -262,6 +267,7 @@ void tgLinearString::moveMotors(double dt)
                      velChange * dt;
             }
         }
+#endif
         m_restLength += diff;
     }
     }

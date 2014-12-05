@@ -52,7 +52,7 @@ public:
      * The only constructor. Configuration parameters are within the
      * .cpp file in this case, not passed in. 
      */
-    tsTestRig();
+    tsTestRig(bool kinematic = true);
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -96,6 +96,15 @@ public:
      * @return A vector of all of the muscles
      */
     const std::vector<tgBaseString*>& getAllMuscles() const;
+    
+    /**
+     * Ensuring we actually have a consistent runtime turing testing
+     */
+    double getTotalTime() const
+    {
+		return totalTime;
+	}
+    
       
 private:
     
@@ -136,6 +145,7 @@ private:
     
     double totalTime;
     bool reached;
+    bool useKinematic;
 };
 
 #endif  // Prism_MODEL_H

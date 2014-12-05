@@ -74,7 +74,8 @@ namespace
   };
 } // namespace
 
-tsTestRig::tsTestRig() :
+tsTestRig::tsTestRig(bool kinematic) :
+useKinematic(kinematic),
 m_pStringController(new PretensionController(c.pretension)),
 tgModel() 
 {
@@ -112,8 +113,8 @@ void tsTestRig::setup(tgWorld& world)
     // Define the configurations of the rods and strings
     const tgRod::Config rodConfig(c.radius, c.density);
     const tgRod::Config rodConfig2(c.radius, 0.0);
-    const tgKinematicString::Config muscleConfig(c.stiffness, c.damping);
-    
+    // String config needs to be inside boolean switch
+        
     // Create a structure that will hold the details of this model
     tgStructure s;
     
@@ -134,7 +135,17 @@ void tsTestRig::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
-    spec.addBuilder("muscle", new tgKinematicStringInfo(muscleConfig));
+    
+    if (useKinematic)
+    {
+		const tgKinematicString::Config muscleConfig(c.stiffness, c.damping);
+		spec.addBuilder("muscle", new tgKinematicStringInfo(muscleConfig));
+	}
+	else
+	{
+		const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
+		spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+	}
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -172,10 +183,10 @@ void tsTestRig::step(double dt)
         allMuscles[0]->setRestLength(5.0, dt);
         if (allMuscles[0]->getRestLength() <= 5.0 && !reached)
         {
-			std::cout << totalTime << std::endl;
+			std::cout << "Rest length below 5.0 at: " << totalTime << std::endl;
 			reached = true;
 		}
-		std::cout << allMuscles[0]->getRestLength() << std::endl;
+		//std::cout << allMuscles[0]->getRestLength() << std::endl;
     }
     
 }

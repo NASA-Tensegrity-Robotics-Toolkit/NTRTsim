@@ -9,6 +9,9 @@ link_libraries(controllers
                 terrain 
                 tgOpenGLSupport)
 
+add_library(TimestepTest SHARED
+			tsTestRig.cpp)
+
 add_executable(AppTSTest
     tsTestRig.cpp
     AppTimestepTest.cpp

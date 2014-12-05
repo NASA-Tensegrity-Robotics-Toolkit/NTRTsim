@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 0.001; // seconds
+    const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -68,7 +68,10 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    tsTestRig* const myModel = new tsTestRig();
+    
+    // Toggle whether the linear or kinematic motor model is used
+    bool useKinematic = true;
+    tsTestRig* const myModel = new tsTestRig(useKinematic);
     
     // Add the model to the world
     simulation.addModel(myModel);

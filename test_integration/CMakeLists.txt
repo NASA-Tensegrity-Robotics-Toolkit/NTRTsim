@@ -28,6 +28,8 @@ include_directories(${ENV_INC_DIR}
 link_directories(${ENV_LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
 
 subdirs(
+ ICRA2015Tests
  #MuscleNP - Segmentation fault as of 11/26/14
  SpineTests
- ICRA2015Tests)
+ TimestepIndependence
+ )
