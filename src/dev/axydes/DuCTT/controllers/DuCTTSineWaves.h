@@ -29,6 +29,9 @@
 // This library
 #include "core/tgObserver.h"
 
+// The Bullet Physics library
+#include "LinearMath/btVector3.h"
+
 // The C++ Standard Library
 #include <vector>
 
@@ -43,11 +46,11 @@ class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
 {
 public:
 
-    DuCTTSineWaves();
+    DuCTTSineWaves(double targetDist = -1);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
-    void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt);
+    void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase=0);
     bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
 
     /**
@@ -73,9 +76,6 @@ public:
                                     std::size_t phase);
 
 private:
-    /**
-     * Pointers to impedance controllers
-     */
     ImpedanceControl* in_controller;
     ImpedanceControl* out_controller;
 
@@ -84,17 +84,25 @@ private:
     double target;
 
     std::vector<double> phaseOffsets;
-    const double offsetSpeed;
+    const double offsetLength;
     const double cpgAmplitude;
     const double cpgFrequency;
     const double bodyWaves;
 
-    /**
-     * Muscle Length Parameters
-     */
+    double cyclePrism;
+    double targetPrism;
+    const double offsetLengthPrism;
+    const double cpgAmplitudePrism;
+    const double cpgFrequencyPrism;
+    const double bodyWavesPrism;
+
+    bool recordedStartCOM;
+    btVector3 startCOM;
 
     const double insideLength;
-    const double outsideLength;
+
+    double targetDist;
+    bool move;
 };
 
 #endif // PRETENSION_CONTROLLER_H

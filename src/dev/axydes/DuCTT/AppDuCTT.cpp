@@ -40,6 +40,11 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     startX = 0;
     startY = 20;
     startZ = 0;
+    startRotX = 0;
+    startRotY = 0;
+    startRotZ = 0;
+    startAngle = 0;
+    targetDist = -1;
 
     handleOptions(argc, argv);
 }
@@ -62,14 +67,16 @@ bool AppDuCTT::setup()
     // Fourth create the models with their controllers and add the models to the
     // simulation
     DuCTTRobotModel::Config c = DuCTTRobotModel::Config(
-                btVector3(startX,startY,startZ));
+                btVector3(startX,startY,startZ),
+                btVector3(startRotX,startRotY,startRotZ),
+                (startAngle*SIMD_RADS_PER_DEG)
+                );
     DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pPrismControl =
-          new DuCTTSineWaves();
+        DuCTTSineWaves* const pPrismControl = new DuCTTSineWaves(targetDist);
         myRobotModel->attach(pPrismControl);
     }
 
@@ -80,8 +87,10 @@ bool AppDuCTT::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 38;
-        ductConfig.m_ductHeight = 38;
+        ductConfig.m_ductWidth = 45;
+        ductConfig.m_ductHeight = 45;
+        ductConfig.m_distance = 1000;
+        ductConfig.m_axis = 2;
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
 
@@ -115,6 +124,11 @@ void AppDuCTT::handleOptions(int argc, char **argv)
         ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
+        ("rot_x", po::value<double>(&startRotX), "X Coordinate of starting rotation axis for robot. Default = 0")
+        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
+        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
+        ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
+        ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
     ;
 
     po::variables_map vm;
