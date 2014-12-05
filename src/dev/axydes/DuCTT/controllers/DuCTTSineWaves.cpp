@@ -159,7 +159,7 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
             applyImpedanceControlOutside(subject.getAllMuscles(), dt, 1);
             applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt, 4);
 //            applySineWave(subject.getBottomPrismatic(), false, true, dt, 4);
-    //        applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+            applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
         }
         else if (dist >= targetDist)
         {

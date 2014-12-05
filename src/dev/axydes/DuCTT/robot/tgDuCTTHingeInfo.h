@@ -27,7 +27,7 @@
  * $Id$
  */
 
-#include "tgRodHinge.h"
+#include "tgDuCTTHinge.h"
 #include "tgcreator/tgConnectorInfo.h"
 
 #include "LinearMath/btVector3.h"
@@ -43,14 +43,14 @@ public:
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgDuCTTHingeInfo(const tgRodHinge::Config& config);
+    tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config);
     
     /**
      * Construct a tgHingeInfo with just a config and tags. The pair must
      * be filled in later, or factory methods can be used to create instances
      * with pairs.
      */
-    tgDuCTTHingeInfo(const tgRodHinge::Config& config, tgTags tags);
+    tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config, tgTags tags);
 
     /**
      * Construct a tgHingeInfo from its Config
@@ -59,7 +59,7 @@ public:
      * @param[in] config
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgDuCTTHingeInfo(const tgRodHinge::Config& config, const tgPair& pair);
+    tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config, const tgPair& pair);
     
     ~tgDuCTTHingeInfo();
     
@@ -78,7 +78,7 @@ public:
 
     btVector3 getRigidVector(bool isCompound, std::set<btVector3> fromNodes);
 protected:
-    tgRodHinge::Config m_config;
+    tgDuCTTHinge::Config m_config;
 };
 
 #endif

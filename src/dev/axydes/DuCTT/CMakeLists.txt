@@ -1,8 +1,7 @@
 link_libraries(tgcreator core controllers boost_program_options)
 
 add_executable(AppDuCTT
-    robot/tgRodHinge.cpp
-    robot/tgRodHingeInfo.cpp
+    robot/tgDuCTTHinge.cpp
     robot/tgDuCTTHingeInfo.cpp
     robot/tgPrismatic.cpp
     robot/tgPrismaticInfo.cpp

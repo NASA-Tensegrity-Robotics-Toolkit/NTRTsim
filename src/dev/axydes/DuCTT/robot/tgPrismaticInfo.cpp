@@ -79,21 +79,8 @@ btSliderConstraint* tgPrismaticInfo::createSlider()
     btTransform transBTop;
     transBTop.setIdentity();
 
-    if (m_config.m_axis == 0)
-    {
-        transATop.setRotation(btQuaternion(btVector3(1,0,0),m_config.m_rotation));
-        transBTop.setRotation(btQuaternion(btVector3(1,0,0),m_config.m_rotation));
-    }
-    else if (m_config.m_axis == 1)
-    {
-        transATop.setRotation(btQuaternion(btVector3(0,1,0),m_config.m_rotation));
-        transBTop.setRotation(btQuaternion(btVector3(0,1,0),m_config.m_rotation));
-    }
-    else if (m_config.m_axis == 2)
-    {
-        transATop.setRotation(btQuaternion(btVector3(0,0,1),m_config.m_rotation));
-        transBTop.setRotation(btQuaternion(btVector3(0,0,1),m_config.m_rotation));
-    }
+    transATop.setRotation(btQuaternion(m_config.m_axis,m_config.m_rotation));
+    transBTop.setRotation(btQuaternion(m_config.m_axis,m_config.m_rotation));
 
     transATop.setOrigin(fromBody->getWorldTransform().inverse() * from);
     transBTop.setOrigin(toBody->getWorldTransform().inverse() * to);

@@ -26,9 +26,13 @@
 
 #include "tgPrismatic.h"
 
-#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+// The NTRT Core Libary
 #include "core/tgBulletUtil.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
+
+// The Bullet Physics library
+#include "LinearMath/btVector3.h"
+#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
 
 // The C++ Standard Library
 #include <cmath>
@@ -44,7 +48,7 @@ tgPrismatic::Config::Config()
 }
 
 tgPrismatic::Config::Config(
-                double axis,
+                btVector3 axis,
                 double rotation,
                 double minLength,
                 double maxLength,

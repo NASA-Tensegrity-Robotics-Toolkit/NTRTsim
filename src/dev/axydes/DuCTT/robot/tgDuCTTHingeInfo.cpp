@@ -35,18 +35,18 @@
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgStructureInfo.h"
 
-tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgRodHinge::Config& config) :
+tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config) :
     m_config(config),
     tgConnectorInfo() 
 {
 }
 
-tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgRodHinge::Config& config, tgTags tags) :
+tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config, tgTags tags) :
     m_config(config),
     tgConnectorInfo(tags)
 {}
 
-tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgRodHinge::Config& config, const tgPair& pair) :
+tgDuCTTHingeInfo::tgDuCTTHingeInfo(const tgDuCTTHinge::Config& config, const tgPair& pair) :
     m_config(config),
     tgConnectorInfo(pair)
 {}
@@ -118,21 +118,7 @@ btHingeConstraint* tgDuCTTHingeInfo::createHinge()
 
     btHingeConstraint* hinge = new btHingeConstraint(*fromBody, *toBody, oriA, oriB, axisA, axisB);
 
-    if (m_config.m_axis == 0)
-    {
-        axisB = btVector3(1,0,0);
-        hinge->setAxis(axisB);
-    }
-    else if (m_config.m_axis == 1)
-    {
-        axisB = btVector3(0,1,0);
-        hinge->setAxis(axisB);
-    }
-    else if (m_config.m_axis == 2)
-    {
-        axisA = btVector3(0,0,1);
-        hinge->setAxis(axisA);
-    }
+    hinge->setAxis(m_config.m_axis);
 
     hinge->setDbgDrawSize(btScalar(5.f));
     return hinge;
@@ -142,7 +128,7 @@ tgModel* tgDuCTTHingeInfo::createModel(tgWorld& world)
 {  
     btHingeConstraint* hingeC = createHinge();
 
-    tgRodHinge* hinge = new tgRodHinge(hingeC, getTags(), m_config);
+    tgDuCTTHinge* hinge = new tgDuCTTHinge(hingeC, getTags(), m_config);
     hinge->setup(world);
     return hinge;
 } 
