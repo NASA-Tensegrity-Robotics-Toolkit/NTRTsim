@@ -41,14 +41,16 @@ DuctStraightModel::Config::Config(
     double distance,
     double wallWidth,
     double friction,
-    int axis
+    int axis,
+    btVector3 startPos
     ) :
 m_ductHeight(ductHeight),
 m_ductWidth(ductWidth),
 m_distance(distance),
 m_wallWidth(wallWidth),
 m_friction(friction),
-m_axis(axis)
+m_axis(axis),
+m_startPos(startPos)
 {
 }
 
@@ -161,6 +163,8 @@ void DuctStraightModel::setup(tgWorld& world)
     {
         s.move(btVector3(0, m_config.m_ductHeight/2.0+1, 0));
     }
+
+    s.move(m_config.m_startPos);
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
