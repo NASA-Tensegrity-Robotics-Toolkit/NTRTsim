@@ -29,9 +29,11 @@
 
 // This application
 #include "../robot/DuCTTRobotModel.h"
+#include "../robot/tgPrismatic.h"
 
 // This library
 #include "core/tgLinearString.h"
+#include "core/ImpedanceControl.h"
 
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
@@ -60,7 +62,8 @@ DuCTTRobotController::DuCTTRobotController(const double initialLength,
     nClusters(8),
     musclesPerCluster(1),
     nPrisms(2),
-    nActions(nClusters+nPrisms)
+    nActions(nClusters+nPrisms),
+    imp_controller(new ImpedanceControl(0.01, 500, 10))
 {
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
@@ -146,6 +149,10 @@ void DuCTTRobotController::onTeardown(DuCTTRobotModel& subject) {
     evolutionAdapter.endEpisode(scores);
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
+    delete amplitude;
+    delete angularFrequency;
+    delete phaseChange;
+    delete dcOffset;
 }
 
 /** 
@@ -272,7 +279,8 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
             } else if (newLength >= maxLength) {
                 newLength = maxLength;
             }
-            pMuscle->setRestLength(newLength, dt);
+//            pMuscle->setRestLength(newLength, dt);
+            imp_controller->control(pMuscle, dt, newLength);
         }
         phase += phaseChange[cluster];
     }

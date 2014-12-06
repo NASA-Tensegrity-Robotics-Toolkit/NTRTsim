@@ -39,6 +39,7 @@
 class DuCTTRobotModel;
 class tgLinearString;
 class tgPrismatic;
+class ImpedanceControl;
 
 //namespace std for vectors
 using namespace std;
@@ -119,6 +120,8 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         double* angularFrequency;
         double* phaseChange;
         double* dcOffset;
+
+        ImpedanceControl* imp_controller;
 };
 
 #endif // ESCAPE_T6CONTROLLER
