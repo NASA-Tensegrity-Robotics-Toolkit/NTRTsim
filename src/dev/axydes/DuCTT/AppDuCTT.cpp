@@ -47,6 +47,7 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     startRotZ = 0;
     startAngle = 0;
     targetDist = -1;
+    ductAxis = 1;
 
     handleOptions(argc, argv);
 }
@@ -96,8 +97,21 @@ bool AppDuCTT::setup()
         ductConfig.m_ductWidth = 45;
         ductConfig.m_ductHeight = 45;
         ductConfig.m_distance = 10000;
-        ductConfig.m_axis = 2;
-        ductConfig.m_startPos = btVector3(0,0,-1000);
+        ductConfig.m_axis = ductAxis;
+        switch(ductAxis)
+        {
+        case 0:
+            ductConfig.m_startPos = btVector3(-1000,0,0);
+            break;
+        case 1:
+            ductConfig.m_startPos = btVector3(0,-1000,0);
+            break;
+        case 2:
+            ductConfig.m_startPos = btVector3(0,0,-1000);
+        default:
+            break;
+        }
+
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
 
@@ -138,6 +152,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
         ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
+        ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
     ;
 
     po::variables_map vm;

@@ -263,7 +263,6 @@ double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
 
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
-//TODO: impedence controllers?
 void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
     const double minLength = m_initialLengths * (1-maxStringLengthFactor);
@@ -279,7 +278,6 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
             } else if (newLength >= maxLength) {
                 newLength = maxLength;
             }
-//            pMuscle->setRestLength(newLength, dt);
             imp_controller->control(pMuscle, dt, newLength);
         }
         phase += phaseChange[cluster];

@@ -104,6 +104,8 @@ private:
 
     double targetDist;
 
+    int ductAxis;
+
     bool bSetup;
 };
 
