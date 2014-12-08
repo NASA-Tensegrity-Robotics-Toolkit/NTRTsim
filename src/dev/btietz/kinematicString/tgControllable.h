@@ -49,6 +49,7 @@ public:
 	/**
 	 * Set the relevant control variable for this class, such as 
 	 * commanded position or torque
+	 * @todo should this also include dt??
 	 */
 	virtual void setControlInput(double input) = 0;
 	
