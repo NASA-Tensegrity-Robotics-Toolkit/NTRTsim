@@ -6,6 +6,7 @@ add_library( ${PROJECT_NAME} SHARED
 	tgImpedanceController.cpp
 	tgBasicController.cpp
 	tgPIDController.cpp
+	tgSCASineControl.cpp
 )
 
 link_directories(${LIB_DIR})
