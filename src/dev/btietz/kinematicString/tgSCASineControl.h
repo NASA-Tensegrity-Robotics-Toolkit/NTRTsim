@@ -26,11 +26,11 @@
 class btRigidBody;
 class tgImpedanceController;
 
-class tgSineStringControl : public tgObserver<tgKinematicString>
+class tgSCASineControl : public tgObserver<tgKinematicString>
 {
 public:
  
-    tgSineStringControl(const double controlStep,
+    tgSCASineControl(const double controlStep,
 							tgImpedanceController* p_ipc,
 							tgPIDController::Config pidConfig,
 							const double amplitude,
@@ -39,7 +39,7 @@ public:
 							const double offset,
 							const double length);
     
-    virtual ~tgSineStringControl();
+    virtual ~tgSCASineControl();
     
     virtual void onAttach(tgKinematicString& subject);
     

@@ -55,21 +55,21 @@ public:
 		
 		/**
 		 * The position gain of the PID controller
-		 * Must be non-negative
+		 * Use a negitive gain for tension control!
 		 * Units are applicaiton dependant 
 		 */
 		const double kP;
 		
 		/**
 		 * The integral gain of the PID controller
-		 * Must be non-negative
+		 * Use a negitive gain for tension control!
 		 * Units are applicaiton dependant 
 		 */
 		const double kI;
 		
 		/**
 		 * The derivative gain of the PID controller
-		 * Must be non-negative
+		 * Use a negitive gain for tension control!
 		 * Units are applicaiton dependant 
 		 */
 		const double kD;

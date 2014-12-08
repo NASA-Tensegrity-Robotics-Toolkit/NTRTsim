@@ -24,7 +24,7 @@
 #include <iostream>
 #include <stdexcept>
 
-tgSineStringControl::tgSineStringControl(const double controlStep,
+tgSCASineControl::tgSCASineControl(const double controlStep,
 											tgImpedanceController* p_ipc,
 											tgPIDController::Config pidConfig,
 											const double amplitude,
@@ -57,35 +57,30 @@ m_pMotorControl(p_ipc)
     assert(p_ipc);
 }
 
-tgSineStringControl::~tgSineStringControl()
+tgSCASineControl::~tgSCASineControl()
 {
-
+	delete m_PIDController;
 }
 
-void tgSineStringControl::onAttach(tgKinematicString& subject)
+void tgSCASineControl::onAttach(tgKinematicString& subject)
 {
 	m_PIDController = new tgPIDController(&subject, m_tempConfig);
 }
 
-void tgSineStringControl::onStep(tgKinematicString& subject, double dt)
+void tgSCASineControl::onStep(tgKinematicString& subject, double dt)
 {
 	assert(&subject == m_PIDController->getControllable());
 	
     m_controlTime += dt;
 	m_totalTime += dt;
-    /// @todo this fails if its attached to multiple controllers!
-    /// is there a way to track _global_ time at this level
-    if (m_controlTime >= m_controlStep)
+
+    //if (m_controlTime >= m_controlStep)
+    if (0.0)
     {
 		// Yep, its a misnomer. Had to change it for In Won
 		cycle = cos(m_totalTime  * 2.0 * M_PI * cpgFrequency + phaseOffset);
         target = cycle*cpgAmplitude + offsetSpeed;
-	#if (0)	
-		if (phaseOffset == 0.0 && m_totalTime < 4.0)
-		{
-			target = 0.0;
-		}
-	#endif
+
 	    // dt is just passed through to PID controller	
 		m_commandedTension = m_pMotorControl->control(*m_PIDController, dt, m_controlLength, target);
 		//std::cout << m_commandedTension << std::endl;
@@ -94,7 +89,8 @@ void tgSineStringControl::onStep(tgKinematicString& subject, double dt)
     else
     {
 		const double currentTension = subject.getTension();
-		m_PIDController->control(dt, m_commandedTension, currentTension);
+		m_PIDController->control(dt, 580.0, currentTension);
+		std::cout << currentTension << " " << subject.getRestLength() << std::endl;
 	}
 
 }

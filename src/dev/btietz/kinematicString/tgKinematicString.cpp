@@ -253,7 +253,7 @@ void tgKinematicString::integrateRestLength(double dt)
 	m_motorAcc = (appliedTorque - m_config.motorFriction * m_motorVel 
 					+ tension * m_config.radius) / m_config.motorInertia;
 	
-	if (!m_config.backdrivable && m_motorAcc * appliedTorque < 0.0)
+	if (!m_config.backdrivable && m_motorAcc * appliedTorque <= 0.0)
 	{
 		// Stop undesired lengthing if the motor is not backdrivable
 		m_motorVel = m_motorVel + m_motorAcc * dt > 0.0 ? 0.0 : m_motorVel + m_motorAcc * dt;

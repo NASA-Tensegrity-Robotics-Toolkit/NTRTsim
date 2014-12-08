@@ -42,18 +42,7 @@ kI(i),
 kD(d),
 startingSetPoint(setPoint)
 {
-	if (p < 0.0)
-    {
-        throw std::invalid_argument("Position gain is negative");
-    }
-    else if (i < 0.0)
-    {
-        throw std::invalid_argument("Integral gain is negative.");
-    }
-    else if (d < 0.0)
-    {
-        throw std::invalid_argument("Derivative gain is negative.");
-    }
+	/// @todo check if p, i & d are all the same sign
 }
 	
 

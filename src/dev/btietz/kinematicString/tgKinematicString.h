@@ -76,6 +76,8 @@ public:
 		/**
 		 * This has units of length^2 * mass / sec as it gets
 		 * multiplied by speed when added to d-omega/dt
+		 * Therefore this is really a damping coefficent (B) not
+		 *  the unitless (mu)
 		 */
 		double motorFriction;
 		

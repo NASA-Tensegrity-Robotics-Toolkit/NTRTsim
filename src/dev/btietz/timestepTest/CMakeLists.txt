@@ -17,3 +17,7 @@ add_executable(AppTSTest
     AppTimestepTest.cpp
 ) 
 
+add_executable(AppPIDTest
+				pidTestRig.cpp
+				AppPIDTest.cpp
+				)
