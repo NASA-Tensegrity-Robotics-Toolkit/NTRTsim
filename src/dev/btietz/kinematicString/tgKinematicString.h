@@ -32,8 +32,6 @@
 #include "core/tgBaseString.h"
 #include "core/tgSubject.h"
 
-#include "tgControllable.h"
-
 // Forward declarations
 class Muscle2P;
 class tgModelVisitor;
@@ -41,7 +39,7 @@ class tgWorld;
 
 // Should always be a child Model of a tgModel
 class tgKinematicString : public tgSubject<tgKinematicString>,
-                        public tgBaseString, public tgControllable
+                        public tgBaseString
 {
 public: 
 	struct Config : public tgBaseString::Config

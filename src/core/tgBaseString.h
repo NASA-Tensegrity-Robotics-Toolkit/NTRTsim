@@ -29,6 +29,7 @@
 
 // This application
 #include "tgModel.h"
+#include "tgControllable.h"
 
 #include <deque> // For history
 // Forward declarations
@@ -39,7 +40,7 @@ class tgWorld;
  * with all of them the same way
  */
 // Should always be a child Model of a tgModel
-class tgBaseString : public tgModel
+class tgBaseString : public tgModel, public tgControllable
 {
 public: 
     
@@ -185,19 +186,15 @@ public:
     virtual void step(double dt);
     
     /**
-     * Functions for interfacing with muscle2P, and higher level controllers
+     * Functions for interfacing with muscle2P
      */
-     
-    // Called from controller class, it makes the restLength get closer to preferredlength.
-    virtual void moveMotors(double dt) = 0;
     
-    // @todo look into a base class implementation of this. Wouldn't be
-    // difficult with existing get functions
-    virtual void tensionMinLengthController(const double targetTension,
-                                            float dt) = 0;
-    
-    virtual void setRestLength(double newLength, float dt);
-      
+    /// @todo remove this!! Needs to be defined on higer level function 
+    virtual void setControlInput(double controlInput)
+    {
+		m_preferredLength = controlInput;
+	}
+       
     virtual const double getStartLength() const = 0;
     
     virtual const double getCurrentLength() const = 0;

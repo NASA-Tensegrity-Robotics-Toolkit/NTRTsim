@@ -164,23 +164,6 @@ void tgBaseString::step(double dt)
         tgModel::step(dt);
     }
 }
- 
-void tgBaseString::setRestLength(double newLength, float dt)
-{
-    if (newLength < 0.0)
-    {
-      throw std::invalid_argument("Rest length is negative.");
-    }
-    else
-    {
-        m_preferredLength = newLength;      
-        moveMotors(dt);
-    }
-
-    // Postcondition
-    assert(invariant());
-    assert(m_preferredLength == newLength);
-}
 
 bool tgBaseString::invariant() const
 {

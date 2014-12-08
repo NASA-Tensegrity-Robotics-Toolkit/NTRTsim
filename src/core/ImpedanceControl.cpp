@@ -144,10 +144,10 @@ ImpedanceControl::controlTension(tgBaseString* const mString,
       determineSetTension(offsetTension,
                 _lengthStiffness * (actualLength - newPosition),
                 _velStiffness * (vel - offsetVel));
-
-    mString->tensionMinLengthController(setTension,
+#if (0)
+    mString->setControlInput(setTension,
                         deltaTimeSeconds);
-
+#endif
     // Postcondition
     assert(setTension >= 0.0);
 

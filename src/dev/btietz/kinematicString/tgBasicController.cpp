@@ -26,7 +26,7 @@
 
 #include "tgBasicController.h"
 
-#include "tgControllable.h"
+#include "core/tgControllable.h"
 
 // The C++ Standard Library
 #include <cassert>
