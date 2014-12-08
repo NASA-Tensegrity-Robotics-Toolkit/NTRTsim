@@ -30,6 +30,7 @@
 
 // The C++ Standard Library
 #include <cassert>
+#include <stdexcept>
 #include <cstddef> // NULL keyword
 
 tgBasicController::tgBasicController(tgControllable* controllable, double setPoint) :
