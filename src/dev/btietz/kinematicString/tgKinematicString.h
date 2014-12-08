@@ -32,6 +32,8 @@
 #include "core/tgBaseString.h"
 #include "core/tgSubject.h"
 
+#include "tgControllable.h"
+
 // Forward declarations
 class Muscle2P;
 class tgModelVisitor;
@@ -39,7 +41,7 @@ class tgWorld;
 
 // Should always be a child Model of a tgModel
 class tgKinematicString : public tgSubject<tgKinematicString>,
-                        public tgBaseString
+                        public tgBaseString, public tgControllable
 {
 public: 
 	struct Config : public tgBaseString::Config
@@ -205,7 +207,15 @@ public:
      * available speeds and torques
      */
     virtual double getAppliedTorque(double desiredTorque) const;
-
+	
+	
+	/**
+	 * Set the value of m_desiredTorque for this timestep.
+	 * Value will be scaled by getAppliedTorque, so we don't have to
+	 * check it here.
+	 */
+	virtual void setControlInput(double input);
+	
 protected:
 
     Muscle2P* m_muscle;
@@ -242,6 +252,9 @@ private:
      */
     double m_motorAcc;
 	
+	/**
+	 * Units of torque (length^2 * mass / sec^2)
+	 */
 	double m_desiredTorque;
     
     /**

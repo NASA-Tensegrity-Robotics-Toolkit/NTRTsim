@@ -277,11 +277,12 @@ void tgKinematicString::integrateRestLength(double dt)
 double tgKinematicString::getAppliedTorque(double desiredTorque) const
 { 
 	double maxTorque = m_config.maxTens * m_config.radius * 
-						(1.0 - m_config.radius * m_motorVel / m_config.targetVelocity);
+						(1.0 - m_config.radius * abs(m_motorVel) / m_config.targetVelocity);
 	
 	maxTorque = maxTorque < 0.0 ? 0.0 : maxTorque;
 	
-	return desiredTorque < maxTorque ? desiredTorque : maxTorque;
+	return abs(desiredTorque) < maxTorque ? desiredTorque : 
+		desiredTorque / abs(desiredTorque) * maxTorque;
 }
 
 void tgKinematicString::moveMotors(double dt)
@@ -303,6 +304,11 @@ void tgKinematicString::tensionMinLengthController(const double targetTension,
     const double delta = targetTension - currentTension;
     
     m_desiredTorque = delta * m_config.radius;
+}
+
+void tgKinematicString::setControlInput(double input)
+{
+	m_desiredTorque = input;
 }
 
 const tgBaseString::BaseStringHistory& tgKinematicString::getHistory() const
