@@ -3,6 +3,7 @@ project(KinematicString)
 add_library( ${PROJECT_NAME} SHARED
 	tgKinematicString.cpp
 	tgKinematicStringInfo.cpp
+	tgImpedanceController.cpp
 	tgBasicController.cpp
 	tgPIDController.cpp
 )
