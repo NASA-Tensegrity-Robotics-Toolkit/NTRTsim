@@ -74,8 +74,7 @@ void tgSCASineControl::onStep(tgKinematicString& subject, double dt)
     m_controlTime += dt;
 	m_totalTime += dt;
 
-    //if (m_controlTime >= m_controlStep)
-    if (0.0)
+    if (m_controlTime >= m_controlStep)
     {
 		// Yep, its a misnomer. Had to change it for In Won
 		cycle = cos(m_totalTime  * 2.0 * M_PI * cpgFrequency + phaseOffset);
@@ -89,8 +88,7 @@ void tgSCASineControl::onStep(tgKinematicString& subject, double dt)
     else
     {
 		const double currentTension = subject.getTension();
-		m_PIDController->control(dt, 580.0, currentTension);
-		std::cout << currentTension << " " << subject.getRestLength() << std::endl;
+		m_PIDController->control(dt, m_commandedTension, currentTension);
 	}
 
 }
