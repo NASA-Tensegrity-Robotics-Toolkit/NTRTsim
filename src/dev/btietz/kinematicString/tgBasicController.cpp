@@ -32,13 +32,6 @@
 #include <cassert>
 #include <cstddef> // NULL keyword
 
-tgBasicController::tgBasicController(tgControllable* controllable) :
-m_setPoint(0.0),
-m_controllable(controllable)
-{
-	assert(controllable != NULL);
-}
-    
 tgBasicController::tgBasicController(tgControllable* controllable, double setPoint) :
 m_setPoint(setPoint),
 m_controllable(controllable)
@@ -53,11 +46,24 @@ tgBasicController::~tgBasicController()
 	
 void tgBasicController::control(double dt)
 {
+	if (dt <= 0.0)
+	{
+		throw std::runtime_error ("Timestep must be positive.");
+	}	
+	
 	m_controllable->setControlInput(m_setPoint);
 }
 	
-void tgBasicController::control(double dt, double setPoint)
+void tgBasicController::control(double dt, double setPoint, double sensorData)
 {
+	if (dt <= 0.0)
+	{
+		throw std::runtime_error ("Timestep must be positive.");
+	}
+	
+	// Suppress compiler warning for unused variable
+	(void)sensorData;
+	
 	setNewSetPoint(setPoint);
 	control(dt);
 }

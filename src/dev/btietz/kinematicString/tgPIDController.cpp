@@ -74,13 +74,15 @@ tgPIDController::~tgPIDController()
 	
 void tgPIDController::control(double dt)
 {
+	if (dt <= 0.0)
+	{
+		throw std::runtime_error ("Timestep must be positive.");
+	}
+	
 	double error = m_setPoint - m_sensorData;
 	
-	/**
-	 * @todo since we have access to prevError, should we integrate by
-	 * another method (ie (m_prevError + error) / 2.0 * dt)?
-	 */
-	m_intError += error * dt;
+	/// Integrate using trapezoid rule to reduce error in integration over rectangle
+	m_intError += (error + m_prevError) / 2.0 * dt;
 	double dError = (error - m_prevError) / dt;
 	double result = m_config.kP * error + m_config.kI * m_intError +
 					m_config.kD * dError;
@@ -92,8 +94,13 @@ void tgPIDController::control(double dt)
 	
 void tgPIDController::control(double dt, double setPoint, double sensorData)
 {
+	if (dt <= 0.0)
+	{
+		throw std::runtime_error ("Timestep must be positive.");
+	}
+	
 	setSensorData(sensorData);
-	m_setPoint = setPoint;
+	setNewSetPoint(setPoint);
 	control(dt);
 }
 

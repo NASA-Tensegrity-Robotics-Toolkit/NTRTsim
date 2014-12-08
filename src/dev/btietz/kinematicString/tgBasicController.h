@@ -39,21 +39,34 @@ class tgBasicController
 {
 public:
 
-	
-    tgBasicController(tgControllable* controllable);
-    
-    tgBasicController(tgControllable* controllable, double setPoint);
+    /**
+	 * The only constructor with two inputs
+     * @param[in] controllable. The system to be controlled.
+     * @param[in] setPoint. The initial setPoint for the system
+	 */
+    tgBasicController(tgControllable* controllable, double setPoint = 0.0);
 
-   
+    /**
+     * The destructor. Sets m_controllable to NULL.
+     */
     virtual ~tgBasicController();
 	
+	/**
+	 * The control step. In this version it passes the setPoint directly
+	 * to m_controllable
+	 * @param[in] dt - the timestep. Must be positive.
+	 */
 	virtual void control(double dt);
 	
 	/**
 	 * Calls setNewSetPoint on the setPoint parameter, then calls
 	 * control(dt)
+	 * @param[in] dt - the timestep. Must be positive.
+	 * @param[in] setPoint - the setpoint to be used at this step.
+	 * @param[in] sensorData: unused in this version. Unifies the API
+	 * with PIDController
 	 */
-	virtual void control(double dt, double setPoint);
+	virtual void control(double dt, double setPoint, double sensorData = 0);
 	
 	virtual void setNewSetPoint(double newSetPoint);
 	
@@ -62,15 +75,21 @@ public:
 	 * Current solution to obtaining sensor data (requires casting
 	 * at a higher level)
 	 */
-	const tgControllable* const getControllable()
+	const tgControllable* const getControllable() const
 	{
 		return m_controllable;
 	}
 	
 protected:
 	
+	/**
+	 * The control setpoint. Updated via control or setNewSetPoint
+	 */
 	double m_setPoint;
 	
+	/**
+	 * The system being controlled. We don't own this
+	 */
 	tgControllable* m_controllable;
 	
 };
