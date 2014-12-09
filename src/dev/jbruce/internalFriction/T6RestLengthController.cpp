@@ -30,7 +30,7 @@
 #include "T6Model.h"
 // This library
 #include "core/tgLinearString.h"
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 #include "tgcreator/tgUtil.h"
 // The C++ Standard Library
 #include <cassert>
@@ -81,7 +81,8 @@ void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
 	static int count = 0;
 	const std::vector<tgLinearString*> strings = subject.getAllMuscles();
-	const Muscle2P* muscles;
+	/// @todo consider whether this is really necessary, or of tgLinearString has all of the functions you need _BTM
+	const tgBulletSpringCable* muscles;
 
 	if(count > 100)
 	{

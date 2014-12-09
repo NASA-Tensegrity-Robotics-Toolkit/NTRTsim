@@ -18,7 +18,6 @@
 
 #include "tgSineStringControl.h"
 
-#include "core/Muscle2P.h"
 #include "core/ImpedanceControl.h"
 
 #include <iostream>

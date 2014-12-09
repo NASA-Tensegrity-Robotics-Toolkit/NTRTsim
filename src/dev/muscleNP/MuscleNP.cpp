@@ -62,7 +62,7 @@ MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  double pretension,
  double thickness,
  double resolution) :
-Muscle2P (anchors, coefK, dampingCoefficient, pretension),
+tgBulletSpringCable (anchors, coefK, dampingCoefficient, pretension),
 m_ghostObject(ghostObject),
 m_world(world),
 m_thickness(thickness),

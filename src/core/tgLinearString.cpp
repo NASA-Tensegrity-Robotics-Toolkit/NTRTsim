@@ -24,7 +24,7 @@
  */
 
 // This Module
-#include "Muscle2P.h"
+#include "tgBulletSpringCable.h"
 #include "tgLinearString.h"
 #include "tgModelVisitor.h"
 #include "tgWorld.h"
@@ -48,7 +48,7 @@ void tgLinearString::constructorAux()
     prevVel = 0.0;
     if (m_muscle == NULL)
     {
-        throw std::invalid_argument("Pointer to Muscle2P is NULL.");
+        throw std::invalid_argument("Pointer to tgBulletSpringCable is NULL.");
     }
     else if (m_config.targetVelocity < 0.0)
     {
@@ -67,7 +67,7 @@ void tgLinearString::constructorAux()
         logHistory();
     }
 }
-tgLinearString::tgLinearString(Muscle2P* muscle,
+tgLinearString::tgLinearString(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgBaseString::Config& config) :
     m_muscle(muscle),

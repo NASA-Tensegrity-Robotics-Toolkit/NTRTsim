@@ -33,7 +33,7 @@
 #include "core/tgSubject.h"
 
 // Forward declarations
-class Muscle2P;
+class tgBulletSpringCable;
 class tgModelVisitor;
 class tgWorld;
 
@@ -107,12 +107,12 @@ public:
      * @param[in] hist whether or not to log additional history @todo 
      * move hist to config
      */    
-    tgKinematicString(Muscle2P* muscle,
+    tgKinematicString(tgBulletSpringCable* muscle,
            const tgTags& tags,
            tgKinematicString::Config& config);
     
     /**
-     * Destructor deletes the Muscle2P
+     * Destructor deletes the tgBulletSpringCable
      */
     virtual ~tgKinematicString();
     
@@ -130,7 +130,7 @@ public:
     /**
      * Step dt forward with the simulation.
      * Notifies observers of step, applies forces to rigid bodies via
-     * Muscle2P, logs history if desired, steps children.
+     * tgBulletSpringCable, logs history if desired, steps children.
      * @param[in] dt, must be >= 0.0
      */    
     virtual void step(double dt);
@@ -158,7 +158,7 @@ public:
     
     /**
      * Directly set m_preferredLength (see base class tgBaseString)
-     * Calls moveMotors(dt) to adjust the rest length of Muscle2P
+     * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
      */
     void setRestLength(double newLength, float dt);
 
@@ -169,10 +169,10 @@ public:
     void setPrefLength(double newLength);
 
     /**
-     * Returns a pointer the string's Muscle2P. Used for rendering in
+     * Returns a pointer the string's tgBulletSpringCable. Used for rendering in
      * tgBulletRenderer
      */
-    const Muscle2P* getMuscle() const
+    const tgBulletSpringCable* getMuscle() const
     {
       return m_muscle;
     }
@@ -218,7 +218,7 @@ public:
 	
 protected:
 
-    Muscle2P* m_muscle;
+    tgBulletSpringCable* m_muscle;
 	
 	virtual void integrateRestLength(double dt);
 private:

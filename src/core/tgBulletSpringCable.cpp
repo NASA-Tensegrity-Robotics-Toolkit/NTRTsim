@@ -17,14 +17,14 @@
 */
 
 /**
- * @file Muscle2P.cpp
- * @brief Definitions of members of classes Muscle2P and MuscleAnchor
+ * @file tgBulletSpringCable.cpp
+ * @brief Definitions of members of classes tgBulletSpringCable and MuscleAnchor
  * @todo Split so only one class is defined per file.
  * $Id$
  */
 
 // This module
-#include "Muscle2P.h"
+#include "tgBulletSpringCable.h"
 #include "tgBulletSpringCableAnchor.h"
 #include "tgCast.h"
 // The BulletPhysics library
@@ -33,7 +33,7 @@
 #include <iostream>
 #include <stdexcept>
 
-Muscle2P::Muscle2P( const std::vector<tgBulletSpringCableAnchor*>& anchors,
+tgBulletSpringCable::tgBulletSpringCable( const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension) :
@@ -48,10 +48,10 @@ tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anc
 }
 
 
-Muscle2P::~Muscle2P()
+tgBulletSpringCable::~tgBulletSpringCable()
 {
     #if (0)
-    std::cout << "Destroying Muscle2P" << std::endl;
+    std::cout << "Destroying tgBulletSpringCable" << std::endl;
     #endif
 	
 	std::size_t n = m_anchors.size();
@@ -76,12 +76,12 @@ Muscle2P::~Muscle2P()
     m_anchors.clear();
 }
 
-void Muscle2P::calculateAndApplyForce(double dt)
+void tgBulletSpringCable::calculateAndApplyForce(double dt)
 {
 	step(dt);
 }
 
-void Muscle2P::step(double dt)
+void tgBulletSpringCable::step(double dt)
 {
     btVector3 force(0.0, 0.0, 0.0);
     double magnitude = 0.0;
@@ -134,7 +134,7 @@ void Muscle2P::step(double dt)
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
 }
 
-void Muscle2P::setRestLength( const double newRestLength)
+void tgBulletSpringCable::setRestLength( const double newRestLength)
 {
     // Assume we've already put this through a motor model
     // But check anyway
@@ -143,26 +143,26 @@ void Muscle2P::setRestLength( const double newRestLength)
     m_restLength = newRestLength;
 }
 
-const double Muscle2P::getRestLength() const
+const double tgBulletSpringCable::getRestLength() const
 {
     return m_restLength;
 }
 
-const double Muscle2P::getActualLength() const
+const double tgBulletSpringCable::getActualLength() const
 {
     const btVector3 dist =
       this->anchor2->getWorldPosition() - this->anchor1->getWorldPosition();
     return dist.length();
 }
 
-const double Muscle2P::getTension() const
+const double tgBulletSpringCable::getTension() const
 {
     double tension = (getActualLength() - m_restLength) * m_coefK;
     tension = (tension < 0.0) ? 0.0 : tension;
     return tension;
 }
 
-const std::vector<tgSpringCableAnchor*> Muscle2P::getAnchors() const
+const std::vector<tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() const
 {
 	return tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(m_anchors);
 }

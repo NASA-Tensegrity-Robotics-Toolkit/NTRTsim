@@ -28,7 +28,7 @@
  */
 
 // NTRT
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 // The Bullet Physics library
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
@@ -46,7 +46,7 @@ class btPairCachingGhostObject;
 class btDynamicsWorld;
 
 /**
- * An extension of Muscle2P that places a ghostObject into the bullet world
+ * An extension of tgBulletSpringCable that places a ghostObject into the bullet world
  * and then uses that object to generate collision dynamics. The
  * ghost object is updated every time step to account for the new
  * shape of the string. Anchors track their associated btPersistentManifold
@@ -57,7 +57,7 @@ class btDynamicsWorld;
  * string. Merging with Corde could also address some of the current
  * issues with rotational energy
  */
-class MuscleNP : public Muscle2P
+class MuscleNP : public tgBulletSpringCable
 {
 public:
 	
@@ -67,13 +67,13 @@ public:
 	 * @param[in] ghostObject - the btPairCashingGhostObject that this interacts with
 	 * @param[in] world - the tgWorld - we need to keep access to the bullet 
 	 * dynamics world's broadphase so that we can determine collisions and contact points
-	 * @param[in] anchors - a reference to a list of anchors. Will be passed to Muscle2P
+	 * @param[in] anchors - a reference to a list of anchors. Will be passed to tgBulletSpringCable
 	 * and form the initial (likely permanent) anchor list. Size must be 2 or greater
-	 * (enforced in Muscle2P)
+	 * (enforced in tgBulletSpringCable)
 	 * @param[in] coefK - The stiffness of this cable. Units are 
-	 * mass / sec^2, sets a member variable of Muscle2P
+	 * mass / sec^2, sets a member variable of tgBulletSpringCable
 	 * @param[in] dampingCofefficient - The damping coefficient of the force application equation.
-	 * Units are mass / sec, sets a member variable of Muscle2P
+	 * Units are mass / sec, sets a member variable of tgBulletSpringCable
 	 * @param[in] The pretension on the string, units are force. Must be small enough 
 	 * (based on stiffness) such that rest length > 0;
 	 * @param[in] thickness, the radius of the cylinder used for the btCollisionObject
@@ -91,7 +91,7 @@ public:
     /**
      * The destructor. Removes the ghost object from the world,
      * deletes its collision shape, and then deletes the object.
-     * Muscle2P ensures all anchors are deleted
+     * tgBulletSpringCable ensures all anchors are deleted
      */     
 	virtual ~MuscleNP();
     

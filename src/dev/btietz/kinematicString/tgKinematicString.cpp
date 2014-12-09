@@ -26,7 +26,7 @@
 // This Module
 #include "tgKinematicString.h"
 // The NTRT Core libary
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 #include "core/tgModelVisitor.h"
 #include "core/tgWorld.h"
 // The Bullet Physics Library
@@ -85,7 +85,7 @@ void tgKinematicString::constructorAux()
     prevVel = 0.0;
     if (m_muscle == NULL)
     {
-        throw std::invalid_argument("Pointer to Muscle2P is NULL.");
+        throw std::invalid_argument("Pointer to tgBulletSpringCable is NULL.");
     }
     else if (m_config.targetVelocity < 0.0)
     {
@@ -104,7 +104,7 @@ void tgKinematicString::constructorAux()
         logHistory();
     }
 }
-tgKinematicString::tgKinematicString(Muscle2P* muscle,
+tgKinematicString::tgKinematicString(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgKinematicString::Config& config) :
     m_muscle(muscle),

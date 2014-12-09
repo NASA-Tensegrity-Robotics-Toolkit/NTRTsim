@@ -37,7 +37,7 @@
 #include "tgKinematicString.h"
 #include "core/tgTags.h"
 
-class Muscle2P;
+class tgBulletSpringCable;
 
 class tgKinematicStringInfo : public tgLinearStringInfo
 {

@@ -36,7 +36,7 @@
 #include "core/tgLinearString.h"
 #include "core/tgTags.h"
 
-class Muscle2P;
+class tgBulletSpringCable;
 
 class tgLinearStringInfo : public tgConnectorInfo
 {
@@ -81,8 +81,8 @@ public:
 
 protected:    
     
-    Muscle2P* createMuscle2P();
-    Muscle2P* m_muscle2P;
+    tgBulletSpringCable* createTgBulletSpringCable();
+    tgBulletSpringCable* m_muscle2P;
 private:
     
     tgLinearString::Config m_config;

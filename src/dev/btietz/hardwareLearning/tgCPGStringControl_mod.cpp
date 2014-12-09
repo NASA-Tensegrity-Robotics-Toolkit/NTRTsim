@@ -18,7 +18,6 @@
 
 #include "tgCPGStringControl_mod.h"
 
-#include "core/Muscle2P.h"
 #include "core/ImpedanceControl.h"
 #include "util/CPGEquations.h"
 

@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef NTRT_MUSCLE2P_H_
-#define NTRT_MUSCLE2P_H_
+#ifndef SRC_CORE_TG_BULLET_SPRING_CABLE_H_
+#define SRC_CORE_TG_BULLET_SPRING_CABLE_H_
 
 /**
- * @file Muscle2P.h
- * @brief Definitions of classes Muscle2P
+ * @file tgBulletSpringCable.h
+ * @brief Definitions of classes tgBulletSpringCable
  * $Id$
  */
 
@@ -29,7 +29,6 @@
 #include "tgSpringCable.h"
 
 // The Bullet Physics library
-#include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 
@@ -40,16 +39,16 @@ class btRigidBody;
 class tgSpringCableAnchor;
 class tgBulletSpringCableAnchor;
 
-class Muscle2P : public tgSpringCable
+class tgBulletSpringCable : public tgSpringCable
 {
-public:	
-	// Alternative constructor
-	Muscle2P( const std::vector<tgBulletSpringCableAnchor*>& anchors,
-				double coefK,
-				double dampingCoefficient,
-				double pretension = 0.0);
-	
-    virtual ~Muscle2P();
+public: 
+    // Alternative constructor
+    tgBulletSpringCable( const std::vector<tgBulletSpringCableAnchor*>& anchors,
+                double coefK,
+                double dampingCoefficient,
+                double pretension = 0.0);
+    
+    virtual ~tgBulletSpringCable();
 
     /// @todo remove this
     virtual void calculateAndApplyForce(double dt);
@@ -85,4 +84,4 @@ protected:
     bool invariant(void) const;
 };
 
-#endif  // NTRT_MUSCLE2P_H_
+#endif  // SRC_CORE_TG_BULLET_SPRING_CABLE_H_

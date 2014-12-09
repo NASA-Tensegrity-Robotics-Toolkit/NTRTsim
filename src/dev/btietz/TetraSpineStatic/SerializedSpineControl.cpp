@@ -35,7 +35,6 @@
 #include "core/tgBaseRigid.h"
 #include "core/ImpedanceControl.h"
 #include "core/abstractMarker.h"
-#include "core/Muscle2P.h"
 #include "tgcreator/tgUtil.h"
 
 // The C++ Standard Library

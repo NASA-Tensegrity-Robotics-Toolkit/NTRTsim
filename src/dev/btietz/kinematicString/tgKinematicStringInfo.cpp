@@ -26,8 +26,6 @@
 
 #include "tgKinematicStringInfo.h"
 
-#include "core/Muscle2P.h"
-
 tgKinematicStringInfo::tgKinematicStringInfo(const tgKinematicString::Config& config) : 
 m_config(config),
 tgLinearStringInfo(config)

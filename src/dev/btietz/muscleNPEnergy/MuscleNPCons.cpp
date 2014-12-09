@@ -33,7 +33,7 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "dev/muscleNP/tgMultiPointStringInfo.h"
 
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
 
 // The Bullet Physics Library

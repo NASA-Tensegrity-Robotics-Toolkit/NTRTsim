@@ -26,7 +26,7 @@
 // This module
 #include "tgBulletRenderer.h"
 // This application
-#include "Muscle2P.h"
+#include "tgBulletSpringCable.h"
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgLinearString.h"
@@ -68,11 +68,11 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
     
-    const Muscle2P* const pMuscle = linString.getMuscle();
+    const tgBulletSpringCable* const pSpringCable = linString.getMuscle();
     
-    if(pDrawer && pMuscle)
+    if(pDrawer && pSpringCable)
     {
-		const std::vector<tgSpringCableAnchor*>& anchors = pMuscle->getAnchors();
+		const std::vector<tgSpringCableAnchor*>& anchors = pSpringCable->getAnchors();
 		std::size_t n = anchors.size() - 1;
 		for (std::size_t i = 0; i < n; i++)
 		{
@@ -82,7 +82,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 			anchors[i+1]->getWorldPosition();
 		   // Should this be normalized??
 		  const double stretch = 
-			linString.getCurrentLength() - pMuscle->getRestLength();
+			linString.getCurrentLength() - linString.getRestLength();
 		  const btVector3 color =
 			(stretch < 0.0) ?
 			btVector3(0.0, 0.0, 1.0) :

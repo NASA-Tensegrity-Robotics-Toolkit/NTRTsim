@@ -26,7 +26,7 @@
 
 #include "tgLinearStringInfo.h"
 
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 #include "core/tgBulletSpringCableAnchor.h"
 
 tgLinearStringInfo::tgLinearStringInfo(const tgLinearString::Config& config) : 
@@ -52,13 +52,13 @@ tgConnectorInfo* tgLinearStringInfo::createConnectorInfo(const tgPair& pair)
 
 void tgLinearStringInfo::initConnector(tgWorld& world)
 {
-    // Note: Muscle2P holds pointers to things in the world, but it doesn't actually have any in-world representation.
-    m_muscle2P = createMuscle2P();
+    // Note: tgBulletSpringCable holds pointers to things in the world, but it doesn't actually have any in-world representation.
+    m_muscle2P = createTgBulletSpringCable();
 }
 
 tgModel* tgLinearStringInfo::createModel(tgWorld& world)
 {
-    // Don't have to do anything in the world for a Muscle2P...
+    // Don't have to do anything in the world for a tgBulletSpringCable...
     // @todo: set the name based on joined tags, or remove name from the model...
     //std::cout << "tgLinearStringInfo::createModel" << std::endl;
     
@@ -69,12 +69,12 @@ tgModel* tgLinearStringInfo::createModel(tgWorld& world)
 
 double tgLinearStringInfo::getMass() 
 {
-    // @todo: calculate a mass? Muscle2P doesn't have physics...
+    // @todo: calculate a mass? tgBulletSpringCable doesn't have physics...
     return 0;
 }
 
 
-Muscle2P* tgLinearStringInfo::createMuscle2P()
+tgBulletSpringCable* tgLinearStringInfo::createTgBulletSpringCable()
 {
     //std::cout << "tgLinearStringInfo::createMuscle2P()" << std::endl;
     
@@ -96,6 +96,6 @@ Muscle2P* tgLinearStringInfo::createMuscle2P()
 	tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
 	anchorList.push_back(anchor2);
 	
-    return new Muscle2P(anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
+    return new tgBulletSpringCable(anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }
     

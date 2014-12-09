@@ -18,7 +18,7 @@
 
 #include "tgCPGStringControl.h"
 
-#include "core/Muscle2P.h"
+#include "core/tgBulletSpringCable.h"
 #include "core/tgBulletSpringCableAnchor.h"
 #include "core/ImpedanceControl.h"
 #include "util/CPGEquations.h"

@@ -43,7 +43,7 @@ class btPersistentManifold;
 class MuscleNP;
 
 /**
- * A class that allows Muscle2P and MuscleNP to attach to btRigidBodies
+ * A class that allows tgBulletSpringCable and MuscleNP to attach to btRigidBodies
  * Anchors track a specific point on a body as that body translates
  * and rotates. They can either be 'non-sliding' which typically means
  * a pin jointed anchor (and are typically permanent), or sliding,

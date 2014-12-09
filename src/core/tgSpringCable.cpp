@@ -17,9 +17,8 @@
 */
 
 /**
- * @file Muscle2P.cpp
- * @brief Definitions of members of classes Muscle2P and MuscleAnchor
- * @todo Split so only one class is defined per file.
+ * @file tgSpringCable.cpp
+ * @brief Definitions of members of class tgSpringCable
  * $Id$
  */
 

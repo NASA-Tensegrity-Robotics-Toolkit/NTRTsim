@@ -42,7 +42,6 @@ public:
     
     virtual ~tgSpringCable();
 
-    // Called by tensegrity class update function for each muscle2p
     virtual void step(double dt) = 0;
    
     virtual const double getRestLength() const = 0;
