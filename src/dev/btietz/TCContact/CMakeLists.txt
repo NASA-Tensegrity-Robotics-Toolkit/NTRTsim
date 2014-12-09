@@ -2,8 +2,7 @@ link_directories(${LIB_DIR})
 
 link_libraries(learningSpines
 		sensors
-                tgcreator
-		MuscleNP                
+                tgcreator             
 		core
                 util
                 terrain

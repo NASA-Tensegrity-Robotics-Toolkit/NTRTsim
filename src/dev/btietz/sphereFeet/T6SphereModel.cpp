@@ -34,7 +34,7 @@
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgMultiPointStringInfo.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library

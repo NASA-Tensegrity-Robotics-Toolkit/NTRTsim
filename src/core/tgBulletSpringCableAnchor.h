@@ -40,10 +40,10 @@
 // Forward References
 class btRigidBody;
 class btPersistentManifold;
-class MuscleNP;
+class tgBulletContactSpringCable;
 
 /**
- * A class that allows tgBulletSpringCable and MuscleNP to attach to btRigidBodies
+ * A class that allows tgBulletSpringCable and tgBulletContactSpringCable to attach to btRigidBodies
  * Anchors track a specific point on a body as that body translates
  * and rotates. They can either be 'non-sliding' which typically means
  * a pin jointed anchor (and are typically permanent), or sliding,
@@ -53,8 +53,8 @@ class MuscleNP;
 class tgBulletSpringCableAnchor : public tgSpringCableAnchor
 {
 public:
-	// MuscleNP needs to scale the forces
-   friend class MuscleNP;
+	// tgBulletContactSpringCable needs to scale the forces
+   friend class tgBulletContactSpringCable;
 	
 	/**
 	 * The only constructor. At a minimum requires a body and a position

@@ -76,12 +76,12 @@ tgBulletSpringCable::~tgBulletSpringCable()
     m_anchors.clear();
 }
 
-void tgBulletSpringCable::calculateAndApplyForce(double dt)
+void tgBulletSpringCable::step(double dt)
 {
-    step(dt);
+    calculateAndApplyForce(dt);
 }
 
-void tgBulletSpringCable::step(double dt)
+void tgBulletSpringCable::calculateAndApplyForce(double dt)
 {
     btVector3 force(0.0, 0.0, 0.0);
     double magnitude = 0.0;

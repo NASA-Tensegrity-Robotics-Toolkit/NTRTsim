@@ -31,7 +31,7 @@
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgMultiPointStringInfo.h"
 
 #include "core/tgBulletSpringCable.h"
 #include "core/tgSpringCableAnchor.h"

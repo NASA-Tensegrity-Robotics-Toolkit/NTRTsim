@@ -26,7 +26,7 @@
 
 #include "tgMultiPointStringInfo.h"
 
-#include "MuscleNP.h"
+#include "core/tgBulletContactSpringCable.h"
 
 #include "core/tgBulletUtil.h"
 #include "core/tgBulletSpringCableAnchor.h"
@@ -61,13 +61,13 @@ tgConnectorInfo* tgMultiPointStringInfo::createConnectorInfo(const tgPair& pair)
 
 void tgMultiPointStringInfo::initConnector(tgWorld& world)
 {
-    // Note: MuscleNP holds pointers to things in the world, but it doesn't actually have any in-world representation.
-    m_muscleNP = createMuscleNP(world);
+    // Note: tgBulletContactSpringCable holds pointers to things in the world, but it doesn't actually have any in-world representation.
+    m_muscleNP = createTgBulletContactSpringCable(world);
 }
 
 tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
 {
-    // Don't have to do anything in the world for a MuscleNP...
+    // Don't have to do anything in the world for a tgBulletContactSpringCable...
     // @todo: set the name based on joined tags, or remove name from the model...
     //std::cout << "tgMultiPointStringInfo::createModel" << std::endl;
     
@@ -78,14 +78,14 @@ tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
 
 double tgMultiPointStringInfo::getMass() 
 {
-    // @todo: calculate a mass? MuscleNP doesn't have mass...
+    // @todo: calculate a mass? tgBulletContactSpringCable doesn't have mass...
     return 0;
 }
 
 
-MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
+tgBulletContactSpringCable* tgMultiPointStringInfo::createTgBulletContactSpringCable(tgWorld& world)
 {
-    //std::cout << "tgLinearStringInfo::createMuscleNP()" << std::endl;
+    //std::cout << "tgLinearStringInfo::createtgBulletContactSpringCable()" << std::endl;
     
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
@@ -132,10 +132,10 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     m_ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	
 	// Add ghost object to world
-	// @todo MuscleNP handles deleting from world - should it handle adding too?
+	// @todo tgBulletContactSpringCable handles deleting from world - should it handle adding too?
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
 	m_dynamicsWorld.addCollisionObject(m_ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	
-    return new MuscleNP(m_ghostObject, world, anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
+    return new tgBulletContactSpringCable(m_ghostObject, world, anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }
     

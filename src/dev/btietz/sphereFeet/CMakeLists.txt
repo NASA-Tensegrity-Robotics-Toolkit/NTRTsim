@@ -1,4 +1,4 @@
-link_libraries(tgcreator MuscleNP core)
+link_libraries(tgcreator core)
 
 add_executable(AppSuperSphereBall
     T6SphereModel.cpp

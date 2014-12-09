@@ -25,13 +25,12 @@
 #include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgMultiPointStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
-
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
 
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"

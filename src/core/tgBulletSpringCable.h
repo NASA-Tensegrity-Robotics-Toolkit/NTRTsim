@@ -50,8 +50,6 @@ public:
     
     virtual ~tgBulletSpringCable();
 
-    /// @todo remove this
-    virtual void calculateAndApplyForce(double dt);
     // Called by tensegrity class update function for each muscle2p
     virtual void step(double dt);
    
@@ -79,6 +77,9 @@ protected:
    // Needs to be stored here for consistent rendering
    std::vector<tgBulletSpringCableAnchor*> m_anchors;
 
+private:
+
+    virtual void calculateAndApplyForce(double dt);
 
  private: 
     bool invariant(void) const;

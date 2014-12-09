@@ -16,11 +16,11 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef NTRT_MUSCLENP_H_
-#define NTRT_MUSCLENP_H_
+#ifndef SRC_CORE_TG_BULLET_CONTACT_SPRING_CABLE_H_
+#define SRC_CORE_TG_BULLET_CONTACT_SPRING_CABLE_H_
 
 /**
- * @file MuscleNP.h
+ * @file tgBulletContactSpringCable.h
  * @brief Definition of a massless cable with contact dynamics
  * @author Brian Mirletz
  * @date November 2014
@@ -57,7 +57,7 @@ class btDynamicsWorld;
  * string. Merging with Corde could also address some of the current
  * issues with rotational energy
  */
-class MuscleNP : public tgBulletSpringCable
+class tgBulletContactSpringCable : public tgBulletSpringCable
 {
 public:
 	
@@ -80,7 +80,7 @@ public:
 	 * @param[in] resolution, the spatial resultion used to prune new contacts. 
 	 * also affects runtime (lower corresponds to longer runtime)
 	 */
-    MuscleNP(btPairCachingGhostObject* ghostObject,
+    tgBulletContactSpringCable(btPairCachingGhostObject* ghostObject,
 				tgWorld& world,
 				const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
@@ -93,7 +93,19 @@ public:
      * deletes its collision shape, and then deletes the object.
      * tgBulletSpringCable ensures all anchors are deleted
      */     
-	virtual ~MuscleNP();
+	virtual ~tgBulletContactSpringCable();
+    
+   /**
+     * The "update" function for tgBulletContactSpringCable. In addition to calculating and
+     * applying the force, this calls:
+     * updateManifolds()
+     * pruneAnchors()
+     * updateAnchorList()
+     * pruneAnchors()
+     * calculateAndApplyForce(dt)
+     * finally updateCollisionObject()
+    */
+    virtual void step(double dt);
     
     /**
      * @return a btScalar of the string's actual length - the sum of the
@@ -101,20 +113,8 @@ public:
      */
     virtual const btScalar getActualLength() const;
     
-    /**
-     * The "update" function for MuscleNP. In addition to calculating and
-     * applying the force, this calls:
-     * updateManifolds()
-     * pruneAnchors()
-     * updateAnchorList()
-     * pruneAnchors()
-     * THEN it calculates and applies the forces (calculating permanent anchors
-     * and sliding contacts slightly differently) and distributes them so momentum
-     * is conserved
-     * finally updateCollisionObject()
-     * @todo change this to update(dt) or similar, since that's the role its serving
-    */
-    virtual void calculateAndApplyForce(double dt);
+
+    
     
 private:
     
@@ -141,6 +141,13 @@ private:
            const tgBulletSpringCableAnchor* const ma1;
            const tgBulletSpringCableAnchor* const ma2;
     };
+    
+    /**
+     * Calculates and applies the forces (calculating permanent anchors
+     * and sliding contacts slightly differently) and distributes them so momentum
+     * is conserved
+     */
+    virtual void calculateAndApplyForce(double dt);
     
     /**
      * Iterate through the pairs of objects to find the contact positions
@@ -258,4 +265,4 @@ protected:
 	const double m_resolution;
 };
 
-#endif  // NTRT_MUSCLENP_H_
+#endif  // SRC_CORE_TG_BULLET_CONTACT_SPRING_CABLE_H_

@@ -6,6 +6,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgBulletSpringCableAnchor.cpp
     tgSpringCable.cpp
     tgBulletSpringCable.cpp
+    tgBulletContactSpringCable.cpp
     ImpedanceControl.cpp
     
     tgModel.cpp

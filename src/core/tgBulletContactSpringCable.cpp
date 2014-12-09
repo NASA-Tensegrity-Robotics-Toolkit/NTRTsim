@@ -17,7 +17,7 @@
 */
 
 /**
- * @file MuscleNP.cpp
+ * @file tgBulletContactSpringCable.cpp
  * @brief Definition of a massless cable with contact dynamics
  * @author Brian Mirletz
  * @date November 2014
@@ -25,7 +25,7 @@
  */
 
 // This object
-#include "MuscleNP.h"
+#include "tgBulletContactSpringCable.h"
 
 // NTRT
 #include "tgcreator/tgUtil.h"
@@ -54,7 +54,7 @@
 
 //#define VERBOSE
 
-MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
+tgBulletContactSpringCable::tgBulletContactSpringCable(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
  const std::vector<tgBulletSpringCableAnchor*>& anchors,
  double coefK,
@@ -71,7 +71,7 @@ m_resolution(resolution)
 
 }
          
-MuscleNP::~MuscleNP()
+tgBulletContactSpringCable::~tgBulletContactSpringCable()
 {
 	btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
 	m_dynamicsWorld.removeCollisionObject(m_ghostObject);
@@ -81,7 +81,7 @@ MuscleNP::~MuscleNP()
     delete m_ghostObject;
 }
 
-const btScalar MuscleNP::getActualLength() const
+const btScalar tgBulletContactSpringCable::getActualLength() const
 {
     btScalar length = 0;
     
@@ -94,13 +94,9 @@ const btScalar MuscleNP::getActualLength() const
     return length;
 }
 
-void MuscleNP::calculateAndApplyForce(double dt)
+void tgBulletContactSpringCable::step(double dt)
 {
-#ifndef BT_NO_PROFILE 
-    BT_PROFILE("calculateAndApplyForce");
-#endif //BT_NO_PROFILE    
-    
-    updateManifolds();
+	updateManifolds();
     
     pruneAnchors();
     
@@ -108,7 +104,19 @@ void MuscleNP::calculateAndApplyForce(double dt)
 	
 	// See if the new anchors change anything
 	pruneAnchors();
+	
+	calculateAndApplyForce(dt);
+	
+	// Do this last so the ghost object gets populated with collisions before it is deleted
+    updateCollisionObject();
+}
 
+void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("calculateAndApplyForce");
+#endif //BT_NO_PROFILE    
+    
 	m_forceTotals = btVector3(0.0, 0.0, 0.0);
     m_forceScales = btVector3(1.0, 1.0, 1.0);
 
@@ -169,7 +177,7 @@ void MuscleNP::calculateAndApplyForce(double dt)
         }
         else
         {
-            throw std::runtime_error("MuscleNP: First or last anchor is a sliding constraint!!");
+            throw std::runtime_error("tgBulletContactSpringCable: First or last anchor is a sliding constraint!!");
         }
         
         m_anchors[i]->force = force;
@@ -216,11 +224,9 @@ void MuscleNP::calculateAndApplyForce(double dt)
     // Finished calculating, so can store things
     m_prevLength = currLength;
     
-    // Do this last so the ghost object gets populated with collisions before it is deleted
-    updateCollisionObject();
 }
 
-void MuscleNP::updateManifolds()
+void tgBulletContactSpringCable::updateManifolds()
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("updateAnchorList");
@@ -364,7 +370,7 @@ void MuscleNP::updateManifolds()
 	
 }
 
-void MuscleNP::updateAnchorList()
+void tgBulletContactSpringCable::updateAnchorList()
 {
 	int numContacts = 2;
     
@@ -454,7 +460,7 @@ void MuscleNP::updateAnchorList()
     
 }
 
-void MuscleNP::pruneAnchors()
+void tgBulletContactSpringCable::pruneAnchors()
 {    
     int numPruned = 0;
     int passes = 0;
@@ -578,7 +584,7 @@ void MuscleNP::pruneAnchors()
 }
 
 // This works ok at the moment. Need an effective way of determining if the rope is under an object
-void MuscleNP::updateCollisionObject()
+void tgBulletContactSpringCable::updateCollisionObject()
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("updateCollisionObject");
@@ -646,7 +652,7 @@ void MuscleNP::updateCollisionObject()
 	m_overlappingPairCache->getOverlappingPairCache()->cleanProxyFromPairs(m_ghostObject->getBroadphaseHandle(),m_dispatcher);
 }
 
-void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
+void tgBulletContactSpringCable::deleteCollisionShape(btCollisionShape* pShape)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("deleteCollisionShape");
@@ -668,7 +674,7 @@ void MuscleNP::deleteCollisionShape(btCollisionShape* pShape)
     }
 }
 
-void MuscleNP::clearCompoundShape(btCompoundShape* pShape)
+void tgBulletContactSpringCable::clearCompoundShape(btCompoundShape* pShape)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("clearCompoundShape");
@@ -686,7 +692,7 @@ void MuscleNP::clearCompoundShape(btCompoundShape* pShape)
 	
 }
 
-bool MuscleNP::deleteAnchor(int i)
+bool tgBulletContactSpringCable::deleteAnchor(int i)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("deleteAnchor");
@@ -705,7 +711,7 @@ bool MuscleNP::deleteAnchor(int i)
 	}
 }
 
-int MuscleNP::findNearestPastAnchor(btVector3& pos)
+int tgBulletContactSpringCable::findNearestPastAnchor(btVector3& pos)
 {
 
 	std::size_t i = 0;
@@ -750,7 +756,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		tgBulletSpringCableAnchor* a0 = m_anchors[i - 1];
 		tgBulletSpringCableAnchor* an = m_anchors[i + 1];
 		
-		MuscleNP::anchorCompare m_acTemp(a0, an);
+		tgBulletContactSpringCable::anchorCompare m_acTemp(a0, an);
 		
 		btVector3 current = m_anchors[i]->getWorldPosition();
 		
@@ -764,7 +770,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	tgBulletSpringCableAnchor* an = m_anchors[i + 1];
 	
 	btVector3 current = a0->getWorldPosition();
-	MuscleNP::anchorCompare m_acTemp(a0, an);
+	tgBulletContactSpringCable::anchorCompare m_acTemp(a0, an);
 	if( m_acTemp.comparePoints(current, pos))
 	{
 		// Success! do nothing, move on
@@ -804,7 +810,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 			tgBulletSpringCableAnchor* a0 = m_anchors[j - 1];
 			tgBulletSpringCableAnchor* an = m_anchors[j + 1];
 			
-			MuscleNP::anchorCompare m_acTemp(a0, an);
+			tgBulletContactSpringCable::anchorCompare m_acTemp(a0, an);
 			
 			btVector3 current = m_anchors[j]->getWorldPosition();
 			
@@ -819,7 +825,7 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		tgBulletSpringCableAnchor* an = m_anchors[j + 1];
 		
 		btVector3 current = a0->getWorldPosition();
-		MuscleNP::anchorCompare m_acTemp(a0, an);
+		tgBulletContactSpringCable::anchorCompare m_acTemp(a0, an);
 		if( m_acTemp.comparePoints(current, pos))
 		{
 			// Success! Set i to j and return
@@ -845,14 +851,14 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 
 }
 
-MuscleNP::anchorCompare::anchorCompare(const tgBulletSpringCableAnchor* m1, const tgBulletSpringCableAnchor* m2) :
+tgBulletContactSpringCable::anchorCompare::anchorCompare(const tgBulletSpringCableAnchor* m1, const tgBulletSpringCableAnchor* m2) :
 ma1(m1),
 ma2(m2)
 {
 	
 }
 
-bool MuscleNP::anchorCompare::operator() (const tgBulletSpringCableAnchor* lhs, const tgBulletSpringCableAnchor* rhs) const
+bool tgBulletContactSpringCable::anchorCompare::operator() (const tgBulletSpringCableAnchor* lhs, const tgBulletSpringCableAnchor* rhs) const
 {
 	btVector3 pt2 = lhs->getWorldPosition();
 	btVector3 pt3 = rhs->getWorldPosition();
@@ -860,7 +866,7 @@ bool MuscleNP::anchorCompare::operator() (const tgBulletSpringCableAnchor* lhs, 
 	return comparePoints(pt2, pt3);
 }  
 
-bool MuscleNP::anchorCompare::comparePoints(btVector3& pt2, btVector3& pt3) const
+bool tgBulletContactSpringCable::anchorCompare::comparePoints(btVector3& pt2, btVector3& pt3) const
 {
 	// @todo make sure these are good anchors. Assert?
 	   btVector3 pt1 = ma1->getWorldPosition();

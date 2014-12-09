@@ -113,7 +113,7 @@ void tgLinearString::step(double dt)
     {   
         // Want to update any controls before applying forces
         notifyStep(dt); 
-        m_muscle->calculateAndApplyForce(dt);
+        m_muscle->step(dt);
         logHistory();  
         tgModel::step(dt);
     }

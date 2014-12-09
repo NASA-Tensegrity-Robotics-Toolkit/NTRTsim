@@ -33,7 +33,7 @@
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgMultiPointStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"

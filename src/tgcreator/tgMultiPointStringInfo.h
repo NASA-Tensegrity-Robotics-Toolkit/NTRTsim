@@ -36,7 +36,7 @@
 #include "core/tgLinearString.h"
 #include "core/tgTags.h"
 
-class MuscleNP;
+class tgBulletContactSpringCable;
 
 class tgMultiPointStringInfo : public tgConnectorInfo
 {
@@ -81,12 +81,12 @@ public:
 
 private:    
     
-    MuscleNP* createMuscleNP(tgWorld& world);
+    tgBulletContactSpringCable* createTgBulletContactSpringCable(tgWorld& world);
     
 private:
     
     tgLinearString::Config m_config;
-    MuscleNP* m_muscleNP;
+    tgBulletContactSpringCable* m_muscleNP;
 };
 
 

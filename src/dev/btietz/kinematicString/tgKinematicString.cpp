@@ -155,7 +155,7 @@ void tgKinematicString::step(double dt)
         notifyStep(dt); 
         // Adjust rest length based on muscle dynamics
         integrateRestLength(dt);
-        m_muscle->calculateAndApplyForce(dt);
+        m_muscle->step(dt);
         logHistory();  
         tgModel::step(dt);
     }
