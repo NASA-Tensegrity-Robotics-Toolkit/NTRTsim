@@ -83,7 +83,7 @@ void tgKinematicString::constructorAux()
   // Precondition
     assert(m_pHistory != NULL);
     prevVel = 0.0;
-    if (m_muscle == NULL)
+    if (m_springCable == NULL)
     {
         throw std::invalid_argument("Pointer to tgBulletSpringCable is NULL.");
     }
@@ -107,25 +107,22 @@ void tgKinematicString::constructorAux()
 tgKinematicString::tgKinematicString(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgKinematicString::Config& config) :
-    m_muscle(muscle),
     m_motorVel(0.0),
     m_motorAcc(0.0),
     m_config(config),
-    tgBaseString(tags, config, muscle->getRestLength(), muscle->getActualLength())
+    tgBaseString(muscle, tags, config)
 {
     constructorAux();
 
     // Postcondition
     assert(invariant());
-    assert(m_muscle == muscle);
     assert(m_preferredLength == m_restLength);
 }
 
 tgKinematicString::~tgKinematicString()
 {
-    //std::cout << "deleting linear string" << std::endl;
+    //std::cout << "deleting kinematic spring cable" << std::endl;
     // Should have already torn down.
-    delete m_muscle;
 }
     
 void tgKinematicString::setup(tgWorld& world)
@@ -155,7 +152,7 @@ void tgKinematicString::step(double dt)
         notifyStep(dt); 
         // Adjust rest length based on muscle dynamics
         integrateRestLength(dt);
-        m_muscle->step(dt);
+        m_springCable->step(dt);
         logHistory();  
         tgModel::step(dt);
     }
@@ -178,34 +175,14 @@ void tgKinematicString::logHistory()
 
     if (m_config.hist)
     {
-        m_pHistory->lastLengths.push_back(m_muscle->getActualLength());
-        m_pHistory->lastVelocities.push_back(m_muscle->getVelocity());
-        m_pHistory->dampingHistory.push_back(m_muscle->getDamping());
-        m_pHistory->restLengths.push_back(m_muscle->getRestLength());
-        m_pHistory->tensionHistory.push_back(m_muscle->getTension());
+        m_pHistory->lastLengths.push_back(m_springCable->getActualLength());
+        m_pHistory->lastVelocities.push_back(m_springCable->getVelocity());
+        m_pHistory->dampingHistory.push_back(m_springCable->getDamping());
+        m_pHistory->restLengths.push_back(m_springCable->getRestLength());
+        m_pHistory->tensionHistory.push_back(m_springCable->getTension());
     }
 }
     
-const double tgKinematicString::getStartLength() const
-{
-    return m_startLength;
-}
-    
-const double tgKinematicString::getCurrentLength() const
-{
-    return m_muscle->getActualLength();
-}  
-
-const double tgKinematicString::getTension() const
-{
-    return m_muscle->getTension();
-}
-    
-const double tgKinematicString::getRestLength() const
-{
-    return m_muscle->getRestLength();
-}
-
 const double tgKinematicString::getVelocity() const
 {
     return m_motorVel * m_config.radius;
@@ -271,7 +248,7 @@ void tgKinematicString::integrateRestLength(double dt)
 	m_restLength =
 	(m_restLength > m_config.minRestLength) ? m_restLength : m_config.minRestLength;
 
-	m_muscle->setRestLength(m_restLength);
+	m_springCable->setRestLength(m_restLength);
 }
 
 double tgKinematicString::getAppliedTorque(double desiredTorque) const
@@ -296,11 +273,11 @@ void tgKinematicString::tensionMinLengthController(const double targetTension,
                       float dt)
 {
 
-    const double stiffness = m_muscle->getCoefK();
+    const double stiffness = m_springCable->getCoefK();
     // @todo: write invariant that checks this;
     assert(stiffness > 0.0);
     
-    const double currentTension = m_muscle->getTension();
+    const double currentTension = m_springCable->getTension();
     const double delta = targetTension - currentTension;
     
     m_desiredTorque = delta * m_config.radius;
@@ -319,7 +296,7 @@ const tgBaseString::BaseStringHistory& tgKinematicString::getHistory() const
 bool tgKinematicString::invariant() const
 {
     return
-      (m_muscle != NULL) &&
+      (m_springCable != NULL) &&
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
       (m_config.maxAcc >= 0.0) &&

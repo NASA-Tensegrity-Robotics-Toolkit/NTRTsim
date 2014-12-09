@@ -34,6 +34,7 @@
 #include <deque> // For history
 // Forward declarations
 class tgWorld;
+class tgSpringCable;
 
 /**
  * Sets a basic API for string models, so controllers can interface
@@ -195,28 +196,38 @@ public:
 		m_preferredLength = controlInput;
 	}
        
-    virtual const double getStartLength() const = 0;
+    virtual const double getStartLength() const;
     
-    virtual const double getCurrentLength() const = 0;
+    virtual const double getCurrentLength() const;
     
-    virtual const double getTension() const = 0;
+    virtual const double getTension() const;
     
-    virtual const double getRestLength() const = 0;
+    virtual const double getRestLength() const;
     
-    virtual const double getVelocity() const = 0;
-
+    virtual const double getVelocity() const;
+    
+    /**
+     * Returns a pointer the string's tgBulletSpringCable. Used for rendering in
+     * tgBulletRenderer
+     */
+    const tgSpringCable* getSpringCable() const
+    {
+      return m_springCable;
+    }
 protected: 
     
     /**
      * Need to pass tags down to tgModel, but these should only be 
      * called by sub classes
      */    
-    tgBaseString(const tgTags& tags,
-           tgBaseString::Config& config,
-           double restLength,
-           double actualLength);
+    tgBaseString(tgSpringCable* springCable,
+			const tgTags& tags,
+           tgBaseString::Config& config);
            
 protected:
+
+    tgSpringCable* m_springCable;
+
     /**
      * A copy of the configuration POD supplied at constuction.
      * This is not const.

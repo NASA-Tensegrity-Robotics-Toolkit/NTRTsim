@@ -120,28 +120,6 @@ public:
      */
     void setRestLengthSingleStep(double newLength);
     
-    /**
-     * Returns a pointer the string's tgBulletSpringCable. Used for rendering in
-     * tgBulletRenderer
-     */
-    const tgBulletSpringCable* getMuscle() const
-    {
-      return m_muscle;
-    }
-    
-    /**
-     * Return the appropreate values.
-     */
-    virtual const double getStartLength() const;
-    
-    virtual const double getCurrentLength() const;
-    
-    virtual const double getTension() const;
-    
-    virtual const double getRestLength() const;
-    
-    virtual const double getVelocity() const;
-    
     virtual const tgBaseString::BaseStringHistory& getHistory() const;
     
     
@@ -150,9 +128,6 @@ public:
      */
     virtual void moveMotors(double dt);
 
-protected:
-
-    tgBulletSpringCable* m_muscle;
 
 private:
 

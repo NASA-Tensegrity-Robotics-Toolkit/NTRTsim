@@ -18,14 +18,18 @@
 
 #include "tgCPGStringControl.h"
 
-#include "core/tgBulletSpringCable.h"
+#include "core/tgSpringCable.h"
+#include "core/tgSpringCableAnchor.h"
 #include "core/tgBulletSpringCableAnchor.h"
 #include "core/ImpedanceControl.h"
 #include "util/CPGEquations.h"
 #include "dev/CPG_feedback/CPGEquationsFB.h"
+#include "core/tgCast.h"
 
+// The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 tgCPGStringControl::tgCPGStringControl(const double controlStep) :
 m_controlTime(0.0),
@@ -51,8 +55,14 @@ tgCPGStringControl::~tgCPGStringControl()
 void tgCPGStringControl::onAttach(tgLinearString& subject)
 {
 	m_controlLength = subject.getStartLength();
-	m_pFromBody = subject.getMuscle()->anchor1->attachedBody;
-	m_pToBody   = subject.getMuscle()->anchor2->attachedBody;
+    /// @todo get the typing right so we don't have to cast twice
+	std::vector<tgBulletSpringCableAnchor*> anchors = 
+        tgCast::filter<tgSpringCableAnchor, tgBulletSpringCableAnchor>(subject.getSpringCable()->getAnchors());
+    std::size_t n = anchors.size();
+    assert(n >= 2);
+    
+	m_pFromBody = anchors[0]->attachedBody;
+	m_pToBody   = anchors[n - 1]->attachedBody;
 }
 
 void tgCPGStringControl::onStep(tgLinearString& subject, double dt)

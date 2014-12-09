@@ -26,7 +26,7 @@
 // This module
 #include "tgBulletRenderer.h"
 // This application
-#include "tgBulletSpringCable.h"
+#include "tgSpringCable.h"
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgLinearString.h"
@@ -68,7 +68,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
     
-    const tgBulletSpringCable* const pSpringCable = linString.getMuscle();
+    const tgSpringCable* const pSpringCable = linString.getSpringCable();
     
     if(pDrawer && pSpringCable)
     {

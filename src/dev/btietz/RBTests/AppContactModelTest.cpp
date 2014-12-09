@@ -20,6 +20,7 @@
  * @file AppRBStringConnections.cpp
  * @brief Contains the definition function main() for testing the rigid
  * body string connections with the 
+ * Depricated as of version 1.1.0
  * @author Brian Tietz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$

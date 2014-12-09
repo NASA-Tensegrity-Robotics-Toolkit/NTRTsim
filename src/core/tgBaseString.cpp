@@ -25,6 +25,7 @@
 
 // This Module
 #include "tgBaseString.h"
+#include "tgSpringCable.h"
 #include "tgWorld.h"
 // The C++ Standard Library
 #include <cmath>
@@ -119,27 +120,29 @@ void tgBaseString::constructorAux()
         throw std::invalid_argument("Starting rest length is negative.");
     }
 }
-tgBaseString::tgBaseString(const tgTags& tags,
-                   tgBaseString::Config& config,
-                   double restLength,
-                   double actualLength) :
+tgBaseString::tgBaseString(tgSpringCable* springCable,
+                    const tgTags& tags,
+                   tgBaseString::Config& config) :
     tgModel(tags),
-    m_pHistory(new BaseStringHistory()),
+    m_springCable(springCable),
     m_config(config),
-    m_restLength(restLength),
+    m_pHistory(new BaseStringHistory()),
+    m_restLength(springCable->getRestLength()),
     m_preferredLength(m_restLength),
-    m_startLength(actualLength),
+    m_startLength(springCable->getActualLength()),
     m_prevVelocity(0.0)
 {
     constructorAux();
 
     // Postcondition
     assert(invariant());
+    assert(m_springCable == springCable);
     assert(m_preferredLength == m_restLength);
 }
 
 tgBaseString::~tgBaseString()
 {
+    delete m_springCable;
     delete m_pHistory;
 }
     
@@ -163,6 +166,31 @@ void tgBaseString::step(double dt)
     {   
         tgModel::step(dt);
     }
+}
+
+const double tgBaseString::getStartLength() const
+{
+    return m_startLength;
+}
+    
+const double tgBaseString::getCurrentLength() const
+{
+    return m_springCable->getActualLength();
+}  
+
+const double tgBaseString::getTension() const
+{
+    return m_springCable->getTension();
+}
+    
+const double tgBaseString::getRestLength() const
+{
+    return m_springCable->getRestLength();
+}
+
+const double tgBaseString::getVelocity() const
+{
+    return m_springCable->getVelocity();
 }
 
 bool tgBaseString::invariant() const

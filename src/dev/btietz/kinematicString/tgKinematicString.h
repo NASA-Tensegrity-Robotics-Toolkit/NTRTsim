@@ -169,25 +169,8 @@ public:
     void setPrefLength(double newLength);
 
     /**
-     * Returns a pointer the string's tgBulletSpringCable. Used for rendering in
-     * tgBulletRenderer
-     */
-    const tgBulletSpringCable* getMuscle() const
-    {
-      return m_muscle;
-    }
-    
-    /**
      * Return the appropreate values.
      */
-    virtual const double getStartLength() const;
-    
-    virtual const double getCurrentLength() const;
-    
-    virtual const double getTension() const;
-    
-    virtual const double getRestLength() const;
-    
     /**
      * Returns the linearized velocity of the motor, as opposed to 
      * tgLinearString which returns the velocity of the muscle material
@@ -217,8 +200,6 @@ public:
 	virtual void setControlInput(double input);
 	
 protected:
-
-    tgBulletSpringCable* m_muscle;
 	
 	virtual void integrateRestLength(double dt);
 private:

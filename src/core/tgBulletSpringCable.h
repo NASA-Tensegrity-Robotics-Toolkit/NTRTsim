@@ -63,20 +63,21 @@ public:
     
     /**
      * @todo figure out how to cast and pass by reference
+     * @todo should the anchors themselves be const?
      */
     virtual const std::vector<tgSpringCableAnchor*> getAnchors() const;
-    
-/// @todo make these protected, force other functions to use getAnchors()   
-    tgBulletSpringCableAnchor * const anchor1;
-
-    tgBulletSpringCableAnchor * const anchor2;
-    
+     
 protected:
 
    // Wanted to do a set, but need random access iterator to sort
    // Needs to be stored here for consistent rendering
    std::vector<tgBulletSpringCableAnchor*> m_anchors;
 
+protected:
+    tgBulletSpringCableAnchor * const anchor1;
+
+    tgBulletSpringCableAnchor * const anchor2;
+    
 private:
 
     virtual void calculateAndApplyForce(double dt);

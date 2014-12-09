@@ -22,7 +22,8 @@
 /**
  * @file tgRBStringInfo.h
  * @brief Contains the definition of class tgRBStringInfo. A string with
- * small rigid bodies to create contact dynamics.
+ * small rigid bodies to create contact dynamics. Depricated as of
+ * version 1.1.0
  * @author Brian Tietz
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$

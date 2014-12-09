@@ -46,7 +46,7 @@ void tgLinearString::constructorAux()
   // Precondition
     assert(m_pHistory != NULL);
     prevVel = 0.0;
-    if (m_muscle == NULL)
+    if (m_springCable == NULL)
     {
         throw std::invalid_argument("Pointer to tgBulletSpringCable is NULL.");
     }
@@ -70,14 +70,12 @@ void tgLinearString::constructorAux()
 tgLinearString::tgLinearString(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgBaseString::Config& config) :
-    m_muscle(muscle),
-    tgBaseString(tags, config, muscle->getRestLength(), muscle->getActualLength())
+    tgBaseString(muscle, tags, config)
 {
     constructorAux();
 
     // Postcondition
     assert(invariant());
-    assert(m_muscle == muscle);
     assert(m_preferredLength == m_restLength);
 }
 
@@ -85,7 +83,6 @@ tgLinearString::~tgLinearString()
 {
     //std::cout << "deleting linear string" << std::endl;
     // Should have already torn down.
-    delete m_muscle;
 }
     
 void tgLinearString::setup(tgWorld& world)
@@ -113,7 +110,7 @@ void tgLinearString::step(double dt)
     {   
         // Want to update any controls before applying forces
         notifyStep(dt); 
-        m_muscle->step(dt);
+        m_springCable->step(dt);
         logHistory();  
         tgModel::step(dt);
     }
@@ -129,42 +126,18 @@ void tgLinearString::onVisit(const tgModelVisitor& r) const
     
 void tgLinearString::logHistory()
 {
-    m_prevVelocity = m_muscle->getVelocity();
+    m_prevVelocity = m_springCable->getVelocity();
 
     if (m_config.hist)
     {
-        m_pHistory->lastLengths.push_back(m_muscle->getActualLength());
-        m_pHistory->lastVelocities.push_back(m_muscle->getVelocity());
-        m_pHistory->dampingHistory.push_back(m_muscle->getDamping());
-        m_pHistory->restLengths.push_back(m_muscle->getRestLength());
-        m_pHistory->tensionHistory.push_back(m_muscle->getTension());
+        m_pHistory->lastLengths.push_back(m_springCable->getActualLength());
+        m_pHistory->lastVelocities.push_back(m_springCable->getVelocity());
+        m_pHistory->dampingHistory.push_back(m_springCable->getDamping());
+        m_pHistory->restLengths.push_back(m_springCable->getRestLength());
+        m_pHistory->tensionHistory.push_back(m_springCable->getTension());
     }
 }
     
-const double tgLinearString::getStartLength() const
-{
-    return m_startLength;
-}
-    
-const double tgLinearString::getCurrentLength() const
-{
-    return m_muscle->getActualLength();
-}  
-
-const double tgLinearString::getTension() const
-{
-    return m_muscle->getTension();
-}
-    
-const double tgLinearString::getRestLength() const
-{
-    return m_muscle->getRestLength();
-}
-
-const double tgLinearString::getVelocity() const
-{
-    return m_muscle->getVelocity();
-}
 
 void tgLinearString::setRestLength(double newLength, float dt)
 {
@@ -204,7 +177,7 @@ void tgLinearString::moveMotors(double dt)
     // @todo add functions from muscle2P Bounded
     
     
-    const double stiffness = m_muscle->getCoefK();
+    const double stiffness = m_springCable->getCoefK();
     // @todo: write invariant that checks this;
     assert(stiffness > 0.0);
     
@@ -213,7 +186,7 @@ void tgLinearString::moveMotors(double dt)
     double stepSize = m_config.targetVelocity * dt;
     // Acceleration limiter
     const double velChange = m_config.maxAcc * dt;
-    const double actualLength = m_muscle->getActualLength();
+    const double actualLength = m_springCable->getActualLength();
     const double mostRecentVelocity = m_prevVelocity;
     
     
@@ -275,16 +248,16 @@ void tgLinearString::moveMotors(double dt)
      m_restLength =
       (m_restLength > m_config.minRestLength) ? m_restLength : m_config.minRestLength;
      #if (0)
-     std::cout << "RL: " << m_restLength << " M2P RL: " << m_muscle->getRestLength() << std::endl;
+     std::cout << "RL: " << m_restLength << " M2P RL: " << m_springCable->getRestLength() << std::endl;
      
      
      std::cout  << "RL: " << m_restLength
-     << " Vel: " << (m_restLength  -m_muscle->getRestLength()) / dt 
+     << " Vel: " << (m_restLength  -m_springCable->getRestLength()) / dt 
      << " prev Vel: " << prevVel
      << " force " << (actualLength - m_restLength)*stiffness << std::endl;
-     prevVel = (m_restLength  -m_muscle->getRestLength()) / dt ;
+     prevVel = (m_restLength  -m_springCable->getRestLength()) / dt ;
      #endif
-     m_muscle->setRestLength(m_restLength);
+     m_springCable->setRestLength(m_restLength);
     
 }
 
@@ -310,7 +283,7 @@ void tgLinearString::setRestLengthSingleStep(double newLength)
 	// not calling moveMotors anymore. Does anything else need to
 	// change when restLength is changed? -Drew 7-1-14
 
-	m_muscle->setRestLength(newLength);
+	m_springCable->setRestLength(newLength);
 	m_restLength = newLength;
 	m_preferredLength = newLength;
     }
@@ -324,14 +297,14 @@ void tgLinearString::tensionMinLengthController(const double targetTension,
                       float dt)
 {
 
-    const double stiffness = m_muscle->getCoefK();
+    const double stiffness = m_springCable->getCoefK();
     // @todo: write invariant that checks this;
     assert(stiffness > 0.0);
     
-    const double currentTension = m_muscle->getTension();
+    const double currentTension = m_springCable->getTension();
     const double delta = targetTension - currentTension;
     double diff = delta/stiffness; 
-    const double currentLength = m_muscle->getRestLength();
+    const double currentLength = m_springCable->getRestLength();
     
     const double newLength = m_restLength - diff;
 
@@ -351,7 +324,7 @@ const tgBaseString::BaseStringHistory& tgLinearString::getHistory() const
 bool tgLinearString::invariant() const
 {
     return
-      (m_muscle != NULL) &&
+      (m_springCable != NULL) &&
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
       (m_config.maxAcc >= 0.0) &&
