@@ -33,7 +33,7 @@
 // NTRTSim
 #include "core/tgLinearString.h"
 #include "core/tgBaseRigid.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgUtil.h"
 
@@ -72,17 +72,17 @@ SerializedSpineControl::Config::Config(std::string fileName)
 	double kTens = root.get("inside_imp_ten", "UTF-8").asDouble();
 	double kPos = root.get("inside_imp_pos", "UTF-8").asDouble();
 	double kVel = root.get("inside_imp_vel", "UTF-8").asDouble();
-    in_controller = new ImpedanceControl(kTens, kPos, kVel);
+    in_controller = new tgImpedanceController(kTens, kPos, kVel);
     
     kTens = root.get("outside_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
-    out_controller = new ImpedanceControl(kTens, kPos, kVel);
+    out_controller = new tgImpedanceController(kTens, kPos, kVel);
 
     kTens = root.get("top_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("top_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("top_imp_vel", "UTF-8").asDouble();
-    top_controller = new ImpedanceControl(kTens, kPos, kVel);
+    top_controller = new tgImpedanceController(kTens, kPos, kVel);
 	
 	rod_edge = root.get("rod_edge", "UTF-8").asDouble();
 	rod_front = root.get("rod_front", "UTF-8").asDouble();
@@ -181,106 +181,7 @@ SerializedSpineControl::~SerializedSpineControl()
 {
 }
 
-#if (0) // TODO: Get these working with new param sets
-void SerializedSpineControl::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
-                                                            double dt,
-                                                            std::size_t phase)
-{
-    for(std::size_t i = 0; i < stringList.size(); i++)
-    {
-		// This will reproduce the same value until simTime is updated. See onStep
-        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
-        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
-        
-		
-        double setTension = m_config.in_controller->control(stringList[i],
-																dt,
-																m_config.insideLength,
-																m_config.insideMod * target
-																);
-#ifdef VERBOSE // Conditional compile for verbose control
-        std::cout << "Inside String " << i
-        << " phase " << phase
-         << " tension " << setTension
-        << " act tension " << stringList[i]->getMuscle()->getTension()
-        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-#endif
-    }    
-}
-
-void SerializedSpineControl::applyImpedanceControlTopInside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase)
-{
-    for(std::size_t i = 0; i < stringList.size(); i++)
-    {
-		// This will reproduce the same value until simTime is updated. See onStep
-        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
-        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
-        
-        double setTension = m_config.in_top_controller->control(stringList[i],
-																dt,
-																m_config.insideTopLength,
-																m_config.insideMod * target
-																);
-#ifdef VERBOSE																
-        std::cout << "Top Inside String " << i << " com tension " << setTension
-        << " act tension " << stringList[i]->getMuscle()->getTension()
-        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-#endif
-    }    
-}
-
-void SerializedSpineControl::applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
-                                                            double dt,
-                                                            std::size_t phase)
-{
-    for(std::size_t i = 0; i < stringList.size(); i++)
-    {
-		// This will reproduce the same value until simTime is updated. See onStep
-        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
-        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
-        
-        double setTension = m_config.out_controller->control(stringList[i],
-																dt,
-																m_config.outsideLength,
-																target
-																);
-#ifdef VERBOSE // Conditional compile for verbose control
-        std::cout << "Outside String " << i
-        << " phase " << phase
-         << " com tension " << setTension
-        << " act tension " << stringList[i]->getMuscle()->getTension()
-        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-#endif
-    }    
-}
-
-void SerializedSpineControl::applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase)
-{
-    for(std::size_t i = 0; i < stringList.size(); i++)
-    {
-		// This will reproduce the same value until simTime is updated. See onStep
-        cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
-        target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
-        
-        double setTension = m_config.out_top_controller->control(stringList[i],
-																dt,
-																m_config.outsideTopLength,
-																target
-																);
-#ifdef VERBOSE // Conditional compile for verbose control
-        std::cout << "Top Outside String " << i << " com tension " << setTension
-        << " act tension " << stringList[i]->getMuscle()->getTension()
-        << " length " << stringList[i]->getMuscle()->getActualLength() << std::endl;
-#endif
-    }    
-}
-#endif //Non generic controllers
-
-void SerializedSpineControl::applyImpedanceControlGeneric(ImpedanceControl* controller,	
+void SerializedSpineControl::applyImpedanceControlGeneric(tgImpedanceController* controller,	
 										const std::vector<tgLinearString*> stringList,
 										const std::vector<double> stringLengths,
 										const std::vector<double> tensions,
@@ -297,7 +198,7 @@ void SerializedSpineControl::applyImpedanceControlGeneric(ImpedanceControl* cont
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = controller->controlTension(stringList[i],
+        double setTension = controller->controlTension(*(stringList[i]),
 																dt,
 																stringLengths[i],
 																tensions[i],

@@ -34,7 +34,7 @@
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
 #include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
@@ -122,7 +122,7 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
 			throw std::runtime_error("Missing tags!");
 		}
 
-        ImpedanceControl* p_ipc = new ImpedanceControl( tension,
+        tgImpedanceController* p_ipc = new tgImpedanceController( tension,
                                                         kPosition,
                                                         kVelocity);
         pStringInfo->setupControl(*p_ipc, controlLength);

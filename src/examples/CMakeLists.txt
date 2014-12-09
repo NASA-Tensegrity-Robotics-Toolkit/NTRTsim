@@ -7,7 +7,7 @@ subdirs(
     3_prism_no_control 
     NestedTetrahedrons
     SUPERball
-    #learningSpines - package PID control with impedance controller
+    learningSpines
     testjson
 )
 

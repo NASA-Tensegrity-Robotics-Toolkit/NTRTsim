@@ -28,11 +28,12 @@
 #include "dev/btietz/kinematicString/tgKinematicString.h"
 #include "dev/btietz/kinematicString/tgKinematicStringInfo.h"
 #include "dev/btietz/kinematicString/tgSCASineControl.h"
-#include "dev/btietz/kinematicString/tgPIDController.h"
-#include "dev/btietz/kinematicString/tgImpedanceController.h"
+#include "controllers/tgPIDController.h"
+#include "controllers/tgImpedanceController.h"
 
 
 #include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgLinearStringInfo.h"
@@ -132,7 +133,7 @@ void pidTestRig::setupControl()
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgKinematicString* kinString = tgCast::cast<tgBaseString, tgKinematicString>(allMuscles[i]);
+		tgKinematicString* kinString = tgCast::cast<tgSpringCableActuator, tgKinematicString>(allMuscles[i]);
 		assert(kinString);
 		
 		tgSCASineControl* sineController = new tgSCASineControl(controlStep,
@@ -197,7 +198,7 @@ void pidTestRig::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgBaseString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     
     if (useKinematic)
     {
@@ -243,7 +244,7 @@ void pidTestRig::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgBaseString*>& pidTestRig::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& pidTestRig::getAllMuscles() const
 {
     return allMuscles;
 }

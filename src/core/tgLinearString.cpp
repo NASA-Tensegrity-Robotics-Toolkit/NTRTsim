@@ -324,30 +324,7 @@ void tgLinearString::setRestLengthSingleStep(double newLength)
     assert(invariant());
     
 }
-#if (0)
-void tgLinearString::tensionMinLengthController(const double targetTension,
-                      float dt)
-{
 
-    const double stiffness = m_springCable->getCoefK();
-    // @todo: write invariant that checks this;
-    assert(stiffness > 0.0);
-    
-    const double currentTension = m_springCable->getTension();
-    const double delta = targetTension - currentTension;
-    double diff = delta/stiffness; 
-    const double currentLength = m_springCable->getRestLength();
-    
-    const double newLength = m_restLength - diff;
-
-    m_preferredLength =
-      (newLength > m_config.minRestLength) ? newLength : m_config.minRestLength;
-#if (0)
-    std::cout << "m_preferred: " << m_preferredLength << std::endl;
-#endif
-    moveMotors(dt);
-}
-#endif
 const tgSpringCableActuator::SpringCableActuatorHistory& tgLinearString::getHistory() const
 {
     return *m_pHistory;

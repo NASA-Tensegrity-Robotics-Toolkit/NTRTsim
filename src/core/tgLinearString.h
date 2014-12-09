@@ -103,17 +103,7 @@ public:
 	 * This will silently fail if it is called erroneously
 	 */
 	virtual void setControlInput(double input, double dt);
-     
-#if (0)     
-    /**
-    * Set the desired tension of the string. Will change m_preferredLength 
-    * (see base class tgSpringCableActuator) to reach targetTension, subject to 
-    * the constraints in the kinematic motor model. Calls moveMotors(dt) 
-    * upon completion of calculations
-    */
-    virtual void tensionMinLengthController(const double targetTension,
-                                            float dt);
-#endif    
+        
     /**
      * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
@@ -131,6 +121,7 @@ public:
     /**
      * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.
+     * @todo Remove this - config can handle it now
      */
     void setRestLengthSingleStep(double newLength);
     

@@ -18,6 +18,7 @@
 
 #include "tgSineStringControl.h"
 
+#include "core/tgLinearString.h"
 #include "controllers/tgImpedanceController.h"
 
 #include <iostream>
@@ -58,12 +59,16 @@ tgSineStringControl::~tgSineStringControl()
 
 }
 
-void tgSineStringControl::onStep(tgLinearString& subject, double dt)
+void tgSineStringControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
+    // Workaround until we implement PID
+    tgLinearString& m_sca = *(tgCast::cast<tgSpringCableActuator, tgLinearString>(subject));
+    
+    
     if (m_controlTime >= m_controlStep)
     {
 		// Yep, its a misnomer. Had to change it for In Won
@@ -75,7 +80,7 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
 			target = 0.0;
 		}
 	#endif	
-		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, target);
+		m_commandedTension = m_pMotorControl->control(m_sca, m_controlTime, m_controlLength, target);
 		//std::cout << m_commandedTension << std::endl;
         m_controlTime = 0;
     }

@@ -61,12 +61,12 @@ tgSCASineControl::~tgSCASineControl()
 	delete m_PIDController;
 }
 
-void tgSCASineControl::onAttach(tgKinematicString& subject)
+void tgSCASineControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_PIDController = new tgPIDController(&subject, m_tempConfig);
 }
 
-void tgSCASineControl::onStep(tgKinematicString& subject, double dt)
+void tgSCASineControl::onStep(tgSpringCableActuator& subject, double dt)
 {
 	assert(&subject == m_PIDController->getControllable());
 	

@@ -19,14 +19,14 @@
 #ifndef TG_SCA_SINE_CONTROL_H
 #define TG_SCA_SINE_CONTROL_H
 
-#include "tgKinematicString.h"
+#include "core/tgSpringCableActuator.h"
 #include "controllers/tgPIDController.h"
 
 // Forward declarations
 class btRigidBody;
 class tgImpedanceController;
 
-class tgSCASineControl : public tgObserver<tgKinematicString>
+class tgSCASineControl : public tgObserver<tgSpringCableActuator>
 {
 public:
  
@@ -41,9 +41,9 @@ public:
     
     virtual ~tgSCASineControl();
     
-    virtual void onAttach(tgKinematicString& subject);
+    virtual void onAttach(tgSpringCableActuator& subject);
     
-    virtual void onStep(tgKinematicString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
 
     

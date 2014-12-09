@@ -29,7 +29,7 @@
 // This application
 #include "dev/btietz/timestepTest/tsTestRig.h"
 // This library
-#include "core/tgBaseString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
@@ -104,7 +104,7 @@ namespace {
 				
 				simulation.run(1000);
 				
-				const std::vector<tgBaseString*>& testMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& testMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(testMuscles.size(), 1);
@@ -116,7 +116,7 @@ namespace {
 				view.setStepSize(1.0/500.0);
 				simulation.run(500);
 				
-				const std::vector<tgBaseString*>& newTestMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& newTestMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(newTestMuscles.size(), 1);
@@ -132,7 +132,7 @@ namespace {
 				view.setStepSize(1.0/5000.0);
 				simulation.run(5000);
 				
-				const std::vector<tgBaseString*>& thirdTestMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& thirdTestMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(thirdTestMuscles.size(), 1);
@@ -172,7 +172,7 @@ namespace {
 				
 				simulation.run(1000);
 				
-				const std::vector<tgBaseString*>& testMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& testMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(testMuscles.size(), 1);
@@ -184,7 +184,7 @@ namespace {
 				view.setStepSize(1.0/500.0);
 				simulation.run(500);
 				
-				const std::vector<tgBaseString*>& newTestMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& newTestMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(newTestMuscles.size(), 1);
@@ -200,7 +200,7 @@ namespace {
 				view.setStepSize(1.0/5000.0);
 				simulation.run(5000);
 				
-				const std::vector<tgBaseString*>& thirdTestMuscles = myModel->getAllMuscles();
+				const std::vector<tgSpringCableActuator*>& thirdTestMuscles = myModel->getAllMuscles();
 				
 				// If this fails we've changed the model in unexpected ways
 				ASSERT_EQ(thirdTestMuscles.size(), 1);

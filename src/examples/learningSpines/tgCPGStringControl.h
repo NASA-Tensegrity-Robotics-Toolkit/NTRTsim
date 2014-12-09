@@ -31,9 +31,9 @@ typedef boost::multi_array<double, 4> array_4D;
 class btRigidBody;
 class CPGEquations;
 class CPGEquationsFB;
-class ImpedanceControl;
+class tgImpedanceController;
 
-class tgCPGStringControl : public tgObserver<tgLinearString>,
+class tgCPGStringControl : public tgObserver<tgSpringCableActuator>,
 							public tgBaseCPGNode
 {
 public:
@@ -42,9 +42,9 @@ public:
     
     virtual ~tgCPGStringControl();
     
-    virtual void onAttach(tgLinearString& subject);
+    virtual void onAttach(tgSpringCableActuator& subject);
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
 	/**
      * Can call these any time, but they'll only have the intended effect
@@ -60,7 +60,7 @@ public:
     void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
     
     /**
-     * Iterate through all other tgLinearStringCPGInfos, and determine
+     * Iterate through all other tgSpringCableActuatorCPGInfos, and determine
      * CPG network by rigid body connectivity
      */
     void setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
@@ -84,9 +84,9 @@ public:
         return m_commandedTension;
     }
     
-    virtual void setupControl(ImpedanceControl& ipc);
+    virtual void setupControl(tgImpedanceController& ipc);
     
-    void setupControl(ImpedanceControl& ipc,
+    void setupControl(tgImpedanceController& ipc,
 						double controlLength);
 
 	const btRigidBody* getFromBody() const

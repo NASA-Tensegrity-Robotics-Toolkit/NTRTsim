@@ -5,6 +5,7 @@ link_libraries(controllers
                 util
                 sensors
                 KinematicString
+                controllers
                 core    
                 terrain 
                 tgOpenGLSupport)

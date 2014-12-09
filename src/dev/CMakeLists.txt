@@ -3,7 +3,7 @@ Project(Dev)
 # Add additional dev directories here.
 subdirs(
     axydes
-    #btietz - Need to refactor use of impedance controller to include PID
+    btietz
     radams
     tests
     atil

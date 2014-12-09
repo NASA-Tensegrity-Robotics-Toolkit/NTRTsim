@@ -18,7 +18,7 @@
 
 #include "tgCPGStringControl_mod.h"
 
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
 
 #include <iostream>
@@ -49,11 +49,11 @@ void tgCPGStringControl_mod::onStep(tgLinearString& subject, double dt)
 		// Encoder inversion for hardware comparison.
 		if (m_nodeNumber == 2 || m_nodeNumber == 4 || m_nodeNumber == 5 || m_nodeNumber == 6 || m_nodeNumber == 7 || m_nodeNumber == 8||m_nodeNumber == 9|| m_nodeNumber == 10 )
 		{
-			m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), -getCPGValue());
+			m_commandedTension = motorControl().control(subject, m_controlTime, controlLength(), -getCPGValue());
 		}
 		else
 		{
-			m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
+			m_commandedTension = motorControl().control(subject, m_controlTime, controlLength(), getCPGValue());
 		}
         m_controlTime = 0;
     }

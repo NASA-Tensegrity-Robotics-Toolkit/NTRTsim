@@ -76,14 +76,13 @@ namespace
 
 tsTestRig::tsTestRig(bool kinematic) :
 useKinematic(kinematic),
-m_pStringController(new PretensionController(c.pretension)),
 tgModel() 
 {
 }
 
 tsTestRig::~tsTestRig()
 {
-    delete m_pStringController;
+
 }
 
 void tsTestRig::addNodes(tgStructure& s)
@@ -155,7 +154,7 @@ void tsTestRig::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgBaseString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     
     // Notify controllers that setup has finished.
     notifySetup();
@@ -198,7 +197,7 @@ void tsTestRig::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgBaseString*>& tsTestRig::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& tsTestRig::getAllMuscles() const
 {
     return allMuscles;
 }

@@ -32,7 +32,7 @@
 
 // NTRTSim
 #include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "tgcreator/tgUtil.h"
 
 // The C++ Standard Library
@@ -65,12 +65,12 @@ SerializedSineWaves::Config::Config(std::string fileName)
 	double kTen = root.get("inside_imp_ten", "UTF-8").asDouble();
 	double kPos = root.get("inside_imp_pos", "UTF-8").asDouble();
 	double kVel = root.get("inside_imp_vel", "UTF-8").asDouble();
-    in_controller = new ImpedanceControl(kTen, kPos, kVel);
+    in_controller = new tgImpedanceController(kTen, kPos, kVel);
     
     kTen = root.get("outside_imp_ten", "UTF-8").asDouble();
 	kPos = root.get("outside_imp_pos", "UTF-8").asDouble();
 	kVel = root.get("outside_imp_vel", "UTF-8").asDouble();
-    out_controller = new ImpedanceControl(kTen, kPos, kVel);
+    out_controller = new tgImpedanceController(kTen, kPos, kVel);
 
     insideLength = root.get("inside_length", "UTF-8").asDouble();
     outsideLength = root.get("outside_length", "UTF-8").asDouble();
@@ -125,7 +125,7 @@ void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgLinear
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
 		
-        double setTension = m_config.in_controller->control(stringList[i],
+        double setTension = m_config.in_controller->control(*(stringList[i]),
 																dt,
 																m_config.insideLength,
 																m_config.insideMod * target
@@ -148,7 +148,7 @@ void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgLinea
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = m_config.out_controller->control(stringList[i],
+        double setTension = m_config.out_controller->control(*(stringList[i]),
 																dt,
 																m_config.outsideLength,
 																target

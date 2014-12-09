@@ -108,7 +108,7 @@ void tgTensionController::control(tgLinearString& sca, double dt, double setPoin
     double newLength = sca.getRestLength() - diff;
     
     // Safety check
-    newLength = newLength < 0.0 ? 0.0 : newLength;
+    newLength = newLength < 0.1 ? 0.1 : newLength;
     
 	sca.setControlInput(newLength, dt);
 }

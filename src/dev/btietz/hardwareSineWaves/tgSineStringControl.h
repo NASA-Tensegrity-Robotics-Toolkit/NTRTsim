@@ -19,13 +19,13 @@
 #ifndef TG_SINE_STRING_CONTRL_H
 #define TG_SINE_STRING_CONTRL_H
 
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 
 // Forward declarations
 class btRigidBody;
 class tgImpedanceController;
 
-class tgSineStringControl : public tgObserver<tgLinearString>
+class tgSineStringControl : public tgObserver<tgSpringCableActuator>
 {
 public:
  
@@ -39,7 +39,7 @@ public:
     
     virtual ~tgSineStringControl();
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
 
     

@@ -34,7 +34,7 @@
 #include <vector>
 
 // Forward declarations
-class tgBaseString;
+class tgSpringCableActuator;
 class tgModelVisitor;
 class tgSCASineControl;
 class tgStructure;
@@ -96,7 +96,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgBaseString*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
     
     /**
      * Ensuring we actually have a consistent runtime turing testing
@@ -144,7 +144,7 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgBaseString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
     
     tgImpedanceController* p_ipc;
     

@@ -33,7 +33,7 @@
 // included from BaseSpineModelLearning. Perhaps we should move things
 // to a cpp over there
 #include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "tgCPGStringControl.h"
 
 #include "helpers/FileHelpers.h"
@@ -228,7 +228,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
         //String will own this pointer
-        ImpedanceControl* p_ipc = new ImpedanceControl( m_config.tension,
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
                                                         m_config.kPosition,
                                                         m_config.kVelocity);
         if (m_config.useDefault)
@@ -302,7 +302,7 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {

@@ -20,8 +20,9 @@
 
 #include "core/tgSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgBulletSpringCableAnchor.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
 #include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "core/tgCast.h"
@@ -52,7 +53,7 @@ tgCPGStringControl::~tgCPGStringControl()
 	m_pToBody = NULL;
 }
 
-void tgCPGStringControl::onAttach(tgLinearString& subject)
+void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_controlLength = subject.getStartLength();
     /// @todo get the typing right so we don't have to cast twice
@@ -65,21 +66,26 @@ void tgCPGStringControl::onAttach(tgLinearString& subject)
 	m_pToBody   = anchors[n - 1]->attachedBody;
 }
 
-void tgCPGStringControl::onStep(tgLinearString& subject, double dt)
+void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
+    
+    // Workaround until we implement PID
+    tgLinearString& m_sca = *(tgCast::cast<tgSpringCableActuator, tgLinearString>(subject));
+    
     if (m_controlTime >= m_controlStep)
     {
-		m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
+        
+		m_commandedTension = motorControl().control(m_sca, m_controlTime, controlLength(), getCPGValue());
 
         m_controlTime = 0;
     }
     else
     {
-		subject.moveMotors(dt);
+		m_sca.moveMotors(dt);
 	}
 }
 
@@ -180,12 +186,12 @@ tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allS
     m_pCPGSystem->defineConnections(m_nodeNumber, connectivityList, weights, phases);
 }
 
-void tgCPGStringControl::setupControl(ImpedanceControl& ipc)
+void tgCPGStringControl::setupControl(tgImpedanceController& ipc)
 {
     tgBaseCPGNode::setupControl(ipc);
 }
 
-void tgCPGStringControl::setupControl(ImpedanceControl& ipc,
+void tgCPGStringControl::setupControl(tgImpedanceController& ipc,
 										double controlLength)
 {
 	 if (controlLength < 0.0)

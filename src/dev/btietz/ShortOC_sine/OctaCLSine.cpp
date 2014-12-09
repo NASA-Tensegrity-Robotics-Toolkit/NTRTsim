@@ -34,7 +34,7 @@
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
 #include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
@@ -144,7 +144,7 @@ void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
     vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {
@@ -184,7 +184,7 @@ void OctaCLSine::setupWaves(BaseSpineModelLearning& subject, array_2D nodeAction
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		ImpedanceControl* p_ipc = new ImpedanceControl( m_config.tension,
+		tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
                                                         m_config.kPosition,
                                                         m_config.kVelocity);
         
