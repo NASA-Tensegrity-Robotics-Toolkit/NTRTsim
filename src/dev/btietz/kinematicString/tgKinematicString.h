@@ -29,7 +29,7 @@
 
 // This application
 #include "core/tgModel.h"
-#include "core/tgBaseString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgSubject.h"
 
 // Forward declarations
@@ -39,10 +39,10 @@ class tgWorld;
 
 // Should always be a child Model of a tgModel
 class tgKinematicString : public tgSubject<tgKinematicString>,
-                        public tgBaseString
+                        public tgSpringCableActuator
 {
 public: 
-	struct Config : public tgBaseString::Config
+	struct Config : public tgSpringCableActuator::Config
 	{
 		Config(double s = 1000.0,
 				double d = 10.0,
@@ -103,7 +103,7 @@ public:
      * Set up in tgKinematicStringInfo.cpp
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      * @param[in] config Holds member variables like elasticity, damping
-     * and motor parameters. See tgBaseString
+     * and motor parameters. See tgSpringCableActuator
      * @param[in] hist whether or not to log additional history @todo 
      * move hist to config
      */    
@@ -149,7 +149,7 @@ public:
      
     /**
     * Set the desired tension of the string. Will change m_preferredLength 
-    * (see base class tgBaseString) to reach targetTension, subject to 
+    * (see base class tgSpringCableActuator) to reach targetTension, subject to 
     * the constraints in the kinematic motor model. Calls moveMotors(dt) 
     * upon completion of calculations
     */
@@ -157,13 +157,13 @@ public:
                                             float dt);
     
     /**
-     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
      */
     void setRestLength(double newLength, float dt);
 
     /**
-     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Does not call moveMotors.
      */
     void setPrefLength(double newLength);
@@ -177,7 +177,7 @@ public:
      */
     virtual const double getVelocity() const;
     
-    virtual const tgBaseString::BaseStringHistory& getHistory() const;
+    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
     
     
     /** Called from public functions, a position controller on 

@@ -18,7 +18,7 @@
 
 #include "tgSCASineControl.h"
 
-#include "tgImpedanceController.h"
+#include "controllers/tgImpedanceController.h"
 
 #include <iostream>
 #include <stdexcept>

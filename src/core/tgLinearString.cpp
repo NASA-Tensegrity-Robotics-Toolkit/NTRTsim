@@ -69,8 +69,8 @@ void tgLinearString::constructorAux()
 }
 tgLinearString::tgLinearString(tgBulletSpringCable* muscle,
                    const tgTags& tags,
-                   tgBaseString::Config& config) :
-    tgBaseString(muscle, tags, config)
+                   tgSpringCableActuator::Config& config) :
+    tgSpringCableActuator(muscle, tags, config)
 {
     constructorAux();
 
@@ -316,7 +316,7 @@ void tgLinearString::tensionMinLengthController(const double targetTension,
     moveMotors(dt);
 }
 
-const tgBaseString::BaseStringHistory& tgLinearString::getHistory() const
+const tgSpringCableActuator::SpringCableActuatorHistory& tgLinearString::getHistory() const
 {
     return *m_pHistory;
 }

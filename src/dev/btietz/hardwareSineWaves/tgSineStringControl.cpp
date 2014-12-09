@@ -18,13 +18,13 @@
 
 #include "tgSineStringControl.h"
 
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 
 #include <iostream>
 #include <stdexcept>
 
 tgSineStringControl::tgSineStringControl(const double controlStep,
-											ImpedanceControl* p_ipc,
+											tgImpedanceController* p_ipc,
 											const double amplitude,
 											const double frequency,
 											const double phase,

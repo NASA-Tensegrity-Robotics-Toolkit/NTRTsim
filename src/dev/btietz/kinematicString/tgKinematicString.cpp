@@ -54,7 +54,7 @@ tgKinematicString::Config::Config(double s,
 									double mnAL,
 									double mnRL,
 									double rot) :
-tgBaseString::Config::Config(s, d, p, h,
+tgSpringCableActuator::Config::Config(s, d, p, h,
 							   mf, tVel, mxAcc, mnAL, mnRL, rot),
 radius(rad),
 motorFriction(moFric),
@@ -110,7 +110,7 @@ tgKinematicString::tgKinematicString(tgBulletSpringCable* muscle,
     m_motorVel(0.0),
     m_motorAcc(0.0),
     m_config(config),
-    tgBaseString(muscle, tags, config)
+    tgSpringCableActuator(muscle, tags, config)
 {
     constructorAux();
 
@@ -288,7 +288,7 @@ void tgKinematicString::setControlInput(double input)
 	m_desiredTorque = input;
 }
 
-const tgBaseString::BaseStringHistory& tgKinematicString::getHistory() const
+const tgSpringCableActuator::SpringCableActuatorHistory& tgKinematicString::getHistory() const
 {
     return *m_pHistory;
 }

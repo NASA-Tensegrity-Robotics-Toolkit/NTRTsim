@@ -214,7 +214,7 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
 
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {

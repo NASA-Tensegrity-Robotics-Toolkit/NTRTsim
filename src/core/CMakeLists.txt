@@ -7,10 +7,9 @@ add_library( ${PROJECT_NAME} SHARED
     tgSpringCable.cpp
     tgBulletSpringCable.cpp
     tgBulletContactSpringCable.cpp
-    ImpedanceControl.cpp
     
     tgModel.cpp
-    tgBaseString.cpp
+    tgSpringCableActuator.cpp
     tgLinearString.cpp
     tgWorld.cpp
     tgSimulation.cpp

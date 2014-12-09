@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_BASE_STRING_H
-#define TG_BASE_STRING_H
+#ifndef SRC_CORE_TG_SPRING_CABLE_ACTUATOR_H
+#define SRC_CORE_TG_SPRING_CABLE_ACTUATOR_H
 
 /**
- * @file tgBaseString.h
- * @brief Contains the definition of abstract base class tgBaseString.
+ * @file tgSpringCableActuator.h
+ * @brief Contains the definition of abstract base class tgSpringCableActuator.
  * Assumes that the string is linear (F = -kX - bV)
  * @author Brian Tietz
  * $Id$
@@ -37,11 +37,11 @@ class tgWorld;
 class tgSpringCable;
 
 /**
- * Sets a basic API for string models, so controllers can interface
+ * Sets a basic API for spring cable actuator models, so controllers can interface
  * with all of them the same way
  */
 // Should always be a child Model of a tgModel
-class tgBaseString : public tgModel, public tgControllable
+class tgSpringCableActuator : public tgModel, public tgControllable
 {
 public: 
     
@@ -158,7 +158,7 @@ public:
     };
     
     /** Encapsulate the history members. */
-    struct BaseStringHistory
+    struct SpringCableActuatorHistory
     {
         /** Length history. */
         std::deque<double> lastLengths;
@@ -177,7 +177,7 @@ public:
     };
 
     /** Deletes history */
-    virtual ~tgBaseString();
+    virtual ~tgSpringCableActuator();
 
     virtual void setup(tgWorld& wdorld);
     
@@ -220,9 +220,9 @@ protected:
      * Need to pass tags down to tgModel, but these should only be 
      * called by sub classes
      */    
-    tgBaseString(tgSpringCable* springCable,
+    tgSpringCableActuator(tgSpringCable* springCable,
 			const tgTags& tags,
-           tgBaseString::Config& config);
+           tgSpringCableActuator::Config& config);
            
 protected:
 
@@ -235,7 +235,7 @@ protected:
     Config m_config;
     
     /** All history sequences. */
-    BaseStringHistory * const m_pHistory;
+    SpringCableActuatorHistory * const m_pHistory;
 
     
      /**
@@ -269,4 +269,4 @@ private:
 };
 
 
-#endif
+#endif // SRC_CORE_TG_SPRING_CABLE_ACTUATOR_H

@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgBaseString.cpp
- * @brief Contains the definitions of members of class tgBaseString
+ * @file tgSpringCableActuator.cpp
+ * @brief Contains the definitions of members of class tgSpringCableActuator
  * @author Brian Tietz
  * $Id$
  */
 
 // This Module
-#include "tgBaseString.h"
+#include "tgSpringCableActuator.h"
 #include "tgSpringCable.h"
 #include "tgWorld.h"
 // The C++ Standard Library
@@ -34,7 +34,7 @@
 
 using namespace std;
 
-tgBaseString::Config::Config(double s,
+tgSpringCableActuator::Config::Config(double s,
                    double d,
                    double p,
                    bool h,
@@ -89,7 +89,7 @@ tgBaseString::Config::Config(double s,
 	}
 }
 
-void tgBaseString::Config::scale (double sf)
+void tgSpringCableActuator::Config::scale (double sf)
 {
   pretension	  *= sf;
   maxTens         *= sf;
@@ -101,7 +101,7 @@ void tgBaseString::Config::scale (double sf)
 
 
 
-void tgBaseString::constructorAux()
+void tgSpringCableActuator::constructorAux()
 {
     if (m_config.targetVelocity < 0.0)
     {
@@ -120,13 +120,13 @@ void tgBaseString::constructorAux()
         throw std::invalid_argument("Starting rest length is negative.");
     }
 }
-tgBaseString::tgBaseString(tgSpringCable* springCable,
+tgSpringCableActuator::tgSpringCableActuator(tgSpringCable* springCable,
                     const tgTags& tags,
-                   tgBaseString::Config& config) :
+                   tgSpringCableActuator::Config& config) :
     tgModel(tags),
     m_springCable(springCable),
     m_config(config),
-    m_pHistory(new BaseStringHistory()),
+    m_pHistory(new SpringCableActuatorHistory()),
     m_restLength(springCable->getRestLength()),
     m_preferredLength(m_restLength),
     m_startLength(springCable->getActualLength()),
@@ -140,23 +140,23 @@ tgBaseString::tgBaseString(tgSpringCable* springCable,
     assert(m_preferredLength == m_restLength);
 }
 
-tgBaseString::~tgBaseString()
+tgSpringCableActuator::~tgSpringCableActuator()
 {
     delete m_springCable;
     delete m_pHistory;
 }
     
-void tgBaseString::setup(tgWorld& world)
+void tgSpringCableActuator::setup(tgWorld& world)
 {
     tgModel::setup(world);
 }
 
-void tgBaseString::teardown()
+void tgSpringCableActuator::teardown()
 {
     tgModel::teardown();
 }
     
-void tgBaseString::step(double dt) 
+void tgSpringCableActuator::step(double dt) 
 {
     if (dt <= 0.0)
     {
@@ -168,32 +168,32 @@ void tgBaseString::step(double dt)
     }
 }
 
-const double tgBaseString::getStartLength() const
+const double tgSpringCableActuator::getStartLength() const
 {
     return m_startLength;
 }
     
-const double tgBaseString::getCurrentLength() const
+const double tgSpringCableActuator::getCurrentLength() const
 {
     return m_springCable->getActualLength();
 }  
 
-const double tgBaseString::getTension() const
+const double tgSpringCableActuator::getTension() const
 {
     return m_springCable->getTension();
 }
     
-const double tgBaseString::getRestLength() const
+const double tgSpringCableActuator::getRestLength() const
 {
     return m_springCable->getRestLength();
 }
 
-const double tgBaseString::getVelocity() const
+const double tgSpringCableActuator::getVelocity() const
 {
     return m_springCable->getVelocity();
 }
 
-bool tgBaseString::invariant() const
+bool tgSpringCableActuator::invariant() const
 {
     return
       // Only know this about history here, can't confirm how child

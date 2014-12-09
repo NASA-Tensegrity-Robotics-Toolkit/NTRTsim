@@ -29,7 +29,7 @@
 
 // This application
 #include "tgModel.h"
-#include "tgBaseString.h"
+#include "tgSpringCableActuator.h"
 #include "tgSubject.h"
 
 // Forward declarations
@@ -39,7 +39,7 @@ class tgWorld;
 
 // Should always be a child Model of a tgModel
 class tgLinearString : public tgSubject<tgLinearString>,
-                        public tgBaseString
+                        public tgSpringCableActuator
 {
 public: 
 
@@ -49,13 +49,13 @@ public:
      * Set up in tgLinearStringInfo.cpp
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      * @param[in] config Holds member variables like elasticity, damping
-     * and motor parameters. See tgBaseString
+     * and motor parameters. See tgSpringCableActuator
      * @param[in] hist whether or not to log additional history @todo 
      * move hist to config
      */    
     tgLinearString(tgBulletSpringCable* muscle,
            const tgTags& tags,
-           tgBaseString::Config& config);
+           tgSpringCableActuator::Config& config);
     
     /**
      * Destructor deletes the tgBulletSpringCable
@@ -95,7 +95,7 @@ public:
      
     /**
     * Set the desired tension of the string. Will change m_preferredLength 
-    * (see base class tgBaseString) to reach targetTension, subject to 
+    * (see base class tgSpringCableActuator) to reach targetTension, subject to 
     * the constraints in the kinematic motor model. Calls moveMotors(dt) 
     * upon completion of calculations
     */
@@ -103,24 +103,24 @@ public:
                                             float dt);
     
     /**
-     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
      */
     void setRestLength(double newLength, float dt);
 
     /**
-     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Does not call moveMotors.
      */
     void setPrefLength(double newLength);
 
     /**
-     * Directly set m_preferredLength (see base class tgBaseString)
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.
      */
     void setRestLengthSingleStep(double newLength);
     
-    virtual const tgBaseString::BaseStringHistory& getHistory() const;
+    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
     
     
     /** Called from public functions, it makes the restLength get closer

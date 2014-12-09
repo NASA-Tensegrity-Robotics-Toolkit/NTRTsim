@@ -3,13 +3,10 @@ project(KinematicString)
 add_library( ${PROJECT_NAME} SHARED
 	tgKinematicString.cpp
 	tgKinematicStringInfo.cpp
-	tgImpedanceController.cpp
-	tgBasicController.cpp
-	tgPIDController.cpp
 	tgSCASineControl.cpp
 )
 
 link_directories(${LIB_DIR})
 
-target_link_libraries(${PROJECT_NAME} core)
+target_link_libraries(${PROJECT_NAME} controllers core)
 

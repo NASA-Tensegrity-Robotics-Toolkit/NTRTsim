@@ -17,55 +17,57 @@
 */
 
 /**
- * @file ImpedanceControl.cpp
- * @brief Contains the definition of members of class ImpedanceControl.
+ * @file tgImpedanceController.cpp
+ * @brief Contains the definition of members of class tgImpedanceController.
  * $Id$
  */
 
 // This module
-#include "ImpedanceControl.h"
+#include "tgImpedanceController.h"
 // This library
-#include "tgBaseString.h"
+#include "tgBasicController.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgCast.h"
 
 /**
- * The default value for Controller::ImpedanceControl::_offsetTension
+ * The default value for Controller::tgImpedanceController::m_offsetTension
  * @author Lee Brownston
  * @date Fri 31 Jan 2014
  */
 static const double kDefaultOffsetTension = 0.001;
 
 /**
- * The default value for Controller::ImpedanceControl::_offsetTension
+ * The default value for Controller::tgImpedanceController::m_offsetTension
  * @author Lee Brownston
  * @date Fri 31 Jan 2014
  */
 static const double kDefaultLengthStiffness = 0.0;
 
 /**
- * The default value for Controller::ImpedanceControl::_offsetTension
+ * The default value for Controller::tgImpedanceController::m_offsetTension
  * @author Lee Brownston
  * @date Fri 31 Jan 2014
  */
 static const double kDefaultVelocityStiffness = 0.0;
 
-ImpedanceControl::ImpedanceControl() :
-  _offsetTension(kDefaultOffsetTension),
-  _lengthStiffness(kDefaultLengthStiffness),
-  _velStiffness(kDefaultVelocityStiffness)
+tgImpedanceController::tgImpedanceController() :
+  m_offsetTension(kDefaultOffsetTension),
+  m_lengthStiffness(kDefaultLengthStiffness),
+  m_velStiffness(kDefaultVelocityStiffness)
 {
         // Postcondition
         assert(invariant());
-    assert(_offsetTension == kDefaultOffsetTension);
-    assert(_lengthStiffness == kDefaultLengthStiffness);
-    assert(_velStiffness == kDefaultVelocityStiffness);
+    assert(m_offsetTension == kDefaultOffsetTension);
+    assert(m_lengthStiffness == kDefaultLengthStiffness);
+    assert(m_velStiffness == kDefaultVelocityStiffness);
 }
 
-ImpedanceControl::ImpedanceControl(double offsetTension,
+tgImpedanceController::tgImpedanceController(double offsetTension,
                            double lengthStiffness,
                            double velStiffness) :
-  _offsetTension(offsetTension),
-  _lengthStiffness(lengthStiffness),
-  _velStiffness(velStiffness)
+  m_offsetTension(offsetTension),
+  m_lengthStiffness(lengthStiffness),
+  m_velStiffness(velStiffness)
 {
         // Precondition
         assert(offsetTension >= 0.0);
@@ -74,25 +76,9 @@ ImpedanceControl::ImpedanceControl(double offsetTension,
 
     // Postcondition
         assert(invariant());
-    assert(_offsetTension == offsetTension);
-    assert(_lengthStiffness == lengthStiffness);
-    assert(_velStiffness == velStiffness);
-}
-
-/**
- * Calculate and return the velocity from the change of position and the change
- * of time.
- * If time is not positive, return 0.
- * @param[in] ds the change of position
- * @param[in] dt the change of time
- * @retval ds/dt if dt > 0.0
- * @retval 0.0 if dt <= 0
- * @author Lee Brownston
- * @date Thu 30 Jan 2014
- */
-static inline double determineVelocity(double ds, double dt)
-{
-        return (dt > 0.0) ? (ds / dt) : 0.0;
+    assert(m_offsetTension == offsetTension);
+    assert(m_lengthStiffness == lengthStiffness);
+    assert(m_velStiffness == velStiffness);
 }
 
 /**
@@ -115,85 +101,92 @@ static inline double determineSetTension(double offset,
 }
 
 double
-ImpedanceControl::control(tgBaseString* const mString, 
+tgImpedanceController::control(tgBasicController& mLocalController, 
                                  double deltaTimeSeconds,
                                  double newPosition,
                                  double offsetVel)
 {
-    return controlTension(  mString,
+    return controlTension(  mLocalController,
                             deltaTimeSeconds,
                             newPosition,
-                            _offsetTension,
+                            m_offsetTension,
                             offsetVel);
 }
 
 double
-ImpedanceControl::controlTension(tgBaseString* const mString, 
+tgImpedanceController::controlTension(tgBasicController& mLocalController,
                                  double deltaTimeSeconds,
                                  double newPosition ,
                                  double offsetTension,
                                  double offsetVel)
 {
-    // Precondition
-    assert(mString != NULL);
-
+	
+	/// @todo create and use new string base class
+	const tgSpringCableActuator* mString = tgCast::cast<tgControllable, tgSpringCableActuator>
+											(mLocalController.getControllable());
+	
+	assert (mString);
+	
     const double actualLength = mString->getCurrentLength();
     const double vel = mString->getVelocity();
 
     const double setTension = 
       determineSetTension(offsetTension,
-                _lengthStiffness * (actualLength - newPosition),
-                _velStiffness * (vel - offsetVel));
-#if (0)
-    mString->setControlInput(setTension,
-                        deltaTimeSeconds);
-#endif
+                m_lengthStiffness * (actualLength - newPosition),
+                m_velStiffness * (vel - offsetVel));
+	
+	const double currentTension = mString->getTension();
+	
+    mLocalController.control(deltaTimeSeconds, setTension, currentTension);
+	
+	std::cout << "Commanded tension " << setTension << " actual tension " << currentTension << " rest length " << mString->getRestLength() <<  std::endl;
+	
     // Postcondition
     assert(setTension >= 0.0);
 
     return setTension;
 }
 
-void ImpedanceControl::setOffsetTension(double offsetTension)
+void tgImpedanceController::setOffsetTension(double offsetTension)
 {
         // Precondition
         assert(offsetTension >= 0.0);
 
-        _offsetTension = offsetTension;
+        m_offsetTension = offsetTension;
 
     // Postcondition
     assert(invariant());
-    assert(_offsetTension == offsetTension);
+    assert(m_offsetTension == offsetTension);
 }
 
-void ImpedanceControl::setLengthStiffness(double lengthStiffness)
+void tgImpedanceController::setLengthStiffness(double lengthStiffness)
 {
         // Precondition
         assert(lengthStiffness >= 0.0);
 
-        _lengthStiffness = lengthStiffness;
+        m_lengthStiffness = lengthStiffness;
 
     // Postcondition
     assert(invariant());
-    assert(_lengthStiffness == lengthStiffness);
+    assert(m_lengthStiffness == lengthStiffness);
 }
 
-void ImpedanceControl::setVelStiffness(double velStiffness)
+void tgImpedanceController::setVelStiffness(double velStiffness)
 {
         // Precondition
         assert(velStiffness >= 0.0);
 
-        _velStiffness = velStiffness;
+        m_velStiffness = velStiffness;
 
     // Postcondition
     assert(invariant());
-    assert(_velStiffness == velStiffness);
+    assert(m_velStiffness == velStiffness);
 }
 
-bool ImpedanceControl::invariant() const
+bool tgImpedanceController::invariant() const
 {
         return
-      (_offsetTension >= 0.0)   &&
-      (_lengthStiffness >= 0.0) &&
-      (_velStiffness >= 0.0);
+      (m_offsetTension >= 0.0)   &&
+      (m_lengthStiffness >= 0.0) &&
+      (m_velStiffness >= 0.0);
 }

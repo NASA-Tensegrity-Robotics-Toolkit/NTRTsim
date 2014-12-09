@@ -20,7 +20,7 @@
 #define TG_SCA_SINE_CONTROL_H
 
 #include "tgKinematicString.h"
-#include "tgPIDController.h"
+#include "controllers/tgPIDController.h"
 
 // Forward declarations
 class btRigidBody;
