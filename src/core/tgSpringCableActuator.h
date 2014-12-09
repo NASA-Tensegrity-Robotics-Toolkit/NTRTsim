@@ -41,7 +41,8 @@ class tgSpringCable;
  * with all of them the same way
  */
 // Should always be a child Model of a tgModel
-class tgSpringCableActuator : public tgModel, public tgControllable
+class tgSpringCableActuator : public tgModel, public tgControllable,
+                                public tgSubject<tgSpringCableActuator>
 {
 public: 
     

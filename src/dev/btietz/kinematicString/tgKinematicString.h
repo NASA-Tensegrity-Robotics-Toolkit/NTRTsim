@@ -30,7 +30,6 @@
 // This application
 #include "core/tgModel.h"
 #include "core/tgSpringCableActuator.h"
-#include "core/tgSubject.h"
 
 // Forward declarations
 class tgBulletSpringCable;
@@ -38,8 +37,7 @@ class tgModelVisitor;
 class tgWorld;
 
 // Should always be a child Model of a tgModel
-class tgKinematicString : public tgSubject<tgKinematicString>,
-                        public tgSpringCableActuator
+class tgKinematicString : public tgSpringCableActuator
 {
 public: 
 	struct Config : public tgSpringCableActuator::Config

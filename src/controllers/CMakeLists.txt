@@ -1,7 +1,7 @@
 project(controllers)
 
 add_library( ${PROJECT_NAME} SHARED
-PretensionController.cpp
+#PretensionController.cpp - depricated?
 tgBasicController.cpp
 tgImpedanceController.cpp
 tgPIDController.cpp
