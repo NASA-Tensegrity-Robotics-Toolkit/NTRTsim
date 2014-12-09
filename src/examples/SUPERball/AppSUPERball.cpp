@@ -84,13 +84,13 @@ int main(int argc, char** argv)
     // length between geometric length in equilibrium and the actual rest length
     // of an individual cable. 
     // Note for the above scale of gravity, this is in decimeters.
-    T6RestLengthController* const pTC = new T6RestLengthController(4);
+    //T6RestLengthController* const pTC = new T6RestLengthController(4);
 
     // For the T6TensionController,
     // Set the tension of the controller units of kg * length / s^2
     // So 10000 units at this scale is 1000 N
 
-    // T6TensionController* const pTC = new T6TensionController(10000);
+     T6TensionController* const pTC = new T6TensionController(10000);
 
     myModel->attach(pTC);
     simulation.addModel(myModel);

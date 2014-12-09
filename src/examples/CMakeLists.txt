@@ -5,7 +5,7 @@ subdirs(
     #3_prism - depricated?
     #3_prism_serialize - update to no_control syntax
     3_prism_no_control 
-    #NestedTetrahedrons - package PID control with impedance controller
+    NestedTetrahedrons
     SUPERball
     #learningSpines - package PID control with impedance controller
     testjson

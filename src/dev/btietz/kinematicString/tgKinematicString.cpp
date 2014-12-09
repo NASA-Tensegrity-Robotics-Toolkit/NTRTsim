@@ -188,39 +188,6 @@ const double tgKinematicString::getVelocity() const
     return m_motorVel * m_config.radius;
 }
 
-void tgKinematicString::setRestLength(double newLength, float dt)
-{
-    if (newLength < 0.0)
-    {
-      throw std::invalid_argument("Rest length is negative.");
-    }
-    else
-    {
-        m_preferredLength = newLength;
-        
-        // moveMotors can change m_preferred length, so this goes here for now
-        assert(m_preferredLength == newLength);
-        
-		moveMotors(dt);
-    }
-
-    // Postcondition
-    assert(invariant());
-    
-}
-
-void tgKinematicString::setPrefLength(double newLength)
-{
-    if (newLength < 0.0)
-    {
-      throw std::invalid_argument("Rest length is negative.");
-    }
-    else
-    {
-        m_preferredLength = newLength;
-    }
-}
-
 void tgKinematicString::integrateRestLength(double dt)
 {
 	double tension = getTension();
@@ -260,27 +227,6 @@ double tgKinematicString::getAppliedTorque(double desiredTorque) const
 	
 	return abs(desiredTorque) < maxTorque ? desiredTorque : 
 		desiredTorque / abs(desiredTorque) * maxTorque;
-}
-
-void tgKinematicString::moveMotors(double dt)
-{
-	double error = m_preferredLength - m_restLength;
-	// Simple p control based on known motor parameters
-    m_desiredTorque = 100.0 * error * m_config.motorInertia / m_config.radius;
-}
-
-void tgKinematicString::tensionMinLengthController(const double targetTension,
-                      float dt)
-{
-
-    const double stiffness = m_springCable->getCoefK();
-    // @todo: write invariant that checks this;
-    assert(stiffness > 0.0);
-    
-    const double currentTension = m_springCable->getTension();
-    const double delta = targetTension - currentTension;
-    
-    m_desiredTorque = delta * m_config.radius;
 }
 
 void tgKinematicString::setControlInput(double input)

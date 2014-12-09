@@ -190,12 +190,6 @@ public:
     /**
      * Functions for interfacing with muscle2P
      */
-    
-    /// @todo remove this!! Needs to be defined on higer level function 
-    virtual void setControlInput(double controlInput)
-    {
-		m_preferredLength = controlInput;
-	}
        
     virtual const double getStartLength() const;
     

@@ -1,4 +1,4 @@
-link_libraries(tgcreator core)
+link_libraries(tgcreator controllers core)
 
 add_executable(AppNestedStructureTest
     NestedStructureTestModel.cpp

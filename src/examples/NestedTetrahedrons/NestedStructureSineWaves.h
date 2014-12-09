@@ -34,7 +34,7 @@
 #include <vector>
 
 // Forward Declarations
-class ImpedanceControl;
+class tgImpedanceController;
 class tgLinearString;
 class NestedStructureTestModel;
 
@@ -54,7 +54,7 @@ public:
     NestedStructureSineWaves();
     
     /**
-     * Destructor. Frees the ImpedanceControl pointers
+     * Destructor. Frees the tgImpedanceController pointers
      */
     ~NestedStructureSineWaves();
     
@@ -93,8 +93,8 @@ private:
 	/**
 	 * Pointers to impedance controllers 
 	 */
-    ImpedanceControl* in_controller;
-    ImpedanceControl* out_controller;
+    tgImpedanceController* in_controller;
+    tgImpedanceController* out_controller;
     
     std::size_t segments;
     

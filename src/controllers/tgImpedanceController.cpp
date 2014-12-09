@@ -26,7 +26,9 @@
 #include "tgImpedanceController.h"
 // This library
 #include "tgBasicController.h"
+#include "tgTensionController.h"
 #include "core/tgSpringCableActuator.h"
+#include "core/tgLinearString.h"
 #include "core/tgCast.h"
 
 /**
@@ -121,7 +123,6 @@ tgImpedanceController::controlTension(tgBasicController& mLocalController,
                                  double offsetVel)
 {
 	
-	/// @todo create and use new string base class
 	const tgSpringCableActuator* mString = tgCast::cast<tgControllable, tgSpringCableActuator>
 											(mLocalController.getControllable());
 	
@@ -140,6 +141,42 @@ tgImpedanceController::controlTension(tgBasicController& mLocalController,
     mLocalController.control(deltaTimeSeconds, setTension, currentTension);
 	
 	std::cout << "Commanded tension " << setTension << " actual tension " << currentTension << " rest length " << mString->getRestLength() <<  std::endl;
+	
+    // Postcondition
+    assert(setTension >= 0.0);
+
+    return setTension;
+}
+
+double
+tgImpedanceController::control(tgLinearString& mBasicActuator, 
+                                 double deltaTimeSeconds,
+                                 double newPosition,
+                                 double offsetVel)
+{
+    return controlTension(  mBasicActuator,
+                            deltaTimeSeconds,
+                            newPosition,
+                            m_offsetTension,
+                            offsetVel);
+}
+
+double
+tgImpedanceController::controlTension(tgLinearString& mBasicActuator,
+                                 double deltaTimeSeconds,
+                                 double newPosition ,
+                                 double offsetTension,
+                                 double offsetVel)
+{
+    const double actualLength = mBasicActuator.getCurrentLength();
+    const double vel = mBasicActuator.getVelocity();
+
+    const double setTension = 
+      determineSetTension(offsetTension,
+                m_lengthStiffness * (actualLength - newPosition),
+                m_velStiffness * (vel - offsetVel));
+
+    tgTensionController::control(mBasicActuator, deltaTimeSeconds, setTension);
 	
     // Postcondition
     assert(setTension >= 0.0);

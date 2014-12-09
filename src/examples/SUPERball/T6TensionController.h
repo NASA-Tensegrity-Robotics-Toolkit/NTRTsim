@@ -29,6 +29,10 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "controllers/tgTensionController.h"
+
+// The C++ Standard Library
+#include <vector>
 
 // Forward declarations
 class T6Model;
@@ -51,7 +55,9 @@ public:
     /**
      * Nothing to delete, destructor must be virtual
      */
-    virtual ~T6TensionController() { }
+    virtual ~T6TensionController();
+    
+    virtual void onSetup(T6Model& subject);
     
     /**
      * Apply the tension controller. Called my notifyStep(dt) of its
@@ -70,6 +76,8 @@ private:
 	 * in the constructor
 	 */
     const double m_tension;
+    
+    std::vector<tgTensionController*> m_controllers;
 };
 
 #endif // T6_TENSION_CONTROLLER_H

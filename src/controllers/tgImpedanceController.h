@@ -27,6 +27,7 @@
 
 // Forward references
 class tgBasicController;
+class tgLinearString;
 /**
  * Influences the spring-cable actuator tension using length and velocity.
  */
@@ -77,7 +78,20 @@ class tgImpedanceController
                     double newPosition,
                     double offsetTension,
                     double offsetVel = 0);
-
+    /**
+     * For those who control on tension without PID
+     */
+    double control(tgLinearString& mLocalController,
+                    double deltaTimeSeconds,
+                    double newPosition,
+                    double offsetVel = 0);
+    
+                    
+    double controlTension(tgLinearString& mLocalController,
+                    double deltaTimeSeconds,
+                    double newPosition,
+                    double offsetTension,
+                    double offsetVel = 0);
     /**
      * Set the value of the offset tension property.
      * @param[in] the new value for the offset tension property

@@ -137,7 +137,39 @@ void tgLinearString::logHistory()
         m_pHistory->tensionHistory.push_back(m_springCable->getTension());
     }
 }
+
+void tgLinearString::setControlInput(double input)
+{
+    if (input < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = input;
+    }
+}    
+
+void tgLinearString::setControlInput(double input, double dt)
+{
+    if (input < 0.0)
+    {
+      throw std::invalid_argument("Rest length is negative.");
+    }
+    else
+    {
+        m_preferredLength = input;
+        
+        // moveMotors can change m_preferred length, so this goes here for now
+        assert(m_preferredLength == input);
+              
+        moveMotors(dt);
+    }
+
+    // Postcondition
+    assert(invariant());
     
+}
 
 void tgLinearString::setRestLength(double newLength, float dt)
 {
@@ -292,7 +324,7 @@ void tgLinearString::setRestLengthSingleStep(double newLength)
     assert(invariant());
     
 }
-
+#if (0)
 void tgLinearString::tensionMinLengthController(const double targetTension,
                       float dt)
 {
@@ -315,7 +347,7 @@ void tgLinearString::tensionMinLengthController(const double targetTension,
 #endif
     moveMotors(dt);
 }
-
+#endif
 const tgSpringCableActuator::SpringCableActuatorHistory& tgLinearString::getHistory() const
 {
     return *m_pHistory;

@@ -12,7 +12,7 @@ subdirs(
     apsabelhaus
     SpineHardwareProject
     muscleNP
-    jbruce
+    #jbruce - waiting for feedback on T6TensionController
     CPG_feedback
 )
 

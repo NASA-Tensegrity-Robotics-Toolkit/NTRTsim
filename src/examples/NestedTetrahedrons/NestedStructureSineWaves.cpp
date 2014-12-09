@@ -32,12 +32,12 @@
 
 // NTRTSim
 #include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "tgcreator/tgUtil.h"
 
 NestedStructureSineWaves::NestedStructureSineWaves() :
-    in_controller(new ImpedanceControl(100, 500, 50)),
-    out_controller(new ImpedanceControl(100, 500, 100)),
+    in_controller(new tgImpedanceController(100, 500, 50)),
+    out_controller(new tgImpedanceController(100, 500, 100)),
     segments(1.0),
     insideLength(16.5),
     outsideLength(19.5),
@@ -65,7 +65,7 @@ void NestedStructureSineWaves::applyImpedanceControlInside(const std::vector<tgL
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        double setTension = in_controller->control(stringList[i],
+        double setTension = in_controller->control(*(stringList[i]),
                                             dt,
                                             insideLength
                                             );
@@ -86,7 +86,7 @@ void NestedStructureSineWaves::applyImpedanceControlOutside(const std::vector<tg
         cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI * i / (segments) + phaseOffsets[phase]);
         target = offsetSpeed + cycle*cpgAmplitude;
         
-        double setTension = out_controller->control(stringList[i],
+        double setTension = out_controller->control(*(stringList[i]),
                                             dt,
                                             outsideLength,
                                             target

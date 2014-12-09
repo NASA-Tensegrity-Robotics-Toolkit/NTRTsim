@@ -52,6 +52,14 @@ public:
 	 */
 	virtual void setControlInput(double input) = 0;
 	
+	/**
+	 * Secondary function for those classes which need to know how much
+	 * time has elapsed since they last recieved input (such as 
+	 * tgBasicActuator's moveMotors(dt) function)
+	 * This will silently fail if it is called erroneously
+	 */
+	virtual void setControlInput(double input, double dt) { }
+	
 };
 
 #endif  // TG_CONTROLLABLE_H

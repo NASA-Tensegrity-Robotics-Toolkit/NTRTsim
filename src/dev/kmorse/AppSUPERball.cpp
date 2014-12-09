@@ -88,8 +88,6 @@ int main(int argc, char** argv)
     // Set the tension of the controller units of kg * length / s^2
     // So 10000 units at this scale is 1000 N
 
-    // T6TensionController* const pTC = new T6TensionController(10000);
-
     myModel->attach(pTC);
     simulation.addModel(myModel);
     

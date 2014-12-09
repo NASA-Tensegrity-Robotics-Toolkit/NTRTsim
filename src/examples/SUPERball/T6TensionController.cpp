@@ -33,10 +33,9 @@
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
-#include <vector>
 
 T6TensionController::T6TensionController(const double tension) :
-    m_tension(tension) 
+    m_tension(tension)
 {
     if (tension < 0.0)
     {
@@ -44,20 +43,41 @@ T6TensionController::T6TensionController(const double tension) :
     }
 }
 
+T6TensionController::~T6TensionController()
+{
+	std::size_t n = m_controllers.size();
+    for(std::size_t i = 0; i < n; i++)
+    {
+        delete m_controllers[i];
+    }
+    m_controllers.clear();
+}	
+
+void T6TensionController::onSetup(T6Model& subject)
+{
+    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    for (size_t i = 0; i < muscles.size(); ++i)
+    {
+        tgLinearString * const pMuscle = muscles[i];
+        assert(pMuscle != NULL);
+        tgTensionController* m_tensController = new tgTensionController(pMuscle, m_tension);
+        m_controllers.push_back(m_tensController);
+    }
+
+}
+
 void T6TensionController::onStep(T6Model& subject, double dt)
 {
-    if (dt <= 0.0)
+	if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive");
     }
     else
     {
-        const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-        for (size_t i = 0; i < muscles.size(); ++i)
+        std::size_t n = m_controllers.size();
+		for(std::size_t i = 0; i < n; i++)
         {
-        tgLinearString * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-            pMuscle->tensionMinLengthController(m_tension, dt);
+            m_controllers[i]->control(dt, m_tension);
         }
-    }
+	}
 }

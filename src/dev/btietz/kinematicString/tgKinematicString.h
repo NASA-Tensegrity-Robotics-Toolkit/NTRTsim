@@ -146,27 +146,6 @@ public:
      */
      
     /**
-    * Set the desired tension of the string. Will change m_preferredLength 
-    * (see base class tgSpringCableActuator) to reach targetTension, subject to 
-    * the constraints in the kinematic motor model. Calls moveMotors(dt) 
-    * upon completion of calculations
-    */
-    virtual void tensionMinLengthController(const double targetTension,
-                                            float dt);
-    
-    /**
-     * Directly set m_preferredLength (see base class tgSpringCableActuator)
-     * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
-     */
-    void setRestLength(double newLength, float dt);
-
-    /**
-     * Directly set m_preferredLength (see base class tgSpringCableActuator)
-     * Does not call moveMotors.
-     */
-    void setPrefLength(double newLength);
-
-    /**
      * Return the appropreate values.
      */
     /**
@@ -176,12 +155,6 @@ public:
     virtual const double getVelocity() const;
     
     virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
-    
-    
-    /** Called from public functions, a position controller on 
-     * preferred rest length
-     */
-    virtual void moveMotors(double dt);
     
     /**
      * Applies a linear torque-speed function to restrict the 
