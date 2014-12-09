@@ -180,6 +180,7 @@ void tsTestRig::step(double dt)
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
+        /// @todo update this so it works with a controller or write a controller!!
         allMuscles[0]->setControlInput(5.0);
         if (allMuscles[0]->getRestLength() <= 5.0 && !reached)
         {

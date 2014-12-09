@@ -31,7 +31,6 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 
-#include <string>
 #include <vector>
 
 // Forward references
@@ -51,9 +50,7 @@ public:
 
     // Called by tensegrity class update function for each muscle2p
     virtual void calculateAndApplyForce(double dt);
-    
-    void setName(std::string a) { name = a; }
-    
+   
     const double getRestLength() const;
     
     void setRestLength( const double newRestLength); 
@@ -76,11 +73,7 @@ public:
     {
         return m_damping;
     }
-
-    const std::string& getName() const {
-        return name;
-    }
-    
+/// @todo make these protected, force other functions to use getAnchors()   
     muscleAnchor * const anchor1;
 
     muscleAnchor * const anchor2;
@@ -89,10 +82,6 @@ public:
     {
         return m_anchors;
     }
-
-    std::string name;
-
-    bool recordHistory;
 
 protected:
 
