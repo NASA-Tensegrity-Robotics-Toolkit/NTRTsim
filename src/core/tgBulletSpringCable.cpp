@@ -34,17 +34,17 @@
 #include <stdexcept>
 
 tgBulletSpringCable::tgBulletSpringCable( const std::vector<tgBulletSpringCableAnchor*>& anchors,
-				double coefK,
-				double dampingCoefficient,
-				double pretension) :
+                double coefK,
+                double dampingCoefficient,
+                double pretension) :
 m_anchors(anchors),
 anchor1(anchors.front()),
 anchor2(anchors.back()),
 tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anchors),
-				coefK, dampingCoefficient, pretension)
+                coefK, dampingCoefficient, pretension)
 {
-	assert(m_anchors.size() >= 2);
-	// tgSpringCable does heavy lifting as far as determining rest length
+    assert(m_anchors.size() >= 2);
+    // tgSpringCable does heavy lifting as far as determining rest length
 }
 
 
@@ -53,32 +53,32 @@ tgBulletSpringCable::~tgBulletSpringCable()
     #if (0)
     std::cout << "Destroying tgBulletSpringCable" << std::endl;
     #endif
-	
-	std::size_t n = m_anchors.size();
-	
+    
+    std::size_t n = m_anchors.size();
+    
     // Make absolutely sure these are deleted, in case we have a poorly timed reset
     if (m_anchors[0] != anchor1)
     {
-		delete anchor1;
+        delete anchor1;
     }
     
     if (m_anchors[n-1] != anchor2)
     {
-		delete anchor2;
-	}
+        delete anchor2;
+    }
     
     for (std::size_t i = 0; i < n; i++)
     {
-		delete m_anchors[i];
-	}
+        delete m_anchors[i];
+    }
 
-	
+    
     m_anchors.clear();
 }
 
 void tgBulletSpringCable::calculateAndApplyForce(double dt)
 {
-	step(dt);
+    step(dt);
 }
 
 void tgBulletSpringCable::step(double dt)
@@ -164,6 +164,6 @@ const double tgBulletSpringCable::getTension() const
 
 const std::vector<tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() const
 {
-	return tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(m_anchors);
+    return tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(m_anchors);
 }
 
