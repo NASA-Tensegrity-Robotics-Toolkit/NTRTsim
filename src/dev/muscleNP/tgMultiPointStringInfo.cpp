@@ -29,7 +29,7 @@
 #include "MuscleNP.h"
 
 #include "core/tgBulletUtil.h"
-#include "core/muscleAnchor.h"
+#include "core/tgBulletSpringCableAnchor.h"
 
 #include "tgcreator/tgNode.h"
 
@@ -97,12 +97,12 @@ MuscleNP* tgMultiPointStringInfo::createMuscleNP(tgWorld& world)
     tgNode from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
     tgNode to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
-	std::vector<muscleAnchor*> anchorList;
+	std::vector<tgBulletSpringCableAnchor*> anchorList;
 	
-	muscleAnchor* anchor1 = new muscleAnchor(fromBody, from);
+	tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
 	anchorList.push_back(anchor1);
 	
-	muscleAnchor* anchor2 = new muscleAnchor(toBody, to);
+	tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
 	anchorList.push_back(anchor2);
 	
 	/// @todo generalize this to n anchors. May take a new info class 

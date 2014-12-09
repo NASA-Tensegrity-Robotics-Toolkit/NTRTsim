@@ -38,7 +38,7 @@
 
 // Forward references
 class tgWorld;
-class muscleAnchor;
+class tgBulletSpringCableAnchor;
 class btRigidBody;
 class btCollisionShape;
 class btCompoundShape;
@@ -82,7 +82,7 @@ public:
 	 */
     MuscleNP(btPairCachingGhostObject* ghostObject,
 				tgWorld& world,
-				const std::vector<muscleAnchor*>& anchors,
+				const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension = 0.0,
@@ -124,12 +124,12 @@ private:
      */
     struct anchorCompare
     {
-        anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2);
+        anchorCompare(const tgBulletSpringCableAnchor* m1, const tgBulletSpringCableAnchor* m2);
         
         /**
          * Calls comparePoints on anchors lhs and rhs
          */
-        bool operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const;
+        bool operator() (const tgBulletSpringCableAnchor* lhs, const tgBulletSpringCableAnchor* rhs) const;
 		
 		/**
 		 * Sees which of the points is further along the line between ma1
@@ -138,8 +138,8 @@ private:
         bool comparePoints(btVector3& pt2, btVector3& pt3) const;
         
         private:
-           const muscleAnchor* const ma1;
-           const muscleAnchor* const ma2;
+           const tgBulletSpringCableAnchor* const ma1;
+           const tgBulletSpringCableAnchor* const ma2;
     };
     
     /**
@@ -207,10 +207,10 @@ private:
     int findNearestPastAnchor(btVector3& pos);
     
     /**
-     * An iterator over a list of muscleAnchors. Used to insert new
+     * An iterator over a list of tgBulletSpringCableAnchors. Used to insert new
      * anchors during updateAnchorList()
      */
-    std::vector<muscleAnchor*>::iterator m_anchorIt;
+    std::vector<tgBulletSpringCableAnchor*>::iterator m_anchorIt;
    
     /**
      * The total force experienced by the sliding anchors
@@ -227,7 +227,7 @@ private:
      * Temporary storage for anchors between updateManifolds() and
      * updateAnchorList()
      */
-    std::vector<muscleAnchor*> m_newAnchors;
+    std::vector<tgBulletSpringCableAnchor*> m_newAnchors;
     
     /**
      * A reference to the dynamics world so that we can track the

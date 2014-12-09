@@ -25,14 +25,14 @@
 
 // This module
 #include "Muscle2P.h"
-#include "muscleAnchor.h"
+#include "tgBulletSpringCableAnchor.h"
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include <iostream>
 #include <stdexcept>
 
-Muscle2P::Muscle2P( const std::vector<muscleAnchor*>& anchors,
+Muscle2P::Muscle2P( const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension) :

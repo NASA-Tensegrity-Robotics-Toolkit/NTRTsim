@@ -29,7 +29,7 @@
 
 // NTRT
 #include "tgcreator/tgUtil.h"
-#include "core/muscleAnchor.h"
+#include "core/tgBulletSpringCableAnchor.h"
 #include "core/tgCast.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
@@ -56,7 +56,7 @@
 
 MuscleNP::MuscleNP(btPairCachingGhostObject* ghostObject,
  tgWorld& world,
- const std::vector<muscleAnchor*>& anchors,
+ const std::vector<tgBulletSpringCableAnchor*>& anchors,
  double coefK,
  double dampingCoefficient,
  double pretension,
@@ -237,7 +237,7 @@ void MuscleNP::updateManifolds()
 	btBroadphasePairArray& pairArray = m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray();
 	int numPairs = pairArray.size();
     
-    std::vector<muscleAnchor*> rejectedAnchors;
+    std::vector<tgBulletSpringCableAnchor*> rejectedAnchors;
     
 	for (int i = 0; i < numPairs; i++)
 	{
@@ -309,11 +309,11 @@ void MuscleNP::updateManifolds()
 						if (anchorPos >= 0)
 						{
 							// Not permanent, sliding contact
-							muscleAnchor* const newAnchor = new muscleAnchor(rb, pos, m_touchingNormal, false, true, manifold);
+							tgBulletSpringCableAnchor* const newAnchor = new tgBulletSpringCableAnchor(rb, pos, m_touchingNormal, false, true, manifold);
 						
 							
-							muscleAnchor* backAnchor = m_anchors[anchorPos];
-							muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+							tgBulletSpringCableAnchor* backAnchor = m_anchors[anchorPos];
+							tgBulletSpringCableAnchor* forwardAnchor = m_anchors[anchorPos + 1];
 							
 							btVector3 pos0 = backAnchor->getWorldPosition();
 							btVector3 pos2 = forwardAnchor->getWorldPosition();
@@ -371,7 +371,7 @@ void MuscleNP::updateAnchorList()
 	while (m_newAnchors.size() > 0)
 	{
 		// Not permanent, sliding contact
-		muscleAnchor* const newAnchor = m_newAnchors[0];
+		tgBulletSpringCableAnchor* const newAnchor = m_newAnchors[0];
 		m_newAnchors.erase(m_newAnchors.begin());
 		
 		btVector3 pos1 = newAnchor->getWorldPosition();
@@ -384,8 +384,8 @@ void MuscleNP::updateAnchorList()
 		if (anchorPos >= 0)
 		{
 		
-			muscleAnchor* backAnchor = m_anchors[anchorPos];
-			muscleAnchor* forwardAnchor = m_anchors[anchorPos + 1];
+			tgBulletSpringCableAnchor* backAnchor = m_anchors[anchorPos];
+			tgBulletSpringCableAnchor* forwardAnchor = m_anchors[anchorPos + 1];
 			
 			btVector3 pos0 = backAnchor->getWorldPosition();
 			btVector3 pos2 = forwardAnchor->getWorldPosition();
@@ -747,8 +747,8 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	else if (n > 1)
 	{
 		// Know we've got 3 anchors, so we need to compare along the line
-		muscleAnchor* a0 = m_anchors[i - 1];
-		muscleAnchor* an = m_anchors[i + 1];
+		tgBulletSpringCableAnchor* a0 = m_anchors[i - 1];
+		tgBulletSpringCableAnchor* an = m_anchors[i + 1];
 		
 		MuscleNP::anchorCompare m_acTemp(a0, an);
 		
@@ -760,8 +760,8 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 	}
 	
 	// Check to make sure it's actually in this line
-	muscleAnchor* a0 = m_anchors[i];
-	muscleAnchor* an = m_anchors[i + 1];
+	tgBulletSpringCableAnchor* a0 = m_anchors[i];
+	tgBulletSpringCableAnchor* an = m_anchors[i + 1];
 	
 	btVector3 current = a0->getWorldPosition();
 	MuscleNP::anchorCompare m_acTemp(a0, an);
@@ -801,8 +801,8 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		else if (n > 1)
 		{
 			// Know we've got 3 anchors, so we need to compare along the line
-			muscleAnchor* a0 = m_anchors[j - 1];
-			muscleAnchor* an = m_anchors[j + 1];
+			tgBulletSpringCableAnchor* a0 = m_anchors[j - 1];
+			tgBulletSpringCableAnchor* an = m_anchors[j + 1];
 			
 			MuscleNP::anchorCompare m_acTemp(a0, an);
 			
@@ -815,8 +815,8 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		}
 		
 		// Check to make sure it's actually in this line
-		muscleAnchor* a0 = m_anchors[j];
-		muscleAnchor* an = m_anchors[j + 1];
+		tgBulletSpringCableAnchor* a0 = m_anchors[j];
+		tgBulletSpringCableAnchor* an = m_anchors[j + 1];
 		
 		btVector3 current = a0->getWorldPosition();
 		MuscleNP::anchorCompare m_acTemp(a0, an);
@@ -838,21 +838,21 @@ int MuscleNP::findNearestPastAnchor(btVector3& pos)
 		}
 	}
 	
-	muscleAnchor* prevAnchor = m_anchors[i];
+	tgBulletSpringCableAnchor* prevAnchor = m_anchors[i];
 	assert (prevAnchor);
 	 
 	return i; 
 
 }
 
-MuscleNP::anchorCompare::anchorCompare(const muscleAnchor* m1, const muscleAnchor* m2) :
+MuscleNP::anchorCompare::anchorCompare(const tgBulletSpringCableAnchor* m1, const tgBulletSpringCableAnchor* m2) :
 ma1(m1),
 ma2(m2)
 {
 	
 }
 
-bool MuscleNP::anchorCompare::operator() (const muscleAnchor* lhs, const muscleAnchor* rhs) const
+bool MuscleNP::anchorCompare::operator() (const tgBulletSpringCableAnchor* lhs, const tgBulletSpringCableAnchor* rhs) const
 {
 	btVector3 pt2 = lhs->getWorldPosition();
 	btVector3 pt3 = rhs->getWorldPosition();

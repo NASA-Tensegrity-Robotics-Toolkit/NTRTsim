@@ -27,7 +27,7 @@
 #include "tgLinearStringInfo.h"
 
 #include "core/Muscle2P.h"
-#include "core/muscleAnchor.h"
+#include "core/tgBulletSpringCableAnchor.h"
 
 tgLinearStringInfo::tgLinearStringInfo(const tgLinearString::Config& config) : 
 m_config(config),
@@ -88,12 +88,12 @@ Muscle2P* tgLinearStringInfo::createMuscle2P()
     btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
     btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
-	std::vector<muscleAnchor*> anchorList;
+	std::vector<tgBulletSpringCableAnchor*> anchorList;
 	
-	muscleAnchor* anchor1 = new muscleAnchor(fromBody, from);
+	tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
 	anchorList.push_back(anchor1);
 	
-	muscleAnchor* anchor2 = new muscleAnchor(toBody, to);
+	tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
 	anchorList.push_back(anchor2);
 	
     return new Muscle2P(anchorList, m_config.stiffness, m_config.damping, m_config.pretension);

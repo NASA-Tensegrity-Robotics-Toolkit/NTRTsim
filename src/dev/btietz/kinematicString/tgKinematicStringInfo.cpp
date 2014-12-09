@@ -27,7 +27,6 @@
 #include "tgKinematicStringInfo.h"
 
 #include "core/Muscle2P.h"
-#include "core/muscleAnchor.h"
 
 tgKinematicStringInfo::tgKinematicStringInfo(const tgKinematicString::Config& config) : 
 m_config(config),

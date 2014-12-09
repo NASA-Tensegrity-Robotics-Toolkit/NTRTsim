@@ -21,8 +21,7 @@
 
 /**
  * @file Muscle2P.h
- * @brief Definitions of classes Muscle2P and MuscleAnchor.
- * @todo Split so only one class is defined per header file.
+ * @brief Definitions of classes Muscle2P
  * $Id$
  */
 
@@ -35,13 +34,13 @@
 
 // Forward references
 class btRigidBody;
-class muscleAnchor;
+class tgBulletSpringCableAnchor;
 
 class Muscle2P
 {
 public:	
 	// Alternative constructor
-	Muscle2P( const std::vector<muscleAnchor*>& anchors,
+	Muscle2P( const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension = 0.0);
@@ -74,11 +73,11 @@ public:
         return m_damping;
     }
 /// @todo make these protected, force other functions to use getAnchors()   
-    muscleAnchor * const anchor1;
+    tgBulletSpringCableAnchor * const anchor1;
 
-    muscleAnchor * const anchor2;
+    tgBulletSpringCableAnchor * const anchor2;
 
-	const std::vector<muscleAnchor*>& getAnchors() const
+	const std::vector<tgBulletSpringCableAnchor*>& getAnchors() const
     {
         return m_anchors;
     }
@@ -87,7 +86,7 @@ protected:
 
    // Wanted to do a set, but need random access iterator to sort
    // Needs to be stored here for consistent rendering
-   std::vector<muscleAnchor*> m_anchors;
+   std::vector<tgBulletSpringCableAnchor*> m_anchors;
 
     // Necessary for computations
     double m_restLength;
