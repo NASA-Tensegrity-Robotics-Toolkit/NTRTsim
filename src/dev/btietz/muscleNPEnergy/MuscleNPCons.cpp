@@ -33,8 +33,8 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "dev/muscleNP/tgMultiPointStringInfo.h"
 
-#include "core/Muscle2P.cpp"
-#include "core/tgBulletSpringCableAnchor.cpp"
+#include "core/Muscle2P.h"
+#include "core/tgSpringCableAnchor.h"
 
 // The Bullet Physics Library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
@@ -152,7 +152,7 @@ void MuscleNPCons::step(double dt)
 	
 	btVector3 forceSum(0.0, 0.0, 0.0);
 	
-	const std::vector<tgBulletSpringCableAnchor*>& anchorList = allMuscles[0]->getMuscle()->getAnchors();
+	const std::vector<tgSpringCableAnchor*>& anchorList = allMuscles[0]->getMuscle()->getAnchors();
 	int n = anchorList.size();
 	for (std::size_t i = 0; i < n; i++)
 	{

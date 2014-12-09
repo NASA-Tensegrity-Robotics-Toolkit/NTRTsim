@@ -25,6 +25,9 @@
  * $Id$
  */
 
+// NTRT
+#include "tgSpringCable.h"
+
 // The Bullet Physics library
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
@@ -34,9 +37,10 @@
 
 // Forward references
 class btRigidBody;
+class tgSpringCableAnchor;
 class tgBulletSpringCableAnchor;
 
-class Muscle2P
+class Muscle2P : public tgSpringCable
 {
 public:	
 	// Alternative constructor
@@ -47,61 +51,35 @@ public:
 	
     virtual ~Muscle2P();
 
-    // Called by tensegrity class update function for each muscle2p
+    /// @todo remove this
     virtual void calculateAndApplyForce(double dt);
+    // Called by tensegrity class update function for each muscle2p
+    virtual void step(double dt);
    
-    const double getRestLength() const;
+    virtual const double getRestLength() const;
     
-    void setRestLength( const double newRestLength); 
+    virtual void setRestLength( const double newRestLength); 
 
-    virtual const btScalar getActualLength() const;
+    virtual const double getActualLength() const;
 
-    const double getTension() const;
+    virtual const double getTension() const;
     
-    const double getCoefK() const
-    {
-        return m_coefK;
-    }
+    /**
+     * @todo figure out how to cast and pass by reference
+     */
+    virtual const std::vector<tgSpringCableAnchor*> getAnchors() const;
     
-    const double getVelocity() const
-    {
-        return m_velocity;
-    }
-    
-    const double getDamping() const
-    {
-        return m_damping;
-    }
 /// @todo make these protected, force other functions to use getAnchors()   
     tgBulletSpringCableAnchor * const anchor1;
 
     tgBulletSpringCableAnchor * const anchor2;
-
-	const std::vector<tgBulletSpringCableAnchor*>& getAnchors() const
-    {
-        return m_anchors;
-    }
-
+    
 protected:
 
    // Wanted to do a set, but need random access iterator to sort
    // Needs to be stored here for consistent rendering
    std::vector<tgBulletSpringCableAnchor*> m_anchors;
 
-    // Necessary for computations
-    double m_restLength;
- 
-    double m_prevLength;
-    
-    // So we can get it without passing a dt
-    double m_damping;
-    
-    double m_velocity;
- 
-    // Should be const for the lifetime of a muscle 
-    const btScalar m_dampingCoefficient;
-    
-    const btScalar m_coefK;
 
  private: 
     bool invariant(void) const;

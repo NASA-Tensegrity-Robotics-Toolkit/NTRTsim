@@ -27,7 +27,7 @@
 #include "tgBulletRenderer.h"
 // This application
 #include "Muscle2P.h"
-#include "tgBulletSpringCableAnchor.h"
+#include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgLinearString.h"
 #include "tgWorld.h"
@@ -72,7 +72,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
     
     if(pDrawer && pMuscle)
     {
-		const std::vector<tgBulletSpringCableAnchor*>& anchors = pMuscle->getAnchors();
+		const std::vector<tgSpringCableAnchor*>& anchors = pMuscle->getAnchors();
 		std::size_t n = anchors.size() - 1;
 		for (std::size_t i = 0; i < n; i++)
 		{

@@ -26,6 +26,7 @@
 // This module
 #include "Muscle2P.h"
 #include "tgBulletSpringCableAnchor.h"
+#include "tgCast.h"
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
@@ -36,32 +37,51 @@ Muscle2P::Muscle2P( const std::vector<tgBulletSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension) :
-m_velocity(0.0),
-m_damping(0.0),
-m_coefK (coefK),
-m_dampingCoefficient(dampingCoefficient),
 m_anchors(anchors),
 anchor1(anchors.front()),
-anchor2(anchors.back())
+anchor2(anchors.back()),
+tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anchors),
+				coefK, dampingCoefficient, pretension)
 {
 	assert(m_anchors.size() >= 2);
-	assert(coefK > 0.0);
-	assert(dampingCoefficient >= 0.0);
+	// tgSpringCable does heavy lifting as far as determining rest length
+}
+
+
+Muscle2P::~Muscle2P()
+{
+    #if (0)
+    std::cout << "Destroying Muscle2P" << std::endl;
+    #endif
 	
-	btVector3 pos1 = anchor1->getWorldPosition();
-	btVector3 pos2 = anchor2->getWorldPosition();
+	std::size_t n = m_anchors.size();
 	
-	m_restLength = pos1.distance(pos2) - pretension / coefK;
-	
-	if (m_restLength <= 0.0)
-	{
-		throw std::invalid_argument("Pretension causes string to shorten past rest length!");
+    // Make absolutely sure these are deleted, in case we have a poorly timed reset
+    if (m_anchors[0] != anchor1)
+    {
+		delete anchor1;
+    }
+    
+    if (m_anchors[n-1] != anchor2)
+    {
+		delete anchor2;
 	}
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+		delete m_anchors[i];
+	}
+
 	
-	m_prevLength = m_restLength;
+    m_anchors.clear();
 }
 
 void Muscle2P::calculateAndApplyForce(double dt)
+{
+	step(dt);
+}
+
+void Muscle2P::step(double dt)
 {
     btVector3 force(0.0, 0.0, 0.0);
     double magnitude = 0.0;
@@ -128,7 +148,7 @@ const double Muscle2P::getRestLength() const
     return m_restLength;
 }
 
-const btScalar Muscle2P::getActualLength() const
+const double Muscle2P::getActualLength() const
 {
     const btVector3 dist =
       this->anchor2->getWorldPosition() - this->anchor1->getWorldPosition();
@@ -142,30 +162,8 @@ const double Muscle2P::getTension() const
     return tension;
 }
 
-Muscle2P::~Muscle2P()
+const std::vector<tgSpringCableAnchor*> Muscle2P::getAnchors() const
 {
-    #if (0)
-    std::cout << "Destroying Muscle2P" << std::endl;
-    #endif
-	
-	std::size_t n = m_anchors.size();
-	
-    // Make absolutely sure these are deleted, in case we have a poorly timed reset
-    if (m_anchors[0] != anchor1)
-    {
-		delete anchor1;
-    }
-    
-    if (m_anchors[n-1] != anchor2)
-    {
-		delete anchor2;
-	}
-    
-    for (std::size_t i = 0; i < n; i++)
-    {
-		delete m_anchors[i];
-	}
-
-	
-    m_anchors.clear();
+	return tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(m_anchors);
 }
+

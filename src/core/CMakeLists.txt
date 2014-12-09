@@ -4,6 +4,7 @@ project(core)
 add_library( ${PROJECT_NAME} SHARED
   tgWorldBulletPhysicsImpl.cpp
     tgBulletSpringCableAnchor.cpp
+    tgSpringCable.cpp
     Muscle2P.cpp
     ImpedanceControl.cpp
     
