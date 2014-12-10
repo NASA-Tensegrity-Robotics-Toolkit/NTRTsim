@@ -28,7 +28,7 @@
 #include "tgBasicController.h"
 #include "tgTensionController.h"
 #include "core/tgSpringCableActuator.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgCast.h"
 
 /**
@@ -149,7 +149,7 @@ tgImpedanceController::controlTension(tgBasicController& mLocalController,
 }
 
 double
-tgImpedanceController::control(tgLinearString& mBasicActuator, 
+tgImpedanceController::control(tgBasicActuator& mBasicActuator, 
                                  double deltaTimeSeconds,
                                  double newPosition,
                                  double offsetVel)
@@ -162,7 +162,7 @@ tgImpedanceController::control(tgLinearString& mBasicActuator,
 }
 
 double
-tgImpedanceController::controlTension(tgLinearString& mBasicActuator,
+tgImpedanceController::controlTension(tgBasicActuator& mBasicActuator,
                                  double deltaTimeSeconds,
                                  double newPosition ,
                                  double offsetTension,

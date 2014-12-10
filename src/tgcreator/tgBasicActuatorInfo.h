@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgLinearStringInfo.h
- * @brief Definition of class tgLinearStringInfo
+ * @file tgBasicActuatorInfo.h
+ * @brief Definition of class tgBasicActuatorInfo
  * @author Ryan Adams
  * @date March 2014
  * $Id$
  */
 
-#ifndef TG_LINEAR_STRING_INFO_H
-#define TG_LINEAR_STRING_INFO_H
+#ifndef SRC_TGCREATOR_TG_BASIC_ACTUATOR_INFO_H
+#define SRC_TGCREATOR_TG_BASIC_ACTUATOR_INFO_H
 
 #include "tgConnectorInfo.h"
 
@@ -33,40 +33,40 @@
 
 #include <string>
 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgTags.h"
 
 class tgBulletSpringCable;
 
-class tgLinearStringInfo : public tgConnectorInfo
+class tgBasicActuatorInfo : public tgConnectorInfo
 {
 public:
 
     /**
-     * Construct a tgLinearStringInfo with just a config. The pair must be filled in 
+     * Construct a tgBasicActuatorInfo with just a config. The pair must be filled in 
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgLinearStringInfo(const tgLinearString::Config& config);
+    tgBasicActuatorInfo(const tgBasicActuator::Config& config);
 
     /**
-     * Construct a tgLinearStringInfo with just a config and tags. The pair must 
+     * Construct a tgBasicActuatorInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgLinearStringInfo(const tgLinearString::Config& config, tgTags tags);
+    tgBasicActuatorInfo(const tgBasicActuator::Config& config, tgTags tags);
 
     /**
-     * Construct a tgLinearStringInfo from its endpoints, radius and density.
+     * Construct a tgBasicActuatorInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgLinearStringInfo(const tgLinearString::Config& config, const tgPair& pair);
+    tgBasicActuatorInfo(const tgBasicActuator::Config& config, const tgPair& pair);
     
 
-    virtual ~tgLinearStringInfo() {}
+    virtual ~tgBasicActuatorInfo() {}
     
     /**
      * Create a tgConnectorInfo* from a tgPair
@@ -82,10 +82,10 @@ public:
 protected:    
     
     tgBulletSpringCable* createTgBulletSpringCable();
-    tgBulletSpringCable* m_muscle2P;
+    tgBulletSpringCable* m_bulletSpringCable;
 private:
     
-    tgLinearString::Config m_config;
+    tgBasicActuator::Config m_config;
     
 };
 

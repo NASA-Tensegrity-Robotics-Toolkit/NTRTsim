@@ -27,7 +27,7 @@
 
 // Forward references
 class tgBasicController;
-class tgLinearString;
+class tgBasicActuator;
 /**
  * Influences the spring-cable actuator tension using length and velocity.
  */
@@ -59,9 +59,9 @@ class tgImpedanceController
     ///Control Functions
 
     /**
-     * @param[in] Control a tgLinearString given a new offset force and a
+     * @param[in] Control a tgBasicActuator given a new offset force and a
      * new offset velocity.
-     * @param[in] mString a pointer to a tgLinearString; must not be NULL
+     * @param[in] mString a pointer to a tgBasicActuator; must not be NULL
      * @param[in] deltaTimeSeconds the number of seconds since the
      * last call
      * @param[in] newPosition the current position of the Muscle
@@ -81,13 +81,13 @@ class tgImpedanceController
     /**
      * For those who control on tension without PID
      */
-    double control(tgLinearString& mLocalController,
+    double control(tgBasicActuator& mLocalController,
                     double deltaTimeSeconds,
                     double newPosition,
                     double offsetVel = 0);
     
                     
-    double controlTension(tgLinearString& mLocalController,
+    double controlTension(tgBasicActuator& mLocalController,
                     double deltaTimeSeconds,
                     double newPosition,
                     double offsetTension,

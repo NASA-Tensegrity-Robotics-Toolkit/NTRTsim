@@ -31,7 +31,7 @@
 
 // Forward declarations
 class tgControllable;
-class tgLinearString;
+class tgBasicActuator;
 
 /**
  * Provides control of rest length based on
@@ -45,7 +45,7 @@ public:
      * @param[in] controllable. The system to be controlled.
      * @param[in] setPoint. The initial setPoint for the system
 	 */
-    tgTensionController(tgLinearString* controllable, double setPoint = 0.0);
+    tgTensionController(tgBasicActuator* controllable, double setPoint = 0.0);
 
     /**
      * The destructor. Sets m_controllable to NULL.
@@ -69,12 +69,12 @@ public:
 	 */
 	virtual void control(double dt, double setPoint, double sensorData = 0);
 	
-    static void control(tgLinearString& sca, double dt, double setPoint);
+    static void control(tgBasicActuator& sca, double dt, double setPoint);
 private:
     /**
      * @todo is it better to keep this pointer or cast back from tgControllable?
      */
-    tgLinearString* m_sca;
+    tgBasicActuator* m_sca;
 	
 };
 

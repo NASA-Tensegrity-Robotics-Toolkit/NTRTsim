@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgLinearString.cpp
- * @brief Contains the definitions of members of class tgLinearString
+ * @file tgBasicActuator.cpp
+ * @brief Contains the definitions of members of class tgBasicActuator
  * @author Brian Tietz
  * $Id$
  */
 
 // This Module
 #include "tgBulletSpringCable.h"
-#include "tgLinearString.h"
+#include "tgBasicActuator.h"
 #include "tgModelVisitor.h"
 #include "tgWorld.h"
 // The Bullet Physics Library
@@ -41,7 +41,7 @@
 
 using namespace std;
 
-void tgLinearString::constructorAux()
+void tgBasicActuator::constructorAux()
 {
   // Precondition
     assert(m_pHistory != NULL);
@@ -67,7 +67,7 @@ void tgLinearString::constructorAux()
         logHistory();
     }
 }
-tgLinearString::tgLinearString(tgBulletSpringCable* muscle,
+tgBasicActuator::tgBasicActuator(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgSpringCableActuator::Config& config) :
     tgSpringCableActuator(muscle, tags, config)
@@ -79,28 +79,28 @@ tgLinearString::tgLinearString(tgBulletSpringCable* muscle,
     assert(m_preferredLength == m_restLength);
 }
 
-tgLinearString::~tgLinearString()
+tgBasicActuator::~tgBasicActuator()
 {
     //std::cout << "deleting linear string" << std::endl;
     // Should have already torn down.
 }
     
-void tgLinearString::setup(tgWorld& world)
+void tgBasicActuator::setup(tgWorld& world)
 {
     notifySetup();
     tgModel::setup(world);
 }
 
-void tgLinearString::teardown()
+void tgBasicActuator::teardown()
 {
     // Do not notify teardown. The controller has already been deleted.
     tgModel::teardown();
 }
     
-void tgLinearString::step(double dt) 
+void tgBasicActuator::step(double dt) 
 {
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgLinearString::step");
+    BT_PROFILE("tgBasicActuator::step");
 #endif //BT_NO_PROFILE   	
     if (dt <= 0.0)
     {
@@ -116,15 +116,15 @@ void tgLinearString::step(double dt)
     }
 }
 
-void tgLinearString::onVisit(const tgModelVisitor& r) const
+void tgBasicActuator::onVisit(const tgModelVisitor& r) const
 {
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgLinearString::onVisit");
+    BT_PROFILE("tgBasicActuator::onVisit");
 #endif //BT_NO_PROFILE	
     r.render(*this);
 }
     
-void tgLinearString::logHistory()
+void tgBasicActuator::logHistory()
 {
     m_prevVelocity = m_springCable->getVelocity();
 
@@ -138,7 +138,7 @@ void tgLinearString::logHistory()
     }
 }
 
-void tgLinearString::setControlInput(double input)
+void tgBasicActuator::setControlInput(double input)
 {
     if (input < 0.0)
     {
@@ -150,7 +150,7 @@ void tgLinearString::setControlInput(double input)
     }
 }    
 
-void tgLinearString::setControlInput(double input, double dt)
+void tgBasicActuator::setControlInput(double input, double dt)
 {
     if (input < 0.0)
     {
@@ -171,7 +171,7 @@ void tgLinearString::setControlInput(double input, double dt)
     
 }
 
-void tgLinearString::setRestLength(double newLength, float dt)
+void tgBasicActuator::setRestLength(double newLength, float dt)
 {
     if (newLength < 0.0)
     {
@@ -192,7 +192,7 @@ void tgLinearString::setRestLength(double newLength, float dt)
     
 }
 
-void tgLinearString::setPrefLength(double newLength)
+void tgBasicActuator::setPrefLength(double newLength)
 {
     if (newLength < 0.0)
     {
@@ -204,7 +204,7 @@ void tgLinearString::setPrefLength(double newLength)
     }
 }
 
-void tgLinearString::moveMotors(double dt)
+void tgBasicActuator::moveMotors(double dt)
 {
     // @todo add functions from muscle2P Bounded
     
@@ -298,7 +298,7 @@ void tgLinearString::moveMotors(double dt)
  * multiple calls, since it relies on moveMotors.
  * @param newLength the new rest length of the string.
  */
-void tgLinearString::setRestLengthSingleStep(double newLength)
+void tgBasicActuator::setRestLengthSingleStep(double newLength)
 {
     if (newLength < 0.0)
     {
@@ -325,12 +325,12 @@ void tgLinearString::setRestLengthSingleStep(double newLength)
     
 }
 
-const tgSpringCableActuator::SpringCableActuatorHistory& tgLinearString::getHistory() const
+const tgSpringCableActuator::SpringCableActuatorHistory& tgBasicActuator::getHistory() const
 {
     return *m_pHistory;
 }
 
-bool tgLinearString::invariant() const
+bool tgBasicActuator::invariant() const
 {
     return
       (m_springCable != NULL) &&

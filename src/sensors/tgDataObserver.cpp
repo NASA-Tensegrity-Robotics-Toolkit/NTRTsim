@@ -33,7 +33,7 @@
 #include "core/tgRod.h"
 #include "core/tgString.h"
 
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 
 #include <iostream>
 #include <sstream>  
@@ -109,7 +109,7 @@ void tgDataObserver::onSetup(tgModel& model)
          */
         std::stringstream name;
         
-        if(tgCast::cast<tgModel, tgLinearString>(children[i]) != 0) 
+        if(tgCast::cast<tgModel, tgSpringCableActuator>(children[i]) != 0) 
         {
             name << children[i]->getTags() <<  " " << stringNum;
             tgOutput <<  name.str() << "_RL" << ","

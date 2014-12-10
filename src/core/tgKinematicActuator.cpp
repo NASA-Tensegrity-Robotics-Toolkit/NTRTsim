@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgKinematicString.cpp
- * @brief Contains the definitions of members of class tgKinematicString
+ * @file tgKinematicActuator.cpp
+ * @brief Contains the definitions of members of class tgKinematicActuator
  * @author Brian Mirletz
  * $Id$
  */
 
 // This Module
-#include "tgKinematicString.h"
+#include "tgKinematicActuator.h"
 // The NTRT Core libary
 #include "core/tgBulletSpringCable.h"
 #include "core/tgModelVisitor.h"
@@ -40,7 +40,7 @@
 
 using namespace std;
 
-tgKinematicString::Config::Config(double s,
+tgKinematicActuator::Config::Config(double s,
 									double d,
 									double p,
 									double rad,
@@ -78,7 +78,7 @@ maxTorque(mf / rad)
     }
 }
 
-void tgKinematicString::constructorAux()
+void tgKinematicActuator::constructorAux()
 {
   // Precondition
     assert(m_pHistory != NULL);
@@ -104,9 +104,9 @@ void tgKinematicString::constructorAux()
         logHistory();
     }
 }
-tgKinematicString::tgKinematicString(tgBulletSpringCable* muscle,
+tgKinematicActuator::tgKinematicActuator(tgBulletSpringCable* muscle,
                    const tgTags& tags,
-                   tgKinematicString::Config& config) :
+                   tgKinematicActuator::Config& config) :
     m_motorVel(0.0),
     m_motorAcc(0.0),
     m_config(config),
@@ -119,28 +119,28 @@ tgKinematicString::tgKinematicString(tgBulletSpringCable* muscle,
     assert(m_preferredLength == m_restLength);
 }
 
-tgKinematicString::~tgKinematicString()
+tgKinematicActuator::~tgKinematicActuator()
 {
     //std::cout << "deleting kinematic spring cable" << std::endl;
     // Should have already torn down.
 }
     
-void tgKinematicString::setup(tgWorld& world)
+void tgKinematicActuator::setup(tgWorld& world)
 {
     notifySetup();
     tgModel::setup(world);
 }
 
-void tgKinematicString::teardown()
+void tgKinematicActuator::teardown()
 {
     // Do not notify teardown. The controller has already been deleted.
     tgModel::teardown();
 }
     
-void tgKinematicString::step(double dt) 
+void tgKinematicActuator::step(double dt) 
 {
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgKinematicString::step");
+    BT_PROFILE("tgKinematicActuator::step");
 #endif //BT_NO_PROFILE   	
     if (dt <= 0.0)
     {
@@ -161,15 +161,15 @@ void tgKinematicString::step(double dt)
     m_desiredTorque = 0.0;
 }
 
-void tgKinematicString::onVisit(const tgModelVisitor& r) const
+void tgKinematicActuator::onVisit(const tgModelVisitor& r) const
 {
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgKinematicString::onVisit");
+    BT_PROFILE("tgKinematicActuator::onVisit");
 #endif //BT_NO_PROFILE	
     r.render(*this);
 }
     
-void tgKinematicString::logHistory()
+void tgKinematicActuator::logHistory()
 {
     m_prevVelocity = getVelocity();
 
@@ -183,12 +183,12 @@ void tgKinematicString::logHistory()
     }
 }
     
-const double tgKinematicString::getVelocity() const
+const double tgKinematicActuator::getVelocity() const
 {
     return m_motorVel * m_config.radius;
 }
 
-void tgKinematicString::integrateRestLength(double dt)
+void tgKinematicActuator::integrateRestLength(double dt)
 {
 	double tension = getTension();
 	double appliedTorque = getAppliedTorque(m_desiredTorque);
@@ -218,7 +218,7 @@ void tgKinematicString::integrateRestLength(double dt)
 	m_springCable->setRestLength(m_restLength);
 }
 
-double tgKinematicString::getAppliedTorque(double desiredTorque) const
+double tgKinematicActuator::getAppliedTorque(double desiredTorque) const
 { 
 	double maxTorque = m_config.maxTens * m_config.radius * 
 						(1.0 - m_config.radius * abs(m_motorVel) / m_config.targetVelocity);
@@ -229,17 +229,17 @@ double tgKinematicString::getAppliedTorque(double desiredTorque) const
 		desiredTorque / abs(desiredTorque) * maxTorque;
 }
 
-void tgKinematicString::setControlInput(double input)
+void tgKinematicActuator::setControlInput(double input)
 {
 	m_desiredTorque = input;
 }
 
-const tgSpringCableActuator::SpringCableActuatorHistory& tgKinematicString::getHistory() const
+const tgSpringCableActuator::SpringCableActuatorHistory& tgKinematicActuator::getHistory() const
 {
     return *m_pHistory;
 }
 
-bool tgKinematicString::invariant() const
+bool tgKinematicActuator::invariant() const
 {
     return
       (m_springCable != NULL) &&

@@ -17,66 +17,66 @@
 */
 
 /**
- * @file tgLinearStringInfo.cpp
- * @brief Implementation of class tgLinearStringInfo
+ * @file tgBasicActuatorInfo.cpp
+ * @brief Implementation of class tgBasicActuatorInfo
  * @author Ryan Adams
  * @date March 2014
  * $Id$
  */
 
-#include "tgLinearStringInfo.h"
+#include "tgBasicActuatorInfo.h"
 
 #include "core/tgBulletSpringCable.h"
 #include "core/tgBulletSpringCableAnchor.h"
 
-tgLinearStringInfo::tgLinearStringInfo(const tgLinearString::Config& config) : 
+tgBasicActuatorInfo::tgBasicActuatorInfo(const tgBasicActuator::Config& config) : 
 m_config(config),
 tgConnectorInfo()
 {}
 
-tgLinearStringInfo::tgLinearStringInfo(const tgLinearString::Config& config, tgTags tags) : 
+tgBasicActuatorInfo::tgBasicActuatorInfo(const tgBasicActuator::Config& config, tgTags tags) : 
 m_config(config),
 tgConnectorInfo(tags)
 {}
 
-tgLinearStringInfo::tgLinearStringInfo(const tgLinearString::Config& config, const tgPair& pair) :
+tgBasicActuatorInfo::tgBasicActuatorInfo(const tgBasicActuator::Config& config, const tgPair& pair) :
 m_config(config),
 tgConnectorInfo(pair)
 {}
     
 
-tgConnectorInfo* tgLinearStringInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgBasicActuatorInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgLinearStringInfo(m_config, pair);
+    return new tgBasicActuatorInfo(m_config, pair);
 }
 
-void tgLinearStringInfo::initConnector(tgWorld& world)
+void tgBasicActuatorInfo::initConnector(tgWorld& world)
 {
     // Note: tgBulletSpringCable holds pointers to things in the world, but it doesn't actually have any in-world representation.
-    m_muscle2P = createTgBulletSpringCable();
+    m_bulletSpringCable = createTgBulletSpringCable();
 }
 
-tgModel* tgLinearStringInfo::createModel(tgWorld& world)
+tgModel* tgBasicActuatorInfo::createModel(tgWorld& world)
 {
     // Don't have to do anything in the world for a tgBulletSpringCable...
     // @todo: set the name based on joined tags, or remove name from the model...
-    //std::cout << "tgLinearStringInfo::createModel" << std::endl;
+    //std::cout << "tgBasicActuatorInfo::createModel" << std::endl;
     
     // ensure connector has been initialized
-    assert(m_muscle2P);
-    return new tgLinearString(m_muscle2P, getTags(), m_config);
+    assert(m_bulletSpringCable);
+    return new tgBasicActuator(m_bulletSpringCable, getTags(), m_config);
 }
 
-double tgLinearStringInfo::getMass() 
+double tgBasicActuatorInfo::getMass() 
 {
     // @todo: calculate a mass? tgBulletSpringCable doesn't have physics...
     return 0;
 }
 
 
-tgBulletSpringCable* tgLinearStringInfo::createTgBulletSpringCable()
+tgBulletSpringCable* tgBasicActuatorInfo::createTgBulletSpringCable()
 {
-    //std::cout << "tgLinearStringInfo::createMuscle2P()" << std::endl;
+    //std::cout << "tgBasicActuatorInfo::createMuscle2P()" << std::endl;
     
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;

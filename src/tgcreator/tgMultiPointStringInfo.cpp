@@ -18,7 +18,7 @@
 
 /**
  * @file tgMultiPointStringInfo.cpp
- * @brief Implementation of class tgLinearStringInfo
+ * @brief Implementation of class tgBasicActuatorInfo
  * @author Brian Mirletz and Ryan Adams
  * @date October 2014
  * $Id$
@@ -38,17 +38,17 @@
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgLinearString::Config& config) : 
+tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config) : 
 m_config(config),
 tgConnectorInfo()
 {}
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgLinearString::Config& config, tgTags tags) : 
+tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config, tgTags tags) : 
 m_config(config),
 tgConnectorInfo(tags)
 {}
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgLinearString::Config& config, const tgPair& pair) :
+tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config, const tgPair& pair) :
 m_config(config),
 tgConnectorInfo(pair)
 {}
@@ -62,7 +62,7 @@ tgConnectorInfo* tgMultiPointStringInfo::createConnectorInfo(const tgPair& pair)
 void tgMultiPointStringInfo::initConnector(tgWorld& world)
 {
     // Note: tgBulletContactSpringCable holds pointers to things in the world, but it doesn't actually have any in-world representation.
-    m_muscleNP = createTgBulletContactSpringCable(world);
+    m_bulletContactSpringCable = createTgBulletContactSpringCable(world);
 }
 
 tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
@@ -72,8 +72,8 @@ tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
     //std::cout << "tgMultiPointStringInfo::createModel" << std::endl;
     
     // ensure connector has been initialized
-    assert(m_muscleNP);
-    return new tgLinearString(m_muscleNP, getTags(), m_config);
+    assert(m_bulletContactSpringCable);
+    return new tgBasicActuator(m_bulletContactSpringCable, getTags(), m_config);
 }
 
 double tgMultiPointStringInfo::getMass() 
@@ -85,7 +85,7 @@ double tgMultiPointStringInfo::getMass()
 
 tgBulletContactSpringCable* tgMultiPointStringInfo::createTgBulletContactSpringCable(tgWorld& world)
 {
-    //std::cout << "tgLinearStringInfo::createtgBulletContactSpringCable()" << std::endl;
+    //std::cout << "tgBasicActuatorInfo::createtgBulletContactSpringCable()" << std::endl;
     
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;

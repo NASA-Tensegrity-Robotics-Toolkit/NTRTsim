@@ -31,7 +31,7 @@
 #include <string>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModel;
 class tgRod;
 
@@ -50,10 +50,10 @@ public:
   virtual void render(const tgRod& rod) const;
   
    /**
-   * Render a tgLinearString
-   * @param[in] linearString a const reference to a tgLinearString to log data
+   * Render a tgSpringCableActuator
+   * @param[in] linearString a const reference to a tgSpringCableActuator to log data
    */
-    virtual void render(const tgLinearString& linearString) const;
+    virtual void render(const tgSpringCableActuator& mSCA) const;
     
     virtual void render(const tgModel& model) const;
 private:

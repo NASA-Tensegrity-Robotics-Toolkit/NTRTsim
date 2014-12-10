@@ -21,6 +21,7 @@
 #include "core/tgSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
 #include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgBulletSpringCableAnchor.h"
 #include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
@@ -74,7 +75,7 @@ void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
     /// is there a way to track _global_ time at this level
     
     // Workaround until we implement PID
-    tgLinearString& m_sca = *(tgCast::cast<tgSpringCableActuator, tgLinearString>(subject));
+    tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(subject));
     
     if (m_controlTime >= m_controlStep)
     {

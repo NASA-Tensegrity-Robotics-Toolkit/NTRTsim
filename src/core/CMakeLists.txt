@@ -10,7 +10,8 @@ add_library( ${PROJECT_NAME} SHARED
     
     tgModel.cpp
     tgSpringCableActuator.cpp
-    tgLinearString.cpp
+    tgBasicActuator.cpp
+    tgKinematicActuator.cpp
     tgWorld.cpp
     tgSimulation.cpp
     tgBulletRenderer.cpp

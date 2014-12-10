@@ -20,7 +20,7 @@
 #define TG_CPG_STRING_CONTRL_H
 
 #include "util/tgBaseCPGNode.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 // The Boost library
 #include "boost/multi_array.hpp"
 

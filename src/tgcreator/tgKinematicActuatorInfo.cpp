@@ -17,44 +17,44 @@
 */
 
 /**
- * @file tgKinematicStringInfo.cpp
- * @brief Implementation of class tgKinematicStringInfo
+ * @file tgKinematicActuatorInfo.cpp
+ * @brief Implementation of class tgKinematicActuatorInfo
  * @author Brian Mirletz
  * @date December 2014
  * $Id$
  */
 
-#include "tgKinematicStringInfo.h"
+#include "tgKinematicActuatorInfo.h"
 
-tgKinematicStringInfo::tgKinematicStringInfo(const tgKinematicString::Config& config) : 
+tgKinematicActuatorInfo::tgKinematicActuatorInfo(const tgKinematicActuator::Config& config) : 
 m_config(config),
-tgLinearStringInfo(config)
+tgBasicActuatorInfo(config)
 {}
 
-tgKinematicStringInfo::tgKinematicStringInfo(const tgKinematicString::Config& config, tgTags tags) : 
+tgKinematicActuatorInfo::tgKinematicActuatorInfo(const tgKinematicActuator::Config& config, tgTags tags) : 
 m_config(config),
-tgLinearStringInfo(config, tags)
+tgBasicActuatorInfo(config, tags)
 {}
 
-tgKinematicStringInfo::tgKinematicStringInfo(const tgKinematicString::Config& config, const tgPair& pair) :
+tgKinematicActuatorInfo::tgKinematicActuatorInfo(const tgKinematicActuator::Config& config, const tgPair& pair) :
 m_config(config),
-tgLinearStringInfo(config, pair)
+tgBasicActuatorInfo(config, pair)
 {}
     
 
-tgConnectorInfo* tgKinematicStringInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgKinematicActuatorInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgKinematicStringInfo(m_config, pair);
+    return new tgKinematicActuatorInfo(m_config, pair);
 }
 
-tgModel* tgKinematicStringInfo::createModel(tgWorld& world)
+tgModel* tgKinematicActuatorInfo::createModel(tgWorld& world)
 {
     // Don't have to do anything in the world for a Muscle2P...
     // @todo: set the name based on joined tags, or remove name from the model...
-    //std::cout << "tgKinematicStringInfo::createModel" << std::endl;
+    //std::cout << "tgKinematicActuatorInfo::createModel" << std::endl;
     
     // ensure connector has been initialized
-    assert(m_muscle2P);
-    return new tgKinematicString(m_muscle2P, getTags(), m_config);
+    assert(m_bulletSpringCable);
+    return new tgKinematicActuator(m_bulletSpringCable, getTags(), m_config);
 }
 

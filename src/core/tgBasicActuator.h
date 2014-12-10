@@ -16,20 +16,20 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_KINEMATIC_STRING_H
-#define TG_KINEMATIC_STRING_H
+#ifndef SRC_CORE_TG_BASIC_ACTUATOR_H
+#define SRC_CORE_TG_BASIC_ACTUATOR_H
 
 /**
- * @file tgKinematicString.h
- * @brief Contains the definition of class tgKinematicString.
- * @author Brian Mirletz
- * @date Dec 2014
+ * @file tgBasicActuator.h
+ * @brief Contains the definition of class tgBasicActuator.
+ * @author Brian Tietz
+ * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "core/tgModel.h"
-#include "core/tgSpringCableActuator.h"
+#include "tgModel.h"
+#include "tgSpringCableActuator.h"
 
 // Forward declarations
 class tgBulletSpringCable;
@@ -37,82 +37,28 @@ class tgModelVisitor;
 class tgWorld;
 
 // Should always be a child Model of a tgModel
-class tgKinematicString : public tgSpringCableActuator
+class tgBasicActuator : public tgSpringCableActuator
 {
 public: 
-	struct Config : public tgSpringCableActuator::Config
-	{
-		Config(double s = 1000.0,
-				double d = 10.0,
-				double p = 0.0,
-				double rad = 1.0,
-				double moFric = 0.0,
-				double moInert = 1.0,
-				bool back = false,
-				bool h = false,
-				double mf = 1000.0,
-				double tVel = 100.0,
-				double mxAcc = 10000.0,
-				double mnAL = 0.1,
-				double mnRL = 0.1,
-				double rot = 0);
-		
-		/**
-		 * Scale parameters that depend on the length of the simulation.
-		 * Centemeter scale has been used throughout many of the demos,
-		 * so those assumptions are baked into the default parameters.
-		*/  
-        void scale (double sf);
-		
-		/**
-		 * Units of length
-		 */
-		double radius;
-		
-		/**
-		 * This has units of length^2 * mass / sec as it gets
-		 * multiplied by speed when added to d-omega/dt
-		 * Therefore this is really a damping coefficent (B) not
-		 *  the unitless (mu)
-		 */
-		double motorFriction;
-		
-		/**
-		 * This has units of mass * length^2. If this and r are
-		 * both 1 its effectively a linear actuator
-		 */
-		double motorInertia;
-		
-		/**
-		 * Should probably have friction if this is true
-		 */
-		bool backdrivable;
-		/**
-		 * Convience values calculated from other values
-		 */
-		double maxOmega;
-		double maxDOmega;
-		double maxTorque;
-	};
-	
+
     /**
-     * Constructor using tags. Typically called in tgKinematicStringInfo.cpp 
+     * Constructor using tags. Typically called in tgBasicActuatorInfo.cpp 
      * @param[in] muscle The muscle2P object that this controls and logs.
-     * Set up in tgKinematicStringInfo.cpp
+     * Set up in tgBasicActuatorInfo.cpp
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      * @param[in] config Holds member variables like elasticity, damping
      * and motor parameters. See tgSpringCableActuator
      * @param[in] hist whether or not to log additional history @todo 
      * move hist to config
      */    
-    tgKinematicString(tgBulletSpringCable* muscle,
+    tgBasicActuator(tgBulletSpringCable* muscle,
            const tgTags& tags,
-           tgKinematicString::Config& config);
+           tgSpringCableActuator::Config& config);
     
     /**
      * Destructor deletes the tgBulletSpringCable
      */
-    virtual ~tgKinematicString();
+    virtual ~tgBasicActuator();
     
     /**
      * Notifies observers of setup, calls setup on children
@@ -144,35 +90,50 @@ public:
     /**
      * Functions for interfacing with muscle2P, and higher level controllers
      */
-     
     /**
-     * Return the appropreate values.
-     */
-    /**
-     * Returns the linearized velocity of the motor, as opposed to 
-     * tgLinearString which returns the velocity of the muscle material
-     */
-    virtual const double getVelocity() const;
-    
-    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
-    
-    /**
-     * Applies a linear torque-speed function to restrict the 
-     * available speeds and torques
-     */
-    virtual double getAppliedTorque(double desiredTorque) const;
-	
-	
-	/**
-	 * Set the value of m_desiredTorque for this timestep.
-	 * Value will be scaled by getAppliedTorque, so we don't have to
-	 * check it here.
+	 * Set the relevant control variable for this class, such as 
+	 * commanded position or torque
 	 */
 	virtual void setControlInput(double input);
 	
-protected:
+	/**
+	 * Secondary function for those classes which need to know how much
+	 * time has elapsed since they last recieved input (such as 
+	 * tgBasicActuator's moveMotors(dt) function)
+	 * This will silently fail if it is called erroneously
+	 */
+	virtual void setControlInput(double input, double dt);
+        
+    /**
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
+     * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
+     * @todo Refactor to setControlInput
+     */
+    void setRestLength(double newLength, float dt);
 	
-	virtual void integrateRestLength(double dt);
+    /**
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
+     * Does not call moveMotors.
+     * @todo Refactor to setControlInput
+     */
+    void setPrefLength(double newLength);
+
+    /**
+     * Directly set m_preferredLength (see base class tgSpringCableActuator)
+     * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.
+     * @todo Remove this - config can handle it now
+     */
+    void setRestLengthSingleStep(double newLength);
+    
+    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
+    
+    
+    /** Called from public functions, it makes the restLength get closer
+     * to preferredlength, according to config constraints.
+     */
+    virtual void moveMotors(double dt);
+
+
 private:
 
     /**
@@ -193,26 +154,6 @@ private:
      * Hold the previous value so history can be turned off
      */
     double prevVel;
-    
-    /**
-     * Units of rad/sec
-     */
-    double m_motorVel;
-    
-    /**
-     * Units of rad/sec^2
-     */
-    double m_motorAcc;
-	
-	/**
-	 * Units of torque (length^2 * mass / sec^2)
-	 */
-	double m_desiredTorque;
-    
-    /**
-     * Override the base config to get the extra parameters
-     */
-    tgKinematicString::Config m_config;
     
 };
 

@@ -26,7 +26,7 @@
 
 #include "tgTensionController.h"
 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgSpringCable.h"
 #include "core/tgCast.h"
 
@@ -35,7 +35,7 @@
 #include <stdexcept>
 #include <cstddef> // NULL keyword
 
-tgTensionController::tgTensionController(tgLinearString* controllable, double setPoint) :
+tgTensionController::tgTensionController(tgBasicActuator* controllable, double setPoint) :
 m_sca(controllable),
 tgBasicController(controllable, setPoint)
 {
@@ -87,7 +87,7 @@ void tgTensionController::control(double dt, double setPoint, double sensorData)
 	control(dt);
 }
 
-void tgTensionController::control(tgLinearString& sca, double dt, double setPoint)
+void tgTensionController::control(tgBasicActuator& sca, double dt, double setPoint)
 {
     if (dt <= 0.0)
 	{

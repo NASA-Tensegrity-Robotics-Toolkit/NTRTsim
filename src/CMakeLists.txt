@@ -11,8 +11,8 @@ subdirs(
     sensors
     tgcreator
     controllers
-    dev
-    examples
+    #dev
+    #examples
 )
 
 add_definitions(

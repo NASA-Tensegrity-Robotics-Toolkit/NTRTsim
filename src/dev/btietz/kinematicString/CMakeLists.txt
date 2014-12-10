@@ -1,8 +1,6 @@
 project(KinematicString)
 
 add_library( ${PROJECT_NAME} SHARED
-	tgKinematicString.cpp
-	tgKinematicStringInfo.cpp
 	tgSCASineControl.cpp
 )
 

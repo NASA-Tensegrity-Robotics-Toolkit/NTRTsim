@@ -33,7 +33,7 @@
 
 #include <string>
 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgTags.h"
 
 class tgBulletContactSpringCable;
@@ -47,14 +47,14 @@ public:
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgMultiPointStringInfo(const tgLinearString::Config& config);
+    tgMultiPointStringInfo(const tgBasicActuator::Config& config);
 
     /**
      * Construct a tgMultiPointStringInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgMultiPointStringInfo(const tgLinearString::Config& config, tgTags tags);
+    tgMultiPointStringInfo(const tgBasicActuator::Config& config, tgTags tags);
 
     /**
      * Construct a tgMultiPointStringInfo from its endpoints, radius and density.
@@ -63,7 +63,7 @@ public:
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgMultiPointStringInfo(const tgLinearString::Config& config, const tgPair& pair);
+    tgMultiPointStringInfo(const tgBasicActuator::Config& config, const tgPair& pair);
     
 
     virtual ~tgMultiPointStringInfo() {}
@@ -85,8 +85,8 @@ private:
     
 private:
     
-    tgLinearString::Config m_config;
-    tgBulletContactSpringCable* m_muscleNP;
+    tgBasicActuator::Config m_config;
+    tgBulletContactSpringCable* m_bulletContactSpringCable;
 };
 
 
