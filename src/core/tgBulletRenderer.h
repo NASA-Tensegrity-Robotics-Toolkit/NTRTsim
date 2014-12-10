@@ -30,7 +30,7 @@
 #include "tgModelVisitor.h"
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModel;
 class tgRod;
 class tgWorld;
@@ -53,7 +53,7 @@ public:
    * Render a tgLinearString.
    * @param[in] linearString a const reference to a tgLinearString to render
    */
-  virtual void render(const tgLinearString& linString) const;
+  virtual void render(const tgSpringCableActuator& mSCA) const;
  
   /**
    * Render a tgRod.

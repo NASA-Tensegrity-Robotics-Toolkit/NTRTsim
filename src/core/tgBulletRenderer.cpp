@@ -29,7 +29,7 @@
 #include "tgSpringCable.h"
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
-#include "tgLinearString.h"
+#include "tgSpringCableActuator.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
 
@@ -57,7 +57,7 @@ void tgBulletRenderer::render(const tgRod& rod) const
         // render the rod (change color, etc. if we want)
 }
 
-void tgBulletRenderer::render(const tgLinearString& linString) const
+void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("tgBulletRenderer::renderString");
@@ -68,7 +68,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
     
-    const tgSpringCable* const pSpringCable = linString.getSpringCable();
+    const tgSpringCable* const pSpringCable = mSCA.getSpringCable();
     
     if(pDrawer && pSpringCable)
     {
@@ -82,7 +82,7 @@ void tgBulletRenderer::render(const tgLinearString& linString) const
 			anchors[i+1]->getWorldPosition();
 		   // Should this be normalized??
 		  const double stretch = 
-			linString.getCurrentLength() - linString.getRestLength();
+			mSCA.getCurrentLength() - mSCA.getRestLength();
 		  const btVector3 color =
 			(stretch < 0.0) ?
 			btVector3(0.0, 0.0, 1.0) :
