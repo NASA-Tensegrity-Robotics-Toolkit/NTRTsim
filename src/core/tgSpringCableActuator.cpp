@@ -40,7 +40,6 @@ tgSpringCableActuator::Config::Config(double s,
                    bool h,
                    double mf,
                    double tVel,
-                   double mxAcc,
                    double mnAL,
                    double mnRL,
                    double rot) :
@@ -50,7 +49,6 @@ tgSpringCableActuator::Config::Config(double s,
   hist(h),
   maxTens(mf),
   targetVelocity(tVel),
-  maxAcc(mxAcc),
   minActualLength(mnAL),
   minRestLength(mnRL),
   rotation(rot)        
@@ -71,10 +69,6 @@ tgSpringCableActuator::Config::Config(double s,
     {
         throw std::invalid_argument("max tension is negative.");
     }
-    else if (maxAcc < 0.0)
-    {
-        throw std::invalid_argument("max acceleration is negative.");
-    }
     else if (mnAL < 0.0)
     {
         throw std::invalid_argument("min Actual Length is negative.");
@@ -94,7 +88,6 @@ void tgSpringCableActuator::Config::scale (double sf)
   pretension	  *= sf;
   maxTens         *= sf;
   targetVelocity  *= sf;
-  maxAcc          *= sf;
   minActualLength *= sf;
   minRestLength   *= sf;
 }
@@ -106,10 +99,6 @@ void tgSpringCableActuator::constructorAux()
     if (m_config.targetVelocity < 0.0)
     {
         throw std::invalid_argument("Target velocity is negative.");
-    }
-    else if (m_config.maxAcc < 0.0)
-    {
-        throw std::invalid_argument("Maximum acceleration is negative.");
     }
     else if (m_config.minActualLength < 0.0)
     {
@@ -200,7 +189,6 @@ bool tgSpringCableActuator::invariant() const
       // classes need to log
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
-      (m_config.maxAcc >= 0.0) &&
       (m_config.minActualLength >= 0.0) &&
       (m_preferredLength >= 0.0) &&
       (m_startLength >= 0.0);

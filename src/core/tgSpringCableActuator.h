@@ -60,7 +60,6 @@ public:
         bool h = false,
         double mf = 1000.0,
         double tVel = 100.0,
-        double mxAcc = 10000.0,
         double mnAL = 0.1,
         double mnRL = 0.1,
         double rot = 0);
@@ -125,14 +124,6 @@ public:
        * Must be nonnegative.
        */
       double targetVelocity;
-      
-      /**
-       * Maximum acceleration of the motor. This has the largest effect
-       * of the limits at small timesteps.
-       * Units are length/s^2
-       * Must be nonnegative
-       */
-      double maxAcc;
       
       /**
        * Actual length below which motor ceases to shorten.

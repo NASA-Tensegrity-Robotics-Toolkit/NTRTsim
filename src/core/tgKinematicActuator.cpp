@@ -50,18 +50,16 @@ tgKinematicActuator::Config::Config(double s,
 									bool h,
 									double mf,
 									double tVel,
-									double mxAcc,
 									double mnAL,
 									double mnRL,
 									double rot) :
 tgSpringCableActuator::Config::Config(s, d, p, h,
-							   mf, tVel, mxAcc, mnAL, mnRL, rot),
+							   mf, tVel, mnAL, mnRL, rot),
 radius(rad),
 motorFriction(moFric),
 motorInertia(moInert),
 backdrivable(back),
 maxOmega(tVel / rad),
-maxDOmega(mxAcc / rad),
 maxTorque(mf / rad)
 {
 	if (rad <= 0.0)
@@ -90,10 +88,6 @@ void tgKinematicActuator::constructorAux()
     else if (m_config.targetVelocity < 0.0)
     {
         throw std::invalid_argument("Target velocity is negative.");
-    }
-    else if (m_config.maxAcc < 0.0)
-    {
-        throw std::invalid_argument("Maximum acceleration is negative.");
     }
     else if (m_config.minActualLength < 0.0)
     {
@@ -245,7 +239,6 @@ bool tgKinematicActuator::invariant() const
       (m_springCable != NULL) &&
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
-      (m_config.maxAcc >= 0.0) &&
       (m_config.minActualLength >= 0.0) &&
       (m_preferredLength >= 0.0);
 }

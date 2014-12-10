@@ -37,8 +37,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#define ACCELERATION_CAP
-
 using namespace std;
 
 void tgBasicActuator::constructorAux()
@@ -53,10 +51,6 @@ void tgBasicActuator::constructorAux()
     else if (m_config.targetVelocity < 0.0)
     {
         throw std::invalid_argument("Target velocity is negative.");
-    }
-    else if (m_config.maxAcc < 0.0)
-    {
-        throw std::invalid_argument("Maximum acceleration is negative.");
     }
     else if (m_config.minActualLength < 0.0)
     {
@@ -216,8 +210,6 @@ void tgBasicActuator::moveMotors(double dt)
     // Reverse the sign if restLength >= preferredLength
     // Velocity limiter
     double stepSize = m_config.targetVelocity * dt;
-    // Acceleration limiter
-    const double velChange = m_config.maxAcc * dt;
     const double actualLength = m_springCable->getActualLength();
     const double mostRecentVelocity = m_prevVelocity;
     
@@ -240,41 +232,13 @@ void tgBasicActuator::moveMotors(double dt)
     (diff > 0))
     {
         if (abs(diff) > stepSize)
-    {
-        //Cap Velocity
-#ifdef ACCELERATION_CAP
-      if (abs((diff/fabsDiff) * m_config.targetVelocity -
-          mostRecentVelocity) >
-          velChange)
-      {
-          // Cap Acceleration
-          stepSize = velChange * dt;
-      }
-#endif      
-      m_restLength += (diff/fabsDiff)*stepSize;
-    }
-    else
-    {
-#ifdef ACCELERATION_CAP
-        if (abs(diff/dt - mostRecentVelocity) > velChange)
-        {
-            // Cap Acceleration
-            if (diff != 0) 
-            {
-              diff = (diff/fabsDiff) * velChange * dt;
-            }
-            else
-            { 
-                // If m_prevVelocity was zero, it would be smaller than
-                // velChange. Therefore preVelocity is valid for 
-                // figuring out direction
-              diff = -(mostRecentVelocity / abs(mostRecentVelocity)) *
-                     velChange * dt;
-            }
+        {      
+          m_restLength += (diff/fabsDiff)*stepSize;
         }
-#endif
-        m_restLength += diff;
-    }
+        else
+        {
+            m_restLength += diff;
+        }
     }
     
      m_restLength =
@@ -336,7 +300,6 @@ bool tgBasicActuator::invariant() const
       (m_springCable != NULL) &&
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
-      (m_config.maxAcc >= 0.0) &&
       (m_config.minActualLength >= 0.0) &&
       (m_preferredLength >= 0.0);
 }
