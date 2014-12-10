@@ -8,9 +8,9 @@ subdirs(
     tests
     #atil
     #steve
-    #kmorse
-    #apsabelhaus
-    #SpineHardwareProject
+    kmorse
+    apsabelhaus
+    SpineHardwareProject
     muscleNP
     #jbruce - waiting for feedback on T6TensionController
     CPG_feedback

@@ -25,7 +25,7 @@
 
 #include "tgDataLoggerLinearStringBasic.h"
 
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgCast.h"
 #include "core/tgTags.h"
 
@@ -55,13 +55,13 @@ void tgDataLoggerLinearStringBasic::setFileName(std::string fileName)
 
 // Check if the tgModel passed in is actually the type of object we
 // want to log.
-// TODO: make the string "tgLinearString" a const string or something somewhere,
+// TODO: make the string "tgSpringCableActuator" a const string or something somewhere,
 // so we only have to set it once as opposed to multiple places
 // for these various casts.
 bool tgDataLoggerLinearStringBasic::isThisMyLoggable(const tgModel* obj) const
 {
     bool result;
-    if(tgCast::cast<tgModel, tgLinearString>(obj) == 0)
+    if(tgCast::cast<tgModel, tgSpringCableActuator>(obj) == 0)
     {
         result = false;
     }
@@ -107,9 +107,9 @@ void tgDataLoggerLinearStringBasic::render(const tgModel& model) const
       tgOutput.open(m_fileName.c_str(), std::ios::app);
     
       // note that we need to cast here in order to access the actual methods
-      // within tgLinearString.
-      const tgLinearString* castedLinStr = 
-	tgCast::cast<tgModel, tgLinearString>(&model);
+      // within tgSpringCableActuator.
+      const tgSpringCableActuator* castedLinStr = 
+	tgCast::cast<tgModel, tgSpringCableActuator>(&model);
 
       tgOutput << castedLinStr->getRestLength() << ","    
 	       << castedLinStr->getCurrentLength() << ","

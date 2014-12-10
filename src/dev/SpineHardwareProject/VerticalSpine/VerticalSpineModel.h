@@ -36,7 +36,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 
 class VerticalSpineModel: public tgSubject<VerticalSpineModel>, public tgModel
 {
@@ -45,7 +45,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgBasicActuator*> > MuscleMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -84,9 +84,9 @@ public:
 	 * a string to a vector of muscles
 	 * @return a std::vector of pointers to the muscles found by the key
 	 */
-    const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
+    const std::vector<tgBasicActuator*>& getMuscles (const std::string& key) const;
      
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -101,10 +101,10 @@ public:
 private:
 	
 	/**
-	 * A std::vector containing all of the tgLinearStrings amongst
+	 * A std::vector containing all of the tgBasicActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 	
 	/**
 	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains

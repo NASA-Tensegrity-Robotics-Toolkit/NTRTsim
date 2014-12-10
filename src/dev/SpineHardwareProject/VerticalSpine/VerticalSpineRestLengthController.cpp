@@ -29,7 +29,7 @@
 // This application
 #include "VerticalSpineModel.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 // The C++ Standard Library
 #include <cassert>
@@ -49,40 +49,40 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 {
     // Do a one-time update of all cable rest lengths
     // First, get all muscles (cables)
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
     // get all vertical muscles
-    const std::vector<tgLinearString*> v_musclesA = subject.getMuscles("vertical a");
-    const std::vector<tgLinearString*> v_musclesB = subject.getMuscles("vertical b");
-    const std::vector<tgLinearString*> v_musclesC = subject.getMuscles("vertical c");
-    const std::vector<tgLinearString*> v_musclesD = subject.getMuscles("vertical d");
+    const std::vector<tgBasicActuator*> v_musclesA = subject.getMuscles("vertical a");
+    const std::vector<tgBasicActuator*> v_musclesB = subject.getMuscles("vertical b");
+    const std::vector<tgBasicActuator*> v_musclesC = subject.getMuscles("vertical c");
+    const std::vector<tgBasicActuator*> v_musclesD = subject.getMuscles("vertical d");
     
     // get saddle muscles and put them in individual vectors
-    const std::vector<tgLinearString*> s_muscles0 = subject.getMuscles(tgString("saddle", 0));
-    const std::vector<tgLinearString*> s_muscles1 = subject.getMuscles(tgString("saddle", 1));
-    const std::vector<tgLinearString*> s_muscles2 = subject.getMuscles(tgString("saddle", 2));
-    const std::vector<tgLinearString*> s_muscles3 = subject.getMuscles(tgString("saddle", 3));
+    const std::vector<tgBasicActuator*> s_muscles0 = subject.getMuscles(tgString("saddle", 0));
+    const std::vector<tgBasicActuator*> s_muscles1 = subject.getMuscles(tgString("saddle", 1));
+    const std::vector<tgBasicActuator*> s_muscles2 = subject.getMuscles(tgString("saddle", 2));
+    const std::vector<tgBasicActuator*> s_muscles3 = subject.getMuscles(tgString("saddle", 3));
     
     // set string length for vertical muscles
     for (size_t i = 0; i < v_musclesA.size(); ++ i)
     {
         // A
-        tgLinearString * const pMuscleA = v_musclesA[i];
+        tgBasicActuator * const pMuscleA = v_musclesA[i];
         assert(pMuscleA != NULL);
         pMuscleA->setRestLengthSingleStep(verticalRL);
         
         //B
-        tgLinearString * const pMuscleB = v_musclesB[i];
+        tgBasicActuator * const pMuscleB = v_musclesB[i];
         assert(pMuscleB != NULL);
         pMuscleB->setRestLengthSingleStep(verticalRL);
         
         //C
-        tgLinearString * const pMuscleC = v_musclesC[i];
+        tgBasicActuator * const pMuscleC = v_musclesC[i];
         assert(pMuscleC != NULL);
         pMuscleC->setRestLengthSingleStep(verticalRL);
         
         //D
-        tgLinearString * const pMuscleD = v_musclesD[i];
+        tgBasicActuator * const pMuscleD = v_musclesD[i];
         assert(pMuscleD != NULL);
         pMuscleD->setRestLengthSingleStep(verticalRL);
     }
@@ -93,22 +93,22 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
     {
         
         // 1
-        tgLinearString * const pMuscle1 = s_muscles0[i];
+        tgBasicActuator * const pMuscle1 = s_muscles0[i];
         assert(pMuscle1 != NULL);
         pMuscle1->setRestLengthSingleStep(saddleRL1);
         
         // 2
-        tgLinearString * const pMuscle2 = s_muscles1[i];
+        tgBasicActuator * const pMuscle2 = s_muscles1[i];
         assert(pMuscle2 != NULL);
         pMuscle2->setRestLengthSingleStep(saddleRL2);
         
         // 3
-        tgLinearString * const pMuscle3 = s_muscles2[i];
+        tgBasicActuator * const pMuscle3 = s_muscles2[i];
         assert(pMuscle3 != NULL);
         pMuscle3->setRestLengthSingleStep(saddleRL3);
         
         // 4
-        tgLinearString * const pMuscle4 = s_muscles3[i];
+        tgBasicActuator * const pMuscle4 = s_muscles3[i];
         assert(pMuscle4 != NULL);
         pMuscle4->setRestLengthSingleStep(saddleRL4);
     }
@@ -117,7 +117,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
    //    // first vertical
 //    for (size_t i = 0; i < 4; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //
 //        double desiredRestLength = verticalRL;
@@ -129,7 +129,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 //    // 1st saddle
 //    for (size_t i = 4; i < 8; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = saddleRL1;
@@ -141,7 +141,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 //    // 2nd vertical
 //    for (size_t i = 8; i < 12; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = verticalRL;
@@ -153,7 +153,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 //    // 2nd saddle
 //    for (size_t i = 12; i < 16; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = saddleRL2;
@@ -165,7 +165,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 //    // 3rd vertical
 //    for (size_t i = 16; i < 20; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = verticalRL;
@@ -177,7 +177,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
     // 3rd  saddle
 //    for (size_t i = 20; i < 24; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = saddleRL3;
@@ -189,7 +189,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
 //    // 4th vertical
 //    for (size_t i = 24; i < 28; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = verticalRL;
@@ -201,7 +201,7 @@ void VerticalSpineRestLengthController::onSetup(VerticalSpineModel& subject)
     // 4th  saddle
 //    for (size_t i = 28; i < 32; ++i)
 //    {
-//        tgLinearString * const pMuscle = muscles[i];
+//        tgBasicActuator * const pMuscle = muscles[i];
 //        assert(pMuscle != NULL);
 //        
 //        double desiredRestLength = saddleRL4;
@@ -223,40 +223,40 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
     {
         // Do a one-time update of all cable rest lengths
         // First, get all muscles (cables)
-        const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
         
         // get all vertical muscles
-        const std::vector<tgLinearString*> v_musclesA = subject.getMuscles("vertical a");
-        const std::vector<tgLinearString*> v_musclesB = subject.getMuscles("vertical b");
-        const std::vector<tgLinearString*> v_musclesC = subject.getMuscles("vertical c");
-        const std::vector<tgLinearString*> v_musclesD = subject.getMuscles("vertical d");
+        const std::vector<tgBasicActuator*> v_musclesA = subject.getMuscles("vertical a");
+        const std::vector<tgBasicActuator*> v_musclesB = subject.getMuscles("vertical b");
+        const std::vector<tgBasicActuator*> v_musclesC = subject.getMuscles("vertical c");
+        const std::vector<tgBasicActuator*> v_musclesD = subject.getMuscles("vertical d");
         
         // get saddle muscles and put them in individual vectors
-        const std::vector<tgLinearString*> s_muscles0 = subject.getMuscles(tgString("saddle", 0));
-        const std::vector<tgLinearString*> s_muscles1 = subject.getMuscles(tgString("saddle", 1));
-        const std::vector<tgLinearString*> s_muscles2 = subject.getMuscles(tgString("saddle", 2));
-        const std::vector<tgLinearString*> s_muscles3 = subject.getMuscles(tgString("saddle", 3));
+        const std::vector<tgBasicActuator*> s_muscles0 = subject.getMuscles(tgString("saddle", 0));
+        const std::vector<tgBasicActuator*> s_muscles1 = subject.getMuscles(tgString("saddle", 1));
+        const std::vector<tgBasicActuator*> s_muscles2 = subject.getMuscles(tgString("saddle", 2));
+        const std::vector<tgBasicActuator*> s_muscles3 = subject.getMuscles(tgString("saddle", 3));
         
         // set string length for vertical muscles
         for (size_t i = 0; i < v_musclesA.size(); ++ i)
         {
             // A
-            tgLinearString * const pMuscleA = v_musclesA[i];
+            tgBasicActuator * const pMuscleA = v_musclesA[i];
             assert(pMuscleA != NULL);
             pMuscleA->setRestLengthSingleStep(verticalRL);
             
             //B
-            tgLinearString * const pMuscleB = v_musclesB[i];
+            tgBasicActuator * const pMuscleB = v_musclesB[i];
             assert(pMuscleB != NULL);
             pMuscleB->setRestLengthSingleStep(verticalRL);
             
             //C
-            tgLinearString * const pMuscleC = v_musclesC[i];
+            tgBasicActuator * const pMuscleC = v_musclesC[i];
             assert(pMuscleC != NULL);
             pMuscleC->setRestLengthSingleStep(verticalRL);
             
             //D
-            tgLinearString * const pMuscleD = v_musclesD[i];
+            tgBasicActuator * const pMuscleD = v_musclesD[i];
             assert(pMuscleD != NULL);
             pMuscleD->setRestLengthSingleStep(verticalRL);
         }
@@ -267,22 +267,22 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
         {
             
             // 1
-            tgLinearString * const pMuscle1 = s_muscles0[i];
+            tgBasicActuator * const pMuscle1 = s_muscles0[i];
             assert(pMuscle1 != NULL);
             pMuscle1->setRestLengthSingleStep(saddleRL1);
             
             // 2
-            tgLinearString * const pMuscle2 = s_muscles1[i];
+            tgBasicActuator * const pMuscle2 = s_muscles1[i];
             assert(pMuscle2 != NULL);
             pMuscle2->setRestLengthSingleStep(saddleRL2);
             
             // 3
-            tgLinearString * const pMuscle3 = s_muscles2[i];
+            tgBasicActuator * const pMuscle3 = s_muscles2[i];
             assert(pMuscle3 != NULL);
             pMuscle3->setRestLengthSingleStep(saddleRL3);
             
             // 4
-            tgLinearString * const pMuscle4 = s_muscles3[i];
+            tgBasicActuator * const pMuscle4 = s_muscles3[i];
             assert(pMuscle4 != NULL);
             pMuscle4->setRestLengthSingleStep(saddleRL4);
         }
@@ -291,7 +291,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // first vertical
 //        for (size_t i = 0; i < 4; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = verticalRL;
@@ -303,7 +303,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 1st saddle
 //        for (size_t i = 4; i < 8; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = saddleRL1;
@@ -315,7 +315,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 2nd vertical
 //        for (size_t i = 8; i < 12; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = verticalRL;
@@ -327,7 +327,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 2nd saddle
 //        for (size_t i = 12; i < 16; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = saddleRL2;
@@ -339,7 +339,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 3rd vertical
 //        for (size_t i = 16; i < 20; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = verticalRL;
@@ -351,7 +351,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 3rd  saddle
 //        for (size_t i = 20; i < 24; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = saddleRL3;
@@ -363,7 +363,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 4th vertical
 //        for (size_t i = 24; i < 28; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = verticalRL;
@@ -375,7 +375,7 @@ void VerticalSpineRestLengthController::onStep(VerticalSpineModel& subject, doub
 //        // 4th  saddle
 //        for (size_t i = 28; i < 32; ++i)
 //        {
-//            tgLinearString * const pMuscle = muscles[i];
+//            tgBasicActuator * const pMuscle = muscles[i];
 //            assert(pMuscle != NULL);
 //            
 //            double desiredRestLength = saddleRL4;

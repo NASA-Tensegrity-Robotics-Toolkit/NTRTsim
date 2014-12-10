@@ -32,7 +32,7 @@
 
 // Forward declarations
 class tgModel;
-class tgLinearString;
+class tgSpringCableActuator;
 
 /**
  * This actual data logger is a tgModelVisitor, which has the methods
