@@ -25,10 +25,10 @@
 // This module
 #include "Escape_T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -67,7 +67,6 @@ namespace
         double rotation;  
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
     {
         0.825,    // density (kg / length^3)
@@ -83,8 +82,10 @@ namespace
         0.2,      // restitution (?)
         0,        // rotation
         5054,     // maxTens (dN)           // Ideally as low as 1000
-        10.0,     // targetVelocity (dm/s)  // Ideally as low as 2.6, can be 5.2
+        10.0     // targetVelocity (dm/s)  // Ideally as low as 2.6, can be 5.2
+#if (0) // Acceleration limit removed 12/10/14
         20000     // maxAcc
+#endif
     };
 } // namespace
 
@@ -124,10 +125,9 @@ Escape_T6Model::~Escape_T6Model() {}
 void Escape_T6Model::setup(tgWorld& world) {
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
             c.rollFriction, c.restitution);
-
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, 
-            c.pretension, c.history, c.maxTens, c.targetVelocity, 
-            c.maxAcc);
+/// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, 
+            c.pretension, c.history, c.maxTens, c.targetVelocity);
 
     // Start creating the structure
     tgStructure s;
@@ -138,7 +138,7 @@ void Escape_T6Model::setup(tgWorld& world) {
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -148,7 +148,7 @@ void Escape_T6Model::setup(tgWorld& world) {
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -186,7 +186,7 @@ void Escape_T6Model::teardown() {
     tgModel::teardown();
 }
                       
-const std::vector<tgLinearString*>& Escape_T6Model::getAllMuscles() const {
+const std::vector<tgBasicActuator*>& Escape_T6Model::getAllMuscles() const {
     return allMuscles;
 }
                                                      

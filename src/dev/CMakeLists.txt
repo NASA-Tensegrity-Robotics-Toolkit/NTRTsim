@@ -6,13 +6,13 @@ subdirs(
     btietz
     radams
     tests
-    #atil
-    #steve
+    atil
+    steve
     kmorse
     apsabelhaus
     SpineHardwareProject
     muscleNP
-    #jbruce - waiting for feedback on T6TensionController
+    jbruce
     CPG_feedback
 )
 

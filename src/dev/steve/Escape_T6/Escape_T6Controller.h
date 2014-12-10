@@ -34,7 +34,7 @@
 
 // Forward declarations
 class Escape_T6Model;
-class tgLinearString;
+class tgBasicActuator;
 
 //namespace std for vectors
 using namespace std;
@@ -74,7 +74,7 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgLinearString*> > clusters; 
+        vector<vector<tgBasicActuator*> > clusters; 
 
         // Sine Wave Data
         double* amplitude;

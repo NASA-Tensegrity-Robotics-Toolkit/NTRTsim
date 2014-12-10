@@ -33,7 +33,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -93,7 +93,7 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * Return a vector of all muscles for the controllers to work with.
          * @return A vector of all of the muscles
          */
-        const std::vector<tgLinearString*>& getAllMuscles() const;
+        const std::vector<tgBasicActuator*>& getAllMuscles() const;
 
         /**
          * Returns the center of mass of this model as an <x,y,z>
@@ -125,7 +125,7 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          
         /**
          * A function called during setup that creates muscles
-         * (tgLinearStrings) from the relevant nodes. 
+         * (tgBasicActuators) from the relevant nodes. 
          * Also collates muscles into clusters of 3 for actuation purposes
          * @param[in] s: A tgStructure that we're building into
          */
@@ -145,7 +145,7 @@ class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
          * A list of all of the muscles. Will be empty until most of the way
          * through setup
          */
-        std::vector<tgLinearString*> allMuscles;
+        std::vector<tgBasicActuator*> allMuscles;
         std::vector<btVector3> nodePositions;
 };
 
