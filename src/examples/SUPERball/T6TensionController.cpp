@@ -29,7 +29,7 @@
 // This application
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -55,12 +55,12 @@ T6TensionController::~T6TensionController()
 
 void T6TensionController::onSetup(T6Model& subject)
 {
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-    for (size_t i = 0; i < muscles.size(); ++i)
+    const std::vector<tgBasicActuator*> actuators = subject.getAllActuators();
+    for (size_t i = 0; i < actuators.size(); ++i)
     {
-        tgLinearString * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        tgTensionController* m_tensController = new tgTensionController(pMuscle, m_tension);
+        tgBasicActuator * const pActuator = actuators[i];
+        assert(pActuator != NULL);
+        tgTensionController* m_tensController = new tgTensionController(pActuator, m_tension);
         m_controllers.push_back(m_tensController);
     }
 

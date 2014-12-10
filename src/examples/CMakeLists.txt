@@ -5,7 +5,7 @@ subdirs(
     3_prism
     3_prism_serialize
     NestedTetrahedrons
-    #SUPERball
+    SUPERball
     #learningSpines
     testjson
 )
