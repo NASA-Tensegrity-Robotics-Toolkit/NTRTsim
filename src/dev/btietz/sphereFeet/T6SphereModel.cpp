@@ -25,16 +25,15 @@
 // This module
 #include "T6SphereModel.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "tgcreator/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -176,7 +175,7 @@ void T6SphereModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history,
+    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history,
 					    c.maxTens, c.targetVelocity, 
 					    c.maxAcc);
     
@@ -201,8 +200,8 @@ void T6SphereModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+    //spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     //spec.addBuilder("sphere1", new tgSphereInfo(sphereConfig));
     //spec.addBuilder("sphere2", new tgSphereInfo(sphereConfig));
     
@@ -214,7 +213,7 @@ void T6SphereModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -243,7 +242,7 @@ void T6SphereModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& T6SphereModel::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& T6SphereModel::getAllMuscles() const
 {
     return allMuscles;
 }

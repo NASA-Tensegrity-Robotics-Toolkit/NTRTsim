@@ -25,11 +25,11 @@
 // This module
 #include "CaterpillarModel.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -67,7 +67,6 @@ namespace
         bool   hist;
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
      0.688,    // density (kg / length^3)
@@ -79,11 +78,10 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0.0,        // pretension
+     919.5,        // pretension
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
-     20000     // maxAcc
 
      // Use the below values for earlier versions of simulation.
      // 1.006,    
@@ -295,9 +293,8 @@ void CaterpillarModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
 
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
+    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
+					    c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -319,7 +316,7 @@ void CaterpillarModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(caterpillar, spec);
@@ -329,7 +326,7 @@ void CaterpillarModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -358,7 +355,7 @@ void CaterpillarModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& CaterpillarModel::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& CaterpillarModel::getAllMuscles() const
 {
     return allMuscles;
 }

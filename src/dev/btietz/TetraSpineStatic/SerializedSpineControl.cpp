@@ -31,7 +31,8 @@
 #include "TetraSpineStaticModel.h"
 
 // NTRTSim
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgBaseRigid.h"
 #include "controllers/tgImpedanceController.h"
 #include "core/abstractMarker.h"
@@ -182,7 +183,7 @@ SerializedSpineControl::~SerializedSpineControl()
 }
 
 void SerializedSpineControl::applyImpedanceControlGeneric(tgImpedanceController* controller,	
-										const std::vector<tgLinearString*> stringList,
+										const std::vector<tgSpringCableActuator*> stringList,
 										const std::vector<double> stringLengths,
 										const std::vector<double> tensions,
 										double dt,
@@ -193,17 +194,19 @@ void SerializedSpineControl::applyImpedanceControlGeneric(tgImpedanceController*
 	
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		// This will reproduce the same value until simTime is updated. See onStep
+		tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(stringList[i]));
+        
+        // This will reproduce the same value until simTime is updated. See onStep
 		// TODO : consider making inside mod a parameter as well...
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = controller->controlTension(*(stringList[i]),
-																dt,
-																stringLengths[i],
-																tensions[i],
-																target
-																);
+        double setTension = controller->controlTension(m_sca,
+                                                        dt,
+                                                        stringLengths[i],
+                                                        tensions[i],
+                                                        target
+                                                        );
 #ifdef VERBOSE // Conditional compile for verbose control
         std::cout << "Top Outside String " << i << " com tension " << setTension
         << " act tension " << stringList[i]->getMuscle()->getTension()
@@ -220,7 +223,7 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 	
 
 	// Setup initial lengths
-	std::vector<tgLinearString*> stringList;
+	std::vector<tgSpringCableActuator*> stringList;
 
 	stringList = subject.getMuscles("inner top");
 	m_config.insideTopLength.clear();

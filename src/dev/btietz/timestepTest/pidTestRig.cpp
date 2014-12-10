@@ -25,18 +25,18 @@
 // This module
 #include "pidTestRig.h"
 // This library
-#include "dev/btietz/kinematicString/tgKinematicString.h"
-#include "dev/btietz/kinematicString/tgKinematicStringInfo.h"
+#include "core/tgKinematicActuator.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 #include "dev/btietz/kinematicString/tgSCASineControl.h"
 #include "controllers/tgPIDController.h"
 #include "controllers/tgImpedanceController.h"
 
 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -133,7 +133,7 @@ void pidTestRig::setupControl()
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgKinematicString* kinString = tgCast::cast<tgSpringCableActuator, tgKinematicString>(allMuscles[i]);
+		tgKinematicActuator* kinString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(allMuscles[i]);
 		assert(kinString);
 		
 		tgSCASineControl* sineController = new tgSCASineControl(controlStep,
@@ -181,13 +181,13 @@ void pidTestRig::setup(tgWorld& world)
     if (useKinematic)
     {
 		// Stiffness, damping, pretension, radius, friction
-		const tgKinematicString::Config muscleConfig(c.stiffness, c.damping, 2000.0, 1.0, 10.0);
-		spec.addBuilder("muscle", new tgKinematicStringInfo(muscleConfig));
+		const tgKinematicActuator::Config muscleConfig(c.stiffness, c.damping, 2000.0, 1.0, 10.0);
+		spec.addBuilder("muscle", new tgKinematicActuatorInfo(muscleConfig));
 	}
 	else
 	{
-		const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-		spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+		const tgBasicActuator::Config muscleConfig(c.stiffness, c.damping);
+		spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 	}
     
     // Create your structureInfo

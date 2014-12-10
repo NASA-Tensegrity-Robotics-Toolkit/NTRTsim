@@ -20,11 +20,12 @@
 #include "TetraSpineStaticModel_hf.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 #include "core/tgSphere.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -140,12 +141,12 @@ namespace
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-		muscleMap["inner left"]  = model.find<tgLinearString>("inner left muscle");
-		muscleMap["inner right"] = model.find<tgLinearString>("inner right muscle");
-		muscleMap["inner top"]   = model.find<tgLinearString>("inner top muscle");
-		muscleMap["outer left"]  = model.find<tgLinearString>("outer left muscle");
-		muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
-		muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
+		muscleMap["inner left"]  = model.find<tgSpringCableActuator>("inner left muscle");
+		muscleMap["inner right"] = model.find<tgSpringCableActuator>("inner right muscle");
+		muscleMap["inner top"]   = model.find<tgSpringCableActuator>("inner top muscle");
+		muscleMap["outer left"]  = model.find<tgSpringCableActuator>("outer left muscle");
+		muscleMap["outer right"] = model.find<tgSpringCableActuator>("outer right muscle");
+		muscleMap["outer top"]   = model.find<tgSpringCableActuator>("outer top muscle");
     }
 	
 	void addMarkers(tgStructure& structure, TetraSpineStaticModel_hf& model)
@@ -201,11 +202,11 @@ namespace
           << "Model: "        << std::endl
           << model            << std::endl;    
     // Showing the find function
-    const std::vector<tgLinearString*> outerMuscles =
-        model.find<tgLinearString>("outer");
+    const std::vector<tgSpringCableActuator*> outerMuscles =
+        model.find<tgSpringCableActuator>("outer");
     for (size_t i = 0; i < outerMuscles.size(); ++i)
     {
-        const tgLinearString* const pMuscle = outerMuscles[i];
+        const tgSpringCableActuator* const pMuscle = outerMuscles[i];
         assert(pMuscle != NULL);
         std::cout << "Outer muscle: " << *pMuscle << std::endl;
     }
@@ -282,11 +283,12 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     spec.addBuilder("PCB num2", new tgSphereInfo(PCB_2_Config));
     
     // Two different string configs
-    tgLinearString::Config muscleConfig(229.16 * 2.0, 20, 0.0, true, 5000, 7.0, 9500, 10.0, 10.0);
-    tgLinearString::Config muscleConfig2(229.16, 20, 0.0, true, 5000, 7.0, 9500, 10.0, 10.0);
-    spec.addBuilder("top muscle", new tgLinearStringInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgLinearStringInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgLinearStringInfo(muscleConfig2));
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
+    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
+    spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
+    spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
+    spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -296,7 +298,7 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    m_allMuscles = this->find<tgLinearString> ("muscle");
+    m_allMuscles = this->find<tgSpringCableActuator> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
     
@@ -340,7 +342,9 @@ std::vector<double> TetraSpineStaticModel_hf::getStringMaxTensions() const
 	 */
     for(int i=0; i<m_allMuscles.size(); i++)
     {
-        tgSpringCableActuator::SpringCableActuatorHistory stringHist = m_allMuscles[i]->getHistory();
+        tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(m_allMuscles[i]));
+        
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = m_sca.getHistory();
         std::deque<double>& tensionHist = stringHist.tensionHistory;
         maxTens.push_back( *(std::max_element(tensionHist.begin(), tensionHist.end())) );
     }

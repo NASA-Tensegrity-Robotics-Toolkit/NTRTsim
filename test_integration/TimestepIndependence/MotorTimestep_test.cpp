@@ -126,7 +126,7 @@ namespace {
 				
 				std::cout << "Original Restlength " << finalLength << " New restlength: " << newLength << std::endl;
 				
-				EXPECT_NEAR(finalLength, newLength, 0.2); 
+				EXPECT_NEAR(finalLength, newLength, 0.03); 
 				
 				simulation.reset();
 				view.setStepSize(1.0/5000.0);
@@ -143,7 +143,7 @@ namespace {
 				std::cout << "Original Restlength " << finalLength << " New restlength: " << thirdLength << std::endl;
 				
 				// This value allows for multiple scales (error slightly higher with higher gravity
-				EXPECT_NEAR(thirdLength, finalLength, 0.04); 
+				EXPECT_NEAR(thirdLength, finalLength, 0.03); 
 	}
 
 	TEST_F(MotorTest, LinearMotor) {
@@ -194,7 +194,7 @@ namespace {
 				
 				std::cout << "Original Restlength " << finalLength << " New restlength: " << newLength << std::endl;
 				
-				EXPECT_NEAR(finalLength, newLength, 0.2); 
+				EXPECT_NEAR(finalLength, newLength, 0.03); 
 				
 				simulation.reset();
 				view.setStepSize(1.0/5000.0);
@@ -211,7 +211,7 @@ namespace {
 				std::cout << "Original Restlength " << finalLength << " New restlength: " << thirdLength << std::endl;
 				
 				/// @todo Fix acceleation problem in tgLinear string, tighten the bounds on this to rounding error
-				EXPECT_NEAR(thirdLength, finalLength, 5); 
+				EXPECT_NEAR(thirdLength, finalLength, 0.03); 
 	}
 
 } // namespace

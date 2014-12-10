@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgMultiPointStringInfo.h
- * @brief Definition of class tgMultiPointStringInfo
+ * @file tgBasicContactCableInfo.h
+ * @brief Definition of class tgBasicContactCableInfo
  * @author Brian Mirletz and Ryan Adams
  * @date October 2014
  * $Id$
  */
 
-#ifndef TG_MULTIPOINT_STRING_INFO_H
-#define TG_MULTIPOINT_STRING_INFO_H
+#ifndef SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H
+#define SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H
 
 #include "tgcreator/tgConnectorInfo.h"
 
@@ -38,35 +38,35 @@
 
 class tgBulletContactSpringCable;
 
-class tgMultiPointStringInfo : public tgConnectorInfo
+class tgBasicContactCableInfo : public tgConnectorInfo
 {
 public:
 
     /**
-     * Construct a tgMultiPointStringInfo with just a config. The pair must be filled in 
+     * Construct a tgBasicContactCableInfo with just a config. The pair must be filled in 
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgMultiPointStringInfo(const tgBasicActuator::Config& config);
+    tgBasicContactCableInfo(const tgBasicActuator::Config& config);
 
     /**
-     * Construct a tgMultiPointStringInfo with just a config and tags. The pair must 
+     * Construct a tgBasicContactCableInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgMultiPointStringInfo(const tgBasicActuator::Config& config, tgTags tags);
+    tgBasicContactCableInfo(const tgBasicActuator::Config& config, tgTags tags);
 
     /**
-     * Construct a tgMultiPointStringInfo from its endpoints, radius and density.
+     * Construct a tgBasicContactCableInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgMultiPointStringInfo(const tgBasicActuator::Config& config, const tgPair& pair);
+    tgBasicContactCableInfo(const tgBasicActuator::Config& config, const tgPair& pair);
     
 
-    virtual ~tgMultiPointStringInfo() {}
+    virtual ~tgBasicContactCableInfo() {}
     
     /**
      * Create a tgConnectorInfo* from a tgPair
@@ -90,4 +90,4 @@ private:
 };
 
 
-#endif
+#endif // SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H

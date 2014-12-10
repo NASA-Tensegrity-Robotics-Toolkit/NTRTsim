@@ -25,14 +25,13 @@
 // This module
 #include "tsTestRig.h"
 // This library
-#include "dev/btietz/kinematicString/tgKinematicString.h"
-#include "dev/btietz/kinematicString/tgKinematicStringInfo.h"
+#include "core/tgKinematicActuator.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 
-#include "controllers/PretensionController.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -137,13 +136,13 @@ void tsTestRig::setup(tgWorld& world)
     
     if (useKinematic)
     {
-		const tgKinematicString::Config muscleConfig(c.stiffness, c.damping);
-		spec.addBuilder("muscle", new tgKinematicStringInfo(muscleConfig));
+		const tgKinematicActuator::Config muscleConfig(c.stiffness, c.damping);
+		spec.addBuilder("muscle", new tgKinematicActuatorInfo(muscleConfig));
 	}
 	else
 	{
-		const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
-		spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+		const tgBasicActuator::Config muscleConfig(c.stiffness, c.damping);
+		spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 	}
     
     // Create your structureInfo
@@ -178,14 +177,22 @@ void tsTestRig::step(double dt)
         totalTime += dt;
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
-        tgModel::step(dt);  // Step any children
-        /// @todo update this so it works with a controller or write a controller!!
-        allMuscles[0]->setControlInput(5.0);
+        
+        if (useKinematic)
+        {
+            allMuscles[0]->setControlInput(-580.0);
+        }
+        else
+        {
+            allMuscles[0]->setControlInput(5.0, dt);
+        }
         if (allMuscles[0]->getRestLength() <= 5.0 && !reached)
         {
 			std::cout << "Rest length below 5.0 at: " << totalTime << std::endl;
 			reached = true;
 		}
+        
+        tgModel::step(dt);  // Step any children
 		//std::cout << allMuscles[0]->getRestLength() << std::endl;
     }
     

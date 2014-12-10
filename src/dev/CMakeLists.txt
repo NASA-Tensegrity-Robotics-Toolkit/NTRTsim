@@ -2,15 +2,15 @@ Project(Dev)
 
 # Add additional dev directories here.
 subdirs(
-    axydes
+    #axydes
     btietz
-    radams
-    tests
-    atil
-    steve
-    kmorse
-    apsabelhaus
-    SpineHardwareProject
+    #radams
+    #tests
+    #atil
+    #steve
+    #kmorse
+    #apsabelhaus
+    #SpineHardwareProject
     muscleNP
     #jbruce - waiting for feedback on T6TensionController
     CPG_feedback

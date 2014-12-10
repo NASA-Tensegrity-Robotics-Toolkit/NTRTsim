@@ -20,18 +20,17 @@
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "core/tgBaseRigid.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "tgcreator/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 
 #include "core/tgBulletSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
@@ -93,11 +92,8 @@ void MuscleNPCons::setup(tgWorld& world)
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
 	spec.addBuilder("box", new tgBoxInfo(boxConfig));
 	spec.addBuilder("rod", new tgRodInfo(rodConfig));
-#if (1)
-	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-#else
-	spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-#endif
+	spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+
 	// Create your structureInfo
 	tgStructureInfo structureInfo(s, spec);
 	// Use the structureInfo to build ourselves
@@ -106,7 +102,7 @@ void MuscleNPCons::setup(tgWorld& world)
 	// models (e.g. muscles) that we want to control.
 	allRods.clear();
 	allMuscles.clear();
-	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+	allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 	allRods = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
 	
 	btRigidBody* body = allRods[0]->getPRigidBody();

@@ -33,7 +33,8 @@
 // Should include tgString, but compiler complains since its been
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
+#include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
@@ -141,7 +142,9 @@ void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgSpringCableActuator* > tmpSCAs = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(tmpSCAs);
+
     for(int i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
@@ -175,7 +178,7 @@ void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
 
 void OctaCLSine::setupWaves(BaseSpineModelLearning& subject, array_2D nodeActions, array_2D edgeActions)
 {
-	std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     double tension;
     double kPosition;

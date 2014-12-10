@@ -20,6 +20,7 @@
 
 #include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
+#include "core/tgBasicActuator.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -38,10 +39,13 @@ tgCPGStringControl_mod::~tgCPGStringControl_mod()
 
 }
 
-void tgCPGStringControl_mod::onStep(tgLinearString& subject, double dt)
+void tgCPGStringControl_mod::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
+    
+    tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(subject));
+    
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
     if (m_controlTime >= m_controlStep)
@@ -49,16 +53,16 @@ void tgCPGStringControl_mod::onStep(tgLinearString& subject, double dt)
 		// Encoder inversion for hardware comparison.
 		if (m_nodeNumber == 2 || m_nodeNumber == 4 || m_nodeNumber == 5 || m_nodeNumber == 6 || m_nodeNumber == 7 || m_nodeNumber == 8||m_nodeNumber == 9|| m_nodeNumber == 10 )
 		{
-			m_commandedTension = motorControl().control(subject, m_controlTime, controlLength(), -getCPGValue());
+			m_commandedTension = motorControl().control(m_sca, m_controlTime, controlLength(), -getCPGValue());
 		}
 		else
 		{
-			m_commandedTension = motorControl().control(subject, m_controlTime, controlLength(), getCPGValue());
+			m_commandedTension = motorControl().control(m_sca, m_controlTime, controlLength(), getCPGValue());
 		}
         m_controlTime = 0;
     }
     else
     {
-		subject.moveMotors(dt);
+		m_sca.moveMotors(dt);
 	}
 }

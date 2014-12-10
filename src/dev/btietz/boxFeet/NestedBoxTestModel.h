@@ -36,7 +36,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 
 /**
  * The NestedBoxTestModel implements a tensegrity with rigid
@@ -50,7 +50,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -89,7 +89,7 @@ public:
 	 * a string to a vector of muscles
 	 * @return a std::vector of pointers to the muscles found by the key
 	 */
-    const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
+    const std::vector<tgSpringCableActuator*>& getMuscles (const std::string& key) const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -104,10 +104,10 @@ public:
 private:
 	
 	/**
-	 * A std::vector containing all of the tgLinearStrings amongst
+	 * A std::vector containing all of the tgSpringCableActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
 	
 	/**
 	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains

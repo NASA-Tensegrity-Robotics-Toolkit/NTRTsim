@@ -37,7 +37,7 @@
 
 // Forward Declarations
 class tgImpedanceController;
-class tgLinearString;
+class tgSpringCableActuator;
 class BaseSpineModelLearning;
 
 /**
@@ -150,7 +150,7 @@ private:
      * Because sometimes you give up and specify everything
      */
     void applyImpedanceControlGeneric(tgImpedanceController* controller,	
-										const std::vector<tgLinearString*> stringList,
+										const std::vector<tgSpringCableActuator*> stringList,
 										const std::vector<double> stringLengths,
 										const std::vector<double> tensions,
 										double dt,

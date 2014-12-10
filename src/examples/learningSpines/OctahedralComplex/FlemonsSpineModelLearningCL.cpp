@@ -33,7 +33,7 @@
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
-#include "tgcreator/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -193,8 +193,8 @@ void FlemonsSpineModelLearningCL::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     #if (1)
-    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-    spec.addBuilder("muscle2", new tgMultiPointStringInfo(stringConfig));
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgBasicContactCableInfo(stringConfig));
     #else
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     spec.addBuilder("muscle2", new tgBasicActuatorInfo(stringConfig));

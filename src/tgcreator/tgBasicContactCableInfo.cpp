@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgMultiPointStringInfo.cpp
+ * @file tgBasicContactCableInfo.cpp
  * @brief Implementation of class tgBasicActuatorInfo
  * @author Brian Mirletz and Ryan Adams
  * @date October 2014
  * $Id$
  */
 
-#include "tgMultiPointStringInfo.h"
+#include "tgBasicContactCableInfo.h"
 
 #include "core/tgBulletContactSpringCable.h"
 
@@ -38,52 +38,52 @@
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config) : 
+tgBasicContactCableInfo::tgBasicContactCableInfo(const tgBasicActuator::Config& config) : 
 m_config(config),
 tgConnectorInfo()
 {}
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config, tgTags tags) : 
+tgBasicContactCableInfo::tgBasicContactCableInfo(const tgBasicActuator::Config& config, tgTags tags) : 
 m_config(config),
 tgConnectorInfo(tags)
 {}
 
-tgMultiPointStringInfo::tgMultiPointStringInfo(const tgBasicActuator::Config& config, const tgPair& pair) :
+tgBasicContactCableInfo::tgBasicContactCableInfo(const tgBasicActuator::Config& config, const tgPair& pair) :
 m_config(config),
 tgConnectorInfo(pair)
 {}
     
 
-tgConnectorInfo* tgMultiPointStringInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgBasicContactCableInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgMultiPointStringInfo(m_config, pair);
+    return new tgBasicContactCableInfo(m_config, pair);
 }
 
-void tgMultiPointStringInfo::initConnector(tgWorld& world)
+void tgBasicContactCableInfo::initConnector(tgWorld& world)
 {
     // Note: tgBulletContactSpringCable holds pointers to things in the world, but it doesn't actually have any in-world representation.
     m_bulletContactSpringCable = createTgBulletContactSpringCable(world);
 }
 
-tgModel* tgMultiPointStringInfo::createModel(tgWorld& world)
+tgModel* tgBasicContactCableInfo::createModel(tgWorld& world)
 {
     // Don't have to do anything in the world for a tgBulletContactSpringCable...
     // @todo: set the name based on joined tags, or remove name from the model...
-    //std::cout << "tgMultiPointStringInfo::createModel" << std::endl;
+    //std::cout << "tgBasicContactCableInfo::createModel" << std::endl;
     
     // ensure connector has been initialized
     assert(m_bulletContactSpringCable);
     return new tgBasicActuator(m_bulletContactSpringCable, getTags(), m_config);
 }
 
-double tgMultiPointStringInfo::getMass() 
+double tgBasicContactCableInfo::getMass() 
 {
     // @todo: calculate a mass? tgBulletContactSpringCable doesn't have mass...
     return 0;
 }
 
 
-tgBulletContactSpringCable* tgMultiPointStringInfo::createTgBulletContactSpringCable(tgWorld& world)
+tgBulletContactSpringCable* tgBasicContactCableInfo::createTgBulletContactSpringCable(tgWorld& world)
 {
     //std::cout << "tgBasicActuatorInfo::createtgBulletContactSpringCable()" << std::endl;
     
