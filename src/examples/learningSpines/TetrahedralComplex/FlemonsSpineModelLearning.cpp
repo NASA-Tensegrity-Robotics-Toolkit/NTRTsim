@@ -29,10 +29,10 @@
 #include "FlemonsSpineModelLearning.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -69,7 +69,8 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    tgLinearString::Config muscleConfig(1000, 10, 0.0, false, 7000, 12, 4000);
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfig(1000, 10, 0.0, false, 7000, 12);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -143,7 +144,7 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
 #if (1)
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif
     
     // Create your structureInfo
@@ -153,7 +154,7 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // Setup vectors for control
-    m_allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
     

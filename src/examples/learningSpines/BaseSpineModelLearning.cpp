@@ -28,7 +28,7 @@
 #include "BaseSpineModelLearning.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgBaseRigid.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
@@ -78,7 +78,7 @@ void BaseSpineModelLearning::step(double dt)
     tgModel::step(dt);  // Step any children
 }
 
-const std::vector<tgLinearString*>&
+const std::vector<tgSpringCableActuator*>&
 BaseSpineModelLearning::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = m_muscleMap.find(key);
@@ -92,7 +92,7 @@ BaseSpineModelLearning::getMuscles (const std::string& key) const
     }
 }
 
-const std::vector<tgLinearString*>& BaseSpineModelLearning::getAllMuscles()
+const std::vector<tgSpringCableActuator*>& BaseSpineModelLearning::getAllMuscles()
 {
     return m_allMuscles;
 }

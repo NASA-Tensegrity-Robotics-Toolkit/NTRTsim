@@ -32,7 +32,8 @@
 // Should include tgString, but compiler complains since its been
 // included from BaseSpineModelLearning. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "tgCPGStringControl.h"
 
@@ -203,7 +204,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
 void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
-    std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+    std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
@@ -299,7 +300,8 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgSpringCableActuator* > tmpSCAs = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(tmpSCAs);
     for(int i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();

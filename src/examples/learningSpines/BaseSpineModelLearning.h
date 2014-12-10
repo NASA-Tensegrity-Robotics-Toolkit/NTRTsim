@@ -37,7 +37,7 @@
 
 class tgWorld;
 class tgStructureInfo;
-class tgLinearString;
+class tgSpringCableActuator;
 class tgBaseRigid;
 
 /**
@@ -49,7 +49,7 @@ class BaseSpineModelLearning: public tgSubject<BaseSpineModelLearning>,
 {
 public: 
 	
-	typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+	typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
 	
     virtual ~BaseSpineModelLearning();
     
@@ -61,9 +61,9 @@ public:
     
     virtual std::vector<double> getSegmentCOM(const int n) const;
       
-    virtual const std::vector<tgLinearString*>& getMuscles(const std::string& key) const;
+    virtual const std::vector<tgSpringCableActuator*>& getMuscles(const std::string& key) const;
     
-    virtual const std::vector<tgLinearString*>& getAllMuscles();
+    virtual const std::vector<tgSpringCableActuator*>& getAllMuscles();
     
     virtual const std::vector<tgBaseRigid*> getAllRigids();
     
@@ -78,7 +78,7 @@ protected:
 	
 	BaseSpineModelLearning(int segments);
 	
-    std::vector<tgLinearString*> m_allMuscles;
+    std::vector<tgSpringCableActuator*> m_allMuscles;
 	
     std::vector<tgModel*> m_allSegments;
 
