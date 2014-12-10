@@ -33,7 +33,7 @@
 // Should include tgString, but compiler complains since its been
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
@@ -57,7 +57,7 @@ BaseSpineCPGControl(config, args, resourcePath, ec, nc)
 
 void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
-	std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {

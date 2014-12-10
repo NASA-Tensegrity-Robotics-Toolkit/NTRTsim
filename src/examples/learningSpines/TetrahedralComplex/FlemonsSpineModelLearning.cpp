@@ -56,10 +56,6 @@ FlemonsSpineModelLearning::~FlemonsSpineModelLearning()
 
 void FlemonsSpineModelLearning::setup(tgWorld& world)
 {
-    // This is basically a manual setup of a model.
-    // There are things that do this for us
-    /// @todo: reference the things that do this for us
-
     // Rod and Muscle configuration
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2/300.0;

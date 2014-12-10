@@ -18,8 +18,8 @@ add_library(${PROJECT_NAME} SHARED
             tgCPGLogger.cpp
             )
 
-subdirs(    #OctahedralComplex
-    #ribDemo
+subdirs(    OctahedralComplex
+    ribDemo
     TetrahedralComplex
-    #TetraSpine
+    TetraSpine
     )

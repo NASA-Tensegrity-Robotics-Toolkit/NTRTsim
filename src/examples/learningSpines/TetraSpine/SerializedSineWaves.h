@@ -36,7 +36,7 @@
 
 // Forward Declarations
 class tgImpedanceController;
-class tgLinearString;
+class tgSpringCableActuator;
 class BaseSpineModelLearning;
 
 /**
@@ -114,7 +114,7 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlInside(const std::vector<tgSpringCableActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase);
     /**
@@ -126,7 +126,7 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */                                    
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlOutside(const std::vector<tgSpringCableActuator*> stringList,
                                     double dt,
                                     std::size_t phase);
     

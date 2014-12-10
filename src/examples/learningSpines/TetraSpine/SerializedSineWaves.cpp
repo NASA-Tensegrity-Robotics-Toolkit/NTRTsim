@@ -31,9 +31,11 @@
 #include "TetraSpineLearningModel.h"
 
 // NTRTSim
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "tgcreator/tgUtil.h"
+#include "core/tgCast.h"
+#include "core/tgBasicActuator.h"
 
 // The C++ Standard Library
 #include <stdexcept>
@@ -114,18 +116,20 @@ SerializedSineWaves::~SerializedSineWaves()
 {
 }
 
-void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgSpringCableActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase)
 {
-    for(std::size_t i = 0; i < stringList.size(); i++)
+    std::vector<tgBasicActuator* > stringList_ba = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(stringList);
+    
+    for(std::size_t i = 0; i < stringList_ba.size(); i++)
     {
 		// This will reproduce the same value until simTime is updated. See onStep
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
 		
-        double setTension = m_config.in_controller->control(*(stringList[i]),
+        double setTension = m_config.in_controller->control(*(stringList_ba[i]),
 																dt,
 																m_config.insideLength,
 																m_config.insideMod * target
@@ -138,17 +142,19 @@ void SerializedSineWaves::applyImpedanceControlInside(const std::vector<tgLinear
     }    
 }
 
-void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+void SerializedSineWaves::applyImpedanceControlOutside(const std::vector<tgSpringCableActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase)
 {
-    for(std::size_t i = 0; i < stringList.size(); i++)
+    std::vector<tgBasicActuator* > stringList_ba = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(stringList);
+    
+    for(std::size_t i = 0; i < stringList_ba.size(); i++)
     {
 		// This will reproduce the same value until simTime is updated. See onStep
         cycle = sin(simTime * m_config.cpgFrequency + 2 * m_config.bodyWaves * M_PI * i / (segments) + m_config.phaseOffsets[phase]);
         target = m_config.offsetSpeed + cycle*m_config.cpgAmplitude;
         
-        double setTension = m_config.out_controller->control(*(stringList[i]),
+        double setTension = m_config.out_controller->control(*( stringList_ba[i]),
 																dt,
 																m_config.outsideLength,
 																target

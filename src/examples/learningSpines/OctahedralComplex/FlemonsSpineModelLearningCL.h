@@ -32,7 +32,6 @@
 
 class tgWorld;
 class tgStructureInfo;
-class tgLinearString;
 
 /**
  * This class implements the octahedral complex tensegrity spine
@@ -52,9 +51,6 @@ public:
         
     virtual void step(double dt);
     
-   
-private:
-    std::vector<tgLinearString*> reflexMuscles;
 };
 
 #endif // FLEMONS_SPINE_MODEL_H
