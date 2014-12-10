@@ -114,7 +114,7 @@ protected:
     double m_totalTime;
     
     double m_commandedTension;
-private:    
+ 
     btRigidBody* m_pFromBody;
     
     btRigidBody* m_pToBody;
