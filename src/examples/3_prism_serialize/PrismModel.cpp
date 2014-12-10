@@ -26,10 +26,10 @@
 #include "PrismModel.h"
 // This library
 #include "controllers/PretensionController.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -72,19 +72,18 @@ namespace
         10.0,     // triangle_length (length)
         10.0,     // triangle_height (length)
         20.0,     // prism_height (length)
-        0.05      // Pretension (percentage)
+        500.0      // Pretension (mass * length / sec^2)
     };
 } // namespace
 
 PrismModel::PrismModel() :
-    m_pStringController(new PretensionController(c.pretension)),
     tgModel() 
 {
 }
 
 PrismModel::~PrismModel()
 {
-    delete m_pStringController;
+
 }
 
 void PrismModel::addNodes(tgStructure& tetra,
@@ -113,29 +112,29 @@ void PrismModel::addRods(tgStructure& s)
     s.addPair( 2,  3, "rod");
 }
 
-void PrismModel::addMuscles(tgStructure& s)
+void PrismModel::addActuators(tgStructure& s)
 {
     // Bottom Triangle
-    s.addPair(0, 1,  "muscle");
-    s.addPair(1, 2,  "muscle");
-    s.addPair(2, 0,  "muscle");
+    s.addPair(0, 1,  "actuator");
+    s.addPair(1, 2,  "actuator");
+    s.addPair(2, 0,  "actuator");
 
     // Top
-    s.addPair(3, 4, "muscle");
-    s.addPair(4, 5,  "muscle");
-    s.addPair(5, 3,  "muscle");
+    s.addPair(3, 4, "actuator");
+    s.addPair(4, 5,  "actuator");
+    s.addPair(5, 3,  "actuator");
 
     //Edges
-    s.addPair(0, 3, "muscle");
-    s.addPair(1, 4,  "muscle");
-    s.addPair(2, 5,  "muscle");
+    s.addPair(0, 3, "actuator");
+    s.addPair(1, 4,  "actuator");
+    s.addPair(2, 5,  "actuator");
 }
 
 void PrismModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     const tgRod::Config rodConfig(c.radius, c.density);
-    const tgLinearString::Config muscleConfig(c.stiffness, c.damping);
+    const tgBasicActuator::Config actuatorConfig(c.stiffness, c.damping, c.pretension);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -167,8 +166,8 @@ void PrismModel::setup(tgWorld& world)
     // Add rods to the structure
     addRods(s);
 
-    // Add muscles to the structure
-    addMuscles(s);
+    // Add actuators to the structure
+    addActuators(s);
 
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
@@ -176,7 +175,7 @@ void PrismModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -185,15 +184,8 @@ void PrismModel::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the
-    // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-
-    // Then attach the pretension controller to each of these muscles to keep
-    // the tensegrity's shape
-    for (std::size_t i = 0; i < allMuscles.size(); i++)
-    {
-        allMuscles[i]->attach(m_pStringController);
-    }
+    // models (e.g. actuators) that we want to control. 
+    allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
     // Notify controllers that setup has finished.
     notifySetup();
@@ -223,9 +215,9 @@ void PrismModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& PrismModel::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& PrismModel::getAllActuators() const
 {
-    return allMuscles;
+    return allActuators;
 }
 
 void PrismModel::teardown()

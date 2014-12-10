@@ -12,7 +12,7 @@ subdirs(
     tgcreator
     controllers
     #dev
-    #examples
+    examples
 )
 
 add_definitions(

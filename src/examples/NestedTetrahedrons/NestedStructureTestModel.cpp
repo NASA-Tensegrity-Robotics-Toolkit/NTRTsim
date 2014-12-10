@@ -27,10 +27,10 @@
 #include "NestedStructureTestModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -90,8 +90,8 @@ namespace
         }
     }
 
-    // Add muscles that connect the segments
-    void addMuscles(tgStructure& snake)
+    // Add actuators that connect the segments
+    void addActuators(tgStructure& snake)
     {
         const std::vector<tgStructure*> children = snake.getChildren();
             for (size_t i = 1; i < children.size(); ++i)
@@ -99,27 +99,27 @@ namespace
                 tgNodes n0 = children[i-1]->getNodes();
                 tgNodes n1 = children[i  ]->getNodes();
 
-                snake.addPair(n0[0], n1[0], "outer right muscle");
-                snake.addPair(n0[1], n1[1], "outer left muscle");
-                snake.addPair(n0[2], n1[2], "outer top muscle");
+                snake.addPair(n0[0], n1[0], "outer right actuator");
+                snake.addPair(n0[1], n1[1], "outer left actuator");
+                snake.addPair(n0[2], n1[2], "outer top actuator");
 
-                snake.addPair(n0[0], n1[3], "inner right muscle");
-                snake.addPair(n0[1], n1[3], "inner left muscle");
-                snake.addPair(n0[2], n1[3], "inner top muscle");
+                snake.addPair(n0[0], n1[3], "inner right actuator");
+                snake.addPair(n0[1], n1[3], "inner left actuator");
+                snake.addPair(n0[2], n1[3], "inner top actuator");
             }
     }
 
-    void mapMuscles(NestedStructureTestModel::MuscleMap& muscleMap,
+    void mapActuators(NestedStructureTestModel::ActuatorMap& actuatorMap,
             tgModel& model)
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-        muscleMap["inner left"]  = model.find<tgLinearString>("inner left muscle");
-        muscleMap["inner right"] = model.find<tgLinearString>("inner right muscle");
-        muscleMap["inner top"]   = model.find<tgLinearString>("inner top muscle");
-        muscleMap["outer left"]  = model.find<tgLinearString>("outer left muscle");
-        muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
-        muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
+        actuatorMap["inner left"]  = model.find<tgBasicActuator>("inner left actuator");
+        actuatorMap["inner right"] = model.find<tgBasicActuator>("inner right actuator");
+        actuatorMap["inner top"]   = model.find<tgBasicActuator>("inner top actuator");
+        actuatorMap["outer left"]  = model.find<tgBasicActuator>("outer left actuator");
+        actuatorMap["outer right"] = model.find<tgBasicActuator>("outer right actuator");
+        actuatorMap["outer top"]   = model.find<tgBasicActuator>("outer top actuator");
     }
 
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -150,7 +150,7 @@ void NestedStructureTestModel::setup(tgWorld& world)
     // Create our snake segments
     tgStructure snake;
     addSegments(snake, tetra, edge, m_segments);
-    addMuscles(snake);
+    addActuators(snake);
 
     // Create the build spec that uses tags to turn the structure into a real model
     // Note: This needs to be high enough or things fly apart...
@@ -160,18 +160,18 @@ void NestedStructureTestModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    tgBasicActuator::Config actuatorConfig(1000, 10);
+    spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
 
-    // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
+    // We could now use tgCast::filter or similar to pull out the models (e.g. actuators)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-    mapMuscles(muscleMap, *this);
+    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+    mapActuators(actuatorMap, *this);
 
     trace(structureInfo, *this);
 
@@ -194,13 +194,13 @@ void NestedStructureTestModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
-NestedStructureTestModel::getMuscles (const std::string& key) const
+const std::vector<tgBasicActuator*>&
+NestedStructureTestModel::getActuators (const std::string& key) const
 {
-    const MuscleMap::const_iterator it = muscleMap.find(key);
-    if (it == muscleMap.end())
+    const ActuatorMap::const_iterator it = actuatorMap.find(key);
+    if (it == actuatorMap.end())
     {
-        throw std::invalid_argument("Key '" + key + "' not found in muscle map");
+        throw std::invalid_argument("Key '" + key + "' not found in actuator map");
     }
     else
     {
