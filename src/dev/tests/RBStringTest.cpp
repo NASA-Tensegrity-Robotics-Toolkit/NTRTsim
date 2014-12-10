@@ -23,7 +23,7 @@
 
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgConnectorInfo.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgBuildSpec.h"
 
@@ -37,7 +37,7 @@
 
 RBStringTest::Config::Config( int segments,
                 const tgRod::Config& rodConf,
-                const tgLinearString::Config& stringConf,
+                const tgBasicActuator::Config& stringConf,
                 double minTotalLength) :
 m_segments(segments),
 m_rodConfig(rodConf),
@@ -61,10 +61,10 @@ void RBStringTest::setup(tgWorld& world)
     const double stiffness = m_config.m_stringConfig.stiffness;
     const double damping = m_config.m_stringConfig.damping;
     const double pretension = 0.0;
-    tgLinearString::Config muscleConfig1(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, -M_PI / 2.0);
-    tgLinearString::Config muscleConfig2(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, M_PI / 2.0);
-    tgLinearString::Config muscleConfig3(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, M_PI);
-    tgLinearString::Config muscleConfig4(stiffness, damping, pretension, false, 1000.0, 100.0, 10000.0, 0.1, 0.1, 0);
+    tgBasicActuator::Config muscleConfig1(stiffness, damping, pretension, false, 1000.0, 100.0, 0.1, 0.1, -M_PI / 2.0);
+    tgBasicActuator::Config muscleConfig2(stiffness, damping, pretension, false, 1000.0, 100.0, 0.1, 0.1, M_PI / 2.0);
+    tgBasicActuator::Config muscleConfig3(stiffness, damping, pretension, false, 1000.0, 100.0, 0.1, 0.1, M_PI);
+    tgBasicActuator::Config muscleConfig4(stiffness, damping, pretension, false, 1000.0, 100.0, 0.1, 0.1, 0);
     
     // Calculations for the flemons spine model
     double v_size = m_config.m_minTotalLength / (double) m_config.m_segments;
@@ -117,10 +117,10 @@ void RBStringTest::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(m_config.m_rodConfig));
     
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig1));
-    spec.addBuilder("muscle2", new tgLinearStringInfo(muscleConfig2));
-    spec.addBuilder("muscle3", new tgLinearStringInfo(muscleConfig3));
-    spec.addBuilder("muscle4", new tgLinearStringInfo(muscleConfig4));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig1));
+    spec.addBuilder("muscle2", new tgBasicActuatorInfo(muscleConfig2));
+    spec.addBuilder("muscle3", new tgBasicActuatorInfo(muscleConfig3));
+    spec.addBuilder("muscle4", new tgBasicActuatorInfo(muscleConfig4));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -129,7 +129,7 @@ void RBStringTest::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     
     // Debug printing
     std::cout << "StructureInfo:" << std::endl;
@@ -149,11 +149,3 @@ void RBStringTest::step(double dt)
     tgModel::step(dt);  // Step any children
 
 }
-
-void RBStringTest::changeMuscle (double length, double dt)
-{
-    for( int i = 0; i < allMuscles.size(); i++){
-        allMuscles[i]->setRestLength(length, dt);
-    }
-}
-

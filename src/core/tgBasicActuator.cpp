@@ -164,7 +164,7 @@ void tgBasicActuator::setControlInput(double input, double dt)
     assert(invariant());
     
 }
-
+#if (0)
 void tgBasicActuator::setRestLength(double newLength, float dt)
 {
     if (newLength < 0.0)
@@ -197,7 +197,7 @@ void tgBasicActuator::setPrefLength(double newLength)
         m_preferredLength = newLength;
     }
 }
-
+#endif
 void tgBasicActuator::moveMotors(double dt)
 {
     // @todo add functions from muscle2P Bounded

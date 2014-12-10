@@ -103,7 +103,7 @@ public:
 	 * This will silently fail if it is called erroneously
 	 */
 	virtual void setControlInput(double input, double dt);
-        
+#if (0)        
     /**
      * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
@@ -117,7 +117,7 @@ public:
      * @todo Refactor to setControlInput
      */
     void setPrefLength(double newLength);
-
+#endif
     /**
      * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.

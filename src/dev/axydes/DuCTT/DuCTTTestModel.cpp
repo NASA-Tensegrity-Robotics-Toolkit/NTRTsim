@@ -133,17 +133,17 @@ void DuCTTTestModel::mapMuscles(DuCTTTestModel::MuscleMap& muscleMap,
 {
     // Note that tags don't need to match exactly, we could create
     // supersets if we wanted to
-    muscleMap["top right"] = model.find<tgLinearString>("top right muscle");
-    muscleMap["top left"]  = model.find<tgLinearString>("top left muscle");
+    muscleMap["top right"] = model.find<tgSpringCableActuator>("top right muscle");
+    muscleMap["top left"]  = model.find<tgSpringCableActuator>("top left muscle");
 
-    muscleMap["front right"] = model.find<tgLinearString>("front right muscle");
-    muscleMap["front left"]  = model.find<tgLinearString>("front left muscle");
+    muscleMap["front right"] = model.find<tgSpringCableActuator>("front right muscle");
+    muscleMap["front left"]  = model.find<tgSpringCableActuator>("front left muscle");
 
-    muscleMap["back right"] = model.find<tgLinearString>("back right muscle");
-    muscleMap["back left"]  = model.find<tgLinearString>("back left muscle");
+    muscleMap["back right"] = model.find<tgSpringCableActuator>("back right muscle");
+    muscleMap["back left"]  = model.find<tgSpringCableActuator>("back left muscle");
 
-    muscleMap["bottom front"] = model.find<tgLinearString>("bottom front muscle");
-    muscleMap["bottom back"]  = model.find<tgLinearString>("bottom back muscle");
+    muscleMap["bottom front"] = model.find<tgSpringCableActuator>("bottom front muscle");
+    muscleMap["bottom back"]  = model.find<tgSpringCableActuator>("bottom back muscle");
 }
 
 void DuCTTTestModel::trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -185,8 +185,8 @@ void DuCTTTestModel::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("prismatic", new tgPrismaticInfo(prismConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    tgSpringCableActuator::Config muscleConfig(1000, 10);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -195,7 +195,7 @@ void DuCTTTestModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     mapMuscles(muscleMap, *this);
 
     trace(structureInfo, *this);
@@ -228,7 +228,7 @@ void DuCTTTestModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
+const std::vector<tgSpringCableActuator*>&
 DuCTTTestModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);

@@ -31,12 +31,6 @@ add_executable(AppStructureTest
     AppStructureTest.cpp
 ) 
 
-add_executable(AppFlemonsSpineTest
-    FlemonsSpineModel.cpp
-    AppFlemonsSpine.cpp
-    
-) 
-
 add_executable(AppRBStringTest
     RBStringTest.cpp
     AppRBString.cpp 

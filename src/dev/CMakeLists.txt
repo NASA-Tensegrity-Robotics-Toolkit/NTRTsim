@@ -2,10 +2,10 @@ Project(Dev)
 
 # Add additional dev directories here.
 subdirs(
-    #axydes
+    axydes
     btietz
-    #radams
-    #tests
+    radams
+    tests
     #atil
     #steve
     #kmorse

@@ -20,7 +20,7 @@
 #define CONNECTOR_TEST_MODEL_H
 
 #include "core/tgModel.h" 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "tgcreator/tgNodes.h"
 #include "core/tgSubject.h"
 #include "core/tgModelVisitor.h"
@@ -31,7 +31,7 @@
 #include <set>
 
 #include "tgcreator/tgRodInfo.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 
 
@@ -56,7 +56,7 @@ public:
         const double radius  = 0.3;
         const tgRod::Config rodConfig(radius, density);
         
-        tgLinearString::Config muscleConfig(1000, 10);
+        tgBasicActuator::Config muscleConfig(1000, 10);
         
         tgNodes nodes;
         nodes.addNode(0,0,0);
@@ -113,7 +113,7 @@ public:
 
         std::set<tgConnectorInfo*> muscles;
         for(int i = 0; i < musclePairs.size(); i++) {
-            tgConnectorInfo* s = new tgLinearStringInfo(muscleConfig, musclePairs[i]);
+            tgConnectorInfo* s = new tgBasicActuatorInfo(muscleConfig, musclePairs[i]);
             
             std::cout << "tgConnectorInfo: " << std::endl;
             std::cout << *s << std::endl;
@@ -170,7 +170,7 @@ private:
     tgRodInfo* m_rod;    
     tgRodInfo* m_rod2;
     
-    //tgLinearString* newString;
+    //tgBasicActuator* newString;
     tgModel* m_testString;
 };
 
