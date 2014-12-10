@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014, United States Government, as represented by the
+ * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  * 
@@ -14,10 +14,10 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */
+*/
 
-#ifndef SUPERBALL_MODEL_H
-#define SUPERBALL_MODEL_H
+#ifndef T6_MODEL_H
+#define T6_MODEL_H
 
 /**
  * @file Escape_T6Model.h
@@ -28,7 +28,6 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
-#include "core/tgRod.h"
 // The C++ Standard Library
 #include <vector>
 
@@ -43,111 +42,94 @@ class tgWorld;
  */
 class Escape_T6Model : public tgSubject<Escape_T6Model>, public tgModel
 {
-    public: 
+public: 
+	
+	/**
+     * The only constructor. Utilizes default constructor of tgModel
+     * Configuration parameters are within the .cpp file in this case,
+     * not passed in. 
+     */
+    Escape_T6Model();
+	
+    /**
+     * Destructor. Deletes controllers, if any were added during setup.
+     * Teardown handles everything else.
+     */
+    virtual ~Escape_T6Model();
+    
+    /**
+     * Create the model. Place the rods and strings into the world
+     * that is passed into the simulation. This is triggered
+     * automatically when the model is added to the simulation, when
+     * tgModel::setup(world) is called (if this model is a child),
+     * and when reset is called. Also notifies controllers of setup.
+     * @param[in] world - the world we're building into
+     */
+    virtual void setup(tgWorld& world);
+    
+    /**
+     * Undoes setup. Deletes child models. Called automatically on
+     * reset and end of simulation. Notifies controllers of teardown
+     */
+    void teardown();
+    
+    /**
+     * Step the model, its children. Notifies controllers of step.
+     * @param[in] dt, the timestep. Must be positive.
+     */
+    virtual void step(double dt);
+	
+	/**
+     * Receives a tgModelVisitor and dispatches itself into the
+     * visitor's "render" function. This model will go to the default
+     * tgModel function, which does nothing.
+     * @param[in] r - a tgModelVisitor which will pass this model back
+     * to itself 
+     */
+    virtual void onVisit(tgModelVisitor& r);
+    
+    /**
+     * Return a vector of all muscles for the controllers to work with.
+     * @return A vector of all of the muscles
+     */
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
 
-        /**
-         * The only constructor. Utilizes default constructor of tgModel
-         * Configuration parameters are within the .cpp file in this case,
-         * not passed in. 
-         */
-        Escape_T6Model();
+    /**
+     * Returns the center of mass of this model as an <x,y,z>
+     */
+    std::vector<double> getBallCOM();
+                                    
+private:
+	
+	/**
+     * A function called during setup that determines the positions of
+     * the nodes based on construction parameters. Rewrite this function
+     * for your own models
+     * @param[in] tetra: A tgStructure that we're building into
+     */
+    static void addNodes(tgStructure& s);
+	
+	/**
+     * A function called during setup that creates rods from the
+     * relevant nodes. Rewrite this function for your own models.
+     * @param[in] s A tgStructure that we're building into
+     */
+    static void addRods(tgStructure& s);
+	
+	/**
+     * A function called during setup that creates muscles (Strings) from
+     * the relevant nodes. Rewrite this function for your own models.
+     * @param[in] s A tgStructure that we're building into
+     */
+    static void addMuscles(tgStructure& s);
 
-        /**
-         * Destructor. Deletes controllers, if any were added during setup.
-         * Teardown handles everything else.
-         */
-        virtual ~Escape_T6Model();
-
-        /**
-         * Create the model. Place the rods and strings into the world
-         * that is passed into the simulation. This is triggered
-         * automatically when the model is added to the simulation, when
-         * tgModel::setup(world) is called (if this model is a child),
-         * and when reset is called. Also notifies controllers of setup.
-         * @param[in] world - the world we're building into
-         */
-        virtual void setup(tgWorld& world);
-
-        /**
-         * Step the model, its children. Notifies controllers of step.
-         * @param[in] dt, the timestep. Must be positive.
-         */
-        virtual void step(double dt);
-
-        /**
-         * Receives a tgModelVisitor and dispatches itself into the
-         * visitor's "render" function. This model will go to the default
-         * tgModel function, which does nothing.
-         * @param[in] r - a tgModelVisitor which will pass this model back
-         * to itself 
-         */
-        virtual void onVisit(tgModelVisitor& r);
-          
-        /**
-         * Undoes setup. Deletes child models. Called automatically on
-         * reset and end of simulation. Notifies controllers of teardown
-         */
-        void teardown();
-         
-        /**
-         * Return a vector of all muscles for the controllers to work with.
-         * @return A vector of all of the muscles
-         */
-        const std::vector<tgBasicActuator*>& getAllMuscles() const;
-
-        /**
-         * Returns the center of mass of this model as an <x,y,z>
-         */
-        std::vector<double> getBallCOM();
-
-    private:
-
-        /**
-         * A function called during setup that determines the positions of
-         * the nodes based on construction parameters. Rewrite this function
-         * for your own models
-         * @param[in] s: the tgStructure that we're building into
-         */
-        void addNodes(tgStructure& s);
-
-        /**
-         * A function called during setup that creates rods from the
-         * relevant nodes. Rewrite this function for your own models.
-         * @param[in] s: A tgStructure that we're building into
-         */
-        static void addRods(tgStructure& s);
- 
-        /**
-         * Adds the 12 markers to the end of the rods so that we can visualize
-         * them and track their position
-         */
-        void addMarkers(tgStructure& s);
-         
-        /**
-         * A function called during setup that creates muscles
-         * (tgBasicActuators) from the relevant nodes. 
-         * Also collates muscles into clusters of 3 for actuation purposes
-         * @param[in] s: A tgStructure that we're building into
-         */
-        void addMuscles(tgStructure& s);
-
-        /**
-         * Moves every rod (i.e. the rigid bodies) according to its arguments.
-         * First rotates the structure around 3 axes given 3 angles.
-         * Moves the structure to the target point.
-         * Sets the speed of each bar to the given speed vector.
-         * (muscles and markers are moved automatically since they are attached).
-         */
-        void moveModel(btVector3 targetPositionVector, btVector3 rotationVector,
-                       btVector3 speedVector);
-
-        /**
-         * A list of all of the muscles. Will be empty until most of the way
-         * through setup
-         */
-        std::vector<tgBasicActuator*> allMuscles;
-        std::vector<btVector3> nodePositions;
+private:
+	
+	/**
+     * A list of all of the muscles. Will be empty until most of the way
+     * through setup
+     */
+    std::vector<tgBasicActuator*> allMuscles;
 };
 
-#endif  // SUPERBALL_MODEL_H
-
+#endif  // T6_MODEL_H

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014, United States Government, as represented by the
+ * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  * 
@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */
+*/
 
 /**
  * @file Escape_T6Model.cpp
@@ -55,91 +55,160 @@ namespace
     {
         double density;
         double radius;
+        //double stiffness_passive;
         double stiffness;
-        bool   history;
         double damping;
-        double pretension;
         double rod_length;
         double rod_space;    
         double friction;
         double rollFriction;
         double restitution;
+        bool   hist;
         double rotation;  
         double maxTens;
         double targetVelocity;
     } c =
     {
-        0.825,    // density (kg / length^3)
-        0.31,     // radius (length)
-        3000.0,   // stiffness (kg / sec^2)
-        true,     // history (record?)
-        200.0,    // damping (kg / sec)
-        0.0,      // pretension (force)
-        15.0,     // rod_length (length)
-        7.5,      // rod_space (length)
-        1.0,      // friction (unitless)
-        0.01,     // rollFriction (unitless)
-        0.2,      // restitution (?)
-        0,        // rotation
-        5054,     // maxTens (dN)           // Ideally as low as 1000
-        10.0     // targetVelocity (dm/s)  // Ideally as low as 2.6, can be 5.2
+       0.40374,   // density (kg / length^3)
+       0.40,      // radius (length)
+       //998.25,    // stiffness_passive (kg / sec^2)
+       3152.36,   // stiffness_active (kg / sec^2)
+       50.0,      // damping (kg / sec)
+       17.00,     // rod_length (length)
+       17.00/4,   // rod_space (length)
+       0.99,      // friction (unitless)
+       0.01,     // rollFriction (unitless)
+       0.0,      // restitution (?)
+       0,			// History logging (boolean)
+       0,        // rotation
+       100000,   // maxTens
+       10000,    // targetVelocity
 #if (0) // Acceleration limit removed 12/10/14
-        20000     // maxAcc
+       5000     // maxAcc
 #endif
-    };
+       //100000,   // maxTens
+       //10000,    // targetVelocity
+       //20000     // maxAcc
+
+           // Use the below values for earlier versions of simulation.
+           // 1.006,    
+           // 0.31,     
+           // 300000.0, 
+           // 3000.0,   
+           // 15.0,     
+           // 7.5,      
+   };
+
 } // namespace
 
-/*
- * helper arrays for node and rod numbering schema
- */
-/*returns the number of the rod for a given node */
-const int rodNumbersPerNode[13]={0,1,2,3,3,4,0,1,2,5,5,4,6};
+Escape_T6Model::Escape_T6Model() : tgModel() 
+{
+}
 
-/*returns the node that is at the other end of the given node */
-const int otherEndOfTheRod[13]={6,7,8,4,3,11,0,1,2,10,9,5,12};
+Escape_T6Model::~Escape_T6Model()
+{
+}
 
-/*returns the node that is at the parallel rod
- * and at the same end of the given node
- */
-const int parallelNode[13]={1,0,5,9,10,2,7,6,11,3,4,8,12};
+void Escape_T6Model::addNodes(tgStructure& s)
+{
+    const double half_length = c.rod_length / 2;
 
-Escape_T6Model::Escape_T6Model() : tgModel() {}
+    s.addNode(-c.rod_space,  -half_length, 0);            // 0
+    s.addNode(-c.rod_space,   half_length, 0);            // 1
+    s.addNode( c.rod_space,  -half_length, 0);            // 2
+    s.addNode( c.rod_space,   half_length, 0);            // 3
+    s.addNode(0,           -c.rod_space,   -half_length); // 4
+    s.addNode(0,           -c.rod_space,    half_length); // 5
+    s.addNode(0,            c.rod_space,   -half_length); // 6
+    s.addNode(0,            c.rod_space,    half_length); // 7
+    s.addNode(-half_length, 0,            c.rod_space);   // 8
+    s.addNode( half_length, 0,            c.rod_space);   // 9
+    s.addNode(-half_length, 0,           -c.rod_space);   // 10
+    s.addNode( half_length, 0,           -c.rod_space);   // 11
+}
 
-Escape_T6Model::~Escape_T6Model() {}
+void Escape_T6Model::addRods(tgStructure& s)
+{
+    s.addPair( 0,  1, "rod");
+    s.addPair( 2,  3, "rod");
+    s.addPair( 4,  5, "rod");
+    s.addPair( 6,  7, "rod");
+    s.addPair( 8,  9, "rod");
+    s.addPair(10, 11, "rod");
+}
 
-//Node numbers seen from Front
-// -----0-------1------
-// ---------2----------
-// 3------------------4
-// ---------5----------
-// -----6-------7------
-//
-//Node numbers seen from Back
-// -----0-------1------
-// ---------8----------
-// 9-----------------10
-// ---------11---------
-// -----6-------7------
-//
- 
-void Escape_T6Model::setup(tgWorld& world) {
+// 24 muscles in total
+void Escape_T6Model::addMuscles(tgStructure& s)
+{
+    s.addPair(0, 4,  "muscle");
+    s.addPair(0, 5,  "muscle");
+    s.addPair(0, 8,  "muscle");
+    s.addPair(0, 10, "muscle");
+
+    s.addPair(1, 6,  "muscle");
+    s.addPair(1, 7,  "muscle");
+    s.addPair(1, 8,  "muscle");
+    s.addPair(1, 10, "muscle");
+
+    s.addPair(2, 4,  "muscle");
+    s.addPair(2, 5,  "muscle");
+    s.addPair(2, 9,  "muscle");
+    s.addPair(2, 11, "muscle");
+
+    s.addPair(3, 7,  "muscle");
+    s.addPair(3, 6,  "muscle");
+    s.addPair(3, 9,  "muscle");
+    s.addPair(3, 11, "muscle");
+
+    s.addPair(4, 10, "muscle");
+    s.addPair(4, 11, "muscle");
+
+    s.addPair(5, 8,  "muscle");
+    s.addPair(5, 9,  "muscle");
+
+    s.addPair(6, 10, "muscle");
+    s.addPair(6, 11, "muscle");
+
+    s.addPair(7, 8,  "muscle");
+    s.addPair(7, 9,  "muscle");
+
+}
+
+void Escape_T6Model::setup(tgWorld& world)
+{
+
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
-            c.rollFriction, c.restitution);
-/// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, 
-            c.pretension, c.history, c.maxTens, c.targetVelocity);
-
+				c.rollFriction, c.restitution);
+    
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate                             
+    tgBasicActuator::Config activeMuscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
+					    c.maxTens, c.targetVelocity);
+/*
+    tgBasicActuator::Config passiveMuscleConfig(c.stiffness_passive, c.damping, c.hist, c.rotation,
+					    c.maxTens, c.targetVelocity, 
+					    c.maxAcc);*/
+            
     // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
     addMuscles(s);
+    s.move(btVector3(0, 10, 0));
+
+    // Add a rotation. This is needed if the ground slopes too much,
+    // otherwise  glitches put a rod below the ground.
+    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    double rotationAngle = M_PI/2;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
-
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(activeMuscleConfig));
+    //spec.addBuilder("active muscle", new tgBasicActuatorInfo(activeMuscleConfig));
+    //spec.addBuilder("passive muscle", new tgBasicActuatorInfo(passiveMuscleConfig));
+    
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
@@ -155,41 +224,39 @@ void Escape_T6Model::setup(tgWorld& world) {
 
     // Actually setup the children
     tgModel::setup(world);
-
-    //map the rods and add the markers to them
-    addMarkers(s);
-
-    btVector3 location(0.0,28.0,0); // Start above ground (positive y)
-    btVector3 rotation(0.0,0.6,0.8);
-    btVector3 speed(0,0,0);
-    this->moveModel(location,rotation,speed);
 }
- 
-void Escape_T6Model::step(double dt) {
+
+void Escape_T6Model::step(double dt)
+{
     // Precondition
-    if (dt <= 0.0) {
+    if (dt <= 0.0)
+    {
         throw std::invalid_argument("dt is not positive");
     }
-    else {
+    else
+    {
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
     }
 }
 
-void Escape_T6Model::onVisit(tgModelVisitor& r) {
+void Escape_T6Model::onVisit(tgModelVisitor& r)
+{
     tgModel::onVisit(r);
 }
-                      
-void Escape_T6Model::teardown() {
+
+const std::vector<tgBasicActuator*>& Escape_T6Model::getAllMuscles() const
+{
+    return allMuscles;
+}
+    
+void Escape_T6Model::teardown()
+{
     notifyTeardown();
     tgModel::teardown();
 }
-                      
-const std::vector<tgBasicActuator*>& Escape_T6Model::getAllMuscles() const {
-    return allMuscles;
-}
-                                                     
+           
 // Return the center of mass of this model
 // Pre-condition: This model has 6 rods
 std::vector<double> Escape_T6Model::getBallCOM() {   
@@ -217,111 +284,5 @@ std::vector<double> Escape_T6Model::getBallCOM() {
 
     return result;
 }
-                                     
-void Escape_T6Model::addNodes(tgStructure& s) {
-    const double half_length = c.rod_length / 2;
-
-    nodePositions.push_back(btVector3(-half_length, c.rod_space, 0));            // 0
-    nodePositions.push_back(btVector3( half_length, c.rod_space, 0));            // 1
-    nodePositions.push_back(btVector3(0,            half_length, -c.rod_space)); // 2
-    nodePositions.push_back(btVector3(-c.rod_space, 0,           -half_length)); // 3
-    nodePositions.push_back(btVector3( c.rod_space, 0,           -half_length)); // 4
-    nodePositions.push_back(btVector3(0,            -half_length, -c.rod_space));// 5
-    nodePositions.push_back(btVector3(-half_length, -c.rod_space, 0));           // 6
-    nodePositions.push_back(btVector3( half_length, -c.rod_space, 0));           // 7
-    nodePositions.push_back(btVector3(0,            half_length,  c.rod_space)); // 8
-    nodePositions.push_back(btVector3(-c.rod_space, 0,            half_length)); // 9
-    nodePositions.push_back(btVector3( c.rod_space, 0,            half_length)); // 10
-    nodePositions.push_back(btVector3(0,            -half_length, c.rod_space)); // 11
-
-    for(int i=0;i<nodePositions.size();i++)
-    {
-        s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
-    }
-}
-
-void Escape_T6Model::addRods(tgStructure& s) {
-    s.addPair( 0,  6, "r1 rod");
-    s.addPair( 1,  7, "r2 rod");
-    s.addPair( 2,  8, "r3 rod");
-    s.addPair( 3,  4, "r4 rod");
-    s.addPair( 5, 11, "r5 rod");
-    s.addPair( 9, 10, "r6 rod");
-}
-
-void Escape_T6Model::addMarkers(tgStructure &s) {
-    const int nNodes = 12; // 2*nRods
-    std::vector <tgRod*> rods=find<tgRod>("rod");
-
-    for(int i=0;i<nNodes;i++) {
-        const btRigidBody* bt = rods[rodNumbersPerNode[i]]->getPRigidBody();
-        btTransform inverseTransform = bt->getWorldTransform().inverse();
-        btVector3 pos = inverseTransform * (nodePositions[i]);
-        abstractMarker tmp=abstractMarker(bt,pos,btVector3(0.08*i,1.0 - 0.08*i,.0),i);
-        this->addMarker(tmp);
-    }
-}
-
-/** 
- * Defines muscles in the structure by their end nodes 
- * as well as the cluster to which they belong
- * A cluster is any three muscles that form a triangle 
- * (with nodes as vertices)
- */
-void Escape_T6Model::addMuscles(tgStructure& s) {
-    // Cluster 1
-    s.addPair(0, 3, "muscle cluster1");
-    s.addPair(3, 2, "muscle cluster1");
-    s.addPair(2, 0, "muscle cluster1");
-
-    // Cluster 2
-    s.addPair(4, 5, "muscle cluster2");
-    s.addPair(5, 7, "muscle cluster2");
-    s.addPair(7, 4, "muscle cluster2");
-
-    // Cluster 3
-    s.addPair(1, 8, "muscle cluster3");
-    s.addPair(8, 10, "muscle cluster3");
-    s.addPair(10, 1, "muscle cluster3");
-
-    //Cluster 4
-    s.addPair(9, 11, "muscle cluster4");
-    s.addPair(11, 6, "muscle cluster4");
-    s.addPair(6, 9, "muscle cluster4");
-
-    // Cluster 5
-    s.addPair(1, 2, "muscle cluster5");
-    s.addPair(2, 4, "muscle cluster5");
-    s.addPair(4, 1, "muscle cluster5");
-
-    // Cluster 6
-    s.addPair(3, 5, "muscle cluster6");
-    s.addPair(5, 6, "muscle cluster6");
-    s.addPair(6, 3, "muscle cluster6");
-
-    // Cluster 7
-    s.addPair(0, 8, "muscle cluster7");
-    s.addPair(8, 9, "muscle cluster7");
-    s.addPair(0, 9, "muscle cluster7");
-
-    // Cluster 8
-    s.addPair(11, 7, "muscle cluster8");
-    s.addPair(7, 10, "muscle cluster8");
-    s.addPair(10, 11, "muscle cluster8");
-}
-
-void Escape_T6Model::moveModel(btVector3 positionVector,btVector3 rotationVector,btVector3 speedVector) {
-    std::vector<tgRod *> rods=find<tgRod>("rod");
-
-    btQuaternion initialRotationQuat;
-    initialRotationQuat.setEuler(rotationVector[0],rotationVector[1],rotationVector[2]);
-    btTransform initialTransform;
-    initialTransform.setIdentity();
-    initialTransform.setRotation(initialRotationQuat);
-    initialTransform.setOrigin(positionVector);
-    for(int i=0;i<rods.size();i++) {
-        rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
-        rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
-    }
-}
+                                            
 
