@@ -25,7 +25,6 @@
 // This module
 #include "PrismModel.h"
 // This library
-#include "controllers/PretensionController.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"

@@ -36,7 +36,6 @@
 // Forward declarations
 class tgSpringCableActuator;
 class tgModelVisitor;
-class PretensionController;
 class tgStructure;
 class tgWorld;
 
