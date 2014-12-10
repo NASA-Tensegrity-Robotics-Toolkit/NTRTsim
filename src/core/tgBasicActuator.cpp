@@ -164,40 +164,7 @@ void tgBasicActuator::setControlInput(double input, double dt)
     assert(invariant());
     
 }
-#if (0)
-void tgBasicActuator::setRestLength(double newLength, float dt)
-{
-    if (newLength < 0.0)
-    {
-      throw std::invalid_argument("Rest length is negative.");
-    }
-    else
-    {
-        m_preferredLength = newLength;
-        
-        // moveMotors can change m_preferred length, so this goes here for now
-        assert(m_preferredLength == newLength);
-              
-	moveMotors(dt);
-    }
 
-    // Postcondition
-    assert(invariant());
-    
-}
-
-void tgBasicActuator::setPrefLength(double newLength)
-{
-    if (newLength < 0.0)
-    {
-      throw std::invalid_argument("Rest length is negative.");
-    }
-    else
-    {
-        m_preferredLength = newLength;
-    }
-}
-#endif
 void tgBasicActuator::moveMotors(double dt)
 {
     // @todo add functions from muscle2P Bounded

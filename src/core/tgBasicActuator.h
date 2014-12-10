@@ -91,33 +91,17 @@ public:
      * Functions for interfacing with muscle2P, and higher level controllers
      */
     /**
-	 * Set the relevant control variable for this class, such as 
-	 * commanded position or torque
+	 * Directly set m_preferredLength (see base class tgSpringCableActuator)
+     * Does not call moveMotors.
 	 */
 	virtual void setControlInput(double input);
 	
 	/**
-	 * Secondary function for those classes which need to know how much
-	 * time has elapsed since they last recieved input (such as 
-	 * tgBasicActuator's moveMotors(dt) function)
-	 * This will silently fail if it is called erroneously
+	 * Directly set m_preferredLength (see base class tgSpringCableActuator)
+     * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
 	 */
 	virtual void setControlInput(double input, double dt);
-#if (0)        
-    /**
-     * Directly set m_preferredLength (see base class tgSpringCableActuator)
-     * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
-     * @todo Refactor to setControlInput
-     */
-    void setRestLength(double newLength, float dt);
-	
-    /**
-     * Directly set m_preferredLength (see base class tgSpringCableActuator)
-     * Does not call moveMotors.
-     * @todo Refactor to setControlInput
-     */
-    void setPrefLength(double newLength);
-#endif
+
     /**
      * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.
