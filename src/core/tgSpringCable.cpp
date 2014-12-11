@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <cassert>
 
 tgSpringCable::tgSpringCable( const std::vector<tgSpringCableAnchor*>& anchors,
 				double coefK,
@@ -60,4 +61,18 @@ m_dampingCoefficient(dampingCoefficient)
 
 tgSpringCable::~tgSpringCable()
 {
+}
+
+const double tgSpringCable::getRestLength() const
+{
+    return m_restLength;
+}
+
+void tgSpringCable::setRestLength( const double newRestLength)
+{
+    // Assume we've already put this through a motor model
+    // But check anyway
+    assert(newRestLength > 0.0);
+    
+    m_restLength = newRestLength;
 }

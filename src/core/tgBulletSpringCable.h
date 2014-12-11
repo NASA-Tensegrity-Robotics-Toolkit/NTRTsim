@@ -57,11 +57,7 @@ public:
 
     // Called by tensegrity class update function for each muscle2p
     virtual void step(double dt);
-   
-    virtual const double getRestLength() const;
     
-    virtual void setRestLength( const double newRestLength); 
-
     virtual const double getActualLength() const;
 
     virtual const double getTension() const;

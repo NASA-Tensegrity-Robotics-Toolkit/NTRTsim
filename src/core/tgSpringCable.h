@@ -32,22 +32,47 @@
 // Forward references
 class tgSpringCableAnchor;
 
+/**
+ * An abstract base class defining the interface for a spring cable
+ * model. This either represents a long elastic member, or a stiff
+ * cable connected to a more flexible spring.
+ */
 class tgSpringCable
 {
 public: 
-    // Alternative constructor
+    
+    /**
+     * The only constructor. Takes a list of anchors, a coefficient
+     * of stiffness, a coefficent of damping, and optionally the amount
+     * of pretension in the cable
+     * @param[in] anchors - a list of this spring cable's attachements
+     * @param[in] coefK - the stiffness of the spring. Must be positive
+     * @param[in] dampingCoefficient - the damping in the spring. Must be non-negative
+     * @param[in] pretension - must be small enough to keep the rest length positive
+     */
     tgSpringCable( const std::vector<tgSpringCableAnchor*>& anchors,
                 double coefK,
                 double dampingCoefficient,
                 double pretension = 0.0);
     
+    /**
+     * The virtual destructor. Does nothing
+     */
     virtual ~tgSpringCable();
-
-    virtual void step(double dt) = 0;
-   
-    virtual const double getRestLength() const = 0;
     
-    virtual void setRestLength( const double newRestLength) = 0; 
+    /**
+     * The function called by model classes to update this class for
+     * a given step
+     * @param[in] dt - elapsed time since the last step
+     */
+    virtual void step(double dt) = 0;
+    
+    /**
+     * Returns m_
+     */
+    virtual const double getRestLength() const;
+    
+    virtual void setRestLength( const double newRestLength); 
 
     virtual const double getActualLength() const = 0;
 

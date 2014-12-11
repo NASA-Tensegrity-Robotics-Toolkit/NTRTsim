@@ -133,20 +133,6 @@ void tgBulletSpringCable::calculateAndApplyForce(double dt)
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
 }
 
-void tgBulletSpringCable::setRestLength( const double newRestLength)
-{
-    // Assume we've already put this through a motor model
-    // But check anyway
-    assert(newRestLength > 0.0);
-    
-    m_restLength = newRestLength;
-}
-
-const double tgBulletSpringCable::getRestLength() const
-{
-    return m_restLength;
-}
-
 const double tgBulletSpringCable::getActualLength() const
 {
     const btVector3 dist =

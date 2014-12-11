@@ -171,28 +171,52 @@ public:
 
     /** Deletes history and spring cable instantiation */
     virtual ~tgSpringCableActuator();
-
-    virtual void setup(tgWorld& wdorld);
     
+    /** Just calls tgModel::setup(world) - sets up any children */
+    virtual void setup(tgWorld& world);
+    
+    /** Just calls tgModel::teardown(world) - sets up any children */
     virtual void teardown();
     
     /** Just calls tgModel::step(dt) - steps any children */
     virtual void step(double dt);
     
     /**
-     * Functions for interfacing with muscle2P
+     * Functions for interfacing with tgSpringCable
      */
        
+    /**
+     * Returns the length of the spring cable when the simulation
+     * started
+     */
     virtual const double getStartLength() const;
     
+    /**
+     * Returns the current length of the spring cable
+     */
     virtual const double getCurrentLength() const;
     
+    /**
+     * Returns the current tension in the spring. Equal to
+     * stiffness * (current length - rest length)
+     */
     virtual const double getTension() const;
     
+    /**
+     * Returns the rest length of the spring-cable
+     */
     virtual const double getRestLength() const;
     
+    /**
+     * In the default implementation returns the change in actual
+     * length / time of the spring cable. Some child classes return
+     * the actuator velocity
+     */
     virtual const double getVelocity() const;
     
+    /**
+     * Return a const reference to the history struct
+     */
     virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
     
     /**
@@ -214,7 +238,7 @@ protected:
            tgSpringCableActuator::Config& config);
            
 protected:
-
+    /** The tgSpringCable system this actuator acts upon */
     tgSpringCable* m_springCable;
 
     /**
