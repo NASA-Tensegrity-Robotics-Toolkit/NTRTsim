@@ -123,7 +123,7 @@ void pidTestRig::setupControl()
 	assert(allMuscles.size() > 0);
 	
 	const double controlStep = 0.01;
-	tgPIDController::Config pidConfig(-100.0, 0.0, -10.0);
+	tgPIDController::Config pidConfig(100.0, 0.0, 10.0, true);
     tgImpedanceController* p_ipc = new tgImpedanceController(200.0, 100.0, 100.0);
     const double amplitude = 5.0;
 	const double frequency = 0.2;

@@ -46,30 +46,36 @@ public:
 		 * @param[in] p, the position gain
 		 * @param[in] i, the velocity gain
 		 * @param[in] d, the derivative gain
+         * @param[in] tensControl, whether or not this PID controller will
+         * be used in tension control, 
 		 * @param[in] setPoint, the initial setpoint
 		 */
 		Config(double p = 1.0,
 				double i = 0.0,
 				double d = 0.0,
+                bool tensControl = false,
 				double setPoint = 0.0);
 		
 		/**
-		 * The position gain of the PID controller
-		 * Use a negitive gain for tension control!
+		 * The position gain of the PID controller. Initial value must
+         * be nonnegative
+		 * Use a negative gain for tension control! (set tensControl to true)
 		 * Units are applicaiton dependant 
 		 */
 		const double kP;
 		
 		/**
-		 * The integral gain of the PID controller
-		 * Use a negitive gain for tension control!
+		 * The integral gain of the PID controller. Initial value must
+         * be nonnegative
+		 * Use a negative gain for tension control! (set tensControl to true)
 		 * Units are applicaiton dependant 
 		 */
 		const double kI;
 		
 		/**
-		 * The derivative gain of the PID controller
-		 * Use a negitive gain for tension control!
+		 * The derivative gain of the PID controller. Initial value must
+         * be nonnegative
+		 * Use a negative gain for tension control! (set tensControl to true)
 		 * Units are applicaiton dependant 
 		 */
 		const double kD;
@@ -115,7 +121,7 @@ public:
 	 * @param[in] the value with which the setpoint will be compared
 	 */
 	virtual void control(double dt, double setPoint, double sensorData);
-
+    
 	/**
 	 * Need a higher level class to do this which knows more about
 	 * the controllable for now

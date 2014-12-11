@@ -36,13 +36,29 @@
 tgPIDController::Config::Config(double p,
 									double i,
 									double d,
+                                    bool tensControl,
 									double setPoint) :
-kP(p),
-kI(i),
-kD(d),
+kP(tensControl ? -p : p),
+kI(tensControl ? -i : i),
+kD(tensControl ? -d : d),
 startingSetPoint(setPoint)
 {
-	/// @todo check if p, i & d are all the same sign
+	if (p < 0.0)
+    {
+        throw std::invalid_argument("Value for p is negative");
+    }
+    else if (i < 0.0)
+    {
+        throw std::invalid_argument("Integral gain is negative.");
+    }
+    else if (d < 0.0)
+    {
+        throw std::invalid_argument("Derivative gain is negative.");
+    }
+    
+    // Use either standard gains or inverted gains for tension control
+    assert ( (kP >= 0.0 && kI >= 0.0 && kD >= 0.0) || 
+                (kP <= 0.0 && kI <= 0.0 && kD <= 0.0));
 }
 	
 
