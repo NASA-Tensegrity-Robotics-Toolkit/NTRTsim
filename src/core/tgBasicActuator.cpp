@@ -256,11 +256,6 @@ void tgBasicActuator::setRestLengthSingleStep(double newLength)
     
 }
 
-const tgSpringCableActuator::SpringCableActuatorHistory& tgBasicActuator::getHistory() const
-{
-    return *m_pHistory;
-}
-
 bool tgBasicActuator::invariant() const
 {
     return

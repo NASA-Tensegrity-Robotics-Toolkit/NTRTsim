@@ -18,8 +18,7 @@
 
 /**
  * @file tgBulletSpringCable.cpp
- * @brief Definitions of members of classes tgBulletSpringCable and MuscleAnchor
- * @todo Split so only one class is defined per file.
+ * @brief Definitions of members of classes tgBulletSpringCable
  * $Id$
  */
 

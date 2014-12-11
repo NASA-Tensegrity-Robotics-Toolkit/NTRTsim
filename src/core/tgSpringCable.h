@@ -20,8 +20,8 @@
 #define SRC_CORE_TG_SPRING_CABLE_H_
 
 /**
- * @file Muscle2P.h
- * @brief Definitions of classes Muscle2P
+ * @file tgSpringCable.h
+ * @brief Definitions of class tgSpringCable
  * $Id$
  */
 

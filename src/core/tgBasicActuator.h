@@ -109,9 +109,6 @@ public:
      */
     void setRestLengthSingleStep(double newLength);
     
-    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
-    
-    
     /** Called from public functions, it makes the restLength get closer
      * to preferredlength, according to config constraints.
      */

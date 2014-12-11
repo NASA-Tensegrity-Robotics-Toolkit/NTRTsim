@@ -39,6 +39,11 @@ class btRigidBody;
 class tgSpringCableAnchor;
 class tgBulletSpringCableAnchor;
 
+/**
+ * This class defines the passive dynamics of a spring-cable system
+ * in the Bullet physics engine
+ * Formerly known as Muscle2P
+ */
 class tgBulletSpringCable : public tgSpringCable
 {
 public: 

@@ -182,6 +182,11 @@ const double tgSpringCableActuator::getVelocity() const
     return m_springCable->getVelocity();
 }
 
+const tgSpringCableActuator::SpringCableActuatorHistory& tgSpringCableActuator::getHistory() const
+{
+    return *m_pHistory;
+}
+
 bool tgSpringCableActuator::invariant() const
 {
     return

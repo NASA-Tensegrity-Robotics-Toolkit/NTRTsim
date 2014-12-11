@@ -33,7 +33,6 @@
 // included from BaseSpineModelLearning. Perhaps we should move things
 // to a cpp over there
 #include "core/tgSpringCableActuator.h"
-#include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "tgCPGStringControl.h"
 
@@ -300,8 +299,8 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgSpringCableActuator* > tmpSCAs = subject.getAllMuscles();
-    vector<tgBasicActuator* > tmpStrings = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(tmpSCAs);
+    vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
+    
     for(int i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();

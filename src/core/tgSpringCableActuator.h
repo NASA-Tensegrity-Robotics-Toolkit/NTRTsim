@@ -192,6 +192,8 @@ public:
     
     virtual const double getVelocity() const;
     
+    virtual const tgSpringCableActuator::SpringCableActuatorHistory& getHistory() const;
+    
     /**
      * Returns a pointer the string's tgBulletSpringCable. Used for rendering in
      * tgBulletRenderer
