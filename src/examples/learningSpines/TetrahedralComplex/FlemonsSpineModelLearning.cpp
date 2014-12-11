@@ -33,6 +33,7 @@
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -44,6 +45,8 @@
 #include <iostream>
 #include <map>
 #include <set>
+
+#define USE_KINEMATIC
 
 FlemonsSpineModelLearning::FlemonsSpineModelLearning(int segments) : 
     BaseSpineModelLearning(segments) 
@@ -64,10 +67,26 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     const double rollFriction = 0.0;
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
-    
-    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(1000, 10, 0.0, false, 7000, 12);
-    
+
+    const double elasticity = 1000.0;
+    const double damping = 10.0;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 12.0;
+#ifdef USE_KINEMATIC
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+
+#else
+    tgSpringCableActuator::Config muscleConfig(elasticity, damping, pretension, history, maxTens, maxSpeed);
+#endif
     // Calculations for the flemons spine model
     double v_size = 10.0;
     
@@ -139,7 +158,9 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-#if (1)
+#ifdef USE_KINEMATIC
+    spec.addBuilder("muscle", new tgKinematicActuatorInfo(motorConfig));
+#else
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif
     

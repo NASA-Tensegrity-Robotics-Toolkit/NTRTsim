@@ -140,7 +140,7 @@ tgImpedanceController::controlTension(tgBasicController& mLocalController,
 	
     mLocalController.control(deltaTimeSeconds, setTension, currentTension);
 	
-	std::cout << "Commanded tension " << setTension << " actual tension " << currentTension << " rest length " << mString->getRestLength() <<  std::endl;
+	//std::cout << "Commanded tension " << setTension << " actual tension " << currentTension << " rest length " << mString->getRestLength() <<  std::endl;
 	
     // Postcondition
     assert(setTension >= 0.0);

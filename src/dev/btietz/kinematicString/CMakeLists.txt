@@ -1,6 +1,7 @@
 project(KinematicString)
 
 add_library( ${PROJECT_NAME} SHARED
+    KinematicSpineCPGControl.cpp
 	tgSCASineControl.cpp
     tgCPGCableControl.cpp
 )

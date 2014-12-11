@@ -28,6 +28,7 @@
 // This application
 #include "FlemonsSpineModelLearning.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
 #include "examples/learningSpines/tgCPGLogger.h"
 // This library
 #include "core/tgModel.h"
@@ -108,8 +109,8 @@ int main(int argc, char** argv)
 															lf,
 															hf
 															);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+    KinematicSpineCPGControl* const myControl =
+      new KinematicSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);
 #if (0)    
     tgCPGLogger* const myLogger = 

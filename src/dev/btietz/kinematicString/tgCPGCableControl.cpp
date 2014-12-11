@@ -46,7 +46,8 @@ tgCPGCableControl::~tgCPGCableControl()
 void tgCPGCableControl::onSetup(tgSpringCableActuator& subject)
 {
     /// @todo make a construction parameter of this class
-	tgPIDController::Config config(10.0, 0.0, 1.0, 0.0);
+	tgPIDController::Config config(-5000.0, 0.0, -10.0); // Non backdrivable
+	//tgPIDController::Config config(-5000.0, -1.0, -10.0);
     m_PID = new tgPIDController(&subject, config);
 }
 

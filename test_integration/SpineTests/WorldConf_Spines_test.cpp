@@ -25,6 +25,7 @@
 // This application
 #include "examples/learningSpines/TetrahedralComplex/FlemonsSpineModelLearning.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -141,8 +142,8 @@ namespace {
 															hf
 															);
 												
-				BaseSpineCPGControl* const myControl =
-				  new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+				KinematicSpineCPGControl* const myControl =
+				  new KinematicSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
 				myModel->attach(myControl);
 				
 				simulation.addModel(myModel);
@@ -152,7 +153,7 @@ namespace {
 				
 				double dist = FileHelpers::getFinalScore(filePath);
 				
-				EXPECT_EQ(dist, 197.632);
+				EXPECT_EQ(dist, 273.785);
 				
 				// Will print out another set of dist moved on teardown
 	}
