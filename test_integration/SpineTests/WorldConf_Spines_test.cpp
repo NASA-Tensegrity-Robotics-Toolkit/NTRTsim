@@ -114,7 +114,7 @@ namespace {
 				const double highAmplitude = 30.0;
 				const double kt = 0.0;
 				const double kp = 1000.0;
-				const double kv = 100.0;
+				const double kv = 210.0;
 				const bool def = true;
 					
 				// Overridden by def being true
@@ -148,7 +148,7 @@ namespace {
 				
 				simulation.addModel(myModel);
 				
-				simulation.run(30000);
+				simulation.run(15000);
 				simulation.reset();
 				
 				double dist = FileHelpers::getFinalScore(filePath);
