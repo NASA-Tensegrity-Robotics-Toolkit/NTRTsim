@@ -61,13 +61,17 @@ public:
 	/**
 	 * Calls setNewSetPoint on the setPoint parameter, then calls
 	 * control(dt)
-	 * @param[in] dt - the timestep. Must be positive.
+	 * @param[in] dt - the elapsed time. Must be positive.
 	 * @param[in] setPoint - the setpoint to be used at this step.
 	 * @param[in] sensorData: unused in this version. Unifies the API
 	 * with PIDController
 	 */
 	virtual void control(double dt, double setPoint, double sensorData = 0);
 	
+    /**
+     * Updates m_setPoint to newSetpoint
+     * @param[in] newSetPoint, the next desired setpoint for the controllable
+     */
 	virtual void setNewSetPoint(double newSetPoint);
 	
 	/**

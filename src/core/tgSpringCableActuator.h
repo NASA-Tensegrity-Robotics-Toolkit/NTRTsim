@@ -38,7 +38,8 @@ class tgSpringCable;
 
 /**
  * Sets a basic API for spring cable actuator models, so controllers can interface
- * with all of them the same way
+ * with all of them the same way. Abstract since it doesn not define
+ * tgControllable's setControlInput.
  */
 // Should always be a child Model of a tgModel
 class tgSpringCableActuator : public tgModel, public tgControllable,
@@ -104,9 +105,9 @@ public:
               
       // Motor model parameters
       /**
-       * The parameters that affect how the string can be controlled
-       * mostly kinematic as of 4/30/14
-       * @todo give the motor interia, and specify more things by torque 
+       * The parameters that affect how the string can be controlled.
+       * Enforces a flat torque (force) speed curve with tgBasicActuator, and 
+       * a linear torque speed curve with tgKinematicActuator
        */
       
       /**
@@ -142,7 +143,7 @@ public:
       // Construction Parameters
       /**
        * Specifies the rotation around the face of the object its attached
-       * to. Any value will work, but +/- PI is the most meaningful.
+       * to.  +/- PI is the most meaningful. absolute value must be < 2 * PI
        * Units are radians.
        * @todo Is this meaningful for non-rod shapes?
        */
@@ -168,7 +169,7 @@ public:
         std::deque<double> tensionHistory;
     };
 
-    /** Deletes history */
+    /** Deletes history and spring cable instantiation */
     virtual ~tgSpringCableActuator();
 
     virtual void setup(tgWorld& wdorld);
@@ -235,12 +236,14 @@ protected:
     double m_preferredLength;
     
     /**
-     * Tracking the start length to avoid using deques.
+     * Tracking the start length to avoid using deques when history is
+     * off.
      */
     double m_startLength;
     
     /**
-     * Tracking the most recent velocity to avoid using deques.
+     * Tracking the most recent velocity to avoid using deques when
+     * history is off.
      */
     double m_prevVelocity;
 private:

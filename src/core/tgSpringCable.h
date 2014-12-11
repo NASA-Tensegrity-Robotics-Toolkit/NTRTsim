@@ -22,6 +22,7 @@
 /**
  * @file tgSpringCable.h
  * @brief Definitions of class tgSpringCable
+ * @author Brian Mirletz, Atil Iscen
  * $Id$
  */
 

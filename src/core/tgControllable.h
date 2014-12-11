@@ -49,6 +49,7 @@ public:
 	/**
 	 * Set the relevant control variable for this class, such as 
 	 * commanded position or torque
+     * @param[in] input, the  control input, units are application dependent
 	 */
 	virtual void setControlInput(double input) = 0;
 	
@@ -57,6 +58,9 @@ public:
 	 * time has elapsed since they last recieved input (such as 
 	 * tgBasicActuator's moveMotors(dt) function)
 	 * This will silently fail if it is called erroneously
+     * @param[in] input, the desired control input
+     * @param[in] dt, the time elapsed since the last call. Must be positive
+     * (typically enforced in child class)
 	 */
 	virtual void setControlInput(double input, double dt) { }
 	

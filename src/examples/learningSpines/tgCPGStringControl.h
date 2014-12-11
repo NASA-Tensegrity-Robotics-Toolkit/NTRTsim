@@ -19,6 +19,14 @@
 #ifndef TG_CPG_STRING_CONTRL_H
 #define TG_CPG_STRING_CONTRL_H
 
+/**
+ * @file tgCPGStringControl.h
+ * @brief Definition of the tgCPGStringControl observer class
+ * @author Brian Mirletz
+ * @date May 2014
+ * $Id$
+ */
+
 #include "util/tgBaseCPGNode.h"
 #include "core/tgSpringCableActuator.h"
 // The Boost library

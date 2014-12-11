@@ -17,9 +17,9 @@
 */
 
 /**
- * @file tgRod.cpp
- * @brief Contains the definitions of members of class tgRod
- * @author Ryan Adams
+ * @file tgBox.cpp
+ * @brief Contains the definitions of members of class tgBox
+ * @author Brian Mirletz and Ryan Adams
  * $Id$
  */
 

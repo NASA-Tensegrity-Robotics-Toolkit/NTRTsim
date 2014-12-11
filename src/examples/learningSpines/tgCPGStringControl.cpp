@@ -16,6 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file tgCPGStringControl.cpp
+ * @brief Implementation of the tgCPGStringControl observer class
+ * @author Brian Mirletz
+ * @date May 2014
+ * $Id$
+ */
+
 #include "tgCPGStringControl.h"
 
 #include "core/tgSpringCable.h"

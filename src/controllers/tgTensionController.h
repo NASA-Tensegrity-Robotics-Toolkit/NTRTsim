@@ -20,8 +20,8 @@
 #define SRC_CONTROLLERS_TG_TENSION_CONTROLLER_H
 
 /**
- * @file tgBasicController.h
- * @brief Definition of the tgBasicController base class
+ * @file tgTensionController.h
+ * @brief Definition of the tgTensionController base class
  * @author Brian Mirletz
  * @date December 2014
  * $Id$
@@ -34,7 +34,8 @@ class tgControllable;
 class tgBasicActuator;
 
 /**
- * Provides control of rest length based on
+ * Provides control of rest length based on a tension setpoint for
+ * tgBasicActuators.
  */
 class tgTensionController : public tgBasicController
 {
@@ -42,7 +43,7 @@ public:
 
     /**
 	 * The only constructor with two inputs
-     * @param[in] controllable. The system to be controlled.
+     * @param[in] controllable. The tgBasicActuator to be controlled.
      * @param[in] setPoint. The initial setPoint for the system
 	 */
     tgTensionController(tgBasicActuator* controllable, double setPoint = 0.0);
@@ -53,25 +54,36 @@ public:
     virtual ~tgTensionController();
 	
 	/**
-	 * The control step. In this version it passes the setPoint directly
-	 * to m_controllable
-	 * @param[in] dt - the timestep. Must be positive.
+	 * The control step. This version calculates the necessary rest length
+     * change in order to produce the desired tension set point in the actuator
+	 * @param[in] dt - the elapsed time since the last call. Must be positive.
 	 */
 	virtual void control(double dt);
     
     /**
 	 * Calls setNewSetPoint on the setPoint parameter, then calls
 	 * control(dt)
-	 * @param[in] dt - the timestep. Must be positive.
+	 * @param[in] dt - the elapsed time since the last call. Must be positive.
 	 * @param[in] setPoint - the setpoint to be used at this step.
 	 * @param[in] sensorData: unused in this version. Unifies the API
 	 * with PIDController
 	 */
 	virtual void control(double dt, double setPoint, double sensorData = 0);
 	
+    /**
+     * A static version which directly calls setControlInput(input, dt)
+     * on the tgBasicActuator. Calculates correct control input based
+     * on the setpoint and properties of the Basic Actuator, performs
+     * the same calculation as control(dt)
+     * @param[in] sca, a reference the tgBasicActuator to be controlled
+     * @param[in] dt, the time elapsed since the last call. Is passed
+     * through to tgBasicActuator.moveMotors(dt)
+     * @param[in] setPoint, the desired tension.
+     */
     static void control(tgBasicActuator& sca, double dt, double setPoint);
 private:
     /**
+     * The tgBasicActuator this class controls. We do not own this
      * @todo is it better to keep this pointer or cast back from tgControllable?
      */
     tgBasicActuator* m_sca;

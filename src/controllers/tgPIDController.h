@@ -33,7 +33,10 @@
 class tgControllable;
 
 /**
- * Applies PID control to its tgControllable
+ * Applies PID control to its tgControllable. Will work for any controllable
+ * for which we can get an approprate sensor input. Depending on the system
+ * it may be necessary to invert the output, this is done within the 
+ * config file upon construction.
  */
 class tgPIDController : public tgBasicController
 {

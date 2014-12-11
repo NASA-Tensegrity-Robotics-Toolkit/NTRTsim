@@ -87,18 +87,20 @@ public:
      */
     virtual void onVisit(const tgModelVisitor& r) const;
     
-    /**
-     * Functions for interfacing with muscle2P, and higher level controllers
-     */
+    
+    /** Functions for interfacing with higher level controllers */
     /**
 	 * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Does not call moveMotors.
+     * @param[in] input, the control input for the current step
 	 */
 	virtual void setControlInput(double input);
 	
 	/**
 	 * Directly set m_preferredLength (see base class tgSpringCableActuator)
      * Calls moveMotors(dt) to adjust the rest length of tgBulletSpringCable
+     * @param[in] input, the control input for the current step
+     * @param[in] dt, time elapsed since last call.
 	 */
 	virtual void setControlInput(double input, double dt);
 
@@ -111,6 +113,7 @@ public:
     
     /** Called from public functions, it makes the restLength get closer
      * to preferredlength, according to config constraints.
+     * @param[in] dt, time elapsed since last call.
      */
     virtual void moveMotors(double dt);
 
