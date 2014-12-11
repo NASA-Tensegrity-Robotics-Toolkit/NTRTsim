@@ -68,31 +68,54 @@ public:
     virtual void step(double dt) = 0;
     
     /**
-     * Returns m_
+     * Returns m_restLength
      */
     virtual const double getRestLength() const;
     
+    /**
+     * Sets m_restLength to newRestLength.
+     * @param[in] newRestLength, must be non-negative
+     */
     virtual void setRestLength( const double newRestLength); 
-
+    
+    /**
+     * Pure virtual funciton, returns the actual length of the spring
+     * cable
+     */
     virtual const double getActualLength() const = 0;
-
+    
+    /**
+     * Pure virtual function, returns the current tension
+     */
     virtual const double getTension() const = 0;
     
+    /**
+     * Get the coefficent of stiffness
+     */
     virtual const double getCoefK() const
     {
         return m_coefK;
     }
     
+    /**
+     * Get the coefficent of damping
+     */
     virtual const double getCoefD() const
     {
         return m_dampingCoefficient;
     }
     
+    /**
+     * Get the last change in length / time
+     */
     virtual const double getVelocity() const
     {
         return m_velocity;
     }
     
+    /**
+     * Get the last value of the damping force
+     */
     virtual const double getDamping() const
     {
         return m_damping;
@@ -106,19 +129,41 @@ public:
 
 protected:
 
-    // Necessary for computations
+    /**
+     * The rest length of the string. Must be non negative
+     */
     double m_restLength;
  
+    /**
+     * The previous actual length of the string. Used when calculating
+     * force and velocity
+     */
     double m_prevLength;
     
-    // So we can get it without passing a dt
+    /**
+     * The previous value of the damping force. Stored so we can get
+     * it without passing a dt
+     */
     double m_damping;
     
+    /**
+     * The velocity of the string at the last update step. Stored so we
+     * can get it without passing a dt
+     */
     double m_velocity;
  
-    // Should be const for the lifetime of a muscle 
+    /**
+     * The damping coefficient.
+     * Units of mass / sec. 
+     * Must be non-negative
+     */
     const double m_dampingCoefficient;
     
+    /**
+     * The stiffness coefficient
+     * Units of mass / sec ^2
+     * Must be positive
+     */
     const double m_coefK;
 
 };
