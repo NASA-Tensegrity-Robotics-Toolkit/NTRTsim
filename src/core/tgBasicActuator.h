@@ -139,6 +139,11 @@ private:
      */
     double prevVel;
     
+    /**
+     * 
+     */
+    double m_preferredLength;
+    
 };
 
 

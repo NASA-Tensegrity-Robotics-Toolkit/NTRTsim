@@ -64,7 +64,8 @@ void tgBasicActuator::constructorAux()
 tgBasicActuator::tgBasicActuator(tgBulletSpringCable* muscle,
                    const tgTags& tags,
                    tgSpringCableActuator::Config& config) :
-    tgSpringCableActuator(muscle, tags, config)
+    tgSpringCableActuator(muscle, tags, config),
+    m_preferredLength(m_restLength)
 {
     constructorAux();
 

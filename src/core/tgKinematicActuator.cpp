@@ -110,7 +110,6 @@ tgKinematicActuator::tgKinematicActuator(tgBulletSpringCable* muscle,
 
     // Postcondition
     assert(invariant());
-    assert(m_preferredLength == m_restLength);
 }
 
 tgKinematicActuator::~tgKinematicActuator()
@@ -239,6 +238,5 @@ bool tgKinematicActuator::invariant() const
       (m_springCable != NULL) &&
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
-      (m_config.minActualLength >= 0.0) &&
-      (m_preferredLength >= 0.0);
+      (m_config.minActualLength >= 0.0);
 }

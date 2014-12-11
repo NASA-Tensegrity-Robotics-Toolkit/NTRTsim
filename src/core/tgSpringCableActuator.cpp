@@ -117,7 +117,6 @@ tgSpringCableActuator::tgSpringCableActuator(tgSpringCable* springCable,
     m_config(config),
     m_pHistory(new SpringCableActuatorHistory()),
     m_restLength(springCable->getRestLength()),
-    m_preferredLength(m_restLength),
     m_startLength(springCable->getActualLength()),
     m_prevVelocity(0.0)
 {
@@ -126,7 +125,6 @@ tgSpringCableActuator::tgSpringCableActuator(tgSpringCable* springCable,
     // Postcondition
     assert(invariant());
     assert(m_springCable == springCable);
-    assert(m_preferredLength == m_restLength);
 }
 
 tgSpringCableActuator::~tgSpringCableActuator()
@@ -195,6 +193,5 @@ bool tgSpringCableActuator::invariant() const
       (m_pHistory != NULL) && 
       (m_config.targetVelocity >= 0.0) &&
       (m_config.minActualLength >= 0.0) &&
-      (m_preferredLength >= 0.0) &&
       (m_startLength >= 0.0);
 }

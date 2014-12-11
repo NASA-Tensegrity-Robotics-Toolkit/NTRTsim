@@ -230,11 +230,15 @@ protected:
      /**
      * Motor Model Parameters
      */
-
+    
+    /**
+     * The current rest length of the spring cable. Directly sets the
+     * m_restLength parameter of m_springCable in the appropreate child
+     * class functions
+     */
     double m_restLength;
     
-    double m_preferredLength;
-    
+
     /**
      * Tracking the start length to avoid using deques when history is
      * off.
