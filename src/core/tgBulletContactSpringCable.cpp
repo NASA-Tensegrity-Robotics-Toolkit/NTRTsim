@@ -109,6 +109,8 @@ void tgBulletContactSpringCable::step(double dt)
 	
 	// Do this last so the ghost object gets populated with collisions before it is deleted
     updateCollisionObject();
+    
+    assert(invariant());
 }
 
 void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
@@ -877,4 +879,19 @@ bool tgBulletContactSpringCable::anchorCompare::comparePoints(btVector3& pt2, bt
 	   
 	   return lhDot < rhDot;
 
+}
+
+bool tgBulletContactSpringCable::invariant(void) const
+{
+    return (m_coefK > 0.0 &&
+    m_dampingCoefficient >= 0.0 &&
+    m_prevLength >= 0.0 &&
+    m_restLength >= 0.0 &&
+    anchor1 != NULL &&
+    anchor2 != NULL &&
+    m_anchors.size() >= 2 &&
+    m_thickness >= 0.0 &&
+    m_resolution > 0 &&
+    m_ghostObject != NULL &&
+    m_newAnchors.size() == 0);
 }

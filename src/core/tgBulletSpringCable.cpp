@@ -43,6 +43,7 @@ tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anc
                 coefK, dampingCoefficient, pretension)
 {
     assert(m_anchors.size() >= 2);
+    assert(invariant());
     // tgSpringCable does heavy lifting as far as determining rest length
 }
 
@@ -77,7 +78,13 @@ tgBulletSpringCable::~tgBulletSpringCable()
 
 void tgBulletSpringCable::step(double dt)
 {
+    if (dt <= 0.0)
+    {
+        throw std::invalid_argument("dt is not positive!");
+    }
+
     calculateAndApplyForce(dt);
+    assert(invariant());
 }
 
 void tgBulletSpringCable::calculateAndApplyForce(double dt)
@@ -152,3 +159,13 @@ const std::vector<const tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() 
     return tgCast::constFilter<tgBulletSpringCableAnchor, const tgSpringCableAnchor>(m_anchors);
 }
 
+bool tgBulletSpringCable::invariant(void) const
+{
+    return (m_coefK > 0.0 &&
+    m_dampingCoefficient >= 0.0 &&
+    m_prevLength >= 0.0 &&
+    m_restLength >= 0.0 &&
+    anchor1 != NULL &&
+    anchor2 != NULL &&
+    m_anchors.size() >= 2);
+}

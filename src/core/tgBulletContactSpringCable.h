@@ -113,9 +113,6 @@ public:
      */
     virtual const btScalar getActualLength() const;
     
-
-    
-    
 private:
     
     /**
@@ -263,6 +260,9 @@ protected:
 	 * Units of length
 	 */
 	const double m_resolution;
+
+private:    
+    bool invariant() const;
 };
 
 #endif  // SRC_CORE_TG_BULLET_CONTACT_SPRING_CABLE_H_

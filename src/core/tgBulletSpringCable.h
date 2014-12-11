@@ -47,42 +47,85 @@ class tgBulletSpringCableAnchor;
 class tgBulletSpringCable : public tgSpringCable
 {
 public: 
-    // Alternative constructor
+    /**
+     * The only constructor. Takes a list of anchors, a coefficient
+     * of stiffness, a coefficent of damping, and optionally the amount
+     * of pretension in the cable
+     * @param[in] anchors - a list of this spring cable's attachements
+     * @param[in] coefK - the stiffness of the spring. Must be positive
+     * @param[in] dampingCoefficient - the damping in the spring. Must be non-negative
+     * @param[in] pretension - must be small enough to keep the rest length positive
+     */
     tgBulletSpringCable( const std::vector<tgBulletSpringCableAnchor*>& anchors,
                 double coefK,
                 double dampingCoefficient,
                 double pretension = 0.0);
     
+    /**
+     * The virtual destructor. Deletes all of the anchors including anchor1 and anchor2
+     */
     virtual ~tgBulletSpringCable();
 
-    // Called by tensegrity class update function for each muscle2p
+    /**
+     * Updates this object. Calls calculateAndApplyForce(dt)
+     * @param[in] dt, must be positive
+     */
     virtual void step(double dt);
     
+    /**
+     * Finds the distance between anchor1 and anchor2, and returns
+     * the length between them
+     */
     virtual const double getActualLength() const;
-
+    
+    /**
+     * Returns the tension currently in the string by multiplying
+     * the difference between the actual length and the rest length
+     * by the stiffness coefficient
+     */
     virtual const double getTension() const;
     
     /**
+     * Returns a const vector of const anchors. Currently
+     * casts from tgBulletSpringCableAnchors, which makes it impossible
+     * to return a reference
      * @todo figure out how to cast and pass by reference
      */
     virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const;
     
 protected:
-
-   // Wanted to do a set, but need random access iterator to sort
-   // Needs to be stored here for consistent rendering
+    
+    /**
+     * The list of contact points. tgBulletSpringCable typically has two
+     * whereas tgBulletContactSpringCable will have more. 
+     * Needs to be stored here for consistent rendering.
+     * Vector has the convienence of tgCast functions, and we used to
+     * need a random iterator to sort
+     */
    std::vector<tgBulletSpringCableAnchor*> m_anchors;
-
-protected:
+    
+    /**
+     * The first attachement point for this spring cable. Storing it
+     * seperately makes a number of functions easier
+     */
     tgBulletSpringCableAnchor * const anchor1;
 
+    /**
+     * The other permanent attachment for this spring cable. 
+     */
     tgBulletSpringCableAnchor * const anchor2;
     
 private:
-
+    
+    /**
+     * Calculates the current forces that need to be applied to 
+     * the rigid bodies, and applies them to the bodies of anchor1 and 
+     * anchor2
+     */
     virtual void calculateAndApplyForce(double dt);
 
- private: 
+private: 
+    /** Ensures integrity of member variables */
     bool invariant(void) const;
 };
 
