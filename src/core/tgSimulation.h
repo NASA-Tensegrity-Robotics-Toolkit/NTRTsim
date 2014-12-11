@@ -76,8 +76,7 @@ public:
      * Add a Tensegrity to the simulation.
      * @param[in] pModel a pointer to a tgModel representing a Tensegrity;
      * an exception is thrown if it is NULL
-     * @throw std::invarlid_argument if pModel is NULL
-     * @todo Model pointer can't be NULL.
+     * @throw std::invalid_argument if pModel is NULL
      */
     void addModel(tgModel* pModel);
 

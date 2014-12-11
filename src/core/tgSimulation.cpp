@@ -59,8 +59,8 @@ tgSimulation::~tgSimulation()
 
 void tgSimulation::addModel(tgModel* pModel)
 {
-        // Precondition
-        if (pModel == NULL)
+    // Precondition
+    if (pModel == NULL)
     {
         throw std::invalid_argument("NULL pointer to tgModel");
     }
