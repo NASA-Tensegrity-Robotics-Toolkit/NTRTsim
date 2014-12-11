@@ -147,8 +147,8 @@ const double tgBulletSpringCable::getTension() const
     return tension;
 }
 
-const std::vector<tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() const
+const std::vector<const tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() const
 {
-    return tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(m_anchors);
+    return tgCast::constFilter<tgBulletSpringCableAnchor, const tgSpringCableAnchor>(m_anchors);
 }
 

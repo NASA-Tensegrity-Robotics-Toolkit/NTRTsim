@@ -72,7 +72,7 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
     
     if(pDrawer && pSpringCable)
     {
-		const std::vector<tgSpringCableAnchor*>& anchors = pSpringCable->getAnchors();
+		const std::vector<const tgSpringCableAnchor*>& anchors = pSpringCable->getAnchors();
 		std::size_t n = anchors.size() - 1;
 		for (std::size_t i = 0; i < n; i++)
 		{

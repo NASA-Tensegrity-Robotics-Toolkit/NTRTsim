@@ -148,7 +148,7 @@ void MuscleNPCons::step(double dt)
 	
 	btVector3 forceSum(0.0, 0.0, 0.0);
 	
-	const std::vector<tgSpringCableAnchor*>& anchorList = allMuscles[0]->getSpringCable()->getAnchors();
+	const std::vector<const tgSpringCableAnchor*>& anchorList = allMuscles[0]->getSpringCable()->getAnchors();
 	int n = anchorList.size();
 	for (std::size_t i = 0; i < n; i++)
 	{

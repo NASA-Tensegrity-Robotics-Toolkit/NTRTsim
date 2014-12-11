@@ -65,9 +65,11 @@ tgCPGStringControl::~tgCPGStringControl()
 void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_controlLength = subject.getStartLength();
-    /// @todo get the typing right so we don't have to cast twice
-	std::vector<tgBulletSpringCableAnchor*> anchors = 
-        tgCast::filter<tgSpringCableAnchor, tgBulletSpringCableAnchor>(subject.getSpringCable()->getAnchors());
+    
+    // tgSpringCable doesn't know about bullet anchors, so we have to cast here to get the rigid bodies
+	std::vector<const tgBulletSpringCableAnchor*> anchors = 
+        tgCast::filter<const tgSpringCableAnchor, const tgBulletSpringCableAnchor>(subject.getSpringCable()->getAnchors());
+
     std::size_t n = anchors.size();
     assert(n >= 2);
     

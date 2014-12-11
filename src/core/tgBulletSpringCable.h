@@ -64,10 +64,9 @@ public:
     
     /**
      * @todo figure out how to cast and pass by reference
-     * @todo should the anchors themselves be const?
      */
-    virtual const std::vector<tgSpringCableAnchor*> getAnchors() const;
-     
+    virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const;
+    
 protected:
 
    // Wanted to do a set, but need random access iterator to sort

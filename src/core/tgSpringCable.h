@@ -125,7 +125,7 @@ public:
      * Child classes will store their type of anchors, but should
      * always define a way to return a vector of base anchors
      */
-    virtual const std::vector<tgSpringCableAnchor*> getAnchors() const = 0;
+    virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const = 0;
 
 protected:
 
