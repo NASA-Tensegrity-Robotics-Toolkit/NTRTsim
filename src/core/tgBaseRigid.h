@@ -47,8 +47,15 @@ public:
     /** A class with a virtual memeber function requires a virtual destructor. */
     virtual ~tgBaseRigid();
     
+    /**
+     * Sets the btRigidBody to NULL
+     */
     virtual void teardown();
     
+    /**
+     * Double dispatch funciton. Will pass itself and any children
+     * back to the tgModelVisitor
+     */
     virtual void onVisit(const tgModelVisitor& v) const;
     
     /**

@@ -120,6 +120,7 @@ tgKinematicActuator::~tgKinematicActuator()
     
 void tgKinematicActuator::setup(tgWorld& world)
 {
+    // This needs to be called here in case the controller needs to cast
     notifySetup();
     tgModel::setup(world);
 }
