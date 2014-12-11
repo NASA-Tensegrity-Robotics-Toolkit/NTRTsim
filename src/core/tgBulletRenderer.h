@@ -45,9 +45,8 @@ public:
   /**
    * The only constructor.
    * @param[in,out] world a reference to the tgWorld being rendered
-   * @todo Make the world const.
    */
-  tgBulletRenderer(tgWorld& world);
+  tgBulletRenderer(const tgWorld& world);
 
   /**
    * Render a tgLinearString.
@@ -71,9 +70,8 @@ private:
 
   /**
    * A reference to the tgWorld being rendered.
-   * @todo Make this const.
    */
-  tgWorld& m_world;
+  const tgWorld& m_world;
 };
 
 #endif

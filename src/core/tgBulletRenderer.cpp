@@ -45,7 +45,7 @@
 #include <cassert>
 
 
-tgBulletRenderer::tgBulletRenderer(tgWorld& world) : m_world(world)
+tgBulletRenderer::tgBulletRenderer(const tgWorld& world) : m_world(world)
 {
 }
 
