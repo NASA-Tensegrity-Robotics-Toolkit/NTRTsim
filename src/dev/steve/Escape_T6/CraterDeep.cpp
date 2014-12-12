@@ -114,6 +114,7 @@ void CraterDeep::onVisit(tgModelVisitor& r) {
 }
 
 void CraterDeep::teardown() {
+    nodes.clear();
     notifyTeardown();
     tgModel::teardown();
 } 
