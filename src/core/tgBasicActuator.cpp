@@ -179,9 +179,7 @@ void tgBasicActuator::moveMotors(double dt)
     // Reverse the sign if restLength >= preferredLength
     // Velocity limiter
     double stepSize = m_config.targetVelocity * dt;
-    const double actualLength = m_springCable->getActualLength();
-    const double mostRecentVelocity = m_prevVelocity;
-    
+    const double actualLength = m_springCable->getActualLength(); 
     
     // First, change preferred length so we don't go over max tension
     if ((actualLength - m_preferredLength) * stiffness

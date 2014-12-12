@@ -33,8 +33,8 @@
 #include <cassert>
 
 tgBulletGround::tgBulletGround() :
-pGroundShape(NULL),
-tgGround()
+tgGround(),
+pGroundShape(NULL)
 { }
 
 tgBulletGround::~tgBulletGround() 

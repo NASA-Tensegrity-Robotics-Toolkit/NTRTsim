@@ -128,18 +128,7 @@ public:
     virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const = 0;
 
 protected:
-
-    /**
-     * The rest length of the string. Must be non negative
-     */
-    double m_restLength;
  
-    /**
-     * The previous actual length of the string. Used when calculating
-     * force and velocity
-     */
-    double m_prevLength;
-    
     /**
      * The previous value of the damping force. Stored so we can get
      * it without passing a dt
@@ -151,7 +140,14 @@ protected:
      * can get it without passing a dt
      */
     double m_velocity;
- 
+
+    /**
+     * The stiffness coefficient
+     * Units of mass / sec ^2
+     * Must be positive
+     */
+    const double m_coefK;
+
     /**
      * The damping coefficient.
      * Units of mass / sec. 
@@ -159,12 +155,17 @@ protected:
      */
     const double m_dampingCoefficient;
     
-    /**
-     * The stiffness coefficient
-     * Units of mass / sec ^2
-     * Must be positive
+    
+        /**
+     * The rest length of the string. Must be non negative
      */
-    const double m_coefK;
+    double m_restLength;
+ 
+    /**
+     * The previous actual length of the string. Used when calculating
+     * force and velocity
+     */
+    double m_prevLength;
 
 };
 

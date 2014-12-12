@@ -50,20 +50,20 @@ NeuroEvoPopulation::NeuroEvoPopulation(int populationSize,configuration config)
 
 NeuroEvoPopulation::~NeuroEvoPopulation()
 {
-	for(int i=0;i<controllers.size();i++)
+	for(std::size_t i=0;i<controllers.size();i++)
 	{
 		delete controllers[i];
 	}
 }
 
-void NeuroEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,int numMutate)
+void NeuroEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t numMutate)
 {
 	if(numMutate>controllers.size()/2)
 	{
 		cout<<"Trying to mutate more than half of the population"<<endl;
 		exit(0);
 	}
-	for(int i=0;i<numMutate;i++)
+	for(std::size_t i=0;i<numMutate;i++)
 	{
 		int copyFrom = i;
 		int copyTo = this->controllers.size()-1-i;
@@ -86,7 +86,7 @@ bool NeuroEvoPopulation::comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMem
 void NeuroEvoPopulation::orderPopulation()
 {
 	//calculate each member's average score
-	for(int i=0;i<this->controllers.size();i++)
+	for(std::size_t i=0;i<this->controllers.size();i++)
 	{
 		double ave = std::accumulate(controllers[i]->pastScores.begin(),controllers[i]->pastScores.end(),0);
 		ave /=  (double) controllers[i]->pastScores.size();

@@ -46,6 +46,7 @@ tgBulletSpringCableAnchor::tgBulletSpringCableAnchor(btRigidBody * body,
                bool perm,
                bool slide,
                btPersistentManifold* m) :
+  tgSpringCableAnchor(worldPos, cn, perm, slide),
   attachedBody(body),
   // Find relative position
   // This should give relative position in a default orientation.
@@ -56,8 +57,7 @@ tgBulletSpringCableAnchor::tgBulletSpringCableAnchor(btRigidBody * body,
 #else
   contactNormal(cn),
 #endif
-  manifold(m),
-  tgSpringCableAnchor(worldPos, cn, perm, slide)
+  manifold(m)
 {
 	assert(body);
 	
@@ -139,6 +139,9 @@ bool tgBulletSpringCableAnchor::setWorldPosition(btVector3& newPos)
 					{
 						std::cout << "Extra contacts!! " << dist << std::endl;
 					}
+#else
+                    // Suppress compiler warning for unused variable
+                    (void) dist;
 #endif
 				}
 				
@@ -295,7 +298,10 @@ std::pair<btScalar, btVector3> tgBulletSpringCableAnchor::getManifoldDistance(bt
 				if (n >= 2)
 				{
 					std::cout << "Extra contacts!! " << p << " length " << length << " dist: " << dist << std::endl;
-				}		
+				}
+#else
+                    // Suppress compiler warning for unused variable
+                    (void) dist;
 #endif
 			}
 		}

@@ -67,7 +67,7 @@ void NeuroEvoMember::mutate(std::tr1::ranlux64_base_01 *eng){
 	{
 		double dev = 3.0 / 100.0;   // 10 percent of interval 0-1
 		std::tr1::normal_distribution<double> normal(0, dev);
-		for(int i=0;i<statelessParameters.size();i++)
+		for(std::size_t i=0;i<statelessParameters.size();i++)
 		{
 			if(unif(*eng)  > 0.5)
 			{
@@ -108,7 +108,7 @@ void NeuroEvoMember::saveToFile(const char * outputFilename)
 	else
 	{
 		ofstream ss(outputFilename);
-		for(int i=0;i<statelessParameters.size();i++)
+		for(std::size_t i=0;i<statelessParameters.size();i++)
 		{
 			ss<<statelessParameters[i];
 			if(i!=statelessParameters.size()-1)

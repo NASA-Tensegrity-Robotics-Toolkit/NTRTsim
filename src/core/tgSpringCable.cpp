@@ -34,8 +34,8 @@ tgSpringCable::tgSpringCable( const std::vector<tgSpringCableAnchor*>& anchors,
 				double coefK,
 				double dampingCoefficient,
 				double pretension) :
-m_velocity(0.0),
 m_damping(0.0),
+m_velocity(0.0),
 m_coefK (coefK),
 m_dampingCoefficient(dampingCoefficient)
 {

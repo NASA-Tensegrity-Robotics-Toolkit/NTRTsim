@@ -35,7 +35,7 @@ public:
 	NeuroEvoPopulation(int numControllers,configuration config);
 	~NeuroEvoPopulation();
 	vector<NeuroEvoMember *> controllers;
-	void mutate(std::tr1::ranlux64_base_01 *eng,int numToMutate);
+	void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
 	void orderPopulation();
 	NeuroEvoMember * selectMemberToEvaluate();
 	NeuroEvoMember * getMember(int i){return controllers[i];};

@@ -94,7 +94,7 @@ NeuroEvolution::~NeuroEvolution()
 
 void NeuroEvolution::mutateEveryController()
 {
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		populations.at(i)->mutate(&eng,numberOfElementsToMutate);
 	}
@@ -111,7 +111,7 @@ void NeuroEvolution::orderAllPopulations()
 	// Disable definition of unused variables to suppress compiler warning
 	double maxScore1,maxScore2;
 #endif
-	for(int i=0;i<scoresOfTheGeneration.size();i++)
+	for(std::size_t i=0;i<scoresOfTheGeneration.size();i++)
 	{
 		aveScore1+=scoresOfTheGeneration[i][0];
 		aveScore2+=scoresOfTheGeneration[i][1];
@@ -120,7 +120,7 @@ void NeuroEvolution::orderAllPopulations()
 	aveScore2 /= scoresOfTheGeneration.size();
 
 
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		populations.at(i)->orderPopulation();
 	}
@@ -131,7 +131,7 @@ void NeuroEvolution::orderAllPopulations()
 	// what if member at 0 isn't the best of all time for some reason? 
 	// This seems biased towards average scores
 	ofstream logfileLeader;
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		stringstream ss;
 		ss<<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
@@ -169,7 +169,7 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 	}
 
 	selectedControllers.clear();
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		int selectedOne=0;
 		if(coevolution)
@@ -193,7 +193,7 @@ void NeuroEvolution::updateScores(vector <double> multiscore)
 	else
 		multiscore.push_back(-1.0);
 	double score=1.0* multiscore[0] - 0.0 * multiscore[1];
-	for(int oneElem=0;oneElem<selectedControllers.size();oneElem++)
+	for(std::size_t oneElem=0;oneElem<selectedControllers.size();oneElem++)
 	{
 		NeuroEvoMember * controllerPointer=selectedControllers.at(oneElem);
 

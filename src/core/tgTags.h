@@ -130,9 +130,9 @@ public:
     static std::deque<std::string> splitTags(const std::deque<std::string> &s,
                           char delim = ' ') {
         std::deque<std::string> result;
-        for(int i = 0; i < s.size(); i++) {
+        for(std::size_t i = 0; i < s.size(); i++) {
             std::deque<std::string> spl = splitTags(s[i]);
-            for(int j = 0; j < spl.size(); j++) {
+            for(std::size_t j = 0; j < spl.size(); j++) {
                 result.push_back(spl[j]);
             }
         }
@@ -141,7 +141,7 @@ public:
 
     std::string joinTags(std::string delim = "_") {
         std::stringstream ss;
-        for(int i = 0; i < m_tags.size(); i++) {
+        for(std::size_t i = 0; i < m_tags.size(); i++) {
             if(i != 0) {
                 ss << delim;
             }
@@ -251,7 +251,7 @@ private:
     
     void append(const std::deque<std::string>& tags)
     {
-        for(int i = 0; i < tags.size(); i++) {
+        for(std::size_t i = 0; i < tags.size(); i++) {
             appendOne(tags[i]);
         }
     }
@@ -264,13 +264,13 @@ private:
 
     void prepend(const std::deque<std::string>& tags)
     {
-        for(int i = 0; i < tags.size(); i++) {
+        for(std::size_t i = 0; i < tags.size(); i++) {
             prependOne(tags[i]);
         }
     }
 
     bool contains(const std::deque<std::string>& tags) const {
-        for(int i = 0; i < tags.size(); i++) {
+        for(std::size_t i = 0; i < tags.size(); i++) {
             if(!containsOne(tags[i])) 
                 return false;
         }
@@ -278,7 +278,7 @@ private:
     }
 
     bool containsAny(const std::deque<std::string>& tags) const {
-        for(int i = 0; i < tags.size(); i++) {
+        for(std::size_t i = 0; i < tags.size(); i++) {
             if(containsOne(tags[i])) 
                 return true;
         }
@@ -297,7 +297,7 @@ private:
     }
     
     void remove(std::deque<std::string> tags) {
-        for(int i = 0; i < tags.size(); i++) {
+        for(std::size_t i = 0; i < tags.size(); i++) {
             removeOne(tags[i]);
         }
     }

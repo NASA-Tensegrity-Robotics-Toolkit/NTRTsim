@@ -130,7 +130,7 @@ void tgModel::notifyTeardowntgModel()
 
 void tgModel::setup(tgWorld& world)
 {
-  for (int i = 0; i < m_children.size(); i++)
+  for (std::size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->setup(world);
   }
@@ -141,7 +141,7 @@ void tgModel::setup(tgWorld& world)
 
 void tgModel::teardown()
 {
-  for (int i = 0; i < m_children.size(); i++)
+  for (std::size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->teardown();
     delete m_children[i];
@@ -166,7 +166,7 @@ void tgModel::step(double dt)
     // Note: You can adjust whether to step children before notifying 
     // controllers or the other way around in your model
     const size_t n = m_children.size();
-    for (int i = 0; i < n; i++)
+    for (std::size_t i = 0; i < n; i++)
     {
       tgModel* const pChild = m_children[i];
       assert(pChild != NULL);
@@ -184,7 +184,7 @@ void tgModel::onVisit(const tgModelVisitor& r) const
 
         // Call onRender for all children (if we have any)
     const size_t n = m_children.size();
-        for (int i = 0; i < n; i++)
+        for (std::size_t i = 0; i < n; i++)
         {
         tgModel * const pChild = m_children[i];
         assert(pChild != NULL);
@@ -207,7 +207,7 @@ void tgModel::onVisit(const tgModelVisitor_tgDLR& r) const
 
         // Call onRender for all children (if we have any)
     const size_t n = m_children.size();
-        for (int i = 0; i < n; i++)
+        for (std::size_t i = 0; i < n; i++)
         {
         tgModel * const pChild = m_children[i];
         assert(pChild != NULL);
@@ -255,7 +255,7 @@ std::string tgModel::toString(std::string prefix) const
   std::ostringstream os;
   os << prefix << "tgModel(" << std::endl;
   os << prefix << p << "Children:" << std::endl;
-  for(int i = 0; i < m_children.size(); i++) {
+  for(std::size_t i = 0; i < m_children.size(); i++) {
     os << m_children[i]->toString(prefix + p) << std::endl;
   }
   os << prefix << p << "Tags: [" << getTags() << "]" << std::endl;
@@ -271,7 +271,7 @@ std::vector<tgModel*> tgModel::getDescendants() const
 {
   std::vector<tgModel*> result;
   const size_t n = m_children.size();
-  for (int i = 0; i < n; i++)
+  for (std::size_t i = 0; i < n; i++)
   {
     tgModel* const pChild = m_children[i];
     assert(pChild != NULL);

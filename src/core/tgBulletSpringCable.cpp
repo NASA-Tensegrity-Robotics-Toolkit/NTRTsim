@@ -36,11 +36,11 @@ tgBulletSpringCable::tgBulletSpringCable( const std::vector<tgBulletSpringCableA
                 double coefK,
                 double dampingCoefficient,
                 double pretension) :
+tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anchors),
+                coefK, dampingCoefficient, pretension),
 m_anchors(anchors),
 anchor1(anchors.front()),
-anchor2(anchors.back()),
-tgSpringCable(tgCast::filter<tgBulletSpringCableAnchor, tgSpringCableAnchor>(anchors),
-                coefK, dampingCoefficient, pretension)
+anchor2(anchors.back())
 {
     assert(m_anchors.size() >= 2);
     assert(invariant());
