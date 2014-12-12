@@ -27,6 +27,11 @@
 #include "CPGNode.h"
 #include "CPGEdge.h"
 
+// The C++ Standard Library
+#include <algorithm> //for_each
+#include <math.h> 
+#include <assert.h>
+
 CPGNode::CPGNode(int nodeNum, const std::vector<double> & params):
 nodeValue(0),
 phiValue(0),
@@ -44,7 +49,7 @@ dMin(params[5]),
 dMax(params[6])
 {
 	//Precondition
-	assert(params.size() == 7);
+	assert(params.size() >= 7);
 }
 
 CPGNode::~CPGNode()

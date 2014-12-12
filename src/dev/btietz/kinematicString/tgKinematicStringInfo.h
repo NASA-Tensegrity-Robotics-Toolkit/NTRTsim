@@ -17,77 +17,71 @@
 */
 
 /**
- * @file tgLinearStringInfo.h
- * @brief Definition of class tgLinearStringInfo
- * @author Ryan Adams
- * @date March 2014
+ * @file tgKinematicStringInfo.h
+ * @brief Definition of class tgKinematicStringInfo
+ * @author Brian Mirletz
+ * @date December 2014
  * $Id$
  */
 
-#ifndef TG_LINEAR_STRING_INFO_H
-#define TG_LINEAR_STRING_INFO_H
+#ifndef TG_KINEMATIC_STRING_INFO_H
+#define TG_KINEMATIC_STRING_INFO_H
 
-#include "tgConnectorInfo.h"
+#include "tgcreator/tgLinearStringInfo.h"
 
-#include "tgRigidInfo.h"
+#include "tgcreator/tgConnectorInfo.h"
+#include "tgcreator/tgRigidInfo.h"
 
 #include <string>
 
-#include "core/tgLinearString.h"
+#include "tgKinematicString.h"
 #include "core/tgTags.h"
 
 class Muscle2P;
 
-class tgLinearStringInfo : public tgConnectorInfo
+class tgKinematicStringInfo : public tgLinearStringInfo
 {
 public:
 
     /**
-     * Construct a tgLinearStringInfo with just a config. The pair must be filled in 
+     * Construct a tgKinematicStringInfo with just a config. The pair must be filled in 
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgLinearStringInfo(const tgLinearString::Config& config);
+    tgKinematicStringInfo(const tgKinematicString::Config& config);
 
     /**
-     * Construct a tgLinearStringInfo with just a config and tags. The pair must 
+     * Construct a tgKinematicStringInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgLinearStringInfo(const tgLinearString::Config& config, tgTags tags);
+    tgKinematicStringInfo(const tgKinematicString::Config& config, tgTags tags);
 
     /**
-     * Construct a tgLinearStringInfo from its endpoints, radius and density.
+     * Construct a tgKinematicStringInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgLinearStringInfo(const tgLinearString::Config& config, const tgPair& pair);
+    tgKinematicStringInfo(const tgKinematicString::Config& config, const tgPair& pair);
     
 
-    virtual ~tgLinearStringInfo() {}
+    virtual ~tgKinematicStringInfo() {}
     
     /**
      * Create a tgConnectorInfo* from a tgPair
      */ 
     virtual tgConnectorInfo* createConnectorInfo(const tgPair& pair);
 
-    virtual void initConnector(tgWorld& world);
-
     virtual tgModel* createModel(tgWorld& world);
 
-    double getMass();
 
-protected:    
-    
-    Muscle2P* createMuscle2P();
-    Muscle2P* m_muscle2P;
 private:
     
-    tgLinearString::Config m_config;
-    
+    tgKinematicString::Config m_config;
+
 };
 
 
-#endif
+#endif // TG_KINEMATIC_STRING_INFO_H
