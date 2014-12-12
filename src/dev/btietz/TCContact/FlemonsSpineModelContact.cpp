@@ -29,12 +29,11 @@
 #include "FlemonsSpineModelContact.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
-#include "dev/muscleNP/MuscleNP.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -71,7 +70,7 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    tgLinearString::Config muscleConfig(1000, 10, 0.0, false, 7000, 12, 4000);
+    tgSpringCableActuator::Config muscleConfig(1000, 10, 0.0, false, 7000, 12);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -145,9 +144,9 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
 #if (1)
-    spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
 #else    
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif
     
     // Create your structureInfo
@@ -157,7 +156,7 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // Setup vectors for control
-    m_allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
     

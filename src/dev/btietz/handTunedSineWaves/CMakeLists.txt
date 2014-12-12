@@ -6,6 +6,7 @@ link_libraries(tetraSpineLearningSine
 				learningSpines
                 sensors
                 tgcreator
+                controllers
                 core
                 util
                 terrain

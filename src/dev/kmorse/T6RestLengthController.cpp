@@ -29,7 +29,8 @@
 // This application
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -48,12 +49,12 @@ void T6RestLengthController::onSetup(T6Model& subject)
 {
     // Do a one-time update of all cable rest lengths
     // First, get all muscles (cables)
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
-
+    const std::vector<tgSpringCableActuator*> sca = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = tgCast::filter<tgSpringCableActuator, tgBasicActuator> (sca);
     // then, iterate over all muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
 	assert(pMuscle != NULL);
    
     double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;

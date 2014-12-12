@@ -11,8 +11,9 @@ link_libraries(tetraSpineHardware
 		learningSpines
                 sensors
                 tgcreator
-                core
                 util
+                controllers
+                core
                 terrain
                 Adapters
                 Configuration

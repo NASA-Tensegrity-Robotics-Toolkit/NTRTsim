@@ -29,7 +29,7 @@ public:
     
     virtual ~tgCPGStringControl_mod();
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 
 };
 

@@ -1,7 +1,6 @@
 link_directories(${LIB_DIR})
 
-link_libraries(btietz
-				tgcreator
+link_libraries(tgcreator
                 util
                 sensors
                 core    

@@ -26,7 +26,7 @@
 #include "tgDataLogger.h"
 
 #include "util/tgBaseCPGNode.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 
 #include <iostream>
@@ -56,14 +56,14 @@ void tgDataLogger::render(const tgRod& rod) const
     tgOutput.close();
 }
     
-void tgDataLogger::render(const tgLinearString& linearString) const
+void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
 {
         std::ofstream tgOutput;
     tgOutput.open(m_fileName.c_str(), std::ios::app);
     
-    tgOutput << linearString.getRestLength() << ","    
-    << linearString.getCurrentLength() << ","
-    << linearString.getTension() << ",";
+    tgOutput << mSCA.getRestLength() << ","    
+    << mSCA.getCurrentLength() << ","
+    << mSCA.getTension() << ",";
     
     tgOutput.close();
 }

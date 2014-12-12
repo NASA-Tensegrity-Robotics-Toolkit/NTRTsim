@@ -29,7 +29,7 @@
 
 // Forward declarations
 class CPGEquations;
-class ImpedanceControl;
+class tgImpedanceController;
 
 /**
  * Control class for a tgBaseString (or other mechanism.
@@ -52,9 +52,9 @@ protected:
 
     tgBaseCPGNode();
 
-    ImpedanceControl& motorControl() const;
+    tgImpedanceController& motorControl() const;
 	
-	virtual void setupControl(ImpedanceControl& ipc); 
+	virtual void setupControl(tgImpedanceController& ipc); 
 	
     double controlLength() const { return m_controlLength; }
     
@@ -66,7 +66,7 @@ protected:
 	double m_controlLength;
 private:	
 	// We own this
-    ImpedanceControl* m_pMotorControl;
+    tgImpedanceController* m_pMotorControl;
 
 };
 

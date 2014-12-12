@@ -5,7 +5,7 @@ link_libraries(octahedralComplex
 				learningSpines
                 sensors
                 tgcreator
-                MuscleNP
+                controllers
                 core
                 util
                 terrain

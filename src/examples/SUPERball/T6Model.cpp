@@ -25,10 +25,10 @@
 // This module
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -66,7 +66,6 @@ namespace
         bool   hist;
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
      0.688,    // density (kg / length^3)
@@ -78,11 +77,10 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0,        // pretension
+     2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
-     20000     // maxAcc
 
      // Use the below values for earlier versions of simulation.
      // 1.006,    
@@ -130,7 +128,7 @@ void T6Model::addRods(tgStructure& s)
     s.addPair(10, 11, "rod");
 }
 
-void T6Model::addMuscles(tgStructure& s)
+void T6Model::addActuators(tgStructure& s)
 {
     s.addPair(0, 4,  "muscle");
     s.addPair(0, 5,  "muscle");
@@ -172,16 +170,16 @@ void T6Model::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
+    
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
+					    c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
-    addMuscles(s);
+    addActuators(s);
     s.move(btVector3(0, 10, 0));
 
     // Add a rotation. This is needed if the ground slopes too much,
@@ -194,7 +192,7 @@ void T6Model::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -204,7 +202,7 @@ void T6Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -233,9 +231,9 @@ void T6Model::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& T6Model::getAllMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getAllActuators() const
 {
-    return allMuscles;
+    return allActuators;
 }
     
 void T6Model::teardown()

@@ -16,15 +16,30 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file tgCPGStringControl.cpp
+ * @brief Implementation of the tgCPGStringControl observer class
+ * @author Brian Mirletz
+ * @date May 2014
+ * $Id$
+ */
+
 #include "tgCPGStringControl.h"
 
-#include "core/Muscle2P.h"
-#include "core/muscleAnchor.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgSpringCable.h"
+#include "core/tgSpringCableAnchor.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
+#include "core/tgBulletSpringCableAnchor.h"
+#include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
+#include "dev/CPG_feedback/CPGEquationsFB.h"
+#include "core/tgCast.h"
 
+// The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 tgCPGStringControl::tgCPGStringControl(const double controlStep) :
 m_controlTime(0.0),
@@ -47,28 +62,41 @@ tgCPGStringControl::~tgCPGStringControl()
 	m_pToBody = NULL;
 }
 
-void tgCPGStringControl::onAttach(tgLinearString& subject)
+void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_controlLength = subject.getStartLength();
-	m_pFromBody = subject.getMuscle()->anchor1->attachedBody;
-	m_pToBody   = subject.getMuscle()->anchor2->attachedBody;
+    
+    // tgSpringCable doesn't know about bullet anchors, so we have to cast here to get the rigid bodies
+	std::vector<const tgBulletSpringCableAnchor*> anchors = 
+        tgCast::filter<const tgSpringCableAnchor, const tgBulletSpringCableAnchor>(subject.getSpringCable()->getAnchors());
+
+    std::size_t n = anchors.size();
+    assert(n >= 2);
+    
+	m_pFromBody = anchors[0]->attachedBody;
+	m_pToBody   = anchors[n - 1]->attachedBody;
 }
 
-void tgCPGStringControl::onStep(tgLinearString& subject, double dt)
+void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
+    
+    // Workaround until we implement PID
+    tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(subject));
+    
     if (m_controlTime >= m_controlStep)
     {
-		m_commandedTension = motorControl().control(&subject, m_controlTime, controlLength(), getCPGValue());
+        
+		m_commandedTension = motorControl().control(m_sca, m_controlTime, controlLength(), getCPGValue());
 
         m_controlTime = 0;
     }
     else
     {
-		subject.moveMotors(dt);
+		m_sca.moveMotors(dt);
 	}
 }
 
@@ -88,6 +116,30 @@ void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodePa
     params[5] = 0.0; // dMin for descending commands
     params[6] = 5.0; // dMax for descending commands
             
+    m_nodeNumber = m_pCPGSystem->addNode(params);
+} 
+
+void tgCPGStringControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams)
+{
+    // Ensure that this hasn't already been assigned
+    assert(m_nodeNumber == -1);
+    
+    m_pCPGSystem = &CPGSys;
+
+    std::vector<double> params (11);
+    params[0] = nodeParams[0][0]; // Frequency Offset
+    params[1] = nodeParams[0][0]; // Frequency Scale
+    params[2] = nodeParams[0][1]; // Radius Offset
+    params[3] = nodeParams[0][1]; // Radius Scale
+    params[4] = 20.0; // rConst (a constant)
+    params[5] = 0.0; // dMin for descending commands
+    params[6] = 5.0; // dMax for descending commands
+    params[6] = 5.0; // dMax for descending commands
+    params[7] = nodeParams[0][0] * 3.0; // Parity between old and new node behavior
+    params[8] = nodeParams[0][2]; // Frequency feedback
+    params[9] = nodeParams[0][3]; // Amplitude feedback
+    params[10] = nodeParams[0][4]; // Phase feedback
+    
     m_nodeNumber = m_pCPGSystem->addNode(params);
 } 
  
@@ -145,12 +197,12 @@ tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allS
     m_pCPGSystem->defineConnections(m_nodeNumber, connectivityList, weights, phases);
 }
 
-void tgCPGStringControl::setupControl(ImpedanceControl& ipc)
+void tgCPGStringControl::setupControl(tgImpedanceController& ipc)
 {
     tgBaseCPGNode::setupControl(ipc);
 }
 
-void tgCPGStringControl::setupControl(ImpedanceControl& ipc,
+void tgCPGStringControl::setupControl(tgImpedanceController& ipc,
 										double controlLength)
 {
 	 if (controlLength < 0.0)

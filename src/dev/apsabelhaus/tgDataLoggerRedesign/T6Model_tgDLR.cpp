@@ -25,11 +25,11 @@
 // This module
 #include "T6Model_tgDLR.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgObserver.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -67,7 +67,6 @@ namespace
         bool   history;  
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
      0.825,    // density (kg / length^3)
@@ -82,9 +81,10 @@ namespace
      0.0,        // pretension (force)
      false,	   // history (boolean)
      100000,   // maxTens
-     10000,    // targetVelocity
+     10000    // targetVelocity
+#if (0) // Removed from config 12/10/14
      20000     // maxAcc
-
+#endif
      // Use the below values for earlier versions of simulation.
      // 1.006,    
      // 0.31,     
@@ -174,9 +174,9 @@ void T6Model_tgDLR::setup(tgWorld& world)
 				c.rollFriction, c.restitution);
 
     // TO-DO: check out this new config, what exactly are we passing as False?
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, 
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, 
+					    c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -195,7 +195,7 @@ void T6Model_tgDLR::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -205,7 +205,7 @@ void T6Model_tgDLR::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -236,7 +236,7 @@ void T6Model_tgDLR::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& T6Model_tgDLR::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& T6Model_tgDLR::getAllMuscles() const
 {
     return allMuscles;
 }

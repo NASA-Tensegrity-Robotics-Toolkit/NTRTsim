@@ -76,19 +76,32 @@ public:
      * Add a Tensegrity to the simulation.
      * @param[in] pModel a pointer to a tgModel representing a Tensegrity;
      * an exception is thrown if it is NULL
-     * @throw std::invarlid_argument if pModel is NULL
-     * @todo Model pointer can't be NULL.
+     * @throw std::invalid_argument if pModel is NULL
      */
     void addModel(tgModel* pModel);
-
+    
+    /**
+     * Pass the tgModelVisitor to all of the models
+     */
     void onVisit(const tgModelVisitor& r) const;
-
+    
+    /**
+     * Calls teardown, then calls setup on the view, finally
+     * calls setup on the models
+     * Will delete and remake the dynamics world
+     */
     void reset();
-
+    
+    /**
+     * Returns a reference to the world
+     */
     tgWorld& getWorld() const;
 
  private:
-
+    
+    /**
+     * Calls teardown on all of the models and reset on the world
+     */
     void teardown() const;
 
     /** Integrity predicate. */

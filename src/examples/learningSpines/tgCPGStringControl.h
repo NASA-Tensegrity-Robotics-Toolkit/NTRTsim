@@ -19,8 +19,16 @@
 #ifndef TG_CPG_STRING_CONTRL_H
 #define TG_CPG_STRING_CONTRL_H
 
+/**
+ * @file tgCPGStringControl.h
+ * @brief Definition of the tgCPGStringControl observer class
+ * @author Brian Mirletz
+ * @date May 2014
+ * $Id$
+ */
+
 #include "util/tgBaseCPGNode.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 // The Boost library
 #include "boost/multi_array.hpp"
 
@@ -30,9 +38,10 @@ typedef boost::multi_array<double, 4> array_4D;
 // Forward declarations
 class btRigidBody;
 class CPGEquations;
-class ImpedanceControl;
+class CPGEquationsFB;
+class tgImpedanceController;
 
-class tgCPGStringControl : public tgObserver<tgLinearString>,
+class tgCPGStringControl : public tgObserver<tgSpringCableActuator>,
 							public tgBaseCPGNode
 {
 public:
@@ -41,9 +50,9 @@ public:
     
     virtual ~tgCPGStringControl();
     
-    virtual void onAttach(tgLinearString& subject);
+    virtual void onAttach(tgSpringCableActuator& subject);
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
 	/**
      * Can call these any time, but they'll only have the intended effect
@@ -53,7 +62,13 @@ public:
     void assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams);
     
     /**
-     * Iterate through all other tgLinearStringCPGInfos, and determine
+     * Account for the larger number of parameters the nodes have
+     * with a feedback CPGSystem
+     */
+    void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
+    
+    /**
+     * Iterate through all other tgSpringCableActuatorCPGInfos, and determine
      * CPG network by rigid body connectivity
      */
     void setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
@@ -77,9 +92,9 @@ public:
         return m_commandedTension;
     }
     
-    virtual void setupControl(ImpedanceControl& ipc);
+    virtual void setupControl(tgImpedanceController& ipc);
     
-    void setupControl(ImpedanceControl& ipc,
+    void setupControl(tgImpedanceController& ipc,
 						double controlLength);
 
 	const btRigidBody* getFromBody() const
@@ -107,7 +122,7 @@ protected:
     double m_totalTime;
     
     double m_commandedTension;
-private:    
+ 
     btRigidBody* m_pFromBody;
     
     btRigidBody* m_pToBody;

@@ -20,21 +20,20 @@
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
-#include "core/tgLinearString.h"
-#include "core/tgBaseString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "core/tgBaseRigid.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 
-#include "core/Muscle2P.cpp"
-#include "core/muscleAnchor.cpp"
+#include "core/tgBulletSpringCable.h"
+#include "core/tgSpringCableAnchor.h"
 
 // The Bullet Physics Library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
@@ -85,7 +84,7 @@ void MuscleNPCons::setup(tgWorld& world)
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
 	s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), M_PI/4);
-	tgBaseString::Config muscleConfig(1000, 0, 0.0, false, 600000000);
+	tgSpringCableActuator::Config muscleConfig(1000, 0, 0.0, false, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
@@ -93,11 +92,8 @@ void MuscleNPCons::setup(tgWorld& world)
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
 	spec.addBuilder("box", new tgBoxInfo(boxConfig));
 	spec.addBuilder("rod", new tgRodInfo(rodConfig));
-#if (1)
-	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-#else
-	spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-#endif
+	spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+
 	// Create your structureInfo
 	tgStructureInfo structureInfo(s, spec);
 	// Use the structureInfo to build ourselves
@@ -106,7 +102,7 @@ void MuscleNPCons::setup(tgWorld& world)
 	// models (e.g. muscles) that we want to control.
 	allRods.clear();
 	allMuscles.clear();
-	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+	allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 	allRods = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
 	
 	btRigidBody* body = allRods[0]->getPRigidBody();
@@ -152,7 +148,7 @@ void MuscleNPCons::step(double dt)
 	
 	btVector3 forceSum(0.0, 0.0, 0.0);
 	
-	const std::vector<muscleAnchor*>& anchorList = allMuscles[0]->getMuscle()->getAnchors();
+	const std::vector<const tgSpringCableAnchor*>& anchorList = allMuscles[0]->getSpringCable()->getAnchors();
 	int n = anchorList.size();
 	for (std::size_t i = 0; i < n; i++)
 	{

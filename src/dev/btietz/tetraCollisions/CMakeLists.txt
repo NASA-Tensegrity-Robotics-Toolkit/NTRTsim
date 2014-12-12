@@ -6,7 +6,6 @@ link_libraries(tetraSpineLearningSine
 				learningSpines
                 sensors
                 tgcreator
-                MuscleNP
                 core
                 util
                 terrain

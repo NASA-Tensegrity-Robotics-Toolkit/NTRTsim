@@ -9,5 +9,5 @@ add_library( ${PROJECT_NAME} SHARED
 
 link_directories(${LIB_DIR})
 
-target_link_libraries(${PROJECT_NAME} core)
+target_link_libraries(${PROJECT_NAME} controllers core)
 

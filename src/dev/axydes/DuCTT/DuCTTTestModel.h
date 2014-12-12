@@ -33,9 +33,9 @@
 #include "core/tgSubject.h"
 #include "core/tgCast.h"
 #include "core/tgString.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -53,7 +53,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 
 /**
  * The DuCTTTestModel implements a tensegrity with rigid
@@ -67,7 +67,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -106,7 +106,7 @@ public:
 	 * a string to a vector of muscles
 	 * @return a std::vector of pointers to the muscles found by the key
 	 */
-    const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
+    const std::vector<tgSpringCableActuator*>& getMuscles (const std::string& key) const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -132,10 +132,10 @@ private:
     void trace(const tgStructureInfo& structureInfo, tgModel& model);
 
 	/**
-	 * A std::vector containing all of the tgLinearStrings amongst
+	 * A std::vector containing all of the tgSpringCableActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
 	
 	/**
 	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains

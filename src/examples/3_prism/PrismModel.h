@@ -22,8 +22,8 @@
 /**
  * @file PrismModel.h
  * @brief Defines a 3 strut 9 string tensegrity model
- * @author Brian Tietz
- * @version 1.0.0
+ * @author Brian Mirletz
+ * @version 1.1.0
  * $Id$
  */
 
@@ -34,15 +34,16 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModelVisitor;
-class PretensionController;
 class tgStructure;
 class tgWorld;
 
 /**
  * A class that constructs a three bar tensegrity prism using the tools
- * in tgcreator.
+ * in tgcreator. This iteration avoids using a controller and instead
+ * uses the new (to v1.1) ability to define pretension in a
+ * tgBasicActuator's constructor
  */
 class PrismModel : public tgSubject<PrismModel>, public tgModel
 {
@@ -95,7 +96,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllActuators() const;
       
 private:
     
@@ -127,18 +128,12 @@ private:
      */
     static void addMuscles(tgStructure& s);
 
-private:
+private:    
     /**
-     * A controller that is attached to all of the strings which applies
-     * pretension to the muscles.
-     */
-    PretensionController* m_pStringController;
-    
-    /**
-     * A list of all of the muscles. Will be empty until most of the way
+     * A list of all of the spring cable actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allActuators;
 };
 
 #endif  // Prism_MODEL_H

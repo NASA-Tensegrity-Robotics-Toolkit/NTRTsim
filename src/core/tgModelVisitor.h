@@ -27,7 +27,7 @@
  */
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModel;
 class tgRod;
 
@@ -51,7 +51,7 @@ public:
    * Render a tgLinearString.
    * @param[in] linearString a const reference to a tgLinearString to render
    */
-  virtual void render(const tgLinearString& linearString) const {};
+  virtual void render(const tgSpringCableActuator& linearString) const {};
  
   /**
    * Render a tgModel.

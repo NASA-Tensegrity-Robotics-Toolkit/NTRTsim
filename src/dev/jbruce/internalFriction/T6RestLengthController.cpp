@@ -29,8 +29,8 @@
 // This application
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
-#include "core/Muscle2P.h"
+#include "core/tgBasicActuator.h"
+#include "core/tgBulletSpringCable.h"
 #include "tgcreator/tgUtil.h"
 // The C++ Standard Library
 #include <cassert>
@@ -53,13 +53,13 @@ void T6RestLengthController::onSetup(T6Model& subject)
     // Do a one-time update of all cable rest lengths
     // First, get all muscles (cables)
 
-	const std::vector<tgLinearString*> passiveMuscles = subject.getPassiveMuscles();
-	const std::vector<tgLinearString*> activeMuscles = subject.getActiveMuscles();
+	const std::vector<tgBasicActuator*> passiveMuscles = subject.getPassiveMuscles();
+	const std::vector<tgBasicActuator*> activeMuscles = subject.getActiveMuscles();
 
 	// then, iterate over all muscles
 	for (size_t i = 0; i < passiveMuscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = passiveMuscles[i];
+		tgBasicActuator * const pMuscle = passiveMuscles[i];
 		assert(pMuscle != NULL);
 
 		// set rest length of the i-th muscle
@@ -68,7 +68,7 @@ void T6RestLengthController::onSetup(T6Model& subject)
 	}
 	for (size_t i = 0; i < activeMuscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = activeMuscles[i];
+		tgBasicActuator * const pMuscle = activeMuscles[i];
 		assert(pMuscle != NULL);
 
 		// set rest length of the i-th muscle
@@ -80,8 +80,9 @@ void T6RestLengthController::onSetup(T6Model& subject)
 void T6RestLengthController::onStep(T6Model& subject, double dt)
 {
 	static int count = 0;
-	const std::vector<tgLinearString*> strings = subject.getAllMuscles();
-	const Muscle2P* muscles;
+	const std::vector<tgBasicActuator*> strings = subject.getAllMuscles();
+	/// @todo consider whether this is really necessary, or of tgBasicActuator has all of the functions you need _BTM
+	const tgBulletSpringCable* muscles;
 
 	if(count > 100)
 	{

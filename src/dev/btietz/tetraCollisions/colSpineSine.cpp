@@ -33,8 +33,8 @@
 // Should include tgString, but compiler complains since its been
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgSpringCableActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
@@ -99,7 +99,7 @@ void colSpineSine::onTeardown(BaseSpineModelLearning& subject)
 
 void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 {
-	std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     double tension;
     double kPosition;
@@ -208,7 +208,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 			throw std::runtime_error("Missing tags!");
 		}
 
-        ImpedanceControl* p_ipc = new ImpedanceControl( tension,
+        tgImpedanceController* p_ipc = new tgImpedanceController( tension,
                                                         kPosition,
                                                         kVelocity);
         

@@ -27,10 +27,10 @@
 #include "VerticalSpineModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -129,15 +129,15 @@ namespace
         // create names for muscles (for getMuscles function)
     
         // vertical muscles
-        muscleMap["vertical a"] = model.find<tgLinearString>("vertical muscle a");
-        muscleMap["vertical b"] = model.find<tgLinearString>("vertical muscle b");
-        muscleMap["vertical c"] = model.find<tgLinearString>("vertical muscle c");
-        muscleMap["vertical d"] = model.find<tgLinearString>("vertical muscle d");
+        muscleMap["vertical a"] = model.find<tgBasicActuator>("vertical muscle a");
+        muscleMap["vertical b"] = model.find<tgBasicActuator>("vertical muscle b");
+        muscleMap["vertical c"] = model.find<tgBasicActuator>("vertical muscle c");
+        muscleMap["vertical d"] = model.find<tgBasicActuator>("vertical muscle d");
         
         // saddle muscles
         for (size_t i = 1; i < segmentCount ; ++i)
         {
-            muscleMap[tgString("saddle", i-1)] = model.find<tgLinearString>(tgString("saddle muscle seg", i-1));
+            muscleMap[tgString("saddle", i-1)] = model.find<tgBasicActuator>(tgString("saddle muscle seg", i-1));
             
         }
     }
@@ -204,8 +204,8 @@ void VerticalSpineModel::setup(tgWorld& world)
     // set muscle (string) parameters
     const double stiffness = 1000 ;
     const double damping = 10;
-    tgLinearString::Config muscleConfig(stiffness, damping);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    tgBasicActuator::Config muscleConfig(stiffness, damping);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 
     
     // Create your structureInfo
@@ -215,7 +215,7 @@ void VerticalSpineModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     mapMuscles(muscleMap, *this, m_segments);
 
     trace(structureInfo, *this);
@@ -239,7 +239,7 @@ void VerticalSpineModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
+const std::vector<tgBasicActuator*>&
 VerticalSpineModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);
@@ -253,7 +253,7 @@ VerticalSpineModel::getMuscles (const std::string& key) const
     }
 }
 
-const std::vector<tgLinearString*>& VerticalSpineModel::getAllMuscles() const
+const std::vector<tgBasicActuator*>& VerticalSpineModel::getAllMuscles() const
 {
     return allMuscles;
 }

@@ -36,8 +36,8 @@
 #include <string>
 
 // Forward Declarations
-class ImpedanceControl;
-class tgLinearString;
+class tgImpedanceController;
+class tgSpringCableActuator;
 class BaseSpineModelLearning;
 
 /**
@@ -57,9 +57,9 @@ struct Config
 	/**
 	 * Pointers to impedance controllers 
 	 */
-    ImpedanceControl* in_controller;
-    ImpedanceControl* out_controller;
-    ImpedanceControl* top_controller;
+    tgImpedanceController* in_controller;
+    tgImpedanceController* out_controller;
+    tgImpedanceController* top_controller;
 	
 	/**
 	 * Definitions to find muscle length parameters
@@ -127,7 +127,7 @@ public:
     SerializedSpineControl(std::string fileName);
     
     /**
-     * Destructor. Frees the ImpedanceControl pointers
+     * Destructor. Frees the tgImpedanceController pointers
      */
     ~SerializedSpineControl();
     
@@ -145,46 +145,12 @@ public:
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
 private:
-
-#if (0)
-    /**
-     * Applies the impedance controllers using a velocity setpoint of 0.
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     * @todo - why is this public? It probably should be private
-     */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
-                                                            double dt,
-                                                            std::size_t phase);
-                                                            
-	void applyImpedanceControlTopInside(const std::vector<tgLinearString*> stringList,
-												double dt,
-												std::size_t phase);
-    /**
-     * Applies the impedance controllers using a velocity setpoint determined.
-     * by the phase parameter and 
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
-     */                                    
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase);
-    
-    void applyImpedanceControlTopOutside(const std::vector<tgLinearString*> stringList,
-                                    double dt,
-                                    std::size_t phase);
-#endif //Non generic controllers    
+   
     /**
      * Because sometimes you give up and specify everything
      */
-    void applyImpedanceControlGeneric(ImpedanceControl* controller,	
-										const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlGeneric(tgImpedanceController* controller,	
+										const std::vector<tgSpringCableActuator*> stringList,
 										const std::vector<double> stringLengths,
 										const std::vector<double> tensions,
 										double dt,

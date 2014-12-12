@@ -25,10 +25,10 @@
 // This module
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -70,7 +70,6 @@ namespace
         bool   hist;
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
 	 0.40374,   // density (kg / length^3)
@@ -86,9 +85,10 @@ namespace
      0.0,        // pretension (force)
      0,			// History logging (boolean)
      100000,   // maxTens
-     10000,    // targetVelocity
+     10000    // targetVelocity
+#if (0) // Acceleration constraint removed 12/10/14
      20000     // maxAcc
-
+#endif
      // Use the below values for earlier versions of simulation.
      // 1.152,    // density (kg / length^3)
      //	0.45,     // radius (length)
@@ -176,14 +176,13 @@ void T6Model::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
+    
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgBasicActuator::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.pretension, c.hist, 
+					    c.maxTens, c.targetVelocity);
 
-    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.pretension, c.hist, 
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
-
-    tgLinearString::Config muscleConfig_active(c.stiffness_active, c.damping, c.pretension, c.hist, 
-    					    c.maxTens, c.targetVelocity,
-    					    c.maxAcc);
+    tgBasicActuator::Config muscleConfig_active(c.stiffness_active, c.damping, c.pretension, c.hist, 
+    					    c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -202,8 +201,8 @@ void T6Model::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle_passive", new tgLinearStringInfo(muscleConfig_passive));
-    spec.addBuilder("muscle_active", new tgLinearStringInfo(muscleConfig_active));
+    spec.addBuilder("muscle_passive", new tgBasicActuatorInfo(muscleConfig_passive));
+    spec.addBuilder("muscle_active", new tgBasicActuatorInfo(muscleConfig_active));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -213,10 +212,10 @@ void T6Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     // Not really sure how to use the find() function in tgModel.h
-    passiveMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_passive"), getDescendants());
-    activeMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_active"), getDescendants());
+    passiveMuscles = tgCast::find<tgModel, tgBasicActuator>(tgTagSearch("muscle_passive"), getDescendants());
+    activeMuscles = tgCast::find<tgModel, tgBasicActuator>(tgTagSearch("muscle_active"), getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -245,17 +244,17 @@ void T6Model::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& T6Model::getAllMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getAllMuscles() const
 {
     return allMuscles;
 }
 
-const std::vector<tgLinearString*>& T6Model::getPassiveMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getPassiveMuscles() const
 {
     return passiveMuscles;
 }
 
-const std::vector<tgLinearString*>& T6Model::getActiveMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getActiveMuscles() const
 {
     return activeMuscles;
 }

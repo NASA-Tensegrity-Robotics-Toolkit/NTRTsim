@@ -64,7 +64,6 @@ public:
   /**
    * Construct with a supplied configuration.
    * @param[in] config a tgWorld::Config
-   * @todo I couldn't find a way to give config a default value.
    */
   tgWorld(const Config& config);
   

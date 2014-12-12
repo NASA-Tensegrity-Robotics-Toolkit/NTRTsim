@@ -27,7 +27,7 @@
 // This module
 #include "tgBaseCPGNode.h"
 // This library
-#include "core/ImpedanceControl.h"
+#include "controllers/tgImpedanceController.h"
 #include "CPGEquations.h"
 // The C++ Standard Library
 #include <iostream>
@@ -49,7 +49,7 @@ tgBaseCPGNode::~tgBaseCPGNode()
     // Should have already torn down.
 }
 
-void tgBaseCPGNode::setupControl(ImpedanceControl& ipc)
+void tgBaseCPGNode::setupControl(tgImpedanceController& ipc)
 {
     if (m_nodeNumber == -1)
     {
@@ -75,7 +75,7 @@ double tgBaseCPGNode::getCPGValue() const
     return cpgValue;
 }
 
-ImpedanceControl& tgBaseCPGNode::motorControl() const
+tgImpedanceController& tgBaseCPGNode::motorControl() const
 {
     if (m_pMotorControl == NULL)
     {

@@ -20,7 +20,7 @@
 #define BUILD_TEST_MODEL_H
 
 #include "core/tgModel.h" 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "tgcreator/tgNodes.h"
 #include "core/tgSubject.h"
 #include "core/tgModelVisitor.h"
@@ -121,7 +121,7 @@ public:
         btVector3* cp1 = new btVector3(0, 20, 0);
         btVector3* cp2 = new btVector3(10, 20, 0);
         
-        newString = new tgLinearString(mb.createMuscle(*m_rod, *cp1, *m_rod2, *cp2, muscleConfig), "Muscle1");
+        newString = new tgBasicActuator(mb.createMuscle(*m_rod, *cp1, *m_rod2, *cp2, muscleConfig), "Muscle1");
         
         this->addChild(newString);
 
@@ -167,7 +167,7 @@ private:
     tgRodInfo* m_rod;    
     tgRodInfo* m_rod2;
     
-    tgLinearString* newString;
+    tgBasicActuator* newString;
 };
 
 #endif

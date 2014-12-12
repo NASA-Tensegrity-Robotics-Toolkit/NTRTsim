@@ -28,7 +28,6 @@
  */
 
 #include <vector>
-#include <assert.h>
 #include <sstream>
 
 #include "CPGNode.h"
@@ -46,7 +45,7 @@ class CPGEquations
 
 	CPGEquations(std::vector<CPGNode*> newNodeList);
 	
-	~CPGEquations();
+	virtual ~CPGEquations();
 	
 	int addNode(std::vector<double> newParams);
 					
@@ -60,13 +59,13 @@ class CPGEquations
 	
 	const double operator[](const std::size_t i) const;
 
-	std::vector<double> getXVars();
+	virtual std::vector<double> getXVars();
 	
-	std::vector<double> getDXVars();
+	virtual std::vector<double> getDXVars();
 	
-	void updateNodes(std::vector<double> descCom);
+	virtual void updateNodes(std::vector<double> descCom);
 	
-	void updateNodeData(std::vector<double> newXVals);
+	virtual void updateNodeData(std::vector<double> newXVals);
 	
 	/**
 	 * Call the integrator a the specified timestep

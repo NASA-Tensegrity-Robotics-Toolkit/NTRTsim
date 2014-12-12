@@ -21,7 +21,7 @@
 
 /**
  * @file tgCPGLogger.h
- * @brief Contains the definition of interface class tgDataLogger_tgDLR
+ * @brief Contains the definition of interface class tgCPGLogger
  * @author Brian Mirletz
  * $Id$
  */
@@ -35,14 +35,16 @@
 class BaseSpineCPGControl;
 
 /**
- * Interface for data observers
+ * Interface for an observer of the CPG values
  */
 class tgCPGLogger : public tgObserver <BaseSpineCPGControl>
 {
     
 public:
 
-  /* Constructor */
+  /** Constructor
+   * @param[in[ fileName, the filename where the data is logged
+   */
   tgCPGLogger (std::string fileName);
 
   /** Virtual base classes must have a virtual destructor. */

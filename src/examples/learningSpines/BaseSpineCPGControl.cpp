@@ -32,8 +32,8 @@
 // Should include tgString, but compiler complains since its been
 // included from BaseSpineModelLearning. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgSpringCableActuator.h"
+#include "controllers/tgImpedanceController.h"
 #include "tgCPGStringControl.h"
 
 #include "helpers/FileHelpers.h"
@@ -203,7 +203,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
 void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
-    std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+    std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
@@ -228,7 +228,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
         //String will own this pointer
-        ImpedanceControl* p_ipc = new ImpedanceControl( m_config.tension,
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
                                                         m_config.kPosition,
                                                         m_config.kVelocity);
         if (m_config.useDefault)
@@ -299,10 +299,11 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
+    
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {

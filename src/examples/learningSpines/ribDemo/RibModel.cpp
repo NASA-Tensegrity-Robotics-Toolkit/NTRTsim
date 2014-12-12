@@ -28,10 +28,10 @@
 #include "RibModel.h"
 
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -184,11 +184,11 @@ namespace
           << "Model: "        << std::endl
           << model            << std::endl;    
     // Showing the find function
-    const std::vector<tgLinearString*> outerMuscles =
-        model.find<tgLinearString>("outer");
+    const std::vector<tgSpringCableActuator*> outerMuscles =
+        model.find<tgSpringCableActuator>("outer");
     for (size_t i = 0; i < outerMuscles.size(); ++i)
     {
-        const tgLinearString* const pMuscle = outerMuscles[i];
+        const tgSpringCableActuator* const pMuscle = outerMuscles[i];
         assert(pMuscle != NULL);
         std::cout << "Outer muscle: " << *pMuscle << std::endl;
     }
@@ -257,24 +257,25 @@ void RibModel::setup(tgWorld& world)
     const double pretension = 0.0;
     const bool	 hist = false;
     
-    tgLinearString::Config muscleConfig(500, 5, pretension, hist);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-    tgLinearString::Config muscleConfigAct(1000, 10, pretension, hist, 7000, 24, 10000);
-    spec.addBuilder("muscleAct", new tgLinearStringInfo(muscleConfigAct));
+    tgSpringCableActuator::Config muscleConfig(500, 5, pretension, hist);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfigAct(1000, 10, pretension, hist, 7000, 24);
+    spec.addBuilder("muscleAct", new tgBasicActuatorInfo(muscleConfigAct));
     
     #if (0) // Compliant Rib Attachments
     const double stiffness = 1000;
     const double damping = .01 * stiffness;
     
-    tgLinearString::Config muscleConfig1(stiffness, damping, -M_PI / 2.0);
-    tgLinearString::Config muscleConfig2(stiffness, damping, M_PI / 2.0);
-    tgLinearString::Config muscleConfig3(stiffness, damping, M_PI);
-    tgLinearString::Config muscleConfig4(stiffness, damping, 0);
+    tgSpringCableActuator::Config muscleConfig1(stiffness, damping, -M_PI / 2.0);
+    tgSpringCableActuator::Config muscleConfig2(stiffness, damping, M_PI / 2.0);
+    tgSpringCableActuator::Config muscleConfig3(stiffness, damping, M_PI);
+    tgSpringCableActuator::Config muscleConfig4(stiffness, damping, 0);
     
-    spec.addBuilder("multiMuscle", new tgLinearStringInfo(muscleConfig1));
-    spec.addBuilder("multiMuscle", new tgLinearStringInfo(muscleConfig2));
-    spec.addBuilder("multiMuscle", new tgLinearStringInfo(muscleConfig3));
-    spec.addBuilder("multiMuscle", new tgLinearStringInfo(muscleConfig4));
+    spec.addBuilder("multiMuscle", new tgBasicActuatorInfo(muscleConfig1));
+    spec.addBuilder("multiMuscle", new tgBasicActuatorInfo(muscleConfig2));
+    spec.addBuilder("multiMuscle", new tgBasicActuatorInfo(muscleConfig3));
+    spec.addBuilder("multiMuscle", new tgBasicActuatorInfo(muscleConfig4));
     #endif
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -284,7 +285,7 @@ void RibModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    m_allMuscles = find<tgLinearString> ("muscleAct");
+    m_allMuscles = find<tgSpringCableActuator> ("muscleAct");
     m_allSegments = find<tgModel> ("segment");
 
     #if (0)
