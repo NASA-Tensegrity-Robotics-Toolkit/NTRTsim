@@ -17,80 +17,71 @@
 */
 
 /**
- * @file tgBasicContactCableInfo.h
- * @brief Definition of class tgBasicContactCableInfo
- * @author Brian Mirletz and Ryan Adams
- * @date October 2014
+ * @file tgKinematicContactCableInfo.h
+ * @brief Definition of class tgKinematicContactCableInfo
+ * @author Brian Mirletz
+ * @date December 2014
  * $Id$
  */
 
-#ifndef SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H
-#define SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H
+#ifndef TG_KINEMATIC_CONTACT_CABLE_INFO_H
+#define TG_KINEMATIC_CONTACT_CABLE_INFO_H
+
+#include "tgcreator/tgBasicContactCableInfo.h"
 
 #include "tgcreator/tgConnectorInfo.h"
-
 #include "tgcreator/tgRigidInfo.h"
 
 #include <string>
 
-#include "core/tgBasicActuator.h"
+#include "core/tgKinematicActuator.h"
 #include "core/tgTags.h"
 
 class tgBulletContactSpringCable;
 
-class tgBasicContactCableInfo : public tgConnectorInfo
+class tgKinematicContactCableInfo : public tgBasicContactCableInfo
 {
 public:
 
     /**
-     * Construct a tgBasicContactCableInfo with just a config. The pair must be filled in 
+     * Construct a tgKinematicContactCableInfo with just a config. The pair must be filled in 
      * later, or factory methods can be used to create instances with
      * pairs.
      */
-    tgBasicContactCableInfo(const tgBasicActuator::Config& config);
+    tgKinematicContactCableInfo(const tgKinematicActuator::Config& config);
 
     /**
-     * Construct a tgBasicContactCableInfo with just a config and tags. The pair must 
+     * Construct a tgKinematicContactCableInfo with just a config and tags. The pair must 
      * be filled in later, or factory methods can be used to create instances 
      * with pairs.
      */
-    tgBasicContactCableInfo(const tgBasicActuator::Config& config, tgTags tags);
+    tgKinematicContactCableInfo(const tgKinematicActuator::Config& config, tgTags tags);
 
     /**
-     * Construct a tgBasicContactCableInfo from its endpoints, radius and density.
+     * Construct a tgKinematicContactCableInfo from its endpoints, radius and density.
      * @param[in] from one endpoint
      * @param[in] to the other endpoint
      * @param[in] config contains the radius and density
      * @todo: make sure that tgPairs returns references to the vectors...
      */
-    tgBasicContactCableInfo(const tgBasicActuator::Config& config, const tgPair& pair);
+    tgKinematicContactCableInfo(const tgKinematicActuator::Config& config, const tgPair& pair);
     
 
-    virtual ~tgBasicContactCableInfo() {}
+    virtual ~tgKinematicContactCableInfo() {}
     
     /**
      * Create a tgConnectorInfo* from a tgPair
      */ 
     virtual tgConnectorInfo* createConnectorInfo(const tgPair& pair);
 
-    void initConnector(tgWorld& world);
-
     virtual tgModel* createModel(tgWorld& world);
 
-    double getMass();
 
-protected:
-    tgBulletContactSpringCable* m_bulletContactSpringCable;
-    
-private:    
-    
-    tgBulletContactSpringCable* createTgBulletContactSpringCable(tgWorld& world);
-    
 private:
     
-    tgBasicActuator::Config m_config;
-    
+    tgKinematicActuator::Config m_config;
+
 };
 
 
-#endif // SRC_TGCREATOR_TG_BASIC_CONTACT_CABLE_INFO_H
+#endif // TG_KINEMATIC_CONTACT_CABLE_INFO_H

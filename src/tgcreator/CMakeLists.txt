@@ -14,6 +14,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgPair.cpp
     tgBasicActuatorInfo.cpp
     tgKinematicActuatorInfo.cpp
+    tgKinematicContactCableInfo.cpp
     tgBasicContactCableInfo.cpp
     tgRigidAutoCompound.cpp
 )

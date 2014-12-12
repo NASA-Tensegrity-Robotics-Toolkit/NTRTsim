@@ -40,7 +40,7 @@ typedef std::vector<double > cpgVars_type;
 CPGEquations::CPGEquations() :
 stepSize(0.1) 
  {}
-CPGEquations::CPGEquations(std::vector<CPGNode*> newNodeList) :
+CPGEquations::CPGEquations(std::vector<CPGNode*>& newNodeList) :
 nodeList(newNodeList),
 stepSize(0.1) //TODO: specify as a parameter somewhere
 {
@@ -126,7 +126,7 @@ std::vector<double> CPGEquations::getDXVars() {
 	return newDXVars;
 }
 
-void CPGEquations::updateNodes(std::vector<double> descCom)
+void CPGEquations::updateNodes(std::vector<double>& descCom)
 {
 	for(int i = 0; i != nodeList.size(); i++){
 		nodeList[i]->updateDTs(descCom[i]);
@@ -209,7 +209,7 @@ class output_function {
 	CPGEquations* theseCPGs;
 };
 
-void CPGEquations::update(std::vector<double> descCom, double dt)
+void CPGEquations::update(std::vector<double>& descCom, double dt)
 {
 	if (dt <= 0.1){ //TODO: specify default step size as a parameter during construction
 		stepSize = dt;

@@ -43,7 +43,7 @@ class CPGEquations
 	
 	CPGEquations();
 
-	CPGEquations(std::vector<CPGNode*> newNodeList);
+	CPGEquations(std::vector<CPGNode*>& newNodeList);
 	
 	virtual ~CPGEquations();
 	
@@ -63,14 +63,14 @@ class CPGEquations
 	
 	virtual std::vector<double> getDXVars();
 	
-	virtual void updateNodes(std::vector<double> descCom);
+	virtual void updateNodes(std::vector<double>& descCom);
 	
 	virtual void updateNodeData(std::vector<double> newXVals);
 	
 	/**
 	 * Call the integrator a the specified timestep
 	 */
-	void update(std::vector<double> descCom, double dt);
+	void update(std::vector<double>& descCom, double dt);
 	
 	std::string toString(const std::string& prefix = "") const;
 	

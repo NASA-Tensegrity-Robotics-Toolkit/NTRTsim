@@ -55,7 +55,7 @@ class CPGNodeFB : public CPGNode
 	 * coupling equations
 	 * @todo better name?
 	 */
-	virtual void updateDTs(	std::vector<double> feedback);
+	virtual void updateDTs(	std::vector<double>& feedback);
 			
 	void updateNodeValues (	double newR,
 							double newPhi,

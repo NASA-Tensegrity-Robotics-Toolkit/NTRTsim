@@ -48,8 +48,6 @@ public:
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      * @param[in] config Holds member variables like elasticity, damping
      * and motor parameters. See tgSpringCableActuator
-     * @param[in] hist whether or not to log additional history @todo 
-     * move hist to config
      */    
     tgBasicActuator(tgBulletSpringCable* muscle,
            const tgTags& tags,

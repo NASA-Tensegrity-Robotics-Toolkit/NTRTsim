@@ -107,7 +107,7 @@ namespace {
 				const int numMuscles = 8;
 				const int numParams = 2;
 				const int segNumber = 6; // For learning results
-				const double controlTime = .001;
+				const double controlTime = .01;
 				const double lowPhase = -1 * M_PI;
 				const double highPhase = M_PI;
 				const double lowAmplitude = -30.0;
@@ -153,7 +153,7 @@ namespace {
 				
 				double dist = FileHelpers::getFinalScore(filePath);
 				
-				EXPECT_EQ(dist, 220.783);
+				EXPECT_EQ(dist, 213.119);
 				
 				// Will print out another set of dist moved on teardown
 	}

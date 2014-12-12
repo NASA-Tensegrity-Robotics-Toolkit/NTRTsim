@@ -49,7 +49,7 @@ CPGNodeFB::~CPGNodeFB()
 
 }
 		
-void CPGNodeFB::updateDTs(std::vector<double> feedback)
+void CPGNodeFB::updateDTs(std::vector<double>& feedback)
 {
 	assert(feedback.size() >= 3);
 	

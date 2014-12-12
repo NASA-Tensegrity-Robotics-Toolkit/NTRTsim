@@ -1,9 +1,11 @@
 link_directories(${LIB_DIR})
 
-link_libraries(learningSpines
-		sensors
+link_libraries(CPG_feedback
+                KinematicString
+                learningSpines
+                sensors
                 tgcreator             
-		core
+                core
                 util
                 terrain
                 Adapters

@@ -17,14 +17,14 @@
 */
 
 /**
- * @file KinematicSpineCPGControl.cpp
+ * @file SpineFeedbackControl.cpp
  * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Tietz
- * @version 1.0.0
+ * @author Brian Mirletz
+ * @version 1.1.0
  * $Id$
  */
 
-#include "KinematicSpineCPGControl.h"
+#include "SpineFeedbackControl.h"
 
 #include <string>
 
@@ -55,7 +55,7 @@
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-KinematicSpineCPGControl::KinematicSpineCPGControl(BaseSpineCPGControl::Config config,	
+SpineFeedbackControl::SpineFeedbackControl(BaseSpineCPGControl::Config config,	
 												std::string args,
 												std::string resourcePath,
                                                 std::string ec,
@@ -66,7 +66,7 @@ BaseSpineCPGControl(config, args, resourcePath, ec, nc)
     
 }
 
-void KinematicSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
+void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();

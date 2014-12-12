@@ -29,7 +29,8 @@
 #include <stdexcept>
 #include <vector>
 
-tgCPGCableControl::tgCPGCableControl(const double controlStep) :
+tgCPGCableControl::tgCPGCableControl(tgPIDController::Config pid_config, const double controlStep) :
+m_config(pid_config),
 tgCPGStringControl(controlStep),
 m_PID(NULL)
 {
@@ -45,10 +46,7 @@ tgCPGCableControl::~tgCPGCableControl()
 
 void tgCPGCableControl::onSetup(tgSpringCableActuator& subject)
 {
-    /// @todo make a construction parameter of this class
-	tgPIDController::Config config(5000.0, 0.0, 10.0, true); // Non backdrivable
-	//tgPIDController::Config config(-5000.0, -1.0, -10.0);
-    m_PID = new tgPIDController(&subject, config);
+    m_PID = new tgPIDController(&subject, m_config);
 }
 
 void tgCPGCableControl::onStep(tgSpringCableActuator& subject, double dt)
@@ -61,7 +59,7 @@ void tgCPGCableControl::onStep(tgSpringCableActuator& subject, double dt)
     if (m_controlTime >= m_controlStep)
     {
         
-		m_commandedTension = motorControl().control(*m_PID, m_controlTime, controlLength(), getCPGValue());
+		m_commandedTension = motorControl().control(*m_PID, dt, controlLength(), getCPGValue());
 
         m_controlTime = 0;
     }

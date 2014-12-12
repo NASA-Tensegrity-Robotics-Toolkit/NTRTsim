@@ -49,7 +49,7 @@ class CPGEquationsFB : public CPGEquations
 	
 	CPGEquationsFB();
 
-	CPGEquationsFB(std::vector<CPGNode*> newNodeList);
+	CPGEquationsFB(std::vector<CPGNode*>& newNodeList);
 	
 	~CPGEquationsFB();
 	
@@ -57,9 +57,9 @@ class CPGEquationsFB : public CPGEquations
 	
 	std::vector<double> getDXVars();
 	
-	void updateNodes(std::vector<double> descCom);
+	void updateNodes(std::vector<double>& descCom);
 	
-	void updateNodeData(std::vector<double> newXVals);
+	void updateNodeData(std::vector<double>& newXVals);
 
 };
 

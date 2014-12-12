@@ -32,6 +32,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
@@ -70,7 +71,20 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    tgSpringCableActuator::Config muscleConfig(1000, 10, 0.0, false, 7000, 12);
+    const double elasticity = 1000.0;
+    const double damping = 10.0;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 12.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -144,7 +158,7 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
 #if (1)
-    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
 #else    
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif

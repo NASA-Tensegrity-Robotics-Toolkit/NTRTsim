@@ -21,17 +21,15 @@
 
 #include "examples/learningSpines/tgCPGStringControl.h"
 #include "core/tgSpringCableActuator.h"
+#include "controllers/tgPIDController.h"
 // The Boost library
 #include "boost/multi_array.hpp"
-
-// Forward declarations
-class tgPIDController;
 
 class tgCPGCableControl : public tgCPGStringControl
 {
 public:
  
-    tgCPGCableControl(const double controlStep = 1.0/10000.0);
+    tgCPGCableControl(const tgPIDController::Config pid_config, const double controlStep = 1.0/10000.0);
     
     virtual ~tgCPGCableControl();
     
@@ -40,6 +38,8 @@ public:
     virtual void onStep(tgSpringCableActuator& subject, double dt);
 
 protected:
+    const tgPIDController::Config m_config;
+
    tgPIDController* m_PID; 
 
 };

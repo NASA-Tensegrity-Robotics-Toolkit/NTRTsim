@@ -43,7 +43,7 @@ typedef std::vector<double > cpgVars_type;
 CPGEquationsFB::CPGEquationsFB() :
 CPGEquations()
  {}
-CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*> newNodeList) :
+CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*>& newNodeList) :
 CPGEquations(newNodeList)
 {
 }
@@ -79,7 +79,7 @@ std::vector<double> CPGEquationsFB::getDXVars() {
 	return newDXVars;
 }
 
-void CPGEquationsFB::updateNodes(std::vector<double> descCom)
+void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
 {
 	std::vector<double>::iterator comIt = descCom.begin();
 	
@@ -94,7 +94,7 @@ void CPGEquationsFB::updateNodes(std::vector<double> descCom)
 	}
 }
 
-void CPGEquationsFB::updateNodeData(std::vector<double> newXVals)
+void CPGEquationsFB::updateNodeData(std::vector<double>& newXVals)
 {
 	assert(newXVals.size()==3*nodeList.size());
 	

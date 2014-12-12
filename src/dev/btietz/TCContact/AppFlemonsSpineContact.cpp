@@ -27,7 +27,8 @@
 
 // This application
 #include "FlemonsSpineModelContact.h"
-#include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "dev/CPG_feedback/SpineFeedbackControl.h"
+#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (1)
+#if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
 #endif
 
     // Second create the view
-    const double stepSize = 1.0/500.0; // Seconds
+    const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
     tgSimViewGraphics view(world, stepSize, renderRate);
 
@@ -100,10 +101,37 @@ int main(int argc, char** argv)
     const double highPhase = M_PI;
     const double lowAmplitude = -30.0;
     const double highAmplitude = 30.0;
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime, 
-												lowAmplitude, highAmplitude, lowPhase, highPhase);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+    const double kt = 0.0;
+    const double kp = 1000.0;
+    const double kv = 200.0;
+    const bool def = true;
+        
+    // Overridden by def being true
+    const double cl = 10.0;
+    const double lf = -30.0;
+    const double hf = 30.0;
+
+
+    BaseSpineCPGControl::Config control_config(segmentSpan, 
+                                                numMuscles,
+                                                numMuscles,
+                                                numParams, 
+                                                segNumber, 
+                                                controlTime,
+                                                lowAmplitude,
+                                                highAmplitude,
+                                                lowPhase,
+                                                highPhase,
+                                                kt,
+                                                kp,
+                                                kv,
+                                                def,
+                                                cl,
+                                                lf,
+                                                hf
+                                                );
+    SpineFeedbackControl* const myControl =
+      new SpineFeedbackControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);
