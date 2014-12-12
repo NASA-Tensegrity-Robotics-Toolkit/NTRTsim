@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (0)
+#if (1)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;

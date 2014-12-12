@@ -35,6 +35,7 @@
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -160,7 +161,7 @@ void FlemonsSpineModelContact::setup(tgWorld& world)
 #if (1)
     spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
 #else    
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(motorConfig));
 #endif
     
     // Create your structureInfo
