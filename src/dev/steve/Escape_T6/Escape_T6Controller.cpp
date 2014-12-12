@@ -61,6 +61,7 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength) :
 /** Set the lengths of the muscles and initialize the learning adapter */
 void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
+    m_totalTime = 0;
     double dt = 0.0001;
 
     //Set the initial length of every muscle in the subject
@@ -165,12 +166,12 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = true;
+    bool usingManualParams = false;
     vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
         string filename = "logs/paramSortedBestTrials.dat";
-        int lineNumber = 190;
+        int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);
     } 
 
@@ -265,13 +266,6 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
 
     for(int iMuscle=0; iMuscle < nMuscles; iMuscle++) {
         const vector<tgLinearString*> muscles = subject.getAllMuscles();
-        /*
-        if (muscles.size() > 0 || subject.getAllMuscles().size() > 0) {
-            cout << "Populated\n";
-        } else {
-            cout << "Unpopulated\n";
-        }
-        cout << "iMuscle: " << iMuscle << endl;*/
         tgLinearString *const pMuscle = muscles[iMuscle];
         assert(pMuscle != NULL);
 
@@ -394,7 +388,7 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string
     if (tweaking) {
         // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
         for (int i=0; i < result.size(); i++) {
-            //std::cout<<"Entered Cell " << i << ": " << result[i] << "\n";
+            std::cout<<"Entered Cell " << i << ": " << result[i] << "\n";
             double seed = ((double) (rand() % 100)) / 100;
             result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
             //std::cout<<"Tweaked Cell " << i << ": " << result[i] << "\n";
