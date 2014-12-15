@@ -140,7 +140,7 @@ void tgCPGStringControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D no
     params[9] = nodeParams[0][3]; // Amplitude feedback
     params[10] = nodeParams[0][4]; // Phase feedback
     
-    m_nodeNumber = m_pCPGSystem->addNode(params);
+    m_nodeNumber = CPGSys.addNode(params);
 } 
  
 void

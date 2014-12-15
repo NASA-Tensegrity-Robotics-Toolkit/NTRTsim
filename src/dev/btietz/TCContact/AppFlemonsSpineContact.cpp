@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (1)
+#if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
     const int numMuscles = 8;
     const int numParams = 2;
     const int segNumber = 6; // For learning results
-    const double controlTime = .001;
+    const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
     const double lowAmplitude = -30.0;

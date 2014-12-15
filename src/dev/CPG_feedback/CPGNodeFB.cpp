@@ -42,7 +42,7 @@ kPhase(params[10])
 {
 	//Precondition
 	assert(params.size() >= 11);
-    rValue = 0.01; // Jumpstart integration
+    rValue = sqrt(radiusOffset); // Jumpstart integration
 }
 
 CPGNodeFB::~CPGNodeFB()

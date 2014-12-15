@@ -47,7 +47,7 @@ class CPGEquations
 	
 	virtual ~CPGEquations();
 	
-	int addNode(std::vector<double> newParams);
+	int addNode(std::vector<double>& newParams);
 					
 	void connectNode(int nodeIndex,
 			 std::vector<CPGEdge*> connectivityList);

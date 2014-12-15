@@ -57,7 +57,7 @@ CPGEquations::~CPGEquations()
 
 // Params needs size 7 to fill all of the params.
 // TODO: consider changing to a config struct
-int CPGEquations::addNode(std::vector<double> newParams) 
+int CPGEquations::addNode(std::vector<double>& newParams) 
 {
 	int index = nodeList.size();
 	CPGNode* newNode = new CPGNode(index, newParams);

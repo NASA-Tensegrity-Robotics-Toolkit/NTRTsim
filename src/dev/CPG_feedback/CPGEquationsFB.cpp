@@ -53,7 +53,7 @@ CPGEquationsFB::~CPGEquationsFB()
   //CPGEquations
 }
 
-int CPGEquations::addNode(std::vector<double> newParams) 
+int CPGEquationsFB::addNode(std::vector<double>& newParams) 
 {
 	int index = nodeList.size();
 	CPGNodeFB* newNode = new CPGNodeFB(index, newParams);
