@@ -53,11 +53,21 @@ CPGEquationsFB::~CPGEquationsFB()
   //CPGEquations
 }
 
+int CPGEquations::addNode(std::vector<double> newParams) 
+{
+	int index = nodeList.size();
+	CPGNodeFB* newNode = new CPGNodeFB(index, newParams);
+	nodeList.push_back(newNode);
+	
+	return index;
+}
+
 std::vector<double> CPGEquationsFB::getXVars() {
 	std::vector<double> newXVars;
 	
 	for (int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
+        assert(currentNode);
 		newXVars.push_back(currentNode->phiValue);
 		newXVars.push_back(currentNode->rValue);
 		newXVars.push_back(currentNode->omega);
@@ -87,7 +97,7 @@ void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
 	
 	for(int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
-		std::vector<double> comGroup(comIt, comIt + 2);
+		std::vector<double> comGroup(comIt, comIt + 3);
 		currentNode->updateDTs(comGroup);
 		
 		comIt += 3;

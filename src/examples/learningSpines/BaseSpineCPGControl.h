@@ -118,7 +118,7 @@ struct Config
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini");
     
-    ~BaseSpineCPGControl() {}
+    virtual ~BaseSpineCPGControl() {}
     
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     

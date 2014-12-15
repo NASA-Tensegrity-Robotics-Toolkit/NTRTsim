@@ -28,7 +28,7 @@
 // This application
 #include "FlemonsSpineModelContact.h"
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
-#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
+
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     const double hf = 30.0;
 
 
-    BaseSpineCPGControl::Config control_config(segmentSpan, 
+    SpineFeedbackControl::Config control_config(segmentSpan, 
                                                 numMuscles,
                                                 numMuscles,
                                                 numParams, 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
                                                 hf
                                                 );
     SpineFeedbackControl* const myControl =
-      new SpineFeedbackControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+      new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);

@@ -53,6 +53,8 @@ class CPGEquationsFB : public CPGEquations
 	
 	~CPGEquationsFB();
 	
+    int addNode(std::vector<double> newParams);
+    
 	std::vector<double> getXVars();
 	
 	std::vector<double> getDXVars();

@@ -33,15 +33,16 @@
 #include <assert.h>
 
 CPGNodeFB::CPGNodeFB(int nodeNum, const std::vector<double> & params):
+CPGNode(nodeNum, params),
 omega(params[7]),
 omegaDot(0),
 kFreq(params[8]),
 kAmp(params[9]),
-kPhase(params[10]),
-CPGNode(nodeNum, params)
+kPhase(params[10])
 {
 	//Precondition
 	assert(params.size() >= 11);
+    rValue = 0.01; // Jumpstart integration
 }
 
 CPGNodeFB::~CPGNodeFB()
