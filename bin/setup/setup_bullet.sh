@@ -139,6 +139,14 @@ function patch_bullet()
     patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
 
     popd > /dev/null
+    
+    # Also fix double free error in btQuickprof
+    
+    pushd "$BULLET_BUILD_DIR/src/LinearMath" > /dev/null
+    
+    patch < "$SETUP_DIR/patches/btQuickprof.patch"
+    
+    popd > /dev/null
 }
 
 # Build the package under the build directory specified in in install.conf

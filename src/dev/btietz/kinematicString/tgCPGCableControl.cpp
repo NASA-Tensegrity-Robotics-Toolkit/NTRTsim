@@ -42,6 +42,7 @@ m_PID(NULL)
 
 tgCPGCableControl::~tgCPGCableControl()
 {
+    delete m_PID;
 }
 
 void tgCPGCableControl::onSetup(tgSpringCableActuator& subject)
