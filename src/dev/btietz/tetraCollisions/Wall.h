@@ -34,7 +34,6 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;

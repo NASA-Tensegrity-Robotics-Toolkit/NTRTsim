@@ -49,8 +49,8 @@ public:
   tgBulletRenderer(const tgWorld& world);
 
   /**
-   * Render a tgLinearString.
-   * @param[in] linearString a const reference to a tgLinearString to render
+   * Render a tgSpringCableActuator.
+   * @param[in] linearString a const reference to a tgSpringCableActuator to render
    */
   virtual void render(const tgSpringCableActuator& mSCA) const;
  

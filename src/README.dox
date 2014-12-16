@@ -79,9 +79,9 @@
 	
 	These models were published in the paper
 	Brian T. Mirletz, In-Won Park, Thomas E. Flemons, Adrian K. Agogino, Roger D. Quinn, and Vytas SunSpiral,
-	“Design and Control of Modular Spine-Like Tensegrity Structures”,
-	To Appear in Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
-	
+    “Design and Control of Modular Spine-Like Tensegrity Structures”, 
+    Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
+	\link PDF <http://www.sunspiral.org/vytas/cv/6WCSCM_snake_published.pdf> \endlink
 	\version 1.0.0 (beta)
 */
 

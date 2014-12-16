@@ -33,8 +33,8 @@ class tgImpedanceController;
 
 /**
  * Control class for a tgBaseString (or other mechanism.
- * using a CPG. Parent class of tgLinearStringCPG and 
- * tgRBString CPG going forward.
+ * using a CPG. Parent class of tgCPGStringControl and several
+ * classes in dev
  * This shouldn't have children, and its child class will have tags.
  * Its child class needs to be a tgSubject
  */
