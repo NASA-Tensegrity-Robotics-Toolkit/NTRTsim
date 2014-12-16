@@ -36,7 +36,13 @@ public:
     virtual void onSetup(tgSpringCableActuator& subject);
     
     virtual void onStep(tgSpringCableActuator& subject, double dt);
-
+    
+    /**
+     * Account for the larger number of parameters the nodes have
+     * with a feedback CPGSystem
+    */
+    void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
+    
 protected:
     const tgPIDController::Config m_config;
 

@@ -1,12 +1,13 @@
 project(CPG_feedback)
 
 add_library( ${PROJECT_NAME} SHARED
-	CPGNodeFB.cpp
-	CPGEquationsFB.cpp
+    CPGNodeFB.cpp
+    CPGEquationsFB.cpp
     SpineFeedbackControl.cpp
+    tgCPGCableControl.cpp
 )
 
 link_directories(${LIB_DIR})
 
-target_link_libraries(${PROJECT_NAME} KinematicString learningSpines util core)
+target_link_libraries(${PROJECT_NAME} learningSpines util core)
 

@@ -60,13 +60,7 @@ public:
      */
     
     void assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams);
-    
-    /**
-     * Account for the larger number of parameters the nodes have
-     * with a feedback CPGSystem
-     */
-    void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
-    
+ 
     /**
      * Iterate through all other tgSpringCableActuatorCPGInfos, and determine
      * CPG network by rigid body connectivity

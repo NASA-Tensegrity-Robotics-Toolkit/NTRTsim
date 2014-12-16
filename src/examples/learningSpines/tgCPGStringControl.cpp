@@ -33,7 +33,6 @@
 #include "core/tgBulletSpringCableAnchor.h"
 #include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
-#include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "core/tgCast.h"
 
 // The C++ Standard Library
@@ -117,32 +116,8 @@ void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodePa
     params[6] = 5.0; // dMax for descending commands
             
     m_nodeNumber = m_pCPGSystem->addNode(params);
-} 
+}
 
-void tgCPGStringControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams)
-{
-    // Ensure that this hasn't already been assigned
-    assert(m_nodeNumber == -1);
-    
-    m_pCPGSystem = &CPGSys;
-
-    std::vector<double> params (11);
-    params[0] = nodeParams[0][0]; // Frequency Offset
-    params[1] = nodeParams[0][0]; // Frequency Scale
-    params[2] = nodeParams[0][1] * 3.0; // Radius Offset - Parity between old and new node behavior
-    params[3] = nodeParams[0][1] * 3.0; // Radius Scale
-    params[4] = 20.0; // rConst (a constant)
-    params[5] = 0.0; // dMin for descending commands
-    params[6] = 5.0; // dMax for descending commands
-    params[6] = 5.0; // dMax for descending commands
-    params[7] = nodeParams[0][0] * 3.0; // Parity between old and new node behavior
-    params[8] = nodeParams[0][2]; // Frequency feedback
-    params[9] = nodeParams[0][3]; // Amplitude feedback
-    params[10] = nodeParams[0][4]; // Phase feedback
-    
-    m_nodeNumber = CPGSys.addNode(params);
-} 
- 
 void
 tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
                        array_4D edgeParams) 

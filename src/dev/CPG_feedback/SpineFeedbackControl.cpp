@@ -36,7 +36,7 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGStringControl.h"
-#include "dev/btietz/kinematicString/tgCPGCableControl.h"
+#include "tgCPGCableControl.h"
 
 #include "helpers/FileHelpers.h"
 
@@ -173,22 +173,16 @@ void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		#ifdef USE_KINEMATIC
-            tgPIDController::Config config(5000.0, 0.0, 10.0, true); // Non backdrivable
-            tgCPGCableControl* pStringControl = new tgCPGCableControl(config, m_config.controlTime);
-        #else
-            tgCPGStringControl* pStringControl = new tgCPGStringControl();
-        #endif
+
+        tgPIDController::Config config(5000.0, 0.0, 10.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config, m_config.controlTime);
+
         allMuscles[i]->attach(pStringControl);
         
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeActions);
+        
         m_allControllers.push_back(pStringControl);
-    }
-    
-    /// @todo: redo with for_each
-    // First assign node numbers to the info Classes 
-    for (std::size_t i = 0; i < m_allControllers.size(); i++)
-    {
-        m_allControllers[i]->assignNodeNumberFB(m_CPGFBSys, nodeActions);
     }
     
     // Then determine connectivity and setup string

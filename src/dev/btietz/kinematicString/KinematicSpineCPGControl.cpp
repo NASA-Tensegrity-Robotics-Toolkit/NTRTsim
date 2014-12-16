@@ -36,7 +36,7 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGStringControl.h"
-#include "dev/btietz/kinematicString/tgCPGCableControl.h"
+#include "dev/CPG_feedback/tgCPGCableControl.h"
 
 #include "helpers/FileHelpers.h"
 
