@@ -231,7 +231,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 void tgBulletContactSpringCable::updateManifolds()
 {
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("updateAnchorList");
+    BT_PROFILE("updateManifolds");
 #endif //BT_NO_PROFILE      
     
     // Copy this vector so we can remove as necessary
@@ -374,6 +374,9 @@ void tgBulletContactSpringCable::updateManifolds()
 
 void tgBulletContactSpringCable::updateAnchorList()
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("updateAnchorList");
+#endif //BT_NO_PROFILE    
 	int numContacts = 2;
     
 	while (m_newAnchors.size() > 0)

@@ -156,6 +156,7 @@ void MuscleNPCons::step(double dt)
 	}
 	
 #if (1)	
+    std::cout << "Time " << totalTime << std::endl;
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Energy " << energy << std::endl;
 	std::cout << "Other Momentum " << getMomentum() << std::endl;

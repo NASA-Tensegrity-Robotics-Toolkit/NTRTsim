@@ -161,7 +161,9 @@ bool tgBulletSpringCableAnchor::setWorldPosition(btVector3& newPos)
 					
 					if ((newNormal + contactNormal).length() < 0.5)
 					{
+                        #ifdef VERBOSE
 						std::cout<< "Reversed normal" << std::endl;
+                        #endif
 					}
 					else
 					{
@@ -233,7 +235,9 @@ bool tgBulletSpringCableAnchor::updateManifold(btPersistentManifold* m)
 			btVector3 newNormal = manifoldValues.second;
 			if ((newNormal + contactNormal).length() < 0.5)
 			{
+                #ifdef VERBOSE
 				 std::cout <<"Reversed normal during anchor update" << std::endl;
+                #endif
 				 ret = false;
 			}
 			else
