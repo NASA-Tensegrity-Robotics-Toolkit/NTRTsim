@@ -146,7 +146,7 @@ public:
      */
     /**
      * Returns the linearized velocity of the motor, as opposed to 
-     * tgLinearString which returns the velocity of the muscle material
+     * tgBasicActuator which returns the velocity of the muscle material
      */
     virtual const double getVelocity() const;
     
