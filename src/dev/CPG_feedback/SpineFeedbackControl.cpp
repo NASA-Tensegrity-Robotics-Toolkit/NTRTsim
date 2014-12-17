@@ -95,11 +95,28 @@ SpineFeedbackControl::SpineFeedbackControl(SpineFeedbackControl::Config config,
 												std::string args,
 												std::string resourcePath,
                                                 std::string ec,
-                                                std::string nc) :
+                                                std::string nc,
+                                                std::string fc) :
 BaseSpineCPGControl(config, args, resourcePath, ec, nc),
-m_config(config)
+m_config(config),
+feedbackConfigFilename(fc),
+// Evolution assumes no pre-processing was done on these names
+feedbackEvolution(args + "_fb", fc, resourcePath),
+// Will be overwritten by configuration data
+feedbackLearning(false)
 {
-
+	std::string path;
+	if (resourcePath != "")
+	{
+		path = FileHelpers::getResourcePath(resourcePath);
+	}
+	else
+	{
+		path = "";
+	}
+	
+    feedbackConfigData.readFile(path + feedbackConfigFilename);
+    feedbackLearning = edgeConfigData.getintvalue("learning");
     
 }
 
@@ -142,10 +159,9 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-        std::size_t numControllers = subject.getNumberofMuslces() * 3;
-        
-        double descendingCommand = 0.0;
-        std::vector<double> desComs (numControllers, descendingCommand);
+        std::vector<double> state = getState(subject);
+        std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
+        std::vector<double> desComs = transformFeedbackActions(actions);
         
         m_pCPGSys->update(desComs, m_updateTime);
 #ifdef LOGGING // Conditional compile for data logging        
@@ -247,4 +263,23 @@ array_2D SpineFeedbackControl::scaleNodeActions
     }
     
     return nodeActions;
+}
+
+std::vector<double> SpineFeedbackControl::getState(BaseSpineModelLearning& subject)
+{
+	// TODO - orientation to goal position!!
+	std::vector<double> statePos = subject.getSegmentCOM(m_config.segmentNumber);
+	std::vector<double> state(3);
+	for(std::size_t i = 0; i < 3; i++)
+	{
+		state[i] = statePos[i];
+	}
+	return state;
+}
+
+std::vector<double> SpineFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> > actions)
+{
+	// Placeholder
+	std:vector<double> feedback;
+	return feedback;
 }
