@@ -43,7 +43,6 @@ public:
 private:
 	static bool comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
 	static bool comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
-	void readConfigFromXML(std::string configFile);
 	bool compareAverageScores;
 	bool clearScoresBetweenGenerations;
 	int populationSize;

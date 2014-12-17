@@ -35,7 +35,6 @@ using namespace std;
 
 NeuroEvoMember::NeuroEvoMember(configuration config)
 {
-	//readConfigFromXML(configFile);
 	this->numInputs=config.getintvalue("numberOfStates");
 	this->numOutputs=config.getintvalue("numberOfActions");
 

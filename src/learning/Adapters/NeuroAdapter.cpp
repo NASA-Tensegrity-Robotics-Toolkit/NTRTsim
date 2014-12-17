@@ -62,7 +62,6 @@ void NeuroAdapter::initialize(NeuroEvolution *evo,bool isLearning,configuration 
 			stringstream ss;
 			ss<< neuroEvo->resourcePath << "logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
 			currentControllers[i]->loadFromFile(ss.str().c_str());
-//			currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
 		}
 	}
 	errorOfFirstController=0.0;
