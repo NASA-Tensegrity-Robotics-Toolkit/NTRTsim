@@ -30,7 +30,7 @@
 #include <sstream>
 #include "NeuroAdapter.h"
 #include "learning/Configuration/configuration.h"
-
+#include "helpers/FileHelpers.h"
 #include "neuralNet/Neural Network v2/neuralNetwork.h"
 
 using namespace std;
@@ -60,7 +60,7 @@ void NeuroAdapter::initialize(NeuroEvolution *evo,bool isLearning,configuration 
 		for(int i=0;i<currentControllers.size();i++)
 		{
 			stringstream ss;
-			ss<<"logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
+			ss<< neuroEvo->resourcePath << "logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
 			currentControllers[i]->loadFromFile(ss.str().c_str());
 //			currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
 		}
@@ -111,7 +111,7 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 	}
 
 
-	return actions;
+    return actions;
 }
 
 void NeuroAdapter::endEpisode(vector<double> scores)

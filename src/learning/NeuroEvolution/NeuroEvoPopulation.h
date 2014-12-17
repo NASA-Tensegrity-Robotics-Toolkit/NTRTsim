@@ -16,6 +16,9 @@
  * governing permissions and limitations under the License.
 */
 
+#ifndef NEUROEVOPOPULATION_H_
+#define NEUROEVOPOPULATION_H_
+
 /**
  * @file NeuroEvoPopulation.h
  * @brief A set of members that gets updated and mutated
@@ -23,9 +26,6 @@
  * @author Atil Iscen
  * $Id$
  */
-
-#ifndef NEUROEVOPOPULATION_H_
-#define NEUROEVOPOPULATION_H_
 
 #include "NeuroEvoMember.h"
 #include <vector>

@@ -46,7 +46,7 @@ public:
 		return nn;
 	}
 
-	void copyFrom(NeuroEvoMember *otherMember);
+    void copyFrom(NeuroEvoMember *otherMember);
 	void saveToFile(const char* outputFilename);
 	void loadFromFile(const char* inputFilename);
 
