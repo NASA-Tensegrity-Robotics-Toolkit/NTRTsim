@@ -25,8 +25,11 @@
  */
 
 #include "NeuroEvoMember.h"
+#include "neuralNet/Neural Network v2/neuralNetwork.h"
 #include <fstream>
 #include <iostream>
+#include <assert.h>
+#include <stdexcept>
 
 using namespace std;
 

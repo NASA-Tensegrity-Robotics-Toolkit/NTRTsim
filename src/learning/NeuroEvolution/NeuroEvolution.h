@@ -16,6 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
+#ifndef NEUROEVOLUTION_H_
+#define NEUROEVOLUTION_H_
 /**
  * @file NeuroEvolution.h
  * @brief Top level class for NeuroEvolution
@@ -24,8 +26,7 @@
  * $Id$
  */
 
-#ifndef NEUROEVOLUTION_H_
-#define NEUROEVOLUTION_H_
+
 
 #include "NeuroEvoPopulation.h"
 #include "NeuroEvoMember.h"
@@ -34,26 +35,29 @@
 class NeuroEvolution
 {
 public:
-	NeuroEvolution(string suffix, string config = "config.ini");
+	NeuroEvolution(std::string suffix, std::string config = "config.ini", std::string path = "");
 	~NeuroEvolution();
 	void mutateEveryController();
 	void orderAllPopulations();
 	void evaluatePopulation();
-	vector< NeuroEvoMember *> nextSetOfControllers();
-	void updateScores(vector<double> scores);
-	string suffix;
+	std::vector< NeuroEvoMember *> nextSetOfControllers();
+	void updateScores(std::vector<double> scores);
+    const std::string suffix;
+    /// @todo make this const if we decide to force everyone to put their logs in resources
+    std::string resourcePath;
 private:
 	int populationSize;
 	int numberOfControllers;
 	std::tr1::ranlux64_base_01 eng;
-	vector< NeuroEvoPopulation *> populations;
-	vector <NeuroEvoMember *>  selectedControllers;
-	vector< vector< double > > scoresOfTheGeneration;
+	std::vector< NeuroEvoPopulation *> populations;
+	std::vector <NeuroEvoMember *>  selectedControllers;
+	std::vector< std::vector< double > > scoresOfTheGeneration;
 //	double minValue;
 //	double maxValue;
 	double leniencyCoef;
+    bool seeded;
 	bool coevolution;
-	ofstream evolutionLog;
+	std::ofstream evolutionLog;
 	int currentTest;
 	int numberOfTestsBetweenGenerations;
 	int generationNumber;

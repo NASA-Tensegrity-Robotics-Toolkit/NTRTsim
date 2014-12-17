@@ -16,6 +16,9 @@
  * governing permissions and limitations under the License.
 */
 
+#ifndef NEUROEVOMEMBER_H_
+#define NEUROEVOMEMBER_H_
+
 /**
  * @file NeuroEvoMember.h
  * @brief Single set of params for NeuroEvolution
@@ -24,16 +27,13 @@
  * $Id$
  */
 
-#ifndef NEUROEVOMEMBER_H_
-#define NEUROEVOMEMBER_H_
-
 #include <string>
 #include <vector>
 #include <tr1/random>
-#include "neuralNet/Neural Network v2/neuralNetwork.h"
-#include "../Configuration/configuration.h"
+#include "learning/Configuration/configuration.h"
 
-using namespace std;
+// Forward Declarations
+class neuralNetwork;
 
 class NeuroEvoMember
 {
@@ -50,9 +50,9 @@ public:
 	void saveToFile(const char* outputFilename);
 	void loadFromFile(const char* inputFilename);
 
-	vector<double> statelessParameters;
+	std::vector<double> statelessParameters;
 	//scores for evaluation
-	vector<double> pastScores;
+	std::vector<double> pastScores;
 	double maxScore;
 	double maxScore1;
 	double maxScore2;

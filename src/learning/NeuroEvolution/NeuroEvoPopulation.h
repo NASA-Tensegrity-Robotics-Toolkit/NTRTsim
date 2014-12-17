@@ -34,7 +34,7 @@ class NeuroEvoPopulation {
 public:
 	NeuroEvoPopulation(int numControllers,configuration config);
 	~NeuroEvoPopulation();
-	vector<NeuroEvoMember *> controllers;
+	std::vector<NeuroEvoMember *> controllers;
 	void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
 	void orderPopulation();
 	NeuroEvoMember * selectMemberToEvaluate();
@@ -43,7 +43,7 @@ public:
 private:
 	static bool comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
 	static bool comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
-	void readConfigFromXML(string configFile);
+	void readConfigFromXML(std::string configFile);
 	bool compareAverageScores;
 	bool clearScoresBetweenGenerations;
 	int populationSize;

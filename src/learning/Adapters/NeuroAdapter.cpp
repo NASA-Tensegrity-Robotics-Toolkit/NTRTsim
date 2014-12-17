@@ -29,7 +29,9 @@
 #include <fstream>
 #include <sstream>
 #include "NeuroAdapter.h"
-#include "../Configuration/configuration.h"
+#include "learning/Configuration/configuration.h"
+
+#include "neuralNet/Neural Network v2/neuralNetwork.h"
 
 using namespace std;
 

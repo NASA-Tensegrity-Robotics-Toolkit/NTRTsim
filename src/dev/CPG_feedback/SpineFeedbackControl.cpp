@@ -50,6 +50,7 @@
 //#define LOGGING
 #define USE_KINEMATIC
 
+using namespace std;
 
 SpineFeedbackControl::Config::Config(int ss,
 										int tm,

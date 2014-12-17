@@ -47,6 +47,8 @@
 
 //#define LOGGING
 
+using namespace std;
+
 BaseSpineCPGControl::Config::Config(int ss,
 										int tm,
 										int om,
@@ -299,7 +301,7 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
     
     for(int i=0; i<tmpStrings.size(); i++)
     {
