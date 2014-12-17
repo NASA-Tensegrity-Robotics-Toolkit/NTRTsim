@@ -143,7 +143,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     {
         std::size_t numControllers = subject.getNumberofMuslces() * 3;
         
-        double descendingCommand = 2.0;
+        double descendingCommand = 0.0;
         std::vector<double> desComs (numControllers, descendingCommand);
         
         m_pCPGSys->update(desComs, m_updateTime);
