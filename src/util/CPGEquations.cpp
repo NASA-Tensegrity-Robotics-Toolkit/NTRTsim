@@ -69,13 +69,13 @@ int CPGEquations::addNode(std::vector<double>& newParams)
 	
 	return index;
 }
-				
+#if (0)				
 void CPGEquations::connectNode(	int nodeIndex,
 								std::vector<CPGEdge*> connectivityList)
 {
 	nodeList[nodeIndex]->addCoupling(connectivityList);
 }
-
+#endif
 void CPGEquations::defineConnections (	int nodeIndex,
 								std::vector<int> connections,
 								std::vector<double> newWeights,

@@ -1,7 +1,6 @@
 project(util)
 
 add_library( ${PROJECT_NAME} SHARED
-	CPGEdge.cpp
 	CPGNode.cpp
 	CPGEquations.cpp
     tgBaseCPGNode.cpp
