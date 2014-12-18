@@ -56,16 +56,7 @@ CPGNode::~CPGNode()
 {
 	couplingList.clear();
 }
-#if (0)	
-void CPGNode::addCoupling(CPGEdge* newEdge)
-{
-	couplingList.push_back(newEdge);
-}
 
-void CPGNode::addCoupling(std::vector<CPGEdge*> edgeList){
-	couplingList.insert(couplingList.end(), edgeList.begin(), edgeList.end());
-}
-#endif
 void CPGNode::addCoupling(	CPGNode* cNode,
 							const double cWeight,
 							const double cPhase)

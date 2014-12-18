@@ -25,7 +25,6 @@
  */
 
 #include "CPGNodeFB.h"
-#include "util/CPGEdge.h"
 
 // The Bullet Physics Library
 #include "LinearMath/btQuickprof.h"

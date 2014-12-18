@@ -41,7 +41,6 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "util/CPGEdge.h"
 #include "util/CPGEquations.h"
 #include "util/CPGNode.h"
 

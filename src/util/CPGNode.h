@@ -36,7 +36,6 @@ class CPGEdge;
 
 class CPGNode
 {
-	//friend class CPGEdge;
 	friend class CPGEquations;
 	friend class CPGNodeFB;
     
@@ -48,15 +47,11 @@ class CPGNode
 	 */
 	CPGNode(int nodeNum, const std::vector<double> & params);
 	virtual ~CPGNode();
-#if (0)	
-	void addCoupling(CPGEdge* newEdge);
-#endif	
+
 	void addCoupling(	CPGNode* cNode,
 						const double cWeight,
 						const double cPhase);
-#if (0)						
-	void addCoupling(std::vector<CPGEdge*> edgeList);
-#endif	
+
 	/**
 	 * Update phiDotValue and rDoubleDotValue based on Node equations and
 	 * coupling equations

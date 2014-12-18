@@ -37,7 +37,6 @@ class CPGEdge;
 
 class CPGNodeFB : public CPGNode
 {
-	friend class CPGEdge;
 	friend class CPGEquationsFB;
 	
 	public:

@@ -29,8 +29,6 @@
 
 #include "util/CPGEquations.h"
 
-#include "util/CPGEdge.h"
-
 #include "CPGNodeFB.h"
 
 

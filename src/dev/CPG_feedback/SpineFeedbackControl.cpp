@@ -43,7 +43,6 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "util/CPGEdge.h"
 #include "CPGEquationsFB.h"
 #include "CPGNodeFB.h"
 
