@@ -92,6 +92,9 @@ void CPGEquations::defineConnections (	int nodeIndex,
 
 const double CPGEquations::operator[](const std::size_t i) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::[]");
+#endif //BT_NO_PROFILE
 	double nodeValue;
 	if (i >= nodeList.size())
 	{
@@ -106,32 +109,38 @@ const double CPGEquations::operator[](const std::size_t i) const
 	return nodeValue;
 }
 
-std::vector<double> CPGEquations::getXVars() {
-	std::vector<double> newXVars;
+std::vector<double>& CPGEquations::getXVars() {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::getXVars");
+#endif //BT_NO_PROFILE
+	XVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
-		newXVars.push_back(nodeList[i]->phiValue);
-		newXVars.push_back(nodeList[i]->rValue);
-		newXVars.push_back(nodeList[i]->rDotValue);
+		XVars.push_back(nodeList[i]->phiValue);
+		XVars.push_back(nodeList[i]->rValue);
+		XVars.push_back(nodeList[i]->rDotValue);
 	}
 	
-	return newXVars;
+	return XVars;
 }
 
-std::vector<double> CPGEquations::getDXVars() {
-	std::vector<double> newDXVars;
+std::vector<double>& CPGEquations::getDXVars() {
+	DXVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
-		newDXVars.push_back(nodeList[i]->phiDotValue);
-		newDXVars.push_back(nodeList[i]->rDotValue);
-		newDXVars.push_back(nodeList[i]->rDoubleDotValue);
+		DXVars.push_back(nodeList[i]->phiDotValue);
+		DXVars.push_back(nodeList[i]->rDotValue);
+		DXVars.push_back(nodeList[i]->rDoubleDotValue);
 	}
 	
-	return newDXVars;
+	return DXVars;
 }
 
 void CPGEquations::updateNodes(std::vector<double>& descCom)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::updateNodes");
+#endif //BT_NO_PROFILE
 	for(int i = 0; i != nodeList.size(); i++){
 		nodeList[i]->updateDTs(descCom[i]);
 	}
@@ -139,6 +148,9 @@ void CPGEquations::updateNodes(std::vector<double>& descCom)
 
 void CPGEquations::updateNodeData(std::vector<double> newXVals)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::updateNodeData");
+#endif //BT_NO_PROFILE    
 	assert(newXVals.size()==3*nodeList.size());
 	
 	for(int i = 0; i!=nodeList.size(); i++){
@@ -163,6 +175,9 @@ class integrate_function {
 					cpgVars_type &dxdt ,
 					double t )
 	{
+#ifndef BT_NO_PROFILE 
+        BT_PROFILE("CPGEquations::integrate_function");
+#endif //BT_NO_PROFILE
 		theseCPGs->updateNodeData(x);
 		theseCPGs->updateNodes(descCom);
 	
@@ -228,7 +243,7 @@ void CPGEquations::update(std::vector<double>& descCom, double dt)
 	/**
 	 * Read information from nodes into variables that work for ODEInt
 	 */
-	std::vector<double> xVars = getXVars(); 
+	std::vector<double>& xVars = getXVars(); 
 	
 	/**
 	 * Run ODEInt. This will change the data in xVars

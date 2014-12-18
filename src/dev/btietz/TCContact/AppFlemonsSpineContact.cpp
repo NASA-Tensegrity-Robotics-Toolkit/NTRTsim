@@ -96,7 +96,7 @@ int main(int argc, char** argv)
     const int numMuscles = 8;
     const int numParams = 2;
     const int segNumber = 6; // For learning results
-    const double controlTime = .001;
+    const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
     const double lowAmplitude = -10 *  30.0;

@@ -65,37 +65,37 @@ int CPGEquationsFB::addNode(std::vector<double>& newParams)
 	return index;
 }
 
-std::vector<double> CPGEquationsFB::getXVars() {
+std::vector<double>& CPGEquationsFB::getXVars() {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("CPGEquationsFB:getXVars");
 #endif //BT_NO_PROFILE
-    std::vector<double> newXVars;
+    XVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
         assert(currentNode);
-		newXVars.push_back(currentNode->phiValue);
-		newXVars.push_back(currentNode->rValue);
-		newXVars.push_back(currentNode->omega);
+		XVars.push_back(currentNode->phiValue);
+		XVars.push_back(currentNode->rValue);
+		XVars.push_back(currentNode->omega);
 	}
 	
-	return newXVars;
+	return XVars;
 }
 
-std::vector<double> CPGEquationsFB::getDXVars() {
+std::vector<double>& CPGEquationsFB::getDXVars() {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("CPGEquationsFB:getDXVars");
 #endif //BT_NO_PROFILE
-	std::vector<double> newDXVars;
+	DXVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
-		newDXVars.push_back(currentNode->phiDotValue);
-		newDXVars.push_back(currentNode->rDotValue);
-		newDXVars.push_back(currentNode->omegaDot);
+		DXVars.push_back(currentNode->phiDotValue);
+		DXVars.push_back(currentNode->rDotValue);
+		DXVars.push_back(currentNode->omegaDot);
 	}
 	
-	return newDXVars;
+	return DXVars;
 }
 
 void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
@@ -116,8 +116,11 @@ void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
 	}
 }
 
-void CPGEquationsFB::updateNodeData(std::vector<double>& newXVals)
+void CPGEquationsFB::updateNodeData(std::vector<double> newXVals)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB::updateNodeData");
+#endif //BT_NO_PROFILE 
 	assert(newXVals.size()==3*nodeList.size());
 	
 	for(int i = 0; i!=nodeList.size(); i++){

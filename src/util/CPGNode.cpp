@@ -86,7 +86,8 @@ void CPGNode::updateDTs(double descCom)
 	 * accordingly.
 	 * @todo ask about refactoring to use for_each
 	 */
-	for (int i = 0; i != couplingList.size(); i++){
+	const std::size_t n = couplingList.size();
+	for (std::size_t i = 0; i != n; i++){
         const CPGNode& targetNode = *(couplingList[i]);
         phiDotValue += weightList[i] * targetNode.rValue * sin (targetNode.phiValue - phiValue - phaseList[i]);
 	}

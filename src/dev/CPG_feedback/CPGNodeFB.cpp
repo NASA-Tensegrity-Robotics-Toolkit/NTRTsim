@@ -53,7 +53,7 @@ CPGNodeFB::~CPGNodeFB()
 
 }
 		
-void CPGNodeFB::updateDTs(std::vector<double>& feedback)
+void CPGNodeFB::updateDTs(const std::vector<double>& feedback)
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("CPGNodeFB::updateDTs");
@@ -67,7 +67,8 @@ void CPGNodeFB::updateDTs(std::vector<double>& feedback)
 	 * accordingly.
 	 * @todo ask about refactoring to use for_each
 	 */
-	for (int i = 0; i != couplingList.size(); i++){
+    const std::size_t n = couplingList.size();
+	for (std::size_t i = 0; i != n; i++){
         const CPGNode& targetNode = *couplingList[i];
         phiDotValue += weightList[i] * targetNode.rValue * sin (targetNode.phiValue - phiValue - phaseList[i]);
 	}

@@ -60,9 +60,9 @@ class CPGEquations
 	
 	const double operator[](const std::size_t i) const;
 
-	virtual std::vector<double> getXVars();
+	virtual std::vector<double>& getXVars();
 	
-	virtual std::vector<double> getDXVars();
+	virtual std::vector<double>& getDXVars();
 	
 	virtual void updateNodes(std::vector<double>& descCom);
 	
@@ -79,6 +79,9 @@ protected:
 	
 	std::vector<CPGNode*> nodeList;
 	
+    std::vector<double> XVars;
+    std::vector<double> DXVars;
+    
 	double stepSize;
 };
 
