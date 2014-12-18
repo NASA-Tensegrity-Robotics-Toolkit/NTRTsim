@@ -88,7 +88,7 @@ void CPGNode::updateDTs(double descCom)
 	 * @todo ask about refactoring to use for_each
 	 */
 	for (int i = 0; i != couplingList.size(); i++){
-		couplingList[i]->couple(*this);
+        couplingList[i]->couple(*this);
 	}
 	
 	rDoubleDotValue = rConst * (rConst / 4 * (nodeEquation(descCom, radiusOffset, radiusScale)

@@ -51,17 +51,18 @@ class CPGEdge
 	 * coupled node. Can be overridden to produce a different
 	 * coupling equation.
 	 */
-	virtual void couple(CPGNode & currentNode);
+
+    virtual void couple(CPGNode & currentNode) const;
 	
-	CPGNode* getTargetNode(){
-		return targetNode;
+	const CPGNode* const getTargetNode() const{
+		return &targetNode;
 	}
 	
 	std::string toString(const std::string& prefix = "") const;
 	
 	protected:
 	
-	CPGNode* targetNode;
+	const CPGNode& targetNode;
 	
 	double weight;
 	

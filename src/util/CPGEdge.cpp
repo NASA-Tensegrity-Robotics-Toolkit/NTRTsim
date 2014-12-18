@@ -27,13 +27,16 @@
 #include "CPGEdge.h"
 #include "CPGNode.h"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <math.h> 
 
 CPGEdge::CPGEdge(	CPGNode* newTarget,
 					double newWeight,
 					double newPhase):
-targetNode(newTarget),
+targetNode(*newTarget),
 weight(newWeight),
 phaseOffset(newPhase)
 {
@@ -42,11 +45,16 @@ phaseOffset(newPhase)
 
 CPGEdge::~CPGEdge(){
 	// will be deleted by CPGEquations
-	targetNode = NULL;
+	//targetNode = NULL;
 }
 
-void CPGEdge::couple(CPGNode & currentNode){
-	currentNode.phiDotValue += weight * targetNode->rValue * sin (targetNode->phiValue - currentNode.phiValue - phaseOffset);
+void CPGEdge::couple(CPGNode & currentNode) const
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEdge::couple");
+#endif //BT_NO_PROFILE
+
+	currentNode.phiDotValue += weight * targetNode.rValue * sin (targetNode.phiValue - currentNode.phiValue - phaseOffset);
 }
 
 std::string CPGEdge::toString(const std::string& prefix) const
@@ -58,7 +66,7 @@ std::string CPGEdge::toString(const std::string& prefix) const
 	// TODO: add something about parameters of this edge?
 	
 	os << prefix << p << "Conected to:";
-	os << prefix << p << p << targetNode->getNodeIndex();
+	os << prefix << p << p << targetNode.getNodeIndex();
 
 	os << prefix << ")";
 	return os.str();

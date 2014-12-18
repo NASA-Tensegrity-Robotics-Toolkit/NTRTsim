@@ -87,7 +87,7 @@ class CPGNode
 	}
 	
 	std::string toString(const std::string& prefix = "") const;
-	
+    
 	protected:
 	
 	/**

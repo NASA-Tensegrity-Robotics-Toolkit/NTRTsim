@@ -29,6 +29,10 @@
 #include "boost/array.hpp"
 #include "boost/numeric/odeint.hpp"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
+
 // The C++ Standard Library
 #include <assert.h>
 #include <stdexcept>
@@ -211,6 +215,9 @@ class output_function {
 
 void CPGEquations::update(std::vector<double>& descCom, double dt)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::update");
+#endif //BT_NO_PROFILE
 	if (dt <= 0.1){ //TODO: specify default step size as a parameter during construction
 		stepSize = dt;
 	}

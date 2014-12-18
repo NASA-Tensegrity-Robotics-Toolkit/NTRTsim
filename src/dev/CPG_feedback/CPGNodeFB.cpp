@@ -68,7 +68,7 @@ void CPGNodeFB::updateDTs(std::vector<double>& feedback)
 	 * @todo ask about refactoring to use for_each
 	 */
 	for (int i = 0; i != couplingList.size(); i++){
-		couplingList[i]->couple(*this);
+        couplingList[i]->couple(*this);
 	}
 	
 	omegaDot = kFreq * feedback[0] * sin(phiValue);
