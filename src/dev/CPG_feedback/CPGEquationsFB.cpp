@@ -31,6 +31,9 @@
 #include "boost/array.hpp"
 #include "boost/numeric/odeint.hpp"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <assert.h>
 #include <stdexcept>
@@ -63,7 +66,10 @@ int CPGEquationsFB::addNode(std::vector<double>& newParams)
 }
 
 std::vector<double> CPGEquationsFB::getXVars() {
-	std::vector<double> newXVars;
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:getXVars");
+#endif //BT_NO_PROFILE
+    std::vector<double> newXVars;
 	
 	for (int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
@@ -77,6 +83,9 @@ std::vector<double> CPGEquationsFB::getXVars() {
 }
 
 std::vector<double> CPGEquationsFB::getDXVars() {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:getDXVars");
+#endif //BT_NO_PROFILE
 	std::vector<double> newDXVars;
 	
 	for (int i = 0; i != nodeList.size(); i++){
@@ -91,6 +100,9 @@ std::vector<double> CPGEquationsFB::getDXVars() {
 
 void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:updateNodes");
+#endif //BT_NO_PROFILE
 	std::vector<double>::iterator comIt = descCom.begin();
 	
 	assert(descCom.size() == nodeList.size() * 3);

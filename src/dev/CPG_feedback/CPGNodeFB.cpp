@@ -27,6 +27,9 @@
 #include "CPGNodeFB.h"
 #include "util/CPGEdge.h"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <algorithm> //for_each
 #include <math.h> 
@@ -52,6 +55,9 @@ CPGNodeFB::~CPGNodeFB()
 		
 void CPGNodeFB::updateDTs(std::vector<double>& feedback)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGNodeFB::updateDTs");
+#endif //BT_NO_PROFILE
 	assert(feedback.size() >= 3);
 	
 	phiDotValue = omega + kPhase * feedback [2];
@@ -75,7 +81,10 @@ void CPGNodeFB::updateNodeValues (double newPhi,
 								double newO)
 								
 {
-	rValue = newR;
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGNodeFB::updateNodeValues");
+#endif //BT_NO_PROFILE	
+    rValue = newR;
 	phiValue = newPhi;
 	omega = newO;
 	nodeValue = rValue*cos(phiValue);

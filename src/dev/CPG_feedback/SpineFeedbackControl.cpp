@@ -159,9 +159,15 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
+#if (0)
         std::vector<double> state = getState(subject);
         std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
-        std::vector<double> desComs = transformFeedbackActions(actions);
+#else        
+        std::size_t numControllers = subject.getNumberofMuslces() * 3;
+        
+        double descendingCommand = 0.0;
+        std::vector<double> desComs (numControllers, descendingCommand);
+#endif // Feedback functions not yet ready        
         
         m_pCPGSys->update(desComs, m_updateTime);
 #ifdef LOGGING // Conditional compile for data logging        

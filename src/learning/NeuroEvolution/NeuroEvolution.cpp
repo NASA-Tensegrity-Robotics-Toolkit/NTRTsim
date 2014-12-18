@@ -69,7 +69,7 @@ suffix(suff)
 	std::string configPath = resourcePath + config;
 
     configuration myconfigdataaa;
-	myconfigdataaa.readFile(config);
+	myconfigdataaa.readFile(configPath);
 	populationSize=myconfigdataaa.getintvalue("populationSize");
 	numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
@@ -102,7 +102,7 @@ suffix(suff)
     }
     if(learning)
     {
-		evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
+		evolutionLog.open((resourcePath + "logs/evolution"+suffix+".csv").c_str(),ios::out);
 		if (!evolutionLog.is_open())
 		{
 			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
@@ -164,7 +164,7 @@ void NeuroEvolution::orderAllPopulations()
 	for(std::size_t i=0;i<populations.size();i++)
 	{
 		stringstream ss;
-		ss<<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
+		ss << resourcePath <<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
 		populations[i]->getMember(0)->saveToFile(ss.str().c_str());
 	}
 }
@@ -243,7 +243,7 @@ void NeuroEvolution::updateScores(vector <double> multiscore)
 
 	//Record it to the file
 	ofstream payloadLog;
-	payloadLog.open("logs/scores.csv",ios::app);
+	payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);
 	payloadLog<<multiscore[0]<<","<<multiscore[1]<<endl;
 	payloadLog.close();
 	return;
