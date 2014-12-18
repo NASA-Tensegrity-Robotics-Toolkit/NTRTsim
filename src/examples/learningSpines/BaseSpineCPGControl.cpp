@@ -167,6 +167,11 @@ bogus(false)
     
 }
 
+BaseSpineCPGControl::~BaseSpineCPGControl() 
+{
+    scores.clear();
+}
+
 void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
 {
 	m_pCPGSys = new CPGEquations();
