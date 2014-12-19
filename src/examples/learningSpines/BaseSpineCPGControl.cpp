@@ -34,7 +34,7 @@
 // to a cpp over there
 #include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
-#include "tgCPGStringControl.h"
+#include "tgCPGActuatorControl.h"
 
 #include "helpers/FileHelpers.h"
 
@@ -213,7 +213,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgCPGStringControl* pStringControl = new tgCPGStringControl();
+		tgCPGActuatorControl* pStringControl = new tgCPGActuatorControl();
         allMuscles[i]->attach(pStringControl);
         
         m_allControllers.push_back(pStringControl);
@@ -229,7 +229,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
     // Then determine connectivity and setup string
     for (std::size_t i = 0; i < m_allControllers.size(); i++)
     {
-        tgCPGStringControl * const pStringInfo = m_allControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_allControllers[i];
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         

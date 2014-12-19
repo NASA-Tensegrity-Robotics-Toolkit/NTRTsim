@@ -35,7 +35,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
-#include "examples/learningSpines/tgCPGStringControl.h"
+#include "examples/learningSpines/tgCPGActuatorControl.h"
 #include "tgCPGCableControl.h"
 
 #include "helpers/FileHelpers.h"
@@ -210,7 +210,7 @@ void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     // Then determine connectivity and setup string
     for (std::size_t i = 0; i < m_allControllers.size(); i++)
     {
-        tgCPGStringControl * const pStringInfo = m_allControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_allControllers[i];
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         

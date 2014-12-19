@@ -33,7 +33,7 @@
 
 tgCPGCableControl::tgCPGCableControl(tgPIDController::Config pid_config, const double controlStep) :
 m_config(pid_config),
-tgCPGStringControl(controlStep),
+tgCPGActuatorControl(controlStep),
 m_PID(NULL)
 {
     if (m_controlStep < 0.0)

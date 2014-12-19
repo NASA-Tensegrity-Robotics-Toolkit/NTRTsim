@@ -24,7 +24,7 @@
  * $Id$
  */
 
-#include "tgCPGStringControl.h"
+#include "tgCPGActuatorControl.h"
 
 #include "core/tgSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
@@ -40,7 +40,7 @@
 #include <stdexcept>
 #include <vector>
 
-tgCPGStringControl::tgCPGStringControl(const double controlStep) :
+tgCPGActuatorControl::tgCPGActuatorControl(const double controlStep) :
 m_controlTime(0.0),
 m_totalTime(0.0),
 m_controlStep(controlStep),
@@ -54,14 +54,14 @@ m_pToBody(NULL)
     }
 }
 
-tgCPGStringControl::~tgCPGStringControl()
+tgCPGActuatorControl::~tgCPGActuatorControl()
 {
 	// We don't own these
 	m_pFromBody = NULL;
 	m_pToBody = NULL;
 }
 
-void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
+void tgCPGActuatorControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_controlLength = subject.getStartLength();
     
@@ -76,7 +76,7 @@ void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
 	m_pToBody   = anchors[n - 1]->attachedBody;
 }
 
-void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
+void tgCPGActuatorControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
@@ -99,7 +99,7 @@ void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
 	}
 }
 
-void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams)
+void tgCPGActuatorControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams)
 {
     // Ensure that this hasn't already been assigned
     assert(m_nodeNumber == -1);
@@ -119,7 +119,7 @@ void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodePa
 }
 
 void
-tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
+tgCPGActuatorControl::setConnectivity(const std::vector<tgCPGActuatorControl*>& allStrings,
                        array_4D edgeParams) 
 {
     assert(m_nodeNumber >= 0);
@@ -172,12 +172,12 @@ tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allS
     m_pCPGSystem->defineConnections(m_nodeNumber, connectivityList, weights, phases);
 }
 
-void tgCPGStringControl::setupControl(tgImpedanceController& ipc)
+void tgCPGActuatorControl::setupControl(tgImpedanceController& ipc)
 {
     tgBaseCPGNode::setupControl(ipc);
 }
 
-void tgCPGStringControl::setupControl(tgImpedanceController& ipc,
+void tgCPGActuatorControl::setupControl(tgImpedanceController& ipc,
 										double controlLength)
 {
 	 if (controlLength < 0.0)

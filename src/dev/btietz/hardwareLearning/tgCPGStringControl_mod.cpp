@@ -26,7 +26,7 @@
 #include <stdexcept>
 
 tgCPGStringControl_mod::tgCPGStringControl_mod(const double controlStep) :
-tgCPGStringControl(controlStep)
+tgCPGActuatorControl(controlStep)
 {
     if (m_controlStep < 0.0)
     {
