@@ -1,4 +1,7 @@
 site_name: NASA Tensegrity Robotics Toolkit
+
+docs_dir: sources
+
 pages:
-- [docs/index.md, Home]
-- [docs/install.md, Installation]
+- ['index.md', 'Home']
+- ['install.md', 'Installation']
