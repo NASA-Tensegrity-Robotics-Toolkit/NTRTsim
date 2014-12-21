@@ -52,22 +52,22 @@
 using namespace std;
 
 SpineFeedbackControl::Config::Config(int ss,
-										int tm,
-										int om,
-										int param,
-										int segnum,
-										double ct,
-								        double la,
-										double ha,
-										double lp,
-										double hp,
-										double kt,
-										double kp,
-										double kv,
-										bool def,
-										double cl,
-										double lf,
-										double hf,
+                                        int tm,
+                                        int om,
+                                        int param,
+                                        int segnum,
+                                        double ct,
+                                        double la,
+                                        double ha,
+                                        double lp,
+                                        double hp,
+                                        double kt,
+                                        double kp,
+                                        double kv,
+                                        bool def,
+                                        double cl,
+                                        double lf,
+                                        double hf,
                                         double ffMin,
                                         double ffMax,
                                         double afMin,
@@ -91,8 +91,8 @@ phaseFeedbackMax(pfMax)
  * and teardown functions are used for tgModel
  */
 SpineFeedbackControl::SpineFeedbackControl(SpineFeedbackControl::Config config,	
-												std::string args,
-												std::string resourcePath,
+                                                std::string args,
+                                                std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc,
                                                 std::string fc) :
@@ -104,16 +104,16 @@ feedbackEvolution(args + "_fb", fc, resourcePath),
 // Will be overwritten by configuration data
 feedbackLearning(false)
 {
-	std::string path;
-	if (resourcePath != "")
-	{
-		path = FileHelpers::getResourcePath(resourcePath);
-	}
-	else
-	{
-		path = "";
-	}
-	
+    std::string path;
+    if (resourcePath != "")
+    {
+        path = FileHelpers::getResourcePath(resourcePath);
+    }
+    else
+    {
+        path = "";
+    }
+    
     feedbackConfigData.readFile(path + feedbackConfigFilename);
     feedbackLearning = edgeConfigData.getintvalue("learning");
     
@@ -183,6 +183,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
+		throw std::runtime_error("Height out of range");
 	}
 }
 

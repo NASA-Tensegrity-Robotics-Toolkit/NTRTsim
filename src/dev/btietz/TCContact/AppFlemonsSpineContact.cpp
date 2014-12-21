@@ -38,6 +38,7 @@
 #include "core/terrain/tgHillyGround.h"
 // The C++ Standard Library
 #include <iostream>
+#include <exception>
 
 /**
  * The entry point.
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
     std::cout << "AppFlemonsSpineContact" << std::endl;
 
     // First create the world
-    const tgWorld::Config config(981); // gravity, cm/sec^2
+    const tgWorld::Config config(0.0); // gravity, cm/sec^2
 #if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
@@ -78,7 +79,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimViewGraphics view(world, stepSize, renderRate);
+    tgSimView view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -139,14 +140,16 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 3000)
     {
-        simulation.run(30000);
-    	#ifdef BT_USE_DOUBLE_PRECISION
-		std::cout << "Double precision" << std::endl;
-	#else
-		std::cout << "Single Precision" << std::endl;
-	#endif
-        simulation.reset();
-        i++;
+        try
+        {
+            simulation.run(30000);
+            simulation.reset();
+            i++;
+        }
+        catch (std::runtime_error e)
+        {
+            simulation.reset();
+        }
     }
     
     /// @todo Does the model assume ownership of the controller?
