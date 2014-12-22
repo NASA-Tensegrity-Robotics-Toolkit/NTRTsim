@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 6;
     FlemonsSpineModelContact* myModel =
       new FlemonsSpineModelContact(segments);
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
     const int segmentSpan = 3;
     const int numMuscles = 8;
     const int numParams = 2;
-    const int segNumber = 6; // For learning results
+    const int segNumber = 0; // For learning results
     const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
