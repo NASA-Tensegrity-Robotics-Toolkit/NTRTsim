@@ -1,26 +1,25 @@
 Doc Contributions
 ============
 
-Placeholder
+This section contains details on contributing to NTRT's documentation.
 
 Install Sphinx
 -----
 
-Each element in a computer program is either
+This documentation is written using Sphinx. So first you'll need to ensure you have Sphinx installed. You can learn more here:
 
--   A variable or value literal like ``x``, ``total``, or ``5``
--   A function or computation like the ``+`` in ``x + 1``, the function ``fib``
-    in ``fib(3)``, the method ``split`` in ``line.split(',')``, or the ``=`` in
-    ``x = 0``
--   Control flow like ``if``, ``for``, or ``return``
+http://sphinx-doc.org/latest/install.html
 
-Here is a piece of code; see if you can label each term as either
-variable/value, function/computation, or control flow
+Getting Started with Sphinx
+-----
 
-.. code::
+You can find details on Sphinx's markup on Sphinx's website: 
 
-    def fib(n):
-        a, b = 0, 1
-        for i in range(n):
-            a, b = b, a + b
-        return b
+http://sphinx-doc.org/tutorial.html
+
+Modifying NTRT's Docs
+-----
+
+NTRTSim's Sphinx documentation can be found in the docs/source directory.
+
+Once you've made your desired changes, double check that they throw no errors on generation. You can generate HTML documentation by running **make html** in doc/. Once you've verified that your documentation has no errors, push it to NTRT's. Once your doc modifications are pushed to the master branch a set of up-to-date docs will be generated.
