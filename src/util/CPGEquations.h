@@ -70,6 +70,11 @@ class CPGEquations
 	
 	std::string toString(const std::string& prefix = "") const;
 	
+    void countStep()
+    {
+        numSteps++;
+    }
+    
 protected:
 	
 	std::vector<CPGNode*> nodeList;
@@ -78,6 +83,9 @@ protected:
     std::vector<double> DXVars;
     
 	double stepSize;
+    
+    int numSteps;
+    
 };
 
 /**

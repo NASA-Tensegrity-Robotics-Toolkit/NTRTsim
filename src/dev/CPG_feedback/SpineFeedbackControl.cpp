@@ -167,8 +167,17 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         double descendingCommand = 0.0;
         std::vector<double> desComs (numControllers, descendingCommand);
 #endif // Feedback functions not yet ready        
+        try
+        {
+            m_pCPGSys->update(desComs, m_updateTime);
+        }
+        catch (std::runtime_error& e)
+        {
+            //  Stops the trial immediately,  lets teardown know it broke
+            bogus = true;
+            throw (e);
+        }
         
-        m_pCPGSys->update(desComs, m_updateTime);
 #ifdef LOGGING // Conditional compile for data logging        
         m_dataObserver.onStep(subject, m_updateTime);
 #endif

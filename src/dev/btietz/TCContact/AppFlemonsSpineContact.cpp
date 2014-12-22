@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     std::cout << "AppFlemonsSpineContact" << std::endl;
 
     // First create the world
-    const tgWorld::Config config(0.0); // gravity, cm/sec^2
+    const tgWorld::Config config(981); // gravity, cm/sec^2
 #if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
             simulation.run(30000);
             simulation.reset();
             i++;
-        }
+        }  
         catch (std::runtime_error e)
         {
             simulation.reset();
