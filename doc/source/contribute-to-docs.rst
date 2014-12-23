@@ -1,4 +1,4 @@
-Doc Contributions
+Contribute to Docs
 ============
 
 This section contains details on contributing to NTRT's documentation.
