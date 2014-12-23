@@ -1,4 +1,4 @@
-Contribute Tutorials 
+Contribute to Tutorials 
 ===================
 
 This section contains details on contributing to NTRT's tutorials.
