@@ -100,7 +100,7 @@ int main(int argc, char** argv)
     const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = 0 *  30.0;
+    const double lowAmplitude = -10 *  30.0;
     const double highAmplitude = 10 * 30.0;
     const double kt = 0.0;
     const double kp = 1000.0;
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
         
     // Overridden by def being true
     const double cl = 10.0;
-    const double lf = 0.0;
+    const double lf = -30.0;
     const double hf = 30.0;
 
 
