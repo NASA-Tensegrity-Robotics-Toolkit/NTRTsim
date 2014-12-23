@@ -17,13 +17,13 @@
  */
 
 /**
- * @file CraterDeep.cpp
- * @brief Contains the implementation of class CraterDeep.
+ * @file tgCraterDeep.cpp
+ * @brief Contains the implementation of class tgCraterDeep.
  * $Id$
  */
 
 // This module
-#include "CraterDeep.h"
+#include "tgCraterDeep.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -59,21 +59,21 @@ namespace
     };
 } // namespace
 
-CraterDeep::CraterDeep() : tgModel() 
+tgCraterDeep::tgCraterDeep() : tgModel() 
 {
     origin = btVector3(0,0,0);
 }
 
-CraterDeep::CraterDeep(btVector3 center) : tgModel() 
+tgCraterDeep::tgCraterDeep(btVector3 center) : tgModel() 
 {
     origin = btVector3(center.getX(), center.getY(), center.getZ());
 }
 
-CraterDeep::~CraterDeep()
+tgCraterDeep::~tgCraterDeep()
 {
 }
                      
-void CraterDeep::setup(tgWorld& world) {
+void tgCraterDeep::setup(tgWorld& world) {
 
     const tgBox::Config boxConfig(c.width, c.height, c.density, c.friction, c.rollFriction, c.restitution);
 
@@ -98,7 +98,7 @@ void CraterDeep::setup(tgWorld& world) {
     tgModel::setup(world);
 }
 
-void CraterDeep::step(double dt) {
+void tgCraterDeep::step(double dt) {
     // Precondition
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
@@ -109,18 +109,18 @@ void CraterDeep::step(double dt) {
     }
 }
 
-void CraterDeep::onVisit(tgModelVisitor& r) {
+void tgCraterDeep::onVisit(tgModelVisitor& r) {
     tgModel::onVisit(r);
 }
 
-void CraterDeep::teardown() {
+void tgCraterDeep::teardown() {
     nodes.clear();
     notifyTeardown();
     tgModel::teardown();
 } 
 
 // Nodes: center points of opposing faces of rectangles
-void CraterDeep::addNodes(tgStructure& s) {
+void tgCraterDeep::addNodes(tgStructure& s) {
     const int nBoxes = 4; 
 
     // Accumulating rotation on boxes
@@ -142,7 +142,7 @@ void CraterDeep::addNodes(tgStructure& s) {
     s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
 }
 
-void CraterDeep::addBoxNodes() {
+void tgCraterDeep::addBoxNodes() {
     tgNode node;
     
     double x1 = 20; // Smaller x values leads to a narrower crater
