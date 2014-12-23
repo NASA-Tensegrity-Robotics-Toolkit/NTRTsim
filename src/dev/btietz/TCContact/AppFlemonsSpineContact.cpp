@@ -28,7 +28,7 @@
 // This application
 #include "FlemonsSpineModelContact.h"
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
-#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
+
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -38,6 +38,7 @@
 #include "core/terrain/tgHillyGround.h"
 // The C++ Standard Library
 #include <iostream>
+#include <exception>
 
 /**
  * The entry point.
@@ -52,7 +53,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (1)
+#if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -78,14 +79,14 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimViewGraphics view(world, stepSize, renderRate);
+    tgSimView view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 6;
     FlemonsSpineModelContact* myModel =
       new FlemonsSpineModelContact(segments);
 
@@ -95,12 +96,12 @@ int main(int argc, char** argv)
     const int segmentSpan = 3;
     const int numMuscles = 8;
     const int numParams = 2;
-    const int segNumber = 6; // For learning results
-    const double controlTime = .001;
+    const int segNumber = 0; // For learning results
+    const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = -30.0;
-    const double highAmplitude = 30.0;
+    const double lowAmplitude = -10 *  30.0;
+    const double highAmplitude = 10 * 30.0;
     const double kt = 0.0;
     const double kp = 1000.0;
     const double kv = 200.0;
@@ -112,7 +113,7 @@ int main(int argc, char** argv)
     const double hf = 30.0;
 
 
-    BaseSpineCPGControl::Config control_config(segmentSpan, 
+    SpineFeedbackControl::Config control_config(segmentSpan, 
                                                 numMuscles,
                                                 numMuscles,
                                                 numParams, 
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
                                                 hf
                                                 );
     SpineFeedbackControl* const myControl =
-      new SpineFeedbackControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+      new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
     myModel->attach(myControl);
     
     simulation.addModel(myModel);
@@ -139,14 +140,16 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 3000)
     {
-        simulation.run(30000);
-    	#ifdef BT_USE_DOUBLE_PRECISION
-		std::cout << "Double precision" << std::endl;
-	#else
-		std::cout << "Single Precision" << std::endl;
-	#endif
-        simulation.reset();
-        i++;
+        try
+        {
+            simulation.run(30000);
+            simulation.reset();
+            i++;
+        }  
+        catch (std::runtime_error e)
+        {
+            simulation.reset();
+        }
     }
     
     /// @todo Does the model assume ownership of the controller?

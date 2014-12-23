@@ -53,7 +53,7 @@ unsigned long long rdtsc(){
 
 #endif
 
-AnnealEvolution::AnnealEvolution(string suff, string config, string path) :
+AnnealEvolution::AnnealEvolution(std::string suff, std::string config, std::string path) :
 suffix(suff),
 Temp(1.0)
 {

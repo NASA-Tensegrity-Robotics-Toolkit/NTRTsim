@@ -39,7 +39,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "examples/learningSpines/tgCPGStringControl.h"
+#include "examples/learningSpines/tgCPGActuatorControl.h"
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -61,7 +61,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgCPGStringControl* pStringControl = new tgCPGStringControl();
+		tgCPGActuatorControl* pStringControl = new tgCPGActuatorControl();
         allMuscles[i]->attach(pStringControl);
         m_allControllers.push_back(pStringControl);
     }
@@ -80,7 +80,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     // Then determine connectivity and setup string
     for (std::size_t i = 0; i < m_allControllers.size(); i++)
     {
-        tgCPGStringControl * const pStringInfo = m_allControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_allControllers[i];
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         

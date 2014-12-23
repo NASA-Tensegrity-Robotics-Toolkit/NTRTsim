@@ -14,7 +14,7 @@ link_libraries(sensors
 add_library(${PROJECT_NAME} SHARED
 			BaseSpineModelLearning.cpp
 			BaseSpineCPGControl.cpp
-            tgCPGStringControl.cpp    
+            tgCPGActuatorControl.cpp    
             tgCPGLogger.cpp
             )
 

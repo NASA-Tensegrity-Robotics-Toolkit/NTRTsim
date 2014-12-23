@@ -31,7 +31,6 @@
 #include <sstream>
 
 #include "CPGNode.h"
-#include "CPGEdge.h"
 
 /**
  * The top level class for interfacing with CPGs. Contains the definition
@@ -41,17 +40,14 @@ class CPGEquations
 {
  public:
 	
-	CPGEquations();
+	CPGEquations(int maxSteps = 200);
 
 	CPGEquations(std::vector<CPGNode*>& newNodeList);
 	
 	virtual ~CPGEquations();
 	
-	int addNode(std::vector<double> newParams);
-					
-	void connectNode(int nodeIndex,
-			 std::vector<CPGEdge*> connectivityList);
-	
+	int addNode(std::vector<double>& newParams);
+
 	 void defineConnections (int nodeIndex,
 				 std::vector<int> connections,
 				 std::vector<double> newWeights,
@@ -59,9 +55,9 @@ class CPGEquations
 	
 	const double operator[](const std::size_t i) const;
 
-	virtual std::vector<double> getXVars();
+	virtual std::vector<double>& getXVars();
 	
-	virtual std::vector<double> getDXVars();
+	virtual std::vector<double>& getDXVars();
 	
 	virtual void updateNodes(std::vector<double>& descCom);
 	
@@ -74,11 +70,23 @@ class CPGEquations
 	
 	std::string toString(const std::string& prefix = "") const;
 	
+    void countStep()
+    {
+        numSteps++;
+    }
+    
 protected:
 	
 	std::vector<CPGNode*> nodeList;
 	
+    std::vector<double> XVars;
+    std::vector<double> DXVars;
+    
 	double stepSize;
+    
+    int m_maxSteps;
+    int numSteps;
+    
 };
 
 /**

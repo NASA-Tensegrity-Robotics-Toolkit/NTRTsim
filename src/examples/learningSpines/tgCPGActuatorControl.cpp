@@ -24,7 +24,7 @@
  * $Id$
  */
 
-#include "tgCPGStringControl.h"
+#include "tgCPGActuatorControl.h"
 
 #include "core/tgSpringCable.h"
 #include "core/tgSpringCableAnchor.h"
@@ -33,7 +33,6 @@
 #include "core/tgBulletSpringCableAnchor.h"
 #include "controllers/tgImpedanceController.h"
 #include "util/CPGEquations.h"
-#include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "core/tgCast.h"
 
 // The C++ Standard Library
@@ -41,7 +40,7 @@
 #include <stdexcept>
 #include <vector>
 
-tgCPGStringControl::tgCPGStringControl(const double controlStep) :
+tgCPGActuatorControl::tgCPGActuatorControl(const double controlStep) :
 m_controlTime(0.0),
 m_totalTime(0.0),
 m_controlStep(controlStep),
@@ -55,14 +54,14 @@ m_pToBody(NULL)
     }
 }
 
-tgCPGStringControl::~tgCPGStringControl()
+tgCPGActuatorControl::~tgCPGActuatorControl()
 {
 	// We don't own these
 	m_pFromBody = NULL;
 	m_pToBody = NULL;
 }
 
-void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
+void tgCPGActuatorControl::onAttach(tgSpringCableActuator& subject)
 {
 	m_controlLength = subject.getStartLength();
     
@@ -77,7 +76,7 @@ void tgCPGStringControl::onAttach(tgSpringCableActuator& subject)
 	m_pToBody   = anchors[n - 1]->attachedBody;
 }
 
-void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
+void tgCPGActuatorControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
@@ -100,7 +99,7 @@ void tgCPGStringControl::onStep(tgSpringCableActuator& subject, double dt)
 	}
 }
 
-void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams)
+void tgCPGActuatorControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams)
 {
     // Ensure that this hasn't already been assigned
     assert(m_nodeNumber == -1);
@@ -117,34 +116,10 @@ void tgCPGStringControl::assignNodeNumber (CPGEquations& CPGSys, array_2D nodePa
     params[6] = 5.0; // dMax for descending commands
             
     m_nodeNumber = m_pCPGSystem->addNode(params);
-} 
+}
 
-void tgCPGStringControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams)
-{
-    // Ensure that this hasn't already been assigned
-    assert(m_nodeNumber == -1);
-    
-    m_pCPGSystem = &CPGSys;
-
-    std::vector<double> params (11);
-    params[0] = nodeParams[0][0]; // Frequency Offset
-    params[1] = nodeParams[0][0]; // Frequency Scale
-    params[2] = nodeParams[0][1]; // Radius Offset
-    params[3] = nodeParams[0][1]; // Radius Scale
-    params[4] = 20.0; // rConst (a constant)
-    params[5] = 0.0; // dMin for descending commands
-    params[6] = 5.0; // dMax for descending commands
-    params[6] = 5.0; // dMax for descending commands
-    params[7] = nodeParams[0][0] * 3.0; // Parity between old and new node behavior
-    params[8] = nodeParams[0][2]; // Frequency feedback
-    params[9] = nodeParams[0][3]; // Amplitude feedback
-    params[10] = nodeParams[0][4]; // Phase feedback
-    
-    m_nodeNumber = m_pCPGSystem->addNode(params);
-} 
- 
 void
-tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
+tgCPGActuatorControl::setConnectivity(const std::vector<tgCPGActuatorControl*>& allStrings,
                        array_4D edgeParams) 
 {
     assert(m_nodeNumber >= 0);
@@ -197,12 +172,12 @@ tgCPGStringControl::setConnectivity(const std::vector<tgCPGStringControl*>& allS
     m_pCPGSystem->defineConnections(m_nodeNumber, connectivityList, weights, phases);
 }
 
-void tgCPGStringControl::setupControl(tgImpedanceController& ipc)
+void tgCPGActuatorControl::setupControl(tgImpedanceController& ipc)
 {
     tgBaseCPGNode::setupControl(ipc);
 }
 
-void tgCPGStringControl::setupControl(tgImpedanceController& ipc,
+void tgCPGActuatorControl::setupControl(tgImpedanceController& ipc,
 										double controlLength)
 {
 	 if (controlLength < 0.0)

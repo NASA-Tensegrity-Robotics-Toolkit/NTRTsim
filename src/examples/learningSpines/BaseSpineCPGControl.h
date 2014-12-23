@@ -43,7 +43,7 @@
 class tgImpedanceController;
 class AnnealEvolution;
 class configuration;
-class tgCPGStringControl;
+class tgCPGActuatorControl;
 class CPGEquations;
 class tgCPGLogger;
 
@@ -118,7 +118,7 @@ struct Config
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini");
     
-    ~BaseSpineCPGControl() {}
+    virtual ~BaseSpineCPGControl();
     
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
@@ -143,7 +143,7 @@ protected:
 
     CPGEquations* m_pCPGSys;
     
-    std::vector<tgCPGStringControl*> m_allControllers;
+    std::vector<tgCPGActuatorControl*> m_allControllers;
     
     BaseSpineCPGControl::Config m_config;
     

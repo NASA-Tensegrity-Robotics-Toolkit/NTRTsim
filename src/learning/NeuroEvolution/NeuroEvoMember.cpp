@@ -25,14 +25,16 @@
  */
 
 #include "NeuroEvoMember.h"
+#include "neuralNet/Neural Network v2/neuralNetwork.h"
 #include <fstream>
 #include <iostream>
+#include <assert.h>
+#include <stdexcept>
 
 using namespace std;
 
 NeuroEvoMember::NeuroEvoMember(configuration config)
 {
-	//readConfigFromXML(configFile);
 	this->numInputs=config.getintvalue("numberOfStates");
 	this->numOutputs=config.getintvalue("numberOfActions");
 
@@ -132,18 +134,31 @@ void NeuroEvoMember::loadFromFile(const char * outputFilename)
 		// Disable definition of unused variable to suppress compiler warning
 		double valueDbl;
 #endif
-		while(!ss.eof())
+		if(ss.is_open())
 		{
-			//cout<<"success opening file"<<endl;
-			if(getline ( ss, value, ',' )>0)
+			while(!ss.eof())
 			{
-				//cout<<"value read as string: "<<value<<endl;
-				statelessParameters[i++]=atof(value.c_str());
-				//cout<<statelessParameters[i-1]<<",";
+				//cout<<"success opening file"<<endl;
+				if(getline ( ss, value, ',' )>0)
+				{
+					//cout<<"value read as string: "<<value<<endl;
+					statelessParameters[i++]=atof(value.c_str());
+					//cout<<statelessParameters[i-1]<<",";
+				}
 			}
+			//cout<<"reading complete"<<endl;
+			cout<<endl;
+			ss.close();
+		}
+		else
+		{
+			cout << "File of name " << outputFilename << " does not exist" << std::endl;
+			cout << "Try turning learning on in config.ini to generate parameters" << std::endl;
+			throw std::invalid_argument("Parameter file does not exist");
 		}
 		//cout<<"reading complete"<<endl;
-		cout<<endl;
+		//cout<<endl;
 		ss.close();
 	}
+
 }

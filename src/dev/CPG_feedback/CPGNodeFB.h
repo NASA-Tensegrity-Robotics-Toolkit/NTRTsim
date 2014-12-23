@@ -37,7 +37,6 @@ class CPGEdge;
 
 class CPGNodeFB : public CPGNode
 {
-	friend class CPGEdge;
 	friend class CPGEquationsFB;
 	
 	public:
@@ -55,7 +54,7 @@ class CPGNodeFB : public CPGNode
 	 * coupling equations
 	 * @todo better name?
 	 */
-	virtual void updateDTs(	std::vector<double>& feedback);
+	virtual void updateDTs(const std::vector<double>& feedback);
 			
 	void updateNodeValues (	double newR,
 							double newPhi,

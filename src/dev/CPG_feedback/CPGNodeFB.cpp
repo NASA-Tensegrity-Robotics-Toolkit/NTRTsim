@@ -25,7 +25,9 @@
  */
 
 #include "CPGNodeFB.h"
-#include "util/CPGEdge.h"
+
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
 
 // The C++ Standard Library
 #include <algorithm> //for_each
@@ -33,15 +35,16 @@
 #include <assert.h>
 
 CPGNodeFB::CPGNodeFB(int nodeNum, const std::vector<double> & params):
+CPGNode(nodeNum, params),
 omega(params[7]),
 omegaDot(0),
 kFreq(params[8]),
 kAmp(params[9]),
-kPhase(params[10]),
-CPGNode(nodeNum, params)
+kPhase(params[10])
 {
 	//Precondition
 	assert(params.size() >= 11);
+    rValue = sqrt(radiusOffset); // Jumpstart integration
 }
 
 CPGNodeFB::~CPGNodeFB()
@@ -49,8 +52,11 @@ CPGNodeFB::~CPGNodeFB()
 
 }
 		
-void CPGNodeFB::updateDTs(std::vector<double>& feedback)
+void CPGNodeFB::updateDTs(const std::vector<double>& feedback)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGNodeFB::updateDTs");
+#endif //BT_NO_PROFILE
 	assert(feedback.size() >= 3);
 	
 	phiDotValue = omega + kPhase * feedback [2];
@@ -60,8 +66,10 @@ void CPGNodeFB::updateDTs(std::vector<double>& feedback)
 	 * accordingly.
 	 * @todo ask about refactoring to use for_each
 	 */
-	for (int i = 0; i != couplingList.size(); i++){
-		couplingList[i]->couple(*this);
+    const std::size_t n = couplingList.size();
+	for (std::size_t i = 0; i != n; i++){
+        const CPGNode& targetNode = *couplingList[i];
+        phiDotValue += weightList[i] * targetNode.rValue * sin (targetNode.phiValue - phiValue - phaseList[i]);
 	}
 	
 	omegaDot = kFreq * feedback[0] * sin(phiValue);
@@ -74,7 +82,10 @@ void CPGNodeFB::updateNodeValues (double newPhi,
 								double newO)
 								
 {
-	rValue = newR;
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGNodeFB::updateNodeValues");
+#endif //BT_NO_PROFILE	
+    rValue = newR;
 	phiValue = newPhi;
 	omega = newO;
 	nodeValue = rValue*cos(phiValue);
