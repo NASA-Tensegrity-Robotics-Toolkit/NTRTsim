@@ -17,8 +17,8 @@
  */
 
 /**
- * @file Crater.h
- * @brief Contains the definition of class Crater.
+ * @file tgCraterShallow.h
+ * @brief Contains the definition of class tgCraterShallow.
  * Specifically, a crater is defined as a series of boxes which
  * form a barrier. It is designed to test escape algorithms for tensegrities
  * $Id$
@@ -40,26 +40,26 @@ class tgNode;
 /**
  * Class that creates box "models" that act as crater walls
  */
-class Crater : public tgSubject<Crater>, public tgModel
+class tgCraterShallow : public tgSubject<tgCraterShallow>, public tgModel
 {
     public: 
 
         /**
          * Default constructor. Sets center point of crater to (0,0,0)
          */
-        Crater();
+        tgCraterShallow();
 
         /**
          * Origin constructor. Sets center point to input param 'origin'.
-         * @param[in] origin - the center point of the Crater object
+         * @param[in] origin - the center point of the tgCraterShallow object
          */
-        Crater(btVector3 origin);
+        tgCraterShallow(btVector3 origin);
 
         /**
          * Destructor. Deletes controllers, if any were added during setup.
          * Teardown handles everything else.
          */
-        virtual ~Crater();
+        virtual ~tgCraterShallow();
 
         /**
          * Create the model.

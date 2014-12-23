@@ -17,14 +17,14 @@
  */
 
 /**
- * @file Crater.cpp
- * @brief Contains the implementation of class Crater.
- * This Crater is four shallow boxes that encircle the origin.
+ * @file tgCraterShallow.cpp
+ * @brief Contains the implementation of class tgCraterShallow.
+ * This tgCraterShallow is four shallow boxes that encircle the origin.
  * $Id$
  */
 
 // This module
-#include "Crater.h"
+#include "tgCraterShallow.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -60,17 +60,17 @@ namespace
     };
 } // namespace
 
-Crater::Crater() : tgModel() {
+tgCraterShallow::tgCraterShallow() : tgModel() {
     origin = btVector3(0,0,0);
 }
 
-Crater::Crater(btVector3 center) : tgModel() {
+tgCraterShallow::tgCraterShallow(btVector3 center) : tgModel() {
     origin = btVector3(center.getX(), center.getY(), center.getZ());
 }
 
-Crater::~Crater() {}
+tgCraterShallow::~tgCraterShallow() {}
                      
-void Crater::setup(tgWorld& world) {
+void tgCraterShallow::setup(tgWorld& world) {
     const tgBox::Config boxConfig(c.width, c.height, c.density, c.friction, c.rollFriction, c.restitution);
 
     // Start creating the structure
@@ -94,7 +94,7 @@ void Crater::setup(tgWorld& world) {
     tgModel::setup(world);
 }
 
-void Crater::step(double dt) {
+void tgCraterShallow::step(double dt) {
     // Precondition
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
@@ -105,17 +105,17 @@ void Crater::step(double dt) {
     }
 }
 
-void Crater::onVisit(tgModelVisitor& r) {
+void tgCraterShallow::onVisit(tgModelVisitor& r) {
     tgModel::onVisit(r);
 }
 
-void Crater::teardown() {
+void tgCraterShallow::teardown() {
     notifyTeardown();
     tgModel::teardown();
 } 
 
 // Nodes: center points of opposing faces of rectangles
-void Crater::addNodes(tgStructure& s) {
+void tgCraterShallow::addNodes(tgStructure& s) {
     const int nBoxes = 4; 
 
     // Accumulating rotation on boxes
@@ -137,7 +137,7 @@ void Crater::addNodes(tgStructure& s) {
     s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
 }
 
-void Crater::addBoxNodes() {
+void tgCraterShallow::addBoxNodes() {
     tgNode node;
     const double shift = 20; // Arbitrary
     const double vshift = 2; 
