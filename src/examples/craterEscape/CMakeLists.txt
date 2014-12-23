@@ -1,7 +1,7 @@
 link_directories(${LIB_DIR})
 
 link_libraries( Adapters
-				tgcreator
+                tgcreator
                 util
                 sensors
                 core    
