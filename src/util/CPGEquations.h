@@ -42,7 +42,7 @@ class CPGEquations
 	
 	CPGEquations(int maxSteps = 200);
 
-	CPGEquations(std::vector<CPGNode*>& newNodeList);
+	CPGEquations(std::vector<CPGNode*>& newNodeList, int maxSteps = 200);
 	
 	virtual ~CPGEquations();
 	

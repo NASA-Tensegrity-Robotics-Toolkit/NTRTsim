@@ -43,12 +43,14 @@ typedef std::vector<double > cpgVars_type;
 
 CPGEquations::CPGEquations(int maxSteps) :
 stepSize(0.1),
+numSteps(0),
 m_maxSteps(maxSteps)
  {}
-CPGEquations::CPGEquations(std::vector<CPGNode*>& newNodeList) :
+CPGEquations::CPGEquations(std::vector<CPGNode*>& newNodeList, int maxSteps) :
 nodeList(newNodeList),
 stepSize(0.1), //TODO: specify as a parameter somewhere
-numSteps(0)
+numSteps(0),
+m_maxSteps(maxSteps)
 {
 }
 

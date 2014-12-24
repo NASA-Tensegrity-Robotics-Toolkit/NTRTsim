@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (0)
+#if (1)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -97,10 +97,10 @@ int main(int argc, char** argv)
     const int numMuscles = 8;
     const int numParams = 2;
     const int segNumber = 0; // For learning results
-    const double controlTime = .01;
+    const double controlTime = .001;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = -10 *  30.0;
+    const double lowAmplitude = 0;
     const double highAmplitude = 10 * 30.0;
     const double kt = 0.0;
     const double kp = 1000.0;
@@ -109,9 +109,16 @@ int main(int argc, char** argv)
         
     // Overridden by def being true
     const double cl = 10.0;
-    const double lf = -30.0;
+    const double lf = 0.0;
     const double hf = 30.0;
-
+    
+    // Feedback parameters
+    const double ffMin = -0.5;
+    const double ffMax = 5.0;
+    const double afMin = 0.0;
+    const double afMax = 5.0;
+    const double pfMin = -0.5;
+    const double pfMax =  5.0;
 
     SpineFeedbackControl::Config control_config(segmentSpan, 
                                                 numMuscles,
@@ -129,7 +136,13 @@ int main(int argc, char** argv)
                                                 def,
                                                 cl,
                                                 lf,
-                                                hf
+                                                hf,
+                                                ffMin,
+                                                ffMax,
+                                                afMin,
+                                                afMax,
+                                                pfMin,
+                                                pfMax
                                                 );
     SpineFeedbackControl* const myControl =
       new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
@@ -138,7 +151,7 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 3000)
+    while (i < 30000)
     {
         try
         {

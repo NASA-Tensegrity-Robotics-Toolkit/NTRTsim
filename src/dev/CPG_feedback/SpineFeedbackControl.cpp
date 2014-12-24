@@ -115,13 +115,13 @@ feedbackLearning(false)
     }
     
     feedbackConfigData.readFile(path + feedbackConfigFilename);
-    feedbackLearning = edgeConfigData.getintvalue("learning");
+    feedbackLearning = feedbackConfigData.getintvalue("learning");
     
 }
 
 void SpineFeedbackControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB();
+	m_pCPGSys = new CPGEquationsFB(100);
     //Initialize the Learning Adapters
     nodeAdapter.initialize(&nodeEvolution,
                             nodeLearning,

@@ -85,7 +85,7 @@ void tgCPGCableControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nod
     params[1] = nodeParams[0][0]; // Frequency Scale
     params[2] = nodeParams[0][1]; // Radius Offset
     params[3] = nodeParams[0][1]; // Radius Scale
-    params[4] = 100.0; // rConst (a constant)
+    params[4] = 1.0; // rConst (a constant)
     params[5] = 0.0; // dMin for descending commands
     params[6] = 5.0; // dMax for descending commands
     params[6] = 5.0; // dMax for descending commands

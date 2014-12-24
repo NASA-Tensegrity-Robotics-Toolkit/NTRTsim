@@ -45,9 +45,9 @@ class CPGEquationsFB : public CPGEquations
 {
  public:
 	
-	CPGEquationsFB();
+	CPGEquationsFB(int maxSteps = 200);
 
-	CPGEquationsFB(std::vector<CPGNode*>& newNodeList);
+	CPGEquationsFB(std::vector<CPGNode*>& newNodeList, int maxSteps = 200);
 	
 	~CPGEquationsFB();
 	
