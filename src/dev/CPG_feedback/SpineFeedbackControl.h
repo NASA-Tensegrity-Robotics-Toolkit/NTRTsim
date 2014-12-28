@@ -97,7 +97,8 @@ struct Config : public BaseSpineCPGControl::Config
     virtual void onSetup(BaseSpineModelLearning& subject);
     
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
-   
+    
+    virtual void onTeardown(BaseSpineModelLearning& subject);
 	
 protected:
 

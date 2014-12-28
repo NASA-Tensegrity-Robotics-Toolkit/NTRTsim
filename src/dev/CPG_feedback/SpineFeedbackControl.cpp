@@ -199,6 +199,70 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 }
 
+void SpineFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
+{
+    scores.clear();
+    // @todo - check to make sure we ran for the right amount of time
+    
+    std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
+    
+    const double newX = finalConditions[0];
+    const double newZ = finalConditions[2];
+    const double oldX = initConditions[0];
+    const double oldZ = initConditions[2];
+    
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                        (newZ-oldZ) * (newZ-oldZ));
+    
+    if (bogus)
+    {
+        scores.push_back(-1.0);
+    }
+    else
+    {
+        scores.push_back(distanceMoved);
+    }
+    
+    /// @todo - consolidate with other controller classes. 
+    /// @todo - return length scale as a parameter
+    double totalEnergySpent=0;
+    
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
+    
+    for(int i=0; i<tmpStrings.size(); i++)
+    {
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
+        
+        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    
+    scores.push_back(totalEnergySpent);
+    
+    edgeAdapter.endEpisode(scores);
+    nodeAdapter.endEpisode(scores);
+    feedbackAdapter.endEpisode(scores);
+    
+    delete m_pCPGSys;
+    m_pCPGSys = NULL;
+    
+    for(size_t i = 0; i < m_allControllers.size(); i++)
+    {
+        delete m_allControllers[i];
+    }
+    m_allControllers.clear();    
+}
+
 void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
