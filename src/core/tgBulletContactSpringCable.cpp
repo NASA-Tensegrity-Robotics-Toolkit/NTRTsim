@@ -95,8 +95,8 @@ const btScalar tgBulletContactSpringCable::getActualLength() const
 }
 
 void tgBulletContactSpringCable::step(double dt)
-{
-	updateManifolds();
+{    
+    updateManifolds();
     
     pruneAnchors();
     
@@ -105,6 +105,11 @@ void tgBulletContactSpringCable::step(double dt)
 	// See if the new anchors change anything
 	pruneAnchors();
 	
+    if (getActualLength() > m_prevLength + 0.2)
+    {
+        throw std::runtime_error("Large length change!");
+    }
+    
 	calculateAndApplyForce(dt);
 	
 	// Do this last so the ghost object gets populated with collisions before it is deleted
@@ -197,7 +202,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 	{
 		if (m_forceTotals[i] != maxForce[i] && m_forceTotals[i] != 0.0)
 		{
-            m_forceScales[i] = -1.0 * (maxForce[i] / m_forceTotals[i]);
+            m_forceScales[i] = btFabs(maxForce[i] / m_forceTotals[i]);
 		}
 		else if (m_forceTotals[i] == 0.0)
 		{
@@ -469,10 +474,6 @@ void tgBulletContactSpringCable::updateAnchorList()
 				
 				numContacts++;
                 
-                if (getActualLength() > m_prevLength + 0.1)
-                {
-                    throw std::runtime_error("Large length change!");
-                }
 #ifdef VERBOSE                
                 std::cout << "Prev: " << m_prevLength << " LengthDiff " << startLength << " " << getActualLength();
                 std::cout << " Anchors " << m_anchors.size() << std::endl;
