@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: scaling_counterexample.aux
+The style file: plain.bst
+Database file #1: scaling_counterexample.bib
+You've used 2 entries,
+            2118 wiz_defined-function locations,
+            508 strings with 4270 characters,
+and the built_in function-call counts, 536 in all, are:
+= -- 52
+> -- 14
+< -- 0
++ -- 6
+- -- 4
+* -- 33
+:= -- 97
+add.period$ -- 6
+call.type$ -- 2
+change.case$ -- 7
+chr.to.int$ -- 0
+cite$ -- 2
+duplicate$ -- 23
+empty$ -- 50
+format.name$ -- 4
+if$ -- 109
+int.to.chr$ -- 0
+int.to.str$ -- 2
+missing$ -- 3
+newline$ -- 13
+num.names$ -- 4
+pop$ -- 9
+preamble$ -- 1
+purify$ -- 6
+quote$ -- 0
+skip$ -- 13
+stack$ -- 0
+substring$ -- 35
+swap$ -- 2
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 6
+warning$ -- 0
+while$ -- 6
+width$ -- 3
+write$ -- 24
