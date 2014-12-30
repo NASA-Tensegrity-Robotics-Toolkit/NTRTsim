@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -153,15 +153,15 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 30000)
     {
-        try
+        //try
         {
             simulation.run(30000);
             simulation.reset();
             i++;
         }  
-        catch (std::runtime_error e)
+        //catch (std::runtime_error e)
         {
-            simulation.reset();
+        //    simulation.reset();
         }
     }
     
