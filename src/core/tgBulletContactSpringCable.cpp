@@ -146,6 +146,8 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     // Apply forces
     std::size_t n = m_anchors.size();
     
+    int slidingCount = 0;
+    
     for (std::size_t i = 0; i < n; i++)
     {
         btVector3 force = btVector3 (0.0, 0.0, 0.0);
@@ -171,19 +173,16 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
 
 
-			btVector3 first = (current - forward);
-			btVector3 second = (current - back);
+			btVector3 first = (forward - current);
+			btVector3 second = (back - current);
 			
-			btVector3 forceDir = (first.normalize()  + second.normalize() ).normalize();
-		
-			// Apply dot of contact normal with string's normal
-			force = (tension * direction).dot(forceDir) * forceDir;
-			
-            if (force.dot(direction) <= 0.0 && !force.fuzzyZero())
-            {
-                throw std::runtime_error("Contact normal or pruning error");
-            }
+			btVector3 forceDir = (first.normalize() + second.normalize() ).normalize();
             
+			// For sliding anchors, just figuring out directions for now
+			force = forceDir;
+			
+            slidingCount++;
+          
             // Only care about scaling sliding forces
             m_forceTotals += force;
         }
@@ -198,22 +197,10 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     
 	btVector3 maxForce = (anchor1->force + anchor2->force);
 	
-	for (std::size_t i = 0; i < 3; i++)
-	{
-		if (m_forceTotals[i] != maxForce[i] && m_forceTotals[i] != 0.0)
-		{
-            m_forceScales[i] = btFabs(maxForce[i] / m_forceTotals[i]);
-		}
-		else if (m_forceTotals[i] == 0.0)
-		{
-			m_forceScales[i] = 1.0;
-		}
-	} 
-
-#ifdef VERBOSE
-	std::cout << "Force Scaling " <<  m_forceScales << std::endl;
-#endif
-
+    btScalar scaling = maxForce.length() / ((double) slidingCount);
+    
+    std::cout << "Sliding force direction " <<  m_forceTotals << std::endl;
+    
     btVector3 totalForce(0.0, 0.0, 0.0);
     
     for (std::size_t i = 0; i < n; i++)
@@ -227,7 +214,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 		if (m_anchors[i]->sliding)
 		{
 			// Elementwise multiply
-			m_anchors[i]->force *= m_forceScales;
+			m_anchors[i]->force *= scaling;
 		}
         
         totalForce += m_anchors[i]->force;
@@ -240,7 +227,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     if (!totalForce.fuzzyZero())
     {
         std::cout << "Total Force Error! " << totalForce << std::endl;
-        throw std::runtime_error("Total force did not sum to zero!");
+        //throw std::runtime_error("Total force did not sum to zero!");
     }
     
     // Finished calculating, so can store things
