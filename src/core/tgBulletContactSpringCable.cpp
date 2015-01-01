@@ -97,9 +97,12 @@ const btScalar tgBulletContactSpringCable::getActualLength() const
 void tgBulletContactSpringCable::step(double dt)
 {    
     updateManifolds();
-    
-    updateAnchorPositions();
-    
+
+    int numPruned = 1;
+    while (numPruned > 0)
+    {
+        numPruned = updateAnchorPositions();
+    }   
 	updateAnchorList();
 	
 	// See if the new anchors change anything
@@ -107,7 +110,8 @@ void tgBulletContactSpringCable::step(double dt)
 	
     if (getActualLength() > m_prevLength + 0.2)
     {
-        //throw std::runtime_error("Large length change!");
+//         throw std::runtime_error("Large length change!");
+        std::cout << "Previous length " << m_prevLength << " actual length " << getActualLength() << std::endl;
     }
     
 	calculateAndApplyForce(dt);
@@ -434,10 +438,21 @@ void tgBulletContactSpringCable::updateAnchorList()
 			{		
 				
 				m_anchorIt = m_anchors.begin() + anchorPos + 1;
-									  
+			    
 				m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-				
-				numContacts++;
+
+#if (0)
+                if (getActualLength() > m_prevLength + m_resolution)
+                {
+                    deleteAnchor(anchorPos + 1);
+                }
+                else
+                {
+                    numContacts++;
+                }
+#else
+                numContacts++;
+#endif
                 
 #ifdef VERBOSE                
                 std::cout << "Prev: " << m_prevLength << " LengthDiff " << startLength << " " << getActualLength();
