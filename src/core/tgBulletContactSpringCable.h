@@ -163,6 +163,12 @@ private:
     void updateAnchorList();
     
     /**
+     * Minimize the length of the anchors - accounts for sliding
+     * Return the number of anchors that are deleted (have slid off the body)
+     */
+    int updateAnchorPositions();
+    
+    /**
      * First minimizes the length of the string in allowed directions
      * and deletes anchors with out of date manifolds. Then deletes
      * anchors that are too close to surrounding anchors or where

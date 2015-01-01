@@ -98,7 +98,7 @@ void tgBulletContactSpringCable::step(double dt)
 {    
     updateManifolds();
     
-    pruneAnchors();
+    updateAnchorPositions();
     
 	updateAnchorList();
 	
@@ -457,6 +457,50 @@ void tgBulletContactSpringCable::updateAnchorList()
     
 }
 
+int tgBulletContactSpringCable::updateAnchorPositions()
+{
+    int numPruned = 0;
+    std::size_t i = 1;
+    
+    bool keep = true; //m_anchors[i]->updateContactNormal();
+    
+    while (i < m_anchors.size() - 1)
+    {
+        btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+        btVector3 current = m_anchors[i]->getWorldPosition(); 
+        btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+        
+        btVector3 lineA = (forward - current);
+        btVector3 lineB = (back - current);
+
+        btVector3 contactNormal = m_anchors[i]->getContactNormal();
+        
+        if (!m_anchors[i]->permanent)
+        {
+            btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
+            btScalar tangentDot = (lineB + lineA).dot(tangentDir);
+            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+            btVector3 newPos = current + tangentMove;
+            // Check if new position is on body
+            if (!keep || !m_anchors[i]->setWorldPosition(newPos))
+            {
+                deleteAnchor(i);
+                numPruned++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+        else
+        {
+            i++;
+        }
+    }
+    
+    return numPruned;
+}
+
 void tgBulletContactSpringCable::pruneAnchors()
 {    
     int numPruned = 0;
@@ -470,90 +514,67 @@ void tgBulletContactSpringCable::pruneAnchors()
             BT_PROFILE("pruneAnchors");
         #endif //BT_NO_PROFILE   
         numPruned = 0;
-        i = 1;
-        while (i < m_anchors.size() - 1)
-        {
-			bool keep = true; //m_anchors[i]->updateContactNormal();
-			
-			numPruned = 0;
-			btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
-			btVector3 current = m_anchors[i]->getWorldPosition(); 
-			btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-			
-			btVector3 lineA = (forward - current);
-			btVector3 lineB = (back - current);
-			
-
-			btVector3 contactNormal = m_anchors[i]->getContactNormal();
-			
-			if (!m_anchors[i]->permanent)
-			{
-				btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
-				btScalar tangentDot = (lineB + lineA).dot(tangentDir);
-				btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
-				btVector3 newPos = current + tangentMove;
-				// Check if new position is on body
-				if (!keep || !m_anchors[i]->setWorldPosition(newPos))
-				{
-					deleteAnchor(i);
-					numPruned++;
-				}
-			}
-			else
-			{
-				i++;
-			}
-		
-			if (numPruned == 0 && !m_anchors[i]->permanent)
-            {
-                btScalar normalValue1;
-                btScalar normalValue2;
-                
-                // Get new values
-                
-                back = m_anchors[i - 1]->getWorldPosition(); 
-                current = m_anchors[i]->getWorldPosition(); 
-                forward = m_anchors[i + 1]->getWorldPosition(); 
-            
-                lineA = (forward - current);
-                lineB = (back - current);
         
-                contactNormal = m_anchors[i]->getContactNormal();
+        numPruned = updateAnchorPositions();
+        
+        if( numPruned == 0)
+        {
+        
+            i = 1;
+            while (i < m_anchors.size() - 1)
+            {
                 
+                if (!m_anchors[i]->permanent)
+                {
+                    btScalar normalValue1;
+                    btScalar normalValue2;
+                    
+                    // Get new values
+                    
+                    btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+                    btVector3 current = m_anchors[i]->getWorldPosition(); 
+                    btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
                 
-                if (lineA.length() < m_resolution / 2.0 || lineB.length() < m_resolution / 2.0)
-                {
-                    // Arbitrary value that deletes the nodes
-                    normalValue1 = -1.0;
-                    normalValue2 = -1.0;
-                }
-                else
-                {
-                    //lineA.normalize();
-                    //lineB.normalize();
-                    //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-
-                    normalValue1 = (lineA).dot(contactNormal);
-                    normalValue2 = (lineB).dot(contactNormal);
-                }	
-                if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-                {
-                    #ifdef VERBOSE
-                        std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
-                    #endif
-                    if (deleteAnchor(i))
+                    btVector3 lineA = (forward - current);
+                    btVector3 lineB = (back - current);
+            
+                    btVector3 contactNormal = m_anchors[i]->getContactNormal();
+                    
+                    
+                    if (lineA.length() < m_resolution / 2.0 || lineB.length() < m_resolution / 2.0)
                     {
-                        numPruned++;
+                        // Arbitrary value that deletes the nodes
+                        normalValue1 = -1.0;
+                        normalValue2 = -1.0;
                     }
                     else
                     {
-                        // Permanent anchor, move on
+                        //lineA.normalize();
+                        //lineB.normalize();
+                        //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
+
+                        normalValue1 = (lineA).dot(contactNormal);
+                        normalValue2 = (lineB).dot(contactNormal);
+                    }	
+                    if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
+                    {
+                        #ifdef VERBOSE
+                            std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
+                        #endif
+                        if (deleteAnchor(i))
+                        {
+                            numPruned++;
+                        }
+                        else
+                        {
+                            // Permanent anchor, move on
+                            i++;
+                        }
+                    }
+                    else
+                    {
                         i++;
                     }
-                }
-                else
-                {
-                    i++;
                 }
             }
         }
