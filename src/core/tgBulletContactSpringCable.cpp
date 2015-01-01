@@ -107,7 +107,7 @@ void tgBulletContactSpringCable::step(double dt)
 	
     if (getActualLength() > m_prevLength + 0.2)
     {
-        throw std::runtime_error("Large length change!");
+        //throw std::runtime_error("Large length change!");
     }
     
 	calculateAndApplyForce(dt);
@@ -146,8 +146,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     // Apply forces
     std::size_t n = m_anchors.size();
     
-    int slidingCount = 0;
-    
     for (std::size_t i = 0; i < n; i++)
     {
         btVector3 force = btVector3 (0.0, 0.0, 0.0);
@@ -176,13 +174,11 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 			btVector3 first = (forward - current);
 			btVector3 second = (back - current);
 			
-			btVector3 forceDir = (first.normalize() + second.normalize() ).normalize();
+			btVector3 forceDir = first.normalize() + second.normalize();
             
 			// For sliding anchors, just figuring out directions for now
-			force = forceDir;
-			
-            slidingCount++;
-          
+			force = magnitude * forceDir;
+
             // Only care about scaling sliding forces
             m_forceTotals += force;
         }
@@ -195,10 +191,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
          
     }
     
-	btVector3 maxForce = (anchor1->force + anchor2->force);
-	
-    btScalar scaling = maxForce.length() / ((double) slidingCount);
-    
     std::cout << "Sliding force direction " <<  m_forceTotals << std::endl;
     
     btVector3 totalForce(0.0, 0.0, 0.0);
@@ -209,13 +201,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 		
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
-	
-		// Scale the force of the sliding anchors
-		if (m_anchors[i]->sliding)
-		{
-			// Elementwise multiply
-			m_anchors[i]->force *= scaling;
-		}
         
         totalForce += m_anchors[i]->force;
         
@@ -227,7 +212,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     if (!totalForce.fuzzyZero())
     {
         std::cout << "Total Force Error! " << totalForce << std::endl;
-        //throw std::runtime_error("Total force did not sum to zero!");
+        throw std::runtime_error("Total force did not sum to zero!");
     }
     
     // Finished calculating, so can store things
