@@ -13,6 +13,7 @@ subdirs(
     muscleNPTests
     tetraCollisions
     muscleNPEnergy
+    muscleNPHills
     TCContact
     ShortOC_CPG 
     ShortOC_sine
