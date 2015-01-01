@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
-   btVector3 size = btVector3(500.0, 1.5, 500.0);
+   btVector3 size = btVector3(500.0, 0.5, 500.0);
    btVector3 origin = btVector3(0.0, 0.0, 0.0);
    size_t nx = 50;
    size_t ny = 50;

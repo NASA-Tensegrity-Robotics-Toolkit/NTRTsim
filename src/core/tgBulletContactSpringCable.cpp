@@ -441,8 +441,8 @@ void tgBulletContactSpringCable::updateAnchorList()
 			    
 				m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
 
-#if (0)
-                if (getActualLength() > m_prevLength + m_resolution)
+#if (1) // Keeps the energy down very well
+                if (getActualLength() > m_prevLength + 2.0 * m_resolution)
                 {
                     deleteAnchor(anchorPos + 1);
                 }
