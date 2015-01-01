@@ -12,13 +12,11 @@ clear all; clc; close all;
 % This disproves the following posulate:
 % 10 * (length / time ^2) == (10 * length) / time^2
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % A spring-mass-damper attached horizontally to a rod, hinged at the
 % origin.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 p = {};
 p.m = 1.5; % kg;
-p.x_r = 1; % meters; NOTE THIS IS NOT USED FOR THE ANGULAR CASE.
+p.x_r = 1; % meters;
 p.l = 2; % meters;
 p.g = 9.81; % m/s^2
 p.k = 100; % N/m
@@ -52,10 +50,8 @@ title('Original, unscaled simulation');
 xlabel('time, sec');
 ylabel('Radial position of rod, radians');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Now, for comparison, scale gravity. This should show different results!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Now, for comparison, scale gravity. This should show different results!
 scaling_factor = 2;
 g_scaled = scaling_factor * p.g;
 p.g = g_scaled;
@@ -79,12 +75,10 @@ title('With only gravity scaled');
 xlabel('time, sec');
 ylabel('Angular position of rod, radians');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Here's the fun part: do a third simulation, and scale length,
 % as we'd normally do in NTRT. Our length constants are the length of the
 % rod, and the rest length of the spring.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 l_new = (1/scaling_factor) * p.l;
 %l_new = scaling_factor * p.l;
 %l_new = sqrt(scaling_factor) * p.l;
@@ -112,6 +106,11 @@ for i=2:num_timesteps
     y_new_length_scaled(:, i) = ( rod_hinge_dynamics(theta, theta_dot, p)) * dt + y_new_length_scaled(:,i-1);
 end
 
+% Adjust time for the g, c, k angular scaling case
+t_new = t.* (1/sqrt(scaling_factor));
+
+% Adjust the time scale, from our pi term analysis:
+%t = t * scaling_factor;
 
 figure;
 hold on;
@@ -120,76 +119,10 @@ plot(t, y_new_length_scaled(1,:));
 
 %Adjust the limits of the plot to match our new scaling
 %t_final_new = floor(t_final * (1/sqrt(scaling_factor)));
-%axis([0 t_final 0.5 1.5]);
+axis([0 t_final 0.5 1.5]);
 title('Gravity and length scale changed');
 xlabel('time, sec');
 ylabel('Angular position of rod, radians');
-axis([0 t_final 0.5 1.5]);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Finally, scale according to our pi terms: both length and angular damping chang along with gravity.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%c_new = sqrt(scaling_factor) * p.c;
-c_new = (1/scaling_factor) * p.c;
-p.c = c_new;
-
-%k_new = scaling_factor * p.k;
-%m_new = (1/sqrt(scaling_factor)) * p.m;
-%m_new = (1/scaling_factor) * p.m;
-%p.k = k_new;
-%p.m = m_new;
-
-% initialize.
-y_new_length_spring_scaled = zeros(2, num_timesteps);
-y_new_length_spring_scaled(:,1) = [p.theta_0; 0];
-
-for i=2:num_timesteps
-    % simulate.
-    theta = y_new_length_spring_scaled(1,i-1);
-    theta_dot = y_new_length_spring_scaled(2,i-1);
-    y_new_length_spring_scaled(:, i) = ( rod_hinge_dynamics(theta, theta_dot, p)) * dt + y_new_length_spring_scaled(:,i-1);
-end
-
-
-figure;
-hold on;
-plot(t, y_new_length_spring_scaled(1,:));
-title('Gravity, length, and angular damping constant scale changed');
-xlabel('time, sec');
-ylabel('Angular position of rod, radians');
-axis([0 t_final 0.5 1.5]);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% But wait! We forgot to do the time term. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% initialize.
-y_new_length_spring_time_scaled = zeros(2, num_timesteps);
-y_new_length_spring_time_scaled(:,1) = [p.theta_0; 0];
-
-for i=2:num_timesteps
-    % simulate.
-    theta = y_new_length_spring_time_scaled(1,i-1);
-    theta_dot = y_new_length_spring_time_scaled(2,i-1);
-    y_new_length_spring_time_scaled(:, i) = ( rod_hinge_dynamics(theta, theta_dot, p)) * dt + y_new_length_spring_time_scaled(:,i-1);
-end
-
-% Adjust time for the g, c, k angular scaling case
-%t_new = t.* (1/scaling_factor);
-t_new = t.* (scaling_factor);
-
-% Adjust the time scale, from our pi term analysis:
-%t = t * scaling_factor;
-
-figure;
-hold on;
-plot(t_new, y_new_length_spring_time_scaled(1,:));
-title('Gravity, length, angular damping constant, and time scale changed');
-xlabel('time, sec');
-ylabel('Angular position of rod, radians');
-axis([0 t_final 0.5 1.5]);
 
 

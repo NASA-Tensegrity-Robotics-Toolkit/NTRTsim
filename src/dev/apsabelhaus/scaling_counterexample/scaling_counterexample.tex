@@ -74,23 +74,21 @@
 
 \begin{center}
 \huge
-Scaling Analysis for Rigid Body Simulations\\
+NTRT Scaling Analysis work\\
 \normalsize
 \vspace{0.1in}
 Andrew P. (Drew) Sabelhaus\\
 apsabelhaus@berkeley.edu \\
-Started 14 July 2014 \\
-Current as of 27 Dec 2014
+14 July 2014
 \end{center}
 
 %\vspace{-1em}
 
-This short white paper illustrates the scaling analysis that needs to be done on an rigid body simulation system, such as the NASA Tensegrity Robotics Toolkit (NTRT or its C++ library, NTRTsim) and the Bullet Physics system.
-This work is designed to convince NTRT/Bullet users that care must be taken for scaling techniques, moreso than occurs on the Bullet Physics forums or wiki.
-In particular, simple scalings work in some circumstances with certain types of simulated parameters, but may have to be modified elsewhere (see: scaling of forces, scaling of angular vs. longitudinal spring constants.)
+This short white paper illustrates the scaling analysis that needs to be done on an NTRT-like system.
+This work is designed to convince NTRT/Bullet users that current scaling techniques work in some circumstances, but may have to be modified elsewhere (see: scaling of forces, scaling of angular vs. longitudinal spring constants.)
 First, we introduce a simple example system for analysis, then do the nondimensionalization of parameters, and evaluate which scalings need to occur.
 Then, simulations of the example system are shown under these scaling conditions.
-Once this has been established, the anaysis is put in the context of NTRT simulations, and we show why simple simulations have (so far) worked in NTRTsim and where they may become improperly scaled in future work.
+Once this has been established, the anaysis is put in the context of NTRT simulations, and we show why current simulations have (luckily) worked.
 Finally, suggestions are made for generalizing these concepts to new parameters in the simulator.
 
 \section{Example system, angular spring/damper}
@@ -130,25 +128,19 @@ Here, $\theta_r$ is the rest angle of the spring. So, then, our rigid body dynam
 
 For a solid rod,
 \[
-I = \frac{m l^2}{3}
+I = \frac{m l^3}{3}
 \]
-
-%http://en.wikipedia.org/wiki/List_of_moments_of_inertia#cite_note-serway-1
 
 And the full dynamics equation is
 \[
-\ddot \theta = \frac{3}{m l^2} (\frac{mgl}{2} cos \theta + k_{\theta} \theta - k_{\theta} \theta_r - c_{\theta} \dot \theta )
+\ddot \theta = \frac{3}{m l^3} (\frac{mgl}{2} cos \theta + k_{\theta} \theta - k_{\theta} \theta_r - c_{\theta} \dot \theta )
 \]
-
-Note that this system has a nonlinear forcing function: the gravitational force has a $cos(\theta)$ term in it.
-Although the plant can be formulated as a linear system, the whole system response cannot be.
-Thus, unlike the example linear systems in the last sections, arguments about transfer function magnitudes do not apply here in the same way.
 
 We will not return to this for the rest of the analysis, but it's useful for reference.
 
 \section{$\Pi$ Terms and Nondimensional Numbers}
 
-For an in-depth discussion of the necessity of Pi terms, and their use, history, and applications, see references such as chapter 7 of the undergraduate fluid mechanics textbook by Munsen~\cite{munson2013fundamentals} and Buckingham's original work on the subject~\cite{buckingham1914physically}.
+I won't include a discussion/justification of NDMs here, see other work for that discussion - e.g. the undergrad fluids textbook by Munsen.
 It's sufficient to recount the following theorem, the Buckingham Pi Theorem, which states, loosely: \\
 
 
@@ -175,22 +167,15 @@ The above example system has the following parameters and variables (both implic
 \[
 \text{gravitational acceleration:} \quad g \sim L^1 T^{-2}
 \]
-%\[
-%\text{angular spring constant:} \quad k_{\theta} \sim M^1 T^{-2} L^1 
-%\]
-%\[
-%\text{angular damping coefficient:} \quad c_{\theta} \sim M^1 T^{-1} L^1
-%\]
 \[
-\text{angular spring constant:} \quad k_{\theta} \sim M^1 T^{-2} L^2 
+\text{angular spring constant:} \quad k_{\theta} \sim M^1 T^{-2} L^1 
 \]
 \[
-\text{angular damping coefficient:} \quad c_{\theta} \sim M^1 T^{-1} L^2
+\text{angular damping coefficient:} \quad c_{\theta} \sim M^1 T^{-1} L^1
 \]
-% Does force need to be here? Isn't it really torque anyway?
-%\[
-%\text{force:} \quad  F \sim M^1 L^1 T^{-2}
-%\]
+\[
+\text{force:} \quad  F \sim M^1 L^1 T^{-2}
+\]
 \[
 \text{time:} \quad t \sim T^1
 \]
@@ -201,7 +186,7 @@ Note that, unlike with longitudinal springs and dampers, their angular counterpa
 
 \subsection{Generation of $\Pi$-Terms}
 
-In order to make use of Buckingham's Pi Theorem to scale our system correctly, we need to make $n-k = 7-3 = 4$ pi terms. I won't do that many until needed for illustrating a concept - I'll show the errors this generates as they occur.
+In order to make use of Buckingham's Pi Theorem to scale our system correctly, we need to make $n-k = 8-3 = 5$ pi terms. I won't do that many until needed for illustrating a concept - I'll show the errors this generates as they occur.
 
 The first step in this procedure is to select $k=3$ ``repeating variables,'' which will make up our pi terms. Any subset of 3 is fine here, under the following conditions:
 
@@ -210,25 +195,18 @@ The first step in this procedure is to select $k=3$ ``repeating variables,'' whi
 2. Avoid selecting difficult-to-scale variables as repeaters (e.g. don't choose time here because that's hard)
 
 
-Let's choose, in this example, our repeaters as $m, l, k_{\theta}$. See the Munsen textbook (or other resources) to see how to procedurally derive all the pi terms. 
-Here are the first 3 of the 4 terms that would be needed.
-Again, I'm doing this erroneously on purpose for example purposes.
+Let's choose, in this example, our repeaters as $m, l, c$. See the Munsen textbook (or other resources) to see how to procedurally derive all the pi terms. 
+Skipping ahead, here are the ones I derived.
 You can check the units in all of these: they divide out evenly.
 
 \[
 \Pi_1 = \Pi_{\theta_r} = 0
 \]
-%\[
-%\Pi_2 = \Pi_{g} = \frac{gm^2l}{c_{\theta}^2}
-%\]
 \[
-\Pi_2 = \Pi_{g} = \frac{gml}{k_{\theta}}
+\Pi_2 = \Pi_{g} = \frac{gm^2l}{c_{\theta}^2}
 \]
-%\[
-%\Pi_3 = \Pi_{k_{\theta}} = \frac{m l k_{\theta}}{c_{\theta}^2}
-%\]
 \[
-\Pi_3 = \Pi_{c_{\theta}} = \frac{c_{\theta}^2 }{m l^2 k_{\theta}}
+\Pi_3 = \Pi_{k_{\theta}} = \frac{m l k_{\theta}}{c_{\theta}^2}
 \]
 
 \subsection{$\Pi$-Term Analysis for Scaling}
@@ -239,38 +217,32 @@ So, if for this system, we want to scale gravitional acceleration by a factor $s
 g_2 = (s) (g_1)
 \]
 
-We would also need to scale length of rod (because of $\Pi_2$) and angular damping constant (because of $\Pi_3$) by the following:
+We would also need to scale length of rod (because of $\Pi_2$) and angular spring constant (because of $\Pi_3$) by the following:
 
 \[
-l_2 = \frac{1}{s} l_1, \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}
+k_{\theta_2} = (s) k_{\theta_1}, \quad \quad l_2 = \frac{1}{s} l_1
 \]
 
-However, there are other combinations we could choose! 
-Pi term scalings are not unique.
-One could choose other sets of scalings but I'll leave that as an exercise for the reader!
-By the theorem, these scalings should all give us the same result.
+However, there are other combinations we could choose! Pi term scalings are not unique. Here is another set of scaling factors we could choose, again assuming we want to scale gravity by $s$.
 
-%\[
+\[
 %m_{2} = \frac{1}{\sqrt{s}} m_{1}, \quad \quad l_2 = (\sqrt{s}) l_1
-%k_{\theta_2} = (s) k_{\theta_1}, \quad \quad c_{\theta_2} = (\sqrt{s}) c_{\theta_1}
-%\]
+k_{\theta_2} = (s) k_{\theta_1}, \quad \quad c_{\theta_2} = (\sqrt{s}) c_{\theta_1}
+\]
 
+...and we could come up with others involving the damping term, or involving all of them, if we wanted to. By the theorem, these scalings should all give us the same result.
 
 \section{Simulation of scaled systems}
 
-In order to verify that following these scalings is actually required, here are a handful of simulations.
-
-Figures \ref{fig:original_angular} and \ref{fig:grav_only_angular} shows simulations of the original system, under parameters defined in the accompanying MATLAB file, as well as one with only gravity scaled by a constant.
-As expected, the latter figure shows an inherently different result.
+Figures \ref{fig:original_angular} and \ref{fig:grav_only_angular} shows simulations of the original system, under parameters defined in the accompanying MATLAB file, as well as one with only gravity scaled by a constant (which is expected to yield a quantitatiely different result.)
 Here, the scaling factor was $s=2$.
-
-Figure \ref{fig:l_g_angular} shows a simulation with length scaled with gravity.
+Figure \ref{fig:l_g_angular} shows a simulation with length scaled with gravity, as per the naive assumption suggested by Bullet developers.
 This one is done with proportional scaling: gravity multiplied by $s$, length multiplied by $s$.
-Note that this is similar to the assumptions passed around on the Bullet Physics forums: when scaling gravity, the only other scaling that's needed is length.
+However, to head off complaints, I've also included a plot where length is multiplied by $1/s$ in figure \ref{fig:l_g_inverse_angular}.
 Both can be seen as incorrect scalings.
 
-Then, figure \ref{fig:l_g_c_angular} shows the same system but this time following the three Pi-terms above.
-Specifically, all of $g, l,$ and $c_{\theta}$ are scaled.
+Figures \ref{fig:k_l_g_angular} and \ref{fig:m_l_g_angular} show two simulations of ``properly scaled'' systems under the two different parameter transformations listed above.
+In order to see differences in the following plots, pay attention to the magnitude of the first peak, as well as the settling time.
 
 \begin{figure}[ht]
   \centering
@@ -295,66 +267,78 @@ Specifically, all of $g, l,$ and $c_{\theta}$ are scaled.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.48\linewidth]{img/l_g_c_angular.eps}
-  \caption{System with gravity, angular damping constant, and length scaled. }
-  \label{fig:l_g_c_angular}
+  \includegraphics[width=.48\linewidth]{img/l_g_inverse_angular.eps}
+  \caption{System with length scaled as well as gravity, inversely: gravity with $s$, length with $1/s$. }
+  \label{fig:l_g_inverse_angular}
 \end{figure}
-
-
-What happened? The plots of Figures \ref{fig:grav_only_angular} and \ref{fig:l_g_angular} are wrong, as expected, but so is Figure \ref{fig:l_g_c_angular}!
-It's not the same as Figure \ref{fig:original_angular}! 
-
-
-As designed by this tutorial, plot \ref{fig:l_g_c_angular} shows what happens when not all Pi-terms are calculated or followed.
-We're not following the theorem exactly! 
-We conveniently left out the Pi-term corresponding to the time scale.
-It's possible that this requires scaling also. 
-Let's see if including this compels us to change our scalings or to scale additional parameters.
-After some algebra, this Pi-term is
-
-\[
-\Pi_4 = \Pi_{t} = \frac{t^2 k_{\theta}}{m l^2}
-\]
-
-Ack! The time scaling! 
-This gets complicated now: ideally, we'd want to find a scaling that doesn't require a change to the time axis - this makes real-time simulations particularly difficult to interpret.
-However, a brief bit of investigation leads us to believe that any possible scaling for this system that involves a gravity term will also necessarily involve a time term.
-A future task is to show that this is true by either exhaustive search of Pi-term options or by finding other work that would show it as such. 
-
-Here's our final scaling with time:
-
-\[
-l_2 = \frac{1}{s} l_1 , \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}, \quad \quad t_2 = \frac{1}{\sqrt{s}} t_1
-\]
-
-This system with all four terms scaled is simulated in figure \ref{fig:l_g_c_t_angular}. See how this is the same result as figure \ref{fig:original_angular}, finally!
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.48\linewidth]{img/l_g_c_t_angular.eps}
-  \caption{System with gravity, angular damping constants, and time scaled. }
-  \label{fig:l_g_c_t_angular}
+  \includegraphics[width=.48\linewidth]{img/k_l_g_angular.eps}
+  \caption{System with gravity, angular spring constant, and length scaled. }
+  \label{fig:k_l_g_angular}
 \end{figure}
 
-\subsection{Discussion}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.48\linewidth]{img/k_c_g_angular.eps}
+  \caption{System with gravity and angular spring/damping constants scaled. }
+  \label{fig:k_c_g_angular}
+\end{figure}
 
-This section should show by contradiction that the following two statements are untrue: \\
 
-1. Commutativity of multiplication implies that we only need to scale length when scaling gravity, e.g., only scaling length will result in similitude.
+What happened? Plots \ref{fig:k_l_g_angular} and \ref{fig:k_c_g_angular} are NOT equivalent to the orignal in figure \ref{fig:original_angular}! 
+For plot \ref{fig:k_l_g_angular} there is likely something that I'm doing wrong with my simulation - I can't quite figure out why it's coming out like this.
+It's included for reference for someone else to figure out later if so desired.
+
+
+But, plot \ref{fig:k_c_g_angular} is expected, as per the analysis below.
+We messed up - we're not following the theorem exactly! 
+We conveniently left out the two remaining Pi terms of force and time. 
+Let's see if including these compels us to change our scalings.
+After some algebra, these two Pi terms are
+
+\[
+\Pi_4 = \Pi_{F} = \frac{fill in later}{fill in later}
+\]
+\[
+\Pi_5 = \Pi_{t} = \frac{tc_{\theta}}{ml}
+\]
+
+Ack! The time scaling! 
+This gets complicated now: let's find a scaling that keeps time consistent also.
+Remember that time gets difficult for us to scale: we could do it post-hoc after the simulation, but that's a pain, so let's see if we can just change the constants.
+
+...
+
+...and it looks like this system of equations is unsolvable unless we scale time too. Darn. 
+Here's a scaling with time, based on the original scaling:
+
+\[
+k_{\theta_2} = (s) k_{\theta_1}, \quad \quad c_{\theta_2} = (\sqrt{s}) c_{\theta_1}, \quad \quad t_2 = \frac{1}{\sqrt{s}} t_1
+\]
+
+This system is simulated in figure \ref{fig:k_c_t_g_angular}. See how this is the same result as figure \ref{fig:original_angular}, finally!
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.48\linewidth]{img/k_c_t_g_angular.eps}
+  \caption{System with gravity, angular spring and damping constants, and time scaled. }
+  \label{fig:k_c_t_g_angular}
+\end{figure}
+
+In conclusion, this section should show by contradiction that the following two statements are untrue: \\
+
+1. Commutativity of multiplication implies that we only need to scale length when scaling gravity: 
 $n * (length / time^2) == (n * length) / time^2.$
 
 If this were true, not only would figures \ref{fig:original_angular} and \ref{fig:l_g_angular} be identical, but there wouldn't be a need for dimensional analysis in the first place.
-This conjecture relies on a notion of commutativity of multiplication for a single equation - that involving only length and gravity - and neglects equations that might involve gravity and other terms, or length and other terms.
-This is the motivation behind the Buckingham Pi Theorem: such a procedural method ensures that all such interactions are accounted for, and the many potential multiplicative commutativity relationships are always satisfied.
+The fact that the Buckingham Pi theorem exists in the first place really disproves this idea intuitively. \\
 
-2. Instead of simulating a robot of characteristic size l, mass m and gravity g, we simulate a robot of size 10*l, mass m and gravity 10*g.
-The result will be dynamically and kinematically similar (in the technical sense of similitude.)
+2. Instead of simulating a robot of characteristic size l, mass m in and gravity g, we simulate a robot of size 10*l, mass m and gravity 10*g.
+The resulting large robot has identical behavior to the original small robot, except for a multiplicative factor 10 for units which depend linearly on length, 100 for units which depend quadratically on length and so on.
 
-Similar to the above reasoning, this neglects other possible variables in the system. 
-While it is true that such a scaling is needed, this conjecture doesn't consider other possibly-necessary scalings.
-In particular, even something like mass may need to be scaled here depending on the situation and if the Pi-terms call for it.
-Care must be taken!
-However, note again that this does work for certain linear systems, such as those described with the simpler Pi-terms in section 
+This is not true, since we may need to pay attention to ALL variables at play. Some (seemingly unrelated) ones may cause significant changes in the reqiured dimensionless terms, as explained in the next section on why our simulations currently ''work''. 
 
 \section{Analysis of related longitudinal spring/damper systems, for NTRT use}
 
@@ -406,8 +390,7 @@ The takeaway here is that without extra Pi terms for more parameters like $k_{\t
 
 \section{Scaling Analysis for General Linear Systems}
 
-Finally, I'll finish with an informal argument as to why a truly linear system would not need any of this scaling analysis.
-In brief, if input forces can be represented as time-invariant, and the Laplace transform of the system shows a scale of the input to correspond proportionally to an output magnitude change, then scaling is simple and intuitive.
+Finally, I'll finish with an argument as to why a truly linear system would not need any of this scaling analysis.
 I originally tried these simulations using a simple spring-mass-damper vertically oriented under gravity, e.g.
 
 \[
@@ -429,7 +412,7 @@ m \ddot x + c \dot x + k x = (n) u(t)
 \]
 
 ...will be exactly $n$ times larger. Thus, dividing the output by $n$ re-scales to the proper dimensions.
-This is, however, informal: more research must be done to show this result, and to review the literature for similar work or proofs.
+I'm lazy and don't feel like looking up the theorems here, but it should be easy to justify if so desired.
 
 \section{Moving Forward}
 
@@ -454,19 +437,4 @@ Nonetheless we need to write good code to perform these scalings behind-the-scen
 
 If anyone would like to run my MATLAB code (attached in this directory), it should be straightforward, but email me if you find issues.
 
-\bibliographystyle{plain}
-\bibliography{scaling_counterexample}
-
 \end{document}
-
-% to add?
-% a variety of rigid body simulation scalings:
-% - air resistance
-% - frictional coefficients
-% - torsional springs/dampers
-% - terms inside controllers: gains? A-Bk?
-
-% To Do before NTRTsim v1.1 release:
-% - Move sections around (make this document flow better)
-% - Include more justification and explanation, see Ken's email
-% - Include scaling analyses for ALL terms in NTRT right now, and hopefully, show at least one of them to violate the ``only l and g'' phenomenon.
