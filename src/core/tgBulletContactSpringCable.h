@@ -215,17 +215,6 @@ private:
      * anchors during updateAnchorList()
      */
     std::vector<tgBulletSpringCableAnchor*>::iterator m_anchorIt;
-   
-    /**
-     * The total force experienced by the sliding anchors
-     */
-    btVector3 m_forceTotals;
-    
-    /**
-     * The scaling factor between the sliding and permanent anchors that
-     * (usually) ensures momentum is conserved
-     */
-    btVector3 m_forceScales;
     
     /**
      * Temporary storage for anchors between updateManifolds() and

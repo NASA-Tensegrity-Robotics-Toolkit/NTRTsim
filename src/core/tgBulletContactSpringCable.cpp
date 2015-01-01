@@ -124,9 +124,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     BT_PROFILE("calculateAndApplyForce");
 #endif //BT_NO_PROFILE    
     
-	m_forceTotals = btVector3(0.0, 0.0, 0.0);
-    m_forceScales = btVector3(1.0, 1.0, 1.0);
-
 	const double tension = getTension();
     const double currLength = getActualLength();
     
@@ -179,8 +176,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
 			// For sliding anchors, just figuring out directions for now
 			force = magnitude * forceDir;
 
-            // Only care about scaling sliding forces
-            m_forceTotals += force;
         }
         else
         {
@@ -190,9 +185,7 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
         m_anchors[i]->force = force;
          
     }
-    
-    std::cout << "Sliding force direction " <<  m_forceTotals << std::endl;
-    
+
     btVector3 totalForce(0.0, 0.0, 0.0);
     
     for (std::size_t i = 0; i < n; i++)
