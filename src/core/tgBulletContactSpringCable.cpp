@@ -97,15 +97,16 @@ const btScalar tgBulletContactSpringCable::getActualLength() const
 void tgBulletContactSpringCable::step(double dt)
 {    
     updateManifolds();
-
+#if (0) // Typically causes contacts to be lost
     int numPruned = 1;
     while (numPruned > 0)
     {
         numPruned = updateAnchorPositions();
-    }   
+    } 
+#endif
 	updateAnchorList();
 	
-	// See if the new anchors change anything
+	// Update positions and remove bad anchors
 	pruneAnchors();
 	
     if (getActualLength() > m_prevLength + 0.2)
