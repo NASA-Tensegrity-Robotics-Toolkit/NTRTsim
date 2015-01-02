@@ -87,7 +87,7 @@ namespace
      1.0,      // friction (unitless)
      0.1,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0.0,        // pretension (force)
+     10.0,        // pretension (force)
      false,     // history
      1000000,   // maxTens
      10000    // targetVelocity
@@ -208,7 +208,7 @@ void T6Model::setup(tgWorld& world)
                 c.rollFriction, c.restitution);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history,
+    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension * c.stiffness / c.stiffness_in, c.history,
 					    c.maxTens, c.targetVelocity);
 
     tgSpringCableActuator::Config muscleInConfig(c.stiffness_in, c.damping_in, c.pretension, c.history,
