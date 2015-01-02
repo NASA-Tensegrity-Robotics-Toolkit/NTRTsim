@@ -33,7 +33,6 @@
 #include <tr1/random>
 #include "learning/Configuration/configuration.h"
 
-using namespace std;
 
 class AnnealEvoMember
 {
@@ -46,9 +45,9 @@ public:
     void saveToFile(const char* outputFilename);
     void loadFromFile(const char* inputFilename);
 
-    vector<double> statelessParameters;
+    std::vector<double> statelessParameters;
     //scores for evaluation
-    vector<double> pastScores;
+    std::vector<double> pastScores;
     double maxScore;
     double maxScore1;
     double maxScore2;

@@ -25,7 +25,7 @@
  */
 
 #include "CPGNode.h"
-#include "CPGEdge.h"
+//#include "CPGEdge.h"
 
 // The C++ Standard Library
 #include <algorithm> //for_each
@@ -54,28 +54,18 @@ dMax(params[6])
 
 CPGNode::~CPGNode()
 {
-	for (std::size_t i = 0; i < couplingList.size(); i++)
-	{
-		delete couplingList[i];
-	}
 	couplingList.clear();
-}
-	
-void CPGNode::addCoupling(CPGEdge* newEdge)
-{
-	couplingList.push_back(newEdge);
-}
-
-void CPGNode::addCoupling(std::vector<CPGEdge*> edgeList){
-	couplingList.insert(couplingList.end(), edgeList.begin(), edgeList.end());
 }
 
 void CPGNode::addCoupling(	CPGNode* cNode,
 							const double cWeight,
 							const double cPhase)
 {
-	CPGEdge* newEdge = new CPGEdge(cNode, cWeight, cPhase);
-	CPGNode::addCoupling(newEdge);
+	couplingList.push_back(cNode);
+    weightList.push_back(cWeight);
+    phaseList.push_back(cPhase);
+    
+    assert(couplingList.size() == weightList.size() && couplingList.size() == phaseList.size());
 }
 	
 void CPGNode::updateDTs(double descCom)
@@ -87,8 +77,10 @@ void CPGNode::updateDTs(double descCom)
 	 * accordingly.
 	 * @todo ask about refactoring to use for_each
 	 */
-	for (int i = 0; i != couplingList.size(); i++){
-		couplingList[i]->couple(*this);
+	const std::size_t n = couplingList.size();
+	for (std::size_t i = 0; i != n; i++){
+        const CPGNode& targetNode = *(couplingList[i]);
+        phiDotValue += weightList[i] * targetNode.rValue * sin (targetNode.phiValue - phiValue - phaseList[i]);
 	}
 	
 	rDoubleDotValue = rConst * (rConst / 4 * (nodeEquation(descCom, radiusOffset, radiusScale)

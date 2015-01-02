@@ -42,6 +42,8 @@
 
 #include "dev/btietz/hardwareSineWaves/tgSineStringControl.h"
 
+using namespace std;
+
 /**
  * Defining the adapters here assumes the controller is around and
  * attached for the lifecycle of the learning runs. I.E. that the setup

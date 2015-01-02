@@ -98,7 +98,7 @@ void AnnealEvoPopulation::orderPopulation()
 
 }
 
-void AnnealEvoPopulation::readConfigFromXML(string configFile)
+void AnnealEvoPopulation::readConfigFromXML(std::string configFile)
 {
     int intValue;
     string elementTxt;

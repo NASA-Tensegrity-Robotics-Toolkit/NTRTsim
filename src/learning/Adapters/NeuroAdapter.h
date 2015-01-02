@@ -53,6 +53,7 @@ private:
 	std::vector< NeuroEvoMember *>currentControllers;
 	std::vector<double> initialPosition;
 	double errorOfFirstController;
+    /** Appears unused */
 	double totalTime;
 };
 

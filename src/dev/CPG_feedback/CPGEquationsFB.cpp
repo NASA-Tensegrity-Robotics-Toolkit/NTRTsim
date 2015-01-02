@@ -31,6 +31,9 @@
 #include "boost/array.hpp"
 #include "boost/numeric/odeint.hpp"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
 // The C++ Standard Library
 #include <assert.h>
 #include <stdexcept>
@@ -40,11 +43,11 @@ using namespace boost::numeric::odeint;
 
 typedef std::vector<double > cpgVars_type;
 
-CPGEquationsFB::CPGEquationsFB() :
-CPGEquations()
+CPGEquationsFB::CPGEquationsFB(int maxSteps) :
+CPGEquations(maxSteps)
  {}
-CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*>& newNodeList) :
-CPGEquations(newNodeList)
+CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*>& newNodeList, int maxSteps) :
+CPGEquations(newNodeList, maxSteps)
 {
 }
 
@@ -53,49 +56,71 @@ CPGEquationsFB::~CPGEquationsFB()
   //CPGEquations
 }
 
-std::vector<double> CPGEquationsFB::getXVars() {
-	std::vector<double> newXVars;
+int CPGEquationsFB::addNode(std::vector<double>& newParams) 
+{
+	int index = nodeList.size();
+	CPGNodeFB* newNode = new CPGNodeFB(index, newParams);
+	nodeList.push_back(newNode);
 	
-	for (int i = 0; i != nodeList.size(); i++){
-		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
-		newXVars.push_back(currentNode->phiValue);
-		newXVars.push_back(currentNode->rValue);
-		newXVars.push_back(currentNode->omega);
-	}
-	
-	return newXVars;
+	return index;
 }
 
-std::vector<double> CPGEquationsFB::getDXVars() {
-	std::vector<double> newDXVars;
+std::vector<double>& CPGEquationsFB::getXVars() {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:getXVars");
+#endif //BT_NO_PROFILE
+    XVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
-		newDXVars.push_back(currentNode->phiDotValue);
-		newDXVars.push_back(currentNode->rDotValue);
-		newDXVars.push_back(currentNode->omegaDot);
+        assert(currentNode);
+		XVars.push_back(currentNode->phiValue);
+		XVars.push_back(currentNode->rValue);
+		XVars.push_back(currentNode->omega);
 	}
 	
-	return newDXVars;
+	return XVars;
+}
+
+std::vector<double>& CPGEquationsFB::getDXVars() {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:getDXVars");
+#endif //BT_NO_PROFILE
+	DXVars.clear();
+	
+	for (int i = 0; i != nodeList.size(); i++){
+		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
+		DXVars.push_back(currentNode->phiDotValue);
+		DXVars.push_back(currentNode->rDotValue);
+		DXVars.push_back(currentNode->omegaDot);
+	}
+	
+	return DXVars;
 }
 
 void CPGEquationsFB::updateNodes(std::vector<double>& descCom)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB:updateNodes");
+#endif //BT_NO_PROFILE
 	std::vector<double>::iterator comIt = descCom.begin();
 	
 	assert(descCom.size() == nodeList.size() * 3);
 	
 	for(int i = 0; i != nodeList.size(); i++){
 		CPGNodeFB* currentNode = tgCast::cast<CPGNode, CPGNodeFB>(nodeList[i]);
-		std::vector<double> comGroup(comIt, comIt + 2);
+		std::vector<double> comGroup(comIt, comIt + 3);
 		currentNode->updateDTs(comGroup);
 		
 		comIt += 3;
 	}
 }
 
-void CPGEquationsFB::updateNodeData(std::vector<double>& newXVals)
+void CPGEquationsFB::updateNodeData(std::vector<double> newXVals)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquationsFB::updateNodeData");
+#endif //BT_NO_PROFILE 
 	assert(newXVals.size()==3*nodeList.size());
 	
 	for(int i = 0; i!=nodeList.size(); i++){

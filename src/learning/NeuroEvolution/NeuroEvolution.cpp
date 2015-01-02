@@ -25,7 +25,9 @@
  */
 
 #include "NeuroEvolution.h"
-#include "../Configuration/configuration.h"
+#include "learning/Configuration/configuration.h"
+#include "core/tgString.h"
+#include "helpers/FileHelpers.h"
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -50,22 +52,35 @@ unsigned long long rdtsc(){
 
 #endif
 
-NeuroEvolution::NeuroEvolution(string suff, string config)
+NeuroEvolution::NeuroEvolution(std::string suff, std::string config, std::string path) :
+suffix(suff)
 {
-	suffix=suff;
 	currentTest=0;
 	generationNumber=0;
+	if (path != "")
+	{
+		resourcePath = FileHelpers::getResourcePath(path);
+	}
+	else
+	{
+		resourcePath = "";
+	}
 
-	configuration myconfigdataaa;
-	myconfigdataaa.readFile(config);
+	std::string configPath = resourcePath + config;
+
+    configuration myconfigdataaa;
+	myconfigdataaa.readFile(configPath);
 	populationSize=myconfigdataaa.getintvalue("populationSize");
 	numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
 	numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
 	leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
 	coevolution=myconfigdataaa.getintvalue("coevolution");
+    seeded = myconfigdataaa.getintvalue("startSeed");
+    
+    bool learning = myconfigdataaa.getintvalue("learning");
 
-	srand(rdtsc());
+   srand(rdtsc());
 	eng.seed(rdtsc());
 
 	for(int j=0;j<numberOfControllers;j++)
@@ -73,11 +88,26 @@ NeuroEvolution::NeuroEvolution(string suff, string config)
 		cout<<"creating Populations"<<endl;
 		populations.push_back(new NeuroEvoPopulation(populationSize,myconfigdataaa));
 	}
-	evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
-	if (!evolutionLog.is_open())
-	{
-		throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
-	}
+
+    // Overwrite the random parameters based on data
+    if(seeded) // Test that the file exists
+    {
+        for(int i = 0; i < numberOfControllers; i++)
+        {
+            NeuroEvoMember* seededPop = populations[i]->controllers.back();
+            stringstream ss;
+            ss<< resourcePath <<"logs/bestParameters-"<<this->suffix<<"-"<<i<<".nnw";
+            seededPop->loadFromFile(ss.str().c_str());
+        }
+    }
+    if(learning)
+    {
+		evolutionLog.open((resourcePath + "logs/evolution"+suffix+".csv").c_str(),ios::out);
+		if (!evolutionLog.is_open())
+		{
+			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+		}
+    }
 }
 
 NeuroEvolution::~NeuroEvolution()
@@ -134,8 +164,7 @@ void NeuroEvolution::orderAllPopulations()
 	for(std::size_t i=0;i<populations.size();i++)
 	{
 		stringstream ss;
-		ss<<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
-//		populations[i]->getMember(0)->getNn()->saveWeights(ss.str().c_str());
+		ss << resourcePath <<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
 		populations[i]->getMember(0)->saveToFile(ss.str().c_str());
 	}
 }
@@ -214,7 +243,7 @@ void NeuroEvolution::updateScores(vector <double> multiscore)
 
 	//Record it to the file
 	ofstream payloadLog;
-	payloadLog.open("logs/scores.csv",ios::app);
+	payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);
 	payloadLog<<multiscore[0]<<","<<multiscore[1]<<endl;
 	payloadLog.close();
 	return;

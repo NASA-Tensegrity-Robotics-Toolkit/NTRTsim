@@ -20,7 +20,7 @@
 #define TG_CPG_STRING_CONTRL_H
 
 /**
- * @file tgCPGStringControl.h
+ * @file tgCPGActuatorControl.h
  * @brief Definition of the tgCPGStringControl observer class
  * @author Brian Mirletz
  * @date May 2014
@@ -41,14 +41,14 @@ class CPGEquations;
 class CPGEquationsFB;
 class tgImpedanceController;
 
-class tgCPGStringControl : public tgObserver<tgSpringCableActuator>,
+class tgCPGActuatorControl : public tgObserver<tgSpringCableActuator>,
 							public tgBaseCPGNode
 {
 public:
  
-    tgCPGStringControl(const double controlStep = 1.0/10000.0);
+    tgCPGActuatorControl(const double controlStep = 1.0/10000.0);
     
-    virtual ~tgCPGStringControl();
+    virtual ~tgCPGActuatorControl();
     
     virtual void onAttach(tgSpringCableActuator& subject);
     
@@ -60,18 +60,12 @@ public:
      */
     
     void assignNodeNumber (CPGEquations& CPGSys, array_2D nodeParams);
-    
-    /**
-     * Account for the larger number of parameters the nodes have
-     * with a feedback CPGSystem
-     */
-    void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
-    
+ 
     /**
      * Iterate through all other tgSpringCableActuatorCPGInfos, and determine
      * CPG network by rigid body connectivity
      */
-    void setConnectivity(const std::vector<tgCPGStringControl*>& allStrings,
+    void setConnectivity(const std::vector<tgCPGActuatorControl*>& allStrings,
              array_4D edgeParams);
     
     const int getNodeNumber() const

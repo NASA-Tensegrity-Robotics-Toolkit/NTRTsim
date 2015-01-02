@@ -163,6 +163,12 @@ private:
     void updateAnchorList();
     
     /**
+     * Minimize the length of the anchors - accounts for sliding
+     * Return the number of anchors that are deleted (have slid off the body)
+     */
+    int updateAnchorPositions();
+    
+    /**
      * First minimizes the length of the string in allowed directions
      * and deletes anchors with out of date manifolds. Then deletes
      * anchors that are too close to surrounding anchors or where
@@ -215,17 +221,6 @@ private:
      * anchors during updateAnchorList()
      */
     std::vector<tgBulletSpringCableAnchor*>::iterator m_anchorIt;
-   
-    /**
-     * The total force experienced by the sliding anchors
-     */
-    btVector3 m_forceTotals;
-    
-    /**
-     * The scaling factor between the sliding and permanent anchors that
-     * (usually) ensures momentum is conserved
-     */
-    btVector3 m_forceScales;
     
     /**
      * Temporary storage for anchors between updateManifolds() and
