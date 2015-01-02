@@ -153,15 +153,15 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 30000)
     {
-        //try
+        try
         {
             simulation.run(30000);
             simulation.reset();
             i++;
         }  
-        //catch (std::runtime_error e)
+        catch (std::runtime_error e)
         {
-        //    simulation.reset();
+            simulation.reset();
         }
     }
     
