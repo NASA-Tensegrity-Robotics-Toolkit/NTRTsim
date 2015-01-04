@@ -39,7 +39,7 @@
 
 namespace
 {
-    // see tgBaseString.h for a descripton of some of these rod parameters
+    // see tgBasicActuator and tgRod for a descripton of these rod parameters
     // (specifically, those related to the motor moving the strings.)
     // NOTE that any parameter that depends on units of length will scale
     // with the current gravity scaling. E.g., with gravity as 98.1,
