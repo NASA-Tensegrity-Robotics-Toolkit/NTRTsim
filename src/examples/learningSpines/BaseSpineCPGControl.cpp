@@ -174,7 +174,8 @@ BaseSpineCPGControl::~BaseSpineCPGControl()
 
 void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquations();
+    // Maximum number of sub-steps allowed by CPG
+	m_pCPGSys = new CPGEquations(200);
     //Initialize the Learning Adapters
     nodeAdapter.initialize(&nodeEvolution,
                             nodeLearning,

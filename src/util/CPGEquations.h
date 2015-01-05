@@ -40,7 +40,7 @@ class CPGEquations
 {
  public:
 	
-	CPGEquations();
+	CPGEquations(int maxSteps = 200);
 
 	CPGEquations(std::vector<CPGNode*>& newNodeList);
 	
@@ -70,6 +70,11 @@ class CPGEquations
 	
 	std::string toString(const std::string& prefix = "") const;
 	
+    void countStep()
+    {
+        numSteps++;
+    }
+    
 protected:
 	
 	std::vector<CPGNode*> nodeList;
@@ -78,6 +83,10 @@ protected:
     std::vector<double> DXVars;
     
 	double stepSize;
+    
+    int m_maxSteps;
+    int numSteps;
+    
 };
 
 /**

@@ -41,12 +41,14 @@ using namespace boost::numeric::odeint;
 
 typedef std::vector<double > cpgVars_type;
 
-CPGEquations::CPGEquations() :
-stepSize(0.1) 
+CPGEquations::CPGEquations(int maxSteps) :
+stepSize(0.1),
+m_maxSteps(maxSteps)
  {}
 CPGEquations::CPGEquations(std::vector<CPGNode*>& newNodeList) :
 nodeList(newNodeList),
-stepSize(0.1) //TODO: specify as a parameter somewhere
+stepSize(0.1), //TODO: specify as a parameter somewhere
+numSteps(0)
 {
 }
 
@@ -188,6 +190,8 @@ class integrate_function {
 		}
 		//std::cout<<"operator call"<<std::endl;
 		
+		theseCPGs->countStep();
+		
 	}
 	
 	private:
@@ -234,6 +238,8 @@ void CPGEquations::update(std::vector<double>& descCom, double dt)
 		stepSize = 0.1;
 	}
 	
+	numSteps = 0;
+	
 	/**
 	 * Read information from nodes into variables that work for ODEInt
 	 */
@@ -243,7 +249,13 @@ void CPGEquations::update(std::vector<double>& descCom, double dt)
 	 * Run ODEInt. This will change the data in xVars
 	 */
 	integrate(integrate_function(this, descCom), xVars, 0.0, dt, stepSize, output_function(this));
-	 
+	
+    if (numSteps > m_maxSteps)
+    {
+        std::cout << "Ending trial due to inefficient equations " << numSteps << std::endl;
+        throw std::runtime_error("Inefficient CPG Parameters");
+    }
+    
 	 #if (0)
 	 std::cout << dt << '\t' << nodeList[0]->nodeValue <<
 	  '\t' << nodeList[1]->nodeValue <<

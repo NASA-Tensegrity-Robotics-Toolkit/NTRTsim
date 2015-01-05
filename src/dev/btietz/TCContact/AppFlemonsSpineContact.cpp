@@ -38,6 +38,7 @@
 #include "core/terrain/tgHillyGround.h"
 // The C++ Standard Library
 #include <iostream>
+#include <exception>
 
 /**
  * The entry point.
@@ -85,7 +86,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 6;
     FlemonsSpineModelContact* myModel =
       new FlemonsSpineModelContact(segments);
 
@@ -95,11 +96,11 @@ int main(int argc, char** argv)
     const int segmentSpan = 3;
     const int numMuscles = 8;
     const int numParams = 2;
-    const int segNumber = 6; // For learning results
+    const int segNumber = 0; // For learning results
     const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = -10 *  30.0;
+    const double lowAmplitude = 0 *  30.0;
     const double highAmplitude = 10 * 30.0;
     const double kt = 0.0;
     const double kp = 1000.0;
@@ -108,7 +109,7 @@ int main(int argc, char** argv)
         
     // Overridden by def being true
     const double cl = 10.0;
-    const double lf = -30.0;
+    const double lf = 0.0;
     const double hf = 30.0;
 
 
@@ -139,14 +140,16 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 3000)
     {
-        simulation.run(30000);
-    	#ifdef BT_USE_DOUBLE_PRECISION
-		std::cout << "Double precision" << std::endl;
-	#else
-		std::cout << "Single Precision" << std::endl;
-	#endif
-        simulation.reset();
-        i++;
+        try
+        {
+            simulation.run(30000);
+            simulation.reset();
+            i++;
+        }  
+        catch (std::runtime_error e)
+        {
+            simulation.reset();
+        }
     }
     
     /// @todo Does the model assume ownership of the controller?

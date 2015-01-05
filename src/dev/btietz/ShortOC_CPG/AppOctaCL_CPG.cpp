@@ -27,7 +27,7 @@
 // This application
 #include "examples/learningSpines/OctahedralComplex/FlemonsSpineModelLearningCL.h"
 // This library
-#include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "dev/CPG_feedback/SpineFeedbackControl.h"
 #include "examples/learningSpines/tgCPGLogger.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -84,11 +84,11 @@ int main(int argc, char** argv)
     const double kPosition = 400.0;
     const double kVelocity = 40.0; 
 
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
+    SpineFeedbackControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
 												lowAmplitude, highAmplitude, lowPhase, highPhase,
 												tension, kPosition, kVelocity);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "bmirletz/OctaCL_CPG/");
+    SpineFeedbackControl* const myControl =
+      new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_CPG/");
     myModel->attach(myControl);
 #if (0)    
     tgCPGLogger* const myLogger = 
@@ -101,9 +101,16 @@ int main(int argc, char** argv)
     int i = 0;
     while (i < 1)
     {
-        simulation.run(60000);
-        simulation.reset();
-        i++;
+        try
+        {
+            simulation.run(60000);
+            simulation.reset();
+            i++;
+        }  
+        catch (std::runtime_error e)
+        {
+            simulation.reset();
+        }
     }
     
     /// @todo Does the model assume ownership of the controller?
