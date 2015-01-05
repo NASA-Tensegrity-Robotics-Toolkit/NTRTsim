@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (1)
+#if (0)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -100,8 +100,8 @@ int main(int argc, char** argv)
     const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = -10 *  30.0;
-    const double highAmplitude = 10 * 30.0;
+    const double lowAmplitude = 0.0;
+    const double highAmplitude = 300.0;
     const double kt = 0.0;
     const double kp = 1000.0;
     const double kv = 200.0;
@@ -109,16 +109,16 @@ int main(int argc, char** argv)
         
     // Overridden by def being true
     const double cl = 10.0;
-    const double lf = -30.0;
+    const double lf = 0.0;
     const double hf = 30.0;
     
     // Feedback parameters
     const double ffMin = -0.5;
-    const double ffMax = 5.0;
+    const double ffMax = 10.0;
     const double afMin = 0.0;
-    const double afMax = 5.0;
+    const double afMax = 20.0;
     const double pfMin = -0.5;
-    const double pfMax =  5.0;
+    const double pfMax =  6.28;
 
     SpineFeedbackControl::Config control_config(segmentSpan, 
                                                 numMuscles,
