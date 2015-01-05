@@ -95,16 +95,26 @@ const btScalar tgBulletContactSpringCable::getActualLength() const
 }
 
 void tgBulletContactSpringCable::step(double dt)
-{
-	updateManifolds();
-    
-    pruneAnchors();
-    
+{    
+    updateManifolds();
+#if (0) // Typically causes contacts to be lost
+    int numPruned = 1;
+    while (numPruned > 0)
+    {
+        numPruned = updateAnchorPositions();
+    } 
+#endif
 	updateAnchorList();
 	
-	// See if the new anchors change anything
+	// Update positions and remove bad anchors
 	pruneAnchors();
 	
+    if (getActualLength() > m_prevLength + 0.2)
+    {
+//         throw std::runtime_error("Large length change!");
+        std::cout << "Previous length " << m_prevLength << " actual length " << getActualLength() << std::endl;
+    }
+    
 	calculateAndApplyForce(dt);
 	
 	// Do this last so the ghost object gets populated with collisions before it is deleted
@@ -119,9 +129,6 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
     BT_PROFILE("calculateAndApplyForce");
 #endif //BT_NO_PROFILE    
     
-	m_forceTotals = btVector3(0.0, 0.0, 0.0);
-    m_forceScales = btVector3(1.0, 1.0, 1.0);
-
 	const double tension = getTension();
     const double currLength = getActualLength();
     
@@ -166,16 +173,14 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
             btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
 
 
-			btVector3 first = (current - forward);
-			btVector3 second = (current - back);
+			btVector3 first = (forward - current);
+			btVector3 second = (back - current);
 			
-			btVector3 forceDir = (first.normalize()  + second.normalize() ).normalize();
-		
-			// Apply dot of contact normal with string's normal
-			force = (tension * direction).dot(forceDir) * forceDir;
-						
-            // Only care about scaling sliding forces
-            m_forceTotals += force;
+			btVector3 forceDir = first.normalize() + second.normalize();
+            
+			// For sliding anchors, just figuring out directions for now
+			force = magnitude * forceDir;
+
         }
         else
         {
@@ -185,43 +190,28 @@ void tgBulletContactSpringCable::calculateAndApplyForce(double dt)
         m_anchors[i]->force = force;
          
     }
+
+    btVector3 totalForce(0.0, 0.0, 0.0);
     
-	btVector3 maxForce = (anchor1->force + anchor2->force);
-	
-	for (std::size_t i = 0; i < 3; i++)
-	{
-		if (m_forceTotals[i] != maxForce[i] && m_forceTotals[i] != 0.0)
-		{
-			m_forceScales[i] = btFabs(maxForce[i] / m_forceTotals[i]);
-		}
-		else if (m_forceTotals[i] == 0.0)
-		{
-			m_forceScales[i] = 1.0;
-		}
-	} 
-
-#ifdef VERBOSE
-	std::cout << "Force Scaling " <<  m_forceScales << std::endl;
-#endif
-
     for (std::size_t i = 0; i < n; i++)
     {
 		btRigidBody* body = m_anchors[i]->attachedBody;
 		
 		btVector3 contactPoint = m_anchors[i]->getRelativePosition();
 		body->activate();
-	
-		// Scale the force of the sliding anchors
-		if (m_anchors[i]->sliding)
-		{
-			// Elementwise multiply
-			m_anchors[i]->force *= m_forceScales;
-		}
-
+        
+        totalForce += m_anchors[i]->force;
+        
 		btVector3 impulse = m_anchors[i]->force* dt;
 		
 		body->applyImpulse(impulse, contactPoint);
 	}
+    
+    if (!totalForce.fuzzyZero())
+    {
+        std::cout << "Total Force Error! " << totalForce << std::endl;
+        throw std::runtime_error("Total force did not sum to zero!");
+    }
     
     // Finished calculating, so can store things
     m_prevLength = currLength;
@@ -379,6 +369,8 @@ void tgBulletContactSpringCable::updateAnchorList()
 #endif //BT_NO_PROFILE    
 	int numContacts = 2;
     
+    btScalar startLength = getActualLength();
+    
 	while (m_newAnchors.size() > 0)
 	{
 		// Not permanent, sliding contact
@@ -447,10 +439,26 @@ void tgBulletContactSpringCable::updateAnchorList()
 			{		
 				
 				m_anchorIt = m_anchors.begin() + anchorPos + 1;
-									  
+			    
 				m_anchorIt = m_anchors.insert(m_anchorIt, newAnchor);
-				
-				numContacts++;
+
+#if (1) // Keeps the energy down very well
+                if (getActualLength() > m_prevLength + 2.0 * m_resolution)
+                {
+                    deleteAnchor(anchorPos + 1);
+                }
+                else
+                {
+                    numContacts++;
+                }
+#else
+                numContacts++;
+#endif
+                
+#ifdef VERBOSE                
+                std::cout << "Prev: " << m_prevLength << " LengthDiff " << startLength << " " << getActualLength();
+                std::cout << " Anchors " << m_anchors.size() << std::endl;
+#endif
 			}
 		}
 		else
@@ -463,6 +471,50 @@ void tgBulletContactSpringCable::updateAnchorList()
     
     //std::cout << " prunedAnchors " << m_anchors.size() << std::endl;
     
+}
+
+int tgBulletContactSpringCable::updateAnchorPositions()
+{
+    int numPruned = 0;
+    std::size_t i = 1;
+    
+    bool keep = true; //m_anchors[i]->updateContactNormal();
+    
+    while (i < m_anchors.size() - 1)
+    {
+        btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+        btVector3 current = m_anchors[i]->getWorldPosition(); 
+        btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+        
+        btVector3 lineA = (forward - current);
+        btVector3 lineB = (back - current);
+
+        btVector3 contactNormal = m_anchors[i]->getContactNormal();
+        
+        if (!m_anchors[i]->permanent)
+        {
+            btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
+            btScalar tangentDot = (lineB + lineA).dot(tangentDir);
+            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+            btVector3 newPos = current + tangentMove;
+            // Check if new position is on body
+            if (!keep || !m_anchors[i]->setWorldPosition(newPos))
+            {
+                deleteAnchor(i);
+                numPruned++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+        else
+        {
+            i++;
+        }
+    }
+    
+    return numPruned;
 }
 
 void tgBulletContactSpringCable::pruneAnchors()
@@ -478,94 +530,71 @@ void tgBulletContactSpringCable::pruneAnchors()
             BT_PROFILE("pruneAnchors");
         #endif //BT_NO_PROFILE   
         numPruned = 0;
-        i = 1;
-        while (i < m_anchors.size() - 1)
+        
+        numPruned = updateAnchorPositions();
+        
+        if( numPruned == 0)
         {
-			bool keep = true; //m_anchors[i]->updateContactNormal();
-			
-			numPruned = 0;
-			btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
-			btVector3 current = m_anchors[i]->getWorldPosition(); 
-			btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
-			
-			btVector3 lineA = (forward - current);
-			btVector3 lineB = (back - current);
-			
+        
+            i = 1;
+            while (i < m_anchors.size() - 1)
+            {
+                
+                if (!m_anchors[i]->permanent)
+                {
+                    btScalar normalValue1;
+                    btScalar normalValue2;
+                    
+                    // Get new values
+                    
+                    btVector3 back = m_anchors[i - 1]->getWorldPosition(); 
+                    btVector3 current = m_anchors[i]->getWorldPosition(); 
+                    btVector3 forward = m_anchors[i + 1]->getWorldPosition(); 
+                
+                    btVector3 lineA = (forward - current);
+                    btVector3 lineB = (back - current);
+            
+                    btVector3 contactNormal = m_anchors[i]->getContactNormal();
+                    
+                    
+                    if (lineA.length() < m_resolution / 2.0 || lineB.length() < m_resolution / 2.0)
+                    {
+                        // Arbitrary value that deletes the nodes
+                        normalValue1 = -1.0;
+                        normalValue2 = -1.0;
+                    }
+                    else
+                    {
+                        //lineA.normalize();
+                        //lineB.normalize();
+                        //std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
 
-			btVector3 contactNormal = m_anchors[i]->getContactNormal();
-			
-			if (!m_anchors[i]->permanent)
-			{
-				btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
-				btScalar tangentDot = (lineB + lineA).dot(tangentDir);
-				btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
-				btVector3 newPos = current + tangentMove;
-				// Check if new position is on body
-				if (!keep || !m_anchors[i]->setWorldPosition(newPos))
-				{
-					deleteAnchor(i);
-					numPruned++;
-				}
-			}
-			else
-			{
-				i++;
-			}
-		
-			if (numPruned == 0 && !m_anchors[i]->permanent)
-			{
-				btScalar normalValue1;
-				btScalar normalValue2;
-				
-				// Get new values
-				
-				back = m_anchors[i - 1]->getWorldPosition(); 
-				current = m_anchors[i]->getWorldPosition(); 
-				forward = m_anchors[i + 1]->getWorldPosition(); 
-			
-				lineA = (forward - current);
-				lineB = (back - current);
-		
-				contactNormal = m_anchors[i]->getContactNormal();
-				
-				
-				if (lineA.length() < m_resolution / 2.0 || lineB.length() < m_resolution / 2.0)
-				{
-					// Arbitrary value that deletes the nodes
-					normalValue1 = -1.0;
-					normalValue2 = -1.0;
-				}
-				else
-				{
-					//lineA.normalize();
-					//lineB.normalize();
-					//std::cout << "Normals " <<  std::btFabs(line.dot( m_anchors[i]->contactNormal)) << std::endl;
-
-					normalValue1 = (lineA).dot(contactNormal);
-					normalValue2 = (lineB).dot(contactNormal);
-				}	
-				if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
-				{
-					#ifdef VERBOSE
-						std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
-					#endif
-					if (deleteAnchor(i))
-					{
-						numPruned++;
-					}
-					else
-					{
-						// Permanent anchor, move on
-						i++;
-					}
-				}
-				else
-				{
-					i++;
-				}
-			}
-			
+                        normalValue1 = (lineA).dot(contactNormal);
+                        normalValue2 = (lineB).dot(contactNormal);
+                    }	
+                    if ((normalValue1 < 0.0) || (normalValue2 < 0.0))
+                    {
+                        #ifdef VERBOSE
+                            std::cout << "Erased normal: " << normalValue1 << " "  << normalValue2 << " "; 
+                        #endif
+                        if (deleteAnchor(i))
+                        {
+                            numPruned++;
+                        }
+                        else
+                        {
+                            // Permanent anchor, move on
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
         }
+
         if (numPruned == 0)
         {
 			passes++;

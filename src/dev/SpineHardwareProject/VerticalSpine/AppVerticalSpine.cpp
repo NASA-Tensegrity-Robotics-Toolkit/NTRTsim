@@ -17,18 +17,16 @@
 */
 
 /**
- * @file AppNestedTetrahedrons.cpp
- * @brief Contains the definition function main() for the Nested Tetrahedrons
+ * @file AppVerticalSpine.cpp
+ * @brief Contains the definition function main() for VerticalSpine
  * application.
- * @author Brian Tietz
+ * @author Brian Tietz, Drew Sabelhaus
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
 #include "VerticalSpineModel.h"
-#include "VerticalSpineRestLengthController.h"
-//#include "AppSineWaves.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -64,18 +62,14 @@ int main(int argc, char** argv)
     const int segments = 5;
     VerticalSpineModel* myModel = new VerticalSpineModel(segments);
     
-    //Pass in the amount of cable to contract in, the "rest length difference":
-    // the static offset of cable
-    // length between geometric length in equilibrium and the actual rest length
-    // of an individual cable.
-    //
+    // If desired, add on a controller now.
+    // The model contains a pretension parameter, so for simple equilibrium
+    // simulations, no controller is needed.
 
-    VerticalSpineRestLengthController* const pTC = new VerticalSpineRestLengthController();
-    myModel->attach(pTC);
+    //VerticalSpineRestLengthController* const pTC = new VerticalSpineRestLengthController();
+    //myModel->attach(pTC);
 
-    //NestedStructureSineWaves* const pMuscleControl =
-    //  new NestedStructureSineWaves();
-    //myModel->attach(pMuscleControl);
+    // Finally, add the model (with attached objects) to the simulation.
     simulation.addModel(myModel);
 	
 	// Run until the user stops

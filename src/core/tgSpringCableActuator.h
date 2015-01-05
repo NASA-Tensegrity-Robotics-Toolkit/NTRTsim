@@ -227,6 +227,16 @@ public:
     {
       return m_springCable;
     }
+    
+    /**
+     * Return a const reference to m_config for scaling values in
+     * neural networks
+     */
+    const Config& getConfig() const
+    {
+        return m_config;
+    }
+    
 protected: 
     
     /**

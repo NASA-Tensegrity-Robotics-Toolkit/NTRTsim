@@ -16,7 +16,7 @@
 * governing permissions and limitations under the License.
 */
 
-#include "simpleMuscleNP.h"
+#include "hillyMuscleNP.h"
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
@@ -30,15 +30,15 @@
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
-simpleMuscleNP::simpleMuscleNP()
+hillyMuscleNP::hillyMuscleNP()
 {
 }
 
-simpleMuscleNP::~simpleMuscleNP()
+hillyMuscleNP::~hillyMuscleNP()
 {
 }
 
-void simpleMuscleNP::setup(tgWorld& world)
+void hillyMuscleNP::setup(tgWorld& world)
 {
 
 
@@ -68,14 +68,13 @@ void simpleMuscleNP::setup(tgWorld& world)
 #else
 	s.addNode(0, 5, 2);
 	s.addNode(0, 5, 0);
-	s.addNode(10, 5, 2);
-	s.addNode(10, 5, 0);
+	s.addNode(20, 5, 2);
+	s.addNode(20, 5, 0);
 	s.addNode(5, 2, -5);
 	s.addNode(5, 2, 5);
 
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod2");
 
 	s.addPair(0, 2, "muscle");
 	s.addPair(1, 3, "muscle");
@@ -110,16 +109,16 @@ void simpleMuscleNP::setup(tgWorld& world)
 	tgModel::setup(world);
 }
 
-void simpleMuscleNP::teardown()
+void hillyMuscleNP::teardown()
 {
 	tgModel::teardown();
 }
 
-void simpleMuscleNP::step(double dt)
+void hillyMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-    allMuscles[0]->setControlInput(11, dt);
+	//allMuscles[0]->setRestLength(11, dt);
 //	allMuscles[1]->setRestLength(11, dt);
 	
 	btVector3 com(0, 0, 0);
@@ -140,7 +139,7 @@ void simpleMuscleNP::step(double dt)
 * Call tgModelVisitor::render() on self and all descendants.
 * @param[in,out] r a reference to a tgModelVisitor
 */
-void simpleMuscleNP::onVisit(const tgModelVisitor& r) const
+void hillyMuscleNP::onVisit(const tgModelVisitor& r) const
 {
 	r.render(*this);
 	tgModel::onVisit(r);

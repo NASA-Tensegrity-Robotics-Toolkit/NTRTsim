@@ -16,7 +16,7 @@ subdirs(
 )
 
 add_definitions(
-    #-Wall
+    -Wall
 )
 
 # Don't need to edit below this line.

@@ -115,13 +115,13 @@ feedbackLearning(false)
     }
     
     feedbackConfigData.readFile(path + feedbackConfigFilename);
-    feedbackLearning = edgeConfigData.getintvalue("learning");
+    feedbackLearning = feedbackConfigData.getintvalue("learning");
     
 }
 
 void SpineFeedbackControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB();
+	m_pCPGSys = new CPGEquationsFB(100);
     //Initialize the Learning Adapters
     nodeAdapter.initialize(&nodeEvolution,
                             nodeLearning,
@@ -129,6 +129,9 @@ void SpineFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     edgeAdapter.initialize(&edgeEvolution,
                             edgeLearning,
                             edgeConfigData);
+    feedbackAdapter.initialize(&feedbackEvolution,
+                                feedbackLearning,
+                                feedbackConfigData);
     /* Empty vector signifying no state information
      * All parameters are stateless parameters, so we can get away with
      * only doing this once
@@ -159,8 +162,8 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     if (m_updateTime >= m_config.controlTime)
     {
 #if (0)
-        std::vector<double> state = getState(subject);
-        std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
+        std::vector<double> desComs = getFeedback(subject);
+
 #else        
         std::size_t numControllers = subject.getNumberofMuslces() * 3;
         
@@ -196,6 +199,70 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 }
 
+void SpineFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
+{
+    scores.clear();
+    // @todo - check to make sure we ran for the right amount of time
+    
+    std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
+    
+    const double newX = finalConditions[0];
+    const double newZ = finalConditions[2];
+    const double oldX = initConditions[0];
+    const double oldZ = initConditions[2];
+    
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                        (newZ-oldZ) * (newZ-oldZ));
+    
+    if (bogus)
+    {
+        scores.push_back(-1.0);
+    }
+    else
+    {
+        scores.push_back(distanceMoved);
+    }
+    
+    /// @todo - consolidate with other controller classes. 
+    /// @todo - return length scale as a parameter
+    double totalEnergySpent=0;
+    
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
+    
+    for(int i=0; i<tmpStrings.size(); i++)
+    {
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
+        
+        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    
+    scores.push_back(totalEnergySpent);
+    
+    edgeAdapter.endEpisode(scores);
+    nodeAdapter.endEpisode(scores);
+    feedbackAdapter.endEpisode(scores);
+    
+    delete m_pCPGSys;
+    m_pCPGSys = NULL;
+    
+    for(size_t i = 0; i < m_allControllers.size(); i++)
+    {
+        delete m_allControllers[i];
+    }
+    m_allControllers.clear();    
+}
+
 void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
@@ -206,8 +273,8 @@ void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
 
-        tgPIDController::Config config(5000.0, 0.0, 10.0, true); // Non backdrivable
-        tgCPGCableControl* pStringControl = new tgCPGCableControl(config, m_config.controlTime);
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
 
         allMuscles[i]->attach(pStringControl);
         
@@ -280,21 +347,65 @@ array_2D SpineFeedbackControl::scaleNodeActions
     return nodeActions;
 }
 
-std::vector<double> SpineFeedbackControl::getState(BaseSpineModelLearning& subject)
+std::vector<double> SpineFeedbackControl::getFeedback(BaseSpineModelLearning& subject)
 {
-	// TODO - orientation to goal position!!
-	std::vector<double> statePos = subject.getSegmentCOM(m_config.segmentNumber);
-	std::vector<double> state(3);
-	for(std::size_t i = 0; i < 3; i++)
-	{
-		state[i] = statePos[i];
-	}
+    // Placeholder
+    std:vector<double> feedback;
+    // Adapter doesn't use this anyway, so just do zero here for now (will trigger errors if it starts to use it =) )
+    const double dt = 0;
+    
+    const std::vector<tgSpringCableActuator*>& allCables = subject.getAllMuscles();
+    
+    std::size_t n = allCables.size();
+    for(std::size_t i = 0; i != n; i++)
+    {
+        const tgSpringCableActuator& cable = *(allCables[i]);
+        std::vector<double > state = getCableState(cable);
+        std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
+        std::vector<double> cableFeedback = transformFeedbackActions(actions);
+        
+        feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
+    }
+    
+    
+    return feedback;
+}
+
+std::vector<double> SpineFeedbackControl::getCableState(const tgSpringCableActuator& cable)
+{
+	// For each string, scale value from -1 to 1 based on initial length or max tension of motor
+    
+    std::vector<double> state;
+    
+    // Scale length by starting length
+    const double startLength = cable.getStartLength();
+    state.push_back((cable.getCurrentLength() - startLength) / startLength);
+    
+    const double maxTension = cable.getConfig().maxTens;
+    state.push_back((cable.getTension() - maxTension / 2.0) / maxTension);
+    
 	return state;
 }
 
-std::vector<double> SpineFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> > actions)
+std::vector<double> SpineFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
 {
 	// Placeholder
 	std:vector<double> feedback;
+    
+    std::size_t numControllers = feedbackConfigData.getintvalue("numberOfControllers");
+    std::size_t numActions = feedbackConfigData.getintvalue("numberOfActions");
+    
+    assert( actions.size() == numControllers);
+    assert( actions[0].size() == numActions);
+    
+    // Scale values back to -1 to +1
+    for( std::size_t i = 0; i < numControllers; i++)
+    {
+        for( std::size_t j = 0; j < numActions; j++)
+        {
+            feedback.push_back(actions[i][j] * 2.0 - 1.0);
+        }
+    }
+    
 	return feedback;
 }

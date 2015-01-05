@@ -43,11 +43,11 @@ using namespace boost::numeric::odeint;
 
 typedef std::vector<double > cpgVars_type;
 
-CPGEquationsFB::CPGEquationsFB() :
-CPGEquations()
+CPGEquationsFB::CPGEquationsFB(int maxSteps) :
+CPGEquations(maxSteps)
  {}
-CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*>& newNodeList) :
-CPGEquations(newNodeList)
+CPGEquationsFB::CPGEquationsFB(std::vector<CPGNode*>& newNodeList, int maxSteps) :
+CPGEquations(newNodeList, maxSteps)
 {
 }
 

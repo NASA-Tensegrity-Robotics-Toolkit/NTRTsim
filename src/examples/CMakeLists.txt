@@ -8,6 +8,7 @@ subdirs(
     SUPERball
     learningSpines
     testjson
+    craterEscape
 )
 
 

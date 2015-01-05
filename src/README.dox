@@ -86,6 +86,11 @@
 */
 
 /**
+ \page tutorials Tutorials 
+ If you're a new user you may find NTRT's tutorials to be a better starting point than the Doxygen documentation. As of version 1.1 the tutorials are fairly bare, but we'll be actively adding content in the coming months. Tutorials can be found on NTRT's <a href="http://ntrtsim.readthedocs.org/en/latest/">ReadTheDocs page</a>.
+*/
+
+/**
  \page contributors Contributors
  The NASA Tensegrity Robotics Toolkit has taken contributions from a 
  number of students and others supported by various fellowships, institutes

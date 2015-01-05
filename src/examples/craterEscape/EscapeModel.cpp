@@ -17,15 +17,15 @@
 */
 
 /**
- * @file T6Model.cpp
- * @brief Contains the implementation of class T6Model.
+ * @file EscapeModel.cpp
+ * @brief Contains the implementation of class EscapeModel.
  * $Id$
  */
 
 // This module
-#include "T6Model.h"
+#include "EscapeModel.h"
 // This library
-#include "core/tgSpringCableActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
@@ -55,63 +55,64 @@ namespace
     {
         double density;
         double radius;
+        //double stiffness_passive;
         double stiffness;
-        double stiffness_in;
         double damping;
-        double damping_in;
         double rod_length;
-        double rod_space; 
-        double payload_h; 
-        double density_pay;
-        double radius_pay;  
+        double rod_space;    
         double friction;
         double rollFriction;
         double restitution;
-        double pretension;
-        bool   history; 
+        bool   hist;
+        double rotation;  
         double maxTens;
         double targetVelocity;
     } c =
-   {
-     0.5366,    // density (kg / length^3)
-     0.3175/2.0,     // radius (length)
-     250000.0,   // stiffness of outer muscles (kg / sec^2)
-     500.0,    // stiffness of inner muscles (kg/sec^2)
-     25000.0,    // damping of outer muscles (kg / sec)
-     50.0,     //damping of inner muscles (kg/sec)
-     15.0,     // rod_length (length)
-     3.75,      // rod_space (length)
-     0.5,         // half payload height (length)
-     20/M_PI,        //payload density (kg/lenght^3)
-     0.5,        //payload radius (length)
-     1.0,      // friction (unitless)
-     0.1,     // rollFriction (unitless)
-     0.0,      // restitution (?)
-     10.0,        // pretension (force)
-     false,     // history
-     1000000,   // maxTens
-     10000    // targetVelocity
-#if (0)
-     20000     // maxAcc
-#endif // removed 12/10/14     
-  };
+    {
+       0.40374,   // density (kg / length^3)
+       0.40,      // radius (length)
+       //998.25,    // stiffness_passive (kg / sec^2)
+       3152.36,   // stiffness_active (kg / sec^2)
+       50.0,      // damping (kg / sec)
+       17.00,     // rod_length (length)
+       17.00/4,   // rod_space (length)
+       0.99,      // friction (unitless)
+       0.01,     // rollFriction (unitless)
+       0.0,      // restitution (?)
+       0,			// History logging (boolean)
+       0,        // rotation
+       100000,   // maxTens
+       10000,    // targetVelocity
+#if (0) // Acceleration limit removed 12/10/14
+       5000     // maxAcc
+#endif
+       //100000,   // maxTens
+       //10000,    // targetVelocity
+       //20000     // maxAcc
+
+           // Use the below values for earlier versions of simulation.
+           // 1.006,    
+           // 0.31,     
+           // 300000.0, 
+           // 3000.0,   
+           // 15.0,     
+           // 7.5,      
+   };
+
 } // namespace
 
-T6Model::T6Model() : tgModel() 
-{
-    //data observer
-    // m_dataObserver("Data_test");
-}
-
-T6Model::~T6Model()
+EscapeModel::EscapeModel() : tgModel() 
 {
 }
 
-void T6Model::addNodes(tgStructure& s)
+EscapeModel::~EscapeModel()
+{
+}
+
+void EscapeModel::addNodes(tgStructure& s)
 {
     const double half_length = c.rod_length / 2;
 
-    // Nodes for struts
     s.addNode(-c.rod_space,  -half_length, 0);            // 0
     s.addNode(-c.rod_space,   half_length, 0);            // 1
     s.addNode( c.rod_space,  -half_length, 0);            // 2
@@ -124,30 +125,21 @@ void T6Model::addNodes(tgStructure& s)
     s.addNode( half_length, 0,            c.rod_space);   // 9
     s.addNode(-half_length, 0,           -c.rod_space);   // 10
     s.addNode( half_length, 0,           -c.rod_space);   // 11
-
-    //Nodes for payload
-    s.addNode(0,c.payload_h,0);
-    s.addNode(0,-c.payload_h,0);
 }
 
-void T6Model::addRods(tgStructure& s)
+void EscapeModel::addRods(tgStructure& s)
 {
-    // Struts
     s.addPair( 0,  1, "rod");
     s.addPair( 2,  3, "rod");
     s.addPair( 4,  5, "rod");
     s.addPair( 6,  7, "rod");
     s.addPair( 8,  9, "rod");
     s.addPair(10, 11, "rod");
-
-    // Payload
-    s.addPair(12, 13, "payload_rod");
-
 }
 
-void T6Model::addMuscles(tgStructure& s)
+// 24 muscles in total
+void EscapeModel::addMuscles(tgStructure& s)
 {
-    // Outer Cables
     s.addPair(0, 4,  "muscle");
     s.addPair(0, 5,  "muscle");
     s.addPair(0, 8,  "muscle");
@@ -168,7 +160,6 @@ void T6Model::addMuscles(tgStructure& s)
     s.addPair(3, 9,  "muscle");
     s.addPair(3, 11, "muscle");
 
-    s.addPair(4, 2,  "muscle");
     s.addPair(4, 10, "muscle");
     s.addPair(4, 11, "muscle");
 
@@ -181,68 +172,42 @@ void T6Model::addMuscles(tgStructure& s)
     s.addPair(7, 8,  "muscle");
     s.addPair(7, 9,  "muscle");
 
-    // Payload Muscles
-    s.addPair(0, 13, "muscle_in");
-    s.addPair(1, 12, "muscle_in");
-    s.addPair(2, 13, "muscle_in");
-    s.addPair(3, 12, "muscle_in");
-    s.addPair(4, 13, "muscle_in");
-    s.addPair(5, 13, "muscle_in");
-    s.addPair(6, 12, "muscle_in");
-    s.addPair(7, 12, "muscle_in");
-    s.addPair(8, 13, "muscle_in");
-    s.addPair(9, 12, "muscle_in");
-    s.addPair(10, 13, "muscle_in");
-    s.addPair(11, 12, "muscle_in");
-
-
 }
 
-void T6Model::setup(tgWorld& world)
+void EscapeModel::setup(tgWorld& world)
 {
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-
-    const tgRod::Config payConfig(c.radius_pay, c.density_pay, c.friction, 
-                c.rollFriction, c.restitution);
     
-    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension * c.stiffness / c.stiffness_in, c.history,
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate                             
+    tgBasicActuator::Config activeMuscleConfig(c.stiffness, c.damping, c.hist, c.rotation,
 					    c.maxTens, c.targetVelocity);
-
-    tgSpringCableActuator::Config muscleInConfig(c.stiffness_in, c.damping_in, c.pretension, c.history,
-                        c.maxTens, c.targetVelocity);
+/*
+    tgBasicActuator::Config passiveMuscleConfig(c.stiffness_passive, c.damping, c.hist, c.rotation,
+					    c.maxTens, c.targetVelocity, 
+					    c.maxAcc);*/
             
     // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
     addMuscles(s);
-    s.move(btVector3(0, 30, 0));
+    s.move(btVector3(0, 10, 0));
 
-    // Add a rotation to land the struture on a V.
-    btVector3 rotationPoint1 = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis1 = btVector3(1, 0, 0);  // x-axis
-    double rotationAngle1 = 0.4636; //M_PI/2;
-    s.addRotation(rotationPoint1, rotationAxis1, rotationAngle1);
-    // Add a rotation to move structure towards triangle.
-    btVector3 rotationPoint2 = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis2 = btVector3(0, 1, 0);  // z-axis
-    double rotationAngle2 = 1.991; 
-    s.addRotation(rotationPoint2, rotationAxis2, rotationAngle2);
-    // Add a rotation to land the struture on a triangle.
-    btVector3 rotationPoint3 = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis3 = btVector3(-1, 0, 0);  // x-axis
-    double rotationAngle3 = 0.58895; 
-    s.addRotation(rotationPoint3, rotationAxis3, rotationAngle3);
+    // Add a rotation. This is needed if the ground slopes too much,
+    // otherwise  glitches put a rod below the ground.
+    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    double rotationAngle = M_PI/2;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("payload_rod", new tgRodInfo(payConfig));
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
-    spec.addBuilder("muscle_in", new tgBasicActuatorInfo(muscleInConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(activeMuscleConfig));
+    //spec.addBuilder("active muscle", new tgBasicActuatorInfo(activeMuscleConfig));
+    //spec.addBuilder("passive muscle", new tgBasicActuatorInfo(passiveMuscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -252,7 +217,7 @@ void T6Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -261,7 +226,7 @@ void T6Model::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void T6Model::step(double dt)
+void EscapeModel::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -276,17 +241,48 @@ void T6Model::step(double dt)
     }
 }
 
-void T6Model::onVisit(tgModelVisitor& r)
+void EscapeModel::onVisit(tgModelVisitor& r)
 {
     tgModel::onVisit(r);
 }
 
-const std::vector<tgSpringCableActuator*>& T6Model::getAllMuscles() const
+const std::vector<tgBasicActuator*>& EscapeModel::getAllMuscles() const
 {
     return allMuscles;
 }
     
-void T6Model::teardown()
+void EscapeModel::teardown()
 {
+    notifyTeardown();
     tgModel::teardown();
 }
+           
+// Return the center of mass of this model
+// Pre-condition: This model has 6 rods
+std::vector<double> EscapeModel::getBallCOM() {   
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+
+    btVector3 ballCenterOfMass(0, 0, 0);
+    double ballMass = 0.0; 
+    for (std::size_t i = 0; i < rods.size(); i++) {   
+        const tgRod* const rod = rods[i];
+        assert(rod != NULL);
+        const double rodMass = rod->mass();
+        const btVector3 rodCenterOfMass = rod->centerOfMass();
+        ballCenterOfMass += rodCenterOfMass * rodMass;
+        ballMass += rodMass;
+    }
+
+    assert(ballMass > 0.0);
+    ballCenterOfMass /= ballMass;
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = ballCenterOfMass[i]; }
+    //std::cout<<"COM: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
+
+    return result;
+}
+                                            
+

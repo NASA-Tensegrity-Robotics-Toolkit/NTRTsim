@@ -16,17 +16,17 @@
 * governing permissions and limitations under the License.
 */
 /**
-* @file AppCordeTest.cpp
-* @brief Contains the definition function main() for testing the Corde
-* string model
+* @file AppHillyMuscleNP.cpp
+* @brief Contains the definition function main() for testing contact string model
 * @author Brian Mirletz
 * $Id$
 */
 // This application
-#include "simpleMuscleNP.h"
+#include "hillyMuscleNP.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgEmptyGround.h"
+#include "core/terrain/tgHillyGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 {
 
 	std::cout << "AppMuscleNPTest" << std::endl;
-	
+#if (0)
 	// First create the ground and world. Specify ground rotation in radians
 	const double yaw = 0.0;
 	const double pitch = 0.0;
@@ -56,12 +56,27 @@ int main(int argc, char** argv)
 	const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
 	
 	// the world will delete this
-#if (0)
 	tgBoxGround* ground = new tgBoxGround(groundConfig);
 #else
-	tgEmptyGround* ground = new tgEmptyGround();
+    btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
+   btScalar friction = 0.5;
+   btScalar restitution = 0.0;
+   btVector3 size = btVector3(500.0, 0.1, 500.0);
+   btVector3 origin = btVector3(0.0, 0.0, 0.0);
+   size_t nx = 50;
+   size_t ny = 50;
+   double margin = 0.5;
+   double triangleSize = 7.5;
+   double waveHeight = 5.0;
+   double offset = 0.0;
+    tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
+                                    size, origin, nx, ny, margin, triangleSize,
+                                    waveHeight, offset);
+    
+    tgHillyGround* ground = new tgHillyGround(groundConfig);
+    
 #endif
-	const tgWorld::Config config(9.81); // gravity, cm/sec^2
+	const tgWorld::Config config(98.1); // gravity, cm/sec^2
 	tgWorld world(config, ground);
 	
 	// Second create the view
@@ -75,7 +90,7 @@ int main(int argc, char** argv)
 
 	// Fourth create the models with their controllers and add the models to the
 	// simulation
-	simpleMuscleNP* const myModel = new simpleMuscleNP();
+	hillyMuscleNP* const myModel = new hillyMuscleNP();
 	// Add the model to the world
 	simulation.addModel(myModel);
 	simulation.run();

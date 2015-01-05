@@ -37,6 +37,7 @@
 // Does the contact normal get updated using the body's rotation? (99% sure its yes)
 #define USE_BASIS
 // Do we update the contact based on the manifold? - Causes contacts to be missed, doesn't prevent angular energy from accumulating
+// Contact update also appears to magnify force direction issues
 #define SKIP_CONTACT_UPDATE
 //#define VERBOSE
 
