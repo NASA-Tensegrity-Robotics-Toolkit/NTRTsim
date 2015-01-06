@@ -408,7 +408,7 @@ void tgBulletContactSpringCable::updateAnchorList()
 			
 			btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 			btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
-			
+            
 			//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
 			
 			// These may have changed, so check again				
@@ -533,7 +533,40 @@ void tgBulletContactSpringCable::pruneAnchors()
 {    
     int numPruned = 0;
     int passes = 0;
-    std::size_t i;
+    std::size_t i = 1;
+    
+    // Check all anchors for manifold validity
+#if (0)
+    while (i < m_anchors.size() - 1)
+    {
+        btVector3 oldPos = m_anchors[i]->getWorldPosition();
+        if (!m_anchors[i]->setWorldPosition(oldPos))
+        {
+            deleteAnchor(i);
+            numPruned++;
+        }
+        else
+        {
+            i++;
+        }
+    }
+#else
+    while (i < m_anchors.size() - 1)
+    {
+        btPersistentManifold* m = m_anchors[i]->getManifold();
+        if (m_anchors[i]->getManifoldDistance(m).first == INFINITY)
+        {
+            deleteAnchor(i);
+            numPruned++;
+        }
+        else
+        {
+            i++;
+        }
+    }
+#endif
+    
+    std::cout << "Pruned off the bat " << numPruned << std::endl;
     
     // Attempt to eliminate points that would cause the string to push
     while (numPruned > 0 || passes <= 3)
