@@ -273,55 +273,58 @@ std::pair<btScalar, btVector3> tgBulletSpringCableAnchor::getManifoldDistance(bt
 	btScalar length = INFINITY;
 	btVector3 newNormal = contactNormal;
 	
-	if (m->getBody0() != attachedBody)
-	{
-		useB = false;			
-	}
-	if(useB || m->getBody1() == attachedBody)
-	{	
-			
-		int n = m->getNumContacts();
-		
-		btVector3 contactPos = getWorldPosition();
-		btScalar dist = 0.0;
-		for (int p = 0; p < n; p++)
-		{
-			const btManifoldPoint& pt = m->getContactPoint(p);
-			
-			// Original position picked at beginning
-			btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
-			
-			btScalar contactDist = (pos - getWorldPosition()).length();
-			
-			if (contactDist < length)
-			{
-				length = contactDist;
-				contactPos = pos;
-				
-				btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
-				
-				if (length < 0.1)
-				{
-					#ifdef USE_BASIS
-					newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
-					#else
-					newNormal = pt.m_normalWorldOnB * directionSign;
-					#endif
-				}
-				
-				dist = pt.getDistance();
-#ifdef VERBOSE				
-				if (n >= 2)
-				{
-					std::cout << "Extra contacts!! " << p << " length " << length << " dist: " << dist << std::endl;
-				}
-#else
-                    // Suppress compiler warning for unused variable
-                    (void) dist;
-#endif
-			}
-		}
-	}
+    if (!permanent)
+    {
+        if (m->getBody0() != attachedBody)
+        {
+            useB = false;			
+        }
+        if(useB || m->getBody1() == attachedBody)
+        {	
+                
+            int n = m->getNumContacts();
+            
+            btVector3 contactPos = getWorldPosition();
+            btScalar dist = 0.0;
+            for (int p = 0; p < n; p++)
+            {
+                const btManifoldPoint& pt = m->getContactPoint(p);
+                
+                // Original position picked at beginning
+                btVector3 pos = useB ? pt.m_positionWorldOnA : pt.m_positionWorldOnB;
+                
+                btScalar contactDist = (pos - getWorldPosition()).length();
+                
+                if (contactDist < length)
+                {
+                    length = contactDist;
+                    contactPos = pos;
+                    
+                    btScalar directionSign = useB ? btScalar(1.0) : btScalar(-1.0);
+                    
+                    if (length < 0.1)
+                    {
+                        #ifdef USE_BASIS
+                        newNormal = attachedBody->getWorldTransform().inverse().getBasis() * pt.m_normalWorldOnB * directionSign;
+                        #else
+                        newNormal = pt.m_normalWorldOnB * directionSign;
+                        #endif
+                    }
+                    
+                    dist = pt.getDistance();
+    #ifdef VERBOSE				
+                    if (n >= 2)
+                    {
+                        std::cout << "Extra contacts!! " << p << " length " << length << " dist: " << dist << std::endl;
+                    }
+    #else
+                        // Suppress compiler warning for unused variable
+                        (void) dist;
+    #endif
+                }
+            }
+        }
+    }
 	
 	return std::make_pair<btScalar, btVector3> (length, newNormal);
 }

@@ -335,7 +335,7 @@ void tgBulletContactSpringCable::updateManifolds()
 									del = true;
 									//std::cout << "UpdateB " << mDistB << std::endl;
 							}
-							if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && mDistA < mDistB)
+							if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && (!del || mDistA < mDistB))
 							{
 								if (forwardAnchor->updateManifold(manifold))
 									del = true;
@@ -420,7 +420,7 @@ void tgBulletContactSpringCable::updateAnchorList()
 					//std::cout << "UpdateB " << mDistB << std::endl;
 				}
 			}
-			if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
+			if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && (!del || mDistA < mDistB))
 			{
 				if(forwardAnchor->updateManifold(newAnchor->getManifold()))
 					del = true;
@@ -445,6 +445,7 @@ void tgBulletContactSpringCable::updateAnchorList()
 #if (1) // Keeps the energy down very well
                 if (getActualLength() > m_prevLength + 2.0 * m_resolution)
                 {
+                    std::cout << "Deleting anchor on basis of length " << std::endl;
                     deleteAnchor(anchorPos + 1);
                 }
                 else
