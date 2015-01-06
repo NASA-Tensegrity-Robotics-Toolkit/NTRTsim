@@ -493,9 +493,15 @@ int tgBulletContactSpringCable::updateAnchorPositions()
         
         if (!m_anchors[i]->permanent)
         {
-            btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
+#if (0)
+            btVector3 tangentMove = ((contactNormal)(lineA + lineB));
+
+            //btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;            
+#else            
+            btVector3 tangentDir = ( (lineB - lineA).normalize().cross(contactNormal)).normalize();
             //btScalar tangentDot = (lineB + lineA).dot(tangentDir);
-            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir;
+#endif
             btVector3 newPos = current + tangentMove;
             // Check if new position is on body
 #if (1)    

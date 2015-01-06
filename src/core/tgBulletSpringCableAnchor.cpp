@@ -138,7 +138,7 @@ bool tgBulletSpringCableAnchor::setWorldPosition(btVector3& newPos)
 #ifdef VERBOSE
 					if (n >= 2)
 					{
-						std::cout << "Extra contacts!! " << dist << std::endl;
+						std::cout << "Extra contacts!! " << p << " " << dist << std::endl;
 					}
 #else
                     // Suppress compiler warning for unused variable
@@ -183,6 +183,10 @@ bool tgBulletSpringCableAnchor::setWorldPosition(btVector3& newPos)
 				}
 			}
 		}
+		else
+        {
+            std::cout << "Manifold out of date!" << std::endl;
+        }
 		// Else: neither body is attached, delete
 	}
 	else
@@ -221,6 +225,9 @@ bool tgBulletSpringCableAnchor::updateManifold(btPersistentManifold* m)
 		if (!manifold)
 		{
 			//manifold = m;
+#ifdef VERBOSE
+            std::cout << "Old manifold was NULL" << std::endl;
+#endif
 			ret = true;
 		}
 		// Use new manifold
@@ -251,6 +258,10 @@ bool tgBulletSpringCableAnchor::updateManifold(btPersistentManifold* m)
 			#endif
 		}
 	}
+	if (!ret)
+    {
+        std::cout << "Failed to update manifold!" << std::endl;
+    }
 	
 	return ret;
 }
