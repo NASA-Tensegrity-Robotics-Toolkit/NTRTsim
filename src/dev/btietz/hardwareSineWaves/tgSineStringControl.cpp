@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 tgSineStringControl::tgSineStringControl(const double controlStep,
 											tgImpedanceController* p_ipc,

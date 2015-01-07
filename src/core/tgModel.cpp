@@ -26,6 +26,7 @@
 #include "tgModel.h"
 // This application
 #include "tgModelVisitor.h"
+#include "abstractMarker.h"
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -182,6 +183,14 @@ std::vector<tgModel*> tgModel::getDescendants() const
     result.insert(result.end(), cd.begin(), cd.end());
   }
   return result;
+}
+
+const std::vector<abstractMarker>& tgModel::getMarkers() const {
+    return m_markers;
+}
+
+void tgModel::addMarker(abstractMarker a){
+    m_markers.push_back(a);
 }
 
 bool tgModel::invariant() const

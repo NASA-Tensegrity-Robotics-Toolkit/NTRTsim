@@ -30,7 +30,6 @@
 #include "tgCast.h"
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
-#include "abstractMarker.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
@@ -38,6 +37,7 @@
 // Forward declarations
 class tgModelVisitor;
 class tgWorld;
+class abstractMarker;
 
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
@@ -148,13 +148,9 @@ public:
      */
     std::vector<tgModel*> getDescendants() const;
 
-    const std::vector<abstractMarker>& getMarkers() const {
-        return m_markers;
-    }
+    const std::vector<abstractMarker>& getMarkers() const;
 
-    void addMarker(abstractMarker a){
-        m_markers.push_back(a);
-    }
+    void addMarker(abstractMarker a);
 
 private:
 

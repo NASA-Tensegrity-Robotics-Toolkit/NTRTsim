@@ -26,6 +26,7 @@
 // This module
 #include "tgBulletRenderer.h"
 // This application
+#include "abstractMarker.h"
 #include "tgSpringCable.h"
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
