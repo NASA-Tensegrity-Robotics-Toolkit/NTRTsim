@@ -35,7 +35,10 @@
 tgBulletGround::tgBulletGround() :
 tgGround(),
 pGroundShape(NULL)
-{ }
+{
+    // Supress compiler warning for bullet's unused variable
+    (void) btInfinityMask;
+}
 
 tgBulletGround::~tgBulletGround() 
 { 
