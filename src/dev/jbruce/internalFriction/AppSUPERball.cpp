@@ -25,7 +25,6 @@
 
 // This application
 #include "T6Model.h"
-#include "T6RestLengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -51,7 +50,7 @@ void simulate(tgSimulation *simulation);
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppSUPERball" << std::endl;
+    std::cout << "AppSUPERball_InternalFriction" << std::endl;
 
     // First create the ground and world
     tgWorld *world = createWorld();
@@ -74,9 +73,9 @@ int main(int argc, char** argv)
     // length between geometric length in equilibrium and the actual rest length
     // of an individual cable. 
     // Note for the above scale of gravity, this is in decimeters.
-    T6RestLengthController* const pTC = new T6RestLengthController(myModel, 4);
+    //T6RestLengthController* const pTC = new T6RestLengthController(myModel, 4);
 
-    myModel->attach(pTC);
+    //myModel->attach(pTC);
     simulation->addModel(myModel);
     
     // Run specified times within function call
