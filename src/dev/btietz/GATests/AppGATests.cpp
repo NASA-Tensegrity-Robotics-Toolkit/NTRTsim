@@ -65,11 +65,8 @@ int main(int argc, char** argv)
     int numberOfInputs = testConfigData.getintvalue("numberOfStates");
     int numberOfOutputs = testConfigData.getintvalue("numberOfActions");
     std::vector<double> state(numberOfInputs, 1.0);
-    double goal = 0.0;
-    for(int i = 0; i < numberOfOutputs; i++)
-    {
-        goal += state[i];
-    }
+    double goal = 1.0 * (double) numberOfOutputs;
+
     
     int steps = 0;
     while (steps < 30000)
