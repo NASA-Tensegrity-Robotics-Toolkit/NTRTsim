@@ -63,11 +63,11 @@ int main(int argc, char** argv)
    btScalar restitution = 0.0;
    btVector3 size = btVector3(500.0, 0.1, 500.0);
    btVector3 origin = btVector3(0.0, 0.0, 0.0);
-   size_t nx = 50;
-   size_t ny = 50;
+   size_t nx = 100;
+   size_t ny = 100;
    double margin = 0.5;
-   double triangleSize = 7.5;
-   double waveHeight = 5.0;
+   double triangleSize = 5.0;
+   double waveHeight = 3.0;
    double offset = 0.0;
     tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
                                     size, origin, nx, ny, margin, triangleSize,

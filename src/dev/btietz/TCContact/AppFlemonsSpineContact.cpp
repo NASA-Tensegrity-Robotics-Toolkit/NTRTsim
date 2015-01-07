@@ -53,17 +53,17 @@ int main(int argc, char** argv)
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
-#if (0)
+#if (1)
 	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
    btVector3 size = btVector3(500.0, 0.5, 500.0);
    btVector3 origin = btVector3(0.0, 0.0, 0.0);
-   size_t nx = 50;
-   size_t ny = 50;
+   size_t nx = 100;
+   size_t ny = 100;
    double margin = 0.5;
-   double triangleSize = 7.5;
-   double waveHeight = 5.0;
+   double triangleSize = 5.0;
+   double waveHeight = 3.0;
    double offset = 0.0;
 	tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
 									size, origin, nx, ny, margin, triangleSize,
@@ -79,14 +79,14 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
+    const int segments = 6;
     FlemonsSpineModelContact* myModel =
       new FlemonsSpineModelContact(segments);
 
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
     const double ffMin = -0.5;
     const double ffMax = 10.0;
     const double afMin = 0.0;
-    const double afMax = 20.0;
+    const double afMax = 200.0;
     const double pfMin = -0.5;
     const double pfMax =  6.28;
 

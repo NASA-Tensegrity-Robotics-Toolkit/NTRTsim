@@ -161,7 +161,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0)
+#if (1)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        
@@ -169,7 +169,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         
         double descendingCommand = 0.0;
         std::vector<double> desComs (numControllers, descendingCommand);
-#endif // Feedback functions not yet ready        
+#endif       
         try
         {
             m_pCPGSys->update(desComs, m_updateTime);
