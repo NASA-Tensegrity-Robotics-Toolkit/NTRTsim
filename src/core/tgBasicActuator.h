@@ -101,14 +101,7 @@ public:
      * @param[in] dt, time elapsed since last call.
 	 */
 	virtual void setControlInput(double input, double dt);
-
-    /**
-     * Directly set m_preferredLength (see base class tgSpringCableActuator)
-     * Directly adjusts the rest length of tgBulletSpringCable, not using moveMotors.
-     * @todo Remove this - config can handle it now
-     */
-    void setRestLengthSingleStep(double newLength);
-    
+  
     /** Called from public functions, it makes the restLength get closer
      * to preferredlength, according to config constraints.
      * @param[in] dt, time elapsed since last call.
