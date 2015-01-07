@@ -273,8 +273,8 @@ void SpineFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
 
-        tgPIDController::Config config(5000.0, 0.0, 10.0, true); // Non backdrivable
-        tgCPGCableControl* pStringControl = new tgCPGCableControl(config, m_config.controlTime);
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
 
         allMuscles[i]->attach(pStringControl);
         

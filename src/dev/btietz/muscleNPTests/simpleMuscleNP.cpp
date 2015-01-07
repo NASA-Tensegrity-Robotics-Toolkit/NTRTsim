@@ -119,7 +119,7 @@ void simpleMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-    allMuscles[0]->setControlInput(11, dt);
+    allMuscles[0]->setControlInput(10, dt);
 //	allMuscles[1]->setRestLength(11, dt);
 	
 	btVector3 com(0, 0, 0);

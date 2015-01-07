@@ -61,13 +61,14 @@ int main(int argc, char** argv)
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
-   btVector3 size = btVector3(500.0, 0.1, 500.0);
+   // Size doesn't affect hilly terrain
+   btVector3 size = btVector3(0.0, 0.1, 0.0);
    btVector3 origin = btVector3(0.0, 0.0, 0.0);
-   size_t nx = 50;
-   size_t ny = 50;
+   size_t nx = 100;
+   size_t ny = 100;
    double margin = 0.5;
-   double triangleSize = 7.5;
-   double waveHeight = 5.0;
+   double triangleSize = 5.0;
+   double waveHeight = 3.0;
    double offset = 0.0;
     tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
                                     size, origin, nx, ny, margin, triangleSize,
@@ -81,7 +82,7 @@ int main(int argc, char** argv)
 	
 	// Second create the view
 	const double timestep_physics = 1.0/1000.0; // seconds
-	const double timestep_graphics = 1.f/60.f; // seconds
+	const double timestep_graphics = 1.f/1000.f; // seconds
 	tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 	
 	// Third create the simulation

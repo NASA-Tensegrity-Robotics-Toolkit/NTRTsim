@@ -79,14 +79,14 @@ int main(int argc, char** argv)
     // Second create the view
     const double stepSize = 1.0/1000.0; // Seconds
     const double renderRate = 1.0/60.0; // Seconds
-    tgSimView view(world, stepSize, renderRate);
+    tgSimViewGraphics view(world, stepSize, renderRate);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 6;
+    const int segments = 12;
     FlemonsSpineModelContact* myModel =
       new FlemonsSpineModelContact(segments);
 
@@ -97,11 +97,11 @@ int main(int argc, char** argv)
     const int numMuscles = 8;
     const int numParams = 2;
     const int segNumber = 0; // For learning results
-    const double controlTime = .001;
+    const double controlTime = .01;
     const double lowPhase = -1 * M_PI;
     const double highPhase = M_PI;
-    const double lowAmplitude = 0;
-    const double highAmplitude = 10 * 30.0;
+    const double lowAmplitude = 0.0;
+    const double highAmplitude = 300.0;
     const double kt = 0.0;
     const double kp = 1000.0;
     const double kv = 200.0;
@@ -114,11 +114,11 @@ int main(int argc, char** argv)
     
     // Feedback parameters
     const double ffMin = -0.5;
-    const double ffMax = 5.0;
+    const double ffMax = 10.0;
     const double afMin = 0.0;
-    const double afMax = 5.0;
+    const double afMax = 20.0;
     const double pfMin = -0.5;
-    const double pfMax =  5.0;
+    const double pfMax =  6.28;
 
     SpineFeedbackControl::Config control_config(segmentSpan, 
                                                 numMuscles,
