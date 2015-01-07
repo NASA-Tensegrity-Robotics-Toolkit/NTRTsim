@@ -103,14 +103,18 @@ function unpack_neuralnet()
     popd > /dev/null
 }
 
-# Patch the neural network to include Atil's mods
+# Patch the neural network to include Atil and Brian's mods
 function patch_neuralnet()
 {
     pushd "$NEURALNET_BUILD_DIR" > /dev/null
 	
     # Patch them
     patch -p3 < "$SETUP_DIR/patches/neuralNet/nnPatch.diff" || { echo "- ERROR: Failed to patch NeuralNet"; exit 1; }
-
+    
+    # Add some additional functions (Brian, 1/7/15)
+    patch -p6 < "$SETUP_DIR/patches/neuralNet/NNPatch2_1.patch" || { echo "- ERROR: Failed to patch NeuralNet, 2nd patch"; exit 1; }
+    patch -p6 < "$SETUP_DIR/patches/neuralNet/NNPatch2_2.patch" || { echo "- ERROR: Failed to patch NeuralNet, 3rd patch"; exit 1; }
+    
     popd > /dev/null
 }
 
