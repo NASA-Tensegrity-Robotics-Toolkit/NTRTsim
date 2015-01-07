@@ -28,6 +28,7 @@
 #include "learning/Configuration/configuration.h"
 #include "core/tgString.h"
 #include "helpers/FileHelpers.h"
+// The C++ Standard Library
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -71,7 +72,8 @@ suffix(suff)
     configuration myconfigdataaa;
 	myconfigdataaa.readFile(configPath);
 	populationSize=myconfigdataaa.getintvalue("populationSize");
-	numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+    numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+	numberOfChildren=myconfigdataaa.getintvalue("numberOfChildren");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
 	numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
 	leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
@@ -79,7 +81,12 @@ suffix(suff)
     seeded = myconfigdataaa.getintvalue("startSeed");
     
     bool learning = myconfigdataaa.getintvalue("learning");
-
+    
+    if (populationSize < numberOfElementsToMutate + numberOfChildren)
+    {
+        throw std::invalid_argument("Population will grow with given parameters");
+    }
+    
    srand(rdtsc());
 	eng.seed(rdtsc());
 
@@ -130,7 +137,13 @@ void NeuroEvolution::mutateEveryController()
 	}
 }
 
-
+void NeuroEvolution::combineAndMutate()
+{
+    for(std::size_t i=0;i<populations.size();i++)
+    {
+        populations.at(i)->combineAndMutate(&eng, numberOfElementsToMutate, numberOfChildren);
+    }    
+}
 
 void NeuroEvolution::orderAllPopulations()
 {
@@ -187,7 +200,14 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 	if(currentTest == testsToDo)
 	{
 		orderAllPopulations();
-		mutateEveryController();
+        if (numberOfChildren == 0)
+        {
+            mutateEveryController();
+        }
+        else
+        {
+            combineAndMutate();
+        }
 		cout<<"mutated the populations"<<endl;
 		this->scoresOfTheGeneration.clear();
 

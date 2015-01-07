@@ -25,16 +25,20 @@
  */
 
 #include "NeuroEvoPopulation.h"
+// The C++ Standard Library
 #include <string>
 #include <vector>
 #include <iostream>
 #include <numeric>
 #include <fstream>
 #include <algorithm>
+#include <stdexcept>
+#include <cassert>
 
 using namespace std;
 
-NeuroEvoPopulation::NeuroEvoPopulation(int populationSize,configuration config)
+NeuroEvoPopulation::NeuroEvoPopulation(int populationSize,configuration& config) :
+m_config(config)
 {
 	compareAverageScores=true;
 	clearScoresBetweenGenerations=false;
@@ -73,13 +77,71 @@ void NeuroEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t 
 	return;
 }
 
-bool NeuroEvoPopulation::comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2)
+void NeuroEvoPopulation::combineAndMutate(std::tr1::ranlux64_base_01 *eng, std::size_t numToMutate, std::size_t numToCombine)
 {
-		return elm1->averageScore > elm2->averageScore;
-}
-bool NeuroEvoPopulation::comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2)
-{
-	return elm1->maxScore > elm2->maxScore;
+    std::tr1::uniform_real<double> unif(0, 1);
+    
+    if(numToMutate + numToCombine > controllers.size())
+    {
+        throw std::invalid_argument("Population will grow in size with these parameters");
+    }
+    
+    std::vector<double> probabilities = generateMatingProbabilities();
+    
+    std::vector<NeuroEvoMember*> newControllers;
+    for(int i = 0; i < numToCombine; i++)
+    {
+        
+        double val1 = unif(*eng);
+        double val2 = unif(*eng);
+        
+        int index1 = getIndexFromProbability(probabilities, val1);
+        int index2 = getIndexFromProbability(probabilities, val2);
+        
+        if(index1 == index2)
+        {
+            if(index2 == 0)
+            {
+                index2++;
+            }
+            else
+            {
+                index2--;
+            }
+        }
+        
+        NeuroEvoMember* newController = new NeuroEvoMember(m_config);
+        newController->copyFrom(controllers[index1], controllers[index2], eng);
+        
+        if(unif(*eng) > 0.9)
+        {
+            newController->mutate(eng);
+        }
+        
+        newControllers.push_back(newController);
+    }
+    
+    for(int i = 0; i < numToMutate; i++)
+    {
+        double val1 = unif(*eng);
+        int index1 = getIndexFromProbability(probabilities, val1);
+        NeuroEvoMember* newController = new NeuroEvoMember(m_config);
+        newController->copyFrom(controllers[index1]);
+        newController->mutate(eng);
+        newControllers.push_back(newController);
+    }
+    
+    
+    const std::size_t n = controllers.size();
+    const std::size_t m = newControllers.size();
+    while(controllers.size() > n - m)
+    {
+        controllers.pop_back();
+    }
+    
+    controllers.insert(controllers.end(), newControllers.begin(), newControllers.end());
+    
+    assert(controllers.size() == n);
 }
 
 
@@ -100,4 +162,47 @@ void NeuroEvoPopulation::orderPopulation()
 	else
 		sort(controllers.begin(),controllers.end(),this->comparisonFuncForMax);
 
+}
+
+std::vector<double> NeuroEvoPopulation::generateMatingProbabilities()
+{
+    double totalScore = 0.0;
+    const std::size_t n = controllers.size();
+    for (std::size_t i = 0; i < n; i++)
+    {
+        totalScore += controllers[i]->maxScore;
+    }
+    
+    std::vector<double> probabilties;
+    probabilties.push_back(controllers[0]->maxScore / totalScore);
+    for (std::size_t i = 1; i < n; i++)
+    {
+        double nextScore = controllers[i]->maxScore / totalScore + probabilties[i - 1];
+        probabilties.push_back(nextScore);
+    }
+    
+    assert(probabilties[n - 1] == 1.0);
+    
+    return probabilties;
+}
+
+int NeuroEvoPopulation::getIndexFromProbability(std::vector<double>& probs, double val)
+{
+    int i = 0;
+    
+    while(i < (probs.size() - 1) && probs[i] < val)
+    {
+        i++;
+    }
+    
+    return i;
+}
+
+bool NeuroEvoPopulation::comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2)
+{
+    return elm1->averageScore > elm2->averageScore;
+}
+bool NeuroEvoPopulation::comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2)
+{
+    return elm1->maxScore > elm2->maxScore;
 }

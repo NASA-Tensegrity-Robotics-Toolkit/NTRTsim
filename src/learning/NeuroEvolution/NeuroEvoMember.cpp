@@ -103,6 +103,31 @@ void NeuroEvoMember::copyFrom(NeuroEvoMember* otherMember)
 	}
 }
 
+void NeuroEvoMember::copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::tr1::ranlux64_base_01 *eng)
+{
+    if(numInputs>0)
+    {
+        this->nn->combineWeights(otherMember1->getNn(), otherMember2->getNn(), eng);
+        this->maxScore=-10000;
+        this->pastScores.clear();
+    }
+    else
+    {
+        std::tr1::uniform_real<double> unif(0, 1);
+        for (int i = 0; i < numOutputs; i++)
+        {
+            if (unif(*eng) > 0.5)
+            {
+                this->statelessParameters[i] = otherMember1->statelessParameters[i];
+            }
+            else
+            {
+                this->statelessParameters[i] = otherMember2->statelessParameters[i];
+            }
+        }
+    }    
+}
+
 void NeuroEvoMember::saveToFile(const char * outputFilename)
 {
 	if(numInputs > 0 )

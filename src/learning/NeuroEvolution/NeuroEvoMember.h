@@ -47,6 +47,7 @@ public:
 	}
 
     void copyFrom(NeuroEvoMember *otherMember);
+    void copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::tr1::ranlux64_base_01 *eng);
 	void saveToFile(const char* outputFilename);
 	void loadFromFile(const char* inputFilename);
 
