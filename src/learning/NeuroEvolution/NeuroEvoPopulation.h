@@ -49,7 +49,7 @@ private:
 	bool compareAverageScores;
 	bool clearScoresBetweenGenerations;
 	int populationSize;
-    configuration& m_config;
+    configuration m_config;
 };
 
 

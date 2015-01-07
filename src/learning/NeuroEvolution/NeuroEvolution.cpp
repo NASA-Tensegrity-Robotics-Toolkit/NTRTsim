@@ -167,6 +167,7 @@ void NeuroEvolution::orderAllPopulations()
 	{
 		populations.at(i)->orderPopulation();
 	}
+	/// @todo numberOfTestsBetweenGenerations may not be accurate
 	evolutionLog<<generationNumber*numberOfTestsBetweenGenerations<<","<<aveScore1<<","<<aveScore2<<",";
 	evolutionLog<<populations.at(0)->getMember(0)->maxScore<<","<<populations.at(0)->getMember(0)->maxScore1<<","<<populations.at(0)->getMember(0)->maxScore2<<endl;
 	
@@ -214,7 +215,7 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 		if(coevolution)
 			currentTest=0;//Start from 0
 		else
-			currentTest=populationSize-numberOfElementsToMutate; //start from the mutated ones only (last x)
+			currentTest=populationSize - numberOfElementsToMutate - numberOfChildren; //start from the mutated ones only (last x)
 	}
 
 	selectedControllers.clear();

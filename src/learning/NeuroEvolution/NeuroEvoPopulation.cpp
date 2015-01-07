@@ -181,7 +181,8 @@ std::vector<double> NeuroEvoPopulation::generateMatingProbabilities()
         probabilties.push_back(nextScore);
     }
     
-    assert(probabilties[n - 1] == 1.0);
+    // 1.0 is too strict, so just get close
+    assert(probabilties[n - 1] >= .99);
     
     return probabilties;
 }

@@ -37,7 +37,7 @@ NeuroEvoMember::NeuroEvoMember(configuration config)
 {
 	this->numInputs=config.getintvalue("numberOfStates");
 	this->numOutputs=config.getintvalue("numberOfActions");
-
+    assert(numOutputs > 0);
 	cout<<"creating NN"<<endl;
 	if(numInputs>0)
 		nn = new neuralNetwork(numInputs,numInputs*2,numOutputs);
