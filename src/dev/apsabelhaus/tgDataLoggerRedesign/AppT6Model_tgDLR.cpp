@@ -112,10 +112,10 @@ int main(int argc, char** argv)
     // Create the observer, passing in the dataloggers vector
     tgDataObserver_tgDLR* const myDataObserver = 
       new tgDataObserver_tgDLR(logFileNamePrefix, loggers);
-
+#if (0)
     // Attach the observer
     myModel->attachtgModel(myDataObserver);
-
+#endif // deprecated 
     // Add model to simulation...
     simulation.addModel(myModel);
     
