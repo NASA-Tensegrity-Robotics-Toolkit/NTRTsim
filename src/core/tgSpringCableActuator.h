@@ -30,6 +30,7 @@
 // This application
 #include "tgModel.h"
 #include "tgControllable.h"
+#include "tgSubject.h"
 
 #include <deque> // For history
 // Forward declarations

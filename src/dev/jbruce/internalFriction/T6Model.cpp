@@ -82,7 +82,7 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0.0,        // pretension
+     399,        // pretension
      true,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity

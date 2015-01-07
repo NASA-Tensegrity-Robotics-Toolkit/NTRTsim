@@ -131,7 +131,13 @@ const btRigidBody* tgRigidInfo::getRigidBody() const {
 	const btRigidBody* body = tgCast::cast<btCollisionObject, btRigidBody>(m_collisionObject);
 	return body;
 }
-    
+
+void tgRigidInfo::setRigidBody(btRigidBody* rigidBody)
+{
+    /// @todo Does this leak any previous value of m_collisionObject?
+    m_collisionObject = rigidBody;
+}
+
 bool tgRigidInfo::sharesNodesWith(const tgRigidInfo& other) const
 {
     const std::set<btVector3> s1 = getContainedNodes();

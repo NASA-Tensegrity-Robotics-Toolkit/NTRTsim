@@ -209,8 +209,9 @@ void T6Model_tgDLR::setup(tgWorld& world)
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
+#if (0)
     notifySetuptgModel();
-
+#endif // deprecated 
     // Actually setup the children
     tgModel::setup(world);
 }
@@ -226,7 +227,9 @@ void T6Model_tgDLR::step(double dt)
     {
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
+#if (0)
 	notifySteptgModel(dt);
+#endif // deprecated 
         tgModel::step(dt);  // Step any children
     }
 }
@@ -244,6 +247,8 @@ const std::vector<tgSpringCableActuator*>& T6Model_tgDLR::getAllMuscles() const
 void T6Model_tgDLR::teardown()
 {
     notifyTeardown();
+#if (0)
     notifyTeardowntgModel();
+#endif // deprecated 
     tgModel::teardown();
 }

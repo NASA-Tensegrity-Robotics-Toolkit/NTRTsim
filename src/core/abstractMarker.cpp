@@ -27,7 +27,8 @@
 #include "abstractMarker.h"
 
 abstractMarker::abstractMarker(){
-
+    // Supress compiler warning for bullet's unused variable
+    (void) btInfinityMask;
 }
 
 //Place the marker to the current world position and attach it to the body.

@@ -108,12 +108,14 @@ void tgBulletContactSpringCable::step(double dt)
 	
 	// Update positions and remove bad anchors
 	pruneAnchors();
-	
+
+#ifdef VERBOSE 
     if (getActualLength() > m_prevLength + 0.2)
     {
 //         throw std::runtime_error("Large length change!");
         std::cout << "Previous length " << m_prevLength << " actual length " << getActualLength() << std::endl;
     }
+#endif
     
 	calculateAndApplyForce(dt);
 	
@@ -335,7 +337,7 @@ void tgBulletContactSpringCable::updateManifolds()
 									del = true;
 									//std::cout << "UpdateB " << mDistB << std::endl;
 							}
-							if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && mDistA < mDistB)
+							if (lengthA <= m_resolution && rb == forwardAnchor->attachedBody && (!del || mDistA < mDistB))
 							{
 								if (forwardAnchor->updateManifold(manifold))
 									del = true;
@@ -401,14 +403,14 @@ void tgBulletContactSpringCable::updateAnchorList()
 			
 			btVector3 contactNormal = newAnchor->getContactNormal();
 							
-			btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
-			btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
+			btScalar normalValue1 = (lineA).dot(contactNormal); 
+			btScalar normalValue2 = (lineB).dot(contactNormal); 
 			
 			bool del = false;	
 			
 			btScalar mDistB = backAnchor->getManifoldDistance(newAnchor->getManifold()).first;
 			btScalar mDistA = forwardAnchor->getManifoldDistance(newAnchor->getManifold()).first;
-			
+            
 			//std::cout << "Update anchor list " << newAnchor->getManifold() << std::endl;
 			
 			// These may have changed, so check again				
@@ -420,13 +422,16 @@ void tgBulletContactSpringCable::updateAnchorList()
 					//std::cout << "UpdateB " << mDistB << std::endl;
 				}
 			}
-			if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && mDistA < mDistB)
+			if (lengthA <= m_resolution && newAnchor->attachedBody == forwardAnchor->attachedBody && (!del || mDistA < mDistB))
 			{
 				if(forwardAnchor->updateManifold(newAnchor->getManifold()))
 					del = true;
 					//std::cout << "UpdateA " << mDistA << std::endl;
 			}
-
+            
+            btVector3 backNormal = backAnchor->getContactNormal();
+            btVector3 forwardNormal = forwardAnchor->getContactNormal();
+            
 			if (del)
 			{
 				delete newAnchor;
@@ -435,6 +440,15 @@ void tgBulletContactSpringCable::updateAnchorList()
 			{
 				delete newAnchor;
 			}
+			else if ((backNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == backAnchor->attachedBody) || 
+                        (forwardNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == forwardAnchor->attachedBody))
+            {
+#ifdef VERBOSE 
+                std::cout << "Deleting based on contact normals! " << backNormal.dot(contactNormal);
+                std::cout << " " << forwardNormal.dot(contactNormal) << std::endl;
+#endif
+                delete newAnchor;
+            }
 			else
 			{		
 				
@@ -445,6 +459,9 @@ void tgBulletContactSpringCable::updateAnchorList()
 #if (1) // Keeps the energy down very well
                 if (getActualLength() > m_prevLength + 2.0 * m_resolution)
                 {
+#ifdef VERBOSE 
+                    std::cout << "Deleting anchor on basis of length " << std::endl;
+#endif
                     deleteAnchor(anchorPos + 1);
                 }
                 else
@@ -493,11 +510,18 @@ int tgBulletContactSpringCable::updateAnchorPositions()
         
         if (!m_anchors[i]->permanent)
         {
-            btVector3 tangentDir = ( (lineB - lineA).cross(contactNormal)).normalize();
-            btScalar tangentDot = (lineB + lineA).dot(tangentDir);
-            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;
+#if (0)
+            btVector3 tangentMove = ((contactNormal)(lineA + lineB));
+
+            //btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir / 2.0;            
+#else            
+            btVector3 tangentDir = ( (lineB - lineA).normalize().cross(contactNormal)).normalize();
+            //btScalar tangentDot = (lineB + lineA).dot(tangentDir);
+            btVector3 tangentMove = (lineB + lineA).dot(tangentDir) * tangentDir;
+#endif
             btVector3 newPos = current + tangentMove;
             // Check if new position is on body
+#if (1)    
             if (!keep || !m_anchors[i]->setWorldPosition(newPos))
             {
                 deleteAnchor(i);
@@ -507,6 +531,10 @@ int tgBulletContactSpringCable::updateAnchorPositions()
             {
                 i++;
             }
+#else
+            m_anchors[i]->setWorldPosition(newPos);
+            i++;
+#endif
         }
         else
         {
@@ -521,8 +549,42 @@ void tgBulletContactSpringCable::pruneAnchors()
 {    
     int numPruned = 0;
     int passes = 0;
-    std::size_t i;
+    std::size_t i = 1;
     
+    // Check all anchors for manifold validity
+#if (0)
+    while (i < m_anchors.size() - 1)
+    {
+        btVector3 oldPos = m_anchors[i]->getWorldPosition();
+        if (!m_anchors[i]->setWorldPosition(oldPos))
+        {
+            deleteAnchor(i);
+            numPruned++;
+        }
+        else
+        {
+            i++;
+        }
+    }
+#else
+    while (i < m_anchors.size() - 1)
+    {
+        btPersistentManifold* m = m_anchors[i]->getManifold();
+        if (m_anchors[i]->getManifoldDistance(m).first == INFINITY)
+        {
+            deleteAnchor(i);
+            numPruned++;
+        }
+        else
+        {
+            i++;
+        }
+    }
+#endif
+
+#ifdef VERBOSE 
+    std::cout << "Pruned off the bat " << numPruned << std::endl;
+#endif    
     // Attempt to eliminate points that would cause the string to push
     while (numPruned > 0 || passes <= 3)
     {

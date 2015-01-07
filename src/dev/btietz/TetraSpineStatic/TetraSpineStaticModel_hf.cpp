@@ -24,6 +24,7 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 #include "core/tgSphere.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"

@@ -45,6 +45,7 @@ class tgPairs;
 class tgTagSearch;
 class tgWorld;
 
+class btCollisionObject;
 class btRigidBody;
 class btCollisionShape;
 class btTransform;
@@ -180,11 +181,7 @@ public:
      * Set the corresponding btRigidBody.
      * @param[in,out] a pointer to a btRigidBody
      */
-    virtual void setRigidBody(btRigidBody* rigidBody)
-    {
-        /// @todo Does this leak any previous value of m_collisionObject?
-        m_collisionObject = rigidBody;
-    }
+    virtual void setRigidBody(btRigidBody* rigidBody);
     
     /**
      * Return a pointer to the collisionObject without upcasting

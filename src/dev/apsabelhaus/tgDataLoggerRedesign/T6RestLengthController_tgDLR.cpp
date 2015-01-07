@@ -61,7 +61,10 @@ void T6RestLengthController_tgDLR::onSetup(T6Model_tgDLR& subject)
 	double desiredRestLength = pMuscle->getStartLength() - m_restLengthDiff;
 	// Note that the single step version of setRestLength is used here,
 	// since we only want to call it once (not iteratively like the original.)
+#if (0)
 	pMuscle->setRestLengthSingleStep(desiredRestLength);
+#endif // Depricated
+        
     }
 }
 

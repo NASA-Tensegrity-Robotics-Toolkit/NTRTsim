@@ -1,0 +1,27 @@
+--- "NTRTmaster/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h"	2014-10-03 15:14:25.618566584 -0400
++++ "NTRTTests/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h"	2015-01-07 13:26:26.291748108 -0500
+@@ -17,7 +17,7 @@
+ {
+ 	//class members
+ 	//--------------------------------------------------------------------------------------------
+-private:
++protected:
+ 
+ 	//number of neurons
+ 	int nInput, nHidden, nOutput;
+@@ -51,12 +51,13 @@
+ 	double getSetAccuracy( std::vector<dataEntry*>& set );
+ 	double getSetMSE( std::vector<dataEntry*>& set );
+ 	void copyWeightFrom(neuralNetwork * nn);
++    void combineWeights(neuralNetwork* nn1, neuralNetwork* nn2, std::tr1::ranlux64_base_01* eng);
+ 	void mutate(std::tr1::ranlux64_base_01 *eng);
+ 
+-	//private methods
++	//protected methods
+ 	//--------------------------------------------------------------------------------------------
+ 
+-private: 
++protected: 
+ 
+ 	void initializeWeights();
+ 	inline double activationFunction( double x );

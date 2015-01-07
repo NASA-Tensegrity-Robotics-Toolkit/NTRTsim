@@ -164,8 +164,9 @@ void tgDataObserver_tgDLR::onStep(tgModel& model, double dt)
 	          // render (output) this subclass of tgModel
 		  // note that we need to de-ref the pointer here due to the
 		  // function definition of onVisit. But that's OK, it's const.
+#if (0)
 		  children[i]->onVisit(*m_loggers[j]);
-		
+#endif //deprecated 
 	      }
 	  }
       }

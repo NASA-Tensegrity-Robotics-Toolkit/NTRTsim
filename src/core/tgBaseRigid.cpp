@@ -49,6 +49,9 @@ tgBaseRigid::tgBaseRigid(btRigidBody* pRigidBody,
     // Postcondition
     assert(invariant());
     assert(m_pRigidBody == pRigidBody);
+    
+    // Supress compiler warning for bullet's unused variable
+    (void) btInfinityMask;
 }
 
 tgBaseRigid::~tgBaseRigid() { }

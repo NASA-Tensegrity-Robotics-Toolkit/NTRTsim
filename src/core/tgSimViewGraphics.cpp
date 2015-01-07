@@ -40,6 +40,8 @@ tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
 {
     /// @todo figure out a good time to delete this
     gDebugDrawer = new tgGLDebugDrawer();
+    // Supress compiler warning for bullet's unused variable
+    (void) btInfinityMask;
 }
 
 tgSimViewGraphics::~tgSimViewGraphics()
@@ -104,7 +106,7 @@ void tgSimViewGraphics::run(int steps)
     if (isInitialzed())
     {
         tgglutmain(1024, 600, "Tensegrity Demo", this);
-        const double dt = 1.0f/120.f;
+
         glutMainLoop();
         
         /* Free glut code

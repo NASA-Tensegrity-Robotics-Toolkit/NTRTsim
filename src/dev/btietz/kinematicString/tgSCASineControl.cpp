@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 tgSCASineControl::tgSCASineControl(const double controlStep,
 											tgImpedanceController* p_ipc,
