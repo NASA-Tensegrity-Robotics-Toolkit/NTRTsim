@@ -401,8 +401,8 @@ void tgBulletContactSpringCable::updateAnchorList()
 			
 			btVector3 contactNormal = newAnchor->getContactNormal();
 							
-			btScalar normalValue1 = (lineA).dot( newAnchor->getContactNormal()); 
-			btScalar normalValue2 = (lineB).dot( newAnchor->getContactNormal()); 
+			btScalar normalValue1 = (lineA).dot(contactNormal); 
+			btScalar normalValue2 = (lineB).dot(contactNormal); 
 			
 			bool del = false;	
 			
@@ -426,7 +426,10 @@ void tgBulletContactSpringCable::updateAnchorList()
 					del = true;
 					//std::cout << "UpdateA " << mDistA << std::endl;
 			}
-
+            
+            btVector3 backNormal = backAnchor->getContactNormal();
+            btVector3 forwardNormal = forwardAnchor->getContactNormal();
+            
 			if (del)
 			{
 				delete newAnchor;
@@ -435,6 +438,13 @@ void tgBulletContactSpringCable::updateAnchorList()
 			{
 				delete newAnchor;
 			}
+			else if ((backNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == backAnchor->attachedBody) || 
+                        (forwardNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == forwardAnchor->attachedBody))
+            {
+                std::cout << "Deleting based on contact normals! " << backNormal.dot(contactNormal);
+                std::cout << " " << forwardNormal.dot(contactNormal) << std::endl;
+                delete newAnchor;
+            }
 			else
 			{		
 				
