@@ -108,12 +108,14 @@ void tgBulletContactSpringCable::step(double dt)
 	
 	// Update positions and remove bad anchors
 	pruneAnchors();
-	
+
+#ifdef VERBOSE 
     if (getActualLength() > m_prevLength + 0.2)
     {
 //         throw std::runtime_error("Large length change!");
         std::cout << "Previous length " << m_prevLength << " actual length " << getActualLength() << std::endl;
     }
+#endif
     
 	calculateAndApplyForce(dt);
 	
@@ -441,8 +443,10 @@ void tgBulletContactSpringCable::updateAnchorList()
 			else if ((backNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == backAnchor->attachedBody) || 
                         (forwardNormal.dot(contactNormal) < 0.0 && newAnchor->attachedBody == forwardAnchor->attachedBody))
             {
+#ifdef VERBOSE 
                 std::cout << "Deleting based on contact normals! " << backNormal.dot(contactNormal);
                 std::cout << " " << forwardNormal.dot(contactNormal) << std::endl;
+#endif
                 delete newAnchor;
             }
 			else
@@ -455,7 +459,9 @@ void tgBulletContactSpringCable::updateAnchorList()
 #if (1) // Keeps the energy down very well
                 if (getActualLength() > m_prevLength + 2.0 * m_resolution)
                 {
+#ifdef VERBOSE 
                     std::cout << "Deleting anchor on basis of length " << std::endl;
+#endif
                     deleteAnchor(anchorPos + 1);
                 }
                 else
@@ -575,9 +581,10 @@ void tgBulletContactSpringCable::pruneAnchors()
         }
     }
 #endif
-    
+
+#ifdef VERBOSE 
     std::cout << "Pruned off the bat " << numPruned << std::endl;
-    
+#endif    
     // Attempt to eliminate points that would cause the string to push
     while (numPruned > 0 || passes <= 3)
     {
