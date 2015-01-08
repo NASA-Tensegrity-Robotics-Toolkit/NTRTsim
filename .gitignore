@@ -17,3 +17,5 @@ src/.settings/org.eclipse.cdt.codan.core.prefs
 
 *~
 *#
+
+*.pdfsync
