@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.18)  15 JUL 2014 15:31
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.8.11)  8 JAN 2015 14:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**scaling_counterexample.tex
-(./scaling_counterexample.tex
+**scaling_analysis.tex
+(./scaling_analysis.tex
 LaTeX2e <2011/06/27>
 Babel <3.9h> and hyphenation patterns for 78 languages loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -795,8 +795,8 @@ LaTeX Font Info:    Try loading font information for OT1+pcr on input line 220.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ))
-(./scaling_counterexample.aux)
-\openout1 = `scaling_counterexample.aux'.
+No file scaling_analysis.aux.
+\openout1 = `scaling_analysis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 71.
 LaTeX Font Info:    ... okay on input line 71.
@@ -812,7 +812,6 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
 LaTeX Font Info:    ... okay on input line 71.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 71.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 71.
-
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
@@ -896,14 +895,12 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 71.
 LaTeX Info: Redefining \pageref on input line 71.
 LaTeX Info: Redefining \nameref on input line 71.
-
-(./scaling_counterexample.out) (./scaling_counterexample.out)
 \@outlinefile=\write3
-\openout3 = `scaling_counterexample.out'.
+\openout3 = `scaling_analysis.out'.
 
 Configuring pdfsync
 \PDFSYNC@ut=\write4
-\openout4 = `scaling_counterexample.pdfsync'.
+\openout4 = `scaling_analysis.pdfsync'.
 
 \PDFSYNCf@li@=\count137
 \PDFSYNC@rder=\count138
@@ -917,12 +914,12 @@ Configuring pdfsync
 \PDFSYNCeveryvb@x=\toks33
 **** pdfsync.sty: started
 \c@lstlisting=\count139
-LaTeX Font Info:    Try loading font information for U+msa on input line 96.
+LaTeX Font Info:    Try loading font information for U+msa on input line 98.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 96.
+LaTeX Font Info:    Try loading font information for U+msb on input line 98.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -931,229 +928,268 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 141.
+(hyperref)                removing `math shift' on input line 149.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 141.
+(hyperref)                removing `\Pi' on input line 149.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 141.
+(hyperref)                removing `math shift' on input line 149.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 143--145
+Package natbib Warning: Citation `munson2013fundamentals' on page 2 undefined o
+n input line 151.
+
+
+Package natbib Warning: Citation `buckingham1914physically' on page 2 undefined
+ on input line 151.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 151--153
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 147--149
+Underfull \hbox (badness 10000) in paragraph at lines 155--157
 
  []
 
 [2]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 187.
+(hyperref)                removing `math shift' on input line 202.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 187.
+(hyperref)                removing `\Pi' on input line 202.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 187.
+(hyperref)                removing `math shift' on input line 202.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 212.
+(hyperref)                removing `math shift' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 212.
+(hyperref)                removing `\Pi' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 212.
+(hyperref)                removing `math shift' on input line 234.
 
 [3]
 
-LaTeX Warning: Reference `fig:m_l_g_angular' on page 4 undefined on input line 
-244.
+LaTeX Warning: Reference `fig:original_angular' on page 4 undefined on input li
+ne 263.
+
+
+LaTeX Warning: Reference `fig:grav_only_angular' on page 4 undefined on input l
+ine 263.
+
+
+LaTeX Warning: Reference `fig:l_g_angular' on page 4 undefined on input line 26
+7.
+
+
+LaTeX Warning: Reference `fig:l_g_c_angular' on page 4 undefined on input line 
+272.
 
 Package epstopdf Info: Source file: <img/original_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:19:26
+(epstopdf)                    date: 2015-01-01 13:29:09
 (epstopdf)                    size: 27973 bytes
 (epstopdf)             Output file: <img/original_angular-eps-converted-to.pdf>
 
-(epstopdf)                    date: 2014-07-15 14:19:34
-(epstopdf)                    size: 13549 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/original_angular-eps-c
 onverted-to.pdf img/original_angular.eps>
-(epstopdf)             \includegraphics on input line 249.
-Package epstopdf Info: Output file is already uptodate.
-<img/original_angular-eps-converted-to.pdf, id=69, 449.68pt x 338.26375pt>
+(epstopdf)             \includegraphics on input line 277.
+runsystem(repstopdf --outfile=img/original_angular-eps-converted-to.pdf img/ori
+ginal_angular.eps)...executed safely (allowed).
+
+Package epstopdf Info: Result file: <img/original_angular-eps-converted-to.pdf>
+
+(epstopdf)                    date: 2015-01-08 14:22:08
+(epstopdf)                    size: 13549 bytes.
+<img/original_angular-eps-converted-to.pdf, id=31, 449.68pt x 338.26375pt>
 File: img/original_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/original_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/original_angular-eps-converted-to.pdf used on inpu
-t line 249.
+t line 277.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 Package epstopdf Info: Source file: <img/grav_only_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:19:06
+(epstopdf)                    date: 2015-01-01 13:29:09
 (epstopdf)                    size: 28423 bytes
 (epstopdf)             Output file: <img/grav_only_angular-eps-converted-to.pdf
 >
-(epstopdf)                    date: 2014-07-15 14:19:35
-(epstopdf)                    size: 14106 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/grav_only_angular-eps-
 converted-to.pdf img/grav_only_angular.eps>
-(epstopdf)             \includegraphics on input line 256.
-Package epstopdf Info: Output file is already uptodate.
+(epstopdf)             \includegraphics on input line 284.
+runsystem(repstopdf --outfile=img/grav_only_angular-eps-converted-to.pdf img/gr
+av_only_angular.eps)...executed safely (allowed).
 
-<img/grav_only_angular-eps-converted-to.pdf, id=70, 449.68pt x 338.26375pt>
+Package epstopdf Info: Result file: <img/grav_only_angular-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2015-01-08 14:22:08
+(epstopdf)                    size: 14106 bytes.
+
+<img/grav_only_angular-eps-converted-to.pdf, id=32, 449.68pt x 338.26375pt>
 File: img/grav_only_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/grav_only_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/grav_only_angular-eps-converted-to.pdf used on inp
-ut line 256.
+ut line 284.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 Package epstopdf Info: Source file: <img/l_g_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:33:09
+(epstopdf)                    date: 2015-01-01 13:29:09
 (epstopdf)                    size: 34149 bytes
 (epstopdf)             Output file: <img/l_g_angular-eps-converted-to.pdf>
-(epstopdf)                    date: 2014-07-15 14:40:02
-(epstopdf)                    size: 28124 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/l_g_angular-eps-conver
 ted-to.pdf img/l_g_angular.eps>
-(epstopdf)             \includegraphics on input line 263.
-Package epstopdf Info: Output file is already uptodate.
+(epstopdf)             \includegraphics on input line 291.
+runsystem(repstopdf --outfile=img/l_g_angular-eps-converted-to.pdf img/l_g_angu
+lar.eps)...executed safely (allowed).
 
-<img/l_g_angular-eps-converted-to.pdf, id=71, 449.68pt x 338.26375pt>
+Package epstopdf Info: Result file: <img/l_g_angular-eps-converted-to.pdf>
+(epstopdf)                    date: 2015-01-08 14:22:09
+(epstopdf)                    size: 28124 bytes.
+
+<img/l_g_angular-eps-converted-to.pdf, id=33, 449.68pt x 338.26375pt>
 File: img/l_g_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/l_g_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/l_g_angular-eps-converted-to.pdf used on input lin
-e 263.
+e 291.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
- [4 <./img/original_angular-eps-converted-to.pdf> <./img/grav_only_angular-eps-
-converted-to.pdf>]
-Package epstopdf Info: Source file: <img/l_g_inverse_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:39:55
-(epstopdf)                    size: 26282 bytes
-(epstopdf)             Output file: <img/l_g_inverse_angular-eps-converted-to.p
-df>
-(epstopdf)                    date: 2014-07-15 14:40:02
-(epstopdf)                    size: 8654 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/l_g_inverse_angular-ep
-s-converted-to.pdf img/l_g_inverse_angular.eps>
-(epstopdf)             \includegraphics on input line 270.
+
+
+LaTeX Warning: File `img/l_g_c_angular.eps' not found on input line 298.
+
+Package epstopdf Info: Source file: <img/l_g_c_angular.eps>
+(epstopdf)             Output file: <img/l_g_c_angular-eps-converted-to.pdf>
+(epstopdf)             Command: <repstopdf --outfile=img/l_g_c_angular-eps-conv
+erted-to.pdf img/l_g_c_angular.eps>
+(epstopdf)             \includegraphics on input line 298.
 Package epstopdf Info: Output file is already uptodate.
 
-<img/l_g_inverse_angular-eps-converted-to.pdf, id=91, 449.68pt x 338.26375pt>
-File: img/l_g_inverse_angular-eps-converted-to.pdf Graphic file (type pdf)
+! Package pdftex.def Error: File `img/l_g_c_angular-eps-converted-to.pdf' not f
+ound.
 
-<use img/l_g_inverse_angular-eps-converted-to.pdf>
-Package pdftex.def Info: img/l_g_inverse_angular-eps-converted-to.pdf used on i
-nput line 270.
-(pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
-Package epstopdf Info: Source file: <img/k_l_g_angular.eps>
-(epstopdf)                    date: 2014-07-15 13:14:52
-(epstopdf)                    size: 26366 bytes
-(epstopdf)             Output file: <img/k_l_g_angular-eps-converted-to.pdf>
-(epstopdf)                    date: 2014-07-15 13:46:38
-(epstopdf)                    size: 8821 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/k_l_g_angular-eps-conv
-erted-to.pdf img/k_l_g_angular.eps>
-(epstopdf)             \includegraphics on input line 277.
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.298 ...dth=.48\linewidth]{img/l_g_c_angular.eps}
+                                                  
+? 
+
+LaTeX Warning: Reference `fig:grav_only_angular' on page 4 undefined on input l
+ine 304.
+
+
+LaTeX Warning: Reference `fig:l_g_angular' on page 4 undefined on input line 30
+4.
+
+
+LaTeX Warning: Reference `fig:l_g_c_angular' on page 4 undefined on input line 
+304.
+
+
+LaTeX Warning: Reference `fig:original_angular' on page 4 undefined on input li
+ne 305.
+
+
+LaTeX Warning: Reference `fig:l_g_c_angular' on page 4 undefined on input line 
+308.
+
+[4]
+
+LaTeX Warning: Reference `fig:l_g_c_t_angular' on page 5 undefined on input lin
+e 330.
+
+
+LaTeX Warning: Reference `fig:original_angular' on page 5 undefined on input li
+ne 330.
+
+
+LaTeX Warning: File `img/l_g_c_t_angular.eps' not found on input line 334.
+
+Package epstopdf Info: Source file: <img/l_g_c_t_angular.eps>
+(epstopdf)             Output file: <img/l_g_c_t_angular-eps-converted-to.pdf>
+(epstopdf)             Command: <repstopdf --outfile=img/l_g_c_t_angular-eps-co
+nverted-to.pdf img/l_g_c_t_angular.eps>
+(epstopdf)             \includegraphics on input line 334.
 Package epstopdf Info: Output file is already uptodate.
 
-<img/k_l_g_angular-eps-converted-to.pdf, id=92, 449.68pt x 338.26375pt>
-File: img/k_l_g_angular-eps-converted-to.pdf Graphic file (type pdf)
+! Package pdftex.def Error: File `img/l_g_c_t_angular-eps-converted-to.pdf' not
+ found.
 
-<use img/k_l_g_angular-eps-converted-to.pdf>
-Package pdftex.def Info: img/k_l_g_angular-eps-converted-to.pdf used on input l
-ine 277.
-(pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
-Package epstopdf Info: Source file: <img/k_c_g_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:11:04
-(epstopdf)                    size: 27829 bytes
-(epstopdf)             Output file: <img/k_c_g_angular-eps-converted-to.pdf>
-(epstopdf)                    date: 2014-07-15 14:18:28
-(epstopdf)                    size: 12424 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/k_c_g_angular-eps-conv
-erted-to.pdf img/k_c_g_angular.eps>
-(epstopdf)             \includegraphics on input line 284.
-Package epstopdf Info: Output file is already uptodate.
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.334 ...h=.48\linewidth]{img/l_g_c_t_angular.eps}
+                                                  
+? 
 
-<img/k_c_g_angular-eps-converted-to.pdf, id=93, 449.68pt x 338.26375pt>
-File: img/k_c_g_angular-eps-converted-to.pdf Graphic file (type pdf)
-
-<use img/k_c_g_angular-eps-converted-to.pdf>
-Package pdftex.def Info: img/k_c_g_angular-eps-converted-to.pdf used on input l
-ine 284.
-(pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
- [5 <./img/l_g_angular-eps-converted-to.pdf> <./img/l_g_inverse_angular-eps-con
-verted-to.pdf>]
-Package epstopdf Info: Source file: <img/k_c_t_g_angular.eps>
-(epstopdf)                    date: 2014-07-15 14:09:09
-(epstopdf)                    size: 27975 bytes
-(epstopdf)             Output file: <img/k_c_t_g_angular-eps-converted-to.pdf>
-(epstopdf)                    date: 2014-07-15 14:16:23
-(epstopdf)                    size: 14026 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/k_c_t_g_angular-eps-co
-nverted-to.pdf img/k_c_t_g_angular.eps>
-(epstopdf)             \includegraphics on input line 325.
-Package epstopdf Info: Output file is already uptodate.
-
-<img/k_c_t_g_angular-eps-converted-to.pdf, id=116, 449.68pt x 338.26375pt>
-File: img/k_c_t_g_angular-eps-converted-to.pdf Graphic file (type pdf)
-
-<use img/k_c_t_g_angular-eps-converted-to.pdf>
-Package pdftex.def Info: img/k_c_t_g_angular-eps-converted-to.pdf used on input
- line 325.
-(pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
- [6 <./img/k_l_g_angular-eps-converted-to.pdf> <./img/k_c_g_angular-eps-convert
-ed-to.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 330--331
+Underfull \hbox (badness 10000) in paragraph at lines 341--342
 
  []
 
+[5 <./img/original_angular-eps-converted-to.pdf> <./img/grav_only_angular-eps-c
+onverted-to.pdf>]
 
-Underfull \hbox (badness 10000) in paragraph at lines 335--337
+LaTeX Warning: Reference `fig:original_angular' on page 6 undefined on input li
+ne 346.
+
+
+LaTeX Warning: Reference `fig:l_g_angular' on page 6 undefined on input line 34
+6.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 361--364
 
  []
 
+[6 <./img/l_g_angular-eps-converted-to.pdf>] [7] [8] [9]
+No file scaling_analysis.bbl.
 
-Underfull \hbox (badness 10000) in paragraph at lines 345--348
+Package natbib Warning: There were undefined citations.
 
- []
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 460.
+[10]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 460.
+ (./scaling_analysis.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 460.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 460.
 
-[7 <./img/k_c_t_g_angular-eps-converted-to.pdf>] [8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 440.
- [9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 440.
 
-(./scaling_counterexample.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 440.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 440.
-Package rerunfilecheck Info: File `scaling_counterexample.out' has not changed.
+Package rerunfilecheck Warning: File `scaling_analysis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
 
-(rerunfilecheck)             Checksum: 2187665A19FF98E21784D4EAB4CD405E;652.
-
+Package rerunfilecheck Info: Checksums for `scaling_analysis.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  A95D49FA121B6339341BAA6E03BE6BDA;712.
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 440.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 460.
  ) 
 Here is how much of TeX's memory you used:
- 10033 strings out of 493304
- 141207 string characters out of 6139871
- 236879 words of memory out of 5000000
- 13290 multiletter control sequences out of 15000+600000
- 19611 words of font info for 73 fonts, out of 8000000 for 9000
+ 10001 strings out of 493304
+ 140140 string characters out of 6139871
+ 236199 words of memory out of 5000000
+ 13264 multiletter control sequences out of 15000+600000
+ 19780 words of font info for 74 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 33i,18n,43p,336b,379s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 33i,18n,43p,346b,366s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texl
@@ -1164,11 +1200,11 @@ type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
 ublic/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
-8.pfb>
-Output written on scaling_counterexample.pdf (9 pages, 215999 bytes).
+8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on scaling_analysis.pdf (10 pages, 190636 bytes).
 PDF statistics:
- 198 PDF objects out of 1000 (max. 8388607)
- 160 compressed objects within 2 object streams
+ 138 PDF objects out of 1000 (max. 8388607)
+ 106 compressed objects within 2 object streams
  26 named destinations out of 1000 (max. 500000)
- 108 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
