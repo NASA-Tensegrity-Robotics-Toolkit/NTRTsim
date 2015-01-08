@@ -5,6 +5,7 @@ import sys
 import csv
 from operator import itemgetter
 import numpy as np
+import statScores
 
 def sortFile(inFile, outFile):
     sortedDistances = []
@@ -119,4 +120,5 @@ if __name__=="__main__":
     cutOuts(sortedFile, noOutsFile)
     bestScores(noOutsFile, bestFile, 0)
     printParams(bestFile, bestParamFile)
+    statScores(bestFile)
 
