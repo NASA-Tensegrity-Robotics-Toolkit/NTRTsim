@@ -1,0 +1,62 @@
+--- "NTRTmaster/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.cpp"	2014-10-03 15:14:25.618566584 -0400
++++ "NTRTTests/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.cpp"	2015-01-07 13:12:33.331713575 -0500
+@@ -4,6 +4,7 @@
+ #include <fstream>
+ #include <math.h>
+ #include <cstring>
++#include <assert.h>
+ 
+ //include definition file
+ #include "neuralNetwork.h"
+@@ -403,6 +404,51 @@
+ 	}
+ }
+ 
++void neuralNetwork::combineWeights(neuralNetwork * nn1, neuralNetwork * nn2, std::tr1::ranlux64_base_01 *eng)
++{
++    std::tr1::uniform_real<double> unif(0, 1);
++    //delete weight storage
++    for (int i=0; i <= nInput; i++) delete[] wInputHidden[i];
++    delete[] wInputHidden;
++
++    for (int j=0; j <= nHidden; j++) delete[] wHiddenOutput[j];
++    delete[] wHiddenOutput;
++
++    //copy numbers
++    this->nInput=nn1->nInput;
++    this->nHidden=nn1->nHidden;
++    this->nOutput=nn1->nOutput;
++    
++    assert(nn1->nInput == nn2->nInput && nn1->nHidden == nn2->nHidden && nn1->nOutput == nn2->nOutput);
++
++    //reallocate and copy weights
++    wInputHidden = new double*[nInput + 1];
++    for ( int i=0; i <= nInput; i++ )
++    {
++        wInputHidden[i] = new double[nHidden];
++        for ( int j=0; j < nHidden; j++ ) 
++        {
++            if(unif(*eng)  > 0.5)
++                wInputHidden[i][j] = nn1->wInputHidden[i][j];
++            else
++                wInputHidden[i][j] = nn2->wInputHidden[i][j];
++        }
++    }
++
++    wHiddenOutput = new double*[nHidden + 1];
++    for ( int i=0; i <= nHidden; i++ )
++    {
++        wHiddenOutput[i] = new double[nOutput];
++        for ( int j=0; j < nOutput; j++ )
++        {
++            if(unif(*eng)  > 0.5)
++                wHiddenOutput[i][j] = nn1->wHiddenOutput[i][j];
++            else
++                wHiddenOutput[i][j] = nn2->wHiddenOutput[i][j];
++        }
++    }
++}
++
+ void neuralNetwork::mutate(std::tr1::ranlux64_base_01 *eng)
+ {
+ 	std::tr1::uniform_real<double> unif(0, 1);

@@ -38,6 +38,7 @@ public:
 	NeuroEvolution(std::string suffix, std::string config = "config.ini", std::string path = "");
 	~NeuroEvolution();
 	void mutateEveryController();
+    void combineAndMutate();
 	void orderAllPopulations();
 	void evaluatePopulation();
 	std::vector< NeuroEvoMember *> nextSetOfControllers();
@@ -62,6 +63,7 @@ private:
 	int numberOfTestsBetweenGenerations;
 	int generationNumber;
 	int numberOfElementsToMutate;
+    int numberOfChildren;
 };
 
 #endif /* NEUROEVOLUTION_H_ */

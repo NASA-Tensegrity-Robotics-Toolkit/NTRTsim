@@ -59,7 +59,7 @@ void NeuroAdapter::initialize(NeuroEvolution *evo,bool isLearning,configuration 
 	else
 	{
 		currentControllers = this->neuroEvo->nextSetOfControllers();
-		for(int i=0;i<currentControllers.size();i++)
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			stringstream ss;
 			ss<< neuroEvo->resourcePath << "logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
@@ -81,11 +81,11 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 		//scale inputs to 0-1 from -1 to 1 (unit vector provided from the controller).
 		// Assumes inputs are already scaled -1 to 1
 		assert (state.size() == numberOfStates);
-		for (std::size_t i = 0; i < numberOfStates; i++)
+		for (int i = 0; i < numberOfStates; i++)
 		{
 			inputs[i]=state[i] / 2.0 + 0.5;
 		}
-		for(int i=0;i<currentControllers.size();i++)
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			double *output=currentControllers[i]->getNn()->feedForwardPattern(inputs);
 			vector<double> tmpAct;
@@ -99,10 +99,10 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 	}
 	else
 	{
-		for(int i=0;i<currentControllers.size();i++)
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			vector<double> tmpAct;
-			for(int j=0;j<currentControllers[i]->statelessParameters.size();j++)
+			for(std::size_t j=0;j<currentControllers[i]->statelessParameters.size();j++)
 			{
 				tmpAct.push_back(currentControllers[i]->statelessParameters[j]);
 			}

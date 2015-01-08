@@ -19,4 +19,5 @@ subdirs(
     ShortOC_sine
     timestepTest
     kinematicString
+    GATests
     )

@@ -29,23 +29,27 @@
 
 #include "NeuroEvoMember.h"
 #include <vector>
+#include <tr1/random>
 
 class NeuroEvoPopulation {
 public:
-	NeuroEvoPopulation(int numControllers,configuration config);
+	NeuroEvoPopulation(int numControllers, configuration& config);
 	~NeuroEvoPopulation();
 	std::vector<NeuroEvoMember *> controllers;
-	void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
+    void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
+	void combineAndMutate(std::tr1::ranlux64_base_01 *eng, std::size_t numToMutate, std::size_t numToCombine);
 	void orderPopulation();
-	NeuroEvoMember * selectMemberToEvaluate();
 	NeuroEvoMember * getMember(int i){return controllers[i];};
 
 private:
+    std::vector<double> generateMatingProbabilities();
+    int getIndexFromProbability(std::vector<double>& probs, double val);
 	static bool comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
 	static bool comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
 	bool compareAverageScores;
 	bool clearScoresBetweenGenerations;
 	int populationSize;
+    configuration m_config;
 };
 
 

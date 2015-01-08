@@ -169,7 +169,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         
         double descendingCommand = 0.0;
         std::vector<double> desComs (numControllers, descendingCommand);
-#endif // Feedback functions not yet ready        
+#endif       
         try
         {
             m_pCPGSys->update(desComs, m_updateTime);

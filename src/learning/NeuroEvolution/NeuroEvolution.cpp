@@ -28,6 +28,7 @@
 #include "learning/Configuration/configuration.h"
 #include "core/tgString.h"
 #include "helpers/FileHelpers.h"
+// The C++ Standard Library
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -71,7 +72,8 @@ suffix(suff)
     configuration myconfigdataaa;
 	myconfigdataaa.readFile(configPath);
 	populationSize=myconfigdataaa.getintvalue("populationSize");
-	numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+    numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+	numberOfChildren=myconfigdataaa.getintvalue("numberOfChildren");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
 	numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
 	leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
@@ -79,7 +81,12 @@ suffix(suff)
     seeded = myconfigdataaa.getintvalue("startSeed");
     
     bool learning = myconfigdataaa.getintvalue("learning");
-
+    
+    if (populationSize < numberOfElementsToMutate + numberOfChildren)
+    {
+        throw std::invalid_argument("Population will grow with given parameters");
+    }
+    
    srand(rdtsc());
 	eng.seed(rdtsc());
 
@@ -130,7 +137,13 @@ void NeuroEvolution::mutateEveryController()
 	}
 }
 
-
+void NeuroEvolution::combineAndMutate()
+{
+    for(std::size_t i=0;i<populations.size();i++)
+    {
+        populations.at(i)->combineAndMutate(&eng, numberOfElementsToMutate, numberOfChildren);
+    }    
+}
 
 void NeuroEvolution::orderAllPopulations()
 {
@@ -154,6 +167,7 @@ void NeuroEvolution::orderAllPopulations()
 	{
 		populations.at(i)->orderPopulation();
 	}
+	/// @todo numberOfTestsBetweenGenerations may not be accurate
 	evolutionLog<<generationNumber*numberOfTestsBetweenGenerations<<","<<aveScore1<<","<<aveScore2<<",";
 	evolutionLog<<populations.at(0)->getMember(0)->maxScore<<","<<populations.at(0)->getMember(0)->maxScore1<<","<<populations.at(0)->getMember(0)->maxScore2<<endl;
 	
@@ -187,14 +201,21 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 	if(currentTest == testsToDo)
 	{
 		orderAllPopulations();
-		mutateEveryController();
+        if (numberOfChildren == 0)
+        {
+            mutateEveryController();
+        }
+        else
+        {
+            combineAndMutate();
+        }
 		cout<<"mutated the populations"<<endl;
 		this->scoresOfTheGeneration.clear();
 
 		if(coevolution)
 			currentTest=0;//Start from 0
 		else
-			currentTest=populationSize-numberOfElementsToMutate; //start from the mutated ones only (last x)
+			currentTest=populationSize - numberOfElementsToMutate - numberOfChildren; //start from the mutated ones only (last x)
 	}
 
 	selectedControllers.clear();
