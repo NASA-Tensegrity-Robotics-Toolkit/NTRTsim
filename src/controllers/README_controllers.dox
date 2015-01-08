@@ -5,8 +5,11 @@
  For a detailed description see page controllers
   
  \page controllers Controllers
- The controllers library contains files that can be used to
- control a variety of tensegrities. It depends on the core library
+ The controllers library contains classes that can be used to
+ control a low level components of tensegrities, typically spring-cable actuators.
+ These range from the very simple tgBasicController to the higher level
+ tgImpedanceController.
+ It depends on the core library
  
- \version 1.0.0 (beta)
+ \version 1.1.0
  */

@@ -1,0 +1,12 @@
+/**
+ \page helpers Helpers
+ Helper functions for file manipulation. Used to direct applications
+ to the resources folder and read JSON configuration files.
+ 
+ \version 1.1.0
+*/
+
+/**
+ * \dir helpers
+ * @brief Provides helpers for file input and output.
+ */

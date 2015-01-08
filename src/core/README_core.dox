@@ -17,5 +17,5 @@
  - the ability to tag models and components with tgTags and tgTaggable
  - basic components of controllers tgSubject and tgObserver
  
- \version 1.0.0 (beta)
+ \version 1.1.0
  */
