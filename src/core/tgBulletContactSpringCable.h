@@ -165,6 +165,8 @@ private:
     /**
      * Minimize the length of the anchors - accounts for sliding
      * Return the number of anchors that are deleted (have slid off the body)
+     * This method occasionally causes the cable to lose contact with the body
+     * prematurely. See https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/119
      */
     int updateAnchorPositions();
     

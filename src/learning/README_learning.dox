@@ -49,24 +49,30 @@
 	- numberOfActions: The number of parameters in a "unit" of the system.
 	For example, the CPGEdges have two: weight and phase
 	- numberOfControllers: Number of units in the system.
- \subsection learn_param_3 
+ \subsection learn_param_3 Learning Parameters
 	- coevolution: Coevolution on selects a random element from the pool. Off ensures
 	all elements are tested. Off is better with max score, on is better
 	with average
 	- populationSize: Number of controllers in the population. Allows for
-	genetic algorithms to use.
+	genetic algorithms to be used.
 	- numberOfElementsToMutate: Number of elements to mutate between each
 	generation
 	- numberOfTestsBetweenGenerations: Number of tests between run between
-	mutiations
+	mutiations. Only used if coevolution is on, otherwise test all new controllers
 	- leniencyCoef: How much past scores are factored in. 1.0 considers the current score
-	- MonteCarlo: If on, parameters will be chosen in a flat random between 0.0 and 1.0
-	- deviation: How large of a standard deviation to mutate by if MonteCarlo is off
+	- MonteCarlo: If on, parameters will be chosen in a flat random between 0.0 and 1.0. AnnealEvolution only
+	- deviation: How large of a standard deviation to mutate by if MonteCarlo is off. AnnealEvolution only
 	- compareAverageScores: Comparing the average scores over a number of previous 
 	generations. Setting to 0 will compare maximum scores
 	- clearScoresBetweenGenerations: Whether or not to clear scores between generations.
 	If looking for a maximum, do not clear.
 	
+  \subsection learn_param_4 Neuro Learning Parameters
+	- numberOfStates: Number of states for a neural network input
+    - numberOfChildren: Number of population members to replace with "children"
+    that combine the parameters of two neural networks. Can be used in combination
+    with numberOfElements to mutate, as long as their sum is less than the population size.
+    
 	\section un_params Unsupported Parameters
 	The following parameters are from an older version of the code,
 	but are explained here since they are still in the .ini files
@@ -79,11 +85,10 @@
 	- addRandomTerrain: Terrain adjustment - can be adjusted with tgGround classes
 	- addSlope: Terrain adjustment - can be adjusted with tgGround classes
 	- recordPositions: See version 0.1
-	- numberOfStates: Number of states for a neural network input
 	- numberOfMusclesPerController: See version 0.1
 	- cycleDuration: See version 0.1
  
- \version 1.0.0 (beta)
+ \version 1.1.0
 */
 
 /**

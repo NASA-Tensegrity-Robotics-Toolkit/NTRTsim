@@ -98,7 +98,7 @@
     
     <a href="https://docs.google.com/document/d/18gA03CjOnLOKXO2njqE5roW0y3vtTAQwoOghsBH7I1Q/edit?usp=sharing">FAQ for new developers</a> 
     
-    \version 1.1.0 (beta)
+    \version 1.1.0
 */
 
 /**
@@ -160,7 +160,7 @@
 	
 	\*FreeGlut support pending: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/27
 	
-	\version 1.1.0 (beta)
+	\version 1.1.0
 */
 
 /**
@@ -181,5 +181,5 @@
  either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
 
- \version 1.1.0 (beta)
+ \version 1.1.0
 */
