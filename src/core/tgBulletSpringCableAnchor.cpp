@@ -260,10 +260,12 @@ bool tgBulletSpringCableAnchor::updateManifold(btPersistentManifold* m)
 			#endif
 		}
 	}
+#ifdef VERBOSE
 	if (!ret)
     {
         std::cout << "Failed to update manifold!" << std::endl;
     }
+#endif
 	
 	return ret;
 }
