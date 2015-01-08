@@ -185,7 +185,9 @@ bool tgBulletSpringCableAnchor::setWorldPosition(btVector3& newPos)
 		}
 		else
         {
+#ifdef VERBOSE
             std::cout << "Manifold out of date!" << std::endl;
+#endif
         }
 		// Else: neither body is attached, delete
 	}
