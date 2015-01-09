@@ -1,0 +1,30 @@
+--- btQuickprof.cpp	2014-12-15 09:50:36.939760854 -0500
++++ btQuickprof_new.cpp	2014-12-15 09:49:36.799762223 -0500
+@@ -285,16 +285,21 @@
+ 
+ void	CProfileNode::CleanupMemory()
+ {
+-	delete ( Child);
+-	Child = NULL;
+-	delete ( Sibling);
+-	Sibling = NULL;
++    if (Child)
++    {
++        delete ( Child);
++	}
++    Child = NULL;
++	if (Sibling)
++    {
++        delete ( Sibling);
++	}
++    Sibling = NULL;
+ }
+ 
+ CProfileNode::~CProfileNode( void )
+ {
+-	delete ( Child);
+-	delete ( Sibling);
++	CleanupMemory();
+ }
+ 
+ 

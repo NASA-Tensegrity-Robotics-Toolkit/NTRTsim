@@ -29,7 +29,7 @@
 // This application
 #include "Escape_T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
 // The C++ Standard Library
@@ -64,11 +64,11 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
     double dt = 0.0001;
 
     //Set the initial length of every muscle in the subject
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i) {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setRestLength(this->m_initialLengths, dt);
+        pMuscle->setControlInput(this->m_initialLengths, dt);
     }
 
     populateClusters(subject);
@@ -96,12 +96,12 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     m_totalTime+=dt;
 
     setPreferredMuscleLengths(subject, dt);
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
@@ -211,7 +211,7 @@ void Escape_T6Controller::setupAdapter() {
 double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     double totalEnergySpent=0;
 
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
         tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
@@ -239,7 +239,7 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
 
     for(int cluster=0; cluster<nClusters; cluster++) {
         for(int node=0; node<musclesPerCluster; node++) {
-            tgLinearString *const pMuscle = clusters[cluster][node];
+            tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
             double minLength = m_initialLengths * (1-maxStringLengthFactor);
@@ -249,7 +249,7 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             } else if (newLength >= maxLength) {
                 newLength = maxLength;
             }
-            pMuscle->setRestLength(newLength, dt);
+            pMuscle->setControlInput(newLength, dt);
         }
         phase += phaseChange[cluster];
     }
@@ -260,8 +260,8 @@ void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
         ostringstream ss;
         ss << (cluster + 1);
         string suffix = ss.str();
-        std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("muscle cluster" + suffix);
-        clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
+        std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("muscle cluster" + suffix);
+        clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
     }
 }
 

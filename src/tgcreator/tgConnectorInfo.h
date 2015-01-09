@@ -51,7 +51,10 @@ public:
         //m_fromRigidBody(0),
         //m_toRigidBody(0),
         tgTaggable()
-    {}    
+    {
+        // Supress compiler warning for bullet's unused variable
+        (void) btInfinityMask;
+    }    
 
     tgConnectorInfo(tgTags tags) : 
         m_fromRigidInfo(0),

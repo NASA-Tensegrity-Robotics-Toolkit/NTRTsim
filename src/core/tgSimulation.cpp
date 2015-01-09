@@ -59,8 +59,8 @@ tgSimulation::~tgSimulation()
 
 void tgSimulation::addModel(tgModel* pModel)
 {
-        // Precondition
-        if (pModel == NULL)
+    // Precondition
+    if (pModel == NULL)
     {
         throw std::invalid_argument("NULL pointer to tgModel");
     }
@@ -91,13 +91,13 @@ void tgSimulation::onVisit(const tgModelVisitor& r) const
 void tgSimulation::reset()
 {
 
-        teardown();
+    teardown();
 
-        m_view.setup();
-        for (int i = 0; i != m_models.size(); i++)
-        {
-            
-            m_models[i]->setup(m_view.world());
+    m_view.setup();
+    for (int i = 0; i != m_models.size(); i++)
+    {
+        
+        m_models[i]->setup(m_view.world());
     }
 }
 

@@ -28,6 +28,8 @@
 // This application
 #include "FlemonsSpineModelLearning.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
+#include "examples/learningSpines/tgCPGLogger.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -80,7 +82,7 @@ int main(int argc, char** argv)
 				const double highAmplitude = 30.0;
 				const double kt = 0.0;
 				const double kp = 1000.0;
-				const double kv = 100.0;
+				const double kv = 210.0;
 				const bool def = true;
 					
 				// Overridden by def being true
@@ -107,14 +109,19 @@ int main(int argc, char** argv)
 															lf,
 															hf
 															);
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
+    KinematicSpineCPGControl* const myControl =
+      new KinematicSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");
     myModel->attach(myControl);
+#if (0)    
+    tgCPGLogger* const myLogger = 
+      new tgCPGLogger("logs/CPGValues.txt");
     
+    myControl->attach(myLogger);
+#endif    
     simulation.addModel(myModel);
     
     int i = 0;
-    while (i < 3000)
+    while (i < 1)
     {
         simulation.run(30000);
     	#ifdef BT_USE_DOUBLE_PRECISION

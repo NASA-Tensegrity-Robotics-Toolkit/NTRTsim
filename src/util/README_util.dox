@@ -2,10 +2,11 @@
  \page util Utilities
  
  Contains general utility classes for tensegrity models or controllers
- As of version 1.0.0 this includes classes for central pattern generators
- or CPGs
+ As of version 1.1.0 this includes classes for central pattern generators
+ or CPGs. Additional functions are located in dev/CPG_feedback and
+ examples/learningSpines
  
- \version 1.0.0 (beta)
+ \version 1.1.0
 */
 
 /**

@@ -21,7 +21,7 @@
 
 /**
  * @file TetraSpineCollisions.h
- * @brief Middle segment of In Won's robot reconfigured with MuscleNP and more segments
+ * @brief Middle segment of In Won's robot reconfigured with tgBulletContactSpringCable and more segments
  * @author Brian Mirletz
  * @date September 2014
  * @version 1.0.0

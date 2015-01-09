@@ -33,7 +33,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -93,7 +93,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
     
 private:
 	
@@ -140,8 +140,8 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgLinearString*> allMuscles;
-	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
+    std::vector<tgBasicActuator*> allMuscles;
+	std::vector<std::vector <tgBasicActuator *> > musclesPerNodes;
 	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 
 	std::vector<btVector3> nodePositions;

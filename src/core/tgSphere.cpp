@@ -79,9 +79,8 @@ void tgSphere::onVisit(const tgModelVisitor& v) const
 
 void tgSphere::teardown()
 {
-  // World should delete the body
-  m_pRigidBody = NULL;
-  tgModel::teardown();
+    // Set body to NULL, calls teardown on children
+    tgBaseRigid::teardown();
 
   // Postcondition
   // This does not preserve the invariant

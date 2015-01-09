@@ -16,6 +16,9 @@
  * governing permissions and limitations under the License.
 */
 
+#ifndef NEUROEVOPOPULATION_H_
+#define NEUROEVOPOPULATION_H_
+
 /**
  * @file NeuroEvoPopulation.h
  * @brief A set of members that gets updated and mutated
@@ -24,29 +27,29 @@
  * $Id$
  */
 
-#ifndef NEUROEVOPOPULATION_H_
-#define NEUROEVOPOPULATION_H_
-
 #include "NeuroEvoMember.h"
 #include <vector>
+#include <tr1/random>
 
 class NeuroEvoPopulation {
 public:
-	NeuroEvoPopulation(int numControllers,configuration config);
+	NeuroEvoPopulation(int numControllers, configuration& config);
 	~NeuroEvoPopulation();
-	vector<NeuroEvoMember *> controllers;
-	void mutate(std::tr1::ranlux64_base_01 *eng,int numToMutate);
+	std::vector<NeuroEvoMember *> controllers;
+    void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
+	void combineAndMutate(std::tr1::ranlux64_base_01 *eng, std::size_t numToMutate, std::size_t numToCombine);
 	void orderPopulation();
-	NeuroEvoMember * selectMemberToEvaluate();
 	NeuroEvoMember * getMember(int i){return controllers[i];};
 
 private:
+    std::vector<double> generateMatingProbabilities();
+    int getIndexFromProbability(std::vector<double>& probs, double val);
 	static bool comparisonFuncForAverage(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
 	static bool comparisonFuncForMax(NeuroEvoMember * elm1, NeuroEvoMember * elm2);
-	void readConfigFromXML(string configFile);
 	bool compareAverageScores;
 	bool clearScoresBetweenGenerations;
 	int populationSize;
+    configuration m_config;
 };
 
 

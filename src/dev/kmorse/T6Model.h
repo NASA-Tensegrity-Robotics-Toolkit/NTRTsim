@@ -37,7 +37,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -97,7 +97,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
     
 private:
 	
@@ -129,7 +129,7 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
 
     //Data logger attempt
     // tgDataObserver m_dataObserver;

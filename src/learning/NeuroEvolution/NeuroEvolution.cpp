@@ -25,7 +25,10 @@
  */
 
 #include "NeuroEvolution.h"
-#include "../Configuration/configuration.h"
+#include "learning/Configuration/configuration.h"
+#include "core/tgString.h"
+#include "helpers/FileHelpers.h"
+// The C++ Standard Library
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -50,22 +53,41 @@ unsigned long long rdtsc(){
 
 #endif
 
-NeuroEvolution::NeuroEvolution(string suff, string config)
+NeuroEvolution::NeuroEvolution(std::string suff, std::string config, std::string path) :
+suffix(suff)
 {
-	suffix=suff;
 	currentTest=0;
 	generationNumber=0;
+	if (path != "")
+	{
+		resourcePath = FileHelpers::getResourcePath(path);
+	}
+	else
+	{
+		resourcePath = "";
+	}
 
-	configuration myconfigdataaa;
-	myconfigdataaa.readFile(config);
+	std::string configPath = resourcePath + config;
+
+    configuration myconfigdataaa;
+	myconfigdataaa.readFile(configPath);
 	populationSize=myconfigdataaa.getintvalue("populationSize");
-	numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+    numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+	numberOfChildren=myconfigdataaa.getintvalue("numberOfChildren");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
 	numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
 	leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
 	coevolution=myconfigdataaa.getintvalue("coevolution");
-
-	srand(rdtsc());
+    seeded = myconfigdataaa.getintvalue("startSeed");
+    
+    bool learning = myconfigdataaa.getintvalue("learning");
+    
+    if (populationSize < numberOfElementsToMutate + numberOfChildren)
+    {
+        throw std::invalid_argument("Population will grow with given parameters");
+    }
+    
+   srand(rdtsc());
 	eng.seed(rdtsc());
 
 	for(int j=0;j<numberOfControllers;j++)
@@ -73,11 +95,26 @@ NeuroEvolution::NeuroEvolution(string suff, string config)
 		cout<<"creating Populations"<<endl;
 		populations.push_back(new NeuroEvoPopulation(populationSize,myconfigdataaa));
 	}
-	evolutionLog.open(("logs/evolution"+suffix+".csv").c_str(),ios::out);
-	if (!evolutionLog.is_open())
-	{
-		throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
-	}
+
+    // Overwrite the random parameters based on data
+    if(seeded) // Test that the file exists
+    {
+        for(int i = 0; i < numberOfControllers; i++)
+        {
+            NeuroEvoMember* seededPop = populations[i]->controllers.back();
+            stringstream ss;
+            ss<< resourcePath <<"logs/bestParameters-"<<this->suffix<<"-"<<i<<".nnw";
+            seededPop->loadFromFile(ss.str().c_str());
+        }
+    }
+    if(learning)
+    {
+		evolutionLog.open((resourcePath + "logs/evolution"+suffix+".csv").c_str(),ios::out);
+		if (!evolutionLog.is_open())
+		{
+			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+		}
+    }
 }
 
 NeuroEvolution::~NeuroEvolution()
@@ -94,13 +131,19 @@ NeuroEvolution::~NeuroEvolution()
 
 void NeuroEvolution::mutateEveryController()
 {
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		populations.at(i)->mutate(&eng,numberOfElementsToMutate);
 	}
 }
 
-
+void NeuroEvolution::combineAndMutate()
+{
+    for(std::size_t i=0;i<populations.size();i++)
+    {
+        populations.at(i)->combineAndMutate(&eng, numberOfElementsToMutate, numberOfChildren);
+    }    
+}
 
 void NeuroEvolution::orderAllPopulations()
 {
@@ -111,7 +154,7 @@ void NeuroEvolution::orderAllPopulations()
 	// Disable definition of unused variables to suppress compiler warning
 	double maxScore1,maxScore2;
 #endif
-	for(int i=0;i<scoresOfTheGeneration.size();i++)
+	for(std::size_t i=0;i<scoresOfTheGeneration.size();i++)
 	{
 		aveScore1+=scoresOfTheGeneration[i][0];
 		aveScore2+=scoresOfTheGeneration[i][1];
@@ -120,10 +163,11 @@ void NeuroEvolution::orderAllPopulations()
 	aveScore2 /= scoresOfTheGeneration.size();
 
 
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		populations.at(i)->orderPopulation();
 	}
+	/// @todo numberOfTestsBetweenGenerations may not be accurate
 	evolutionLog<<generationNumber*numberOfTestsBetweenGenerations<<","<<aveScore1<<","<<aveScore2<<",";
 	evolutionLog<<populations.at(0)->getMember(0)->maxScore<<","<<populations.at(0)->getMember(0)->maxScore1<<","<<populations.at(0)->getMember(0)->maxScore2<<endl;
 	
@@ -131,11 +175,10 @@ void NeuroEvolution::orderAllPopulations()
 	// what if member at 0 isn't the best of all time for some reason? 
 	// This seems biased towards average scores
 	ofstream logfileLeader;
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		stringstream ss;
-		ss<<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
-//		populations[i]->getMember(0)->getNn()->saveWeights(ss.str().c_str());
+		ss << resourcePath <<"logs/bestParameters-"<<suffix<<"-"<<i<<".nnw";
 		populations[i]->getMember(0)->saveToFile(ss.str().c_str());
 	}
 }
@@ -158,18 +201,25 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 	if(currentTest == testsToDo)
 	{
 		orderAllPopulations();
-		mutateEveryController();
+        if (numberOfChildren == 0)
+        {
+            mutateEveryController();
+        }
+        else
+        {
+            combineAndMutate();
+        }
 		cout<<"mutated the populations"<<endl;
 		this->scoresOfTheGeneration.clear();
 
 		if(coevolution)
 			currentTest=0;//Start from 0
 		else
-			currentTest=populationSize-numberOfElementsToMutate; //start from the mutated ones only (last x)
+			currentTest=populationSize - numberOfElementsToMutate - numberOfChildren; //start from the mutated ones only (last x)
 	}
 
 	selectedControllers.clear();
-	for(int i=0;i<populations.size();i++)
+	for(std::size_t i=0;i<populations.size();i++)
 	{
 		int selectedOne=0;
 		if(coevolution)
@@ -193,7 +243,7 @@ void NeuroEvolution::updateScores(vector <double> multiscore)
 	else
 		multiscore.push_back(-1.0);
 	double score=1.0* multiscore[0] - 0.0 * multiscore[1];
-	for(int oneElem=0;oneElem<selectedControllers.size();oneElem++)
+	for(std::size_t oneElem=0;oneElem<selectedControllers.size();oneElem++)
 	{
 		NeuroEvoMember * controllerPointer=selectedControllers.at(oneElem);
 
@@ -214,7 +264,7 @@ void NeuroEvolution::updateScores(vector <double> multiscore)
 
 	//Record it to the file
 	ofstream payloadLog;
-	payloadLog.open("logs/scores.csv",ios::app);
+	payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);
 	payloadLog<<multiscore[0]<<","<<multiscore[1]<<endl;
 	payloadLog.close();
 	return;

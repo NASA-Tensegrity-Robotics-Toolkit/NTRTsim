@@ -42,7 +42,9 @@
 #include "core/tgString.h"
 
 //#include <tgmath.h>
-
+/**
+ * Depricated as of version 1.1.0
+ */
 class ContactTestModel : public tgSubject<ContactTestModel>, public tgModel
 {
 public: 

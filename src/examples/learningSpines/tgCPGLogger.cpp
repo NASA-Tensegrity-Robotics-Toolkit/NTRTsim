@@ -18,7 +18,7 @@
 
 /**
  * @file tgCPGLogger.cpp
- * @brief Contains the implementation of class tgDataLoggerRodBasic.
+ * @brief Contains the implementation of class tgCPGLogger.
  * @author Drew Sabelhaus and Brian Tietz
  * $Id$
  */

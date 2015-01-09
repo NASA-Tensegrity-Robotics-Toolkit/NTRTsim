@@ -60,6 +60,27 @@ public:
     }
     
     /**
+     * A version of filter that returns const objects inside the vector
+     * Filter by type, e.g. 
+     * std::vector<SomeBaseType> myVector;
+     * tgCast::filter<SomeBaseType, const SomeSubType>(myVector); will return a 
+     * vector containing only the elements in myVector that are castable to 
+     * const SomeSubType
+     */
+    template <typename T_FROM, typename T_TO>
+    static std::vector<const T_TO*> constFilter(const std::vector<T_FROM*>& v)
+    {
+        std::vector<const T_TO*> result;
+        for(int i = 0; i < v.size(); i++) {
+            const T_TO* t = cast<T_FROM, T_TO>(v[i]);
+            if(t != 0) {
+                result.push_back(t);
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Attempt a dynamic cast to the provided type. If it fails, return 0
      */ 
     template <typename T_FROM, typename T_TO>

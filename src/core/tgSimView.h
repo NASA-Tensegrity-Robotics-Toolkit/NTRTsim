@@ -64,12 +64,20 @@ public:
      */
     tgWorld& world() { return m_world; }
 
+    /**
+     * Sets m_initialized to true. Proxy for higher level functions
+     * in tgSimViewGraphics
+     */
     virtual void setup();
    
+    /**
+     * Sets m_initialized to false. Proxy for higher level functions
+     * in tgSimViewGraphics
+     */
     virtual void teardown();
     
     /**
-     * Run until stoppeed by user
+     * Run until stopped by user
      */
     virtual void run();
 	
@@ -77,13 +85,21 @@ public:
 	 * Run for a specific number of steps
 	 */
     virtual void run(int steps);
-
+    
+    /**
+     * Send the tgModelVisitor to the simulation
+     */
     virtual void render() const;
     
+    /**
+     * Send the tgModelVisitor that was passed in to the simulation
+     */
     virtual void render(const tgModelVisitor& r) const;
     
-    // tgSimulation handles calling teardown and setup on this,
-    // since it knows when the new world is available
+    /**
+     * Resets the simulation using simulation->reset()
+     * the simulation will call setup and teardown on this as appropreate
+     */
     virtual void reset();
 
     /**
@@ -142,7 +158,7 @@ protected:
      */
     void bindToWorld(tgWorld& world);
 
-    /** @todo Get rid of this. */
+    /** @todo Get rid of this. May only be possible once we're no longer using GLUT*/
     bool isInitialzed() const { return m_initialized; }
     
 protected:

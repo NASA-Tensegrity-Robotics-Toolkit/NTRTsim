@@ -80,21 +80,35 @@ public:
     {
         run(10);
     }
-
+    
+    /**
+     * Gives us a pointer to the world, sets up the debug drawer for
+     * the dynamics world and sets up a new tgBulletRenderer
+     */
     void setup();
     
+    /**
+     * Nullifies the pointer to the dynamics world, calls tgSimView::teardown()
+     */
     void teardown();
-
+    
+    /**
+     * Clears the openGL buffer and dispatches a tgBulletRenderer to the world
+     */
     void render();
     
     /**
      * Run for a specified number of steps. Currently performs the
      * role of run() at this level
+     * @todo doesn't work until FreeGLUT or another rendering engine
+     * is implemented
      */
     virtual void run(int steps);
     
-    // tgSimulation handles calling teardown and setup on this,
-    // since it knows when the new world is available
+    /**
+     * Resets the simulation using simulation->reset()
+     * the simulation will call setup and teardown on this as appropreate
+     */
     void reset();
 
     //Required by tgDemoApplication
@@ -110,10 +124,21 @@ public:
         std::cout << "exiting physics" << std::endl;
         teardown();
     }
-
+    
+    /**
+     * Requried by tgDemoApplication. Handles Rendering
+     */
     virtual void clientMoveAndDisplay();
-
+    
+    /**
+     * Contains a smaller set of rendering functions than clientMoveAndDisplay
+     */
     virtual void displayCallback();
+    
+    /**
+     * Called when the space bar is pressed. Calls reset,
+     * then updates the pointers to the world and glDebugDrawer
+     */
     virtual void clientResetScene();
 
 private:    

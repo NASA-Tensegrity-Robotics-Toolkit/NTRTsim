@@ -24,7 +24,7 @@
 #include "core/tgSubject.h"
 
 // SubModels
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 
 #include <set>
@@ -43,12 +43,12 @@ public:
     public:
         Config( int segments,
                 const tgRod::Config& rodConf,
-                const tgLinearString::Config& stringConf,
+                const tgBasicActuator::Config& stringConf,
                 double minTotalLength = 0.1); // todo: find better default
         
         int m_segments;
         tgRod::Config           m_rodConfig;
-        tgLinearString::Config  m_stringConfig;
+        tgBasicActuator::Config  m_stringConfig;
         double m_minTotalLength;
     };
     
@@ -64,16 +64,13 @@ public:
     // we need to know what class we're notifying
     virtual void step(double dt);
     
-    //Does this make myModel an observer as well??
-    void changeMuscle (double length, double dt);
-    
     const int getSegments() const
     {
         return m_config.m_segments;
     }
     
 private:
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 
     Config m_config;
     

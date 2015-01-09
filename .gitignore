@@ -12,8 +12,13 @@ src/DoxyDocs
 .idea
 
 *.pyc
-
+*.kdev4
 src/.settings/org.eclipse.cdt.codan.core.prefs
 
 *~
 *#
+
+*.pdfsync
+*.bbl
+*.blg
+*eps-converted-to.pdf

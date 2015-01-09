@@ -33,13 +33,16 @@
 // Should include tgString, but compiler complains since its been
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgBasicActuator.h"
+#include "core/tgSpringCableActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
 #include "dev/btietz/hardwareSineWaves/tgSineStringControl.h"
+
+using namespace std;
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -141,10 +144,12 @@ void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgSpringCableActuator* > tmpSCAs = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(tmpSCAs);
+
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {
@@ -175,7 +180,7 @@ void OctaCLSine::onTeardown(BaseSpineModelLearning& subject)
 
 void OctaCLSine::setupWaves(BaseSpineModelLearning& subject, array_2D nodeActions, array_2D edgeActions)
 {
-	std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     double tension;
     double kPosition;
@@ -184,7 +189,7 @@ void OctaCLSine::setupWaves(BaseSpineModelLearning& subject, array_2D nodeAction
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		ImpedanceControl* p_ipc = new ImpedanceControl( m_config.tension,
+		tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
                                                         m_config.kPosition,
                                                         m_config.kVelocity);
         

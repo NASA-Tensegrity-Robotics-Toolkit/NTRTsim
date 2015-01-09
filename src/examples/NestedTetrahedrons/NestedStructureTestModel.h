@@ -36,7 +36,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 
 /**
  * The NestedStructureTestModel implements a tensegrity with rigid
@@ -50,7 +50,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgBasicActuator*> > ActuatorMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -83,13 +83,13 @@ public:
     virtual void step(const double dt);
 	
 	/**
-	 * Get a group of muscles according to the provided key. Groups are
+	 * Get a group of actuators according to the provided key. Groups are
 	 * populated during setup.
 	 * @param[in] key - a std:string* used as a key to a std::map from
-	 * a string to a vector of muscles
-	 * @return a std::vector of pointers to the muscles found by the key
+	 * a string to a vector of actuators
+	 * @return a std::vector of pointers to the actuators found by the key
 	 */
-    const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
+    const std::vector<tgBasicActuator*>& getActuators (const std::string& key) const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -104,16 +104,16 @@ public:
 private:
 	
 	/**
-	 * A std::vector containing all of the tgLinearStrings amongst
+	 * A std::vector containing all of the tgBasicActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allActuators;
 	
 	/**
-	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains
-	 * mapped muscles, populated during setup.
+	 * A typdef of std::map from std::string to tgBasicActuator*. Contains
+	 * mapped actuators, populated during setup.
 	 */
-    MuscleMap muscleMap;
+    ActuatorMap actuatorMap;
     
     /**
      * The number of segments in the spine

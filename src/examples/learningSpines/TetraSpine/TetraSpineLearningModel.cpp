@@ -20,10 +20,10 @@
 #include "TetraSpineLearningModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -117,12 +117,12 @@ namespace
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-    muscleMap["inner left"]  = model.find<tgLinearString>("inner left muscle");
-    muscleMap["inner right"] = model.find<tgLinearString>("inner right muscle");
-    muscleMap["inner top"]   = model.find<tgLinearString>("inner top muscle");
-    muscleMap["outer left"]  = model.find<tgLinearString>("outer left muscle");
-    muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
-    muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
+    muscleMap["inner left"]  = model.find<tgSpringCableActuator>("inner left muscle");
+    muscleMap["inner right"] = model.find<tgSpringCableActuator>("inner right muscle");
+    muscleMap["inner top"]   = model.find<tgSpringCableActuator>("inner top muscle");
+    muscleMap["outer left"]  = model.find<tgSpringCableActuator>("outer left muscle");
+    muscleMap["outer right"] = model.find<tgSpringCableActuator>("outer right muscle");
+    muscleMap["outer top"]   = model.find<tgSpringCableActuator>("outer top muscle");
     }
 
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -132,11 +132,11 @@ namespace
           << "Model: "        << std::endl
           << model            << std::endl;    
     // Showing the find function
-    const std::vector<tgLinearString*> outerMuscles =
-        model.find<tgLinearString>("outer");
+    const std::vector<tgSpringCableActuator*> outerMuscles =
+        model.find<tgSpringCableActuator>("outer");
     for (size_t i = 0; i < outerMuscles.size(); ++i)
     {
-        const tgLinearString* const pMuscle = outerMuscles[i];
+        const tgSpringCableActuator* const pMuscle = outerMuscles[i];
         assert(pMuscle != NULL);
         std::cout << "Outer muscle: " << *pMuscle << std::endl;
     }
@@ -177,8 +177,9 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 100, 0, false, 7000, 24, 10000);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfig(1000, 100, 0, false, 7000, 24);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #else // Params for In Won
     const double density = .00311;
     const double radius  = 0.635;
@@ -187,8 +188,9 @@ void TetraSpineLearningModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(10000, 10, false, 0, 7000, 7.0, 9500);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgSpringCableActuator::Config muscleConfig(10000, 10, false, 0, 7000, 7.0);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -198,7 +200,7 @@ void TetraSpineLearningModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    m_allMuscles = this->find<tgLinearString> ("muscle");
+    m_allMuscles = this->find<tgSpringCableActuator> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
     

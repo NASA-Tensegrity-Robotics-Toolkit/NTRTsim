@@ -13,5 +13,6 @@ subdirs(
     SpineHardwareProject
     muscleNP
     jbruce
+    CPG_feedback
 )
 

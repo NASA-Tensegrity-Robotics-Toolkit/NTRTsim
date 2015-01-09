@@ -33,7 +33,7 @@
 
 /**
  * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
- * different muscle groups can have different ImpedanceControl parameters
+ * different muscle groups can have different tgImpedanceController parameters
  */
 class LearningSpineJSON : public BaseSpineCPGControl
 {

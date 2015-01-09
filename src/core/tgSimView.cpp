@@ -176,8 +176,6 @@ void tgSimView::render(const tgModelVisitor& r) const
     }
 }
 
-// tgSimulation handles calling teardown and setup on this,
-// since it knows when the new world is available
 void tgSimView::reset() 
 {
 	if (m_pSimulation != NULL)

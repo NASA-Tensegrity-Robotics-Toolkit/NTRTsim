@@ -51,15 +51,15 @@ AnnealEvoPopulation::AnnealEvoPopulation(int populationSize,configuration config
 
 AnnealEvoPopulation::~AnnealEvoPopulation()
 {
-    for(int i=0;i<controllers.size();i++)
+    for(std::size_t i=0;i<controllers.size();i++)
     {
         delete controllers[i];
     }
 }
 
-void AnnealEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,int numMutate, double T)
+void AnnealEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t numMutate, double T)
 {
-    for(int i=0;i<numMutate;i++)
+    for(std::size_t i=0;i<numMutate;i++)
     {
         int copyFrom = 0; // Always copy from the best
         int copyTo = this->controllers.size()-1-i;
@@ -82,7 +82,7 @@ bool AnnealEvoPopulation::comparisonFuncForMax(AnnealEvoMember * elm1, AnnealEvo
 void AnnealEvoPopulation::orderPopulation()
 {
     //calculate each member's average score
-    for(int i=0;i<this->controllers.size();i++)
+    for(std::size_t i=0;i<this->controllers.size();i++)
     {
         double ave = std::accumulate(controllers[i]->pastScores.begin(),controllers[i]->pastScores.end(),0);
         ave /=  (double) controllers[i]->pastScores.size();
@@ -98,7 +98,7 @@ void AnnealEvoPopulation::orderPopulation()
 
 }
 
-void AnnealEvoPopulation::readConfigFromXML(string configFile)
+void AnnealEvoPopulation::readConfigFromXML(std::string configFile)
 {
     int intValue;
     string elementTxt;

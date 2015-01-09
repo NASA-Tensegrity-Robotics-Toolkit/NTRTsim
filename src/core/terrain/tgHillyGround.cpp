@@ -187,9 +187,9 @@ void tgHillyGround::setVertices(btVector3 vertices[]) {
 
 void tgHillyGround::setIndices(int indices[]) {
     int index = 0;
-    for (int i = 0; i < m_config.m_nx - 1; i++)
+    for (std::size_t i = 0; i < m_config.m_nx - 1; i++)
     {
-        for (int j = 0; j < m_config.m_ny - 1; j++)
+        for (std::size_t j = 0; j < m_config.m_ny - 1; j++)
         {
             indices[index++] = (j       * m_config.m_nx) + i;
             indices[index++] = (j       * m_config.m_nx) + i + 1;

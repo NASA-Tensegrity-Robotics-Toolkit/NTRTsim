@@ -19,18 +19,18 @@
 #ifndef TG_SINE_STRING_CONTRL_H
 #define TG_SINE_STRING_CONTRL_H
 
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 
 // Forward declarations
 class btRigidBody;
-class ImpedanceControl;
+class tgImpedanceController;
 
-class tgSineStringControl : public tgObserver<tgLinearString>
+class tgSineStringControl : public tgObserver<tgSpringCableActuator>
 {
 public:
  
     tgSineStringControl(const double controlStep,
-							ImpedanceControl* p_ipc,
+							tgImpedanceController* p_ipc,
 							const double amplitude,
 							const double frequency,
 							const double phase,
@@ -39,7 +39,7 @@ public:
     
     virtual ~tgSineStringControl();
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
 
     
@@ -88,7 +88,7 @@ private:
      */
     const double  m_controlLength;
     
-    ImpedanceControl* m_pMotorControl;
+    tgImpedanceController* m_pMotorControl;
 };
 
 

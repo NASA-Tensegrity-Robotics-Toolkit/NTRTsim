@@ -60,7 +60,7 @@ void AnnealEvoMember::mutate(std::tr1::ranlux64_base_01 *eng, double T){
 
     double dev = devBase * T / 100.0; 
     std::tr1::normal_distribution<double> normal(0, dev);
-    for(int i=0;i<statelessParameters.size();i++)
+    for(std::size_t i=0;i<statelessParameters.size();i++)
     {
         double newParam;
         if (monteCarlo)
@@ -96,7 +96,7 @@ void AnnealEvoMember::saveToFile(const char * outputFilename)
 {
 
     ofstream ss(outputFilename);
-    for(int i=0;i<statelessParameters.size();i++)
+    for(std::size_t i=0;i<statelessParameters.size();i++)
     {
         ss<<statelessParameters[i];
         if(i!=statelessParameters.size()-1)

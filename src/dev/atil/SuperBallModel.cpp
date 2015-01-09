@@ -25,10 +25,11 @@
 // This module
 #include "SuperBallModel.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -68,7 +69,6 @@ namespace
         bool   history;  
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
      0.825,    // density (kg / length^3)
@@ -80,12 +80,13 @@ namespace
      1.0,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
-     0,        // rotation
+     0,        // pretension
      false,    // history
      100000,   // maxTens
      10000,    // targetVelocity
+#if (0) // acceleration constrant removed 12/10/14
      20000     // maxAcc
-
+#endif
      // Use the below values for earlier versions of simulation.
      // 1.006,    
      // 0.31,     
@@ -268,10 +269,9 @@ void SuperBallModel::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-
-    tgLinearString::Config muscleConfig(c.stiffness, c.damping, c.pretension,
-					    c.history, c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
+    /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
+					    c.history, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -291,7 +291,7 @@ void SuperBallModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -301,7 +301,7 @@ void SuperBallModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -346,7 +346,7 @@ void SuperBallModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& SuperBallModel::getAllMuscles() const
+const std::vector<tgBasicActuator*>& SuperBallModel::getAllMuscles() const
 {
     return allMuscles;
 }
@@ -503,7 +503,7 @@ void SuperBallModel::fillMusclesPerNode()
 			{
 				std::stringstream tag;
 				tag<<"muscle "<<i<<"-"<<j;
-				std::vector<tgLinearString*> foundStr = this->find<tgLinearString>(tag.str());
+				std::vector<tgBasicActuator*> foundStr = this->find<tgBasicActuator>(tag.str());
 				if(!foundStr.empty())
 				{
 //					std::cout<<"Found muscle "<<tag.str()<<std::endl;

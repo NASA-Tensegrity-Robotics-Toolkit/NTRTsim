@@ -18,14 +18,15 @@
 
 #include "tgSineStringControl.h"
 
-#include "core/Muscle2P.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgBasicActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 tgSineStringControl::tgSineStringControl(const double controlStep,
-											ImpedanceControl* p_ipc,
+											tgImpedanceController* p_ipc,
 											const double amplitude,
 											const double frequency,
 											const double phase,
@@ -59,12 +60,16 @@ tgSineStringControl::~tgSineStringControl()
 
 }
 
-void tgSineStringControl::onStep(tgLinearString& subject, double dt)
+void tgSineStringControl::onStep(tgSpringCableActuator& subject, double dt)
 {
     m_controlTime += dt;
 	m_totalTime += dt;
     /// @todo this fails if its attached to multiple controllers!
     /// is there a way to track _global_ time at this level
+    // Workaround until we implement PID
+    tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(subject));
+    
+    
     if (m_controlTime >= m_controlStep)
     {
 		// Yep, its a misnomer. Had to change it for In Won
@@ -76,7 +81,7 @@ void tgSineStringControl::onStep(tgLinearString& subject, double dt)
 			target = 0.0;
 		}
 	#endif	
-		m_commandedTension = m_pMotorControl->control(&subject, m_controlTime, m_controlLength, target);
+		m_commandedTension = m_pMotorControl->control(m_sca, m_controlTime, m_controlLength, target);
 		//std::cout << m_commandedTension << std::endl;
         m_controlTime = 0;
     }

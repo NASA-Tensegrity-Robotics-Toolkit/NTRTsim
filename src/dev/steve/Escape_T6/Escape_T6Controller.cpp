@@ -18,7 +18,7 @@
 
 /**
  * @file Escape_T6Controller.cpp
- * @brief Escape Controller for T6 
+ * @brief Escape Controller for Jonathan's T6 model of SUPERBall 
  * @author Steven Lessard
  * @version 1.0.0
  * $Id$
@@ -29,7 +29,7 @@
 // This application
 #include "Escape_T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
 // The C++ Standard Library
@@ -61,14 +61,15 @@ Escape_T6Controller::Escape_T6Controller(const double initialLength) :
 /** Set the lengths of the muscles and initialize the learning adapter */
 void Escape_T6Controller::onSetup(Escape_T6Model& subject)
 {
+    m_totalTime = 0;
     double dt = 0.0001;
 
     //Set the initial length of every muscle in the subject
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i) {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setRestLength(this->m_initialLengths, dt);
+        pMuscle->setControlInput(this->m_initialLengths, dt);
     }
 
     populateClusters(subject);
@@ -96,12 +97,12 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     m_totalTime+=dt;
 
     setPreferredMuscleLengths(subject, dt);
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
@@ -115,6 +116,28 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
             tmp.push_back(0.5);
         }
         actions.push_back(tmp);
+    }
+
+    // Start J Bruce code
+    static int count = 0;
+
+    if(count > 100)
+    {
+        for(size_t i=0; i<muscles.size(); i++)
+        {
+        std::cout << (muscles[i]->getTension())/10 << "\t";
+        }
+        std::cout << "\n";
+        for(size_t i=0; i<muscles.size(); i++)
+        {
+            std::cout << (muscles[i]->getCurrentLength())/10 << "\t";
+        }
+        std::cout << "\n";
+        count = 0;
+    }
+    else
+    {
+        count++;
     }
 }
 
@@ -143,12 +166,11 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 vector< vector <double> > Escape_T6Controller::transformActions(vector< vector <double> > actions)
 {
-    bool usingManualParams = true;
+    bool usingManualParams = false;
     vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
-        //string filename = "logs/trial_7/bestParametersNoOutliersSorted.dat";
-        string filename = "logs/trial_8/bestParamsSorted.dat";
+        string filename = "logs/paramSortedBestTrials.dat";
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);
     } 
@@ -192,6 +214,7 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, vector< vector <
         angularFrequency[cluster] = actions[cluster][1];
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
+        dcOffset[cluster] = 1;
     }
     //printSineParams();
 }
@@ -211,10 +234,10 @@ void Escape_T6Controller::setupAdapter() {
 double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     double totalEnergySpent=0;
 
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
 
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {
@@ -236,10 +259,56 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
 // Post-condition: every muscle will have a new target length
 void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, double dt) {
     double phase = 0; // Phase of cluster1
+    
+    int nMuscles = 24;
+    int oldCluster = 0;
+    int cluster = 0;
 
+    for(int iMuscle=0; iMuscle < nMuscles; iMuscle++) {
+
+        const vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+        tgBasicActuator *const pMuscle = muscles[iMuscle];
+
+        assert(pMuscle != NULL);
+
+        // Determine cluster
+        oldCluster = cluster;
+        if (iMuscle < 4) {
+            cluster = 0;
+        } else if (iMuscle < 8) {
+            cluster = 1;
+        } else if (iMuscle < 12) {
+            cluster = 2;
+        } else if (iMuscle < 16 ) {
+            cluster = 3;
+        } else if (iMuscle < 18) {
+            cluster = 4;
+        } else if (iMuscle < 20) {
+            cluster = 5;
+        } else if (iMuscle < 22) {
+            cluster = 6;
+        } else { // iMuscle < 24
+            cluster = 7;
+        }
+
+        double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+        double minLength = m_initialLengths * (1-maxStringLengthFactor);
+        double maxLength = m_initialLengths * (1+maxStringLengthFactor);
+        if (newLength <= minLength) {
+            newLength = minLength;
+        } else if (newLength >= maxLength) {
+            newLength = maxLength;
+        }
+        pMuscle->setControlInput(newLength, dt);
+        if (oldCluster != cluster) {
+            phase += phaseChange[cluster];
+        }
+    }
+
+    /*
     for(int cluster=0; cluster<nClusters; cluster++) {
         for(int node=0; node<musclesPerCluster; node++) {
-            tgLinearString *const pMuscle = clusters[cluster][node];
+            tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
             double minLength = m_initialLengths * (1-maxStringLengthFactor);
@@ -249,10 +318,10 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             } else if (newLength >= maxLength) {
                 newLength = maxLength;
             }
-            pMuscle->setRestLength(newLength, dt);
+            pMuscle->setControlInput(newLength, dt);
         }
         phase += phaseChange[cluster];
-    }
+    }*/
 }
 
 void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
@@ -260,8 +329,8 @@ void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
         ostringstream ss;
         ss << (cluster + 1);
         string suffix = ss.str();
-        std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("muscle cluster" + suffix);
-        clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
+        std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("muscle cluster" + suffix);
+        clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
     }
 }
 
@@ -296,10 +365,14 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string
 
     // Grab line from input file
     if (infile.is_open()) {
+        cout << "OPENED FILE\n";
         for (int i=0; i<lineNumber; i++) {
             getline(infile, line);
         }
         infile.close();
+    } else {
+        cerr << "Error: Manual Parameters file not found\n";
+        exit(1);
     }
 
     //cout << "Using: " << line << " as input for starting parameter values\n";
@@ -313,12 +386,17 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, string
         iCell++;
     }
 
-    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
-    for (int i=0; i < result.size(); i++) {
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-        double seed = ((double) (rand() % 100)) / 100;
-        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+    bool tweaking = false;
+    if (tweaking) {
+        // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
+        for (int i=0; i < result.size(); i++) {
+            std::cout<<"Entered Cell " << i << ": " << result[i] << "\n";
+            double seed = ((double) (rand() % 100)) / 100;
+            result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+            //std::cout<<"Tweaked Cell " << i << ": " << result[i] << "\n";
+        }
+    } else {
+        cerr << "WARNING: Not changing manual input parameters\n";
     }
 
     return result;

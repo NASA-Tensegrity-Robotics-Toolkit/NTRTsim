@@ -20,7 +20,7 @@
 #define CONNECTOR_TEST_MODEL_H
 
 #include "core/tgModel.h" 
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 
 #include "core/tgSubject.h"
 #include "core/tgModelVisitor.h"
@@ -30,7 +30,7 @@
 #include <set>
 
 #include "tgcreator/tgRodInfo.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgBuildSpec.h"
 
@@ -63,7 +63,7 @@ public:
         double stiffness = 100000;
         double dampening = stiffness * 0.001;
         
-        tgLinearString::Config muscleConfig(stiffness, dampening);
+        tgBasicActuator::Config muscleConfig(stiffness, dampening);
         
         tgStructure structure;
         
@@ -92,7 +92,7 @@ public:
     
         tgBuildSpec spec;
         spec.addBuilder("rod", new tgRodInfo(rodConfig));
-        spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+        spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
         
         tgStructureInfo structureInfo(structure, spec);
         structureInfo.buildInto(*this, world);
@@ -152,7 +152,7 @@ private:
     tgRodInfo* m_rod;    
     tgRodInfo* m_rod2;
     
-    //tgLinearString* newString;
+    //tgBasicActuator* newString;
     tgModel* m_testString;
 };
 

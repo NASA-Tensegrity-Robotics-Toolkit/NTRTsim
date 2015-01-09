@@ -24,4 +24,6 @@ add_executable(tgUtil_test
 
 # libcore gets us enough links to bullet to get the btAlignedAllocator
 target_link_libraries(tgUtil_test ${ENV_LIB_DIR}/libgtest.a pthread
-						${NTRT_BUILD_DIR}/core/libcore.so )
+                        ${NTRT_BUILD_DIR}/core/terrain/libterrain.so
+						${NTRT_BUILD_DIR}/core/libcore.so
+                        ${NTRT_BUILD_DIR}/tgcreator/libtgcreator.so )

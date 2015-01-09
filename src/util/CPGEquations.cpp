@@ -29,19 +29,28 @@
 #include "boost/array.hpp"
 #include "boost/numeric/odeint.hpp"
 
+// The Bullet Physics Library
+#include "LinearMath/btQuickprof.h"
+
+
 // The C++ Standard Library
+#include <assert.h>
 #include <stdexcept>
 
 using namespace boost::numeric::odeint;
 
 typedef std::vector<double > cpgVars_type;
 
-CPGEquations::CPGEquations() :
-stepSize(0.1) 
+CPGEquations::CPGEquations(int maxSteps) :
+stepSize(0.1),
+numSteps(0),
+m_maxSteps(maxSteps)
  {}
-CPGEquations::CPGEquations(std::vector<CPGNode*> newNodeList) :
+CPGEquations::CPGEquations(std::vector<CPGNode*>& newNodeList, int maxSteps) :
 nodeList(newNodeList),
-stepSize(0.1) //TODO: specify as a parameter somewhere
+stepSize(0.1), //TODO: specify as a parameter somewhere
+numSteps(0),
+m_maxSteps(maxSteps)
 {
 }
 
@@ -56,19 +65,13 @@ CPGEquations::~CPGEquations()
 
 // Params needs size 7 to fill all of the params.
 // TODO: consider changing to a config struct
-int CPGEquations::addNode(std::vector<double> newParams) 
+int CPGEquations::addNode(std::vector<double>& newParams) 
 {
 	int index = nodeList.size();
 	CPGNode* newNode = new CPGNode(index, newParams);
 	nodeList.push_back(newNode);
 	
 	return index;
-}
-				
-void CPGEquations::connectNode(	int nodeIndex,
-								std::vector<CPGEdge*> connectivityList)
-{
-	nodeList[nodeIndex]->addCoupling(connectivityList);
 }
 
 void CPGEquations::defineConnections (	int nodeIndex,
@@ -87,6 +90,9 @@ void CPGEquations::defineConnections (	int nodeIndex,
 
 const double CPGEquations::operator[](const std::size_t i) const
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::[]");
+#endif //BT_NO_PROFILE
 	double nodeValue;
 	if (i >= nodeList.size())
 	{
@@ -101,32 +107,38 @@ const double CPGEquations::operator[](const std::size_t i) const
 	return nodeValue;
 }
 
-std::vector<double> CPGEquations::getXVars() {
-	std::vector<double> newXVars;
+std::vector<double>& CPGEquations::getXVars() {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::getXVars");
+#endif //BT_NO_PROFILE
+	XVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
-		newXVars.push_back(nodeList[i]->phiValue);
-		newXVars.push_back(nodeList[i]->rValue);
-		newXVars.push_back(nodeList[i]->rDotValue);
+		XVars.push_back(nodeList[i]->phiValue);
+		XVars.push_back(nodeList[i]->rValue);
+		XVars.push_back(nodeList[i]->rDotValue);
 	}
 	
-	return newXVars;
+	return XVars;
 }
 
-std::vector<double> CPGEquations::getDXVars() {
-	std::vector<double> newDXVars;
+std::vector<double>& CPGEquations::getDXVars() {
+	DXVars.clear();
 	
 	for (int i = 0; i != nodeList.size(); i++){
-		newDXVars.push_back(nodeList[i]->phiDotValue);
-		newDXVars.push_back(nodeList[i]->rDotValue);
-		newDXVars.push_back(nodeList[i]->rDoubleDotValue);
+		DXVars.push_back(nodeList[i]->phiDotValue);
+		DXVars.push_back(nodeList[i]->rDotValue);
+		DXVars.push_back(nodeList[i]->rDoubleDotValue);
 	}
 	
-	return newDXVars;
+	return DXVars;
 }
 
-void CPGEquations::updateNodes(std::vector<double> descCom)
+void CPGEquations::updateNodes(std::vector<double>& descCom)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::updateNodes");
+#endif //BT_NO_PROFILE
 	for(int i = 0; i != nodeList.size(); i++){
 		nodeList[i]->updateDTs(descCom[i]);
 	}
@@ -134,6 +146,9 @@ void CPGEquations::updateNodes(std::vector<double> descCom)
 
 void CPGEquations::updateNodeData(std::vector<double> newXVals)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::updateNodeData");
+#endif //BT_NO_PROFILE    
 	assert(newXVals.size()==3*nodeList.size());
 	
 	for(int i = 0; i!=nodeList.size(); i++){
@@ -158,6 +173,9 @@ class integrate_function {
 					cpgVars_type &dxdt ,
 					double t )
 	{
+#ifndef BT_NO_PROFILE 
+        BT_PROFILE("CPGEquations::integrate_function");
+#endif //BT_NO_PROFILE
 		theseCPGs->updateNodeData(x);
 		theseCPGs->updateNodes(descCom);
 	
@@ -173,6 +191,8 @@ class integrate_function {
 			dxdt[i] = dXVars[i];
 		}
 		//std::cout<<"operator call"<<std::endl;
+		
+		theseCPGs->countStep();
 		
 	}
 	
@@ -208,8 +228,11 @@ class output_function {
 	CPGEquations* theseCPGs;
 };
 
-void CPGEquations::update(std::vector<double> descCom, double dt)
+void CPGEquations::update(std::vector<double>& descCom, double dt)
 {
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("CPGEquations::update");
+#endif //BT_NO_PROFILE
 	if (dt <= 0.1){ //TODO: specify default step size as a parameter during construction
 		stepSize = dt;
 	}
@@ -217,16 +240,24 @@ void CPGEquations::update(std::vector<double> descCom, double dt)
 		stepSize = 0.1;
 	}
 	
+	numSteps = 0;
+	
 	/**
 	 * Read information from nodes into variables that work for ODEInt
 	 */
-	std::vector<double> xVars = getXVars(); 
+	std::vector<double>& xVars = getXVars(); 
 	
 	/**
 	 * Run ODEInt. This will change the data in xVars
 	 */
 	integrate(integrate_function(this, descCom), xVars, 0.0, dt, stepSize, output_function(this));
-	 
+	
+    if (numSteps > m_maxSteps)
+    {
+        std::cout << "Ending trial due to inefficient equations " << numSteps << std::endl;
+        throw std::runtime_error("Inefficient CPG Parameters");
+    }
+    
 	 #if (0)
 	 std::cout << dt << '\t' << nodeList[0]->nodeValue <<
 	  '\t' << nodeList[1]->nodeValue <<

@@ -25,7 +25,6 @@
 
 // This application
 #include "CaterpillarModel.h"
-#include "CaterRestLengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -74,10 +73,7 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     CaterpillarModel* const myModel = new CaterpillarModel();
-	
-	CaterRestLengthController* const pTC = new CaterRestLengthController(1.5);
-	
-	myModel->attach(pTC);
+
     simulation.addModel(myModel);
     
     // Run until the user stops

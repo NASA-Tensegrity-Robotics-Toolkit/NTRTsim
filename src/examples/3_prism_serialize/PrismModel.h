@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef PRISM_MODEL_H
-#define PRISM_MODEL_H
+#ifndef SRC_EXAMPLES_3PRISMSERIALIZE_PRISM_MODEL_H
+#define SRC_EXAMPLES_3PRISMSERIALIZE_PRISM_MODEL_H
 
 /**
  * @file PrismModel.h
@@ -34,9 +34,8 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModelVisitor;
-class PretensionController;
 class tgStructure;
 class tgWorld;
 
@@ -92,10 +91,10 @@ public:
     virtual void onVisit(tgModelVisitor& r);
     
     /**
-     * Return a vector of all muscles for the controllers to work with.
-     * @return A vector of all of the muscles
+     * Return a vector of all actuators for the controllers to work with.
+     * @return A vector of all of the actuators
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllActuators() const;
       
 private:
     
@@ -121,24 +120,18 @@ private:
     static void addRods(tgStructure& s);
     
     /**
-     * A function called during setup that creates muscles (Strings) from
+     * A function called during setup that creates actuators (cables) from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addMuscles(tgStructure& s);
+    static void addActuators(tgStructure& s);
 
 private:
     /**
-     * A controller that is attached to all of the strings which applies
-     * pretension to the muscles.
-     */
-    PretensionController* m_pStringController;
-    
-    /**
-     * A list of all of the muscles. Will be empty until most of the way
+     * A list of all of the actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allActuators;
 };
 
-#endif  // Prism_MODEL_H
+#endif  // SRC_EXAMPLES_3PRISMSERIALIZE_PRISM_MODEL_H

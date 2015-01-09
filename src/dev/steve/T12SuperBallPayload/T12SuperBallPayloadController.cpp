@@ -29,7 +29,7 @@
 // This application
 #include "T12SuperBallPayload.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -47,12 +47,12 @@ SuperBallPrefLengthController::SuperBallPrefLengthController(const double initia
 //Fetch all the muscles and set their preferred length
 void SuperBallPrefLengthController::onSetup(T12SuperBallPayload& subject)
 {
-	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = muscles[i];
+		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
-		pMuscle->setRestLength(this->m_initialLengths,0.0001);
+		pMuscle->setControlInput(this->m_initialLengths,0.0001);
 	}
 }
 
@@ -65,10 +65,10 @@ void SuperBallPrefLengthController::onStep(T12SuperBallPayload& subject, double 
     m_totalTime+=dt;
 
     //Move motors for all the muscles
-	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = muscles[i];
+		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
 	}
@@ -120,7 +120,7 @@ vector< vector <double> > SuperBallPrefLengthController::transformActions(vector
 void SuperBallPrefLengthController::applyActions(T12SuperBallPayload& subject, vector< vector <double> > act)
 {
 	//Get All the muscles of the subject
-	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	//Check if the number of the actions match the number of the muscles
 	if(act.size() != muscles.size())
 	{
@@ -130,9 +130,9 @@ void SuperBallPrefLengthController::applyActions(T12SuperBallPayload& subject, v
 	//Apply actions (currently in a random order)
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = muscles[i];
+		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		//cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
-		pMuscle->setPrefLength(act[i][0]);
+		pMuscle->setControlInput(act[i][0]);
 	}
 }

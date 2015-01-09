@@ -25,17 +25,19 @@
  */
 
 #include "NeuroEvoMember.h"
+#include "neuralNet/Neural Network v2/neuralNetwork.h"
 #include <fstream>
 #include <iostream>
+#include <assert.h>
+#include <stdexcept>
 
 using namespace std;
 
 NeuroEvoMember::NeuroEvoMember(configuration config)
 {
-	//readConfigFromXML(configFile);
 	this->numInputs=config.getintvalue("numberOfStates");
 	this->numOutputs=config.getintvalue("numberOfActions");
-
+    assert(numOutputs > 0);
 	cout<<"creating NN"<<endl;
 	if(numInputs>0)
 		nn = new neuralNetwork(numInputs,numInputs*2,numOutputs);
@@ -67,7 +69,7 @@ void NeuroEvoMember::mutate(std::tr1::ranlux64_base_01 *eng){
 	{
 		double dev = 3.0 / 100.0;   // 10 percent of interval 0-1
 		std::tr1::normal_distribution<double> normal(0, dev);
-		for(int i=0;i<statelessParameters.size();i++)
+		for(std::size_t i=0;i<statelessParameters.size();i++)
 		{
 			if(unif(*eng)  > 0.5)
 			{
@@ -101,6 +103,31 @@ void NeuroEvoMember::copyFrom(NeuroEvoMember* otherMember)
 	}
 }
 
+void NeuroEvoMember::copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::tr1::ranlux64_base_01 *eng)
+{
+    if(numInputs>0)
+    {
+        this->nn->combineWeights(otherMember1->getNn(), otherMember2->getNn(), eng);
+        this->maxScore=-10000;
+        this->pastScores.clear();
+    }
+    else
+    {
+        std::tr1::uniform_real<double> unif(0, 1);
+        for (int i = 0; i < numOutputs; i++)
+        {
+            if (unif(*eng) > 0.5)
+            {
+                this->statelessParameters[i] = otherMember1->statelessParameters[i];
+            }
+            else
+            {
+                this->statelessParameters[i] = otherMember2->statelessParameters[i];
+            }
+        }
+    }    
+}
+
 void NeuroEvoMember::saveToFile(const char * outputFilename)
 {
 	if(numInputs > 0 )
@@ -108,7 +135,7 @@ void NeuroEvoMember::saveToFile(const char * outputFilename)
 	else
 	{
 		ofstream ss(outputFilename);
-		for(int i=0;i<statelessParameters.size();i++)
+		for(std::size_t i=0;i<statelessParameters.size();i++)
 		{
 			ss<<statelessParameters[i];
 			if(i!=statelessParameters.size()-1)
@@ -132,18 +159,31 @@ void NeuroEvoMember::loadFromFile(const char * outputFilename)
 		// Disable definition of unused variable to suppress compiler warning
 		double valueDbl;
 #endif
-		while(!ss.eof())
+		if(ss.is_open())
 		{
-			//cout<<"success opening file"<<endl;
-			if(getline ( ss, value, ',' )>0)
+			while(!ss.eof())
 			{
-				//cout<<"value read as string: "<<value<<endl;
-				statelessParameters[i++]=atof(value.c_str());
-				//cout<<statelessParameters[i-1]<<",";
+				//cout<<"success opening file"<<endl;
+				if(getline ( ss, value, ',' )>0)
+				{
+					//cout<<"value read as string: "<<value<<endl;
+					statelessParameters[i++]=atof(value.c_str());
+					//cout<<statelessParameters[i-1]<<",";
+				}
 			}
+			//cout<<"reading complete"<<endl;
+			cout<<endl;
+			ss.close();
+		}
+		else
+		{
+			cout << "File of name " << outputFilename << " does not exist" << std::endl;
+			cout << "Try turning learning on in config.ini to generate parameters" << std::endl;
+			throw std::invalid_argument("Parameter file does not exist");
 		}
 		//cout<<"reading complete"<<endl;
-		cout<<endl;
+		//cout<<endl;
 		ss.close();
 	}
+
 }

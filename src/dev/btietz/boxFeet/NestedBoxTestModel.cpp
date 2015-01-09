@@ -27,13 +27,13 @@
 #include "NestedBoxTestModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgBox.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
@@ -119,12 +119,12 @@ namespace
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-        muscleMap["inner left"]  = model.find<tgLinearString>("inner left muscle");
-        muscleMap["inner right"] = model.find<tgLinearString>("inner right muscle");
-        muscleMap["inner top"]   = model.find<tgLinearString>("inner top muscle");
-        muscleMap["outer left"]  = model.find<tgLinearString>("outer left muscle");
-        muscleMap["outer right"] = model.find<tgLinearString>("outer right muscle");
-        muscleMap["outer top"]   = model.find<tgLinearString>("outer top muscle");
+        muscleMap["inner left"]  = model.find<tgSpringCableActuator>("inner left muscle");
+        muscleMap["inner right"] = model.find<tgSpringCableActuator>("inner right muscle");
+        muscleMap["inner top"]   = model.find<tgSpringCableActuator>("inner top muscle");
+        muscleMap["outer left"]  = model.find<tgSpringCableActuator>("outer left muscle");
+        muscleMap["outer right"] = model.find<tgSpringCableActuator>("outer right muscle");
+        muscleMap["outer top"]   = model.find<tgSpringCableActuator>("outer top muscle");
     }
 
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
@@ -166,8 +166,8 @@ void NestedBoxTestModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-    tgLinearString::Config muscleConfig(1000, 10);
-    //spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    tgSpringCableActuator::Config muscleConfig(1000, 10);
+    //spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     const tgSphere::Config sphereConfig(0.5, 0.5);
     spec.addBuilder("light", new tgSphereInfo(sphereConfig));
@@ -182,7 +182,7 @@ void NestedBoxTestModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     mapMuscles(muscleMap, *this);
 
     trace(structureInfo, *this);
@@ -206,7 +206,7 @@ void NestedBoxTestModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
+const std::vector<tgSpringCableActuator*>&
 NestedBoxTestModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);
