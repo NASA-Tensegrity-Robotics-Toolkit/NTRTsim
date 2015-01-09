@@ -441,6 +441,7 @@ void DuCTTRobotModel::setupVariables()
     {
         btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomSpheres[i]->centerOfMass();
         abstractMarker marker (bottomSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        addMarker(marker);
         bottomTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<bottomRods.size(); j++)
         {
@@ -451,6 +452,7 @@ void DuCTTRobotModel::setupVariables()
     {
         btVector3 offset = topTouchSensors[i]->centerOfMass() - topSpheres[i]->centerOfMass();
         abstractMarker marker (topSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        addMarker(marker);
         topTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<topRods.size(); j++)
         {
@@ -468,6 +470,16 @@ void DuCTTRobotModel::setupVariables()
     if (topPrisms.size() == 1)
     {
         m_pTopPrismatic = topPrisms[0];
+    }
+
+    std::vector<tgRod*> innerRods = find<tgRod>("inner rod");
+    for (size_t i=0; i<innerRods.size(); i++)
+    {
+        double offsetDist = innerRods[i]->length()/2;
+        abstractMarker marker (innerRods[i]->getPRigidBody(), btVector3(0,offsetDist,0), btVector3(255,0,0), 0);
+        addMarker(marker);
+        abstractMarker marker2 (innerRods[i]->getPRigidBody(), btVector3(0,-offsetDist,0), btVector3(255,0,0), 0);
+        addMarker(marker2);
     }
 }
 
