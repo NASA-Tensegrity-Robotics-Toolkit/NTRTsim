@@ -20,7 +20,7 @@
  * @file EscapeController.cpp
  * @brief Escape Controller for Jonathan's T6 model of SUPERBall 
  * @author Steven Lessard
- * @version 1.0.0
+ * @version 1.1.0
  * $Id$
  */
 
@@ -34,6 +34,8 @@
 #include "learning/Configuration/configuration.h"
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Adapters/AnnealAdapter.h"
+// File helpers to use resources folder
+#include "helpers/FileHelpers.h"
 // The C++ Standard Library
 #include <cassert>
 #include <cmath>
@@ -47,12 +49,18 @@ using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-EscapeController::EscapeController(const double initialLength) :
+EscapeController::EscapeController(const double initialLength,
+                                    std::string args,
+                                    std::string resourcePath,
+                                    std::string config) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nClusters(8),
-    musclesPerCluster(3)
+    musclesPerCluster(3),
+    suffix(args),
+    configPath(resourcePath),
+    configName(config)
 {
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++) {
@@ -189,8 +197,19 @@ void EscapeController::applyActions(EscapeModel& subject, vector< vector <double
 }
 
 void EscapeController::setupAdapter() {
-    string suffix = "_Escape";
-    string configAnnealEvolution = "Config.ini";
+    //string suffix = "_Escape";
+    
+    std::string path;
+    if (configPath != "")
+    {
+        path = FileHelpers::getResourcePath(configPath);
+    }
+    else
+    {
+        path = "";
+    }
+    
+    string configAnnealEvolution = path + configName;
     AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
     bool isLearning = true;
     configuration configEvolutionAdapter;

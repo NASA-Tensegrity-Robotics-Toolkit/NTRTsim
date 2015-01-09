@@ -46,7 +46,10 @@ class EscapeController : public tgObserver<EscapeModel>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        EscapeController(const double prefLength=5.0);
+        EscapeController(const double prefLength=5.0,
+                            std::string args = "_Escape",
+                            std::string resourcePath = "",
+                            std::string config = "Config.ini");
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~EscapeController() { }
@@ -83,6 +86,11 @@ class EscapeController : public tgObserver<EscapeModel>
         double* angularFrequency;
         double* phaseChange;
         double* dcOffset;
+        
+        // Configuration strings
+        std::string suffix;
+        std::string configPath;
+        std::string configName;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();

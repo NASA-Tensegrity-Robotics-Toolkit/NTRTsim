@@ -6,6 +6,7 @@ link_libraries(tgcreator
                 Adapters
                 Configuration
                 AnnealEvolution
+                FileHelpers
                 core    
                 terrain 
                 tgOpenGLSupport)

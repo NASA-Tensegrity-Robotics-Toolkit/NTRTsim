@@ -73,9 +73,17 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the simulation
     EscapeModel* const model = new EscapeModel();
 
+    /* Required for setting up learning file input/output. */
+    const std::string suffix((argc > 1) ? argv[1] : "default");
+    
+    
+    
     // Fifth create controller and attach it to the model
     double initialLength = 9.0; // decimeters
-    EscapeController* const controller = new EscapeController(initialLength);
+    EscapeController* const controller = new EscapeController(initialLength,
+                                                                suffix,
+                                                                "craterEscape/",
+                                                                "Config.ini");
     model->attach(controller);
 
     //Sixth add model (with controller) to simulation
