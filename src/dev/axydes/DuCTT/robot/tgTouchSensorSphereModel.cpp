@@ -31,12 +31,14 @@
 #include "core/tgModelVisitor.h"
 #include "core/tgWorld.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
+#include "core/abstractMarker.h"
 
 // The NTRT Creator library
 #include "tgcreator/tgUtil.h"
 
 // The Bullet Physics library
 #include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
 #include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"

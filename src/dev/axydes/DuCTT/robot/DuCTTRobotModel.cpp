@@ -30,20 +30,20 @@
 #include "tgTouchSensorSphereModel.h"
 
 // The NTRT Core Libary
-#include "core/tgLinearString.h"
+#include "core/abstractMarker.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 
 // The NTRT Creator Libary
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 
 // The Bullet Physics library
-#include "LinearMath/btVector3.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
 // The C++ Standard Library
@@ -312,11 +312,11 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
     const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
 
-    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                  false, m_config.m_maxStringForce, m_config.m_maxVertStringVel, m_config.m_maxStringAcc,
+    const tgBasicActuator::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
+                                                  false, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
                                                   m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
-    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                    false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel, m_config.m_maxStringAcc,
+    const tgBasicActuator::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
+                                                    false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
     btVector3 prismAxisBottom(0,0,1);
@@ -374,8 +374,8 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
 //    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
 //    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
 
-    spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
-    spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
+    spec.addBuilder("vert string", new tgBasicActuatorInfo(vertStringConfig));
+    spec.addBuilder("saddle string", new tgBasicActuatorInfo(saddleStringConfig));
 
     spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
     spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
@@ -424,15 +424,15 @@ void DuCTTRobotModel::setupVariables()
 {
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control.
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     allPrisms = tgCast::filter<tgModel, tgPrismatic> (getDescendants());
     allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 
     bottomRods = find<tgRod>("rod bottom");
     topRods = find<tgRod>("rod top");
     prismRods = find<tgRod>("prism rod");
-    vertMuscles = find<tgLinearString>("vert string");
-    saddleMuscles = find<tgLinearString>("saddle string");
+    vertMuscles = find<tgBasicActuator>("vert string");
+    saddleMuscles = find<tgBasicActuator>("saddle string");
 
     spheres = find<tgSphere>("sphere");
     allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
@@ -509,17 +509,17 @@ void DuCTTRobotModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getAllMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getAllMuscles() const
 {
     return allMuscles;
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getVertMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getVertMuscles() const
 {
     return vertMuscles;
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getSaddleMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getSaddleMuscles() const
 {
     return saddleMuscles;
 }

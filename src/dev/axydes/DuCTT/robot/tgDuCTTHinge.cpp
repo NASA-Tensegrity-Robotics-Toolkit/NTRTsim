@@ -27,7 +27,6 @@
 #include "tgDuCTTHinge.h"
 
 // The Bullet Physics library
-#include "LinearMath/btVector3.h"
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorldBulletPhysicsImpl.h"

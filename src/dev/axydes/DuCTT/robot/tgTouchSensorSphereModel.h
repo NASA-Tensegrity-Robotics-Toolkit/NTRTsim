@@ -37,10 +37,12 @@
 #include <vector>
 
 // Forward declarations
+class btCollisionObject;
 class btPairCachingGhostObject;
 class btBroadphaseInterface;
 class btDispatcher;
 class tgWorld;
+class abstractMarker;
 
 /**
  * Holds a pointer to a btPairCachingGhostObject through the build process

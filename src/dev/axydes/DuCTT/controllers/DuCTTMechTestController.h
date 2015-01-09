@@ -36,10 +36,11 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
+class tgBasicActuator;
 class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
-class ImpedanceControl;
+class tgImpedanceController;
 
 class DuCTTMechTestController : public tgObserver<DuCTTRobotModel>
 {
@@ -56,7 +57,7 @@ public:
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
      */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList,
                                     double dt);
     /**
      * Applies the impedance controllers using a velocity setpoint determined.
@@ -67,13 +68,13 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
                                     double dt,
                                     std::size_t phase);
 
 private:
-    ImpedanceControl* in_controller;
-    ImpedanceControl* out_controller;
+    tgImpedanceController* in_controller;
+    tgImpedanceController* out_controller;
 
     double simTime;
     double cycle;

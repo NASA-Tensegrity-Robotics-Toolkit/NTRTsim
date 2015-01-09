@@ -27,12 +27,12 @@
  * $Id$
  */
 
-// This library
-#include "tgPrismatic.h"
-
 // The NTRT Core Libary
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+
+// The Bullet Physics library
+#include "LinearMath/btVector3.h"
 
 // The C++ Standard Library
 #include <vector>
@@ -41,11 +41,11 @@
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
-class tgLinearString;
+class tgBasicActuator;
+class tgPrismatic;
 class tgRod;
 class tgSphere;
 class tgTouchSensorSphereModel;
-class btVector3;
 
 /**
  * A class that constructs a three bar tensegrity DuCTT using the tools
@@ -169,19 +169,19 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
 
     /**
      * Return a vector of all the vertical muscles for the controllers to work with.
      * @return A vector of all of the vertical muscles
      */
-    const std::vector<tgLinearString*>& getVertMuscles() const;
+    const std::vector<tgBasicActuator*>& getVertMuscles() const;
 
     /**
      * Return a vector of all saddle muscles for the controllers to work with.
      * @return A vector of all of the saddle muscles
      */
-    const std::vector<tgLinearString*>& getSaddleMuscles() const;
+    const std::vector<tgBasicActuator*>& getSaddleMuscles() const;
 
     /**
      * Return a vector of all prismatic joints for the controllers to work with.
@@ -275,19 +275,19 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 
     /**
      * A list of all of the vertical muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> vertMuscles;
+    std::vector<tgBasicActuator*> vertMuscles;
 
     /**
      * A list of all of the saddle muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> saddleMuscles;
+    std::vector<tgBasicActuator*> saddleMuscles;
 
     /**
      * A list of all of the prismatic joints. Will be empty until most of the way

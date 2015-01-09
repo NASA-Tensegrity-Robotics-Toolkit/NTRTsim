@@ -29,10 +29,10 @@
 
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+#include "LinearMath/btVector3.h"
 
 class tgWorld;
 class btSliderConstraint;
-class btVector3;
 
 class tgPrismatic: public tgSubject<tgPrismatic>, public tgModel
 {

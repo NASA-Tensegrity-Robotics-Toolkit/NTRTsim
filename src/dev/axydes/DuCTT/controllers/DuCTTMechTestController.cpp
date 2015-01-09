@@ -31,9 +31,9 @@
 #include "../robot/tgPrismatic.h"
 #include "../robot/tgTouchSensorSphereModel.h"
 
-#include "core/Muscle2P.h"
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/abstractMarker.h"
+#include "core/tgBasicActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 // The C++ Standard Library
 #include <cassert>
@@ -41,8 +41,8 @@
 #include <vector>
 
 DuCTTMechTestController::DuCTTMechTestController(double targetTime) :
-    in_controller(new ImpedanceControl(100, 500, 50)),
-    out_controller(new ImpedanceControl(0.01, 500, 10)),
+    in_controller(new tgImpedanceController(100, 500, 50)),
+    out_controller(new tgImpedanceController(0.01, 500, 10)),
     insideLength(6.5),
     simTime(0.0),
     offsetLength(0.5),
@@ -63,11 +63,11 @@ DuCTTMechTestController::DuCTTMechTestController(double targetTime) :
     phaseOffsets.push_back(M_PI);
 }
 
-void DuCTTMechTestController::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList, double dt)
+void DuCTTMechTestController::applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList, double dt)
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        double setTension = in_controller->control(stringList[i],
+        double setTension = in_controller->control(*(stringList[i]),
                                             dt,
                                             insideLength
                                             );
@@ -79,7 +79,7 @@ void DuCTTMechTestController::applyImpedanceControlInside(const std::vector<tgLi
     }
 }
 
-void DuCTTMechTestController::applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+void DuCTTMechTestController::applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase)
 {
@@ -90,7 +90,7 @@ void DuCTTMechTestController::applyImpedanceControlOutside(const std::vector<tgL
 
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        double setTension = out_controller->control(stringList[i], dt, target);
+        double setTension = out_controller->control(*(stringList[i]), dt, target);
 //        stringList[i]->setRestLength(target,dt);
 //        double setTension = stringList[i]->getMuscle()->getTension();
         #if(0) // Conditional compile for verbose control
