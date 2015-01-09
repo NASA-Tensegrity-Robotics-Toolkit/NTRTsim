@@ -11,7 +11,6 @@ clean:
 	-rm *.aux
 	-rm *.log
 	-rm *.bbl
-	-rm *.out
 	-rm scaling_analysis.pdf
 	-rm scaling_analysis.dvi
 	-rm scaling_analysis.ps
