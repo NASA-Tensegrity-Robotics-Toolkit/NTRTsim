@@ -183,3 +183,27 @@
 
  \version 1.1.0
 */
+
+/**
+ \page scaling Scaling Analysis
+ For the v1.1 release of NTRT, a short white paper is provided that
+ justifies much of the scaling that's done in the example files and
+ related work.
+
+ Most common situations are covered by this analysis.
+ For example, if the gravitational constant needs to be changed in order to make
+ the computations faster for the underlying C++ math libraries, only a few
+ constants would need to be scaled.
+ In particular, our analysis shows that any length scales, force measurements,
+ velocity measurements, density parameters, and moduli of elasticity must be
+ scaled along with gravitational acceleration.
+ Note that this only applies to current models using the semi-standardized
+ CONFIG structure.
+ See, for example, the SUPERball model under src/examples.
+
+ The white paper is currently available at:
+ src/dev/apsabelhaus/scaling_analysis/scaling_analysis.pdf
+
+ If any errors or corrections are found, please email Drew Sabelhaus
+ at apsabelhaus@berkeley.edu.
+*/

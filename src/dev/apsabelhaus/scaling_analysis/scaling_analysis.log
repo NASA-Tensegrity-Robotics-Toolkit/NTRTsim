@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.8.11)  8 JAN 2015 17:32
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.8.11)  8 JAN 2015 23:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -917,12 +917,12 @@ Configuring pdfsync
 \PDFSYNCeveryvb@x=\toks33
 **** pdfsync.sty: started
 \c@lstlisting=\count139
-LaTeX Font Info:    Try loading font information for U+msa on input line 98.
+LaTeX Font Info:    Try loading font information for U+msa on input line 103.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 98.
+LaTeX Font Info:    Try loading font information for U+msb on input line 103.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -931,50 +931,50 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 149.
+(hyperref)                removing `math shift' on input line 151.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 149.
+(hyperref)                removing `\Pi' on input line 151.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 149.
+(hyperref)                removing `math shift' on input line 151.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--153
+Underfull \hbox (badness 10000) in paragraph at lines 153--155
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 155--157
+Underfull \hbox (badness 10000) in paragraph at lines 157--159
 
  []
 
 [2]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 202.
+(hyperref)                removing `math shift' on input line 204.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 202.
+(hyperref)                removing `\Pi' on input line 204.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 202.
+(hyperref)                removing `math shift' on input line 204.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 234.
+(hyperref)                removing `math shift' on input line 236.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Pi' on input line 234.
+(hyperref)                removing `\Pi' on input line 236.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 234.
+(hyperref)                removing `math shift' on input line 236.
 
 [3]
 Package epstopdf Info: Source file: <img/original_angular.eps>
@@ -982,18 +982,18 @@ Package epstopdf Info: Source file: <img/original_angular.eps>
 (epstopdf)                    size: 27237 bytes
 (epstopdf)             Output file: <img/original_angular-eps-converted-to.pdf>
 
-(epstopdf)                    date: 2015-01-08 17:32:53
+(epstopdf)                    date: 2015-01-08 17:38:33
 (epstopdf)                    size: 10910 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/original_angular-eps-c
 onverted-to.pdf img/original_angular.eps>
-(epstopdf)             \includegraphics on input line 277.
+(epstopdf)             \includegraphics on input line 279.
 Package epstopdf Info: Output file is already uptodate.
  <img/original_angular-eps-converted-to.pdf, id=75, 449.68pt x 338.26375pt>
 File: img/original_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/original_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/original_angular-eps-converted-to.pdf used on inpu
-t line 277.
+t line 279.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 Package epstopdf Info: Source file: <img/grav_only_angular.eps>
 (epstopdf)                    date: 2015-01-08 17:27:45
@@ -1004,7 +1004,7 @@ Package epstopdf Info: Source file: <img/grav_only_angular.eps>
 (epstopdf)                    size: 11192 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/grav_only_angular-eps-
 converted-to.pdf img/grav_only_angular.eps>
-(epstopdf)             \includegraphics on input line 284.
+(epstopdf)             \includegraphics on input line 286.
 Package epstopdf Info: Output file is already uptodate.
 
 <img/grav_only_angular-eps-converted-to.pdf, id=76, 449.68pt x 338.26375pt>
@@ -1012,7 +1012,7 @@ File: img/grav_only_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/grav_only_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/grav_only_angular-eps-converted-to.pdf used on inp
-ut line 284.
+ut line 286.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 Package epstopdf Info: Source file: <img/l_g_angular.eps>
 (epstopdf)                    date: 2015-01-08 17:27:45
@@ -1022,7 +1022,7 @@ Package epstopdf Info: Source file: <img/l_g_angular.eps>
 (epstopdf)                    size: 8654 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/l_g_angular-eps-conver
 ted-to.pdf img/l_g_angular.eps>
-(epstopdf)             \includegraphics on input line 291.
+(epstopdf)             \includegraphics on input line 293.
 Package epstopdf Info: Output file is already uptodate.
 
 <img/l_g_angular-eps-converted-to.pdf, id=77, 449.68pt x 338.26375pt>
@@ -1030,7 +1030,7 @@ File: img/l_g_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/l_g_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/l_g_angular-eps-converted-to.pdf used on input lin
-e 291.
+e 293.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 Package epstopdf Info: Source file: <img/l_g_c_angular.eps>
 (epstopdf)                    date: 2015-01-08 17:27:45
@@ -1040,7 +1040,7 @@ Package epstopdf Info: Source file: <img/l_g_c_angular.eps>
 (epstopdf)                    size: 9651 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/l_g_c_angular-eps-conv
 erted-to.pdf img/l_g_c_angular.eps>
-(epstopdf)             \includegraphics on input line 298.
+(epstopdf)             \includegraphics on input line 300.
 Package epstopdf Info: Output file is already uptodate.
 
 <img/l_g_c_angular-eps-converted-to.pdf, id=78, 449.68pt x 338.26375pt>
@@ -1048,7 +1048,7 @@ File: img/l_g_c_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/l_g_c_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/l_g_c_angular-eps-converted-to.pdf used on input l
-ine 298.
+ine 300.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
  [4]
 Package epstopdf Info: Source file: <img/l_g_c_t_angular.eps>
@@ -1059,7 +1059,7 @@ Package epstopdf Info: Source file: <img/l_g_c_t_angular.eps>
 (epstopdf)                    size: 11120 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/l_g_c_t_angular-eps-co
 nverted-to.pdf img/l_g_c_t_angular.eps>
-(epstopdf)             \includegraphics on input line 334.
+(epstopdf)             \includegraphics on input line 336.
 Package epstopdf Info: Output file is already uptodate.
 
 <img/l_g_c_t_angular-eps-converted-to.pdf, id=95, 449.68pt x 338.26375pt>
@@ -1067,36 +1067,36 @@ File: img/l_g_c_t_angular-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/l_g_c_t_angular-eps-converted-to.pdf>
 Package pdftex.def Info: img/l_g_c_t_angular-eps-converted-to.pdf used on input
- line 334.
+ line 336.
 (pdftex.def)             Requested size: 225.4804pt x 169.61147pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 341--342
+Underfull \hbox (badness 10000) in paragraph at lines 343--344
 
  []
 
 [5 <./img/original_angular-eps-converted-to.pdf> <./img/grav_only_angular-eps-c
 onverted-to.pdf>] [6 <./img/l_g_angular-eps-converted-to.pdf> <./img/l_g_c_angu
 lar-eps-converted-to.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 361--364
+Underfull \hbox (badness 10000) in paragraph at lines 363--368
 
  []
 
-[7 <./img/l_g_c_t_angular-eps-converted-to.pdf>] [8] (./scaling_analysis.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 460.
-
-[9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 460.
+[7 <./img/l_g_c_t_angular-eps-converted-to.pdf>] [8] [9]
+(./scaling_analysis.bbl)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 494.
+ [10]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 494.
  (./scaling_analysis.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 460.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 460.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 494.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 494.
 Package rerunfilecheck Info: File `scaling_analysis.out' has not changed.
-(rerunfilecheck)             Checksum: A95D49FA121B6339341BAA6E03BE6BDA;712.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 460.
+(rerunfilecheck)             Checksum: C5175DB73B6BB5966288210A6CFD1E6E;755.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 494.
  ) 
 Here is how much of TeX's memory you used:
- 10034 strings out of 493304
- 140993 string characters out of 6139871
- 236702 words of memory out of 5000000
+ 10035 strings out of 493304
+ 141000 string characters out of 6139871
+ 237702 words of memory out of 5000000
  13287 multiletter control sequences out of 15000+600000
  19958 words of font info for 74 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -1113,10 +1113,10 @@ sfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
 8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 
-Output written on scaling_analysis.pdf (9 pages, 187451 bytes).
+Output written on scaling_analysis.pdf (10 pages, 190410 bytes).
 PDF statistics:
- 195 PDF objects out of 1000 (max. 8388607)
- 160 compressed objects within 2 object streams
- 28 named destinations out of 1000 (max. 500000)
+ 199 PDF objects out of 1000 (max. 8388607)
+ 163 compressed objects within 2 object streams
+ 29 named destinations out of 1000 (max. 500000)
  106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

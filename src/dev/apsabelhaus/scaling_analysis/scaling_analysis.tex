@@ -80,7 +80,7 @@ Scaling Analysis for Rigid Body Simulations\\
 Andrew P. (Drew) Sabelhaus\\
 apsabelhaus@berkeley.edu \\
 Started 14 July 2014 \\
-Current as of 27 Dec 2014
+Current as of 8 Jan 2015
 \end{center}
 
 %\vspace{-1em}
@@ -95,13 +95,15 @@ Finally, suggestions are made for generalizing these concepts to new parameters 
 
 \section{Example system, angular spring/damper}
 
+The first system we'll use as an example is not one that is currently used in NTRT.
+Though this doesn't help current NTRTsim users with their scalings, it is used to illustrate the potential pitfalls with scaling.
+Since an angular system is a completely reasonable model, this analysis shows that even a simple system model produces many (unintuitive) scaling requirements.
+See later sections for applications to the current NTRTsim model(s), once you've convinced yourself that this dimensionless term analysis is necessary.
+
 In this example system, there is a rod on a hinge (hinge at (x,y) = (0,0) ) with length $l$.
 There is an angular (rotational) spring, and an angular damper, acting at the origin also.
 Gravity is present, and we assume it acts fully at the center of mass for the rod.
 
-NOTE that this is NOT the same as the longitudinal/linear spring models that are used in NTRT.
-This specific system model is analysed first to emphasize that current assumptions don't work.
-See later sections for applications to our specific model, once you've convinced yourself that this dimensionless term analysis is necessary.
 
 With the state variables for this system as the angle between the rod and the horizontal, and its derivative,
 
@@ -110,7 +112,7 @@ x = [\theta, \dot \theta]^\top
 \]
 
 We can derive the following system dynamics. 
-(Note, these are NOT needed for scaling analysis, but are just provided for reference in case you'd like to simulate this yourself to check this math. I did!)
+(Note, these equations are not needed for scaling analysis, but are just provided for reference in case you'd like to simulate this yourself to check this math. I did!)
 
 \[
 \sum T = I \ddot \theta, \quad \sum T = T_s - T_d + T_g
@@ -144,9 +146,9 @@ Note that this system has a nonlinear forcing function: the gravitational force 
 Although the plant can be formulated as a linear system, the whole system response cannot be.
 Thus, unlike the example linear systems in the last sections, arguments about transfer function magnitudes do not apply here in the same way.
 
-We will not return to this for the rest of the analysis, but it's useful for reference.
+We will not return to these equations of motion for the rest of the analysis, but it's useful for reference.
 
-\section{$\Pi$ Terms and Nondimensional Numbers}
+\section{$\Pi$ Terms and Nondimensional Numbers for example angular system}
 
 For an in-depth discussion of the necessity of Pi terms, and their use, history, and applications, see references such as chapter 7 of the undergraduate fluid mechanics textbook by Munsen~\cite{munson2013fundamentals} and Buckingham's original work on the subject~\cite{buckingham1914physically}.
 It's sufficient to recount the following theorem, the Buckingham Pi Theorem, which states, loosely: \\
@@ -207,7 +209,7 @@ The first step in this procedure is to select $k=3$ ``repeating variables,'' whi
 
 1. The set of repeating variables must not be able to make a nondimensional set by themselves (i.e. they must be an independent basis)
 
-2. Avoid selecting difficult-to-scale variables as repeaters (e.g. don't choose time here because that's hard)
+2. Avoid selecting difficult-to-scale variables as repeaters (e.g. don't choose time here because that's difficult to scale dynamically on-line as the simulation runs.)
 
 
 Let's choose, in this example, our repeaters as $m, l, k_{\theta}$. See the Munsen textbook (or other resources) to see how to procedurally derive all the pi terms. 
@@ -256,7 +258,7 @@ By the theorem, these scalings should all give us the same result.
 %\]
 
 
-\section{Simulation of scaled systems}
+\section{Simulations of example angular spring system}
 
 In order to verify that following these scalings is actually required, here are a handful of simulations.
 
@@ -324,7 +326,7 @@ A future task is to show that this is true by either exhaustive search of Pi-ter
 Here's our final scaling with time:
 
 \[
-l_2 = \frac{1}{s} l_1 , \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}, \quad \quad t_2 = \frac{1}{\sqrt{s}} t_1
+l_2 = \frac{1}{s} l_1 , \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}, \quad \quad t_2 = (s) t_1
 \]
 
 This system with all four terms scaled is simulated in figure \ref{fig:l_g_c_t_angular}. See how this is the same result as figure \ref{fig:original_angular}, finally!
@@ -359,8 +361,10 @@ However, note again that this does work for certain linear systems, such as thos
 \section{Analysis of related longitudinal spring/damper systems, for NTRT use}
 
 The above analysis is based on a system where parameters are angular.
-However, our simulated systems use longitudinal/linear dampers and springs, and the analysis changes quite a bit.
-This is somewhat unexpected at first - why would the units of these extra parameters influence the required scaling for unrelated terms? - but by the Pi theorem, it must work this way. \\
+However, our simulated systems use longitudinal/linear dampers and springs, along with some other parameters, not angular systems.
+The analysis changes quite a bit here!
+This is somewhat unexpected at first - why would the units of these extra parameters influence the required scaling for unrelated terms? - but by the Pi theorem, it must work this way.
+As alluded to below, this change in scaling requirements arises from the inclusion of a spring constant term that does not depend on length. \\
 
 Ignoring a full dynamics derivation (no more simulations for me!), let's take the following constitutive equations for longitudinal springs and dampers:
 
@@ -368,41 +372,79 @@ Ignoring a full dynamics derivation (no more simulations for me!), let's take th
 F_s = k(x - x_r), \quad F_d = c \dot x
 \]
 
-So, here is how the units and Pi terms would change for a longitudinal spring/damper system:
+Here are the units of all the CONFIG parameters for the most recent SUPERball model in NTRT.
 
 \[
-\text{spring rest length:} \quad x_r \sim L^1
+\text{gravitational acceleration:} \quad g \sim L^1 T^{-2}
 \]
 \[
-\text{spring constant:} \quad k \sim M^1 T^{-2}
+\text{density:} \quad \rho \sim M^1 L^{-3}
 \]
 \[
-\text{damping coefficient:} \quad c \sim M^1 T^{-1}
+\text{linear spring rest length:} \quad x_r \sim L^1
+\]
+\[
+\text{linear spring constant:} \quad k \sim M^1 T^{-2}
+\]
+\[
+\text{linear damping coefficient:} \quad c \sim M^1 T^{-1}
+\]
+\[
+\text{pretension force:} \quad F \sim M^1 L^1 T^{-2}
+\]
+\[
+\text{target actuator velocity:} \quad v \sim L^1 T^{-1}
+\]
+\[
+\text{time:} \quad t \sim T^1
+\]
+
+Additionally, some models in NTRTsim have other parameters, such as Brian Mirletz' Corde model that uses a shear modulus and modulus of elasticity:
+
+\[
+\text{shear modulus:} \quad G \sim M^1 L^{-1} T^{-2}
+\]
+\[
+\text{modulus of elasticity:} \quad E \sim M^1 L^{-1} T^{-2}
 \]
 
 Note the missing length scale in $k$ and $c$. 
 This is because, for example, $k$ needs to be units of $N/m$ instead of $N/rad$, and the extra length term cancels out.
-The new Pi terms, using the same set of $\{m,l,c\}$ are:
+The new Pi terms, using the same set of $\{m,l,k\}$ are:
 
 \[
 \Pi_1 = \Pi_{x_r} = \frac{x_r}{l}
 \]
 \[
-\Pi_2 = \Pi_{g} = \frac{gm^2}{c^2l}
+\Pi_2 = \Pi_{g} = \frac{gm}{kl}
 \]
 \[
-\Pi_3 = \Pi_{k} = \frac{km}{c^2}
+\Pi_3 = \Pi_{c} = \frac{km}{c^2}
 \]
 \[
-\Pi_4 = \Pi_{F} = \frac{Fm}{c^2l}
+\Pi_4 = \Pi_{F} = \frac{F}{kl}
 \]
 \[
-\Pi_5 = \Pi_{t} = \frac{tc}{m}
+\Pi_5 = \Pi_{t} = \frac{t^{2}k}{m}
+\]
+\[
+\Pi_6 = \Pi_G = \frac{Gl}{k}
+\]
+\[
+\Pi_7 = \Pi_E = \frac{El}{k}
+\]
+\[
+\Pi_8 = \Pi_v = \frac{v^2 m}{l^2 d}
+\]
+\[
+\Pi_9 = \Pi_{\rho} = \frac{\rho l^3}{m}
 \]
 
-Note that here, the scaling of gravity with length DOES actually work!
-When $g$ is multiplied by $s$, we can do the same to $l$, then to $x_r$ by $\Pi_1$ and to $F$ by $\Pi_4$.
-The takeaway here is that without extra Pi terms for more parameters like $k_{\theta}$, we can get away with this simple scaling, BUT we need to be careful and re-evaluate our Pi terms each time a new unit parameter is introduced.
+Note that here, the scaling of gravity with length does satisfy almost all of these Pi terms.
+When $g$ is multiplied by $s$, we can do the same to $l$.
+That then would require scaling by $s$ to $F$ and $v$, scaling by $1/s$ to $G$ and $E$, and by $1/l^3$ to $\rho$.
+So, time does not need to be scaled here, but still, five other parameters beyond just gravitational acceleration need to be scaled.
+The takeaway here is that without extra Pi terms for more parameters like $k_{\theta}$, we can get away with this simple scaling, but we need to be careful and re-evaluate our Pi terms each time a new unit parameter is introduced.
 
 \section{Scaling Analysis for General Linear Systems}
 
@@ -433,26 +475,18 @@ This is, however, informal: more research must be done to show this result, and 
 
 \section{Moving Forward}
 
-So, after all this work, where do we stand? 
+So, after all this work, what should a simulation user do? 
 
-First, we need to check NTRT and Bullet for other parameters with other units, create Pi terms for them, and check to be absolutely sure we have the required number of dimensionless numbers.
-Coefficients that are dimensionless can be left out, so I'm not aware of other constants that would need to be scaled, but it's worth a hard look nonetheless.
-We should list all these, their corresponding Pi terms, and post the analysis somewhere so we can justify we're scaled correctly.
+First, review one's model and ensure that the model's scalings are appropriate.
+If your model parameters only have the units above, then following the corresponding Pi terms I derived should be enough.
+However, if your model either does not include a linear spring constant $k$ or involves other terms not analyzed here, you must do a new dimensional analysis for your results to be correct (e.g. dynamically similar.)
 
-Second, we should look through old results and make sure we scaled (for example) output forces after the simulation.
-This would be relevant for the IPPW paper and Atil's learning results with the original SUPERball model.
+Additionally, simulation users must be mindful of parameters with units inside their controllers, not just in their models.
+The Buckingham Pi Theorem only works if all terms in the entire system equations are taken into account, and with a closed-loop controller, the controller dynamics must be included.
+As one example, developing a model-based controller with parameters calculated analytically would have to be scaled. 
+A controller using nonlinear damping techniques would require a complete re-derivation of these Pi terms and scaling.
 
-Third, we should alert users to situations where their scaling might get crazy messy, and things to watch out for.
-Two situations come to mind.
-As one example, developing a model-based controller with parameters calculated analytically would have to be scaled. A controller using nonlinear damping techniques would require a complete re-derivation of these Pi terms and scaling.
-Another situation would be the creation of a new NTRT object, like a new model, which has constitutive equations that use new constants and terms.
-One example here would be the new string model that Brian Tietz Mirletz is working on.
-
-Finally, all of this should be formalized and integrated into Bullet and/or NTRT in as scalable a way as possible.
-I'm not sure if there are automated techniques to developing Pi terms and scaling (?), but if those exist, it would be great to explore them.
-Nonetheless we need to write good code to perform these scalings behind-the-scene.
-
-If anyone would like to run my MATLAB code (attached in this directory), it should be straightforward, but email me if you find issues.
+Please feel free to use the MATLAB code in the subdirectory here to help analyze your system, if needed. Email me if you find issues.
 
 \bibliographystyle{plain}
 \bibliography{scaling_analysis}
