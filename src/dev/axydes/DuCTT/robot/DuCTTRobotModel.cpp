@@ -305,9 +305,12 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
     const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_prismDensity);
-    const tgRod::Config staticRodConfig(m_config.m_prismRadius, 0);
     const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
+
+    const tgRod::Config staticPrismRodConfig(m_config.m_prismRadius, 0);
+    const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
+    const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
 
     const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
                                                   false, m_config.m_maxStringForce, m_config.m_maxVertStringVel, m_config.m_maxStringAcc,
@@ -366,7 +369,10 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
-//    spec.addBuilder("inner rod", new tgRodInfo(staticRodConfig));
+
+    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
+    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
+    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
 
     spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
