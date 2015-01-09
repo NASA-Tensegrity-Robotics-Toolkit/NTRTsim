@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef DUCTT_SINE_WAVES_H
-#define DUCTT_SINE_WAVES_H
+#ifndef DUCTT_MECH_TEST_CONTROLLER_H
+#define DUCTT_MECH_TEST_CONTROLLER_H
 
 /**
- * @file DuCTTSineWaves.h
- * @brief Contains the definition of the class DuCTTSineWaves.
+ * @file DuCTTMechTestController.h
+ * @brief Contains the definition of the class DuCTTMechTestController.
  * @author Alexander Xydes
  * $Id$
  */
@@ -37,22 +37,18 @@
 
 // Forward declarations
 class tgLinearString;
-class tgPrismatic;
 class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
 class ImpedanceControl;
 
-class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
+class DuCTTMechTestController : public tgObserver<DuCTTRobotModel>
 {
 public:
 
-    DuCTTSineWaves(double targetDist = -1);
+    DuCTTMechTestController(double targetTime = -1);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
-    void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase=0);
-    bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
-
     /**
      * Applies the impedance controllers using a velocity setpoint of 0.
      * Called during this classes onStep function.
@@ -89,19 +85,12 @@ private:
     const double cpgFrequency;
     const double bodyWaves;
 
-    double cyclePrism;
-    double targetPrism;
-    const double offsetLengthPrism;
-    const double cpgAmplitudePrism;
-    const double cpgFrequencyPrism;
-    const double bodyWavesPrism;
-
     bool recordedStartCOM;
     btVector3 startCOM;
 
     const double insideLength;
 
-    double targetDist;
+    double targetTime;
     bool move;
 };
 

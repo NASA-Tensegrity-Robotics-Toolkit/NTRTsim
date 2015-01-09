@@ -17,16 +17,16 @@
 */
 
 /**
- * @file AppDuCTT.cpp
- * @brief Contains the definition function main() for the DuCTT app
+ * @file AppDuCTTMechTest.cpp
+ * @brief Contains the definition function main() for the DuCTT Mechanics Testing app
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "AppDuCTT.h"
+#include "AppDuCTTMechTest.h"
 
-AppDuCTT::AppDuCTT(int argc, char** argv)
+AppDuCTTMechTest::AppDuCTTMechTest(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = true;
@@ -49,7 +49,7 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppDuCTT::setup()
+bool AppDuCTTMechTest::setup()
 {
     // First create the world
     tgWorld* world = createWorld();
@@ -76,7 +76,7 @@ bool AppDuCTT::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pController = new DuCTTSineWaves(targetDist);
+        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetDist);
         myRobotModel->attach(pController);
     }
 
@@ -109,7 +109,7 @@ bool AppDuCTT::setup()
     return bSetup;
 }
 
-void AppDuCTT::handleOptions(int argc, char **argv)
+void AppDuCTTMechTest::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -157,7 +157,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
     }
 }
 
-tgWorld* AppDuCTT::createWorld()
+tgWorld* AppDuCTTMechTest::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -166,17 +166,17 @@ tgWorld* AppDuCTT::createWorld()
     return new tgWorld(config);
 }
 
-tgSimViewGraphics *AppDuCTT::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppDuCTTMechTest::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppDuCTT::createView(tgWorld *world)
+tgSimView *AppDuCTTMechTest::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppDuCTT::run()
+bool AppDuCTTMechTest::run()
 {
     if (!bSetup)
     {
@@ -197,7 +197,7 @@ bool AppDuCTT::run()
     return true;
 }
 
-void AppDuCTT::simulate(tgSimulation *simulation)
+void AppDuCTTMechTest::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -214,8 +214,8 @@ void AppDuCTT::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppDuCTT" << std::endl;
-    AppDuCTT app (argc, argv);
+    std::cout << "AppDuCTTMechTest" << std::endl;
+    AppDuCTTMechTest app (argc, argv);
 
     if (app.setup())
         app.run();
