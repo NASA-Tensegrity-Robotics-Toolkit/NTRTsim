@@ -210,7 +210,7 @@ void EscapeController::setupAdapter() {
     }
     
     string configAnnealEvolution = path + configName;
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configName, configPath);
     bool isLearning = true;
     configuration configEvolutionAdapter;
     configEvolutionAdapter.readFile(configAnnealEvolution);
