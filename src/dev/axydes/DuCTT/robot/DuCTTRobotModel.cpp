@@ -319,14 +319,14 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
                                                     false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel, m_config.m_maxStringAcc,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
-    btVector3 prism1Axis(0,0,1);
-    btVector3 prism2Axis(0,1,0);
+    btVector3 prismAxisBottom(0,0,1);
+    btVector3 prismAxisTop(0,1,0);
 
-    prism1Axis = prism1Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
-    prism2Axis = prism2Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prismAxisBottom = prismAxisBottom.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prismAxisTop = prismAxisTop.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
 
-    const tgPrismatic::Config prismConfig(prism1Axis, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
-    const tgPrismatic::Config prismConfig2(prism2Axis, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
@@ -370,15 +370,15 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
 
-    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
-    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
-    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
+//    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
+//    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
+//    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
 
     spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
 
-    spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfig));
-    spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfig2));
+    spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
+    spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     spec.addBuilder("hinge", new tgDuCTTHingeInfo(hingeConfig));
