@@ -40,7 +40,8 @@ https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues
   * https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/commit/50a97d2726d4d45500a05b66a8fcddc835f24a43
 12. Python virtualenv
   * https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/commit/8b0a103fc2250a845528ab631ae31f6b4014c07c
-13. Scaling Analysis** (commit TBA)
+13. Scaling Analysis
+  * https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/commit/28e82e0e9e09ab4b1df2727f5c4f83e18bf81482
 14. Kinematic motor model
   * https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/pull/110
 15. PID Controllers
