@@ -27,6 +27,7 @@
 
 // This application
 #include "VerticalSpineModel.h"
+#include "VerticalSpineBendingController.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -66,13 +67,13 @@ int main(int argc, char** argv)
     // The model contains a pretension parameter, so for simple equilibrium
     // simulations, no controller is needed.
 
-    //VerticalSpineRestLengthController* const pTC = new VerticalSpineRestLengthController();
-    //myModel->attach(pTC);
+    VerticalSpineBendingController* const pTC = new VerticalSpineBendingController();
+    myModel->attach(pTC);
 
     // Finally, add the model (with attached objects) to the simulation.
     simulation.addModel(myModel);
 	
-	// Run until the user stops
+    // Run until the user stops
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic
