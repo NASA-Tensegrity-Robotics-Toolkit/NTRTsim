@@ -175,6 +175,9 @@ public:
      */
     virtual bool isAtPreferredLength();
 
+    virtual double getMinLength();
+    virtual double getMaxLength();
+
 private:
     /**
      * A copy of the configuration POD supplied at constuction.

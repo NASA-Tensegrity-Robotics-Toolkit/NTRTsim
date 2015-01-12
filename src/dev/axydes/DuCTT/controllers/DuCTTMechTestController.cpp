@@ -144,7 +144,7 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
         }
         else if (simTime >= targetTime)
         {
-            std::cerr << "Total Dist moved: " << dist << std::endl;
+            std::cout << "Total Dist moved: " << dist << std::endl;
             move = false;
         }
     }
