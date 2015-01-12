@@ -37,8 +37,7 @@
 #include "ducts/DuctTeeModel.h"
 
 //controllers
-#include "controllers/DuCTTSineWaves.h"
-#include "controllers/TestLearning.h"
+#include "controllers/DuCTTLearningController.h"
 
 // This library
 #include "core/tgModel.h"

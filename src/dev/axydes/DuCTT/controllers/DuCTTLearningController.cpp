@@ -18,14 +18,14 @@
 
 /**
  * @file DuCTTLearningController.cpp
- * @brief Escape Controller for T6 
- * @author Steven Lessard
+ * @brief Learning Controller for DuCTT
+ * @author Alexander Xydes
  * @version 1.0.0
  * $Id$
  */
 
 // This module
-#include "TestLearning.h"
+#include "DuCTTLearningController.h"
 
 // This application
 #include "../robot/DuCTTRobotModel.h"

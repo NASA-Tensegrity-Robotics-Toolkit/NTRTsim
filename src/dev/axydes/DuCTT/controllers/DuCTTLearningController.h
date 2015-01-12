@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
  */
 
-#ifndef ESCAPE_T6CONTROLLER
-#define ESCAPE_T6CONTROLLER
+#ifndef DUCTT_LEARNING_CONTROLLER
+#define DUCTT_LEARNING_CONTROLLER
 
 /**
  * @file DuCTTLearningController.h
  * @brief Contains the definition of class DuCTTLearningController.
- * @author Steven Lessard
+ * @author Alexander Xydes
  * @version 1.0.0
  * $Id$
  */
@@ -44,7 +44,6 @@ class tgImpedanceController;
 //namespace std for vectors
 using namespace std;
 
-/** Escape Controller for T6 */
 class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
 {
     public:
@@ -78,8 +77,6 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         /** Sets target lengths for each prismatic joint */
         void setPrismaticLengths(DuCTTRobotModel& subject, double dt);
 
-        /** Divides the 24 muscles of an DuCTTRobotModel
-         * into 8 clusters of 3 muscles */
         void populateClusters(DuCTTRobotModel& subject);
 
         /** Sets the amplitude, angularFrequency, phase change, and dcOffset

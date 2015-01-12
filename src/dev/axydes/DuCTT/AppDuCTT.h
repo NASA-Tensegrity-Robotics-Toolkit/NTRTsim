@@ -38,7 +38,6 @@
 
 //controllers
 #include "controllers/DuCTTSineWaves.h"
-#include "controllers/TestLearning.h"
 
 // This library
 #include "core/tgModel.h"
@@ -51,6 +50,9 @@
 
 // The C++ Standard Library
 #include <iostream>
+#include <string.h>
+
+using namespace std;
 
 namespace po = boost::program_options;
 
