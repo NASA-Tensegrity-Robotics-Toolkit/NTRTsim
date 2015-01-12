@@ -31,13 +31,13 @@
 #include "NestedStructureTestModel.h"
 
 // NTRTSim
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgBasicActuator.h"
+#include "controllers/tgImpedanceController.h"
 #include "tgcreator/tgUtil.h"
 
 NestedStructureSineWaves::NestedStructureSineWaves() :
-    in_controller(new ImpedanceControl(100, 500, 50)),
-    out_controller(new ImpedanceControl(100, 500, 100)),
+    in_controller(new tgImpedanceController(100, 500, 50)),
+    out_controller(new tgImpedanceController(100, 500, 100)),
     segments(1.0),
     insideLength(16.5),
     outsideLength(19.5),
@@ -61,11 +61,11 @@ NestedStructureSineWaves::~NestedStructureSineWaves()
 	delete out_controller;
 }
 
-void NestedStructureSineWaves::applyImpedanceControlInside(const std::vector<tgLinearString*> stringList, double dt)
+void NestedStructureSineWaves::applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList, double dt)
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        double setTension = in_controller->control(stringList[i],
+        double setTension = in_controller->control(*(stringList[i]),
                                             dt,
                                             insideLength
                                             );
@@ -77,7 +77,7 @@ void NestedStructureSineWaves::applyImpedanceControlInside(const std::vector<tgL
     }    
 }
 
-void NestedStructureSineWaves::applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+void NestedStructureSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase)
 {
@@ -86,7 +86,7 @@ void NestedStructureSineWaves::applyImpedanceControlOutside(const std::vector<tg
         cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI * i / (segments) + phaseOffsets[phase]);
         target = offsetSpeed + cycle*cpgAmplitude;
         
-        double setTension = out_controller->control(stringList[i],
+        double setTension = out_controller->control(*(stringList[i]),
                                             dt,
                                             outsideLength,
                                             target
@@ -105,13 +105,13 @@ void NestedStructureSineWaves::onStep(NestedStructureTestModel& subject, double 
     
     segments = subject.getSegments();
     
-    applyImpedanceControlInside(subject.getMuscles("inner top"), dt);
-    applyImpedanceControlInside(subject.getMuscles("inner left") , dt);
-    applyImpedanceControlInside(subject.getMuscles("inner right"), dt);
+    applyImpedanceControlInside(subject.getActuators("inner top"), dt);
+    applyImpedanceControlInside(subject.getActuators("inner left") , dt);
+    applyImpedanceControlInside(subject.getActuators("inner right"), dt);
     
-    applyImpedanceControlOutside(subject.getMuscles("outer top"), dt, 0);
-    applyImpedanceControlOutside(subject.getMuscles("outer left"), dt, 1);
-    applyImpedanceControlOutside(subject.getMuscles("outer right"), dt, 2);
+    applyImpedanceControlOutside(subject.getActuators("outer top"), dt, 0);
+    applyImpedanceControlOutside(subject.getActuators("outer left"), dt, 1);
+    applyImpedanceControlOutside(subject.getActuators("outer right"), dt, 2);
 }
     
 

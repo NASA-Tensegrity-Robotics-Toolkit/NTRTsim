@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef NESTED_STRUCTURE_SINE_WAVES_H
-#define NESTED_STRUCTURE_SINE_WAVES_H
+#ifndef NESTED_STRUCTURE_SERIALIZED_SINE_WAVES_H
+#define NESTED_STRUCTURE_SERIALIZED_SINE_WAVES_H
 
 /**
  * @file SerializedSineWaves.h
@@ -35,8 +35,8 @@
 #include <string>
 
 // Forward Declarations
-class ImpedanceControl;
-class tgLinearString;
+class tgImpedanceController;
+class tgSpringCableActuator;
 class BaseSpineModelLearning;
 
 /**
@@ -56,8 +56,8 @@ struct Config
 	/**
 	 * Pointers to impedance controllers 
 	 */
-    ImpedanceControl* in_controller;
-    ImpedanceControl* out_controller;
+    tgImpedanceController* in_controller;
+    tgImpedanceController* out_controller;
 	
 	 /**
      * Muscle Length Parameters
@@ -102,7 +102,7 @@ public:
     SerializedSineWaves(std::string fileName);
     
     /**
-     * Destructor. Frees the ImpedanceControl pointers
+     * Destructor. Frees the tgImpedanceController pointers
      */
     ~SerializedSineWaves();
     
@@ -114,7 +114,7 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlInside(const std::vector<tgSpringCableActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase);
     /**
@@ -126,7 +126,7 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */                                    
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlOutside(const std::vector<tgSpringCableActuator*> stringList,
                                     double dt,
                                     std::size_t phase);
     

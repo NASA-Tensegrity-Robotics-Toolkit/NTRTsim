@@ -53,7 +53,7 @@ public:
      * @return the world's implementation's btSoftRigidDynamicsView
      * @todo consider implications of casting to include Corde objects
      */
-    static btDynamicsWorld& worldToDynamicsWorld(tgWorld& world);
+    static btDynamicsWorld& worldToDynamicsWorld(const tgWorld& world);
 };
 
 

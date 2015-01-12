@@ -29,10 +29,11 @@
 #include "FlemonsSpineModelLearning.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -45,6 +46,8 @@
 #include <map>
 #include <set>
 
+#define USE_KINEMATIC
+
 FlemonsSpineModelLearning::FlemonsSpineModelLearning(int segments) : 
     BaseSpineModelLearning(segments) 
 {
@@ -56,10 +59,6 @@ FlemonsSpineModelLearning::~FlemonsSpineModelLearning()
 
 void FlemonsSpineModelLearning::setup(tgWorld& world)
 {
-    // This is basically a manual setup of a model.
-    // There are things that do this for us
-    /// @todo: reference the things that do this for us
-
     // Rod and Muscle configuration
     // Note: This needs to be high enough or things fly apart...
     const double density = 4.2/300.0;
@@ -68,9 +67,26 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     const double rollFriction = 0.0;
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
-    
-    tgLinearString::Config muscleConfig(1000, 10, 0.0, false, 7000, 12, 4000);
-    
+
+    const double elasticity = 1000.0;
+    const double damping = 10.0;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 12.0;
+#ifdef USE_KINEMATIC
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+
+#else
+    tgSpringCableActuator::Config muscleConfig(elasticity, damping, pretension, history, maxTens, maxSpeed);
+#endif
     // Calculations for the flemons spine model
     double v_size = 10.0;
     
@@ -142,8 +158,10 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-#if (1)
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+#ifdef USE_KINEMATIC
+    spec.addBuilder("muscle", new tgKinematicActuatorInfo(motorConfig));
+#else
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 #endif
     
     // Create your structureInfo
@@ -153,7 +171,7 @@ void FlemonsSpineModelLearning::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
 
     // Setup vectors for control
-    m_allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
     

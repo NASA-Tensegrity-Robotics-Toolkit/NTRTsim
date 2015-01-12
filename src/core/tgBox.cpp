@@ -17,9 +17,9 @@
 */
 
 /**
- * @file tgRod.cpp
- * @brief Contains the definitions of members of class tgRod
- * @author Ryan Adams
+ * @file tgBox.cpp
+ * @brief Contains the definitions of members of class tgBox
+ * @author Brian Mirletz and Ryan Adams
  * $Id$
  */
 
@@ -84,9 +84,8 @@ void tgBox::onVisit(const tgModelVisitor& v) const
 
 void tgBox::teardown()
 {
-
-   m_pRigidBody = NULL;
-   tgModel::teardown();
+    // Sets body to NULL, calls teardown on children
+    tgBaseRigid::teardown();
 
   // Postcondition
   // This does not preserve the invariant

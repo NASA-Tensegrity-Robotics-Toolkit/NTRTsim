@@ -27,10 +27,10 @@
 #include "VerticalSpineModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRigidAutoCompound.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -42,6 +42,8 @@
 #include <iostream>
 #include <stdexcept>
 
+// @todo move hard-coded parameters into config
+
 VerticalSpineModel::VerticalSpineModel(size_t segments) :
     m_segments(segments),
     tgModel() 
@@ -49,119 +51,157 @@ VerticalSpineModel::VerticalSpineModel(size_t segments) :
 }
 
 /**
- * Anonomous namespace for helper functions
+ * Anonomous namespace for config struct. This makes changing the parameters
+ * of the model much easier (they're all at the top of this file!).
  */
 namespace
 {
-    void addNodes(tgStructure& tetra, double edge, double height)
+    const struct Config
     {
-        // right
-        tetra.addNode( edge / 2.0, 0, 0); // node 0
-        // left
-        tetra.addNode( -edge / 2.0, 0, 0); // node 1
-        // top
-        tetra.addNode(0, height, -edge / 2.0); // node 2
-        // front
-        tetra.addNode(0, height, edge / 2.0); // node 3
-        // middle
-        tetra.addNode(0, height/2, 0); // node 4
-    }
+        double densityA;
+        double densityB;
+        double radius;
+        double edge;
+        double height;
+        double stiffness;
+        double damping;  
+        double friction;
+        double rollFriction;
+        double restitution;
+        double pretension;
+        bool   hist;
+        double maxTens;
+        double targetVelocity;
+    } c =
+   {
+     0.026,    // densityA (kg / length^3)
+     0.0,    // densityB (kg / length^3)
+     0.5,     // radius (length)
+     20.0,      // edge (length)
+     tgUtil::round(c.edge / std::sqrt(2.0)),    // height (length)
+     1000.0,   // stiffness (kg / sec^2)
+     10.0,    // damping (kg / sec)
+     0.99,      // friction (unitless)
+     0.01,     // rollFriction (unitless)
+     0.0,      // restitution (?)
+     2452.0,        // pretension
+     0,			// History logging (boolean)
+     100000,   // maxTens
+     10000,    // targetVelocity
+      
+  };
 
-    void addPairs(tgStructure& tetra)
-    {
-        tetra.addPair(0, 4, "rod");
-        tetra.addPair(1, 4, "rod");
-        tetra.addPair(2, 4, "rod");
-        tetra.addPair(3, 4, "rod");
-    }
+} // end namespace
+
+// Helper functions, with explicit scopes, moved from implicit namespace.
+void VerticalSpineModel::trace(const tgStructureInfo& structureInfo, tgModel& model)
+{
+    std::cout << "StructureInfo:" << std::endl
+    << structureInfo    << std::endl
+    << "Model: "        << std::endl
+    << model            << std::endl;
+}
+
+void VerticalSpineModel::addNodes(tgStructure& tetra, double edge, double height)
+{
+    // right
+    tetra.addNode( c.edge / 2.0, 0, 0); // node 0
+    // left
+    tetra.addNode( -c.edge / 2.0, 0, 0); // node 1
+    // top
+    tetra.addNode(0, c.height, -edge / 2.0); // node 2
+    // front
+    tetra.addNode(0, c.height, edge / 2.0); // node 3
+    // middle
+    tetra.addNode(0, c.height/2, 0); // node 4
+}
+
+void VerticalSpineModel::addPairs(tgStructure& tetra)
+{
+    tetra.addPair(0, 4, "rod");
+    tetra.addPair(1, 4, "rod");
+    tetra.addPair(2, 4, "rod");
+    tetra.addPair(3, 4, "rod");
+}
     
-    void addPairsB(tgStructure& tetra)
+void VerticalSpineModel::addPairsB(tgStructure& tetra)
+{
+    tetra.addPair(0, 4, "rodB");
+    tetra.addPair(1, 4, "rodB");
+    tetra.addPair(2, 4, "rodB");
+    tetra.addPair(3, 4, "rodB");
+}
+
+void VerticalSpineModel::addSegments(tgStructure& snake, const tgStructure& tetra, 
+				     double edge, size_t segmentCount)
+{
+    //const btVector3 offset(0, 0, -edge * 1.15);
+    const btVector3 offset(0, 7.5, 0);
+    for (size_t i = 1; i < segmentCount; ++i)
     {
-        tetra.addPair(0, 4, "rodB");
-        tetra.addPair(1, 4, "rodB");
-        tetra.addPair(2, 4, "rodB");
-        tetra.addPair(3, 4, "rodB");
+        tgStructure* const t = new tgStructure(tetra);
+        t->addTags(tgString("segment", i + 1));
+        t->move((i + 1) * offset);
+        // Add a child to the snake
+        snake.addChild(t);
     }
-
-    void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
-             size_t segmentCount)
-    {
-
-        //const btVector3 offset(0, 0, -edge * 1.15);
-        const btVector3 offset(0, 7.5, 0);
-        for (size_t i = 1; i < segmentCount; ++i)
-        {
-            tgStructure* const t = new tgStructure(tetra);
-            t->addTags(tgString("segment", i + 1));
-            t->move((i + 1) * offset);
-            // Add a child to the snake
-            snake.addChild(t);
-        }
         
-    }
+}
 
-    // Add muscles that connect the segments
-    void addMuscles(tgStructure& snake)
+// Add muscles that connect the segments
+void VerticalSpineModel::addMuscles(tgStructure& snake)
+{
+    const std::vector<tgStructure*> children = snake.getChildren();
+    for (size_t i = 1; i < children.size(); ++i)
     {
-        const std::vector<tgStructure*> children = snake.getChildren();
-            for (size_t i = 1; i < children.size(); ++i)
-            {
-                tgNodes n0 = children[i-1]->getNodes();
-                tgNodes n1 = children[i  ]->getNodes();
+        tgNodes n0 = children[i-1]->getNodes();
+        tgNodes n1 = children[i  ]->getNodes();
                 
-                // vertical muscles
-                snake.addPair(n0[0], n1[0], "vertical muscle a");
-                snake.addPair(n0[1], n1[1], "vertical muscle b");
-                snake.addPair(n0[2], n1[2], "vertical muscle c");
-                snake.addPair(n0[3], n1[3], "vertical muscle d");
-
-                // saddle muscles
-                snake.addPair(n0[2], n1[1], tgString("saddle muscle seg", i-1));
-                snake.addPair(n0[3], n1[1], tgString("saddle muscle seg", i-1));
-                snake.addPair(n0[2], n1[0], tgString("saddle muscle seg", i-1));
-                snake.addPair(n0[3], n1[0], tgString("saddle muscle seg", i-1));
-            }
-    }
-
-    void mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
-            tgModel& model, size_t segmentCount)
-    {
-        // create names for muscles (for getMuscles function)
-    
         // vertical muscles
-        muscleMap["vertical a"] = model.find<tgLinearString>("vertical muscle a");
-        muscleMap["vertical b"] = model.find<tgLinearString>("vertical muscle b");
-        muscleMap["vertical c"] = model.find<tgLinearString>("vertical muscle c");
-        muscleMap["vertical d"] = model.find<tgLinearString>("vertical muscle d");
-        
+        snake.addPair(n0[0], n1[0], "vertical muscle a");
+        snake.addPair(n0[1], n1[1], "vertical muscle b");
+        snake.addPair(n0[2], n1[2], "vertical muscle c");
+        snake.addPair(n0[3], n1[3], "vertical muscle d");
+
         // saddle muscles
-        for (size_t i = 1; i < segmentCount ; ++i)
-        {
-            muscleMap[tgString("saddle", i-1)] = model.find<tgLinearString>(tgString("saddle muscle seg", i-1));
-            
-        }
+        snake.addPair(n0[2], n1[1], tgString("saddle muscle seg", i-1));
+        snake.addPair(n0[3], n1[1], tgString("saddle muscle seg", i-1));
+        snake.addPair(n0[2], n1[0], tgString("saddle muscle seg", i-1));
+        snake.addPair(n0[3], n1[0], tgString("saddle muscle seg", i-1));
     }
+}
 
-    void trace(const tgStructureInfo& structureInfo, tgModel& model)
+void VerticalSpineModel::mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
+            tgModel& model, size_t segmentCount)
+{
+    // create names for muscles (for getMuscles function)
+    
+    // vertical muscles
+    muscleMap["vertical a"] = model.find<tgBasicActuator>("vertical muscle a");
+    muscleMap["vertical b"] = model.find<tgBasicActuator>("vertical muscle b");
+    muscleMap["vertical c"] = model.find<tgBasicActuator>("vertical muscle c");
+    muscleMap["vertical d"] = model.find<tgBasicActuator>("vertical muscle d");
+        
+    // saddle muscles
+    for (size_t i = 1; i < segmentCount ; ++i)
     {
-        std::cout << "StructureInfo:" << std::endl
-          << structureInfo    << std::endl
-          << "Model: "        << std::endl
-          << model            << std::endl;
+        muscleMap[tgString("saddle", i-1)] = model.find<tgBasicActuator>(tgString("saddle muscle seg", i-1));
+            
     }
+}
 
-} // namespace
-
+/***************************************
+ * The primary functions., called from other classes.
+ **************************************/
 void VerticalSpineModel::setup(tgWorld& world)
 {
-    const double edge = 20.0;
-    const double height = tgUtil::round(edge / std::sqrt(2.0));
-    //const double height = 22;
-    std::cout << "edge: " << edge << "; height: " << height << std::endl;
+    // debugging output: edge and height length
+    std::cout << "edge: " << c.edge << "; height: " << c.height << std::endl;
     
     // Create the first fixed snake segment
+    // @todo move these hard-coded parameters into config
     tgStructure tetraB;
-    addNodes(tetraB, edge, height);
+    addNodes(tetraB, c.edge, c.height);
     addPairsB(tetraB);
     tetraB.move(btVector3(0.0, 2, 0));
     
@@ -175,14 +215,15 @@ void VerticalSpineModel::setup(tgWorld& world)
     
     // Create the first non-fixed tetrahedra
     tgStructure tetra;
-    addNodes(tetra, edge, height);
+    addNodes(tetra, c.edge, c.height);
     addPairs(tetra);
     
     // Move the first tetrahedra
-     tetra.move(btVector3(0.0, -6, 0));
+    // @todo move these hard-coded parameters into config
+    tetra.move(btVector3(0.0, -6, 0));
     
     // add rest of segments using original tetra configuration
-    addSegments(snake, tetra, edge, m_segments);
+    addSegments(snake, tetra, c.edge, m_segments);
     
     addMuscles(snake);
 
@@ -193,19 +234,20 @@ void VerticalSpineModel::setup(tgWorld& world)
     // m = 1 kg
     // volume of 1 rod = 9.62 cm^3
     // total volume = 38.48 cm^3
-    const double density = 1 / 38.48; // kg / length^3 - see app for length
-    const double radius  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
-    const tgRod::Config rodConfigB(radius, 0);
+    //const double density = 1/38.48; = 0.026 // kg / length^3 - see app for length
+    const tgRod::Config rodConfigA(c.radius, c.densityA, c.friction, 
+				  c.rollFriction, c.restitution);
+    const tgRod::Config rodConfigB(c.radius, c.densityB, c.friction, 
+				  c.rollFriction, c.restitution);
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("rod", new tgRodInfo(rodConfigA));
     spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
     
     // set muscle (string) parameters
-    const double stiffness = 1000 ;
-    const double damping = 10;
-    tgLinearString::Config muscleConfig(stiffness, damping);
-    spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
+    // @todo replace acceleration constraint with tgKinematicActuator if needed...
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
+					 c.hist, c.maxTens, c.targetVelocity);
+    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 
     
     // Create your structureInfo
@@ -215,7 +257,7 @@ void VerticalSpineModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     mapMuscles(muscleMap, *this, m_segments);
 
     trace(structureInfo, *this);
@@ -239,7 +281,7 @@ void VerticalSpineModel::step(double dt)
     }
 }
     
-const std::vector<tgLinearString*>&
+const std::vector<tgBasicActuator*>&
 VerticalSpineModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);
@@ -253,7 +295,7 @@ VerticalSpineModel::getMuscles (const std::string& key) const
     }
 }
 
-const std::vector<tgLinearString*>& VerticalSpineModel::getAllMuscles() const
+const std::vector<tgBasicActuator*>& VerticalSpineModel::getAllMuscles() const
 {
     return allMuscles;
 }

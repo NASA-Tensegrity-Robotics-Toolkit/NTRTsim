@@ -42,7 +42,7 @@ using namespace std;
  * Preferred Length Controller for T6. This controllers sets a preferred rest length for the muscles.
  * Constant speed motors are used in muscles to move the rest length to the preffered length over time.
  * The assumption here is that motors are constant speed independent of the tension of the muscles.
- * motorspeed and movemotors are defined at the tgLinearString class.
+ * motorspeed and movemotors are defined at the tgBasicActuator class.
  */
 class SuperBallPrefLengthController : public tgObserver<T12SuperBallPayload>
 {

@@ -19,9 +19,9 @@
 #ifndef TG_CPG_STRING_CONTROL_MOD_H
 #define TG_CPG_STRING_CONTROL_MOD_H
 
-#include "examples/learningSpines/tgCPGStringControl.h"
+#include "examples/learningSpines/tgCPGActuatorControl.h"
 
-class tgCPGStringControl_mod : public tgCPGStringControl
+class tgCPGStringControl_mod : public tgCPGActuatorControl
 {
 public:
  
@@ -29,7 +29,7 @@ public:
     
     virtual ~tgCPGStringControl_mod();
     
-    virtual void onStep(tgLinearString& subject, double dt);
+    virtual void onStep(tgSpringCableActuator& subject, double dt);
 
 };
 

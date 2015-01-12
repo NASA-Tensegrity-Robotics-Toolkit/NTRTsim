@@ -35,8 +35,8 @@ class AnnealEvoPopulation {
 public:
     AnnealEvoPopulation(int numControllers,configuration config);
     ~AnnealEvoPopulation();
-    vector<AnnealEvoMember *> controllers;
-    void mutate(std::tr1::ranlux64_base_01 *eng,int numToMutate, double T);
+    std::vector<AnnealEvoMember *> controllers;
+    void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate, double T);
     void orderPopulation();
     AnnealEvoMember * selectMemberToEvaluate();
     AnnealEvoMember * getMember(int i){return controllers[i];};
@@ -44,7 +44,7 @@ public:
 private:
     static bool comparisonFuncForAverage(AnnealEvoMember * elm1, AnnealEvoMember * elm2);
     static bool comparisonFuncForMax(AnnealEvoMember * elm1, AnnealEvoMember * elm2);
-    void readConfigFromXML(string configFile);
+    void readConfigFromXML(std::string configFile);
     bool compareAverageScores;
     bool clearScoresBetweenGenerations;
     int populationSize;

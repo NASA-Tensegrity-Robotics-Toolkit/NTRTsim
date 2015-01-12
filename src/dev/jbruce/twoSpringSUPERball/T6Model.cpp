@@ -18,17 +18,17 @@
 
 /**
  * @file T6Model.cpp
- * @brief Contains the implementation of class T6Model.
+z * @brief Contains the implementation of class T6Model.
  * $Id$
  */
 
 // This module
 #include "T6Model.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -58,36 +58,36 @@ namespace
     {
         double density;
         double radius;
-        double stiffness_passive;
-        double stiffness_active;
+        double stiffnessA;
+        double stiffnessB;
         double damping;
         double rod_length;
         double rod_space;    
         double friction;
         double rollFriction;
         double restitution;
-        double pretension; 
+        double pretensionA; 
+        double pretensionB;
         bool   hist;
         double maxTens;
         double targetVelocity;
-        double maxAcc;
     } c =
    {
-	 0.40374,   // density (kg / length^3)
+     0.40374,   // density (kg / length^3)
      0.40,      // radius (length)
-     998.25,    // stiffness_passive (kg / sec^2)
-     3152.36,   // stiffness_active (kg / sec^2)
+     998.25,    // stiffnessA (kg / sec^2), generally less stiff than B.
+     3152.36,   // stiffnessB (kg / sec^2)
      50.0,      // damping (kg / sec)
      17.00,     // rod_length (length)
      17.00/4,   // rod_space (length)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     0.0,        // pretension (force)
+     399.0,        // pretensionA (force), from (0.4)*(998)
+     1261.0,        // pretensionB (force), from (0.4)*(3152)
      0,			// History logging (boolean)
      100000,   // maxTens
-     10000,    // targetVelocity
-     20000     // maxAcc
+     10000    // targetVelocity
 
      // Use the below values for earlier versions of simulation.
      // 1.152,    // density (kg / length^3)
@@ -135,55 +135,57 @@ void T6Model::addRods(tgStructure& s)
 
 void T6Model::addMuscles(tgStructure& s)
 {
-	// Added ability to have two muscles in a structure.
-	// Configuration currently is random, at the moment [27 June 2014]
-    s.addPair(0, 4,  "muscle_active");
-    s.addPair(0, 5,  "muscle_passive");
-    s.addPair(0, 8,  "muscle_active");
-    s.addPair(0, 10, "muscle_passive");
+    // There are now two types of cables.
+    // cableA corresponds to the unactuated cables on SUPERball, "passive."
+    // cableB are the ones with motors attached, "active." (stiffer cables.)
+    s.addPair(0, 4,  "cableB");
+    s.addPair(0, 5,  "cableA");
+    s.addPair(0, 8,  "cableB"); //muscle_active
+    s.addPair(0, 10, "cableA");
 
-    s.addPair(1, 6,  "muscle_active");
-    s.addPair(1, 7,  "muscle_passive");
-    s.addPair(1, 8,  "muscle_passive");
-    s.addPair(1, 10, "muscle_active");
+    s.addPair(1, 6,  "cableB");
+    s.addPair(1, 7,  "cableA");
+    s.addPair(1, 8,  "cableA");
+    s.addPair(1, 10, "cableB");
 
-    s.addPair(2, 4,  "muscle_passive");
-    s.addPair(2, 5,  "muscle_active");
-    s.addPair(2, 9,  "muscle_active");
-    s.addPair(2, 11, "muscle_passive");
+    s.addPair(2, 4,  "cableA");
+    s.addPair(2, 5,  "cableB");
+    s.addPair(2, 9,  "cableB");
+    s.addPair(2, 11, "cableA");
 
-    s.addPair(3, 7,  "muscle_active");
-    s.addPair(3, 6,  "muscle_passive");
-    s.addPair(3, 9,  "muscle_passive");
-    s.addPair(3, 11, "muscle_active");
+    s.addPair(3, 7,  "cableB");
+    s.addPair(3, 6,  "cableA");
+    s.addPair(3, 9,  "cableA");
+    s.addPair(3, 11, "cableB");
 
-    s.addPair(4, 10, "muscle_active");
-    s.addPair(4, 11, "muscle_passive");
+    s.addPair(4, 10, "cableB");
+    s.addPair(4, 11, "cableA");
 
-    s.addPair(5, 8,  "muscle_active");
-    s.addPair(5, 9,  "muscle_passive");
+    s.addPair(5, 8,  "cableB");
+    s.addPair(5, 9,  "cableA");
 
-    s.addPair(6, 10, "muscle_passive");
-    s.addPair(6, 11, "muscle_active");
+    s.addPair(6, 10, "cableA");
+    s.addPair(6, 11, "cableB");
 
-    s.addPair(7, 8,  "muscle_passive");
-    s.addPair(7, 9,  "muscle_active");
+    s.addPair(7, 8,  "cableA");
+    s.addPair(7, 9,  "cableB");
 
 }
 
 void T6Model::setup(tgWorld& world)
 {
-
+    // rod config: same for all rods on this model
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
+    
+    // cable configs for the two cables
+    // muscleConfigA is for cableA, the "passive" one on SUPERball
+    // @todo acceleration constraint deprecated, replace with tgKinematicActuator
+    tgBasicActuator::Config muscleConfigA(c.stiffnessA, c.damping, c.pretensionA, 
+					  c.hist, c.maxTens, c.targetVelocity);
 
-    tgLinearString::Config muscleConfig_passive(c.stiffness_passive, c.damping, c.pretension, c.hist, 
-					    c.maxTens, c.targetVelocity, 
-					    c.maxAcc);
-
-    tgLinearString::Config muscleConfig_active(c.stiffness_active, c.damping, c.pretension, c.hist, 
-    					    c.maxTens, c.targetVelocity,
-    					    c.maxAcc);
+    tgBasicActuator::Config muscleConfigB(c.stiffnessB, c.damping, c.pretensionB, 
+					  c.hist, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -202,8 +204,8 @@ void T6Model::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle_passive", new tgLinearStringInfo(muscleConfig_passive));
-    spec.addBuilder("muscle_active", new tgLinearStringInfo(muscleConfig_active));
+    spec.addBuilder("cableA", new tgBasicActuatorInfo(muscleConfigA));
+    spec.addBuilder("cableB", new tgBasicActuatorInfo(muscleConfigB));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -213,10 +215,13 @@ void T6Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
-    // Not really sure how to use the find() function in tgModel.h
-    passiveMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_passive"), getDescendants());
-    activeMuscles = tgCast::find<tgModel, tgLinearString>(tgTagSearch("muscle_active"), getDescendants());
+    // @todo check and confirm these calls actually work correctly.
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+
+    passiveMuscles = tgCast::find<tgModel, tgBasicActuator>(tgTagSearch("cableA"), 
+							    getDescendants());
+    activeMuscles = tgCast::find<tgModel, tgBasicActuator>(tgTagSearch("cableB"), 
+							   getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -245,24 +250,24 @@ void T6Model::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& T6Model::getAllMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getAllMuscles() const
 {
     return allMuscles;
 }
 
-const std::vector<tgLinearString*>& T6Model::getPassiveMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getPassiveMuscles() const
 {
     return passiveMuscles;
 }
 
-const std::vector<tgLinearString*>& T6Model::getActiveMuscles() const
+const std::vector<tgBasicActuator*>& T6Model::getActiveMuscles() const
 {
     return activeMuscles;
 }
 
 const double T6Model::muscleRatio()
 {
-	return (c.stiffness_passive/c.stiffness_active);
+	return (c.stiffnessA/c.stiffnessB);
 	//return 2.5;
 }
     

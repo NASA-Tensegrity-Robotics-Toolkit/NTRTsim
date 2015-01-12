@@ -32,7 +32,6 @@
 
 class tgWorld;
 class tgStructureInfo;
-class tgLinearString;
 
 /**
  * This class implements the tetrahedral complex tensegrity spine

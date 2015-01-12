@@ -3,13 +3,15 @@ project(core)
 
 add_library( ${PROJECT_NAME} SHARED
   tgWorldBulletPhysicsImpl.cpp
-    muscleAnchor.cpp
-    Muscle2P.cpp
-    ImpedanceControl.cpp
+    tgBulletSpringCableAnchor.cpp
+    tgSpringCable.cpp
+    tgBulletSpringCable.cpp
+    tgBulletContactSpringCable.cpp
     
     tgModel.cpp
-    tgBaseString.cpp
-    tgLinearString.cpp
+    tgSpringCableActuator.cpp
+    tgBasicActuator.cpp
+    tgKinematicActuator.cpp
     tgWorld.cpp
     tgSimulation.cpp
     tgBulletRenderer.cpp

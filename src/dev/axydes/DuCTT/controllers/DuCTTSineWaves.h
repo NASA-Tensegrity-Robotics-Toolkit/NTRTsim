@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TEST_CONTROLLER_H
-#define TEST_CONTROLLER_H
+#ifndef DUCTT_SINE_WAVES_H
+#define DUCTT_SINE_WAVES_H
 
 /**
  * @file DuCTTSineWaves.h
@@ -36,11 +36,11 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 class tgPrismatic;
 class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
-class ImpedanceControl;
+class tgImpedanceController;
 
 class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
 {
@@ -60,7 +60,7 @@ public:
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
      */
-    void applyImpedanceControlInside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList,
                                     double dt);
     /**
      * Applies the impedance controllers using a velocity setpoint determined.
@@ -71,13 +71,13 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlOutside(const std::vector<tgLinearString*> stringList,
+    void applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
                                     double dt,
                                     std::size_t phase);
 
 private:
-    ImpedanceControl* in_controller;
-    ImpedanceControl* out_controller;
+    tgImpedanceController* in_controller;
+    tgImpedanceController* out_controller;
 
     double simTime;
     double cycle;

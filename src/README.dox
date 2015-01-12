@@ -79,10 +79,31 @@
 	
 	These models were published in the paper
 	Brian T. Mirletz, In-Won Park, Thomas E. Flemons, Adrian K. Agogino, Roger D. Quinn, and Vytas SunSpiral,
-	“Design and Control of Modular Spine-Like Tensegrity Structures”,
-	To Appear in Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
-	
-	\version 1.0.0 (beta)
+    <a href="http://www.sunspiral.org/vytas/cv/6WCSCM_snake_published.pdf">“Design and Control of Modular Spine-Like Tensegrity Structures”</a>, 
+    Proceedings of The 6th World Conference of the International Association for Structural Control and Monitoring (6WCSCM), Barcelona, Spain, July 2014.
+    
+    \subsection contribute Contributing
+    Please contact ntrtdev-owner [at] lists [dot] nasa [dot] gov if you 
+    wish to contribute to the NASA Tensegrity Robotics Toolkit and be 
+    added to the Github developers team. NTRT is Apache 2 licensed. 
+    Due to NASA policy, all contributors will also need to complete a 
+    <a href="https://ti.arc.nasa.gov/m/groups/intelligent-robotics/ntrt/NTRT%20Ind%20CLA.pdf">
+    Individual Contributor License Agreement (CLA)</a>.
+    and send it to the 
+    address specified on the form. Organizations that would like to 
+    support this work can also get broad agreement for employees to 
+    contribute by completing the <a href="https://ti.arc.nasa.gov/m/groups/intelligent-robotics/ntrt/NTRT%20Corp%20CLA.pdf">
+    Corporate Contributor License Agreement</a>. 
+    Please send any questions to ntrtdev-owner [at] lists [dot] nasa [dot] gov.
+    
+    <a href="https://docs.google.com/document/d/18gA03CjOnLOKXO2njqE5roW0y3vtTAQwoOghsBH7I1Q/edit?usp=sharing">FAQ for new developers</a> 
+    
+    \version 1.1.0
+*/
+
+/**
+ \page tutorials Tutorials 
+ If you're a new user you may find NTRT's tutorials to be a better starting point than the Doxygen documentation. As of version 1.1 the tutorials are fairly bare, but we'll be actively adding content in the coming months. Tutorials can be found on NTRT's <a href="http://ntrtsim.readthedocs.org/en/latest/">ReadTheDocs page</a>.
 */
 
 /**
@@ -102,6 +123,7 @@
 | Jérémie Despraz | Ecole Polytechnique Fédérale de Lausanne | jer.despraz (at) gmail.com |
 | Jeffrey Friesen | UC San Diego | jfriesen (at) ucsd.edu |
 | Atil Iscen | Oregon State University | atiliscen (at) gmail.com |
+| Steven Lessard | UC Santa Cruz | slessard (at) ucsc.edu |
 | Brian Mirletz | Case Western Reserve University | brt6 (at) case.edu |
 | Alexie Pogue | UC San Diego | alexie.pogue (at) gmail.com |
 | Andrew Sabelhaus | UC Berkeley | apsabelhaus (at) berkeley.edu |
@@ -136,9 +158,9 @@
 	on your build config, but the default is
 	depends env/build/bullet-2.82-r2704/Demos/OpenGL_FreeGlut\*
 	
-	\*FreeGlut support pending in version 1.0.1
+	\*FreeGlut support pending: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/27
 	
-	\version 1.0.0 (beta)
+	\version 1.1.0
 */
 
 /**
@@ -159,5 +181,29 @@
  either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
 
- \version 1.0.0 (beta)
+ \version 1.1.0
+*/
+
+/**
+ \page scaling Scaling Analysis
+ For the v1.1 release of NTRT, a short white paper is provided that
+ justifies much of the scaling that's done in the example files and
+ related work.
+
+ Most common situations are covered by this analysis.
+ For example, if the gravitational constant needs to be changed in order to make
+ the computations faster for the underlying C++ math libraries, only a few
+ constants would need to be scaled.
+ In particular, our analysis shows that any length scales, force measurements,
+ velocity measurements, density parameters, and moduli of elasticity must be
+ scaled along with gravitational acceleration.
+ Note that this only applies to current models using the semi-standardized
+ CONFIG structure.
+ See, for example, the SUPERball model under src/examples.
+
+ The white paper is currently available at:
+ src/dev/apsabelhaus/scaling_analysis/scaling_analysis.pdf
+
+ If any errors or corrections are found, please email Drew Sabelhaus
+ at apsabelhaus@berkeley.edu.
 */

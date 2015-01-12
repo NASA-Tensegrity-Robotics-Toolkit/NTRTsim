@@ -76,7 +76,7 @@ btRigidBody* tgBulletUtil::createRigidBody(btDynamicsWorld* dynamicsWorld,
     return body;
 }
 
-btDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(tgWorld& world)
+btDynamicsWorld& tgBulletUtil::worldToDynamicsWorld(const tgWorld& world)
 {
   // Fetch the world's implementation.
   tgWorldImpl& impl = world.implementation();

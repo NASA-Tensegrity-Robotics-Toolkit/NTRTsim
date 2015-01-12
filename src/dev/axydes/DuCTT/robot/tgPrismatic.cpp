@@ -31,7 +31,6 @@
 #include "core/tgWorldBulletPhysicsImpl.h"
 
 // The Bullet Physics library
-#include "LinearMath/btVector3.h"
 #include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
 
 // The C++ Standard Library

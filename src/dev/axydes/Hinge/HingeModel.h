@@ -35,9 +35,9 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
+class tgBasicActuator;
 class tgModelVisitor;
-class PretensionController;
 class tgStructure;
 class tgWorld;
 
@@ -96,7 +96,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
       
 private:
     
@@ -133,16 +133,10 @@ private:
 
 private:
     /**
-     * A controller that is attached to all of the strings which applies
-     * pretension to the muscles.
-     */
-    PretensionController* m_pStringController;
-    
-    /**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
 };
 
 #endif  // Hinge_MODEL_H

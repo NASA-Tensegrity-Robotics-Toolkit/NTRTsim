@@ -24,12 +24,16 @@
  * $Id$
  */
 
+#include "NeuroAdapter.h"
+#include "learning/Configuration/configuration.h"
+#include "helpers/FileHelpers.h"
+#include "neuralNet/Neural Network v2/neuralNetwork.h"
+
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "NeuroAdapter.h"
-#include "../Configuration/configuration.h"
+#include <assert.h>
 
 using namespace std;
 
@@ -55,12 +59,11 @@ void NeuroAdapter::initialize(NeuroEvolution *evo,bool isLearning,configuration 
 	else
 	{
 		currentControllers = this->neuroEvo->nextSetOfControllers();
-		for(int i=0;i<currentControllers.size();i++)
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			stringstream ss;
-			ss<<"logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
+			ss<< neuroEvo->resourcePath << "logs/bestParameters-"<<this->neuroEvo->suffix<<"-"<<i<<".nnw";
 			currentControllers[i]->loadFromFile(ss.str().c_str());
-//			currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
 		}
 	}
 	errorOfFirstController=0.0;
@@ -74,16 +77,15 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 	if(numberOfStates>0)
 	{
 		double *inputs = new double[numberOfStates];
-		if(numberOfStates!=3)
-		{
-			cout<<"Warning: numberOfStates is not 3"<<endl;
-		}
+
 		//scale inputs to 0-1 from -1 to 1 (unit vector provided from the controller).
-		double length=sqrt(state[0]*state[0]+state[1]*state[1]+state[2]*state[2]);
-		inputs[0]=state[0] / length / 2.0 + 0.5;
-		inputs[1]=state[1] / length / 2.0 + 0.5;
-		inputs[2]=state[2] / length / 2.0 + 0.5;
-		for(int i=0;i<currentControllers.size();i++)
+		// Assumes inputs are already scaled -1 to 1
+		assert (state.size() == numberOfStates);
+		for (int i = 0; i < numberOfStates; i++)
+		{
+			inputs[i]=state[i] / 2.0 + 0.5;
+		}
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			double *output=currentControllers[i]->getNn()->feedForwardPattern(inputs);
 			vector<double> tmpAct;
@@ -97,10 +99,10 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 	}
 	else
 	{
-		for(int i=0;i<currentControllers.size();i++)
+		for(std::size_t i=0;i<currentControllers.size();i++)
 		{
 			vector<double> tmpAct;
-			for(int j=0;j<currentControllers[i]->statelessParameters.size();j++)
+			for(std::size_t j=0;j<currentControllers[i]->statelessParameters.size();j++)
 			{
 				tmpAct.push_back(currentControllers[i]->statelessParameters[j]);
 			}
@@ -109,7 +111,7 @@ vector<vector<double> > NeuroAdapter::step(double deltaTimeSeconds,vector<double
 	}
 
 
-	return actions;
+    return actions;
 }
 
 void NeuroAdapter::endEpisode(vector<double> scores)

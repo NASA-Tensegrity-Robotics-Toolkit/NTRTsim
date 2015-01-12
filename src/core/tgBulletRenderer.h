@@ -30,7 +30,7 @@
 #include "tgModelVisitor.h"
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModel;
 class tgRod;
 class tgWorld;
@@ -45,15 +45,14 @@ public:
   /**
    * The only constructor.
    * @param[in,out] world a reference to the tgWorld being rendered
-   * @todo Make the world const.
    */
-  tgBulletRenderer(tgWorld& world);
+  tgBulletRenderer(const tgWorld& world);
 
   /**
-   * Render a tgLinearString.
-   * @param[in] linearString a const reference to a tgLinearString to render
+   * Render a tgSpringCableActuator.
+   * @param[in] linearString a const reference to a tgSpringCableActuator to render
    */
-  virtual void render(const tgLinearString& linString) const;
+  virtual void render(const tgSpringCableActuator& mSCA) const;
  
   /**
    * Render a tgRod.
@@ -71,9 +70,8 @@ private:
 
   /**
    * A reference to the tgWorld being rendered.
-   * @todo Make this const.
    */
-  tgWorld& m_world;
+  const tgWorld& m_world;
 };
 
 #endif

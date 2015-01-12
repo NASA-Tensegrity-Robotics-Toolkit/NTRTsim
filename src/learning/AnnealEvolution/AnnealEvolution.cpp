@@ -53,10 +53,9 @@ unsigned long long rdtsc(){
 
 #endif
 
-AnnealEvolution::AnnealEvolution(string suff, string config, string path) :
-Temp(1.0),
-suffix(suff)
-
+AnnealEvolution::AnnealEvolution(std::string suff, std::string config, std::string path) :
+suffix(suff),
+Temp(1.0)
 {
     currentTest=0;
     generationNumber=0;
@@ -127,7 +126,7 @@ AnnealEvolution::~AnnealEvolution()
 
 void AnnealEvolution::mutateEveryController()
 {
-    for(int i=0;i<populations.size();i++)
+    for(std::size_t i=0;i<populations.size();i++)
     {
         populations.at(i)->mutate(&eng,numberOfElementsToMutate, Temp);
     }
@@ -144,7 +143,7 @@ void AnnealEvolution::orderAllPopulations()
     // Disable definition of unused variables to suppress compiler warning
     double maxScore1,maxScore2;
 #endif
-    for(int i=0;i<scoresOfTheGeneration.size();i++)
+    for(std::size_t i=0;i<scoresOfTheGeneration.size();i++)
     {
         aveScore1+=scoresOfTheGeneration[i][0];
         aveScore2+=scoresOfTheGeneration[i][1];
@@ -153,7 +152,7 @@ void AnnealEvolution::orderAllPopulations()
     aveScore2 /= scoresOfTheGeneration.size();
 
 
-    for(int i=0;i<populations.size();i++)
+    for(std::size_t i=0;i<populations.size();i++)
     {
         populations.at(i)->orderPopulation();
     }
@@ -165,7 +164,7 @@ void AnnealEvolution::orderAllPopulations()
     // This seems biased towards average scores
     // We actually order the populations, so member 0 is the current best according to the assigned fitness
     ofstream logfileLeader;
-    for(int i=0;i<populations.size();i++)
+    for(std::size_t i=0;i<populations.size();i++)
     {
         stringstream ss;
         ss << resourcePath << "logs/bestParameters-" << suffix << "-" << i << ".nnw";
@@ -206,7 +205,7 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
     }
 
     selectedControllers.clear();
-    for(int i=0;i<populations.size();i++)
+    for(std::size_t i=0;i<populations.size();i++)
     {
         int selectedOne=0;
         if(coevolution)
@@ -236,7 +235,7 @@ void AnnealEvolution::updateScores(vector <double> multiscore)
     payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);
     payloadLog<<multiscore[0]<<","<<multiscore[1];
     
-    for(int oneElem=0;oneElem<selectedControllers.size();oneElem++)
+    for(std::size_t oneElem=0;oneElem<selectedControllers.size();oneElem++)
     {
         AnnealEvoMember * controllerPointer=selectedControllers.at(oneElem);
 

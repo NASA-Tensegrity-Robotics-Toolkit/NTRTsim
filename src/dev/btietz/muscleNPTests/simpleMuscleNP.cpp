@@ -20,17 +20,16 @@
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
-#include "core/tgLinearString.h"
-#include "core/tgBaseString.h"
+#include "core/tgSpringCableActuator.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-#include "dev/muscleNP/tgMultiPointStringInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 simpleMuscleNP::simpleMuscleNP()
 {
 }
@@ -88,25 +87,22 @@ void simpleMuscleNP::setup(tgWorld& world)
 	// Move the structure so it doesn't start in the ground
 	s.move(btVector3(0, 0, 0));
 	//s.addRotation(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 1.0, 0.0), M_PI_2);
-	tgBaseString::Config muscleConfig(1000, 10, 0.0, false, 600000000);
+	tgSpringCableActuator::Config muscleConfig(1000, 10, 0.0, false, 600000000);
 	
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
 	spec.addBuilder("rod", new tgRodInfo(rodConfig));
 	spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
 	spec.addBuilder("box", new tgBoxInfo(boxConfig));
-#if (1)
-	spec.addBuilder("muscle", new tgMultiPointStringInfo(muscleConfig));
-#else
-	spec.addBuilder("muscle", new tgLinearStringInfo(muscleConfig));
-#endif
+	spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+
 	// Create your structureInfo
 	tgStructureInfo structureInfo(s, spec);
 	// Use the structureInfo to build ourselves
 	structureInfo.buildInto(*this, world);
 	// We could now use tgCast::filter or similar to pull out the
 	// models (e.g. muscles) that we want to control.
-	allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+	allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 	allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 	
 	notifySetup();
@@ -123,7 +119,7 @@ void simpleMuscleNP::step(double dt)
 {
 	totalTime += dt;
 	
-	//allMuscles[0]->setRestLength(11, dt);
+    allMuscles[0]->setControlInput(10, dt);
 //	allMuscles[1]->setRestLength(11, dt);
 	
 	btVector3 com(0, 0, 0);

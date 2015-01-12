@@ -36,7 +36,9 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
+class tgStructure;
+class tgStructureInfo;
 
 class VerticalSpineModel: public tgSubject<VerticalSpineModel>, public tgModel
 {
@@ -45,7 +47,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgLinearString*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgBasicActuator*> > MuscleMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -84,9 +86,9 @@ public:
 	 * a string to a vector of muscles
 	 * @return a std::vector of pointers to the muscles found by the key
 	 */
-    const std::vector<tgLinearString*>& getMuscles (const std::string& key) const;
+    const std::vector<tgBasicActuator*>& getMuscles (const std::string& key) const;
      
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -100,11 +102,57 @@ public:
     
 private:
 	
+    /**
+     * A series of helper functions, used to create the model.
+     */
+
+    /**
+     * Generate the five nodes for a tetrahedron, inside the tgStructure
+     * that's passed in.
+     * @param[in] tetra: the structure to build the nodes into
+     * @param[in] edge: edge length for this one tetrahedron
+     * @param[in] height: height length for this one tetrahedron
+     */
+    static void addNodes(tgStructure& tetra, double edge, double height);
+
+    /**
+     * Output debugging information for this model and structure.
+     */
+    static void trace(const tgStructureInfo& structureInfo, tgModel& model);
+
+    /**
+     * Pair together the nodes for the first type of rod
+     */
+    static void addPairs(tgStructure& tetra);
+
+    /**
+     * Pair together the nods for the second type of rod
+     */
+    static void addPairsB(tgStructure& tetra);
+
+    /**
+     * Generate the full spine structure by copying and translating one tetra
+     * into segmentCount number of tetras, and build that into spine.
+     */
+    static void addSegments(tgStructure& spine, const tgStructure& tetra, double
+			    edge, size_t segmentCount);
+
+    /**
+     * Add the muscles that connect between the segments of the spine.
+     */
+    static void addMuscles(tgStructure& spine);
+
+    /**
+     * Create the names for the muscles, used in the getMuscles function.
+     */
+    static void mapMuscles(VerticalSpineModel::MuscleMap& muscleMap, tgModel&
+			   model, size_t segmentCount);
+
 	/**
-	 * A std::vector containing all of the tgLinearStrings amongst
+	 * A std::vector containing all of the tgBasicActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 	
 	/**
 	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains

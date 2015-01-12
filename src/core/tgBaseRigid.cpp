@@ -49,6 +49,9 @@ tgBaseRigid::tgBaseRigid(btRigidBody* pRigidBody,
     // Postcondition
     assert(invariant());
     assert(m_pRigidBody == pRigidBody);
+    
+    // Supress compiler warning for bullet's unused variable
+    (void) btInfinityMask;
 }
 
 tgBaseRigid::~tgBaseRigid() { }
@@ -61,8 +64,9 @@ void tgBaseRigid::onVisit(const tgModelVisitor& v) const
 
 void tgBaseRigid::teardown()
 {
-  // This does not appear to be called
-
+  // World owns this
+    m_pRigidBody = NULL;
+    tgModel::teardown();
   // Postcondition
   // This does not preserve the invariant
 }

@@ -25,8 +25,6 @@
 
 // This application
 #include "T6Model.h"
-#include "T6TensionController.h"
-#include "T6RestLengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -46,7 +44,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppSUPERball" << std::endl;
+    std::cout << "AppSUPERball_TwoSprings" << std::endl;
 
     // First create the ground and world
     
@@ -79,20 +77,16 @@ int main(int argc, char** argv)
 
     // Fifth, select the controller to use. Uncomment desired controller.
 
-    // For the T6RestLengthController, pass in the amount of cable to contract
-    // in. This is the "rest length difference": the static offset of cable
-    // length between geometric length in equilibrium and the actual rest length
-    // of an individual cable. 
-    // Note for the above scale of gravity, this is in decimeters.
-    T6RestLengthController* const pTC = new T6RestLengthController(myModel, 4);
+    // This controller is not used anymore, and is depreciated in favor of
+    // using the pretension parameter within T6Model itself.
+    // It is kept here for a reference for how such a controller would be
+    // called in the future.
+    //T6RestLengthController* const pTC = new T6RestLengthController(myModel, 4);
 
-    // For the T6TensionController,
-    // Set the tension of the controller units of kg * length / s^2
-    // So 10000 units at this scale is 1000 N
+    // Attach the controller to the model
+    //myModel->attach(pTC);
 
-    //T6TensionController* const pTC = new T6TensionController(750);
-
-    myModel->attach(pTC);
+    // Add the model (with attachments) to the simulation
     simulation.addModel(myModel);
     
     // Run until the user stops

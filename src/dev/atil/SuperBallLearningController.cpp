@@ -29,7 +29,7 @@
 // This application
 #include "SuperBallModel.h"
 // This library
-#include "core/tgLinearString.h"
+#include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
@@ -51,12 +51,12 @@ SuperBallPrefLengthController::SuperBallPrefLengthController(const double initia
 void SuperBallPrefLengthController::onSetup(SuperBallModel& subject)
 {
 	m_totalTime=0;
-	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = muscles[i];
+		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
-		pMuscle->setRestLength(this->m_initialLengths,0.0001);
+		pMuscle->setControlInput(this->m_initialLengths,0.0001);
 	}
 
     btTransform boxTr;
@@ -100,10 +100,10 @@ void SuperBallPrefLengthController::onStep(SuperBallModel& subject, double dt)
     }
 
     //Move motors for all the muscles
-	const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i)
 	{
-		tgLinearString * const pMuscle = muscles[i];
+		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
 	}
@@ -234,7 +234,7 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 					//give the action that corresponds to these nodes originally to the ones with new mapping
 					int nodeStartNew=subject.nodeMappingReverse[nodeStartOriginal];
 					int nodeEndNew=subject.nodeMappingReverse[nodeEndOriginal];
-					tgLinearString * correspondingMuscle = subject.musclesPerNodes[nodeStartNew][nodeEndNew];
+					tgBasicActuator * correspondingMuscle = subject.musclesPerNodes[nodeStartNew][nodeEndNew];
 					if(correspondingMuscle==NULL)
 					{
 						cout<<"NO MUSCLE EXISTS ACCORDING TO THE NEW MAPPING"<<endl;
@@ -245,7 +245,7 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 						cout<<"Warning: actions < number of active muscles, no input given"<<endl;
 						continue;
 					}
-					correspondingMuscle->setPrefLength(actions[actionNo][0]);
+					correspondingMuscle->setControlInput(actions[actionNo][0]);
 				}
 			}
 		}
@@ -329,7 +329,7 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 					//give the action that corresponds to these nodes originally to the ones with new mapping
 					int nodeStartNew=subject.nodeMappingReverse[nodeStartOriginal];
 					int nodeEndNew=subject.nodeMappingReverse[nodeEndOriginal];
-					tgLinearString * correspondingMuscle = subject.musclesPerNodes[nodeStartNew][nodeEndNew];
+					tgBasicActuator * correspondingMuscle = subject.musclesPerNodes[nodeStartNew][nodeEndNew];
 					if(correspondingMuscle==NULL)
 					{
 						cout<<"NO MUSCLE EXISTS ACCORDING TO THE NEW MAPPING"<<endl;
@@ -340,7 +340,7 @@ void SuperBallPrefLengthController::applyActions(SuperBallModel& subject, vector
 						cout<<"Warning: actions < number of active muscles, no input given"<<endl;
 						continue;
 					}
-					correspondingMuscle->setPrefLength(actions[actionNo][0]);
+					correspondingMuscle->setControlInput(actions[actionNo][0]);
 				}
 			}
 		}

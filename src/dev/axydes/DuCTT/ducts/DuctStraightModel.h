@@ -30,6 +30,9 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+
+// The Bullet Physics library
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <vector>
 
@@ -38,7 +41,6 @@ class tgModelVisitor;
 class tgStructure;
 class tgWorld;
 class tgBox;
-class btVector3;
 
 /**
  * A class that constructs a straight rectangular duct using the tools

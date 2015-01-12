@@ -7,6 +7,8 @@ tgEmptyGround.cpp
 tgPlaneGround.cpp
 tgCraterGround.cpp
 tgHillyGround.cpp
+tgCraterShallow.cpp
+tgCraterDeep.cpp
 )
 
 link_directories(${LIB_DIR})

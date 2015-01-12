@@ -34,7 +34,7 @@
 #include "heightSensor.h"
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -94,7 +94,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
     
     /**
      * Returns the values from all the 12 height sensors.
@@ -127,7 +127,7 @@ public:
     //Fill the list of pointers to the muscles for each node.
 	void fillMusclesPerNode();
 
-	const std::vector<std::vector<tgLinearString*> >& getMusclesPerNodes() const {
+	const std::vector<std::vector<tgBasicActuator*> >& getMusclesPerNodes() const {
 		return musclesPerNodes;
 	}
 
@@ -141,7 +141,7 @@ public:
 	//muscle connections between the nodes.
 	int muscleConnections[13][13];
 	//contains pointer to the muscle for a given pair of nodes
-	std::vector<std::vector <tgLinearString *> > musclesPerNodes;
+	std::vector<std::vector <tgBasicActuator *> > musclesPerNodes;
 
 private:
 	
@@ -192,7 +192,7 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 	std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
 	std::vector<btVector3> nodePositions;
 	std::vector<heightSensor> heightSensors;

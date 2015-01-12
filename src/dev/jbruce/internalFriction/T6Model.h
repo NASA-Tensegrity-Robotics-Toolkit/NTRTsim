@@ -32,7 +32,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -92,19 +92,19 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgLinearString*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllMuscles() const;
     
     /**
 	 * Return a vector of passive muscles for the controllers to work with.
 	 * @return A vector of all of the muscles
 	 */
-	const std::vector<tgLinearString*>& getPassiveMuscles() const;
+	const std::vector<tgBasicActuator*>& getPassiveMuscles() const;
 
 	/**
 	 * Return a vector of active muscles for the controllers to work with.
 	 * @return A vector of all of the muscles
 	 */
-	const std::vector<tgLinearString*>& getActiveMuscles() const;
+	const std::vector<tgBasicActuator*>& getActiveMuscles() const;
 
 	/**
 	 * Return a const of the ratio of spring constants for active and passive
@@ -143,19 +143,19 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgLinearString*> allMuscles;
+    std::vector<tgBasicActuator*> allMuscles;
 
 	/**
      * A list of passively actuated muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgLinearString*> passiveMuscles;
+    std::vector<tgBasicActuator*> passiveMuscles;
 
     /**
 	 * A list of passively actuated muscles. Will be empty until most of the way
 	 * through setup
 	 */
-	std::vector<tgLinearString*> activeMuscles;
+	std::vector<tgBasicActuator*> activeMuscles;
 };
 
 #endif  // T6_MODEL_H

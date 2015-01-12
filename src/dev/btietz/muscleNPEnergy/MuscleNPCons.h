@@ -38,7 +38,7 @@
 #include <vector>
 
 // Forward declarations
-class tgLinearString;
+class tgSpringCableActuator;
 class tgModelVisitor;
 class tgWorld;
 class tgBaseRigid;
@@ -103,7 +103,7 @@ public:
 	
 private:
 	double totalTime;
-	std::vector<tgLinearString*> allMuscles;
+	std::vector<tgSpringCableActuator*> allMuscles;
 	std::vector<tgBaseRigid*> allRods;
 	
 };

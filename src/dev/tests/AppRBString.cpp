@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
-    const tgLinearString::Config stringConfig(stiffness, damping);
+    const tgBasicActuator::Config stringConfig(stiffness, damping);
     const RBStringTest::Config rbConfig(segments, rodConfig, stringConfig, 3.0);
     RBStringTest* myModel = new RBStringTest(&start, &end, rbConfig);
 #if (0)

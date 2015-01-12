@@ -30,20 +30,20 @@
 #include "tgTouchSensorSphereModel.h"
 
 // The NTRT Core Libary
-#include "core/tgLinearString.h"
+#include "core/abstractMarker.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 
 // The NTRT Creator Libary
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 
 // The Bullet Physics library
-#include "LinearMath/btVector3.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
 // The C++ Standard Library
@@ -305,25 +305,28 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     // Define the configurations of the rods and strings
     // rodConfigB has density of 0 so it stays fixed in simulator
     const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_prismDensity);
-    const tgRod::Config staticRodConfig(m_config.m_prismRadius, 0);
     const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
 
-    const tgLinearString::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                  false, m_config.m_maxStringForce, m_config.m_maxVertStringVel, m_config.m_maxStringAcc,
+    const tgRod::Config staticPrismRodConfig(m_config.m_prismRadius, 0);
+    const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
+    const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
+
+    const tgBasicActuator::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
+                                                  false, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
                                                   m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
-    const tgLinearString::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
-                                                    false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel, m_config.m_maxStringAcc,
+    const tgBasicActuator::Config saddleStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
+                                                    false, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
-    btVector3 prism1Axis(0,0,1);
-    btVector3 prism2Axis(0,1,0);
+    btVector3 prismAxisBottom(0,0,1);
+    btVector3 prismAxisTop(0,1,0);
 
-    prism1Axis = prism1Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
-    prism2Axis = prism2Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prismAxisBottom = prismAxisBottom.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prismAxisTop = prismAxisTop.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
 
-    const tgPrismatic::Config prismConfig(prism1Axis, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
-    const tgPrismatic::Config prismConfig2(prism2Axis, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
@@ -366,13 +369,16 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
-//    spec.addBuilder("inner rod", new tgRodInfo(staticRodConfig));
 
-    spec.addBuilder("vert string", new tgLinearStringInfo(vertStringConfig));
-    spec.addBuilder("saddle string", new tgLinearStringInfo(saddleStringConfig));
+//    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
+//    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
+//    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
 
-    spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfig));
-    spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfig2));
+    spec.addBuilder("vert string", new tgBasicActuatorInfo(vertStringConfig));
+    spec.addBuilder("saddle string", new tgBasicActuatorInfo(saddleStringConfig));
+
+    spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
+    spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     spec.addBuilder("hinge", new tgDuCTTHingeInfo(hingeConfig));
@@ -418,15 +424,15 @@ void DuCTTRobotModel::setupVariables()
 {
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control.
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
     allPrisms = tgCast::filter<tgModel, tgPrismatic> (getDescendants());
     allRods = tgCast::filter<tgModel, tgRod> (getDescendants());
 
     bottomRods = find<tgRod>("rod bottom");
     topRods = find<tgRod>("rod top");
     prismRods = find<tgRod>("prism rod");
-    vertMuscles = find<tgLinearString>("vert string");
-    saddleMuscles = find<tgLinearString>("saddle string");
+    vertMuscles = find<tgBasicActuator>("vert string");
+    saddleMuscles = find<tgBasicActuator>("saddle string");
 
     spheres = find<tgSphere>("sphere");
     allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
@@ -441,6 +447,7 @@ void DuCTTRobotModel::setupVariables()
     {
         btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomSpheres[i]->centerOfMass();
         abstractMarker marker (bottomSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        addMarker(marker);
         bottomTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<bottomRods.size(); j++)
         {
@@ -451,6 +458,7 @@ void DuCTTRobotModel::setupVariables()
     {
         btVector3 offset = topTouchSensors[i]->centerOfMass() - topSpheres[i]->centerOfMass();
         abstractMarker marker (topSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        addMarker(marker);
         topTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<topRods.size(); j++)
         {
@@ -468,6 +476,16 @@ void DuCTTRobotModel::setupVariables()
     if (topPrisms.size() == 1)
     {
         m_pTopPrismatic = topPrisms[0];
+    }
+
+    std::vector<tgRod*> innerRods = find<tgRod>("inner rod");
+    for (size_t i=0; i<innerRods.size(); i++)
+    {
+        double offsetDist = innerRods[i]->length()/2;
+        abstractMarker marker (innerRods[i]->getPRigidBody(), btVector3(0,offsetDist,0), btVector3(255,0,0), 0);
+        addMarker(marker);
+        abstractMarker marker2 (innerRods[i]->getPRigidBody(), btVector3(0,-offsetDist,0), btVector3(255,0,0), 0);
+        addMarker(marker2);
     }
 }
 
@@ -491,17 +509,17 @@ void DuCTTRobotModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getAllMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getAllMuscles() const
 {
     return allMuscles;
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getVertMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getVertMuscles() const
 {
     return vertMuscles;
 }
 
-const std::vector<tgLinearString*>& DuCTTRobotModel::getSaddleMuscles() const
+const std::vector<tgBasicActuator*>& DuCTTRobotModel::getSaddleMuscles() const
 {
     return saddleMuscles;
 }

@@ -27,19 +27,18 @@
  * $Id$
  */
 
-#include <algorithm> //for_each
-#include <math.h> 
-#include <vector>
-#include <assert.h>
-#include <sstream>
 
-#include "CPGEdge.h"
+#include <vector>
+#include <sstream>
 
 //Forward Declaration
 class CPGEdge; 
 
 class CPGNode
 {
+	friend class CPGEquations;
+	friend class CPGNodeFB;
+    
 	public:
 	
 	/**
@@ -47,22 +46,18 @@ class CPGNode
 	 * stability
 	 */
 	CPGNode(int nodeNum, const std::vector<double> & params);
-	~CPGNode();
-	
-	void addCoupling(CPGEdge* newEdge);
-	
+	virtual ~CPGNode();
+
 	void addCoupling(	CPGNode* cNode,
 						const double cWeight,
 						const double cPhase);
-						
-	void addCoupling(std::vector<CPGEdge*> edgeList);
-	
+
 	/**
 	 * Update phiDotValue and rDoubleDotValue based on Node equations and
 	 * coupling equations
 	 * @todo better name?
 	 */
-	void updateDTs(	double descCom);
+	virtual void updateDTs(	double descCom);
 	
 	/**
 	 * Compute the base node equation for R and Phi
@@ -71,9 +66,9 @@ class CPGNode
 							double c0,
 							double c1);
 				
-	void updateNodeValues (	double newR,
-							double newRD,
-							double newPhi);
+	virtual void updateNodeValues (	double newR,
+									double newRD,
+									double newPhi);
 	// out of date since we're using pointers, but still potentially useful
 	#if (0)
 	std::vector<CPGNode*> getCoupling(){
@@ -88,6 +83,8 @@ class CPGNode
 	}
 	
 	std::string toString(const std::string& prefix = "") const;
+    
+	protected:
 	
 	/**
 	 * Values for numerical integration
@@ -99,10 +96,10 @@ class CPGNode
 	double rDotValue; //rDot for next update
 	double rDoubleDotValue; //Deriviative of RDot
 	
-	protected:
-	
-	std::vector<CPGEdge*> couplingList;
-	
+	std::vector<CPGNode*> couplingList;
+	std::vector<double> phaseList;
+    std::vector<double> weightList;
+    
 	/**
 	 * Index of this node for printing and debugging
 	 */

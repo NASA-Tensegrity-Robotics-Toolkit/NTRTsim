@@ -33,13 +33,13 @@
 // Should include tgString, but compiler complains since its been
 // included from TetraSpineLearningModel. Perhaps we should move things
 // to a cpp over there
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgSpringCableActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "examples/learningSpines/tgCPGStringControl.h"
+#include "examples/learningSpines/tgCPGActuatorControl.h"
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -57,11 +57,11 @@ BaseSpineCPGControl(config, args, resourcePath, ec, nc)
 
 void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
-	std::vector <tgLinearString*> allMuscles = subject.getAllMuscles();
+	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgCPGStringControl* pStringControl = new tgCPGStringControl();
+		tgCPGActuatorControl* pStringControl = new tgCPGActuatorControl();
         allMuscles[i]->attach(pStringControl);
         m_allControllers.push_back(pStringControl);
     }
@@ -80,7 +80,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
     // Then determine connectivity and setup string
     for (std::size_t i = 0; i < m_allControllers.size(); i++)
     {
-        tgCPGStringControl * const pStringInfo = m_allControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_allControllers[i];
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_allControllers, edgeActions);
         
@@ -116,7 +116,7 @@ void TetraSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D n
             controlLength = 16.5 ;
         }
 #endif
-        ImpedanceControl* p_ipc = new ImpedanceControl( tension,
+        tgImpedanceController* p_ipc = new tgImpedanceController( tension,
                                                         kPosition,
                                                         kVelocity);
         pStringInfo->setupControl(*p_ipc, controlLength);

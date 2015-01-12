@@ -139,6 +139,14 @@ function patch_bullet()
     patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
 
     popd > /dev/null
+    
+    # Also fix double free error in btQuickprof
+    
+    pushd "$BULLET_BUILD_DIR/src/LinearMath" > /dev/null
+    
+    patch < "$SETUP_DIR/patches/btQuickprof.patch"
+    
+    popd > /dev/null
 }
 
 # Build the package under the build directory specified in in install.conf
@@ -243,8 +251,16 @@ function main()
         env_link_bullet
         return
     fi
-
-    # @todo: add check bullet patched
+    
+    # This may not be the best test - The directory is created at the beginning of the function
+    # Is there a way to check a specific line into a file?
+    if check_directory_exists "$BULLET_BUILD_DIR/Demos/OpenGL_FreeGlut/"; then
+        echo "- Bullet Physics patches have already been applied -- skipping."
+        build_bullet
+        install_bullet
+        env_link_bullet
+        return
+    fi
 
     if check_file_exists "$BULLET_PACKAGE_DIR/CMakeLists.txt"; then
         echo "- Bullet Physics is already unpacked to $BULLET_BUILD_DIR -- skipping."

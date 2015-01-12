@@ -10,7 +10,7 @@
  Nodes are first placed into a tgStructure, and then those nodes are paired and tagged.
  Nodes can be tagged directly, and then become a tgSphereInfo.
  A tgPair can either become a tgRigidInfo or a tgConnectorInfo based on
- its tgTag structure. This is determined by the config (from tgRodInfo or tgLinearStringInfo)
+ its tgTag structure. This is determined by the config (from tgRodInfo or tgBasicActuatorInfo)
  that is passed into a tgBuildSpec.
  The tgBuildSpec is given to a tgStructureInfo, which then builds the structure
  into the relevant tgModel. It takes care of compouding tgRod (s) that share the same
@@ -18,5 +18,5 @@
  
  For an example, see PrismModel
  
- \version 1.0.0 (beta)
+ \version 1.1.0
  */

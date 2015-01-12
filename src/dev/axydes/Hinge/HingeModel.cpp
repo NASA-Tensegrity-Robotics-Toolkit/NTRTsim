@@ -27,11 +27,11 @@
 #include "../DuCTT/robot/tgTouchSensorSphereInfo.h"
 #include "../DuCTT/robot/tgTouchSensorSphereModel.h"
 // This library
-#include "controllers/PretensionController.h"
-#include "core/tgLinearString.h"
+#include "core/abstractMarker.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgLinearStringInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -82,7 +82,6 @@ tgModel()
 
 HingeModel::~HingeModel()
 {
-    delete m_pStringController;
 }
 
 void HingeModel::addNodes(tgStructure& tetra,
@@ -172,7 +171,7 @@ void HingeModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgLinearString> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     std::vector<tgSphere*> spheres = find<tgSphere>("sphere");
 
     std::vector<tgTouchSensorSphereModel*> allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
@@ -182,9 +181,6 @@ void HingeModel::setup(tgWorld& world)
         allTouchSensors[i]->addMarker(marker);
     }
 
-    // Then attach the pretension controller to each of these muscles to keep
-    // the tensegrity's shape
-   
     // Notify controllers that setup has finished.
     notifySetup();
     
@@ -213,7 +209,7 @@ void HingeModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgLinearString*>& HingeModel::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& HingeModel::getAllMuscles() const
 {
     return allMuscles;
 }

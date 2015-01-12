@@ -31,6 +31,9 @@
 // This library
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 
+// The C++ Standard Library
+#include <vector>
+
 // Forward Declarations
 class tgWorld;
 
@@ -55,6 +58,8 @@ public:
     virtual void teardown();
     
     virtual void step(const double dt);
+    
+    std::vector<double> getStringMaxTensions() const;
 
 };
 
