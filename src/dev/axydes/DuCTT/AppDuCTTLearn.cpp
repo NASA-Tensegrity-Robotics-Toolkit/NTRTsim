@@ -79,8 +79,8 @@ bool AppDuCTTLearn::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTRobotController* testLearningController =
-            new DuCTTRobotController(5.0, use_manual_params, paramFile);
+        DuCTTLearningController* testLearningController =
+            new DuCTTLearningController(5.0, use_manual_params, paramFile);
         myRobotModel->attach(testLearningController);
     }
 

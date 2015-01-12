@@ -17,7 +17,7 @@
  */
 
 /**
- * @file DuCTTRobotController.cpp
+ * @file DuCTTLearningController.cpp
  * @brief Escape Controller for T6 
  * @author Steven Lessard
  * @version 1.0.0
@@ -51,7 +51,7 @@ using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-DuCTTRobotController::DuCTTRobotController(const double initialLength,
+DuCTTLearningController::DuCTTLearningController(const double initialLength,
                                            const bool useManualParams,
                                            const string manParamFile) :
     m_initialLengths(initialLength),
@@ -74,7 +74,7 @@ DuCTTRobotController::DuCTTRobotController(const double initialLength,
 }
 
 /** Set the lengths of the muscles and initialize the learning adapter */
-void DuCTTRobotController::onSetup(DuCTTRobotModel& subject)
+void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
 {
     double dt = 0.0001;
 
@@ -103,7 +103,7 @@ void DuCTTRobotController::onSetup(DuCTTRobotModel& subject)
     applyActions(subject,actions);
 }
 
-void DuCTTRobotController::onStep(DuCTTRobotModel& subject, double dt)
+void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
 {
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
@@ -136,7 +136,7 @@ void DuCTTRobotController::onStep(DuCTTRobotModel& subject, double dt)
 
 // So far, only score used for eventual fitness calculation of an Escape Model
 // is the maximum distance from the origin reached during that subject's episode
-void DuCTTRobotController::onTeardown(DuCTTRobotModel& subject) {
+void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
     std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
     double distance = displacement(subject);
     double energySpent = totalEnergySpent(subject);
@@ -161,7 +161,7 @@ void DuCTTRobotController::onTeardown(DuCTTRobotModel& subject) {
  * Invariant: actions[x].size() == 4 for all legal values of x
  * Invariant: Each actions[] contains: amplitude, angularFrequency, phaseChange, dcOffset
  */
-vector< vector <double> > DuCTTRobotController::transformActions(vector< vector <double> > actions)
+vector< vector <double> > DuCTTLearningController::transformActions(vector< vector <double> > actions)
 {
     vector <double> manualParams(4 * (nActions), 1); // '4' for the number of sine wave parameters
     if (m_usingManualParams) {
@@ -199,7 +199,7 @@ vector< vector <double> > DuCTTRobotController::transformActions(vector< vector 
 /**
  * Defines each cluster's sine wave according to actions
  */
-void DuCTTRobotController::applyActions(DuCTTRobotModel& subject, vector< vector <double> > actions)
+void DuCTTLearningController::applyActions(DuCTTRobotModel& subject, vector< vector <double> > actions)
 {
     assert(actions.size() == nActions);
 
@@ -221,7 +221,7 @@ void DuCTTRobotController::applyActions(DuCTTRobotModel& subject, vector< vector
     //printSineParams();
 }
 
-void DuCTTRobotController::setupAdapter() {
+void DuCTTLearningController::setupAdapter() {
     string suffix = "_DuCTT";
     string configAnnealEvolution = "Config.ini";
     AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
@@ -237,7 +237,7 @@ void DuCTTRobotController::setupAdapter() {
 //TODO: too much pretension
 //TODO: historisis effect of latching onto wall (need to come away from wall
 //      a certain amount to be unlocked
-double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
+double DuCTTLearningController::totalEnergySpent(DuCTTRobotModel& subject) {
     double totalEnergySpent=0;
 
     vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
@@ -263,7 +263,7 @@ double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
 
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
-void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
+void DuCTTLearningController::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
     const double minLength = m_initialLengths * (1-maxStringLengthFactor);
     const double maxLength = m_initialLengths * (1+maxStringLengthFactor);
@@ -288,7 +288,7 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
 // Post-condition: every muscle will have a new target length
 //TODO: saturation of sin wave by touch sensors
 //TODO: 'locking' of prismatics?
-void DuCTTRobotController::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
+void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
     const double minLength = m_initialLengths * (1-maxStringLengthFactor);
     const double maxLength = m_initialLengths * (1+maxStringLengthFactor);
@@ -307,7 +307,7 @@ void DuCTTRobotController::setPrismaticLengths(DuCTTRobotModel& subject, double 
     }
 }
 
-void DuCTTRobotController::populateClusters(DuCTTRobotModel& subject) {
+void DuCTTLearningController::populateClusters(DuCTTRobotModel& subject) {
     for(int cluster=0; cluster < nClusters; cluster++) {
         ostringstream ss;
         ss << (cluster + 1);
@@ -331,14 +331,14 @@ void DuCTTRobotController::populateClusters(DuCTTRobotModel& subject) {
     }
 }
 
-void DuCTTRobotController::initializeSineWaves() {
+void DuCTTLearningController::initializeSineWaves() {
     amplitude = new double[nActions];
     angularFrequency = new double[nActions];
     phaseChange = new double[nActions]; // Does not use last value stored in array
     dcOffset = new double[nActions];
 }
 
-double DuCTTRobotController::displacement(DuCTTRobotModel& subject) {
+double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
     btVector3 finalPosition = subject.getCOM();
 
     // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
@@ -357,7 +357,7 @@ double DuCTTRobotController::displacement(DuCTTRobotModel& subject) {
     return distanceMoved;
 }
                                          
-std::vector<double> DuCTTRobotController::readManualParams(int lineNumber, string filename) {
+std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
     vector<double> result(nActions*4, 1.0);
     string line;
@@ -393,7 +393,7 @@ std::vector<double> DuCTTRobotController::readManualParams(int lineNumber, strin
     return result;
 }
 
-void DuCTTRobotController::printSineParams() {
+void DuCTTLearningController::printSineParams() {
     for (size_t idx = 0; idx < nActions; idx++) {
         std::cout << "amplitude[" << idx << "]: " << amplitude[idx] << std::endl;
         std::cout << "angularFrequency[" << idx << "]: " << angularFrequency[idx] << std::endl;

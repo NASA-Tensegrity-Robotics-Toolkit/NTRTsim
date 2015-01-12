@@ -20,8 +20,8 @@
 #define ESCAPE_T6CONTROLLER
 
 /**
- * @file DuCTTRobotController.h
- * @brief Contains the definition of class DuCTTRobotController.
+ * @file DuCTTLearningController.h
+ * @brief Contains the definition of class DuCTTLearningController.
  * @author Steven Lessard
  * @version 1.0.0
  * $Id$
@@ -45,15 +45,15 @@ class tgImpedanceController;
 using namespace std;
 
 /** Escape Controller for T6 */
-class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
+class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
 {
     public:
-        DuCTTRobotController(const double prefLength=5.0,
+        DuCTTLearningController(const double prefLength=5.0,
                              const bool useManualParams=false,
                              const string manParamFile="");
 
         /** Nothing to delete, destructor must be virtual */
-        virtual ~DuCTTRobotController() { }
+        virtual ~DuCTTLearningController() { }
 
         virtual void onSetup(DuCTTRobotModel& subject);
 
