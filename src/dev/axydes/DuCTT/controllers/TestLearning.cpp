@@ -32,8 +32,8 @@
 #include "../robot/tgPrismatic.h"
 
 // This library
-#include "core/tgLinearString.h"
-#include "core/ImpedanceControl.h"
+#include "core/tgBasicActuator.h"
+#include "controllers/tgImpedanceController.h"
 
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
@@ -63,7 +63,7 @@ DuCTTRobotController::DuCTTRobotController(const double initialLength,
     musclesPerCluster(1),
     nPrisms(2),
     nActions(nClusters+nPrisms),
-    imp_controller(new ImpedanceControl(0.01, 500, 10))
+    imp_controller(new tgImpedanceController(0.01, 500, 10))
 {
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
@@ -79,11 +79,11 @@ void DuCTTRobotController::onSetup(DuCTTRobotModel& subject)
     double dt = 0.0001;
 
     //Set the initial length of every muscle in the subject
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i) {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setRestLength(this->m_initialLengths, dt);
+        pMuscle->setControlInput(this->m_initialLengths, dt);
     }
 
     populateClusters(subject);
@@ -112,12 +112,12 @@ void DuCTTRobotController::onStep(DuCTTRobotModel& subject, double dt)
 
     setPreferredMuscleLengths(subject, dt);
     setPrismaticLengths(subject, dt);
-    const std::vector<tgLinearString*> muscles = subject.getAllMuscles();
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
     //Move motors for all the muscles
     for (size_t i = 0; i < muscles.size(); ++i)
     {
-        tgLinearString * const pMuscle = muscles[i];
+        tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
@@ -240,10 +240,10 @@ void DuCTTRobotController::setupAdapter() {
 double DuCTTRobotController::totalEnergySpent(DuCTTRobotModel& subject) {
     double totalEnergySpent=0;
 
-    vector<tgLinearString* > tmpStrings = subject.getAllMuscles();
+    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
-        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
 
         for(int j=1; j<stringHist.tensionHistory.size(); j++)
         {
@@ -270,7 +270,7 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
 
     for(int cluster=0; cluster<nClusters; cluster++) {
         for(int node=0; node<musclesPerCluster; node++) {
-            tgLinearString *const pMuscle = clusters[cluster][node];
+            tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
             double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
             if (newLength <= minLength) {
@@ -278,7 +278,7 @@ void DuCTTRobotController::setPreferredMuscleLengths(DuCTTRobotModel& subject, d
             } else if (newLength >= maxLength) {
                 newLength = maxLength;
             }
-            imp_controller->control(pMuscle, dt, newLength);
+            imp_controller->control(*pMuscle, dt, newLength);
         }
         phase += phaseChange[cluster];
     }
@@ -312,8 +312,8 @@ void DuCTTRobotController::populateClusters(DuCTTRobotModel& subject) {
         ostringstream ss;
         ss << (cluster + 1);
         string suffix = ss.str();
-        std::vector <tgLinearString*> musclesInThisCluster = subject.find<tgLinearString>("string cluster" + suffix);
-        clusters[cluster] = std::vector<tgLinearString*>(musclesInThisCluster);
+        std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("string cluster" + suffix);
+        clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
     }
     for(int prism=0; prism < nPrisms; prism++) {
         switch(prism)

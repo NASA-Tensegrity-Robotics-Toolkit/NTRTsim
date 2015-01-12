@@ -37,9 +37,9 @@
 
 // Forward declarations
 class DuCTTRobotModel;
-class tgLinearString;
+class tgBasicActuator;
 class tgPrismatic;
-class ImpedanceControl;
+class tgImpedanceController;
 
 //namespace std for vectors
 using namespace std;
@@ -110,7 +110,7 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgLinearString*> > clusters;
+        vector<vector<tgBasicActuator*> > clusters;
         int nPrisms;
         vector<tgPrismatic*> prisms;
         int nActions;
@@ -121,7 +121,7 @@ class DuCTTRobotController : public tgObserver<DuCTTRobotModel>
         double* phaseChange;
         double* dcOffset;
 
-        ImpedanceControl* imp_controller;
+        tgImpedanceController* imp_controller;
 };
 
 #endif // ESCAPE_T6CONTROLLER

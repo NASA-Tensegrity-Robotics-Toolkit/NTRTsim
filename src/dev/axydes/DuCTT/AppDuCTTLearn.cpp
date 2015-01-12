@@ -17,16 +17,16 @@
 */
 
 /**
- * @file AppDuCTT.cpp
+ * @file AppDuCTTLearn.cpp
  * @brief Contains the definition function main() for the DuCTT app
  * @author Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "AppDuCTT.h"
+#include "AppDuCTTLearn.h"
 
-AppDuCTT::AppDuCTT(int argc, char** argv)
+AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = true;
@@ -52,7 +52,7 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppDuCTT::setup()
+bool AppDuCTTLearn::setup()
 {
     // First create the world
     tgWorld* world = createWorld();
@@ -79,8 +79,9 @@ bool AppDuCTT::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pSimpleControl = new DuCTTSineWaves(targetDist);
-        myRobotModel->attach(pSimpleControl);
+        DuCTTRobotController* testLearningController =
+            new DuCTTRobotController(5.0, use_manual_params, paramFile);
+        myRobotModel->attach(testLearningController);
     }
 
     // Sixth add model & controller to simulation
@@ -125,7 +126,7 @@ bool AppDuCTT::setup()
     return bSetup;
 }
 
-void AppDuCTT::handleOptions(int argc, char **argv)
+void AppDuCTTLearn::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -181,7 +182,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
     }
 }
 
-tgWorld* AppDuCTT::createWorld()
+tgWorld* AppDuCTTLearn::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -190,17 +191,17 @@ tgWorld* AppDuCTT::createWorld()
     return new tgWorld(config);
 }
 
-tgSimViewGraphics *AppDuCTT::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppDuCTTLearn::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppDuCTT::createView(tgWorld *world)
+tgSimView *AppDuCTTLearn::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppDuCTT::run()
+bool AppDuCTTLearn::run()
 {
     if (!bSetup)
     {
@@ -221,7 +222,7 @@ bool AppDuCTT::run()
     return true;
 }
 
-void AppDuCTT::simulate(tgSimulation *simulation)
+void AppDuCTTLearn::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -238,8 +239,8 @@ void AppDuCTT::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppDuCTT" << std::endl;
-    AppDuCTT app (argc, argv);
+    std::cout << "AppDuCTTLearn" << std::endl;
+    AppDuCTTLearn app (argc, argv);
 
     if (app.setup())
         app.run();
