@@ -44,7 +44,7 @@ AppDuCTTMechTest::AppDuCTTMechTest(int argc, char** argv)
     startRotY = 0;
     startRotZ = 0;
     startAngle = 0;
-    targetDist = -1;
+    targetTime = -1;
 
     handleOptions(argc, argv);
 }
@@ -76,7 +76,7 @@ bool AppDuCTTMechTest::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetDist);
+        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetTime);
         myRobotModel->attach(pController);
     }
 
@@ -130,7 +130,7 @@ void AppDuCTTMechTest::handleOptions(int argc, char **argv)
 //        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
-        ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
+        ("target_time,t", po::value<double>(&targetTime), "Amount of time for controller to move robot. Default = infinite")
     ;
 
     po::variables_map vm;

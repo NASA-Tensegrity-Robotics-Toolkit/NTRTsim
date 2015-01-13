@@ -97,7 +97,7 @@ private:
     double startRotZ;
     double startAngle;
 
-    double targetDist;
+    double targetTime;
 
     bool bSetup;
 };

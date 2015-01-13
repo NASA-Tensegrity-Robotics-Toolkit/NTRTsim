@@ -201,3 +201,13 @@ bool tgPrismatic::isAtPreferredLength()
 {
     return fabs(getActualLength() - m_preferredLength) <= m_config.m_eps;
 }
+
+double tgPrismatic::getMinLength()
+{
+    return m_config.m_minLength;
+}
+
+double tgPrismatic::getMaxLength()
+{
+    return m_config.m_maxLength;
+}
