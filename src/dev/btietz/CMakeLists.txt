@@ -20,4 +20,5 @@ subdirs(
     timestepTest
     kinematicString
     GATests
+    Obstacles
     )

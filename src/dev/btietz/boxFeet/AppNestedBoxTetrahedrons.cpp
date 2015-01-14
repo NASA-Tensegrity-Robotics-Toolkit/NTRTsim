@@ -33,6 +33,7 @@
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 #include "core/terrain/tgEmptyGround.h"
+#include "core/terrain/tgBoxGround.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -46,7 +47,7 @@ int main(int argc, char** argv)
 {
     std::cout << "AppNestedBoxTest" << std::endl;
 
-	tgEmptyGround* ground = new tgEmptyGround();
+	tgBoxGround* ground = new tgBoxGround();
 
     // First create the world
     const tgWorld::Config config(981); // gravity, cm/sec^2
