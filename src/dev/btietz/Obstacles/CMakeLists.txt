@@ -8,6 +8,7 @@ link_libraries(tgcreator
 
 add_executable(AppObstacleTest
 	tgBlockField.cpp
+    tgStairs.cpp
 	AppObstacleTest.cpp
 )
 

@@ -23,6 +23,7 @@
 */
 // This application
 #include "tgBlockField.h"
+#include "tgStairs.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgEmptyGround.h"
@@ -92,9 +93,14 @@ int main(int argc, char** argv)
 
 	// Fourth create the models with their controllers and add the models to the
 	// simulation
-	tgBlockField* myObstacle = new tgBlockField();
-	// Add the model to the world
-	simulation.addModel(myObstacle);
+    tgBlockField* myObstacle = new tgBlockField();
+    // Add the model to the world
+    simulation.addModel(myObstacle);
+    
+	tgStairs* bigStairs = new tgStairs();
+	// Add the stairs to the world
+	simulation.addModel(bigStairs);
+    
 	simulation.run();
 	return 0;
 }
