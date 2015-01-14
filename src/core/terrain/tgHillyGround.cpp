@@ -36,6 +36,7 @@
 
 // The C++ Standard Library
 #include <cassert>
+#include <iostream>
 
 tgHillyGround::Config::Config(btVector3 eulerAngles,
         btScalar friction,
@@ -86,6 +87,7 @@ tgHillyGround::tgHillyGround(const tgHillyGround::Config& config) :
 
 btRigidBody* tgHillyGround::getGroundRigidBody() const
 {
+        std::cout << "Hilly ground " << std::endl;
     const btScalar mass = 0.0;
 
     btTransform groundTransform;

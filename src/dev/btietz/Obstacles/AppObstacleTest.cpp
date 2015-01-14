@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 {
 
 	std::cout << "AppObstacleTest" << std::endl;
-#if (1)
+
 	// First create the ground and world. Specify ground rotation in radians
 	const double yaw = 0.0;
 	const double pitch = 0.0;
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	
 	// the world will delete this
 	tgBoxGround* ground = new tgBoxGround(groundConfig);
-#else
+
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.0;
@@ -71,13 +71,11 @@ int main(int argc, char** argv)
    double triangleSize = 5.0;
    double waveHeight = 3.0;
    double offset = 0.0;
-    tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
+    tgHillyGround::Config hillGroundConfig(eulerAngles, friction, restitution,
                                     size, origin, nx, ny, margin, triangleSize,
                                     waveHeight, offset);
     
-    tgHillyGround* ground = new tgHillyGround(groundConfig);
-    
-#endif
+
 	const tgWorld::Config config(98.1); // gravity, cm/sec^2
 	tgWorld world(config, ground);
 	
@@ -100,7 +98,26 @@ int main(int argc, char** argv)
 	tgStairs* bigStairs = new tgStairs();
 	// Add the stairs to the world
 	simulation.addModel(bigStairs);
+
+    for (int i = 0; i < 3; i++)
+    {
     
-	simulation.run();
+        simulation.run(10);
+        
+        if (i %2 == 0)
+        {
+            // World will delete prior pointer, so make a new one each time
+            tgHillyGround* hillGround = new tgHillyGround(hillGroundConfig);
+            world.reset(hillGround);
+        }
+        else
+        {
+            ground = new tgBoxGround(groundConfig);
+            world.reset(ground);
+        }
+        
+        simulation.reset();
+        
+    }
 	return 0;
 }
