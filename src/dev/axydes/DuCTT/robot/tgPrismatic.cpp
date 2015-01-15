@@ -211,3 +211,8 @@ double tgPrismatic::getMaxLength()
 {
     return m_config.m_maxLength;
 }
+
+double tgPrismatic::getMaxVelocity()
+{
+    return m_config.m_maxVelocity;
+}

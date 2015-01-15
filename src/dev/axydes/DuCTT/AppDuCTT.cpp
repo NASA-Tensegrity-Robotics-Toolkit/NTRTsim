@@ -76,7 +76,8 @@ bool AppDuCTT::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pController = new DuCTTSineWaves(targetDist);
+//        DuCTTSineWaves* const pController = new DuCTTSineWaves(targetDist);
+        DuCTTSimple* const pController = new DuCTTSimple(targetDist);
         myRobotModel->attach(pController);
     }
 
@@ -87,11 +88,26 @@ bool AppDuCTT::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 45;
-        ductConfig.m_ductHeight = 45;
-        ductConfig.m_distance = 1000;
-        ductConfig.m_axis = 2;
-        ductConfig.m_startPos = btVector3(0,0,-100);
+//        ductConfig.m_ductWidth = 33;
+//        ductConfig.m_ductHeight = 33;
+        ductConfig.m_ductWidth = 46;
+        ductConfig.m_ductHeight = 46;
+        ductConfig.m_distance = 10000;
+        ductConfig.m_axis = ductAxis;
+        switch(ductAxis)
+        {
+        case 0:
+            ductConfig.m_startPos = btVector3(-1000,2,0);
+            break;
+        case 1:
+            ductConfig.m_startPos = btVector3(0,-1000,0);
+            break;
+        case 2:
+            ductConfig.m_startPos = btVector3(0,2,-1000);
+        default:
+            break;
+        }
+
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
 
@@ -131,6 +147,7 @@ void AppDuCTT::handleOptions(int argc, char **argv)
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
+        ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
     ;
 
     po::variables_map vm;

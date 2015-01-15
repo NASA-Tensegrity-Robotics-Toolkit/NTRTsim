@@ -17,14 +17,14 @@
 */
 
 /**
- * @file DuCTTSineWaves.cpp
- * @brief Contains the implementation of the class DuCTTSineWaves
+ * @file DuCTTSimple.cpp
+ * @brief Contains the implementation of the class DuCTTSimple
  * @author Alexander Xydes
  * $Id$
  */
 
 // This module
-#include "DuCTTSineWaves.h"
+#include "DuCTTSimple.h"
 
 // Its subject
 #include "../robot/DuCTTRobotModel.h"
@@ -40,7 +40,7 @@
 #include <stdexcept>
 #include <vector>
 
-DuCTTSineWaves::DuCTTSineWaves(double targetDist) :
+DuCTTSimple::DuCTTSimple(double targetDist) :
     in_controller(new tgImpedanceController(100, 500, 50)),
     out_controller(new tgImpedanceController(0.01, 500, 10)),
     insideLength(6.5),
@@ -61,7 +61,8 @@ DuCTTSineWaves::DuCTTSineWaves(double targetDist) :
     recordedStartCOM(false),
     move(true),
     shouldBotPause(true),
-    shouldTopPause(false)
+    shouldTopPause(false),
+    state(EXPAND_BOTTOM)
 {
     phaseOffsets.clear();
     phaseOffsets.push_back(0);
@@ -71,7 +72,7 @@ DuCTTSineWaves::DuCTTSineWaves(double targetDist) :
     phaseOffsets.push_back(M_PI);
 }
 
-void DuCTTSineWaves::applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase)
+void DuCTTSimple::applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase)
 {
     cyclePrism = sin(simTime * cpgFrequencyPrism + 2 * bodyWavesPrism * M_PI + phaseOffsets[phase]);
     targetPrism = offsetLengthPrism + cyclePrism*cpgAmplitudePrism;
@@ -85,7 +86,7 @@ void DuCTTSineWaves::applySineWave(tgPrismatic* prism, bool shouldPause, bool sh
     }
 }
 
-void DuCTTSineWaves::applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList, double dt)
+void DuCTTSimple::applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList, double dt)
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
@@ -101,7 +102,7 @@ void DuCTTSineWaves::applyImpedanceControlInside(const std::vector<tgBasicActuat
     }
 }
 
-void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
+void DuCTTSimple::applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
                                                             double dt,
                                                             std::size_t phase)
 {
@@ -123,7 +124,7 @@ void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicActua
     }
 }
 
-bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
 {
     bool shouldPause = true;
 
@@ -135,7 +136,7 @@ bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSen
     return shouldPause;
 }
 
-bool DuCTTSineWaves::checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top)
+bool DuCTTSimple::checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top)
 {
     bool shouldPause = true;
 
@@ -155,70 +156,98 @@ bool DuCTTSineWaves::checkPause(std::vector<tgTouchSensorSphereModel*> touchSens
     return true;
 }
 
-void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
+bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereModel*> sensors, double goal, double dt)
 {
+    double currPos = prism->getActualLength();
+    double delta = (goal-currPos);
+//    std::cerr << "delta: " << delta << std::endl;
+//    std::cerr << "curr goal: " << (currPos+delta) << std::endl;
 
+    double dist = (prism->getMaxVelocity() / dt);
+
+//    prism->setPreferredLength(currPos + (delta / dt));
+    if (delta > 0)
+        prism->setPreferredLength(currPos + dist);
+    if (delta < 0)
+        prism->setPreferredLength(currPos - dist);
+
+//    prism->setPreferredLength(goal);
+//    prism->moveMotors(dt);
+
+//    return shouldPause(sensors);
+    return fabs(delta) < 0.1;
+}
+
+bool DuCTTSimple::moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt)
+{
+    bool switchState = false;
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+        double setTension = out_controller->control(*(stringList[i]), dt, goals);
+        double currLength = stringList[i]->getCurrentLength();
+
+        double delta = fabs(currLength - goals);
+        std::cerr << "String " << i << " length: " << currLength << ", delta: " << delta << std::endl;
+        if (delta < 2) switchState = true;
+    }
+    return switchState;
+}
+
+void DuCTTSimple::onStep(DuCTTRobotModel& subject, double dt)
+{
     if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive");
     }
     else
     {
-        simTime += dt;
-
-        if (simTime < 5)
+        std::cerr << "State: " << state << std::endl;
+        double maxStringLength = 10;
+        double minStringLength = 4;
+        switch(state)
         {
-            double goal = subject.getBottomPrismatic()->getMaxLength();
-            double currPos = subject.getBottomPrismatic()->getActualLength();
-            double delta = (goal-currPos) / (5.0);
-            std::cerr << "delta: " << delta << std::endl;
-            std::cerr << "curr goal: " << (currPos+delta) << std::endl;
-            subject.getBottomPrismatic()->setPreferredLength(currPos + delta);
-            return;
-        }
-        else if (!move) return;
-        else if (!recordedStartCOM)
-        {
-            startCOM = subject.getCOM();
-            recordedStartCOM = true;
-                subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
-        }
-
-        btVector3 com = subject.getCOM();
-        double dist = startCOM.distance(com);
-
-        if (targetDist < 0 || dist < targetDist)
-        {
-            applyImpedanceControlOutside(subject.getAllMuscles(), dt, 1);
-//            applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 1);
-//            applyImpedanceControlOutside(subject.getVertMuscles(), dt, 1);
-
-            checkPause(subject.bottomTouchSensors, false);
-            checkPause(subject.topTouchSensors, true);
-
-            applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), shouldPause(subject.topTouchSensors), dt, 4);
-            applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), shouldPause(subject.bottomTouchSensors), dt, 0);
-//            applySineWave(subject.getBottomPrismatic(), false, true, dt, 4);
-//            applySineWave(subject.getTopPrismatic(), false, true, dt, 0);
-//            applySineWave(subject.getBottomPrismatic(), shouldBotPause, shouldTopPause, dt, 4);
-//            applySineWave(subject.getTopPrismatic(), false, true, dt, 0);
-        }
-        else if (dist >= targetDist)
-        {
-            std::cerr << "Total Dist moved: " << dist << std::endl;
-            move = false;
+        case EXPAND_BOTTOM:
+            if (movePrism(subject.getBottomPrismatic(), subject.bottomTouchSensors, subject.getBottomPrismatic()->getMaxLength(), dt))
+                state = RETRACT_TOP;
+            break;
+        case RETRACT_TOP:
+            if (movePrism(subject.getTopPrismatic(), subject.topTouchSensors, subject.getTopPrismatic()->getMinLength(), dt))
+                state = PUSH_TOP;
+            break;
+        case PUSH_TOP:
+            (moveStrings(subject.getSaddleMuscles(), minStringLength, dt));
+            if (moveStrings(subject.getVertMuscles(), maxStringLength, dt))
+                state = EXPAND_TOP;
+            break;
+        case EXPAND_TOP:
+            if (movePrism(subject.getTopPrismatic(), subject.topTouchSensors, subject.getTopPrismatic()->getMaxLength(), dt))
+                state = RETRACT_BOTTOM;
+            break;
+        case RETRACT_BOTTOM:
+            if (movePrism(subject.getBottomPrismatic(), subject.bottomTouchSensors, subject.getBottomPrismatic()->getMinLength(), dt))
+                state = PULL_BOTTOM;
+            break;
+        case PULL_BOTTOM:
+            (moveStrings(subject.getSaddleMuscles(), maxStringLength, dt));
+            if (moveStrings(subject.getVertMuscles(), minStringLength, dt))
+                state = EXPAND_BOTTOM;
+            break;
+        default:
+            break;
         }
     }
 }
 
-void DuCTTSineWaves::onSetup(DuCTTRobotModel& subject)
+void DuCTTSimple::onSetup(DuCTTRobotModel& subject)
 {
+    state = EXPAND_BOTTOM;
     simTime = 0;
     recordedStartCOM = false;
 }
 
-void DuCTTSineWaves::onTeardown(DuCTTRobotModel& subject)
+void DuCTTSimple::onTeardown(DuCTTRobotModel& subject)
 {
+    state = EXPAND_BOTTOM;
     simTime = 0;
     recordedStartCOM = false;
 }

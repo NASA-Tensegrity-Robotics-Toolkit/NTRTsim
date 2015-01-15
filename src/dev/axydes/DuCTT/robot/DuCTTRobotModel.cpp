@@ -325,10 +325,10 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     prismAxisBottom = prismAxisBottom.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
     prismAxisTop = prismAxisTop.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
 
-    const tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
-    const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 1.016, 0.0254);
+    const tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
+    const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
 
-    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
+    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
 
     btVector3 hinge1Axis(0,0,1);
     btVector3 hinge2Axis(1,0,0);
@@ -394,7 +394,7 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
 
 void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
 {
-    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
+    const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -445,6 +445,7 @@ void DuCTTRobotModel::setupVariables()
     //add the appropriate rods to the touch sensor ignore list
     for (size_t i=0; i<bottomTouchSensors.size(); i++)
     {
+        fprintf(stdout,"Touch sensor %d friction: %f,%f\n",i,bottomSpheres[i]->getPRigidBody()->getFriction(),bottomSpheres[i]->getPRigidBody()->getAnisotropicFriction());
         btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomSpheres[i]->centerOfMass();
         abstractMarker marker (bottomSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         addMarker(marker);
@@ -456,6 +457,7 @@ void DuCTTRobotModel::setupVariables()
     }
     for (size_t i=0; i<topTouchSensors.size(); i++)
     {
+        fprintf(stdout,"Touch sensor %d friction: %f,%f\n",i+2,topSpheres[i]->getPRigidBody()->getFriction(),topSpheres[i]->getPRigidBody()->getAnisotropicFriction());
         btVector3 offset = topTouchSensors[i]->centerOfMass() - topSpheres[i]->centerOfMass();
         abstractMarker marker (topSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         addMarker(marker);

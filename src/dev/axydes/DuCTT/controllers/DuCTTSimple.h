@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef DUCTT_SINE_WAVES_H
-#define DUCTT_SINE_WAVES_H
+#ifndef DUCTT_SIMPLE_H
+#define DUCTT_SIMPLE_H
 
 /**
- * @file DuCTTSineWaves.h
- * @brief Contains the definition of the class DuCTTSineWaves.
+ * @file DuCTTSimple.h
+ * @brief Contains the definition of the class DuCTTSimple.
  * @author Alexander Xydes
  * $Id$
  */
@@ -42,11 +42,19 @@ class tgTouchSensorSphereModel;
 class DuCTTRobotModel;
 class tgImpedanceController;
 
-class DuCTTSineWaves : public tgObserver<DuCTTRobotModel>
+class DuCTTSimple : public tgObserver<DuCTTRobotModel>
 {
 public:
+    enum ROBOT_STATE{
+        EXPAND_BOTTOM,
+        RETRACT_TOP,
+        PUSH_TOP,
+        EXPAND_TOP,
+        RETRACT_BOTTOM,
+        PULL_BOTTOM
+    };
 
-    DuCTTSineWaves(double targetDist = -1);
+    DuCTTSimple(double targetDist = -1);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     virtual void onSetup(DuCTTRobotModel& subject);
@@ -78,6 +86,9 @@ public:
                                     double dt,
                                     std::size_t phase);
 
+    bool movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereModel*> sensors, double goal, double dt);
+    bool moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt);
+
 private:
     tgImpedanceController* in_controller;
     tgImpedanceController* out_controller;
@@ -108,6 +119,8 @@ private:
     bool move;
     bool shouldBotPause;
     bool shouldTopPause;
+
+    ROBOT_STATE state;
 };
 
 #endif // PRETENSION_CONTROLLER_H

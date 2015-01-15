@@ -21,6 +21,7 @@ add_executable(AppDuCTT
     ${DuCTT_ROBOT_SRCS}
     ${DUCT_SRCS}
     controllers/DuCTTSineWaves.cpp
+    controllers/DuCTTSimple.cpp
     AppDuCTT.cpp
 )
 
