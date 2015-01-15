@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     
 	tgStairs* bigStairs = new tgStairs();
 	// Add the stairs to the world
-	simulation.addModel(bigStairs);
+	simulation.addObstacle(bigStairs);
 
     for (int i = 0; i < 3; i++)
     {
