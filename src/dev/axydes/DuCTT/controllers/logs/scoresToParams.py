@@ -120,5 +120,5 @@ if __name__=="__main__":
     cutOuts(sortedFile, noOutsFile)
     bestScores(noOutsFile, bestFile, 0)
     printParams(bestFile, bestParamFile)
-    statScores(bestFile)
+    statScores.statScores(bestFile)
 

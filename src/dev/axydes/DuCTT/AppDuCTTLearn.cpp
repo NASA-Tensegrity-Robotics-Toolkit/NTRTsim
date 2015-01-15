@@ -98,13 +98,13 @@ bool AppDuCTTLearn::setup()
         switch(ductAxis)
         {
         case 0:
-            ductConfig.m_startPos = btVector3(-1000,0,0);
+            ductConfig.m_startPos = btVector3(-1000,2,0);
             break;
         case 1:
             ductConfig.m_startPos = btVector3(0,-1000,0);
             break;
         case 2:
-            ductConfig.m_startPos = btVector3(0,0,-1000);
+            ductConfig.m_startPos = btVector3(0,2,-1000);
         default:
             break;
         }
