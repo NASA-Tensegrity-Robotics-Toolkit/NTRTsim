@@ -27,28 +27,25 @@
  */
 
 //robot
-#include "robot/DuCTTRobotModel.h"
+#include "dev/btietz/TCContact/FlemonsSpineModelContact.h"
 
-//ducts
-#include "ducts/DuctCrossModel.h"
-#include "ducts/DuctLModel.h"
-#include "ducts/DuctStraightModel.h"
-#include "ducts/DuctTeeModel.h"
-
-//controllers
-#include "controllers/DuCTTSineWaves.h"
+// controller 
+#include "dev/CPG_feedback/SpineFeedbackControl.h"
 
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgHillyGround.h"
 
 // Boost
 #include <boost/program_options.hpp>
 
 // The C++ Standard Library
 #include <iostream>
+#include <string>
 
 namespace po = boost::program_options;
 
@@ -66,6 +63,10 @@ private:
     /** Parse command line options */
     void handleOptions(int argc, char** argv);
 
+    const tgHillyGround::Config getHillyConfig();
+    
+    const tgBoxGround::Config getBoxConfig();
+    
     /** Create the tgWorld object */
     tgWorld *createWorld();
 
@@ -77,27 +78,27 @@ private:
 
     /** Run a series of episodes for nSteps each */
     void simulate(tgSimulation *simulation);
-
+    
     tgSimulation* simulation;
 
     bool use_graphics;
     bool add_controller;
-    bool add_duct;
+    bool add_blocks;
+    bool add_hills;
+    bool all_terrain;
     double timestep_physics; //Seconds
     double timestep_graphics; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     int nEpisodes; // Number of episodes ("trial runs")
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int nSegments; // Number of segments in the tensegrity spine
 
     double startX;
     double startY;
     double startZ;
-    double startRotX;
-    double startRotY;
-    double startRotZ;
     double startAngle;
-
-    double targetDist;
-
+    
+    std::string suffix;
+    
     bool bSetup;
 };
 

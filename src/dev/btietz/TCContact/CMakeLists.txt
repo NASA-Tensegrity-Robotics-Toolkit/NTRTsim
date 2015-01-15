@@ -13,6 +13,10 @@ link_libraries(CPG_feedback
                 AnnealEvolution
                 tgOpenGLSupport)
 
+add_library(flemonsSpineContact 
+                FlemonsSpineModelContact.cpp
+            )
+                
 add_executable(AppFlemonsSpineContact
     FlemonsSpineModelContact.cpp
     AppFlemonsSpineContact.cpp

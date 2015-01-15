@@ -30,21 +30,22 @@ AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = true;
-    add_controller = false;
-    add_duct = false;
-    timestep_physics = 1.0f/60.0f/10.0f;
+    add_controller = true;
+    add_blocks = false;
+    add_hills = false;
+    all_terrain = false;
+    timestep_physics = 1.0f/1000.0f;
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
+    nSegments = 6;
 
     startX = 0;
     startY = 20;
     startZ = 0;
-    startRotX = 0;
-    startRotY = 0;
-    startRotZ = 0;
     startAngle = 0;
-    targetDist = -1;
+    
+    suffix = "default";
 
     handleOptions(argc, argv);
 }
@@ -66,44 +67,71 @@ bool AppMultiTerrain::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    DuCTTRobotModel::Config c = DuCTTRobotModel::Config(
-                btVector3(startX,startY,startZ),
-                btVector3(startRotX,startRotY,startRotZ),
-                (startAngle*SIMD_RADS_PER_DEG)
-                );
-    DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
+    /// @todo add position and angle to configuration
+        FlemonsSpineModelContact* myModel =
+      new FlemonsSpineModelContact(nSegments);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pPrismControl = new DuCTTSineWaves(targetDist);
-        myRobotModel->attach(pPrismControl);
+        const int segmentSpan = 3;
+        const int numMuscles = 8;
+        const int numParams = 2;
+        const int segNumber = 0; // For learning results
+        const double controlTime = .01;
+        const double lowPhase = -1 * M_PI;
+        const double highPhase = M_PI;
+        const double lowAmplitude = 0.0;
+        const double highAmplitude = 300.0;
+        const double kt = 0.0;
+        const double kp = 1000.0;
+        const double kv = 200.0;
+        const bool def = true;
+            
+        // Overridden by def being true
+        const double cl = 10.0;
+        const double lf = 0.0;
+        const double hf = 30.0;
+        
+        // Feedback parameters
+        const double ffMin = -0.5;
+        const double ffMax = 10.0;
+        const double afMin = 0.0;
+        const double afMax = 200.0;
+        const double pfMin = -0.5;
+        const double pfMax =  6.28;
+
+        SpineFeedbackControl::Config control_config(segmentSpan, 
+                                                    numMuscles,
+                                                    numMuscles,
+                                                    numParams, 
+                                                    segNumber, 
+                                                    controlTime,
+                                                    lowAmplitude,
+                                                    highAmplitude,
+                                                    lowPhase,
+                                                    highPhase,
+                                                    kt,
+                                                    kp,
+                                                    kv,
+                                                    def,
+                                                    cl,
+                                                    lf,
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax
+                                                    );
+        SpineFeedbackControl* const myControl =
+        new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
+        myModel->attach(myControl);;
     }
 
     // Sixth add model & controller to simulation
-    simulation->addModel(myRobotModel);
-
-    // Seventh add duct to simulation
-    if (add_duct)
-    {
-        DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 45;
-        ductConfig.m_ductHeight = 45;
-        ductConfig.m_distance = 1000;
-        ductConfig.m_axis = 2;
-        ductConfig.m_startPos = btVector3(0,0,-100);
-        DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
-        simulation->addModel(myDuctModel);
-
-//        DuctCrossModel* myDuctModel = new DuctCrossModel();
-//        simulation->addModel(myDuctModel);
-
-//        DuctTeeModel* myDuctModel = new DuctTeeModel();
-//        simulation->addModel(myDuctModel);
-
-//        DuctLModel* myDuctModel = new DuctLModel();
-//        simulation->addModel(myDuctModel);
-    }
+    simulation->addModel(myModel);
 
     bSetup = true;
     return bSetup;
@@ -116,21 +144,20 @@ void AppMultiTerrain::handleOptions(int argc, char **argv)
     desc.add_options()
         ("help,h", "produce help message")
         ("graphics,G", po::value<bool>(&use_graphics), "Test using graphical view")
-        ("controller,c", po::value<bool>(&add_controller)->implicit_value(true), "Attach the controller to the model.")
-        ("duct,d", po::value<bool>(&add_duct)->implicit_value(true), "Add the duct to the simulation.")
+        ("controller,c", po::value<bool>(&add_controller), "Attach the controller to the model.")
+        ("blocks,b", po::value<bool>(&add_blocks)->implicit_value(false), "Add a block field as obstacles.")
+        ("hills,H", po::value<bool>(&add_hills)->implicit_value(false), "Use hilly terrain.")
+        ("all_terrain,A", po::value<bool>(&all_terrain)->implicit_value(false), "Alternate through terrain types. Only works with graphics off")
         ("phys_time,p", po::value<double>(), "Physics timestep value (Hz). Default=1000")
         ("graph_time,g", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
         ("episodes,e", po::value<int>(&nEpisodes), "Number of episodes to run. Default=1")
-        ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (100 seconds)")
+        ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (60 seconds)")
+        ("segments,S", po::value<int>(&nSegments), "Number of segments in the tensegrity spine. Default=6")
         ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
-        ("rot_x", po::value<double>(&startRotX), "X Coordinate of starting rotation axis for robot. Default = 0")
-        //Can only support rotation around the x axis for now.
-//        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
-//        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
-        ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
+        ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
     ;
 
     po::variables_map vm;
@@ -157,13 +184,56 @@ void AppMultiTerrain::handleOptions(int argc, char **argv)
     }
 }
 
+const tgHillyGround::Config AppMultiTerrain::getHillyConfig()
+{
+    btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
+    btScalar friction = 0.5;
+    btScalar restitution = 0.0;
+    // Size doesn't affect hilly terrain
+    btVector3 size = btVector3(0.0, 0.1, 0.0);
+    btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    size_t nx = 100;
+    size_t ny = 100;
+    double margin = 0.5;
+    double triangleSize = 5.0;
+    double waveHeight = 3.0;
+    double offset = 0.0;
+    const tgHillyGround::Config hillGroundConfig(eulerAngles, friction, restitution,
+                                    size, origin, nx, ny, margin, triangleSize,
+                                    waveHeight, offset);
+    return hillGroundConfig;
+}
+
+const tgBoxGround::Config AppMultiTerrain::getBoxConfig()
+{
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    
+    return groundConfig;
+}
+
 tgWorld* AppMultiTerrain::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
     );
-
-    return new tgWorld(config);
+    
+    tgBulletGround* ground;
+    
+    if (add_hills)
+    {
+        const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+        ground = new tgHillyGround(hillGroundConfig);
+    }
+    else
+    {
+        const tgBoxGround::Config groundConfig = getBoxConfig();
+        ground = new tgBoxGround(groundConfig);
+    }
+    
+    return new tgWorld(config, ground);
 }
 
 tgSimViewGraphics *AppMultiTerrain::createGraphicsView(tgWorld *world)
@@ -220,7 +290,6 @@ int main(int argc, char** argv)
     if (app.setup())
         app.run();
     
-    delete simulation;
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }

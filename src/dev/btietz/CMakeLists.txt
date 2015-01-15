@@ -21,4 +21,5 @@ subdirs(
     kinematicString
     GATests
     Obstacles
+    multiTerrain
     )
