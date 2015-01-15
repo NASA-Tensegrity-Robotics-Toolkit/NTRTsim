@@ -85,6 +85,13 @@ tgHillyGround::tgHillyGround(const tgHillyGround::Config& config) :
     pGroundShape = hillyCollisionShape();
 }
 
+tgHillyGround::~tgHillyGround()
+{
+    delete m_pMesh;
+    delete[] m_pIndices;
+    delete[] m_vertices;
+}
+
 btRigidBody* tgHillyGround::getGroundRigidBody() const
 {
         std::cout << "Hilly ground " << std::endl;
@@ -126,26 +133,26 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
         const size_t triangleCount = 2 * (m_config.m_nx - 1) * (m_config.m_ny - 1);
 
         // A flattened array of all vertices in the mesh
-        btVector3 * const vertices = new btVector3[vertexCount];
+        m_vertices = new btVector3[vertexCount];
 
         // Supplied by the derived class
-        setVertices(vertices);
+        setVertices(m_vertices);
         // A flattened array of indices for each corner of each triangle
-        int *indices = new int[triangleCount * 3];
+        m_pIndices = new int[triangleCount * 3];
 
         // Supplied by the derived class
-        setIndices(indices);
+        setIndices(m_pIndices);
 
         // Create the mesh object
-        btTriangleIndexVertexArray* const pMesh =
-            createMesh(triangleCount, indices, vertexCount, vertices);
+        m_pMesh = createMesh(triangleCount, m_pIndices, vertexCount, m_vertices);
 
         // Create the shape object
-        pShape = createShape(pMesh);
+        pShape = createShape(m_pMesh);
 
         // Set the margin
         pShape->setMargin(m_config.m_margin);
-        // DO NOT deallocate vertices, indices or pMesh! The shape owns them.
+        // DO NOT deallocate vertices, indices or pMesh until simulation is over!
+        // The shape owns them, but will not delete them
     }
 
     assert(pShape);

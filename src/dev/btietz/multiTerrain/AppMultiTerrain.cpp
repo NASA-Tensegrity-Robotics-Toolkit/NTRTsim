@@ -54,10 +54,9 @@ AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
 bool AppMultiTerrain::setup()
 {
     // First create the world
-    tgWorld* world = createWorld();
+    world = createWorld();
 
     // Second create the view
-    tgSimView *view;
     if (use_graphics)
         view = createGraphicsView(world); // For visual experimenting on one tensegrity
     else
@@ -126,6 +125,7 @@ bool AppMultiTerrain::setup()
                                                     pfMin,
                                                     pfMax
                                                     );
+        /// @todo fix memory leak that occurs here
         SpineFeedbackControl* const myControl =
         new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
         myModel->attach(myControl);;
@@ -277,7 +277,12 @@ bool AppMultiTerrain::run()
         // or run for a specific number of steps
         simulate(simulation);
     }
-
+    
+    ///@todo consider app.cleanup()
+   delete simulation;
+   delete view;
+   delete world;
+    
     return true;
 }
 
@@ -287,7 +292,8 @@ void AppMultiTerrain::simulate(tgSimulation *simulation)
         fprintf(stderr,"Episode %d\n", i);
         simulation->run(nSteps);
         
-        if (all_terrain)
+        // Don't change the terrain before the last episode to avoid leaks
+        if (all_terrain && i != nEpisodes - 1)
         {   
             // Next run has Hills
             if (i % nTypes == 0)

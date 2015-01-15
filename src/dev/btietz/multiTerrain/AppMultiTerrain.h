@@ -84,6 +84,10 @@ private:
     /** Run a series of episodes for nSteps each */
     void simulate(tgSimulation *simulation);
     
+    
+    // Keep these around for cleanup
+    tgWorld* world;
+    tgSimView* view;
     tgSimulation* simulation;
 
     bool use_graphics;

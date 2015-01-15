@@ -199,6 +199,7 @@ void tgSimulation::teardown()
         pModel->teardown();
         
         // Remove and destroy element
+        delete pModel;
         m_obstacles.pop_back();
     }
     
