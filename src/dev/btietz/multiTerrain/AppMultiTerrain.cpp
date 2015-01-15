@@ -29,7 +29,7 @@
 AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
 {
     bSetup = false;
-    use_graphics = true;
+    use_graphics = false;
     add_controller = true;
     add_blocks = false;
     add_hills = false;
@@ -39,6 +39,7 @@ AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
     nEpisodes = 1;
     nSteps = 60000;
     nSegments = 6;
+    nTypes = 3;
 
     startX = 0;
     startY = 20;
@@ -132,7 +133,13 @@ bool AppMultiTerrain::setup()
 
     // Sixth add model & controller to simulation
     simulation->addModel(myModel);
-
+    
+    if (add_blocks)
+    {
+        tgModel* blockField = getBlocks();
+        simulation->addObstacle(blockField);
+    }
+    
     bSetup = true;
     return bSetup;
 }
@@ -214,6 +221,13 @@ const tgBoxGround::Config AppMultiTerrain::getBoxConfig()
     return groundConfig;
 }
 
+tgModel* AppMultiTerrain::getBlocks()
+{
+    // Room to add a config
+    tgBlockField* myObstacle = new tgBlockField();
+    return myObstacle;
+}
+
 tgWorld* AppMultiTerrain::createWorld()
 {
     const tgWorld::Config config(
@@ -272,7 +286,36 @@ void AppMultiTerrain::simulate(tgSimulation *simulation)
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
         simulation->run(nSteps);
-        simulation->reset();
+        
+        if (all_terrain)
+        {   
+            // Next run has Hills
+            if (i % nTypes == 0)
+            {
+                
+                const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+                tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
+                simulation->reset(ground);
+            }
+            // Flat
+            else if (i % nTypes == 1)
+            {
+                const tgBoxGround::Config groundConfig = getBoxConfig();
+                tgBulletGround* ground = new tgBoxGround(groundConfig);
+                simulation->reset(ground);
+            }
+            // Flat with blocks
+            else if (i % nTypes == 2)
+            {
+                simulation->reset();
+                tgModel* obstacle = getBlocks();
+                simulation->addObstacle(obstacle);
+            }
+        }
+        else
+        {
+            simulation->reset();
+        }
     }
 }
 

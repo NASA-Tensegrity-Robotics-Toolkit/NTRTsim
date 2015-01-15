@@ -32,6 +32,9 @@
 // controller 
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
 
+// obstacles
+#include "dev/btietz/Obstacles/tgBlockField.h"
+
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -67,6 +70,8 @@ private:
     
     const tgBoxGround::Config getBoxConfig();
     
+    tgModel* getBlocks();
+    
     /** Create the tgWorld object */
     tgWorld *createWorld();
 
@@ -91,6 +96,7 @@ private:
     int nEpisodes; // Number of episodes ("trial runs")
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     int nSegments; // Number of segments in the tensegrity spine
+    int nTypes; // Number of types of terrain to be used. Currently 3
 
     double startX;
     double startY;

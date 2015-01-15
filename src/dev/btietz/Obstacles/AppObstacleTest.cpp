@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	// Second create the view
 	const double timestep_physics = 1.0/1000.0; // seconds
 	const double timestep_graphics = 1.f/60.f; // seconds
-	tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+	tgSimView view(world, timestep_physics, timestep_graphics);
 	
 	// Third create the simulation
 	tgSimulation simulation(view);
@@ -108,16 +108,13 @@ int main(int argc, char** argv)
         {
             // World will delete prior pointer, so make a new one each time
             tgHillyGround* hillGround = new tgHillyGround(hillGroundConfig);
-            world.reset(hillGround);
+            simulation.reset(hillGround);
         }
         else
         {
             ground = new tgBoxGround(groundConfig);
-            world.reset(ground);
-        }
-        
-        simulation.reset();
-        
+            simulation.reset(ground);
+        }        
     }
 	return 0;
 }

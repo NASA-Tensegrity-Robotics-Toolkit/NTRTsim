@@ -122,6 +122,24 @@ void tgSimulation::reset()
         m_models[i]->setup(m_view.world());
     }
     
+    // Don't need to set up obstacles since they will be added after this
+}
+
+void tgSimulation::reset(tgGround* newGround)
+{
+
+    teardown();
+    
+    // This will reset the world twice (once in teardown, once here), but that shouldn't hurt anything
+    m_view.world().reset(newGround);
+    
+    m_view.setup();
+    for (std::size_t i = 0; i != m_models.size(); i++)
+    {
+        
+        m_models[i]->setup(m_view.world());
+    }
+    
     // Don't need to set up obstacles since they were just added
 }
 

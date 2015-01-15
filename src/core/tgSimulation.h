@@ -35,6 +35,7 @@ class tgModel;
 class tgModelVisitor;
 class tgSimView;
 class tgWorld;
+class tgGround;
 
 /**
  * Holds objects necessary for simulation, a world, a view
@@ -100,6 +101,15 @@ public:
      * Will delete and remake the dynamics world
      */
     void reset();
+
+    /**
+     * Calls teardown, then sets the ground of the world to newGround
+     * then calls setup on the view, finally
+     * calls setup on the models
+     * Will delete and remake the dynamics world, the previous
+     * ground will be deleted
+     */
+    void reset(tgGround* newGround);
     
     /**
      * Returns a reference to the world
