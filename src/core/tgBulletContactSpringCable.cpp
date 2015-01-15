@@ -931,7 +931,9 @@ int tgBulletContactSpringCable::findNearestPastAnchor(btVector3& pos)
 		{
 			if ( i !=j )
 			{
+#ifdef VERBOSE 
 				std::cout << "Error in iteration order First try: " << i << " Second Try: " << j << std::endl;
+#endif
 				//throw std::runtime_error("Neither the front nor back iterations worked!");
 			}
 			
