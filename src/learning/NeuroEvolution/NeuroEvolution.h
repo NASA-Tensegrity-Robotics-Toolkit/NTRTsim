@@ -64,6 +64,8 @@ private:
 	int generationNumber;
 	int numberOfElementsToMutate;
     int numberOfChildren;
+    int numberOfSubtests;
+    int subTests;
 };
 
 #endif /* NEUROEVOLUTION_H_ */

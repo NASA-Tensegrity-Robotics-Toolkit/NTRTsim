@@ -290,7 +290,14 @@ void AppMultiTerrain::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
-        simulation->run(nSteps);
+        try
+        {
+            simulation->run(nSteps);
+        }
+        catch (std::runtime_error e)
+        {
+            // Nothing to do here, score will be set to -1
+        }
         
         // Don't change the terrain before the last episode to avoid leaks
         if (all_terrain && i != nEpisodes - 1)
