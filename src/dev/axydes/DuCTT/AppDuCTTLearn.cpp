@@ -73,6 +73,7 @@ bool AppDuCTTLearn::setup()
                 btVector3(startRotX,startRotY,startRotZ),
                 (startAngle*SIMD_RADS_PER_DEG)
                 );
+    c.m_storeStringHist = true;
     DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
 
     // Fifth create the controllers, attach to model

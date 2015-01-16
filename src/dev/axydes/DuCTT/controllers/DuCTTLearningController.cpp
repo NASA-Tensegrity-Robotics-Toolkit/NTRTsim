@@ -264,11 +264,9 @@ double DuCTTLearningController::totalEnergySpent(DuCTTRobotModel& subject) {
             if(motorSpeed > 0) // Vestigial code
             {
                 motorSpeed = 0;
-                std::cerr << "Setting motor speed to 0" << std::endl;
             }
             else
             {
-                std::cerr << "NOT Setting motor speed to 0" << std::endl;
             }
             const double workDone = previousTension * motorSpeed;
             totalEnergySpent += workDone;
