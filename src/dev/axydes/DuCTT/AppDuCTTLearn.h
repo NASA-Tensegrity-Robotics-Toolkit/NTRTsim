@@ -101,8 +101,6 @@ private:
     double startRotZ;
     double startAngle;
 
-    double targetDist;
-
     int ductAxis;
 
     bool bSetup;

@@ -119,6 +119,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         double* dcOffset;
 
         tgImpedanceController* imp_controller;
+        bool badRun;
 };
 
 #endif // ESCAPE_T6CONTROLLER

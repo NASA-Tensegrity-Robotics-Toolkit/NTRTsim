@@ -63,7 +63,8 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     musclesPerCluster(1),
     nPrisms(2),
     nActions(nClusters+nPrisms),
-    imp_controller(new tgImpedanceController(0.01, 500, 10))
+    imp_controller(new tgImpedanceController(0.01, 500, 10)),
+    badRun(false)
 {
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
@@ -87,8 +88,8 @@ void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
     }
 
     populateClusters(subject);
-    initPosition = subject.getCOM();
     setupAdapter();
+    initPosition = subject.getCOM();
     initializeSineWaves(); // For muscle actuation
 
     vector<double> state; // For config file usage (including Monte Carlo simulations)
@@ -142,7 +143,15 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
     double energySpent = totalEnergySpent(subject);
 
     //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    scores.push_back(distance);
+    if (!badRun)
+    {
+        scores.push_back(distance);
+    }
+    else
+    {
+        scores.push_back(-1);
+    }
+
     scores.push_back(energySpent);
 
     std::cout << "Tearing down" << std::endl;
@@ -253,7 +262,14 @@ double DuCTTLearningController::totalEnergySpent(DuCTTRobotModel& subject) {
             //TODO: examine this assumption - free spinning motor may require more power         
             double motorSpeed = (currentLength-previousLength);
             if(motorSpeed > 0) // Vestigial code
+            {
                 motorSpeed = 0;
+                std::cerr << "Setting motor speed to 0" << std::endl;
+            }
+            else
+            {
+                std::cerr << "NOT Setting motor speed to 0" << std::endl;
+            }
             const double workDone = previousTension * motorSpeed;
             totalEnergySpent += workDone;
         }

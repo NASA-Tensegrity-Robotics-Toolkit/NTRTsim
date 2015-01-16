@@ -40,13 +40,12 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     nSteps = 60000;
 
     startX = 0;
-    startY = 20;
+    startY = 1;
     startZ = 0;
     startRotX = 0;
     startRotY = 0;
     startRotZ = 0;
     startAngle = 0;
-    targetDist = -1;
     ductAxis = 1;
 
     handleOptions(argc, argv);
@@ -140,14 +139,13 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("episodes,e", po::value<int>(&nEpisodes), "Number of episodes to run. Default=1")
         ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (100 seconds)")
         ("start_x,x", po::value<double>(&startX), "X Coordinate of starting position for robot. Default = 0")
-        ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
+        ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 1")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
         ("rot_x", po::value<double>(&startRotX), "X Coordinate of starting rotation axis for robot. Default = 0")
         //Can only support rotation around the x axis for now.
 //        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
-        ("target_dist,t", po::value<double>(&targetDist), "Target distance for controller to move robot. Default = infinite")
         ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
     ;
@@ -178,7 +176,6 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     if (vm.count("paramFile") && vm["paramFile"].as<string>() != "")
     {
         use_manual_params = true;
-        use_graphics = true;
     }
 }
 
@@ -224,10 +221,18 @@ bool AppDuCTTLearn::run()
 
 void AppDuCTTLearn::simulate(tgSimulation *simulation)
 {
-    for (int i=0; i<nEpisodes; i++) {
+    for (int i=0; i<nEpisodes; i++)
+    {
         fprintf(stderr,"Episode %d\n", i);
-        simulation->run(nSteps);
-        simulation->reset();
+        try
+        {
+            simulation->run(nSteps);
+            simulation->reset();
+        }
+        catch (std::runtime_error e)
+        {
+            simulation->reset();
+        }
     }
 }
 
