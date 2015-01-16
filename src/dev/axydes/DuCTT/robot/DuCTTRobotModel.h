@@ -92,7 +92,8 @@ public:
                 double maxSaddleStringVel = 8.5,
                 double maxStringForce = 5000.0,
                 double maxStringAcc = 100000.0,
-                double minStringRestLength = 1.2
+                double minStringRestLength = 1.2,
+                bool storeStringHist = false
               );
 
         //robot params
@@ -124,6 +125,7 @@ public:
         double m_maxStringForce; // max force to exert on all strings (Newtons) 50 N = 5000 kg*cm/s^2
         double m_maxStringAcc; // max acceleration of string motors (length/s^2) 10000.0
         double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
+        bool m_storeStringHist; // store string history, useful for learning applications
     };
 
     DuCTTRobotModel();
