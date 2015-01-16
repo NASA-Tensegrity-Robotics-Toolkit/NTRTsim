@@ -36,6 +36,7 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
+    ductAxis = 1;
 
     startX = 0;
     startY = 20;
