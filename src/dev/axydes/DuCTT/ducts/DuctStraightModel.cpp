@@ -145,8 +145,8 @@ void DuctStraightModel::addBoxes(tgStructure &s)
 void DuctStraightModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
-    const tgBox::Config boxConfig(m_config.m_ductWidth/2.0, m_config.m_wallWidth, 0, m_config.m_friction);
-    const tgBox::Config boxConfig2(m_config.m_wallWidth, m_config.m_ductHeight/2.0, 0, m_config.m_friction);
+    const tgBox::Config boxConfig(m_config.m_ductWidth/2.0, m_config.m_wallWidth, 0, m_config.m_friction, 0, 0.01);
+    const tgBox::Config boxConfig2(m_config.m_wallWidth, m_config.m_ductHeight/2.0, 0, m_config.m_friction, 0, 0.01);
     
     // Create a structure that will hold the details of this model
     tgStructure s;

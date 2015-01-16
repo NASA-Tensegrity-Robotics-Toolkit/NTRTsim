@@ -38,6 +38,7 @@ AppDuCTT::AppDuCTT(int argc, char** argv)
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
+    ductAxis = 1;
 
     startX = 0;
     startY = 20;
@@ -79,8 +80,9 @@ bool AppDuCTT::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTSineWaves* const pSimpleControl = new DuCTTSineWaves(targetDist);
-        myRobotModel->attach(pSimpleControl);
+//        DuCTTSineWaves* const pController = new DuCTTSineWaves(targetDist);
+        DuCTTSimple* const pController = new DuCTTSimple(targetDist);
+        myRobotModel->attach(pController);
     }
 
     // Sixth add model & controller to simulation
@@ -90,20 +92,22 @@ bool AppDuCTT::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 45;
-        ductConfig.m_ductHeight = 45;
+//        ductConfig.m_ductWidth = 33;
+//        ductConfig.m_ductHeight = 33;
+        ductConfig.m_ductWidth = 46;
+        ductConfig.m_ductHeight = 46;
         ductConfig.m_distance = 10000;
         ductConfig.m_axis = ductAxis;
         switch(ductAxis)
         {
         case 0:
-            ductConfig.m_startPos = btVector3(-1000,0,0);
+            ductConfig.m_startPos = btVector3(-1000,2,0);
             break;
         case 1:
             ductConfig.m_startPos = btVector3(0,-1000,0);
             break;
         case 2:
-            ductConfig.m_startPos = btVector3(0,0,-1000);
+            ductConfig.m_startPos = btVector3(0,2,-1000);
         default:
             break;
         }

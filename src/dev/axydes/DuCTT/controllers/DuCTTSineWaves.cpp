@@ -59,7 +59,9 @@ DuCTTSineWaves::DuCTTSineWaves(double targetDist) :
     targetPrism(0.0),
     targetDist(targetDist),
     recordedStartCOM(false),
-    move(true)
+    move(true),
+    shouldBotPause(true),
+    shouldTopPause(false)
 {
     phaseOffsets.clear();
     phaseOffsets.push_back(0);
@@ -106,10 +108,10 @@ void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicActua
     cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI + phaseOffsets[phase]);
     target = offsetLength + cycle*cpgAmplitude;
 
-    if (target < 0) target *= -1;
-
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
+//        if (stringList[i]->hasTag("cluster3"))
+//            target = insideLength;
         double setTension = out_controller->control(*(stringList[i]), dt, target);
 //        stringList[i]->setRestLength(target,dt);
 //        double setTension = stringList[i]->getMuscle()->getTension();
@@ -133,6 +135,26 @@ bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSen
     return shouldPause;
 }
 
+bool DuCTTSineWaves::checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top)
+{
+    bool shouldPause = true;
+
+    for (size_t i=0; i<touchSensors.size(); i++)
+    {
+        if (!touchSensors[i]->isTouching()) shouldPause = false;
+    }
+
+    if (top)
+    {
+        shouldTopPause = shouldPause;
+    }
+    else
+    {
+        shouldBotPause = shouldPause;
+    }
+    return true;
+}
+
 void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
 {
 
@@ -144,11 +166,22 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
     {
         simTime += dt;
 
-        if (simTime < 5 || !move) return;
+        if (simTime < 5)
+        {
+            double goal = subject.getBottomPrismatic()->getMaxLength();
+            double currPos = subject.getBottomPrismatic()->getActualLength();
+            double delta = (goal-currPos) / (5.0);
+            std::cerr << "delta: " << delta << std::endl;
+            std::cerr << "curr goal: " << (currPos+delta) << std::endl;
+            subject.getBottomPrismatic()->setPreferredLength(currPos + delta);
+            return;
+        }
+        else if (!move) return;
         else if (!recordedStartCOM)
         {
             startCOM = subject.getCOM();
             recordedStartCOM = true;
+                subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
         }
 
         btVector3 com = subject.getCOM();
@@ -157,9 +190,18 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
         if (targetDist < 0 || dist < targetDist)
         {
             applyImpedanceControlOutside(subject.getAllMuscles(), dt, 1);
-            applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), !shouldPause(subject.topTouchSensors), dt, 4);
+//            applyImpedanceControlOutside(subject.getSaddleMuscles(), dt, 1);
+//            applyImpedanceControlOutside(subject.getVertMuscles(), dt, 1);
+
+            checkPause(subject.bottomTouchSensors, false);
+            checkPause(subject.topTouchSensors, true);
+
+            applySineWave(subject.getBottomPrismatic(), shouldPause(subject.bottomTouchSensors), shouldPause(subject.topTouchSensors), dt, 4);
+            applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), shouldPause(subject.bottomTouchSensors), dt, 0);
 //            applySineWave(subject.getBottomPrismatic(), false, true, dt, 4);
-//            applySineWave(subject.getTopPrismatic(), shouldPause(subject.topTouchSensors), !shouldPause(subject.bottomTouchSensors), dt);
+//            applySineWave(subject.getTopPrismatic(), false, true, dt, 0);
+//            applySineWave(subject.getBottomPrismatic(), shouldBotPause, shouldTopPause, dt, 4);
+//            applySineWave(subject.getTopPrismatic(), false, true, dt, 0);
         }
         else if (dist >= targetDist)
         {
@@ -167,4 +209,16 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
             move = false;
         }
     }
+}
+
+void DuCTTSineWaves::onSetup(DuCTTRobotModel& subject)
+{
+    simTime = 0;
+    recordedStartCOM = false;
+}
+
+void DuCTTSineWaves::onTeardown(DuCTTRobotModel& subject)
+{
+    simTime = 0;
+    recordedStartCOM = false;
 }

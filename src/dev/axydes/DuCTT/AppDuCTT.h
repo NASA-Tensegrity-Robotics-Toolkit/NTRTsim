@@ -38,6 +38,7 @@
 
 //controllers
 #include "controllers/DuCTTSineWaves.h"
+#include "controllers/DuCTTSimple.h"
 
 // This library
 #include "core/tgModel.h"

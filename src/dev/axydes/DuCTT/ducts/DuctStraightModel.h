@@ -69,7 +69,8 @@ public:
             double ductWidth = 40,
             double distance = 100,
             double wallWidth = 0.5,
-            double friction = 1.0,
+//            double friction = 1.0,
+            double friction = 10.0,
             int axis = 1,
             btVector3 startPos = btVector3(0,0,0)
         );

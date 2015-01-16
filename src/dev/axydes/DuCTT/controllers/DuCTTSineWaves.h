@@ -49,9 +49,12 @@ public:
     DuCTTSineWaves(double targetDist = -1);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
-    
+    virtual void onSetup(DuCTTRobotModel& subject);
+    virtual void onTeardown(DuCTTRobotModel& subject);
+
     void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase=0);
     bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
+    bool checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top);
 
     /**
      * Applies the impedance controllers using a velocity setpoint of 0.
@@ -103,6 +106,8 @@ private:
 
     double targetDist;
     bool move;
+    bool shouldBotPause;
+    bool shouldTopPause;
 };
 
 #endif // PRETENSION_CONTROLLER_H

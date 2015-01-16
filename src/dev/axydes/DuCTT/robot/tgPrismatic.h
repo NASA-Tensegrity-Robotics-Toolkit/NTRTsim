@@ -177,6 +177,7 @@ public:
 
     virtual double getMinLength();
     virtual double getMaxLength();
+    virtual double getMaxVelocity();
 
 private:
     /**
