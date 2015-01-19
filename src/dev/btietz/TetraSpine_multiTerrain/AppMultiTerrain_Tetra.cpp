@@ -17,16 +17,16 @@
 */
 
 /**
- * @file AppMultiTerrain.cpp
+ * @file AppMultiTerrain_Tetra.cpp
  * @brief Contains the definition of functions for multi-terrain app
  * @author Brian Mirletz, Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "AppMultiTerrain.h"
+#include "AppMultiTerrain_Tetra.h"
 
-AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
+AppMultiTerrain_Tetra::AppMultiTerrain_Tetra(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -51,7 +51,7 @@ AppMultiTerrain::AppMultiTerrain(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppMultiTerrain::setup()
+bool AppMultiTerrain_Tetra::setup()
 {
     // First create the world
     world = createWorld();
@@ -68,15 +68,14 @@ bool AppMultiTerrain::setup()
     // Fourth create the models with their controllers and add the models to the
     // simulation
     /// @todo add position and angle to configuration
-        FlemonsSpineModelContact* myModel =
-      new FlemonsSpineModelContact(nSegments);
+        TetraSpineKinematic* myModel =
+      new TetraSpineKinematic(nSegments);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-#if (1)
         const int segmentSpan = 3;
-        const int numMuscles = 8;
+        const int numMuscles = 6;
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -128,50 +127,8 @@ bool AppMultiTerrain::setup()
                                                     );
         /// @todo fix memory leak that occurs here
         SpineFeedbackControl* const myControl =
-        new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
-#else
-                const int segmentSpan = 3;
-                const int numMuscles = 8;
-                const int numParams = 2;
-                const int segNumber = 6; // For learning results
-                const double controlTime = .001;
-                const double lowPhase = -1 * M_PI;
-                const double highPhase = M_PI;
-                const double lowAmplitude = -30.0;
-                const double highAmplitude = 30.0;
-                const double kt = 0.0;
-                const double kp = 1000.0;
-                const double kv = 210.0;
-                const bool def = true;
-                    
-                // Overridden by def being true
-                const double cl = 10.0;
-                const double lf = -30.0;
-                const double hf = 30.0;
+        new SpineFeedbackControl(control_config, suffix, "bmirletz/TetraSpine_Contact/");
 
-    
-                BaseSpineCPGControl::Config control_config(segmentSpan, 
-                                                            numMuscles,
-                                                            numMuscles,
-                                                            numParams, 
-                                                            segNumber, 
-                                                            controlTime,
-                                                            lowAmplitude,
-                                                            highAmplitude,
-                                                            lowPhase,
-                                                            highPhase,
-                                                            kt,
-                                                            kp,
-                                                            kv,
-                                                            def,
-                                                            cl,
-                                                            lf,
-                                                            hf
-                                                            );
-    KinematicSpineCPGControl* const myControl =
-      new KinematicSpineCPGControl(control_config, suffix, "learningSpines/TetrahedralComplex/");       
-        
-#endif
         myModel->attach(myControl);
     }
 
@@ -188,7 +145,7 @@ bool AppMultiTerrain::setup()
     return bSetup;
 }
 
-void AppMultiTerrain::handleOptions(int argc, char **argv)
+void AppMultiTerrain_Tetra::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -235,7 +192,7 @@ void AppMultiTerrain::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppMultiTerrain::getHillyConfig()
+const tgHillyGround::Config AppMultiTerrain_Tetra::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -255,7 +212,7 @@ const tgHillyGround::Config AppMultiTerrain::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppMultiTerrain::getBoxConfig()
+const tgBoxGround::Config AppMultiTerrain_Tetra::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -265,14 +222,14 @@ const tgBoxGround::Config AppMultiTerrain::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppMultiTerrain::getBlocks()
+tgModel* AppMultiTerrain_Tetra::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppMultiTerrain::createWorld()
+tgWorld* AppMultiTerrain_Tetra::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -294,17 +251,17 @@ tgWorld* AppMultiTerrain::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppMultiTerrain::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppMultiTerrain_Tetra::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppMultiTerrain::createView(tgWorld *world)
+tgSimView *AppMultiTerrain_Tetra::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppMultiTerrain::run()
+bool AppMultiTerrain_Tetra::run()
 {
     if (!bSetup)
     {
@@ -330,7 +287,7 @@ bool AppMultiTerrain::run()
     return true;
 }
 
-void AppMultiTerrain::simulate(tgSimulation *simulation)
+void AppMultiTerrain_Tetra::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -384,8 +341,8 @@ void AppMultiTerrain::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppMultiTerrain" << std::endl;
-    AppMultiTerrain app (argc, argv);
+    std::cout << "AppMultiTerrain_Tetra" << std::endl;
+    AppMultiTerrain_Tetra app (argc, argv);
 
     if (app.setup())
         app.run();
