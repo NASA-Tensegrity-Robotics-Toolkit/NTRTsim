@@ -16,18 +16,18 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef APP_MULTI_TERRAIN
-#define APP_MULTI_TERRAIN
+#ifndef APP_MULTI_TERRAIN_TETRA
+#define APP_MULTI_TERRAIN_TETRA
 
 /**
- * @file AppMultiTerrain.cpp
+ * @file AppMultiTerrain_Tetra.h
  * @brief Contains the definition function main() for the Multiple terrains app
  * @author Brian Mirletz, Alexander Xydes
  * $Id$
  */
 
 //robot
-#include "dev/btietz/TCContact/FlemonsSpineModelContact.h"
+#include "TetraSpineKinematic.h"
 
 // controller 
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
@@ -53,10 +53,10 @@
 
 namespace po = boost::program_options;
 
-class AppMultiTerrain
+class AppMultiTerrain_Tetra
 {
 public:
-    AppMultiTerrain(int argc, char** argv);
+    AppMultiTerrain_Tetra(int argc, char** argv);
 
     /** Setup the simulation */
     bool setup();

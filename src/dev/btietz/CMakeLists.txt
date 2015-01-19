@@ -22,4 +22,5 @@ subdirs(
     GATests
     Obstacles
     multiTerrain
+    TetraSpine_multiTerrain/
     )

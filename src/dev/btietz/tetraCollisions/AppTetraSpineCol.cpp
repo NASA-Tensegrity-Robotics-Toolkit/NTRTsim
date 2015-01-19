@@ -64,8 +64,8 @@ int main(int argc, char** argv)
    size_t nx = 50;
    size_t ny = 50;
    double margin = 0.2;
-   double triangleSize = 12;
-   double waveHeight = 5.0;
+   double triangleSize = 4.0;
+   double waveHeight = 2.0;
    double offset = 0.0;
 	tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
 									size, origin, nx, ny, margin, triangleSize,
