@@ -40,6 +40,7 @@ class DuCTTRobotModel;
 class tgBasicActuator;
 class tgPrismatic;
 class tgImpedanceController;
+class tgTouchSensorSphereModel;
 
 //namespace std for vectors
 using namespace std;
@@ -76,6 +77,8 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
         /** Sets target lengths for each prismatic joint */
         void setPrismaticLengths(DuCTTRobotModel& subject, double dt);
+        bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
+        bool isLocked(DuCTTRobotModel& subject, bool isTop);
 
         void populateClusters(DuCTTRobotModel& subject);
 

@@ -30,6 +30,7 @@
 // This application
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
+#include "../robot/tgTouchSensorSphereModel.h"
 
 // This library
 #include "core/tgBasicActuator.h"
@@ -308,17 +309,53 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
     const double maxLength = m_initialLengths * (1+maxStringLengthFactor);
 
     for(int prism=0; prism<nPrisms; prism++) {
-        tgPrismatic* const pPrism = prisms[prism];
         size_t idx = prism + clusters.size()-1;
-        double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
-        if (newLength <= minLength) {
-            newLength = minLength;
-        } else if (newLength >= maxLength) {
-            newLength = maxLength;
+        tgPrismatic* const pPrism = prisms[prism];
+        bool isTop = (pPrism == subject.getBottomPrismatic());
+
+//        if (!isLocked(subject, isTop))
+        {
+            double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
+            if (newLength <= minLength) {
+                newLength = minLength;
+            } else if (newLength >= maxLength) {
+                newLength = maxLength;
+            }
+
+            pPrism->setPreferredLength(newLength);
         }
-        pPrism->setPreferredLength(newLength);
+//        else
+        {
+        }
+
         phase += phaseChange[idx];
     }
+}
+
+void DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
+{
+    bool isLocked = false;
+    if (isTop)
+    {
+        isLocked = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
+    }
+    else
+    {
+        isLocked = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
+    }
+    return isLocked;
+}
+
+bool DuCTTLearningController::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+{
+    bool shouldPause = true;
+
+    for (size_t i=0; i<touchSensors.size(); i++)
+    {
+        if (!touchSensors[i]->isTouching()) shouldPause = false;
+    }
+
+    return shouldPause;
 }
 
 void DuCTTLearningController::populateClusters(DuCTTRobotModel& subject) {
