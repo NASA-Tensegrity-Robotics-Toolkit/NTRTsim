@@ -36,7 +36,9 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 
-// For AnnealEvolution
+#include "helpers/FileHelpers.h"
+
+#include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
 // The C++ Standard Library
@@ -53,13 +55,20 @@ using namespace std;
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
 DuCTTLearningController::DuCTTLearningController(const double initialLength,
-                                           const bool useManualParams,
-                                           const string manParamFile) :
+                                                const bool useManualParams,
+                                                const string manParamFile,
+                                                string resourcePath,
+                                                string suffix,
+                                                string evoConfigFilename
+                                                 ) :
+    m_evoConfigFilename(evoConfigFilename),
+    m_evolution(suffix, evoConfigFilename),
+    m_isLearning(false),
     m_initialLengths(initialLength),
     m_usingManualParams(useManualParams),
     m_manualParamFile(manParamFile),
     m_totalTime(0.0),
-    maxStringLengthFactor(0.50),
+    maxStringLengthFactor(1.50),
     nClusters(8),
     musclesPerCluster(1),
     nPrisms(2),
@@ -67,6 +76,18 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     imp_controller(new tgImpedanceController(0.01, 500, 10)),
     badRun(false)
 {
+    std::string path;
+    if (resourcePath != "")
+    {
+        path = FileHelpers::getResourcePath(resourcePath);
+    }
+    else
+    {
+        path = "";
+    }
+    m_evoConfig.readFile(path+m_evoConfigFilename);
+    m_isLearning = m_evoConfig.getBoolValue("learning");
+
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++)
@@ -88,21 +109,31 @@ void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
         pMuscle->setControlInput(this->m_initialLengths, dt);
     }
 
+    //Set the initial lengths of the prismatic joints
+    subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
+    subject.getBottomPrismatic()->moveMotors(dt);
+    subject.getTopPrismatic()->setPreferredLength(subject.getTopPrismatic()->getMinLength());
+    subject.getTopPrismatic()->moveMotors(dt);
+
     populateClusters(subject);
-    setupAdapter();
+    m_evolutionAdapter.initialize(&m_evolution, m_isLearning, m_evoConfig);
     initPosition = subject.getCOM();
     initializeSineWaves(); // For muscle actuation
 
-    vector<double> state; // For config file usage (including Monte Carlo simulations)
+    /* Empty vector signifying no state information
+     * All parameters are stateless parameters, so we can get away with
+     * only doing this once
+     */
+    vector<double> state;
 
-    //get the actions (between 0 and 1) from evolution (todo)
-    actions = evolutionAdapter.step(dt,state);
+    //get the actions (between 0 and 1) from evolution
+    m_actions = m_evolutionAdapter.step(dt,state);
  
     //transform them to the size of the structure
-    actions = transformActions(actions);
+    m_actions = transformActions(m_actions);
 
     //apply these actions to the appropriate muscles according to the sensor values
-    applyActions(subject,actions);
+    applyActions(subject,m_actions);
 }
 
 void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
@@ -114,17 +145,12 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
 
     setPreferredMuscleLengths(subject, dt);
     setPrismaticLengths(subject, dt);
-    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    
-    //Move motors for all the muscles
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
-        tgBasicActuator * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        pMuscle->moveMotors(dt);
-    }
 
-    //instead, generate it here for now!
+    moveMotors(subject, dt);
+
+    //TODO: check for bad run?
+
+    /** What is this?
     for(int i=0; i<nActions; i++)
     {
         vector<double> tmp;
@@ -132,8 +158,25 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
         {
             tmp.push_back(0.5);
         }
-        actions.push_back(tmp);
+        m_actions.push_back(tmp);
     }
+    /**/
+}
+
+void DuCTTLearningController::moveMotors(DuCTTRobotModel &subject, double dt)
+{
+    //Move motors for all the muscles
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for (size_t i = 0; i < muscles.size(); ++i)
+    {
+        tgBasicActuator * const pMuscle = muscles[i];
+        assert(pMuscle != NULL);
+        pMuscle->moveMotors(dt);
+    }
+
+    //Move prismatic joints
+    subject.getBottomPrismatic()->moveMotors(dt);
+    subject.getTopPrismatic()->moveMotors(dt);
 }
 
 // So far, only score used for eventual fitness calculation of an Escape Model
@@ -156,7 +199,7 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
     scores.push_back(energySpent);
 
     std::cout << "Tearing down" << std::endl;
-    evolutionAdapter.endEpisode(scores);
+    m_evolutionAdapter.endEpisode(scores);
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
     delete amplitude;
@@ -182,10 +225,10 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
 
     double pretension = 0.90; // Tweak this value if need be
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
+    double mins[4]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor),
                        0.3, //Hz
                        -1 * M_PI, 
-                       m_initialLengths};// * (1 - maxStringLengthFactor)};
+                       1.2}; //m_initialLengths};// * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
     double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
@@ -194,7 +237,7 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
                        m_initialLengths};// * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
-    for(int i=0;i<actions.size();i++) { //8x
+    for(int i=0;i<actions.size();i++) { //10x
         for (int j=0; j<actions[i].size(); j++) { //4x
             if (m_usingManualParams) {
                 actions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
@@ -229,17 +272,6 @@ void DuCTTLearningController::applyActions(DuCTTRobotModel& subject, vector< vec
         dcOffset[idx] = actions[idx][3];
     }
     //printSineParams();
-}
-
-void DuCTTLearningController::setupAdapter() {
-    string suffix = "_DuCTT";
-    string configAnnealEvolution = "Config.ini";
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
-    configuration configEvolutionAdapter;
-    configEvolutionAdapter.readFile(configAnnealEvolution);
-    bool isLearning = configEvolutionAdapter.getBoolValue("learning");
-
-    evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 }
 
 //TODO: Doesn't seem to correctly calculate energy spent by tensegrity
@@ -311,9 +343,9 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
     for(int prism=0; prism<nPrisms; prism++) {
         size_t idx = prism + clusters.size()-1;
         tgPrismatic* const pPrism = prisms[prism];
-        bool isTop = (pPrism == subject.getBottomPrismatic());
+        bool isTop = (pPrism == subject.getTopPrismatic());
 
-//        if (!isLocked(subject, isTop))
+        if (!isLocked(subject, isTop))
         {
             double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
             if (newLength <= minLength) {
@@ -324,7 +356,7 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
 
             pPrism->setPreferredLength(newLength);
         }
-//        else
+        else
         {
         }
 
@@ -332,7 +364,7 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
     }
 }
 
-void DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
+bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
 {
     bool isLocked = false;
     if (isTop)
@@ -402,10 +434,13 @@ double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
     const double oldY = initPosition.y();
     const double oldZ = initPosition.z();
 
-    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+    const double distanceMoved = sqrt(
+                                      (newX-oldX) * (newX-oldX) +
                                       (newY-oldY) * (newY-oldY) +
-                                      (newZ-oldZ) * (newZ-oldZ));
-    return distanceMoved;
+                                      (newZ-oldZ) * (newZ-oldZ)
+                                    );
+//    return distanceMoved;
+    return newY - oldY;
 }
                                          
 std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {

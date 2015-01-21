@@ -109,8 +109,8 @@ def printParams(inFile, outFile):
 
     return
 
-if __name__=="__main__":
-    scoreFile = sys.argv[1]
+def mainFunc(inFile):
+    scoreFile = inFile 
     sortedFile = 'sorted_'+scoreFile
     noOutsFile = 'sorted_NoOutliers_'+scoreFile
     bestFile = 'best_'+scoreFile
@@ -118,7 +118,12 @@ if __name__=="__main__":
 
     sortFile(scoreFile, sortedFile)
     cutOuts(sortedFile, noOutsFile)
-    bestScores(noOutsFile, bestFile, 0)
+    bestScores(noOutsFile, bestFile, -3)
     printParams(bestFile, bestParamFile)
     statScores.statScores(bestFile)
+
+    return
+
+if __name__=="__main__":
+    mainFunc(sys.argv[1])
 

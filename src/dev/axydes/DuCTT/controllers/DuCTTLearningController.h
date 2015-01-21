@@ -36,6 +36,7 @@
 #include "LinearMath/btVector3.h"
 
 // Forward declarations
+class AnnealEvolution;
 class DuCTTRobotModel;
 class tgBasicActuator;
 class tgPrismatic;
@@ -49,8 +50,12 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
 {
     public:
         DuCTTLearningController(const double prefLength=5.0,
-                             const bool useManualParams=false,
-                             const string manParamFile="");
+                                const bool useManualParams=false,
+                                const string manParamFile="",
+                                string resourcePath="",
+                                string suffix="_DuCTT",
+                                string evoConfigFilename="Config.ini"
+                                );
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~DuCTTLearningController() { }
@@ -67,16 +72,15 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         virtual void applyActions(DuCTTRobotModel& subject, vector< vector <double> > act);
 
     private:
-        /** Initialize the evolution adapter as well as its own parameters */
-        void setupAdapter();
-
         /** Returns amount of energy spent by each muscle in subject */
         double totalEnergySpent(DuCTTRobotModel& subject);
 
+        void moveMotors(DuCTTRobotModel &subject, double dt);
         /** Sets target lengths for each muscle */
         void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
         /** Sets target lengths for each prismatic joint */
         void setPrismaticLengths(DuCTTRobotModel& subject, double dt);
+
         bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
         bool isLocked(DuCTTRobotModel& subject, bool isTop);
 
@@ -103,8 +107,12 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         const string m_manualParamFile;
 
         // Evolution and Adapter
-        AnnealAdapter evolutionAdapter;
-        vector< vector<double> > actions; // For modifications between episodes
+        bool m_isLearning;
+        string m_evoConfigFilename;
+        configuration m_evoConfig;
+        AnnealEvolution m_evolution;
+        AnnealAdapter m_evolutionAdapter;
+        vector< vector<double> > m_actions; // For modifications between episodes
 
         // Muscle Clusters
         int nClusters;
