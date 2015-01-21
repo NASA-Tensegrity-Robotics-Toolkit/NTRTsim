@@ -48,7 +48,8 @@
 #include <vector>
 #include <string>
 
-# define M_PI 3.14159265358979323846 
+#define M_PI 3.14159265358979323846
+#define N_PARAMS 4
                                
 using namespace std;
 
@@ -216,7 +217,7 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
  */
 vector< vector <double> > DuCTTLearningController::transformActions(vector< vector <double> > actions)
 {
-    vector <double> manualParams(4 * (nActions), 1); // '4' for the number of sine wave parameters
+    vector <double> manualParams(N_PARAMS * nActions, 1); // '4' for the number of sine wave parameters
     if (m_usingManualParams) {
         std::cout << "Using manually set parameters\n"; 
         int lineNumber = 1;
@@ -225,28 +226,36 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
 
     double pretension = 0.90; // Tweak this value if need be
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor),
+    double mins[N_PARAMS]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor),
                        0.3, //Hz
                        -1 * M_PI, 
                        1.2}; //m_initialLengths};// * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
+    double maxes[N_PARAMS] = {m_initialLengths * (pretension + maxStringLengthFactor),
                        20, //Hz (can cheat to 50Hz, if feeling immoral)
                        M_PI, 
                        m_initialLengths};// * (1 + maxStringLengthFactor)}; 
-    double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+    double ranges[N_PARAMS] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
-    for(int i=0;i<actions.size();i++) { //10x
-        for (int j=0; j<actions[i].size(); j++) { //4x
-            if (m_usingManualParams) {
-                actions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
-            } else {
-                actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+    std::vector< std::vector<double> > newActions (nActions);
+    //going from 1x40 to 10x4
+    for(int i=0;i<nActions;i++) //10x
+    {
+        newActions[i] = std::vector<double>(N_PARAMS);
+        for (int j=0; j<N_PARAMS; j++)  //4x
+        {
+            if (m_usingManualParams)
+            {
+                newActions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
+            }
+            else
+            {
+                newActions[i][j] = actions[0][(i*N_PARAMS)+j]*(ranges[j])+mins[j];
             }
         }
     }
-    return actions;
+    return newActions;
 }
 
 /**
