@@ -123,6 +123,9 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         vector<tgPrismatic*> prisms;
         int nActions;
 
+        bool m_bIgnoreTouchSensors;
+        bool m_bRecordedStart;
+
         // Sine Wave Data
         double* amplitude;
         double* angularFrequency;
@@ -130,7 +133,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         double* dcOffset;
 
         tgImpedanceController* imp_controller;
-        bool badRun;
+        bool m_bBadRun;
 };
 
 #endif // ESCAPE_T6CONTROLLER

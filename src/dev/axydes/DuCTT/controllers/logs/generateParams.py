@@ -1,8 +1,11 @@
 #!/usr/bin/python
 """ Goes through entire workflow to get MonteCarlo params for learning algorithm """
 
+import os
 import sys
 import csv
+import re
+import shutil
 from operator import itemgetter
 import numpy as np
 import statScores
@@ -23,7 +26,8 @@ def sortFile(inFile, outFile):
 
         f.close()
 
-    sortedDistances = sorted(unsorted, key=lambda elem: elem[0], reverse=True)
+    sortedEnergy = sorted(unsorted, key=itemgetter(1))
+    sortedDistances = sorted(sortedEnergy, key=itemgetter(0), reverse=True)
 
     try:
         f = open(outFile, 'w')
@@ -109,21 +113,65 @@ def printParams(inFile, outFile):
 
     return
 
-def mainFunc(inFile):
-    scoreFile = inFile 
-    sortedFile = 'sorted_'+scoreFile
-    noOutsFile = 'sorted_NoOutliers_'+scoreFile
-    bestFile = 'best_'+scoreFile
-    bestParamFile = 'bestParams_'+scoreFile
+def createFolder(trialFolder):
+    if (not os.path.exists(trialFolder)):
+        os.makedirs(trialFolder)
 
+    if not trialFolder.endswith('/'):
+        trialFolder = trialFolder+'/'
+
+    regex = re.compile('trial_([0-9])+$')
+
+    maxTrial = 0
+    currTrials = os.listdir(trialFolder)
+    for trial in currTrials:
+        matched = regex.match(trial)
+        if matched:
+            newTrial = int(matched.group(1))
+            if newTrial >= maxTrial:
+                maxTrial = newTrial+1
+
+    newTrialDir = trialFolder+'trial_'+str(maxTrial)
+    print 'Trial folder: {}'.format(newTrialDir)
+    os.makedirs(newTrialDir)
+
+    return newTrialDir
+
+def mainFunc(inFile, trialFolder):
+    if not os.path.exists(inFile):
+        print 'Error: {} does not exist.'.format(inFile)
+        return
+
+    #Setup trial forlder
+    folder = createFolder(trialFolder)
+
+    # Create filenames
+    scoreFile = folder+'/'+inFile 
+    sortedFile = folder+'/'+'sorted_'+inFile
+    noOutsFile = folder+'/'+'sorted_NoOutliers_'+inFile
+    bestFile = folder+'/'+'best_'+inFile
+    bestParamFile = folder+'/'+'bestParams_'+inFile
+
+    # Move file to new trial folder
+    shutil.move(inFile,scoreFile)
+
+    #Do the actual parameter generation
     sortFile(scoreFile, sortedFile)
     cutOuts(sortedFile, noOutsFile)
-    bestScores(noOutsFile, bestFile, -3)
+    bestScores(noOutsFile, bestFile, 0)
     printParams(bestFile, bestParamFile)
     statScores.statScores(bestFile)
 
     return
 
 if __name__=="__main__":
-    mainFunc(sys.argv[1])
+    if len(sys.argv) < 2:
+        print 'Usage: {} [SCORES_FILE] [TRIAL_FOLDER]'.format(os.path.basename(sys.argv[0]))
+        exit(-1)
+    if len(sys.argv) < 3:
+        folder = '.'
+    else:
+        folder = sys.argv[2]
+
+    mainFunc(sys.argv[1], folder)
 
