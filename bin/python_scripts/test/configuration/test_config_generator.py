@@ -12,12 +12,25 @@ class TestConfigGenerator(unittest.TestCase):
     def setUp(self):
         self.configGenerator = ConfigGenerator(self.CONF_GENERATED_DIR, self.CONF_DEFAULT_DIR)
 
-    def testGenerateNoConf(self):
+    def testNoMissing(self):
         generatedList = ["bullet.ini", "gmocktest.ini", "general.ini"]
         flexmock(Directory).should_receive('getDirList').and_return(generatedList).and_return(self.DEFAULT_LIST)
         self.assertEqual(self.configGenerator.getMissing(), [])
 
-    def testGenerateTwoConf(self):
+    def testTwoMissing(self):
         generatedList = ["gmocktest.ini"]
         flexmock(Directory).should_receive('getDirList').and_return(generatedList).and_return(self.DEFAULT_LIST)
         self.assertEqual(self.configGenerator.getMissing(), ["bullet.ini.default" ,"general.ini.default"])
+
+    def testGenerateNoConf(self):
+        generatedList = ["bullet.ini", "gmocktest.ini", "general.ini"]
+        flexmock(Directory).should_receive('getDirList').and_return(generatedList).and_return(self.DEFAULT_LIST)
+        flexmock(shutil).should_receive('copy').times(0)
+        self.configGenerator.generateMissing()
+
+    def testGenerateTwoConf(self):
+        generatedList = ["general.ini"]
+        flexmock(Directory).should_receive('getDirList').and_return(generatedList).and_return(self.DEFAULT_LIST)
+        flexmock(shutil).should_receive('copy').times(2)
+        self.configGenerator.generateMissing()
+

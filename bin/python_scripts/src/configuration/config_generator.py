@@ -1,4 +1,5 @@
 from ..utilities.directory import Directory
+import shutil
 
 class ConfigGenerator:
 
@@ -33,4 +34,12 @@ class ConfigGenerator:
         """
         Generates all missing conf files.
         """
-        pass
+        # Get the list of missing files.
+        missingList = self.getMissing()
+
+        # Loop over the missing list. For each one copy it.
+        for missing in missingList:
+            srcPath = "%s/%s" % (self.defaultDir, missing)
+            destPath = "%s/%s" % (self.generatedDir, missing.rsplit(".", 1)[0])
+
+            shutil.copy(srcPath, destPath)
