@@ -1,3 +1,5 @@
+from ..utilities.directory import Directory
+
 class ConfigGenerator:
 
     def __init__(self, generatedDir, defaultDir):
@@ -16,7 +18,16 @@ class ConfigGenerator:
         """
         Returns a list containing the names of all missing conf files.
         """
+        generatedDirectory = Directory(self.generatedDir).getDirList()
+        defaultDirectory = Directory(self.defaultDir).getDirList()
 
+        toGenerate = []
+        for defaultFile in defaultDirectory:
+            generatedName = defaultFile.rsplit(".", 1)
+            if generatedName[0] not in generatedDirectory:
+                toGenerate.append(defaultFile)
+
+        return toGenerate
 
     def generateMissing(self):
         """
