@@ -9,8 +9,8 @@ class ConfigGenerator:
 
         Parameters
 
-        generatedDir: Relative path (relative to base dir) where generated conf files are written.
-        defaultDir: Relative path (relative to base dir) to where default configuration files are located.
+        generatedDir: Absolute path where generated conf files are written.
+        defaultDir: Absolute path where conf templates can be found.
         """
         self.generatedDir = generatedDir
         self.defaultDir = defaultDir

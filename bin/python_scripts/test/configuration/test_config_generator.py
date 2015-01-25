@@ -6,8 +6,8 @@ class TestConfigGenerator(unittest.TestCase):
 
     DEFAULT_LIST = ["bullet.ini.default", "gmocktest.ini.default", "general.ini.default"]
 
-    CONF_GENERATED_DIR = "conf"
-    CONF_DEFAULT_DIR = "conf/default"
+    CONF_GENERATED_DIR = "/home/perr/work/git/NTRTsim/conf"
+    CONF_DEFAULT_DIR= "/home/perr/work/git/NTRTsim/conf"
 
     def setUp(self):
         self.configGenerator = ConfigGenerator(self.CONF_GENERATED_DIR, self.CONF_DEFAULT_DIR)
