@@ -81,8 +81,14 @@ private:
    * in the constructor.
    */
     
-   double verticalRLA;
-   double verticalRLB;
+   double verticalRLA1;
+   double verticalRLA2;
+   double verticalRLA3;
+   double verticalRLA4;
+   double verticalRLB1;
+   double verticalRLB2;
+   double verticalRLB3;
+   double verticalRLB4;
    double dL;
    double state;
    double updateTime;
