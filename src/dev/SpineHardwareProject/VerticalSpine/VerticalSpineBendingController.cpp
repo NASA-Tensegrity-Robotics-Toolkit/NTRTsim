@@ -36,7 +36,8 @@
 #include <vector>
 
 VerticalSpineBendingController::VerticalSpineBendingController():
-  verticalRL(4.0),
+  verticalRLA(4.0),
+  verticalRLB(4.0),
   dL(0.01),        // Length Change
   state(-1.0),
   updateTime(0.0)
@@ -58,27 +59,29 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
     else
       {
 	updateTime += dt;
-	if (updateTime >= 1.0/300)  //Speed of actuators
+	if (updateTime >= 1.0/100)  //Speed of actuators
 	  {
 	    updateTime = 0.0;
 
 	    // Bend & Unbend
-	    if(verticalRL <= 0.5 && state == -1.0)
+	    if(verticalRLA <= 2.0 && state == -1.0)  //min length of cable
 	      {
 		state = 1.0;
 	      }
-	    else if (verticalRL >= 4.0 && state == 1.0)
+	    else if (verticalRLA >= 4.0 && state == 1.0)  //stop at upright position
 	      {
 		state = -1.0;
 	      }
 
 	    if (state == -1.0)
 	      {
-		verticalRL -= dL;
+		verticalRLA -= dL;
+		verticalRLB += dL;
 	      }
 	    else if (state == 1.0)
 	      {
-		verticalRL += dL;
+		verticalRLA += dL;
+		verticalRLB -= dL;
 	      }
 	  }
 	
@@ -95,15 +98,15 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
         // set string length for vertical muscles
         for (size_t i = 0; i < v_musclesA.size(); ++ i)
         {
-            // A
+	    //A   **Contracting Cable
             tgBasicActuator * const pMuscleA = v_musclesA[i];
             assert(pMuscleA != NULL);
-            pMuscleA->setControlInput(verticalRL,dt);
+            pMuscleA->setControlInput(verticalRLA,dt);
             
-            // //B
-            // tgBasicActuator * const pMuscleB = v_musclesB[i];
-            // assert(pMuscleB != NULL);
-            // pMuscleB->setControlInput(verticalRL);
+            //B   **Elongating Cable
+            tgBasicActuator * const pMuscleB = v_musclesB[i];
+            assert(pMuscleB != NULL);
+            pMuscleB->setControlInput(verticalRLB,dt);
             
             // //C
             // tgBasicActuator * const pMuscleC = v_musclesC[i];

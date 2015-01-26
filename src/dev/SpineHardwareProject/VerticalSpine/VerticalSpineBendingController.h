@@ -81,7 +81,8 @@ private:
    * in the constructor.
    */
     
-   double verticalRL;
+   double verticalRLA;
+   double verticalRLB;
    double dL;
    double state;
    double updateTime;
