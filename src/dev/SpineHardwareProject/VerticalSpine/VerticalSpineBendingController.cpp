@@ -30,10 +30,13 @@
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgString.h"
+#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 #include <vector>
+
+#include "helpers/FileHelpers.h"
 
 VerticalSpineBendingController::VerticalSpineBendingController():
   verticalRLA1(4.0),
@@ -44,9 +47,10 @@ VerticalSpineBendingController::VerticalSpineBendingController():
   verticalRLB2(4.0),
   verticalRLB3(4.0),
   verticalRLB4(4.0),
-  dL(0.01),        // Length Change
+  dL(0.001),        // Length Change, 0.01
   state(-1.0),
-  updateTime(0.0)
+  updateTime(0.0),
+  m_dataObserver("/home/drew/NTRTsim_logs/vertspine")
 {
   // verticalRL = 1; // cm
     //verticalRL = 7.38; //cm
@@ -54,6 +58,13 @@ VerticalSpineBendingController::VerticalSpineBendingController():
     //saddleRL2 = 13.613 ; // cm
     //saddleRL3 = 14.189 ; // cm
     //saddleRL4 = 14.766 ; // cm
+//m_dataObserver = new tgDataObserver("logs/vertspine");
+//m_dataObserver("logs/vertispine");
+}
+  //m_dataObserver("logs/vert_spine")
+
+void VerticalSpineBendingController::onSetup(VerticalSpineModel& subject){
+  m_dataObserver.onSetup(subject);
 }
 
 
@@ -145,6 +156,11 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
 	  {
 	    updateTime = 0.0;
 
+	    // logging
+	    //std::cout << "got to right before onstep observer" << std::endl;
+	    m_dataObserver.onStep(subject, updateTime);
+	    //notifyStep(m_updateTime);
+
 	    // Bend & Unbend
 	    if(verticalRLA1 <= 2.0 && state == -1.0)  //min length of cable
 	      {
@@ -232,5 +248,6 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
 	// pMuscleD->setControlInput(verticalRL);
        
     }
+
 }
 

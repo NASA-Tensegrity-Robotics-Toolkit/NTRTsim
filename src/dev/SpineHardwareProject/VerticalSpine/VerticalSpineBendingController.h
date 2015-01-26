@@ -29,6 +29,11 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "core/tgSubject.h"
+
+// the data collection class
+#include "sensors/tgDataObserver.h"
+#include <string>
 
 // Forward declarations
 class VerticalSpineModel;
@@ -39,7 +44,7 @@ class VerticalSpineModel;
  * tightening up the structure and keeping it held together without
  * further control input.
  */
-class VerticalSpineBendingController : public tgObserver<VerticalSpineModel>
+class VerticalSpineBendingController : public tgObserver<VerticalSpineModel>, public tgSubject <VerticalSpineBendingController>
 {
 public:
 	
@@ -64,7 +69,7 @@ public:
    * @param[in] subject - the SpineModel that is being controlled. Must
    * have a list of allMuscles populated
    */
-  //  virtual void onSetup(VerticalSpineModel& subject);
+  virtual void onSetup(VerticalSpineModel& subject);
     
   /**
    * The onStep method is not used for this controller.
@@ -94,8 +99,9 @@ private:
    double updateTime;
 
   // For data logging. TO-DO: implement this fully.
-  // tgDataObserver m_dataObserver;
-  // double m_updateTime;
+  tgDataObserver m_dataObserver;
+  //double m_updateTime;
+
 };
 
 #endif // Spine_BENDING_CONTROLLER_H
