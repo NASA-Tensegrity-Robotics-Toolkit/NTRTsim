@@ -1,5 +1,5 @@
 import urllib2
-from .utilities.file_utils import FileUtils
+from ..utilities.file_utils import FileUtils
 
 class Downloader:
     """
@@ -35,12 +35,15 @@ class Downloader:
         try:
             fullPath = "%s/%s" % (self.localSavePath, self.localSaveName)
             writeTo = FileUtils.open(fullPath, 'wb')
-            inputBuffer = urlConnection.read(self.DOWNLOAD_BLOCK_SIZE)
 
-            if not buffer:
-                break
+            while True:
+                inputBuffer = urlConnection.read(self.DOWNLOAD_BLOCK_SIZE)
 
-            writeTo.write(inputBuffer)
+                if not inputBuffer:
+                    break
+
+                writeTo.write(inputBuffer)
+
         except IOError, e:
             raise DownloaderError("Hit an IOError while trying to create an output file at %s. The error message is '%s'", e)
         finally:
@@ -48,4 +51,4 @@ class Downloader:
                 writeTo.close()
 
 class DownloaderError(Exception):
-    pass
+   pass
