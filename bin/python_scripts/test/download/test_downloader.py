@@ -18,13 +18,12 @@ class TestDownloader(unittest.TestCase):
     def testGetErrorUrlOpen(self):
         flexmock(urllib2).should_receive('urlopen').and_raise(urllib2.URLError("Error message"))
 
-
         with self.assertRaises(DownloaderError):
             self.downloader.attemptDownload()
 
     def testIOErrorWriteToIsNotNoneVerifyCloseCall(self):
         fileMock = MockHelpers.getOpenMock()
-        urlMock = getUrlLib2OpenMock()
+        urlMock = MockHelpers.getUrlLibTwoOpenMock()
 
         urlMock.should_receive('read').and_raise(IOError("error message.")).once().ordered()
         fileMock.should_receive('close').once().ordered()
@@ -36,7 +35,7 @@ class TestDownloader(unittest.TestCase):
         readString = "bunchofchars"
 
         fileMock = MockHelpers.getOpenMock()
-        urlMock = getUrlLib2OpenMock()
+        urlMock = MockHelpers.getUrlLibTwoOpenMock()
 
         fileMock.should_receive('write').with_args(readString).once().ordered()
         fileMock.should_receive('close').once().ordered()
