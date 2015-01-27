@@ -1,8 +1,10 @@
 import urllib2
+#TODO: [URGENT] Switch to absolute imports. There are several areas where this will need to be fixed, just grep "from ."
 from ..utilities.file_utils import FileUtils
 
 class Downloader:
     """
+    #TODO: Set Vim to automatically add line breaks on long comment/docstring lines, then fix all existing comments in the new scripts.
     Downloader is responsible for, as the name implies, downloading. Downloading packages necessary during installation, specifically.
 
     While Downloader will throw exceptions in response to download failure (be it a non-responsive IP, hitting a 404, etc), but there are some failures it will not catch. You should verify the hash of any files downloaded with Downloader.
