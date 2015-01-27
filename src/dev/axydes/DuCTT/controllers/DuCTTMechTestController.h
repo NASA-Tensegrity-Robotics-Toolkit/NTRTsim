@@ -51,36 +51,25 @@ public:
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
     /**
-     * Applies the impedance controllers using a velocity setpoint of 0.
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     */
-    void applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList,
-                                    double dt);
-    /**
      * Applies the impedance controllers using a velocity setpoint determined.
      * by the phase parameter and
      * Called during this classes onStep function.
      * @param[in] stringList a std::vector of strings taken from the
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
-                                    double dt,
-                                    std::size_t phase);
+    void applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
+                                    double dt);
 
 private:
     tgImpedanceController* in_controller;
-    tgImpedanceController* out_controller;
+    tgImpedanceController* impController;
 
     double simTime;
     double cycle;
     double target;
 
-    std::vector<double> phaseOffsets;
+    const double phaseOffset;
     const double offsetLength;
     const double cpgAmplitude;
     const double cpgFrequency;
@@ -92,6 +81,7 @@ private:
     const double insideLength;
 
     double targetTime;
+    double startTime;
     bool move;
 };
 
