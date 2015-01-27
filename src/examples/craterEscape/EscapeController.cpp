@@ -45,8 +45,6 @@
 
 # define M_PI 3.14159265358979323846 
                                
-using namespace std;
-
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
 EscapeController::EscapeController(const double initialLength,
@@ -87,7 +85,7 @@ void EscapeController::onSetup(EscapeModel& subject)
     setupAdapter();
     initializeSineWaves(); // For muscle actuation
 
-    vector<double> state; // For config file usage (including Monte Carlo simulations)
+    std::vector<double> state; // For config file usage (including Monte Carlo simulations)
 
     //get the actions (between 0 and 1) from evolution (todo)
     actions = evolutionAdapter.step(dt,state);
@@ -141,13 +139,13 @@ void EscapeController::onTeardown(EscapeModel& subject) {
  * Invariant: actions[x].size() == 4 for all legal values of x
  * Invariant: Each actions[] contains: amplitude, angularFrequency, phaseChange, dcOffset
  */
-vector< vector <double> > EscapeController::transformActions(vector< vector <double> > actions)
+std::vector< std::vector <double> > EscapeController::transformActions(std::vector< std::vector <double> > actions)
 {
     bool usingManualParams = false;
-    vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
+    std::vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
-        string filename = "logs/paramSortedBestTrials.dat";
+        std::string filename = "logs/paramSortedBestTrials.dat";
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);
     } 
@@ -181,7 +179,7 @@ vector< vector <double> > EscapeController::transformActions(vector< vector <dou
 /**
  * Defines each cluster's sine wave according to actions
  */
-void EscapeController::applyActions(EscapeModel& subject, vector< vector <double> > actions)
+void EscapeController::applyActions(EscapeModel& subject, std::vector< std::vector <double> > actions)
 {
     assert(actions.size() == clusters.size());
 
@@ -197,7 +195,7 @@ void EscapeController::applyActions(EscapeModel& subject, vector< vector <double
 }
 
 void EscapeController::setupAdapter() {
-    //string suffix = "_Escape";
+    //std::string suffix = "_Escape";
     
     std::string path;
     if (configPath != "")
@@ -209,7 +207,7 @@ void EscapeController::setupAdapter() {
         path = "";
     }
     
-    string configAnnealEvolution = path + configName;
+    std::string configAnnealEvolution = path + configName;
     AnnealEvolution* evo = new AnnealEvolution(suffix, configName, configPath);
     bool isLearning = true;
     configuration configEvolutionAdapter;
@@ -221,7 +219,7 @@ void EscapeController::setupAdapter() {
 double EscapeController::totalEnergySpent(EscapeModel& subject) {
     double totalEnergySpent=0;
 
-    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
+    std::vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
     for(int i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
@@ -253,7 +251,7 @@ void EscapeController::setPreferredMuscleLengths(EscapeModel& subject, double dt
 
     for(int iMuscle=0; iMuscle < nMuscles; iMuscle++) {
 
-        const vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
         tgBasicActuator *const pMuscle = muscles[iMuscle];
 
         assert(pMuscle != NULL);
@@ -313,9 +311,9 @@ void EscapeController::setPreferredMuscleLengths(EscapeModel& subject, double dt
 
 void EscapeController::populateClusters(EscapeModel& subject) {
     for(int cluster=0; cluster < nClusters; cluster++) {
-        ostringstream ss;
+        std::ostringstream ss;
         ss << (cluster + 1);
-        string suffix = ss.str();
+        std::string suffix = ss.str();
         std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("muscle cluster" + suffix);
         clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
     }
@@ -329,7 +327,7 @@ void EscapeController::initializeSineWaves() {
 }
 
 double EscapeController::displacement(EscapeModel& subject) {
-    vector<double> finalPosition = subject.getBallCOM();
+    std::vector<double> finalPosition = subject.getBallCOM();
 
     // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
     //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
@@ -344,29 +342,29 @@ double EscapeController::displacement(EscapeModel& subject) {
     return distanceMoved;
 }
                                          
-std::vector<double> EscapeController::readManualParams(int lineNumber, string filename) {
+std::vector<double> EscapeController::readManualParams(int lineNumber, std::string filename) {
     assert(lineNumber > 0);
-    vector<double> result(32, 1.0);
-    string line;
-    ifstream infile(filename.c_str(), ifstream::in);
+    std::vector<double> result(32, 1.0);
+    std::string line;
+    std::ifstream infile(filename.c_str(), std::ifstream::in);
 
     // Grab line from input file
     if (infile.is_open()) {
-        cout << "OPENED FILE\n";
+        std::cout << "OPENED FILE\n";
         for (int i=0; i<lineNumber; i++) {
             getline(infile, line);
         }
         infile.close();
     } else {
-        cerr << "Error: Manual Parameters file not found\n";
+        std::cerr << "Error: Manual Parameters file not found\n";
         exit(1);
     }
 
     //cout << "Using: " << line << " as input for starting parameter values\n";
 
     // Split line into parameters
-    stringstream lineStream(line);
-    string cell;
+    std::stringstream lineStream(line);
+    std::string cell;
     int iCell = 0;
     while(getline(lineStream,cell,',')) {
         result[iCell] = atof(cell.c_str());
@@ -382,7 +380,7 @@ std::vector<double> EscapeController::readManualParams(int lineNumber, string fi
             result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
         }
     } else {
-        cerr << "WARNING: Not changing manual input parameters\n";
+        std::cerr << "WARNING: Not changing manual input parameters\n";
     }
 
     return result;

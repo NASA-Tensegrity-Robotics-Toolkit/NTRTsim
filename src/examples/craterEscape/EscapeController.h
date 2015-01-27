@@ -38,9 +38,6 @@
 class EscapeModel;
 class tgBasicActuator;
 
-//namespace std for vectors
-using namespace std;
-
 /** Escape Controller for T6 */
 class EscapeController : public tgObserver<EscapeModel>
 {
@@ -61,25 +58,25 @@ class EscapeController : public tgObserver<EscapeModel>
         virtual void onTeardown(EscapeModel& subject);
 
     protected:
-        virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+        virtual std::vector< std::vector <double> > transformActions(std::vector< std::vector <double> > act);
 
-        virtual void applyActions(EscapeModel& subject, vector< vector <double> > act);
+        virtual void applyActions(EscapeModel& subject, std::vector< std::vector <double> > act);
 
     private:
-        vector<double> initPosition; // Initial position of model
+        std::vector<double> initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
 
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
-        vector< vector<double> > actions; // For modifications between episodes
+        std::vector< std::vector<double> > actions; // For modifications between episodes
 
         // Muscle Clusters
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgBasicActuator*> > clusters; 
+        std::vector<std::vector<tgBasicActuator*> > clusters; 
 
         // Sine Wave Data
         double* amplitude;
@@ -114,7 +111,7 @@ class EscapeController : public tgObserver<EscapeModel>
         double displacement(EscapeModel& subject);
 
         /** Select action paramters from a comma-separated line in a file */
-        std::vector<double> readManualParams(int lineNumber, string filename);
+        std::vector<double> readManualParams(int lineNumber, std::string filename);
 
         void printSineParams();
 };
