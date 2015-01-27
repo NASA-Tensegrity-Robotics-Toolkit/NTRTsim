@@ -2,6 +2,9 @@ import unittest
 from flexmock import *
 from src.download.downloader import *
 
+# Helpers
+from test.test_helpers.mock_helpers import MockHelpers
+
 class TestDownloader(unittest.TestCase):
 
     URL = "http://www.perryb.ca/bigfile.tar.gz"
@@ -19,31 +22,24 @@ class TestDownloader(unittest.TestCase):
             self.downloader.attemptDownload()
 
     def testIOErrorWriteToIsNotNoneVerifyCloseCall(self):
-        fileMock = flexmock()
-        urlMock = flexmock()
+        fileMock = MockHelpers.getOpenMock()
+        urlMock = getUrlLib2OpenMock()
 
         urlMock.should_receive('read').and_raise(IOError("error message.")).once().ordered()
         fileMock.should_receive('close').once().ordered()
 
-        flexmock(urllib2).should_receive('urlopen').and_return(urlMock)
-        flexmock(FileUtils).should_receive('open').and_return(fileMock)
-
         with self.assertRaises(DownloaderError):
             self.downloader.attemptDownload()
-
 
     def testFinishReadNoErrorVerifyCloseCall(self):
         readString = "bunchofchars"
 
-        fileMock = flexmock()
-        urlMock = flexmock()
+        fileMock = MockHelpers.getOpenMock()
+        urlMock = getUrlLib2OpenMock()
 
         fileMock.should_receive('write').with_args(readString).once().ordered()
         fileMock.should_receive('close').once().ordered()
 
         urlMock.should_receive('read').and_return("bunchofchars").and_return(None).twice()
-
-        flexmock(urllib2).should_receive('urlopen').and_return(urlMock)
-        flexmock(FileUtils).should_receive('open').and_return(fileMock)
 
         self.downloader.attemptDownload()
