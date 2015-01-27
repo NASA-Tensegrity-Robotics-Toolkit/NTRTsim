@@ -1,6 +1,5 @@
 from flexmock import *
 from src.utilities.file_utils import FileUtils
-import urllib2
 
 class MockHelpers:
 
