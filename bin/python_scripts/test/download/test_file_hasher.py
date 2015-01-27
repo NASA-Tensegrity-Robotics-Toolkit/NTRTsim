@@ -17,22 +17,19 @@ class TestFileHasher(unittest.TestCase):
             FileHasher(self.FILE_PATH)
 
     def testIOErrorOnFileReadRaisesHasherException(self):
-        pass
+        fileMock = MockHelpers.getOpenMock()
+        fileMock.should_receive('read').and_raise(IOError("Mock error."))
+        fileMock.should_receive('close')
+
+        with self.assertRaises(FileHasherException):
+            FileHasher(self.FILE_PATH)
 
     def testHashMatches(self):
-        self.__createFileMock()
-        self.__setHexDigestValue(self.FILE_HASH)
-
-        fileHasher = FileHasher(self.FILE_PATH)
-
+        fileHasher = self.__prepMocks()
         self.assertTrue(fileHasher.compareHash(self.FILE_HASH))
 
     def testHashDoesNotMatch(self):
-        self.__createFileMock()
-        self.__setHexDigestValue(self.FILE_HASH)
-
-        fileHasher = FileHasher(self.FILE_PATH)
-
+        fileHasher = self.__prepMocks()
         self.assertFalse(fileHasher.compareHash(self.INCORRECT_HASH))
 
     def __setHexDigestValue(self, hashToReturn):
@@ -46,4 +43,10 @@ class TestFileHasher(unittest.TestCase):
         fileMock = MockHelpers.getOpenMock()
         fileMock.should_receive('read')
         fileMock.should_receive('close')
+
+    def __prepMocks(self):
+        self.__createFileMock()
+        self.__setHexDigestValue(self.FILE_HASH)
+
+        return FileHasher(self.FILE_PATH)
 
