@@ -76,7 +76,7 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     nActions(nClusters+nPrisms),
     imp_controller(new tgImpedanceController(0.01, 500, 10)),
     m_bBadRun(false),
-    m_bIgnoreTouchSensors(false),
+    m_bIgnoreTouchSensors(true),
     m_bRecordedStart(false)
 {
     std::string path;
@@ -268,8 +268,11 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
         }
     }
 
-    m_bIgnoreTouchSensors = (actions[0][actions[0].size()-1]);
-    std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
+    if (!m_usingManualParams)
+    {
+        m_bIgnoreTouchSensors = (actions[0][actions[0].size()-1]);
+        std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
+    }
 
     return newActions;
 }
