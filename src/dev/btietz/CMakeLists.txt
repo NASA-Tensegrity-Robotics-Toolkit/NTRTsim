@@ -23,4 +23,5 @@ subdirs(
     Obstacles
     multiTerrain
     TetraSpine_multiTerrain/
+    TC_goal
     )
