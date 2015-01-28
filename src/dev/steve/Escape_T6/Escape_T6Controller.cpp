@@ -133,34 +133,15 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         std::cout << m_totalTime << " ";
         std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " "; 
 
-<<<<<<< HEAD
         for(size_t i=0; i<muscles.size(); i++) {
             std::cout << (muscles[i]->getTension())/10 << " ";
         }
         std::cout << "\n";
         for(size_t i=0; i<muscles.size(); i++) {
-=======
-    if(count > 100)
-    {
-        std::vector<double> currentPosition = subject.getBallCOM();
-        std::cout << m_totalTime << " ";
-        std::cout << currentPosition[0] << " " << currentPosition[1] << " " << currentPosition[2] << " ";
-        
-        for(size_t i=0; i<muscles.size(); i++)
-        {
-        std::cout << (muscles[i]->getTension())/10 << " ";
-        }
-        for(size_t i=0; i<muscles.size(); i++)
-        {
->>>>>>> e0c6542238c41f143d0b69b1833e396625bf4a8d
             std::cout << (muscles[i]->getCurrentLength())/10 << " ";
         }
         std::cout << "\n";
         count = 0;
-<<<<<<< HEAD
-=======
-     
->>>>>>> e0c6542238c41f143d0b69b1833e396625bf4a8d
     }
     else {
         count++;
