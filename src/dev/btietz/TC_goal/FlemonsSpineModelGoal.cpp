@@ -35,6 +35,7 @@
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -106,7 +107,7 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
 
     // Move the first one so we can create a longer snake.
     // Or you could move the snake at the end, up to you. 
-    tetra.move(btVector3(0.0,15.0,100.0));
+    tetra.move(btVector3(0.0,15.0,50.0));
 
     // Create our snake segments
     tgStructure snake;
@@ -154,6 +155,7 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
 
     }
 #endif
+  
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -169,7 +171,29 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
+    
+    // Create goal box in a new structure
+    double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 3.1415;
+    double xPos = 10 * sin(randomAngle);
+    double zPos = 10 * cos(randomAngle);
+    
+    tgStructure goalBox;
+    
+    goalBox.addNode(xPos, 20.0, zPos);
+    goalBox.addNode(xPos + 1.0, 20.0, zPos);
+    
+    goalBox.addPair(0, 1, "goalBox");
+    
+    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
+    const tgBox::Config boxConfig(0.5, 0.5);
 
+    tgBuildSpec boxSpec;
+    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
+    
+    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
+    
+    goalStructureInfo.buildInto(*this, world);
+    
     // Setup vectors for control
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
