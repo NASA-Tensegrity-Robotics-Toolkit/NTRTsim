@@ -116,28 +116,24 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         actions.push_back(tmp);
     }
 
-    // Start Jonathan Bruce code
+    // prints m_totalTime COM(x)/10 COM(y)/10 COM(z)/10 <muscle tensions/10> <muscles lengths/10>
     static int count = 0;
+    if(count > 100) {
+        std::vector<double> currentPosition = subject.getBallCOM();
+        std::cout << m_totalTime << " ";
+        std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " "; 
 
-    if(count > 100)
-    {
-        for(size_t i=0; i<muscles.size(); i++)
-        {
-        std::cout << (muscles[i]->getTension())/10 << "\t";
+        for(size_t i=0; i<muscles.size(); i++) {
+            std::cout << (muscles[i]->getTension())/10 << " ";
         }
         std::cout << "\n";
-        for(size_t i=0; i<muscles.size(); i++)
-        {
-            std::cout << (muscles[i]->getCurrentLength())/10 << "\t";
+        for(size_t i=0; i<muscles.size(); i++) {
+            std::cout << (muscles[i]->getCurrentLength())/10 << " ";
         }
         std::cout << "\n";
         count = 0;
-    
-        std::vector<double> currentPosition = subject.getBallCOM();
-        std::cout << std::endl << "COM (x,y,z): (" << currentPosition[0] << "," << currentPosition[1] << "," << currentPosition[2] << ")\n"; 
     }
-    else
-    {
+    else {
         count++;
     }
 }
