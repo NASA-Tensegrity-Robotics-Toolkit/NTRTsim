@@ -32,6 +32,10 @@
 #include "core/tgBasicActuator.h"
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
+#include "learning/AnnealEvolution/AnnealEvolution.h"
+#include "learning/Adapters/AnnealAdapter.h"
+// File helpers to use resources folder
+#include "helpers/FileHelpers.h"
 // The C++ Standard Library
 #include <cassert>
 #include <cmath>
@@ -43,12 +47,18 @@
                                
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-Escape_T6Controller::Escape_T6Controller(const double initialLength) :
+Escape_T6Controller::Escape_T6Controller(const double initialLength,
+                                    std::string args,
+                                    std::string resourcePath,
+                                    std::string config) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nClusters(8),
-    musclesPerCluster(3)
+    musclesPerCluster(3),
+    suffix(args),
+    configPath(resourcePath),
+    configName(config)
 {
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++) {
@@ -123,15 +133,34 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         std::cout << m_totalTime << " ";
         std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " "; 
 
+<<<<<<< HEAD
         for(size_t i=0; i<muscles.size(); i++) {
             std::cout << (muscles[i]->getTension())/10 << " ";
         }
         std::cout << "\n";
         for(size_t i=0; i<muscles.size(); i++) {
+=======
+    if(count > 100)
+    {
+        std::vector<double> currentPosition = subject.getBallCOM();
+        std::cout << m_totalTime << " ";
+        std::cout << currentPosition[0] << " " << currentPosition[1] << " " << currentPosition[2] << " ";
+        
+        for(size_t i=0; i<muscles.size(); i++)
+        {
+        std::cout << (muscles[i]->getTension())/10 << " ";
+        }
+        for(size_t i=0; i<muscles.size(); i++)
+        {
+>>>>>>> e0c6542238c41f143d0b69b1833e396625bf4a8d
             std::cout << (muscles[i]->getCurrentLength())/10 << " ";
         }
         std::cout << "\n";
         count = 0;
+<<<<<<< HEAD
+=======
+     
+>>>>>>> e0c6542238c41f143d0b69b1833e396625bf4a8d
     }
     else {
         count++;
@@ -167,8 +196,8 @@ std::vector< std::vector <double> > Escape_T6Controller::transformActions(std::v
     std::vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
-        std::string filename = "logs/Jan82015/params.dat";
-        int lineNumber = 4;
+        std::string filename = "logs/Jan242015/params.dat";
+        int lineNumber = 5;
         manualParams = readManualParams(lineNumber, filename);
     } 
 
@@ -217,9 +246,20 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, std::vector< std
 }
 
 void Escape_T6Controller::setupAdapter() {
-    std::string suffix = "_Escape";
-    std::string configAnnealEvolution = "Config.ini";
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    //std::string suffix = "_Escape";
+    
+    std::string path;
+    if (configPath != "")
+    {
+        path = FileHelpers::getResourcePath(configPath);
+    }
+    else
+    {
+        path = "";
+    }
+    
+    std::string configAnnealEvolution = path + configName;
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configName, configPath);
     bool isLearning = true;
     configuration configEvolutionAdapter;
     configEvolutionAdapter.readFile(configAnnealEvolution);

@@ -31,6 +31,8 @@
 
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
+#include "learning/Configuration/configuration.h"
+#include "learning/AnnealEvolution/AnnealEvolution.h"
 
 // Forward declarations
 class Escape_T6Model;
@@ -41,7 +43,10 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        Escape_T6Controller(const double prefLength=5.0);
+        Escape_T6Controller(const double prefLength=5.0,
+                            std::string args = "_Escape",
+                            std::string resourcePath = "",
+                            std::string config = "Config.ini");
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~Escape_T6Controller() { }
@@ -78,6 +83,11 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         double* angularFrequency;
         double* phaseChange;
         double* dcOffset;
+        
+        // Configuration strings
+        std::string suffix;
+        std::string configPath;
+        std::string configName;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
