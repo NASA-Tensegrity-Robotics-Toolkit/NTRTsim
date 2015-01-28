@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef VERTICAL_SPINE_BENDING_CONTROLLER_H
-#define VERTICAL_SPINE_BENDING_CONTROLLER_H
+#ifndef VERTICAL_SPINE_RESTLENGTH_CONTROLLER_H
+#define VERTICAL_SPINE_RESTLENGTH_CONTROLLER_H
 
 /**
- * @file VerticalSpineBendingController.h
- * @brief Contains the definition of class VerticalSpineBendingController.
+ * @file VerticalSpineRestLengthController.h
+ * @brief Contains the definition of class VerticalSpineRestLengthController.
  * @author Drew Sabelhaus, Brian Tietz, Michael Fanton
  * @version 1.0.0
  * $Id$
@@ -39,7 +39,7 @@ class VerticalSpineModel;
  * tightening up the structure and keeping it held together without
  * further control input.
  */
-class VerticalSpineBendingController : public tgObserver<VerticalSpineModel>
+class VerticalSpineRestLengthController : public tgObserver<VerticalSpineModel>
 {
 public:
 	
@@ -51,20 +51,20 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-  VerticalSpineBendingController();
+  VerticalSpineRestLengthController();
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~VerticalSpineBendingController() { }
+  virtual ~VerticalSpineRestLengthController() { }
 
   /**
-   * Apply the Bending controller. On setup, adjust the cable
+   * Apply the RestLength controller. On setup, adjust the cable
    * lengths one time.
    * @param[in] subject - the SpineModel that is being controlled. Must
    * have a list of allMuscles populated
    */
-  //  virtual void onSetup(VerticalSpineModel& subject);
+  virtual void onSetup(VerticalSpineModel& subject);
     
   /**
    * The onStep method is not used for this controller.
@@ -81,21 +81,16 @@ private:
    * in the constructor.
    */
     
-   double verticalRLA1;
-   double verticalRLA2;
-   double verticalRLA3;
-   double verticalRLA4;
-   double verticalRLB1;
-   double verticalRLB2;
-   double verticalRLB3;
-   double verticalRLB4;
-   double dL;
-   double state;
-   double updateTime;
+   double desiredRestLength;
+   double verticalRL;
+   double saddleRL1;
+   double saddleRL2;
+   double saddleRL3;
+   double saddleRL4;
 
   // For data logging. TO-DO: implement this fully.
   // tgDataObserver m_dataObserver;
   // double m_updateTime;
 };
 
-#endif // Spine_BENDING_CONTROLLER_H
+#endif // Spine_RESTLENGTH_CONTROLLER_H
