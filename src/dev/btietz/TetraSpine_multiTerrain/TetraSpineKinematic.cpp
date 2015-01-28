@@ -17,7 +17,7 @@
 */
 
 // This module
-#include "TetraSpineCollisions.h"
+#include "TetraSpineKinematic.h"
 // This library
 #include "core/tgCast.h"
 #include "core/tgSpringCableActuator.h"
@@ -25,8 +25,7 @@
 #include "core/tgSphere.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgBasicActuatorInfo.h"
-#include "tgcreator/tgBasicContactCableInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -40,20 +39,20 @@
 #include <stdexcept>
 
 /**
- * @file TetraSpineCollisions.cpp
+ * @file TetraSpineKinematic.cpp
  * @brief Tetraspine, configured for learning in the NTRT simulator
- * @author Brian Tietz
- * @date May 2014
- * @version 1.0.0
+ * @author Brian Mirletz
+ * @date January 2015
+ * @version 1.1.0
  * $Id$
  */
 
-TetraSpineCollisions::TetraSpineCollisions(size_t segments) : 
+TetraSpineKinematic::TetraSpineKinematic(size_t segments) : 
     BaseSpineModelLearning(segments)
 {
 }
 
-TetraSpineCollisions::~TetraSpineCollisions()
+TetraSpineKinematic::~TetraSpineKinematic()
 {
 }
 namespace
@@ -136,7 +135,7 @@ namespace
 		}
     }
 
-    void mapMuscles(TetraSpineCollisions::MuscleMap& muscleMap,
+    void mapMuscles(TetraSpineKinematic::MuscleMap& muscleMap,
             tgModel& model)
     {
         // Note that tags don't need to match exactly, we could create
@@ -149,74 +148,28 @@ namespace
 		muscleMap["outer top"]   = model.find<tgSpringCableActuator>("outer top muscle");
     }
 	
-	void addMarkers(tgStructure& structure, TetraSpineCollisions& model)
-	{
-		
-		const std::vector<tgStructure*> children = structure.getChildren();
-		tgNodes n0 = children[0]->getNodes();
-		
-		// TODO: consider using the segments vector here
-		btRigidBody* firstBody = model.getAllRigids()[0]->getPRigidBody();
-		
-		std::vector<tgBaseRigid*> myRigids = model.getAllRigids();
-#if (0)
-		for (int i =0; i < myRigids.size(); i++)
-		{
-			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
-		}
-#endif			
-		
-		abstractMarker marker1(firstBody, n0[3] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
-		
-		model.addMarker(marker1);
-		
-		tgNodes n1 = children[1]->getNodes();
-		
-		btRigidBody* secondBody = model.getAllRigids()[15]->getPRigidBody();
-		
-		abstractMarker marker2(secondBody, n1[3] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
-		
-		model.addMarker(marker2);
-		
-		abstractMarker marker3(secondBody, n1[1] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
-		
-		model.addMarker(marker3);
-		
-		abstractMarker marker4(secondBody, n1[0] - secondBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
-		
-		model.addMarker(marker4);
-		
-		tgNodes n2 = children[2]->getNodes();
-		
-		btRigidBody* thirdBody = model.getAllRigids()[29]->getPRigidBody();
-		
-		abstractMarker marker5(thirdBody, n2[3] - thirdBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
-		
-		model.addMarker(marker5);
-	}
-	
     void trace(const tgStructureInfo& structureInfo, tgModel& model)
     {
         std::cout << "StructureInfo:" << std::endl
           << structureInfo    << std::endl
           << "Model: "        << std::endl
           << model            << std::endl;    
-    // Showing the find function
-    const std::vector<tgSpringCableActuator*> outerMuscles =
-        model.find<tgSpringCableActuator>("outer");
-    for (size_t i = 0; i < outerMuscles.size(); ++i)
-    {
-        const tgSpringCableActuator* const pMuscle = outerMuscles[i];
-        assert(pMuscle != NULL);
-        std::cout << "Outer muscle: " << *pMuscle << std::endl;
-    }
+        // Showing the find function
+        const std::vector<tgSpringCableActuator*> outerMuscles =
+            model.find<tgSpringCableActuator>("outer");
+        for (size_t i = 0; i < outerMuscles.size(); ++i)
+        {
+            const tgSpringCableActuator* const pMuscle = outerMuscles[i];
+            assert(pMuscle != NULL);
+            std::cout << "Outer muscle: " << *pMuscle << std::endl;
+        }
     }
 
 } // namespace
 
 // This is basically a manual setup of a model.
 // There are things that do this for us (@todo: reference the things that do this for us)
-void TetraSpineCollisions::setup(tgWorld& world)
+void TetraSpineKinematic::setup(tgWorld& world)
 {
     const double edge = 3.8 * 5.0;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
@@ -267,16 +220,31 @@ void TetraSpineCollisions::setup(tgWorld& world)
     
     
     // Two different string configs
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 5000, 7.0, 0.1, 0.1);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 5000, 7.0, 0.1, 0.1);
-#if (1)
-    spec.addBuilder("top muscle", new tgBasicContactCableInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicContactCableInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicContactCableInfo(muscleConfig2));
+        const double elasticity = 229.16;
+    const double damping = 20;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 5000.0;
+    const double maxSpeed = 7.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config muscleConfig(elasticity * 2.0, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+    
+    tgKinematicActuator::Config muscleConfig2(elasticity * 2.0, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+
+#if (0)
+    spec.addBuilder("top muscle", new tgKinematicContactCableInfo(muscleConfig));
+    spec.addBuilder("left muscle", new tgKinematicContactCableInfo(muscleConfig2));
+    spec.addBuilder("right muscle", new tgKinematicContactCableInfo(muscleConfig2));
 #else
-    spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));
+    spec.addBuilder("muscle", new tgKinematicContactCableInfo(muscleConfig2));
 #endif
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
@@ -290,8 +258,6 @@ void TetraSpineCollisions::setup(tgWorld& world)
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
     
-    addMarkers(snake, *this);
-    
     #if (0)
     trace(structureInfo, *this);
     #endif
@@ -300,14 +266,14 @@ void TetraSpineCollisions::setup(tgWorld& world)
     BaseSpineModelLearning::setup(world);
 }
       
-void TetraSpineCollisions::teardown()
+void TetraSpineKinematic::teardown()
 {
 
     BaseSpineModelLearning::teardown();
     
 } 
     
-void TetraSpineCollisions::step(double dt)
+void TetraSpineKinematic::step(double dt)
 {
     if (dt < 0.0)
     {

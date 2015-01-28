@@ -1,6 +1,5 @@
 link_libraries(obstacles
                 KinematicString
-               flemonsSpineContact
                CPG_feedback
                 KinematicString
                 learningSpines
@@ -16,6 +15,7 @@ link_libraries(obstacles
                 tgOpenGLSupport
                 boost_program_options)
 
-add_executable(AppMultiTerrain
-    AppMultiTerrain.cpp
+add_executable(AppMultiTerrain_Tetra
+    TetraSpineKinematic.cpp
+    AppMultiTerrain_Tetra.cpp
 )
