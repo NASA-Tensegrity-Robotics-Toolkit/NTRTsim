@@ -174,8 +174,8 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     
     // Create goal box in a new structure
     double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 3.1415;
-    double xPos = 10 * sin(randomAngle);
-    double zPos = 10 * cos(randomAngle);
+    double xPos = 1000 * sin(randomAngle);
+    double zPos = 1000 * cos(randomAngle);
     
     tgStructure goalBox;
     
@@ -198,6 +198,11 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
+    
+    // A little sloppy, but I'm pretty confident there is only one
+    m_goalBox = (find<tgBox>("goalBox"))[0];
+    
+    assert(m_goalBox != NULL);
     
 #if (0)
     // Debug printing
@@ -227,4 +232,9 @@ void FlemonsSpineModelGoal::step(double dt)
     */
     
     BaseSpineModelLearning::step(dt);  // Step any children
+}
+
+btVector3 FlemonsSpineModelGoal::goalBoxPosition() const
+{
+    return m_goalBox->centerOfMass();
 }

@@ -23,15 +23,18 @@
  * @file FlemonsSpineModelGoal.h
  * @brief Implementing the tetrahedral complex spine inspired by Tom Flemons
  * @author Brian Mirletz
- * @date November 2014
- * @version 1.0.0
+ * @date January 2015
+ * @version 1.1.0
  * $Id$
  */
 
 #include "examples/learningSpines/BaseSpineModelLearning.h" 
 
+#include "LinearMath/btVector3.h"
+
 class tgWorld;
 class tgStructureInfo;
+class tgBox;
 
 /**
  * This class implements the tetrahedral complex tensegrity spine
@@ -51,6 +54,12 @@ public:
     virtual void teardown();
         
     virtual void step(double dt);
+    
+    btVector3 goalBoxPosition() const;
+    
+private:
+    
+    tgBox* m_goalBox;
 
 };
 

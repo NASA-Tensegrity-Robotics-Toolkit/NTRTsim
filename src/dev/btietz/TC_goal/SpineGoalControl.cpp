@@ -26,14 +26,14 @@
 
 #include "SpineGoalControl.h"
 
-#include <string>
-
+#include "FlemonsSpineModelGoal.h"
 
 // Should include tgString, but compiler complains since its been
 // included from BaseSpineModelLearning. Perhaps we should move things
 // to a cpp over there
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
+#include "tgcreator/tgUtil.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
 #include "dev/CPG_feedback/tgCPGCableControl.h"
@@ -45,6 +45,8 @@
 
 #include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "dev/CPG_feedback/CPGNodeFB.h"
+
+#include <string>
 
 //#define LOGGING
 #define USE_KINEMATIC
@@ -154,6 +156,9 @@ void SpineGoalControl::onSetup(BaseSpineModelLearning& subject)
 #endif    
     m_updateTime = 0.0;
     bogus = false;
+    
+    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+    std::cout << goalSubject->goalBoxPosition() << std::endl;
 }
 
 void SpineGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -204,15 +209,9 @@ void SpineGoalControl::onTeardown(BaseSpineModelLearning& subject)
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
     
-    std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
+    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
     
-    const double newX = finalConditions[0];
-    const double newZ = finalConditions[2];
-    const double oldX = initConditions[0];
-    const double oldZ = initConditions[2];
-    
-    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
-                                        (newZ-oldZ) * (newZ-oldZ));
+    const double distanceMoved = calculateDistanceMoved(goalSubject);
     
     if (bogus)
     {
@@ -408,4 +407,26 @@ std::vector<double> SpineGoalControl::transformFeedbackActions(std::vector< std:
     }
     
 	return feedback;
+}
+
+double SpineGoalControl::calculateDistanceMoved(const FlemonsSpineModelGoal* subject) const
+{
+    std::vector<double> finalConditions = subject->getSegmentCOM(m_config.segmentNumber);
+  
+    const btVector3 goalPos = subject->goalBoxPosition();
+    
+    std::cout << goalPos << std::endl;
+    
+    double x= finalConditions[0] - goalPos.getX();
+    double z= finalConditions[2] - goalPos.getZ();
+    double distanceNew=sqrt(x*x + z*z);
+    double xx=initConditions[0]-goalPos.getX();
+    double zz=initConditions[2]-goalPos.getZ();
+    double distanceOld=sqrt(xx*xx + zz*zz);
+    double distanceMoved=distanceOld-distanceNew;
+
+    //If you want to calculate only the distance moved independent of the target:
+//  distanceMoved=sqrt((x-xx)*(x-xx)+(z-zz)*(z-zz));
+
+    return distanceMoved;
 }

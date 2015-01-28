@@ -33,6 +33,7 @@
 #include "learning/Adapters/NeuroAdapter.h"
 
 class tgSpringCableActuator;
+class FlemonsSpineModelGoal;
 
 /**
  * SpineGoalControl learns the parameters for a CPG system on a
@@ -111,6 +112,8 @@ protected:
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     
     std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions);
+    
+    double calculateDistanceMoved(const FlemonsSpineModelGoal* subject) const;
     
     SpineGoalControl::Config m_config;
     
