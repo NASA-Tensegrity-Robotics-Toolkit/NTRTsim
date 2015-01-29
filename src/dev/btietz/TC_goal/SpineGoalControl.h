@@ -31,6 +31,7 @@
 
 #include "learning/NeuroEvolution/NeuroEvolution.h"
 #include "learning/Adapters/NeuroAdapter.h"
+#include "learning/Configuration/configuration.h"
 
 class tgSpringCableActuator;
 class FlemonsSpineModelGoal;
@@ -91,7 +92,8 @@ struct Config : public BaseSpineCPGControl::Config
 							std::string resourcePath = "",
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini",
-                            std::string fc = "feedbackConfig.ini");
+                            std::string fc = "feedbackConfig.ini",
+                            std::string gc = "goalConfig.ini");
     
     virtual ~SpineGoalControl() {}
     
@@ -109,22 +111,27 @@ protected:
     
     std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
+    std::vector<double> getGoalFeedback(const FlemonsSpineModelGoal* subject);
+    
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     
-    std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions);
+    std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions, configuration& configData);
     
     double calculateDistanceMoved(const FlemonsSpineModelGoal* subject) const;
     
     SpineGoalControl::Config m_config;
     
     std::string feedbackConfigFilename;
-    
     NeuroEvolution feedbackEvolution;
     NeuroAdapter feedbackAdapter;
-    
     bool feedbackLearning;
-    
     configuration feedbackConfigData;
+    
+    std::string goalConfigFilename;
+    NeuroEvolution goalEvolution;
+    NeuroAdapter goalAdapter;
+    bool goalLearning;
+    configuration goalConfigData;
 };
 
 #endif // SPINE_FEEDBACK_CONTROL_H

@@ -46,6 +46,7 @@
 #include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "dev/CPG_feedback/CPGNodeFB.h"
 
+#include <iterator>     // std::iterator
 #include <string>
 
 //#define LOGGING
@@ -92,19 +93,24 @@ phaseFeedbackMax(pfMax)
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-SpineGoalControl::SpineGoalControl(SpineGoalControl::Config config,	
+SpineGoalControl::SpineGoalControl(SpineGoalControl::Config config,
                                                 std::string args,
                                                 std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc,
-                                                std::string fc) :
+                                                std::string fc,
+                                                std::string gc) :
 BaseSpineCPGControl(config, args, resourcePath, ec, nc),
 m_config(config),
 feedbackConfigFilename(fc),
 // Evolution assumes no pre-processing was done on these names
 feedbackEvolution(args + "_fb", fc, resourcePath),
 // Will be overwritten by configuration data
-feedbackLearning(false)
+feedbackLearning(false),
+goalConfigFilename(gc),
+// Evolution assumes no pre-processing was done on these names
+goalEvolution(args + "_goal", gc, resourcePath),
+goalLearning(false)
 {
     std::string path;
     if (resourcePath != "")
@@ -118,6 +124,9 @@ feedbackLearning(false)
     
     feedbackConfigData.readFile(path + feedbackConfigFilename);
     feedbackLearning = feedbackConfigData.getintvalue("learning");
+    
+    goalConfigData.readFile(path + goalConfigFilename);
+    goalLearning = goalConfigData.getintvalue("learning");
     
 }
 
@@ -134,6 +143,9 @@ void SpineGoalControl::onSetup(BaseSpineModelLearning& subject)
     feedbackAdapter.initialize(&feedbackEvolution,
                                 feedbackLearning,
                                 feedbackConfigData);
+    goalAdapter.initialize(&goalEvolution,
+                            goalLearning,
+                            goalConfigData);
     /* Empty vector signifying no state information
      * All parameters are stateless parameters, so we can get away with
      * only doing this once
@@ -166,14 +178,20 @@ void SpineGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
-        std::vector<double> desComs = getFeedback(subject);
 
-#else        
-        std::size_t numControllers = subject.getNumberofMuslces() * 3;
-        
-        double descendingCommand = 0.0;
-        std::vector<double> desComs (numControllers, descendingCommand);
+#if (1)        
+        const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+        std::vector<double> desComs = getGoalFeedback(goalSubject);
+#else 
+    #if (1)
+            std::vector<double> desComs = getFeedback(subject);
+
+    #else        
+            std::size_t numControllers = subject.getNumberofMuslces() * 3;
+            
+            double descendingCommand = 0.0;
+            std::vector<double> desComs (numControllers, descendingCommand);
+    #endif
 #endif       
         try
         {
@@ -361,9 +379,79 @@ std::vector<double> SpineGoalControl::getFeedback(BaseSpineModelLearning& subjec
         const tgSpringCableActuator& cable = *(allCables[i]);
         std::vector<double > state = getCableState(cable);
         std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
-        std::vector<double> cableFeedback = transformFeedbackActions(actions);
+        std::vector<double> cableFeedback = transformFeedbackActions(actions, feedbackConfigData);
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
+    }
+    
+    
+    return feedback;
+}
+
+std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoal* subject)
+{
+    // Placeholder
+    std:vector<double> feedback;
+    // Adapter doesn't use this anyway, so just do zero here for now (will trigger errors if it starts to use it =) )
+    const double dt = 0;
+    
+    // Get heading and generate feedback vector
+    std::vector<double> currentPosition = subject->getSegmentCOM(m_config.segmentNumber);
+    
+    assert(currentPosition.size() == 3);
+    
+    btVector3 currentPosVector(currentPosition[0], currentPosition[1], currentPosition[2]);
+    
+    btVector3 goalPosition = subject->goalBoxPosition();
+    
+    btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
+    
+    int m = subject->getSegments() - 1;
+    
+    for (int i = 0; i != m; i++)
+    {
+        // 2D for now to cut down on parameters
+        std::vector<double> state;
+        state.push_back(desiredHeading.getX());
+        state.push_back(desiredHeading.getZ());
+        
+        std::vector< std::vector<double> > actions = goalAdapter.step(m_updateTime, state);
+        // 16 actions as of 1_29_15, amplitude and phase
+        std::vector<double> segmentFeedback = transformFeedbackActions(actions, goalConfigData);
+        
+        feedback.insert(feedback.end(), segmentFeedback.begin(), segmentFeedback.end());
+    }
+    
+    // Add cable feedback to close the low level loop
+    const std::vector<tgSpringCableActuator*>& allCables = subject->getAllMuscles();
+    
+    std::size_t n = allCables.size();
+    std::size_t nA = feedbackConfigData.getintvalue("numberOfActions");
+    
+    assert (feedback.size() == n * (nA - 1));
+    
+    // Insert a zero every third element to account for frequency
+    std::vector<double>::iterator it = feedback.begin();
+    while (it != feedback.end())
+    {
+        it = feedback.insert(it, 0.0);
+        // Skip amplitude and phase values already inserted
+        it += 3;
+    }
+    
+    assert (feedback.size() == n * nA);
+    
+    for(std::size_t i = 0; i != n; i++)
+    {
+        const tgSpringCableActuator& cable = *(allCables[i]);
+        std::vector<double > state = getCableState(cable);
+        std::vector< std::vector<double> > actions = feedbackAdapter.step(m_updateTime, state);
+        std::vector<double> cableFeedback = transformFeedbackActions(actions, feedbackConfigData);
+        
+        for (std::size_t j = 0; j != nA; j++)
+        {
+            feedback[i * nA + j] += cableFeedback[nA];
+        }
     }
     
     
@@ -386,13 +474,13 @@ std::vector<double> SpineGoalControl::getCableState(const tgSpringCableActuator&
 	return state;
 }
 
-std::vector<double> SpineGoalControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
+std::vector<double> SpineGoalControl::transformFeedbackActions(std::vector< std::vector<double> >& actions, configuration& configData)
 {
 	// Placeholder
 	std:vector<double> feedback;
     
-    std::size_t numControllers = feedbackConfigData.getintvalue("numberOfControllers");
-    std::size_t numActions = feedbackConfigData.getintvalue("numberOfActions");
+    std::size_t numControllers = configData.getintvalue("numberOfControllers");
+    std::size_t numActions = configData.getintvalue("numberOfActions");
     
     assert( actions.size() == numControllers);
     assert( actions[0].size() == numActions);

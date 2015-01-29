@@ -35,6 +35,7 @@
 class tgWorld;
 class tgStructureInfo;
 class tgBox;
+class tgSpringCableActuator;
 
 /**
  * This class implements the tetrahedral complex tensegrity spine
@@ -57,7 +58,16 @@ public:
     
     btVector3 goalBoxPosition() const;
     
+    const std::vector < std::vector < tgSpringCableActuator*> >& getSegmentMuscles() const
+    {
+        return m_segmentMuscles;
+    }
+    
 private:
+    
+    void mapSegmentMuscles();
+    
+    std::vector < std::vector < tgSpringCableActuator*> > m_segmentMuscles;
     
     tgBox* m_goalBox;
 

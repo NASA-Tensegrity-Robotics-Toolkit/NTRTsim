@@ -136,22 +136,22 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
         tgNodes n1 = children[i]->getNodes();
         
         snake.addPair(n0[1], n1[1],
-              tgString("outer front muscle seg", i - 1) + tgString(" seg", i));
+              tgString("outer front muscle seg", i));
         snake.addPair(n0[2], n1[2],
-              tgString("outer right muscle seg", i - 1) + tgString(" seg", i));
+              tgString("outer right muscle seg", i));
         snake.addPair(n0[3], n1[3],
-              tgString("outer back muscle seg",  i - 1) + tgString(" seg", i));
+              tgString("outer back muscle seg",  i));
         snake.addPair(n0[4], n1[4],
-              tgString("outer top muscle seg",   i - 1) + tgString(" seg", i));
+              tgString("outer top muscle seg",   i));
         
         snake.addPair(n0[2], n1[1],
-              tgString("inner front muscle seg",  i - 1) + tgString(" seg", i));
+              tgString("inner front muscle seg", i));
         snake.addPair(n0[2], n1[4],
-              tgString("inner right muscle seg",  i - 1) + tgString(" seg", i));
+              tgString("inner right muscle seg",  i));
         snake.addPair(n0[3], n1[1],
-              tgString("inner left muscle seg",   i - 1) + tgString(" seg", i));
+              tgString("inner left muscle seg",   i));
         snake.addPair(n0[3], n1[4],
-              tgString("inner back muscle seg",   i - 1) + tgString(" seg", i));
+              tgString("inner back muscle seg",   i));
 
     }
 #endif
@@ -237,4 +237,12 @@ void FlemonsSpineModelGoal::step(double dt)
 btVector3 FlemonsSpineModelGoal::goalBoxPosition() const
 {
     return m_goalBox->centerOfMass();
+}
+
+void FlemonsSpineModelGoal::mapSegmentMuscles()
+{
+    for (int i = 1; i < m_segments; i++)
+    {
+        m_segmentMuscles.push_back(find<tgSpringCableActuator> (tgString("seg", i)));
+    }
 }
