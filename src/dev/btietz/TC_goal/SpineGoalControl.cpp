@@ -269,6 +269,7 @@ void SpineGoalControl::onTeardown(BaseSpineModelLearning& subject)
     edgeAdapter.endEpisode(scores);
     nodeAdapter.endEpisode(scores);
     feedbackAdapter.endEpisode(scores);
+    goalAdapter.endEpisode(scores);
     
     delete m_pCPGSys;
     m_pCPGSys = NULL;
