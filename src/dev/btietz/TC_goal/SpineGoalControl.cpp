@@ -415,6 +415,9 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
         state.push_back(desiredHeading.getX());
         state.push_back(desiredHeading.getZ());
         
+        assert(state[0] >= -1.0 && state[0] <= 1.0);
+        assert(state[1] >= -1.0 && state[1] <= 1.0);
+        
         std::vector< std::vector<double> > actions = goalAdapter.step(m_updateTime, state);
         // 16 actions as of 1_29_15, amplitude and phase
         std::vector<double> segmentFeedback = transformFeedbackActions(actions, goalConfigData);
@@ -450,7 +453,7 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
         
         for (std::size_t j = 0; j != nA; j++)
         {
-            feedback[i * nA + j] += cableFeedback[nA];
+            feedback[i * nA + j] += cableFeedback[j];
         }
     }
     
