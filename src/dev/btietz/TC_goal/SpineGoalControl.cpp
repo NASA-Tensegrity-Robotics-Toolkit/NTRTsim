@@ -132,7 +132,7 @@ goalLearning(false)
 
 void SpineGoalControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB(100);
+	m_pCPGSys = new CPGEquationsFB(200);
     //Initialize the Learning Adapters
     nodeAdapter.initialize(&nodeEvolution,
                             nodeLearning,
