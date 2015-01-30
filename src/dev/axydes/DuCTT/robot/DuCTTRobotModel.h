@@ -76,14 +76,13 @@ public:
                 double duct_height = 23,
                 double prismRadius = 1.524,
                 double prismExtent = 10.16,
-                double prismDensity = 0.0109,
+                double prismDensity = 0.001943,
                 double vertRodRadius = 1.27,
-                double vertDensity = 0.00164,
+                double vertDensity = 0.000895,
                 double innerRodRadius = 2.0955,
-                double innerDensity = 0.00164,
+                double innerDensity = 0.001359,
                 double tipRad = 1.524,
-                double tipDens = 0.0109,
-//                double tipFric = 0.9,
+                double tipDens = 0.001943,
                 double tipFric = 10,
                 double stiffness = 5000.0,
                 double damping = 100.0,
@@ -93,7 +92,8 @@ public:
                 double maxStringForce = 5000.0,
                 double maxStringAcc = 100000.0,
                 double minStringRestLength = 1.2,
-                bool storeStringHist = false
+                bool storeStringHist = false,
+                bool debug = false
               );
 
         //robot params
@@ -107,11 +107,11 @@ public:
         //rod params
         double m_prismRadius; // prismatic joint radius 1.524 cm
         double m_prismExtent; // prismatic joint max extension 10.16 cm
-        double m_prismDensity;     // density (mass / length^3) kg/cm^3 0.453592 / 41.6537cm^3 = 0.0109
+        double m_prismDensity;     // density (mass / (pi * radius^2 * length)) kg/cm^3 0.453592 / (pi * 1.524^2 * 32) = 0.001943
         double m_vertRodRadius; // vertical rod radius 1.27 cm
-        double m_vertDensity;     // density (mass / length^3) kg/cm^3 0.12 /  =
+        double m_vertDensity;     // density (mass / (pi * radius^2 * length)) kg/cm^3 0.127 / (pi * 1.27^2 * 28) = 0.000895
         double m_innerRodRadius; // inner rod radius 2.0955 cm
-        double m_innerDensity;     // density (mass / length^3) kg/cm^3 0.6 /  =
+        double m_innerDensity;     // density (mass / (pi * radius^2 * length)) kg/cm^3 0.6 / (pi * 2.0955^2 * 32) = 0.001359
         //sphere tip params
         double m_tipRad; // prismatic joint tip radius 1.524 cm
         double m_tipDens; // prismatic joint tip density (mas / length^3) kg/cm^3
@@ -126,6 +126,7 @@ public:
         double m_maxStringAcc; // NOT USED: max acceleration of string motors (length/s^2) 10000.0
         double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
         bool m_storeStringHist; // store string history, useful for learning applications
+        bool m_debug; //print debugging info
     };
 
     DuCTTRobotModel();
