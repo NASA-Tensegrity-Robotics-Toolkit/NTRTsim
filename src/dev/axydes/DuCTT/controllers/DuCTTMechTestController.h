@@ -46,7 +46,7 @@ class DuCTTMechTestController : public tgObserver<DuCTTRobotModel>
 {
 public:
 
-    DuCTTMechTestController(double targetTime = -1);
+    DuCTTMechTestController(double targetTime = -1, int testCase = 0);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
@@ -59,30 +59,35 @@ public:
      * @param[in] dt - a timestep. Must be positive.
      */
     void applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
-                                    double dt);
+                                    double dt, int phase);
+    void applyImpedanceControl(tgBasicActuator* string, double dt, int phase);
 
 private:
+    double getCPGTarget(int phase);
+
     tgImpedanceController* in_controller;
     tgImpedanceController* impController;
 
     double simTime;
     double cycle;
-    double target;
 
-    const double phaseOffset;
-    const double offsetLength;
-    const double cpgAmplitude;
-    const double cpgFrequency;
-    const double bodyWaves;
+    std::vector<double> phaseOffset;
+    double offsetLength;
+    double cpgAmplitude;
+    double cpgFrequency;
+    double bodyWaves;
 
     bool recordedStartCOM;
     btVector3 startCOM;
 
-    const double insideLength;
+    bool startedFile;
 
     double targetTime;
     double startTime;
     bool move;
+
+    //0=all strings same sine, 1=upper vert opposite sines, 2=lower vert opposite sine
+    int testCase;
 };
 
 #endif // PRETENSION_CONTROLLER_H

@@ -88,6 +88,7 @@ private:
     double timestep_graphics; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     int nEpisodes; // Number of episodes ("trial runs")
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int testCase; //0=all strings same sine, 1=upper vert opposite sines, 2=lower vert opposite sine
 
     double startX;
     double startY;

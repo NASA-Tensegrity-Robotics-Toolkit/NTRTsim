@@ -85,9 +85,9 @@ public:
                 double tipDens = 0.0109,
 //                double tipFric = 0.9,
                 double tipFric = 10,
-                double stiffness = 10000.0,
+                double stiffness = 5000.0,
                 double damping = 100.0,
-                double pretension = 0.001,
+                double pretension = 2000.0,
                 double maxVertStringVel = 25.4,
                 double maxSaddleStringVel = 8.5,
                 double maxStringForce = 5000.0,
@@ -119,11 +119,11 @@ public:
         //string params
         double m_stiffness;   // stiffness (mass / sec^2) vectran string
         double m_damping;     // damping (mass / sec)
-        double m_pretension;     // Pretension (percentage)
+        double m_pretension;     // Pretension Force (Newtons?)
         double m_maxVertStringVel; // max velocity of vertical string motors (cm/s) 25.4cm/s
         double m_maxSaddleStringVel; // max velocity of saddle string motors (cm/s) 8.5cm/s
         double m_maxStringForce; // max force to exert on all strings (Newtons) 50 N = 5000 kg*cm/s^2
-        double m_maxStringAcc; // max acceleration of string motors (length/s^2) 10000.0
+        double m_maxStringAcc; // NOT USED: max acceleration of string motors (length/s^2) 10000.0
         double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
         bool m_storeStringHist; // store string history, useful for learning applications
     };

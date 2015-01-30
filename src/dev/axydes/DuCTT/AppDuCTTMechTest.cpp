@@ -36,6 +36,7 @@ AppDuCTTMechTest::AppDuCTTMechTest(int argc, char** argv)
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
+    testCase = 0;
 
     startX = 0;
     startY = 20;
@@ -76,7 +77,7 @@ bool AppDuCTTMechTest::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetTime);
+        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetTime, testCase);
         myRobotModel->attach(pController);
     }
 
@@ -118,7 +119,7 @@ void AppDuCTTMechTest::handleOptions(int argc, char **argv)
         ("graphics,G", po::value<bool>(&use_graphics), "Test using graphical view")
         ("controller,c", po::value<bool>(&add_controller)->implicit_value(true), "Attach the controller to the model.")
         ("duct,d", po::value<bool>(&add_duct)->implicit_value(true), "Add the duct to the simulation.")
-        ("phys_time,p", po::value<double>(), "Physics timestep value (Hz). Default=1000")
+        ("phys_time,p", po::value<double>(), "Physics timestep value (Hz). Default=600")
         ("graph_time,g", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
         ("episodes,e", po::value<int>(&nEpisodes), "Number of episodes to run. Default=1")
         ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (100 seconds)")
@@ -131,6 +132,7 @@ void AppDuCTTMechTest::handleOptions(int argc, char **argv)
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("target_time,t", po::value<double>(&targetTime), "Amount of time for controller to move robot. Default = infinite")
+        ("test_case,T", po::value<int>(&testCase)->implicit_value(0), "Test case to run: 0=all strings same sine, 1=upper vert opposite sines, 2=lower vert opposite sine. Default = 0")
     ;
 
     po::variables_map vm;
