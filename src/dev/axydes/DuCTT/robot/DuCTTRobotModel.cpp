@@ -79,7 +79,8 @@ DuCTTRobotModel::Config::Config(
     double maxStringForce,
     double maxStringAcc,
     double minStringRestLength,
-    bool storeStringHist
+    bool storeStringHist,
+    bool debug
     ) :
 m_startPos(startPos),
 m_startRotAxis(startRotAxis),
@@ -105,7 +106,8 @@ m_maxSaddleStringVel(maxSaddleStringVel),
 m_maxStringForce(maxStringForce),
 m_maxStringAcc(maxStringAcc),
 m_minStringRestLength(minStringRestLength),
-m_storeStringHist(storeStringHist)
+m_storeStringHist(storeStringHist),
+m_debug(debug)
 {
 }
 
@@ -392,6 +394,16 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
+
+    if (m_config.m_debug)
+    {
+        std::vector<tgRigidInfo*> allRodInfo = structureInfo.getAllRigids();
+        std::cout << "Num rod infos: " << allRodInfo.size() << std::endl;
+        for (size_t i=0; i<allRodInfo.size(); i++)
+        {
+            std::cout << "Rod " << allRodInfo[i]->getTagStr() << " mass: " << allRodInfo[i]->getMass() << std::endl;
+        }
+    }
 }
 
 void DuCTTRobotModel::setupGhostStructure(tgWorld &world)

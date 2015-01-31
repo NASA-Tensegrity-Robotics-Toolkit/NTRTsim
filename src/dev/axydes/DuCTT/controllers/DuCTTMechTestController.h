@@ -46,19 +46,10 @@ class DuCTTMechTestController : public tgObserver<DuCTTRobotModel>
 {
 public:
 
-    DuCTTMechTestController(double targetTime = -1);
+    DuCTTMechTestController(double targetTime = -1, int testCase = 0);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
-    /**
-     * Applies the impedance controllers using a velocity setpoint of 0.
-     * Called during this classes onStep function.
-     * @param[in] stringList a std::vector of strings taken from the
-     * subject's MuscleMap
-     * @param[in] dt - a timestep. Must be positive.
-     */
-    void applyImpedanceControlInside(const std::vector<tgBasicActuator*> stringList,
-                                    double dt);
     /**
      * Applies the impedance controllers using a velocity setpoint determined.
      * by the phase parameter and
@@ -66,33 +57,37 @@ public:
      * @param[in] stringList a std::vector of strings taken from the
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
-     * @param[in] phase - reads the index out of the phaseOffsets vector
      */
-    void applyImpedanceControlOutside(const std::vector<tgBasicActuator*> stringList,
-                                    double dt,
-                                    std::size_t phase);
+    void applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
+                                    double dt, int phase);
+    void applyImpedanceControl(tgBasicActuator* string, double dt, int phase);
 
 private:
+    double getCPGTarget(int phase);
+
     tgImpedanceController* in_controller;
-    tgImpedanceController* out_controller;
+    tgImpedanceController* impController;
 
     double simTime;
     double cycle;
-    double target;
 
-    std::vector<double> phaseOffsets;
-    const double offsetLength;
-    const double cpgAmplitude;
-    const double cpgFrequency;
-    const double bodyWaves;
+    std::vector<double> phaseOffset;
+    double offsetLength;
+    double cpgAmplitude;
+    double cpgFrequency;
+    double bodyWaves;
 
     bool recordedStartCOM;
     btVector3 startCOM;
 
-    const double insideLength;
+    bool startedFile;
 
     double targetTime;
+    double startTime;
     bool move;
+
+    //0=all strings same sine, 1=upper vert opposite sines, 2=lower vert opposite sine
+    int testCase;
 };
 
 #endif // PRETENSION_CONTROLLER_H
