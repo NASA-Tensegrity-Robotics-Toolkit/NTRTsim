@@ -195,15 +195,15 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
 
             switch(testCase)
             {
-            case 2:
-                applyImpedanceControl(subject.getVertMuscles()[2], dt, 0);
-                applyImpedanceControl(subject.getVertMuscles()[3], dt, 2);
-                break;
-            case 1:
+            case 2://bottom vert strings
                 applyImpedanceControl(subject.getVertMuscles()[0], dt, 0);
                 applyImpedanceControl(subject.getVertMuscles()[1], dt, 2);
                 break;
-            case 0:
+            case 1://top vert strings
+                applyImpedanceControl(subject.getVertMuscles()[2], dt, 0);
+                applyImpedanceControl(subject.getVertMuscles()[3], dt, 2);
+                break;
+            case 0://all strings
             default:
                 applyImpedanceControl(subject.getAllMuscles(), dt, 1);
                 break;
