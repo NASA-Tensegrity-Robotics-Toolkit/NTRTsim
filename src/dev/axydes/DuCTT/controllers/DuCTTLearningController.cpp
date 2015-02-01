@@ -229,7 +229,7 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
  */
 vector< vector <double> > DuCTTLearningController::transformActions(vector< vector <double> > actions)
 {
-    vector <double> manualParams(N_PARAMS * nActions, 1); // '4' for the number of sine wave parameters
+    vector <double> manualParams(N_PARAMS * nActions + 1, 1); // '4' for the number of sine wave parameters
     if (m_usingManualParams) {
         std::cout << "Using manually set parameters\n"; 
         int lineNumber = 1;
@@ -268,11 +268,17 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
         }
     }
 
-    if (!m_usingManualParams)
+    double touchParam;
+    if (m_usingManualParams)
     {
-        m_bIgnoreTouchSensors = (actions[0][actions[0].size()-1]);
-        std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
+        touchParam = (manualParams[manualParams.size()-1]) < 0.5;
     }
+    else
+    {
+        touchParam = (actions[0][actions[0].size()-1]);
+    }
+    m_bIgnoreTouchSensors = touchParam < 0.5;
+    std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
 
     return newActions;
 }
@@ -468,12 +474,12 @@ double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
                                     );
 //    return distanceMoved;
 //    return newY - oldY;
-    return newZ - oldZ;
+    return fabs(newZ - oldZ);
 }
                                          
 std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    vector<double> result(nActions*4, 1.0);
+    vector<double> result(nActions*N_PARAMS+1, 1.0);
     string line;
     ifstream infile(filename.c_str(), ifstream::in);
 
