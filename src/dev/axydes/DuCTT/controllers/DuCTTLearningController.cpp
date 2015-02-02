@@ -238,16 +238,16 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
 
     double pretension = 0.90; // Tweak this value if need be
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[N_PARAMS]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor),
+    double mins[N_PARAMS]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor), //amplitude
                        0.3, //Hz
-                       -1 * M_PI, 
-                       1.2}; //m_initialLengths};// * (1 - maxStringLengthFactor)};
+                       -1 * M_PI, //phase change
+                       1.2}; //m_initialLengths};// * (1 - maxStringLengthFactor)}; //offset
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[N_PARAMS] = {10, //m_initialLengths * (pretension + maxStringLengthFactor),
+    double maxes[N_PARAMS] = {40, //m_initialLengths * (pretension + maxStringLengthFactor), //amplitude
                        20, //Hz (can cheat to 50Hz, if feeling immoral)
-                       M_PI, 
-                       10};//m_initialLengths};// * (1 + maxStringLengthFactor)};
+                       M_PI, //phase change
+                       10};//m_initialLengths};// * (1 + maxStringLengthFactor)}; //offset
     double ranges[N_PARAMS] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     std::vector< std::vector<double> > newActions (nActions);

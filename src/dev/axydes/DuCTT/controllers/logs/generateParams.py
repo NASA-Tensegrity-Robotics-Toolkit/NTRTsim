@@ -154,9 +154,11 @@ def mainFunc(inFile, trialFolder):
 
     # Move file to new trial folder
     shutil.move(inFile,scoreFile)
+    shutil.copy2('../Config.ini',folder+'/Config.ini')
 
     #Do the actual parameter generation
     sortFile(scoreFile, sortedFile)
+    # shutil.copy2(sortedFile,noOutsFile)
     cutOuts(sortedFile, noOutsFile)
     bestScores(noOutsFile, bestFile, 0)
     printParams(bestFile, bestParamFile)
