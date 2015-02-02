@@ -59,10 +59,40 @@ Algorithm Options
 What's going on under the hood?
 ---------------------------------
 
+For the default "one process" learning algorithm, here's what's going on:
 
+When evolution objects are constructed, they create sets of random parameters in memory according to the specifications in config.ini.
+Currently, one of the random sets of parameters is overwritten with the best prior set if the 'start seed' parameter in config is on.
+
+When the adapter's initialize function is called, it asks the evolution object for the 'next set of controllers', which typically just supplies
+it with a nested set of vectors (actions). The controller then proceeds with the rest of the 'trial' (running a simulation with these sets of parameters)
+until the simulation ends (typically after a certain number of steps with graphics off). Then the simulation calls reset, onTeardown is called, and the controller provides
+a score to the adapter which passes that score on to the evolution object. The next step of a reset is onSetup, so the process resumes.
+
+However, after a certain number of trials (depends on the type of learning), counters within the 'next set of controllers' function trigger the end of a generation.
+At this point, the controllers are sorted according to their scores, and then mutation, children, and elitism happen according to the algorithm.
+Finally, a new controller is passed to the adapter out of the new population.
 
 Using learning in Python
 ---------------------------
 
+An alternative is to use Python to perform the sorting and mutating. In this case, parameters are often dumped straight to a common scores.csv file, and
+then sorted out with Python scripts. These scripts can either generate another csv like file with just parameters (as in craterEscape), or new .nnw files
+(this may still just be on a branch).
+
+A more sophisticated, multi-process algorithm may need to transition the entire learning process to python. We would write a 'python adapter' that interfaces with the 
+master Python script, and the Python script would provide the files required for learning. This actually provides an opportunity for a clean break with the current 
+structure, so we are free to specify whatever files we want, as long as the adapter receives them as a nested list of actions. The one exception is the neural network library,
+where it may be easier to maintain the existing interface architecture.
+
 Historical Notes and Future Work
 ----------------------------------
+
+Many of the elements of the current learning library actually exist because we used to lose controller objects on reset. Therefore the evolution
+object would be owned by main, and passed to a controller which would use an adapter to read the parameters. Our new architecture gives us a lot more 
+flexibility, so we should take advantage of it.
+
+Other opprotunities for future work:
+
+* Update config.ini to JSON: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/42
+* Merge features of annealEvolution and neuroEvolution: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/131
