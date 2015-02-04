@@ -37,6 +37,15 @@ Pre-built documentation for the repository can be found here:
 
 http://ntrt.perryb.ca/doxygen
 
+Tutorials
+----------
+
+Tutorials for NTRT (in progress) can be found at:
+
+http://ntrtsim.readthedocs.org/en/latest/index.html
+
+The source for that site is located under doc.
+
 Build Status
 ---------
 
