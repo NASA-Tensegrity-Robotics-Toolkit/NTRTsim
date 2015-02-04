@@ -81,6 +81,8 @@ private:
 
     tgSimulation* simulation;
 
+    bool freqSweep;
+    bool debug;
     bool use_graphics;
     bool add_controller;
     bool add_duct;
