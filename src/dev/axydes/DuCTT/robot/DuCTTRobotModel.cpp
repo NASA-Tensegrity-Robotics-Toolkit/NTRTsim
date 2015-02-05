@@ -312,10 +312,6 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
 
-    const tgRod::Config staticPrismRodConfig(m_config.m_prismRadius, 0);
-    const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
-    const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
-
     const tgBasicActuator::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
                                                   m_config.m_storeStringHist, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
                                                   m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
@@ -333,6 +329,13 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
+
+    //used for mechanical test & validation
+    const tgRod::Config staticPrismRodConfig(m_config.m_prismRadius, 0);
+    const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
+    const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
+    const tgSphere::Config topsphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
+    const tgSphere::Config botsphereConfig(m_config.m_tipRad, 0, m_config.m_tipFric, 0, 0.01);
 
     btVector3 hinge1Axis(0,0,1);
     btVector3 hinge2Axis(1,0,0);
@@ -374,16 +377,20 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
 
-//    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
-//    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
-//    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
-
     spec.addBuilder("vert string", new tgBasicActuatorInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgBasicActuatorInfo(saddleStringConfig));
 
     spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
     spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
+
     spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+
+    //used for mechanical test & validation
+//    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
+//    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
+//    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
+//    spec.addBuilder("top sphere", new tgSphereInfo(topsphereConfig));
+//    spec.addBuilder("bottom sphere", new tgSphereInfo(botsphereConfig));
 
     spec.addBuilder("hinge", new tgDuCTTHingeInfo(hingeConfig));
     spec.addBuilder("hinge2", new tgDuCTTHingeInfo(hingeConfig2));
@@ -501,6 +508,20 @@ void DuCTTRobotModel::setupVariables()
         abstractMarker marker2 (innerRods[i]->getPRigidBody(), btVector3(0,-offsetDist,0), btVector3(255,0,0), 0);
         addMarker(marker2);
     }
+
+    if (m_config.m_debug)
+    {
+        std::cout << "Num rod s: " << allRods.size() << std::endl;
+        double totalMass = 0;
+        for (size_t i=0; i<allRods.size(); i++)
+        {
+            std::cout << "Rod " << allRods[i]->toString() << " mass: " << allRods[i]->mass() << std::endl;
+            totalMass += allRods[i]->mass();
+        }
+        std::cout << "Top Mass: " << getTetraMass(false) << std::endl;
+        std::cout << "Bottom Mass: " << getTetraMass(true) << std::endl;
+        std::cout << "Total Mass: " << totalMass << std::endl;
+    }
 }
 
 void DuCTTRobotModel::step(double dt)
@@ -585,11 +606,11 @@ btVector3 DuCTTRobotModel::getTetraCOM(bool bottom)
     std::vector<tgRod*> rods;
     if (bottom)
     {
-        rods = find<tgRod>("rod bottom");
+        rods = bottomRods;
     }
     else
     {
-        rods = find<tgRod>("rod top");
+        rods = topRods;
     }
     assert(!rods.empty());
 
@@ -608,6 +629,38 @@ btVector3 DuCTTRobotModel::getTetraCOM(bool bottom)
     tetraCenterOfMass /= tetraMass;
 
     return tetraCenterOfMass;
+}
+
+double DuCTTRobotModel::mass()
+{
+    assert(!allRods.empty());
+    double totalMass = 0;
+    for (size_t i=0; i<allRods.size(); i++)
+    {
+        totalMass += allRods[i]->mass();
+    }
+    return totalMass;
+}
+
+double DuCTTRobotModel::getTetraMass(bool bottom)
+{
+    std::vector<tgRod*> rods;
+    if (bottom)
+    {
+        rods = bottomRods;
+    }
+    else
+    {
+        rods = topRods;
+    }
+    assert(!rods.empty());
+
+    double totalMass = 0;
+    for (size_t i=0; i<rods.size(); i++)
+    {
+        totalMass += rods[i]->mass();
+    }
+    return totalMass;
 }
 
 void DuCTTRobotModel::teardown()

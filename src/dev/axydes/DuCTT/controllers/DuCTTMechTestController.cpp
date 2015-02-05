@@ -119,7 +119,7 @@ double DuCTTMechTestController::applyImpedanceControl(const std::vector<tgBasicA
 
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        stringList[i]->setControlInput(target, dt);
+        stringList[i]->setControlInput(target);
     }
 
     return target;
@@ -212,11 +212,6 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
                     //make sure other strings don't go slack
                     subject.getVertMuscles()[2]->setControlInput(7);
                     subject.getVertMuscles()[3]->setControlInput(7);
-                    std::vector<tgBasicActuator*> saddleMuscles = subject.getSaddleMuscles();
-                    for (size_t i = 0; i<saddleMuscles.size(); i++)
-                    {
-                        saddleMuscles[i]->setControlInput(15);
-                    }
                 }
                 break;
             case 1://top vert strings
@@ -227,26 +222,26 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
                     //make sure other strings don't go slack
                     subject.getVertMuscles()[0]->setControlInput(7);
                     subject.getVertMuscles()[1]->setControlInput(7);
-                    std::vector<tgBasicActuator*> saddleMuscles = subject.getSaddleMuscles();
-                    for (size_t i = 0; i<saddleMuscles.size(); i++)
-                    {
-                        saddleMuscles[i]->setControlInput(15);
-                    }
                 }
                 break;
             case 0://all strings
             default:
                 {
                     double target1 = applyImpedanceControl(subject.getAllMuscles(), dt, 1);
+                    std::vector<tgBasicActuator*> saddleMuscles = subject.getSaddleMuscles();
+                    for (size_t i = 0; i<saddleMuscles.size(); i++)
+                    {
+                        saddleMuscles[i]->moveMotors(dt);
+                    }
                 }
                 break;
             }
 
             //Move all the cable motors
-            std::vector<tgBasicActuator*> allMuscles = subject.getAllMuscles();
-            for (size_t i = 0; i<allMuscles.size(); i++)
+            std::vector<tgBasicActuator*> vertMuscles = subject.getVertMuscles();
+            for (size_t i = 0; i<vertMuscles.size(); i++)
             {
-                allMuscles[i]->moveMotors(dt);
+                vertMuscles[i]->moveMotors(dt);
             }
 
             fprintf(stderr,"\n");
