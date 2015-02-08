@@ -116,28 +116,22 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         actions.push_back(tmp);
     }
 
-    // Start Jonathan Bruce code
+    // prints: "m_totalTime COM(x) COM(y) COM(z) <muscle tensions/10> <muscle lengths/10>"
     static int count = 0;
+    if(count > 100) {
+        std::vector<double> currentPosition = subject.getBallCOM();
+        std::cout << m_totalTime << " ";
+        std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " ";  //"x y z"
 
-    if(count > 100)
-    {
-        for(size_t i=0; i<muscles.size(); i++)
-        {
-        std::cout << (muscles[i]->getTension())/10 << "\t";
+        for(size_t i=0; i<muscles.size(); i++) {
+            std::cout << (muscles[i]->getTension())/10 << " ";
         }
-        std::cout << "\n";
-        for(size_t i=0; i<muscles.size(); i++)
-        {
-            std::cout << (muscles[i]->getCurrentLength())/10 << "\t";
+        for(size_t i=0; i<muscles.size(); i++) {
+            std::cout << (muscles[i]->getCurrentLength())/10 << " ";
         }
         std::cout << "\n";
         count = 0;
-    
-        std::vector<double> currentPosition = subject.getBallCOM();
-        std::cout << std::endl << "COM (x,y,z): (" << currentPosition[0] << "," << currentPosition[1] << "," << currentPosition[2] << ")\n"; 
-    }
-    else
-    {
+    } else {
         count++;
     }
 }
@@ -172,7 +166,7 @@ std::vector< std::vector <double> > Escape_T6Controller::transformActions(std::v
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
         std::string filename = "logs/Jan82015/params.dat";
-        int lineNumber = 4;
+        int lineNumber = 8;
         manualParams = readManualParams(lineNumber, filename);
     } 
 
@@ -371,7 +365,7 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, std::s
         }
         infile.close();
     } else {
-        std::cerr << "Error: Manual Parameters file not found\n";
+        std::cerr << "ERROR: Manual Parameters file not found\n";
         exit(1);
     }
 
@@ -396,7 +390,7 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, std::s
             //std::cout<<"Tweaked Cell " << i << ": " << result[i] << "\n";
         }
     } else {
-        std::cerr << "WARNING: Not changing manual input parameters\n";
+        std::cerr << "WARNING: Input parameters are manually set and constant. Expect the same results each iteration.\n";
     }
 
     return result;
