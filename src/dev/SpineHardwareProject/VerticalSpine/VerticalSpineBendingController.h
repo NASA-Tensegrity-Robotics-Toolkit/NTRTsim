@@ -100,7 +100,7 @@ private:
 
   // For data logging. TO-DO: implement this fully.
   tgDataObserver m_dataObserver;
-  //double m_updateTime;
+  double m_updateTime;
 
 };
 
