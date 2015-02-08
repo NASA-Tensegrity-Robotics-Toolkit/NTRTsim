@@ -71,7 +71,6 @@ private:
     double m_totalTime;
     
     tgDataLogger * m_dataLogger;
-    
 };
    
 #endif
