@@ -174,8 +174,8 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     
     // Create goal box in a new structure
     double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 2.0 * 3.1415;
-    double xPos = 1000 * sin(randomAngle);
-    double zPos = 1000 * cos(randomAngle);
+    double xPos = 200 * sin(randomAngle);
+    double zPos = 200 * cos(randomAngle);
     
     tgStructure goalBox;
     
