@@ -244,7 +244,7 @@ void TetraSpineCollisions::setup(tgWorld& world)
     // Params for In Won
     const double radius  = 0.635 * scaleFactor / 10.0;
     const double sphereRadius  = 0.635 * scaleFactor / (10.0);
-    const double density = .0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
+    const double density = 2.0 *.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
     const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;

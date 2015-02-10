@@ -48,7 +48,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-//#define LOGGING
+#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -132,7 +132,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
     {
 		if (allMuscles[i]->hasTag("inner top"))
         {
-			tension = 10.0;
+			tension = 100.0;
             kPosition = 600.0;
             
             controlLength = allMuscles[i]->getStartLength();
@@ -140,14 +140,14 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 			amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 			/// @todo get top, left, right offset, add bodywaves back in.
 			phase = i * bodywaves + root.get("in_top_offset", "UTF-8").asDouble();
-			kVelocity = 100.0;
+			kVelocity = 50.0;
 
 		}
         else if (allMuscles[i]->hasTag("outer top"))
         {
-            tension = 20.0;
-            kPosition = 400.0;
-            kVelocity = 200.0;
+            tension = 200.0;
+            kPosition = 500.0;
+            kVelocity = 100.0;
             
 
 			amplitude = root.get("out_top_amp_a", "UTF-8").asDouble();
@@ -157,9 +157,9 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("inner left"))
         {
-            tension = 10.0;
+            tension = 100.0;
             kPosition = 600.0;
-            kVelocity = 100.0;
+            kVelocity = 50.0;
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
@@ -168,9 +168,9 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer left"))
         {
-			tension = 5.0;
-            kPosition = 400.0;
-            kVelocity = 200.0;
+			tension = 50.0;
+            kPosition = 500.0;
+            kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
@@ -181,9 +181,9 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 		}
         else if (allMuscles[i]->hasTag("inner right"))
         {
-            tension = 10.0;
+            tension = 100.0;
             kPosition = 600.0;
-            kVelocity = 100.0;
+            kVelocity = 50.0;
             controlLength = allMuscles[i]->getStartLength();
 
 			amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
@@ -192,8 +192,8 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer right"))
         {
-			tension = 5.0;
-            kPosition = 400.0;
+			tension = 50.0;
+            kPosition = 500.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
 

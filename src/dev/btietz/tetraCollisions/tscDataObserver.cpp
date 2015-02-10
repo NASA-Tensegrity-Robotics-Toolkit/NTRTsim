@@ -132,7 +132,7 @@ void tscDataObserver::onSetup(BaseSpineModelLearning& model)
     {
         std::stringstream name;
         
-        name << "segment_" << i;
+        name << "segment_" << i+1;
         tgOutput << name.str() << "_X" << ","
         << name.str() << "_Y" << ","
         << name.str() << "_Z" << ",";

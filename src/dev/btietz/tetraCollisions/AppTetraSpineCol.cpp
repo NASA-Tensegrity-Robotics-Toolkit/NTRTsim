@@ -52,22 +52,22 @@ int main(int argc, char** argv)
     std::cout << "AppTetraSpineHT" << std::endl;
 
     // First create the world
-    const double scale = 25;
+    const double scale = 100;
     const tgWorld::Config config(9.81 * scale); // gravity, cm/sec^2
 
 	;
 #if (1)
-	btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
+	btVector3 eulerAngles = btVector3(M_PI/4.0, 0.0, 0.0);
    btScalar friction = 0.5;
    btScalar restitution = 0.1;
    btVector3 size = btVector3(500.0, 1.5, 500.0);
    btVector3 origin = btVector3(0.0, 0.0, 0.0);
     const size_t nx = 100;
     const size_t ny = 100;
-    const double triangleSize = 2.40;
-    const double waveHeight = 1.20;
+    const double triangleSize = 15.0;
+    const double waveHeight = 5.0;
     const double offset = 0.0;
-    const double margin = 0.15;
+    const double margin = 1.0;
 	tgHillyGround::Config groundConfig(eulerAngles, friction, restitution,
 									size, origin, nx, ny, margin, triangleSize,
 									waveHeight, offset);
