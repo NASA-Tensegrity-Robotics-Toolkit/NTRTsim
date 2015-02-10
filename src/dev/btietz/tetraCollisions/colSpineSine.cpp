@@ -48,7 +48,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define LOGGING
+//#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -132,7 +132,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
     {
 		if (allMuscles[i]->hasTag("inner top"))
         {
-			tension = 100.0;
+			tension = 10.0;
             kPosition = 600.0;
             
             controlLength = allMuscles[i]->getStartLength();
@@ -145,7 +145,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 		}
         else if (allMuscles[i]->hasTag("outer top"))
         {
-            tension = 200.0;
+            tension = 20.0;
             kPosition = 400.0;
             kVelocity = 200.0;
             
@@ -157,7 +157,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("inner left"))
         {
-            tension = 100.0;
+            tension = 10.0;
             kPosition = 600.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
@@ -168,7 +168,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer left"))
         {
-			tension = 50.0;
+			tension = 5.0;
             kPosition = 400.0;
             kVelocity = 200.0;
             controlLength = allMuscles[i]->getStartLength();
@@ -181,7 +181,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 		}
         else if (allMuscles[i]->hasTag("inner right"))
         {
-            tension = 100.0;
+            tension = 10.0;
             kPosition = 600.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
@@ -192,7 +192,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer right"))
         {
-			tension = 50.0;
+			tension = 5.0;
             kPosition = 400.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
