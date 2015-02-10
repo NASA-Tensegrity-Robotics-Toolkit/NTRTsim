@@ -68,7 +68,7 @@ namespace
         // top
 		tetra.addNode(0, height, 0, "base");
 		// front
-		tetra.addNode(0, edge / 2.0 * tan(M_PI / 6.0), 2.50 * 5.0, "tip");
+		tetra.addNode(0, edge / 2.0 * tan(M_PI / 6.0), 2.50 * 1.0, "tip");
 		
 		// Get the next two nodes from existing nodes:
 		tgNodes oldNodes = tetra.getNodes();
@@ -101,7 +101,7 @@ namespace
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        const btVector3 offset(0, 0, -2.30 * 5.0);
+        const btVector3 offset(0, 0, -2.30 * 1.0);
 		for (size_t i = 0; i < segmentCount; ++i)
 		{
 				/// @todo: the snake is a temporary variable -- will its destructor be called?
@@ -218,7 +218,7 @@ namespace
 // There are things that do this for us (@todo: reference the things that do this for us)
 void TetraSpineCollisions::setup(tgWorld& world)
 {
-    const double edge = 3.8 * 5.0;
+    const double edge = 3.8;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
     std::cout << "edge: " << edge << "; height: " << height << std::endl;
 	
@@ -241,8 +241,8 @@ void TetraSpineCollisions::setup(tgWorld& world)
     
 
     // Params for In Won
-    const double radius  = 0.635 / 2.0;
-    const double sphereRadius  = 0.635 / 2.0;
+    const double radius  = 0.635 / 10.0;
+    const double sphereRadius  = 0.635 / 10.0;
     const double density = .0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
     const double friction = 0.5;
     const tgRod::Config rodConfig(radius, density, friction);
@@ -267,9 +267,9 @@ void TetraSpineCollisions::setup(tgWorld& world)
     
     
     // Two different string configs
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 5000, 7.0, 0.1, 0.1);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 5000, 7.0, 0.1, 0.1);
-#if (1)
+    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 100.0, 1.40, 0.1, 0.1);
+    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 100.0, 1.40, 0.1, 0.1);
+#if (0)
     spec.addBuilder("top muscle", new tgBasicContactCableInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgBasicContactCableInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgBasicContactCableInfo(muscleConfig2));
@@ -290,7 +290,7 @@ void TetraSpineCollisions::setup(tgWorld& world)
     m_allSegments = this->find<tgModel> ("segment");
     mapMuscles(m_muscleMap, *this);
     
-    addMarkers(snake, *this);
+    //addMarkers(snake, *this);
     
     #if (0)
     trace(structureInfo, *this);
