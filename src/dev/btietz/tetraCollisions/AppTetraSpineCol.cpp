@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     std::cout << "AppTetraSpineHT" << std::endl;
 
     // First create the world
-    const double scale = 50;
+    const double scale = 25;
     const tgWorld::Config config(9.81 * scale); // gravity, cm/sec^2
 
 	;
