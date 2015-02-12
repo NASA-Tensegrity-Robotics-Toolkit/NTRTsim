@@ -29,10 +29,12 @@
 AppDuCTTMechTest::AppDuCTTMechTest(int argc, char** argv)
 {
     bSetup = false;
+    debug = false;
     use_graphics = true;
     add_controller = false;
     add_duct = false;
-    timestep_physics = 1.0f/60.0f/10.0f;
+    freqSweep = false;
+    timestep_physics = 1.0f/1000.0f;
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
@@ -72,12 +74,13 @@ bool AppDuCTTMechTest::setup()
                 btVector3(startRotX,startRotY,startRotZ),
                 (startAngle*SIMD_RADS_PER_DEG)
                 );
+    c.m_debug = debug;
     DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetTime, testCase);
+        DuCTTMechTestController* const pController = new DuCTTMechTestController(targetTime, testCase, freqSweep);
         myRobotModel->attach(pController);
     }
 
@@ -133,6 +136,8 @@ void AppDuCTTMechTest::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("target_time,t", po::value<double>(&targetTime), "Amount of time for controller to move robot. Default = infinite")
         ("test_case,T", po::value<int>(&testCase)->implicit_value(0), "Test case to run: 0=all strings same sine, 1=upper vert opposite sines, 2=lower vert opposite sine. Default = 0")
+        ("debug,D", po::value<bool>(&debug)->implicit_value(true), "Debug flag, output debug information. Default = false")
+        ("freq_sweep,f", po::value<bool>(&freqSweep)->implicit_value(true), "Perform the frequency sweep for this test. Default = false")
     ;
 
     po::variables_map vm;

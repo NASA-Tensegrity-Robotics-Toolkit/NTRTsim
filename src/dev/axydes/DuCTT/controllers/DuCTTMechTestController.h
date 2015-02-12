@@ -46,7 +46,7 @@ class DuCTTMechTestController : public tgObserver<DuCTTRobotModel>
 {
 public:
 
-    DuCTTMechTestController(double targetTime = -1, int testCase = 0);
+    DuCTTMechTestController(double targetTime = -1, int testCase = 0, bool _freqSweep = false);
     
     virtual void onStep(DuCTTRobotModel& subject, double dt);
     
@@ -58,9 +58,9 @@ public:
      * subject's MuscleMap
      * @param[in] dt - a timestep. Must be positive.
      */
-    void applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
+    double applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
                                     double dt, int phase);
-    void applyImpedanceControl(tgBasicActuator* string, double dt, int phase);
+    double applyImpedanceControl(tgBasicActuator* string, double dt, int phase);
 
 private:
     double getCPGTarget(int phase);
@@ -81,6 +81,12 @@ private:
     btVector3 startCOM;
 
     bool startedFile;
+
+    //for frequency sweeping test
+    bool freqSweep;
+    double timePerFreq;
+    double freqTime;
+    double maxFreq;
 
     double targetTime;
     double startTime;

@@ -82,10 +82,10 @@ public:
                 double innerRodRadius = 2.0955,
                 double innerDensity = 0.001359,
                 double tipRad = 1.524,
-                double tipDens = 0.001943,
+                double tipDens = 0.00001943,
                 double tipFric = 10,
                 double stiffness = 5000.0,
-                double damping = 100.0,
+                double damping = 25.0,
                 double pretension = 2000.0,
                 double maxVertStringVel = 25.4,
                 double maxSaddleStringVel = 8.5,
@@ -221,6 +221,20 @@ public:
      * @return btVector3 COM of the specified tetra
      */
     btVector3 getTetraCOM(bool bottom = true);
+
+    /**
+     * Calculate the mass for the entire model.
+     * @return double mass of the model
+     */
+    double mass();
+
+    /**
+     * Calculate the mass for one of the tetras.
+     * @param bottom true if you want the COM for the bottom tetra, false if you want it for the top
+     * @return double mass of the specified tetra
+     */
+    double getTetraMass(bool bottom = true);
+
     std::vector<tgSphere*> spheres;
     std::vector<tgTouchSensorSphereModel*> allTouchSensors;
     std::vector<tgSphere*> bottomSpheres;

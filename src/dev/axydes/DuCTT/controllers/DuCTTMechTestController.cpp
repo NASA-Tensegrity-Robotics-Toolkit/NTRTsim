@@ -40,7 +40,7 @@
 #include <stdexcept>
 #include <vector>
 
-DuCTTMechTestController::DuCTTMechTestController(double targetTime, int _testCase) :
+DuCTTMechTestController::DuCTTMechTestController(double targetTime, int _testCase, bool _freqSweep) :
     impController(new tgImpedanceController(0.01, 5000, 10)),
     simTime(0.0),
     startTime(5.0),
@@ -53,7 +53,11 @@ DuCTTMechTestController::DuCTTMechTestController(double targetTime, int _testCas
     recordedStartCOM(false),
     move(true),
     testCase(_testCase),
-    startedFile(false)
+    startedFile(false),
+    timePerFreq(3.0),
+    freqTime(0.0),
+    maxFreq(50.0),
+    freqSweep(_freqSweep)
 {
     phaseOffset.clear();
     phaseOffset.push_back(0);
@@ -65,23 +69,29 @@ DuCTTMechTestController::DuCTTMechTestController(double targetTime, int _testCas
     {
         case 2:
             offsetLength = 3.0;
-            cpgAmplitude = 30.0;
-            cpgFrequency = 20.0;
+            cpgAmplitude = 10.0;
+            cpgFrequency = 50.0;
             bodyWaves = 1.0;
             break;
         case 1:
             offsetLength = 3.0;
             cpgAmplitude = 15.0;
-            cpgFrequency = 20.0;
+            cpgFrequency = 50.0;
             bodyWaves = 1.0;
             break;
         case 0:
         default:
             offsetLength = 3.0;
             cpgAmplitude = 5.0;
-            cpgFrequency = 40.0;
+            cpgFrequency = 50.0;
             bodyWaves = 1.0;
             break;
+    }
+
+    if (freqSweep)
+    {
+        cpgFrequency = 10.0;
+        std::cout << "Start Frequency: " << cpgFrequency << std::endl;
     }
 }
 
@@ -93,21 +103,26 @@ double DuCTTMechTestController::getCPGTarget(int phase)
     return target;
 }
 
-void DuCTTMechTestController::applyImpedanceControl(tgBasicActuator* string, double dt, int phase)
+double DuCTTMechTestController::applyImpedanceControl(tgBasicActuator* string, double dt, int phase)
 {
     double target = getCPGTarget(phase);
-    string->setControlInput(target, dt);
+
+    string->setControlInput(target);
+
+    return target;
 }
 
-void DuCTTMechTestController::applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
+double DuCTTMechTestController::applyImpedanceControl(const std::vector<tgBasicActuator*> stringList,
                                                             double dt, int phase)
 {
     double target = getCPGTarget(phase);
 
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        stringList[i]->setControlInput(target, dt);
+        stringList[i]->setControlInput(target);
     }
+
+    return target;
 }
 
 void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
@@ -135,40 +150,7 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
             fprintf(stderr,"\n");
             startedFile = true;
         }
-        //Record values of markers
-        std::vector<abstractMarker> markers = subject.getMarkers();
-        for (size_t i = 0; i<markers.size(); i++)
-        {
-            btVector3 pos = markers[i].getWorldPosition();
-            fprintf(stderr,"%f,%f,%f,",pos.x(),pos.y(),pos.z());
-        }
 
-        //Record rest lengths of strings
-        std::vector<tgBasicActuator*> vertMuscles = subject.getVertMuscles();
-        for (size_t i = 0; i<vertMuscles.size(); i++)
-        {
-            fprintf(stderr,"%f,",vertMuscles[i]->getRestLength());
-        }
-        std::vector<tgBasicActuator*> saddleMuscles = subject.getSaddleMuscles();
-        for (size_t i = 0; i<vertMuscles.size(); i++)
-        {
-            fprintf(stderr,"%f,",saddleMuscles[i]->getRestLength());
-        }
-
-        fprintf(stderr,"\n");
-
-        if (simTime < startTime || !move) return;
-        else if (!recordedStartCOM)
-        {
-            startCOM = subject.getCOM();
-            recordedStartCOM = true;
-        }
-
-        btVector3 com = subject.getCOM();
-        double dist = startCOM.distance(com);
-
-
-        //Check for end condition
         if (targetTime < 0 || simTime < targetTime)
         {
             //Record values of markers
@@ -190,24 +172,79 @@ void DuCTTMechTestController::onStep(DuCTTRobotModel& subject, double dt)
             {
                 fprintf(stderr,"%f,",saddleMuscles[i]->getRestLength());
             }
+            if (simTime < startTime || !move) fprintf(stderr,"\n");
+        }
 
-            fprintf(stderr,"\n");
+        if (simTime < startTime || !move) return;
+        else if (!recordedStartCOM)
+        {
+            startCOM = subject.getCOM();
+            recordedStartCOM = true;
+        }
 
+        if (freqSweep)
+        {
+            freqTime += dt;
+            if (freqTime >= timePerFreq)
+            {
+                freqTime = 0.0;
+                cpgFrequency += 5.0;
+                std::cout << "New Frequency: " << cpgFrequency << std::endl;
+                if (cpgFrequency > maxFreq)
+                    targetTime = simTime;
+            }
+        }
+
+        btVector3 com = subject.getCOM();
+        double dist = startCOM.distance(com);
+
+
+        //Check for end condition
+        if (targetTime < 0 || simTime < targetTime)
+        {
             switch(testCase)
             {
             case 2://bottom vert strings
-                applyImpedanceControl(subject.getVertMuscles()[0], dt, 0);
-                applyImpedanceControl(subject.getVertMuscles()[1], dt, 2);
+                {
+                    double target1 = applyImpedanceControl(subject.getVertMuscles()[0], dt, 0);
+                    double target2 = applyImpedanceControl(subject.getVertMuscles()[1], dt, 2);
+
+                    //make sure other strings don't go slack
+                    subject.getVertMuscles()[2]->setControlInput(7);
+                    subject.getVertMuscles()[3]->setControlInput(7);
+                }
                 break;
             case 1://top vert strings
-                applyImpedanceControl(subject.getVertMuscles()[2], dt, 0);
-                applyImpedanceControl(subject.getVertMuscles()[3], dt, 2);
+                {
+                    double target1 = applyImpedanceControl(subject.getVertMuscles()[2], dt, 0);
+                    double target2 = applyImpedanceControl(subject.getVertMuscles()[3], dt, 2);
+
+                    //make sure other strings don't go slack
+                    subject.getVertMuscles()[0]->setControlInput(7);
+                    subject.getVertMuscles()[1]->setControlInput(7);
+                }
                 break;
             case 0://all strings
             default:
-                applyImpedanceControl(subject.getAllMuscles(), dt, 1);
+                {
+                    double target1 = applyImpedanceControl(subject.getAllMuscles(), dt, 1);
+                    std::vector<tgBasicActuator*> saddleMuscles = subject.getSaddleMuscles();
+                    for (size_t i = 0; i<saddleMuscles.size(); i++)
+                    {
+                        saddleMuscles[i]->moveMotors(dt);
+                    }
+                }
                 break;
             }
+
+            //Move all the cable motors
+            std::vector<tgBasicActuator*> vertMuscles = subject.getVertMuscles();
+            for (size_t i = 0; i<vertMuscles.size(); i++)
+            {
+                vertMuscles[i]->moveMotors(dt);
+            }
+
+            fprintf(stderr,"\n");
         }
         else if (simTime >= targetTime)
         {
