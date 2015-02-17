@@ -76,7 +76,8 @@ SpineGoalControl::Config::Config(int ss,
                                         double afMin,
                                         double afMax,
                                         double pfMin,
-                                        double pfMax) :
+                                        double pfMax,
+                                        double tf) :
 BaseSpineCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
@@ -84,7 +85,8 @@ freqFeedbackMax(ffMax),
 ampFeedbackMin(afMin),
 ampFeedbackMax(afMax),
 phaseFeedbackMin(pfMin),
-phaseFeedbackMax(pfMax)
+phaseFeedbackMax(pfMax),
+tensFeedback(tf)
 {
     
 }
@@ -401,8 +403,6 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     // Placeholder
     std:vector<double> feedback;
     
-#if (0)
-    
     // Adapter doesn't use this anyway, so just do zero here for now (will trigger errors if it starts to use it =) )
     const double dt = 0;
     
@@ -416,6 +416,9 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     btVector3 goalPosition = subject->goalBoxPosition();
     
     btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
+    
+    
+#if (0) // Direct to CPG or set impedance controller tensions
     
     int m = subject->getSegments() - 1;
     
@@ -450,7 +453,7 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     
 #else
     
-    // Write function for adjusting impedance controllers
+    setGoalTensions(subject, desiredHeading);
     
     std::vector<double> zeroFB(n * nA, 0.0);
     
@@ -474,6 +477,29 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     
     
     return feedback;
+}
+
+void SpineGoalControl::setGoalTensions(const FlemonsSpineModelGoal* subject, btVector3& desiredHeading)
+{
+    std::vector<double> state;
+    state.push_back(desiredHeading.getX());
+    state.push_back(desiredHeading.getZ());
+    
+    assert(state[0] >= -1.0 && state[0] <= 1.0);
+    assert(state[1] >= -1.0 && state[1] <= 1.0);
+    
+    std::size_t numActions = goalConfigData.getintvalue("numberOfActions");
+    
+    std::vector< std::vector<double> > actions = goalAdapter.step(m_updateTime, state);
+    
+    for (std::size_t i = 0; i < subject->getSegments() - 1; i++)
+    {
+        for (std::size_t j = 0; j < numActions; j++)
+        {
+            tgCPGCableControl* cableControl = tgCast::cast<tgCPGActuatorControl, tgCPGCableControl>(m_allControllers[i * numActions + j]);
+            cableControl->updateTensionSetpoint(actions[0][j] * m_config.tensFeedback);
+        }
+    }
 }
 
 std::vector<double> SpineGoalControl::getCableState(const tgSpringCableActuator& cable)

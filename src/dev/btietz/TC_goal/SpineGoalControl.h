@@ -33,6 +33,8 @@
 #include "learning/Adapters/NeuroAdapter.h"
 #include "learning/Configuration/configuration.h"
 
+#include "LinearMath/btVector3.h"
+
 class tgSpringCableActuator;
 class FlemonsSpineModelGoal;
 
@@ -76,7 +78,9 @@ struct Config : public BaseSpineCPGControl::Config
         double afMin = 0.0,
         double afMax = 0.0,
         double pfMin = 0.0,
-        double pfMax = 0.0);
+        double pfMax = 0.0,
+        double tf = 0.0
+        );
         
         const double freqFeedbackMin;
         const double freqFeedbackMax;
@@ -84,6 +88,8 @@ struct Config : public BaseSpineCPGControl::Config
         const double ampFeedbackMax;
         const double phaseFeedbackMin;
         const double phaseFeedbackMax;
+        
+        const double tensFeedback;
         
     };
 
@@ -112,6 +118,8 @@ protected:
     std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
     std::vector<double> getGoalFeedback(const FlemonsSpineModelGoal* subject);
+    
+    void setGoalTensions(const FlemonsSpineModelGoal* subject, btVector3& desiredHeading);
     
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     

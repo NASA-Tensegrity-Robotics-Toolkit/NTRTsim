@@ -100,6 +100,7 @@ bool AppGoalTerrain::setup()
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
+        const double tensionFeedback = 1000.0;
 
         SpineGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -123,7 +124,8 @@ bool AppGoalTerrain::setup()
                                                     afMin,
                                                     afMax,
                                                     pfMin,
-                                                    pfMax
+                                                    pfMax,
+                                                    tensionFeedback
                                                     );
         /// @todo fix memory leak that occurs here
         SpineGoalControl* const myControl =
