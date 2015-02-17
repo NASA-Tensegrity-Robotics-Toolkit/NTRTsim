@@ -119,3 +119,15 @@ void tgCPGCableControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nod
     
     m_nodeNumber = CPGSys.addNode(params);
 } 
+
+void tgCPGCableControl::updateTensionSetpoint(double newTension)
+{
+    if (newTension >= 0.0)
+    {
+        motorControl().setOffsetTension(newTension);
+    }
+    else
+    {
+        throw std::runtime_error("Tension setpoint is less than zero!");
+    }
+}
