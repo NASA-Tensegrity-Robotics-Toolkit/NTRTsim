@@ -391,8 +391,18 @@ std::vector<double> SpineGoalControl::getFeedback(BaseSpineModelLearning& subjec
 
 std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoal* subject)
 {
+
+    // Add cable feedback to close the low level loop
+    const std::vector<tgSpringCableActuator*>& allCables = subject->getAllMuscles();
+    
+    std::size_t n = allCables.size();
+    std::size_t nA = feedbackConfigData.getintvalue("numberOfActions");
+    
     // Placeholder
     std:vector<double> feedback;
+    
+#if (0)
+    
     // Adapter doesn't use this anyway, so just do zero here for now (will trigger errors if it starts to use it =) )
     const double dt = 0;
     
@@ -426,12 +436,6 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
         feedback.insert(feedback.end(), segmentFeedback.begin(), segmentFeedback.end());
     }
     
-    // Add cable feedback to close the low level loop
-    const std::vector<tgSpringCableActuator*>& allCables = subject->getAllMuscles();
-    
-    std::size_t n = allCables.size();
-    std::size_t nA = feedbackConfigData.getintvalue("numberOfActions");
-    
     assert (feedback.size() == n * (nA - 1));
     
     // Insert a zero every third element to account for frequency
@@ -443,6 +447,16 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
         it += 3;
     }
     
+    
+#else
+    
+    // Write function for adjusting impedance controllers
+    
+    std::vector<double> zeroFB(n * nA, 0.0);
+    
+    feedback.insert(feedback.end(), zeroFB.begin(), zeroFB.end());
+    
+#endif
     assert (feedback.size() == n * nA);
     
     for(std::size_t i = 0; i != n; i++)

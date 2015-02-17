@@ -219,7 +219,7 @@ const tgBoxGround::Config AppGoalTerrain::getBoxConfig()
     const double roll = 0.0;
     const double friction = 0.5;
     const double restitution = 0.0;
-    const btVector3 size(1000.0, 0.0, 1000.0);
+    const btVector3 size(1000.0, 1.5, 1000.0);
     
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),
                                             friction,
