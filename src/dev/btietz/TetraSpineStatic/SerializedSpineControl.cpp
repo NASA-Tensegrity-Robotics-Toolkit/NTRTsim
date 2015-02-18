@@ -47,7 +47,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-//#define LOGGING
+#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -221,7 +221,7 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     m_dataObserver.onSetup(subject);
 #endif  
 	
-
+#if (0)
 	// Setup initial lengths
 	std::vector<tgSpringCableActuator*> stringList;
 
@@ -245,7 +245,7 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     {
 		m_config.insideRightLength.push_back(stringList[i]->getStartLength());
 	}
-#if (0)	
+
 	stringList = subject.getMuscles("outer top");
 	m_config.outsideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
