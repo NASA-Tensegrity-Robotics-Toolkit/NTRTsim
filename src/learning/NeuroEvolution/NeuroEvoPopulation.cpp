@@ -151,7 +151,19 @@ void NeuroEvoPopulation::orderPopulation()
 	for(std::size_t i=0;i<this->controllers.size();i++)
 	{
 		double ave = std::accumulate(controllers[i]->pastScores.begin(),controllers[i]->pastScores.end(),0);
-		ave /=  (double) controllers[i]->pastScores.size();
+		
+        double n = (double) controllers[i]->pastScores.size(); 
+        if (n > 0)
+        {
+            ave /= n;
+        }
+        else
+        {
+            ave = -100000;
+        }
+        
+        //assert(controllers[i]->pastScores.size() > 0);
+        
 		controllers[i]->averageScore=ave;
 		if(clearScoresBetweenGenerations)
 			controllers[i]->pastScores.clear();
@@ -161,7 +173,7 @@ void NeuroEvoPopulation::orderPopulation()
 		sort(controllers.begin(),controllers.end(),this->comparisonFuncForAverage);
 	else
 		sort(controllers.begin(),controllers.end(),this->comparisonFuncForMax);
-
+    
 }
 
 std::vector<double> NeuroEvoPopulation::generateMatingProbabilities()
