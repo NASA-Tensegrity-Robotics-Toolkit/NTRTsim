@@ -221,10 +221,10 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     m_dataObserver.onSetup(subject);
 #endif  
 	
-#if (0)
+
 	// Setup initial lengths
 	std::vector<tgSpringCableActuator*> stringList;
-
+#if (1)
 	stringList = subject.getMuscles("inner top");
 	m_config.insideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
@@ -245,7 +245,9 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     {
 		m_config.insideRightLength.push_back(stringList[i]->getStartLength());
 	}
-
+#endif
+	
+#if (0)
 	stringList = subject.getMuscles("outer top");
 	m_config.outsideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
