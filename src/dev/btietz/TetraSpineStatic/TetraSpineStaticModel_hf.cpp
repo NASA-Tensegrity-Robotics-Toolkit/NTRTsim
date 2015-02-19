@@ -104,7 +104,7 @@ namespace
     void addSegments(tgStructure& snake, const tgStructure& tetra, double edge,
              size_t segmentCount)
     {
-        const btVector3 offset(0, 0, -23.0);
+        const btVector3 offset(0, 0, -22.0);
 		for (size_t i = 0; i < segmentCount; ++i)
 		{
 				/// @todo: the snake is a temporary variable -- will its destructor be called?
@@ -300,9 +300,9 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     const double maxSpeed = 7.0;
 
     const double mRad = 1.0;
-    const double motorFriction = 1000.0;
+    const double motorFriction = 1.0;
     const double motorInertia = 1.0;
-    const bool backDrivable = true;
+    const bool backDrivable = false;
     tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);

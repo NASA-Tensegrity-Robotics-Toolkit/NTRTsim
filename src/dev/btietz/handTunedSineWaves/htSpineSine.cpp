@@ -50,7 +50,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define LOGGING
+//#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -141,13 +141,13 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
             {
 				amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 				phase = root.get("front_offset", "UTF-8").asDouble();
-				kVelocity = 50;
+				kVelocity = 150;
 			}
 			else if(allMuscles[i]->hasTag("seg2"))
 			{
 				amplitude = root.get("in_top_amp_b", "UTF-8").asDouble();
 				phase = root.get("back_offset", "UTF-8").asDouble();
-				kVelocity = 100.0;
+				kVelocity = 150.0;
 			}
 			else
 			{
@@ -158,7 +158,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
             tension = 1000.0;
             kPosition = 500.0;
-            kVelocity = 100.0;
+            kVelocity = 150.0;
             
             if (allMuscles[i]->hasTag("seg1"))
             {
@@ -177,6 +177,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
 			{
 				throw std::runtime_error("Missing tags!");
 			}
+			//controlLength = allMuscles[i]->getStartLength();
         }
         else if (allMuscles[i]->hasTag("inner"))
         {
@@ -202,10 +203,11 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         }
         else if (allMuscles[i]->hasTag("outer"))
         {
-			tension = 500.0;
-            kPosition = 100.0;
+			tension = 800.0;
+            kPosition = 300.0;
             kVelocity = 100.0;
-            controlLength = 19.0;
+            //controlLength = allMuscles[i]->getStartLength();
+            controlLength = 19.2;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();
