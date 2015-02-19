@@ -39,6 +39,7 @@
 class tgImpedanceController;
 class tgSpringCableActuator;
 class BaseSpineModelLearning;
+class tgSCASineControl;
 
 /**
  * Control the TetraSpineLearningModel with a series of sine waves
@@ -144,6 +145,8 @@ public:
      */
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
+    virtual void onTeardown(BaseSpineModelLearning& subject);
+    
 private:
    
     /**
@@ -155,6 +158,10 @@ private:
 										const std::vector<double> tensions,
 										double dt,
 										std::size_t phase);
+    
+    std::vector<tgSCASineControl*> m_sineControllers;
+    
+    std::vector<tgImpedanceController*> m_impedanceControllers;
     
     Config m_config;
     

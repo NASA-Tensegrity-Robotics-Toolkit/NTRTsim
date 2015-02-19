@@ -35,11 +35,13 @@
 // to a cpp over there
 #include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
+#include "controllers/tgPIDController.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
 #include "dev/btietz/hardwareSineWaves/tgSineStringControl.h"
+#include "dev/btietz/kinematicString/tgSCASineControl.h"
 
 // JSON Serialization
 #include "helpers/FileHelpers.h"
@@ -48,7 +50,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-//#define LOGGING
+#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -231,8 +233,11 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         // In Won's convention
         offset = amplitude;
         
-        tgSineStringControl* pStringControl = new tgSineStringControl(m_controlTime,
+        tgPIDController::Config mPID(10000.0, 0.0, 0.0, true); 
+        
+        tgSCASineControl* pStringControl = new tgSCASineControl(m_controlTime,
 																		p_ipc,
+                                                                        mPID,
 																		amplitude,
 																		frequency,
 																		phase,

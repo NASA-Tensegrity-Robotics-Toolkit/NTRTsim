@@ -1,11 +1,11 @@
 {
-    "inside_imp_ten" : 00.0,
+    "inside_imp_ten" : 1500.0,
     "inside_imp_pos" : 100.0,
     "inside_imp_vel" : 100.0,
     "outside_imp_ten" : 1000.0,
     "outside_imp_pos" : 100.0,
     "outside_imp_vel" : 100.0,
-    "top_imp_ten" : 1200.0,
+    "top_imp_ten" : 1500.0,
     "top_imp_pos" : 500.0,
     "top_imp_vel" : 100.0,
     "rod_edge" : 19.0,

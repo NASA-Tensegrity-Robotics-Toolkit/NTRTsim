@@ -33,10 +33,13 @@
 // NTRTSim
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
+#include "core/tgKinematicActuator.h"
 #include "core/tgBaseRigid.h"
 #include "controllers/tgImpedanceController.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgUtil.h"
+#include "controllers/tgPIDController.h"
+#include "dev/btietz/kinematicString/tgSCASineControl.h"
 
 // The C++ Standard Library
 #include <stdexcept>
@@ -47,7 +50,7 @@
 #include <json/json.h>
 
 //#define VERBOSE
-//#define LOGGING
+#define LOGGING
 
 SerializedSpineControl::Config::Config(std::string fileName)
 {
@@ -220,8 +223,13 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif  
-	
 
+    tgSCASineControl* pStringControl;
+    tgImpedanceController* p_ipc;
+    // Code for individually controlled cables with kinematic model
+
+    tgPIDController::Config mPID(10000.0, 0.0, 0.0, true);
+    
 	// Setup initial lengths
 	std::vector<tgSpringCableActuator*> stringList;
 #if (1)
@@ -229,7 +237,24 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 	m_config.insideTopLength.clear();
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
-		m_config.insideTopLength.push_back(stringList[i]->getStartLength());
+        m_config.insideTopLength.push_back(stringList[i]->getStartLength());
+        
+        p_ipc = new tgImpedanceController(m_config.insideTopTens[i], m_config.top_controller->getLengthStiffness(), m_config.top_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.insideTopLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
 	}
 	
 	stringList = subject.getMuscles("inner left");
@@ -237,6 +262,22 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		m_config.insideLeftLength.push_back(stringList[i]->getStartLength());
+        p_ipc = new tgImpedanceController(m_config.insideLeftTens[i], m_config.in_controller->getLengthStiffness(), m_config.in_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.insideLeftLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
 	}
 	
 	stringList = subject.getMuscles("inner right");
@@ -244,6 +285,23 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
 	for(std::size_t i = 0; i < stringList.size(); i++)
     {
 		m_config.insideRightLength.push_back(stringList[i]->getStartLength());
+        
+        p_ipc = new tgImpedanceController(m_config.insideRightTens[i], m_config.in_controller->getLengthStiffness(), m_config.in_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.insideRightLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
 	}
 #endif
 	
@@ -268,7 +326,71 @@ void SerializedSpineControl::onSetup(BaseSpineModelLearning& subject)
     {
 		m_config.outsideRightLength.push_back(stringList[i]->getStartLength());
 	}
+#else
+    stringList = subject.getMuscles("outer top");
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+        p_ipc = new tgImpedanceController(m_config.outsideTopTens[i], m_config.top_controller->getLengthStiffness(), m_config.top_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.outsideTopLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
+    }
+    
+    stringList = subject.getMuscles("outer left");
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+        p_ipc = new tgImpedanceController(m_config.outsideLeftTens[i], m_config.out_controller->getLengthStiffness(), m_config.out_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.outsideLeftLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
+    }
+    
+    stringList = subject.getMuscles("outer right");
+    for(std::size_t i = 0; i < stringList.size(); i++)
+    {
+            p_ipc = new tgImpedanceController(m_config.outsideRightTens[i], m_config.out_controller->getLengthStiffness(), m_config.out_controller->getVelStiffness());
+        
+        m_impedanceControllers.push_back(p_ipc);
+                pStringControl = new tgSCASineControl(0.0001,
+                                                p_ipc,
+                                                mPID,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                m_config.outsideRightLength[i]);
+                
+        tgKinematicActuator* kString = tgCast::cast<tgSpringCableActuator, tgKinematicActuator>(stringList[i]);
+                
+        kString->attach(pStringControl);
+        m_sineControllers.push_back(pStringControl);
+    }
 #endif
+
 }
 
 void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
@@ -289,7 +411,7 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 	
 	segments = subject.getSegments();
-#if (1)	
+#if (0)	
 	applyImpedanceControlGeneric(m_config.top_controller, 
 									subject.getMuscles("inner top"), 
 									m_config.insideTopLength, 
@@ -368,4 +490,17 @@ void SerializedSpineControl::onStep(BaseSpineModelLearning& subject, double dt)
 	//seg2Body->applyForce(-force / 2.0, marker4.getRelativePosition());
 }
     
-
+void SerializedSpineControl::onTeardown(BaseSpineModelLearning& subject)
+{
+     for(size_t i = 0; i < m_sineControllers.size(); i++)
+    {
+        delete m_sineControllers[i];
+    }
+    m_sineControllers.clear();   
+    
+     for(size_t i = 0; i < m_impedanceControllers.size(); i++)
+    {
+        delete m_impedanceControllers[i];
+    }
+    m_impedanceControllers.clear();
+}

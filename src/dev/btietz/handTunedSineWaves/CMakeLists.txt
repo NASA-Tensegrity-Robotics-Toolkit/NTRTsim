@@ -3,6 +3,7 @@ link_directories(${LIB_DIR})
 
 link_libraries(tetraSpineLearningSine
 				tetraSpineHardware
+				KinematicString
 				learningSpines
                 sensors
                 tgcreator

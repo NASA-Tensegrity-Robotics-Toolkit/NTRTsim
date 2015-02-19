@@ -22,11 +22,13 @@
 #include "core/tgCast.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
+#include "core/tgKinematicActuator.h"
 #include "core/tgString.h"
 #include "core/tgSphere.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -285,11 +287,33 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     
     // Two different string configs
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
-    spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));
+    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 2000.0, true, 5000, 7.0, 10.0, 10.0);
+    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 500.0, true, 5000, 7.0, 10.0, 10.0);
+    
+    const double elasticity = 229.16 * 2.0;
+    const double elasticity2 = 229.16;
+    const double damping = 20.0;
+    const double pretension = 1000.0;
+    const double pretension2 = 500.0;
+    const bool   history = true;
+    const double maxTens = 5000.0;
+    const double maxSpeed = 7.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 1000.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = true;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+    
+    tgKinematicActuator::Config motorConfig2(elasticity2, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+    
+    spec.addBuilder("top muscle", new tgKinematicActuatorInfo(motorConfig));
+    spec.addBuilder("left muscle", new tgKinematicActuatorInfo(motorConfig2));
+    spec.addBuilder("right muscle", new tgKinematicActuatorInfo(motorConfig2));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);

@@ -34,6 +34,7 @@
 #include "sensors/tgDataObserver.h"
 
 class tgSineStringControl;
+class tgSCASineControl;
 
 /**
  * Inherits from BaseSpineCPGControl, and overrides setupCPGs so
@@ -56,7 +57,7 @@ protected:
 	
 	virtual void setupWaves(BaseSpineModelLearning& subject);
 	
-	std::vector<tgSineStringControl*> m_sineControllers;
+	std::vector<tgSCASineControl*> m_sineControllers;
 	
 	tgDataObserver m_dataObserver;
 	
