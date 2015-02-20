@@ -113,6 +113,15 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, std::string filename);
 
+        /** Prints displacement of center of mass (x,y,z) from origin. Each dimension is space separated, all followed by a newline to stdout */
+        void printCOM(Escape_T6Model& subject);
+        
+        /** Prints each muscle's current tension in Newtons to stdout. Each tension is space separated. */ 
+        void printMuscleTensions(Escape_T6Model& subject);
+
+        /** Prints each muscle's current length in meters to stdout. Each length is space separated. */
+        void printMuscleLengths(Escape_T6Model& subject);
+
         void printSineParams();
 };
 
