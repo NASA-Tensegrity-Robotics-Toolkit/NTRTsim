@@ -45,6 +45,7 @@
 
 // The Bullet Physics library
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
 // The C++ Standard Library
 #include <stdexcept>
@@ -173,6 +174,9 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
     {
         tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere bottom right"); // 0
         tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere bottom left"); // 1
+//        tetra.addNode(bottomRight); // 0
+//        tetra.addNode(bottomLeft); // 1
+
         tetra.addNode(topBack); // 2
         tetra.addNode(topFront); // 3
     }
@@ -180,6 +184,9 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
     {
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
+
+//        tetra.addNode(topBack); // 2
+//        tetra.addNode(topFront); // 3
         tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere top back"); // 2
         tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere top front"); // 3
     }
@@ -325,8 +332,23 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     prismAxisBottom = prismAxisBottom.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
     prismAxisTop = prismAxisTop.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
 
-    const tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
-    const tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
+    tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
+    tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
+
+    if ((m_config.m_startRotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (45*SIMD_RADS_PER_DEG)) < 0.01)
+    {
+        prismAxisBottom = btVector3(0,1,0);
+        prismConfigBottom.m_axis = prismAxisBottom;
+        prismConfigBottom.m_rotation = M_PI/4.0;
+        prismConfigTop.m_rotation = 3.0*M_PI/4.0;
+    }
+    else if ((m_config.m_startRotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (-45*SIMD_RADS_PER_DEG)) < 0.01)
+    {
+        prismAxisBottom = btVector3(0,1,0);
+        prismConfigBottom.m_axis = prismAxisBottom;
+        prismConfigBottom.m_rotation = -M_PI/4.0;
+        prismConfigTop.m_rotation = M_PI/4.0;
+    }
 
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
 
@@ -485,6 +507,15 @@ void DuCTTRobotModel::setupVariables()
         {
             topTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
         }
+    }
+
+    if (m_IgnoredObjs.size() > 0)
+    {
+        for (size_t i=0; i<m_IgnoredObjs.size(); i++)
+        {
+            addIgnoredObject(m_IgnoredObjs[i], allTouchSensors);
+        }
+        m_IgnoredObjs.clear();
     }
 
     std::vector<tgPrismatic*> bottomPrisms = find<tgPrismatic>("prismatic bottom");
@@ -661,6 +692,26 @@ double DuCTTRobotModel::getTetraMass(bool bottom)
         totalMass += rods[i]->mass();
     }
     return totalMass;
+}
+
+bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj)
+{
+    if (allTouchSensors.size() > 0)
+    {
+        addIgnoredObject(obj, allTouchSensors);
+    }
+    else
+    {
+        m_IgnoredObjs.push_back(obj);
+    }
+}
+
+bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorSphereModel*> touchSensors)
+{
+    for (size_t i=0; i<touchSensors.size(); i++)
+    {
+        touchSensors[i]->addIgnoredObject(obj);
+    }
 }
 
 void DuCTTRobotModel::teardown()

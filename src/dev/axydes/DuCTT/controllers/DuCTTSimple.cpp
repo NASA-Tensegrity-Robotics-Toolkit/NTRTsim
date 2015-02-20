@@ -41,7 +41,7 @@
 #include <vector>
 
 DuCTTSimple::DuCTTSimple(double targetDist) :
-    impController(new tgImpedanceController(0.01, 500, 10)),
+    impController(new tgImpedanceController(1000, 500, 10)),
     simTime(0.0),
     offsetLength(0.5),
     cpgAmplitude(14.5),
@@ -83,7 +83,7 @@ bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereM
 //    prism->moveMotors(dt);
 
 //    return shouldPause(sensors);
-    return fabs(delta) < 0.1;
+    return fabs(delta) < 0.1 || shouldPause(sensors);
 }
 
 bool DuCTTSimple::moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt)
@@ -114,7 +114,7 @@ void DuCTTSimple::onStep(DuCTTRobotModel& subject, double dt)
         if (simTime < 5) return;
 
         std::cerr << "State: " << state << std::endl;
-        double maxStringLength = 10;
+        double maxStringLength = 16;
         double minStringLength = 4;
         switch(state)
         {
