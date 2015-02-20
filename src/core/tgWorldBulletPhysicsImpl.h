@@ -101,6 +101,7 @@ class tgWorldBulletPhysicsImpl : public tgWorldImpl
      * @param[in] pConstraint a pointer to a btTypedConstraint; do nothing if NULL
      */
         void addConstraint(btTypedConstraint* pConstaint);
+    btRigidBody* m_pGround;
 private:
 
     /**

@@ -104,6 +104,7 @@ private:
     int ductAxis;
 
     bool bSetup;
+    bool debug;
 };
 
 #endif  // APP_DUCTT

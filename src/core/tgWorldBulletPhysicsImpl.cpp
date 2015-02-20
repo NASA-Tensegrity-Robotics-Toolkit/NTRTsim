@@ -125,7 +125,8 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 	
 	if (!tgCast::cast<tgBulletGround, tgEmptyGround>(ground) && ground != NULL)
 	{
-		m_pDynamicsWorld->addRigidBody(ground->getGroundRigidBody());
+        m_pGround = ground->getGroundRigidBody();
+        m_pDynamicsWorld->addRigidBody(m_pGround);
 	}
 	
 	/*

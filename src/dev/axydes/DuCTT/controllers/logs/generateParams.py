@@ -58,6 +58,10 @@ def cutOuts(inFile, outFile):
     lowerThresh = mean - 2*std
     upperThresh = mean + 2*std
 
+    if mean <= 0:
+        upperThresh = np.max(dists)
+        lowerThresh = 0
+
     try:
         f = open(inFile, 'r')
         for line in f: 

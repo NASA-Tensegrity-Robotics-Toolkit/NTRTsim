@@ -26,6 +26,8 @@
 
 #include "AppDuCTTLearn.h"
 
+#include "core/tgWorldBulletPhysicsImpl.h"
+
 AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
 {
     bSetup = false;
@@ -34,7 +36,7 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     add_duct = false;
     use_manual_params = false;
 
-    timestep_physics = 1.0f/60.0f/10.0f;
+    timestep_physics = 1.0f/1000.0f;
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
@@ -74,7 +76,11 @@ bool AppDuCTTLearn::setup()
                 (startAngle*SIMD_RADS_PER_DEG)
                 );
     c.m_storeStringHist = true;
+    c.m_debug = debug;
     DuCTTRobotModel* myRobotModel = new DuCTTRobotModel(c);
+    tgWorldImpl& impl = world->implementation();
+    tgWorldBulletPhysicsImpl& bulletPhysicsImpl = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    myRobotModel->addIgnoredObject((btCollisionObject*)bulletPhysicsImpl.m_pGround);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
@@ -91,8 +97,8 @@ bool AppDuCTTLearn::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 45;
-        ductConfig.m_ductHeight = 45;
+        ductConfig.m_ductWidth = 32;
+        ductConfig.m_ductHeight = 32;
         ductConfig.m_distance = 10000;
         ductConfig.m_axis = ductAxis;
         switch(ductAxis)
@@ -143,12 +149,13 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 1")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
         ("rot_x", po::value<double>(&startRotX), "X Coordinate of starting rotation axis for robot. Default = 0")
+        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
         //Can only support rotation around the x axis for now.
-//        ("rot_y", po::value<double>(&startRotY), "Y Coordinate of starting rotation axis for robot. Default = 0")
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
+        ("debug,D", po::value<bool>(&debug)->implicit_value(true), "Debug flag, output debug information. Default = false")
     ;
 
     po::variables_map vm;

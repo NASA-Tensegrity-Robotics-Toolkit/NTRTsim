@@ -74,10 +74,12 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     musclesPerCluster(1),
     nPrisms(2),
     nActions(nClusters+nPrisms),
-    imp_controller(new tgImpedanceController(0.01, 500, 10)),
+    imp_controller(new tgImpedanceController(1000, 500, 10)),
     m_bBadRun(false),
     m_bIgnoreTouchSensors(true),
-    m_bRecordedStart(false)
+    m_bRecordedStart(false),
+    bottomCounter(0),
+    topCounter(0)
 {
     std::string path;
     if (resourcePath != "")
@@ -145,7 +147,14 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
     }
     m_totalTime+=dt;
 
-    if (m_totalTime < 5) return;
+    if (m_totalTime < 3)
+    {
+        if (isLocked(subject, false))
+        {
+            subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getActualLength());
+        }
+        return;
+    }
     else if (!m_bRecordedStart)
     {
         initPosition = subject.getCOM();
@@ -158,18 +167,6 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
     moveMotors(subject, dt);
 
     //TODO: check for bad run?
-
-    /** What is this?
-    for(int i=0; i<nActions; i++)
-    {
-        vector<double> tmp;
-        for(int j=0;j<2;j++)
-        {
-            tmp.push_back(0.5);
-        }
-        m_actions.push_back(tmp);
-    }
-    /**/
 }
 
 void DuCTTLearningController::moveMotors(DuCTTRobotModel &subject, double dt)
@@ -271,7 +268,7 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
     double touchParam;
     if (m_usingManualParams)
     {
-        touchParam = (manualParams[manualParams.size()-1]) < 0.5;
+        touchParam = (manualParams[manualParams.size()-1]);
     }
     else
     {
@@ -400,15 +397,35 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
 
 bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
 {
-    bool isLocked = false;
+    static const double maxSecs = 1.3;
+    static const double maxCount = maxSecs*1000;//1000Hz timestep
+
+    bool sPause = false;
     if (isTop)
     {
-        isLocked = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
+        sPause = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
+        topCounter++;
     }
     else
     {
-        isLocked = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
+        sPause = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
+        bottomCounter++;
     }
+    bool isLocked = false;
+    if (sPause)
+    {
+        if (isTop && topCounter > maxCount)
+        {
+            isLocked = true;
+            bottomCounter = 0;
+        }
+        else if (bottomCounter > maxCount)
+        {
+            isLocked = true;
+            topCounter = 0;
+        }
+    }
+
     return isLocked;
 }
 
@@ -473,8 +490,8 @@ double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
                                       (newZ-oldZ) * (newZ-oldZ)
                                     );
 //    return distanceMoved;
-//    return newY - oldY;
-    return fabs(newZ - oldZ);
+    return newY - oldY;
+//    return fabs(newZ - oldZ);
 }
                                          
 std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {
