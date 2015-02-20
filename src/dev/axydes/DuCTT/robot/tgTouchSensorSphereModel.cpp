@@ -138,7 +138,7 @@ void tgTouchSensorSphereModel::checkCollisions()
         btBroadphasePair* collisionPair = m_overlappingPairCache->getOverlappingPairCache()->findPair(pair.m_pProxy0,pair.m_pProxy1);
 
         btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
-                btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
+        btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
 
         if (collisionPair->m_algorithm)
             collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
@@ -193,6 +193,7 @@ void tgTouchSensorSphereModel::checkCollisions()
                             continue;
                         }
                         else{
+//                            std::cerr << "Contact normal: " << m_touchingNormal << std::endl;
 //                            std::cerr << "TouchSensor Contact!!!!!! " << rb->getCollisionShape()->getShapeType() << "\n";
                             m_bContact = true;
                         }

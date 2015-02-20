@@ -171,8 +171,8 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
             double goal = subject.getBottomPrismatic()->getMaxLength();
             double currPos = subject.getBottomPrismatic()->getActualLength();
             double delta = (goal-currPos) / (5.0);
-            std::cerr << "delta: " << delta << std::endl;
-            std::cerr << "curr goal: " << (currPos+delta) << std::endl;
+//            std::cerr << "delta: " << delta << std::endl;
+//            std::cerr << "curr goal: " << (currPos+delta) << std::endl;
             subject.getBottomPrismatic()->setPreferredLength(currPos + delta);
             return;
         }
@@ -181,7 +181,7 @@ void DuCTTSineWaves::onStep(DuCTTRobotModel& subject, double dt)
         {
             startCOM = subject.getCOM();
             recordedStartCOM = true;
-                subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
+            subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
         }
 
         btVector3 com = subject.getCOM();

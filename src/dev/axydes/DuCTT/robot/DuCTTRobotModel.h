@@ -46,6 +46,7 @@ class tgPrismatic;
 class tgRod;
 class tgSphere;
 class tgTouchSensorSphereModel;
+class btCollisionObject;
 
 /**
  * A class that constructs a three bar tensegrity DuCTT using the tools
@@ -235,6 +236,9 @@ public:
      */
     double getTetraMass(bool bottom = true);
 
+    bool addIgnoredObject(const btCollisionObject* obj);
+    bool addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorSphereModel*> touchSensors);
+
     std::vector<tgSphere*> spheres;
     std::vector<tgTouchSensorSphereModel*> allTouchSensors;
     std::vector<tgSphere*> bottomSpheres;
@@ -322,6 +326,7 @@ private:
 
     tgPrismatic *m_pBottomPrismatic;
     tgPrismatic *m_pTopPrismatic;
+    std::vector<const btCollisionObject*> m_IgnoredObjs;
 };
 
 #endif  // DuCTT_MODEL_H
