@@ -59,9 +59,11 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
 {
 	std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
     
+    tgPIDController::Config mPID(3.0, 0.5, 0.0, true); 
+    
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
-		tgCPGStringControl_mod* pStringControl = new tgCPGStringControl_mod();
+		tgCPGStringControl_mod* pStringControl = new tgCPGStringControl_mod(mPID);
         allMuscles[i]->attach(pStringControl);
         std::cout << allMuscles[i]->getTags() << std::endl;
         m_allControllers.push_back(pStringControl);

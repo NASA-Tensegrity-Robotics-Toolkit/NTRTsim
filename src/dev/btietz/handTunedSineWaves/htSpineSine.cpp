@@ -235,7 +235,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         // In Won's convention
         offset = amplitude;
         
-        tgPIDController::Config mPID(10000.0, 0.0, 0.0, true); 
+        tgPIDController::Config mPID(300.0, 50.0, 0.0, true); 
         
         tgSCASineControl* pStringControl = new tgSCASineControl(m_controlTime,
 																		p_ipc,

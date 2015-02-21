@@ -1,6 +1,7 @@
 link_directories(${LIB_DIR})
 
 link_libraries(tetraSpineHardware
+                CPG_feedback
 				learningSpines
                 sensors
                 tgcreator

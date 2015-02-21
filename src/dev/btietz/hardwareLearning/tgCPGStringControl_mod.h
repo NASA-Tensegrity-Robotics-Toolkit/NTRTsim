@@ -19,13 +19,13 @@
 #ifndef TG_CPG_STRING_CONTROL_MOD_H
 #define TG_CPG_STRING_CONTROL_MOD_H
 
-#include "examples/learningSpines/tgCPGActuatorControl.h"
+#include "dev/CPG_feedback/tgCPGCableControl.h"
 
-class tgCPGStringControl_mod : public tgCPGActuatorControl
+class tgCPGStringControl_mod : public tgCPGCableControl
 {
 public:
  
-    tgCPGStringControl_mod(const double controlStep = 1.0/10000.0);
+    tgCPGStringControl_mod(const tgPIDController::Config pid_config, const double controlStep = 1.0/10000.0);
     
     virtual ~tgCPGStringControl_mod();
     
