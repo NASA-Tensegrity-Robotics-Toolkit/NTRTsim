@@ -52,7 +52,7 @@ void tgCPGStringControl_mod::onStep(tgSpringCableActuator& subject, double dt)
     if (m_controlTime >= m_controlStep)
     {
 		// Encoder inversion for hardware comparison.
-		if (m_nodeNumber == 2 || m_nodeNumber == 4 || m_nodeNumber == 5 || m_nodeNumber == 6 || m_nodeNumber == 7 || m_nodeNumber == 8)//||m_nodeNumber == 9|| m_nodeNumber == 10 )
+		if (m_nodeNumber == 2 || m_nodeNumber == 4 || m_nodeNumber == 5 || m_nodeNumber == 6 || m_nodeNumber == 7 || m_nodeNumber == 9)//||m_nodeNumber == 9|| m_nodeNumber == 10 )
 		{
 			m_commandedTension = motorControl().control(*m_PID, dt, controlLength(), -getCPGValue());
 		}
