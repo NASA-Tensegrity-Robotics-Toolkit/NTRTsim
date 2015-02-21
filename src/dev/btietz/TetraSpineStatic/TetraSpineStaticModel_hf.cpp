@@ -301,7 +301,7 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
 
     const double mRad = 1.27;
     const double motorFriction = 0.65;
-    const double motorInertia = 0.0065 * 52;
+    const double motorInertia = 0.012;
     const bool backDrivable = false;
     tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,

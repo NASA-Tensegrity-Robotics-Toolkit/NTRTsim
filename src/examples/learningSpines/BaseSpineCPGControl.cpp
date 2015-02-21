@@ -44,7 +44,7 @@
 #include "util/CPGEquations.h"
 #include "util/CPGNode.h"
 
-//#define LOGGING
+#define LOGGING
 
 using namespace std;
 

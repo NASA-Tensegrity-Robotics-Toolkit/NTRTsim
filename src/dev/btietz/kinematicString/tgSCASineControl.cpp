@@ -81,6 +81,7 @@ void tgSCASineControl::onStep(tgSpringCableActuator& subject, double dt)
         target = cycle*cpgAmplitude + offsetSpeed;
 
 	    // dt is just passed through to PID controller	
+        
 		m_commandedTension = m_pMotorControl->control(*m_PIDController, dt, m_controlLength, target);
 		//std::cout << m_commandedTension << std::endl;
         m_controlTime = 0;
