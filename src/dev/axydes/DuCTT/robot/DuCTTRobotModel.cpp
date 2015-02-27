@@ -27,7 +27,7 @@
 #include "tgDuCTTHingeInfo.h"
 #include "tgPrismaticInfo.h"
 #include "tgTouchSensorSphereInfo.h"
-#include "tgTouchSensorSphereModel.h"
+#include "tgTouchSensorModel.h"
 
 // The NTRT Core Libary
 #include "core/abstractMarker.h"
@@ -478,11 +478,11 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgBasicActuator>("saddle string");
 
     spheres = find<tgSphere>("sphere");
-    allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
+    allTouchSensors = find<tgTouchSensorModel>("sphere");
     bottomSpheres = find<tgSphere>("sphere bottom");
     topSpheres = find<tgSphere>("sphere top");
-    bottomTouchSensors = find<tgTouchSensorSphereModel>("sphere bottom");
-    topTouchSensors = find<tgTouchSensorSphereModel>("sphere top");
+    bottomTouchSensors = find<tgTouchSensorModel>("sphere bottom");
+    topTouchSensors = find<tgTouchSensorModel>("sphere top");
 
     //attach touch sensors to the appropriate spheres on the actual robot model
     //add the appropriate rods to the touch sensor ignore list
@@ -595,7 +595,7 @@ const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const
     return allPrisms;
 }
 
-const std::vector<tgTouchSensorSphereModel*>& DuCTTRobotModel::getAllTouchSensors() const
+const std::vector<tgTouchSensorModel*>& DuCTTRobotModel::getAllTouchSensors() const
 {
     return allTouchSensors;
 }
@@ -706,7 +706,7 @@ bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj)
     }
 }
 
-bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorModel*> touchSensors)
 {
     for (size_t i=0; i<touchSensors.size(); i++)
     {

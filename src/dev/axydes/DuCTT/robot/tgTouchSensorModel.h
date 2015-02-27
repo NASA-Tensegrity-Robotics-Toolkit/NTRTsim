@@ -16,11 +16,11 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_TOUCH_SENSOR_SPHERE_MODEL_H
-#define TG_TOUCH_SENSOR_SPHERE_MODEL_H
+#ifndef TG_TOUCH_SENSOR_MODEL_H
+#define TG_TOUCH_SENSOR_MODEL_H
 
 /**
- * @file tgTouchSensorSphereModel.h
+ * @file tgTouchSensorModel.h
  * @brief Like tgBaseRigid, but uses btPairCachingGhostObject instead
  * @author Brian Mirletz
  * @date October 2014
@@ -49,16 +49,16 @@ class abstractMarker;
  * It could be used to keep additional functions away from MuscleNP in the future,
  * by holding pointers to the dispatcher and similar
  */
-class tgTouchSensorSphereModel : public tgModel
+class tgTouchSensorModel : public tgModel
 {
 public:
 	
-    tgTouchSensorSphereModel(btPairCachingGhostObject* pGhostObject,
+    tgTouchSensorModel(btPairCachingGhostObject* pGhostObject,
                             tgWorld& world,
                             const tgTags& tags);
 	
     /** A class with a virtual memeber function requires a virtual destructor. */
-    virtual ~tgTouchSensorSphereModel();
+    virtual ~tgTouchSensorModel();
     
     virtual void teardown();
     

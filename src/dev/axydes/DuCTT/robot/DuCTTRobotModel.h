@@ -45,7 +45,7 @@ class tgBasicActuator;
 class tgPrismatic;
 class tgRod;
 class tgSphere;
-class tgTouchSensorSphereModel;
+class tgTouchSensorModel;
 class btCollisionObject;
 
 /**
@@ -198,7 +198,7 @@ public:
      * Return a vector of all touch sensors for the controllers to work with.
      * @return A vector of all of the touch sensors
      */
-    const std::vector<tgTouchSensorSphereModel*>& getAllTouchSensors() const;
+    const std::vector<tgTouchSensorModel*>& getAllTouchSensors() const;
 
     /**
      * @return the bottom tetra's prismatic actuator
@@ -237,14 +237,14 @@ public:
     double getTetraMass(bool bottom = true);
 
     bool addIgnoredObject(const btCollisionObject* obj);
-    bool addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorSphereModel*> touchSensors);
+    bool addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorModel*> touchSensors);
 
     std::vector<tgSphere*> spheres;
-    std::vector<tgTouchSensorSphereModel*> allTouchSensors;
+    std::vector<tgTouchSensorModel*> allTouchSensors;
     std::vector<tgSphere*> bottomSpheres;
-    std::vector<tgTouchSensorSphereModel*> bottomTouchSensors;
+    std::vector<tgTouchSensorModel*> bottomTouchSensors;
     std::vector<tgSphere*> topSpheres;
-    std::vector<tgTouchSensorSphereModel*> topTouchSensors;
+    std::vector<tgTouchSensorModel*> topTouchSensors;
 
 private:
     /**

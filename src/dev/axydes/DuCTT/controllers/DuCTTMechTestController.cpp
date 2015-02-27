@@ -29,7 +29,7 @@
 // Its subject
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
-#include "../robot/tgTouchSensorSphereModel.h"
+#include "../robot/tgTouchSensorModel.h"
 
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"

@@ -38,7 +38,7 @@
 // Forward declarations
 class tgBasicActuator;
 class tgPrismatic;
-class tgTouchSensorSphereModel;
+class tgTouchSensorModel;
 class DuCTTRobotModel;
 class tgImpedanceController;
 
@@ -53,8 +53,8 @@ public:
     virtual void onTeardown(DuCTTRobotModel& subject);
 
     void applySineWave(tgPrismatic* prism, bool shouldPause, bool shouldUnPause, double dt, int phase=0);
-    bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
-    bool checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top);
+    bool shouldPause(std::vector<tgTouchSensorModel*> touchSensors);
+    bool checkPause(std::vector<tgTouchSensorModel*> touchSensors, bool top);
 
     /**
      * Applies the impedance controllers using a velocity setpoint of 0.

@@ -29,7 +29,7 @@
 // Its subject
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
-#include "../robot/tgTouchSensorSphereModel.h"
+#include "../robot/tgTouchSensorModel.h"
 
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"
@@ -52,7 +52,7 @@ DuCTTSimple::DuCTTSimple(double targetDist) :
 {
 }
 
-bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorModel*> touchSensors)
 {
     bool shouldPause = true;
 
@@ -64,7 +64,7 @@ bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensor
     return shouldPause;
 }
 
-bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereModel*> sensors, double goal, double dt)
+bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorModel*> sensors, double goal, double dt)
 {
     double currPos = prism->getActualLength();
     double delta = (goal-currPos);

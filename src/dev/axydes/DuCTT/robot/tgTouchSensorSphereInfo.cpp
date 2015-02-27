@@ -27,7 +27,7 @@
 // This module
 #include "tgTouchSensorSphereInfo.h"
 // This application
-#include "tgTouchSensorSphereModel.h"
+#include "tgTouchSensorModel.h"
 
 // The NTRT Core Libary
 #include "core/abstractMarker.h"
@@ -117,7 +117,7 @@ tgModel* tgTouchSensorSphereInfo::createModel(tgWorld& world)
     
     btPairCachingGhostObject* ghostObject = tgCast::cast<btCollisionObject, btPairCachingGhostObject> (getCollisionObject());
     
-    tgTouchSensorSphereModel* slimer = new tgTouchSensorSphereModel(ghostObject, world, getTags());
+    tgTouchSensorModel* slimer = new tgTouchSensorModel(ghostObject, world, getTags());
 
     return slimer;
 }

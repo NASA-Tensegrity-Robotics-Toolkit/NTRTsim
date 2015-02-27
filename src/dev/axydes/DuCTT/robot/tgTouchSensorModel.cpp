@@ -17,14 +17,14 @@
 */
 
 /**
- * @file tgTouchSensorSphereModel.cpp
+ * @file tgTouchSensorModel.cpp
  * @brief Contains the definitions of members of class tgRod
  * @author Brian Mirletz and Ryan Adams
  * $Id$
  */
 
 // This module
-#include "tgTouchSensorSphereModel.h"
+#include "tgTouchSensorModel.h"
 
 // The NTRT Core library
 #include "core/tgBulletUtil.h"
@@ -50,7 +50,7 @@
 #include <cassert>
 #include <stdexcept>
 
-tgTouchSensorSphereModel::tgTouchSensorSphereModel(btPairCachingGhostObject* pGhostObject,
+tgTouchSensorModel::tgTouchSensorModel(btPairCachingGhostObject* pGhostObject,
     tgWorld& world,
     const tgTags& tags) :
 tgModel(tags),
@@ -70,24 +70,24 @@ m_bContact(false)
     assert(m_pGhostObject == pGhostObject);
 }
 
-tgTouchSensorSphereModel::~tgTouchSensorSphereModel()
+tgTouchSensorModel::~tgTouchSensorModel()
 {
     btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
     dynamicsWorld.removeCollisionObject(m_pGhostObject);
     delete m_pGhostObject;
 }
 
-void tgTouchSensorSphereModel::teardown()
+void tgTouchSensorModel::teardown()
 {
     tgModel::teardown();
 }
 
-void tgTouchSensorSphereModel::onVisit(const tgModelVisitor& v) const
+void tgTouchSensorModel::onVisit(const tgModelVisitor& v) const
 {
 //    v.render(*this);
 }
 
-void tgTouchSensorSphereModel::step(double dt)
+void tgTouchSensorModel::step(double dt)
 {
     if (dt <= 0.0)
     {
@@ -109,7 +109,7 @@ void tgTouchSensorSphereModel::step(double dt)
     }
 }
 
-void tgTouchSensorSphereModel::updatePosition()
+void tgTouchSensorModel::updatePosition()
 {
     m_bContact = false;
     std::vector<abstractMarker> markers = getMarkers();
@@ -117,7 +117,7 @@ void tgTouchSensorSphereModel::updatePosition()
         m_pGhostObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
 }
 
-void tgTouchSensorSphereModel::checkCollisions()
+void tgTouchSensorModel::checkCollisions()
 {
     btManifoldArray	m_manifoldArray;
     btVector3 m_touchingNormal;
@@ -205,7 +205,7 @@ void tgTouchSensorSphereModel::checkCollisions()
     }
 }
 
-bool tgTouchSensorSphereModel::isRBIgnored(const btCollisionObject *_rb)
+bool tgTouchSensorModel::isRBIgnored(const btCollisionObject *_rb)
 {
     if (_rb == m_pGhostObject) return true;
     for (size_t i=0; i<m_IgnoredObjects.size(); i++)
@@ -215,33 +215,33 @@ bool tgTouchSensorSphereModel::isRBIgnored(const btCollisionObject *_rb)
     }
 }
 
-btPairCachingGhostObject* tgTouchSensorSphereModel::getPGhostObject()
+btPairCachingGhostObject* tgTouchSensorModel::getPGhostObject()
 {
     return m_pGhostObject;
 }
 
-std::vector<const btCollisionObject*> tgTouchSensorSphereModel::getIgnoredObjects()
+std::vector<const btCollisionObject*> tgTouchSensorModel::getIgnoredObjects()
 {
     return m_IgnoredObjects;
 }
 
-void tgTouchSensorSphereModel::addIgnoredObject(const btCollisionObject *_objToIgnore)
+void tgTouchSensorModel::addIgnoredObject(const btCollisionObject *_objToIgnore)
 {
     m_IgnoredObjects.push_back(_objToIgnore);
 }
 
-void tgTouchSensorSphereModel::addMarker(abstractMarker &_a)
+void tgTouchSensorModel::addMarker(abstractMarker &_a)
 {
     tgModel::addMarker(_a);
     addIgnoredObject(_a.getAttachedBody());
 }
 
-bool tgTouchSensorSphereModel::isTouching()
+bool tgTouchSensorModel::isTouching()
 {
     return m_bContact;
 }
 
-btVector3 tgTouchSensorSphereModel::centerOfMass() const
+btVector3 tgTouchSensorModel::centerOfMass() const
 {
   btTransform transform = m_pGhostObject->getWorldTransform();
   const btVector3& result = transform.getOrigin();
@@ -250,7 +250,7 @@ btVector3 tgTouchSensorSphereModel::centerOfMass() const
   return result;
 }
 
-bool tgTouchSensorSphereModel::invariant() const
+bool tgTouchSensorModel::invariant() const
 {
   return
     (m_pGhostObject != NULL);
