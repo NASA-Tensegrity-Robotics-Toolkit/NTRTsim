@@ -91,8 +91,8 @@ bool AppDuCTT::setup()
         DuctStraightModel::Config ductConfig;
 //        ductConfig.m_ductWidth = 33;
 //        ductConfig.m_ductHeight = 33;
-        ductConfig.m_ductWidth = 46;
-        ductConfig.m_ductHeight = 46;
+        ductConfig.m_ductWidth = 42;
+        ductConfig.m_ductHeight = 42;
         ductConfig.m_distance = 10000;
         ductConfig.m_axis = ductAxis;
         switch(ductAxis)

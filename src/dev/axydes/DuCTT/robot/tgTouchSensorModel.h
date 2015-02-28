@@ -32,6 +32,7 @@
 
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 
 // The C++ Standard Library
 #include <vector>

@@ -94,14 +94,32 @@ void tgTouchSensorRodInfo::initRigidBody(tgWorld& world)
 	
             ghostObject->setCollisionShape(shape);
 			ghostObject->setWorldTransform(transform);
+//            std::cout << "GhostInit transform: " << transform << std::endl;
 			ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			
 			// @todo look up what the second and third arguments of this are
 			m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 			
             rigid->setCollisionObject(ghostObject);
-		}
-	}
+//            fprintf(stderr,"tgTouchSensorRodInfo::%s() created ghost\n", __FUNCTION__);
+        }
+//        else
+//        {
+//            fprintf(stderr,"tgTouchSensorRodInfo::%s() inner Collision Object is NOT null\n", __FUNCTION__);
+//        }
+    }
+//    else
+//    {
+//        fprintf(stderr,"tgTouchSensorRodInfo::%s() Collision Object is NOT null\n", __FUNCTION__);
+//        tgRigidInfo* rigid = getRigidInfoGroup();
+
+//        std::set<btVector3> nodes = rigid->getContainedNodes();
+//        std::set<btVector3>::iterator it;
+//        for (it=nodes.begin(); it!=nodes.end(); it++)
+//        {
+//            std::cerr << *it << std::endl;
+//        }
+//    }
 }
 
 tgModel* tgTouchSensorRodInfo::createModel(tgWorld& world)

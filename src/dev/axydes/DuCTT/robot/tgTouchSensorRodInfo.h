@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TG_TOUCH_SENSOR_SPHERE_INFO_H
-#define TG_TOUCH_SENSOR_SPHERE_INFO_H
+#ifndef TG_TOUCH_SENSOR_ROD_INFO_H
+#define TG_TOUCH_SENSOR_ROD_INFO_H
 
 /**
  * @file tgTouchSensorRodInfo.h

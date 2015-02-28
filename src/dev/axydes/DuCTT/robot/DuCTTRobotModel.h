@@ -239,11 +239,8 @@ public:
     bool addIgnoredObject(const btCollisionObject* obj);
     bool addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorModel*> touchSensors);
 
-    std::vector<tgSphere*> spheres;
     std::vector<tgTouchSensorModel*> allTouchSensors;
-    std::vector<tgSphere*> bottomSpheres;
     std::vector<tgTouchSensorModel*> bottomTouchSensors;
-    std::vector<tgSphere*> topSpheres;
     std::vector<tgTouchSensorModel*> topTouchSensors;
 
 private:
@@ -271,12 +268,14 @@ private:
      * @param[in] width: the Z distance of the base triangle
      * @param[in] height: the Y distance along the axis of the DuCTT
      */
-    static void addNodes(tgStructure& tetra,
+    void addNodes(tgStructure& tetra,
                             double edge,
                             double width,
                             double height,
+                            bool isGhost = false,
                             double distBtHinges = 0.1,
-                            double distBtNodes = 0.1);
+                            double distBtNodes = 0.1
+                  );
 
     /**
      * A function called during setup that creates rods from the
@@ -284,7 +283,7 @@ private:
      * @param[in] s A tgStructure that we're building into
      * @param[in] startNode Number of node to start with
      */
-    static void addRods(tgStructure& s, int startNode = 0);
+    static void addPairs(tgStructure& s, int startNode = 0);
     
     /**
      * A function called during setup that creates muscles (Strings) from

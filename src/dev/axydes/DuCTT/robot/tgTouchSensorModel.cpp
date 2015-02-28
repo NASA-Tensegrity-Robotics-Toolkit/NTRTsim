@@ -101,7 +101,7 @@ void tgTouchSensorModel::step(double dt)
 
         if (m_bContact)
         {
-//            std::cerr << toString() << std::endl;
+//            std::cerr << "Touch Sensor contact: " << toString() << std::endl;
         }
         else
         {
@@ -114,7 +114,14 @@ void tgTouchSensorModel::updatePosition()
     m_bContact = false;
     std::vector<abstractMarker> markers = getMarkers();
     if (markers.size() == 1)
-        m_pGhostObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
+    {
+        btTransform ghostTransform = m_pGhostObject->getWorldTransform();
+//        btQuaternion diff = ghostTransform.getRotation() - m_rotationOffset;
+//        btQuaternion diff = ghostTransform.getRotation() - btQuaternion();
+//        m_pGhostObject->setWorldTransform(btTransform(btQuaternion::getIdentity(),markers[0].getWorldPosition()));
+        m_pGhostObject->setWorldTransform(btTransform(ghostTransform.getRotation(),markers[0].getWorldPosition()));
+//        m_pGhostObject->setWorldTransform(btTransform(ghostTransform.getRotation()-diff,markers[0].getWorldPosition()));
+    }
 }
 
 void tgTouchSensorModel::checkCollisions()

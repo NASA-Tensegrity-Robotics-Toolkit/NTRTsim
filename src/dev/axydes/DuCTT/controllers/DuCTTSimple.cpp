@@ -58,7 +58,11 @@ bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorModel*> touchSensors)
 
     for (size_t i=0; i<touchSensors.size(); i++)
     {
-        if (!touchSensors[i]->isTouching()) shouldPause = false;
+        if (!touchSensors[i]->isTouching())
+        {
+//            std::cout << "Touch sensor not touching: " << touchSensors[i]->toString() << std::endl;
+            shouldPause = false;
+        }
     }
 
     return shouldPause;
@@ -83,7 +87,16 @@ bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorModel*>
 //    prism->moveMotors(dt);
 
 //    return shouldPause(sensors);
-    return fabs(delta) < 0.1 || shouldPause(sensors);
+    bool pause = false;
+    static int pauseCount = 0;
+    pauseCount += shouldPause(sensors);
+    if (pauseCount > 500)
+    {
+        pauseCount = 0;
+        pause = true;
+    }
+
+    return fabs(delta) < 0.1 || pause;
 }
 
 bool DuCTTSimple::moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt)
