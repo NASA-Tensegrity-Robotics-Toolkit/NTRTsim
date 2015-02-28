@@ -26,8 +26,9 @@
 #include "DuCTTRobotModel.h"
 #include "tgDuCTTHingeInfo.h"
 #include "tgPrismaticInfo.h"
+#include "tgTouchSensorRodInfo.h"
 #include "tgTouchSensorSphereInfo.h"
-#include "tgTouchSensorSphereModel.h"
+#include "tgTouchSensorModel.h"
 
 // The NTRT Core Libary
 #include "core/abstractMarker.h"
@@ -132,8 +133,10 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
                             double edge,
                             double distance,
                             double height,
+                            bool isGhost,
                             double distBtHinges,
-                            double distBtNodes)
+                            double distBtNodes
+                               )
 {
     //Main nodes
     btVector3 bottomRight = btVector3(edge/2.0, distance, 0);
@@ -148,6 +151,25 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     btVector3 topMidFront = btVector3(0, distance+height, 0.01);
     btVector3 topMidBack = btVector3(0, distance+height, -0.01);
+
+    //touch sensor rod nodes
+    btVector3 bottomRightTouch = bottomRight;
+    bottomRightTouch.setX(bottomRight.x()+m_config.m_tipRad);
+    btVector3 bottomLeftTouch = bottomLeft;
+    bottomLeftTouch.setX(bottomLeft.x()-m_config.m_tipRad);
+
+    btVector3 topFrontTouch = topFront;
+    topFrontTouch.setZ(topFront.z()+m_config.m_tipRad);
+    btVector3 topBackTouch = topBack;
+    topBackTouch.setZ(topBack.z()-m_config.m_tipRad);
+
+    if (isGhost)
+    {
+        bottomRightTouch.setX(bottomRightTouch.x()+0.01);
+        bottomLeftTouch.setX(bottomLeftTouch.x()-0.01);
+        topFrontTouch.setZ(topFrontTouch.z()+0.01);
+        topBackTouch.setZ(topBackTouch.z()-0.01);
+    }
 
     //bottom Hinge nodes
     btVector3 RightFrontSlope = topFront - bottomRight;
@@ -172,10 +194,10 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     if (distance == 0)
     {
-        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere bottom right"); // 0
-        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere bottom left"); // 1
-//        tetra.addNode(bottomRight); // 0
-//        tetra.addNode(bottomLeft); // 1
+//        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere bottom right"); // 0
+//        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere bottom left"); // 1
+        tetra.addNode(bottomRight); // 0
+        tetra.addNode(bottomLeft); // 1
 
         tetra.addNode(topBack); // 2
         tetra.addNode(topFront); // 3
@@ -185,10 +207,10 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
 
-//        tetra.addNode(topBack); // 2
-//        tetra.addNode(topFront); // 3
-        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere top back"); // 2
-        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere top front"); // 3
+        tetra.addNode(topBack); // 2
+        tetra.addNode(topFront); // 3
+//        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere top back"); // 2
+//        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere top front"); // 3
     }
 
     tetra.addNode(bottomMidRight); // 4
@@ -208,9 +230,15 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     tetra.addNode(topRightBack); // 14
     tetra.addNode(topLeftBack); // 15
+
+    //touch sensor nodes
+    tetra.addNode(bottomRightTouch); // 16
+    tetra.addNode(bottomLeftTouch); // 17
+    tetra.addNode(topBackTouch); // 18
+    tetra.addNode(topFrontTouch); // 19
 }
 
-void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
+void DuCTTRobotModel::addPairs(tgStructure& s, int startNode)
 {
     std::string tetra = " bottom";
     if (startNode != 0)
@@ -233,7 +261,6 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
 
         //top rods
         s.addPair( startNode+2, startNode+3, "inner rod"+tetra);
-//        s.addPair( startNode+2, startNode+3, "static rod"+tetra);
 
         s.addPair( startNode+4, startNode+5, "prismatic"+tetra);
 
@@ -252,6 +279,10 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         //top back hinges
         s.addPair( startNode+2, startNode+14, "hinge3"+tetra);
         s.addPair( startNode+2, startNode+15, "hinge3"+tetra);
+
+        //touch sensor rods
+        s.addPair( startNode+16, startNode+0, "right touch rod"+tetra);
+        s.addPair( startNode+1, startNode+17, "left touch rod"+tetra);
     }
     else
     {
@@ -280,6 +311,10 @@ void DuCTTRobotModel::addRods(tgStructure& s, int startNode)
         //top back hinges
         s.addPair( startNode+2, startNode+14, "hinge2"+tetra);
         s.addPair( startNode+2, startNode+15, "hinge2"+tetra);
+
+        //touch sensor rods
+        s.addPair( startNode+18, startNode+2, "back touch rod"+tetra);
+        s.addPair( startNode+3, startNode+19, "front touch rod"+tetra);
     }
 }
 
@@ -318,6 +353,7 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config prismRodConfig(m_config.m_prismRadius, m_config.m_prismDensity);
     const tgRod::Config vertRodConfig(m_config.m_vertRodRadius, m_config.m_vertDensity);
     const tgRod::Config innerRodConfig(m_config.m_innerRodRadius, m_config.m_innerDensity);
+    const tgRod::Config touchRodConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
 
     const tgBasicActuator::Config vertStringConfig(m_config.m_stiffness, m_config.m_damping, m_config.m_pretension,
                                                   m_config.m_storeStringHist, m_config.m_maxStringForce, m_config.m_maxVertStringVel,
@@ -356,6 +392,7 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     const tgRod::Config staticPrismRodConfig(m_config.m_prismRadius, 0);
     const tgRod::Config staticVertRodConfig(m_config.m_vertRodRadius, 0);
     const tgRod::Config staticInnerRodConfig(m_config.m_innerRodRadius, 0);
+    const tgRod::Config staticTouchRodConfig(m_config.m_tipRad, 0, m_config.m_tipFric);
     const tgSphere::Config topsphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
     const tgSphere::Config botsphereConfig(m_config.m_tipRad, 0, m_config.m_tipFric, 0, 0.01);
 
@@ -378,16 +415,16 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height);
 
     // Add rods to the bottom tetrahedron
-    addRods(s);
+    addPairs(s);
 
     // Add nodes to top tetrahedron
     addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height);
 
     // Add rods to the top tetrahedron
-    addRods(s, 16);
+    addPairs(s, 20);
 
     // Add muscles to the structure
-    addMuscles(s, 16);
+    addMuscles(s, 20);
 
     // Move the structure so it doesn't start in the ground
     s.addRotation(btVector3(0,0,0), m_config.m_startRotAxis, m_config.m_startRotAngle);
@@ -395,9 +432,10 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("prism rod", new tgRodInfo(prismRodConfig));
-    spec.addBuilder("vert rod", new tgRodInfo(vertRodConfig));
-    spec.addBuilder("inner rod", new tgRodInfo(innerRodConfig));
+    spec.addBuilder("prism rod ", new tgRodInfo(prismRodConfig));
+    spec.addBuilder("vert rod ", new tgRodInfo(vertRodConfig));
+    spec.addBuilder("inner rod ", new tgRodInfo(innerRodConfig));
+    spec.addBuilder("touch", new tgRodInfo(touchRodConfig));
 
     spec.addBuilder("vert string", new tgBasicActuatorInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgBasicActuatorInfo(saddleStringConfig));
@@ -405,12 +443,13 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
     spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
 
-    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+//    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
 
     //used for mechanical test & validation
-//    spec.addBuilder("prism rod", new tgRodInfo(staticPrismRodConfig));
-//    spec.addBuilder("vert rod", new tgRodInfo(staticVertRodConfig));
-//    spec.addBuilder("inner rod", new tgRodInfo(staticInnerRodConfig));
+//    spec.addBuilder("prism rod ", new tgRodInfo(staticPrismRodConfig));
+//    spec.addBuilder("vert rod ", new tgRodInfo(staticVertRodConfig));
+//    spec.addBuilder("inner rod ", new tgRodInfo(staticInnerRodConfig));
+//    spec.addBuilder("touch", new tgRodInfo(staticTouchRodConfig));
 //    spec.addBuilder("top sphere", new tgSphereInfo(topsphereConfig));
 //    spec.addBuilder("bottom sphere", new tgSphereInfo(botsphereConfig));
 
@@ -437,16 +476,21 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
 
 void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
 {
+    const tgRod::Config touchRodConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric);
     const tgSphere::Config sphereConfig(m_config.m_tipRad, m_config.m_tipDens, m_config.m_tipFric, 0, 0.01);
 
     // Create a structure that will hold the details of this model
     tgStructure s;
 
     // Add nodes to the bottom tetrahedron
-    addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height);
+    addNodes(s, m_config.m_triangle_length, 0, m_config.m_duct_height, true);
+
+    addPairs(s);
 
     // Add nodes to top tetrahedron
-    addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height);
+    addNodes(s, m_config.m_triangle_length, m_config.m_duct_distance, m_config.m_duct_height, true);
+
+    addPairs(s,20);
 
     // Move the structure so it doesn't start in the ground
     s.move(m_config.m_startPos);
@@ -454,7 +498,8 @@ void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
+    spec.addBuilder("touch", new tgTouchSensorRodInfo(touchRodConfig));
+//    spec.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -477,19 +522,21 @@ void DuCTTRobotModel::setupVariables()
     vertMuscles = find<tgBasicActuator>("vert string");
     saddleMuscles = find<tgBasicActuator>("saddle string");
 
-    spheres = find<tgSphere>("sphere");
-    allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
-    bottomSpheres = find<tgSphere>("sphere bottom");
-    topSpheres = find<tgSphere>("sphere top");
-    bottomTouchSensors = find<tgTouchSensorSphereModel>("sphere bottom");
-    topTouchSensors = find<tgTouchSensorSphereModel>("sphere top");
+    allTouchSensors = find<tgTouchSensorModel>("touch");
+    std::vector<tgRod*> bottomTouchRods = find<tgRod>("touch rod bottom");
+    std::vector<tgRod*> topTouchRods = find<tgRod>("touch rod top");
+    bottomTouchSensors = find<tgTouchSensorModel>("touch rod bottom");
+    topTouchSensors = find<tgTouchSensorModel>("touch rod top");
 
-    //attach touch sensors to the appropriate spheres on the actual robot model
+    //attach touch sensors to the appropriate rods on the actual robot model
     //add the appropriate rods to the touch sensor ignore list
     for (size_t i=0; i<bottomTouchSensors.size(); i++)
     {
-        btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomSpheres[i]->centerOfMass();
-        abstractMarker marker (bottomSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        if (m_config.m_debug)
+            std::cerr << bottomTouchSensors[i]->toString() << std::endl;
+
+        btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomTouchRods[i]->centerOfMass();
+        abstractMarker marker (bottomTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         addMarker(marker);
         bottomTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<bottomRods.size(); j++)
@@ -499,8 +546,11 @@ void DuCTTRobotModel::setupVariables()
     }
     for (size_t i=0; i<topTouchSensors.size(); i++)
     {
-        btVector3 offset = topTouchSensors[i]->centerOfMass() - topSpheres[i]->centerOfMass();
-        abstractMarker marker (topSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+        if (m_config.m_debug)
+            std::cerr << topTouchSensors[i]->toString() << std::endl;
+
+        btVector3 offset = topTouchSensors[i]->centerOfMass() - topTouchRods[i]->centerOfMass();
+        abstractMarker marker (topTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
         addMarker(marker);
         topTouchSensors[i]->addMarker(marker);
         for (size_t j=0; j<topRods.size(); j++)
@@ -542,7 +592,7 @@ void DuCTTRobotModel::setupVariables()
 
     if (m_config.m_debug)
     {
-        std::cout << "Num rod s: " << allRods.size() << std::endl;
+        std::cout << "Num rods: " << allRods.size() << std::endl;
         double totalMass = 0;
         for (size_t i=0; i<allRods.size(); i++)
         {
@@ -595,7 +645,7 @@ const std::vector<tgPrismatic*>& DuCTTRobotModel::getAllPrismatics() const
     return allPrisms;
 }
 
-const std::vector<tgTouchSensorSphereModel*>& DuCTTRobotModel::getAllTouchSensors() const
+const std::vector<tgTouchSensorModel*>& DuCTTRobotModel::getAllTouchSensors() const
 {
     return allTouchSensors;
 }
@@ -706,7 +756,7 @@ bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj)
     }
 }
 
-bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTRobotModel::addIgnoredObject(const btCollisionObject* obj, std::vector<tgTouchSensorModel*> touchSensors)
 {
     for (size_t i=0; i<touchSensors.size(); i++)
     {
@@ -727,10 +777,7 @@ void DuCTTRobotModel::teardown()
     bottomRods.clear();
     topRods.clear();
     prismRods.clear();
-    spheres.clear();
-    bottomSpheres.clear();
-    topSpheres.clear();
     allTouchSensors.clear();
-    bottomSpheres.clear();
+    bottomTouchSensors.clear();
     topTouchSensors.clear();
 }

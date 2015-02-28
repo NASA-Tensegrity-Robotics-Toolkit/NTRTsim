@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgTouchSensorSphereInfo.cpp
- * @brief Contains the definitions of members of class tgTouchSensorSphereInfo
+ * @file tgTouchSensorRodInfo.cpp
+ * @brief Contains the definitions of members of class tgTouchSensorRodInfo
  * @author Alexander Xydes
  * @date November 2014
  * $Id$
  */
 
 // This module
-#include "tgTouchSensorSphereInfo.h"
+#include "tgTouchSensorRodInfo.h"
 // This application
 #include "tgTouchSensorModel.h"
 
@@ -47,28 +47,28 @@
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "LinearMath/btVector3.h"
 
-tgTouchSensorSphereInfo::tgTouchSensorSphereInfo(const tgSphere::Config& config) :
-    tgSphereInfo(config)
+tgTouchSensorRodInfo::tgTouchSensorRodInfo(const tgRod::Config& config) :
+    tgRodInfo(config)
 {}
 
-tgTouchSensorSphereInfo::tgTouchSensorSphereInfo(const tgSphere::Config& config, tgTags tags) :
-    tgSphereInfo(config, tags)
+tgTouchSensorRodInfo::tgTouchSensorRodInfo(const tgRod::Config& config, tgTags tags) :
+    tgRodInfo(config, tags)
 {}
 
-tgTouchSensorSphereInfo::tgTouchSensorSphereInfo(const tgSphere::Config& config, const tgNode &node) :
-    tgSphereInfo(config, node)
+tgTouchSensorRodInfo::tgTouchSensorRodInfo(const tgRod::Config& config, const tgPair &pair):
+    tgRodInfo(config, pair)
 {}
 
-tgTouchSensorSphereInfo::tgTouchSensorSphereInfo(const tgSphere::Config& config, tgTags tags, const tgNode &node) :
-    tgSphereInfo(config, tags, node)
+tgTouchSensorRodInfo::tgTouchSensorRodInfo(const tgRod::Config& config, tgTags tags, const tgPair &pair) :
+    tgRodInfo(config, tags, pair)
 {}
 
-tgRigidInfo* tgTouchSensorSphereInfo::createRigidInfo(const tgNode& node)
+tgRigidInfo* tgTouchSensorRodInfo::createRigidInfo(const tgPair &pair)
 {
-    return new tgTouchSensorSphereInfo(getConfig(), node);
+    return new tgTouchSensorRodInfo(getConfig(), pair);
 }
 
-void tgTouchSensorSphereInfo::initRigidBody(tgWorld& world)
+void tgTouchSensorRodInfo::initRigidBody(tgWorld& world)
 {
     if(!getCollisionObject())
     {
@@ -94,17 +94,35 @@ void tgTouchSensorSphereInfo::initRigidBody(tgWorld& world)
 	
             ghostObject->setCollisionShape(shape);
 			ghostObject->setWorldTransform(transform);
+//            std::cout << "GhostInit transform: " << transform << std::endl;
 			ghostObject->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			
 			// @todo look up what the second and third arguments of this are
 			m_dynamicsWorld.addCollisionObject(ghostObject,btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 			
             rigid->setCollisionObject(ghostObject);
-		}
-	}
+//            fprintf(stderr,"tgTouchSensorRodInfo::%s() created ghost\n", __FUNCTION__);
+        }
+//        else
+//        {
+//            fprintf(stderr,"tgTouchSensorRodInfo::%s() inner Collision Object is NOT null\n", __FUNCTION__);
+//        }
+    }
+//    else
+//    {
+//        fprintf(stderr,"tgTouchSensorRodInfo::%s() Collision Object is NOT null\n", __FUNCTION__);
+//        tgRigidInfo* rigid = getRigidInfoGroup();
+
+//        std::set<btVector3> nodes = rigid->getContainedNodes();
+//        std::set<btVector3>::iterator it;
+//        for (it=nodes.begin(); it!=nodes.end(); it++)
+//        {
+//            std::cerr << *it << std::endl;
+//        }
+//    }
 }
 
-tgModel* tgTouchSensorSphereInfo::createModel(tgWorld& world)
+tgModel* tgTouchSensorRodInfo::createModel(tgWorld& world)
 {
     // @todo: handle tags -> model
     // @todo: check to make sure the rigidBody has been built

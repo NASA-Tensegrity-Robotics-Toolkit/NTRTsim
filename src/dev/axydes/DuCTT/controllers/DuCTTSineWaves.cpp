@@ -29,7 +29,7 @@
 // Its subject
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
-#include "../robot/tgTouchSensorSphereModel.h"
+#include "../robot/tgTouchSensorModel.h"
 
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"
@@ -123,7 +123,7 @@ void DuCTTSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicActua
     }
 }
 
-bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorModel*> touchSensors)
 {
     bool shouldPause = true;
 
@@ -135,7 +135,7 @@ bool DuCTTSineWaves::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSen
     return shouldPause;
 }
 
-bool DuCTTSineWaves::checkPause(std::vector<tgTouchSensorSphereModel*> touchSensors, bool top)
+bool DuCTTSineWaves::checkPause(std::vector<tgTouchSensorModel*> touchSensors, bool top)
 {
     bool shouldPause = true;
 

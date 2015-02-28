@@ -38,7 +38,7 @@
 // Forward declarations
 class tgBasicActuator;
 class tgBasicActuator;
-class tgTouchSensorSphereModel;
+class tgTouchSensorModel;
 class DuCTTRobotModel;
 class tgImpedanceController;
 

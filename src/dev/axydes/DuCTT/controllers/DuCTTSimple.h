@@ -38,7 +38,7 @@
 // Forward declarations
 class tgBasicActuator;
 class tgPrismatic;
-class tgTouchSensorSphereModel;
+class tgTouchSensorModel;
 class DuCTTRobotModel;
 class tgImpedanceController;
 
@@ -60,9 +60,9 @@ public:
     virtual void onSetup(DuCTTRobotModel& subject);
     virtual void onTeardown(DuCTTRobotModel& subject);
 
-    bool shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors);
+    bool shouldPause(std::vector<tgTouchSensorModel*> touchSensors);
 
-    bool movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereModel*> sensors, double goal, double dt);
+    bool movePrism(tgPrismatic* prism, std::vector<tgTouchSensorModel*> sensors, double goal, double dt);
     bool moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt);
 
 private:

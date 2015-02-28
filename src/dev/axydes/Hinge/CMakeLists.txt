@@ -4,7 +4,7 @@ add_executable(AppHinge
     ../DuCTT/robot/tgRodHinge.cpp
     ../DuCTT/robot/tgRodHingeInfo.cpp
     ../DuCTT/robot/tgTouchSensorSphereInfo.cpp
-    ../DuCTT/robot/tgTouchSensorSphereModel.cpp
+    ../DuCTT/robot/tgTouchSensorModel.cpp
     HingeModel.cpp
     AppHinge.cpp
 )

@@ -5,8 +5,9 @@ set(DuCTT_ROBOT_SRCS
     robot/tgDuCTTHingeInfo.cpp
     robot/tgPrismatic.cpp
     robot/tgPrismaticInfo.cpp
+    robot/tgTouchSensorRodInfo.cpp
     robot/tgTouchSensorSphereInfo.cpp
-    robot/tgTouchSensorSphereModel.cpp
+    robot/tgTouchSensorModel.cpp
     robot/DuCTTRobotModel.cpp
 )
 

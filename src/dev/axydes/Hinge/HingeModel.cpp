@@ -25,7 +25,7 @@
 // This module
 #include "HingeModel.h"
 #include "../DuCTT/robot/tgTouchSensorSphereInfo.h"
-#include "../DuCTT/robot/tgTouchSensorSphereModel.h"
+#include "../DuCTT/robot/tgTouchSensorModel.h"
 // This library
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"
@@ -174,7 +174,7 @@ void HingeModel::setup(tgWorld& world)
     allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     std::vector<tgSphere*> spheres = find<tgSphere>("sphere");
 
-    std::vector<tgTouchSensorSphereModel*> allTouchSensors = find<tgTouchSensorSphereModel>("sphere");
+    std::vector<tgTouchSensorModel*> allTouchSensors = find<tgTouchSensorModel>("sphere");
     for (size_t i=0; i<allTouchSensors.size(); i++)
     {
         abstractMarker marker (spheres[i]->getPRigidBody(), btVector3(0,0,0), btVector3(255,0,0), 0);

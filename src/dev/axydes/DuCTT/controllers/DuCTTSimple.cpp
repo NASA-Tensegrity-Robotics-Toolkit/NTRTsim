@@ -29,7 +29,7 @@
 // Its subject
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
-#include "../robot/tgTouchSensorSphereModel.h"
+#include "../robot/tgTouchSensorModel.h"
 
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"
@@ -52,19 +52,23 @@ DuCTTSimple::DuCTTSimple(double targetDist) :
 {
 }
 
-bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTSimple::shouldPause(std::vector<tgTouchSensorModel*> touchSensors)
 {
     bool shouldPause = true;
 
     for (size_t i=0; i<touchSensors.size(); i++)
     {
-        if (!touchSensors[i]->isTouching()) shouldPause = false;
+        if (!touchSensors[i]->isTouching())
+        {
+//            std::cout << "Touch sensor not touching: " << touchSensors[i]->toString() << std::endl;
+            shouldPause = false;
+        }
     }
 
     return shouldPause;
 }
 
-bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereModel*> sensors, double goal, double dt)
+bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorModel*> sensors, double goal, double dt)
 {
     double currPos = prism->getActualLength();
     double delta = (goal-currPos);
@@ -83,7 +87,16 @@ bool DuCTTSimple::movePrism(tgPrismatic* prism, std::vector<tgTouchSensorSphereM
 //    prism->moveMotors(dt);
 
 //    return shouldPause(sensors);
-    return fabs(delta) < 0.1 || shouldPause(sensors);
+    bool pause = false;
+    static int pauseCount = 0;
+    pauseCount += shouldPause(sensors);
+    if (pauseCount > 500)
+    {
+        pauseCount = 0;
+        pause = true;
+    }
+
+    return fabs(delta) < 0.1 || pause;
 }
 
 bool DuCTTSimple::moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt)
