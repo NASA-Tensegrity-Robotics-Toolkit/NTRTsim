@@ -30,7 +30,7 @@
 // This application
 #include "../robot/DuCTTRobotModel.h"
 #include "../robot/tgPrismatic.h"
-#include "../robot/tgTouchSensorSphereModel.h"
+#include "../robot/tgTouchSensorModel.h"
 
 // This library
 #include "core/tgBasicActuator.h"
@@ -429,7 +429,7 @@ bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
     return isLocked;
 }
 
-bool DuCTTLearningController::shouldPause(std::vector<tgTouchSensorSphereModel*> touchSensors)
+bool DuCTTLearningController::shouldPause(std::vector<tgTouchSensorModel*> touchSensors)
 {
     bool shouldPause = true;
 
