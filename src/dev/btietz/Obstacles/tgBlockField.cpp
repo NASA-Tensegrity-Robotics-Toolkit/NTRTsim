@@ -51,7 +51,7 @@
 unsigned long long rdtsc(){
     unsigned int lo,hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((unsigned long long)hi << 32) | lo;
+    return 1;// ((unsigned long long)hi << 32) | lo;
 }
 
 #endif
@@ -89,7 +89,7 @@ m_config()
 {
     // Seed the random number generator
     /// @todo assess if doing this multiple times in a trial (here and evolution) causes problems
-    srand(rdtsc());
+    //srand(rdtsc());
 }
 
 tgBlockField::tgBlockField(tgBlockField::Config& config) :
@@ -98,7 +98,7 @@ m_config(config)
 {
     // Seed the random number generator
     /// @todo assess if doing this multiple times in a trial (here and evolution) causes problems
-    srand(rdtsc());
+    //srand(rdtsc());
 }
 
 tgBlockField::~tgBlockField() {}
