@@ -418,7 +418,7 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
     
     
-#if (0) // Direct to CPG or set impedance controller tensions
+#if (1) // Direct to CPG or set impedance controller tensions
     
     int m = subject->getSegments() - 1;
     

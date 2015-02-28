@@ -369,6 +369,12 @@ void AppMultiTerrain::simulate(tgSimulation *simulation)
                 simulation->addObstacle(obstacle);
             }
         }
+        else if(add_blocks)
+        {
+            simulation->reset();
+            tgModel* obstacle = getBlocks();
+            simulation->addObstacle(obstacle);
+        }
         else
         {
             simulation->reset();
