@@ -9,8 +9,8 @@ src/DoxyDocs
 
 *.cmake
 
-CMakeFiles
-CMakeCache.txt
+*CMakeFiles
+*CMakeCache.txt
 
 Makefile
 
