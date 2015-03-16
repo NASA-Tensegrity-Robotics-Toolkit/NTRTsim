@@ -52,6 +52,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         DuCTTLearningController(const double prefLength=5.0,
                                 const bool useManualParams=false,
                                 const string manParamFile="",
+                                int axis=1,
                                 string resourcePath="",
                                 string suffix="_DuCTT",
                                 string evoConfigFilename="Config.ini"
@@ -100,11 +101,12 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         void printSineParams();
 
         btVector3 initPosition; // Initial position of model
-        const double m_initialLengths;
+        const double m_initialLength;
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
         const bool m_usingManualParams;
         const string m_manualParamFile;
+        int m_axis; //axis of movement. x=0, y=1, z=2, all=3
 
         // Evolution and Adapter
         bool m_isLearning;
@@ -137,6 +139,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
 
         int bottomCounter;
         int topCounter;
+        double m_dHistorisisSeconds;
 };
 
 #endif // ESCAPE_T6CONTROLLER

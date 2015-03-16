@@ -56,10 +56,10 @@ def cutOuts(inFile, outFile):
     std = np.std(dists)
 
     lowerThresh = mean - 2*std
-    upperThresh = mean + 2*std
+    # upperThresh = mean + 2*std
+    upperThresh = np.max(dists)
 
     if mean <= 0:
-        upperThresh = np.max(dists)
         lowerThresh = 0
 
     try:
@@ -124,7 +124,7 @@ def createFolder(trialFolder):
     if not trialFolder.endswith('/'):
         trialFolder = trialFolder+'/'
 
-    regex = re.compile('trial_([0-9])+$')
+    regex = re.compile('trial_([0-9]+)+$')
 
     maxTrial = 0
     currTrials = os.listdir(trialFolder)
@@ -141,7 +141,7 @@ def createFolder(trialFolder):
 
     return newTrialDir
 
-def mainFunc(inFile, trialFolder):
+def mainFunc(inFile, trialFolder, suffix):
     if not os.path.exists(inFile):
         print 'Error: {} does not exist.'.format(inFile)
         return
@@ -160,6 +160,17 @@ def mainFunc(inFile, trialFolder):
     shutil.move(inFile,scoreFile)
     shutil.copy2('../Config.ini',folder+'/Config.ini')
 
+    # Move evolution file
+    inFilePath = os.path.dirname(os.path.abspath(inFile))
+    evoFile=inFilePath+'/evolution{}.csv'.format(suffix)
+    newEvoFile=folder+'/evolution{}.csv'.format(suffix)
+    shutil.copy2(evoFile,newEvoFile)
+
+    # Move best param file
+    paramFile=inFilePath+'/bestParameters-{}-0.nnw'.format(suffix)
+    newParamFile=folder+'/bestParameters-{}-0.nnw'.format(suffix)
+    shutil.move(paramFile,newParamFile)
+
     #Do the actual parameter generation
     sortFile(scoreFile, sortedFile)
     # shutil.copy2(sortedFile,noOutsFile)
@@ -172,12 +183,17 @@ def mainFunc(inFile, trialFolder):
 
 if __name__=="__main__":
     if len(sys.argv) < 2:
-        print 'Usage: {} [SCORES_FILE] [TRIAL_FOLDER]'.format(os.path.basename(sys.argv[0]))
+        print 'Usage: {} [SCORES_FILE] [TRIAL_FOLDER] [SUFFIX]'.format(os.path.basename(sys.argv[0]))
         exit(-1)
     if len(sys.argv) < 3:
         folder = '.'
     else:
         folder = sys.argv[2]
 
-    mainFunc(sys.argv[1], folder)
+    if len(sys.argv) < 4:
+        suffix = '_DuCTT'
+    else:
+        suffix = sys.argv[3]
+
+    mainFunc(sys.argv[1], folder, suffix)
 

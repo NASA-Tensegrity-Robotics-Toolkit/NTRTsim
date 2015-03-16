@@ -58,6 +58,7 @@ using namespace std;
 DuCTTLearningController::DuCTTLearningController(const double initialLength,
                                                 const bool useManualParams,
                                                 const string manParamFile,
+                                                int axis,
                                                 string resourcePath,
                                                 string suffix,
                                                 string evoConfigFilename
@@ -65,9 +66,10 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     m_evoConfigFilename(evoConfigFilename),
     m_evolution(suffix, evoConfigFilename),
     m_isLearning(false),
-    m_initialLengths(initialLength),
+    m_initialLength(initialLength),
     m_usingManualParams(useManualParams),
     m_manualParamFile(manParamFile),
+    m_axis(axis),
     m_totalTime(0.0),
     maxStringLengthFactor(1.50),
     nClusters(8),
@@ -79,7 +81,8 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     m_bIgnoreTouchSensors(true),
     m_bRecordedStart(false),
     bottomCounter(0),
-    topCounter(0)
+    topCounter(0),
+    m_dHistorisisSeconds(0.5)
 {
     std::string path;
     if (resourcePath != "")
@@ -111,11 +114,11 @@ void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
     for (size_t i = 0; i < muscles.size(); ++i) {
         tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
-        pMuscle->setControlInput(this->m_initialLengths, dt);
+        pMuscle->setControlInput(this->m_initialLength, dt);
     }
 
     //Set the initial lengths of the prismatic joints
-    subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMaxLength());
+    subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMinLength());
     subject.getBottomPrismatic()->moveMotors(dt);
     subject.getTopPrismatic()->setPreferredLength(subject.getTopPrismatic()->getMinLength());
     subject.getTopPrismatic()->moveMotors(dt);
@@ -167,6 +170,8 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
     moveMotors(subject, dt);
 
     //TODO: check for bad run?
+    double distance = displacement(subject);
+    //if old dist >0 and new dist<0 -> bad run?
 }
 
 void DuCTTLearningController::moveMotors(DuCTTRobotModel &subject, double dt)
@@ -226,25 +231,34 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
  */
 vector< vector <double> > DuCTTLearningController::transformActions(vector< vector <double> > actions)
 {
-    vector <double> manualParams(N_PARAMS * nActions + 1, 1); // '4' for the number of sine wave parameters
-    if (m_usingManualParams) {
+    vector <double> params(N_PARAMS * nActions + 2, 1); // '4' for the number of sine wave parameters
+    if (m_usingManualParams)
+    {
         std::cout << "Using manually set parameters\n"; 
         int lineNumber = 1;
-        manualParams = readManualParams(lineNumber, m_manualParamFile);
+        params = readManualParams(lineNumber, m_manualParamFile);
     } 
+    else
+    {
+        params = actions[0];
+    }
 
-    double pretension = 0.90; // Tweak this value if need be
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[N_PARAMS]  = {1.2, //m_initialLengths * (pretension - maxStringLengthFactor), //amplitude
-                       0.3, //Hz
-                       -1 * M_PI, //phase change
-                       1.2}; //m_initialLengths};// * (1 - maxStringLengthFactor)}; //offset
+    double mins[N_PARAMS]  = {
+                               0,
+//                               1.2, //m_initialLengths * (pretension - maxStringLengthFactor), //amplitude
+                               0.3, //Hz
+                               -1 * M_PI, //phase change
+//                               1.2
+                               0
+                             }; //m_initialLengths};// * (1 - maxStringLengthFactor)}; //offset
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
     double maxes[N_PARAMS] = {40, //m_initialLengths * (pretension + maxStringLengthFactor), //amplitude
-                       20, //Hz (can cheat to 50Hz, if feeling immoral)
-                       M_PI, //phase change
-                       10};//m_initialLengths};// * (1 + maxStringLengthFactor)}; //offset
+                               20, //Hz (can cheat to 50Hz, if feeling immoral)
+                               M_PI, //phase change
+                               40
+                             };//m_initialLengths};// * (1 + maxStringLengthFactor)}; //offset
     double ranges[N_PARAMS] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     std::vector< std::vector<double> > newActions (nActions);
@@ -254,28 +268,27 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
         newActions[i] = std::vector<double>(N_PARAMS);
         for (int j=0; j<N_PARAMS; j++)  //4x
         {
-            if (m_usingManualParams)
-            {
-                newActions[i][j] = manualParams[i*N_PARAMS + j]*(ranges[j])+mins[j];
-            }
-            else
-            {
-                newActions[i][j] = actions[0][(i*N_PARAMS)+j]*(ranges[j])+mins[j];
-            }
+            newActions[i][j] = params[i*N_PARAMS + j]*(ranges[j])+mins[j];
         }
     }
 
-    double touchParam;
-    if (m_usingManualParams)
+    if (params.size() > 40)
     {
-        touchParam = (manualParams[manualParams.size()-1]);
+        double touchParam;
+        int touchOffset = actions[0].size() - (nActions*N_PARAMS);
+        touchParam = (params[params.size()-touchOffset]);
+        m_bIgnoreTouchSensors = touchParam < 0.5;
+        std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
     }
-    else
+
+    if (params.size() > 41)
     {
-        touchParam = (actions[0][actions[0].size()-1]);
+        double minHistorisis = 0.0;
+        double maxHistorisis = 2.0;
+        double historisisRange = maxHistorisis - minHistorisis;
+        int offset = params.size() - (nActions*N_PARAMS + 1);
+        m_dHistorisisSeconds = params[params.size()-offset]*historisisRange + minHistorisis;
     }
-    m_bIgnoreTouchSensors = touchParam < 0.5;
-    std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
 
     return newActions;
 }
@@ -308,8 +321,6 @@ void DuCTTLearningController::applyActions(DuCTTRobotModel& subject, vector< vec
 //TODO: Doesn't seem to correctly calculate energy spent by tensegrity
 //TODO: punish slack strings
 //TODO: too much pretension
-//TODO: historisis effect of latching onto wall (need to come away from wall
-//      a certain amount to be unlocked
 double DuCTTLearningController::totalEnergySpent(DuCTTRobotModel& subject) {
     double totalEnergySpent=0;
 
@@ -350,13 +361,13 @@ void DuCTTLearningController::setPreferredMuscleLengths(DuCTTRobotModel& subject
         for(int node=0; node<musclesPerCluster; node++) {
             tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
-            double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-            if (newLength <= minLength) {
-                newLength = minLength;
-            } else if (newLength >= maxLength) {
-                newLength = maxLength;
-            }
-            imp_controller->control(*pMuscle, dt, m_initialLengths, newLength);
+            double newVelocity = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+//            if (newVelocity <= minLength) {
+//                newVelocity = minLength;
+//            } else if (newVelocity >= maxLength) {
+//                newVelocity = maxLength;
+//            }
+            imp_controller->control(*pMuscle, dt, m_initialLength, newVelocity);
         }
         phase += phaseChange[cluster];
     }
@@ -368,8 +379,6 @@ void DuCTTLearningController::setPreferredMuscleLengths(DuCTTRobotModel& subject
 //TODO: 'locking' of prismatics?
 void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
     double phase = 0; // Phase of cluster1
-    const double minLength = subject.getBottomPrismatic()->getMinLength();
-    const double maxLength = subject.getBottomPrismatic()->getMaxLength();
 
     for(int prism=0; prism<nPrisms; prism++) {
         size_t idx = prism + clusters.size()-1;
@@ -379,12 +388,6 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
         if (m_bIgnoreTouchSensors || !isLocked(subject, isTop))
         {
             double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
-            if (newLength <= minLength) {
-                newLength = minLength;
-            } else if (newLength >= maxLength) {
-                newLength = maxLength;
-            }
-
             pPrism->setPreferredLength(newLength);
         }
         else
@@ -397,19 +400,20 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
 
 bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
 {
-    static const double maxSecs = 1.3;
-    static const double maxCount = maxSecs*1000;//1000Hz timestep
+    static const double maxCount = m_dHistorisisSeconds*1000;//1000Hz timestep
 
     bool sPause = false;
     if (isTop)
     {
-        sPause = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
-        topCounter++;
+        sPause = shouldPause(subject.topTouchSensors);// && !shouldPause(subject.bottomTouchSensors);
+        if (sPause)
+            topCounter++;
     }
     else
     {
-        sPause = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
-        bottomCounter++;
+        sPause = shouldPause(subject.bottomTouchSensors);// && !shouldPause(subject.topTouchSensors);
+        if (sPause)
+            bottomCounter++;
     }
     bool isLocked = false;
     if (sPause)
@@ -489,14 +493,24 @@ double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
                                       (newY-oldY) * (newY-oldY) +
                                       (newZ-oldZ) * (newZ-oldZ)
                                     );
-//    return distanceMoved;
-    return newY - oldY;
-//    return fabs(newZ - oldZ);
+
+    switch(m_axis)
+    {
+    case 0:
+        return fabs(newX - oldX);
+    case 2:
+        return fabs(newZ - oldZ);
+    case 3:
+        return distanceMoved;
+    case 1:
+    default:
+        return newY - oldY;
+    }
 }
                                          
 std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    vector<double> result(nActions*N_PARAMS+1, 1.0);
+    vector<double> result(nActions*N_PARAMS+2, 1.0);
     string line;
     ifstream infile(filename.c_str(), ifstream::in);
 
@@ -520,12 +534,12 @@ std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, st
     }
 
     // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
-    for (int i=0; i < result.size(); i++) {
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-        double seed = ((double) (rand() % 100)) / 100;
-        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-    }
+//    for (int i=0; i < result.size(); i++) {
+//        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+//        double seed = ((double) (rand() % 100)) / 100;
+//        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+//        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+//    }
 
     return result;
 }

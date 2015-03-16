@@ -86,7 +86,7 @@ bool AppDuCTTLearn::setup()
     if (add_controller)
     {
         DuCTTLearningController* testLearningController =
-            new DuCTTLearningController(5.0, use_manual_params, paramFile);
+            new DuCTTLearningController(5.0, use_manual_params, paramFile, ductAxis);
         myRobotModel->attach(testLearningController);
     }
 
@@ -97,8 +97,10 @@ bool AppDuCTTLearn::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-        ductConfig.m_ductWidth = 32;
-        ductConfig.m_ductHeight = 32;
+//        ductConfig.m_ductWidth = 32;
+//        ductConfig.m_ductHeight = 32;
+        ductConfig.m_ductWidth = 40;
+        ductConfig.m_ductHeight = 40;
         ductConfig.m_distance = 10000;
         ductConfig.m_axis = ductAxis;
         switch(ductAxis)

@@ -84,7 +84,7 @@ public:
                 double innerDensity = 0.001359,
                 double tipRad = 1.524,
                 double tipDens = 0.00001943,
-                double tipFric = 10,
+                double tipFric = 10.0,
                 double stiffness = 5000.0,
                 double damping = 25.0,
                 double pretension = 2000.0,
