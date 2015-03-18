@@ -345,9 +345,13 @@ std::vector<double> TetraSpineStaticModel_hf::getStringMaxTensions() const
     {
         tgBasicActuator& m_sca = *(tgCast::cast<tgSpringCableActuator, tgBasicActuator>(m_allMuscles[i]));
         
+        std::cout << i << " " << m_sca.getTags();
+        
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = m_sca.getHistory();
         std::deque<double>& tensionHist = stringHist.tensionHistory;
         maxTens.push_back( *(std::max_element(tensionHist.begin(), tensionHist.end())) );
+        
+        std::cout <<" "<< tensionHist[5] << " " << maxTens[i] << std::endl;
     }
 	
 	return maxTens;
