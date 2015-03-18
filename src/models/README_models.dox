@@ -1,0 +1,8 @@
+/**
+ \page models Models Folder
+ The models directory holds general purpose components that can be added
+ to tensegrity structures and simulations. As of 3/18/2015 the library
+ contains obstacles that can make the terrain more difficult.
+ 
+ \version 1.1.0
+*/
