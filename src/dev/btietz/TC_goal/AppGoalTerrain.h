@@ -33,7 +33,7 @@
 #include "SpineGoalControl.h"
 
 // obstacles
-#include "dev/btietz/Obstacles/tgBlockField.h"
+#include "models/obstacles/tgBlockField.h"
 
 // This library
 #include "core/tgModel.h"

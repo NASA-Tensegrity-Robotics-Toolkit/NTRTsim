@@ -20,7 +20,6 @@ subdirs(
     timestepTest
     kinematicString
     GATests
-    Obstacles
     multiTerrain
     TetraSpine_multiTerrain/
     TC_goal
