@@ -1,6 +1,14 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+3/19/15 - Warning: OS X Setup/Build Failures
+---------
+Currently the simulator is not compiling under OS X. We hope to have this resolved soon. In the meantime if you wish to use the simulator your best bet is to install a Linux VM and install NTRT there.
+
+On that note, we're currently seeking a Mac dev who can help us ensure the simulator remains working on OS X. See thiswho can help us ensure the simulator remains working on OS X. See thiswho can help us ensure the simulator remains working on OS X. See thiswho can help us ensure the simulator remains working on OS X. See this issue for more details:
+
+https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/143
+
 About NTRT
 ---------
 
