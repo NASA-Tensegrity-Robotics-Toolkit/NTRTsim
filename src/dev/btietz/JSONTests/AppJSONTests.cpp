@@ -74,8 +74,6 @@ int main(int argc, char** argv)
         CPGVect.push_back((*CPGIt)[0].asDouble());
     }
     
-    std::cout << CPGVals.end().computeDistance(CPGVals.begin()) << std::endl;
-    
     std::cout << CPGVals << std::endl;
     
     for(std::size_t i = 0; i < CPGVect.size(); i++)
