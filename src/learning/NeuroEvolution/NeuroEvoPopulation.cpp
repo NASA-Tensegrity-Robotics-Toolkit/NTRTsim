@@ -38,10 +38,10 @@
 using namespace std;
 
 NeuroEvoPopulation::NeuroEvoPopulation(int populationSize,configuration& config) :
-m_config(config)
+m_config(config),
+compareAverageScores(true),
+clearScoresBetweenGenerations(false)
 {
-	compareAverageScores=true;
-	clearScoresBetweenGenerations=false;
 	this->compareAverageScores=config.getintvalue("compareAverageScores");
 	this->clearScoresBetweenGenerations=config.getintvalue("clearScoresBetweenGenerations");
 
@@ -151,7 +151,19 @@ void NeuroEvoPopulation::orderPopulation()
 	for(std::size_t i=0;i<this->controllers.size();i++)
 	{
 		double ave = std::accumulate(controllers[i]->pastScores.begin(),controllers[i]->pastScores.end(),0);
-		ave /=  (double) controllers[i]->pastScores.size();
+		
+        double n = (double) controllers[i]->pastScores.size(); 
+        if (n > 0)
+        {
+            ave /= n;
+        }
+        else
+        {
+            ave = -100000;
+        }
+        
+        //assert(controllers[i]->pastScores.size() > 0);
+        
 		controllers[i]->averageScore=ave;
 		if(clearScoresBetweenGenerations)
 			controllers[i]->pastScores.clear();
@@ -161,28 +173,46 @@ void NeuroEvoPopulation::orderPopulation()
 		sort(controllers.begin(),controllers.end(),this->comparisonFuncForAverage);
 	else
 		sort(controllers.begin(),controllers.end(),this->comparisonFuncForMax);
-
+    
 }
 
 std::vector<double> NeuroEvoPopulation::generateMatingProbabilities()
 {
     double totalScore = 0.0;
     const std::size_t n = controllers.size();
-    for (std::size_t i = 0; i < n; i++)
-    {
-        totalScore += controllers[i]->maxScore;
-    }
-    
     std::vector<double> probabilties;
-    probabilties.push_back(controllers[0]->maxScore / totalScore);
-    for (std::size_t i = 1; i < n; i++)
+    if (compareAverageScores)
     {
-        double nextScore = controllers[i]->maxScore / totalScore + probabilties[i - 1];
-        probabilties.push_back(nextScore);
+        double floor = controllers[n - 1]->averageScore;
+        
+        for (std::size_t i = 0; i < n; i++)
+        {
+            totalScore += (controllers[i]->averageScore - floor);
+        }
+        
+        probabilties.push_back((controllers[0]->averageScore - floor) / totalScore);
+        for (std::size_t i = 1; i < n; i++)
+        {
+            double nextScore = (controllers[i]->averageScore - floor) / totalScore + probabilties[i - 1];
+            probabilties.push_back(nextScore);
+        }
     }
-    
-    // 1.0 is too strict, so just get close
-    assert(probabilties[n - 1] >= .99);
+    else
+    {
+        double floor = controllers[n - 1]->maxScore;
+        
+        for (std::size_t i = 0; i < n; i++)
+        {
+            totalScore += (controllers[i]->maxScore - floor);
+        }
+        
+        probabilties.push_back((controllers[0]->maxScore - floor) / totalScore);
+        for (std::size_t i = 1; i < n; i++)
+        {
+            double nextScore = (controllers[i]->maxScore - floor) / totalScore + probabilties[i - 1];
+            probabilties.push_back(nextScore);
+        }
+    }
     
     return probabilties;
 }

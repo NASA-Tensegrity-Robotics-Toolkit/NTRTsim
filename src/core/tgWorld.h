@@ -86,6 +86,12 @@ public:
    * @param[in] config configuration POD
    */
   void reset(const Config& config);
+
+  /**
+   * Replace the implementation with a new ground.
+   * @param[in] ground the new ground
+   */
+  void reset(tgGround* ground);
     
   /**
    * Advance the simulation.

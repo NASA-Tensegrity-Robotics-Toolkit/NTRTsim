@@ -10,6 +10,7 @@ subdirs(
     util
     sensors
     tgcreator
+    models
     controllers
     dev
     examples

@@ -20,6 +20,7 @@
 
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBulletSpringCableAnchor.h"
+#include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "controllers/tgPIDController.h"
 #include "core/tgCast.h"
@@ -34,7 +35,8 @@
 tgCPGCableControl::tgCPGCableControl(tgPIDController::Config pid_config, const double controlStep) :
 m_config(pid_config),
 tgCPGActuatorControl(controlStep),
-m_PID(NULL)
+m_PID(NULL),
+usePID(true)
 {
     if (m_controlStep < 0.0)
     {
@@ -50,6 +52,13 @@ tgCPGCableControl::~tgCPGCableControl()
 void tgCPGCableControl::onSetup(tgSpringCableActuator& subject)
 {
     m_PID = new tgPIDController(&subject, m_config);
+    
+    tgBasicActuator* basicAct =  tgCast::cast<tgSpringCableActuator, tgBasicActuator>(&subject);
+    
+    if (basicAct != NULL)
+    {
+        usePID = false;
+    }
 }
 
 void tgCPGCableControl::onStep(tgSpringCableActuator& subject, double dt)
@@ -61,15 +70,29 @@ void tgCPGCableControl::onStep(tgSpringCableActuator& subject, double dt)
 
     if (m_controlTime >= m_controlStep)
     {
-        
-		m_commandedTension = motorControl().control(*m_PID, dt, controlLength(), getCPGValue());
-
+        if (usePID)
+        {
+            m_commandedTension = motorControl().control(*m_PID, dt, controlLength(), getCPGValue());
+        }
+        else
+        {
+            tgBasicActuator* basicAct =  tgCast::cast<tgSpringCableActuator, tgBasicActuator>(&subject);
+            m_commandedTension = motorControl().control(*basicAct, dt, controlLength(), getCPGValue());
+        }
         m_controlTime = 0;
     }
     else
     {
 		const double currentTension = subject.getTension();
-		m_PID->control(dt, m_commandedTension, currentTension);
+        if(usePID)
+        {
+            m_PID->control(dt, m_commandedTension, currentTension);
+        }
+        else
+        {
+            tgBasicActuator* basicAct =  tgCast::cast<tgSpringCableActuator, tgBasicActuator>(&subject);
+            basicAct->moveMotors(dt);
+        }
 	}
 }
 
@@ -96,3 +119,15 @@ void tgCPGCableControl::assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nod
     
     m_nodeNumber = CPGSys.addNode(params);
 } 
+
+void tgCPGCableControl::updateTensionSetpoint(double newTension)
+{
+    if (newTension >= 0.0)
+    {
+        motorControl().setOffsetTension(newTension);
+    }
+    else
+    {
+        throw std::runtime_error("Tension setpoint is less than zero!");
+    }
+}

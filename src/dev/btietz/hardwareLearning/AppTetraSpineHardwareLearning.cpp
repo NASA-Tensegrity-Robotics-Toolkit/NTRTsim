@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     const int numMuscles = 6;
     const int numParams = 2;
     const int segment = 1;
-    const double controlTime = .01;
+    const double controlTime = .001;
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segment, controlTime);
     
     LearningSpineJSON* const myControl =
