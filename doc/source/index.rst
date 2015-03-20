@@ -16,3 +16,4 @@ Contents
    :maxdepth: 2
  
    contribute-tutorials.rst
+   learning-library-walkthrough.rst

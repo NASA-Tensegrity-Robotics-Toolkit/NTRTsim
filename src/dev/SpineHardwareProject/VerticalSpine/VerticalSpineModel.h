@@ -35,8 +35,10 @@
 #include <string>
 #include <vector>
 
+#include "sensors/tgDataObserver.h"
+
 // Forward declarations
-class tgBasicActuator;
+class tgSpringCableActuator;
 class tgStructure;
 class tgStructureInfo;
 
@@ -47,7 +49,7 @@ public:
 	/**
 	 * Used within this function to map segments to string keys
 	 */
-    typedef std::map<std::string, std::vector<tgBasicActuator*> > MuscleMap;
+    typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
 	
 	/**
 	 * The only constructor. The model details are instantiated once
@@ -86,9 +88,9 @@ public:
 	 * a string to a vector of muscles
 	 * @return a std::vector of pointers to the muscles found by the key
 	 */
-    const std::vector<tgBasicActuator*>& getMuscles (const std::string& key) const;
+    const std::vector<tgSpringCableActuator*>& getMuscles (const std::string& key) const;
      
-    const std::vector<tgBasicActuator*>& getAllMuscles() const;
+    const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
     
     /**
      * Return a std::size_t indicating the number of segments in the 
@@ -149,10 +151,10 @@ private:
 			   model, size_t segmentCount);
 
 	/**
-	 * A std::vector containing all of the tgBasicActuators amongst
+	 * A std::vector containing all of the tgStringCableActuators amongst
 	 * the children of this model. Populated during setup
 	 */
-    std::vector<tgBasicActuator*> allMuscles;
+    std::vector<tgSpringCableActuator*> allMuscles;
 	
 	/**
 	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains

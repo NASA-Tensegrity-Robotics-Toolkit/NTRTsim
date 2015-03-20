@@ -1,8 +1,8 @@
-# Install script for directory: /home/drew/research/Tensegrity/trunk/Simulator/src/lib/Configuration
+# Install script for directory: /home/drew/repositories/NTRTsim/src/learning/Configuration
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  SET(CMAKE_INSTALL_PREFIX "/home/drew/research/Tensegrity/trunk/Simulator/env")
+  SET(CMAKE_INSTALL_PREFIX "/home/drew/repositories/NTRTsim/env")
 ENDIF(NOT DEFINED CMAKE_INSTALL_PREFIX)
 STRING(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -31,16 +31,4 @@ ENDIF(NOT CMAKE_INSTALL_COMPONENT)
 IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
   SET(CMAKE_INSTALL_SO_NO_EXE "1")
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-
-IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/drew/research/Tensegrity/trunk/Simulator/src/../env/include/tensegrity/Configuration/configuration.h")
-  IF (CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
-    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
-  ENDIF (CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
-  IF (CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
-    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
-  ENDIF (CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
-FILE(INSTALL DESTINATION "/home/drew/research/Tensegrity/trunk/Simulator/src/../env/include/tensegrity/Configuration" TYPE FILE FILES "/home/drew/research/Tensegrity/trunk/Simulator/src/lib/Configuration/configuration.h")
-ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
