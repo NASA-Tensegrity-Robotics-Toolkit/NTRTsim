@@ -14,6 +14,7 @@ Contents
 
 .. toctree::
    :maxdepth: 2
- 
+
+   setup.rst
    contribute-tutorials.rst
    learning-library-walkthrough.rst
