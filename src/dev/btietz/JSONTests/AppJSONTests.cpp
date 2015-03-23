@@ -64,6 +64,8 @@ int main(int argc, char** argv)
     // such member.
     Json::Value CPGVals = root.get("CPGVals", "UTF-8");
     
+    std::cout << CPGVals.size() << " " << CPGVals[0].size()<< std::endl;
+    
     Json::Value::iterator CPGIt = CPGVals.begin();
     
     std::vector<double> CPGVect;
