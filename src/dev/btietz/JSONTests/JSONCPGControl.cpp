@@ -45,11 +45,13 @@
 // JSON
 #include <json/json.h>
 
+#include <exception>
+
 //#define LOGGING
 
 using namespace std;
 
-BaseSpineCPGControl::Config::Config(int ss,
+JSONCPGControl::Config::Config(int ss,
 										int tm,
 										int om,
 										int param,
@@ -131,11 +133,9 @@ BaseSpineCPGControl::Config::Config(int ss,
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-BaseSpineCPGControl::BaseSpineCPGControl(BaseSpineCPGControl::Config config,	
+JSONCPGControl::JSONCPGControl(JSONCPGControl::Config config,	
 												std::string args,
-												std::string resourcePath,
-                                                std::string ec,
-                                                std::string nc) :
+												std::string resourcePath) :
 m_pCPGSys(NULL),
 m_config(config),
 m_dataObserver("logs/TCData"),
@@ -155,12 +155,12 @@ bogus(false)
     
 }
 
-BaseSpineCPGControl::~BaseSpineCPGControl() 
+JSONCPGControl::~JSONCPGControl() 
 {
     scores.clear();
 }
 
-void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
+void JSONCPGControl::onSetup(BaseSpineModelLearning& subject)
 {
     // Maximum number of sub-steps allowed by CPG
 	m_pCPGSys = new CPGEquations(200);
@@ -169,21 +169,21 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVars.json"), root );
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVarsOct.json"), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.
         std::cout << "Failed to parse configuration\n"
             << reader.getFormattedErrorMessages();
-        /// @todo should this throw an exception instead??
+        throw std::invalid_argument("Bad filename for JSON");
     }
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
-    array_4D edgeParams = scaleEdgeActions(nodeVals);
-    array_2D nodeParams = scaleNodeActions(edgeVals);
+    array_4D edgeParams = scaleEdgeActions(edgeVals);
+    array_2D nodeParams = scaleNodeActions(nodeVals);
     
     setupCPGs(subject, nodeParams, edgeParams);
     
@@ -199,7 +199,7 @@ void BaseSpineCPGControl::onSetup(BaseSpineModelLearning& subject)
     bogus = false;
 }
 
-void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
+void JSONCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
@@ -242,7 +242,7 @@ void BaseSpineCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D no
 	
 }
 
-void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
+void JSONCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 {
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
@@ -270,7 +270,7 @@ void BaseSpineCPGControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 }
 
-void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
+void JSONCPGControl::onTeardown(BaseSpineModelLearning& subject)
 {
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
@@ -331,13 +331,13 @@ void BaseSpineCPGControl::onTeardown(BaseSpineModelLearning& subject)
 	m_allControllers.clear();
 }
 
-const double BaseSpineCPGControl::getCPGValue(std::size_t i) const
+const double JSONCPGControl::getCPGValue(std::size_t i) const
 {
 	// Error handling on input done in CPG_Equations
 	return (*m_pCPGSys)[i];
 }
 
-double BaseSpineCPGControl::getScore() const
+double JSONCPGControl::getScore() const
 {
 	if (scores.size() == 2)
 	{
@@ -350,7 +350,7 @@ double BaseSpineCPGControl::getScore() const
 }
 	
 
-array_4D BaseSpineCPGControl::scaleEdgeActions  
+array_4D JSONCPGControl::scaleEdgeActions  
                             (Json::Value edgeParam)
 {
     assert(edgeParam[0].size() == 2);
@@ -374,7 +374,10 @@ array_4D BaseSpineCPGControl::scaleEdgeActions
     int j = 0;
     int k = 0;
     
-    Json::Value::iterator edgeIt = edgeParam.begin();
+    // Quirk of the old learning code. Future examples can move forward
+    Json::Value::iterator edgeIt = edgeParam.end();
+    
+    int count = 0;
     
     while (i < m_config.segmentSpan)
     {
@@ -382,7 +385,7 @@ array_4D BaseSpineCPGControl::scaleEdgeActions
         {
             while(k < m_config.ourMuscles)
             {
-                if (edgeIt == edgeParam.end())
+                if (edgeIt == edgeParam.begin())
                 {
                     std::cout << "ran out before table populated!"
                     << std::endl;
@@ -398,14 +401,17 @@ array_4D BaseSpineCPGControl::scaleEdgeActions
                     }
                     else
                     {
+                        edgeIt--;
                         Json::Value edgeParam = *edgeIt;
                         assert(edgeParam.size() == 2);
                         // Weight from 0 to 1
                         actionList[i][j][k][0] = edgeParam[0].asDouble();
+                        std::cout << actionList[i][j][k][0] << " ";
                         // Phase offset from -pi to pi
                         actionList[i][j][k][1] = edgeParam[1].asDouble() * 
                                                 (range) + lowerLimit;
-                        edgeIt++;
+                        std::cout <<  actionList[i][j][k][1] << std::endl;
+                        count++;
                     }
                 }
                 k++;
@@ -419,11 +425,13 @@ array_4D BaseSpineCPGControl::scaleEdgeActions
         i++;
     }
     
-    assert(edgeParam.end() == edgeIt);
+    std::cout<< "Params used: " << count << std::endl;
+    
+    assert(edgeParam.begin() == edgeIt);
     
     return actionList;
 }
-array_2D BaseSpineCPGControl::scaleNodeActions  
+array_2D JSONCPGControl::scaleNodeActions  
                             (Json::Value actions)
 {
     std::size_t numControllers = actions.size();
