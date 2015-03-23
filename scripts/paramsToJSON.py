@@ -16,18 +16,19 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-""" Goes through entire workflow to get MonteCarlo params for learning algorithm """
+""" Converts .nnw files to a JSON file """
 
 # Purpose: Assist users with learning trials and playback of learned parameters
-# Author:  Brian Mirletz, Alexander Xydes
-# Date:    January 2015
-# Notes:   Converts a scores.csv file into the '.nnw' files uses by
-# the learning library. Input parameters are
-# (1) The name of the scores file, must be "single origin" See 
-#     splitInfile.py for preliminary work that may need to be done
-# (2) The name of the Config.ini file, may be in a different directory
-# (3) The best number of scores files to output
-# (4) Any suffix that needs to be applied to bestParams files
+# Author:  Brian Mirletz
+# Date:    March 2015
+# Notes:   Converts .nnw files to .json files as specified by users. Inputs include
+# (1) The name of the config.ini file
+# (2) The path to the .nnw files
+# (3) The full name of the desired JSON output file
+# (4) The name of the controller (default, 1, etc). 'suffix' in C++ parliance
+# (5) The variable name that will be used in JSON
+# (6) (optional) any additional suffix, assumed to be after an _ in the file name (such as node or edge)
+# (7) (optional) an input JSON file, if the name is different than the output file
 
 import sys
 import csv
