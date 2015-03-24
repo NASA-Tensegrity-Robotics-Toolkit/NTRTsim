@@ -152,6 +152,8 @@ protected:
     std::vector<double> scores;
     
     bool bogus;
+    
+    std::string controlFilename;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H

@@ -152,7 +152,7 @@ bogus(false)
 		path = "";
 	}
 
-    
+    controlFilename = path + args;
 }
 
 JSONCPGControl::~JSONCPGControl() 
@@ -169,7 +169,7 @@ void JSONCPGControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVarsOct.json"), root );
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.
