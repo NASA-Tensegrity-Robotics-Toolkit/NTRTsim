@@ -142,17 +142,16 @@ m_dataObserver("logs/TCData"),
 m_updateTime(0.0),
 bogus(false)
 {
-	std::string path;
 	if (resourcePath != "")
 	{
-		path = FileHelpers::getResourcePath(resourcePath);
+		controlFilePath = FileHelpers::getResourcePath(resourcePath);
 	}
 	else
 	{
-		path = "";
+		controlFilePath = "";
 	}
-
-    controlFilename = path + args;
+    
+    controlFilename = controlFilePath + args;
 }
 
 JSONCPGControl::~JSONCPGControl() 

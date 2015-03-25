@@ -154,6 +154,7 @@ protected:
     bool bogus;
     
     std::string controlFilename;
+    std::string controlFilePath;
 };
 
 #endif // BASE_SPINE_CPG_CONTROL_H
