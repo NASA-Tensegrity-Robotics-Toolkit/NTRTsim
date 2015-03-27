@@ -26,6 +26,7 @@
 import sys
 import os
 import subprocess
+import json
 
 ###
 # Interfaces.
@@ -111,7 +112,14 @@ class BrianJobMaster(NTRTJobMaster):
         like creating your input and output directories.
         """
         
-        path = self.configFileName
+        try:
+            fin = open(self.configFileName, 'r')
+            self.obj = json.load(fin)
+            fin.close()
+        except IOError:
+            self.obj = {}
+        
+        path = self.obj['resourcePath'] + self.obj['lowerPath']
         
         try: 
             os.makedirs(path)
@@ -128,11 +136,13 @@ class BrianJobMaster(NTRTJobMaster):
         
         # All args to be passed to subprocess must be strings
         args = {'filename' : "tcContact.json",
-                'path'     : "bmirletz/TetrahedralComplex_Contact/",
-                'executable' : "./../build/dev/btietz/JSONTests/AppTerrainJSON",
+                'resourcePrefix' : self.obj['resourcePath'],
+                'path'     : self.obj['lowerPath'],
+                'executable' : self.obj['executable'],
                 'length'   : "60000"}
         job = BrianJob(args)
-        job.runJob()
+        scores = job.runJob()
+        print(scores)
 
 class BrianJob(NTRTJob):
     def __init__(self, jobArgs):
@@ -168,6 +178,18 @@ class BrianJob(NTRTJob):
         """
 
         subprocess.call([self.args['executable'], "-l", self.args['filename'], "-b", "1"])
+        
+        scoresPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename']
+        
+        try:
+            fin = open(scoresPath, 'r')
+            obj = json.load(fin)
+            fin.close()
+        except IOError:
+            obj = {}
+        
+        
+        return obj['scores']
 
 if __name__ == "__main__":
     configFile = sys.argv[1]

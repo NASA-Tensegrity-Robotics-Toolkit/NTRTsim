@@ -1,0 +1,34 @@
+{
+    "resourcePath" : "../resources/src/",
+    "lowerPath"    : "bmirletz/TetrahedralComplex_Contact/",
+    "executable" : "./../build/dev/btietz/JSONTests/AppTerrainJSON",
+    "learningParams": 
+    {
+        "trialLength" : 6000,
+        "numTrials" : 100,
+        "node" :
+        {
+            "learning" : true,
+            "startFromScratch" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 5,
+            "numberOfInstances" : 1
+        },
+        "edge" :
+        {
+            "learning" : true,
+            "startFromScratch" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 100
+        },
+        "feedback" :
+        {
+            "learning" : true,
+            "startFromScratch" : true,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 3,
+            "numberOfInstances" : 1
+        }
+    }
+}

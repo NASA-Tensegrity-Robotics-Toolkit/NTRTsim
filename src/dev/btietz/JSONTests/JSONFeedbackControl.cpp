@@ -269,7 +269,7 @@ void JSONFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     
     Json::Value subScores;
     subScores["distance"] = scores[0];
-    subScores["energy"] = scores[totalEnergySpent];
+    subScores["energy"] = totalEnergySpent;
     
     prevScores.append(subScores);
     root["scores"] = prevScores;
