@@ -332,7 +332,8 @@ void AppTerrainJSON::simulate(tgSimulation *simulation)
                 simulation->addObstacle(obstacle);
             }
         }
-        else
+        // Avoid resetting twice on the last run
+        else if (i != nEpisodes - 1)
         {
             simulation->reset();
         }
