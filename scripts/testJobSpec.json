@@ -1,4 +1,6 @@
 {
+    "filePrefix"   : "monteOut",
+    "fileSuffix"   : ".json",
     "resourcePath" : "../resources/src/",
     "lowerPath"    : "bmirletz/TetrahedralComplex_Contact/",
     "executable" : "./../build/dev/btietz/JSONTests/AppTerrainJSON",
@@ -6,7 +8,7 @@
     {
         "trialLength" : 6000,
         "numTrials" : 100,
-        "node" :
+        "nodeVals" :
         {
             "learning" : true,
             "startFromScratch" : true,
@@ -14,7 +16,7 @@
             "numberOfOutputs" : 5,
             "numberOfInstances" : 1
         },
-        "edge" :
+        "edgeVals" :
         {
             "learning" : true,
             "startFromScratch" : true,
@@ -22,7 +24,7 @@
             "numberOfOutputs" : 2,
             "numberOfInstances" : 100
         },
-        "feedback" :
+        "feedbackVals" :
         {
             "learning" : true,
             "startFromScratch" : true,

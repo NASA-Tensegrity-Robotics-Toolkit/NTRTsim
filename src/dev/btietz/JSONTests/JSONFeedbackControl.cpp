@@ -136,11 +136,13 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
 
     setupCPGs(subject, nodeParams, edgeParams);
     
-    // Setup neural network
-    m_config.numStates = root.get("numStates", "UTF-8").asInt();
-    m_config.numActions = root.get("numActions", "UTF-8").asInt();
+    Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     
-    std::string nnFile = controlFilePath + root.get("neuralFilename", "UTF-8").asString();
+    // Setup neural network
+    m_config.numStates = feedbackParams.get("numStates", "UTF-8").asInt();
+    m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
+    
+    std::string nnFile = controlFilePath + feedbackParams.get("neuralFilename", "UTF-8").asString();
     
     nn = new neuralNetwork(m_config.numStates, m_config.numStates*2, m_config.numActions);
     

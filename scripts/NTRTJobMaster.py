@@ -19,7 +19,7 @@
 """ Converts .nnw files to a JSON file """
 
 # Purpose: Queue up learning runs, pass them parameters via JSON
-# Author:  Brian Mirletz
+# Author:  Brian Mirletz and Perry Bhandal
 # Date:    March 2015
 # Notes:   In progress as of this commit (3/27/15)
 
@@ -27,6 +27,7 @@ import sys
 import os
 import subprocess
 import json
+import random
 
 ###
 # Interfaces.
@@ -114,19 +115,66 @@ class BrianJobMaster(NTRTJobMaster):
         
         try:
             fin = open(self.configFileName, 'r')
-            self.obj = json.load(fin)
+            self.jConf = json.load(fin)
             fin.close()
         except IOError:
-            self.obj = {}
+            self.jConf = {}
         
-        path = self.obj['resourcePath'] + self.obj['lowerPath']
+        self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
         
         try: 
-            os.makedirs(path)
+            os.makedirs(self.path)
         except OSError:
-            if not os.path.isdir(path):
+            if not os.path.isdir(self.path):
                 raise
-
+        
+        # Consider seeding random, using default (system time) now)
+    
+    def getNewParams(self, paramName):
+        """
+        Generate a new set of paramters based on learning method and config file
+        Returns a dictionary paramName : values
+        This version is Monte Carlo, other versions may just pick up a pre-generated file
+        """
+        params = self.jConf["learningParams"][paramName]
+        if params['numberOfStates'] == 0 :
+            
+            newParams = []
+        
+            for i in range(0, params['numberOfInstances']) :
+                subParams = []
+                for j in range(0, params['numberOfOutputs']) :
+                    # Assume scaling happens elsewhere
+                    subParams.append(random.random())
+                newParams.append(subParams)
+        else :
+            # Temp code for pre-specified neural network, future editions will generate networks
+            newParams = { 'numActions' : params['numberOfOutputs'],
+                         'numStates' : params['numberOfStates'],
+                         'neuralFilename' : "logs/bestParameters-6_fb-0.nnw"}
+    
+        return newParams
+    
+    def getNewFile(self, jobNum):
+        """
+        Handle the generation of a new JSON file with new parameters. Will vary based on the
+        learning method used and the config file
+        """
+        
+        obj = {}
+        
+        obj["nodeVals"] = self.getNewParams("nodeVals")
+        obj["edgeVals"] = self.getNewParams("edgeVals")
+        obj["feedbackVals"] = self.getNewParams("feedbackVals")
+        
+        outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+        
+        fout = open(outFile, 'w')
+    
+        json.dump(obj, fout, indent=4)
+        
+        return self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+    
     def beginTrial(self):
         """
         Override this. It should just contain a loop where you keep constructing NTRTJobs, then calling
@@ -134,16 +182,29 @@ class BrianJobMaster(NTRTJobMaster):
         deciding if you should run another trial or if you want to terminate.
         """
         
-        # All args to be passed to subprocess must be strings
-        args = {'filename' : "tcContact.json",
-                'resourcePrefix' : self.obj['resourcePath'],
-                'path'     : self.obj['lowerPath'],
-                'executable' : self.obj['executable'],
-                'length'   : "60000"}
-        job = BrianJob(args)
-        scores = job.runJob()
-        print(scores)
-
+        numTrials = self.jConf['learningParams']['numTrials']
+        
+        results = {}
+        
+        for i in range(1, numTrials) :
+            
+            # MonteCarlo solution. This function could be overridden with something that 
+            # provides a filename for a pre-existing file
+            fileName = self.getNewFile(i)
+            
+            # All args to be passed to subprocess must be strings
+            args = {'filename' : fileName,
+                    'resourcePrefix' : self.jConf['resourcePath'],
+                    'path'     : self.jConf['lowerPath'],
+                    'executable' : self.jConf['executable'],
+                    'length'   : self.jConf['learningParams']['trialLength']}
+            job = BrianJob(args)
+            scores = job.runJob()
+            results[fileName] = scores[0]['distance']
+        
+        #TODO, something that exports results and picks the best trial based on results
+        
+    
 class BrianJob(NTRTJob):
     def __init__(self, jobArgs):
         """
@@ -177,7 +238,7 @@ class BrianJob(NTRTJob):
         master will care about.
         """
 
-        subprocess.call([self.args['executable'], "-l", self.args['filename'], "-b", "1"])
+        subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])])
         
         scoresPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename']
         
