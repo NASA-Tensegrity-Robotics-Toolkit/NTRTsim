@@ -121,9 +121,12 @@ class BrianJobMaster(NTRTJobMaster):
         
         # If this fails, the program should fail. Input file is required
         # for useful output
-        fin = open(self.configFileName, 'r')
-        self.jConf = json.load(fin)
-        fin.close()
+        try:
+            fin = open(self.configFileName, 'r')
+            self.jConf = json.load(fin)
+            fin.close()
+        except IOError:
+            raise NTRTMasterError("Please provide a valid configuration file")
         
         self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
         
@@ -131,7 +134,7 @@ class BrianJobMaster(NTRTJobMaster):
             os.makedirs(self.path)
         except OSError:
             if not os.path.isdir(self.path):
-                raise NTRTMasterError
+                raise NTRTMasterError("Directed the folder path to an invalid address")
         
         # Consider seeding random, using default (system time) now
     
