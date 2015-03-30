@@ -102,6 +102,12 @@ class NTRTJob:
         """
         pass
 
+class NTRTMasterError(Exception):
+    """
+    Base class for exceptions in this module
+    """
+    pass
+
 ###
 # Your implementations.
 ###
@@ -113,12 +119,11 @@ class BrianJobMaster(NTRTJobMaster):
         like creating your input and output directories.
         """
         
-        try:
-            fin = open(self.configFileName, 'r')
-            self.jConf = json.load(fin)
-            fin.close()
-        except IOError:
-            self.jConf = {}
+        # If this fails, the program should fail. Input file is required
+        # for useful output
+        fin = open(self.configFileName, 'r')
+        self.jConf = json.load(fin)
+        fin.close()
         
         self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
         
@@ -126,11 +131,11 @@ class BrianJobMaster(NTRTJobMaster):
             os.makedirs(self.path)
         except OSError:
             if not os.path.isdir(self.path):
-                raise
+                raise NTRTMasterError
         
-        # Consider seeding random, using default (system time) now)
+        # Consider seeding random, using default (system time) now
     
-    def getNewParams(self, paramName):
+    def __getNewParams(self, paramName):
         """
         Generate a new set of paramters based on learning method and config file
         Returns a dictionary paramName : values
@@ -163,9 +168,9 @@ class BrianJobMaster(NTRTJobMaster):
         
         obj = {}
         
-        obj["nodeVals"] = self.getNewParams("nodeVals")
-        obj["edgeVals"] = self.getNewParams("edgeVals")
-        obj["feedbackVals"] = self.getNewParams("feedbackVals")
+        obj["nodeVals"] = self.__getNewParams("nodeVals")
+        obj["edgeVals"] = self.__getNewParams("edgeVals")
+        obj["feedbackVals"] = self.__getNewParams("feedbackVals")
         
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
         
