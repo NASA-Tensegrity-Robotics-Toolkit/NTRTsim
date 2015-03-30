@@ -202,8 +202,8 @@ const tgHillyGround::Config AppGoalTerrain::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 100;
-    size_t ny = 100;
+    size_t nx = 180;
+    size_t ny = 180;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;
