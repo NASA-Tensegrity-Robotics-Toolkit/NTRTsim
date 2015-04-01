@@ -23,4 +23,5 @@ subdirs(
     multiTerrain
     TetraSpine_multiTerrain/
     TC_goal
+    JSONTests
     )

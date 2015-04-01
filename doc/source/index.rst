@@ -17,4 +17,5 @@ Contents
 
    setup.rst
    contribute-tutorials.rst
+   third-party-libraries.rst
    learning-library-walkthrough.rst
