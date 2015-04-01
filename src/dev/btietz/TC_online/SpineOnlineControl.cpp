@@ -130,6 +130,7 @@ void SpineOnlineControl::onStep(BaseSpineModelLearning& subject, double dt)
             
             if (dist > m_lastGoalDist)
             {
+#if (0)
                 // Moved away from the goal, get a new controller
                 std::vector<double> tempScores;
                 tempScores.push_back(m_controllerStartDist - dist);
@@ -140,6 +141,9 @@ void SpineOnlineControl::onStep(BaseSpineModelLearning& subject, double dt)
                         goalLearning,
                         goalConfigData);
                 m_controllerStartDist = dist;
+#else
+                throw std::runtime_error("Moved away from goal");
+#endif
             }
             
             m_feedbackControlTime = 0;
