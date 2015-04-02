@@ -74,9 +74,9 @@ bool AppMultiTerrain_OC::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-#if (0) // Feedback vs kinematic
+#if (1) // Feedback vs kinematic
         const int segmentSpan = 3;
-        const int numMuscles = 8;
+        const int numMuscles = 4;
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -86,7 +86,7 @@ bool AppMultiTerrain_OC::setup()
         const double highAmplitude = 300.0;
         const double kt = 0.0;
         const double kp = 1000.0;
-        const double kv = 200.0;
+        const double kv = 210.0;
         const bool def = true;
             
         // Overridden by def being true
@@ -102,7 +102,7 @@ bool AppMultiTerrain_OC::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
 
-        BaseSpineModelLearning::Config control_config(segmentSpan, 
+        SpineFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -118,10 +118,16 @@ bool AppMultiTerrain_OC::setup()
                                                     def,
                                                     cl,
                                                     lf,
-                                                    hf);
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax);
         /// @todo fix memory leak that occurs here
         SpineFeedbackControl* const myControl =
-        new SpineFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
+        new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_6/");
 #else
                 const int segmentSpan = 3;
                 const int numMuscles = 4;
