@@ -36,7 +36,7 @@
 #include "LinearMath/btVector3.h"
 
 class tgSpringCableActuator;
-class FlemonsSpineModelGoal;
+class BaseSpineModelGoal;
 
 /**
  * SpineGoalControl learns the parameters for a CPG system on a
@@ -117,15 +117,15 @@ protected:
     
     std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
-    std::vector<double> getGoalFeedback(const FlemonsSpineModelGoal* subject);
+    std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
     
-    void setGoalTensions(const FlemonsSpineModelGoal* subject, btVector3& desiredHeading);
+    void setGoalTensions(const BaseSpineModelGoal* subject, btVector3& desiredHeading);
     
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     
     std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions, configuration& configData);
     
-    double calculateDistanceMoved(const FlemonsSpineModelGoal* subject) const;
+    double calculateDistanceMoved(const BaseSpineModelGoal* subject) const;
     
     SpineGoalControl::Config m_config;
     

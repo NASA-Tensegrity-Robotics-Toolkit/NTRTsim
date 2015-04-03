@@ -48,7 +48,7 @@
 #include <set>
 
 OctahedralComplex::OctahedralComplex(int segments) :   
-    BaseSpineModelLearning(segments) 
+    BaseSpineModelGoal(segments) 
 {
 }
 
@@ -251,13 +251,13 @@ void OctahedralComplex::setup(tgWorld& world)
     children.clear();
     
     // Actually setup the children
-    BaseSpineModelLearning::setup(world);
+    BaseSpineModelGoal::setup(world);
 }
 
 void OctahedralComplex::teardown()
 {
     
-    BaseSpineModelLearning::teardown();
+    BaseSpineModelGoal::teardown();
       
 }
 
@@ -267,11 +267,6 @@ void OctahedralComplex::step(double dt)
     * from the physics update
     */
     
-    BaseSpineModelLearning::step(dt);  // Step any children
-}
-
-btVector3 OctahedralComplex::goalBoxPosition() const
-{
-    return m_goalBox->centerOfMass();
+    BaseSpineModelGoal::step(dt);  // Step any children
 }
 
