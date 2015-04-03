@@ -1,3 +1,5 @@
+import logging
+
 class ConcurrentScheduler:
 
     def __init__(self, toProcess, numProcesses):

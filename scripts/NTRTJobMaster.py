@@ -28,6 +28,7 @@ import os
 import subprocess
 import json
 import random
+import logging
 from concurrent_scheduler import ConcurrentScheduler
 
 ###
@@ -44,6 +45,7 @@ class NTRTJobMaster:
         """
         Don't override init. You should do all of your setup in the _setup method instead.
         """
+        logging.info("Instatiated NTRTJobMaster. Config file is %s, using %d processes." % (configFile, numProcesses))
         self.configFileName = configFile
         self.numProcesses = numProcesses
 
@@ -274,7 +276,8 @@ class BrianJob(NTRTJob):
             self.obj = {}
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
-    numProcesses = sys.argv[2]
+    numProcesses = int(sys.argv[2])
     jobMaster = BrianJobMaster(configFile, numProcesses)
     jobMaster.beginTrial()
