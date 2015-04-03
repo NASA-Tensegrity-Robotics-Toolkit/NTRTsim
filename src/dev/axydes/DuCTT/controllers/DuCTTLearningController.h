@@ -57,7 +57,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
                                 int axis=1,
                                 bool neuro=false,
                                 string resourcePath="",
-                                string suffix="_DuCTT",
+                                string suffix="DuCTT",
                                 string evoConfigFilename="Config.ini"
                                 );
 
@@ -108,7 +108,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
         const bool m_usingManualParams;
-        const string m_manualParamFile;
+        string m_manualParamFile;
         int m_axis; //axis of movement. x=0, y=1, z=2, all=3
 
         // Evolution Params

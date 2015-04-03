@@ -66,12 +66,11 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
                                                 string evoConfigFilename
                                                  ) :
     m_evoConfigFilename(evoConfigFilename),
-    m_evolution(suffix, evoConfigFilename),
-    m_NeuroEvolution(suffix, evoConfigFilename),
+    m_evolution(suffix, evoConfigFilename, resourcePath),
+    m_NeuroEvolution(suffix, evoConfigFilename, resourcePath),
     m_isLearning(false),
     m_initialLength(initialLength),
     m_usingManualParams(useManualParams),
-    m_manualParamFile(manParamFile),
     m_axis(axis),
     m_bUseNeuro(neuro),
     m_totalTime(0.0),
@@ -103,6 +102,7 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     }
     m_evoConfig.readFile(path+m_evoConfigFilename);
     m_isLearning = m_evoConfig.getBoolValue("learning");
+    m_manualParamFile = path+manParamFile;
 
     prisms.resize(nPrisms);
     clusters.resize(nClusters);

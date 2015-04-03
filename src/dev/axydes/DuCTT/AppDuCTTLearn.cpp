@@ -51,6 +51,10 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     startAngle = 0;
     ductAxis = 1;
 
+    paramFile = "";
+    resource_path = "axydes/DuCTT/";
+    suffix = "DuCTT";
+
     handleOptions(argc, argv);
 }
 
@@ -87,7 +91,10 @@ bool AppDuCTTLearn::setup()
     if (add_controller)
     {
         DuCTTLearningController* testLearningController =
-            new DuCTTLearningController(5.0, use_manual_params, paramFile, ductAxis, use_neuro);
+            new DuCTTLearningController(5.0, use_manual_params,
+                                        paramFile, ductAxis, use_neuro,
+                                        resource_path,
+                                        suffix);
         myRobotModel->attach(testLearningController);
     }
 
@@ -160,6 +167,8 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
         ("debug,D", po::value<bool>(&debug)->implicit_value(true), "Debug flag, output debug information. Default = false")
         ("neuro,n", po::value<bool>(&use_neuro)->implicit_value(true), "Neuro Evolution flag, use NeuroEvolution instead of AnnealEvolution. Default = false")
+        ("resource_path,r", po::value<string>(&resource_path)->implicit_value(resource_path), "Resource path (i.e. axydes/DuCTT). Default = 'axydes/DuCTT'")
+        ("suffix", po::value<string>(&suffix)->implicit_value(suffix), "Which learned controller to write to or use. Default = 'DuCTT'")
     ;
 
     po::variables_map vm;

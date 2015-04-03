@@ -40,8 +40,10 @@ add_executable(AppDuCTTLearn
     AppDuCTTLearn.cpp
 )
 
-add_custom_command(TARGET AppDuCTTLearn POST_BUILD
-    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/controllers/Config.ini ${CMAKE_CURRENT_BINARY_DIR}/Config.ini)
+file(GLOB SCRIPTS evolve*.sh)
+message("${SCRIPTS}")
 
-add_custom_command(TARGET AppDuCTTLearn POST_BUILD
-    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/controllers/logs)
+foreach(file ${SCRIPTS})
+    add_custom_command(TARGET AppDuCTTLearn POST_BUILD
+        COMMAND cp "${file}" ${CMAKE_CURRENT_BINARY_DIR}/.)
+endforeach(file)

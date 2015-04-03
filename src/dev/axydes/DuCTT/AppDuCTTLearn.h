@@ -93,6 +93,8 @@ private:
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
 
     std::string paramFile;
+    std::string resource_path;
+    std::string suffix;
 
     double startX;
     double startY;
