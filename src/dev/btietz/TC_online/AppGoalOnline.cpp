@@ -17,16 +17,15 @@
 */
 
 /**
- * @file AppGoalTerrain.cpp
+ * @file AppGoalOnline.cpp
  * @brief Contains the definition of functions for multi-terrain app
  * @author Brian Mirletz, Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "AppGoalTerrain.h"
+#include "AppGoalOnline.h"
 
-AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
+AppGoalOnline::AppGoalOnline(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -51,7 +50,7 @@ AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppGoalTerrain::setup()
+bool AppGoalOnline::setup()
 {
     // First create the world
     world = createWorld();
@@ -101,8 +100,11 @@ bool AppGoalTerrain::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
         const double tensionFeedback = 1000.0;
+        
+        // How often to check/change the controller during online learning
+        const double feedbackTime = 3.0;
 
-        SpineGoalControl::Config control_config(segmentSpan, 
+        SpineOnlineControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -125,11 +127,12 @@ bool AppGoalTerrain::setup()
                                                     afMax,
                                                     pfMin,
                                                     pfMax,
-                                                    tensionFeedback
+                                                    tensionFeedback,
+                                                    feedbackTime
                                                     );
         /// @todo fix memory leak that occurs here
-        SpineGoalControl* const myControl =
-        new SpineGoalControl(control_config, suffix, "bmirletz/TetrahedralComplex_Goal/");
+        SpineOnlineControl* const myControl =
+        new SpineOnlineControl(control_config, suffix, "bmirletz/TetrahedralComplex_Online/");
 
         myModel->attach(myControl);
     }
@@ -147,7 +150,7 @@ bool AppGoalTerrain::setup()
     return bSetup;
 }
 
-void AppGoalTerrain::handleOptions(int argc, char **argv)
+void AppGoalOnline::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -194,7 +197,7 @@ void AppGoalTerrain::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppGoalTerrain::getHillyConfig()
+const tgHillyGround::Config AppGoalOnline::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -214,7 +217,7 @@ const tgHillyGround::Config AppGoalTerrain::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppGoalTerrain::getBoxConfig()
+const tgBoxGround::Config AppGoalOnline::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -231,14 +234,14 @@ const tgBoxGround::Config AppGoalTerrain::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppGoalTerrain::getBlocks()
+tgModel* AppGoalOnline::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppGoalTerrain::createWorld()
+tgWorld* AppGoalOnline::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -260,17 +263,17 @@ tgWorld* AppGoalTerrain::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppGoalTerrain::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppGoalOnline::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppGoalTerrain::createView(tgWorld *world)
+tgSimView *AppGoalOnline::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppGoalTerrain::run()
+bool AppGoalOnline::run()
 {
     if (!bSetup)
     {
@@ -296,7 +299,7 @@ bool AppGoalTerrain::run()
     return true;
 }
 
-void AppGoalTerrain::simulate(tgSimulation *simulation)
+void AppGoalOnline::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -350,8 +353,8 @@ void AppGoalTerrain::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppGoalTerrain" << std::endl;
-    AppGoalTerrain app (argc, argv);
+    std::cout << "AppGoalOnline" << std::endl;
+    AppGoalOnline app (argc, argv);
 
     if (app.setup())
         app.run();

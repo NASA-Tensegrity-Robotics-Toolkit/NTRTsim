@@ -74,8 +74,8 @@ namespace
 } // namespace
 
 tsTestRig::tsTestRig(bool kinematic) :
-useKinematic(kinematic),
-tgModel() 
+tgModel(),
+useKinematic(kinematic)
 {
 }
 

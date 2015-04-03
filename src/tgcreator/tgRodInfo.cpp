@@ -41,27 +41,27 @@
 // @todo: Need to take tags into account...
 
 tgRodInfo::tgRodInfo(const tgRod::Config& config) : 
+    tgRigidInfo(),
     m_pair(), 
-    m_config(config),
-    tgRigidInfo()
+    m_config(config)
 {}
 
 tgRodInfo::tgRodInfo(const tgRod::Config& config, tgTags tags) : 
+    tgRigidInfo(tags),
     m_pair(), 
-    m_config(config),
-    tgRigidInfo(tags)
+    m_config(config)
 {}
 
 tgRodInfo::tgRodInfo(const tgRod::Config& config, const tgPair& pair) :
+    tgRigidInfo(pair.getTags()),
     m_pair(pair),
-    m_config(config),
-    tgRigidInfo(pair.getTags())
+    m_config(config)
 {}
 
 tgRodInfo::tgRodInfo(const tgRod::Config& config, tgTags tags, const tgPair& pair) :
+    tgRigidInfo( tags + pair.getTags() ),
     m_pair(pair),
-    m_config(config),
-    tgRigidInfo( tags + pair.getTags() )
+    m_config(config)
 {}
 
 tgRigidInfo* tgRodInfo::createRigidInfo(const tgPair& pair)

@@ -1,4 +1,5 @@
-link_libraries(obstacles
+link_libraries(GoalSpine
+                obstacles
                CPG_feedback
                 KinematicString
                 learningSpines
@@ -13,15 +14,9 @@ link_libraries(obstacles
                 AnnealEvolution
                 tgOpenGLSupport
                 boost_program_options)
-
-add_library(GoalSpine SHARED
-                FlemonsSpineModelGoal.cpp
-                SpineGoalControl.cpp
-                )
                 
                 
-add_executable(AppGoalTerrain
-    FlemonsSpineModelGoal.cpp
-    SpineGoalControl.cpp
-    AppGoalTerrain.cpp
+add_executable(AppGoalOnline
+    SpineOnlineControl.cpp
+    AppGoalOnline.cpp
 )
