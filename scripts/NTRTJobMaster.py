@@ -220,9 +220,9 @@ class BrianJobMaster(NTRTJobMaster):
         for job in completedJobs:
             job.processJobOutput()
             fileName = job.args['filename']
-            results[fileName] = job.obj[0]['distance']
+            #TODO: Brian, fix this line to get the proper value out from the obj.
+            #results[fileName] = job.obj ??
 
-        print "Jobs are complete, results are: %r" % results
         #job.startJob()
         #scores = job.runJob()
         #results[fileName] = scores[0]['distance']
@@ -265,7 +265,7 @@ class BrianJob(NTRTJob):
             # Redirect the stdout output to dev null in the child.
             devNull = open(os.devnull, 'wb')
             subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
-            sys.exit(0)
+            sys.exit()
 
     def processJobOutput(self):
         scoresPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename']
