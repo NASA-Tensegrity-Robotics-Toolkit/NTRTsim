@@ -263,7 +263,8 @@ class BrianJob(NTRTJob):
 
         if self.pid == 0:
             # Redirect the stdout output to dev null in the child.
-            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=os.devnull)
+            devNull = open(os.devnull, 'wb')
+            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
             sys.exit(0)
 
     def processJobOutput(self):
