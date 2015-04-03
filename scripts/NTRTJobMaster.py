@@ -241,6 +241,7 @@ class BrianJob(NTRTJob):
         You can put args into this however you want, just depends on what convention you want to use. I'd personally
         use a dictionary. If you use a dictionary, just use the jobArgs keyword from this function's signature.
         """
+        logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
 
         self._setup()
@@ -257,12 +258,12 @@ class BrianJob(NTRTJob):
         by NTRTJobMaster when it wants to start this NTRT process.
         """
 
+        logging.info("STARTING job with args %r" % self.args)
         self.pid = os.fork()
 
         if self.pid == 0:
             # Redirect the stdout output to dev null in the child.
-            sys.stdout = os.devnull
-            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])])
+            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=os.devnull)
             sys.exit(0)
 
     def processJobOutput(self):
