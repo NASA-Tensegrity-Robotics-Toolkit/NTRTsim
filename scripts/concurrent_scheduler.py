@@ -23,9 +23,6 @@ class ConcurrentScheduler:
     def __jobLoop(self):
         while True:
 
-            for processing in self.jobsProcessing:
-                print "Waiting on job with PID %d" % processing.pid
-
             if len(self.jobsUnprocessed) == 0 and len(self.jobsProcessing) == 0:
                 logging.info("All jobs processed. Breaking out of job loop.")
                 return
