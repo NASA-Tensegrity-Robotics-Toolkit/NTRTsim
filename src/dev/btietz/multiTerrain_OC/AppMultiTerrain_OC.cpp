@@ -26,6 +26,14 @@
 
 #include "AppMultiTerrain_OC.h"
 
+//robot
+#include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
+
+// controller 
+#include "dev/CPG_feedback/SpineFeedbackControl.h"
+#include "dev/btietz/TC_goal/SpineGoalControl.h"
+
+
 AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
 {
     bSetup = false;
@@ -74,7 +82,7 @@ bool AppMultiTerrain_OC::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-#if (1) // Feedback vs kinematic
+
         const int segmentSpan = 3;
         const int numMuscles = 4;
         const int numParams = 2;
@@ -101,8 +109,9 @@ bool AppMultiTerrain_OC::setup()
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
+        const double tensionFeedback = 1000.0;
 
-        SpineFeedbackControl::Config control_config(segmentSpan, 
+        SpineGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -124,53 +133,13 @@ bool AppMultiTerrain_OC::setup()
                                                     afMin,
                                                     afMax,
                                                     pfMin,
-                                                    pfMax);
+                                                    pfMax,
+                                                    tensionFeedback
+                                                    );
         /// @todo fix memory leak that occurs here
-        SpineFeedbackControl* const myControl =
-        new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_6/");
-#else
-                const int segmentSpan = 3;
-                const int numMuscles = 4;
-                const int numParams = 2;
-                const int segNumber = 0; // For learning results
-                const double controlTime = .01;
-                const double lowPhase = -1 * M_PI;
-                const double highPhase = M_PI;
-                const double lowAmplitude = 0.0;
-                const double highAmplitude = 30.0;
-                const double kt = 0.0;
-                const double kp = 1000.0;
-                const double kv = 210.0;
-                const bool def = true;
-                    
-                // Overridden by def being true
-                const double cl = 10.0;
-                const double lf = 0.0;
-                const double hf = 30.0;
+        SpineGoalControl* const myControl =
+        new SpineGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
 
-    
-                BaseSpineCPGControl::Config control_config(segmentSpan, 
-                                                            numMuscles,
-                                                            numMuscles,
-                                                            numParams, 
-                                                            segNumber, 
-                                                            controlTime,
-                                                            lowAmplitude,
-                                                            highAmplitude,
-                                                            lowPhase,
-                                                            highPhase,
-                                                            kt,
-                                                            kp,
-                                                            kv,
-                                                            def,
-                                                            cl,
-                                                            lf,
-                                                            hf
-                                                            );
-    KinematicSpineCPGControl* const myControl =
-      new KinematicSpineCPGControl(control_config, suffix, "bmirletz/OctaCL_6/");       
-        
-#endif
         myModel->attach(myControl);
     }
 
@@ -242,8 +211,8 @@ const tgHillyGround::Config AppMultiTerrain_OC::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 100;
-    size_t ny = 100;
+    size_t nx = 180;
+    size_t ny = 180;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;
@@ -259,7 +228,14 @@ const tgBoxGround::Config AppMultiTerrain_OC::getBoxConfig()
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    const double friction = 0.5;
+    const double restitution = 0.0;
+    const btVector3 size(1000.0, 1.5, 1000.0);
+    
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),
+                                            friction,
+                                            restitution,
+                                            size    );
     
     return groundConfig;
 }

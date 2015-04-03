@@ -50,7 +50,7 @@
 #include <set>
 
 FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments) : 
-    BaseSpineModelLearning(segments) 
+    BaseSpineModelGoal(segments) 
 {
 }
 
@@ -216,13 +216,13 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     children.clear();
     
     // Actually setup the children, notify controller
-    BaseSpineModelLearning::setup(world);
+    BaseSpineModelGoal::setup(world);
 }
 
 void FlemonsSpineModelGoal::teardown()
 {
     
-    BaseSpineModelLearning::teardown();
+    BaseSpineModelGoal::teardown();
       
 }
 
@@ -232,18 +232,5 @@ void FlemonsSpineModelGoal::step(double dt)
     * from the physics update
     */
     
-    BaseSpineModelLearning::step(dt);  // Step any children
-}
-
-btVector3 FlemonsSpineModelGoal::goalBoxPosition() const
-{
-    return m_goalBox->centerOfMass();
-}
-
-void FlemonsSpineModelGoal::mapSegmentMuscles()
-{
-    for (int i = 1; i < m_segments; i++)
-    {
-        m_segmentMuscles.push_back(find<tgSpringCableActuator> (tgString("seg", i)));
-    }
+    BaseSpineModelGoal::step(dt);  // Step any children
 }

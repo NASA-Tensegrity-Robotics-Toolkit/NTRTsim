@@ -26,7 +26,7 @@
 
 #include "SpineGoalControl.h"
 
-#include "FlemonsSpineModelGoal.h"
+#include "BaseSpineModelGoal.h"
 
 // Should include tgString, but compiler complains since its been
 // included from BaseSpineModelLearning. Perhaps we should move things
@@ -171,7 +171,7 @@ void SpineGoalControl::onSetup(BaseSpineModelLearning& subject)
     m_updateTime = 0.0;
     bogus = false;
     
-    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     std::cout << goalSubject->goalBoxPosition() << std::endl;
 }
 
@@ -182,13 +182,13 @@ void SpineGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     {
 
 #if (1)        
-        const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
         std::vector<double> desComs = getGoalFeedback(goalSubject);
-#else 
+#else // Goal feedback vs others
     #if (1)
             std::vector<double> desComs = getFeedback(subject);
 
-    #else        
+    #else  // cable feedback vs no feedback
             std::size_t numControllers = subject.getNumberofMuslces() * 3;
             
             double descendingCommand = 0.0;
@@ -229,7 +229,7 @@ void SpineGoalControl::onTeardown(BaseSpineModelLearning& subject)
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
     
-    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
     const double distanceMoved = calculateDistanceMoved(goalSubject);
     
@@ -391,7 +391,7 @@ std::vector<double> SpineGoalControl::getFeedback(BaseSpineModelLearning& subjec
     return feedback;
 }
 
-std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoal* subject)
+std::vector<double> SpineGoalControl::getGoalFeedback(const BaseSpineModelGoal* subject)
 {
 
     // Add cable feedback to close the low level loop
@@ -461,7 +461,8 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
     
 #endif
     assert (feedback.size() == n * nA);
-    
+
+#if (0) //Switch for cable based feedback   
     for(std::size_t i = 0; i != n; i++)
     {
         const tgSpringCableActuator& cable = *(allCables[i]);
@@ -474,12 +475,12 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const FlemonsSpineModelGoa
             feedback[i * nA + j] += cableFeedback[j];
         }
     }
-    
+#endif
     
     return feedback;
 }
 
-void SpineGoalControl::setGoalTensions(const FlemonsSpineModelGoal* subject, btVector3& desiredHeading)
+void SpineGoalControl::setGoalTensions(const BaseSpineModelGoal* subject, btVector3& desiredHeading)
 {
     std::vector<double> state;
     state.push_back(desiredHeading.getX());
@@ -541,7 +542,7 @@ std::vector<double> SpineGoalControl::transformFeedbackActions(std::vector< std:
 	return feedback;
 }
 
-double SpineGoalControl::calculateDistanceMoved(const FlemonsSpineModelGoal* subject) const
+double SpineGoalControl::calculateDistanceMoved(const BaseSpineModelGoal* subject) const
 {
     std::vector<double> finalConditions = subject->getSegmentCOM(m_config.segmentNumber);
   

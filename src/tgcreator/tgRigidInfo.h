@@ -76,24 +76,24 @@ class tgRigidInfo : public tgTaggable {
 public:
         
     tgRigidInfo() : 
+        tgTaggable(),
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_collisionObject(NULL), 
-        tgTaggable()
+        m_collisionObject(NULL)
     {}    
 
     tgRigidInfo(tgTags tags) : 
+        tgTaggable(tags),
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_collisionObject(NULL), 
-        tgTaggable(tags)
+        m_collisionObject(NULL)
     {}    
 
     tgRigidInfo(const std::string& space_separated_tags) :
+        tgTaggable(space_separated_tags),
         m_collisionShape(NULL), 
         m_rigidInfoGroup(NULL), 
-        m_collisionObject(NULL), 
-        tgTaggable(space_separated_tags)
+        m_collisionObject(NULL)        
     {}    
     
     /** The destructor has nothing to do. */

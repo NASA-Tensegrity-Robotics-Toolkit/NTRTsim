@@ -88,7 +88,7 @@ void tgStructureInfo::createTree(tgStructureInfo& structureInfo,
                  const tgStructure& structure)
 {
     const std::vector<tgStructure*> children = structure.getChildren();
-    for (int i = 0; i < children.size(); i++)
+    for (std::size_t i = 0; i < children.size(); i++)
     {
         tgStructure * const pStructure = children[i];
     assert(pStructure != NULL);
@@ -105,7 +105,7 @@ std::vector<tgRigidInfo*> tgStructureInfo::getAllRigids() const
     result.insert(result.end(), m_rigids.begin(), m_rigids.end());
  
     // Collect child rigids
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
     assert(pStructureInfo != NULL);
@@ -126,7 +126,7 @@ void tgStructureInfo::initRigidInfo()
 
     const std::vector<tgBuildSpec::RigidAgent*> rigidAgents = m_buildSpec.getRigidAgents();
 
-    for (int i = 0; i < rigidAgents.size(); i++)
+    for (std::size_t i = 0; i < rigidAgents.size(); i++)
     {
         tgBuildSpec::RigidAgent * const pRigidAgent = rigidAgents[i];
         assert(pRigidAgent != NULL);
@@ -154,7 +154,7 @@ void tgStructureInfo::initRigidInfo()
     }
     
     // Children
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo* const pStructureInfo = m_children[i];
         
@@ -177,7 +177,7 @@ void tgStructureInfo::initConnectorInfo()
     const std::vector<tgBuildSpec::ConnectorAgent*> connectorAgents =
         m_buildSpec.getConnectorAgents();
 
-    for (int i = 0; i < connectorAgents.size(); i++)
+    for (std::size_t i = 0; i < connectorAgents.size(); i++)
     {
         tgBuildSpec::ConnectorAgent* const pConnectorAgent = connectorAgents[i];
         assert(pConnectorAgent != NULL);
@@ -203,7 +203,7 @@ void tgStructureInfo::initConnectorInfo()
     }
     
     // Children
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
         assert(pStructureInfo != NULL);
@@ -218,7 +218,7 @@ void tgStructureInfo::chooseConnectorRigids()
 
 void tgStructureInfo::chooseConnectorRigids(std::vector<tgRigidInfo*> allRigids)
 {
-    for (int i = 0; i < m_connectors.size(); i++)
+    for (std::size_t i = 0; i < m_connectors.size(); i++)
     {
         tgConnectorInfo * const pConnectorInfo = m_connectors[i];
     assert(pConnectorInfo != NULL);
@@ -226,7 +226,7 @@ void tgStructureInfo::chooseConnectorRigids(std::vector<tgRigidInfo*> allRigids)
     }    
 
     // Children
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
     assert(pStructureInfo != NULL);
@@ -237,7 +237,7 @@ void tgStructureInfo::chooseConnectorRigids(std::vector<tgRigidInfo*> allRigids)
 void tgStructureInfo::initRigidBodies(tgWorld& world) 
 {
     // Rigids
-    for (int i = 0; i < m_rigids.size(); i++)
+    for (std::size_t i = 0; i < m_rigids.size(); i++)
     {
         tgRigidInfo * const pRigidInfo = m_rigids[i];
     assert(pRigidInfo != NULL);
@@ -245,7 +245,7 @@ void tgStructureInfo::initRigidBodies(tgWorld& world)
     }
     
     // Children
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
     assert(pStructureInfo != NULL);
@@ -256,7 +256,7 @@ void tgStructureInfo::initRigidBodies(tgWorld& world)
 void tgStructureInfo::initConnectors(tgWorld& world) 
 {
     // Connectors
-    for (int i = 0; i < m_connectors.size(); i++)
+    for (std::size_t i = 0; i < m_connectors.size(); i++)
     {
         tgConnectorInfo * const pConnectorInfo = m_connectors[i];
     assert(pConnectorInfo != NULL);
@@ -264,7 +264,7 @@ void tgStructureInfo::initConnectors(tgWorld& world)
     }
     
     // Children
-    for (int i = 0; i < m_children.size(); i++)
+    for (std::size_t i = 0; i < m_children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = m_children[i];
     assert(pStructureInfo != NULL);
@@ -292,7 +292,7 @@ void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,
 {
     
     const std::vector<tgRigidInfo*> rigids = structureInfo.getRigids();
-    for (int i = 0; i < rigids.size(); i++)
+    for (std::size_t i = 0; i < rigids.size(); i++)
     {
         tgRigidInfo * const pRigidInfo = rigids[i];
     assert(pRigidInfo != NULL);
@@ -305,7 +305,7 @@ void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,
     }
     
     const std::vector<tgConnectorInfo*> connectors = structureInfo.getConnectors();
-    for (int i = 0; i < connectors.size(); i++)
+    for (std::size_t i = 0; i < connectors.size(); i++)
     {
         tgConnectorInfo * const pConnectorInfo = connectors[i];
     assert(pConnectorInfo != NULL);
@@ -318,7 +318,7 @@ void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,
     }
     
     const std::vector<tgStructureInfo*> children = structureInfo.getChildren();
-    for (int i = 0; i < children.size(); i++)
+    for (std::size_t i = 0; i < children.size(); i++)
     {
         tgStructureInfo * const pStructureInfo = children[i];
     assert(pStructureInfo != NULL);
@@ -350,17 +350,17 @@ std::string tgStructureInfo::toString(const std::string& prefix) const
         os << prefix << "tgStructureInfo(" << std::endl;
 
         os << prefix << p << "Rigids:" << std::endl;
-        for (int i = 0; i < m_rigids.size(); i++) {
+        for (std::size_t i = 0; i < m_rigids.size(); i++) {
             os << prefix << p << p << *(m_rigids[i]) << std::endl;
         }
 
         os << prefix << p << "Connectors:" << std::endl;
-        for (int i = 0; i < m_connectors.size(); i++) {
+        for (std::size_t i = 0; i < m_connectors.size(); i++) {
             os << prefix << p << p << *(m_connectors[i]) << std::endl;
         }
 
         os << prefix << p << "Children:" << std::endl;
-        for (int i = 0; i < m_children.size(); i++) {
+        for (std::size_t i = 0; i < m_children.size(); i++) {
             os << m_children[i]->toString(prefix + p + p) << std::endl; 
         }
 

@@ -15,12 +15,14 @@ link_libraries(obstacles
                 boost_program_options)
 
 add_library(GoalSpine SHARED
+                BaseSpineModelGoal.cpp
                 FlemonsSpineModelGoal.cpp
                 SpineGoalControl.cpp
                 )
                 
                 
 add_executable(AppGoalTerrain
+    BaseSpineModelGoal.cpp
     FlemonsSpineModelGoal.cpp
     SpineGoalControl.cpp
     AppGoalTerrain.cpp

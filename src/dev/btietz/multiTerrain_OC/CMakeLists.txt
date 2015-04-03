@@ -1,4 +1,5 @@
-link_libraries(obstacles
+link_libraries(GoalSpine
+                obstacles
                 KinematicString
                flemonsSpineContact
                CPG_feedback
