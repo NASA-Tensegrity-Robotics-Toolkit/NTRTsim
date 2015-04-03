@@ -35,6 +35,7 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     add_controller = false;
     add_duct = false;
     use_manual_params = false;
+    use_neuro = false;
 
     timestep_physics = 1.0f/1000.0f;
     timestep_graphics = 1.0f/60.0f;
@@ -86,7 +87,7 @@ bool AppDuCTTLearn::setup()
     if (add_controller)
     {
         DuCTTLearningController* testLearningController =
-            new DuCTTLearningController(5.0, use_manual_params, paramFile, ductAxis);
+            new DuCTTLearningController(5.0, use_manual_params, paramFile, ductAxis, use_neuro);
         myRobotModel->attach(testLearningController);
     }
 
@@ -158,6 +159,7 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
         ("debug,D", po::value<bool>(&debug)->implicit_value(true), "Debug flag, output debug information. Default = false")
+        ("neuro,n", po::value<bool>(&use_neuro)->implicit_value(true), "Neuro Evolution flag, use NeuroEvolution instead of AnnealEvolution. Default = false")
     ;
 
     po::variables_map vm;

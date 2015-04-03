@@ -31,12 +31,14 @@
 
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
+#include "learning/Adapters/NeuroAdapter.h"
 
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 
 // Forward declarations
 class AnnealEvolution;
+class NeuroEvolution;
 class DuCTTRobotModel;
 class tgBasicActuator;
 class tgPrismatic;
@@ -53,6 +55,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
                                 const bool useManualParams=false,
                                 const string manParamFile="",
                                 int axis=1,
+                                bool neuro=false,
                                 string resourcePath="",
                                 string suffix="_DuCTT",
                                 string evoConfigFilename="Config.ini"
@@ -108,12 +111,20 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         const string m_manualParamFile;
         int m_axis; //axis of movement. x=0, y=1, z=2, all=3
 
-        // Evolution and Adapter
+        // Evolution Params
         bool m_isLearning;
         string m_evoConfigFilename;
         configuration m_evoConfig;
+
+        // Anneal adapter
         AnnealEvolution m_evolution;
         AnnealAdapter m_evolutionAdapter;
+
+        // Neuro adapter
+        NeuroEvolution m_NeuroEvolution;
+        NeuroAdapter m_neuroAdapter;
+        bool m_bUseNeuro;
+
         vector< vector<double> > m_actions; // For modifications between episodes
 
         // Muscle Clusters

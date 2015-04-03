@@ -39,6 +39,7 @@
 #include "helpers/FileHelpers.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
+#include "learning/NeuroEvolution/NeuroEvolution.h"
 #include "learning/Configuration/configuration.h"
 
 // The C++ Standard Library
@@ -59,21 +60,26 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
                                                 const bool useManualParams,
                                                 const string manParamFile,
                                                 int axis,
+                                                bool neuro,
                                                 string resourcePath,
                                                 string suffix,
                                                 string evoConfigFilename
                                                  ) :
     m_evoConfigFilename(evoConfigFilename),
     m_evolution(suffix, evoConfigFilename),
+    m_NeuroEvolution(suffix, evoConfigFilename),
     m_isLearning(false),
     m_initialLength(initialLength),
     m_usingManualParams(useManualParams),
     m_manualParamFile(manParamFile),
     m_axis(axis),
+    m_bUseNeuro(neuro),
     m_totalTime(0.0),
     maxStringLengthFactor(1.50),
-    nClusters(8),
-    musclesPerCluster(1),
+//    nClusters(8),
+    nClusters(2),
+//    musclesPerCluster(1),
+    musclesPerCluster(4),
     nPrisms(2),
     nActions(nClusters+nPrisms),
     imp_controller(new tgImpedanceController(1000, 500, 10)),
@@ -107,6 +113,7 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
 /** Set the lengths of the muscles and initialize the learning adapter */
 void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
 {
+    std::cout << "Setting up" << std::endl;
     double dt = 0.0001;
 
     //Set the initial length of every muscle in the subject
@@ -124,7 +131,15 @@ void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
     subject.getTopPrismatic()->moveMotors(dt);
 
     populateClusters(subject);
-    m_evolutionAdapter.initialize(&m_evolution, m_isLearning, m_evoConfig);
+
+    if (m_bUseNeuro)
+    {
+        m_neuroAdapter.initialize(&m_NeuroEvolution, m_isLearning, m_evoConfig);
+    }
+    else
+    {
+        m_evolutionAdapter.initialize(&m_evolution, m_isLearning, m_evoConfig);
+    }
     initializeSineWaves(); // For muscle actuation
 
     /* Empty vector signifying no state information
@@ -133,8 +148,15 @@ void DuCTTLearningController::onSetup(DuCTTRobotModel& subject)
      */
     vector<double> state;
 
-    //get the actions (between 0 and 1) from evolution
-    m_actions = m_evolutionAdapter.step(dt,state);
+        //get the actions (between 0 and 1) from evolution
+    if (m_bUseNeuro)
+    {
+        m_actions = m_neuroAdapter.step(dt,state);
+    }
+    else
+    {
+        m_actions = m_evolutionAdapter.step(dt,state);
+    }
  
     //transform them to the size of the structure
     m_actions = transformActions(m_actions);
@@ -162,6 +184,30 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
     {
         initPosition = subject.getCOM();
         m_bRecordedStart = true;
+    }
+
+    btVector3 bottomCOM = subject.getTetraCOM();
+    btVector3 topCOM = subject.getTetraCOM(false);
+
+//    fprintf(stderr,"bottom: <%f,%f,%f>\n",bottomCOM.x(), bottomCOM.y(), bottomCOM.z());
+//    fprintf(stderr,"top: <%f,%f,%f>\n",topCOM.x(), topCOM.y(), topCOM.z());
+
+    double diffx = topCOM.x() - bottomCOM.x();
+    double diffy = topCOM.y() - bottomCOM.y();
+    double diffz = topCOM.z() - bottomCOM.z();
+
+    double tilting = false;
+    if (m_axis == 1)
+    {
+        double totalDiff = diffx + diffz;
+//        fprintf(stderr,"Diff: %f\n", totalDiff);
+
+        //starting to tilt?
+        if (fabs(totalDiff) > 1)
+        {
+//            std::cerr << "TILTING!!!" << std::endl;
+            tilting = true;
+        }
     }
 
     setPreferredMuscleLengths(subject, dt);
@@ -209,8 +255,14 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
 
     scores.push_back(energySpent);
 
-    std::cout << "Tearing down" << std::endl;
-    m_evolutionAdapter.endEpisode(scores);
+    if (m_bUseNeuro)
+    {
+        m_neuroAdapter.endEpisode(scores);
+    }
+    else
+    {
+        m_evolutionAdapter.endEpisode(scores);
+    }
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
     delete amplitude;
@@ -221,6 +273,7 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
     m_totalTime = 0.0;
     m_bRecordedStart = false;
     m_bBadRun = false;
+    std::cout << "Torn down" << std::endl;
 }
 
 /** 
@@ -262,7 +315,10 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
     double ranges[N_PARAMS] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     std::vector< std::vector<double> > newActions (nActions);
+
     //going from 1x40 to 10x4
+    //going from 1x16 to 4x4
+    //#1=vertical, #2=saddle, 3-4=prism
     for(int i=0;i<nActions;i++) //10x
     {
         newActions[i] = std::vector<double>(N_PARAMS);
@@ -272,7 +328,10 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
         }
     }
 
-    if (params.size() > 40)
+    //going from 1x28 to 7x4
+    //first 4 are vertical cables, #5 is all saddle cables, last two are prisms
+
+    if (params.size()%4 != 0)
     {
         double touchParam;
         int touchOffset = actions[0].size() - (nActions*N_PARAMS);
@@ -281,7 +340,7 @@ vector< vector <double> > DuCTTLearningController::transformActions(vector< vect
         std::cerr << "Ignoring touch sensors: " << m_bIgnoreTouchSensors << std::endl;
     }
 
-    if (params.size() > 41)
+    if (params.size()%4 != 0)
     {
         double minHistorisis = 0.0;
         double maxHistorisis = 2.0;
@@ -389,6 +448,8 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
         {
             double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
             pPrism->setPreferredLength(newLength);
+//            std::cerr << "Prism is top: " << isTop << ", newLength: " << newLength;
+//            fprintf(stderr, ", amp: %f, freq: %f, phase: %f, offset: %f\n", amplitude[idx], angularFrequency[idx], phase, dcOffset[idx]);
         }
         else
         {
@@ -405,13 +466,13 @@ bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
     bool sPause = false;
     if (isTop)
     {
-        sPause = shouldPause(subject.topTouchSensors);// && !shouldPause(subject.bottomTouchSensors);
+        sPause = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
         if (sPause)
             topCounter++;
     }
     else
     {
-        sPause = shouldPause(subject.bottomTouchSensors);// && !shouldPause(subject.topTouchSensors);
+        sPause = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
         if (sPause)
             bottomCounter++;
     }
@@ -510,7 +571,8 @@ double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {
                                          
 std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, string filename) {
     assert(lineNumber > 0);
-    vector<double> result(nActions*N_PARAMS+2, 1.0);
+    int numParams = nActions*N_PARAMS+2;
+    vector<double> result(numParams, 1.0);
     string line;
     ifstream infile(filename.c_str(), ifstream::in);
 
@@ -528,7 +590,7 @@ std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, st
     stringstream lineStream(line);
     string cell;
     int iCell = 0;
-    while(getline(lineStream,cell,',')) {
+    while(getline(lineStream,cell,',') && iCell <= numParams) {
         result[iCell] = atof(cell.c_str());
         iCell++;
     }
