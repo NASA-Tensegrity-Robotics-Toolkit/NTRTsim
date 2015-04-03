@@ -1,6 +1,6 @@
 class ConcurrentScheduler:
 
-    def self(self, toProcess, numProcesses):
+    def __init__(self, toProcess, numProcesses):
         self.numProcesses = numProcesses
         self.jobsUnprocessed = toProcess
         self.jobsProcessing = []
