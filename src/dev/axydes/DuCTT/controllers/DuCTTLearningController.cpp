@@ -88,7 +88,9 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
     m_bRecordedStart(false),
     bottomCounter(0),
     topCounter(0),
-    m_dHistorisisSeconds(0.5)
+    m_dHistorisisSeconds(0.5),
+    m_bBottomPaused(false),
+    m_bTopPaused(false)
 {
     std::string path;
     if (resourcePath != "")
@@ -464,16 +466,23 @@ bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
     static const double maxCount = m_dHistorisisSeconds*1000;//1000Hz timestep
 
     bool sPause = false;
+    bool sUnPause = false;
     if (isTop)
     {
-        sPause = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
-        if (sPause)
+//        sPause = shouldPause(subject.topTouchSensors) && !shouldPause(subject.bottomTouchSensors);
+        sPause = shouldPause(subject.topTouchSensors);// && !shouldPause(subject.bottomTouchSensors);
+        sUnPause = shouldPause(subject.bottomTouchSensors);
+//        if (sPause)
+        if ((sPause && !m_bTopPaused) || (sUnPause && m_bTopPaused))
             topCounter++;
     }
     else
     {
-        sPause = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
-        if (sPause)
+//        sPause = shouldPause(subject.bottomTouchSensors) && !shouldPause(subject.topTouchSensors);
+        sPause = shouldPause(subject.bottomTouchSensors);// && !shouldPause(subject.topTouchSensors);
+        sUnPause = shouldPause(subject.topTouchSensors);
+//        if (sPause)
+        if ((sPause && !m_bBottomPaused) || (sUnPause && m_bBottomPaused))
             bottomCounter++;
     }
     bool isLocked = false;
@@ -481,13 +490,31 @@ bool DuCTTLearningController::isLocked(DuCTTRobotModel& subject, bool isTop)
     {
         if (isTop && topCounter > maxCount)
         {
-            isLocked = true;
-            bottomCounter = 0;
-        }
-        else if (bottomCounter > maxCount)
-        {
-            isLocked = true;
+            if (!m_bTopPaused)
+            {
+                isLocked = true;
+                m_bTopPaused = true;
+            }
+            else
+            {
+                isLocked = false;
+                m_bTopPaused = false;
+            }
             topCounter = 0;
+        }
+        else if (!isTop && bottomCounter > maxCount)
+        {
+            if (!m_bBottomPaused)
+            {
+                isLocked = true;
+                m_bBottomPaused = true;
+            }
+            else
+            {
+                isLocked = false;
+                m_bBottomPaused = false;
+            }
+            bottomCounter = 0;
         }
     }
 
@@ -596,12 +623,12 @@ std::vector<double> DuCTTLearningController::readManualParams(int lineNumber, st
     }
 
     // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
-//    for (int i=0; i < result.size(); i++) {
-//        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-//        double seed = ((double) (rand() % 100)) / 100;
-//        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
-//        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-//    }
+    for (int i=0; i < result.size(); i++) {
+        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+        double seed = ((double) (rand() % 100)) / 100;
+        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+    }
 
     return result;
 }

@@ -148,6 +148,8 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         tgImpedanceController* imp_controller;
         bool m_bBadRun;
 
+        bool m_bBottomPaused;
+        bool m_bTopPaused;
         int bottomCounter;
         int topCounter;
         double m_dHistorisisSeconds;

@@ -334,7 +334,6 @@ void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
     s.addPair(2, topNodesStart+1,  "saddle string cluster8");
 }
 /**/
-
 void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
 {
     //vertical strings
@@ -349,6 +348,7 @@ void DuCTTRobotModel::addMuscles(tgStructure& s, int topNodesStart)
     s.addPair(3, topNodesStart+1,  "saddle string cluster2");
     s.addPair(2, topNodesStart+1,  "saddle string cluster2");
 }
+/**/
 
 void DuCTTRobotModel::setup(tgWorld& world)
 {
