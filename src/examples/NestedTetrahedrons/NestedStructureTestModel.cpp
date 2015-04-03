@@ -43,8 +43,8 @@
 #include <stdexcept>
 
 NestedStructureTestModel::NestedStructureTestModel(size_t segments) : 
-    m_segments(segments),
-    tgModel() 
+    tgModel(),
+    m_segments(segments)
 {
 }
 

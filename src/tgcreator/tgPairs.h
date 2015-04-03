@@ -44,7 +44,7 @@ public:
     // tgPairs(std::vector<tgPair>& pairs) : tgTaggables(pairs) { // @todo: Fix this -- casting is a problem...
     tgPairs(std::vector<tgPair>& pairs) : tgTaggables() {
         // @todo: make sure each pair is unique
-        for(int i = 0; i < pairs.size(); i++) {
+        for(std::size_t i = 0; i < pairs.size(); i++) {
             addElement(pairs[i]);
         }
     }
@@ -85,7 +85,7 @@ public:
     void move(const btVector3& offset)
     {
         std::vector<tgPair>& pairs = getPairs();
-        for(int i = 0; i < pairs.size(); i++) {
+        for(std::size_t i = 0; i < pairs.size(); i++) {
             pairs[i].move(offset);
         }
     }
@@ -111,7 +111,7 @@ public:
                      const btQuaternion& rotation)
     {
         std::vector<tgPair>& pairs = getPairs();
-        for(int i = 0; i < pairs.size(); i++) {
+        for(std::size_t i = 0; i < pairs.size(); i++) {
             pairs[i].addRotation(fixedPoint, rotation);
         }
     }
@@ -159,7 +159,7 @@ operator<<(std::ostream& os, const tgPairs& p)
 
     os << "tgPairs(" << std::endl;
     const std::vector<tgPair>& pairs = p.getPairs();
-    for(int i = 0; i < pairs.size(); i++) {
+    for(std::size_t i = 0; i < pairs.size(); i++) {
         os << "  " << pairs[i] << std::endl;
     }
     os << ")";
