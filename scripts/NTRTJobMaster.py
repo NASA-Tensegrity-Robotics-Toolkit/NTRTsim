@@ -28,6 +28,7 @@ import os
 import subprocess
 import json
 import random
+from concurrent_scheduler import ConcurrentScheduler
 
 ###
 # Interfaces.
@@ -39,11 +40,12 @@ class NTRTJobMaster:
     NTRTJob objects.
     """
 
-    def __init__(self, configFile):
+    def __init__(self, configFile, numProcesses):
         """
         Don't override init. You should do all of your setup in the _setup method instead.
         """
         self.configFileName = configFile
+        self.numProcesses = numProcesses
 
         self._setup()
 
@@ -194,6 +196,7 @@ class BrianJobMaster(NTRTJobMaster):
         numTrials = self.jConf['learningParams']['numTrials']
 
         results = {}
+        jobList = []
 
         for i in range(1, numTrials) :
 
@@ -207,11 +210,20 @@ class BrianJobMaster(NTRTJobMaster):
                     'path'     : self.jConf['lowerPath'],
                     'executable' : self.jConf['executable'],
                     'length'   : self.jConf['learningParams']['trialLength']}
-            job = BrianJob(args)
-            print "Starting job."
-            job.startJob()
-            #scores = job.runJob()
-            #results[fileName] = scores[0]['distance']
+            jobList.append(BrianJob(args))
+
+        conSched = ConcurrentScheduler(jobList, self.numProcesses)
+        completedJobs = conSched.processJobs()
+
+        for job in completedJobs:
+            job.processJobOutput()
+            fileName = job.args['filename']
+            results[fileName] = job.obj[0]['distance']
+
+        print "Jobs are complete, results are: %r" % results
+        #job.startJob()
+        #scores = job.runJob()
+        #results[fileName] = scores[0]['distance']
 
         #TODO, something that exports results and picks the best trial based on results
 
@@ -261,5 +273,6 @@ class BrianJob(NTRTJob):
 
 if __name__ == "__main__":
     configFile = sys.argv[1]
-    jobMaster = BrianJobMaster(configFile)
+    numProcesses = sys.argv[2]
+    jobMaster = BrianJobMaster(configFile, numProcesses)
     jobMaster.beginTrial()
