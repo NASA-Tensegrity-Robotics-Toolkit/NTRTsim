@@ -19,5 +19,8 @@ link_libraries(GoalSpine
 
 add_executable(AppMultiTerrainOC
     OctahedralComplex.cpp
+    JSONGoalControl.cpp
     AppMultiTerrain_OC.cpp
 )
+
+target_link_libraries(AppMultiTerrainOC ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)

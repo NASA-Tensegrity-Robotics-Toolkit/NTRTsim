@@ -111,6 +111,8 @@ bool AppMultiTerrain_OC::setup()
         const double pfMax =  6.28;
         const double tensionFeedback = 1000.0;
 
+        
+#if (0)
         SpineGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
@@ -136,10 +138,38 @@ bool AppMultiTerrain_OC::setup()
                                                     pfMax,
                                                     tensionFeedback
                                                     );
+        
         /// @todo fix memory leak that occurs here
         SpineGoalControl* const myControl =
         new SpineGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
-
+#else
+        SpineFeedbackControl::Config control_config(segmentSpan, 
+                                                    numMuscles,
+                                                    numMuscles,
+                                                    numParams, 
+                                                    segNumber, 
+                                                    controlTime,
+                                                    lowAmplitude,
+                                                    highAmplitude,
+                                                    lowPhase,
+                                                    highPhase,
+                                                    kt,
+                                                    kp,
+                                                    kv,
+                                                    def,
+                                                    cl,
+                                                    lf,
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax);
+        
+        SpineFeedbackControl* const myControl =
+        new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_6/");
+#endif
         myModel->attach(myControl);
     }
 

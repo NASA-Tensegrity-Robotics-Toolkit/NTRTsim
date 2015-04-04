@@ -36,6 +36,7 @@
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -69,20 +70,30 @@ void OctahedralComplex::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    const double radius2  = 0.15;
-    const double density2 = 1;  // Note: This needs to be high enough or things fly apart...
-    const tgRod::Config rodConfig2(radius2, density2);
-    
-    const double stiffness = 1000.0;
-    const double damping = .01*stiffness;
+    const double elasticity = 1000.0;
+    const double damping = 10.0;
     const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 24.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+#if (0)
     const tgSpringCableActuator::Config stringConfig(stiffness, damping, pretension, false, 7000, 24);
-    
+#endif
     
     const double passivePretension = 700; // 5 N
-    tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
+    tgKinematicActuator::Config muscleConfig(2000, 20, passivePretension, 
+                                             mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -195,8 +206,8 @@ void OctahedralComplex::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     #if (1)
-    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
-    spec.addBuilder("muscle2", new tgBasicContactCableInfo(stringConfig));
+    spec.addBuilder("muscle", new  tgKinematicContactCableInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgKinematicContactCableInfo(motorConfig));
     #else
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     spec.addBuilder("muscle2", new tgBasicActuatorInfo(stringConfig));
