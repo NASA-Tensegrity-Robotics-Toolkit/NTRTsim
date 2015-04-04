@@ -3,13 +3,13 @@
 # Copyright (c) 2012, United States Government, as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All rights reserved.
-# 
+#
 # The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # http://www.apache.org/licenses/LICENSE-2.0.
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -28,6 +28,8 @@ import os
 import subprocess
 import json
 import random
+import logging
+from concurrent_scheduler import ConcurrentScheduler
 
 ###
 # Interfaces.
@@ -39,12 +41,14 @@ class NTRTJobMaster:
     NTRTJob objects.
     """
 
-    def __init__(self, configFile):
+    def __init__(self, configFile, numProcesses):
         """
         Don't override init. You should do all of your setup in the _setup method instead.
         """
+        logging.info("Instatiated NTRTJobMaster. Config file is %s, using %d processes." % (configFile, numProcesses))
         self.configFileName = configFile
-        
+        self.numProcesses = numProcesses
+
         self._setup()
 
     def _setup(self):
@@ -82,16 +86,17 @@ class NTRTJob:
         """
         raise NotImplementedError("")
 
-    def runJob(self):
+    def startJob(self):
         """
         Override this to start the NTRT instance and pass it the relevant parameters.. This is called
-        by NTRTJobMaster when it wants to start this NTRT process. Note that NTRTJobMaster will block on
-        this method until it completes (the NTRT instance closes). I'll take care of making it run
-        in a separate thread when I add my multi-threading code. Your best bet is to just use subprocess.call
-        here, and I'll modify it later so it forks a process.
+        by NTRTJobMaster when it wants to start this NTRT process.
+        """
+        raise NotImplementedError("")
 
-        This method should return a dictionary containing the results from the learning trial that the
-        master will care about.
+    def processJobOutput(self):
+        """
+        This method will be called once this job is complete (we define 'complete' as the process forked
+        in startJob ends).
         """
         raise NotImplementedError("")
 
@@ -118,7 +123,7 @@ class BrianJobMaster(NTRTJobMaster):
         Override this method and implement any global setup necessary. This includes tasks
         like creating your input and output directories.
         """
-        
+
         # If this fails, the program should fail. Input file is required
         # for useful output
         try:
@@ -127,17 +132,17 @@ class BrianJobMaster(NTRTJobMaster):
             fin.close()
         except IOError:
             raise NTRTMasterError("Please provide a valid configuration file")
-        
+
         self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
-        
-        try: 
+
+        try:
             os.makedirs(self.path)
         except OSError:
             if not os.path.isdir(self.path):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
-        
+
         # Consider seeding random, using default (system time) now
-    
+
     def __getNewParams(self, paramName):
         """
         Generate a new set of paramters based on learning method and config file
@@ -146,9 +151,9 @@ class BrianJobMaster(NTRTJobMaster):
         """
         params = self.jConf["learningParams"][paramName]
         if params['numberOfStates'] == 0 :
-            
+
             newParams = []
-        
+
             for i in range(0, params['numberOfInstances']) :
                 subParams = []
                 for j in range(0, params['numberOfOutputs']) :
@@ -160,60 +165,73 @@ class BrianJobMaster(NTRTJobMaster):
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
                          'neuralFilename' : "logs/bestParameters-6_fb-0.nnw"}
-    
+
         return newParams
-    
+
     def getNewFile(self, jobNum):
         """
         Handle the generation of a new JSON file with new parameters. Will vary based on the
         learning method used and the config file
         """
-        
+
         obj = {}
-        
+
         obj["nodeVals"] = self.__getNewParams("nodeVals")
         obj["edgeVals"] = self.__getNewParams("edgeVals")
         obj["feedbackVals"] = self.__getNewParams("feedbackVals")
-        
+
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
-        
+
         fout = open(outFile, 'w')
-    
+
         json.dump(obj, fout, indent=4)
-        
+
         return self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
-    
+
     def beginTrial(self):
         """
         Override this. It should just contain a loop where you keep constructing NTRTJobs, then calling
         runJob on it (which will block you until the NTRT instance returns), parsing the result from the job, then
         deciding if you should run another trial or if you want to terminate.
         """
-        
+
         numTrials = self.jConf['learningParams']['numTrials']
-        
+
         results = {}
-        
+        jobList = []
+
         for i in range(1, numTrials) :
-            
-            # MonteCarlo solution. This function could be overridden with something that 
+
+            # MonteCarlo solution. This function could be overridden with something that
             # provides a filename for a pre-existing file
             fileName = self.getNewFile(i)
-            
+
             # All args to be passed to subprocess must be strings
             args = {'filename' : fileName,
                     'resourcePrefix' : self.jConf['resourcePath'],
                     'path'     : self.jConf['lowerPath'],
                     'executable' : self.jConf['executable'],
                     'length'   : self.jConf['learningParams']['trialLength']}
-            job = BrianJob(args)
-            scores = job.runJob()
-            results[fileName] = scores[0]['distance']
-        
+            jobList.append(BrianJob(args))
+
+        conSched = ConcurrentScheduler(jobList, self.numProcesses)
+        completedJobs = conSched.processJobs()
+
+        for job in completedJobs:
+            job.processJobOutput()
+            fileName = job.args['filename']
+            #TODO: Brian, fix this line to get the proper value out from the obj.
+            #results[fileName] = job.obj ??
+
+        #job.startJob()
+        #scores = job.runJob()
+        #results[fileName] = scores[0]['distance']
+
         #TODO, something that exports results and picks the best trial based on results
-        
-    
+
+
 class BrianJob(NTRTJob):
+
     def __init__(self, jobArgs):
         """
         Override this in your subclass. Be sure that at the end of your method your init method
@@ -223,8 +241,9 @@ class BrianJob(NTRTJob):
         You can put args into this however you want, just depends on what convention you want to use. I'd personally
         use a dictionary. If you use a dictionary, just use the jobArgs keyword from this function's signature.
         """
+        logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
-        
+
         self._setup()
 
     def _setup(self):
@@ -232,35 +251,35 @@ class BrianJob(NTRTJob):
         This is where you'll handle setup related to this *single* learning trial. Each instance of NTRT
         we run will have its own NTRTJob instance.
         """
-        
 
-    def runJob(self):
+    def startJob(self):
         """
         Override this to start the NTRT instance and pass it the relevant parameters.. This is called
-        by NTRTJobMaster when it wants to start this NTRT process. Note that NTRTJobMaster will block on
-        this method until it completes (the NTRT instance closes). I'll take care of making it run
-        in a separate thread when I add my multi-threading code. Your best bet is to just use subprocess.call
-        here, and I'll modify it later so it forks a process.
-
-        This method should return a dictionary containing the results from the learning trial that the
-        master will care about.
+        by NTRTJobMaster when it wants to start this NTRT process.
         """
 
-        subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])])
-        
+        logging.info("STARTING job with args %r" % self.args)
+        self.pid = os.fork()
+
+        if self.pid == 0:
+            # Redirect the stdout output to dev null in the child.
+            devNull = open(os.devnull, 'wb')
+            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
+            sys.exit()
+
+    def processJobOutput(self):
         scoresPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename']
-        
+
         try:
             fin = open(scoresPath, 'r')
-            obj = json.load(fin)
+            self.obj = json.load(fin)
             fin.close()
         except IOError:
-            obj = {}
-        
-        
-        return obj['scores']
+            self.obj = {}
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
-    jobMaster = BrianJobMaster(configFile)
+    numProcesses = int(sys.argv[2])
+    jobMaster = BrianJobMaster(configFile, numProcesses)
     jobMaster.beginTrial()
