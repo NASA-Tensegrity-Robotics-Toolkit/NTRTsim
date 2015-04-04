@@ -142,7 +142,19 @@ class BrianJobMaster(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-
+    
+    def __writeToNNW(self, neuralParams, fileName):
+        
+        fout = open(fileName, 'w')
+        first = True
+        for x in neuralParams:
+            if (first):
+                fout.write(str(x))
+                first = False
+            else:
+                fout.write("," + str(x))
+                
+    
     def __getNewParams(self, paramName):
         """
         Generate a new set of paramters based on learning method and config file
@@ -164,8 +176,24 @@ class BrianJobMaster(NTRTJobMaster):
             # Temp code for pre-specified neural network, future editions will generate networks
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
-                         'neuralFilename' : "logs/bestParameters-6_fb-0.nnw"}
-
+                         'neuralFilename' : "logs/bestParameters-test_fb-0.nnw"}
+            
+            neuralParams = []
+            
+            numStates = params['numberOfStates']
+            numOutputs=  params['numberOfOutputs']
+            numHidden = 2*numStates
+            
+            totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numStates
+            
+            for i in range(0,  totalParams) :
+                # TODO scale like neural net class (this is 0 to 1)
+                neuralParams.append(random.random())
+            
+            newParams['neuralParams'] = neuralParams
+            
+            self.__writeToNNW(neuralParams, self.path + newParams['neuralFilename'])
+            
         return newParams
 
     def getNewFile(self, jobNum):
