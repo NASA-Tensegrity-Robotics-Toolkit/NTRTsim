@@ -35,13 +35,13 @@
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
 #include "dev/CPG_feedback/tgCPGCableControl.h"
+#include "dev/btietz/kinematicString/tgSCASineControl.h"
 
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 #include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 #include "helpers/FileHelpers.h"
 
-#include "learning/AnnealEvolution/AnnealEvolution.h"
-#include "learning/Configuration/configuration.h"
+#include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
 
 #include "dev/CPG_feedback/CPGEquationsFB.h"
 #include "dev/CPG_feedback/CPGNodeFB.h"
@@ -152,6 +152,9 @@ void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
     
     nn->loadWeights(nnFile.c_str());
     
+    const OctahedralComplex* ocSubject = tgCast::cast<BaseSpineModelLearning, OctahedralComplex>(subject);
+    setupSaddleControllers(ocSubject);
+    
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
@@ -169,10 +172,14 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
+#if (0)
         std::vector<double> desComs = getFeedback(subject);
 
-#else        
+#else 
+    #if (1)
+        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
+        setGoalTensions(goalSubject);
+    #endif
         std::size_t numControllers = subject.getNumberofMuslces() * 3;
         
         double descendingCommand = 0.0;
@@ -292,7 +299,13 @@ void JSONGoalControl::onTeardown(BaseSpineModelLearning& subject)
     {
         delete m_allControllers[i];
     }
-    m_allControllers.clear();    
+    m_allControllers.clear();
+    
+    for(size_t i = 0; i < m_allControllers.size(); i++)
+    {
+        delete m_saddleControllers[i];
+    }
+    m_saddleControllers.clear(); 
 }
 
 void JSONGoalControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
@@ -337,6 +350,36 @@ void JSONGoalControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeAc
 		}
     }
 	
+}
+
+void JSONGoalControl::setupSaddleControllers(const OctahedralComplex* subject)
+{
+        
+    const std::vector <tgSpringCableActuator*> allSaddleMuscles = subject->getSaddleMuscles();
+    
+    for (std::size_t i = 0; i < allSaddleMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tensFeedback,
+                                                                m_config.kPosition,
+                                                                0.0);
+        
+        // Impedance control only, no sine waves
+        tgSCASineControl* pStringControl = new tgSCASineControl(m_config.controlTime,
+                                                                p_ipc,
+                                                                config,
+                                                                0.0,
+                                                                0.0,
+                                                                0.0,
+                                                                0.0,
+                                                                allSaddleMuscles[i]->getCurrentLength());
+
+        allSaddleMuscles[i]->attach(pStringControl);
+        
+        m_saddleControllers.push_back(pStringControl);
+    }
+    
 }
 
 array_2D JSONGoalControl::scaleNodeActions (Json::Value actions)
@@ -423,8 +466,7 @@ void JSONGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
     {
         for (int j = 0; j < m_config.numActions; j++)
         {
-            tgCPGCableControl* cableControl = tgCast::cast<tgCPGActuatorControl, tgCPGCableControl>(m_allControllers[i * m_config.numActions + j]);
-            cableControl->updateTensionSetpoint(actions[j] * m_config.tensFeedback);
+             m_saddleControllers[i * m_config.numActions + j]->updateTensionSetpoint(actions[j] * m_config.tensFeedback + m_config.tensFeedback);
         }
     }
 }
