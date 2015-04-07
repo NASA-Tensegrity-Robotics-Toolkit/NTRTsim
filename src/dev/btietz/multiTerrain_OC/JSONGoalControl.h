@@ -126,6 +126,8 @@ protected:
     // Changes scale of actions from [0, 1] to [-1, 1]
     void transformFeedbackActions(std::vector<double>& actions);
     
+    double calculateDistanceMoved(const BaseSpineModelGoal* subject) const;
+    
     JSONGoalControl::Config m_config;
     
     /// @todo generalize this if we need more than one

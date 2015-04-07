@@ -6,18 +6,18 @@
     "executable" : "./../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
     "learningParams": 
     {
-        "trialLength" : 6000,
-        "numTrials" : 5,
-        "numGenerations" : 3,
+        "trialLength" : 3000,
+        "numTrials" : 100,
+        "numGenerations" : 30,
         "nodeVals" :
         {
-            "learning" : true,
-            "startingControllers" : 0,
+            "learning" : false,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
             "numberOfInstances" : 1,
-            "populationSize" : 5,
+            "populationSize" : 1,
             "useAverage" : true,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
@@ -29,13 +29,13 @@
         },
         "edgeVals" :
         {
-            "learning" : true,
-            "startingControllers" : 0,
+            "learning" : false,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
             "numberOfInstances" : 26,
-            "populationSize" : 5,
+            "populationSize" : 1,
             "useAverage" : true,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
@@ -53,15 +53,15 @@
             "numberOfStates" : 2,
             "numberOfOutputs" : 4,
             "numberOfInstances" : 1,
-            "populationSize" : 5,
+            "populationSize" : 20,
             "useAverage" : true,
-            "numberToMutate" : 2,
-            "numberOfChildren" : 1,
+            "numberToMutate" : 5,
+            "numberOfChildren" : 10,
             "mutationChance" : 0.5,
             "mutationDev" : 0.03,
             "paramMax" : 1.0,
-            "paramMin": 0.0,
-            "childMutationChance" : 0.9
+            "paramMin": -1.0,
+            "childMutationChance" : 0.5
         }
     }
 }

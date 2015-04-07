@@ -173,6 +173,7 @@ class BrianJobMaster(NTRTJobMaster):
         
         if params['numberOfStates'] == 0 :
 
+            controller['params'] = jControl[paramName]
             newParams = []
 
             for i in range(0, params['numberOfInstances']) :
@@ -193,7 +194,7 @@ class BrianJobMaster(NTRTJobMaster):
             numOutputs=  params['numberOfOutputs']
             numHidden = 2*numStates
             
-            totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numStates
+            totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numOutputs
             
             for i in range(0,  totalParams) :
                 # TODO scale like neural net class (this is 0 to 1)
@@ -234,10 +235,6 @@ class BrianJobMaster(NTRTJobMaster):
                     elif (v < pMin):
                         v = pMin
             cNew[i] = v
-                        
-                    
-        print(currentController)
-        print(cNew)
         
         if(params['numberOfStates'] > 0):
             newNeuro = {}
@@ -255,8 +252,6 @@ class BrianJobMaster(NTRTJobMaster):
         
         return c
         
-        print(prob)
-        print(c['probability'] )
         raise NTRTMasterError("Insufficient values to satisfy requested probability")
     
     def __getChildController(self, c1, c2, params):
@@ -268,8 +263,6 @@ class BrianJobMaster(NTRTJobMaster):
         cNew = []
         
         if (len(c1) == 0):
-            print (c1)
-            print (c2)
             raise NTRTMasterError("Error in length")
         
         for i, j in zip(c1, c2):
@@ -312,11 +305,15 @@ class BrianJobMaster(NTRTJobMaster):
                 for i in range(0, params['startingControllers']):
                     inFile = self.path + self.jConf['filePrefix'] + "_" + str(i) + self.jConf['fileSuffix']
                     # We want the IO error if this fails
-                    fin = open(scoresPath, 'r')
+                    fin = open(inFile, 'r')
                     jControl = json.load(fin)
                     fin.close()
-                    controller = jControl[paramName]
+                    controller = {}
+                    controller['params'] = jControl[paramName]
+                    controller['paramID'] = str(self.paramID)
+                    controller['scores'] = []
                     nextGeneration[controller['paramID']] = controller
+                    
                     self.paramID += 1
                 
             # Fill in remaining population with random parameters
@@ -348,8 +345,8 @@ class BrianJobMaster(NTRTJobMaster):
             else:
                 key = lambda x: x[1]['maxScore']
             sortedGeneration = collections.OrderedDict(sorted(currentGeneration.items(), None, key, True))
-                
-            print(sortedGeneration)
+            
+            print json.dumps(sortedGeneration)
             
             totalScore = 0
             
@@ -436,7 +433,6 @@ class BrianJobMaster(NTRTJobMaster):
                 
                 if (random.random() >= params['childMutationChance']):
                     cNew['params'] = self.__mutateParams(cNew['params'], paramName)
-                    print('Mutated params')
                 
                 cNew['paramID'] = str(self.paramID)
                 cNew['scores'] = []
@@ -452,7 +448,6 @@ class BrianJobMaster(NTRTJobMaster):
             
             if (params['numberOfStates'] > 0):
                 for c in nextGeneration.itervalues():
-                    print(c)
                     c['params']['neuralFilename'] = "logs/bestParameters-test_fb-"+ c['paramID'] +".nnw"
                     self.__writeToNNW(c['params']['neuralParams'], self.path + c['params']['neuralFilename'])
             
@@ -471,10 +466,26 @@ class BrianJobMaster(NTRTJobMaster):
         """
 
         obj = {}
-
-        obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum)]
-        obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum)]
-        obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum)]
+        
+        # Hacked co-evolution
+        if(jobNum >= len(self.currentGeneration['node'])):
+            jobNum_node = random.randint(0, len(self.currentGeneration['node']) - 1)
+        else:
+            jobNum_node = jobNum
+        
+        if(jobNum >= len(self.currentGeneration['edge'])):
+            jobNum_edge = random.randint(0, len(self.currentGeneration['edge']) - 1)
+        else:
+            jobNum_edge = jobNum
+        
+        if(jobNum >= len(self.currentGeneration['feedback'])):
+            jobNum_fb = random.randint(0, len(self.currentGeneration['feedback']) - 1)
+        else:
+            jobNum_fb = jobNum
+        
+        obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum_node)]
+        obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum_edge)]
+        obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
         
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 

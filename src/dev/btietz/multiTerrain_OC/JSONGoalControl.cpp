@@ -230,8 +230,9 @@ void JSONGoalControl::onTeardown(BaseSpineModelLearning& subject)
     const double oldX = initConditions[0];
     const double oldZ = initConditions[2];
     
-    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
-                                        (newZ-oldZ) * (newZ-oldZ));
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
+    
+    const double distanceMoved = calculateDistanceMoved(goalSubject);
     
     if (bogus)
     {
@@ -539,4 +540,26 @@ void JSONGoalControl::transformFeedbackActions(std::vector<double> & actions)
     {
         actions[i] = actions[i] * 2.0 - 1.0;
     }
+}
+
+double JSONGoalControl::calculateDistanceMoved(const BaseSpineModelGoal* subject) const
+{
+    std::vector<double> finalConditions = subject->getSegmentCOM(m_config.segmentNumber);
+  
+    const btVector3 goalPos = subject->goalBoxPosition();
+    
+    std::cout << goalPos << std::endl;
+    
+    double x= finalConditions[0] - goalPos.getX();
+    double z= finalConditions[2] - goalPos.getZ();
+    double distanceNew=sqrt(x*x + z*z);
+    double xx=initConditions[0]-goalPos.getX();
+    double zz=initConditions[2]-goalPos.getZ();
+    double distanceOld=sqrt(xx*xx + zz*zz);
+    double distanceMoved=distanceOld-distanceNew;
+
+    //If you want to calculate only the distance moved independent of the target:
+//  distanceMoved=sqrt((x-xx)*(x-xx)+(z-zz)*(z-zz));
+
+    return distanceMoved;
 }
