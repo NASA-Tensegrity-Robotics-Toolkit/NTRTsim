@@ -381,7 +381,8 @@ void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
             tgModel* obstacle = getBlocks();
             simulation->addObstacle(obstacle);
         }
-        else
+        // Avoid resetting twice on the last run
+        else if (i != nEpisodes - 1)
         {
             simulation->reset();
         }
