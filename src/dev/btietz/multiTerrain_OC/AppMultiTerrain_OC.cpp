@@ -32,6 +32,7 @@
 // controller 
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
 #include "dev/btietz/TC_goal/SpineGoalControl.h"
+#include "dev/btietz/multiTerrain_OC/JSONGoalControl.h"
 
 
 AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
@@ -112,8 +113,8 @@ bool AppMultiTerrain_OC::setup()
         const double tensionFeedback = 1000.0;
 
         
-#if (0)
-        SpineGoalControl::Config control_config(segmentSpan, 
+#if (1)
+        JSONGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -140,8 +141,8 @@ bool AppMultiTerrain_OC::setup()
                                                     );
         
         /// @todo fix memory leak that occurs here
-        SpineGoalControl* const myControl =
-        new SpineGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
+        JSONGoalControl* const myControl =
+        new JSONGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
 #else
         SpineFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -380,7 +381,8 @@ void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
             tgModel* obstacle = getBlocks();
             simulation->addObstacle(obstacle);
         }
-        else
+        // Avoid resetting twice on the last run
+        else if (i != nEpisodes - 1)
         {
             simulation->reset();
         }

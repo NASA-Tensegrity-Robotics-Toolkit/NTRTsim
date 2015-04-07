@@ -35,6 +35,8 @@
 class neuralNetwork;
 class tgSpringCableActuator;
 class BaseSpineModelGoal;
+class tgSCASineControl;
+class OctahedralComplex;
 
 /**
  * JSONGoalControl learns the parameters for a CPG system on a
@@ -111,6 +113,8 @@ protected:
 
     virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
     
+    virtual void setupSaddleControllers(const OctahedralComplex* subject);
+    
     virtual array_2D scaleNodeActions (Json::Value actions);
 
     void setGoalTensions(const BaseSpineModelGoal* subject);
@@ -122,10 +126,15 @@ protected:
     // Changes scale of actions from [0, 1] to [-1, 1]
     void transformFeedbackActions(std::vector<double>& actions);
     
+    double calculateDistanceMoved(const BaseSpineModelGoal* subject) const;
+    
     JSONGoalControl::Config m_config;
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
+    
+    // A list of impedance controllers not associated with the CPG
+    std::vector<tgSCASineControl*> m_saddleControllers;
     
 };
 

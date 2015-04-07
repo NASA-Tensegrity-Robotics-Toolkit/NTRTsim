@@ -29,6 +29,8 @@ import subprocess
 import json
 import random
 import logging
+import collections
+import operator
 from concurrent_scheduler import ConcurrentScheduler
 
 ###
@@ -142,7 +144,19 @@ class BrianJobMaster(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-
+    
+    def __writeToNNW(self, neuralParams, fileName):
+        
+        fout = open(fileName, 'w')
+        first = True
+        for x in neuralParams:
+            if (first):
+                fout.write(str(x))
+                first = False
+            else:
+                fout.write("," + str(x))
+                
+    
     def __getNewParams(self, paramName):
         """
         Generate a new set of paramters based on learning method and config file
@@ -150,24 +164,301 @@ class BrianJobMaster(NTRTJobMaster):
         This version is Monte Carlo, other versions may just pick up a pre-generated file
         """
         params = self.jConf["learningParams"][paramName]
+        
+        pMax = params['paramMax']
+        pMin = params['paramMin']
+        
+        newController = {}
+        newController['paramID'] = str(self.paramID)
+        
         if params['numberOfStates'] == 0 :
 
+            controller['params'] = jControl[paramName]
             newParams = []
 
             for i in range(0, params['numberOfInstances']) :
                 subParams = []
                 for j in range(0, params['numberOfOutputs']) :
                     # Assume scaling happens elsewhere
-                    subParams.append(random.random())
+                    subParams.append(random.uniform(pMin, pMax))
                 newParams.append(subParams)
         else :
             # Temp code for pre-specified neural network, future editions will generate networks
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
-                         'neuralFilename' : "logs/bestParameters-6_fb-0.nnw"}
-
-        return newParams
-
+                         'neuralFilename' : "logs/bestParameters-test_fb-"+ newController['paramID'] +".nnw"}
+            
+            neuralParams = []
+            
+            numStates = params['numberOfStates']
+            numOutputs=  params['numberOfOutputs']
+            numHidden = 2*numStates
+            
+            totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numOutputs
+            
+            for i in range(0,  totalParams) :
+                # TODO scale like neural net class (this is 0 to 1)
+                neuralParams.append(random.uniform(pMin, pMax))
+            
+            newParams['neuralParams'] = neuralParams
+            
+            self.__writeToNNW(neuralParams, self.path + newParams['neuralFilename'])
+        
+        newController['params'] = newParams
+        newController['scores'] = []
+        
+        return newController
+    
+    def __mutateParams(self, currentController, paramName):
+        params = self.jConf["learningParams"][paramName]
+        
+        pMax = params['paramMax']
+        pMin = params['paramMin']
+        
+        if(params['numberOfStates'] > 0):
+            cNew = list(currentController['neuralParams'])
+        else:
+            # Make a deep copy
+            cNew = list(currentController)
+        
+        for i, v in enumerate(cNew):
+            if isinstance(v, collections.Iterable):
+                v = self.__mutateParams(v, paramName)
+            else:
+                if(random.random() > params['mutationChance']):
+                    
+                    mutAmount = random.normalvariate(0.0, params['mutationDev'])
+                    v += mutAmount
+                                    
+                    if (v > pMax):
+                        v = pMax
+                    elif (v < pMin):
+                        v = pMin
+            cNew[i] = v
+        
+        if(params['numberOfStates'] > 0):
+            newNeuro = {}
+            newNeuro['neuralParams'] = cNew
+            newNeuro['numStates'] = params['numberOfStates']
+            newNeuro['numActions'] =  params['numberOfOutputs']
+            return newNeuro
+        else:
+            return cNew
+    
+    def __getControllerFromProbability(self, currentGeneration, prob):
+        for c in currentGeneration.itervalues():
+            if (c['probability'] < prob):
+                break
+        
+        return c
+        
+        raise NTRTMasterError("Insufficient values to satisfy requested probability")
+    
+    def __getChildController(self, c1, c2, params):
+        
+        if(params['numberOfStates'] > 0):
+            c1 = list(c1['neuralParams'])
+            c2 = list(c2['neuralParams'])
+                
+        cNew = []
+        
+        if (len(c1) == 0):
+            raise NTRTMasterError("Error in length")
+        
+        for i, j in zip(c1, c2):
+            if isinstance(i, collections.Iterable):
+                cNew.append(self.__getChildController(i, j, params))
+            else:
+                if (random.random() > 0.5):
+                    cNew.append(i)
+                else:
+                    cNew.append(j)
+        
+        if(params['numberOfStates'] > 0):
+            newNeuro = {}
+            newNeuro['neuralParams'] = cNew
+            newNeuro['numStates'] = params['numberOfStates']
+            newNeuro['numActions'] =  params['numberOfOutputs']
+            return newNeuro
+        else:
+            return cNew
+    
+    def __sortAvg(self, x):
+        
+        return x['avgScore']
+    
+    def __sortMax(self, x):
+        return x['maxScore']
+    
+    def generationGenerator(self, currentGeneration, paramName):
+        
+        params = self.jConf["learningParams"][paramName]
+        
+        useAvg = params['useAverage']
+        
+        nextGeneration = {}
+        
+        if (len(currentGeneration) == 0 or params['monteCarlo']):
+            
+            # Starting a new trial - load previous results, if any, unless doing monteCarlo
+            if (not (params['learning'] and params['monteCarlo'])):
+                for i in range(0, params['startingControllers']):
+                    inFile = self.path + self.jConf['filePrefix'] + "_" + str(i) + self.jConf['fileSuffix']
+                    # We want the IO error if this fails
+                    fin = open(inFile, 'r')
+                    jControl = json.load(fin)
+                    fin.close()
+                    controller = {}
+                    controller['params'] = jControl[paramName]
+                    controller['paramID'] = str(self.paramID)
+                    controller['scores'] = []
+                    nextGeneration[controller['paramID']] = controller
+                    
+                    self.paramID += 1
+                
+            # Fill in remaining population with random parameters
+            for i in range(len(nextGeneration), params['populationSize']):
+                if (i < 0):
+                    raise NTRTMasterError("Number of controllers greater than population size!")
+                
+                controller = self.__getNewParams(paramName)
+                nextGeneration[controller['paramID']] = controller
+                self.paramID += 1
+        elif (not params['learning']):
+            # Not learning, return previous controllers
+            nextGeneration = currentGeneration
+        else:
+            # learning, not doing monteCarlo, have a previous generation
+            
+            popSize = len(currentGeneration)
+            
+            # order the prior population
+            
+            for k, controller in currentGeneration.iteritems() :
+                scores = controller['scores']
+                controller['maxScore'] = max(scores)
+                controller['avgScore'] = sum(scores) / len(scores)
+                
+            
+            if (useAvg):
+                key = lambda x: x[1]['avgScore']
+            else:
+                key = lambda x: x[1]['maxScore']
+            sortedGeneration = collections.OrderedDict(sorted(currentGeneration.items(), None, key, True))
+            
+            print json.dumps(sortedGeneration)
+            
+            totalScore = 0
+            
+            # Get probabilities for children
+            
+            if (useAvg):
+                
+                for controller in sortedGeneration.itervalues():
+                    pass
+                
+                floor = controller['avgScore']
+                for controller in sortedGeneration.itervalues():
+                    totalScore += controller['avgScore'] - floor
+                first = True
+                c1 = {}
+                for c in sortedGeneration.itervalues():
+                    if first:
+                        c['probability'] = (c['avgScore'] - floor) / totalScore
+                        first = False
+                    else:
+                        c['probability'] = (c['avgScore'] - floor) / totalScore + c1['probability']
+                    c1 = c
+            else:
+                floor = sortedGeneration[popSize - 1]['maxScore']
+                for controller in sortedGeneration.itervalues():
+                    totalScore += controller['maxScore'] - floor
+                for i in range(len(sortedGeneration)):
+                    c = sortedGeneration[i]
+                    if i == 0:
+                        c['probability'] = (c['maxScore'] - floor) / totalScore
+                    else:
+                        c1 = sortedGeneration[i - 1]
+                        c['probability'] = (c['maxScore'] - floor) / totalScore + c1['probability']
+            
+                
+            
+            numElites = popSize - (params['numberToMutate'] + params['numberOfChildren'])
+            
+            if (numElites < 0):
+                raise NTRTMasterError("Population slated to grow in size! Please adjust population size, number to mutate and/or number of children")
+            
+            # Copy elites to new generation
+            count = 0
+            for c in sortedGeneration.itervalues():
+                # Stop when number of elites has been reached
+                if (count >= numElites):
+                    break
+                
+                nextGeneration[c['paramID']] = c
+                if c['params'] == None:
+                    raise NTRTMasterError("Found it!")
+                count += 1
+            
+            # Add 'asexual' mutations to next generation.
+            # TODO: make option that assigns mutations to random controllers, rather than just mutating top N
+            count = 0
+            for c in sortedGeneration.itervalues():
+                if (count >= params['numberToMutate']):
+                    break
+                cNew = {}
+                cNew['params'] = self.__mutateParams(c['params'], paramName)
+                cNew['paramID'] = str(self.paramID)
+                cNew['scores'] = []
+                
+                nextGeneration[cNew['paramID']] = cNew
+                self.paramID += 1
+                
+                if cNew['params'] == None:
+                    raise NTRTMasterError("Found it!")
+                
+                count += 1
+                
+            # Add children to new generation
+            for i in range(params['numberOfChildren']):
+                
+                c1Prob = random.random()
+                c2Prob = random.random()
+                
+                c1 = self.__getControllerFromProbability(sortedGeneration, c1Prob)
+                c2 = self.__getControllerFromProbability(sortedGeneration, c2Prob)
+                
+                cNew = {}
+                cNew['params'] = self.__getChildController(c1['params'], c2['params'], params)
+                
+                if (random.random() >= params['childMutationChance']):
+                    cNew['params'] = self.__mutateParams(cNew['params'], paramName)
+                
+                cNew['paramID'] = str(self.paramID)
+                cNew['scores'] = []
+                
+                nextGeneration[cNew['paramID']] = cNew
+                self.paramID += 1
+                
+                if cNew['params'] == None:
+                    raise NTRTMasterError("Found it!")
+            
+            if (len(nextGeneration) != popSize):
+                raise NTRTMasterError("Failed to generate the correct number of controllers")
+            
+            if (params['numberOfStates'] > 0):
+                for c in nextGeneration.itervalues():
+                    c['params']['neuralFilename'] = "logs/bestParameters-test_fb-"+ c['paramID'] +".nnw"
+                    self.__writeToNNW(c['params']['neuralParams'], self.path + c['params']['neuralFilename'])
+            
+        return nextGeneration
+    
+    def getParamID(self, gen, jobNum):
+        try:
+            return list(gen)[jobNum]
+        except IndexError:
+            print 'Not enough keys'
+        
     def getNewFile(self, jobNum):
         """
         Handle the generation of a new JSON file with new parameters. Will vary based on the
@@ -175,11 +466,27 @@ class BrianJobMaster(NTRTJobMaster):
         """
 
         obj = {}
-
-        obj["nodeVals"] = self.__getNewParams("nodeVals")
-        obj["edgeVals"] = self.__getNewParams("edgeVals")
-        obj["feedbackVals"] = self.__getNewParams("feedbackVals")
-
+        
+        # Hacked co-evolution
+        if(jobNum >= len(self.currentGeneration['node'])):
+            jobNum_node = random.randint(0, len(self.currentGeneration['node']) - 1)
+        else:
+            jobNum_node = jobNum
+        
+        if(jobNum >= len(self.currentGeneration['edge'])):
+            jobNum_edge = random.randint(0, len(self.currentGeneration['edge']) - 1)
+        else:
+            jobNum_edge = jobNum
+        
+        if(jobNum >= len(self.currentGeneration['feedback'])):
+            jobNum_fb = random.randint(0, len(self.currentGeneration['feedback']) - 1)
+        else:
+            jobNum_fb = jobNum
+        
+        obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum_node)]
+        obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum_edge)]
+        obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
+        
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
         fout = open(outFile, 'w')
@@ -194,38 +501,58 @@ class BrianJobMaster(NTRTJobMaster):
         runJob on it (which will block you until the NTRT instance returns), parsing the result from the job, then
         deciding if you should run another trial or if you want to terminate.
         """
-
+        
+        # Start a counter job ids to be use in dictionaries
+        self.paramID = 1
+        
         numTrials = self.jConf['learningParams']['numTrials']
-
+        numGenerations = self.jConf['learningParams']['numGenerations']
+        
         results = {}
         jobList = []
+        self.currentGeneration = {}
+        self.currentGeneration['edge'] = {}
+        self.currentGeneration['node'] = {}
+        self.currentGeneration['feedback'] = {}
+        for n in range(numGenerations):
+            # Create the generation
+            self.currentGeneration['edge'] = self.generationGenerator(self.currentGeneration['edge'], 'edgeVals')
+            self.currentGeneration['node'] = self.generationGenerator(self.currentGeneration['node'], 'nodeVals')
+            self.currentGeneration['feedback'] = self.generationGenerator(self.currentGeneration['feedback'], 'feedbackVals')
+            
+            # Iterate over the generation (change range..)
+            for i in range(0, numTrials) :
 
-        for i in range(1, numTrials) :
+                # MonteCarlo solution. This function could be overridden with something that
+                # provides a filename for a pre-existing file
+                fileName = self.getNewFile(i)
 
-            # MonteCarlo solution. This function could be overridden with something that
-            # provides a filename for a pre-existing file
-            fileName = self.getNewFile(i)
+                # All args to be passed to subprocess must be strings
+                args = {'filename' : fileName,
+                        'resourcePrefix' : self.jConf['resourcePath'],
+                        'path'     : self.jConf['lowerPath'],
+                        'executable' : self.jConf['executable'],
+                        'length'   : self.jConf['learningParams']['trialLength']}
+                jobList.append(BrianJob(args))
 
-            # All args to be passed to subprocess must be strings
-            args = {'filename' : fileName,
-                    'resourcePrefix' : self.jConf['resourcePath'],
-                    'path'     : self.jConf['lowerPath'],
-                    'executable' : self.jConf['executable'],
-                    'length'   : self.jConf['learningParams']['trialLength']}
-            jobList.append(BrianJob(args))
+            conSched = ConcurrentScheduler(jobList, self.numProcesses)
+            completedJobs = conSched.processJobs()
 
-        conSched = ConcurrentScheduler(jobList, self.numProcesses)
-        completedJobs = conSched.processJobs()
+            for job in completedJobs:
+                job.processJobOutput()
+                jobVals = job.obj
+                # TODO commit to one run per file
+                score = jobVals['scores'][0]['distance']
+                edgeKey = jobVals ['edgeVals']['paramID']
+                self.currentGeneration['edge'][edgeKey]['scores'].append(score)
+                nodeKey = jobVals ['nodeVals']['paramID']
+                self.currentGeneration['node'][nodeKey]['scores'].append(score)
+                feedbackKey = jobVals ['feedbackVals']['paramID']
+                self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+                
+                
 
-        for job in completedJobs:
-            job.processJobOutput()
-            fileName = job.args['filename']
-            #TODO: Brian, fix this line to get the proper value out from the obj.
-            #results[fileName] = job.obj ??
-
-        #job.startJob()
-        #scores = job.runJob()
-        #results[fileName] = scores[0]['distance']
+            #TODO save parameters and scores from this generation
 
         #TODO, something that exports results and picks the best trial based on results
 
@@ -264,7 +591,8 @@ class BrianJob(NTRTJob):
         if self.pid == 0:
             # Redirect the stdout output to dev null in the child.
             devNull = open(os.devnull, 'wb')
-            subprocess.call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
+            #TODO improve error handling here
+            subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
             sys.exit()
 
     def processJobOutput(self):

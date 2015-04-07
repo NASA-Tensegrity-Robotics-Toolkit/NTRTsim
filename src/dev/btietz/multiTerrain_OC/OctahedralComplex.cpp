@@ -244,6 +244,7 @@ void OctahedralComplex::setup(tgWorld& world)
     
     // Setup vectors for control
     m_allMuscles = find<tgSpringCableActuator> ("muscle2");   
+    m_saddleMuscles = find<tgSpringCableActuator> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
     
     // A little sloppy, but I'm pretty confident there is only one

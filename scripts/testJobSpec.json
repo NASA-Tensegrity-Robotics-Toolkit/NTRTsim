@@ -2,35 +2,66 @@
     "filePrefix"   : "monteOut",
     "fileSuffix"   : ".json",
     "resourcePath" : "../resources/src/",
-    "lowerPath"    : "bmirletz/TetrahedralComplex_Contact/",
-    "executable" : "./../build/dev/btietz/JSONTests/AppTerrainJSON",
+    "lowerPath"    : "bmirletz/OctaCL_6/",
+    "executable" : "./../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
     "learningParams": 
     {
-        "trialLength" : 6000,
+        "trialLength" : 3000,
         "numTrials" : 100,
+        "numGenerations" : 30,
         "nodeVals" :
         {
-            "learning" : true,
-            "startFromScratch" : true,
+            "learning" : false,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
-            "numberOfInstances" : 1
+            "numberOfInstances" : 1,
+            "populationSize" : 1,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
         },
         "edgeVals" :
         {
-            "learning" : true,
-            "startFromScratch" : true,
+            "learning" : false,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
-            "numberOfInstances" : 100
+            "numberOfInstances" : 26,
+            "populationSize" : 1,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
         },
         "feedbackVals" :
         {
             "learning" : true,
-            "startFromScratch" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : false,
             "numberOfStates" : 2,
-            "numberOfOutputs" : 3,
-            "numberOfInstances" : 1
+            "numberOfOutputs" : 4,
+            "numberOfInstances" : 1,
+            "populationSize" : 20,
+            "useAverage" : true,
+            "numberToMutate" : 5,
+            "numberOfChildren" : 10,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.5
         }
     }
 }

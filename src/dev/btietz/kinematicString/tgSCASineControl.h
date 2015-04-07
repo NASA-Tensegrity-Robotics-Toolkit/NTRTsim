@@ -45,7 +45,7 @@ public:
     
     virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
-
+    void updateTensionSetpoint(double newTension);
     
     const double getCommandedTension() const
     {

@@ -55,6 +55,14 @@ public:
         
     virtual void step(double dt);
     
+    const std::vector<tgSpringCableActuator*>& getSaddleMuscles() const
+    {
+        return m_saddleMuscles;
+    }
+    
+protected:
+    
+    std::vector<tgSpringCableActuator*> m_saddleMuscles;
 };
 
 #endif // FLEMONS_SPINE_MODEL_H
