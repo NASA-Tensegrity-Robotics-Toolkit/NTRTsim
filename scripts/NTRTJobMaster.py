@@ -173,7 +173,6 @@ class BrianJobMaster(NTRTJobMaster):
         
         if params['numberOfStates'] == 0 :
 
-            controller['params'] = jControl[paramName]
             newParams = []
 
             for i in range(0, params['numberOfInstances']) :
@@ -362,6 +361,7 @@ class BrianJobMaster(NTRTJobMaster):
                     totalScore += controller['avgScore'] - floor
                 first = True
                 c1 = {}
+                #TODO handle special case of pop = 1, deal with div by zero that happens here
                 for c in sortedGeneration.itervalues():
                     if first:
                         c['probability'] = (c['avgScore'] - floor) / totalScore
@@ -370,16 +370,22 @@ class BrianJobMaster(NTRTJobMaster):
                         c['probability'] = (c['avgScore'] - floor) / totalScore + c1['probability']
                     c1 = c
             else:
-                floor = sortedGeneration[popSize - 1]['maxScore']
+                for controller in sortedGeneration.itervalues():
+                    pass
+                
+                floor = controller['maxScore']
                 for controller in sortedGeneration.itervalues():
                     totalScore += controller['maxScore'] - floor
-                for i in range(len(sortedGeneration)):
-                    c = sortedGeneration[i]
-                    if i == 0:
+                first = True
+                c1 = {}
+                #TODO handle special case of pop = 1, deal with div by zero that happens here
+                for c in sortedGeneration.itervalues():
+                    if first:
                         c['probability'] = (c['maxScore'] - floor) / totalScore
+                        first = False
                     else:
-                        c1 = sortedGeneration[i - 1]
                         c['probability'] = (c['maxScore'] - floor) / totalScore + c1['probability']
+                    c1 = c
             
                 
             
