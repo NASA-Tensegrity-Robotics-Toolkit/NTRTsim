@@ -94,6 +94,7 @@ public:
                 double maxStringAcc = 100000.0,
                 double minStringRestLength = 1.2,
                 bool storeStringHist = false,
+                bool useCylinderEndCaps = false,
                 bool debug = false
               );
 
@@ -127,6 +128,7 @@ public:
         double m_maxStringAcc; // NOT USED: max acceleration of string motors (length/s^2) 10000.0
         double m_minStringRestLength; // rest length below which motor ceases to function 1.2cm
         bool m_storeStringHist; // store string history, useful for learning applications
+        bool m_useCylinderEndCaps; // true=use cylinders for end caps of linear actuators, false=use half-spheres
         bool m_debug; //print debugging info
     };
 
@@ -283,14 +285,14 @@ private:
      * @param[in] s A tgStructure that we're building into
      * @param[in] startNode Number of node to start with
      */
-    static void addPairs(tgStructure& s, int startNode = 0);
+    void addPairs(tgStructure& s, int startNode = 0);
     
     /**
      * A function called during setup that creates muscles (Strings) from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addMuscles(tgStructure& s, int topNodesStart);
+    void addMuscles(tgStructure& s, int topNodesStart);
     
     /**
      * A list of all of the muscles. Will be empty until most of the way
