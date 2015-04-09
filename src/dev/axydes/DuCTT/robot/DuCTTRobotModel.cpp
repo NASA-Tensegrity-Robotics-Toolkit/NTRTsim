@@ -82,6 +82,7 @@ DuCTTRobotModel::Config::Config(
     double maxStringAcc,
     double minStringRestLength,
     bool storeStringHist,
+    bool useCylinderEndCaps,
     bool debug
     ) :
 m_startPos(startPos),
@@ -109,6 +110,7 @@ m_maxStringForce(maxStringForce),
 m_maxStringAcc(maxStringAcc),
 m_minStringRestLength(minStringRestLength),
 m_storeStringHist(storeStringHist),
+m_useCylinderEndCaps(useCylinderEndCaps),
 m_debug(debug)
 {
 }
@@ -194,10 +196,16 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
 
     if (distance == 0)
     {
-//        tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere bottom right"); // 0
-//        tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere bottom left"); // 1
-        tetra.addNode(bottomRight); // 0
-        tetra.addNode(bottomLeft); // 1
+        if (m_config.m_useCylinderEndCaps)
+        {
+            tetra.addNode(bottomRight); // 0
+            tetra.addNode(bottomLeft); // 1
+        }
+        else
+        {
+            tetra.addNode(bottomRight.x(), bottomRight.y(), bottomRight.z(), "sphere right touch bottom"); // 0
+            tetra.addNode(bottomLeft.x(), bottomLeft.y(), bottomLeft.z(), "sphere left touch bottom"); // 1
+        }
 
         tetra.addNode(topBack); // 2
         tetra.addNode(topFront); // 3
@@ -207,10 +215,16 @@ void DuCTTRobotModel::addNodes(tgStructure& tetra,
         tetra.addNode(bottomRight); // 0
         tetra.addNode(bottomLeft); // 1
 
-        tetra.addNode(topBack); // 2
-        tetra.addNode(topFront); // 3
-//        tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere top back"); // 2
-//        tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere top front"); // 3
+        if (m_config.m_useCylinderEndCaps)
+        {
+            tetra.addNode(topBack); // 2
+            tetra.addNode(topFront); // 3
+        }
+        else
+        {
+            tetra.addNode(topBack.x(), topBack.y(), topBack.z(), "sphere back touch top"); // 2
+            tetra.addNode(topFront.x(), topFront.y(), topFront.z(), "sphere front touch top"); // 3
+        }
     }
 
     tetra.addNode(bottomMidRight); // 4
@@ -280,9 +294,12 @@ void DuCTTRobotModel::addPairs(tgStructure& s, int startNode)
         s.addPair( startNode+2, startNode+14, "hinge3"+tetra);
         s.addPair( startNode+2, startNode+15, "hinge3"+tetra);
 
-        //touch sensor rods
-        s.addPair( startNode+16, startNode+0, "right touch rod"+tetra);
-        s.addPair( startNode+1, startNode+17, "left touch rod"+tetra);
+        if (m_config.m_useCylinderEndCaps)
+        {
+            //touch sensor rods
+            s.addPair( startNode+16, startNode+0, "rod right touch"+tetra);
+            s.addPair( startNode+1, startNode+17, "rod left touch"+tetra);
+        }
     }
     else
     {
@@ -312,9 +329,12 @@ void DuCTTRobotModel::addPairs(tgStructure& s, int startNode)
         s.addPair( startNode+2, startNode+14, "hinge2"+tetra);
         s.addPair( startNode+2, startNode+15, "hinge2"+tetra);
 
-        //touch sensor rods
-        s.addPair( startNode+18, startNode+2, "back touch rod"+tetra);
-        s.addPair( startNode+3, startNode+19, "front touch rod"+tetra);
+        if (m_config.m_useCylinderEndCaps)
+        {
+            //touch sensor rods
+            s.addPair( startNode+18, startNode+2, "rod back touch"+tetra);
+            s.addPair( startNode+3, startNode+19, "rod front touch"+tetra);
+        }
     }
 }
 
@@ -435,7 +455,6 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("prism rod ", new tgRodInfo(prismRodConfig));
     spec.addBuilder("vert rod ", new tgRodInfo(vertRodConfig));
     spec.addBuilder("inner rod ", new tgRodInfo(innerRodConfig));
-    spec.addBuilder("touch", new tgRodInfo(touchRodConfig));
 
     spec.addBuilder("vert string", new tgBasicActuatorInfo(vertStringConfig));
     spec.addBuilder("saddle string", new tgBasicActuatorInfo(saddleStringConfig));
@@ -443,7 +462,14 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     spec.addBuilder("prismatic bottom", new tgPrismaticInfo(prismConfigBottom));
     spec.addBuilder("prismatic top", new tgPrismaticInfo(prismConfigTop));
 
-//    spec.addBuilder("sphere", new tgSphereInfo(sphereConfig));
+    if (m_config.m_useCylinderEndCaps)
+    {
+        spec.addBuilder("touch", new tgRodInfo(touchRodConfig));
+    }
+    else
+    {
+        spec.addBuilder("touch", new tgSphereInfo(sphereConfig));
+    }
 
     //used for mechanical test & validation
 //    spec.addBuilder("prism rod ", new tgRodInfo(staticPrismRodConfig));
@@ -498,8 +524,14 @@ void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("touch", new tgTouchSensorRodInfo(touchRodConfig));
-//    spec.addBuilder("sphere", new tgTouchSensorSphereInfo(sphereConfig));
+    if (m_config.m_useCylinderEndCaps)
+    {
+        spec.addBuilder("touch", new tgTouchSensorRodInfo(touchRodConfig));
+    }
+    else
+    {
+        spec.addBuilder("touch", new tgTouchSensorSphereInfo(sphereConfig));
+    }
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -523,39 +555,79 @@ void DuCTTRobotModel::setupVariables()
     saddleMuscles = find<tgBasicActuator>("saddle string");
 
     allTouchSensors = find<tgTouchSensorModel>("touch");
-    std::vector<tgRod*> bottomTouchRods = find<tgRod>("touch rod bottom");
-    std::vector<tgRod*> topTouchRods = find<tgRod>("touch rod top");
-    bottomTouchSensors = find<tgTouchSensorModel>("touch rod bottom");
-    topTouchSensors = find<tgTouchSensorModel>("touch rod top");
+    bottomTouchSensors = find<tgTouchSensorModel>("touch bottom");
+    topTouchSensors = find<tgTouchSensorModel>("touch top");
 
-    //attach touch sensors to the appropriate rods on the actual robot model
-    //add the appropriate rods to the touch sensor ignore list
-    for (size_t i=0; i<bottomTouchSensors.size(); i++)
+    if (m_config.m_useCylinderEndCaps)
     {
-        if (m_config.m_debug)
-            std::cerr << bottomTouchSensors[i]->toString() << std::endl;
+        std::vector<tgRod*> bottomTouchRods = find<tgRod>("touch bottom");
+        std::vector<tgRod*> topTouchRods = find<tgRod>("touch top");
 
-        btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomTouchRods[i]->centerOfMass();
-        abstractMarker marker (bottomTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
-        addMarker(marker);
-        bottomTouchSensors[i]->addMarker(marker);
-        for (size_t j=0; j<bottomRods.size(); j++)
+        //attach touch sensors to the appropriate rods on the actual robot model
+        //add the appropriate rods to the touch sensor ignore list
+        for (size_t i=0; i<bottomTouchSensors.size(); i++)
         {
-            bottomTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
+            if (m_config.m_debug)
+                std::cerr << bottomTouchSensors[i]->toString() << std::endl;
+
+            btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomTouchRods[i]->centerOfMass();
+            abstractMarker marker (bottomTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+            addMarker(marker);
+            bottomTouchSensors[i]->addMarker(marker);
+            for (size_t j=0; j<bottomRods.size(); j++)
+            {
+                bottomTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
+            }
+        }
+        for (size_t i=0; i<topTouchSensors.size(); i++)
+        {
+            if (m_config.m_debug)
+                std::cerr << topTouchSensors[i]->toString() << std::endl;
+
+            btVector3 offset = topTouchSensors[i]->centerOfMass() - topTouchRods[i]->centerOfMass();
+            abstractMarker marker (topTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+            addMarker(marker);
+            topTouchSensors[i]->addMarker(marker);
+            for (size_t j=0; j<topRods.size(); j++)
+            {
+                topTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
+            }
         }
     }
-    for (size_t i=0; i<topTouchSensors.size(); i++)
+    else
     {
-        if (m_config.m_debug)
-            std::cerr << topTouchSensors[i]->toString() << std::endl;
+        std::vector<tgSphere*> bottomTouchSpheres = find<tgSphere>("touch bottom");
+        std::vector<tgSphere*> topTouchSpheres = find<tgSphere>("touch top");
 
-        btVector3 offset = topTouchSensors[i]->centerOfMass() - topTouchRods[i]->centerOfMass();
-        abstractMarker marker (topTouchRods[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
-        addMarker(marker);
-        topTouchSensors[i]->addMarker(marker);
-        for (size_t j=0; j<topRods.size(); j++)
+        //attach touch sensors to the appropriate Spheres on the actual robot model
+        //add the appropriate Spheres to the touch sensor ignore list
+        for (size_t i=0; i<bottomTouchSensors.size(); i++)
         {
-            topTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
+            if (m_config.m_debug)
+                std::cerr << bottomTouchSensors[i]->toString() << std::endl;
+
+            btVector3 offset = bottomTouchSensors[i]->centerOfMass() - bottomTouchSpheres[i]->centerOfMass();
+            abstractMarker marker (bottomTouchSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+            addMarker(marker);
+            bottomTouchSensors[i]->addMarker(marker);
+            for (size_t j=0; j<bottomRods.size(); j++)
+            {
+                bottomTouchSensors[i]->addIgnoredObject(bottomRods[j]->getPRigidBody());
+            }
+        }
+        for (size_t i=0; i<topTouchSensors.size(); i++)
+        {
+            if (m_config.m_debug)
+                std::cerr << topTouchSensors[i]->toString() << std::endl;
+
+            btVector3 offset = topTouchSensors[i]->centerOfMass() - topTouchSpheres[i]->centerOfMass();
+            abstractMarker marker (topTouchSpheres[i]->getPRigidBody(), offset, btVector3(255,0,0), 0);
+            addMarker(marker);
+            topTouchSensors[i]->addMarker(marker);
+            for (size_t j=0; j<topRods.size(); j++)
+            {
+                topTouchSensors[i]->addIgnoredObject(topRods[j]->getPRigidBody());
+            }
         }
     }
 
