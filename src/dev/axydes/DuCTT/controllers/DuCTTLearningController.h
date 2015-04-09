@@ -145,6 +145,11 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         double* phaseChange;
         double* dcOffset;
 
+        double* amplitudeTilt;
+        double* angularFrequencyTilt;
+        double* phaseChangeTilt;
+        double* dcOffsetTilt;
+
         tgImpedanceController* imp_controller;
         bool m_bBadRun;
 
@@ -153,6 +158,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
         int bottomCounter;
         int topCounter;
         double m_dHistorisisSeconds;
+        bool m_bTilting;
 };
 
 #endif // ESCAPE_T6CONTROLLER

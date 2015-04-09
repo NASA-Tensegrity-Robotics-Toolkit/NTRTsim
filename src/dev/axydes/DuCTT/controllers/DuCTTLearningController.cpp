@@ -80,7 +80,7 @@ DuCTTLearningController::DuCTTLearningController(const double initialLength,
 //    musclesPerCluster(1),
     musclesPerCluster(4),
     nPrisms(2),
-    nActions(nClusters+nPrisms),
+    nActions((nClusters+nPrisms)*2),
     imp_controller(new tgImpedanceController(1000, 500, 10)),
     m_bBadRun(false),
     m_bIgnoreTouchSensors(true),
@@ -198,7 +198,7 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
     double diffy = topCOM.y() - bottomCOM.y();
     double diffz = topCOM.z() - bottomCOM.z();
 
-    double tilting = false;
+    m_bTilting = false;
     if (m_axis == 1)
     {
         double totalDiff = diffx + diffz;
@@ -208,7 +208,7 @@ void DuCTTLearningController::onStep(DuCTTRobotModel& subject, double dt)
         if (fabs(totalDiff) > 1)
         {
 //            std::cerr << "TILTING!!!" << std::endl;
-            tilting = true;
+            m_bTilting = true;
         }
     }
 
@@ -271,6 +271,11 @@ void DuCTTLearningController::onTeardown(DuCTTRobotModel& subject) {
     delete angularFrequency;
     delete phaseChange;
     delete dcOffset;
+
+    delete amplitudeTilt;
+    delete angularFrequencyTilt;
+    delete phaseChangeTilt;
+    delete dcOffsetTilt;
 
     m_totalTime = 0.0;
     m_bRecordedStart = false;
@@ -368,9 +373,16 @@ void DuCTTLearningController::applyActions(DuCTTRobotModel& subject, vector< vec
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
     }
+    for (size_t cluster = 0; cluster < clusters.size(); cluster++) {
+        size_t idx = cluster+((clusters.size()-1));
+        amplitudeTilt[idx] = actions[idx][0];
+        angularFrequencyTilt[idx] = actions[idx][1];
+        phaseChangeTilt[idx] = actions[idx][2];
+        dcOffsetTilt[idx] = actions[idx][3];
+    }
     // Apply prism actions
     for (size_t prism = 0; prism < prisms.size(); prism++) {
-        size_t idx = prism + clusters.size()-1;
+        size_t idx = prism + ((clusters.size()-1)*2);
         amplitude[idx] = actions[idx][0];
         angularFrequency[idx] = actions[idx][1];
         phaseChange[idx] = actions[idx][2];
@@ -422,7 +434,16 @@ void DuCTTLearningController::setPreferredMuscleLengths(DuCTTRobotModel& subject
         for(int node=0; node<musclesPerCluster; node++) {
             tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
-            double newVelocity = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+
+            double newVelocity = 0;
+            if (m_bTilting)
+            {
+                newVelocity = amplitudeTilt[cluster] * sin(angularFrequencyTilt[cluster] * m_totalTime + phase) + dcOffsetTilt[cluster];
+            }
+            else
+            {
+                newVelocity = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+            }
 //            if (newVelocity <= minLength) {
 //                newVelocity = minLength;
 //            } else if (newVelocity >= maxLength) {
@@ -430,7 +451,10 @@ void DuCTTLearningController::setPreferredMuscleLengths(DuCTTRobotModel& subject
 //            }
             imp_controller->control(*pMuscle, dt, m_initialLength, newVelocity);
         }
-        phase += phaseChange[cluster];
+        if (m_bTilting)
+            phase += phaseChangeTilt[cluster];
+        else
+            phase += phaseChange[cluster];
     }
 }
 
@@ -448,7 +472,15 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
 
         if (m_bIgnoreTouchSensors || !isLocked(subject, isTop))
         {
-            double newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
+            double newLength = pPrism->getActualLength();
+            if (m_bTilting)
+            {
+                newLength = amplitudeTilt[idx] * sin(angularFrequencyTilt[idx] * m_totalTime + phase) + dcOffsetTilt[idx];
+            }
+            else
+            {
+                newLength = amplitude[idx] * sin(angularFrequency[idx] * m_totalTime + phase) + dcOffset[idx];
+            }
             pPrism->setPreferredLength(newLength);
 //            std::cerr << "Prism is top: " << isTop << ", newLength: " << newLength;
 //            fprintf(stderr, ", amp: %f, freq: %f, phase: %f, offset: %f\n", amplitude[idx], angularFrequency[idx], phase, dcOffset[idx]);
@@ -457,7 +489,10 @@ void DuCTTLearningController::setPrismaticLengths(DuCTTRobotModel& subject, doub
         {
         }
 
-        phase += phaseChange[idx];
+        if (m_bTilting)
+            phase += phaseChangeTilt[idx];
+        else
+            phase += phaseChange[idx];
     }
 }
 
@@ -562,6 +597,11 @@ void DuCTTLearningController::initializeSineWaves() {
     angularFrequency = new double[nActions];
     phaseChange = new double[nActions]; // Does not use last value stored in array
     dcOffset = new double[nActions];
+
+    amplitudeTilt = new double[nActions];
+    angularFrequencyTilt = new double[nActions];
+    phaseChangeTilt = new double[nActions]; // Does not use last value stored in array
+    dcOffsetTilt = new double[nActions];
 }
 
 double DuCTTLearningController::displacement(DuCTTRobotModel& subject) {

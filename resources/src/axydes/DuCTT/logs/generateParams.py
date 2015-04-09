@@ -169,7 +169,8 @@ def mainFunc(inFile, trialFolder, suffix):
     # Move best param file
     paramFile=inFilePath+'/bestParameters-{}-0.nnw'.format(suffix)
     newParamFile=folder+'/bestParameters-{}-0.nnw'.format(suffix)
-    shutil.move(paramFile,newParamFile)
+    shutil.copy2(paramFile,newParamFile)
+    #shutil.move(paramFile,newParamFile)
 
     #Do the actual parameter generation
     sortFile(scoreFile, sortedFile)
@@ -191,7 +192,7 @@ if __name__=="__main__":
         folder = sys.argv[2]
 
     if len(sys.argv) < 4:
-        suffix = '_DuCTT'
+        suffix = 'DuCTT'
     else:
         suffix = sys.argv[3]
 
