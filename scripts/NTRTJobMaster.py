@@ -520,6 +520,8 @@ class BrianJobMaster(NTRTJobMaster):
         self.currentGeneration['edge'] = {}
         self.currentGeneration['node'] = {}
         self.currentGeneration['feedback'] = {}
+        logFile = open('evoLog.txt', 'w') #Clear logfile
+        logFile.close()
         for n in range(numGenerations):
             # Create the generation
             self.currentGeneration['edge'] = self.generationGenerator(self.currentGeneration['edge'], 'edgeVals')
@@ -543,7 +545,9 @@ class BrianJobMaster(NTRTJobMaster):
 
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
             completedJobs = conSched.processJobs()
-
+            
+            totalScore = 0
+            maxScore = -1000
             for job in completedJobs:
                 job.processJobOutput()
                 jobVals = job.obj
@@ -556,8 +560,14 @@ class BrianJobMaster(NTRTJobMaster):
                 feedbackKey = jobVals ['feedbackVals']['paramID']
                 self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
                 
-                
-
+                totalScore += score
+                if score > maxScore:
+                    maxScore = score
+            
+            avgScore = totalScore / float(len(completedJobs))
+            logFile = open('evoLog.txt', 'a') 
+            logFile.write(str((n+1) * numTrials) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
+            logFile.close()
             #TODO save parameters and scores from this generation
 
         #TODO, something that exports results and picks the best trial based on results
