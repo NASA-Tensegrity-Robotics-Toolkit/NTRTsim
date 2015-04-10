@@ -37,7 +37,8 @@
 #include "ducts/DuctTeeModel.h"
 
 //controllers
-#include "controllers/DuCTTLearningController.h"
+#include "controllers/DuCTTLearningSines.h"
+#include "controllers/DuCTTLearnCtrl.h"
 
 // This library
 #include "core/tgModel.h"
@@ -82,7 +83,7 @@ private:
     tgSimulation* simulation;
 
     bool use_graphics;
-    bool add_controller;
+    int controller;
     bool add_duct;
     bool use_manual_params;
     bool use_neuro;
@@ -105,6 +106,8 @@ private:
     double startAngle;
 
     int ductAxis;
+    int ductWidth;
+    int ductHeight;
 
     bool bSetup;
     bool debug;

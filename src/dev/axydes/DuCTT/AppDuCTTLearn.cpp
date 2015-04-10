@@ -32,7 +32,7 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = true;
-    add_controller = false;
+    controller = 0;
     add_duct = false;
     use_manual_params = false;
     use_neuro = false;
@@ -49,7 +49,10 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     startRotY = 0;
     startRotZ = 0;
     startAngle = 0;
+
     ductAxis = 1;
+    ductWidth = 33;
+    ductHeight = 33;
 
     paramFile = "";
     resource_path = "axydes/DuCTT/";
@@ -88,14 +91,29 @@ bool AppDuCTTLearn::setup()
     myRobotModel->addIgnoredObject((btCollisionObject*)bulletPhysicsImpl.m_pGround);
 
     // Fifth create the controllers, attach to model
-    if (add_controller)
+    switch (controller)
     {
-        DuCTTLearningController* testLearningController =
-            new DuCTTLearningController(5.0, use_manual_params,
-                                        paramFile, ductAxis, use_neuro,
-                                        resource_path,
-                                        suffix);
-        myRobotModel->attach(testLearningController);
+    case 1:
+        {
+            DuCTTLearnCtrl* testLearnCtrl =
+                new DuCTTLearnCtrl(5.0, use_manual_params,
+                                            paramFile, ductAxis, 0.2, use_neuro,
+                                            resource_path,
+                                            suffix);
+            myRobotModel->attach(testLearnCtrl);
+        }
+        break;
+    case 0:
+    default:
+        {
+            DuCTTLearningSines* learningSines =
+                new DuCTTLearningSines(5.0, use_manual_params,
+                                            paramFile, ductAxis, use_neuro,
+                                            resource_path,
+                                            suffix);
+            myRobotModel->attach(learningSines);
+        }
+        break;
     }
 
     // Sixth add model & controller to simulation
@@ -105,10 +123,8 @@ bool AppDuCTTLearn::setup()
     if (add_duct)
     {
         DuctStraightModel::Config ductConfig;
-//        ductConfig.m_ductWidth = 32;
-//        ductConfig.m_ductHeight = 32;
-        ductConfig.m_ductWidth = 40;
-        ductConfig.m_ductHeight = 40;
+        ductConfig.m_ductWidth = ductWidth;
+        ductConfig.m_ductHeight = ductHeight;
         ductConfig.m_distance = 10000;
         ductConfig.m_axis = ductAxis;
         switch(ductAxis)
@@ -127,15 +143,6 @@ bool AppDuCTTLearn::setup()
 
         DuctStraightModel* myDuctModel = new DuctStraightModel(ductConfig);
         simulation->addModel(myDuctModel);
-
-//        DuctCrossModel* myDuctModel = new DuctCrossModel();
-//        simulation->addModel(myDuctModel);
-
-//        DuctTeeModel* myDuctModel = new DuctTeeModel();
-//        simulation->addModel(myDuctModel);
-
-//        DuctLModel* myDuctModel = new DuctLModel();
-//        simulation->addModel(myDuctModel);
     }
 
     bSetup = true;
@@ -149,7 +156,7 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     desc.add_options()
         ("help,h", "produce help message")
         ("graphics,g", po::value<bool>(&use_graphics), "Test using graphical view")
-        ("controller,c", po::value<bool>(&add_controller)->implicit_value(true), "Attach the controller to the model.")
+        ("controller,c", po::value<int>(&controller)->implicit_value(0), "Attach the controller to the model. Default=0=DuCTTLearningSines, 1=DuCTTLearnCtrl")
         ("duct,d", po::value<bool>(&add_duct)->implicit_value(true), "Add the duct to the simulation.")
         ("phys_time,p", po::value<double>(), "Physics timestep value (Hz). Default=600")
         ("graph_time,G", po::value<double>(), "Graphics timestep value a.k.a. render rate (Hz). Default = 60")
@@ -165,6 +172,8 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
+        ("duct_width,W", po::value<int>(&ductWidth)->implicit_value(33), "Width of the duct (cm)")
+        ("duct_height,H", po::value<int>(&ductHeight)->implicit_value(33), "Height of the duct (cm)")
         ("debug,D", po::value<bool>(&debug)->implicit_value(true), "Debug flag, output debug information. Default = false")
         ("neuro,n", po::value<bool>(&use_neuro)->implicit_value(true), "Neuro Evolution flag, use NeuroEvolution instead of AnnealEvolution. Default = false")
         ("resource_path,r", po::value<string>(&resource_path)->implicit_value(resource_path), "Resource path (i.e. axydes/DuCTT). Default = 'axydes/DuCTT'")
@@ -197,6 +206,20 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     if (vm.count("paramFile") && vm["paramFile"].as<string>() != "")
     {
         use_manual_params = true;
+    }
+
+    if (vm.count("duct_width") && !vm.count("duct_height"))
+    {
+        ductHeight = vm["duct_width"].as<int>();
+    }
+    else if (!vm.count("duct_width") && vm.count("duct_height"))
+    {
+        ductWidth = vm["duct_height"].as<int>();
+    }
+
+    if (!resource_path.empty() && (*resource_path.rbegin()) != '/')
+    {
+        resource_path.append("/");
     }
 }
 

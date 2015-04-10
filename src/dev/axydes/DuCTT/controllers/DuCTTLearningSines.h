@@ -20,8 +20,8 @@
 #define DUCTT_LEARNING_CONTROLLER
 
 /**
- * @file DuCTTLearningController.h
- * @brief Contains the definition of class DuCTTLearningController.
+ * @file DuCTTLearningSines.h
+ * @brief Contains the definition of class DuCTTLearningSines.
  * @author Alexander Xydes
  * @version 1.0.0
  * $Id$
@@ -48,10 +48,10 @@ class tgTouchSensorModel;
 //namespace std for vectors
 using namespace std;
 
-class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
+class DuCTTLearningSines : public tgObserver<DuCTTRobotModel>
 {
     public:
-        DuCTTLearningController(const double prefLength=5.0,
+        DuCTTLearningSines(const double prefLength=5.0,
                                 const bool useManualParams=false,
                                 const string manParamFile="",
                                 int axis=1,
@@ -62,7 +62,7 @@ class DuCTTLearningController : public tgObserver<DuCTTRobotModel>
                                 );
 
         /** Nothing to delete, destructor must be virtual */
-        virtual ~DuCTTLearningController() { }
+        virtual ~DuCTTLearningSines() { }
 
         virtual void onSetup(DuCTTRobotModel& subject);
 
