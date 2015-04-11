@@ -36,6 +36,7 @@ add_executable(AppDuCTTMechTest
 add_executable(AppDuCTTLearn
     ${DuCTT_ROBOT_SRCS}
     ${DUCT_SRCS}
+    controllers/DuCTTLearning.cpp
     controllers/DuCTTLearningSines.cpp
     controllers/DuCTTLearnCtrl.cpp
     AppDuCTTLearn.cpp

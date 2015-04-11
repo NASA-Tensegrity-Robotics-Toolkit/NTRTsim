@@ -96,8 +96,7 @@ bool AppDuCTTLearn::setup()
     case 1:
         {
             DuCTTLearnCtrl* testLearnCtrl =
-                new DuCTTLearnCtrl(5.0, use_manual_params,
-                                            paramFile, ductAxis, 0.2, use_neuro,
+                new DuCTTLearnCtrl(5.0, ductAxis, 0.2, use_neuro,
                                             resource_path,
                                             suffix);
             myRobotModel->attach(testLearnCtrl);

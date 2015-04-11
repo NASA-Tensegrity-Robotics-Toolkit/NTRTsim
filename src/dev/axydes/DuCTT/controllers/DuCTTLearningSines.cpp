@@ -307,7 +307,7 @@ vector< vector <double> > DuCTTLearningSines::transformActions(vector< vector <d
     double mins[N_PARAMS]  = {
                                0,
 //                               1.2, //m_initialLengths * (pretension - maxStringLengthFactor), //amplitude
-                               0.3, //Hz
+                               0.01, //Hz
                                -1 * M_PI, //phase change
 //                               1.2
                                0
