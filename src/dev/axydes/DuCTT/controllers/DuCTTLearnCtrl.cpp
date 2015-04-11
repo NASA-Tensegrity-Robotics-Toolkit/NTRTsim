@@ -49,7 +49,6 @@
 #include <vector>
 #include <string>
 
-#define M_PI 3.14159265358979323846
 #define N_PARAMS 3
                                
 using namespace std;
@@ -63,12 +62,8 @@ DuCTTLearnCtrl::DuCTTLearnCtrl(const double initialLength,
                                 string resourcePath,
                                 string suffix,
                                 string evoConfigFilename
-) : DuCTTLearning(initialLength,
-           axis,
-           neuro,
-           resourcePath,
-           suffix,
-           evoConfigFilename),
+) :
+    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename),
     angularFrequency(freq),
 //    nClusters(8),
     nClusters(2),

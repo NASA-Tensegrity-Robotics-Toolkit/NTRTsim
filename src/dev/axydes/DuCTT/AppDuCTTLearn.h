@@ -93,7 +93,7 @@ private:
     int nEpisodes; // Number of episodes ("trial runs")
     int nSteps; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
 
-    std::string paramFile;
+    std::string configFile;
     std::string resource_path;
     std::string suffix;
 

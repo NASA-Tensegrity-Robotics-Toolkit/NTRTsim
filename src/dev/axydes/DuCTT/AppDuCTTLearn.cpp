@@ -54,7 +54,7 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     ductWidth = 33;
     ductHeight = 33;
 
-    paramFile = "";
+    configFile = "Config.ini";
     resource_path = "axydes/DuCTT/";
     suffix = "DuCTT";
 
@@ -98,7 +98,7 @@ bool AppDuCTTLearn::setup()
             DuCTTLearnCtrl* testLearnCtrl =
                 new DuCTTLearnCtrl(5.0, ductAxis, 0.2, use_neuro,
                                             resource_path,
-                                            suffix);
+                                            suffix, configFile);
             myRobotModel->attach(testLearnCtrl);
         }
         break;
@@ -106,10 +106,9 @@ bool AppDuCTTLearn::setup()
     default:
         {
             DuCTTLearningSines* learningSines =
-                new DuCTTLearningSines(5.0, use_manual_params,
-                                            paramFile, ductAxis, use_neuro,
+                new DuCTTLearningSines(5.0,  ductAxis, use_neuro,
                                             resource_path,
-                                            suffix);
+                                            suffix, configFile);
             myRobotModel->attach(learningSines);
         }
         break;
@@ -169,7 +168,7 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         //Can only support rotation around the x axis for now.
 //        ("rot_z", po::value<double>(&startRotZ), "Z Coordinate of starting rotation axis for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
-        ("paramFile,f", po::value<string>(&paramFile)->implicit_value(""), "File of parameters to use in controller instead of learning the params.")
+        ("configFile,f", po::value<string>(&configFile)->implicit_value(configFile), "Learning config file.")
         ("duct_axis", po::value<int>(&ductAxis)->implicit_value(1), "Axis to extend duct along (X,Y, or Z). Default=Y.")
         ("duct_width,W", po::value<int>(&ductWidth)->implicit_value(33), "Width of the duct (cm)")
         ("duct_height,H", po::value<int>(&ductHeight)->implicit_value(33), "Height of the duct (cm)")
@@ -200,11 +199,6 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     {
         timestep_graphics = 1/vm["graph_time"].as<double>();
         std::cout << "Graphics timestep set to: " << timestep_graphics << " seconds.\n";
-    }
-
-    if (vm.count("paramFile") && vm["paramFile"].as<string>() != "")
-    {
-        use_manual_params = true;
     }
 
     if (vm.count("duct_width") && !vm.count("duct_height"))

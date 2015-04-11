@@ -49,7 +49,6 @@
 #include <vector>
 #include <string>
 
-#define M_PI 3.14159265358979323846
 #define N_PARAMS 4
                                
 using namespace std;
@@ -57,32 +56,19 @@ using namespace std;
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
 DuCTTLearningSines::DuCTTLearningSines(const double initialLength,
-                                                const bool useManualParams,
-                                                const string manParamFile,
-                                                int axis,
-                                                bool neuro,
-                                                string resourcePath,
-                                                string suffix,
-                                                string evoConfigFilename
-                                                 ) :
-    m_evoConfigFilename(evoConfigFilename),
-    m_evolution(suffix, evoConfigFilename, resourcePath),
-    m_NeuroEvolution(suffix, evoConfigFilename, resourcePath),
-    m_isLearning(false),
-    m_initialLength(initialLength),
-    m_usingManualParams(useManualParams),
-    m_axis(axis),
-    m_bUseNeuro(neuro),
-    m_totalTime(0.0),
-    maxStringLengthFactor(1.50),
+                                        int axis,
+                                        bool neuro,
+                                        string resourcePath,
+                                        string suffix,
+                                        string evoConfigFilename
+) :
+    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename),
 //    nClusters(8),
     nClusters(2),
 //    musclesPerCluster(1),
     musclesPerCluster(4),
     nPrisms(2),
     nActions((nClusters+nPrisms)*2),
-    imp_controller(new tgImpedanceController(1000, 500, 10)),
-    m_bBadRun(false),
     m_bIgnoreTouchSensors(true),
     m_bRecordedStart(false),
     bottomCounter(0),
@@ -91,19 +77,6 @@ DuCTTLearningSines::DuCTTLearningSines(const double initialLength,
     m_bBottomPaused(false),
     m_bTopPaused(false)
 {
-    std::string path;
-    if (resourcePath != "")
-    {
-        path = FileHelpers::getResourcePath(resourcePath);
-    }
-    else
-    {
-        path = "";
-    }
-    m_evoConfig.readFile(path+m_evoConfigFilename);
-    m_isLearning = m_evoConfig.getBoolValue("learning");
-    m_manualParamFile = path+manParamFile;
-
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++)
@@ -112,82 +85,55 @@ DuCTTLearningSines::DuCTTLearningSines(const double initialLength,
     }
 }
 
-/** Set the lengths of the muscles and initialize the learning adapter */
-void DuCTTLearningSines::onSetup(DuCTTRobotModel& subject)
+void DuCTTLearningSines::initBeforeAdapter(DuCTTRobotModel &subject)
 {
-    std::cout << "Setting up DuCTTLearningSines" << std::endl;
-    double dt = 0.0001;
-
-    //Set the initial length of every muscle in the subject
-    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    for (size_t i = 0; i < muscles.size(); ++i) {
-        tgBasicActuator * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        pMuscle->setControlInput(this->m_initialLength, dt);
+    for(int cluster=0; cluster < nClusters; cluster++) {
+        ostringstream ss;
+        ss << (cluster + 1);
+        string suffix = ss.str();
+        std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("string cluster" + suffix);
+        clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
     }
-
-    //Set the initial lengths of the prismatic joints
-    subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getMinLength());
-    subject.getBottomPrismatic()->moveMotors(dt);
-    subject.getTopPrismatic()->setPreferredLength(subject.getTopPrismatic()->getMinLength());
-    subject.getTopPrismatic()->moveMotors(dt);
-
-    populateClusters(subject);
-
-    if (m_bUseNeuro)
-    {
-        m_neuroAdapter.initialize(&m_NeuroEvolution, m_isLearning, m_evoConfig);
+    for(int prism=0; prism < nPrisms; prism++) {
+        switch(prism)
+        {
+        case 0:
+            prisms[prism] = subject.getBottomPrismatic();
+            break;
+        case 1:
+            prisms[prism] = subject.getTopPrismatic();
+            break;
+        default:
+            std::cerr << "ERROR: Too many prismatic joints!" << std::endl;
+            break;
+        }
     }
-    else
-    {
-        m_evolutionAdapter.initialize(&m_evolution, m_isLearning, m_evoConfig);
-    }
-    initializeSineWaves(); // For muscle actuation
-
-    /* Empty vector signifying no state information
-     * All parameters are stateless parameters, so we can get away with
-     * only doing this once
-     */
-    vector<double> state;
-
-        //get the actions (between 0 and 1) from evolution
-    if (m_bUseNeuro)
-    {
-        m_actions = m_neuroAdapter.step(dt,state);
-    }
-    else
-    {
-        m_actions = m_evolutionAdapter.step(dt,state);
-    }
- 
-    //transform them to the size of the structure
-    m_actions = transformActions(m_actions);
-
-    //apply these actions to the appropriate muscles according to the sensor values
-    applyActions(subject,m_actions);
 }
 
-void DuCTTLearningSines::onStep(DuCTTRobotModel& subject, double dt)
+void DuCTTLearningSines::initAfterAdapter(DuCTTRobotModel &subject)
 {
-    if (dt <= 0.0) {
-        throw std::invalid_argument("dt is not positive");
-    }
-    m_totalTime+=dt;
+    amplitude = new double[nActions];
+    angularFrequency = new double[nActions];
+    phaseChange = new double[nActions]; // Does not use last value stored in array
+    dcOffset = new double[nActions];
 
-    if (m_totalTime < 3)
-    {
-        if (isLocked(subject, false))
-        {
-            subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getActualLength());
-        }
-        return;
-    }
-    else if (!m_bRecordedStart)
-    {
-        initPosition = subject.getCOM();
-        m_bRecordedStart = true;
-    }
+    amplitudeTilt = new double[nActions];
+    angularFrequencyTilt = new double[nActions];
+    phaseChangeTilt = new double[nActions]; // Does not use last value stored in array
+    dcOffsetTilt = new double[nActions];
+}
 
+void DuCTTLearningSines::stepBeforeStart(DuCTTRobotModel& subject, double dt)
+{
+    if (isLocked(subject, false))
+    {
+        subject.getBottomPrismatic()->setPreferredLength(subject.getBottomPrismatic()->getActualLength());
+    }
+    return;
+}
+
+void DuCTTLearningSines::stepBeforeMove(DuCTTRobotModel& subject, double dt)
+{
     btVector3 bottomCOM = subject.getTetraCOM();
     btVector3 topCOM = subject.getTetraCOM(false);
 
@@ -214,59 +160,18 @@ void DuCTTLearningSines::onStep(DuCTTRobotModel& subject, double dt)
 
     setPreferredMuscleLengths(subject, dt);
     setPrismaticLengths(subject, dt);
+}
 
-    moveMotors(subject, dt);
 
+void DuCTTLearningSines::stepAfterMove(DuCTTRobotModel& subject, double dt)
+{
     //TODO: check for bad run?
     double distance = displacement(subject);
     //if old dist >0 and new dist<0 -> bad run?
 }
 
-void DuCTTLearningSines::moveMotors(DuCTTRobotModel &subject, double dt)
+void DuCTTLearningSines::teardownEnd(DuCTTRobotModel& subject)
 {
-    //Move motors for all the muscles
-    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
-        tgBasicActuator * const pMuscle = muscles[i];
-        assert(pMuscle != NULL);
-        pMuscle->moveMotors(dt);
-    }
-
-    //Move prismatic joints
-    subject.getBottomPrismatic()->moveMotors(dt);
-    subject.getTopPrismatic()->moveMotors(dt);
-}
-
-// So far, only score used for eventual fitness calculation of an Escape Model
-// is the maximum distance from the origin reached during that subject's episode
-void DuCTTLearningSines::onTeardown(DuCTTRobotModel& subject) {
-    std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
-    double distance = displacement(subject);
-    double energySpent = totalEnergySpent(subject);
-
-    //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    if (!m_bBadRun)
-    {
-        scores.push_back(distance);
-    }
-    else
-    {
-        scores.push_back(-1);
-    }
-
-    scores.push_back(energySpent);
-
-    if (m_bUseNeuro)
-    {
-        m_neuroAdapter.endEpisode(scores);
-    }
-    else
-    {
-        m_evolutionAdapter.endEpisode(scores);
-    }
-
-    // If any of subject's dynamic objects need to be freed, this is the place to do so
     delete amplitude;
     delete angularFrequency;
     delete phaseChange;
@@ -276,11 +181,6 @@ void DuCTTLearningSines::onTeardown(DuCTTRobotModel& subject) {
     delete angularFrequencyTilt;
     delete phaseChangeTilt;
     delete dcOffsetTilt;
-
-    m_totalTime = 0.0;
-    m_bRecordedStart = false;
-    m_bBadRun = false;
-    std::cout << "Torn down" << std::endl;
 }
 
 /** 
@@ -292,16 +192,7 @@ void DuCTTLearningSines::onTeardown(DuCTTRobotModel& subject) {
 vector< vector <double> > DuCTTLearningSines::transformActions(vector< vector <double> > actions)
 {
     vector <double> params(N_PARAMS * nActions + 2, 1); // '4' for the number of sine wave parameters
-    if (m_usingManualParams)
-    {
-        std::cout << "Using manually set parameters\n"; 
-        int lineNumber = 1;
-        params = readManualParams(lineNumber, m_manualParamFile);
-    } 
-    else
-    {
-        params = actions[0];
-    }
+    params = actions[0];
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
     double mins[N_PARAMS]  = {
@@ -389,38 +280,6 @@ void DuCTTLearningSines::applyActions(DuCTTRobotModel& subject, vector< vector <
         dcOffset[idx] = actions[idx][3];
     }
     //printSineParams();
-}
-
-//TODO: Doesn't seem to correctly calculate energy spent by tensegrity
-//TODO: punish slack strings
-//TODO: too much pretension
-double DuCTTLearningSines::totalEnergySpent(DuCTTRobotModel& subject) {
-    double totalEnergySpent=0;
-
-    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
-    for(int i=0; i<tmpStrings.size(); i++)
-    {
-        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
-
-        for(int j=1; j<stringHist.tensionHistory.size(); j++)
-        {
-            const double previousTension = stringHist.tensionHistory[j-1];
-            const double previousLength = stringHist.restLengths[j-1];
-            const double currentLength = stringHist.restLengths[j];
-            //TODO: examine this assumption - free spinning motor may require more power         
-            double motorSpeed = (currentLength-previousLength);
-            if(motorSpeed > 0) // Vestigial code
-            {
-                motorSpeed = 0;
-            }
-            else
-            {
-            }
-            const double workDone = previousTension * motorSpeed;
-            totalEnergySpent += workDone;
-        }
-    }
-    return totalEnergySpent;
 }
 
 // Pre-condition: every element in muscles must be defined
@@ -566,111 +425,6 @@ bool DuCTTLearningSines::shouldPause(std::vector<tgTouchSensorModel*> touchSenso
     }
 
     return shouldPause;
-}
-
-void DuCTTLearningSines::populateClusters(DuCTTRobotModel& subject) {
-    for(int cluster=0; cluster < nClusters; cluster++) {
-        ostringstream ss;
-        ss << (cluster + 1);
-        string suffix = ss.str();
-        std::vector <tgBasicActuator*> musclesInThisCluster = subject.find<tgBasicActuator>("string cluster" + suffix);
-        clusters[cluster] = std::vector<tgBasicActuator*>(musclesInThisCluster);
-    }
-    for(int prism=0; prism < nPrisms; prism++) {
-        switch(prism)
-        {
-        case 0:
-            prisms[prism] = subject.getBottomPrismatic();
-            break;
-        case 1:
-            prisms[prism] = subject.getTopPrismatic();
-            break;
-        default:
-            std::cerr << "ERROR: Too many prismatic joints!" << std::endl;
-            break;
-        }
-    }
-}
-
-void DuCTTLearningSines::initializeSineWaves() {
-    amplitude = new double[nActions];
-    angularFrequency = new double[nActions];
-    phaseChange = new double[nActions]; // Does not use last value stored in array
-    dcOffset = new double[nActions];
-
-    amplitudeTilt = new double[nActions];
-    angularFrequencyTilt = new double[nActions];
-    phaseChangeTilt = new double[nActions]; // Does not use last value stored in array
-    dcOffsetTilt = new double[nActions];
-}
-
-double DuCTTLearningSines::displacement(DuCTTRobotModel& subject) {
-    btVector3 finalPosition = subject.getCOM();
-
-    //assert(finalPosition[0] > 0);
-
-    const double newX = finalPosition.x();
-    const double newY = finalPosition.y();
-    const double newZ = finalPosition.z();
-    const double oldX = initPosition.x();
-    const double oldY = initPosition.y();
-    const double oldZ = initPosition.z();
-
-    const double distanceMoved = sqrt(
-                                      (newX-oldX) * (newX-oldX) +
-                                      (newY-oldY) * (newY-oldY) +
-                                      (newZ-oldZ) * (newZ-oldZ)
-                                    );
-
-    switch(m_axis)
-    {
-    case 0:
-        return fabs(newX - oldX);
-    case 2:
-        return fabs(newZ - oldZ);
-    case 3:
-        return distanceMoved;
-    case 1:
-    default:
-        return newY - oldY;
-    }
-}
-                                         
-std::vector<double> DuCTTLearningSines::readManualParams(int lineNumber, string filename) {
-    assert(lineNumber > 0);
-    int numParams = nActions*N_PARAMS+2;
-    vector<double> result(numParams, 1.0);
-    string line;
-    ifstream infile(filename.c_str(), ifstream::in);
-
-    // Grab line from input file
-    if (infile.is_open()) {
-        for (int i=0; i<lineNumber; i++) {
-            getline(infile, line);
-        }
-        infile.close();
-    }
-
-    //cout << "Using: " << line << " as input for starting parameter values\n";
-
-    // Split line into parameters
-    stringstream lineStream(line);
-    string cell;
-    int iCell = 0;
-    while(getline(lineStream,cell,',') && iCell <= numParams) {
-        result[iCell] = atof(cell.c_str());
-        iCell++;
-    }
-
-    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
-    for (int i=0; i < result.size(); i++) {
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-        double seed = ((double) (rand() % 100)) / 100;
-        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-    }
-
-    return result;
 }
 
 void DuCTTLearningSines::printSineParams() {
