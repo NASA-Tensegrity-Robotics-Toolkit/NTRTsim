@@ -45,7 +45,7 @@ class TetraSpineCollisions: public BaseSpineModelLearning
 public: 
 
     
-    TetraSpineCollisions(size_t segments);
+    TetraSpineCollisions(size_t segments, double scale);
 
     virtual ~TetraSpineCollisions();
     
@@ -54,6 +54,8 @@ public:
     virtual void teardown();
     
     virtual void step(const double dt);
+
+    const double scaleFactor;
 
 };
 

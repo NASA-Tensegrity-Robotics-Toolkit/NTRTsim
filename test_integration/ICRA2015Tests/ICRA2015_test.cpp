@@ -127,7 +127,7 @@ namespace {
 				 * error = abs((actual - simulated)/actual)
 				 * Expected error values are a mix from double precision
 				 * results, the original paper errors and values
-				 * as of 12/3/14. Try to make them smaller!
+				 * as of 2/28/15. Try to make them smaller!
 				 */
 				double error;
 				std::cout << "Inner front top max tension " << simMaxTens[1] / 100.0 << " N" << std::endl;
@@ -135,7 +135,7 @@ namespace {
 				EXPECT_LE(error, 0.1441);
 				std::cout << "Inner front left max tension " << simMaxTens[5] / 100.0 << " N" << std::endl;
 				error = abs ((18.0986 - simMaxTens[5] / 100.0) / 18.0986);
-				EXPECT_LE(error, 0.0256368);
+				EXPECT_LE(error, 0.0263763);
 				std::cout << "Inner front right max tension " << simMaxTens[9] / 100.0 << " N" << std::endl;
 				error = abs ((22.0161 - simMaxTens[9] / 100.0) / 22.0161);
 				EXPECT_LE(error, 0.113424);
@@ -144,7 +144,7 @@ namespace {
 				EXPECT_LE(error, 0.3281);
 				std::cout << "Outer front left max tension " << simMaxTens[4] / 100.0 << " N" << std::endl;
 				error = abs ((15.5914 - simMaxTens[4] / 100.0) / 15.5914);
-				EXPECT_LE(error, 0.3337);
+				EXPECT_LE(error, 0.335482);
 				std::cout << "Outer front right max tension " << simMaxTens[8] / 100.0 << " N" << std::endl;
 				error = abs ((14.1811 - simMaxTens[8] / 100.0) / 14.1811);
 				EXPECT_LE(error, 0.1988);

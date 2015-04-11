@@ -162,9 +162,9 @@ void NestedBoxTestModel::setup(tgWorld& world)
     const double density = 4.2 / 3000.0; // kg / length^3 - see app for length
     const double radius = 0.5;
     const double h  = 0.5;
-    const tgRod::Config rodConfig(radius, density);
+    const tgBox::Config rodConfig(radius, density);
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("rod", new tgBoxInfo(rodConfig));
     
     tgSpringCableActuator::Config muscleConfig(1000, 10);
     //spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));

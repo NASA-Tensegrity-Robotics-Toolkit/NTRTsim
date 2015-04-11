@@ -92,12 +92,12 @@ BaseSpineModelLearning::getMuscles (const std::string& key) const
     }
 }
 
-const std::vector<tgSpringCableActuator*>& BaseSpineModelLearning::getAllMuscles()
+const std::vector<tgSpringCableActuator*>& BaseSpineModelLearning::getAllMuscles() const
 {
     return m_allMuscles;
 }
 
-const std::vector<tgBaseRigid*> BaseSpineModelLearning::getAllRigids()
+const std::vector<tgBaseRigid*> BaseSpineModelLearning::getAllRigids() const
 {
 	if (m_allSegments.size() != m_segments)
     {
@@ -115,7 +115,7 @@ const std::vector<tgBaseRigid*> BaseSpineModelLearning::getAllRigids()
 	return p_rods;
 }
 
-const int BaseSpineModelLearning::getSegments()
+const int BaseSpineModelLearning::getSegments() const
 {
     return m_segments;
 }

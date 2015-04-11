@@ -146,19 +146,38 @@ protected:
     std::vector<tgCPGActuatorControl*> m_allControllers;
     
     BaseSpineCPGControl::Config m_config;
-    
+
+    /**
+     * Hold the filename that gets passed to the respective configuration objects
+     * Having two of each of these allows for different groups of parameters to be specified
+     */
     std::string edgeConfigFilename;
     std::string nodeConfigFilename;
     
+    /**
+     * A file input/output system that uses .ini files. The object converts a string to
+     * data in the filename that it has been passed.
+     */
     configuration nodeConfigData;
     configuration edgeConfigData;
     
+    /**
+     * The object that holds all of the data for the evolution run in vectors of populations.
+     * Needs to persist throughout a simulation
+     */
     AnnealEvolution edgeEvolution;
     AnnealEvolution nodeEvolution;
     
+    /**
+     * Handles getting parameters from and returning scores to the evolution object.
+     * Needs to persist throughout a simulation
+     */
     AnnealAdapter edgeAdapter;
     AnnealAdapter nodeAdapter;
     
+    /**
+     * A booelan that indicates whether the respective group is learning this run. Is passed to the evolution adapter
+     */
     bool nodeLearning;
     bool edgeLearning;
     

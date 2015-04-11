@@ -63,11 +63,11 @@ public:
       
     virtual const std::vector<tgSpringCableActuator*>& getMuscles(const std::string& key) const;
     
-    virtual const std::vector<tgSpringCableActuator*>& getAllMuscles();
+    virtual const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
     
-    virtual const std::vector<tgBaseRigid*> getAllRigids();
+    virtual const std::vector<tgBaseRigid*> getAllRigids() const;
     
-    virtual const int getSegments();
+    virtual const int getSegments() const;
     
     virtual std::size_t getNumberofMuslces() const
     {

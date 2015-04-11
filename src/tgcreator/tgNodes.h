@@ -68,7 +68,7 @@ public:
         assertUniqueElements("All nodes must be unique.");
 
         // @todo: There has to be a better way to do this (maybe initializer lists with upcasting btVector3 => tgNode?) 
-        for(int i = 0; i < nodes.size(); i++) {
+        for(std::size_t i = 0; i < nodes.size(); i++) {
             addElement(tgNode(nodes[i]));
         }
         
@@ -176,7 +176,7 @@ public:
     {
         /// @todo use std::for_each()
         std::vector<tgNode>& nodes = getElements();
-        for(int i = 0; i < nodes.size(); i++) {
+        for(std::size_t i = 0; i < nodes.size(); i++) {
             nodes[i] += offset;
         }
     }
@@ -207,7 +207,7 @@ public:
                      const btQuaternion& rotation)
     {
         std::vector<tgNode>& nodes = getNodes();
-        for(int i = 0; i < nodes.size(); i++) {
+        for(std::size_t i = 0; i < nodes.size(); i++) {
             nodes[i].addRotation(fixedPoint, rotation);
         }
     }
@@ -247,7 +247,7 @@ operator<<(std::ostream& os, const tgNodes& n)
 
     os << "tgNodes(" << std::endl;
     const std::vector<tgNode>& nodes = n.getNodes();
-    for(int i = 0; i < nodes.size(); i++) {
+    for(std::size_t i = 0; i < nodes.size(); i++) {
         os << "  " << nodes[i] << std::endl;
     }
     os << ")";

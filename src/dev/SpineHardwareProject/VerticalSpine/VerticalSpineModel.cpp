@@ -27,7 +27,8 @@
 #include "VerticalSpineModel.h"
 // This library
 #include "core/tgCast.h"
-#include "core/tgBasicActuator.h"
+//#include "core/tgBasicActuator.h"
+#include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
@@ -114,6 +115,7 @@ void VerticalSpineModel::addNodes(tgStructure& tetra, double edge, double height
     tetra.addNode(0, c.height, edge / 2.0); // node 3
     // middle
     tetra.addNode(0, c.height/2, 0); // node 4
+
 }
 
 void VerticalSpineModel::addPairs(tgStructure& tetra)
@@ -122,6 +124,7 @@ void VerticalSpineModel::addPairs(tgStructure& tetra)
     tetra.addPair(1, 4, "rod");
     tetra.addPair(2, 4, "rod");
     tetra.addPair(3, 4, "rod");
+
 }
     
 void VerticalSpineModel::addPairsB(tgStructure& tetra)
@@ -130,6 +133,7 @@ void VerticalSpineModel::addPairsB(tgStructure& tetra)
     tetra.addPair(1, 4, "rodB");
     tetra.addPair(2, 4, "rodB");
     tetra.addPair(3, 4, "rodB");
+
 }
 
 void VerticalSpineModel::addSegments(tgStructure& snake, const tgStructure& tetra, 
@@ -177,15 +181,15 @@ void VerticalSpineModel::mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
     // create names for muscles (for getMuscles function)
     
     // vertical muscles
-    muscleMap["vertical a"] = model.find<tgBasicActuator>("vertical muscle a");
-    muscleMap["vertical b"] = model.find<tgBasicActuator>("vertical muscle b");
-    muscleMap["vertical c"] = model.find<tgBasicActuator>("vertical muscle c");
-    muscleMap["vertical d"] = model.find<tgBasicActuator>("vertical muscle d");
+    muscleMap["vertical a"] = model.find<tgSpringCableActuator>("vertical muscle a");
+    muscleMap["vertical b"] = model.find<tgSpringCableActuator>("vertical muscle b");
+    muscleMap["vertical c"] = model.find<tgSpringCableActuator>("vertical muscle c");
+    muscleMap["vertical d"] = model.find<tgSpringCableActuator>("vertical muscle d");
         
     // saddle muscles
     for (size_t i = 1; i < segmentCount ; ++i)
     {
-        muscleMap[tgString("saddle", i-1)] = model.find<tgBasicActuator>(tgString("saddle muscle seg", i-1));
+        muscleMap[tgString("saddle", i-1)] = model.find<tgSpringCableActuator>(tgString("saddle muscle seg", i-1));
             
     }
 }
@@ -196,7 +200,7 @@ void VerticalSpineModel::mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
 void VerticalSpineModel::setup(tgWorld& world)
 {
     // debugging output: edge and height length
-    std::cout << "edge: " << c.edge << "; height: " << c.height << std::endl;
+    //std::cout << "edge: " << c.edge << "; height: " << c.height << std::endl;
     
     // Create the first fixed snake segment
     // @todo move these hard-coded parameters into config
@@ -239,13 +243,19 @@ void VerticalSpineModel::setup(tgWorld& world)
 				  c.rollFriction, c.restitution);
     const tgRod::Config rodConfigB(c.radius, c.densityB, c.friction, 
 				  c.rollFriction, c.restitution);
+    //holder
+    const tgRod::Config rodConfigHA(0.1, c.densityA, c.friction,
+				    c.rollFriction, c.restitution);
+    const tgRod::Config rodConfigHB(0.1, c.densityB, c.friction,
+				    c.rollFriction, c.restitution);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfigA));
     spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
-    
+
+
     // set muscle (string) parameters
     // @todo replace acceleration constraint with tgKinematicActuator if needed...
-    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
+    tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
 					 c.hist, c.maxTens, c.targetVelocity);
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
 
@@ -257,12 +267,13 @@ void VerticalSpineModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
-    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     mapMuscles(muscleMap, *this, m_segments);
 
-    trace(structureInfo, *this);
+    //trace(structureInfo, *this);
 
     // Actually setup the children
+    notifySetup();
     tgModel::setup(world);
 }
 
@@ -281,7 +292,7 @@ void VerticalSpineModel::step(double dt)
     }
 }
     
-const std::vector<tgBasicActuator*>&
+const std::vector<tgSpringCableActuator*>&
 VerticalSpineModel::getMuscles (const std::string& key) const
 {
     const MuscleMap::const_iterator it = muscleMap.find(key);
@@ -295,7 +306,7 @@ VerticalSpineModel::getMuscles (const std::string& key) const
     }
 }
 
-const std::vector<tgBasicActuator*>& VerticalSpineModel::getAllMuscles() const
+const std::vector<tgSpringCableActuator*>& VerticalSpineModel::getAllMuscles() const
 {
     return allMuscles;
 }

@@ -35,6 +35,7 @@ class tgModel;
 class tgModelVisitor;
 class tgSimView;
 class tgWorld;
+class tgGround;
 
 /**
  * Holds objects necessary for simulation, a world, a view
@@ -78,7 +79,16 @@ public:
      * an exception is thrown if it is NULL
      * @throw std::invalid_argument if pModel is NULL
      */
+
     void addModel(tgModel* pModel);
+    /**
+     * Add an obstacle to the simulation.
+     * Obstacles are deleted upon reset.
+     * @param[in] pObstacle a pointer to a tgModel representing an obstacle;
+     * an exception is thrown if it is NULL
+     * @throw std::invalid_argument if pModel is NULL
+     */
+    void addObstacle(tgModel* pObstacle);
     
     /**
      * Pass the tgModelVisitor to all of the models
@@ -91,6 +101,15 @@ public:
      * Will delete and remake the dynamics world
      */
     void reset();
+
+    /**
+     * Calls teardown, then sets the ground of the world to newGround
+     * then calls setup on the view, finally
+     * calls setup on the models
+     * Will delete and remake the dynamics world, the previous
+     * ground will be deleted
+     */
+    void reset(tgGround* newGround);
     
     /**
      * Returns a reference to the world
@@ -102,7 +121,7 @@ public:
     /**
      * Calls teardown on all of the models and reset on the world
      */
-    void teardown() const;
+    void teardown();
 
     /** Integrity predicate. */
     bool invariant() const;
@@ -118,6 +137,14 @@ private:
      * @todo Should this be std::set?
      */
     std::vector<tgModel*> m_models;
+    
+    /**
+     * Obstacles are models that are deleted after one simulation
+     * This allows their presence or absence to be controlled by
+     * main.
+     * All pointers should be non-NULL
+     */
+    std::vector<tgModel*> m_obstacles;
 };
 
 #endif  // TG_SIMULATION_H

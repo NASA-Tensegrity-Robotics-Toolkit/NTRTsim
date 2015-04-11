@@ -26,9 +26,8 @@
 
 #ifndef FILE_HELPERS_H 
 #define FILE_HELPERS_H 
- 
-// The C++ Standard Library
-#include <vector>
+
+#include <string>
 
 class FileHelpers 
 {
