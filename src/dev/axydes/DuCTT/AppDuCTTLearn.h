@@ -39,6 +39,7 @@
 //controllers
 #include "controllers/DuCTTLearningSines.h"
 #include "controllers/DuCTTLearnCtrl.h"
+#include "controllers/DuCTTLearnStateMachine.h"
 
 // This library
 #include "core/tgModel.h"

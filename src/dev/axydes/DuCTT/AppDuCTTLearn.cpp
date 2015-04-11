@@ -93,6 +93,15 @@ bool AppDuCTTLearn::setup()
     // Fifth create the controllers, attach to model
     switch (controller)
     {
+    case 2:
+        {
+            DuCTTLearnStateMachine* testLearnStateMachine =
+                new DuCTTLearnStateMachine(5.0, ductAxis, use_neuro,
+                                            resource_path,
+                                            suffix, configFile);
+            myRobotModel->attach(testLearnStateMachine);
+        }
+        break;
     case 1:
         {
             DuCTTLearnCtrl* testLearnCtrl =

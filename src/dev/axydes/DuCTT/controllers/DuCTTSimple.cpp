@@ -140,7 +140,7 @@ void DuCTTSimple::onStep(DuCTTRobotModel& subject, double dt)
                 state = PUSH_TOP;
             break;
         case PUSH_TOP:
-            (moveStrings(subject.getSaddleMuscles(), minStringLength, dt));
+            (moveStrings(subject.getSaddleMuscles(), maxStringLength, dt));
             if (moveStrings(subject.getVertMuscles(), maxStringLength, dt))
                 state = EXPAND_TOP;
             break;
@@ -153,7 +153,7 @@ void DuCTTSimple::onStep(DuCTTRobotModel& subject, double dt)
                 state = PULL_BOTTOM;
             break;
         case PULL_BOTTOM:
-            (moveStrings(subject.getSaddleMuscles(), maxStringLength, dt));
+            (moveStrings(subject.getSaddleMuscles(), minStringLength, dt));
             if (moveStrings(subject.getVertMuscles(), minStringLength, dt))
                 state = EXPAND_BOTTOM;
             break;

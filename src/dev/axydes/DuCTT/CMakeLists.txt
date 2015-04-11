@@ -39,6 +39,7 @@ add_executable(AppDuCTTLearn
     controllers/DuCTTLearning.cpp
     controllers/DuCTTLearningSines.cpp
     controllers/DuCTTLearnCtrl.cpp
+    controllers/DuCTTLearnStateMachine.cpp
     AppDuCTTLearn.cpp
 )
 
