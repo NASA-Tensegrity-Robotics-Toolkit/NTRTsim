@@ -47,6 +47,8 @@ public:
 	
     void updateTensionSetpoint(double newTension);
     
+    void updateControlLength(double newControlLength);
+    
     const double getCommandedTension() const
     {
         return m_commandedTension;
@@ -87,7 +89,7 @@ private:
     /**
      * Control parameters unique to this, borrowed from tgBaseCPGNode
      */
-    const double  m_controlLength;
+    double  m_controlLength;
     
     tgPIDController::Config m_tempConfig;
     

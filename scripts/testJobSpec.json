@@ -7,12 +7,12 @@
     "learningParams": 
     {
         "trialLength" : 3000,
-        "numTrials" : 100,
+        "numTrials" : 250,
         "numGenerations" : 30,
         "nodeVals" :
         {
             "learning" : false,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
@@ -30,7 +30,7 @@
         "edgeVals" :
         {
             "learning" : false,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
@@ -51,14 +51,14 @@
             "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 2,
-            "numberOfOutputs" : 4,
+            "numberOfOutputs" : 40,
             "numberOfInstances" : 1,
-            "populationSize" : 20,
+            "populationSize" : 50,
             "useAverage" : true,
-            "numberToMutate" : 5,
+            "numberToMutate" : 15,
             "numberOfChildren" : 10,
             "mutationChance" : 0.5,
-            "mutationDev" : 0.03,
+            "mutationDev" : 0.1,
             "paramMax" : 1.0,
             "paramMin": -1.0,
             "childMutationChance" : 0.5

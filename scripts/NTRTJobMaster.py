@@ -144,7 +144,8 @@ class BrianJobMaster(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-    
+        # random.seed(1)
+        
     def __writeToNNW(self, neuralParams, fileName):
         
         fout = open(fileName, 'w')
@@ -336,7 +337,7 @@ class BrianJobMaster(NTRTJobMaster):
             for k, controller in currentGeneration.iteritems() :
                 scores = controller['scores']
                 controller['maxScore'] = max(scores)
-                controller['avgScore'] = sum(scores) / len(scores)
+                controller['avgScore'] = sum(scores) / float(len(scores))
                 
             
             if (useAvg):
@@ -345,7 +346,10 @@ class BrianJobMaster(NTRTJobMaster):
                 key = lambda x: x[1]['maxScore']
             sortedGeneration = collections.OrderedDict(sorted(currentGeneration.items(), None, key, True))
             
-            print json.dumps(sortedGeneration)
+            scoreDump = open('scoreDump.txt', 'a')
+            scoreDump.write(json.dumps(sortedGeneration))
+            scoreDump.write('\n')
+            scoreDump.close()
             
             totalScore = 0
             
@@ -357,11 +361,17 @@ class BrianJobMaster(NTRTJobMaster):
                     pass
                 
                 floor = controller['avgScore']
+                
                 for controller in sortedGeneration.itervalues():
                     totalScore += controller['avgScore'] - floor
+
                 first = True
                 c1 = {}
-                #TODO handle special case of pop = 1, deal with div by zero that happens here
+                
+                # All scores are the same for some reason, don't divide by zero
+                if totalScore == 0.0:
+                    totalScore = 1
+                
                 for c in sortedGeneration.itervalues():
                     if first:
                         c['probability'] = (c['avgScore'] - floor) / totalScore
@@ -369,16 +379,21 @@ class BrianJobMaster(NTRTJobMaster):
                     else:
                         c['probability'] = (c['avgScore'] - floor) / totalScore + c1['probability']
                     c1 = c
+
             else:
                 for controller in sortedGeneration.itervalues():
                     pass
                 
                 floor = controller['maxScore']
+                
                 for controller in sortedGeneration.itervalues():
                     totalScore += controller['maxScore'] - floor
+
                 first = True
                 c1 = {}
-                #TODO handle special case of pop = 1, deal with div by zero that happens here
+                # All scores are the same for some reason, don't divide by zero
+                if totalScore == 0.0:
+                    totalScore = 1
                 for c in sortedGeneration.itervalues():
                     if first:
                         c['probability'] = (c['maxScore'] - floor) / totalScore
@@ -386,7 +401,6 @@ class BrianJobMaster(NTRTJobMaster):
                     else:
                         c['probability'] = (c['maxScore'] - floor) / totalScore + c1['probability']
                     c1 = c
-            
                 
             
             numElites = popSize - (params['numberToMutate'] + params['numberOfChildren'])
@@ -433,6 +447,10 @@ class BrianJobMaster(NTRTJobMaster):
                 
                 c1 = self.__getControllerFromProbability(sortedGeneration, c1Prob)
                 c2 = self.__getControllerFromProbability(sortedGeneration, c2Prob)
+                
+                while (c1 == c2):
+                    c2Prob = random.random()
+                    c2 = self.__getControllerFromProbability(sortedGeneration, c2Prob)
                 
                 cNew = {}
                 cNew['params'] = self.__getChildController(c1['params'], c2['params'], params)
@@ -522,6 +540,9 @@ class BrianJobMaster(NTRTJobMaster):
         self.currentGeneration['feedback'] = {}
         logFile = open('evoLog.txt', 'w') #Clear logfile
         logFile.close()
+        
+        scoreDump = open('scoreDump.txt', 'w')
+        scoreDump.close()
         for n in range(numGenerations):
             # Create the generation
             self.currentGeneration['edge'] = self.generationGenerator(self.currentGeneration['edge'], 'edgeVals')

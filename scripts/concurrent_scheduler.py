@@ -6,7 +6,7 @@ class ConcurrentScheduler:
 
     # Number of seconds to wait after spawning processes before
     # querying PID list.
-    __CHECK_DELAY = 2
+    __CHECK_DELAY = 0.1
 
     def __init__(self, toProcess, numProcesses):
         self.numProcesses = numProcesses

@@ -43,6 +43,24 @@
 
 namespace po = boost::program_options;
 
+/// Rand seeding simular to the evolution classes. 
+/// @todo should we make this common?
+#ifdef _WIN32
+
+//  Windows
+#define rdtsc  __rdtsc
+
+#else
+
+//  For everything else
+unsigned long long rdtsc(){
+    unsigned int lo,hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((unsigned long long)hi << 32) | lo;
+}
+
+#endif
+
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -55,6 +73,8 @@ int main(int argc, char** argv)
     std::cout << "AppGATests" << std::endl;
     
     std::string suffix;
+    
+    srand(rdtsc());
     
     int nSteps;
     
@@ -102,7 +122,11 @@ int main(int argc, char** argv)
     
     nn->loadWeights(nnFile.c_str());
     
-    std::vector<double> state(numberOfInputs, 1.0);
+    std::vector<double> state;
+    for (int i = 0; i < numberOfInputs; i++)
+    {
+        state.push_back((rand() / (double)RAND_MAX));
+    }
     double goal = 1.0 * (double) numberOfOutputs;
 
     
@@ -110,14 +134,14 @@ int main(int argc, char** argv)
     double *inputs = new double[numberOfInputs];    
     for (std::size_t i = 0; i < state.size(); i++)
     {
-        inputs[i]=state[i] / 2.0 + 0.5;
+        inputs[i] = (state[i] - 0.5) / 2.0;
     }
     
     double *output = nn->feedForwardPattern(inputs);
     double score1 = 0.0;
     for(std::size_t i = 0; i < numberOfOutputs; i++)
     {
-        score1 += output[i];
+        score1 += pow(-1.0, i) * output[i];
     }
     
     std::vector<double> scores;
