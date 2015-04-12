@@ -467,12 +467,26 @@ void JSONGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
 
     transformFeedbackActions(actions);
     
-    for (int i = 0; i < nSeg; i++)
+    assert(m_config.numActions == m_saddleControllers.size() + m_allControllers.size());
+    assert(m_saddleControllers.size() == m_allControllers.size());
+    
+    const OctahedralComplex* octaSubject = tgCast::cast<BaseSpineModelLearning, OctahedralComplex>(subject);
+    const std::vector <tgSpringCableActuator*> allSaddleMuscles = octaSubject->getSaddleMuscles();
+    const std::vector <tgSpringCableActuator*> allCPGMuscles = octaSubject->getAllMuscles();
+    
+    
+    for (int j = 0; j < m_saddleControllers.size(); j++)
     {
-        for (int j = 0; j < m_config.numActions; j++)
-        {
-             m_saddleControllers[i * m_config.numActions + j]->updateTensionSetpoint(actions[j] * m_config.tensFeedback + m_config.tensFeedback);
-        }
+        double startLength = allSaddleMuscles[j]->getStartLength();
+        m_saddleControllers[j]->updateControlLength(actions[j] * startLength + startLength);
+    }
+    
+    for (int i = 0; i < m_allControllers.size(); i++)
+    {
+        double startLength = allCPGMuscles[i]->getStartLength();
+        
+        tgCPGCableControl* mCPGController = tgCast::cast<tgCPGActuatorControl, tgCPGCableControl>(m_allControllers[i]);
+        mCPGController->updateControlLength(actions[i] *startLength + startLength);
     }
 }
 

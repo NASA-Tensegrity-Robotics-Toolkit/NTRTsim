@@ -131,3 +131,15 @@ void tgCPGCableControl::updateTensionSetpoint(double newTension)
         throw std::runtime_error("Tension setpoint is less than zero!");
     }
 }
+
+void tgCPGCableControl::updateControlLength(double newControlLength)
+{
+    if (newControlLength >= 0.0)
+    {
+       m_controlLength = newControlLength;
+    }
+    else
+    {
+        throw std::runtime_error("Length setpoint is less than zero!");
+    }
+}
