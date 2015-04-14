@@ -30,8 +30,18 @@
 
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 
+// This library
+#include "core/tgModel.h" 
+#include "core/tgSubject.h"
+// The C++ Standard Library
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
 class tgWorld;
 class tgStructureInfo;
+class tgBasicActuator;
 
 /**
  * This class implements the octahedral complex tensegrity spine
@@ -40,6 +50,8 @@ class tgStructureInfo;
 class Quadruped : public BaseSpineModelLearning
 {
 public: 
+
+    typedef std::map<std::string, std::vector<tgBasicActuator*> > ActuatorMap;
 
     Quadruped(int segments);
 
@@ -50,6 +62,19 @@ public:
     virtual void teardown();
         
     virtual void step(double dt);
+
+    /**
+	 * Get a group of actuators according to the provided key. Groups are
+	 * populated during setup.
+	 * @param[in] key - a std:string* used as a key to a std::map from
+	 * a string to a vector of actuators
+	 * @return a std::vector of pointers to the actuators found by the key
+	 */
+    const std::vector<tgBasicActuator*>& getActuators (const std::string& key) const;
+
+private:
+
+    ActuatorMap actuatorMap;
     
 };
 

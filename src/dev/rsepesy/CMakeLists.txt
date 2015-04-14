@@ -13,7 +13,7 @@ link_libraries(learningSpines
 
 add_executable(AppQuadruped
     Quadruped.cpp
+    QuadrupedSineWaves.cpp
     AppQuadruped.cpp
-    
 ) 
 

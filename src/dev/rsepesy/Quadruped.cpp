@@ -31,6 +31,7 @@
 #include "core/tgCast.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
+#include "core/tgBasicActuator.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
@@ -52,6 +53,19 @@ Quadruped::Quadruped(int segments) :
 
 Quadruped::~Quadruped()
 {
+}
+
+namespace
+{
+
+    void mapActuators(Quadruped::ActuatorMap& actuatorMap,
+            tgModel& model)
+    {
+        // Note that tags don't need to match exactly, we could create
+        // supersets if we wanted to
+        actuatorMap["pull"]  = model.find<tgBasicActuator>("leg pull");
+    }
+
 }
 
 void Quadruped::setup(tgWorld& world)
@@ -80,7 +94,7 @@ void Quadruped::setup(tgWorld& world)
     
     
     const double passivePretension = 700; // 5 N
-    tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
+    tgSpringCableActuator::Config muscleConfig(stiffness, damping, pretension, false, 7000, 24);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -250,7 +264,7 @@ void Quadruped::setup(tgWorld& world)
     int leg = 0; //Current leg position
 
     for(int i = 0; i < 2; i++){
-        //Outside leg to inside leg
+        //Outside left leg to inside left leg
         tgNodes n0 = children[m_segments + leg]->getNodes();
         tgNodes n1 = children[m_segments + leg + 1]->getNodes();
 
@@ -260,11 +274,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[3],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[3],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], tgString("leg pull", 1) + tgString(" seg", m_segments + 5));
 
         leg++;
 
-        //Inside leg to connector
+        //Inside left leg to connector
         n0 = children[m_segments + leg]->getNodes();
         n1 = children[connector[i]]->getNodes();
 
@@ -278,7 +292,7 @@ void Quadruped::setup(tgWorld& world)
 
 	leg++;
   
-        //Inside leg to connector
+        //Inside right leg to connector
         n0 = children[connector[i]]->getNodes();
         n1 = children[m_segments + leg]->getNodes();
 
@@ -292,7 +306,7 @@ void Quadruped::setup(tgWorld& world)
 
 	leg++;   
 
-        //Outside leg to inside leg
+        //Outside right leg to inside right leg
         n0 = children[m_segments + leg - 1]->getNodes();
         n1 = children[m_segments + leg]->getNodes();
 
@@ -306,6 +320,8 @@ void Quadruped::setup(tgWorld& world)
 	
 	leg++;
     }
+
+    mapActuators(actuatorMap, *this);
 
     #endif
     // Create the build spec that uses tags to turn the structure into a real model
@@ -337,7 +353,7 @@ void Quadruped::setup(tgWorld& world)
     
     std::cout << "Model: " << std::endl;
     std::cout << *this << std::endl;
-    
+
     #endif
 
     children.clear();
@@ -361,3 +377,19 @@ void Quadruped::step(double dt)
     
     BaseSpineModelLearning::step(dt);  // Step any children
 }
+
+
+const std::vector<tgBasicActuator*>&
+Quadruped::getActuators (const std::string& key) const
+{
+    const ActuatorMap::const_iterator it = actuatorMap.find(key);
+    if (it == actuatorMap.end())
+    {
+        throw std::invalid_argument("Key '" + key + "' not found in actuator map");
+    }
+    else
+    {
+        return it->second;
+    }
+}
+

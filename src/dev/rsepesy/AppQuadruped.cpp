@@ -27,7 +27,7 @@
 // This application
 #include "Quadruped.h"
 // This library
-#include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "QuadrupedSineWaves.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
 #include "core/tgSimViewGraphics.h"
@@ -64,7 +64,8 @@ int main(int argc, char** argv)
     const int segments = 12;
     Quadruped* myModel =
       new Quadruped(segments);
-    
+
+    #if(0)
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
     
@@ -89,7 +90,12 @@ int main(int argc, char** argv)
     BaseSpineCPGControl* const myControl =
       new BaseSpineCPGControl(control_config, suffix, "learningSpines/OctahedralComplex/");
     myModel->attach(myControl);
-    
+    #endif
+
+    QuadrupedSineWaves* const myControl = new QuadrupedSineWaves();
+    myModel->attach(myControl);
+        
+
     simulation.addModel(myModel);
     
     int i = 0;
