@@ -161,7 +161,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
+#if (0)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        

@@ -121,8 +121,9 @@ void tgCraterDeep::teardown() {
 
 // Nodes: center points of opposing faces of rectangles
 void tgCraterDeep::addNodes(tgStructure& s) {
+#if (0)
     const int nBoxes = 4; 
-
+#endif // Suppress compiler warning unused variable
     // Accumulating rotation on boxes
     btVector3 rotationPoint = origin;
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
@@ -133,7 +134,7 @@ void tgCraterDeep::addNodes(tgStructure& s) {
     addBoxNodes();
     addBoxNodes();
     
-    for(int i=0;i<nodes.size();i+=2) {
+    for(std::size_t i=0;i<nodes.size();i+=2) {
         s.addNode(nodes[i]);
         s.addNode(nodes[i+1]);
         s.addRotation(rotationPoint, rotationAxis, rotationAngle);

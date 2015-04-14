@@ -9,6 +9,9 @@ On that note, we're currently seeking a Mac dev who can help us ensure the simul
 
 https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/143
 
+UPDATE:  While we are working on a fix to the above, we have create a virtual machine image that could be installed on an OSX machine.  See:
+http://ntrtsim.readthedocs.org/en/latest/setup.html#installing-ntrt-in-a-virtual-machine
+
 About NTRT
 ---------
 

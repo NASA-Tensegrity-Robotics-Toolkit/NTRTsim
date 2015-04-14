@@ -1,4 +1,6 @@
 link_libraries(obstacles
+                KinematicString
+               flemonsSpineContact
                CPG_feedback
                 KinematicString
                 learningSpines
@@ -14,14 +16,7 @@ link_libraries(obstacles
                 tgOpenGLSupport
                 boost_program_options)
 
-add_library(GoalSpine SHARED
-                FlemonsSpineModelGoal.cpp
-                SpineGoalControl.cpp
-                )
-                
-                
-add_executable(AppGoalTerrain
-    FlemonsSpineModelGoal.cpp
-    SpineGoalControl.cpp
-    AppGoalTerrain.cpp
+add_executable(AppMultiTerrainOC
+    OctahedralComplex.cpp
+    AppMultiTerrain_OC.cpp
 )
