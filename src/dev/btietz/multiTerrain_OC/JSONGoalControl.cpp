@@ -176,9 +176,13 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0)
+#if (1)
+    #if (0)
         std::vector<double> desComs = getFeedback(subject);
-
+    #else
+        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
+        std::vector<double> desComs = getGoalFeedback(goalSubject);
+    #endif // Terrain feedback vs goal feedback
 #else 
     #if (1)
         const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
@@ -490,6 +494,56 @@ void JSONGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
     }
 }
 
+std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* subject)
+{
+    // Get heading and generate feedback vector
+    std::vector<double> currentPosition = subject->getSegmentCOM(m_config.segmentNumber);
+    
+    assert(currentPosition.size() == 3);
+    
+    btVector3 currentPosVector(currentPosition[0], currentPosition[1], currentPosition[2]);
+    
+    btVector3 goalPosition = subject->goalBoxPosition();
+    
+    btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
+    
+    std::vector<double> state;
+    state.push_back(desiredHeading.getX());
+    state.push_back(desiredHeading.getZ());
+    
+    assert(state[0] >= -1.0 && state[0] <= 1.0);
+    assert(state[1] >= -1.0 && state[1] <= 1.0);
+    
+    double *inputs = new double[m_config.numStates];
+    
+    // Rescale to 0 to 1 (consider doing this inside getState
+    for (std::size_t i = 0; i < state.size(); i++)
+    {
+        inputs[i]=state[i] / 2.0 + 0.5;
+    }
+    
+    const int nSeg = subject->getSegments() - 1;
+    
+    double *output = nn->feedForwardPattern(inputs);
+    
+    vector<double> actions;
+    
+    int m = subject->getSegments() - 1;
+    
+    // Duplicate the actions across segments
+    for (int i = 0; i != m; i++)
+    {
+        for(int j=0;j<m_config.numActions;j++)
+        {
+            actions.push_back(output[j]);
+        }
+    }
+    
+    transformFeedbackActions(actions);
+    
+    return actions;
+}
+
 std::vector<double> JSONGoalControl::getFeedback(BaseSpineModelLearning& subject)
 {
     // Placeholder
@@ -546,9 +600,10 @@ std::vector<double> JSONGoalControl::getCableState(const tgSpringCableActuator& 
 void JSONGoalControl::transformFeedbackActions(std::vector<double> & actions)
 {
     const std::size_t numActions = m_config.numActions;
-    
+
+#if (0) // Only true if actions are applied to all segments
     assert( actions.size() == numActions);
-    
+#endif
     // Scale values back to -1 to +1
     for( std::size_t i = 0; i < numActions; i++)
     {

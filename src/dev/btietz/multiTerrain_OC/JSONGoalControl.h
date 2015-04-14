@@ -119,6 +119,8 @@ protected:
 
     void setGoalTensions(const BaseSpineModelGoal* subject);
     
+    std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
+    
     std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
     std::vector<double> getCableState(const tgSpringCableActuator& cable);

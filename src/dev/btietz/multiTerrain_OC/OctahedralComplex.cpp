@@ -66,8 +66,9 @@ unsigned long long rdtsc(){
 
 #endif
 
-OctahedralComplex::OctahedralComplex(int segments) :   
-    BaseSpineModelGoal(segments) 
+OctahedralComplex::OctahedralComplex(int segments, double goalAngle) :   
+    BaseSpineModelGoal(segments), 
+    m_goalAngle(goalAngle)
 {
     srand(rdtsc());
 }
@@ -239,10 +240,13 @@ void OctahedralComplex::setup(tgWorld& world)
     structureInfo.buildInto(*this, world);
     
         // Create goal box in a new structure
-    double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 2.0 * 3.1415;
     
-    double xPos = 100 * sin(randomAngle);
-    double zPos = 100 * cos(randomAngle);
+#if (0)
+    m_goalAngle = ((rand() / (double)RAND_MAX) - 0.5) * 2.0 * 3.1415;
+#endif // If we're resetting the simulation and want to change the angle    
+    
+    double xPos = 300 * sin(m_goalAngle);
+    double zPos = 300 * cos(m_goalAngle);
     
     tgStructure goalBox;
     

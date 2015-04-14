@@ -76,9 +76,13 @@ bool AppMultiTerrain_OC::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
+    
+    // TODO properly add this to the header info and learning apparatus
+    double goalAngle = M_PI / 2.0;
+    
     /// @todo add position and angle to configuration
         OctahedralComplex* myModel =
-      new OctahedralComplex(nSegments);
+      new OctahedralComplex(nSegments, goalAngle);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
