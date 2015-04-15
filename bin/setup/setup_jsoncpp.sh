@@ -118,6 +118,11 @@ function build_jsoncpp()
         -DCMAKE_INSTALL_PREFIX="$JSONCPP_INSTALL_PREFIX" \
         -DCMAKE_C_COMPILER="gcc" \
         -DCMAKE_CXX_COMPILER="g++" \
+        -DCMAKE_C_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
         -DUSE_DOUBLE_PRECISION=OFF \
         -DCMAKE_INSTALL_NAME_DIR="$JSONCPP_INSTALL_PREFIX" || { echo "- ERROR: CMake for JsonCPP failed."; exit 1; }
     #If you turn this on, turn it on in inc.CMakeJsonCPP.txt as well for the NTRT build
