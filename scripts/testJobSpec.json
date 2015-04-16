@@ -6,9 +6,9 @@
     "executable" : "./../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
     "learningParams": 
     {
-        "trialLength" : 30000,
-        "numTrials" : 250,
-        "numGenerations" : 120,
+        "trialLength" : 3000,
+        "numTrials" : 100,
+        "numGenerations" : 30,
         "nodeVals" :
         {
             "learning" : true,
@@ -51,17 +51,17 @@
             "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 2,
-            "numberOfOutputs" : 40,
+            "numberOfOutputs" : 12,
             "numberOfInstances" : 1,
-            "populationSize" : 50,
+            "populationSize" : 30,
             "useAverage" : true,
-            "numberToMutate" : 15,
+            "numberToMutate" : 10,
             "numberOfChildren" : 10,
             "mutationChance" : 0.5,
-            "mutationDev" : 0.1,
+            "mutationDev" : 0.03,
             "paramMax" : 1.0,
             "paramMin": -1.0,
-            "childMutationChance" : 0.5
+            "childMutationChance" : 0.7
         }
     }
 }

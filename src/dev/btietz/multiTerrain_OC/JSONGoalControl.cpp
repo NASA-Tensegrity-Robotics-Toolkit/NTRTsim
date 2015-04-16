@@ -117,7 +117,7 @@ JSONGoalControl::~JSONGoalControl()
 
 void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB(100);
+	m_pCPGSys = new CPGEquationsFB(200);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;

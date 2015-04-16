@@ -197,7 +197,6 @@ class BrianJobMaster(NTRTJobMaster):
             totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numOutputs
             
             for i in range(0,  totalParams) :
-                # TODO scale like neural net class (this is 0 to 1)
                 neuralParams.append(random.uniform(pMin, pMax))
             
             newParams['neuralParams'] = neuralParams
@@ -309,7 +308,11 @@ class BrianJobMaster(NTRTJobMaster):
                     jControl = json.load(fin)
                     fin.close()
                     controller = {}
-                    controller['params'] = jControl[paramName]
+                    # Check how controller was generated
+                    try:
+                        controller['params'] = jControl[paramName]['params']
+                    except KeyError:
+                        controller['params'] = jControl[paramName]
                     controller['paramID'] = str(self.paramID)
                     controller['scores'] = []
                     nextGeneration[controller['paramID']] = controller
@@ -572,7 +575,7 @@ class BrianJobMaster(NTRTJobMaster):
             for job in completedJobs:
                 job.processJobOutput()
                 jobVals = job.obj
-                # TODO commit to one run per file
+                # TODO commit to one run per file - get rid of list/zero notation
                 score = jobVals['scores'][0]['distance']
                 edgeKey = jobVals ['edgeVals']['paramID']
                 self.currentGeneration['edge'][edgeKey]['scores'].append(score)
@@ -589,7 +592,6 @@ class BrianJobMaster(NTRTJobMaster):
             logFile = open('evoLog.txt', 'a') 
             logFile.write(str((n+1) * numTrials) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
             logFile.close()
-            #TODO save parameters and scores from this generation
 
         #TODO, something that exports results and picks the best trial based on results
 
