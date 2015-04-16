@@ -1,5 +1,5 @@
---- "NTRTmaster/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h"	2014-10-03 15:14:25.618566584 -0400
-+++ "NTRTTests/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h"	2015-01-07 13:26:26.291748108 -0500
+--- NTRTmaster/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h	2014-10-03 15:14:25.618566584 -0400
++++ NTRTTests/env/build/neuralNet/nnImplementationV2/Neural Network v2/neuralNetwork.h	2015-01-07 13:26:26.291748108 -0500
 @@ -17,7 +17,7 @@
  {
  	//class members
