@@ -91,6 +91,9 @@ for the cables, allowing them to interact with the structure and the environment
 Finally, terrains can be created, and the performance of the controller 
 can be tested as the tensegrity robot moves through the simulated world.
 
+Publications and Simulator Verification
+----------------
+
 We have published a 
 [number of research papers](http://www.magicalrobot.org/BeingHuman/vytas-sunspirals-publications) 
 using NTRT. Many of the models are available in the simulator. 
