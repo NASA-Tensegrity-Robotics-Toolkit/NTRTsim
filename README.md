@@ -91,7 +91,7 @@ for the cables, allowing them to interact with the structure and the environment
 Finally, terrains can be created, and the performance of the controller 
 can be tested as the tensegrity robot moves through the simulated world.
 
-Publications and Simulator Verification
+Publications and Simulator Validation
 ----------------
 
 We have published a 
