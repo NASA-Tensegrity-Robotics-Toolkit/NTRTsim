@@ -78,7 +78,7 @@ bool AppMultiTerrain_OC::setup()
     // simulation
     
     // TODO properly add this to the header info and learning apparatus
-    double goalAngle = M_PI / 2.0;
+    double goalAngle = -M_PI / 2.0;
     
     /// @todo add position and angle to configuration
         OctahedralComplex* myModel =
