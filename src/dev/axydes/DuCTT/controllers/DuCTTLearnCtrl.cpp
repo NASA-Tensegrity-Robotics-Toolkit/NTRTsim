@@ -172,7 +172,7 @@ vector< vector <double> > DuCTTLearnCtrl::transformActions(vector< vector <doubl
 
     //frequency (Hz)
     double minFreq = 0.01;
-    double maxFreq = 5;
+    double maxFreq = 20;
     double freqRange = maxFreq-minFreq;
     int freqOffset = 0;
     angularFrequency = params[freqOffset]*freqRange + minFreq;

@@ -217,7 +217,7 @@ bool DuCTTLearnStateMachine::moveStrings(const std::vector<tgBasicActuator*> str
 
         double delta = fabs(currLength - goals);
 //        std::cerr << "String " << i << " length: " << currLength << ", delta: " << delta << std::endl;
-        if (delta < 2) switchState = true;
+        if (delta < stringLengthEPS) switchState = true;
     }
     return switchState;
 }
@@ -257,17 +257,21 @@ vector< vector <double> > DuCTTLearnStateMachine::transformActions(vector< vecto
     double maxMinLength = 10.0;
     double minLengthRange = maxMinLength - minMinLength;
     int minLenOffset = histOffset+1;
-    minStringLength = params[minLenOffset]*minLenOffset + minMinLength;
+    minStringLength = params[minLenOffset]*minLengthRange + minMinLength;
 
     //max string goal length (cm)
-    double minMaxLength = 0.0;
-    double maxMaxLength = 10.0;
+    double minMaxLength = 5.0;
+    double maxMaxLength = 20.0;
     double maxLengthRange = maxMaxLength - minMaxLength;
     int maxLenOffset = minLenOffset+1;
-    maxStringLength = params[maxLenOffset]*maxLenOffset + maxMinLength;
+    maxStringLength = params[maxLenOffset]*maxLengthRange + minMaxLength;
 
-    //going from 1x28 to 7x4
-    //first 4 are vertical cables, #5 is all saddle cables, last two are prisms
+    //string goal length EPS (cm)
+    double minLengthEPS = 0.0;
+    double maxLengthEPS = 5.0;
+    double lengthEPSRange = maxLengthEPS - minLengthEPS;
+    int lenEPSOffset = maxLenOffset+1;
+    stringLengthEPS = params[lenEPSOffset]*lengthEPSRange + minLengthEPS;
 
     return actions;
 }

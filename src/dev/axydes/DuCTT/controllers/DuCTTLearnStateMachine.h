@@ -104,6 +104,7 @@ class DuCTTLearnStateMachine : public DuCTTLearning
         ROBOT_STATE state;
         double maxStringLength;
         double minStringLength;
+        double stringLengthEPS;
 };
 
 #endif // ESCAPE_T6CONTROLLER
