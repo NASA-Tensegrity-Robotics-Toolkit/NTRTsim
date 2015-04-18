@@ -123,8 +123,10 @@ void hillyMuscleNP::step(double dt)
 	
 	btVector3 com(0, 0, 0);
 	btScalar mass = 0;
+#if (0)
 	btScalar energy = 0;
-	for (std::size_t i = 0; i < allRods.size(); i++)
+#endif // Supress compiler warning
+    for (std::size_t i = 0; i < allRods.size(); i++)
 	{
 		tgRod& ri = *(allRods[i]);
 		com += ri.centerOfMass() * ri.mass();

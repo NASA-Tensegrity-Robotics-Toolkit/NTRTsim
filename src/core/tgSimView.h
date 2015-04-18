@@ -56,7 +56,7 @@ public:
           double stepSize = 1.0/1000.0,
           double renderRate = 1.0/60.0);
 
-    ~tgSimView();
+    virtual ~tgSimView();
 
     /**
      * Return a reference to the tgWorld being simulated.

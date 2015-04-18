@@ -48,3 +48,4 @@ popd > /dev/null
 ##############################################################################
 
 ${BIN_DIR}/build.sh -r || { echo "Test build and run failed."; exit 1; }
+${BIN_DIR}/build.sh -g || { echo "Integration Test build and run failed."; exit 1; }

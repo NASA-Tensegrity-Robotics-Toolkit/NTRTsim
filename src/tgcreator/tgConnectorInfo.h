@@ -46,39 +46,40 @@ class tgConnectorInfo : public tgTaggable {
 public:
 
     tgConnectorInfo() : 
+        tgTaggable(),
         m_fromRigidInfo(0),
-        m_toRigidInfo(0),
+        m_toRigidInfo(0)
         //m_fromRigidBody(0),
         //m_toRigidBody(0),
-        tgTaggable()
+        
     {
         // Supress compiler warning for bullet's unused variable
         (void) btInfinityMask;
     }    
 
     tgConnectorInfo(tgTags tags) : 
+        tgTaggable(tags),
         m_fromRigidInfo(0),
-        m_toRigidInfo(0),
+        m_toRigidInfo(0)
         //m_fromRigidBody(0),
         //m_toRigidBody(0),
-        tgTaggable(tags)
     {}    
 
     tgConnectorInfo(const std::string& space_separated_tags) :
+        tgTaggable(space_separated_tags),
         m_fromRigidInfo(0),
-        m_toRigidInfo(0),
+        m_toRigidInfo(0)
         //m_fromRigidBody(0),
         //m_toRigidBody(0),
-        tgTaggable(space_separated_tags)
     {}    
 
     tgConnectorInfo(const tgPair& pair) :
+        tgTaggable(pair.getTags()),
         m_pair(pair),
         m_fromRigidInfo(0),
-        m_toRigidInfo(0),
+        m_toRigidInfo(0)
         //m_fromRigidBody(0),
         //m_toRigidBody(0),
-        tgTaggable(pair.getTags())
     {}    
 
 

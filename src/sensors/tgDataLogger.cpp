@@ -58,7 +58,7 @@ void tgDataLogger::render(const tgRod& rod) const
     
 void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
 {
-        std::ofstream tgOutput;
+    std::ofstream tgOutput;
     tgOutput.open(m_fileName.c_str(), std::ios::app);
     
     tgOutput << mSCA.getRestLength() << ","    

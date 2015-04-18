@@ -125,7 +125,7 @@ void tgDataObserver::onSetup(tgModel& model)
             << name.str() << "_Z" << ","
             << name.str() << "_mass" << ",";
             rodNum++;
-        }
+	}
         // Else do nothing since tgDataLogger won't touch it
     }
     
@@ -140,12 +140,12 @@ void tgDataObserver::onSetup(tgModel& model)
  * positive
  */
 void tgDataObserver::onStep(tgModel& model, double dt)
-{
+{  
     m_totalTime += dt;
     tgOutput.open(m_fileName.c_str(), std::ios::app);
     tgOutput << m_totalTime << ",";
     tgOutput.close();
-    
+
     model.onVisit(*m_dataLogger);
     
     tgOutput.open(m_fileName.c_str(), std::ios::app);

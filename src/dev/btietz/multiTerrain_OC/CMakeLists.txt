@@ -1,0 +1,22 @@
+link_libraries(obstacles
+                KinematicString
+               flemonsSpineContact
+               CPG_feedback
+                KinematicString
+                learningSpines
+                sensors
+                controllers
+                tgcreator             
+                core
+                util
+                terrain
+                Adapters
+                Configuration
+                AnnealEvolution
+                tgOpenGLSupport
+                boost_program_options)
+
+add_executable(AppMultiTerrainOC
+    OctahedralComplex.cpp
+    AppMultiTerrain_OC.cpp
+)

@@ -34,6 +34,7 @@
 
 // The C++ Standard Library
 #include <cassert>
+#include <iostream>
 
 tgBoxGround::Config::Config( btVector3 eulerAngles,
                 btScalar friction,
@@ -71,6 +72,7 @@ m_config(config)
 
 btRigidBody* tgBoxGround::getGroundRigidBody() const
 {
+        std::cout << "Box Ground" << std::endl;
     const btScalar mass = 0.0;
     
     btTransform groundTransform;
