@@ -97,6 +97,7 @@ private:
     std::string configFile;
     std::string resource_path;
     std::string suffix;
+    std::string manualParamFile;
 
     double startX;
     double startY;

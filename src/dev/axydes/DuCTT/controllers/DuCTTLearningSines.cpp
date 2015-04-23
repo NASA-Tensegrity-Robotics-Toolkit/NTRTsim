@@ -60,9 +60,11 @@ DuCTTLearningSines::DuCTTLearningSines(const double initialLength,
                                         bool neuro,
                                         string resourcePath,
                                         string suffix,
-                                        string evoConfigFilename
+                                        string evoConfigFilename,
+                                        bool useManualParams,
+                                        string manualParamFile
 ) :
-    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename),
+    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename, useManualParams, manualParamFile),
 //    nClusters(8),
     nClusters(2),
 //    musclesPerCluster(1),

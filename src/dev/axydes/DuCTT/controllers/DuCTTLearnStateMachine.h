@@ -46,7 +46,9 @@ class DuCTTLearnStateMachine : public DuCTTLearning
                         bool neuro=false,
                         string resourcePath="",
                         string suffix="DuCTT",
-                        string evoConfigFilename="Config.ini"
+                        string evoConfigFilename="Config.ini",
+                        bool useManualParams=false,
+                        string manualParamFile=""
                         );
 
         /** Nothing to delete, destructor must be virtual */

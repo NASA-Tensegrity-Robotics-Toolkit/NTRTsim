@@ -60,9 +60,11 @@ DuCTTLearnStateMachine::DuCTTLearnStateMachine(const double initialLength,
                                 bool neuro,
                                 string resourcePath,
                                 string suffix,
-                                string evoConfigFilename
+                                string evoConfigFilename,
+                                bool useManualParams,
+                                string manualParamFile
 ) :
-    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename),
+    DuCTTLearning(initialLength, axis, neuro, resourcePath, suffix, evoConfigFilename, useManualParams, manualParamFile),
 //    nClusters(8),
     nClusters(2),
 //    musclesPerCluster(1),
@@ -237,7 +239,14 @@ void DuCTTLearnStateMachine::teardownEnd(DuCTTRobotModel& subject)
 vector< vector <double> > DuCTTLearnStateMachine::transformActions(vector< vector <double> > actions)
 {
     vector <double> params(N_PARAMS * nActions + 2, 1); // '4' for the number of sine wave parameters
-    params = actions[0];
+    if (m_bUseManualParams)
+    {
+       params = readManualParams(1);
+    }
+    else
+    {
+        params = actions[0];
+    }
 
     //use touch sensors (bool)
     double touchParam;
@@ -272,6 +281,8 @@ vector< vector <double> > DuCTTLearnStateMachine::transformActions(vector< vecto
     double lengthEPSRange = maxLengthEPS - minLengthEPS;
     int lenEPSOffset = maxLenOffset+1;
     stringLengthEPS = params[lenEPSOffset]*lengthEPSRange + minLengthEPS;
+
+    fprintf(stdout,"IgnoreTouchSensors: %d, HistorisisSeconds: %f, minStringLength: %f, maxStringLength: %f, stringLengthEPS: %f\n", m_bIgnoreTouchSensors, m_dHistorisisSeconds, minStringLength, maxStringLength, stringLengthEPS);
 
     return actions;
 }

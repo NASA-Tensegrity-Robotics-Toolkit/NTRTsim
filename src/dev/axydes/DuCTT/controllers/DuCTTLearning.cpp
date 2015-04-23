@@ -61,7 +61,9 @@ DuCTTLearning::DuCTTLearning(const double initialLength,
                                 bool neuro,
                                 string resourcePath,
                                 string suffix,
-                                string evoConfigFilename
+                                string evoConfigFilename,
+                                bool useManualParams,
+                                string manualParamFile
                                  ) :
     m_evoConfigFilename(evoConfigFilename),
     m_evolution(suffix, evoConfigFilename, resourcePath),
@@ -73,18 +75,19 @@ DuCTTLearning::DuCTTLearning(const double initialLength,
     m_totalTime(0.0),
     imp_controller(new tgImpedanceController(1000, 500, 10)),
     m_bBadRun(false),
-    m_bRecordedStart(false)
+    m_bRecordedStart(false),
+    m_bUseManualParams(useManualParams),
+    m_ManualParamFile(manualParamFile)
 {
-    std::string path;
     if (resourcePath != "")
     {
-        path = FileHelpers::getResourcePath(resourcePath);
+        m_ResourcePath = FileHelpers::getResourcePath(resourcePath);
     }
     else
     {
-        path = "";
+        m_ResourcePath = "";
     }
-    m_evoConfig.readFile(path+m_evoConfigFilename);
+    m_evoConfig.readFile(m_ResourcePath+m_evoConfigFilename);
     m_isLearning = m_evoConfig.getBoolValue("learning");
 }
 
@@ -291,4 +294,39 @@ double DuCTTLearning::displacement(DuCTTRobotModel& subject) {
     default:
         return newY - oldY;
     }
+}
+
+std::vector<double> DuCTTLearning::readManualParams(int lineNumber)
+{
+    std::string filename = m_ResourcePath + m_ManualParamFile;
+    std::cout << "Using manual parameters: " << filename << std::endl;
+    assert(lineNumber > 0);
+    std::vector<double> result(32, 1.0);
+    std::string line;
+    std::ifstream infile(filename.c_str(), std::ifstream::in);
+
+    // Grab line from input file
+    if (infile.is_open()) {
+        std::cout << "OPENED FILE\n";
+        for (int i=0; i<lineNumber; i++) {
+            getline(infile, line);
+        }
+        infile.close();
+    } else {
+        std::cerr << "Error: Manual Parameters file not found\n";
+        exit(1);
+    }
+
+    //cout << "Using: " << line << " as input for starting parameter values\n";
+
+    // Split line into parameters
+    std::stringstream lineStream(line);
+    std::string cell;
+    int iCell = 0;
+    while(getline(lineStream,cell,',')) {
+        result[iCell] = atof(cell.c_str());
+        iCell++;
+    }
+
+    return result;
 }

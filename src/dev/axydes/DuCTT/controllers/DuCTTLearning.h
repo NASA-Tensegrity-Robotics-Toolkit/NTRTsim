@@ -56,7 +56,9 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
                         bool neuro=false,
                         string resourcePath="",
                         string suffix="DuCTT",
-                        string evoConfigFilename="Config.ini"
+                        string evoConfigFilename="Config.ini",
+                        bool useManualParams=false,
+                        string manualParamFile=""
                         );
 
         /** Nothing to delete, destructor must be virtual */
@@ -93,6 +95,9 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
         //Anything needing to be done after moveMotors is called
         virtual void stepAfterMove(DuCTTRobotModel& subject, double dt) = 0;
 
+        //local teardown function
+        virtual void teardownEnd(DuCTTRobotModel &subject) = 0;
+
         //Moves the subjects motors
         void moveMotors(DuCTTRobotModel &subject, double dt);
 
@@ -113,8 +118,7 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
          * of subject */
         double displacement(DuCTTRobotModel& subject);
 
-        //local teardown function
-        virtual void teardownEnd(DuCTTRobotModel &subject) = 0;
+        std::vector<double> readManualParams(int lineNumber);
 
         btVector3 initPosition; // Initial position of model
         const double m_initialLength;
@@ -142,6 +146,9 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
         tgImpedanceController* imp_controller;
 
         bool m_bBadRun;
+        bool m_bUseManualParams;
+        string m_ManualParamFile;
+        string m_ResourcePath;
 };
 
 #endif // ESCAPE_T6CONTROLLER

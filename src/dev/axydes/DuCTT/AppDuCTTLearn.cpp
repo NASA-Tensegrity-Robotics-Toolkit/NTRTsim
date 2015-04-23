@@ -57,6 +57,7 @@ AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
     configFile = "Config.ini";
     resource_path = "axydes/DuCTT/";
     suffix = "DuCTT";
+    manualParamFile = "";
 
     handleOptions(argc, argv);
 }
@@ -98,7 +99,10 @@ bool AppDuCTTLearn::setup()
             DuCTTLearnStateMachine* testLearnStateMachine =
                 new DuCTTLearnStateMachine(5.0, ductAxis, use_neuro,
                                             resource_path,
-                                            suffix, configFile);
+                                            suffix, configFile,
+                                            use_manual_params,
+                                            manualParamFile
+                                           );
             myRobotModel->attach(testLearnStateMachine);
         }
         break;
@@ -107,7 +111,10 @@ bool AppDuCTTLearn::setup()
             DuCTTLearnCtrl* testLearnCtrl =
                 new DuCTTLearnCtrl(5.0, ductAxis, 0.2, use_neuro,
                                             resource_path,
-                                            suffix, configFile);
+                                            suffix, configFile,
+                                            use_manual_params,
+                                            manualParamFile
+                                           );
             myRobotModel->attach(testLearnCtrl);
         }
         break;
@@ -117,7 +124,10 @@ bool AppDuCTTLearn::setup()
             DuCTTLearningSines* learningSines =
                 new DuCTTLearningSines(5.0,  ductAxis, use_neuro,
                                             resource_path,
-                                            suffix, configFile);
+                                            suffix, configFile,
+                                            use_manual_params,
+                                            manualParamFile
+                                           );
             myRobotModel->attach(learningSines);
         }
         break;
@@ -185,6 +195,7 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         ("neuro,n", po::value<bool>(&use_neuro)->implicit_value(true), "Neuro Evolution flag, use NeuroEvolution instead of AnnealEvolution. Default = false")
         ("resource_path,r", po::value<string>(&resource_path)->implicit_value(resource_path), "Resource path (i.e. axydes/DuCTT). Default = 'axydes/DuCTT'")
         ("suffix", po::value<string>(&suffix)->implicit_value(suffix), "Which learned controller to write to or use. Default = 'DuCTT'")
+        ("manualFile,m", po::value<string>(&manualParamFile)->implicit_value(manualParamFile), "Manual param file to use when viewing learned parameters.")
     ;
 
     po::variables_map vm;
@@ -222,6 +233,11 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     if (!resource_path.empty() && (*resource_path.rbegin()) != '/')
     {
         resource_path.append("/");
+    }
+
+    if (!manualParamFile.empty())
+    {
+        use_manual_params = true;
     }
 }
 
