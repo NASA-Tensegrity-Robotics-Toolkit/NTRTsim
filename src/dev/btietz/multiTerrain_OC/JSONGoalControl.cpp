@@ -520,7 +520,12 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     for (std::size_t i = 0; i < state.size(); i++)
     {
         inputs[i]=state[i] / 2.0 + 0.5;
+#if (0)
+        std::cout << inputs[i] << " ";
+#endif        
     }
+    
+    std::cout << std::endl;
     
     const int nSeg = subject->getSegments() - 1;
     
@@ -529,6 +534,13 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     vector<double> actions;
     
     int m = subject->getSegments() - 1;
+#if (0)    
+    for(int j=0;j<m_config.numActions;j++)
+    {
+        std::cout << output[j] << " ";
+    }
+    std::cout << std::endl;
+#endif
     
     // Duplicate the actions across segments
     for (int i = 0; i != m; i++)

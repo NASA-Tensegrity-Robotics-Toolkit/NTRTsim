@@ -52,6 +52,7 @@
             "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 12,
+            "numberHidden" : 4,
             "numberOfInstances" : 1,
             "populationSize" : 30,
             "useAverage" : false,

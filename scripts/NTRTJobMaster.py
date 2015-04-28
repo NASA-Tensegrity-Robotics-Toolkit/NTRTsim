@@ -186,13 +186,14 @@ class BrianJobMaster(NTRTJobMaster):
             # Temp code for pre-specified neural network, future editions will generate networks
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
+                         'numHidden' : params['numberHidden'],
                          'neuralFilename' : "logs/bestParameters-test_fb-"+ newController['paramID'] +".nnw"}
             
             neuralParams = []
             
             numStates = params['numberOfStates']
             numOutputs=  params['numberOfOutputs']
-            numHidden = 2*numStates
+            numHidden = params['numberHidden']
             
             totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numOutputs
             
@@ -240,6 +241,7 @@ class BrianJobMaster(NTRTJobMaster):
             newNeuro['neuralParams'] = cNew
             newNeuro['numStates'] = params['numberOfStates']
             newNeuro['numActions'] =  params['numberOfOutputs']
+            newNeuro['numHidden'] =  params['numberHidden']
             return newNeuro
         else:
             return cNew
@@ -278,6 +280,7 @@ class BrianJobMaster(NTRTJobMaster):
             newNeuro['neuralParams'] = cNew
             newNeuro['numStates'] = params['numberOfStates']
             newNeuro['numActions'] =  params['numberOfOutputs']
+            newNeuro['numHidden'] =  params['numberHidden']
             return newNeuro
         else:
             return cNew

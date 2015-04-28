@@ -115,17 +115,19 @@ int main(int argc, char** argv)
     // Setup neural network
     const int numberOfInputs  = feedbackParams.get("numStates", "UTF-8").asInt();
     const int numberOfOutputs = feedbackParams.get("numActions", "UTF-8").asInt();
+    const int numberHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
     
     std::string nnFile = fullPath + feedbackParams.get("neuralFilename", "UTF-8").asString();
     
-    neuralNetwork* nn = new neuralNetwork(numberOfInputs,numberOfInputs*2, numberOfOutputs);
+    neuralNetwork* nn = new neuralNetwork(numberOfInputs,numberHidden, numberOfOutputs);
     
     nn->loadWeights(nnFile.c_str());
     
     std::vector<double> state;
     for (int i = 0; i < numberOfInputs; i++)
     {
-        state.push_back((rand() / (double)RAND_MAX));
+        //state.push_back((rand() / (double)RAND_MAX));
+        state.push_back(1.0);
     }
     double goal = 1.0 * (double) numberOfOutputs;
 
@@ -134,18 +136,38 @@ int main(int argc, char** argv)
     double *inputs = new double[numberOfInputs];    
     for (std::size_t i = 0; i < state.size(); i++)
     {
-        inputs[i] = (state[i] - 0.5) / 2.0;
+        inputs[i] = state[i];
     }
     
     double *output = nn->feedForwardPattern(inputs);
     double score1 = 0.0;
     for(std::size_t i = 0; i < numberOfOutputs; i++)
     {
-        score1 += pow(-1.0, i) * output[i];
+        score1 +=  output[i];
+    }
+    
+    // Test other direction
+    state.clear();
+    for (int i = 0; i < numberOfInputs; i++)
+    {
+        //state.push_back((rand() / (double)RAND_MAX));
+        state.push_back(-1.0);
+    }
+
+    for (std::size_t i = 0; i < state.size(); i++)
+    {
+        inputs[i] = state[i];
+    }
+    
+    double *output2 = nn->feedForwardPattern(inputs);
+    double score2 = 0.0;
+    for(std::size_t i = 0; i < numberOfOutputs; i++)
+    {
+        score2 +=  output2[i];
     }
     
     std::vector<double> scores;
-    scores.push_back(score1);
+    scores.push_back(score1 - score2);
     scores.push_back(0.0);
     
     Json::Value prevScores = root.get("scores", Json::nullValue);
@@ -162,6 +184,7 @@ int main(int argc, char** argv)
     
     payloadLog << root << std::endl;
     
+    std::cout << "Score " << scores[0] << std::endl;
 
     //Teardown is handled by delete, so that should be automatic
     return 0;
