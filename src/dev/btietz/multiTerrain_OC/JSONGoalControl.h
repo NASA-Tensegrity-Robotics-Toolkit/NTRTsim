@@ -94,6 +94,7 @@ struct Config : public JSONCPGControl::Config
         // Values to be filled in by JSON file during onSetup
         int numStates;
         int numActions;
+        int numHidden;
         
     };
 

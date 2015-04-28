@@ -149,10 +149,11 @@ void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
     // Setup neural network
     m_config.numStates = feedbackParams.get("numStates", "UTF-8").asInt();
     m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
+    m_config.numHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
     
     std::string nnFile = controlFilePath + feedbackParams.get("neuralFilename", "UTF-8").asString();
     
-    nn = new neuralNetwork(m_config.numStates, m_config.numStates*2, m_config.numActions);
+    nn = new neuralNetwork(m_config.numStates, m_config.numHidden, m_config.numActions);
     
     nn->loadWeights(nnFile.c_str());
     
@@ -516,10 +517,10 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     
     double *inputs = new double[m_config.numStates];
     
-    // Rescale to 0 to 1 (consider doing this inside getState
+    // Don't scale! Sigmoid can handle the range
     for (std::size_t i = 0; i < state.size(); i++)
     {
-        inputs[i]=state[i] / 2.0 + 0.5;
+        inputs[i]=state[i];
 #if (0)
         std::cout << inputs[i] << " ";
 #endif        
@@ -550,7 +551,8 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
             actions.push_back(output[j]);
         }
     }
-    
+
+
     transformFeedbackActions(actions);
     
     return actions;
