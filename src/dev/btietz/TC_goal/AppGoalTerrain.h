@@ -31,6 +31,7 @@
 
 // controller 
 #include "SpineGoalControl.h"
+#include "JSONGoalControl.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"

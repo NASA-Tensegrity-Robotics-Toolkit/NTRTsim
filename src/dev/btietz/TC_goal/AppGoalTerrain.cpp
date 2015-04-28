@@ -74,6 +74,7 @@ bool AppGoalTerrain::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
+        
         const int segmentSpan = 3;
         const int numMuscles = 8;
         const int numParams = 2;
@@ -101,6 +102,38 @@ bool AppGoalTerrain::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
         const double tensionFeedback = 1000.0;
+#if (1) // Switch for .nnw or JSON based methods
+        JSONGoalControl::Config control_config(segmentSpan, 
+                                                    numMuscles,
+                                                    numMuscles,
+                                                    numParams, 
+                                                    segNumber, 
+                                                    controlTime,
+                                                    lowAmplitude,
+                                                    highAmplitude,
+                                                    lowPhase,
+                                                    highPhase,
+                                                    kt,
+                                                    kp,
+                                                    kv,
+                                                    def,
+                                                    cl,
+                                                    lf,
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax,
+                                                    tensionFeedback
+                                                    );
+        
+        /// @todo fix memory leak that occurs here
+        JSONGoalControl* const myControl =
+        new JSONGoalControl(control_config, suffix, "bmirletz/TC_Goal_JSON/");
+        
+#else
 
         SpineGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -130,7 +163,8 @@ bool AppGoalTerrain::setup()
         /// @todo fix memory leak that occurs here
         SpineGoalControl* const myControl =
         new SpineGoalControl(control_config, suffix, "bmirletz/TetrahedralComplex_Goal/");
-
+#endif
+        
         myModel->attach(myControl);
     }
 
