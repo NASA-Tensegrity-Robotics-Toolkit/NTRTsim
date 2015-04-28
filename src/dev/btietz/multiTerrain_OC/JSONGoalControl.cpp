@@ -520,14 +520,21 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     // Don't scale! Sigmoid can handle the range
     for (std::size_t i = 0; i < state.size(); i++)
     {
+#if (1)
         inputs[i]=state[i];
+#else
+        inputs[i]=state[i]/ 2.0 + 0.5;
+#endif
 #if (0)
         std::cout << inputs[i] << " ";
-#endif        
+      
     }
     
     std::cout << std::endl;
+#else
+    }
     
+#endif      
     const int nSeg = subject->getSegments() - 1;
     
     double *output = nn->feedForwardPattern(inputs);

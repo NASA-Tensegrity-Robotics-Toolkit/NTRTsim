@@ -164,6 +164,10 @@ int main(int argc, char** argv)
     for(std::size_t i = 0; i < numberOfOutputs; i++)
     {
         score2 +=  output2[i];
+        if (output2[i] < 0.0)
+        {
+            std::cout << "Negative value! " << output2[i] << std::endl;
+        }
     }
     
     std::vector<double> scores;
