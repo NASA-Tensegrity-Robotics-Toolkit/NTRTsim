@@ -24,7 +24,7 @@
  * $Id$
  */
 
-#include "JSONGoalControl.h"
+#include "OctahedralGoalControl.h"
 
 
 // Should include tgString, but compiler complains since its been
@@ -59,63 +59,25 @@
 
 using namespace std;
 
-JSONGoalControl::Config::Config(int ss,
-                                        int tm,
-                                        int om,
-                                        int param,
-                                        int segnum,
-                                        double ct,
-                                        double la,
-                                        double ha,
-                                        double lp,
-                                        double hp,
-                                        double kt,
-                                        double kp,
-                                        double kv,
-                                        bool def,
-                                        double cl,
-                                        double lf,
-                                        double hf,
-                                        double ffMin,
-                                        double ffMax,
-                                        double afMin,
-                                        double afMax,
-                                        double pfMin,
-                                        double pfMax,
-                                        double tf) :
-JSONCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
-                                    lp, hp, kt, kp, kv, def, cl, lf, hf),
-freqFeedbackMin(ffMin),
-freqFeedbackMax(ffMax),
-ampFeedbackMin(afMin),
-ampFeedbackMax(afMax),
-phaseFeedbackMin(pfMin),
-phaseFeedbackMax(pfMax),
-tensFeedback(tf)
-{
-    
-}
 /**
  * Defining the adapters here assumes the controller is around and
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-JSONGoalControl::JSONGoalControl(JSONGoalControl::Config config,	
+OctahedralGoalControl::OctahedralGoalControl(JSONGoalControl::Config config,	
                                                 std::string args,
                                                 std::string resourcePath) :
-JSONCPGControl(config, args, resourcePath),
-m_config(config)
+JSONGoalControl(config, args, resourcePath)
 {
     // Path and filename handled by base class
     
 }
 
-JSONGoalControl::~JSONGoalControl()
+OctahedralGoalControl::~OctahedralGoalControl()
 {
-    delete nn;
 }
 
-void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
+void OctahedralGoalControl::onSetup(BaseSpineModelLearning& subject)
 {
 	m_pCPGSys = new CPGEquationsFB(200);
 
@@ -172,7 +134,7 @@ void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
     bogus = false;
 }
 
-void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
+void OctahedralGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
 {
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
@@ -223,7 +185,7 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
 	}
 }
 
-void JSONGoalControl::onTeardown(BaseSpineModelLearning& subject)
+void OctahedralGoalControl::onTeardown(BaseSpineModelLearning& subject)
 {
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
@@ -318,51 +280,7 @@ void JSONGoalControl::onTeardown(BaseSpineModelLearning& subject)
     m_saddleControllers.clear(); 
 }
 
-void JSONGoalControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
-{
-	    
-    std::vector <tgSpringCableActuator*> allMuscles = subject.getAllMuscles();
-    
-    CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
-    
-    for (std::size_t i = 0; i < allMuscles.size(); i++)
-    {
-
-        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
-        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
-
-        allMuscles[i]->attach(pStringControl);
-        
-        // First assign node numbers
-        pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeActions);
-        
-        m_allControllers.push_back(pStringControl);
-    }
-    
-    // Then determine connectivity and setup string
-    for (std::size_t i = 0; i < m_allControllers.size(); i++)
-    {
-        tgCPGActuatorControl * const pStringInfo = m_allControllers[i];
-        assert(pStringInfo != NULL);
-        pStringInfo->setConnectivity(m_allControllers, edgeActions);
-        
-        //String will own this pointer
-        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
-                                                        m_config.kPosition,
-                                                        m_config.kVelocity);
-        if (m_config.useDefault)
-        {
-			pStringInfo->setupControl(*p_ipc);
-		}
-		else
-		{
-			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
-		}
-    }
-	
-}
-
-void JSONGoalControl::setupSaddleControllers(const OctahedralComplex* subject)
+void OctahedralGoalControl::setupSaddleControllers(const OctahedralComplex* subject)
 {
         
     const std::vector <tgSpringCableActuator*> allSaddleMuscles = subject->getSaddleMuscles();
@@ -392,47 +310,8 @@ void JSONGoalControl::setupSaddleControllers(const OctahedralComplex* subject)
     
 }
 
-array_2D JSONGoalControl::scaleNodeActions (Json::Value actions)
-{
-    std::size_t numControllers = actions.size();
-    std::size_t numActions = actions[0].size();
-    
-    array_2D nodeActions(boost::extents[numControllers][numActions]);
-    
-    array_2D limits(boost::extents[2][numActions]);
-    
-    // Check if we need to update limits
-    assert(numActions == 5);
-    
-	limits[0][0] = m_config.lowFreq;
-	limits[1][0] = m_config.highFreq;
-	limits[0][1] = m_config.lowAmp;
-	limits[1][1] = m_config.highAmp;
-    limits[0][2] = m_config.freqFeedbackMin;
-    limits[1][2] = m_config.freqFeedbackMax;
-    limits[0][3] = m_config.ampFeedbackMin;
-    limits[1][3] = m_config.ampFeedbackMax;
-    limits[0][4] = m_config.phaseFeedbackMin;
-    limits[1][4] = m_config.phaseFeedbackMax;
-    
-    Json::Value::iterator nodeIt = actions.begin();
-    
-    // This one is square
-    for( std::size_t i = 0; i < numControllers; i++)
-    {
-        Json::Value nodeParam = *nodeIt;
-        for( std::size_t j = 0; j < numActions; j++)
-        {
-            nodeActions[i][j] = ( (nodeParam.get(j, 0.0)).asDouble() *  
-                    (limits[1][j] - limits[0][j])) + limits[0][j];
-        }
-        nodeIt++;
-    }
-    
-    return nodeActions;
-}
 
-void JSONGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
+void OctahedralGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
 {
     // Get heading and generate feedback vector
     std::vector<double> currentPosition = subject->getSegmentCOM(m_config.segmentNumber);
@@ -493,163 +372,4 @@ void JSONGoalControl::setGoalTensions(const BaseSpineModelGoal* subject)
         tgCPGCableControl* mCPGController = tgCast::cast<tgCPGActuatorControl, tgCPGCableControl>(m_allControllers[i]);
         mCPGController->updateControlLength(actions[i] *startLength + startLength);
     }
-}
-
-std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* subject)
-{
-    // Get heading and generate feedback vector
-    std::vector<double> currentPosition = subject->getSegmentCOM(m_config.segmentNumber);
-    
-    assert(currentPosition.size() == 3);
-    
-    btVector3 currentPosVector(currentPosition[0], currentPosition[1], currentPosition[2]);
-    
-    btVector3 goalPosition = subject->goalBoxPosition();
-    
-    btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
-    
-    std::vector<double> state;
-    state.push_back(desiredHeading.getX());
-    state.push_back(desiredHeading.getZ());
-    
-    assert(state[0] >= -1.0 && state[0] <= 1.0);
-    assert(state[1] >= -1.0 && state[1] <= 1.0);
-    
-    double *inputs = new double[m_config.numStates];
-    
-    // Don't scale! Sigmoid can handle the range
-    for (std::size_t i = 0; i < state.size(); i++)
-    {
-#if (1)
-        inputs[i]=state[i];
-#else
-        inputs[i]=state[i]/ 2.0 + 0.5;
-#endif
-#if (0)
-        std::cout << inputs[i] << " ";
-      
-    }
-    
-    std::cout << std::endl;
-#else
-    }
-    
-#endif      
-    const int nSeg = subject->getSegments() - 1;
-    
-    double *output = nn->feedForwardPattern(inputs);
-    
-    vector<double> actions;
-    
-    int m = subject->getSegments() - 1;
-#if (0)    
-    for(int j=0;j<m_config.numActions;j++)
-    {
-        std::cout << output[j] << " ";
-    }
-    std::cout << std::endl;
-#endif
-    
-    // Duplicate the actions across segments
-    for (int i = 0; i != m; i++)
-    {
-        for(int j=0;j<m_config.numActions;j++)
-        {
-            actions.push_back(output[j]);
-        }
-    }
-
-
-    transformFeedbackActions(actions);
-    
-    return actions;
-}
-
-std::vector<double> JSONGoalControl::getFeedback(BaseSpineModelLearning& subject)
-{
-    // Placeholder
-    std::vector<double> feedback;
-    
-    const std::vector<tgSpringCableActuator*>& allCables = subject.getAllMuscles();
-    
-    double *inputs = new double[m_config.numStates];
-    
-    std::size_t n = allCables.size();
-    for(std::size_t i = 0; i != n; i++)
-    {        
-        const tgSpringCableActuator& cable = *(allCables[i]);
-        std::vector<double > state = getCableState(cable);
-        
-        // Rescale to 0 to 1 (consider doing this inside getState
-        for (std::size_t i = 0; i < state.size(); i++)
-        {
-            inputs[i]=state[i] / 2.0 + 0.5;
-        }
-        
-        double *output = nn->feedForwardPattern(inputs);
-        vector<double> actions;
-        for(int j=0;j<m_config.numActions;j++)
-        {
-            actions.push_back(output[j]);
-        }
-
-        transformFeedbackActions(actions);
-        
-        feedback.insert(feedback.end(), actions.begin(), actions.end());
-    }
-    
-    
-    return feedback;
-}
-
-std::vector<double> JSONGoalControl::getCableState(const tgSpringCableActuator& cable)
-{
-	// For each string, scale value from -1 to 1 based on initial length or max tension of motor
-    
-    std::vector<double> state;
-    
-    // Scale length by starting length
-    const double startLength = cable.getStartLength();
-    state.push_back((cable.getCurrentLength() - startLength) / startLength);
-    
-    const double maxTension = cable.getConfig().maxTens;
-    state.push_back((cable.getTension() - maxTension / 2.0) / maxTension);
-    
-	return state;
-}
-
-void JSONGoalControl::transformFeedbackActions(std::vector<double> & actions)
-{
-    const std::size_t numActions = m_config.numActions;
-
-#if (0) // Only true if actions are applied to all segments
-    assert( actions.size() == numActions);
-#endif
-    // Scale values back to -1 to +1
-    for( std::size_t i = 0; i < numActions; i++)
-    {
-        actions[i] = actions[i] * 2.0 - 1.0;
-    }
-}
-
-double JSONGoalControl::calculateDistanceMoved(const BaseSpineModelGoal* subject) const
-{
-    std::vector<double> finalConditions = subject->getSegmentCOM(m_config.segmentNumber);
-  
-    const btVector3 goalPos = subject->goalBoxPosition();
-    
-    std::cout << goalPos << std::endl;
-    
-    double x= finalConditions[0] - goalPos.getX();
-    double z= finalConditions[2] - goalPos.getZ();
-    double distanceNew=sqrt(x*x + z*z);
-    double xx=initConditions[0]-goalPos.getX();
-    double zz=initConditions[2]-goalPos.getZ();
-    double distanceOld=sqrt(xx*xx + zz*zz);
-    double distanceMoved=distanceOld-distanceNew;
-
-    //If you want to calculate only the distance moved independent of the target:
-//  distanceMoved=sqrt((x-xx)*(x-xx)+(z-zz)*(z-zz));
-
-    return distanceMoved;
 }

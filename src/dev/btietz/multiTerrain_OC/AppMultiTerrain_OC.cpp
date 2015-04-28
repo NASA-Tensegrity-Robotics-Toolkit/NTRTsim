@@ -32,7 +32,7 @@
 // controller 
 #include "dev/CPG_feedback/SpineFeedbackControl.h"
 #include "dev/btietz/TC_goal/SpineGoalControl.h"
-#include "dev/btietz/multiTerrain_OC/JSONGoalControl.h"
+#include "dev/btietz/multiTerrain_OC/OctahedralGoalControl.h"
 
 
 AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
@@ -145,8 +145,8 @@ bool AppMultiTerrain_OC::setup()
                                                     );
         
         /// @todo fix memory leak that occurs here
-        JSONGoalControl* const myControl =
-        new JSONGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
+        OctahedralGoalControl* const myControl =
+        new OctahedralGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
 #else
         SpineFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,

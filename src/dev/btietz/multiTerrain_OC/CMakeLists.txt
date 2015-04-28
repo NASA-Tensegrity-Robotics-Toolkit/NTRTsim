@@ -19,7 +19,7 @@ link_libraries(GoalSpine
 
 add_executable(AppMultiTerrainOC
     OctahedralComplex.cpp
-    JSONGoalControl.cpp
+    OctahedralGoalControl.cpp
     AppMultiTerrain_OC.cpp
 )
 
