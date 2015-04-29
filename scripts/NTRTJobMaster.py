@@ -316,6 +316,8 @@ class BrianJobMaster(NTRTJobMaster):
                         controller['params'] = jControl[paramName]['params']
                     except KeyError:
                         controller['params'] = jControl[paramName]
+                    except TypeError:
+                        controller['params'] = jControl[paramName]
                     controller['paramID'] = str(self.paramID)
                     controller['scores'] = []
                     nextGeneration[controller['paramID']] = controller

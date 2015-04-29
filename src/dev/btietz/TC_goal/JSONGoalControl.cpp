@@ -180,10 +180,6 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
         std::vector<double> desComs = getGoalFeedback(goalSubject);
     #endif // Terrain feedback vs goal feedback
 #else 
-    #if (1)
-        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
-        setGoalTensions(goalSubject);
-    #endif
         std::size_t numControllers = subject.getNumberofMuslces() * 3;
         
         double descendingCommand = 0.0;
