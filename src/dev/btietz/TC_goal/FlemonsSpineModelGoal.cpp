@@ -49,8 +49,8 @@
 #include <map>
 #include <set>
 
-FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments) : 
-    BaseSpineModelGoal(segments) 
+FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments, double goalAngle) : 
+    BaseSpineModelGoal(segments, goalAngle) 
 {
 }
 
@@ -172,38 +172,10 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
     
-    // Create goal box in a new structure
-    double randomAngle= ((rand() / (double)RAND_MAX) - 0.5) * 3.1415 + 3.1415;
-    
-    double xPos = 350 * sin(randomAngle);
-    double zPos = 350 * cos(randomAngle);
-    
-    tgStructure goalBox;
-    
-    goalBox.addNode(xPos, 20.0, zPos);
-    goalBox.addNode(xPos + 5.0, 20.0, zPos);
-    
-    goalBox.addPair(0, 1, "goalBox");
-    
-    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
-    const tgBox::Config boxConfig(10.0, 10.0);
-
-    tgBuildSpec boxSpec;
-    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
-    
-    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
-    
-    goalStructureInfo.buildInto(*this, world);
-    
     // Setup vectors for control
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
-    
-    // A little sloppy, but I'm pretty confident there is only one
-    m_goalBox = (find<tgBox>("goalBox"))[0];
-    
-    assert(m_goalBox != NULL);
     
 #if (0)
     // Debug printing

@@ -67,8 +67,7 @@ unsigned long long rdtsc(){
 #endif
 
 OctahedralComplex::OctahedralComplex(int segments, double goalAngle) :   
-    BaseSpineModelGoal(segments), 
-    m_goalAngle(goalAngle)
+    BaseSpineModelGoal(segments, goalAngle)
 {
     srand(rdtsc());
 }
@@ -239,39 +238,10 @@ void OctahedralComplex::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
     
-        // Create goal box in a new structure
-    
-#if (1)
-    m_goalAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415 + 3.1415;
-#endif // If we're resetting the simulation and want to change the angle    
-    
-    double xPos = 350 * sin(m_goalAngle);
-    double zPos = 350 * cos(m_goalAngle);
-    
-    tgStructure goalBox;
-    
-    goalBox.addNode(xPos, 20.0, zPos);
-    goalBox.addNode(xPos + 5.0, 20.0, zPos);
-    
-    goalBox.addPair(0, 1, "goalBox");
-    
-    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
-    const tgBox::Config boxConfig(10.0, 10.0);
-
-    tgBuildSpec boxSpec;
-    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
-    
-    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
-    
-    goalStructureInfo.buildInto(*this, world);
-    
     // Setup vectors for control
     m_allMuscles = find<tgSpringCableActuator> ("muscle2");   
     m_saddleMuscles = find<tgSpringCableActuator> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
-    
-    // A little sloppy, but I'm pretty confident there is only one
-    m_goalBox = (find<tgBox>("goalBox"))[0];
     
     #if (0)
     // Debug printing

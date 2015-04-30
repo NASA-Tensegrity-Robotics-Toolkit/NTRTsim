@@ -45,7 +45,7 @@ class BaseSpineModelGoal : public BaseSpineModelLearning
 {
 public: 
 
-    BaseSpineModelGoal(int segments);
+    BaseSpineModelGoal(int segments, double goalAngle);
 
     virtual ~BaseSpineModelGoal();
     
@@ -61,6 +61,8 @@ public:
 protected:
     
     tgBox* m_goalBox;
+    
+    double m_goalAngle;
 
 };
 

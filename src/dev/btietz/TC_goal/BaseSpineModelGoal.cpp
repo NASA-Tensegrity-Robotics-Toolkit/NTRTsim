@@ -29,6 +29,10 @@
 #include "BaseSpineModelGoal.h"
 // This library
 #include "core/tgBox.h"
+#include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgBuildSpec.h"
+#include "tgcreator/tgStructure.h"
+#include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
@@ -38,8 +42,9 @@
 #include <map>
 #include <set>
 
-BaseSpineModelGoal::BaseSpineModelGoal(int segments) : 
-    BaseSpineModelLearning(segments) 
+BaseSpineModelGoal::BaseSpineModelGoal(int segments, double goalAngle) : 
+    BaseSpineModelLearning(segments),
+    m_goalAngle(goalAngle)
 {
 }
 
@@ -49,7 +54,37 @@ BaseSpineModelGoal::~BaseSpineModelGoal()
 
 void BaseSpineModelGoal::setup(tgWorld& world)
 {
+    
+    // Create goal box in a new structure
+#if (1)
+    m_goalAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415 + 3.1415;
+#endif // If we're resetting the simulation and want to change the angle    
+    
+    double xPos = 350 * sin(m_goalAngle);
+    double zPos = 350 * cos(m_goalAngle);
+    
+    tgStructure goalBox;
+    
+    goalBox.addNode(xPos, 20.0, zPos);
+    goalBox.addNode(xPos + 5.0, 20.0, zPos);
+    
+    goalBox.addPair(0, 1, "goalBox");
+    
+    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
+    const tgBox::Config boxConfig(10.0, 10.0);
 
+    tgBuildSpec boxSpec;
+    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
+    
+    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
+    
+    goalStructureInfo.buildInto(*this, world);
+    
+    // A little sloppy, but I'm pretty confident there is only one
+    m_goalBox = (find<tgBox>("goalBox"))[0];
+    
+    assert(m_goalBox != NULL);
+    
     // Actually setup the children, notify controller
     BaseSpineModelLearning::setup(world);
 }
