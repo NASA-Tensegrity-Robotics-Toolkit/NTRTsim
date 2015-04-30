@@ -78,7 +78,7 @@ bool AppGoalTerrain::setup()
         const int segmentSpan = 3;
         const int numMuscles = 8;
         const int numParams = 2;
-        const int segNumber = 0; // For learning results
+        const int segNumber = 5; // For learning results
         const double controlTime = .01;
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
@@ -369,7 +369,14 @@ void AppGoalTerrain::simulate(tgSimulation *simulation)
                 simulation->addObstacle(obstacle);
             }
         }
-        else
+        else if(add_blocks)
+        {
+            simulation->reset();
+            tgModel* obstacle = getBlocks();
+            simulation->addObstacle(obstacle);
+        }
+        // Avoid resetting twice on the last run
+        else if (i != nEpisodes - 1)
         {
             simulation->reset();
         }
