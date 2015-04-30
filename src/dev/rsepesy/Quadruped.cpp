@@ -272,11 +272,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[6],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[6],n1[3], tgString("inner back muscle seg leg pull", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[6],n1[3], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[3],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[3],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], tgString("inner back muscle seg leg pull", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
 
         leg++;
 
@@ -286,11 +286,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[6],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], tgString("inner back muscle seg leg pull", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[4],n1[5], tgString("inner back muscle seg leg pull", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[4],n1[5], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
 
 	leg++;
 
@@ -323,8 +323,6 @@ void Quadruped::setup(tgWorld& world)
 	leg++;
     }
 
-    mapActuators(actuatorMap, *this);
-
     #endif
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
@@ -343,12 +341,14 @@ void Quadruped::setup(tgWorld& world)
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
-
+    
+    mapActuators(actuatorMap, *this);
+    
     // Setup vectors for control
     m_allMuscles = find<tgSpringCableActuator> ("muscle2");   
     m_allSegments = this->find<tgModel> ("segment");
     
-    #if (0)
+    #if (1)
     // Debug printing
     std::cout << "StructureInfo:" << std::endl;
     std::cout << structureInfo << std::endl;
