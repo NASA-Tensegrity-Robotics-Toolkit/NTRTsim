@@ -18,10 +18,9 @@
 
 """ Converts .nnw files to a JSON file """
 
-# Purpose: Queue up learning runs, pass them parameters via JSON
-# Author:  Brian Mirletz and Perry Bhandal
+# Purpose: Read JSON files and print results to the command line. Used to determine best params after learning has completed
+# Author:  Brian Mirletz
 # Date:    March 2015
-# Notes:   In progress as of this commit (3/27/15)
 
 import sys
 import os
