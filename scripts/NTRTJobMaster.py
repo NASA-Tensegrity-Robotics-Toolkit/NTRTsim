@@ -18,7 +18,7 @@
 
 """ Converts .nnw files to a JSON file """
 
-# Purpose: Queue up learning runs, pass them parameters via JSON
+# Purpose: Queue up learning runs, pass them parameters via JSON. Can run several different types of learning.
 # Author:  Brian Mirletz and Perry Bhandal
 # Date:    March 2015
 # Notes:   In progress as of this commit (3/27/15)
@@ -116,14 +116,14 @@ class NTRTMasterError(Exception):
     pass
 
 ###
-# Your implementations.
+# Brian's implementations.
+# @todo consider moving this to a different file
 ###
 
 class BrianJobMaster(NTRTJobMaster):
     def _setup(self):
         """
-        Override this method and implement any global setup necessary. This includes tasks
-        like creating your input and output directories.
+        Read input file, store file paths for run
         """
 
         # If this fails, the program should fail. Input file is required
@@ -147,7 +147,10 @@ class BrianJobMaster(NTRTJobMaster):
         # random.seed(1)
         
     def __writeToNNW(self, neuralParams, fileName):
-        
+        """
+        Take the params (neuralParams) and write them to a .nnw file for reading by
+        the neuralNetwork code (Third party library)
+        """
         fout = open(fileName, 'w')
         first = True
         for x in neuralParams:
@@ -162,7 +165,7 @@ class BrianJobMaster(NTRTJobMaster):
         """
         Generate a new set of paramters based on learning method and config file
         Returns a dictionary paramName : values
-        This version is Monte Carlo, other versions may just pick up a pre-generated file
+        This is the implementation of monteCarlo
         """
         params = self.jConf["learningParams"][paramName]
         
@@ -172,6 +175,7 @@ class BrianJobMaster(NTRTJobMaster):
         newController = {}
         newController['paramID'] = str(self.paramID)
         
+        # Neural network or not. Slightly different data structure
         if params['numberOfStates'] == 0 :
 
             newParams = []
@@ -183,7 +187,6 @@ class BrianJobMaster(NTRTJobMaster):
                     subParams.append(random.uniform(pMin, pMax))
                 newParams.append(subParams)
         else :
-            # Temp code for pre-specified neural network, future editions will generate networks
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
                          'numHidden' : params['numberHidden'],
@@ -210,11 +213,16 @@ class BrianJobMaster(NTRTJobMaster):
         return newController
     
     def __mutateParams(self, currentController, paramName):
+        """
+        Change some parameters (according to mutationChance) by an amount sampled from a gaussian
+        (mutationDev)
+        """
         params = self.jConf["learningParams"][paramName]
         
         pMax = params['paramMax']
         pMin = params['paramMin']
         
+        # Slightly different encoding for neural nets
         if(params['numberOfStates'] > 0):
             cNew = list(currentController['neuralParams'])
         else:
@@ -236,6 +244,7 @@ class BrianJobMaster(NTRTJobMaster):
                         v = pMin
             cNew[i] = v
         
+        # Slightly different encoding for neural nets
         if(params['numberOfStates'] > 0):
             newNeuro = {}
             newNeuro['neuralParams'] = cNew
@@ -247,6 +256,11 @@ class BrianJobMaster(NTRTJobMaster):
             return cNew
     
     def __getControllerFromProbability(self, currentGeneration, prob):
+        """
+        A support function for genetic algorithms that selects a controller
+        based on the distribution of probabilities for all of their controllers (their
+        contriution to the total score of the generation)
+        """
         for c in currentGeneration.itervalues():
             if (c['probability'] < prob):
                 break
@@ -256,6 +270,10 @@ class BrianJobMaster(NTRTJobMaster):
         raise NTRTMasterError("Insufficient values to satisfy requested probability")
     
     def __getChildController(self, c1, c2, params):
+        """
+        Takes two controllers and merges them with a 50/50 chance of selecting 
+        a parameter from each controller
+        """        
         
         if(params['numberOfStates'] > 0):
             c1 = list(c1['neuralParams'])
@@ -267,9 +285,11 @@ class BrianJobMaster(NTRTJobMaster):
             raise NTRTMasterError("Error in length")
         
         for i, j in zip(c1, c2):
+            # Go to the deepest level of the parameters (see instances in the specification)
             if isinstance(i, collections.Iterable):
                 cNew.append(self.__getChildController(i, j, params))
             else:
+                # @todo should this be adjustable?
                 if (random.random() > 0.5):
                     cNew.append(i)
                 else:
@@ -286,13 +306,24 @@ class BrianJobMaster(NTRTJobMaster):
             return cNew
     
     def __sortAvg(self, x):
+        """
+        Returns the average score from a controller for sorting
+        """
         
         return x['avgScore']
     
     def __sortMax(self, x):
+        """
+        Returns the max score of a controller for sorting
+        """
+        
         return x['maxScore']
     
     def generationGenerator(self, currentGeneration, paramName):
+        """
+        Master function that takes an existing set of paramters, sorts them by score
+        and then returns a new set of parameters based on the specification file
+        """        
         
         params = self.jConf["learningParams"][paramName]
         
@@ -300,6 +331,7 @@ class BrianJobMaster(NTRTJobMaster):
         
         nextGeneration = {}
         
+        # Are we doing monteCarlo or starting a new trial?
         if (len(currentGeneration) == 0 or params['monteCarlo']):
             
             # Starting a new trial - load previous results, if any, unless doing monteCarlo
@@ -332,9 +364,11 @@ class BrianJobMaster(NTRTJobMaster):
                 controller = self.__getNewParams(paramName)
                 nextGeneration[controller['paramID']] = controller
                 self.paramID += 1
+                
         elif (not params['learning']):
             # Not learning, return previous controllers
             nextGeneration = currentGeneration
+            
         else:
             # learning, not doing monteCarlo, have a previous generation
             
@@ -361,7 +395,7 @@ class BrianJobMaster(NTRTJobMaster):
             
             totalScore = 0
             
-            # Get probabilities for children
+            # Get probabilities for children (for mating)
             
             if (useAvg):
                 
@@ -410,7 +444,7 @@ class BrianJobMaster(NTRTJobMaster):
                         c['probability'] = (c['maxScore'] - floor) / totalScore + c1['probability']
                     c1 = c
                 
-            
+            # How many of the best controllers are we keeping?
             numElites = popSize - (params['numberToMutate'] + params['numberOfChildren'])
             
             if (numElites < 0):
@@ -486,6 +520,9 @@ class BrianJobMaster(NTRTJobMaster):
         return nextGeneration
     
     def getParamID(self, gen, jobNum):
+        """
+        Get the controller's key based on the job number
+        """
         try:
             return list(gen)[jobNum]
         except IndexError:
@@ -495,11 +532,12 @@ class BrianJobMaster(NTRTJobMaster):
         """
         Handle the generation of a new JSON file with new parameters. Will vary based on the
         learning method used and the config file
+        Edit this based on your parameter set
         """
 
         obj = {}
         
-        # Hacked co-evolution
+        # Hacked co-evolution. Normally co-evolution would always select a random controller
         if(jobNum >= len(self.currentGeneration['node'])):
             jobNum_node = random.randint(0, len(self.currentGeneration['node']) - 1)
         else:
@@ -571,16 +609,18 @@ class BrianJobMaster(NTRTJobMaster):
                         'executable' : self.jConf['executable'],
                         'length'   : self.jConf['learningParams']['trialLength']}
                 jobList.append(BrianJob(args))
-
+            
+            # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
             completedJobs = conSched.processJobs()
             
+            # Read scores from files, write to logs
             totalScore = 0
             maxScore = -1000
             for job in completedJobs:
                 job.processJobOutput()
                 jobVals = job.obj
-                # TODO commit to one run per file - get rid of list/zero notation
+                # TODO commit to one run per file - get rid of list/zero notation, will require editing CPP files
                 score = jobVals['scores'][0]['distance']
                 edgeKey = jobVals ['edgeVals']['paramID']
                 self.currentGeneration['edge'][edgeKey]['scores'].append(score)
@@ -597,8 +637,6 @@ class BrianJobMaster(NTRTJobMaster):
             logFile = open('evoLog.txt', 'a') 
             logFile.write(str((n+1) * numTrials) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
             logFile.close()
-
-        #TODO, something that exports results and picks the best trial based on results
 
 
 class BrianJob(NTRTJob):
