@@ -68,7 +68,7 @@ void QuadrupedSineWaves::applyImpedanceControlInside(const std::vector<tgBasicAc
     {
         double setTension = in_controller->control(*(stringList[i]),
                                             dt,
-                                            insideLength
+                                            stringList[i]->getStartLength()
                                             );
         #if (0) // Conditional compile for verbose control
         std::cout << "Inside String " << i << " tension " << setTension
@@ -89,7 +89,7 @@ void QuadrupedSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicA
         
         double setTension = out_controller->control(*(stringList[i]),
                                             dt,
-                                            outsideLength,
+                                            stringList[i]->getStartLength(),
                                             target
                                             );
         #if(0) // Conditional compile for verbose control
@@ -108,7 +108,7 @@ void QuadrupedSineWaves::onStep(BaseSpineModelLearning& subject, double dt)
 
     //segments = subject.getSegments();
     
-    applyImpedanceControlInside(qSubject->getActuators("pull"), dt);
+    //applyImpedanceControlInside(qSubject->getActuators("pull"), dt);
     /*
     applyImpedanceControlInside(subject.getActuators("inner left") , dt);
     applyImpedanceControlInside(subject.getActuators("inner right"), dt);
