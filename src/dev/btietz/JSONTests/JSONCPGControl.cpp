@@ -35,6 +35,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
+#include "dev/CPG_feedback/tgCPGCableControl.h"
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 
 #include "helpers/FileHelpers.h"
@@ -181,6 +182,9 @@ void JSONCPGControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
+    nodeVals = nodeVals.get("params", "UTF-8");
+    edgeVals = edgeVals.get("params", "UTF-8");
+    
     array_4D edgeParams = scaleEdgeActions(edgeVals);
     array_2D nodeParams = scaleNodeActions(nodeVals);
     
@@ -205,7 +209,12 @@ void JSONCPGControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeAct
     
     for (std::size_t i = 0; i < allMuscles.size(); i++)
     {
+#if (1)
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+#else
 		tgCPGActuatorControl* pStringControl = new tgCPGActuatorControl();
+#endif // Update for kinematic cables
         allMuscles[i]->attach(pStringControl);
         
         m_allControllers.push_back(pStringControl);

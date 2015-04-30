@@ -25,7 +25,7 @@
 #include "core/tgSphere.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
@@ -267,18 +267,24 @@ void TetraSpineGoal::setup(tgWorld& world)
     spec.addBuilder("PCB", new tgSphereInfo(PCB_1_Config));
     
     
-    // Two different string configs
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
-#if (1)
-    spec.addBuilder("top muscle", new tgBasicContactCableInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicContactCableInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicContactCableInfo(muscleConfig2));
-#else
-    spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));
-#endif
+        const double elasticity = 1000.0;
+    const double damping = 10.0;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 12.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+    
+    spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
+
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
 
