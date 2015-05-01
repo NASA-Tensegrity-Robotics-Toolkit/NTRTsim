@@ -4,6 +4,7 @@
     "resourcePath" : "../resources/src/",
     "lowerPath"    : "bmirletz/OctaCL_6/",
     "executable" : "./../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
+    "terrain" : [[0, 0]],
     "learningParams": 
     {
         "trialLength" : 60000,

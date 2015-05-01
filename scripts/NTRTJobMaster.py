@@ -608,7 +608,7 @@ class BrianJobMaster(NTRTJobMaster):
                         'path'     : self.jConf['lowerPath'],
                         'executable' : self.jConf['executable'],
                         'length'   : self.jConf['learningParams']['trialLength'],
-                        'terrain'  : [[0, 0], [1, 0], [0, 1]]}
+                        'terrain'  : self.jConf['terrain']}
                 jobList.append(BrianJob(args))
             
             # Run the jobs

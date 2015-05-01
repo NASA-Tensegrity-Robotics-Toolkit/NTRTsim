@@ -4,6 +4,7 @@
     "resourcePath" : "../resources/src/",
     "lowerPath"    : "bmirletz/Tetra_Goal/",
     "executable" : "./../build/dev/btietz/TS_goal/AppTSGoal",
+    "terrain" : [[0, 0]],
     "learningParams": 
     {
         "trialLength" : 1000,
