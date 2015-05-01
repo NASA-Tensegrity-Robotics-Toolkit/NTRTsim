@@ -6,8 +6,8 @@
     "executable" : "./../build/dev/btietz/TS_goal/AppTSGoal",
     "learningParams": 
     {
-        "trialLength" : 10000,
-        "numTrials" : 100,
+        "trialLength" : 1000,
+        "numTrials" : 10,
         "numGenerations" : 1,
         "nodeVals" :
         {
@@ -17,7 +17,7 @@
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
             "numberOfInstances" : 1,
-            "populationSize" : 100,
+            "populationSize" : 10,
             "useAverage" : false,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
@@ -35,7 +35,7 @@
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
             "numberOfInstances" : 57,
-            "populationSize" : 100,
+            "populationSize" : 10,
             "useAverage" : false,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,

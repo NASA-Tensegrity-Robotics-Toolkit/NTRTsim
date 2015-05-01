@@ -328,6 +328,33 @@ void JSONCPGControl::onTeardown(BaseSpineModelLearning& subject)
     
     scores.push_back(totalEnergySpent);
     
+        std::cout << "Dist travelled " << scores[0] << std::endl;
+    
+    Json::Value root; // will contains the root value after parsing.
+    Json::Reader reader;
+
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
+    if ( !parsingSuccessful )
+    {
+        // report to the user the failure and their locations in the document.
+        std::cout << "Failed to parse configuration\n"
+            << reader.getFormattedErrorMessages();
+        throw std::invalid_argument("Bad filename for JSON");
+    }
+    
+    Json::Value prevScores = root.get("scores", Json::nullValue);
+    
+    Json::Value subScores;
+    subScores["distance"] = scores[0];
+    subScores["energy"] = totalEnergySpent;
+    
+    prevScores.append(subScores);
+    root["scores"] = prevScores;
+    
+    ofstream payloadLog;
+    payloadLog.open(controlFilename.c_str(),ofstream::out);
+    
+    payloadLog << root << std::endl;
     
     delete m_pCPGSys;
     m_pCPGSys = NULL;

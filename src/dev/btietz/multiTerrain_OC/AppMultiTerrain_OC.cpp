@@ -354,41 +354,45 @@ void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
         }
         
         // Don't change the terrain before the last episode to avoid leaks
-        if (all_terrain && i != nEpisodes - 1)
-        {   
-            // Next run has Hills
-            if (i % nTypes == 0)
-            {
-                
-                const tgHillyGround::Config hillGroundConfig = getHillyConfig();
-                tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
-                simulation->reset(ground);
+        if (i != nEpisodes - 1)
+        {
+            
+            if (all_terrain)
+            {   
+                // Next run has Hills
+                if (i % nTypes == 0)
+                {
+                    
+                    const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+                    tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat
+                else if (i % nTypes == 1)
+                {
+                    const tgBoxGround::Config groundConfig = getBoxConfig();
+                    tgBulletGround* ground = new tgBoxGround(groundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat with blocks
+                else if (i % nTypes == 2)
+                {
+                    simulation->reset();
+                    tgModel* obstacle = getBlocks();
+                    simulation->addObstacle(obstacle);
+                }
             }
-            // Flat
-            else if (i % nTypes == 1)
-            {
-                const tgBoxGround::Config groundConfig = getBoxConfig();
-                tgBulletGround* ground = new tgBoxGround(groundConfig);
-                simulation->reset(ground);
-            }
-            // Flat with blocks
-            else if (i % nTypes == 2)
+            else if(add_blocks)
             {
                 simulation->reset();
                 tgModel* obstacle = getBlocks();
                 simulation->addObstacle(obstacle);
             }
-        }
-        else if(add_blocks)
-        {
-            simulation->reset();
-            tgModel* obstacle = getBlocks();
-            simulation->addObstacle(obstacle);
-        }
-        // Avoid resetting twice on the last run
-        else if (i != nEpisodes - 1)
-        {
-            simulation->reset();
+            // Avoid resetting twice on the last run
+            else
+            {
+                simulation->reset();
+            }
         }
     }
 }

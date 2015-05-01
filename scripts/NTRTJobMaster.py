@@ -607,7 +607,8 @@ class BrianJobMaster(NTRTJobMaster):
                         'resourcePrefix' : self.jConf['resourcePath'],
                         'path'     : self.jConf['lowerPath'],
                         'executable' : self.jConf['executable'],
-                        'length'   : self.jConf['learningParams']['trialLength']}
+                        'length'   : self.jConf['learningParams']['trialLength'],
+                        'terrain'  : [[0, 0], [1, 0], [0, 1]]}
                 jobList.append(BrianJob(args))
             
             # Run the jobs
@@ -620,18 +621,24 @@ class BrianJobMaster(NTRTJobMaster):
             for job in completedJobs:
                 job.processJobOutput()
                 jobVals = job.obj
-                # TODO commit to one run per file - get rid of list/zero notation, will require editing CPP files
-                score = jobVals['scores'][0]['distance']
-                edgeKey = jobVals ['edgeVals']['paramID']
-                self.currentGeneration['edge'][edgeKey]['scores'].append(score)
-                nodeKey = jobVals ['nodeVals']['paramID']
-                self.currentGeneration['node'][nodeKey]['scores'].append(score)
-                feedbackKey = jobVals ['feedbackVals']['paramID']
-                self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+               
+                scores = jobVals['scores']
                 
-                totalScore += score
-                if score > maxScore:
-                    maxScore = score
+                edgeKey = jobVals ['edgeVals']['paramID']
+                nodeKey = jobVals ['nodeVals']['paramID']
+                feedbackKey = jobVals ['feedbackVals']['paramID']
+               
+                # Iterate through all of the new scores for this file
+                for i in scores:
+                    score = i['distance']
+                    
+                    # TODO consider only appending when learning
+                    self.currentGeneration['edge'][edgeKey]['scores'].append(score)
+                    self.currentGeneration['node'][nodeKey]['scores'].append(score)
+                    self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+                    totalScore += score
+                    if score > maxScore:
+                        maxScore = score
             
             avgScore = totalScore / float(len(completedJobs))
             logFile = open('evoLog.txt', 'a') 
@@ -652,7 +659,7 @@ class BrianJob(NTRTJob):
         """
         logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
-
+        
         self._setup()
 
     def _setup(self):
@@ -672,9 +679,16 @@ class BrianJob(NTRTJob):
 
         if self.pid == 0:
             # Redirect the stdout output to dev null in the child.
-            devNull = open(os.devnull, 'wb')
+            logPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename'] + '_log.txt'
+            logFile = open(logPath, 'wb')
+            
+            terrainMatrix = self.args['terrain']
+            if len(terrainMatrix[0]) < 2:
+                raise NTRTMasterError("Not enough terrain args!")
+            
             #TODO improve error handling here
-            subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length'])], stdout=devNull)
+            for run in terrainMatrix:
+                subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1])], stdout=logFile)
             sys.exit()
 
     def processJobOutput(self):
