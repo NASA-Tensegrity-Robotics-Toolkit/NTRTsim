@@ -136,7 +136,7 @@ bool AppTSGoal::setup()
         
 #else
 
-        JSONCPGControl::Config control_config(segmentSpan, 
+        JSONFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -152,10 +152,16 @@ bool AppTSGoal::setup()
                                                     def,
                                                     cl,
                                                     lf,
-                                                    hf);
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax);
         /// @todo fix memory leak that occurs here
-       JSONCPGControl* const myControl =
-        new JSONCPGControl(control_config, suffix, "bmirletz/Tetra_Goal/");
+       JSONFeedbackControl * const myControl =
+        new JSONFeedbackControl(control_config, suffix, "bmirletz/Tetra_Goal/");
 
 #endif
         

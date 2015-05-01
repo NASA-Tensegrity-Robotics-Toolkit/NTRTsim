@@ -30,7 +30,7 @@
 #include "TetraSpineGoal.h"
 
 // controller 
-#include "dev/btietz/JSONTests/JSONCPGControl.h"
+#include "dev/btietz/JSONTests/JSONFeedbackControl.h"
 #include "dev/btietz/TC_goal/JSONGoalControl.h"
 
 // obstacles

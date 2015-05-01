@@ -132,16 +132,21 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
+    nodeVals = nodeVals.get("params", "UTF-8");
+    edgeVals = edgeVals.get("params", "UTF-8");
+    
     array_4D edgeParams = scaleEdgeActions(edgeVals);
     array_2D nodeParams = scaleNodeActions(nodeVals);
 
     setupCPGs(subject, nodeParams, edgeParams);
     
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
+    feedbackParams = feedbackParams.get("params", "UTF-8");
     
     // Setup neural network
     m_config.numStates = feedbackParams.get("numStates", "UTF-8").asInt();
     m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
+    //m_config.numHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
     
     std::string nnFile = controlFilePath + feedbackParams.get("neuralFilename", "UTF-8").asString();
     
@@ -166,7 +171,7 @@ void JSONFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
+#if (0)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        
