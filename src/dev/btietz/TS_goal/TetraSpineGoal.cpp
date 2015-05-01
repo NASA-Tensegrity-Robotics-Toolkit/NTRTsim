@@ -17,7 +17,7 @@
 */
 
 // This module
-#include "TetraSpineCollisions.h"
+#include "TetraSpineGoal.h"
 // This library
 #include "core/tgCast.h"
 #include "core/tgSpringCableActuator.h"
@@ -25,7 +25,7 @@
 #include "core/tgSphere.h"
 #include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgSphereInfo.h"
@@ -40,7 +40,7 @@
 #include <stdexcept>
 
 /**
- * @file TetraSpineCollisions.cpp
+ * @file TetraSpineGoal.cpp
  * @brief Tetraspine, configured for learning in the NTRT simulator
  * @author Brian Tietz
  * @date May 2014
@@ -48,13 +48,13 @@
  * $Id$
  */
 
-TetraSpineCollisions::TetraSpineCollisions(size_t segments, double scale) : 
-    BaseSpineModelLearning(segments),
+TetraSpineGoal::TetraSpineGoal(size_t segments, double goalAngle, double scale) : 
+    BaseSpineModelGoal(segments, goalAngle),
     scaleFactor(scale / 10.0)
 {
 }
 
-TetraSpineCollisions::~TetraSpineCollisions()
+TetraSpineGoal::~TetraSpineGoal()
 {
 }
 namespace
@@ -137,7 +137,7 @@ namespace
 		}
     }
 
-    void mapMuscles(TetraSpineCollisions::MuscleMap& muscleMap,
+    void mapMuscles(TetraSpineGoal::MuscleMap& muscleMap,
             tgModel& model)
     {
         // Note that tags don't need to match exactly, we could create
@@ -150,7 +150,7 @@ namespace
 		muscleMap["outer top"]   = model.find<tgSpringCableActuator>("outer top muscle");
     }
 	
-	void addMarkers(tgStructure& structure, TetraSpineCollisions& model)
+	void addMarkers(tgStructure& structure, TetraSpineGoal& model)
 	{
 		
 		const std::vector<tgStructure*> children = structure.getChildren();
@@ -217,7 +217,7 @@ namespace
 
 // This is basically a manual setup of a model.
 // There are things that do this for us (@todo: reference the things that do this for us)
-void TetraSpineCollisions::setup(tgWorld& world)
+void TetraSpineGoal::setup(tgWorld& world)
 {
     const double edge = 3.8 * scaleFactor;
     const double height = tgUtil::round(std::sqrt(3.0)/2 * edge);
@@ -267,18 +267,24 @@ void TetraSpineCollisions::setup(tgWorld& world)
     spec.addBuilder("PCB", new tgSphereInfo(PCB_1_Config));
     
     
-    // Two different string configs
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
-#if (1)
-    spec.addBuilder("top muscle", new tgBasicContactCableInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicContactCableInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicContactCableInfo(muscleConfig2));
-#else
-    spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
-    spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
-    spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));
-#endif
+        const double elasticity = 1000.0;
+    const double damping = 10.0;
+    const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 12.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+    
+    spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
+
     // Create your structureInfo
     tgStructureInfo structureInfo(snake, spec);
 
@@ -298,17 +304,17 @@ void TetraSpineCollisions::setup(tgWorld& world)
     #endif
     
     // Actually setup the children
-    BaseSpineModelLearning::setup(world);
+    BaseSpineModelGoal::setup(world);
 }
       
-void TetraSpineCollisions::teardown()
+void TetraSpineGoal::teardown()
 {
 
-    BaseSpineModelLearning::teardown();
+    BaseSpineModelGoal::teardown();
     
 } 
     
-void TetraSpineCollisions::step(double dt)
+void TetraSpineGoal::step(double dt)
 {
     if (dt < 0.0)
     {
@@ -317,6 +323,6 @@ void TetraSpineCollisions::step(double dt)
     else
     {
         // Step any children, notify observers
-        BaseSpineModelLearning::step(dt);
+        BaseSpineModelGoal::step(dt);
     }
 }

@@ -16,22 +16,22 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef APP_GOAL_TERRAIN
-#define APP_GOAL_TERRAIN
+#ifndef APP_TS_GOAL
+#define APP_TS_GOAL
 
 /**
- * @file AppGoalTerrain.cpp
+ * @file AppTSGoal.cpp
  * @brief Contains the definition function main() for the Multiple terrains app
  * @author Brian Mirletz, Alexander Xydes
  * $Id$
  */
 
 //robot
-#include "FlemonsSpineModelGoal.h"
+#include "TetraSpineGoal.h"
 
 // controller 
-#include "SpineGoalControl.h"
-#include "JSONGoalControl.h"
+#include "dev/btietz/JSONTests/JSONFeedbackControl.h"
+#include "dev/btietz/TC_goal/JSONGoalControl.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"
@@ -53,10 +53,10 @@
 
 namespace po = boost::program_options;
 
-class AppGoalTerrain
+class AppTSGoal
 {
 public:
-    AppGoalTerrain(int argc, char** argv);
+    AppTSGoal(int argc, char** argv);
 
     /** Setup the simulation */
     bool setup();

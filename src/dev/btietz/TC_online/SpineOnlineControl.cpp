@@ -26,7 +26,7 @@
 
 #include "SpineOnlineControl.h"
 
-#include "dev/btietz/TC_goal/FlemonsSpineModelGoal.h"
+#include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 
 // Should include tgString, but compiler complains since its been
 // included from BaseSpineModelLearning. Perhaps we should move things
@@ -108,7 +108,7 @@ void SpineOnlineControl::onSetup(BaseSpineModelLearning& subject)
 {
     m_feedbackControlTime = 0.0;
     
-    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
     m_lastGoalDist = getGoalDist(goalSubject);
     m_controllerStartDist = m_lastGoalDist;
@@ -124,7 +124,7 @@ void SpineOnlineControl::onStep(BaseSpineModelLearning& subject, double dt)
     {
         if(m_feedbackControlTime > m_config.feedbackTime)
         {
-            const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+            const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
             const double dist = getGoalDist(goalSubject);
             
@@ -150,7 +150,7 @@ void SpineOnlineControl::onStep(BaseSpineModelLearning& subject, double dt)
             m_lastGoalDist = dist;
         }
 #if (1)        
-        const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
         std::vector<double> desComs = getGoalFeedback(goalSubject);
 #else 
         std::vector<double> desComs = getFeedback(subject);
@@ -190,7 +190,7 @@ void SpineOnlineControl::onTeardown(BaseSpineModelLearning& subject)
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
     
-    const FlemonsSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, FlemonsSpineModelGoal>(subject);
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
     const double distanceMoved = calculateDistanceMoved(goalSubject);
     
@@ -249,7 +249,7 @@ void SpineOnlineControl::onTeardown(BaseSpineModelLearning& subject)
     m_allControllers.clear();    
 }
 
-double SpineOnlineControl::getGoalDist(const FlemonsSpineModelGoal* subject) const
+double SpineOnlineControl::getGoalDist(const BaseSpineModelGoal* subject) const
 {
     // TODO: consider comparing all segments instead of just the one specified by config
     std::vector<double> finalConditions = subject->getSegmentCOM(m_config.segmentNumber);

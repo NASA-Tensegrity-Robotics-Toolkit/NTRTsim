@@ -67,17 +67,18 @@ bool AppGoalTerrain::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    /// @todo add position and angle to configuration
+    /// @todo Generalize angle code
         FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments);
+      new FlemonsSpineModelGoal(nSegments, 0.0);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
+        
         const int segmentSpan = 3;
         const int numMuscles = 8;
         const int numParams = 2;
-        const int segNumber = 0; // For learning results
+        const int segNumber = 5; // For learning results
         const double controlTime = .01;
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
@@ -101,6 +102,38 @@ bool AppGoalTerrain::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
         const double tensionFeedback = 1000.0;
+#if (1) // Switch for .nnw or JSON based methods
+        JSONGoalControl::Config control_config(segmentSpan, 
+                                                    numMuscles,
+                                                    numMuscles,
+                                                    numParams, 
+                                                    segNumber, 
+                                                    controlTime,
+                                                    lowAmplitude,
+                                                    highAmplitude,
+                                                    lowPhase,
+                                                    highPhase,
+                                                    kt,
+                                                    kp,
+                                                    kv,
+                                                    def,
+                                                    cl,
+                                                    lf,
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax,
+                                                    tensionFeedback
+                                                    );
+        
+        /// @todo fix memory leak that occurs here
+        JSONGoalControl* const myControl =
+        new JSONGoalControl(control_config, suffix, "bmirletz/TC_Goal_JSON/");
+        
+#else
 
         SpineGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -130,7 +163,8 @@ bool AppGoalTerrain::setup()
         /// @todo fix memory leak that occurs here
         SpineGoalControl* const myControl =
         new SpineGoalControl(control_config, suffix, "bmirletz/TetrahedralComplex_Goal/");
-
+#endif
+        
         myModel->attach(myControl);
     }
 
@@ -310,34 +344,45 @@ void AppGoalTerrain::simulate(tgSimulation *simulation)
         }
         
         // Don't change the terrain before the last episode to avoid leaks
-        if (all_terrain && i != nEpisodes - 1)
-        {   
-            // Next run has Hills
-            if (i % nTypes == 0)
-            {
-                
-                const tgHillyGround::Config hillGroundConfig = getHillyConfig();
-                tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
-                simulation->reset(ground);
+        if (i != nEpisodes - 1)
+        {
+            
+            if (all_terrain)
+            {   
+                // Next run has Hills
+                if (i % nTypes == 0)
+                {
+                    
+                    const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+                    tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat
+                else if (i % nTypes == 1)
+                {
+                    const tgBoxGround::Config groundConfig = getBoxConfig();
+                    tgBulletGround* ground = new tgBoxGround(groundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat with blocks
+                else if (i % nTypes == 2)
+                {
+                    simulation->reset();
+                    tgModel* obstacle = getBlocks();
+                    simulation->addObstacle(obstacle);
+                }
             }
-            // Flat
-            else if (i % nTypes == 1)
-            {
-                const tgBoxGround::Config groundConfig = getBoxConfig();
-                tgBulletGround* ground = new tgBoxGround(groundConfig);
-                simulation->reset(ground);
-            }
-            // Flat with blocks
-            else if (i % nTypes == 2)
+            else if(add_blocks)
             {
                 simulation->reset();
                 tgModel* obstacle = getBlocks();
                 simulation->addObstacle(obstacle);
             }
-        }
-        else
-        {
-            simulation->reset();
+            // Avoid resetting twice on the last run
+            else
+            {
+                simulation->reset();
+            }
         }
     }
 }
