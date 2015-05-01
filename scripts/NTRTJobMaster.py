@@ -682,12 +682,16 @@ class BrianJob(NTRTJob):
             logPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename'] + '_log.txt'
             logFile = open(logPath, 'wb')
             
+            # A set of jobs. Currently [0 0] is flat ground, [1 0] is a block field, [0 1] is hilly terrain, and [1 1] is both
+            # This will expand in the future.
             terrainMatrix = self.args['terrain']
+            # Update this if the subprocess call gets changed
             if len(terrainMatrix[0]) < 2:
                 raise NTRTMasterError("Not enough terrain args!")
             
-            #TODO improve error handling here
+            # Run through a set of binary job options. Currently handles terrain switches
             for run in terrainMatrix:
+                #TODO improve error handling here
                 subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1])], stdout=logFile)
             sys.exit()
 
