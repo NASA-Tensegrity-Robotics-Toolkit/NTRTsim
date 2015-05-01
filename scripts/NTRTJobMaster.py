@@ -554,14 +554,14 @@ class BrianJobMaster(NTRTJobMaster):
             jobNum_fb = jobNum
         
         if(jobNum >= len(self.currentGeneration['goal'])):
-            jobNum_fb = random.randint(0, len(self.currentGeneration['goal']) - 1)
+            jobNum_goal = random.randint(0, len(self.currentGeneration['goal']) - 1)
         else:
-            jobNum_fb = jobNum
+            jobNum_goal = jobNum
         
         obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum_node)]
         obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum_edge)]
         obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
-        obj["goalVals"] = self.currentGeneration['goal'][self.getParamID(self.currentGeneration['goal'], jobNum_fb)]
+        obj["goalVals"] = self.currentGeneration['goal'][self.getParamID(self.currentGeneration['goal'], jobNum_goal)]
         
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
@@ -650,7 +650,7 @@ class BrianJobMaster(NTRTJobMaster):
                     if (lParams['feedbackVals']['learning']):
                         self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
                     if (lParams['goalVals']['learning']):
-                        self.currentGeneration['goal'][feedbackKey]['scores'].append(score)
+                        self.currentGeneration['goal'][goalKey]['scores'].append(score)
                     totalScore += score
                     if score > maxScore:
                         maxScore = score
