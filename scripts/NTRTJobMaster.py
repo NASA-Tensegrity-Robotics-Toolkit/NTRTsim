@@ -553,9 +553,15 @@ class BrianJobMaster(NTRTJobMaster):
         else:
             jobNum_fb = jobNum
         
+        if(jobNum >= len(self.currentGeneration['goal'])):
+            jobNum_fb = random.randint(0, len(self.currentGeneration['goal']) - 1)
+        else:
+            jobNum_fb = jobNum
+        
         obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum_node)]
         obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum_edge)]
         obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
+        obj["goalVals"] = self.currentGeneration['goal'][self.getParamID(self.currentGeneration['goal'], jobNum_fb)]
         
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
@@ -584,6 +590,7 @@ class BrianJobMaster(NTRTJobMaster):
         self.currentGeneration['edge'] = {}
         self.currentGeneration['node'] = {}
         self.currentGeneration['feedback'] = {}
+        self.currentGeneration['goal'] = {}
         logFile = open('evoLog.txt', 'w') #Clear logfile
         logFile.close()
         
@@ -594,6 +601,7 @@ class BrianJobMaster(NTRTJobMaster):
             self.currentGeneration['edge'] = self.generationGenerator(self.currentGeneration['edge'], 'edgeVals')
             self.currentGeneration['node'] = self.generationGenerator(self.currentGeneration['node'], 'nodeVals')
             self.currentGeneration['feedback'] = self.generationGenerator(self.currentGeneration['feedback'], 'feedbackVals')
+            self.currentGeneration['goal'] = self.generationGenerator(self.currentGeneration['goal'], 'goalVals')
             
             # Iterate over the generation (change range..)
             for i in range(0, numTrials) :
@@ -627,15 +635,22 @@ class BrianJobMaster(NTRTJobMaster):
                 edgeKey = jobVals ['edgeVals']['paramID']
                 nodeKey = jobVals ['nodeVals']['paramID']
                 feedbackKey = jobVals ['feedbackVals']['paramID']
-               
+                goalKey = jobVals ['goalVals']['paramID']
+                
+                lParams = self.jConf['learningParams']
+                
                 # Iterate through all of the new scores for this file
                 for i in scores:
                     score = i['distance']
                     
-                    # TODO consider only appending when learning
-                    self.currentGeneration['edge'][edgeKey]['scores'].append(score)
-                    self.currentGeneration['node'][nodeKey]['scores'].append(score)
-                    self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+                    if (lParams['edgeVals']['learning']):
+                        self.currentGeneration['edge'][edgeKey]['scores'].append(score)
+                    if (lParams['nodeVals']['learning']):    
+                        self.currentGeneration['node'][nodeKey]['scores'].append(score)
+                    if (lParams['feedbackVals']['learning']):
+                        self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+                    if (lParams['goalVals']['learning']):
+                        self.currentGeneration['goal'][feedbackKey]['scores'].append(score)
                     totalScore += score
                     if score > maxScore:
                         maxScore = score

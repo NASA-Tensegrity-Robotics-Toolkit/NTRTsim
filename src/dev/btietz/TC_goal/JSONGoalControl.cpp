@@ -102,7 +102,9 @@ JSONGoalControl::JSONGoalControl(JSONGoalControl::Config config,
                                                 std::string args,
                                                 std::string resourcePath) :
 JSONCPGControl(config, args, resourcePath),
-m_config(config)
+m_config(config),
+nn(NULL),
+nn_goal(NULL)
 {
     // Path and filename handled by base class
     
@@ -110,7 +112,6 @@ m_config(config)
 
 JSONGoalControl::~JSONGoalControl()
 {
-    delete nn;
 }
 
 void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
@@ -141,6 +142,7 @@ void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
 
     setupCPGs(subject, nodeParams, edgeParams);
     
+    // TODO make a function that does this based on a NN pointer and a string
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
     
@@ -154,6 +156,20 @@ void JSONGoalControl::onSetup(BaseSpineModelLearning& subject)
     nn = new neuralNetwork(m_config.numStates, m_config.numHidden, m_config.numActions);
     
     nn->loadWeights(nnFile.c_str());
+    
+    Json::Value goalParams = root.get("goalVals", "UTF-8");
+    goalParams = goalParams.get("params", "UTF-8");
+    
+    // Setup neural network
+    m_config.goalStates = goalParams.get("numStates", "UTF-8").asInt();
+    m_config.goalActions = goalParams.get("numActions", "UTF-8").asInt();
+    m_config.goalHidden = goalParams.get("numHidden", "UTF-8").asInt();
+    
+    std::string nnFile_goal = controlFilePath + goalParams.get("neuralFilename", "UTF-8").asString();
+    
+    nn_goal = new neuralNetwork(m_config.goalStates, m_config.goalHidden, m_config.goalActions);
+    
+    nn_goal->loadWeights(nnFile_goal.c_str());
     
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
 #ifdef LOGGING // Conditional compile for data logging    
@@ -172,18 +188,29 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
-    #if (0)
-        std::vector<double> desComs = getFeedback(subject);
-    #else
-        const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
-        std::vector<double> desComs = getGoalFeedback(goalSubject);
-    #endif // Terrain feedback vs goal feedback
-#else 
-        std::size_t numControllers = subject.getNumberofMuslces() * 3;
-        
-        double descendingCommand = 0.0;
-        std::vector<double> desComs (numControllers, descendingCommand);
+#if (1) // Goal and cable
+
+    std::vector<double> desComs = getFeedback(subject);
+
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
+    std::vector<double> desComsSet2 = getGoalFeedback(goalSubject);
+    
+    std::size_t n = desComs.size();
+    assert(n == desComsSet2.size());
+    
+    for (std::size_t i = 0; i < n; i++)
+    {
+        desComs[i] += desComsSet2[i];
+    }
+    
+#elif (1) // Just goal
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
+    std::vector<double> desComs = getGoalFeedback(goalSubject);
+#else // Nothing
+    std::size_t numControllers = subject.getNumberofMuslces() * 3;
+    
+    double descendingCommand = 0.0;
+    std::vector<double> desComs (numControllers, descendingCommand);
 #endif       
         try
         {
@@ -302,6 +329,8 @@ void JSONGoalControl::onTeardown(BaseSpineModelLearning& subject)
     }
     m_allControllers.clear();
     
+    delete nn;
+    delete nn_goal;
 }
 
 void JSONGoalControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
@@ -408,7 +437,7 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     assert(state[0] >= -1.0 && state[0] <= 1.0);
     assert(state[1] >= -1.0 && state[1] <= 1.0);
     
-    double *inputs = new double[m_config.numStates];
+    double *inputs = new double[m_config.goalStates];
     
     // Don't scale! Sigmoid can handle the range
     for (std::size_t i = 0; i < state.size(); i++)
@@ -430,13 +459,13 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
 #endif      
     const int nSeg = subject->getSegments() - 1;
     
-    double *output = nn->feedForwardPattern(inputs);
+    double *output = nn_goal->feedForwardPattern(inputs);
     
     vector<double> actions;
     
     int m = subject->getSegments() - 1;
 #if (0)    
-    for(int j=0;j<m_config.numActions;j++)
+    for(int j=0;j<m_config.goalActions;j++)
     {
         std::cout << output[j] << " ";
     }
@@ -446,7 +475,7 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
     // Duplicate the actions across segments
     for (int i = 0; i != m; i++)
     {
-        for(int j=0;j<m_config.numActions;j++)
+        for(int j=0;j<m_config.goalActions;j++)
         {
             actions.push_back(output[j]);
         }
@@ -476,7 +505,7 @@ std::vector<double> JSONGoalControl::getFeedback(BaseSpineModelLearning& subject
         // Rescale to 0 to 1 (consider doing this inside getState
         for (std::size_t i = 0; i < state.size(); i++)
         {
-            inputs[i]=state[i] / 2.0 + 0.5;
+            inputs[i]=state[i];
         }
         
         double *output = nn->feedForwardPattern(inputs);
@@ -513,13 +542,11 @@ std::vector<double> JSONGoalControl::getCableState(const tgSpringCableActuator& 
 
 void JSONGoalControl::transformFeedbackActions(std::vector<double> & actions)
 {
-    const std::size_t numActions = m_config.numActions;
-
 #if (0) // Only true if actions are applied to all segments
     assert( actions.size() == numActions);
 #endif
     // Scale values back to -1 to +1
-    for( std::size_t i = 0; i < numActions; i++)
+    for( std::size_t i = 0; i < actions.size(); i++)
     {
         actions[i] = actions[i] * 2.0 - 1.0;
     }
