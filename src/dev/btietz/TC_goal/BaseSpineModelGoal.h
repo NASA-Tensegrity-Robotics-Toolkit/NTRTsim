@@ -16,19 +16,19 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef OCTAHEDRAL_COMPLEX_H
-#define OCTAHEDRAL_COMPLEX_H
+#ifndef BASE_SPINE_MODEL_GOAL_H
+#define BASE_SPINE_MODEL_GOAL_H
 
 /**
- * @file OctahedralComplex.h
- * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
+ * @file BaseSpineModelGoal.h
+ * @brief Implementing the tetrahedral complex spine inspired by Tom Flemons
  * @author Brian Mirletz
- * @date March 2015
+ * @date April 2015
  * @version 1.1.0
  * $Id$
  */
 
-#include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
+#include "examples/learningSpines/BaseSpineModelLearning.h" 
 
 #include "LinearMath/btVector3.h"
 
@@ -38,16 +38,16 @@ class tgBox;
 class tgSpringCableActuator;
 
 /**
- * This class implements the octahedral complex tensegrity spine
- * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
+ * An abstract base class providing the interface for classes that attempt
+ * goal directed locomtion
  */
-class OctahedralComplex : public BaseSpineModelGoal
+class BaseSpineModelGoal : public BaseSpineModelLearning
 {
 public: 
 
-    OctahedralComplex(int segments, double goalAngle);
+    BaseSpineModelGoal(int segments, double goalAngle);
 
-    virtual ~OctahedralComplex();
+    virtual ~BaseSpineModelGoal();
     
     virtual void setup(tgWorld& world);
     
@@ -55,15 +55,15 @@ public:
         
     virtual void step(double dt);
     
-    const std::vector<tgSpringCableActuator*>& getSaddleMuscles() const
-    {
-        return m_saddleMuscles;
-    }
+    btVector3 goalBoxPosition() const;
+    
     
 protected:
     
-    std::vector<tgSpringCableActuator*> m_saddleMuscles;
+    tgBox* m_goalBox;
     
+    double m_goalAngle;
+
 };
 
-#endif // FLEMONS_SPINE_MODEL_H
+#endif // BASE_SPINE_MODEL_GOAL_H

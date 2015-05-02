@@ -161,7 +161,7 @@ void SpineFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0)
+#if (1)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        
@@ -365,8 +365,17 @@ std::vector<double> SpineFeedbackControl::getFeedback(BaseSpineModelLearning& su
         std::vector<double> cableFeedback = transformFeedbackActions(actions);
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
+       
+#if (0)
+        for (std::size_t j = 0; j < cableFeedback.size(); j++)
+        {
+            std::cout << cableFeedback[j] << " ";
+        }
     }
-    
+    std::cout << std::endl;
+#else
+    }
+#endif
     
     return feedback;
 }

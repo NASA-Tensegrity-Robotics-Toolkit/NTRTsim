@@ -16,54 +16,47 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef OCTAHEDRAL_COMPLEX_H
-#define OCTAHEDRAL_COMPLEX_H
+#ifndef TETRA_SPINE_GOAL
+#define TETRA_SPINE_GOAL
 
 /**
- * @file OctahedralComplex.h
- * @brief Implementing the cross-linked octahedral complex spine inspired by Tom Flemons
+ * @file TetraSpineGoal.h
+ * @brief Middle segment of In Won's robot reconfigured with tgBulletContactSpringCable and more segments
  * @author Brian Mirletz
- * @date March 2015
+ * @date April 2015
  * @version 1.1.0
  * $Id$
  */
 
+// This library
 #include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 
-#include "LinearMath/btVector3.h"
-
+// Forward Declarations
 class tgWorld;
-class tgStructureInfo;
-class tgBox;
-class tgSpringCableActuator;
+
 
 /**
- * This class implements the octahedral complex tensegrity spine
- * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
+ * Basically the same structure as NestedStructureTestModel
+ * just with different parameters and learning capabilities.
+ * This is an simplification of the model used in the 2015 ICRA paper
  */
-class OctahedralComplex : public BaseSpineModelGoal
+class TetraSpineGoal: public BaseSpineModelGoal
 {
 public: 
 
-    OctahedralComplex(int segments, double goalAngle);
+    
+    TetraSpineGoal(size_t segments, double goalAngle, double scale);
 
-    virtual ~OctahedralComplex();
+    virtual ~TetraSpineGoal();
     
     virtual void setup(tgWorld& world);
     
     virtual void teardown();
-        
-    virtual void step(double dt);
     
-    const std::vector<tgSpringCableActuator*>& getSaddleMuscles() const
-    {
-        return m_saddleMuscles;
-    }
-    
-protected:
-    
-    std::vector<tgSpringCableActuator*> m_saddleMuscles;
-    
+    virtual void step(const double dt);
+
+    const double scaleFactor;
+
 };
 
-#endif // FLEMONS_SPINE_MODEL_H
+#endif

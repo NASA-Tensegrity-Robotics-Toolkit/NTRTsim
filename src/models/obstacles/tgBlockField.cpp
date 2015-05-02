@@ -98,7 +98,7 @@ m_config(config)
 {
     // Seed the random number generator
     /// @todo assess if doing this multiple times in a trial (here and evolution) causes problems
-    //srand(rdtsc());
+    srand(rdtsc());
 }
 
 tgBlockField::~tgBlockField() {}

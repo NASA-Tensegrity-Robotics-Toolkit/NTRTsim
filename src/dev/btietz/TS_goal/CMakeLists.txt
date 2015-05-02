@@ -17,10 +17,9 @@ link_libraries(GoalSpine
                 tgOpenGLSupport
                 boost_program_options)
 
-add_executable(AppMultiTerrainOC
-    OctahedralComplex.cpp
-    OctahedralGoalControl.cpp
-    AppMultiTerrain_OC.cpp
+add_executable(AppTSGoal
+    TetraSpineGoal.cpp
+    AppTSGoal.cpp
 )
 
-target_link_libraries(AppMultiTerrainOC ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)
+target_link_libraries(AppTSGoal ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)

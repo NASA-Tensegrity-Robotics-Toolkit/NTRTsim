@@ -17,25 +17,16 @@
 */
 
 /**
- * @file AppMultiTerrain_OC.cpp
+ * @file AppTSGoal.cpp
  * @brief Contains the definition of functions for multi-terrain app
  * @author Brian Mirletz, Alexander Xydes
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
-#include "AppMultiTerrain_OC.h"
+#include "AppTSGoal.h"
 
-//robot
-#include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
-
-// controller 
-#include "dev/CPG_feedback/SpineFeedbackControl.h"
-#include "dev/btietz/TC_goal/SpineGoalControl.h"
-#include "dev/btietz/multiTerrain_OC/OctahedralGoalControl.h"
-
-
-AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
+AppTSGoal::AppTSGoal(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -60,9 +51,10 @@ AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppMultiTerrain_OC::setup()
+bool AppTSGoal::setup()
 {
     // First create the world
+    const double scale = 100;
     world = createWorld();
 
     // Second create the view
@@ -76,22 +68,18 @@ bool AppMultiTerrain_OC::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    
-    // TODO properly add this to the header info and learning apparatus
-    double goalAngle = -M_PI / 2.0;
-    
     /// @todo add position and angle to configuration
-        OctahedralComplex* myModel =
-      new OctahedralComplex(nSegments, goalAngle);
+        TetraSpineGoal* myModel =
+      new TetraSpineGoal(nSegments, 0.0, scale);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-
+        
         const int segmentSpan = 3;
-        const int numMuscles = 4;
+        const int numMuscles = 6;
         const int numParams = 2;
-        const int segNumber = 0; // For learning results
+        const int segNumber = 5; // For learning results
         const double controlTime = .01;
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
@@ -99,7 +87,7 @@ bool AppMultiTerrain_OC::setup()
         const double highAmplitude = 300.0;
         const double kt = 0.0;
         const double kp = 1000.0;
-        const double kv = 210.0;
+        const double kv = 200.0;
         const bool def = true;
             
         // Overridden by def being true
@@ -115,11 +103,9 @@ bool AppMultiTerrain_OC::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
         const double tensionFeedback = 1000.0;
-
-        
-#if (1)
+#if (0) // Switch for .nnw or JSON based methods
         JSONGoalControl::Config control_config(segmentSpan, 
-                                                    numMuscles,
+                                                numMuscles,
                                                     numMuscles,
                                                     numParams, 
                                                     segNumber, 
@@ -145,10 +131,12 @@ bool AppMultiTerrain_OC::setup()
                                                     );
         
         /// @todo fix memory leak that occurs here
-        OctahedralGoalControl* const myControl =
-        new OctahedralGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
+        JSONGoalControl* const myControl =
+        new JSONGoalControl(control_config, suffix, "bmirletz/Tetra_Goal/");
+        
 #else
-        SpineFeedbackControl::Config control_config(segmentSpan, 
+
+        JSONFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -171,10 +159,12 @@ bool AppMultiTerrain_OC::setup()
                                                     afMax,
                                                     pfMin,
                                                     pfMax);
-        
-        SpineFeedbackControl* const myControl =
-        new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_6/");
+        /// @todo fix memory leak that occurs here
+       JSONFeedbackControl * const myControl =
+        new JSONFeedbackControl(control_config, suffix, "bmirletz/Tetra_Goal/");
+
 #endif
+        
         myModel->attach(myControl);
     }
 
@@ -191,7 +181,7 @@ bool AppMultiTerrain_OC::setup()
     return bSetup;
 }
 
-void AppMultiTerrain_OC::handleOptions(int argc, char **argv)
+void AppTSGoal::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -238,7 +228,7 @@ void AppMultiTerrain_OC::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppMultiTerrain_OC::getHillyConfig()
+const tgHillyGround::Config AppTSGoal::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -258,7 +248,7 @@ const tgHillyGround::Config AppMultiTerrain_OC::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppMultiTerrain_OC::getBoxConfig()
+const tgBoxGround::Config AppTSGoal::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -275,14 +265,14 @@ const tgBoxGround::Config AppMultiTerrain_OC::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppMultiTerrain_OC::getBlocks()
+tgModel* AppTSGoal::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppMultiTerrain_OC::createWorld()
+tgWorld* AppTSGoal::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -304,17 +294,17 @@ tgWorld* AppMultiTerrain_OC::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppMultiTerrain_OC::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppTSGoal::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppMultiTerrain_OC::createView(tgWorld *world)
+tgSimView *AppTSGoal::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppMultiTerrain_OC::run()
+bool AppTSGoal::run()
 {
     if (!bSetup)
     {
@@ -340,7 +330,7 @@ bool AppMultiTerrain_OC::run()
     return true;
 }
 
-void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
+void AppTSGoal::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -405,8 +395,8 @@ void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppMultiTerrain_OC" << std::endl;
-    AppMultiTerrain_OC app (argc, argv);
+    std::cout << "AppTSGoal" << std::endl;
+    AppTSGoal app (argc, argv);
 
     if (app.setup())
         app.run();

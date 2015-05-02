@@ -92,3 +92,27 @@ void tgSCASineControl::onStep(tgSpringCableActuator& subject, double dt)
 	}
 
 }
+
+void tgSCASineControl::updateTensionSetpoint(double newTension)
+{
+    if (newTension >= 0.0)
+    {
+        m_pMotorControl->setOffsetTension(newTension);
+    }
+    else
+    {
+        throw std::runtime_error("Tension setpoint is less than zero!");
+    }
+}
+
+void tgSCASineControl::updateControlLength(double newControlLength)
+{
+    if (newControlLength >= 0.0)
+    {
+       m_controlLength = newControlLength;
+    }
+    else
+    {
+        throw std::runtime_error("Length setpoint is less than zero!");
+    }
+}

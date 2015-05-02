@@ -49,8 +49,8 @@
 #include <map>
 #include <set>
 
-FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments) : 
-    BaseSpineModelLearning(segments) 
+FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments, double goalAngle) : 
+    BaseSpineModelGoal(segments, goalAngle) 
 {
 }
 
@@ -172,38 +172,10 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
     
-    // Create goal box in a new structure
-    double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 2.0 * 3.1415;
-    
-    double xPos = 300 * sin(randomAngle);
-    double zPos = 300 * cos(randomAngle);
-    
-    tgStructure goalBox;
-    
-    goalBox.addNode(xPos, 20.0, zPos);
-    goalBox.addNode(xPos + 5.0, 20.0, zPos);
-    
-    goalBox.addPair(0, 1, "goalBox");
-    
-    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
-    const tgBox::Config boxConfig(10.0, 10.0);
-
-    tgBuildSpec boxSpec;
-    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
-    
-    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
-    
-    goalStructureInfo.buildInto(*this, world);
-    
     // Setup vectors for control
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
      
     m_allSegments = this->find<tgModel> ("segment");
-    
-    // A little sloppy, but I'm pretty confident there is only one
-    m_goalBox = (find<tgBox>("goalBox"))[0];
-    
-    assert(m_goalBox != NULL);
     
 #if (0)
     // Debug printing
@@ -216,13 +188,13 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     children.clear();
     
     // Actually setup the children, notify controller
-    BaseSpineModelLearning::setup(world);
+    BaseSpineModelGoal::setup(world);
 }
 
 void FlemonsSpineModelGoal::teardown()
 {
     
-    BaseSpineModelLearning::teardown();
+    BaseSpineModelGoal::teardown();
       
 }
 
@@ -232,18 +204,5 @@ void FlemonsSpineModelGoal::step(double dt)
     * from the physics update
     */
     
-    BaseSpineModelLearning::step(dt);  // Step any children
-}
-
-btVector3 FlemonsSpineModelGoal::goalBoxPosition() const
-{
-    return m_goalBox->centerOfMass();
-}
-
-void FlemonsSpineModelGoal::mapSegmentMuscles()
-{
-    for (int i = 1; i < m_segments; i++)
-    {
-        m_segmentMuscles.push_back(find<tgSpringCableActuator> (tgString("seg", i)));
-    }
+    BaseSpineModelGoal::step(dt);  // Step any children
 }
