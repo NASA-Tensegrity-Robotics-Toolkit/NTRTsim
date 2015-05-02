@@ -104,12 +104,12 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
         //Return the first score to be recorded for this run
         //Defaults to displacement
         //Override to use your own
-        double getFirstScore(DuCTTRobotModel &subject);
+        virtual double getFirstScore(DuCTTRobotModel &subject);
 
         //Return the second score to be recorded for this run
         //Defaults to totalEnergySpent
         //Override to use your own
-        double getSecondScore(DuCTTRobotModel &subject);
+        virtual double getSecondScore(DuCTTRobotModel &subject);
 
         /** Returns amount of energy spent by each muscle in subject */
         double totalEnergySpent(DuCTTRobotModel& subject);

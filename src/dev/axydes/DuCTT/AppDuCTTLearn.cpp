@@ -26,6 +26,7 @@
 
 #include "AppDuCTTLearn.h"
 
+#include "core/terrain/tgBoxGround.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
 
 AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
@@ -247,7 +248,16 @@ tgWorld* AppDuCTTLearn::createWorld()
         981 // gravity, cm/sec^2
     );
 
-    return new tgWorld(config);
+    //create ground with higher friction to help with horiz plane test
+    tgBoxGround::Config groundConfig (
+        btVector3(0,0,0),
+        100,
+        0,
+        btVector3(1000,0.2,1000)
+    );
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    return new tgWorld(config, ground);
 }
 
 tgSimViewGraphics *AppDuCTTLearn::createGraphicsView(tgWorld *world)

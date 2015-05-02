@@ -33,6 +33,7 @@
 // The NTRT Core Libary
 #include "core/abstractMarker.h"
 #include "core/tgBasicActuator.h"
+#include "core/tgBulletUtil.h"
 #include "core/tgRod.h"
 #include "core/tgSphere.h"
 
@@ -399,23 +400,34 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
                                                     m_config.m_storeStringHist, m_config.m_maxStringForce, m_config.m_maxSaddleStringVel,
                                                     m_config.m_minStringRestLength, m_config.m_minStringRestLength, 0);
 
+    bool rotY = false;
+    btVector3 rotAxis = m_config.m_startRotAxis;
+    if (rotAxis == btVector3(1,1,0))
+    {
+        btDynamicsWorld& m_dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(world);
+        btVector3 newGrav = btVector3(-981,0,0);
+        m_dynamicsWorld.setGravity(newGrav);
+        rotAxis = btVector3(0,1,0);
+        m_config.m_startRotAngle = 45*SIMD_RADS_PER_DEG;
+    }
+
     btVector3 prismAxisBottom(0,0,1);
     btVector3 prismAxisTop(0,1,0);
 
-    prismAxisBottom = prismAxisBottom.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
-    prismAxisTop = prismAxisTop.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    prismAxisBottom = prismAxisBottom.rotate(rotAxis, m_config.m_startRotAngle);
+    prismAxisTop = prismAxisTop.rotate(rotAxis, m_config.m_startRotAngle);
 
     tgPrismatic::Config prismConfigBottom(prismAxisBottom, 0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
     tgPrismatic::Config prismConfigTop(prismAxisTop, M_PI/2.0, 0.1, m_config.m_prismExtent, 133.45, 0.01016, 0.0254);
 
-    if ((m_config.m_startRotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (45*SIMD_RADS_PER_DEG)) < 0.01)
+    if ((rotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (45*SIMD_RADS_PER_DEG)) < 0.01)
     {
         prismAxisBottom = btVector3(0,1,0);
         prismConfigBottom.m_axis = prismAxisBottom;
         prismConfigBottom.m_rotation = M_PI/4.0;
         prismConfigTop.m_rotation = 3.0*M_PI/4.0;
     }
-    else if ((m_config.m_startRotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (-45*SIMD_RADS_PER_DEG)) < 0.01)
+    else if ((rotAxis == btVector3(0,1,0)) && fabs(m_config.m_startRotAngle - (-45*SIMD_RADS_PER_DEG)) < 0.01)
     {
         prismAxisBottom = btVector3(0,1,0);
         prismConfigBottom.m_axis = prismAxisBottom;
@@ -437,9 +449,9 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     btVector3 hinge2Axis(1,0,0);
     btVector3 hinge3Axis(0,1,0);
 
-    hinge1Axis = hinge1Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
-//    hinge2Axis = hinge2Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
-//    hinge3Axis = hinge3Axis.rotate(m_config.m_startRotAxis, m_config.m_startRotAngle);
+    hinge1Axis = hinge1Axis.rotate(rotAxis, m_config.m_startRotAngle);
+//    hinge2Axis = hinge2Axis.rotate(rotAxis, m_config.m_startRotAngle);
+//    hinge3Axis = hinge3Axis.rotate(rotAxis, m_config.m_startRotAngle);
 
     const tgDuCTTHinge::Config hingeConfig(-SIMD_PI, SIMD_PI, hinge1Axis, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
     const tgDuCTTHinge::Config hingeConfig2(-SIMD_PI, SIMD_PI, hinge2Axis, false, 0.01, 20, 0.2, 0.9, 0.9, 0);
@@ -464,7 +476,7 @@ void DuCTTRobotModel::setupStructure(tgWorld &world)
     addMuscles(s, 20);
 
     // Move the structure so it doesn't start in the ground
-    s.addRotation(btVector3(0,0,0), m_config.m_startRotAxis, m_config.m_startRotAngle);
+    s.addRotation(btVector3(0,0,0), rotAxis, m_config.m_startRotAngle);
     s.move(m_config.m_startPos);
 
     // Create the build spec that uses tags to turn the structure into a real model
@@ -536,8 +548,13 @@ void DuCTTRobotModel::setupGhostStructure(tgWorld &world)
     addPairs(s,20);
 
     // Move the structure so it doesn't start in the ground
+    btVector3 rotAxis = m_config.m_startRotAxis;
+    if (rotAxis == btVector3(1,1,0))
+    {
+        rotAxis = btVector3(0,1,0);
+    }
     s.move(m_config.m_startPos);
-    s.addRotation(m_config.m_startPos, m_config.m_startRotAxis, m_config.m_startRotAngle);
+    s.addRotation(m_config.m_startPos, rotAxis, m_config.m_startRotAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;

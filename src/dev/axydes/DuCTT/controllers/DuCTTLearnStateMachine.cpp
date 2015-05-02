@@ -78,7 +78,10 @@ DuCTTLearnStateMachine::DuCTTLearnStateMachine(const double initialLength,
     m_dHistorisisSeconds(0.5),
     m_bBottomPaused(false),
     m_bTopPaused(false),
-    state(EXPAND_BOTTOM)
+    state(EXPAND_BOTTOM),
+    m_dMaxInstaSpeed(0.0),
+    m_dMinInstaSpeed(9999999),
+    m_dOldCOM(-1,-1,-1)
 {
     prisms.resize(nPrisms);
     clusters.resize(nClusters);
@@ -123,7 +126,7 @@ void DuCTTLearnStateMachine::stepBeforeStart(DuCTTRobotModel& subject, double dt
 {
 }
 
-void DuCTTLearnStateMachine::stepBeforeMove(DuCTTRobotModel& subject, double dt)
+void DuCTTLearnStateMachine::checkForTilting(DuCTTRobotModel& subject)
 {
     btVector3 bottomCOM = subject.getTetraCOM();
     btVector3 topCOM = subject.getTetraCOM(false);
@@ -142,6 +145,35 @@ void DuCTTLearnStateMachine::stepBeforeMove(DuCTTRobotModel& subject, double dt)
         {
             m_bTilting = true;
         }
+    }
+}
+
+double DuCTTLearnStateMachine::getSpeed(DuCTTRobotModel& subject, double dt)
+{
+    btVector3 newCOM = subject.getCOM();
+
+    double speed = (newCOM.distance(m_dOldCOM)) / dt;
+    m_dOldCOM = newCOM;
+
+    return speed;
+}
+
+void DuCTTLearnStateMachine::stepBeforeMove(DuCTTRobotModel& subject, double dt)
+{
+    checkForTilting(subject);
+
+    if (m_dOldCOM.x() != -1)
+    {
+        double instaSpeed = getSpeed(subject, dt);
+
+        if (instaSpeed > m_dMaxInstaSpeed)
+            m_dMaxInstaSpeed = instaSpeed;
+        if (instaSpeed < m_dMinInstaSpeed)
+            m_dMinInstaSpeed = instaSpeed;
+    }
+    else
+    {
+        m_dOldCOM = subject.getCOM();
     }
 
 //    std::cerr << "State: " << state << std::endl;
@@ -228,6 +260,35 @@ void DuCTTLearnStateMachine::teardownEnd(DuCTTRobotModel& subject)
 {
     // If any of subject's dynamic objects need to be freed, this is the place to do so
     state = EXPAND_BOTTOM;
+    m_dMaxInstaSpeed=0.0;
+    m_dMinInstaSpeed=9999999;
+}
+
+double DuCTTLearnStateMachine::getFirstScore(DuCTTRobotModel& subject)
+{
+//    return getCoT(subject);
+    return getCoIS(subject);
+}
+
+double DuCTTLearnStateMachine::getSecondScore(DuCTTRobotModel& subject)
+{
+    return displacement(subject);
+}
+
+//Return cost of transport = work/(mass*grav*dist)
+//work=sum of (tension*dist shortened), ie totalEnergySpent
+double DuCTTLearnStateMachine::getCoT(DuCTTRobotModel& subject)
+{
+    return totalEnergySpent(subject) / (subject.mass() * 981 * displacement(subject));
+}
+
+//return cost of instaspeed vs avg speed
+double DuCTTLearnStateMachine::getCoIS(DuCTTRobotModel& subject)
+{
+    double avgSpeed = displacement(subject) / (m_totalTime-3);
+    double instaDiff = (m_dMaxInstaSpeed - m_dMinInstaSpeed);
+
+    return avgSpeed + (1 / (instaDiff + 1));
 }
 
 /** 

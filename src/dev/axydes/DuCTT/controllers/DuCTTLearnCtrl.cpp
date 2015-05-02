@@ -200,7 +200,7 @@ vector< vector <double> > DuCTTLearnCtrl::transformActions(vector< vector <doubl
                                0
                              };
 
-    // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+    // Maximum amplitude, phaseChange, and dcOffset
     double maxes[N_PARAMS] = {40, //m_initialLengths * (pretension + maxStringLengthFactor), //amplitude
                                M_PI, //phase change
                                40
@@ -253,7 +253,6 @@ void DuCTTLearnCtrl::applyActions(DuCTTRobotModel& subject, vector< vector <doub
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
 void DuCTTLearnCtrl::setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt) {
-    double phase = 0; // Phase of cluster1
     const double minLength = 1.2;//m_initialLengths * (1-maxStringLengthFactor);
     const double maxLength = 10;//m_initialLengths * (1+maxStringLengthFactor);
 
@@ -262,7 +261,7 @@ void DuCTTLearnCtrl::setPreferredMuscleLengths(DuCTTRobotModel& subject, double 
             tgBasicActuator *const pMuscle = clusters[cluster][node];
             assert(pMuscle != NULL);
 
-            double newVelocity = amplitude[cluster] * sin(angularFrequency * m_totalTime + phase) + dcOffset[cluster];
+            double newVelocity = amplitude[cluster] * sin(angularFrequency * m_totalTime + phaseChange[cluster]) + dcOffset[cluster];
 //            if (newVelocity <= minLength) {
 //                newVelocity = minLength;
 //            } else if (newVelocity >= maxLength) {
@@ -270,7 +269,6 @@ void DuCTTLearnCtrl::setPreferredMuscleLengths(DuCTTRobotModel& subject, double 
 //            }
             imp_controller->control(*pMuscle, dt, m_initialLength, newVelocity);
         }
-        phase += phaseChange[cluster];
     }
 }
 
@@ -279,7 +277,6 @@ void DuCTTLearnCtrl::setPreferredMuscleLengths(DuCTTRobotModel& subject, double 
 //TODO: saturation of sin wave by touch sensors
 //TODO: 'locking' of prismatics?
 void DuCTTLearnCtrl::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
-    double phase = 0; // Phase of cluster1
 
     for(int prism=0; prism<nPrisms; prism++) {
         size_t idx = prism + clusters.size()-1;
@@ -288,7 +285,7 @@ void DuCTTLearnCtrl::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
 
         if (m_bIgnoreTouchSensors || !isLocked(subject, isTop))
         {
-            double newLength = amplitude[idx] * sin(angularFrequency * m_totalTime + phase) + dcOffset[idx];
+            double newLength = amplitude[idx] * sin(angularFrequency * m_totalTime + phaseChange[idx]) + dcOffset[idx];
             pPrism->setPreferredLength(newLength);
 //            std::cerr << "Prism is top: " << isTop << ", newLength: " << newLength;
 //            fprintf(stderr, ", amp: %f, freq: %f, phase: %f, offset: %f\n", amplitude[idx], angularFrequency[idx], phase, dcOffset[idx]);
@@ -297,7 +294,6 @@ void DuCTTLearnCtrl::setPrismaticLengths(DuCTTRobotModel& subject, double dt) {
         {
         }
 
-        phase += phaseChange[idx];
     }
 }
 
