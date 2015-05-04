@@ -655,7 +655,7 @@ class BrianJobMaster(NTRTJobMaster):
                     if score > maxScore:
                         maxScore = score
             
-            avgScore = totalScore / float(len(completedJobs))
+            avgScore = totalScore / float(len(completedJobs) * len(self.jConf['terrain']) )
             logFile = open('evoLog.txt', 'a') 
             logFile.write(str((n+1) * numTrials) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
             logFile.close()

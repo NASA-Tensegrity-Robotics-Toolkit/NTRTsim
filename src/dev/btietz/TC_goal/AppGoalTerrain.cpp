@@ -69,7 +69,7 @@ bool AppGoalTerrain::setup()
     // simulation
     /// @todo Generalize angle code
         FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments, 0.0);
+      new FlemonsSpineModelGoal(nSegments, M_PI);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
@@ -236,8 +236,8 @@ const tgHillyGround::Config AppGoalTerrain::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 180;
-    size_t ny = 180;
+    size_t nx = 240;
+    size_t ny = 240;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;
