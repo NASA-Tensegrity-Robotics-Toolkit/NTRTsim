@@ -36,10 +36,16 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
     numFiles = int(sys.argv[2])
-    
+    if len(sys.argv) == 4:
+        numScore = int(sys.argv[3])
+    else:
+        numScore = 1
+        
     scoreSum = 0
     fileSum = 0
     maxScore = 0
+    topScore = []
+    topParam = []
     
     paramList = []
     
@@ -49,9 +55,10 @@ if __name__ == "__main__":
         obj = json.load(fin)
         fin.close()
         try: 
-            paramID = obj['goalVals']['paramID']
+            paramID = obj['edgeVals']['paramID']
             if (paramList.count(paramID) == 0):
-                thisScore = float(obj['goalVals']['avgScore'])
+                # Use this for processing monteCarlo
+                thisScore = float(obj['scores'][2]['distance'])
                 fileSum += 1
                 paramList.append(paramID)
             else:
@@ -60,8 +67,21 @@ if __name__ == "__main__":
             thisScore =  0
         
         if(thisScore > maxScore):
-            topScore = i
-            maxScore = thisScore
+            j = min([numScore, len(topScore)])
+            # Sort into position
+            while j > 0:
+                if thisScore > topScore[j - 1]:
+                    j -= 1
+                else:
+                    break
+            
+            topScore.insert(j, thisScore)
+            topParam.insert(j, i)
+            
+            if (len(topScore) > numScore):
+                maxScore = topScore[numScore - 1]
+                topScore.pop(numScore)
+                topParam.pop(numScore)
             topObj = obj
         
         scoreSum += thisScore
@@ -69,6 +89,7 @@ if __name__ == "__main__":
     print(maxScore)
     print(scoreSum / fileSum)
     print(topScore)
+    print(topParam)
     
     # Now average the scores of the top object
     

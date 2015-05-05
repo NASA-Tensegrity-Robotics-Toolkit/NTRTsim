@@ -155,6 +155,11 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     nn->loadWeights(nnFile.c_str());
     
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
+    for (int i = 0; i < initConditions.size(); i++)
+    {
+        std::cout << initConditions[i] << " ";
+    }
+    std::cout << std::endl;
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif    
