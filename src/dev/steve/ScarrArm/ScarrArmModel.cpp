@@ -121,7 +121,7 @@ ScarrArmModel::~ScarrArmModel()
 void ScarrArmModel::addNodes(tgStructure& s)
 {
     const double scale = 0.1;
-    const size_t nNodes = 11;
+    const size_t nNodes = 11 + 2; //2 for massless rod
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -149,6 +149,10 @@ void ScarrArmModel::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(a/2 + sigma, 0, -ulna_diameter));
     nodePositions.push_back(btVector3(a/2 + sigma + e, 0, -ulna_diameter));
 
+    //Massless rod
+    nodePositions.push_back(btVector3(0, f, c+1));
+    nodePositions.push_back(btVector3(0, -f, c+1));
+
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
     }
@@ -156,7 +160,6 @@ void ScarrArmModel::addNodes(tgStructure& s)
 
 void ScarrArmModel::addRods(tgStructure& s)
 {
-    s.addPair(5,  6,  "massless rod");
     s.addPair(5,  6,  "rod");
     s.addPair(3,  5,  "rod");
     s.addPair(4,  5,  "rod");
@@ -166,6 +169,7 @@ void ScarrArmModel::addRods(tgStructure& s)
     s.addPair(1,  2,  "rod");
 
     s.addPair(9, 10,  "rod"); 
+    s.addPair(11, 12, "massless rod");
 }
 
 /*
@@ -199,13 +203,17 @@ void ScarrArmModel::addMuscles(tgStructure& s)
     //s.addPair(7, 8, "muscle"); 
     s.addPair(6, 8, "muscle"); 
     s.addPair(8, 10, "muscle"); 
+
+    //Muscles to massless rod
+    s.addPair(6, 11, "muscle"); 
+    s.addPair(6, 12, "muscle"); 
 }
 
 void ScarrArmModel::setup(tgWorld& world)
 {
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
-    const tgRod::Config rodConfigMassless(c.radius, 0.001/*c.density*/, c.friction, c.rollFriction, c.restitution); //TODO: Fix
+    const tgRod::Config rodConfigMassless(c.radius, 0/*c.density*/, c.friction, c.rollFriction, c.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, c.maxTens, c.targetVelocity);
             
