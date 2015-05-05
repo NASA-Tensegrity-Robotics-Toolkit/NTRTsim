@@ -18,7 +18,8 @@
 
 /**
  * @file ScarrArmModel.cpp
- * @brief Contains the implementation of class ScarrArmModel.
+ * @brief Contains the implementation of class ScarrArmModel. 
+ * Measurements are scaled to average adult male
  * $Id$
  */
 
@@ -119,27 +120,19 @@ ScarrArmModel::~ScarrArmModel()
 
 void ScarrArmModel::addNodes(tgStructure& s)
 {
-    /*const double a = 22; //2.2cm
-    const double b = 265;
-    const double c = 334;
-    const double d = 66;
-    const double e = 246;
-    const double f = 25;
-    const double g = 17;
-    const double sigma = 5; //TODO: tinker
-    const double ulna_diameter = g*2; //TODO: tinker
-    const double x = a/2;
-    const double z = c/2;
-     */
-
-    const double a = 2.2 * 5; //0.22cm
-    const double b = 26.5 * 5;
-    const double c = 33.4 * 5;
-    const double d = 6.6 * 5;
-    const double e = 24.6 * 5;
-    const double f = 2.5 * 5;
-    const double g = 1.7 * 5;
-    const double sigma = 2.0; //TODO: tinker
+    const double scale = 0.1;
+    const size_t nNodes = 11;
+    
+    // Average Adult Male Measurements with scale
+    // Lengths are in mm
+    const double a = 22 * scale; //2.2cm
+    const double b = 265 * scale;
+    const double c = 334 * scale;
+    const double d = 66 * scale;
+    const double e = 246 * scale;
+    const double f = 25 * scale;
+    const double g = 17 * scale;
+    const double sigma = 1; //TODO: tinker
     const double ulna_diameter = g*2; //TODO: tinker
     const double x = a/2;
     const double z = c/2;
@@ -152,23 +145,26 @@ void ScarrArmModel::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(0, 0, d));
     nodePositions.push_back(btVector3(0, 0, c));
     nodePositions.push_back(btVector3(x, 0, z));
-    nodePositions.push_back(btVector3(b-a/2, 0, 0));
+    nodePositions.push_back(btVector3(b+a/2, 0, 0));
     nodePositions.push_back(btVector3(a/2 + sigma, 0, -ulna_diameter));
     nodePositions.push_back(btVector3(a/2 + sigma + e, 0, -ulna_diameter));
 
-    for(int i=0;i<11;i++) {
+    for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
     }
 }
 
 void ScarrArmModel::addRods(tgStructure& s)
 {
+    s.addPair(5,  6,  "massless rod");
+    s.addPair(5,  6,  "rod");
+    s.addPair(3,  5,  "rod");
+    s.addPair(4,  5,  "rod");
+
     s.addPair(0,  1,  "rod");
     s.addPair(0,  8,  "rod");
     s.addPair(1,  2,  "rod");
-    s.addPair(3,  5,  "rod");
-    s.addPair(4,  5,  "rod");
-    s.addPair(5,  6,  "rod");
+
     s.addPair(9, 10,  "rod"); 
 }
 
@@ -208,11 +204,10 @@ void ScarrArmModel::addMuscles(tgStructure& s)
 void ScarrArmModel::setup(tgWorld& world)
 {
 
-    const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
-				c.rollFriction, c.restitution);
+    const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
+    const tgRod::Config rodConfigMassless(c.radius, 0.001/*c.density*/, c.friction, c.rollFriction, c.restitution); //TODO: Fix
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
-					    c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -229,6 +224,7 @@ void ScarrArmModel::setup(tgWorld& world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
+    spec.addBuilder("massless rod", new tgRodInfo(rodConfigMassless));
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
@@ -251,8 +247,9 @@ void ScarrArmModel::setup(tgWorld& world)
     //map the rods and add the markers to them
     //addMarkers(s);
 
-    btVector3 location(0,20.0,0);
-    btVector3 rotation(M_PI/2,0,0);
+    btVector3 location(0,10.0,0);
+    //btVector3 rotation(M_PI/2,0,0);
+    btVector3 rotation(0,0,0);
   	btVector3 speed(0,0,0);
     this->moveModel(location,rotation,speed);
 }
