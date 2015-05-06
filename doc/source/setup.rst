@@ -15,7 +15,7 @@ Currently the NTRT OS X build does not work, and Windows is not supported. If yo
 For now, here is how to install it and get it going...
  
 1) Install VirtualBox on your computer. https://www.virtualbox.org/. Theoretically you could use whatever virtualization program you wanted, but virtualbox is easy to learn.
-2) Download the .ova file: http://storage.perryb.ca/ntrt/ntrt_vb_1-1.ova
+2) Download the .ova file: http://ntrt.perryb.ca/storage/vm/ntrt_vb_1-1.ova 
 3) Open Virtualbox. "File -> Import Appliance" and select the .ova file.
 4) Adjust the number of processors, RAM, and video memory you'd like to allocate to the guest. I'd suggest 2 processors, 4GB of RAM, and max out the video memory. If your computer is a bit slower, you might be able to get away with one one processor and down to 2 or 3GB of RAM.
 5) Once it's done importing, click on "Settings" to confirm things are OK. If you see an error in the bottom of the Settings window that says "Invalid Settings Detected," change your settings according to the error's recommendation.
