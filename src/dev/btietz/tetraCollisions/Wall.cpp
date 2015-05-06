@@ -124,7 +124,7 @@ void Wall::addNodes(tgStructure& s) {
 
     addBoxNodes();
     
-    for(int i=0;i<nodes.size();i+=2) {
+    for(std::size_t i=0;i<nodes.size();i+=2) {
         s.addNode(nodes[i]);
         s.addNode(nodes[i+1]);
         

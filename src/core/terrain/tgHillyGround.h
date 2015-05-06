@@ -102,8 +102,8 @@ class tgHillyGround : public tgBulletGround
          */
         tgHillyGround(const tgHillyGround::Config& config);
 
-        /** Clean up the implementation. The base class holds nothing. */
-        virtual ~tgHillyGround() { }
+        /** Clean up the implementation. Deletes m_pMesh */
+        virtual ~tgHillyGround();
 
         /**
          * Setup and return a return a rigid body based on the collision 
@@ -140,6 +140,11 @@ class tgHillyGround : public tgBulletGround
          * @param[out] A flattened array of indices in the mesh
          */
         void setIndices(int indices[]);
+        
+        // Store this so we can delete it later
+        btTriangleIndexVertexArray* m_pMesh;
+        btVector3 * m_vertices;
+        int * m_pIndices;
 
 };
 

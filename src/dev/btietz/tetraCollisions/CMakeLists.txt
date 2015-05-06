@@ -15,6 +15,8 @@ link_libraries(tetraSpineLearningSine
                 tgOpenGLSupport)
 
 add_executable(AppTetraSpineCol
+    tscDataLogger.cpp
+    tscDataObserver.cpp
 	TetraSpineCollisions.cpp
 	colSpineSine.cpp
 	Wall.cpp

@@ -201,9 +201,9 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         else if (allMuscles[i]->hasTag("outer"))
         {
 			tension = 500.0;
-            kPosition = 300.0;
+            kPosition = 100.0;
             kVelocity = 100.0;
-            controlLength = 19.0 ;
+            controlLength = 19.0;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("out_bottom_amp_a", "UTF-8").asDouble();

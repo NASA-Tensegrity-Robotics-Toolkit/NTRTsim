@@ -17,13 +17,14 @@
  */
 
 /**
- * @file tgCraterDeep.cpp
- * @brief Contains the implementation of class tgCraterDeep.
+ * @file tgCraterShallow.cpp
+ * @brief Contains the implementation of class tgCraterShallow.
+ * This tgCraterShallow is four shallow boxes that encircle the origin.
  * $Id$
  */
 
 // This module
-#include "tgCraterDeep.h"
+#include "tgCraterShallow.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -50,8 +51,8 @@ namespace
         double restitution;
     } c =
     {
-        15.0, // width (dm?)
-        15.0, // height (dm?)
+        10.0, // width (dm?)
+        10.0, // height (dm?)
         0.0,  // density (kg / length^3)
         1.0,  // friction (unitless)
         0.01, // rollFriction (unitless)
@@ -59,22 +60,17 @@ namespace
     };
 } // namespace
 
-tgCraterDeep::tgCraterDeep() : tgModel() 
-{
+tgCraterShallow::tgCraterShallow() : tgModel() {
     origin = btVector3(0,0,0);
 }
 
-tgCraterDeep::tgCraterDeep(btVector3 center) : tgModel() 
-{
+tgCraterShallow::tgCraterShallow(btVector3 center) : tgModel() {
     origin = btVector3(center.getX(), center.getY(), center.getZ());
 }
 
-tgCraterDeep::~tgCraterDeep()
-{
-}
+tgCraterShallow::~tgCraterShallow() {}
                      
-void tgCraterDeep::setup(tgWorld& world) {
-
+void tgCraterShallow::setup(tgWorld& world) {
     const tgBox::Config boxConfig(c.width, c.height, c.density, c.friction, c.rollFriction, c.restitution);
 
     // Start creating the structure
@@ -98,7 +94,7 @@ void tgCraterDeep::setup(tgWorld& world) {
     tgModel::setup(world);
 }
 
-void tgCraterDeep::step(double dt) {
+void tgCraterShallow::step(double dt) {
     // Precondition
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
@@ -109,20 +105,21 @@ void tgCraterDeep::step(double dt) {
     }
 }
 
-void tgCraterDeep::onVisit(tgModelVisitor& r) {
+void tgCraterShallow::onVisit(tgModelVisitor& r) {
     tgModel::onVisit(r);
 }
 
-void tgCraterDeep::teardown() {
-    nodes.clear();
+void tgCraterShallow::teardown() {
     notifyTeardown();
     tgModel::teardown();
 } 
 
 // Nodes: center points of opposing faces of rectangles
-void tgCraterDeep::addNodes(tgStructure& s) {
+void tgCraterShallow::addNodes(tgStructure& s) {
+    
+#if (0)    
     const int nBoxes = 4; 
-
+#endif // Supress compiler warning unused variable
     // Accumulating rotation on boxes
     btVector3 rotationPoint = origin;
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
@@ -133,7 +130,7 @@ void tgCraterDeep::addNodes(tgStructure& s) {
     addBoxNodes();
     addBoxNodes();
     
-    for(int i=0;i<nodes.size();i+=2) {
+    for(std::size_t i=0;i<nodes.size();i+=2) {
         s.addNode(nodes[i]);
         s.addNode(nodes[i+1]);
         s.addRotation(rotationPoint, rotationAxis, rotationAngle);
@@ -142,19 +139,23 @@ void tgCraterDeep::addNodes(tgStructure& s) {
     s.move(btVector3(0, -5, 0)); // Sink boxes into the ground
 }
 
-void tgCraterDeep::addBoxNodes() {
+void tgCraterShallow::addBoxNodes() {
     tgNode node;
+    const double shift = 20; // Arbitrary
+    const double vshift = 2; 
+    const double node_h = c.height/2 + vshift;
+    const double node_w = c.width/2; 
     
-    double x1 = 20; // Smaller x values leads to a narrower crater
-    double x2 = 20;
-    double y1 = -10;
-    double y2 = 25;
-    double z1 = 0;
-    double z2 = 0;
+    double x1 = -shift-node_w;
+    double x2 =  shift+node_w;
+    double y1 = -node_h;
+    double y2 =  node_h;
+    double z1 = -shift-node_w;
+    double z2 =  shift+node_w;
 
     btVector3 rotationPoint = btVector3((x2-x1)/2, (y2-y1)/2, (z2-z1)/2); //Halfway between nodes
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-    double rotationAngle = 0; // Must != 0 for actual change
+    double rotationAngle = M_PI/4;
 
     node = tgNode(x1, y1, z1, "node");
     node.addRotation(rotationPoint, rotationAxis, rotationAngle);

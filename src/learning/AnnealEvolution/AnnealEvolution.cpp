@@ -58,6 +58,7 @@ suffix(suff),
 Temp(1.0)
 {
     currentTest=0;
+    subTests = 0;
     generationNumber=0;
 	
 	if (path != "")
@@ -76,6 +77,7 @@ Temp(1.0)
     populationSize=myconfigdataaa.getintvalue("populationSize");
     numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
     numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
+    numberOfSubtests=myconfigdataaa.getintvalue("numberOfSubtests");
     numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
     leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
     coevolution=myconfigdataaa.getintvalue("coevolution");
@@ -216,7 +218,14 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
 //      cout<<"selected: "<<selectedOne<<endl;
         selectedControllers.push_back(populations.at(i)->getMember(selectedOne));
     }
-    currentTest++;
+    
+    subTests++;
+    
+    if (subTests == numberOfSubtests)
+    {
+        currentTest++;
+        subTests = 0;
+    }
 //  cout<<"currentTest:"<<currentTest<<endl;
 
     return selectedControllers;

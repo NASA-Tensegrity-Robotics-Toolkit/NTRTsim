@@ -32,6 +32,7 @@
 
 // Forward declarations
 class tgSpringCableActuator;
+class tgBasicActuator;
 class tgModel;
 class tgRod;
 
@@ -56,6 +57,7 @@ public:
     virtual void render(const tgSpringCableActuator& mSCA) const;
     
     virtual void render(const tgModel& model) const;
+
 private:
     
     std::string m_fileName;

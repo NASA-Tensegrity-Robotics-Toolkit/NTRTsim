@@ -75,6 +75,7 @@ suffix(suff)
     numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
 	numberOfChildren=myconfigdataaa.getintvalue("numberOfChildren");
 	numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
+    numberOfSubtests=myconfigdataaa.getintvalue("numberOfSubtests");
 	numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
 	leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
 	coevolution=myconfigdataaa.getintvalue("coevolution");
@@ -230,7 +231,13 @@ vector <NeuroEvoMember *> NeuroEvolution::nextSetOfControllers()
 //		cout<<"selected: "<<selectedOne<<endl;
 		selectedControllers.push_back(populations.at(i)->getMember(selectedOne));
 	}
-	currentTest++;
+    subTests++;
+    
+    if (subTests == numberOfSubtests)
+    {
+        currentTest++;
+        subTests = 0;
+    }
 //	cout<<"currentTest:"<<currentTest<<endl;
 
 	return selectedControllers;
