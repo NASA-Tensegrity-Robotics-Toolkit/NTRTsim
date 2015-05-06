@@ -29,6 +29,8 @@
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
 
+#include "helpers/FileHelpers.h"
+
 AppDuCTTLearn::AppDuCTTLearn(int argc, char** argv)
 {
     bSetup = false;
@@ -240,6 +242,24 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
     {
         use_manual_params = true;
     }
+
+    //open file, save command line arguments
+    if (!resource_path.empty())
+    {
+        string tempPath = FileHelpers::getResourcePath(resource_path);
+        string tempFileName = tempPath + "/logs/cli.txt";
+
+        std::stringstream ss;
+        for (int i=0; i<argc; i++)
+        {
+            ss << argv[i] << " ";
+        }
+
+        ofstream myfile;
+        myfile.open(tempFileName.c_str());
+        myfile << ss.str() << "\n";
+        myfile.close();
+    }
 }
 
 tgWorld* AppDuCTTLearn::createWorld()
@@ -317,6 +337,7 @@ void AppDuCTTLearn::simulate(tgSimulation *simulation)
 int main(int argc, char** argv)
 {
     std::cout << "AppDuCTTLearn" << std::endl;
+
     AppDuCTTLearn app (argc, argv);
 
     if (app.setup())

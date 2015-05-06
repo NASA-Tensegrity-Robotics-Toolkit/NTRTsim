@@ -172,6 +172,11 @@ def mainFunc(inFile, trialFolder, suffix):
     shutil.copy2(paramFile,newParamFile)
     #shutil.move(paramFile,newParamFile)
 
+    # Move command line arguments file
+    cliFile=inFilePath+'/cli.txt'.format(suffix)
+    newCLIFile=folder+'/cli.txt'.format(suffix)
+    shutil.copy2(cliFile,newCLIFile)
+
     #Do the actual parameter generation
     sortFile(scoreFile, sortedFile)
     # shutil.copy2(sortedFile,noOutsFile)
