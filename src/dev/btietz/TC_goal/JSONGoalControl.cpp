@@ -188,7 +188,7 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1) // Goal and cable
+#if (0) // Goal and cable
 
     std::vector<double> desComs = getFeedback(subject);
 
@@ -419,51 +419,43 @@ array_2D JSONGoalControl::scaleNodeActions (Json::Value actions)
 
 std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* subject)
 {
+    const int nSeg = subject->getSegments() - 1;
+    
+    // Only one segment has no actuators, and means we can't get heading.
+    assert(nSeg > 0);
+    
     // Get heading and generate feedback vector
-    std::vector<double> currentPosition = subject->getSegmentCOM(m_config.segmentNumber);
+    const btVector3 currentPosVector = subject->getSegmentCOMVector(m_config.segmentNumber);
     
-    assert(currentPosition.size() == 3);
-    
-    btVector3 currentPosVector(currentPosition[0], currentPosition[1], currentPosition[2]);
-    
-    btVector3 goalPosition = subject->goalBoxPosition();
+    const btVector3 goalPosition = subject->goalBoxPosition();
     
     btVector3 desiredHeading = (goalPosition - currentPosVector).normalize();
+    
+    // Get current orientation
+    /// @TODO should this be configurable?
+    const btVector3 firstSegment = subject->getSegmentCOMVector(0);
+    const btVector3 secondSegment = subject->getSegmentCOMVector(1);
+    
+    btVector3 currentHeading = (firstSegment - secondSegment).normalize();
     
     std::vector<double> state;
     state.push_back(desiredHeading.getX());
     state.push_back(desiredHeading.getZ());
-    
-    assert(state[0] >= -1.0 && state[0] <= 1.0);
-    assert(state[1] >= -1.0 && state[1] <= 1.0);
+    state.push_back(currentHeading.getX());
+    state.push_back(currentHeading.getZ());
     
     double *inputs = new double[m_config.goalStates];
-    
-    // Don't scale! Sigmoid can handle the range
     for (std::size_t i = 0; i < state.size(); i++)
     {
-#if (1)
+        assert(state[i] >= -1.0 && state[i] <= 1.0);
+        // Don't scale! Sigmoid can handle this range
         inputs[i]=state[i];
-#else
-        inputs[i]=state[i]/ 2.0 + 0.5;
-#endif
-#if (0)
-        std::cout << inputs[i] << " ";
-      
     }
-    
-    std::cout << std::endl;
-#else
-    }
-    
-#endif      
-    const int nSeg = subject->getSegments() - 1;
-    
+        
     double *output = nn_goal->feedForwardPattern(inputs);
     
     vector<double> actions;
     
-    int m = subject->getSegments() - 1;
 #if (0)    
     for(int j=0;j<m_config.goalActions;j++)
     {
@@ -473,7 +465,7 @@ std::vector<double> JSONGoalControl::getGoalFeedback(const BaseSpineModelGoal* s
 #endif
     
     // Duplicate the actions across segments
-    for (int i = 0; i != m; i++)
+    for (int i = 0; i != nSeg; i++)
     {
         for(int j=0;j<m_config.goalActions;j++)
         {
