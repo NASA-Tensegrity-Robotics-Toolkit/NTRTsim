@@ -39,4 +39,4 @@ BOOST_PACKAGE_DIR="$BOOST_BUILD_DIR"
 
 # BOOST_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/boost.tgz or file:///path/to/boost.tgz
-BOOST_URL="http://storage.perryb.ca/ntrt/dependencies/boost_1_53_0.tar.gz"
+BOOST_URL="http://ntrt.perryb.ca/dependencies/boost_1_53_0.tar.gz"
