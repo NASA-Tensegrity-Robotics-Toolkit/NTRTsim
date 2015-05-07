@@ -82,6 +82,7 @@ then sorted out with Python scripts. These scripts can either generate another c
 
 Our new (as of April 2015) multi-process learning script (scripts/NTRTJobMaster.py) uses JSON to interface with NTRT.
 In order to use this you need to provide a JSON interface to your controller, and write a specification file.
+Your controller must write the score back to the JSON file.
 Your App must also support boost command line options.
 The specification file fills the role of Config.ini, and has parameters as follows:
 
@@ -160,6 +161,8 @@ The specification file fills the role of Config.ini, and has parameters as follo
 
 Note that replacing the explanations with numbers and added commas the end of each line, the above would lead to a valid JSON specification file, similar to:
 https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/blob/master/scripts/TCSpec.json
+
+See this issue for discussion and more instructions for running the script: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/133
 
 Historical Notes and Future Work
 ----------------------------------
