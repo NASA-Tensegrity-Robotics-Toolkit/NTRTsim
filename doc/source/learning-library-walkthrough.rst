@@ -130,7 +130,7 @@ The specification file fills the role of Config.ini, and has parameters as follo
             
             **"numberHidden"** : Integer. Only matters if numberOfStates >= 1. The number of neurons in the ANN's hidden layer
     
-            "numberOfInstances" : Integer. Must be > 0 if numberOfStates = 0. How many times are you going to interate through the outputs?
+            **"numberOfInstances"** : Integer. Must be > 0 if numberOfStates = 0. How many times are you going to interate through the outputs?
             Great for repeated parameters like weights. If numberOfStates > 0 this is ignored.
     
             **"populationSize"** : Integer. How many controllers are we testing?
