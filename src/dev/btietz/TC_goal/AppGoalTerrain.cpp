@@ -26,6 +26,8 @@
 
 #include "AppGoalTerrain.h"
 
+#include "tgcreator/tgUtil.h"
+
 AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
 {
     bSetup = false;
@@ -49,6 +51,8 @@ AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
     suffix = "default";
 
     handleOptions(argc, argv);
+    
+    tgUtil::seedRandom();
 }
 
 bool AppGoalTerrain::setup()
@@ -67,9 +71,11 @@ bool AppGoalTerrain::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    /// @todo Generalize angle code
+#if (1)
+    startAngle = ((rand() / (double)RAND_MAX)) * 3.1415 * 2.0;
+#endif
         FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments, M_PI);
+      new FlemonsSpineModelGoal(nSegments, M_PI / 2.0, startAngle);
 
     // Fifth create the controllers, attach to model
     if (add_controller)

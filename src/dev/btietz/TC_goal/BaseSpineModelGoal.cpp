@@ -42,29 +42,10 @@
 #include <map>
 #include <set>
 
-/// Rand seeding simular to the evolution classes. 
-/// @todo should we make this common?
-#ifdef _WIN32
-
-//  Windows
-#define rdtsc  __rdtsc
-
-#else
-
-//  For everything else
-unsigned long long rdtsc(){
-    unsigned int lo,hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((unsigned long long)hi << 32) | lo;
-}
-
-#endif
-
 BaseSpineModelGoal::BaseSpineModelGoal(int segments, double goalAngle) : 
     BaseSpineModelLearning(segments),
     m_goalAngle(goalAngle)
 {
-    srand(rdtsc());
 }
 
 BaseSpineModelGoal::~BaseSpineModelGoal()
