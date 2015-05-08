@@ -144,7 +144,7 @@ class BrianJobMaster(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-        # random.seed(1)
+        #random.seed(5)
         
     def __writeToNNW(self, neuralParams, fileName):
         """
@@ -284,6 +284,8 @@ class BrianJobMaster(NTRTJobMaster):
         if (len(c1) == 0):
             raise NTRTMasterError("Error in length")
         
+        """
+        # Old code for random params
         for i, j in zip(c1, c2):
             # Go to the deepest level of the parameters (see instances in the specification)
             if isinstance(i, collections.Iterable):
@@ -294,6 +296,20 @@ class BrianJobMaster(NTRTJobMaster):
                     cNew.append(i)
                 else:
                     cNew.append(j)
+        """
+        crossOver = random.randint(0, len(c1) - 1)
+        
+        print(crossOver)
+        
+        cNew[0:crossOver] = c1[0:crossOver]
+        print(len(cNew))
+        
+        cNew[crossOver:len(c2)+1] = c2[crossOver:len(c2)+1]
+        print(len(cNew))
+        
+        
+        if (len(cNew) != len(c1)):
+            raise NTRTMasterError("Error in length")
         
         if(params['numberOfStates'] > 0):
             newNeuro = {}

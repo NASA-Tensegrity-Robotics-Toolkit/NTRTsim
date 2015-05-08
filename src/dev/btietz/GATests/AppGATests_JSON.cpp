@@ -77,6 +77,8 @@ int main(int argc, char** argv)
     srand(rdtsc());
     
     int nSteps;
+    bool add_blocks;
+    bool add_hills;
     
     /* Required for setting up learning file input/output. */
     po::options_description desc("Allowed options");
@@ -84,7 +86,9 @@ int main(int argc, char** argv)
         ("help,h", "produce help message")
         ("steps,s", po::value<int>(&nSteps), "Number of steps per episode to run. Default=60K (60 seconds)")
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
-    ;
+        ("blocks,b", po::value<bool>(&add_blocks)->implicit_value(false), "Add a block field as obstacles.")
+        ("hills,H", po::value<bool>(&add_hills)->implicit_value(false), "Use hilly terrain.")
+        ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -111,7 +115,7 @@ int main(int argc, char** argv)
 
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
-    
+#if (1)    
     // Setup neural network
     const int numberOfInputs  = feedbackParams.get("numStates", "UTF-8").asInt();
     const int numberOfOutputs = feedbackParams.get("numActions", "UTF-8").asInt();
@@ -173,11 +177,22 @@ int main(int argc, char** argv)
     std::vector<double> scores;
     scores.push_back(score1 - score2);
     scores.push_back(0.0);
+#else
     
+    Json::Value values = feedbackParams.get("neuralParams", "UTF-8");
+    
+    double score1;
+    for (int i = 0; i < values.size(); i++)
+    {
+        score1 += values[i].asDouble() * values[i].asDouble();
+    }
+    
+    
+#endif     
     Json::Value prevScores = root.get("scores", Json::nullValue);
     
     Json::Value subScores;
-    subScores["distance"] = scores[0];
+    subScores["distance"] = score1;
     subScores["energy"] = 0.0;
     
     prevScores.append(subScores);
@@ -188,7 +203,7 @@ int main(int argc, char** argv)
     
     payloadLog << root << std::endl;
     
-    std::cout << "Score " << scores[0] << std::endl;
+    std::cout << "Score " << score1 << std::endl;
 
     //Teardown is handled by delete, so that should be automatic
     return 0;

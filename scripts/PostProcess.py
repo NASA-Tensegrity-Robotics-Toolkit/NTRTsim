@@ -55,11 +55,11 @@ if __name__ == "__main__":
         obj = json.load(fin)
         fin.close()
         try: 
-            paramID = obj['nodeVals']['paramID']
+            paramID = obj['goalVals']['paramID']
             if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
                 #thisScore = float(obj['scores'][2]['distance'])
-                thisScore = float(obj['nodeVals']['maxScore'])
+                thisScore = float(obj['goalVals']['maxScore'])
                 fileSum += 1
                 paramList.append(paramID)
             else:

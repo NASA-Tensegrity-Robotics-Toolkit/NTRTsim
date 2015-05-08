@@ -37,6 +37,8 @@
 #include "core/tgWorld.h"
 #include "core/terrain/tgHillyGround.h"
 #include "examples/learningSpines/tgCPGLogger.h"
+// obstacles
+#include "models/obstacles/tgBlockField.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -90,7 +92,7 @@ int main(int argc, char** argv)
     // simulation
     const int segments = 12;
     TetraSpineCollisions* myModel =
-      new TetraSpineCollisions(segments, scale);
+      new TetraSpineCollisions(segments, scale /2.0);
     
     colSpineSine* const myControl =
       new colSpineSine();
@@ -106,9 +108,11 @@ int main(int argc, char** argv)
 	// Add obstacles
 	btVector3 wallOrigin(0.0, 0.0, 50.0);
 	Wall* myWall = new Wall(wallOrigin);
-
+    
+    tgBlockField* myObstacle = new tgBlockField();
+    
     simulation.addModel(myModel);
-    //simulation.addModel(myWall);
+    //simulation.addModel(myObstacle);
     
     int i = 0;
     while (i < 1)

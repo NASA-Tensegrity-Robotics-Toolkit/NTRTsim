@@ -71,7 +71,7 @@ bool AppGoalTerrain::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-#if (1)
+#if (0)
     startAngle = ((rand() / (double)RAND_MAX)) * 3.1415 * 2.0;
 #endif
         FlemonsSpineModelGoal* myModel =

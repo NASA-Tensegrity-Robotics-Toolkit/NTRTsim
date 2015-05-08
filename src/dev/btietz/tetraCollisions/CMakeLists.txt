@@ -1,7 +1,8 @@
 link_directories(${LIB_DIR})
 
 
-link_libraries(tetraSpineLearningSine
+link_libraries(obstacles
+                tetraSpineLearningSine
 				tetraSpineHardware
 				learningSpines
                 sensors
