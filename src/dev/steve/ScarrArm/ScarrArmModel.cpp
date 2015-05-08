@@ -64,7 +64,11 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
-        double pretension;
+        double pretension_olecranon;
+        double pretension_anconeus;
+        double pretension_brachioradialis;
+        double pretension_ulnaradius;
+        double pretension_support;
         bool   history;  
         double maxTens;
         double targetVelocity;
@@ -79,7 +83,11 @@ namespace
      1.0,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
-     0,        // pretension (force)
+     3000.0/15.55,   // pretension_olecranon (force), stiffness/initial length
+     3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
+     3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
+     3000.0/1,        // pretension_ulnaradius (force), stiffness/initial length 
+     3000.0/1,        // pretension_support (force), stiffness/initial length 
      false,    // history (boolean)
      100000,   // maxTens
      10000    // targetVelocity
@@ -219,7 +227,12 @@ void ScarrArmModel::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
     const tgRod::Config rodConfigMassless(c.radius, 0.00/*c.density*/, c.friction, c.rollFriction, c.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, c.maxTens, c.targetVelocity);
+
+    tgBasicActuator::Config olecranonMuscleConfig(c.stiffness, c.damping, c.pretension_olecranon, c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config anconeusMuscleConfig(c.stiffness, c.damping, c.pretension_anconeus, c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config brachioradialisMuscleConfig(c.stiffness, c.damping, c.pretension_brachioradialis, c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config ulnaradiusMuscleConfig(c.stiffness, c.damping, c.pretension_ulnaradius, c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config supportstringMuscleConfig(c.stiffness, c.damping, c.pretension_support, c.history, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -231,7 +244,11 @@ void ScarrArmModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("massless", new tgRodInfo(rodConfigMassless));
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
+    spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfig));
+    spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
+    spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
+    spec.addBuilder("ulnaradius muscle", new tgBasicActuatorInfo(ulnaradiusMuscleConfig));
+    spec.addBuilder("support muscle", new tgBasicActuatorInfo(supportstringMuscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

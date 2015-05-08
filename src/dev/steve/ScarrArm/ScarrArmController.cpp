@@ -52,15 +52,16 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
     const double a = 22; //TODO: Currently ulna distal width, needs to be olecranon diameter (not quite, but close to that in length)
 
     const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
+    const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
     const double brachioradialis_length = 262 * scale; //TODO: Justify
-    const double ulnaradius_length      = a/std::sqrt(2.0) * scale; //"muscle" to connect radius and ulna at distal end TODO: Change
-    const double supportstring_length   = 10 * scale;
+    const double ulnaradius_length      = 1 * scale; //"muscle" to connect radius and ulna at distal end TODO: Change
+    const double supportstring_length   = 1 * scale;
 
-	//const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon muscle");
-	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis muscle");
-	const std::vector<tgBasicActuator*> ulnaradius      = subject.find<tgBasicActuator>("ulnaradius muscle");
-	const std::vector<tgBasicActuator*> supportstrings  = subject.find<tgBasicActuator>("support muscle");
+	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
+	const std::vector<tgBasicActuator*> anconeus        = subject.find<tgBasicActuator>("anconeus");
+	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
+	const std::vector<tgBasicActuator*> ulnaradius      = subject.find<tgBasicActuator>("ulnaradius");
+	const std::vector<tgBasicActuator*> supportstrings  = subject.find<tgBasicActuator>("support");
 
     for (size_t i=0; i<olecranonfascia.size(); i++) {
 		tgBasicActuator * const pMuscle = olecranonfascia[i];
@@ -69,6 +70,12 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
     }
                                         
     // using for loops to anticipate more muscle fibers in the future
+    for (size_t i=0; i<anconeus.size(); i++) {
+		tgBasicActuator * const pMuscle = anconeus[i];
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(anconeus_length, dt);
+    }
+     
     for (size_t i=0; i<brachioradialis.size(); i++) {
 		tgBasicActuator * const pMuscle = brachioradialis[i];
 		assert(pMuscle != NULL);
@@ -85,9 +92,12 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
 		tgBasicActuator * const pMuscle = supportstrings[i];
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(supportstring_length, dt);
+        cout << "string " << i << "\n";
     }
 
-	/*for (size_t i = 0; i < muscles.size(); ++i) {
+    /*
+	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+	for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(this->m_initialLengths,0.0001);
