@@ -48,8 +48,7 @@ ScarrArmController::ScarrArmController(const double initialLength)
 void ScarrArmController::onSetup(ScarrArmModel& subject)
 {
 	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	for (size_t i = 0; i < muscles.size(); ++i)
-	{
+	for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(this->m_initialLengths,0.0001);
@@ -58,16 +57,14 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
 
 void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
 {
-    if (dt <= 0.0)
-    {
+    if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
     }
     m_totalTime+=dt;
 
     //Move motors for all the muscles
 	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	for (size_t i = 0; i < muscles.size(); ++i)
-	{
+	for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
@@ -105,10 +102,8 @@ vector< vector <double> > ScarrArmController::transformActions(vector< vector <d
 	double max=11;
 	double range=max-min;
 	double scaledAct;
-	for(unsigned i=0;i<actions.size();i++)
-	{
-		for(unsigned j=0;j<actions[i].size();j++)
-		{
+	for(unsigned i=0;i<actions.size();i++) {
+		for(unsigned j=0;j<actions[i].size();j++) {
 			scaledAct=actions[i][j]*(range)+min;
 			actions[i][j]=scaledAct;
 		}
@@ -122,14 +117,12 @@ void ScarrArmController::applyActions(ScarrArmModel& subject, vector< vector <do
 	//Get All the muscles of the subject
 	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	//Check if the number of the actions match the number of the muscles
-	if(act.size() != muscles.size())
-	{
+	if(act.size() != muscles.size()) {
 		cout<<"Warning: # of muscles: "<< muscles.size() << " != # of actions: "<< act.size()<<endl;
 		return;
 	}
 	//Apply actions (currently in a random order)
-	for (size_t i = 0; i < muscles.size(); ++i)
-	{
+	for (size_t i = 0; i < muscles.size(); ++i)	{
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		//cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
