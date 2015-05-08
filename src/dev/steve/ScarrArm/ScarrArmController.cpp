@@ -47,12 +47,51 @@ ScarrArmController::ScarrArmController(const double initialLength)
 //Fetch all the muscles and set their preferred length
 void ScarrArmController::onSetup(ScarrArmModel& subject)
 {
-	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	for (size_t i = 0; i < muscles.size(); ++i) {
+    const double dt = 0.0001;
+    const double scale = 0.1;
+    const double a = 22; //TODO: Currently ulna distal width, needs to be olecranon diameter (not quite, but close to that in length)
+
+    const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
+    const double brachioradialis_length = 262 * scale; //TODO: Justify
+    const double ulnaradius_length      = a/std::sqrt(2.0) * scale; //"muscle" to connect radius and ulna at distal end TODO: Change
+    const double supportstring_length   = 10 * scale;
+
+	//const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon muscle");
+	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis muscle");
+	const std::vector<tgBasicActuator*> ulnaradius      = subject.find<tgBasicActuator>("ulnaradius muscle");
+	const std::vector<tgBasicActuator*> supportstrings  = subject.find<tgBasicActuator>("support muscle");
+
+    for (size_t i=0; i<olecranonfascia.size(); i++) {
+		tgBasicActuator * const pMuscle = olecranonfascia[i];
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(olecranonfascia_length, dt);
+    }
+                                        
+    // using for loops to anticipate more muscle fibers in the future
+    for (size_t i=0; i<brachioradialis.size(); i++) {
+		tgBasicActuator * const pMuscle = brachioradialis[i];
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(brachioradialis_length, dt);
+    }
+     
+    for (size_t i=0; i<ulnaradius.size(); i++) {
+		tgBasicActuator * const pMuscle = ulnaradius[i];
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(ulnaradius_length, dt);
+    }
+     
+    for (size_t i=0; i<supportstrings.size(); i++) {
+		tgBasicActuator * const pMuscle = supportstrings[i];
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(supportstring_length, dt);
+    }
+
+	/*for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(this->m_initialLengths,0.0001);
-	}
+	}*/
 }
 
 void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
@@ -77,8 +116,7 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
 	//actions=evolutionAdapter.step(dt,state);
 
 	//instead, generate it here for now!
-	for(unsigned i=0;i<24;i++)
-	{
+	for(unsigned i=0;i<24;i++) {
 		vector<double> tmp;
 		for(unsigned j=0;j<2;j++)
 		{
@@ -91,7 +129,7 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
 	actions = transformActions(actions);
 
 	//apply these actions to the appropriate muscles according to the sensor values
-//	applyActions(subject,actions);
+    //applyActions(subject,actions);
 
 }
 

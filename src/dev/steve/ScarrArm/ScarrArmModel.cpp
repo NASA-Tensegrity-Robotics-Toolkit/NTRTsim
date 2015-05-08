@@ -132,7 +132,7 @@ void ScarrArmModel::addNodes(tgStructure& s)
     const double e = 246 * scale * 0.5; //radius length
     const double f = 25 * scale; // humerus head radius
     const double g = 17 * scale; //ulna proximal width
-    const double sigma = 10 * scale; //TODO: tinker
+    const double sigma = 10 * scale; // gap from end of radius to olecranon TODO: tinker
     const double ulna_diameter = g; //TODO: tinker
     const double x = a/2;
     const double z = c/2;
@@ -195,23 +195,23 @@ void ScarrArmModel::addMuscles(tgStructure& s)
 {
     const std::vector<tgStructure*> children = s.getChildren();
 
-    s.addPair(0, 3, "muscle");
-    s.addPair(0, 4, "muscle");
-    s.addPair(1, 3, "muscle");
-    s.addPair(1, 4, "muscle");
-    s.addPair(2, 3, "muscle");
-    s.addPair(2, 4, "muscle");
-    s.addPair(3, 9, "muscle");
-    s.addPair(4, 9, "muscle");
+    s.addPair(0, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(0, 4, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 4, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(2, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(2, 4, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(3, 9, "anconeus muscle");
+    //s.addPair(4, 9, "muscle");
     //s.addPair(5, 7, "muscle");
     //s.addPair(6, 7, "muscle");
     //s.addPair(7, 8, "muscle"); 
-    s.addPair(6, 8, "muscle"); 
-    s.addPair(8, 10, "muscle"); 
+    s.addPair(5, 8, "brachioradialis muscle"); 
+    s.addPair(8, 10, "ulnaradius muscle");  //NB not a true muscle
 
     //Muscles to massless rod
-    s.addPair(6, 11, "muscle"); 
-    s.addPair(6, 12, "muscle"); 
+    s.addPair(6, 11, "support muscle"); 
+    s.addPair(6, 12, "support muscle"); 
 }
 
 void ScarrArmModel::setup(tgWorld& world)
@@ -252,7 +252,7 @@ void ScarrArmModel::setup(tgWorld& world)
     //map the rods and add the markers to them
     //addMarkers(s);
 
-    btVector3 location(0,10.0,0);
+    btVector3 location(0,30.0,0);
     //btVector3 rotation(M_PI/2,0,0);
     btVector3 rotation(0,0,0);
   	btVector3 speed(0,0,0);
@@ -262,12 +262,9 @@ void ScarrArmModel::setup(tgWorld& world)
 void ScarrArmModel::step(double dt)
 {
     // Precondition
-    if (dt <= 0.0)
-    {
+    if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
-    }
-    else
-    {
+    } else {
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
         tgModel::step(dt);  // Step any children

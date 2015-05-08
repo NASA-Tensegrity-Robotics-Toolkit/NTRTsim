@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     ScarrArmModel* const myModel = new ScarrArmModel();
 
     // Fifth, select the controller to use. Uncomment desired controller.
-    ScarrArmController* const pTC = new ScarrArmController(1.5);
+    ScarrArmController* const pTC = new ScarrArmController(2.5);
 
     myModel->attach(pTC);
     simulation.addModel(myModel);
