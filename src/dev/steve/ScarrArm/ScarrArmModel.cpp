@@ -121,7 +121,7 @@ ScarrArmModel::~ScarrArmModel()
 void ScarrArmModel::addNodes(tgStructure& s)
 {
     const double scale = 0.1;
-    const size_t nNodes = 11; //2 for massless rod
+    const size_t nNodes = 11 + 2; //2 for massless rod
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -137,18 +137,6 @@ void ScarrArmModel::addNodes(tgStructure& s)
     const double x = a/2;
     const double z = c/2;
 
-    /*nodePositions.push_back(btVector3(a/2, 0, 0));
-    nodePositions.push_back(btVector3(0, 0, -g));
-    nodePositions.push_back(btVector3(-a/2, 0, 0));
-    nodePositions.push_back(btVector3(0, f, 0));
-    nodePositions.push_back(btVector3(0, -f, 0));
-    nodePositions.push_back(btVector3(0, 0, d));
-    nodePositions.push_back(btVector3(0, 0, c));
-    nodePositions.push_back(btVector3(x, 0, z));
-    nodePositions.push_back(btVector3(b+a/2, 0, 0));
-    nodePositions.push_back(btVector3(a/2 + sigma, 0, -ulna_diameter));
-    nodePositions.push_back(btVector3(a/2 + sigma + e, 0, -ulna_diameter));*/
-     
     nodePositions.push_back(btVector3(a/2, 0, 0));
     nodePositions.push_back(btVector3(0, -g, 0));
     nodePositions.push_back(btVector3(-a/2, 0, 0));
@@ -160,6 +148,8 @@ void ScarrArmModel::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(b+a/2, 0, 0));
     nodePositions.push_back(btVector3(a/2 + sigma, -ulna_diameter, 0));
     nodePositions.push_back(btVector3(a/2 + sigma + e, -ulna_diameter, 0));
+    nodePositions.push_back(btVector3(0, c, f));
+    nodePositions.push_back(btVector3(0, c, -f));
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -190,6 +180,7 @@ void ScarrArmModel::addRods(tgStructure& s)
     s.addPair(1,  2,  "rod");
 
     s.addPair(9, 10,  "rod"); 
+    s.addPair(10, 11, "massless");
 }
 
 /*
@@ -208,29 +199,27 @@ void ScarrArmModel::addMarkers(tgStructure &s)
 }
 */
 
-void ScarrArmModel::addMuscles(tgStructure& arm)
+void ScarrArmModel::addMuscles(tgStructure& s)
 {
-    const std::vector<tgStructure*> children = arm.getChildren();
+    const std::vector<tgStructure*> children = s.getChildren();
 
-    arm.addPair(0, 3, "muscle");
-    arm.addPair(0, 4, "muscle");
-    arm.addPair(1, 3, "muscle");
-    arm.addPair(1, 4, "muscle");
-    arm.addPair(2, 3, "muscle");
-    arm.addPair(2, 4, "muscle");
-    arm.addPair(3, 9, "muscle");
-    arm.addPair(4, 9, "muscle");
-    //arm.addPair(5, 7, "muscle");
-    //arm.addPair(6, 7, "muscle");
-    //arm.addPair(7, 8, "muscle"); 
-    arm.addPair(6, 8, "muscle"); 
-    arm.addPair(8, 10, "muscle"); 
+    s.addPair(0, 3, "muscle");
+    s.addPair(0, 4, "muscle");
+    s.addPair(1, 3, "muscle");
+    s.addPair(1, 4, "muscle");
+    s.addPair(2, 3, "muscle");
+    s.addPair(2, 4, "muscle");
+    s.addPair(3, 9, "muscle");
+    s.addPair(4, 9, "muscle");
+    //s.addPair(5, 7, "muscle");
+    //s.addPair(6, 7, "muscle");
+    //s.addPair(7, 8, "muscle"); 
+    s.addPair(6, 8, "muscle"); 
+    s.addPair(8, 10, "muscle"); 
 
-/*
     //Muscles to massless rod
-    arm.addPair(6, 0, "muscle"); 
-    arm.addPair(6, 1, "muscle"); 
-    */
+    s.addPair(6, 10, "muscle"); 
+    s.addPair(6, 11, "muscle"); 
 }
 
 void ScarrArmModel::setup(tgWorld& world)
@@ -241,12 +230,12 @@ void ScarrArmModel::setup(tgWorld& world)
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.history, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
-    tgStructure masslessbase;
-    populateMasslessSupport(masslessbase);
+    //tgStructure masslessbase;
+    //populateMasslessSupport(masslessbase);
 
-    tgStructure arm;
-    tgStructure* const tBase = new tgStructure(masslessbase);
-    arm.addChild(tBase);
+    //tgStructure arm;
+    //tgStructure* const tBase = new tgStructure(masslessbase);
+    //arm.addChild(tBase);
     //tB->addTags(tgString("base", 1));
 
     tgStructure s;
@@ -255,8 +244,8 @@ void ScarrArmModel::setup(tgWorld& world)
 
     //addMuscles(arm);
     addMuscles(s);
-    tgStructure* const t = new tgStructure(s);
-    arm.addChild(t);
+    //tgStructure* const t = new tgStructure(s);
+    //arm.addChild(t);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
@@ -265,8 +254,8 @@ void ScarrArmModel::setup(tgWorld& world)
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
-    //tgStructureInfo structureInfo(s, spec);
-    tgStructureInfo structureInfo(arm, spec);
+    tgStructureInfo structureInfo(s, spec);
+    //tgStructureInfo structureInfo(arm, spec);
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
