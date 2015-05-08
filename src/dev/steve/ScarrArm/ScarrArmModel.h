@@ -106,10 +106,16 @@ private:
      void addNodes(tgStructure& s);
 	
 	/**
-     * A function called during setup that creates rods from the
-     * relevant nodes. Rewrite this function for your own models.
-     * @param[in] s A tgStructure that we're building into
+     * Populates the massless structure of the structure
+     * @param[in] masslessbase A tgStructure that we're building into
      */
+    static void populateMasslessSupport(tgStructure& masslessbase);
+	
+	/**
+     * A function called during setup that creates muscles (Strings) from
+     * the relevant nodes. Rewrite this function for your own models.
+     * @param[in] s A tgStructure that we're building into
+     */ 
     static void addRods(tgStructure& s);
 	
 	/**
@@ -117,7 +123,7 @@ private:
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    void addMuscles(tgStructure& s);
+    void addMuscles(tgStructure& arm);
 
     /*
      * Adds the 12 markers to the end of the rods so that we can visualize
