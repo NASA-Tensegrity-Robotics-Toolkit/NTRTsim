@@ -63,7 +63,9 @@ namespace
     {
         // Note that tags don't need to match exactly, we could create
         // supersets if we wanted to
-        actuatorMap["pull"]  = model.find<tgBasicActuator>("leg pull");
+        actuatorMap["pull1"]  = model.find<tgBasicActuator>("leg pull seg1");
+        actuatorMap["pull2"]  = model.find<tgBasicActuator>("leg pull seg2");
+	actuatorMap["npull2"]  = model.find<tgBasicActuator>("n leg pull seg2");
     }
 
 }
@@ -116,6 +118,24 @@ void Quadruped::setup(tgWorld& world)
     tetra.addPair(0,4, "back rod");
     tetra.addPair(0,5, "right rod");
     tetra.addPair(0,6, "left rod");
+
+    //Create the hub connector tetrahedron
+    tgStructure topTetra;
+
+    topTetra.addNode(0,0,0);  // center
+    topTetra.addNode(0.0, (v_size - 5), 0.0);   // Top
+    topTetra.addNode(0.0, (-v_size + 5), 0.0);   // Bottom
+    topTetra.addNode(0.0, 0.0, v_size);   // front
+    topTetra.addNode(0.0, 0.0, -v_size);   // back
+    topTetra.addNode(v_size, 0.0, 0.0); // right
+    topTetra.addNode(-v_size, 0.0, 0.0); // left
+    
+    topTetra.addPair(0,1, "top rod");
+    topTetra.addPair(0,2, "bottom rod");
+    topTetra.addPair(0,3, "front rod");
+    topTetra.addPair(0,4, "back rod");
+    topTetra.addPair(0,5, "right rod");
+    topTetra.addPair(0,6, "left rod");
     
     int connector [2] = { 2, 6 }; //connector locations for legs 
     
@@ -132,7 +152,13 @@ void Quadruped::setup(tgWorld& world)
         
 	if (i == connector[0] || i == connector[1])
 	{
+	    t = new tgStructure(topTetra);
+	    t->addTags(tgString("segment num", i + 1));
+	    t->move((i + 1)*offset);
+
 	    t -> addRotation(btVector3(0.0, 0.0, (i + 1) * offsetDist), btVector3(0, 1, 0), -M_PI/4.0);
+	    
+	    //Rotate one more time to offset snake rotation 
 	    t -> addRotation(btVector3(0.0, 0.0, (i + 1) * offsetDist), btVector3(0, 0, 1), -M_PI/4.0);
 	}
         else if (i % 2 == 1)
@@ -197,11 +223,11 @@ void Quadruped::setup(tgWorld& world)
         tgNodes n1 = children[i]->getNodes();
  	if (i == connector[0] || i == connector[1])
 	{
-	     snake.addPair(n0[5], n1[3], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
+	     snake.addPair(n0[5], n1[3], "inner front muscle seg leg pull" + tgString(" seg", i));
 	     snake.addPair(n0[4], n1[3], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 	     snake.addPair(n0[2], n1[3], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 
-	     snake.addPair(n0[6], n1[5], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
+	     snake.addPair(n0[6], n1[5], "inner front muscle seg n leg pull" + tgString(" seg", i));
 	     snake.addPair(n0[4], n1[5], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 	     snake.addPair(n0[2], n1[5], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 
@@ -212,7 +238,7 @@ void Quadruped::setup(tgWorld& world)
 	     snake.addPair(n0[6], n1[5], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 	     snake.addPair(n0[6], n1[3], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 
-	     snake.addPair(n0[4], n1[1], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
+	     snake.addPair(n0[4], n1[1], "inner front muscle seg" + tgString(" seg", i));
 	     snake.addPair(n0[4], n1[6], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 	     snake.addPair(n0[4], n1[3], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
 	}
@@ -241,13 +267,13 @@ void Quadruped::setup(tgWorld& world)
         else if (i != connector[0] + 1 && i != connector[1] + 1)
         {
             
-            snake.addPair(n0[6], n1[1], tgString("inner front muscle seg", i-1) + tgString(" seg", i));
-            snake.addPair(n0[4], n1[1], tgString("inner right muscle seg", i-1) + tgString(" seg", i));
-            snake.addPair(n0[6], n1[3], tgString("inner left muscle seg", i-1) + tgString(" seg", i));
+            snake.addPair(n0[6], n1[1], "inner front muscle seg" + tgString(" seg", i));
+            snake.addPair(n0[4], n1[1], "inner right muscle seg" + tgString(" seg", i));
+            snake.addPair(n0[6], n1[3], "inner left muscle seg leg pull" + tgString(" seg", i));
             snake.addPair(n0[4], n1[3], tgString("inner back muscle seg", i-1) + tgString(" seg", i));
             
             #if (1)
-            snake.addPair(n0[1], n1[3], tgString("inner left muscle2 seg", i-1) + tgString(" seg", i));
+            snake.addPair(n0[1], n1[3], "inner left muscle2 seg" + tgString(" seg", i));
             snake.addPair(n0[2], n1[1], tgString("inner back muscle2 seg", i-1) + tgString(" seg", i));
             snake.addPair(n0[6], n1[5], tgString("inner left muscle2 seg", i-1) + tgString(" seg", i));
             snake.addPair(n0[4], n1[6], tgString("inner back muscle2 seg", i-1) + tgString(" seg", i));
@@ -272,11 +298,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[6],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[6],n1[3], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[6],n1[3], "inner back muscle seg" + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[3],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[3],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg" + tgString(" seg", m_segments + 5));
 
         leg++;
 
@@ -286,11 +312,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[6],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg leg pull" + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[4],n1[5], "inner back muscle seg leg pull " + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[4],n1[5], "inner back muscle seg" + tgString(" seg", m_segments + 5));
 
 	leg++;
 
@@ -298,9 +324,9 @@ void Quadruped::setup(tgWorld& world)
         n0 = children[connector[i]]->getNodes();
         n1 = children[m_segments + leg]->getNodes();
 
-        snake.addPair(n0[3],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
+        snake.addPair(n0[3],n1[1], "inner back muscle seg leg pull" + tgString(" seg", m_segments + 3));
         snake.addPair(n0[3],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg" + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[6],n1[1], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
@@ -314,11 +340,11 @@ void Quadruped::setup(tgWorld& world)
 
         snake.addPair(n0[6],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[3],n1[4], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 5));
+        snake.addPair(n0[3],n1[4], "inner back muscle seg" + tgString(" seg", m_segments + 5));
 
         snake.addPair(n0[6],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 3));
         snake.addPair(n0[2],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 4));
-        snake.addPair(n0[4],n1[5], tgString("inner back muscle seg", 1) + tgString(" seg", m_segments + 5));    
+        snake.addPair(n0[4],n1[5], "inner back muscle seg" + tgString(" seg", m_segments + 5));    
 	
 	leg++;
     }
@@ -348,7 +374,7 @@ void Quadruped::setup(tgWorld& world)
     m_allMuscles = find<tgSpringCableActuator> ("muscle2");   
     m_allSegments = this->find<tgModel> ("segment");
     
-    #if (1)
+    #if (0)
     // Debug printing
     std::cout << "StructureInfo:" << std::endl;
     std::cout << structureInfo << std::endl;

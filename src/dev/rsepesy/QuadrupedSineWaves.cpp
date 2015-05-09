@@ -51,7 +51,7 @@ QuadrupedSineWaves::QuadrupedSineWaves() :
     target(0.0)
 {
     phaseOffsets.clear();
-    phaseOffsets.push_back(M_PI/2);
+    phaseOffsets.push_back(M_PI);
     phaseOffsets.push_back(0);
     phaseOffsets.push_back(0);
 }
@@ -84,7 +84,7 @@ void QuadrupedSineWaves::applyImpedanceControlOutside(const std::vector<tgBasicA
 {
     for(std::size_t i = 0; i < stringList.size(); i++)
     {
-        cycle = sin(simTime * cpgFrequency + 2 * bodyWaves * M_PI * i / (segments) + phaseOffsets[phase]);
+        cycle = sin(simTime * cpgFrequency + phaseOffsets[phase]);
         target = offsetSpeed + cycle*cpgAmplitude;
         
         double setTension = out_controller->control(*(stringList[i]),
@@ -113,11 +113,11 @@ void QuadrupedSineWaves::onStep(BaseSpineModelLearning& subject, double dt)
     applyImpedanceControlInside(subject.getActuators("inner left") , dt);
     applyImpedanceControlInside(subject.getActuators("inner right"), dt);
     */
-    applyImpedanceControlOutside(qSubject->getActuators("pull"), dt, 0);
-    /*
-    applyImpedanceControlOutside(subject.getActuators("outer left"), dt, 1);
-    applyImpedanceControlOutside(subject.getActuators("outer right"), dt, 2);
-    */
+    applyImpedanceControlOutside(qSubject->getActuators("pull1"), dt, 0);
+    applyImpedanceControlOutside(qSubject->getActuators("pull2"), dt, 0);
+    applyImpedanceControlOutside(qSubject->getActuators("pull1"), dt, 1);
+    applyImpedanceControlOutside(qSubject->getActuators("npull2"), dt, 1);
+
 }
 
 
