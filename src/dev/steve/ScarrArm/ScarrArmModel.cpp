@@ -239,7 +239,11 @@ void ScarrArmModel::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addMuscles(s);
-
+    
+    // Move the arm out of the ground
+    btVector3 offset(0.0, 20.0, 0.0);
+    s.move(offset);
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("massless", new tgRodInfo(rodConfigMassless));
@@ -269,11 +273,6 @@ void ScarrArmModel::setup(tgWorld& world)
     //map the rods and add the markers to them
     //addMarkers(s);
 
-    btVector3 location(0,30.0,0);
-    //btVector3 rotation(M_PI/2,0,0);
-    btVector3 rotation(0,0,0);
-  	btVector3 speed(0,0,0);
-    this->moveModel(location,rotation,speed);
 }
 
 void ScarrArmModel::step(double dt)
@@ -303,18 +302,3 @@ void ScarrArmModel::teardown()
     tgModel::teardown();
 }
 
-void ScarrArmModel::moveModel(btVector3 positionVector,btVector3 rotationVector,btVector3 speedVector)
-{
-    std::vector<tgRod *> rods=find<tgRod>("rod");
-
-	btQuaternion initialRotationQuat;
-	initialRotationQuat.setEuler(rotationVector[0],rotationVector[1],rotationVector[2]);
-	btTransform initialTransform;
-	initialTransform.setIdentity();
-	initialTransform.setRotation(initialRotationQuat);
-	initialTransform.setOrigin(positionVector);
-	for(size_t i=0;i<rods.size();i++) {
-			rods[i]->getPRigidBody()->setLinearVelocity(speedVector);
-			rods[i]->getPRigidBody()->setWorldTransform(initialTransform * rods[i]->getPRigidBody()->getWorldTransform());
-	}
-}
