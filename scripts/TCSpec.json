@@ -4,12 +4,13 @@
     "resourcePath" : "../resources/src/",
     "lowerPath"    : "bmirletz/TC_Goal_JSON//",
     "executable" : "./../build/dev/btietz/TC_goal/AppGoalTerrain",
-    "terrain" : [[0, 0],[1, 0],[0, 1],[1, 1]],
+    "terrain" : [[0, 0, 0],[0, 0, -1.57],[0, 0, -0.785],[0, 0, 1.57],[0, 0, 0.785]],
     "learningParams": 
     {
         "trialLength" : 10000,
-        "numTrials" : 100,
+        "numTrials" : 40,
         "numGenerations" : 300,
+        "deterministic": 15,
         "nodeVals" :
         {
             "learning" : false,
@@ -67,14 +68,14 @@
         },
         "goalVals" :
         {
-            "learning" : true,
-            "startingControllers" : 0,
+            "learning" : false,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 4,
             "numberOfOutputs" : 24,
             "numberHidden" : 24,
             "numberOfInstances" : 1,
-            "populationSize" : 40,
+            "populationSize" : 1,
             "useAverage" : true,
             "numberToMutate" : 15,
             "numberOfChildren" : 5,

@@ -59,7 +59,7 @@ if __name__ == "__main__":
             if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
                 #thisScore = float(obj['scores'][2]['distance'])
-                thisScore = float(obj['goalVals']['maxScore'])
+                thisScore = float(obj['goalVals']['avgScore'])
                 fileSum += 1
                 paramList.append(paramID)
             else:

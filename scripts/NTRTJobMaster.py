@@ -620,7 +620,9 @@ class BrianJobMaster(NTRTJobMaster):
             self.currentGeneration['goal'] = self.generationGenerator(self.currentGeneration['goal'], 'goalVals')
             
             # Iterate over the generation (change range..)
-            for i in range(0, numTrials) :
+            startTrial = self.jConf['learningParams']['deterministic']
+            
+            for i in range(startTrial, numTrials) :
 
                 # MonteCarlo solution. This function could be overridden with something that
                 # provides a filename for a pre-existing file
@@ -717,13 +719,13 @@ class BrianJob(NTRTJob):
             # This will expand in the future.
             terrainMatrix = self.args['terrain']
             # Update this if the subprocess call gets changed
-            if len(terrainMatrix[0]) < 2:
+            if len(terrainMatrix[0]) < 3:
                 raise NTRTMasterError("Not enough terrain args!")
             
             # Run through a set of binary job options. Currently handles terrain switches
             for run in terrainMatrix:
                 #TODO improve error handling here
-                subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1])], stdout=logFile)
+                subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2])], stdout=logFile)
             sys.exit()
 
     def processJobOutput(self):

@@ -183,7 +183,7 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
      
     m_allSegments = this->find<tgModel> ("segment");
     
-#if (1)
+#if (0)
     // Debug printing
     std::cout << "StructureInfo:" << std::endl;
     std::cout << structureInfo << std::endl;

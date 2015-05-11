@@ -56,12 +56,12 @@ void BaseSpineModelGoal::setup(tgWorld& world)
 {
     
     // Create goal box in a new structure
-#if (0)
-    m_goalAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415 + 3.1415;    
+#if (1)
+    m_goalAngle = ((rand() / (double)RAND_MAX)) * 3.1415;    
 #endif // If we're resetting the simulation and want to change the angle    
     
-    double xPos = 350 * sin(m_goalAngle);
-    double zPos = 350 * cos(m_goalAngle);
+    double xPos = 500 * sin(m_goalAngle);
+    double zPos = 500 * cos(m_goalAngle);
     
     tgStructure goalBox;
     
