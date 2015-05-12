@@ -107,6 +107,7 @@ private:
     double startY;
     double startZ;
     double startAngle;
+    double goalAngle;
     
     std::string suffix;
     

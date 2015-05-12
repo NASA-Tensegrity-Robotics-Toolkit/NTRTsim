@@ -732,13 +732,13 @@ class BrianJob(NTRTJob):
             # This will expand in the future.
             terrainMatrix = self.args['terrain']
             # Update this if the subprocess call gets changed
-            if len(terrainMatrix[0]) < 3:
+            if len(terrainMatrix[0]) < 4:
                 raise NTRTMasterError("Not enough terrain args!")
             
             # Run through a set of binary job options. Currently handles terrain switches
             for run in terrainMatrix:
                 #TODO improve error handling here
-                subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2])], stdout=logFile)
+                subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-s", str(self.args['length']), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2]), "-B", str(run[3])], stdout=logFile)
             sys.exit()
 
     def processJobOutput(self):
