@@ -120,6 +120,14 @@ class NTRTMasterError(Exception):
 # @todo consider moving this to a different file
 ###
 
+class LastUpdatedOrderedDict(collections.OrderedDict):
+    'Store items in the order the keys were last added'
+
+    def __setitem__(self, key, value):
+        if key in self:
+            del self[key]
+        collections.OrderedDict.__setitem__(self, key, value)
+
 class BrianJobMaster(NTRTJobMaster):
     def _setup(self):
         """
@@ -345,7 +353,7 @@ class BrianJobMaster(NTRTJobMaster):
         
         useAvg = params['useAverage']
         
-        nextGeneration = {}
+        nextGeneration = LastUpdatedOrderedDict()
         
         # Are we doing monteCarlo or starting a new trial?
         if (len(currentGeneration) == 0 or params['monteCarlo']):
@@ -368,7 +376,7 @@ class BrianJobMaster(NTRTJobMaster):
                         controller['params'] = jControl[paramName]
                     controller['paramID'] = str(self.paramID)
                     controller['scores'] = []
-                    nextGeneration[controller['paramID']] = controller
+                    nextGeneration.__setitem__(controller['paramID'], controller)
                     
                     self.paramID += 1
                 
@@ -378,7 +386,7 @@ class BrianJobMaster(NTRTJobMaster):
                     raise NTRTMasterError("Number of controllers greater than population size!")
                 
                 controller = self.__getNewParams(paramName)
-                nextGeneration[controller['paramID']] = controller
+                nextGeneration.__setitem__(controller['paramID'], controller)
                 self.paramID += 1
                 
         elif (not params['learning']):
@@ -473,7 +481,7 @@ class BrianJobMaster(NTRTJobMaster):
                 if (count >= numElites):
                     break
                 
-                nextGeneration[c['paramID']] = c
+                nextGeneration.__setitem__(c['paramID'], c)
                 if c['params'] == None:
                     raise NTRTMasterError("Found it!")
                 count += 1
@@ -489,7 +497,7 @@ class BrianJobMaster(NTRTJobMaster):
                 cNew['paramID'] = str(self.paramID)
                 cNew['scores'] = []
                 
-                nextGeneration[cNew['paramID']] = cNew
+                nextGeneration.__setitem__(cNew['paramID'], cNew)
                 self.paramID += 1
                 
                 if cNew['params'] == None:
@@ -519,7 +527,7 @@ class BrianJobMaster(NTRTJobMaster):
                 cNew['paramID'] = str(self.paramID)
                 cNew['scores'] = []
                 
-                nextGeneration[cNew['paramID']] = cNew
+                nextGeneration.__setitem__(cNew['paramID'], cNew)
                 self.paramID += 1
                 
                 if cNew['params'] == None:
@@ -620,9 +628,13 @@ class BrianJobMaster(NTRTJobMaster):
             self.currentGeneration['goal'] = self.generationGenerator(self.currentGeneration['goal'], 'goalVals')
             
             # Iterate over the generation (change range..)
-            startTrial = self.jConf['learningParams']['deterministic']
+            if n > 0:
+                startTrial = self.jConf['learningParams']['deterministic']
+            else:
+                startTrial = 0
             
-            for i in range(startTrial, numTrials) :
+            # We want to write all of the trials for post processing
+            for i in range(0, numTrials) :
 
                 # MonteCarlo solution. This function could be overridden with something that
                 # provides a filename for a pre-existing file
@@ -635,7 +647,8 @@ class BrianJobMaster(NTRTJobMaster):
                         'executable' : self.jConf['executable'],
                         'length'   : self.jConf['learningParams']['trialLength'],
                         'terrain'  : self.jConf['terrain']}
-                jobList.append(BrianJob(args))
+                if (n == 0 or i >= startTrial):
+                    jobList.append(BrianJob(args))
             
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)

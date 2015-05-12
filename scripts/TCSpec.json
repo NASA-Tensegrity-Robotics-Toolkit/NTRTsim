@@ -4,7 +4,7 @@
     "resourcePath" : "../resources/src/",
     "lowerPath"    : "bmirletz/TC_Goal_JSON//",
     "executable" : "./../build/dev/btietz/TC_goal/AppGoalTerrain",
-    "terrain" : [[0, 0, 0],[0, 0, -1.57],[0, 0, -0.785],[0, 0, 1.57],[0, 0, 0.785]],
+    "terrain" : [[0, 0, 0]],
     "learningParams": 
     {
         "trialLength" : 10000,
