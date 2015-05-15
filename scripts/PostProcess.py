@@ -55,7 +55,7 @@ if __name__ == "__main__":
         obj = json.load(fin)
         fin.close()
         try: 
-            paramID = obj['feedbackVals']['paramID']
+            paramID = obj['goalVals']['paramID']
             if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
                 """
@@ -66,7 +66,7 @@ if __name__ == "__main__":
                     except IndexError:
                         thisScore += 0
                 """
-                thisScore = float(obj['feedbackVals']['avgScore'])
+                thisScore = float(obj['goalVals']['avgScore'])
                 fileSum += 1
                 paramList.append(paramID)
             else:

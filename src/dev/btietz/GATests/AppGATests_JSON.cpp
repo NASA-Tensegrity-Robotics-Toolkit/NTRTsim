@@ -79,6 +79,8 @@ int main(int argc, char** argv)
     int nSteps;
     bool add_blocks;
     bool add_hills;
+    double startAngle;
+    double goalAngle;
     
     /* Required for setting up learning file input/output. */
     po::options_description desc("Allowed options");
@@ -88,6 +90,8 @@ int main(int argc, char** argv)
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
         ("blocks,b", po::value<bool>(&add_blocks)->implicit_value(false), "Add a block field as obstacles.")
         ("hills,H", po::value<bool>(&add_hills)->implicit_value(false), "Use hilly terrain.")
+        ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
+        ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
         ;
 
     po::variables_map vm;
@@ -115,7 +119,7 @@ int main(int argc, char** argv)
 
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
-#if (1)    
+#if (0)    
     // Setup neural network
     const int numberOfInputs  = feedbackParams.get("numStates", "UTF-8").asInt();
     const int numberOfOutputs = feedbackParams.get("numActions", "UTF-8").asInt();

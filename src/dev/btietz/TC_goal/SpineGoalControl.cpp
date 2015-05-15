@@ -433,22 +433,13 @@ std::vector<double> SpineGoalControl::getGoalFeedback(const BaseSpineModelGoal* 
         assert(state[1] >= -1.0 && state[1] <= 1.0);
         
         std::vector< std::vector<double> > actions = goalAdapter.step(m_updateTime, state);
-        // 16 actions as of 1_29_15, amplitude and phase
+        // 24 actions as of 5_12_15, amplitude and phase
         std::vector<double> segmentFeedback = transformFeedbackActions(actions, goalConfigData);
         
         feedback.insert(feedback.end(), segmentFeedback.begin(), segmentFeedback.end());
     }
     
-    assert (feedback.size() == n * (nA - 1));
-    
-    // Insert a zero every third element to account for frequency
-    std::vector<double>::iterator it = feedback.begin();
-    while (it != feedback.end())
-    {
-        it = feedback.insert(it, 0.0);
-        // Skip amplitude and phase values already inserted
-        it += 3;
-    }
+    assert (feedback.size() == n * nA);
     
     
 #else

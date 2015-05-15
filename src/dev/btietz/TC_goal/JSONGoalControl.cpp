@@ -188,7 +188,7 @@ void JSONGoalControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0) // Goal and cable
+#if (1) // Goal and cable
 
     std::vector<double> desComs = getFeedback(subject);
 
