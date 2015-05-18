@@ -5,7 +5,8 @@ import subprocess
 import random
 import json
 import logging
-import NTRTJobMaster
+from interfaces import NTRTJobMaster, NTRTMasterError
+from NTRTJobMaster import MonteCarloJob
 from concurrent_scheduler import ConcurrentScheduler
 
 def sumOfSquares(x):
@@ -14,7 +15,7 @@ def sumOfSquares(x):
     print(total)
     return total
 
-class SPSA(NTRTJobMaster.NTRTJobMaster):
+class SPSA(NTRTJobMaster):
 
     def _setup(self):
         """
@@ -437,7 +438,7 @@ class SPSA(NTRTJobMaster.NTRTJobMaster):
                         'length'   : self.jConf['learningParams']['trialLength'],
                         'terrain'  : self.jConf['terrain']}
                 if (n == 0 or i >= startTrial):
-                    jobList.append(NTRTJobMaster.MonteCarloJob(args))
+                    jobList.append(MonteCarloJob(args))
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
