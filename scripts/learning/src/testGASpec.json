@@ -1,0 +1,89 @@
+{
+    "filePrefix"   : "monteOut",
+    "fileSuffix"   : ".json",
+    "resourcePath" : "../../../resources/src/",
+    "lowerPath"    : "bmirletz/GATests/",
+    "executable" : "./../../../build/dev/btietz/GATests/AppJSONLearningTests",
+    "terrain" : [[0, 0, 0, 0]],
+    "learningParams": 
+    {
+        "trialLength" : 3000,
+        "numTrials" : 40,
+        "numGenerations" : 50,
+        "deterministic": 1,
+        "nodeVals" :
+        {
+            "learning" : false,
+            "startingControllers" : 0,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 5,
+            "numberOfInstances" : 1,
+            "populationSize" : 1,
+            "useAverage" : false,
+            "numberToMutate" : 0,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "edgeVals" :
+        {
+            "learning" : false,
+            "startingControllers" : 0,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 1,
+            "numberOfInstances" : 26,
+            "populationSize" : 2,
+            "useAverage" : false,
+            "numberToMutate" : 0,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "feedbackVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : false,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 20,
+            "numberHidden" : 20,
+            "numberOfInstances" : 1,
+            "populationSize" : 40,
+            "useAverage" : false,
+            "numberToMutate" : 20,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.2,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.5
+        },
+        "goalVals" :
+        {
+            "learning" : false,
+            "startingControllers" : 0,
+            "monteCarlo" : false,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 20,
+            "numberHidden" : 20,
+            "numberOfInstances" : 1,
+            "populationSize" : 1,
+            "useAverage" : false,
+            "numberToMutate" : 25,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.2,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.5
+        }
+    }
+}
