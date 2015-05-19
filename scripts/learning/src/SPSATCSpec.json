@@ -18,7 +18,7 @@
         "nodeVals" :
         {
             "learning" : true,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
@@ -36,7 +36,7 @@
         "edgeVals" :
         {
             "learning" : true,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
@@ -54,7 +54,7 @@
         "feedbackVals" :
         {
             "learning" : true,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 3,
@@ -73,7 +73,7 @@
         "goalVals" :
         {
             "learning" : true,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 4,
             "numberOfOutputs" : 24,
