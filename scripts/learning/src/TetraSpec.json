@@ -1,9 +1,9 @@
 {
     "filePrefix"   : "monteOut",
     "fileSuffix"   : ".json",
-    "resourcePath" : "../resources/src/",
+    "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/Tetra_Goal/",
-    "executable" : "./../build/dev/btietz/TS_goal/AppTSGoal",
+    "executable" : "./../../../build/dev/btietz/TS_goal/AppTSGoal",
     "terrain" : [[0, 0]],
     "learningParams": 
     {

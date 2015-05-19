@@ -1,9 +1,9 @@
 {
     "filePrefix"   : "monteOut",
     "fileSuffix"   : ".json",
-    "resourcePath" : "../resources/src/",
+    "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/OctaCL_6/",
-    "executable" : "./../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
+    "executable" : "./../../../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
     "terrain" : [[0, 0]],
     "learningParams": 
     {

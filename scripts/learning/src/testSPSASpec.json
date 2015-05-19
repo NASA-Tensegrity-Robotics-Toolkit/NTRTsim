@@ -1,9 +1,9 @@
 {
     "filePrefix"   : "monteOut",
     "fileSuffix"   : ".json",
-    "resourcePath" : "../resources/src/",
+    "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/GATests/",
-    "executable" : "./../build/dev/btietz/GATests/AppJSONLearningTests",
+    "executable" : "./../../../build/dev/btietz/GATests/AppJSONLearningTests",
     "terrain" : [[0, 0, 0, 0]],
     "a0" : 0.5,
     "c0" : 0.5,
