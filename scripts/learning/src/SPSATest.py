@@ -6,9 +6,9 @@ import random
 import json
 import logging
 # TODO: Need to remove this namespace import and do a direct import of BrianJob (from wherever it ends up).
-from NTRTJobMaster import BrianJob
 from interfaces import NTRTJobMaster, NTRTJob, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
+from evolution import EvolutionJob
 
 def sumOfSquares(x):
 
@@ -439,7 +439,7 @@ class SPSA(NTRTJobMaster):
                         'length'   : self.jConf['learningParams']['trialLength'],
                         'terrain'  : self.jConf['terrain']}
                 if (n == 0 or i >= startTrial):
-                    jobList.append(BrianJob(args))
+                    jobList.append(EvolutionJob(args))
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
