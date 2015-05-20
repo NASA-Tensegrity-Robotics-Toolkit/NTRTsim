@@ -5,7 +5,7 @@ import collections
 from interfaces import NTRTJobMaster, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
 import collections
-from utils import ConfigLoader
+from utils import ConfigLoader, ResourcePath
 #TODO: This is hackety, fix it.
 from evolution_job import EvolutionJob
 
@@ -26,13 +26,8 @@ class EvolutionJobMaster(NTRTJobMaster):
 
         self.jconf = ConfigLoader(self.configFileName).toDict()
 
-        self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
-
-        try:
-            os.makedirs(self.path)
-        except OSError:
-            if not os.path.isdir(self.path):
-                raise NTRTMasterError("Directed the folder path to an invalid address")
+        resPath = "%s%s" % (self.jconf['resourcePath'], self.jconf['lowerPath'])
+        self.resourcePath = ResourcePath(resPath)
 
         # Consider seeding random, using default (system time) now
         #random.seed(5)
@@ -244,7 +239,7 @@ class EvolutionJobMaster(NTRTJobMaster):
             # Starting a new trial - load previous results, if any, unless doing monteCarlo
             if (not (params['learning'] and params['monteCarlo'])):
                 for i in range(0, params['startingControllers']):
-                    inFile = self.path + self.jConf['filePrefix'] + "_" + str(i) + self.jConf['fileSuffix']
+                    inFile = self.resourcePath.getResourcePath("%s_%d%s" % (self.jConf['filePrefix'], i, self.jConf['fileSuffix']))
                     # We want the IO error if this fails
                     fin = open(inFile, 'r')
                     jControl = json.load(fin)
@@ -470,7 +465,7 @@ class EvolutionJobMaster(NTRTJobMaster):
         obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
         obj["goalVals"] = self.currentGeneration['goal'][self.getParamID(self.currentGeneration['goal'], jobNum_goal)]
 
-        outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+        outFile = self.resourcePath.getResourcePath("%s_%d%s" % (self.jConf['filePrefix'], jobNum, self.jConf['fileSuffix']))
 
         fout = open(outFile, 'w')
 
