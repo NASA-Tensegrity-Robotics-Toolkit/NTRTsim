@@ -40,21 +40,21 @@ if __name__ == "__main__":
         numScore = int(sys.argv[3])
     else:
         numScore = 1
-        
+
     scoreSum = 0
     fileSum = 0
     maxScore = -1000
     topScore = []
     topParam = []
-    
+
     paramList = []
-    
+
     for i in range(0, numFiles):
         scoresPath = configFile + str(i) +'.json'
         fin = open(scoresPath, 'r')
         obj = json.load(fin)
         fin.close()
-        try: 
+        try:
             paramID = obj['goalVals']['paramID']
             
             #if (paramList.count(paramID) == 0):
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         except KeyError:
             print(str(i) + " " + str(KeyError))
             thisScore =  0
-        
+
         if(thisScore > maxScore):
             j = min([numScore, len(topScore)])
             # Sort into position
@@ -88,22 +88,22 @@ if __name__ == "__main__":
                     j -= 1
                 else:
                     break
-            
+
             topScore.insert(j, thisScore)
             topParam.insert(j, i)
-            
+
             if (len(topScore) > numScore):
                 maxScore = topScore[numScore - 1]
                 topScore.pop(numScore)
                 topParam.pop(numScore)
             topObj = obj
-        
+
         scoreSum += thisScore
-        
+
     print(maxScore)
     print(scoreSum / fileSum)
     print(topScore)
     print(topParam)
-    
+
     # Now average the scores of the top object
-    
+

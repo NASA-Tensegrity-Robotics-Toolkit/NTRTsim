@@ -3,13 +3,13 @@
 # Copyright (c) 2012, United States Government, as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All rights reserved.
-# 
+#
 # The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # http://www.apache.org/licenses/LICENSE-2.0.
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -23,7 +23,7 @@
 # Date:    January 2015
 # Notes:   Prints statistics about both scores from a scores.csv file.
 # Input parameters are
-# (1) The name of the scores file, must be "single origin" See 
+# (1) The name of the scores file, must be "single origin" See
 #     splitInfile.py for preliminary work that may need to be done
 
 import sys
