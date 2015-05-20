@@ -5,6 +5,7 @@ import collections
 from interfaces import NTRTJobMaster, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
 import collections
+from utils import ConfigLoader
 #TODO: This is hackety, fix it.
 from evolution_job import EvolutionJob
 
@@ -23,14 +24,7 @@ class EvolutionJobMaster(NTRTJobMaster):
         Read input file, store file paths for run
         """
 
-        # If this fails, the program should fail. Input file is required
-        # for useful output
-        try:
-            fin = open(self.configFileName, 'r')
-            self.jConf = json.load(fin)
-            fin.close()
-        except IOError:
-            raise NTRTMasterError("Please provide a valid configuration file")
+        self.jconf = ConfigLoader(self.configFileName).toDict()
 
         self.path = self.jConf['resourcePath'] + self.jConf['lowerPath']
 
