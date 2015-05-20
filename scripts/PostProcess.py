@@ -56,22 +56,26 @@ if __name__ == "__main__":
         fin.close()
         try: 
             paramID = obj['goalVals']['paramID']
-            if (paramList.count(paramID) == 0):
+            
+            #if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
-                """
-                thisScore = 0
-                for k in range(1, 4):
-                    try:
-                        thisScore += float(obj['scores'][k]['distance'])
-                    except IndexError:
-                        thisScore += 0
-                """
-                thisScore = float(obj['goalVals']['avgScore'])
-                fileSum += 1
-                paramList.append(paramID)
+                
+            thisScore = 0
+            for k in range(0, 4):
+                try:
+                    thisScore += float(obj['scores'][k]['distance'])
+                except IndexError:
+                    thisScore += 0
+            """
+            thisScore = float(obj['goalVals']['avgScore'])
+            """
+            fileSum += 1
+            paramList.append(paramID)
+            """
             else:
                 print(str(i) + " " +str(paramID) + " " + str(paramList.count(paramID)))
                 thisScore = 0
+            """
         except KeyError:
             print(str(i) + " " + str(KeyError))
             thisScore =  0

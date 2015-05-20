@@ -5,15 +5,16 @@
     "lowerPath"    : "bmirletz/TC_Goal_JSON/",
     "executable" : "./../build/dev/btietz/TC_goal/AppGoalTerrain",
     "terrain" : [[0, 0, 0, 1.517], [1, 0, 0, 1.517], [0, 1, 0, 1.517], [1, 1, 0, 1.517]],
-    "a0" : 0.2,
-    "c0" : 0.5,
+    "A"  : 15,
+    "a0" : 0.9,
+    "c0" : 0.1,
     "bp" : 0.5,
-    "maxStep" : 0.01,
+    "maxStep" : 2,
     "learningParams": 
     {
         "trialLength" : 30000,
         "numTrials" : 3,
-        "numGenerations" : 50,
+        "numGenerations" : 150,
         "deterministic": 1,
         "nodeVals" :
         {

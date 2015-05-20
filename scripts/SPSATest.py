@@ -35,6 +35,7 @@ class SPSA(NTRTJobMaster.NTRTJobMaster):
         self.a0 = self.jConf['a0']
         self.c0 = self.jConf['c0']
         self.bp = self.jConf['bp']
+        self.A = self.jConf['A']
         self.maxStep = self.jConf['maxStep']
         
         self.k = 1
@@ -50,10 +51,10 @@ class SPSA(NTRTJobMaster.NTRTJobMaster):
     
     def __getAk(self,k):
         
-        return self.a0 / k
+        return self.a0 /(self.A + k)
 
     def __getCk(self,k):
-        return self.c0 / (k ** 0.125)
+        return self.c0 / (k ** 0.166)
         
     def __getBernoulli(self, n):
         
@@ -61,9 +62,9 @@ class SPSA(NTRTJobMaster.NTRTJobMaster):
         
         for i in range(0, n):
             if random.random() > self.bp:
-                deltas.append(0.1)
+                deltas.append(1)
             else:
-                deltas.append(-0.1)
+                deltas.append(-1)
         
         return np.array(deltas)
     
@@ -87,12 +88,13 @@ class SPSA(NTRTJobMaster.NTRTJobMaster):
         pMax = params['paramMax']
         pMin = params['paramMin']
         
-        deltaX = -ak * gk
+        deltaX = ak * gk
         
         newX = []
         
         for i in range(0, len(x)):
-            newX.append(x[i] + np.sign(deltaX[i]) * min(abs(deltaX[i]), self.maxStep))
+            #newX.append(x[i] + np.sign(deltaX[i]) * min(abs(deltaX[i]), self.maxStep))
+            newX.append(x[i] + deltaX[i])
         
         nXArray = np.array(newX)
         
