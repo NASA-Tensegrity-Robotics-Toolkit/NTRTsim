@@ -6,16 +6,16 @@
     "executable" : "./../../../build/dev/btietz/GATests/AppJSONLearningTests",
     "terrain" : [[0, 0, 0, 0]],
     "A"  : 15,
-    "a0" : 0.9,
+    "a0" : 0.0625,
     "c0" : 0.1,
     "bp" : 0.5,
     "maxStep" : 2,
     "learningParams": 
     {
         "trialLength" : 15000,
-        "numTrials" : 3,
+        "numTrials" : 4,
         "numGenerations" : 150,
-        "deterministic": 1,
+        "deterministic": 2,
         "nodeVals" :
         {
             "learning" : true,

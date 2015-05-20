@@ -49,7 +49,7 @@ class SPSA(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-        #random.seed(5)
+        random.seed(1)
 
     def __getAk(self,k):
         
@@ -286,9 +286,11 @@ class SPSA(NTRTJobMaster):
 
         else:
             # learning, not doing monteCarlo, have a previous generation
-            if len(currentGeneration) != 3:
-                raise NTRTMasterError("Incorrect input for this stage!")
-
+            if len(currentGeneration) < 3:
+                raise NTRTMasterError("Incorrect input for this stage! " + str(len(currentGeneration)))
+            
+            genSize = len(currentGeneration)
+            
             for controller in currentGeneration:
                 try:
                     scores = controller['scores']
@@ -302,14 +304,14 @@ class SPSA(NTRTJobMaster):
                 controller['maxScore'] = max(scores)
                 controller['avgScore'] = sum(scores) / float(len(scores))
 
-            oldX = self.__JSONToArray(params, currentGeneration[0])
+            oldX = self.__JSONToArray(params, currentGeneration[genSize - 3])
 
             if (useAvg):
-                newScores = [currentGeneration[1]['avgScore'], currentGeneration[2]['avgScore']]
+                newScores = [currentGeneration[genSize - 2]['avgScore'], currentGeneration[genSize - 1]['avgScore']]
             else:
-                newScores = [currentGeneration[1]['maxScore'], currentGeneration[2]['maxScore']]
+                newScores = [currentGeneration[genSize - 2]['maxScore'], currentGeneration[genSize - 1]['maxScore']]
 
-            gk = self.__getGk(self.__getCk(self.k), np.array(currentGeneration[0]['deltas']), newScores)
+            gk = self.__getGk(self.__getCk(self.k), np.array(currentGeneration[genSize - 3]['deltas']), newScores)
 
             newX = self.__updateParams(oldX, gk, self.__getAk(self.k), params)
 
@@ -318,23 +320,25 @@ class SPSA(NTRTJobMaster):
 
             newController = self.__arrayToJSON(params, newX)
             self.paramID += 1
-
+            
+            nextGeneration.append(currentGeneration[genSize - 3])
             nextGeneration.append(newController)
-
+            
         return [nextGeneration, newX]
 
     def nextTestParams(self, nextGeneration, xParams, paramName):
 
         print(paramName)
         print(xParams)
-
+        
+        genSize = len(nextGeneration)
 
         params = self.jConf["learningParams"][paramName]
 
         deltas = self.__getBernoulli(len(xParams))
 
         # Store for future use
-        nextGeneration[0]['deltas'] = deltas.tolist()
+        nextGeneration[genSize - 1]['deltas'] = deltas.tolist()
 
         print(self.__getCk(self.k))
 
@@ -383,7 +387,91 @@ class SPSA(NTRTJobMaster):
                 break
 
         return i
+    
+    def runTrials(self, st, nt):
+        
+        jobList = []
+        
+        print("Should run " + str(nt - st) + " jobs")
+        
+        # We want to write all of the trials for post processing
+        for i in range(0, self.numTrials) :
 
+            # MonteCarlo solution. This function could be overridden with something that
+            # provides a filename for a pre-existing file
+            fileName = self.getNewFile(i)
+
+            # All args to be passed to subprocess must be strings
+            args = {'filename' : fileName,
+                    'resourcePrefix' : self.jConf['resourcePath'],
+                    'path'     : self.jConf['lowerPath'],
+                    'executable' : self.jConf['executable'],
+                    'length'   : self.jConf['learningParams']['trialLength'],
+                    'terrain'  : self.jConf['terrain']}
+            if (i <= nt and i >= st):
+                jobList.append(EvolutionJob(args))
+                self.trialTotal += 1 
+
+        # Run the jobs
+        conSched = ConcurrentScheduler(jobList, self.numProcesses)
+        completedJobs = conSched.processJobs()
+
+        # Read scores from files, write to logs
+        totalScore = 0
+        maxScore = -1000
+
+        for job in completedJobs:
+            job.processJobOutput()
+            jobVals = job.obj
+
+            scores = jobVals['scores']
+
+            jobNum =  self.getJobNum(jobVals['edgeVals']['paramID'], 'edge')
+
+            # Iterate through all of the new scores for this file
+            for i in scores:
+                score = i['distance']
+
+                for p in self.prefixes:
+                    if (self.lParams[p + 'Vals']['learning']):
+                        self.currentGeneration[p][jobNum]['scores'].append(score)
+
+                totalScore += score
+                if score > maxScore:
+                    maxScore = score
+
+
+        avgScore = totalScore / float(len(completedJobs) * len(self.jConf['terrain']) )
+        logFile = open('evoLog.txt', 'a')
+        logFile.write(str(self.trialTotal) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
+        logFile.close()
+    
+    def evaluateNewController(self, currentGeneration, paramName):
+        
+        for controller in currentGeneration:
+            try:
+                scores = controller['scores']
+            except KeyError:
+                scores = [0]
+
+            if len(scores) == 0:
+                scores = [0]
+            print (scores)
+
+            controller['maxScore'] = max(scores)
+            controller['avgScore'] = sum(scores) / float(len(scores))
+        
+        params = self.jConf["learningParams"][paramName]
+
+        useAvg = params['useAverage']
+        
+        if (useAvg):
+            success = currentGeneration[0]['avgScore'] < currentGeneration[1]['avgScore']
+        else:
+            success = currentGeneration[0]['maxScore'] < currentGeneration[1]['maxScore']
+        
+        return success
+    
     def beginTrial(self):
         """
         Override this. It should just contain a loop where you keep constructing NTRTJobs, then calling
@@ -393,14 +481,14 @@ class SPSA(NTRTJobMaster):
 
         # Start a counter job ids to be use in dictionaries
         self.paramID = 1
+        self.trialTotal = 0
 
-        numTrials = self.jConf['learningParams']['numTrials']
+        self.numTrials = self.jConf['learningParams']['numTrials']
         numGenerations = self.jConf['learningParams']['numGenerations']
         self.prefixes = ['edge', 'node', 'feedback', 'goal']
 
-        results = {}
-        jobList = []
         self.currentGeneration = {}
+        self.oldGeneration = {}
 
         for p in self.prefixes:
             self.currentGeneration[p] = {}
@@ -410,73 +498,53 @@ class SPSA(NTRTJobMaster):
 
         scoreDump = open('scoreDump.txt', 'w')
         scoreDump.close()
-
-        lParams = self.jConf['learningParams']
+        
+        xVals = {}
+        
+        self.lParams = self.jConf['learningParams']
 
         for n in range(numGenerations):
-            # Create the generation
+            
+            success = False
+            
             for p in self.prefixes:
-                [self.currentGeneration[p], xVals] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
-                if (lParams[p + 'Vals']['learning']):
-                    self.currentGeneration[p] = self.nextTestParams(self.currentGeneration[p], xVals, p + 'Vals')
-
-            # Iterate over the generation (change range..)
+                self.oldGeneration[p] = self.currentGeneration[p]
+            
+            print("Old: " + str(len(self.oldGeneration[p])) + " New " + str(len(self.currentGeneration[p])))
+            
+            # Create the generation
+            print("New Generation!")
+            for p in self.prefixes:
+                [self.currentGeneration[p], xVals[p]] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
+            
             if n > 0:
-                startTrial = self.jConf['learningParams']['deterministic']
-            else:
-                startTrial = 0
-
-            # We want to write all of the trials for post processing
-            for i in range(0, numTrials) :
-
-                # MonteCarlo solution. This function could be overridden with something that
-                # provides a filename for a pre-existing file
-                fileName = self.getNewFile(i)
-
-                # All args to be passed to subprocess must be strings
-                args = {'filename' : fileName,
-                        'resourcePrefix' : self.jConf['resourcePath'],
-                        'path'     : self.jConf['lowerPath'],
-                        'executable' : self.jConf['executable'],
-                        'length'   : self.jConf['learningParams']['trialLength'],
-                        'terrain'  : self.jConf['terrain']}
-                if (n == 0 or i >= startTrial):
-                    jobList.append(EvolutionJob(args))
-
-            # Run the jobs
-            conSched = ConcurrentScheduler(jobList, self.numProcesses)
-            completedJobs = conSched.processJobs()
-
-            # Read scores from files, write to logs
-            totalScore = 0
-            maxScore = -1000
-            jobNum = startTrial
-            for job in completedJobs:
-                job.processJobOutput()
-                jobVals = job.obj
-
-                scores = jobVals['scores']
-
-                jobNum =  self.getJobNum(jobVals['edgeVals']['paramID'], 'edge')
-
-                # Iterate through all of the new scores for this file
-                for i in scores:
-                    score = i['distance']
-
+                
+                # Zero should already have been evaluated
+                self.runTrials(1, 1)
+            
+                success = self.evaluateNewController(self.currentGeneration[p],  p + 'Vals')
+                
+                if success == False:
+                    print ("Backtracking! " + str(len(self.oldGeneration[p])) + " Run " + str(n))
                     for p in self.prefixes:
-                        if (lParams[p + 'Vals']['learning']):
-                            self.currentGeneration[p][jobNum]['scores'].append(score)
-
-                    totalScore += score
-                    if score > maxScore:
-                        maxScore = score
-
-                jobNum += 1
-
-            avgScore = totalScore / float(len(completedJobs) * len(self.jConf['terrain']) )
-            logFile = open('evoLog.txt', 'a')
-            logFile.write(str((n+1) * numTrials) + ',' + str(maxScore) + ',' + str(avgScore) +'\n')
-            logFile.close()
+                        self.currentGeneration[p] = self.oldGeneration[p]
+                    print ("Updated: " + str(len(self.currentGeneration[p])))
+                    # Only want to backtrack once
+                    for p in self.prefixes:
+                        [self.currentGeneration[p], xVals[p]] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
+            
+            for p in self.prefixes:
+                if (self.lParams[p + 'Vals']['learning']):
+                        self.currentGeneration[p] = self.nextTestParams(self.currentGeneration[p], xVals[p], p + 'Vals')
+            
+            print("Post run " + str(len(self.currentGeneration[p])))
+            
+            genSize = len(self.currentGeneration[p])
+            
+            if n > 0:
+                self.runTrials(genSize - 2, genSize - 1)
+            else:
+                self.runTrials(0, genSize - 1)
 
             self.k += 1
 

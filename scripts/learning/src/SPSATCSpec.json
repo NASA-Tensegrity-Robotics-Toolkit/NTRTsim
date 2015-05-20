@@ -6,20 +6,20 @@
     "executable" : "./../../../build/dev/btietz/TC_goal/AppGoalTerrain",
     "terrain" : [[0, 0, 0, 1.517], [1, 0, 0, 1.517], [0, 1, 0, 1.517], [1, 1, 0, 1.517]],
     "A"  : 15,
-    "a0" : 0.9,
-    "c0" : 0.1,
+    "a0" : 0.000066,
+    "c0" : 0.01,
     "bp" : 0.5,
     "maxStep" : 2,
     "learningParams": 
     {
         "trialLength" : 30000,
-        "numTrials" : 3,
+        "numTrials" : 4,
         "numGenerations" : 150,
-        "deterministic": 1,
+        "deterministic": 2,
         "nodeVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
@@ -37,7 +37,7 @@
         "edgeVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
@@ -55,7 +55,7 @@
         "feedbackVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 3,
@@ -74,7 +74,7 @@
         "goalVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 4,
             "numberOfOutputs" : 24,
