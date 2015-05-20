@@ -6,4 +6,5 @@ ScarrArmModel
 
 ScarrArmController
     Basic controller that keeps all cables at the specified length (dictated in constructor)
+    Uses tgBasicActuator class for cables
 
