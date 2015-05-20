@@ -28,6 +28,7 @@ class EvolutionJobMaster(NTRTJobMaster):
 
         resPath = "%s%s" % (self.jconf['resourcePath'], self.jconf['lowerPath'])
         self.resourcePath = ResourcePath(resPath)
+        self.resourcePath.createPath()
 
         # Consider seeding random, using default (system time) now
         #random.seed(5)
