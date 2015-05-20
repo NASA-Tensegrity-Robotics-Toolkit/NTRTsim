@@ -42,15 +42,17 @@ def statScores(inFile):
     finally:
         f.close()
 
+    max1 = np.max(scores1)
     mean1 = np.mean(scores1)
     std1 = np.std(scores1)
     var1 = np.var(scores1)
+    max2 = np.max(scores2)
     mean2 = np.mean(scores2)
     std2 = np.std(scores2)
     var2 = np.var(scores2)
 
-    print "Score 1:\nMean: {:.6g}, STD: {:.6g}, VAR: {:.6g}\n".format(mean1, std1, var1)
-    print "Score 2:\nMean: {:.6g}, STD: {:.6g}, VAR: {:.6g}\n".format(mean2, std2, var2)
+    print "Score 1:\nMax: {:.6g}, Mean: {:.6g}, STD: {:.6g}, VAR: {:.6g}\n".format(max1, mean1, std1, var1)
+    print "Score 2:\nMax: {:.6g}, Mean: {:.6g}, STD: {:.6g}, VAR: {:.6g}\n".format(max2, mean2, std2, var2)
 
 if __name__=="__main__":
     inFile = sys.argv[1]

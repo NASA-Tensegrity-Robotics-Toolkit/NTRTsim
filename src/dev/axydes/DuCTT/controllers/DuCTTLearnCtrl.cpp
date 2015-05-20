@@ -161,6 +161,17 @@ void DuCTTLearnCtrl::teardownEnd(DuCTTRobotModel& subject)
     delete dcOffset;
 }
 
+double DuCTTLearnCtrl::getFirstScore(DuCTTRobotModel& subject)
+{
+    return getCoIS(subject);
+}
+
+double DuCTTLearnCtrl::getSecondScore(DuCTTRobotModel& subject)
+{
+    return displacement(subject);
+}
+
+
 /** 
  * Returns the modified actions 2D vector such that 
  *   each action value is now scaled to fit the model
@@ -178,6 +189,7 @@ vector< vector <double> > DuCTTLearnCtrl::transformActions(vector< vector <doubl
     double freqRange = maxFreq-minFreq;
     int freqOffset = 0;
     angularFrequency = params[freqOffset]*freqRange + minFreq;
+    std::cerr << "Angular freq: " << angularFrequency << std::endl;
 
     //use touch sensors (bool)
     double touchParam;
@@ -192,6 +204,7 @@ vector< vector <double> > DuCTTLearnCtrl::transformActions(vector< vector <doubl
     double historisisRange = maxHistorisis - minHistorisis;
     int histOffset = 2;//params.size() - (nActions*N_PARAMS + 1);
     m_dHistorisisSeconds = params[histOffset]*historisisRange + minHistorisis;
+    std::cerr << "Histeresis seconds: " << m_dHistorisisSeconds << std::endl;
 
     // Minimum amplitude, phaseChange, and dcOffset
     double mins[N_PARAMS]  = {

@@ -185,6 +185,16 @@ void DuCTTLearningSines::teardownEnd(DuCTTRobotModel& subject)
     delete dcOffsetTilt;
 }
 
+double DuCTTLearningSines::getFirstScore(DuCTTRobotModel& subject)
+{
+    return getCoIS(subject);
+}
+
+double DuCTTLearningSines::getSecondScore(DuCTTRobotModel& subject)
+{
+    return displacement(subject);
+}
+
 /** 
  * Returns the modified actions 2D vector such that 
  *   each action value is now scaled to fit the model
@@ -198,19 +208,17 @@ vector< vector <double> > DuCTTLearningSines::transformActions(vector< vector <d
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
     double mins[N_PARAMS]  = {
-                               0,
-//                               1.2, //m_initialLengths * (pretension - maxStringLengthFactor), //amplitude
+                               0, //amplitude
                                0.01, //Hz
                                -1 * M_PI, //phase change
-//                               1.2
-                               0
+                               0 //offset
                              }; //m_initialLengths};// * (1 - maxStringLengthFactor)}; //offset
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[N_PARAMS] = {40, //m_initialLengths * (pretension + maxStringLengthFactor), //amplitude
+    double maxes[N_PARAMS] = {40, //amplitude
                                20, //Hz (can cheat to 50Hz, if feeling immoral)
                                M_PI, //phase change
-                               40
+                               40 //offset
                              };//m_initialLengths};// * (1 + maxStringLengthFactor)}; //offset
     double ranges[N_PARAMS] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
@@ -247,6 +255,7 @@ vector< vector <double> > DuCTTLearningSines::transformActions(vector< vector <d
         double historisisRange = maxHistorisis - minHistorisis;
         int offset = params.size() - (nActions*N_PARAMS + 1);
         m_dHistorisisSeconds = params[params.size()-offset]*historisisRange + minHistorisis;
+        std::cerr << "Histeresis seconds: " << m_dHistorisisSeconds << std::endl;
     }
 
     return newActions;

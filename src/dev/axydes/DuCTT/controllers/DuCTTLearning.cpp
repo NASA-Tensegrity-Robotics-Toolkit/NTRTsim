@@ -77,7 +77,10 @@ DuCTTLearning::DuCTTLearning(const double initialLength,
     m_bBadRun(false),
     m_bRecordedStart(false),
     m_bUseManualParams(useManualParams),
-    m_ManualParamFile(manualParamFile)
+    m_ManualParamFile(manualParamFile),
+    m_dMaxInstaSpeed(0.0),
+    m_dMinInstaSpeed(9999999),
+    m_dOldCOM(-1,-1,-1)
 {
     if (resourcePath != "")
     {
@@ -163,6 +166,20 @@ void DuCTTLearning::onStep(DuCTTRobotModel& subject, double dt)
     {
         initPosition = subject.getCOM();
         m_bRecordedStart = true;
+    }
+
+    if (m_dOldCOM.x() != -1)
+    {
+        double instaSpeed = getSpeed(subject, dt);
+
+        if (instaSpeed > m_dMaxInstaSpeed)
+            m_dMaxInstaSpeed = instaSpeed;
+        if (instaSpeed < m_dMinInstaSpeed)
+            m_dMinInstaSpeed = instaSpeed;
+    }
+    else
+    {
+        m_dOldCOM = subject.getCOM();
     }
 
     stepBeforeMove(subject, dt);
@@ -295,6 +312,33 @@ double DuCTTLearning::displacement(DuCTTRobotModel& subject) {
         return newY - oldY;
     }
 }
+
+//Return cost of transport = work/(mass*grav*dist)
+//work=sum of (tension*dist shortened), ie totalEnergySpent
+double DuCTTLearning::getCoT(DuCTTRobotModel& subject)
+{
+    return totalEnergySpent(subject) / (subject.mass() * 981 * displacement(subject));
+}
+
+//return cost of instaspeed vs avg speed
+double DuCTTLearning::getCoIS(DuCTTRobotModel& subject)
+{
+    double avgSpeed = displacement(subject) / (m_totalTime-3);
+    double instaDiff = (m_dMaxInstaSpeed - m_dMinInstaSpeed);
+
+    return avgSpeed + (1 / (instaDiff + 1));
+}
+
+double DuCTTLearning::getSpeed(DuCTTRobotModel& subject, double dt)
+{
+    btVector3 newCOM = subject.getCOM();
+
+    double speed = (newCOM.distance(m_dOldCOM)) / dt;
+    m_dOldCOM = newCOM;
+
+    return speed;
+}
+
 
 std::vector<double> DuCTTLearning::readManualParams(int lineNumber)
 {

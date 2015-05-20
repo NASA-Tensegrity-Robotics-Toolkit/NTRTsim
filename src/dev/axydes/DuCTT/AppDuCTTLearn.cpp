@@ -253,7 +253,9 @@ void AppDuCTTLearn::handleOptions(int argc, char **argv)
         for (int i=0; i<argc; i++)
         {
             ss << argv[i] << " ";
+            std::cout << argv[i] << " ";
         }
+        std::cout << std::endl;
 
         ofstream myfile;
         myfile.open(tempFileName.c_str());
@@ -271,7 +273,7 @@ tgWorld* AppDuCTTLearn::createWorld()
     //create ground with higher friction to help with horiz plane test
     tgBoxGround::Config groundConfig (
         btVector3(0,0,0),
-        100,
+        1,
         0,
         btVector3(1000,0.2,1000)
     );
@@ -308,6 +310,8 @@ bool AppDuCTTLearn::run()
         simulate(simulation);
     }
 
+    delete simulation;
+
     return true;
 }
 
@@ -319,12 +323,13 @@ void AppDuCTTLearn::simulate(tgSimulation *simulation)
         try
         {
             simulation->run(nSteps);
-            simulation->reset();
         }
         catch (std::runtime_error e)
         {
-            simulation->reset();
         }
+
+        if (i != nEpisodes-1)
+            simulation->reset();
     }
 }
 

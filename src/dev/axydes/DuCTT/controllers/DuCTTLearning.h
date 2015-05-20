@@ -118,6 +118,15 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
          * of subject */
         double displacement(DuCTTRobotModel& subject);
 
+        //Return cost of transport = work/(mass*grav*dist)
+        //work=sum of (tension*dist shortened), ie totalEnergySpent
+        double getCoT(DuCTTRobotModel& subject);
+
+        //return cost of instaspeed vs avg speed
+        double getCoIS(DuCTTRobotModel& subject);
+
+        double getSpeed(DuCTTRobotModel& subject, double dt);
+
         std::vector<double> readManualParams(int lineNumber);
 
         btVector3 initPosition; // Initial position of model
@@ -149,6 +158,10 @@ class DuCTTLearning : public tgObserver<DuCTTRobotModel>
         bool m_bUseManualParams;
         string m_ManualParamFile;
         string m_ResourcePath;
+
+        btVector3 m_dOldCOM;
+        double m_dMaxInstaSpeed;
+        double m_dMinInstaSpeed;
 };
 
 #endif // ESCAPE_T6CONTROLLER

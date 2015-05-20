@@ -66,6 +66,10 @@ class DuCTTLearningSines : public DuCTTLearning
 
         virtual void teardownEnd(DuCTTRobotModel &subject);
 
+        virtual double getFirstScore(DuCTTRobotModel &subject);
+
+        virtual double getSecondScore(DuCTTRobotModel &subject);
+
         /** Sets target lengths for each muscle */
         void setPreferredMuscleLengths(DuCTTRobotModel& subject, double dt);
 

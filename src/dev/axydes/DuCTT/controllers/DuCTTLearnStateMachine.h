@@ -81,16 +81,7 @@ protected:
 
         virtual double getSecondScore(DuCTTRobotModel &subject);
 
-        //Return cost of transport = work/(mass*grav*dist)
-        //work=sum of (tension*dist shortened), ie totalEnergySpent
-        double getCoT(DuCTTRobotModel& subject);
-
-        //return cost of instaspeed vs avg speed
-        double getCoIS(DuCTTRobotModel& subject);
-
         void checkForTilting(DuCTTRobotModel& subject);
-
-        double getSpeed(DuCTTRobotModel& subject, double dt);
 
         bool movePrism(tgPrismatic* prism, std::vector<tgTouchSensorModel*> sensors, double goal, double dt);
         bool moveStrings(const std::vector<tgBasicActuator*> stringList, double goals, double dt);
@@ -124,10 +115,6 @@ protected:
         double maxStringLength;
         double minStringLength;
         double stringLengthEPS;
-
-        btVector3 m_dOldCOM;
-        double m_dMaxInstaSpeed;
-        double m_dMinInstaSpeed;
 };
 
 #endif // ESCAPE_T6CONTROLLER
