@@ -25,7 +25,7 @@ class ConfigLoader:
         try:
             self.loadedConf = open(self.configFileName, 'r')
         except IOError, e:
-            raise ConfigLoaderError("Hit IOError while loading config file %s. Error message is %s" % (self.configFileName, e.message))
+            raise ConfigLoaderError("Hit IOError while loading config file %s. Error message is %s" % (self.configFileName, e))
 
 class ConfigLoaderError(Exception):
     pass

@@ -21,9 +21,9 @@ class ResourcePath:
         """
 
         try:
-            os.makedirs(self.path)
+            os.makedirs(self.resourcePath)
         except OSError, e:
-            raise ResourcePathError("Resource path creation failed, hit an OSError. Error message is %s" % e.message)
+            raise ResourcePathError("Resource path creation failed, hit an OSError. Error message is %s" % e)
 
     def getResourcePath(self, filePath):
         """
