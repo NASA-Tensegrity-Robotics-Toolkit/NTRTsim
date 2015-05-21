@@ -4,7 +4,7 @@
     "resourcePath" : "../../resources/src/",
     "lowerPath"    : "bmirletz/OctaCL_6/",
     "executable" : "./../../build/dev/btietz/multiTerrain_OC/AppMultiTerrainOC",
-    "terrain" : [[0, 0]],
+    "terrain" : [[0, 0, 0, 0]],
     "learningParams": 
     {
         "trialLength" : 60000,
@@ -13,7 +13,7 @@
         "nodeVals" :
         {
             "learning" : false,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
@@ -31,7 +31,7 @@
         "edgeVals" :
         {
             "learning" : false,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
@@ -49,7 +49,7 @@
         "goalVals" :
         {
             "learning" : true,
-            "startingControllers" : 4,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 4,
@@ -68,7 +68,7 @@
         "feedbackVals" :
         {
             "learning" : false,
-            "startingControllers" : 1,
+            "startingControllers" : 0,
             "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 12,
