@@ -92,7 +92,7 @@ class EvolutionJobMaster(NTRTJobMaster):
 
             newParams['neuralParams'] = neuralParams
 
-            self.__writeToNNW(neuralParams, self.path + newParams['neuralFilename'])
+            self.__writeToNNW(neuralParams, self.resourcePath.basePath + newParams['neuralFilename'])
 
         newController['params'] = newParams
         newController['scores'] = []
@@ -418,7 +418,7 @@ class EvolutionJobMaster(NTRTJobMaster):
             if (params['numberOfStates'] > 0):
                 for c in nextGeneration.itervalues():
                     c['params']['neuralFilename'] = "logs/bestParameters-test_fb-"+ c['paramID'] +".nnw"
-                    self.__writeToNNW(c['params']['neuralParams'], self.path + c['params']['neuralFilename'])
+                    self.__writeToNNW(c['params']['neuralParams'], self.resourcePath.basePath + c['params']['neuralFilename'])
 
         return nextGeneration
 
