@@ -356,13 +356,6 @@ class SPSA(NTRTJobMaster):
                     print (scores)
 
                     i += 1
-            if (self.k >= 2):
-                if self.evaluateNewController(currentGeneration, paramName):
-                    rootController = 0
-                else:
-                    rootController = 1
-            else:
-                rootController = 0
             
             oldX = self.__JSONToArray(params, currentGeneration[genSize - 3])
 
@@ -582,18 +575,12 @@ class SPSA(NTRTJobMaster):
                 if success == False:
                     print ("Backtracking! " + str(len(self.oldGeneration[p])) + " Run " + str(n))
                     for p in self.prefixes:
-                        self.currentGeneration[p] = self.oldGeneration[p]
-                        if (self.k >= 2):
-                            if self.evaluateNewController(self.currentGeneration[p], p + 'Vals'):
-                                rootController = 0
-                            else:
-                                rootController = 1
+                        self.currentGeneration[p][1] = self.currentGeneration[p][0]
                         
-                        self.currentGeneration[p][1] = self.currentGeneration[p][rootController]
                     print ("Updated: " + str(len(self.currentGeneration[p])))
                     # Only want to backtrack once
                     for p in self.prefixes:
-                        [self.currentGeneration[p], xVals[p]] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
+                        xVals[p] = self.__JSONToArray(self.lParams[p + 'Vals'], self.currentGeneration[p][1])
             
             for p in self.prefixes:
                 if (self.lParams[p + 'Vals']['learning']):
