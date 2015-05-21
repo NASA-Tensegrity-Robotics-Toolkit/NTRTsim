@@ -11,7 +11,7 @@ class ResourcePath:
         """
         if not self.__isIndexSlash(resourcePath, -1):
             raise ResourcePathError("Received resource path %s, but this does not contain a trailing slash as expected.", resourcePath)
-        self.resourcePath = resourcePath
+        self.basePath = resourcePath
 
     def createPath(self):
         """
@@ -20,9 +20,9 @@ class ResourcePath:
         Throws ResourcePathError if any error occurs during path creation.
         """
 
-        if not os.path.exists(self.resourcePath):
+        if not os.path.exists(self.basePath):
             try:
-                os.makedirs(self.resourcePath)
+                os.makedirs(self.basePath)
             except OSError, e:
                 raise ResourcePathError("Resource path creation failed, hit an OSError. Error message is %s" % e)
 
@@ -38,7 +38,7 @@ class ResourcePath:
         if self.__isIndexSlash(filePath, 0):
             raise ResourcePathError("Received file path %s includes an initial slash.", filePath)
 
-        return "%s%s" % (self.resourcePath, filePath)
+        return "%s%s" % (self.basePath, filePath)
 
     def __isIndexSlash(self, toCheck, index):
         if toCheck[index] == '/':
