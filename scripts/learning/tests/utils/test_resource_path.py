@@ -15,11 +15,11 @@ class TestResourcePath(unittest.TestCase):
         resPath = self.__getResPathObject()
 
         with self.assertRaises(ResourcePathError):
-            resPath.getResourcePath("/relativePath")
+            resPath.getResourcePath("/relativePath/someOtherFile.tar.gz")
 
     def testGetPathNoForwardSlash(self):
         resPath = self.__getResPathObject()
-        resPath.getResourcePath("relativePath")
+        resPath.getResourcePath("relativePath/someOtherFile.tar.gz")
 
     def __getResPathObject(self):
         return ResourcePath("test/meow/")
