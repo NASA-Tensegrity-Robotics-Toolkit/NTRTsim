@@ -24,9 +24,9 @@ class EvolutionJobMaster(NTRTJobMaster):
         Read input file, store file paths for run
         """
 
-        self.jconf = ConfigLoader(self.configFileName).toDict()
+        self.jConf = ConfigLoader(self.configFileName).toDict()
 
-        resPath = "%s%s" % (self.jconf['resourcePath'], self.jconf['lowerPath'])
+        resPath = "%s%s" % (self.jConf['resourcePath'], self.jConf['lowerPath'])
         self.resourcePath = ResourcePath(resPath)
         self.resourcePath.createPath()
 
