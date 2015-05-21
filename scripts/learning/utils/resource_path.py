@@ -20,10 +20,11 @@ class ResourcePath:
         Throws ResourcePathError if any error occurs during path creation.
         """
 
-        try:
-            os.makedirs(self.resourcePath)
-        except OSError, e:
-            raise ResourcePathError("Resource path creation failed, hit an OSError. Error message is %s" % e)
+        if not os.path.exists(self.resourcePath):
+            try:
+                os.makedirs(self.resourcePath)
+            except OSError, e:
+                raise ResourcePathError("Resource path creation failed, hit an OSError. Error message is %s" % e)
 
     def getResourcePath(self, filePath):
         """
