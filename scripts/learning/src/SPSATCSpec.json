@@ -12,7 +12,7 @@
     "maxStep" : 2,
     "learningParams": 
     {
-        "trialLength" : 10000,
+        "trialLength" : 30000,
         "numTrials" : 4,
         "numGenerations" : 150,
         "deterministic": 2,

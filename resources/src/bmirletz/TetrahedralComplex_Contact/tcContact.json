@@ -1,7 +1,8 @@
 
 {
-	"edgeVals" : 
-	[
+	"edgeVals" :
+    { 
+	"params" : [
 		[ 0.333658, 0.0141477 ],
 		[ 0.357506, 0.583802 ],
 		[ 0.824675, 0.239439 ],
@@ -102,12 +103,24 @@
 		[ 0.350191, 0.5791539999999999 ],
 		[ 0.702259, 0.09733169999999999 ],
 		[ 0.739797, 0.604226 ]
-	],
-	"neuralFilename" : "logs/bestParameters-6_fb-0.nnw",
-	"nodeVals" : 
-	[
+	]
+    },
+    "feedbackVals":
+    {
+        "params" : 
+        {
+            "neuralFilename" : "logs/bestParameters-6_fb-0.nnw",
+            "numStates": 2,
+            "numHidden" : 4,
+            "numActions": 3
+        }
+    },
+    "nodeVals" :
+    { 
+	"params" : [
 		[ 0.846772, 0.909471, 0.998302, 1, 0.966812 ]
-	],
+	]
+    },
 	"numActions" : 3,
 	"numStates" : 2,
 	"scores" : 
