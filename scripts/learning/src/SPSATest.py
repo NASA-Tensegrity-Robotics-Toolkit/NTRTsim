@@ -43,7 +43,7 @@ class SPSA(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-        random.seed(1)
+        # random.seed(1)
 
     def __getAk(self,k):
         
@@ -330,6 +330,8 @@ class SPSA(NTRTJobMaster):
             
             genSize = len(currentGeneration)
             
+            print(paramName)
+            
             i = 0
             for controller in currentGeneration:
                 try:
@@ -428,11 +430,14 @@ class SPSA(NTRTJobMaster):
 
         obj = {}
 
-        # Hacked co-evolution. Normally co-evolution would always select a random controller
         for p in self.prefixes:
-            if(jobNum >= len(self.currentGeneration[p])):
+            if (self.lParams[p + 'Vals']['learning'] == False):
+                #TODO This is a hackey solution to running mixed learning and non-learning sets. Update for the potential of non-learning sets
+                jobNum_node = 0
+            elif(jobNum >= len(self.currentGeneration[p])):
                 jobNum_node = 0
                 raise NTRTMasterError("Called a bad job number")
+            
             else:
                 jobNum_node = jobNum
 
@@ -461,7 +466,11 @@ class SPSA(NTRTJobMaster):
         
         print("Should run " + str(nt - st) + " jobs")
         
-        writeOut = min(len(self.currentGeneration['edge']),  self.numTrials)
+        numberToWrite = 0
+        for p in self.prefixes:
+            numberToWrite = max(numberToWrite, len(self.currentGeneration[p]))
+        
+        writeOut = min(numberToWrite, self.numTrials)
         
         if writeOut < nt - 1:
             raise NTRTMasterError("Not writing enough files")
@@ -499,14 +508,13 @@ class SPSA(NTRTJobMaster):
 
             scores = jobVals['scores']
 
-            jobNum =  self.getJobNum(jobVals['edgeVals']['paramID'], 'edge')
-
             # Iterate through all of the new scores for this file
             for i in scores:
                 score = i['distance']
 
                 for p in self.prefixes:
                     if (self.lParams[p + 'Vals']['learning']):
+                        jobNum =  self.getJobNum(jobVals[p + 'Vals']['paramID'], p)
                         self.currentGeneration[p][jobNum]['scores'].append(score)
 
                 totalScore += score
@@ -571,18 +579,20 @@ class SPSA(NTRTJobMaster):
                 
                 # Zero should already have been evaluated
                 self.runTrials(1, 1)
-            
-                success = self.evaluateNewController(self.currentGeneration[p],  p + 'Vals')
                 
-                if success == False:
-                    print ("Backtracking! " + str(len(self.oldGeneration[p])) + " Run " + str(n))
-                    for p in self.prefixes:
-                        self.currentGeneration[p][1] = self.currentGeneration[p][0]
+                for p in self.prefixes:
+                    
+                    if (self.lParams[p + 'Vals']['learning']):
+                    
+                        success = self.evaluateNewController(self.currentGeneration[p],  p + 'Vals')
                         
-                    print ("Updated: " + str(len(self.currentGeneration[p])))
-                    # Only want to backtrack once
-                    for p in self.prefixes:
-                        xVals[p] = self.__JSONToArray(self.lParams[p + 'Vals'], self.currentGeneration[p][1])
+                        if success == False:
+                            print ("Backtracking! " + str(len(self.oldGeneration[p])) + " Run " + str(n))
+                            
+                            self.currentGeneration[p][1] = self.currentGeneration[p][0]
+                            
+                            # Only want to backtrack once
+                            xVals[p] = self.__JSONToArray(self.lParams[p + 'Vals'], self.currentGeneration[p][1])
             
             for p in self.prefixes:
                 if (self.lParams[p + 'Vals']['learning']):
