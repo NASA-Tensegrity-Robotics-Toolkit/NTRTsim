@@ -132,6 +132,8 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
+    std::cout << nodeVals << std::endl;
+    
     nodeVals = nodeVals.get("params", "UTF-8");
     edgeVals = edgeVals.get("params", "UTF-8");
     
@@ -176,7 +178,7 @@ void JSONFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0)
+#if (1)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        
