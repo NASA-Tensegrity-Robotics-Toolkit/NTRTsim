@@ -43,7 +43,7 @@ class SPSA(NTRTJobMaster):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
 
         # Consider seeding random, using default (system time) now
-        # random.seed(1)
+        random.seed(1)
 
     def __getAk(self,k):
         
@@ -262,7 +262,9 @@ class SPSA(NTRTJobMaster):
         useAvg = params['useAverage']
         
         if (useAvg):
-            success = currentGeneration[0]['avgScore'] < currentGeneration[1]['avgScore']
+            success = (currentGeneration[0]['avgScore'] < currentGeneration[1]['avgScore']
+                       or (currentGeneration[0]['avgScore'] - 10.0 < currentGeneration[1]['avgScore']
+                           and currentGeneration[0]['maxScore'] < currentGeneration[1]['maxScore']))
         else:
             success = currentGeneration[0]['maxScore'] < currentGeneration[1]['maxScore']
         
