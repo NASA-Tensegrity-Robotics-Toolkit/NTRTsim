@@ -528,16 +528,17 @@ class EvolutionJobMaster(NTRTJobMaster):
                 # MonteCarlo solution. This function could be overridden with something that
                 # provides a filename for a pre-existing file
                 fileName = self.getNewFile(i)
-
-                # All args to be passed to subprocess must be strings
-                args = {'filename' : fileName,
-                        'resourcePrefix' : self.jConf['resourcePath'],
-                        'path'     : self.jConf['lowerPath'],
-                        'executable' : self.jConf['executable'],
-                        'length'   : self.jConf['learningParams']['trialLength'],
-                        'terrain'  : self.jConf['terrain']}
-                if (n == 0 or i >= startTrial):
-                    jobList.append(EvolutionJob(args))
+                
+                for j in self.jConf['terrain']:
+                    # All args to be passed to subprocess must be strings
+                    args = {'filename' : fileName,
+                            'resourcePrefix' : self.jConf['resourcePath'],
+                            'path'     : self.jConf['lowerPath'],
+                            'executable' : self.jConf['executable'],
+                            'length'   : self.jConf['learningParams']['trialLength'],
+                            'terrain'  : j}
+                    if (n == 0 or i >= startTrial):
+                        jobList.append(EvolutionJob(args))
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
@@ -563,14 +564,14 @@ class EvolutionJobMaster(NTRTJobMaster):
                 for i in scores:
                     score = i['distance']
 
-                    if (lParams['edgeVals']['learning']):
-                        self.currentGeneration['edge'][edgeKey]['scores'].append(score)
-                    if (lParams['nodeVals']['learning']):
-                        self.currentGeneration['node'][nodeKey]['scores'].append(score)
-                    if (lParams['feedbackVals']['learning']):
-                        self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
-                    if (lParams['goalVals']['learning']):
-                        self.currentGeneration['goal'][goalKey]['scores'].append(score)
+                #if (lParams['edgeVals']['learning']):
+                    self.currentGeneration['edge'][edgeKey]['scores'].append(score)
+                #if (lParams['nodeVals']['learning']):
+                    self.currentGeneration['node'][nodeKey]['scores'].append(score)
+                #if (lParams['feedbackVals']['learning']):
+                    self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
+                #if (lParams['goalVals']['learning']):
+                    self.currentGeneration['goal'][goalKey]['scores'].append(score)
                     totalScore += score
                     if score > maxScore:
                         maxScore = score
