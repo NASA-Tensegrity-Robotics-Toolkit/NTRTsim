@@ -102,12 +102,12 @@ bool AppGoalTension::setup()
         const double hf = 30.0;
         
         // Feedback parameters
-        const double ffMin = -0.5;
+        const double ffMin = -10.0;
         const double ffMax = 10.0;
         const double afMin = 0.0;
         const double afMax = 200.0;
-        const double pfMin = -0.5;
-        const double pfMax =  6.28;
+        const double pfMin = 0.0;
+        const double pfMax =  0.0;
         const double tensionFeedback = 1000.0;
 
         JSONGoalControl::Config control_config(segmentSpan, 

@@ -103,6 +103,14 @@ void JSONGoalTension::onSetup(BaseSpineModelLearning& subject)
 
     setupCPGs(subject, nodeParams, edgeParams);
     
+    Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
+    feedbackParams = feedbackParams.get("params", "UTF-8");
+    
+    // Setup neural network
+    m_config.numStates = feedbackParams.get("numStates", "UTF-8").asInt();
+    m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
+    m_config.numHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
+    
     Json::Value goalParams = root.get("goalVals", "UTF-8");
     goalParams = goalParams.get("params", "UTF-8");
     
@@ -137,21 +145,7 @@ void JSONGoalTension::onStep(BaseSpineModelLearning& subject, double dt)
 #if (1) // Goal and cable
 
     std::vector<double> desComs = getFeedback(subject);
-
-    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
-    std::vector<double> desComsSet2 = getGoalFeedback(goalSubject);
-    
-    std::size_t n = desComs.size();
-    assert(n == desComsSet2.size());
-    
-    for (std::size_t i = 0; i < n; i++)
-    {
-        desComs[i] += desComsSet2[i];
-    }
-    
-#elif (1) // Just goal
-    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning,  BaseSpineModelGoal>(subject);
-    std::vector<double> desComs = getGoalFeedback(goalSubject);
+  
 #else // Nothing
     std::size_t numControllers = subject.getNumberofMuslces() * 3;
     
@@ -275,7 +269,6 @@ void JSONGoalTension::onTeardown(BaseSpineModelLearning& subject)
     }
     m_allControllers.clear();
     
-    delete nn;
     delete nn_goal;
 }
 
@@ -366,17 +359,25 @@ std::vector<double> JSONGoalTension::getGoalFeedback(const BaseSpineModelGoal* s
     std::cout << std::endl;
 #endif
     
+    for(int j=0;j<m_config.goalActions;j++)
+    {
+        actions.push_back(output[j]);
+    }
+    
+    transformFeedbackActions(actions);
+    
+    assert(m_config.goalActions * nSeg == m_allControllers.size());
+    
     // Duplicate the actions across segments
     for (int i = 0; i != nSeg; i++)
     {
         for(int j=0;j<m_config.goalActions;j++)
         {
-            actions.push_back(output[j]);
+            m_allControllers[i * m_config.goalActions + j]->updateTensionSetpoint(actions[i] * m_config.tensFeedback + m_config.tensFeedback);
         }
     }
 
-
-    transformFeedbackActions(actions);
+    
     
     return actions;
 }
@@ -388,25 +389,18 @@ std::vector<double> JSONGoalTension::getFeedback(BaseSpineModelLearning& subject
     
     const std::vector<tgSpringCableActuator*>& allCables = subject.getAllMuscles();
     
-    double *inputs = new double[m_config.numStates];
-    
+
     std::size_t n = allCables.size();
     for(std::size_t i = 0; i != n; i++)
     {        
         const tgSpringCableActuator& cable = *(allCables[i]);
         std::vector<double > state = getCableState(cable);
         
-        // Rescale to 0 to 1 (consider doing this inside getState
-        for (std::size_t i = 0; i < state.size(); i++)
-        {
-            inputs[i]=state[i];
-        }
-        
-        double *output = nn->feedForwardPattern(inputs);
         vector<double> actions;
         for(int j=0;j<m_config.numActions;j++)
         {
-            actions.push_back(output[j]);
+            // Provide tension to all inputs
+            actions.push_back(state[0]);
         }
 
         transformFeedbackActions(actions);
