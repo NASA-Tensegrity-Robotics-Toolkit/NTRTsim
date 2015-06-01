@@ -122,7 +122,7 @@ protected:
 
     std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
     
-    std::vector<double> getFeedback(BaseSpineModelLearning& subject);
+    virtual std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     
