@@ -60,8 +60,6 @@ protected:
 
     virtual array_2D scaleNodeActions (Json::Value actions);
     
-    void setGoalTensions(const BaseSpineModelGoal* subject);
-    
     virtual std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
     
     virtual std::vector<double> getFeedback(BaseSpineModelLearning& subject);    

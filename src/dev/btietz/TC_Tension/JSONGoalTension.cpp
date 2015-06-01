@@ -145,7 +145,11 @@ void JSONGoalTension::onStep(BaseSpineModelLearning& subject, double dt)
 #if (1) // Goal and cable
 
     std::vector<double> desComs = getFeedback(subject);
-  
+    
+    const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
+    
+    getGoalFeedback(goalSubject);
+    
 #else // Nothing
     std::size_t numControllers = subject.getNumberofMuslces() * 3;
     
