@@ -450,31 +450,12 @@ class EvolutionJobMaster(NTRTJobMaster):
 
         obj = {}
 
-        # Hacked co-evolution. Normally co-evolution would always select a random controller
-        if(jobNum >= len(self.currentGeneration['node'])):
-            jobNum_node = random.randint(0, len(self.currentGeneration['node']) - 1)
-        else:
-            jobNum_node = jobNum
-
-        if(jobNum >= len(self.currentGeneration['edge'])):
-            jobNum_edge = random.randint(0, len(self.currentGeneration['edge']) - 1)
-        else:
-            jobNum_edge = jobNum
-
-        if(jobNum >= len(self.currentGeneration['feedback'])):
-            jobNum_fb = random.randint(0, len(self.currentGeneration['feedback']) - 1)
-        else:
-            jobNum_fb = jobNum
-
-        if(jobNum >= len(self.currentGeneration['goal'])):
-            jobNum_goal = random.randint(0, len(self.currentGeneration['goal']) - 1)
-        else:
-            jobNum_goal = jobNum
-
-        obj["nodeVals"] = self.currentGeneration['node'][self.getParamID(self.currentGeneration['node'], jobNum_node)]
-        obj["edgeVals"] = self.currentGeneration['edge'][self.getParamID(self.currentGeneration['edge'], jobNum_edge)]
-        obj["feedbackVals"] = self.currentGeneration['feedback'][self.getParamID(self.currentGeneration['feedback'], jobNum_fb)]
-        obj["goalVals"] = self.currentGeneration['goal'][self.getParamID(self.currentGeneration['goal'], jobNum_goal)]
+        for p in self.prefixes:
+            # Hacked co-evolution. Normally co-evolution would always select a random controller
+            if(jobNum >= len(self.currentGeneration[p])):
+                jobNum = random.randint(0, len(self.currentGeneration[p]) - 1)
+            
+            obj[p + "Vals"] = self.currentGeneration[p][self.getParamID(self.currentGeneration[p], jobNum)]
 
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
@@ -499,22 +480,22 @@ class EvolutionJobMaster(NTRTJobMaster):
 
         results = {}
         jobList = []
+        
+        self.prefixes = ['edge', 'node', 'feedback', 'goal']
+        
         self.currentGeneration = {}
-        self.currentGeneration['edge'] = {}
-        self.currentGeneration['node'] = {}
-        self.currentGeneration['feedback'] = {}
-        self.currentGeneration['goal'] = {}
+        for p in self.prefixes:
+            self.currentGeneration[p] = {}
+
         logFile = open('evoLog.txt', 'w') #Clear logfile
         logFile.close()
 
         scoreDump = open('scoreDump.txt', 'w')
         scoreDump.close()
         for n in range(numGenerations):
-            # Create the generation
-            self.currentGeneration['edge'] = self.generationGenerator(self.currentGeneration['edge'], 'edgeVals')
-            self.currentGeneration['node'] = self.generationGenerator(self.currentGeneration['node'], 'nodeVals')
-            self.currentGeneration['feedback'] = self.generationGenerator(self.currentGeneration['feedback'], 'feedbackVals')
-            self.currentGeneration['goal'] = self.generationGenerator(self.currentGeneration['goal'], 'goalVals')
+            # Create the generation'
+            for p in self.prefixes:
+                self.currentGeneration[p] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
 
             # Iterate over the generation (change range..)
             if n > 0:
@@ -552,29 +533,25 @@ class EvolutionJobMaster(NTRTJobMaster):
                 jobVals = job.obj
 
                 scores = jobVals['scores']
-
-                edgeKey = jobVals ['edgeVals']['paramID']
-                nodeKey = jobVals ['nodeVals']['paramID']
-                feedbackKey = jobVals ['feedbackVals']['paramID']
-                goalKey = jobVals ['goalVals']['paramID']
-
+                
                 lParams = self.jConf['learningParams']
+                
+                for p in self.prefixes:
+                
+                    key = jobVals [p + 'Vals']['paramID']
 
-                # Iterate through all of the new scores for this file
-                for i in scores:
-                    score = i['distance']
+                    
 
-                #if (lParams['edgeVals']['learning']):
-                    self.currentGeneration['edge'][edgeKey]['scores'].append(score)
-                #if (lParams['nodeVals']['learning']):
-                    self.currentGeneration['node'][nodeKey]['scores'].append(score)
-                #if (lParams['feedbackVals']['learning']):
-                    self.currentGeneration['feedback'][feedbackKey]['scores'].append(score)
-                #if (lParams['goalVals']['learning']):
-                    self.currentGeneration['goal'][goalKey]['scores'].append(score)
-                    totalScore += score
-                    if score > maxScore:
-                        maxScore = score
+                    # Iterate through all of the new scores for this file
+                    for i in scores:
+                        score = i['distance']
+
+                    if (lParams[p + 'Vals']['learning']):
+                        self.currentGeneration[p][key]['scores'].append(score)
+
+                        totalScore += score
+                        if score > maxScore:
+                            maxScore = score
 
             avgScore = totalScore / float(len(completedJobs) * len(self.jConf['terrain']) )
             logFile = open('evoLog.txt', 'a')
