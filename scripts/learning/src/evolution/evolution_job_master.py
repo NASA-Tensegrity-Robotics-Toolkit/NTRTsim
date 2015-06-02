@@ -481,7 +481,15 @@ class EvolutionJobMaster(NTRTJobMaster):
         results = {}
         jobList = []
         
-        self.prefixes = ['edge', 'node', 'feedback', 'goal']
+        lParams = self.jConf['learningParams']
+        
+        self.prefixes = []
+        
+        for keys in lParams:
+            if keys[-4:] == "Vals":
+                self.prefixes.append(keys[:-4])
+        
+        print (self.prefixes)
         
         self.currentGeneration = {}
         for p in self.prefixes:
@@ -533,8 +541,6 @@ class EvolutionJobMaster(NTRTJobMaster):
                 jobVals = job.obj
 
                 scores = jobVals['scores']
-                
-                lParams = self.jConf['learningParams']
                 
                 for p in self.prefixes:
                 

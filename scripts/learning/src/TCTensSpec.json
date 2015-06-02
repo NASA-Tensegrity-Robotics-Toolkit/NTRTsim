@@ -93,6 +93,25 @@
             "paramMax" : 1.0,
             "paramMin": -1.0,
             "childMutationChance" : 0.7
+        },
+        "impedenceVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 4,
+            "numberHidden" : 0,
+            "numberOfInstances" : 1,
+            "populationSize" : 2,
+            "useAverage" : true,
+            "numberToMutate" : 1,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.7
         }
     }
 }

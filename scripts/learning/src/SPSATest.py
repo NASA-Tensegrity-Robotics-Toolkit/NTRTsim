@@ -540,7 +540,12 @@ class SPSA(NTRTJobMaster):
 
         self.numTrials = self.jConf['learningParams']['numTrials']
         numGenerations = self.jConf['learningParams']['numGenerations']
-        self.prefixes = ['edge', 'node', 'feedback', 'goal']
+        
+        self.prefixes = []
+        
+        for keys in lParams:
+            if keys[-4:] == "Vals":
+                self.prefixes.append(keys[:-4])
 
         self.currentGeneration = {}
         self.oldGeneration = {}
