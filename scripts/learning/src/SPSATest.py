@@ -541,9 +541,11 @@ class SPSA(NTRTJobMaster):
         self.numTrials = self.jConf['learningParams']['numTrials']
         numGenerations = self.jConf['learningParams']['numGenerations']
         
+        self.lParams = self.jConf['learningParams']
+        
         self.prefixes = []
         
-        for keys in lParams:
+        for keys in self.lParams:
             if keys[-4:] == "Vals":
                 self.prefixes.append(keys[:-4])
 
@@ -563,8 +565,6 @@ class SPSA(NTRTJobMaster):
         scoreDump.close()
         
         xVals = {}
-        
-        self.lParams = self.jConf['learningParams']
 
         for n in range(numGenerations):
             

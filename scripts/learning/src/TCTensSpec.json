@@ -4,7 +4,7 @@
     "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/TC_Tension/",
     "executable" : "./../../../build/dev/btietz/TC_Tension/AppTC_Tension",
-    "terrain"   : [[[0, 0, 0, 0]]],
+    "terrain"   : [[[0, 0, 0, -1.517]], [[1, 0, 0, -1.517]], [[0, 1, 0, -1.517]], [[1, 1, 0, -1.517]]],
     "_terrain" : [[[0, 0, 0, 1.517]], [[1, 0, 0, 1.517]], [[0, 1, 0, 1.517]], [[1, 1, 0, 1.517]],
                  [[0, 0, 0, -1.517]], [[1, 0, 0, -1.517]], [[0, 1, 0, -1.517]], [[1, 1, 0, -1.517]],
                  [[0, 0, 0, 0]], [[1, 0, 0, 0]], [[0, 1, 0, 0]], [[1, 1, 0, 0]],
@@ -17,9 +17,9 @@
     "learningParams": 
     {
         "trialLength" : 30000,
-        "numTrials" : 1,
-        "numGenerations" : 1,
-        "deterministic": 0,
+        "numTrials" : 4,
+        "numGenerations" : 150,
+        "deterministic": 2,
         "nodeVals" :
         {
             "learning" : false,
@@ -78,7 +78,7 @@
         "goalVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 4,
             "numberOfOutputs" : 8,
@@ -110,7 +110,7 @@
             "mutationChance" : 0.5,
             "mutationDev" : 0.03,
             "paramMax" : 1.0,
-            "paramMin": -1.0,
+            "paramMin": 0.0,
             "childMutationChance" : 0.7
         }
     }
