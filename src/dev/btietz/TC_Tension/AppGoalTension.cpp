@@ -26,7 +26,10 @@
 
 #include "AppGoalTension.h"
 
+#include "helpers/FileHelpers.h"
 #include "tgcreator/tgUtil.h"
+
+#include <json/json.h>
 
 AppGoalTension::AppGoalTension(int argc, char** argv)
 {
@@ -81,6 +84,33 @@ bool AppGoalTension::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
+        Json::Value root; // will contains the root value after parsing.
+        Json::Reader reader;
+        
+        std::string resourcePath = "bmirletz/TC_Tension/";
+        std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
+        std::string controlFilename = controlFilePath + suffix;
+        
+        bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
+        if ( !parsingSuccessful )
+        {
+            // report to the user the failure and their locations in the document.
+            std::cout << "Failed to parse configuration\n"
+                << reader.getFormattedErrorMessages();
+            throw std::invalid_argument("Bad filename for JSON");
+        }
+        // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
+        // such member.
+        Json::Value impedenceVals = root.get("impedenceVals", "UTF-8");
+        impedenceVals = impedenceVals.get("params", "UTF-8");
+        
+        // Keep drilling if necessary
+        if (impedenceVals[0].isArray())
+        {
+            impedenceVals = impedenceVals[0];
+        }
+        
+        const double impedanceMax = 2000.0;
         
         const int segmentSpan = 3;
         const int numMuscles = 8;
@@ -91,9 +121,11 @@ bool AppGoalTension::setup()
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
         const double highAmplitude = 300.0;
-        const double kt = 0.0;
-        const double kp = 1000.0;
-        const double kv = 200.0;
+        // JSONCPP's .get really wants this to be typed...
+        int j = 0;
+        const double kt = impedanceMax * (impedenceVals.get(j, 0.0)).asDouble();
+        const double kp = impedanceMax * (impedenceVals.get(1, 0.0)).asDouble();
+        const double kv = impedanceMax * (impedenceVals.get(2, 0.0)).asDouble();
         const bool def = true;
             
         // Overridden by def being true
@@ -108,7 +140,7 @@ bool AppGoalTension::setup()
         const double afMax = 200.0;
         const double pfMin = 0.0;
         const double pfMax =  0.0;
-        const double tensionFeedback = 1000.0;
+        const double tensionFeedback = impedanceMax *(impedenceVals.get(3, 0.0)).asDouble();
 
         JSONGoalControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -138,7 +170,7 @@ bool AppGoalTension::setup()
         
         /// @todo fix memory leak that occurs here
         JSONGoalTension* const myControl =
-        new JSONGoalTension(control_config, suffix, "bmirletz/TC_Tension/");
+        new JSONGoalTension(control_config, suffix, resourcePath);
         
         myModel->attach(myControl);
     }
