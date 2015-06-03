@@ -453,9 +453,11 @@ class EvolutionJobMaster(NTRTJobMaster):
         for p in self.prefixes:
             # Hacked co-evolution. Normally co-evolution would always select a random controller
             if(jobNum >= len(self.currentGeneration[p])):
-                jobNum = random.randint(0, len(self.currentGeneration[p]) - 1)
+                paramNum = random.randint(0, len(self.currentGeneration[p]) - 1)
+            else:
+                paramNum = jobNum
             
-            obj[p + "Vals"] = self.currentGeneration[p][self.getParamID(self.currentGeneration[p], jobNum)]
+            obj[p + "Vals"] = self.currentGeneration[p][self.getParamID(self.currentGeneration[p], paramNum)]
 
         outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
