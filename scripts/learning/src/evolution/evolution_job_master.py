@@ -466,7 +466,15 @@ class EvolutionJobMaster(NTRTJobMaster):
         json.dump(obj, fout, indent=4)
 
         return self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+    
+    def getJobNum(self, paramNum, paramName):
 
+        for i in range(0, len(self.currentGeneration[paramName])):
+            if paramNum == self.currentGeneration[paramName][i]['paramID']:
+                break
+
+        return i
+    
     def beginTrial(self):
         """
         Override this. It should just contain a loop where you keep constructing NTRTJobs, then calling
@@ -544,22 +552,20 @@ class EvolutionJobMaster(NTRTJobMaster):
 
                 scores = jobVals['scores']
                 
-                for p in self.prefixes:
-                
-                    key = jobVals [p + 'Vals']['paramID']
+                             
 
+                # Iterate through all of the new scores for this file
+                for i in scores:
+                    score = i['distance']
                     
+                    for p in self.prefixes:
+                        if (lParams[p + 'Vals']['learning']):
+                            key = jobVals [p + 'Vals']['paramID']
+                            self.currentGeneration[p][key]['scores'].append(score)
 
-                    # Iterate through all of the new scores for this file
-                    for i in scores:
-                        score = i['distance']
-
-                    if (lParams[p + 'Vals']['learning']):
-                        self.currentGeneration[p][key]['scores'].append(score)
-
-                        totalScore += score
-                        if score > maxScore:
-                            maxScore = score
+                    totalScore += score
+                    if score > maxScore:
+                        maxScore = score
 
             avgScore = totalScore / float(len(completedJobs) * len(self.jConf['terrain']) )
             logFile = open('evoLog.txt', 'a')
