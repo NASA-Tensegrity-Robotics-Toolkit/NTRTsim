@@ -39,4 +39,4 @@ GMOCKTEST_PACKAGE_DIR="$GMOCKTEST_BUILD_DIR"
 
 # GMOCKTEST_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/gmocktest.tgz or file:///path/to/gmocktest.tgz
-GMOCKTEST_URL="http://storage.perryb.ca/ntrt/dependencies/gmock-1.7.0.zip"
+GMOCKTEST_URL="http://ntrt.perryb.ca/storage/dependencies/gmock-1.7.0.zip"
