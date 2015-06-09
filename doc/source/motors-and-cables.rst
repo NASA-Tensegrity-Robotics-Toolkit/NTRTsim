@@ -4,6 +4,10 @@ This tutorial assumes you're familiar with the basics of building structures in 
 The Doxygen documentation and examples are currently the best place to get that information:
 http://ntrt.perryb.ca/doxygen/
 
+The basic model we're using is that the robot has a motor connected to each cable,
+which is in turn connected to a spring. The motor adjusts the rest length of this
+system according to rules defined by the motor model.
+
 NTRT provides two options for motors, and two options for cables.
 All of these are a subclass of tgSpringCable_ and 
 use the same attributes in the config struct
@@ -14,7 +18,7 @@ The basic options in core are as follows:
 
 2. Motors can be perfect actuators (easy to control) or possess inertia, friction, and a torque speed curve.
 
-Both of these are actuated with simple switches in the builder tools.
+Both of these are chosen with simple switches (similar child classes) in the builder tools.
 
 Cables
 --------------
@@ -27,8 +31,8 @@ https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/blob/master/src/exam
 Motors
 -----------------
 tgBasicActuator_ is a perfect actuator. As long as you don't exceed the force or speed constraints set
-by the config (from tgSpringCable_) then it will do what you want. Great for getting started, but not
-the way motors really work.
+by the config (from tgSpringCable_) then it will make your desired changes to the cable's rest length.
+Great for getting started, but not the way motors really work.
 
 For more complex behaviors, use tgKinematicActuator_. This adds four new parameters to the specification,
 the radius of the motor, motor friction, motor inertia, and whether the motor is backdrivable (a boolean).
@@ -43,6 +47,15 @@ https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/blob/master/src/exam
 If you need a different torque speed curve or friction behavior, you should be able to subclass
 the functions getAppliedTorque or integrateRestLength in tgKinematicActuator_
 
+Controlling Each Type of Motor
+--------------------------------
+tgBasicActuator_ controls rest length directly, these are the commands passed by setControlInput.
+tgKinematicActuator_ controls the motor's applied torque, which is then integrated to produce a rest
+length change. Thus control needs to be a little more complicated. Look at the controller_ classes
+for PID controllers, and other things that are useful for more complex low level controls.
+
+Tutorials on controllers will hopefully get written in August 2015.
+
 If you have questions contact Brian at bmirletz (at) case (dot) edu
 
 .. _tgSpringCable: http://ntrt.perryb.ca/doxygen/classtg_spring_cable.html
@@ -52,3 +65,4 @@ If you have questions contact Brian at bmirletz (at) case (dot) edu
 .. _tgKinematicActuator: http://ntrt.perryb.ca/doxygen/classtg_kinematic_actuator.html
 .. _tgKinematicActuatorInfo: http://ntrt.perryb.ca/doxygen/classtg_kinematic_actuator_info.html
 .. _tgKinematicContactCableInfo : http://ntrt.perryb.ca/doxygen/classtg_kinematic_contact_cable_info.html
+.. _controller: https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/tree/master/src/controllers
