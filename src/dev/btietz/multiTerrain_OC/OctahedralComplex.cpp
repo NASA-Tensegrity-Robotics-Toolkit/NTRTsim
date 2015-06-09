@@ -36,6 +36,7 @@
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -47,8 +48,8 @@
 #include <map>
 #include <set>
 
-OctahedralComplex::OctahedralComplex(int segments) :   
-    BaseSpineModelLearning(segments) 
+OctahedralComplex::OctahedralComplex(int segments, double goalAngle) :   
+    BaseSpineModelGoal(segments, goalAngle)
 {
 }
 
@@ -69,20 +70,30 @@ void OctahedralComplex::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
     
-    const double radius2  = 0.15;
-    const double density2 = 1;  // Note: This needs to be high enough or things fly apart...
-    const tgRod::Config rodConfig2(radius2, density2);
-    
-    const double stiffness = 1000.0;
-    const double damping = .01*stiffness;
+    const double elasticity = 1000.0;
+    const double damping = 10.0;
     const double pretension = 0.0;
+    const bool   history = false;
+    const double maxTens = 7000.0;
+    const double maxSpeed = 24.0;
+
+    const double mRad = 1.0;
+    const double motorFriction = 10.0;
+    const double motorInertia = 1.0;
+    const bool backDrivable = false;
+    tgKinematicActuator::Config motorConfig(elasticity, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+#if (0)
     const tgSpringCableActuator::Config stringConfig(stiffness, damping, pretension, false, 7000, 24);
-    
+#endif
     
     const double passivePretension = 700; // 5 N
-    tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
+    tgKinematicActuator::Config muscleConfig(2000, 20, passivePretension, 
+                                             mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
     
     // Calculations for the flemons spine model
     double v_size = 10.0;
@@ -195,8 +206,8 @@ void OctahedralComplex::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
     #if (1)
-    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
-    spec.addBuilder("muscle2", new tgBasicContactCableInfo(stringConfig));
+    spec.addBuilder("muscle", new  tgKinematicContactCableInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgKinematicContactCableInfo(motorConfig));
     #else
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     spec.addBuilder("muscle2", new tgBasicActuatorInfo(stringConfig));
@@ -208,35 +219,10 @@ void OctahedralComplex::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
     
-        // Create goal box in a new structure
-    double randomAngle=((rand() / (double)RAND_MAX) - 0.5) * 2.0 * 3.1415;
-    
-    double xPos = 300 * sin(randomAngle);
-    double zPos = 300 * cos(randomAngle);
-    
-    tgStructure goalBox;
-    
-    goalBox.addNode(xPos, 20.0, zPos);
-    goalBox.addNode(xPos + 5.0, 20.0, zPos);
-    
-    goalBox.addPair(0, 1, "goalBox");
-    
-    // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed
-    const tgBox::Config boxConfig(10.0, 10.0);
-
-    tgBuildSpec boxSpec;
-    boxSpec.addBuilder("goalBox", new tgBoxInfo(boxConfig));
-    
-    tgStructureInfo goalStructureInfo(goalBox, boxSpec);
-    
-    goalStructureInfo.buildInto(*this, world);
-    
     // Setup vectors for control
     m_allMuscles = find<tgSpringCableActuator> ("muscle2");   
+    m_saddleMuscles = find<tgSpringCableActuator> ("muscle");
     m_allSegments = this->find<tgModel> ("segment");
-    
-    // A little sloppy, but I'm pretty confident there is only one
-    m_goalBox = (find<tgBox>("goalBox"))[0];
     
     #if (0)
     // Debug printing
@@ -251,13 +237,13 @@ void OctahedralComplex::setup(tgWorld& world)
     children.clear();
     
     // Actually setup the children
-    BaseSpineModelLearning::setup(world);
+    BaseSpineModelGoal::setup(world);
 }
 
 void OctahedralComplex::teardown()
 {
     
-    BaseSpineModelLearning::teardown();
+    BaseSpineModelGoal::teardown();
       
 }
 
@@ -267,11 +253,6 @@ void OctahedralComplex::step(double dt)
     * from the physics update
     */
     
-    BaseSpineModelLearning::step(dt);  // Step any children
-}
-
-btVector3 OctahedralComplex::goalBoxPosition() const
-{
-    return m_goalBox->centerOfMass();
+    BaseSpineModelGoal::step(dt);  // Step any children
 }
 

@@ -270,7 +270,7 @@ void TetraSpineCollisions::setup(tgWorld& world)
     // Two different string configs
     tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
     tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, false, 100.0 * scaleFactor, 1.40 * scaleFactor, 0.1, 0.1);
-#if (0)
+#if (1)
     spec.addBuilder("top muscle", new tgBasicContactCableInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgBasicContactCableInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgBasicContactCableInfo(muscleConfig2));

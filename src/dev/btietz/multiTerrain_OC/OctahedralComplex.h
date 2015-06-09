@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "examples/learningSpines/BaseSpineModelLearning.h"
+#include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 
 #include "LinearMath/btVector3.h"
 
@@ -41,11 +41,11 @@ class tgSpringCableActuator;
  * This class implements the octahedral complex tensegrity spine
  * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
  */
-class OctahedralComplex : public BaseSpineModelLearning
+class OctahedralComplex : public BaseSpineModelGoal
 {
 public: 
 
-    OctahedralComplex(int segments);
+    OctahedralComplex(int segments, double goalAngle);
 
     virtual ~OctahedralComplex();
     
@@ -55,11 +55,14 @@ public:
         
     virtual void step(double dt);
     
-    btVector3 goalBoxPosition() const;
+    const std::vector<tgSpringCableActuator*>& getSaddleMuscles() const
+    {
+        return m_saddleMuscles;
+    }
     
-private:
+protected:
     
-    tgBox* m_goalBox;
+    std::vector<tgSpringCableActuator*> m_saddleMuscles;
     
 };
 

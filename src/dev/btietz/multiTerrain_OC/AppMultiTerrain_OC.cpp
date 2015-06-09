@@ -26,6 +26,15 @@
 
 #include "AppMultiTerrain_OC.h"
 
+//robot
+#include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
+
+// controller 
+#include "dev/CPG_feedback/SpineFeedbackControl.h"
+#include "dev/btietz/TC_goal/SpineGoalControl.h"
+#include "dev/btietz/multiTerrain_OC/OctahedralGoalControl.h"
+
+
 AppMultiTerrain_OC::AppMultiTerrain_OC(int argc, char** argv)
 {
     bSetup = false;
@@ -67,14 +76,18 @@ bool AppMultiTerrain_OC::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
+    
+    // TODO properly add this to the header info and learning apparatus
+    double goalAngle = -M_PI / 2.0;
+    
     /// @todo add position and angle to configuration
         OctahedralComplex* myModel =
-      new OctahedralComplex(nSegments);
+      new OctahedralComplex(nSegments, goalAngle);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-#if (1) // Feedback vs kinematic
+
         const int segmentSpan = 3;
         const int numMuscles = 4;
         const int numParams = 2;
@@ -101,7 +114,40 @@ bool AppMultiTerrain_OC::setup()
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
+        const double tensionFeedback = 1000.0;
 
+        
+#if (1)
+        JSONGoalControl::Config control_config(segmentSpan, 
+                                                    numMuscles,
+                                                    numMuscles,
+                                                    numParams, 
+                                                    segNumber, 
+                                                    controlTime,
+                                                    lowAmplitude,
+                                                    highAmplitude,
+                                                    lowPhase,
+                                                    highPhase,
+                                                    kt,
+                                                    kp,
+                                                    kv,
+                                                    def,
+                                                    cl,
+                                                    lf,
+                                                    hf,
+                                                    ffMin,
+                                                    ffMax,
+                                                    afMin,
+                                                    afMax,
+                                                    pfMin,
+                                                    pfMax,
+                                                    tensionFeedback
+                                                    );
+        
+        /// @todo fix memory leak that occurs here
+        OctahedralGoalControl* const myControl =
+        new OctahedralGoalControl(control_config, suffix, "bmirletz/OctaCL_6/");
+#else
         SpineFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
@@ -125,51 +171,9 @@ bool AppMultiTerrain_OC::setup()
                                                     afMax,
                                                     pfMin,
                                                     pfMax);
-        /// @todo fix memory leak that occurs here
+        
         SpineFeedbackControl* const myControl =
         new SpineFeedbackControl(control_config, suffix, "bmirletz/OctaCL_6/");
-#else
-                const int segmentSpan = 3;
-                const int numMuscles = 4;
-                const int numParams = 2;
-                const int segNumber = 0; // For learning results
-                const double controlTime = .01;
-                const double lowPhase = -1 * M_PI;
-                const double highPhase = M_PI;
-                const double lowAmplitude = 0.0;
-                const double highAmplitude = 30.0;
-                const double kt = 0.0;
-                const double kp = 1000.0;
-                const double kv = 210.0;
-                const bool def = true;
-                    
-                // Overridden by def being true
-                const double cl = 10.0;
-                const double lf = 0.0;
-                const double hf = 30.0;
-
-    
-                BaseSpineCPGControl::Config control_config(segmentSpan, 
-                                                            numMuscles,
-                                                            numMuscles,
-                                                            numParams, 
-                                                            segNumber, 
-                                                            controlTime,
-                                                            lowAmplitude,
-                                                            highAmplitude,
-                                                            lowPhase,
-                                                            highPhase,
-                                                            kt,
-                                                            kp,
-                                                            kv,
-                                                            def,
-                                                            cl,
-                                                            lf,
-                                                            hf
-                                                            );
-    KinematicSpineCPGControl* const myControl =
-      new KinematicSpineCPGControl(control_config, suffix, "bmirletz/OctaCL_6/");       
-        
 #endif
         myModel->attach(myControl);
     }
@@ -242,8 +246,8 @@ const tgHillyGround::Config AppMultiTerrain_OC::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 100;
-    size_t ny = 100;
+    size_t nx = 180;
+    size_t ny = 180;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;
@@ -259,7 +263,14 @@ const tgBoxGround::Config AppMultiTerrain_OC::getBoxConfig()
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    const double friction = 0.5;
+    const double restitution = 0.0;
+    const btVector3 size(1000.0, 1.5, 1000.0);
+    
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),
+                                            friction,
+                                            restitution,
+                                            size    );
     
     return groundConfig;
 }
@@ -343,40 +354,45 @@ void AppMultiTerrain_OC::simulate(tgSimulation *simulation)
         }
         
         // Don't change the terrain before the last episode to avoid leaks
-        if (all_terrain && i != nEpisodes - 1)
-        {   
-            // Next run has Hills
-            if (i % nTypes == 0)
-            {
-                
-                const tgHillyGround::Config hillGroundConfig = getHillyConfig();
-                tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
-                simulation->reset(ground);
+        if (i != nEpisodes - 1)
+        {
+            
+            if (all_terrain)
+            {   
+                // Next run has Hills
+                if (i % nTypes == 0)
+                {
+                    
+                    const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+                    tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat
+                else if (i % nTypes == 1)
+                {
+                    const tgBoxGround::Config groundConfig = getBoxConfig();
+                    tgBulletGround* ground = new tgBoxGround(groundConfig);
+                    simulation->reset(ground);
+                }
+                // Flat with blocks
+                else if (i % nTypes == 2)
+                {
+                    simulation->reset();
+                    tgModel* obstacle = getBlocks();
+                    simulation->addObstacle(obstacle);
+                }
             }
-            // Flat
-            else if (i % nTypes == 1)
-            {
-                const tgBoxGround::Config groundConfig = getBoxConfig();
-                tgBulletGround* ground = new tgBoxGround(groundConfig);
-                simulation->reset(ground);
-            }
-            // Flat with blocks
-            else if (i % nTypes == 2)
+            else if(add_blocks)
             {
                 simulation->reset();
                 tgModel* obstacle = getBlocks();
                 simulation->addObstacle(obstacle);
             }
-        }
-        else if(add_blocks)
-        {
-            simulation->reset();
-            tgModel* obstacle = getBlocks();
-            simulation->addObstacle(obstacle);
-        }
-        else
-        {
-            simulation->reset();
+            // Avoid resetting twice on the last run
+            else
+            {
+                simulation->reset();
+            }
         }
     }
 }

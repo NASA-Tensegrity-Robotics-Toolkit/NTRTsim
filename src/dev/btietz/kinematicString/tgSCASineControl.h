@@ -45,7 +45,9 @@ public:
     
     virtual void onStep(tgSpringCableActuator& subject, double dt);
 	
-
+    void updateTensionSetpoint(double newTension);
+    
+    void updateControlLength(double newControlLength);
     
     const double getCommandedTension() const
     {
@@ -87,7 +89,7 @@ private:
     /**
      * Control parameters unique to this, borrowed from tgBaseCPGNode
      */
-    const double  m_controlLength;
+    double  m_controlLength;
     
     tgPIDController::Config m_tempConfig;
     

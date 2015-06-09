@@ -67,8 +67,9 @@ bool AppGoalOnline::setup()
     // Fourth create the models with their controllers and add the models to the
     // simulation
     /// @todo add position and angle to configuration
+    /// @todo Generalize angle code
         FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments);
+      new FlemonsSpineModelGoal(nSegments, 0.0);
 
     // Fifth create the controllers, attach to model
     if (add_controller)

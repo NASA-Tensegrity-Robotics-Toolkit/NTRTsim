@@ -28,7 +28,8 @@
  * $Id$
  */
 
-#include "examples/learningSpines/BaseSpineModelLearning.h" 
+#include "examples/learningSpines/BaseSpineModelLearning.h"
+#include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 
 #include "LinearMath/btVector3.h"
 
@@ -42,11 +43,11 @@ class tgSpringCableActuator;
  * based on the work of <a href="http://www.intensiondesigns.com/models.html">Tom Flemons</a>
  * This is similar to the version in examples, but uses muscles with contact dynamics
  */
-class FlemonsSpineModelGoal : public BaseSpineModelLearning
+class FlemonsSpineModelGoal : public BaseSpineModelGoal
 {
 public: 
 
-    FlemonsSpineModelGoal(int segments);
+    FlemonsSpineModelGoal(int segments, double goalAngle);
 
     virtual ~FlemonsSpineModelGoal();
     
@@ -56,20 +57,6 @@ public:
         
     virtual void step(double dt);
     
-    btVector3 goalBoxPosition() const;
-    
-    const std::vector < std::vector < tgSpringCableActuator*> >& getSegmentMuscles() const
-    {
-        return m_segmentMuscles;
-    }
-    
-private:
-    
-    void mapSegmentMuscles();
-    
-    std::vector < std::vector < tgSpringCableActuator*> > m_segmentMuscles;
-    
-    tgBox* m_goalBox;
 
 };
 

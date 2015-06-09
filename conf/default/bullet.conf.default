@@ -40,4 +40,4 @@ BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
 
 # BULLET_URL can be either a web address or a local file address, 
 # e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
-BULLET_URL="http://storage.perryb.ca/ntrt/dependencies/bullet-2.82-r2704.tgz"
+BULLET_URL="http://ntrt.perryb.ca/storage/dependencies/bullet-2.82-r2704.tgz"

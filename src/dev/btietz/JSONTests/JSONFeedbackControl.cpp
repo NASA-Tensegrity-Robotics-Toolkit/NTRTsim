@@ -51,6 +51,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 //#define LOGGING
 #define USE_KINEMATIC
@@ -131,16 +132,21 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
+    nodeVals = nodeVals.get("params", "UTF-8");
+    edgeVals = edgeVals.get("params", "UTF-8");
+    
     array_4D edgeParams = scaleEdgeActions(edgeVals);
     array_2D nodeParams = scaleNodeActions(nodeVals);
 
     setupCPGs(subject, nodeParams, edgeParams);
     
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
+    feedbackParams = feedbackParams.get("params", "UTF-8");
     
     // Setup neural network
     m_config.numStates = feedbackParams.get("numStates", "UTF-8").asInt();
     m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
+    //m_config.numHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
     
     std::string nnFile = controlFilePath + feedbackParams.get("neuralFilename", "UTF-8").asString();
     
@@ -165,7 +171,7 @@ void JSONFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (1)
+#if (0)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        
@@ -233,11 +239,11 @@ void JSONFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     
     std::vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
     
-    for(int i=0; i<tmpStrings.size(); i++)
+    for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
-        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        for(std::size_t j=1; j<stringHist.tensionHistory.size(); j++)
         {
             const double previousTension = stringHist.tensionHistory[j-1];
             const double previousLength = stringHist.restLengths[j-1];
@@ -378,9 +384,7 @@ array_2D JSONFeedbackControl::scaleNodeActions (Json::Value actions)
 std::vector<double> JSONFeedbackControl::getFeedback(BaseSpineModelLearning& subject)
 {
     // Placeholder
-    std:vector<double> feedback;
-    // Adapter doesn't use this anyway, so just do zero here for now (will trigger errors if it starts to use it =) )
-    const double dt = 0;
+    std::vector<double> feedback;
     
     const std::vector<tgSpringCableActuator*>& allCables = subject.getAllMuscles();
     
@@ -395,7 +399,7 @@ std::vector<double> JSONFeedbackControl::getFeedback(BaseSpineModelLearning& sub
         std::vector<double > state = getCableState(cable);
         
         // Rescale to 0 to 1 (consider doing this inside getState
-        for (int i = 0; i < state.size(); i++)
+        for (std::size_t i = 0; i < state.size(); i++)
         {
             inputs[i]=state[i] / 2.0 + 0.5;
         }
@@ -436,7 +440,7 @@ std::vector<double> JSONFeedbackControl::getCableState(const tgSpringCableActuat
 std::vector<double> JSONFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
 {
 	// Placeholder
-	std:vector<double> feedback;
+	std::vector<double> feedback;
     
     // Leave in place for generalization later
     const std::size_t numControllers = 1;

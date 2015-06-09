@@ -45,6 +45,8 @@ public:
     
     void updateTensionSetpoint(double newTension);
     
+    void updateControlLength(double newControlLength);
+    
 protected:
     const tgPIDController::Config m_config;
 

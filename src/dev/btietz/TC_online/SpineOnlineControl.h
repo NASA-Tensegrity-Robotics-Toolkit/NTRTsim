@@ -38,7 +38,7 @@
 #include "LinearMath/btVector3.h"
 
 class tgSpringCableActuator;
-class FlemonsSpineModelGoal;
+class BaseSpineModelGoal;
 
 /**
  * SpineOnlineControl learns the parameters for a CPG system on a
@@ -107,7 +107,7 @@ struct Config : public SpineGoalControl::Config
 
 protected:
     
-    double getGoalDist(const FlemonsSpineModelGoal* subject) const;
+    double getGoalDist(const BaseSpineModelGoal* subject) const;
     
     SpineOnlineControl::Config m_config;
     

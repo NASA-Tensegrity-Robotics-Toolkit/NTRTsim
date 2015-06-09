@@ -26,4 +26,5 @@ subdirs(
     JSONTests
     TC_online
     multiTerrain_OC/
+    TS_goal/
     )

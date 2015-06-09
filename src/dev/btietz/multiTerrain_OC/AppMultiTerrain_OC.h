@@ -26,14 +26,6 @@
  * $Id$
  */
 
-//robot
-#include "dev/btietz/TCContact/FlemonsSpineModelContact.h"
-#include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
-
-// controller 
-#include "dev/CPG_feedback/SpineFeedbackControl.h"
-#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
-
 // obstacles
 #include "models/obstacles/tgBlockField.h"
 
