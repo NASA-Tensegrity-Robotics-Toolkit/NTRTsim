@@ -1,4 +1,6 @@
-link_libraries(GoalSpine
+link_libraries(JSONGoalTension
+                OctahedralComplex
+                GoalSpine
                 obstacles
                 KinematicString
                flemonsSpineContact
@@ -17,13 +19,9 @@ link_libraries(GoalSpine
                 tgOpenGLSupport
                 boost_program_options)
 
-add_library(JSONGoalTension
-    JSONGoalTension.cpp)
-                
-add_executable(AppTC_Tension
-    JSONGoalTension.cpp
-    AppGoalTension.cpp
+add_executable(AppOC_Tension
+    OctahedralTensionControl.cpp
+    AppOCTension.cpp
 )
 
-target_link_libraries(JSONGoalTension ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)
-target_link_libraries(AppTC_Tension ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)
+target_link_libraries(AppOC_Tension ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONControl)

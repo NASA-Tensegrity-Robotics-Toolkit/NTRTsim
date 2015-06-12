@@ -45,7 +45,7 @@ class OctahedralComplex : public BaseSpineModelGoal
 {
 public: 
 
-    OctahedralComplex(int segments, double goalAngle);
+    OctahedralComplex(int segments, double goalAngle, double startAngle = 0.0);
 
     virtual ~OctahedralComplex();
     
@@ -64,6 +64,7 @@ protected:
     
     std::vector<tgSpringCableActuator*> m_saddleMuscles;
     
+    const double m_startAngle;
 };
 
 #endif // FLEMONS_SPINE_MODEL_H

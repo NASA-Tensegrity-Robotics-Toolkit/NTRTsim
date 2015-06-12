@@ -48,8 +48,9 @@
 #include <map>
 #include <set>
 
-OctahedralComplex::OctahedralComplex(int segments, double goalAngle) :   
-    BaseSpineModelGoal(segments, goalAngle)
+OctahedralComplex::OctahedralComplex(int segments, double goalAngle, double startAngle) :   
+    BaseSpineModelGoal(segments, goalAngle),
+    m_startAngle(startAngle)
 {
 }
 
@@ -201,6 +202,13 @@ void OctahedralComplex::setup(tgWorld& world)
         }
     }
     #endif
+    
+    btVector3 fixedPoint(0.0, 0.0, 0.0);
+    btVector3 axis(0.0, 1.0, 0.0);
+    
+    snake.addRotation(fixedPoint, axis, m_startAngle);
+    
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));

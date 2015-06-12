@@ -28,4 +28,5 @@ subdirs(
     multiTerrain_OC/
     TS_goal/
     TC_Tension/
+    OC_Tension/
     )
