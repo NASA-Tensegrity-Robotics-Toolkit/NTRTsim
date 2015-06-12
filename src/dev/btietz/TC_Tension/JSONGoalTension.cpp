@@ -377,7 +377,7 @@ std::vector<double> JSONGoalTension::getGoalFeedback(const BaseSpineModelGoal* s
     {
         for(int j=0;j<m_config.goalActions;j++)
         {
-            m_allControllers[i * m_config.goalActions + j]->updateTensionSetpoint(actions[i] * m_config.tensFeedback + m_config.tensFeedback);
+            m_allControllers[i * m_config.goalActions + j]->updateTensionSetpoint(actions[j] * m_config.tensFeedback + m_config.tensFeedback);
         }
     }
 
