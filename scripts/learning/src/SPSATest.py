@@ -601,13 +601,15 @@ class SPSA(NTRTJobMaster):
                             # Only want to backtrack once
                             xVals[p] = self.__JSONToArray(self.lParams[p + 'Vals'], self.currentGeneration[p][1])
             
+            genSize = 0
+            
             for p in self.prefixes:
                 if (self.lParams[p + 'Vals']['learning']):
                         self.currentGeneration[p] = self.nextTestParams(self.currentGeneration[p], xVals[p], p + 'Vals')
-            
+                        genSize = max(genSize, len(self.currentGeneration[p]))
+                        
             print("Post run " + str(len(self.currentGeneration[p])))
             
-            genSize = len(self.currentGeneration[p])
             
             if n > 0:
                 self.runTrials(genSize - 2, genSize - 1)
