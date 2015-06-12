@@ -55,22 +55,22 @@ if __name__ == "__main__":
         obj = json.load(fin)
         fin.close()
         try:
-            paramID = obj['goalVals']['paramID']
+            paramID = obj['impedenceVals']['paramID']
             
-            #if (paramList.count(paramID) == 0):
+            if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
+                """    
+                thisScore = 0
+                for k in range(0, 4):
+                    try:
+                        thisScore += float(obj['scores'][k]['distance'])
+                    except IndexError:
+                        thisScore += 0
+                """
+                thisScore = float(obj['impedenceVals']['avgScore'])
                 
-            thisScore = 0
-            for k in range(0, 4):
-                try:
-                    thisScore += float(obj['scores'][k]['distance'])
-                except IndexError:
-                    thisScore += 0
-            """
-            thisScore = float(obj['goalVals']['avgScore'])
-            """
-            fileSum += 1
-            paramList.append(paramID)
+                fileSum += 1
+                paramList.append(paramID)
             """
             else:
                 print(str(i) + " " +str(paramID) + " " + str(paramList.count(paramID)))
