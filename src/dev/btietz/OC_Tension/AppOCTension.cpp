@@ -113,7 +113,7 @@ bool AppOCTension::setup()
         const double impedanceMax = 2000.0;
         
         const int segmentSpan = 3;
-        const int numMuscles = 8;
+        const int numMuscles = 4;
         const int numParams = 2;
         const int segNumber = 5; // For learning results
         const double controlTime = .01;
