@@ -128,16 +128,17 @@ ScarrArmModel::~ScarrArmModel()
 
 void ScarrArmModel::addNodes(tgStructure& s)
 {
-    const double scale = 0.1;
+    const double scale = 0.5;
+    const double bone_scale = 0.5;
     const size_t nNodes = 11 + 2; //2 for massless rod
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
     const double a = 22 * scale; //ulnta distal width
-    const double b = 265 * scale * 0.5; //ulna length
-    const double c = 334 * scale * 0.5; //humerus length
+    const double b = 265 * scale * bone_scale; //ulna length
+    const double c = 334 * scale * bone_scale; //humerus length
     const double d = 66 * scale; // humerus epicondylar width
-    const double e = 246 * scale * 0.5; //radius length
+    const double e = 246 * scale * bone_scale; //radius length
     const double f = 25 * scale; // humerus head radius
     const double g = 17 * scale; //ulna proximal width
     const double sigma = 10 * scale; // gap from end of radius to olecranon TODO: tinker
@@ -241,7 +242,7 @@ void ScarrArmModel::setup(tgWorld& world)
     addMuscles(s);
     
     // Move the arm out of the ground
-    btVector3 offset(0.0, 20.0, 0.0);
+    btVector3 offset(0.0, 10.0, 0.0);
     s.move(offset);
     
     // Create the build spec that uses tags to turn the structure into a real model
