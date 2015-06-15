@@ -27,6 +27,7 @@
  * $Id$
  */
 
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 #include "dev/btietz/TC_goal/JSONGoalControl.h"
 
 #include <json/value.h>
@@ -64,6 +65,9 @@ protected:
     
     virtual std::vector<double> getFeedback(BaseSpineModelLearning& subject);    
     
+    virtual void setupFeedbackWeights(array_2D nodeVals);
+    
+    array_2D feedbackWeights;
 };
 
 #endif // SPINE_FEEDBACK_CONTROL_H

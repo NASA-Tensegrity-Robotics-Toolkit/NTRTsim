@@ -111,6 +111,9 @@ void JSONGoalTension::onSetup(BaseSpineModelLearning& subject)
     m_config.numActions = feedbackParams.get("numActions", "UTF-8").asInt();
     m_config.numHidden = feedbackParams.get("numHidden", "UTF-8").asInt();
     
+    feedbackWeights.resize(boost::extents[m_config.numActions][m_config.numStates]);
+    setupFeedbackWeights(nodeParams);
+    
     Json::Value goalParams = root.get("goalVals", "UTF-8");
     goalParams = goalParams.get("params", "UTF-8");
     
@@ -286,7 +289,7 @@ array_2D JSONGoalTension::scaleNodeActions (Json::Value actions)
     array_2D limits(boost::extents[2][numActions]);
     
     // Check if we need to update limits
-    assert(numActions == 5);
+    assert(numActions >= 5);
     
 	limits[0][0] = m_config.lowFreq;
 	limits[1][0] = m_config.highFreq;
@@ -298,6 +301,12 @@ array_2D JSONGoalTension::scaleNodeActions (Json::Value actions)
     limits[1][3] = m_config.ampFeedbackMax;
     limits[0][4] = m_config.phaseFeedbackMin;
     limits[1][4] = m_config.phaseFeedbackMax;
+    
+    for (std::size_t i = 5; i < numActions; i++)
+    {
+        limits[0][i] = -1.0;
+        limits[1][i] = 1.0;
+    }
     
     Json::Value::iterator nodeIt = actions.begin();
     
@@ -404,7 +413,7 @@ std::vector<double> JSONGoalTension::getFeedback(BaseSpineModelLearning& subject
         for(int j=0;j<m_config.numActions;j++)
         {
             // Provide tension to all inputs
-            actions.push_back(state[0]);
+            actions.push_back(state[0] * feedbackWeights[j][0] + state[1] * feedbackWeights[j][1]);
         }
 
         transformFeedbackActions(actions);
@@ -414,4 +423,20 @@ std::vector<double> JSONGoalTension::getFeedback(BaseSpineModelLearning& subject
     
     
     return feedback;
+}
+void JSONGoalTension::setupFeedbackWeights(array_2D nodeVals)
+{
+    
+    /// @todo update so this is a config param
+    int k = 5;
+    
+    for(int i = 0; i < m_config.numActions; i++)
+    {
+        for(int j = 0; j < m_config.numStates; j++)
+        {
+            feedbackWeights[i][j] = nodeVals[0][k];
+            k++;
+        }
+    }
+
 }
