@@ -48,13 +48,14 @@ ScarrArmController::ScarrArmController(const double initialLength)
 void ScarrArmController::onSetup(ScarrArmModel& subject)
 {
     const double dt = 0.0001;
-    const double scale = 0.1;
+    const double scale = 0.5;
+    const double bone_scale = 0.5;
     const double a = 22; //TODO: Currently ulna distal width, needs to be olecranon diameter (not quite, but close to that in length)
 
     const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
     const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
-    const double brachioradialis_length = 262 * scale; //TODO: Justify
-    const double ulnaradius_length      = 1 * scale; //"muscle" to connect radius and ulna at distal end TODO: Change
+    const double brachioradialis_length = 262 * scale * bone_scale; //TODO: Justify
+    const double ulnaradius_length      = 2.5 * scale; //"muscle" to connect radius and ulna at distal end TODO: Change
     const double supportstring_length   = 1 * scale;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
