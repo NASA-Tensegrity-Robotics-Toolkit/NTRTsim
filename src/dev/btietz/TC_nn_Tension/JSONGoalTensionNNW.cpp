@@ -155,7 +155,7 @@ void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
     
     const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
-    //getGoalFeedback(goalSubject);
+    getGoalFeedback(goalSubject);
     
 #else // Nothing
     std::size_t numControllers = subject.getNumberofMuslces() * 3;
