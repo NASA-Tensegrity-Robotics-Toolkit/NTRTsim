@@ -102,20 +102,6 @@ namespace
   };
 } // namespace
 
-/*
- * helper arrays for node and rod numbering schema
- */
-/*returns the number of the rod for a given node */
-//const int rodNumbersPerNode[11]={0,1,2,3,3,4,0,1,2,5,5,4,6};
-
-/*returns the node that is at the other end of the given node */
-//const int otherEndOfTheRod[11]={6,7,8,4,3,11,0,1,2,10,9,5,12};
-
-/*returns the node that is at the parallel rod
- * and at the same end of the given node
- */
-//const int parallelNode[11]={1,0,5,9,10,2,7,6,11,3,4,8,12};
-
 ScarrArmModel::ScarrArmModel() : tgModel() 
 {
 }
@@ -133,11 +119,10 @@ void ScarrArmModel::addNodes(tgStructure& s)
     // Average Adult Male Measurements with scale
     // Lengths are in mm
     const double a = 22 * scale; //ulnta distal width
-    const double b = 265 * scale * bone_scale; //ulna length
-    //const double c = 334 * scale * bone_scale; //humerus length
+    const double b = 334 * scale * bone_scale; //ulna length
     const double c = 265 * scale * bone_scale; //humerus length //NB: in model, c==b
-    const double d = 66 * scale; // humerus epicondylar width
-    const double e = 246 * scale * bone_scale; //radius length
+    //const double d = 66 * scale; // humerus epicondylar width
+    //const double e = 246 * scale * bone_scale; //radius length
     const double f = 25 * scale; // humerus head radius
     const double g = 17 * scale; //ulna proximal width
     const double x = a/2;
@@ -212,6 +197,8 @@ void ScarrArmModel::addMuscles(tgStructure& s)
     s.addPair(11, 12, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(0, 5, "brachioradialis muscle");
     s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(3, 13, "anconeus muscle");
+    s.addPair(4, 14, "anconeus muscle");
 
     //Muscles to massless rod
     s.addPair(6, 9, "support muscle"); 
