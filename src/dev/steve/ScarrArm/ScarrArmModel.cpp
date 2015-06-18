@@ -67,7 +67,6 @@ namespace
         double pretension_olecranon;
         double pretension_anconeus;
         double pretension_brachioradialis;
-        double pretension_ulnaradius;
         double pretension_support;
         bool   history;  
         double maxTens;
@@ -83,10 +82,9 @@ namespace
      1.0,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.2,      // restitution (?)
-     3000.0/15.55,   // pretension_olecranon (force), stiffness/initial length
+     3000.0/1,   // pretension_olecranon (force), stiffness/initial length
      3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
      3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
-     3000.0/1,        // pretension_ulnaradius (force), stiffness/initial length 
      3000.0/1,        // pretension_support (force), stiffness/initial length 
      false,    // history (boolean)
      100000,   // maxTens
@@ -129,36 +127,42 @@ ScarrArmModel::~ScarrArmModel()
 void ScarrArmModel::addNodes(tgStructure& s)
 {
     const double scale = 0.5;
-    const double bone_scale = 0.5;
-    const size_t nNodes = 11 + 2; //2 for massless rod
+    const double bone_scale = 0.3;
+    const size_t nNodes = 13 + 2; //2 for massless rod
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
     const double a = 22 * scale; //ulnta distal width
     const double b = 265 * scale * bone_scale; //ulna length
-    const double c = 334 * scale * bone_scale; //humerus length
+    //const double c = 334 * scale * bone_scale; //humerus length
+    const double c = 265 * scale * bone_scale; //humerus length //NB: in model, c==b
     const double d = 66 * scale; // humerus epicondylar width
     const double e = 246 * scale * bone_scale; //radius length
     const double f = 25 * scale; // humerus head radius
     const double g = 17 * scale; //ulna proximal width
-    const double sigma = 10 * scale; // gap from end of radius to olecranon TODO: tinker
-    const double ulna_diameter = g; //TODO: tinker
     const double x = a/2;
     const double z = c/2;
 
-    nodePositions.push_back(btVector3(a/2, 0, 0));
+    //Format: (x, z, y)
+    nodePositions.push_back(btVector3(g, 0, 0));
     nodePositions.push_back(btVector3(0, -g, 0));
     nodePositions.push_back(btVector3(-a/2, 0, 0));
-    nodePositions.push_back(btVector3(0, 0, f));
-    nodePositions.push_back(btVector3(0, 0, -f));
-    nodePositions.push_back(btVector3(0, d, 0));
+    nodePositions.push_back(btVector3(0, 0, g));
+    nodePositions.push_back(btVector3(0, 0, -g));
+    nodePositions.push_back(btVector3(0, g, 0));
     nodePositions.push_back(btVector3(0, c, 0));
     nodePositions.push_back(btVector3(x, z, 0));
-    nodePositions.push_back(btVector3(b+a/2, 0, 0));
-    nodePositions.push_back(btVector3(a/2 + sigma, -ulna_diameter, 0));
-    nodePositions.push_back(btVector3(a/2 + sigma + e, -ulna_diameter, 0));
+    nodePositions.push_back(btVector3(b+a/2, -g, 0));
     nodePositions.push_back(btVector3(0, c+5, f));
     nodePositions.push_back(btVector3(0, c+5, -f));
+
+    //Added 6/17/15
+    nodePositions.push_back(btVector3(a/2, -2*g, 0));
+
+    //ulna and radius
+    nodePositions.push_back(btVector3(3*a/2, -g, 0));
+    nodePositions.push_back(btVector3(3*a/4, -g, g));
+    nodePositions.push_back(btVector3(3*a/4, -g, -g));
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -167,23 +171,53 @@ void ScarrArmModel::addNodes(tgStructure& s)
                   
 void ScarrArmModel::addRods(tgStructure& s)
 {   
-    // ulna
+    // ulna and radius
+    s.addPair(8,  12,  "rod");
+    s.addPair(12,  14,  "rod");
+    s.addPair(12,  13,  "rod");
+
+    //olecranon
     s.addPair(0,  1,  "rod");
-    s.addPair(0,  8,  "rod");
     s.addPair(1,  2,  "rod");
+    s.addPair(1, 11,  "rod");
 
     // humerus
     s.addPair(3,  5,  "rod");
     s.addPair(4,  5,  "rod"); 
     s.addPair(5,  6,  "rod");
 
-    //radius
-    s.addPair(9, 10,  "rod"); 
-
     // massless support beam
-    s.addPair(11, 12, "massless");
+    s.addPair(9, 10, "massless");
 }
 
+void ScarrArmModel::addMuscles(tgStructure& s)
+{
+    const std::vector<tgStructure*> children = s.getChildren();
+
+    s.addPair(0, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(0, 4, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 4, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(2, 3, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(2, 4, "olecranon muscle"); //NB actually fascial tissue
+    
+    s.addPair(0, 13, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 13, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(11, 13, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(0, 14, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 14, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(11, 14, "olecranon muscle"); //NB actually fascial tissue
+
+    s.addPair(0, 12, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(11, 12, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(0, 5, "brachioradialis muscle");
+    s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
+
+    //Muscles to massless rod
+    s.addPair(6, 9, "support muscle"); 
+    s.addPair(6, 10, "support muscle"); 
+}
+ 
 /*
 void ScarrArmModel::addMarkers(tgStructure &s)
 {
@@ -199,30 +233,7 @@ void ScarrArmModel::addMarkers(tgStructure &s)
 	}
 }
 */
-
-void ScarrArmModel::addMuscles(tgStructure& s)
-{
-    const std::vector<tgStructure*> children = s.getChildren();
-
-    s.addPair(0, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(0, 4, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 4, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(2, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(2, 4, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(3, 9, "anconeus muscle");
-    //s.addPair(4, 9, "muscle");
-    //s.addPair(5, 7, "muscle");
-    //s.addPair(6, 7, "muscle");
-    //s.addPair(7, 8, "muscle"); 
-    s.addPair(5, 8, "brachioradialis muscle"); 
-    s.addPair(8, 10, "ulnaradius muscle");  //NB not a true muscle
-
-    //Muscles to massless rod
-    s.addPair(6, 11, "support muscle"); 
-    s.addPair(6, 12, "support muscle"); 
-}
-
+ 
 void ScarrArmModel::setup(tgWorld& world)
 {
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
@@ -232,7 +243,6 @@ void ScarrArmModel::setup(tgWorld& world)
     tgBasicActuator::Config olecranonMuscleConfig(c.stiffness, c.damping, c.pretension_olecranon, c.history, c.maxTens, c.targetVelocity);
     tgBasicActuator::Config anconeusMuscleConfig(c.stiffness, c.damping, c.pretension_anconeus, c.history, c.maxTens, c.targetVelocity);
     tgBasicActuator::Config brachioradialisMuscleConfig(c.stiffness, c.damping, c.pretension_brachioradialis, c.history, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config ulnaradiusMuscleConfig(c.stiffness, c.damping, c.pretension_ulnaradius, c.history, c.maxTens, c.targetVelocity);
     tgBasicActuator::Config supportstringMuscleConfig(c.stiffness, c.damping, c.pretension_support, c.history, c.maxTens, c.targetVelocity);
             
     // Start creating the structure
@@ -242,7 +252,7 @@ void ScarrArmModel::setup(tgWorld& world)
     addMuscles(s);
     
     // Move the arm out of the ground
-    btVector3 offset(0.0, 10.0, 0.0);
+    btVector3 offset(0.0, 15.0, 0.0);
     s.move(offset);
     
     // Create the build spec that uses tags to turn the structure into a real model
@@ -252,7 +262,6 @@ void ScarrArmModel::setup(tgWorld& world)
     spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfig));
     spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
     spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
-    spec.addBuilder("ulnaradius muscle", new tgBasicActuatorInfo(ulnaradiusMuscleConfig));
     spec.addBuilder("support muscle", new tgBasicActuatorInfo(supportstringMuscleConfig));
     
     // Create your structureInfo
