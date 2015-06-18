@@ -252,7 +252,7 @@ void ScarrArmModel::setup(tgWorld& world)
     addMuscles(s);
     
     // Move the arm out of the ground
-    btVector3 offset(0.0, 15.0, 0.0);
+    btVector3 offset(0.0, 40.0, 0.0);
     s.move(offset);
     
     // Create the build spec that uses tags to turn the structure into a real model

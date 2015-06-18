@@ -54,7 +54,8 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
 
     const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
     const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
-    const double brachioradialis_length = 262 * scale * bone_scale; //TODO: Justify
+    //const double brachioradialis_length = 262 * scale * bone_scale; //TODO: Justify
+    const double brachioradialis_length = 12; //TODO: Justify
     const double supportstring_length   = 1 * scale;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
@@ -105,11 +106,11 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
     m_totalTime+=dt;
 
     // Set target length of each brachioradils
-    const double mean_brachioradialis_length = 262/4;
+    const double mean_brachioradialis_length = 12;
     double newLength = 0;
     const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
     const double amplitude    = mean_brachioradialis_length/4;
-    const double angular_freq = 50; //TODO: Test for demo
+    const double angular_freq = 2; //TODO: Test for demo
     const double phase = 0;
     const double dcOffset     = mean_brachioradialis_length;
 
