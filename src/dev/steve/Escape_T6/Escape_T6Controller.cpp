@@ -97,6 +97,7 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
     applyActions(subject,actions);
 }
 
+// Set target length of each muscle, then move motors accordingly
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
 {
     if (dt <= 0.0) {
@@ -114,7 +115,6 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
         pMuscle->moveMotors(dt);
     }
 
-    //instead, generate it here for now!
     for(size_t i=0; i<muscles.size(); i++) {
         std::vector<double> tmp;
         for(int j=0;j<2;j++) {
