@@ -197,8 +197,8 @@ void ScarrArmModel::addMuscles(tgStructure& s)
     s.addPair(11, 12, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(0, 5, "brachioradialis muscle");
     s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(3, 13, "anconeus muscle");
-    s.addPair(4, 14, "anconeus muscle");
+    s.addPair(3, 13, "right anconeus muscle");
+    s.addPair(4, 14, "left anconeus muscle");
 
     //Muscles to massless rod
     s.addPair(6, 9, "support muscle"); 

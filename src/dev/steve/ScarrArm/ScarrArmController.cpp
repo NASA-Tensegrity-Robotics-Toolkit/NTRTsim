@@ -119,7 +119,7 @@ void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, 
 		assert(pMuscle != NULL);
         cout <<"t: " << pMuscle->getCurrentLength() << endl;
         newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
-        std::cout<<"calculating brachiolength:" << newLength << "\n";
+        std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
 		pMuscle->setControlInput(newLength, dt);
         cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
     }
@@ -130,19 +130,31 @@ void ScarrArmController::setAnconeusTargetLength(ScarrArmModel& subject, double 
     double newLength = 0;
     const double amplitude = mean_anconeus_length/2;
     const double angular_freq = 2;
-    const double phase = 0;
+    const double phaseleft = 0;
+    const double phaseright = phaseleft + M_PI;
     const double dcOffset = mean_anconeus_length;
-    const std::vector<tgBasicActuator*> anconeus = subject.find<tgBasicActuator>("anconeus");
+    const std::vector<tgBasicActuator*> anconeusleft = subject.find<tgBasicActuator>("right anconeus");
+    const std::vector<tgBasicActuator*> anconeusright = subject.find<tgBasicActuator>("left anconeus");
 
-    for (size_t i=0; i<anconeus.size(); i++) {
-		tgBasicActuator * const pMuscle = anconeus[i];
+    for (size_t i=0; i<anconeusleft.size(); i++) {
+		tgBasicActuator * const pMuscle = anconeusleft[i];
 		assert(pMuscle != NULL);
         cout <<"t: " << pMuscle->getCurrentLength() << endl;
-        newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
-        std::cout<<"calculating anconeuslength:" << newLength << "\n";
+        newLength = amplitude * sin(angular_freq * m_totalTime + phaseleft) + dcOffset;
+        std::cout<<"calculating anconeusleft target length:" << newLength << "\n";
 		pMuscle->setControlInput(newLength, dt);
         cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
     }
+
+    for (size_t i=0; i<anconeusright.size(); i++) {
+		tgBasicActuator * const pMuscle = anconeusright[i];
+		assert(pMuscle != NULL);
+        cout <<"t: " << pMuscle->getCurrentLength() << endl;
+        newLength = amplitude * sin(angular_freq * m_totalTime + phaseright) + dcOffset;
+        std::cout<<"calculating anconeusright target length:" << newLength << "\n";
+		pMuscle->setControlInput(newLength, dt);
+        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+    } 
 }
 
 //Move motors for all the muscles
