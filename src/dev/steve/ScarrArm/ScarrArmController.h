@@ -74,9 +74,12 @@ protected:
 private:
   double m_initialLengths;
   double m_totalTime;
-
   AnnealAdapter evolutionAdapter;
-	
+    
+  void setBrachioradialisTargetLength(ScarrArmModel& subject, double dt);
+  void setAnconeusTargetLength(ScarrArmModel& subject, double dt);
+  void moveAllMotors(ScarrArmModel& subject, double dt);
+  void updateActions(ScarrArmModel& subject, double dt);
 };
 
 #endif // SCARRARM_CONTROLLER_H

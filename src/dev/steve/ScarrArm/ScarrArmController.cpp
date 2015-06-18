@@ -35,6 +35,8 @@
 #include <stdexcept>
 #include <vector>
 
+# define M_PI 3.14159265358979323846 
+
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
@@ -53,9 +55,10 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
     const double a = 22; //TODO: Currently ulna distal width, needs to be olecranon diameter (not quite, but close to that in length)
 
     const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
-    const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
+    //const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
     //const double brachioradialis_length = 262 * scale * bone_scale; //TODO: Justify
-    const double brachioradialis_length = 12; //TODO: Justify
+    const double brachioradialis_length = 12;
+    const double anconeus_length        = 12;
     const double supportstring_length   = 1 * scale;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
@@ -88,31 +91,28 @@ void ScarrArmController::onSetup(ScarrArmModel& subject)
 		pMuscle->setControlInput(supportstring_length, dt);
         cout << "string " << i << "\n";
     }
-
-    /*
-	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	for (size_t i = 0; i < muscles.size(); ++i) {
-		tgBasicActuator * const pMuscle = muscles[i];
-		assert(pMuscle != NULL);
-		pMuscle->setControlInput(this->m_initialLengths,0.0001);
-	}*/
 }
 
 // Set target length of each muscle, then move motors accordingly
-void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
-{
+void ScarrArmController::onStep(ScarrArmModel& subject, double dt) {
     // Update controller's internal time
     if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
     m_totalTime+=dt;
 
-    // Set target length of each brachioradils
-    const double mean_brachioradialis_length = 12;
+    setBrachioradialisTargetLength(subject, dt);
+    setAnconeusTargetLength(subject, dt);
+    moveAllMotors(subject, dt);
+    //updateActions(dt);
+}
+ 
+void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, double dt) {
+    const double mean_brachioradialis_length = 12; //TODO: define according to vars
     double newLength = 0;
-    const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
-    const double amplitude    = mean_brachioradialis_length/4;
-    const double angular_freq = 2; //TODO: Test for demo
+    const double amplitude    = mean_brachioradialis_length/2;
+    const double angular_freq = 2;
     const double phase = 0;
     const double dcOffset     = mean_brachioradialis_length;
+    const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
 
     for (size_t i=0; i<brachioradialis.size(); i++) {
 		tgBasicActuator * const pMuscle = brachioradialis[i];
@@ -121,63 +121,54 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt)
         newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
         std::cout<<"calculating brachiolength:" << newLength << "\n";
 		pMuscle->setControlInput(newLength, dt);
-		pMuscle->moveMotors(dt);
         cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
     }
+}
 
-/*
-    //Move motors for all the muscles
+void ScarrArmController::setAnconeusTargetLength(ScarrArmModel& subject, double dt) {
+    const double mean_anconeus_length = 6; //TODO: define according to vars
+    double newLength = 0;
+    const double amplitude = mean_anconeus_length/2;
+    const double angular_freq = 2;
+    const double phase = 0;
+    const double dcOffset = mean_anconeus_length;
+    const std::vector<tgBasicActuator*> anconeus = subject.find<tgBasicActuator>("anconeus");
+
+    for (size_t i=0; i<anconeus.size(); i++) {
+		tgBasicActuator * const pMuscle = anconeus[i];
+		assert(pMuscle != NULL);
+        cout <<"t: " << pMuscle->getCurrentLength() << endl;
+        newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
+        std::cout<<"calculating anconeuslength:" << newLength << "\n";
+		pMuscle->setControlInput(newLength, dt);
+        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+    }
+}
+
+//Move motors for all the muscles
+void ScarrArmController::moveAllMotors(ScarrArmModel& subject, double dt) {
 	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
 	for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
 	}
-*/	
      
-    /*
-    for(int iMuscle=0; iMuscle < nMuscles; iMuscle++) {
-        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-        tgBasicActuator *const pMuscle = muscles[iMuscle];
-        assert(pMuscle != NULL);
+}
 
-        double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-        double minLength = m_initialLengths * (1-maxStringLengthFactor);
-        double maxLength = m_initialLengths * (1+maxStringLengthFactor);
-        if (newLength <= minLength) {
-            newLength = minLength;
-        } else if (newLength >= maxLength) {
-            newLength = maxLength;
-        }
-        pMuscle->setControlInput(newLength, dt);
-        if (oldCluster != cluster) {
-            phase += phaseChange[cluster];
-        }
-    }        
-    */
-
-    /*
-	//vector<double> state=getState();
+// Get actions from evolutionAdapter, transform them to this structure, and apply them
+void ScarrArmController::updateActions(ScarrArmModel& subject, double dt) {
+	/*vector<double> state=getState();
 	vector< vector<double> > actions;
 
 	//get the actions (between 0 and 1) from evolution (todo)
-	//actions=evolutionAdapter.step(dt,state);
-
-	//instead, generate it here for now!
-	for(unsigned i=0;i<24;i++) {
-		vector<double> tmp;
-		for(unsigned j=0;j<2;j++)
-		{
-			tmp.push_back(0.5);
-		}
-		actions.push_back(tmp);
-	}
+	actions=evolutionAdapter.step(dt,state);
 
 	//transform them to the size of the structure
 	actions = transformActions(actions);
 
 	//apply these actions to the appropriate muscles according to the sensor values
-    //applyActions(subject,actions);
+    applyActions(subject,actions);
     */
 }
 
