@@ -45,7 +45,7 @@ VENV_PACKAGE_DIR="$VENV_BUILD_DIR"
 
 # *_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/package.tgz or file:///path/to/package.tgz
-VENV_URL="http://storage.perryb.ca/ntrt/dependencies/virtualenv-1.9.tar.gz"
+VENV_URL="http://ntrt.perryb.ca/storage/dependencies/virtualenv-1.9.tar.gz"
 
 # Path to python interpreter to use for setting up the virtualenv
 VENV_PYTHON_INTERPRETER="/usr/bin/python2.7"
