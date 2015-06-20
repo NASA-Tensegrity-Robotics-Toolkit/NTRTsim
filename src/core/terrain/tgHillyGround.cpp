@@ -39,8 +39,8 @@
 #include <iostream>
 
 tgHillyGround::Config::Config(btVector3 eulerAngles,
-        btScalar friction,
-        btScalar restitution,
+        double friction,
+        double restitution,
         btVector3 size,
         btVector3 origin,
         size_t nx,

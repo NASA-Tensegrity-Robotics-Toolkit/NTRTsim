@@ -13,6 +13,13 @@ SET(OPENGL_FG_LIB ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL_FreeGlut)
 
 include_directories(${SRC_DIR})
 
+OPTION(USE_DOUBLE_PRECISION "Use double precision"  ON)
+
+IF (USE_DOUBLE_PRECISION)
+ADD_DEFINITIONS( -DBT_USE_DOUBLE_PRECISION)
+SET( BULLET_DOUBLE_DEF "-DBT_USE_DOUBLE_PRECISION")
+ENDIF (USE_DOUBLE_PRECISION)
+
 # Env components
 include_directories(${ENV_INC_DIR}
 					${BULLET_PHYSICS_SOURCE_DIR}/src
@@ -32,4 +39,5 @@ subdirs(
  #MuscleNP - Segmentation fault as of 11/26/14
  SpineTests
  TimestepIndependence
+ HillTest
  )

@@ -65,7 +65,7 @@ protected:
 	double m_updateTime;
 	
 	double m_controlTime;
-    
+    std::vector<double> initConditions;
     std::string controlFilename;
     std::string controlFilePath;
 };
