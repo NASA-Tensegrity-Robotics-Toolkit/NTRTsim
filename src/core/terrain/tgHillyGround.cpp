@@ -186,7 +186,7 @@ void tgHillyGround::setVertices(btVector3 vertices[]) {
         for (size_t j = 0; j < m_config.m_ny; j++)
         {
             const btScalar x = (i - (m_config.m_nx * 0.5)) * m_config.m_triangleSize;
-            const btScalar y = (m_config.m_waveHeight * sinf((float)i) * cosf((float)j) +
+            const btScalar y = (m_config.m_waveHeight * sin((double)i) * cos((double)j) +
                     m_config.m_offset);
             const btScalar z = (j - (m_config.m_ny * 0.5)) * m_config.m_triangleSize;
             vertices[i + (j * m_config.m_nx)].setValue(x, y, z);
