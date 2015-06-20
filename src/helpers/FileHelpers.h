@@ -34,7 +34,14 @@ class FileHelpers
 public: 
     
     static std::string getFileString(std::string fileName);
+    /**
+     * Directs to resources/src
+     */
     static std::string getResourcePath(std::string relPath);
+    /**
+     * Directs paths to resources/test
+     */
+    static std::string getTestResourcePath(std::string relPath);
     
     /**
      * Used by integration tests to check what the score was for that test

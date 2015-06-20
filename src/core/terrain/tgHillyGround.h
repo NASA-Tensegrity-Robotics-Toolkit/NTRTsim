@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
  */
 
-#ifndef TG_HILLY_GROUND_H
-#define TG_HILLY_GROUND_H
+#ifndef CORE_TERRAIN_TG_HILLY_GROUND_H
+#define CORE_TERRAIN_TG_HILLY_GROUND_H
 
 /**
  * @file tgHillyGround.h
@@ -45,8 +45,8 @@ class tgHillyGround : public tgBulletGround
         {
             public:
                 Config(btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0),
-                       btScalar friction = 0.5,
-                       btScalar restitution = 0.0,
+                       double friction = 0.5,
+                       double restitution = 0.0,
                        btVector3 size = btVector3(500.0, 1.5, 500.0),
                        btVector3 origin = btVector3(0.0, 0.0, 0.0),
                        size_t nx = 50,
