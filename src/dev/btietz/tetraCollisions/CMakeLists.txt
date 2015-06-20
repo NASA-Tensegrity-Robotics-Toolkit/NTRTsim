@@ -15,6 +15,11 @@ link_libraries(obstacles
                 AnnealEvolution
                 tgOpenGLSupport)
 
+add_library(tetraCollisions
+    TetraSpineCollisions.cpp
+    colSpineSine.cpp
+)
+                
 add_executable(AppTetraSpineCol
     tscDataLogger.cpp
     tscDataObserver.cpp

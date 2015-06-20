@@ -1,0 +1,15 @@
+{
+    "in_top_amp_a" : -30.0,
+    "in_bottom_amp_a" : -30.0,
+    "out_top_amp_a" : 100.0,
+    "out_bottom_amp_a" : 100.0,
+    "cpg_frequency" : 0.5,
+    "body_waves" : 1,
+    "in_top_offset" : 1.57,
+    "in_left_offset" : 0.0,
+    "in_right_offset" : 0.0,
+    "out_top_offset" : 1.57,
+    "out_left_offset" : 0.0,
+    "out_right_offset" : 0.0,
+    "updateFrequency" : 0.01
+}

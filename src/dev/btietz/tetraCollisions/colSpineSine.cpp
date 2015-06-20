@@ -48,16 +48,28 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define LOGGING
+//#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-colSpineSine::colSpineSine() :
+colSpineSine::colSpineSine(std::string args,
+                            std::string resourcePath) :
 m_dataObserver("logs/TCData")
 {    
+    if (resourcePath != "")
+    {
+        controlFilePath = FileHelpers::getResourcePath(resourcePath);
+    }
+    else
+    {
+        controlFilePath = "";
+    }
+    
+    controlFilename = controlFilePath + args;
+    
 }
 
 void colSpineSine::onSetup(BaseSpineModelLearning& subject)
@@ -114,7 +126,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 	Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVars.json"), root );
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.

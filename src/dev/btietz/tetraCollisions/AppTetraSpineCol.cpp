@@ -95,7 +95,7 @@ int main(int argc, char** argv)
       new TetraSpineCollisions(segments, scale /2.0);
     
     colSpineSine* const myControl =
-      new colSpineSine();
+      new colSpineSine("controlVars.json", "tetraTerrain/");
 
     myModel->attach(myControl);
     /*

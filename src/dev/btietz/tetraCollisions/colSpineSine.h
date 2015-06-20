@@ -43,7 +43,8 @@ class tgSineStringControl;
 class colSpineSine : public tgObserver<BaseSpineModelLearning>
 {
 public:
-    colSpineSine();
+    colSpineSine(std::string args,
+                 std::string resourcePath = "");
     
     ~colSpineSine() {}
 	
@@ -64,6 +65,9 @@ protected:
 	double m_updateTime;
 	
 	double m_controlTime;
+    
+    std::string controlFilename;
+    std::string controlFilePath;
 };
 
 #endif // HT_SPINE_SINE_H

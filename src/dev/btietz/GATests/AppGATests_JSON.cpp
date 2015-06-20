@@ -119,7 +119,7 @@ int main(int argc, char** argv)
 
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
-#if (0)    
+#if (1)    
     // Setup neural network
     const int numberOfInputs  = feedbackParams.get("numStates", "UTF-8").asInt();
     const int numberOfOutputs = feedbackParams.get("numActions", "UTF-8").asInt();
