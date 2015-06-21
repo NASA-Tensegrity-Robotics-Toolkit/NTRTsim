@@ -54,7 +54,7 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-	ScarrArmController(const double prefLength=5);
+	ScarrArmController(const double prefLength, double timestep);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -74,6 +74,7 @@ protected:
 private:
   double m_initialLengths;
   double m_totalTime;
+  double dt;
   AnnealAdapter evolutionAdapter;
     
   void setBrachioradialisTargetLength(ScarrArmModel& subject, double dt);

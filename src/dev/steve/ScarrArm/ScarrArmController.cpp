@@ -40,26 +40,18 @@
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
-ScarrArmController::ScarrArmController(const double initialLength)
-{
+ScarrArmController::ScarrArmController(const double initialLength, double timestep) {
 	this->m_initialLengths=initialLength;
 	this->m_totalTime=0.0;
+    this->dt = timestep;
 }
 
 //Fetch all the muscles and set their preferred length
-void ScarrArmController::onSetup(ScarrArmModel& subject)
-{
-    const double dt = 0.0001;
-    const double scale = 0.5;
-    const double bone_scale = 0.5;
-    const double a = 22; //TODO: Currently ulna distal width, needs to be olecranon diameter (not quite, but close to that in length)
-
-    const double olecranonfascia_length = a/std::sqrt(2.0) * scale;
-    //const double anconeus_length        = a/std::sqrt(2.0) * scale; //TODO: Change
-    //const double brachioradialis_length = 262 * scale * bone_scale; //TODO: Justify
+void ScarrArmController::onSetup(ScarrArmModel& subject) {
+    const double olecranonfascia_length = 4;
     const double brachioradialis_length = 12;
-    const double anconeus_length        = 12;
-    const double supportstring_length   = 1 * scale;
+    const double anconeus_length        = 6;
+    const double supportstring_length   = 0.5;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
 	const std::vector<tgBasicActuator*> anconeus        = subject.find<tgBasicActuator>("anconeus");
@@ -99,8 +91,8 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt) {
     if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
     m_totalTime+=dt;
 
-    setBrachioradialisTargetLength(subject, dt);
-    setAnconeusTargetLength(subject, dt);
+    setBrachioradialisTargetLength(subject, dt); //pitch
+    //setAnconeusTargetLength(subject, dt);        //yaw
     moveAllMotors(subject, dt);
     //updateActions(dt);
 }
@@ -108,7 +100,7 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt) {
 void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, double dt) {
     const double mean_brachioradialis_length = 12; //TODO: define according to vars
     double newLength = 0;
-    const double amplitude    = mean_brachioradialis_length/2;
+    const double amplitude    = mean_brachioradialis_length/1;
     const double angular_freq = 2;
     const double phase = 0;
     const double dcOffset     = mean_brachioradialis_length;
@@ -118,8 +110,13 @@ void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, 
 		tgBasicActuator * const pMuscle = brachioradialis[i];
 		assert(pMuscle != NULL);
         cout <<"t: " << pMuscle->getCurrentLength() << endl;
-        newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
+        //newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
+        newLength = dcOffset - amplitude*m_totalTime/5;
+        if(newLength < dcOffset/8) {
+            newLength = dcOffset/8;
+        }
         std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
+        std::cout<<"m_totalTime: " << m_totalTime << "\n";
 		pMuscle->setControlInput(newLength, dt);
         cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
     }

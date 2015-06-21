@@ -73,8 +73,8 @@ namespace
         double targetVelocity;
     } c =
    {
-     0.825,    // density (kg / length^3)
-     0.31,     // radius (length)
+     0.05,    // density (kg / length^3)
+     0.8,     // radius (length)
      3000.0,   // stiffness (kg / sec^2)
      200.0,    // damping (kg / sec)
      15.0,     // rod_length (length)
@@ -85,7 +85,7 @@ namespace
      3000.0/1,   // pretension_olecranon (force), stiffness/initial length
      3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
      3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
-     3000.0/1,        // pretension_support (force), stiffness/initial length 
+     30000.0/1,        // pretension_support (force), stiffness/initial length 
      false,    // history (boolean)
      100000,   // maxTens
      10000    // targetVelocity
@@ -114,7 +114,7 @@ void ScarrArmModel::addNodes(tgStructure& s)
 {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 13 + 2; //2 for massless rod
+    const size_t nNodes = 15 + 2; //2 for massless rod
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -138,8 +138,8 @@ void ScarrArmModel::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(0, c, 0));
     nodePositions.push_back(btVector3(x, z, 0));
     nodePositions.push_back(btVector3(b+a/2, -g, 0));
-    nodePositions.push_back(btVector3(0, c+5, f));
-    nodePositions.push_back(btVector3(0, c+5, -f));
+    nodePositions.push_back(btVector3(0, c+2, f));
+    nodePositions.push_back(btVector3(0, c+2, -f));
 
     //Added 6/17/15
     nodePositions.push_back(btVector3(a/2, -2*g, 0));
@@ -148,6 +148,9 @@ void ScarrArmModel::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(3*a/2, -g, 0));
     nodePositions.push_back(btVector3(3*a/4, -g, g));
     nodePositions.push_back(btVector3(3*a/4, -g, -g));
+
+    nodePositions.push_back(btVector3(f, c+2, 0));
+    nodePositions.push_back(btVector3(-f, c+2, 0));
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -167,12 +170,9 @@ void ScarrArmModel::addRods(tgStructure& s)
     s.addPair(1, 11,  "rod");
 
     // humerus
-    s.addPair(3,  5,  "rod");
-    s.addPair(4,  5,  "rod"); 
-    s.addPair(5,  6,  "rod");
-
-    // massless support beam
-    s.addPair(9, 10, "massless");
+    s.addPair(3,  5,  "humerus massless");
+    s.addPair(4,  5,  "humerus massless"); 
+    s.addPair(5,  6,  "humerus massless");
 }
 
 void ScarrArmModel::addMuscles(tgStructure& s)
@@ -199,10 +199,6 @@ void ScarrArmModel::addMuscles(tgStructure& s)
     s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(3, 13, "right anconeus muscle");
     s.addPair(4, 14, "left anconeus muscle");
-
-    //Muscles to massless rod
-    s.addPair(6, 9, "support muscle"); 
-    s.addPair(6, 10, "support muscle"); 
 }
  
 /*
@@ -239,7 +235,7 @@ void ScarrArmModel::setup(tgWorld& world)
     addMuscles(s);
     
     // Move the arm out of the ground
-    btVector3 offset(0.0, 40.0, 0.0);
+    btVector3 offset(0.0, 50.0, 0.0);
     s.move(offset);
     
     // Create the build spec that uses tags to turn the structure into a real model
@@ -296,6 +292,7 @@ const std::vector<tgBasicActuator*>& ScarrArmModel::getAllMuscles() const
     
 void ScarrArmModel::teardown()
 {
+    notifyTeardown();
     tgModel::teardown();
 }
 

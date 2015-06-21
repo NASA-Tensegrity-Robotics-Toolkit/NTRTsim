@@ -77,13 +77,14 @@ int main(int argc, char** argv) {
     ScarrArmModel* const myModel = new ScarrArmModel();
 
     // Fifth, select the controller to use. Uncomment desired controller.
-    ScarrArmController* const pTC = new ScarrArmController(2.5);
+    ScarrArmController* const pTC = new ScarrArmController(2.5, timestep_physics);
 
     myModel->attach(pTC);
     simulation.addModel(myModel);
     
     // Run until the user stops
     simulation.run();
+    simulation.reset();
 
     //Teardown is handled by delete, so that should be automatic
     return 0;
