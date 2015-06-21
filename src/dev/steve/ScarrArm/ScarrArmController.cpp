@@ -92,7 +92,7 @@ void ScarrArmController::onStep(ScarrArmModel& subject, double dt) {
     m_totalTime+=dt;
 
     setBrachioradialisTargetLength(subject, dt); //pitch
-    //setAnconeusTargetLength(subject, dt);        //yaw
+    setAnconeusTargetLength(subject, dt);        //yaw
     moveAllMotors(subject, dt);
     //updateActions(dt);
 }
@@ -115,6 +115,10 @@ void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, 
         if(newLength < dcOffset/8) {
             newLength = dcOffset/8;
         }
+
+        if(m_totalTime > 15) {
+            m_totalTime = 0;
+        }
         std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
         std::cout<<"m_totalTime: " << m_totalTime << "\n";
 		pMuscle->setControlInput(newLength, dt);
@@ -125,7 +129,7 @@ void ScarrArmController::setBrachioradialisTargetLength(ScarrArmModel& subject, 
 void ScarrArmController::setAnconeusTargetLength(ScarrArmModel& subject, double dt) {
     const double mean_anconeus_length = 6; //TODO: define according to vars
     double newLength = 0;
-    const double amplitude = mean_anconeus_length/2;
+    const double amplitude = mean_anconeus_length/1;
     const double angular_freq = 2;
     const double phaseleft = 0;
     const double phaseright = phaseleft + M_PI;
@@ -134,30 +138,32 @@ void ScarrArmController::setAnconeusTargetLength(ScarrArmModel& subject, double 
     const std::vector<tgBasicActuator*> anconeusright = subject.find<tgBasicActuator>("left anconeus");
 
     for (size_t i=0; i<anconeusleft.size(); i++) {
-		tgBasicActuator * const pMuscle = anconeusleft[i];
-		assert(pMuscle != NULL);
-        cout <<"t: " << pMuscle->getCurrentLength() << endl;
-        newLength = amplitude * sin(angular_freq * m_totalTime + phaseleft) + dcOffset;
-        std::cout<<"calculating anconeusleft target length:" << newLength << "\n";
-		pMuscle->setControlInput(newLength, dt);
-        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+        tgBasicActuator * const pMuscle = anconeusleft[i];
+        assert(pMuscle != NULL);
+        if(m_totalTime > 5) {
+            newLength = amplitude * sin(angular_freq * m_totalTime + phaseleft) + dcOffset;
+        } else {
+            newLength = dcOffset;
+        }
+        pMuscle->setControlInput(newLength, dt);
     }
 
     for (size_t i=0; i<anconeusright.size(); i++) {
-		tgBasicActuator * const pMuscle = anconeusright[i];
-		assert(pMuscle != NULL);
-        cout <<"t: " << pMuscle->getCurrentLength() << endl;
-        newLength = amplitude * sin(angular_freq * m_totalTime + phaseright) + dcOffset;
-        std::cout<<"calculating anconeusright target length:" << newLength << "\n";
-		pMuscle->setControlInput(newLength, dt);
-        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+        tgBasicActuator * const pMuscle = anconeusright[i];
+        assert(pMuscle != NULL);
+        if(m_totalTime > 5) {
+            newLength = amplitude * sin(angular_freq * m_totalTime + phaseright) + dcOffset;
+        } else {
+            newLength = dcOffset;
+        }
+        pMuscle->setControlInput(newLength, dt);
     } 
 }
 
 //Move motors for all the muscles
 void ScarrArmController::moveAllMotors(ScarrArmModel& subject, double dt) {
-	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	for (size_t i = 0; i < muscles.size(); ++i) {
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for (size_t i = 0; i < muscles.size(); ++i) {
 		tgBasicActuator * const pMuscle = muscles[i];
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
