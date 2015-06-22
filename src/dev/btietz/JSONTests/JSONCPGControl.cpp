@@ -441,11 +441,11 @@ array_4D JSONCPGControl::scaleEdgeActions
                         assert(edgeParam.size() == 2);
                         // Weight from 0 to 1
                         actionList[i][j][k][0] = edgeParam[0].asDouble();
-                        std::cout << actionList[i][j][k][0] << " ";
+                        //std::cout << actionList[i][j][k][0] << " ";
                         // Phase offset from -pi to pi
                         actionList[i][j][k][1] = edgeParam[1].asDouble() * 
                                                 (range) + lowerLimit;
-                        std::cout <<  actionList[i][j][k][1] << std::endl;
+                        //std::cout <<  actionList[i][j][k][1] << std::endl;
                         count++;
                     }
                 }

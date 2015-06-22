@@ -183,6 +183,7 @@ void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
     
     double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
     
+    
     /// @todo add to config
     if (currentHeight > 25 || currentHeight < 1.0)
     {
@@ -206,7 +207,10 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     
     const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
     
-    const double distanceMoved = calculateDistanceMoved(goalSubject);
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                    (newZ-oldZ) * (newZ-oldZ));
+    
+    const double distanceToGoal = calculateDistanceMoved(goalSubject);
     
     if (bogus)
     {
@@ -260,7 +264,7 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     Json::Value prevScores = root.get("scores", Json::nullValue);
     
     Json::Value subScores;
-    subScores["distance"] = scores[0];
+    subScores["distance"] = distanceToGoal;
     subScores["energy"] = totalEnergySpent;
     
     prevScores.append(subScores);

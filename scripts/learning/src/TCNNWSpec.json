@@ -4,10 +4,10 @@
     "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/TC_nn_Tension/",
     "executable" : "./../../../build/dev/btietz/TC_nn_Tension/AppTCNNW_Tension",
-    "terrain" : [[[0, 0, 0, -1.517, 30000]], [[1, 0, 0, -1.517, 120000]]],
+    "terrain" : [[[1, 0, 0, -1.517, 120000]], [[1, 0, 0, -1.517, 120000]],[[1, 0, 0, -1.517, 120000]], [[1, 0, 0, -1.517, 120000]], [[1, 0, 0, -1.517, 120000]]],
     "A"  : 15,
     "a0" : 0.000066,
-    "c0" : 0.05,
+    "c0" : 0.025,
     "bp" : 0.5,
     "maxStep" : 2,
     "learningParams": 
@@ -18,11 +18,11 @@
         "deterministic": 0,
         "nodeVals" :
         {
-            "learning" : false,
+            "learning" : true,
             "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
-            "numberOfOutputs" : 11,
+            "numberOfOutputs" : 5,
             "numberOfInstances" : 1,
             "populationSize" : 1,
             "useAverage" : true,
@@ -36,14 +36,14 @@
         },
         "edgeVals" :
         {
-            "learning" : false,
+            "learning" : true,
             "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
             "numberOfInstances" : 100,
             "populationSize" : 1,
-            "useAverage" : false,
+            "useAverage" : true,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
             "mutationChance" : 0.5,
@@ -54,7 +54,7 @@
         },
         "feedbackVals" :
         {
-            "learning" : false,
+            "learning" : true,
             "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 2,
@@ -74,7 +74,7 @@
         "goalVals" :
         {
             "learning" : true,
-            "startingControllers" : 0,
+            "startingControllers" : 1,
             "monteCarlo" : false,
             "numberOfStates" : 4,
             "numberOfOutputs" : 8,
