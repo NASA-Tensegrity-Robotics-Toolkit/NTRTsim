@@ -245,7 +245,7 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     const double oldDensity = .00311;
     const double radius  = 0.635 / 2.0;
     const double density = 0.0201 / (pow(radius, 2) * M_PI * edge); // Mass divided by volume... should there be a way to set this automatically??
-    const double friction = 0.15;
+    const double friction = 0.6;
     const tgRod::Config rodConfig(radius, density, friction);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -285,8 +285,8 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     
     // Two different string configs
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 0.0, true, 5000, 7.0, 10.0, 10.0);
+    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 2000.0, true, 2800, 7.0, 10.0, 10.0);
+    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 1000.0, true, 2800, 7.0, 10.0, 10.0);
     spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));

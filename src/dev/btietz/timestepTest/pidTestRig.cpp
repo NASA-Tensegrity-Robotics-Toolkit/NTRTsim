@@ -70,7 +70,7 @@ namespace
        2,     // density (mass / length^3)
        0.31,     // radius (length)
        1000.0,   // stiffness (mass / sec^2)
-       10.0,     // damping (mass / sec)
+       0.0,     // damping (mass / sec)
        10.0,     // triangle_length (length)
        10.0,     // triangle_height (length)
        20.0,     // prism_height (length)
@@ -125,7 +125,7 @@ void pidTestRig::setupControl()
 	const double controlStep = 0.01;
 	tgPIDController::Config pidConfig(100.0, 0.0, 10.0, true);
     tgImpedanceController* p_ipc = new tgImpedanceController(200.0, 100.0, 100.0);
-    const double amplitude = 5.0;
+    const double amplitude = 0.0;
 	const double frequency = 0.2;
 	const double phase = 0.0;
 	const double offset = 0.0;
@@ -181,7 +181,7 @@ void pidTestRig::setup(tgWorld& world)
     if (useKinematic)
     {
 		// Stiffness, damping, pretension, radius, friction
-		const tgKinematicActuator::Config muscleConfig(c.stiffness, c.damping, 2000.0, 1.0, 10.0);
+		const tgKinematicActuator::Config muscleConfig(c.stiffness, c.damping, 0.0, 1.0, 0.0, 1.0, true, true);
 		spec.addBuilder("muscle", new tgKinematicActuatorInfo(muscleConfig));
 	}
 	else
@@ -209,6 +209,17 @@ void pidTestRig::setup(tgWorld& world)
     
     // Actually setup the children
     tgModel::setup(world);
+    
+        std::vector<tgBaseRigid*> myRigids = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
+#if (1)
+		for (int i =0; i < myRigids.size(); i++)
+		{
+			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
+		}
+#endif
+    
+    std::cout << "Starting Length: " << allMuscles[0]->getCurrentLength() << std::endl;
+    std::cout << "Starting Rest Length: " << allMuscles[0]->getRestLength() << std::endl;
     
     totalTime = 0.0;
     reached = false;
@@ -252,5 +263,59 @@ const std::vector<tgSpringCableActuator*>& pidTestRig::getAllMuscles() const
 void pidTestRig::teardown()
 {
     notifyTeardown();
+    
+    std::vector<tgSpringCableActuator* > tmpStrings = this->getAllMuscles();
+    
+    tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[0]->getHistory();
+        
+    std::size_t histSize = stringHist.tensionHistory.size();
+    
+    double dt = totalTime / (double)histSize;
+    
+    double totalEnergySpent = 0;
+    
+    
+    std::cout << "Ending Length: " << allMuscles[0]->getCurrentLength() << std::endl;
+    std::cout << "Ending Rest Length: " << allMuscles[0]->getRestLength() << std::endl;
+    std::cout << "Ending Tension: " <<allMuscles[0]->getTension()  << std::endl;
+    
+    std::vector<tgBaseRigid*> myRigids = tgCast::filter<tgModel, tgBaseRigid> (getDescendants());
+    
+    btRigidBody* body0 = myRigids[0]->getPRigidBody(); 
+    
+    btVector3 velocity = body0->getLinearVelocity();
+    
+    std::cout << "Final Velocity: " << velocity.length() << std::endl;
+    
+    #if (0)
+    
+        for(std::size_t j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+        
+    #else
+        for(std::size_t j=0; j < histSize; j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j];
+            double motorSpeed = stringHist.lastVelocities[j];
+            // Integrating power over time
+            const double workDone = previousTension * motorSpeed * dt;
+            totalEnergySpent += workDone;
+        }
+    #endif
+    
+    std::cout << "Motor Speed " << stringHist.lastVelocities[histSize - 1]  << std::endl;
+    
+    std::cout << "Energy Spent: " << totalEnergySpent << std::endl;
+    
     tgModel::teardown();
 }

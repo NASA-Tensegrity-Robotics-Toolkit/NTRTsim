@@ -205,6 +205,8 @@ private:
 	 */
 	double m_desiredTorque;
     
+    double m_appliedTorque;
+    
     /**
      * Override the base config to get the extra parameters
      */

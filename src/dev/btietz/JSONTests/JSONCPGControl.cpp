@@ -37,6 +37,7 @@
 #include "examples/learningSpines/tgCPGActuatorControl.h"
 #include "dev/CPG_feedback/tgCPGCableControl.h"
 #include "examples/learningSpines/BaseSpineModelLearning.h"
+#include "examples/learningSpines/BaseSpineCPGControl.h"
 
 #include "helpers/FileHelpers.h"
 

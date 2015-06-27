@@ -77,6 +77,7 @@ JSONGoalTensionNNW::~JSONGoalTensionNNW()
 
 void JSONGoalTensionNNW::onSetup(BaseSpineModelLearning& subject)
 {
+    m_totalTime = 0;
 	m_pCPGSys = new CPGEquationsFB(200);
 
     Json::Value root; // will contains the root value after parsing.
@@ -147,8 +148,13 @@ void JSONGoalTensionNNW::onSetup(BaseSpineModelLearning& subject)
 void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
 {
     m_updateTime += dt;
+    m_totalTime += dt;
+    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+    
     if (m_updateTime >= m_config.controlTime)
     {
+        
+        
 #if (1) // Goal and cable
 
     std::vector<double> desComs = getFeedback(subject);
@@ -179,10 +185,12 @@ void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
 #endif
 		notifyStep(m_updateTime);
         m_updateTime = 0;
+        //std::cout << m_totalTime << " " << currentHeight<< std::endl;
     }
     
-    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
     
+    
+#if (0)
     /// @todo add to config
     if (currentHeight > 25 || currentHeight < 1.0)
     {
@@ -190,6 +198,7 @@ void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
 		bogus = true;
 		throw std::runtime_error("Height out of range");
 	}
+#endif
 }
 
 void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
@@ -205,6 +214,9 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     const double oldZ = initConditions[2];
     
     const BaseSpineModelGoal* goalSubject = tgCast::cast<BaseSpineModelLearning, BaseSpineModelGoal>(subject);
+    
+    const double totalDistanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                    (newZ-oldZ) * (newZ-oldZ));
     
     const double distanceMoved = calculateDistanceMoved(goalSubject);
     
@@ -227,6 +239,13 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
+        std::size_t histSize = stringHist.tensionHistory.size();
+        
+        double dt = m_totalTime / (double)histSize;
+        
+        //std::cout << "Estimated dt: " << dt << std::endl;
+    #if (0)
+    
         for(std::size_t j=1; j<stringHist.tensionHistory.size(); j++)
         {
             const double previousTension = stringHist.tensionHistory[j-1];
@@ -239,11 +258,23 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
             const double workDone = previousTension * motorSpeed;
             totalEnergySpent += workDone;
         }
+        
+    #else
+        for(std::size_t j=0; j < histSize; j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j];
+            double motorSpeed = stringHist.lastVelocities[j];
+            // Integrating power over time
+            const double workDone = previousTension * motorSpeed * dt;
+            totalEnergySpent += workDone;
+        }
+    #endif
     }
     
     scores.push_back(totalEnergySpent);
     
-    std::cout << "Dist travelled " << scores[0] << std::endl;
+    std::cout << "Dist travelled towards goal " << scores[0] << " Total Distance Travelled " << totalDistanceMoved ;
+    std::cout << " Energy Spent: " << scores[1] << std::endl;
     
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;

@@ -77,7 +77,7 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     const double elasticity = 1000.0;
     const double damping = 10.0;
     const double pretension = 0.0;
-    const bool   history = false;
+    const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
 
@@ -192,6 +192,14 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     std::cout << *this << std::endl;
     
     std::cout << "Spine Length: " << getSpineLength() << std::endl;
+#endif
+
+    std::vector<tgBaseRigid*> myRigids = this->getAllRigids();
+#if (1)
+		for (int i =0; i < myRigids.size(); i++)
+		{
+			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
+		}
 #endif
     children.clear();
     

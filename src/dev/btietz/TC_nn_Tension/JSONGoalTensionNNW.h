@@ -61,6 +61,8 @@ protected:
 
     virtual std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
     
+    double m_totalTime;
+    
 };
 
 #endif // SPINE_FEEDBACK_CONTROL_H

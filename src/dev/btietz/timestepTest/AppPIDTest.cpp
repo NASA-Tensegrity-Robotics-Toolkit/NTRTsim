@@ -55,13 +55,13 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(981); // gravity, cm/sec^2
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 0.001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
     
-    simulation.run();
+    simulation.run(440);
 
     //Teardown is handled by delete, so that should be automatic
     return 0;
