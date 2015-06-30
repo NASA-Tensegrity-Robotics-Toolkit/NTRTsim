@@ -18,20 +18,21 @@
 
 /**
  * @file AppSUPERball.cpp
- * @brief Contains the definition function main() for the Super Ball applicaiton
+ * @brief Contains the definition function main() for the SUPERball applicaiton
  * application.
  * $Id$
  */
 
 // This application
 #include "T6Model.h"
-#include "T6TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+// Controller
+#include "controllers/T6zeroMQController.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
     
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
+    const double pitch = 0.0;//M_PI/15.0;
     //const double pitch = 0.0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
@@ -76,15 +77,12 @@ int main(int argc, char** argv)
     // simulation
     T6Model* const myModel = new T6Model();
 
-    // Fifth, select the controller to use. Uncomment desired controller.
+    // Fifth, select the controller to use, and attach it to the model.
+    // For example, you could run the following to use the T6TensionController:
+    T6zeroMQController* const pTC = new T6zeroMQController();
+    myModel->attach(pTC);
 
-    // For the T6TensionController,
-    // Set the tension of the controller units of kg * length / s^2
-    // So 10000 units at this scale is 1000 N
-
-     //T6TensionController* const pTC = new T6TensionController(10000);
-
-    //myModel->attach(pTC);
+    // Finally, add out model to the simulation
     simulation.addModel(myModel);
     
     // Run until the user stops

@@ -202,7 +202,7 @@ void tgKinematicActuator::integrateRestLength(double dt)
 	}
 	
 	// semi-implicit Euler integration
-	m_restLength += m_motorVel * dt; 
+	m_restLength += m_config.radius * m_motorVel * dt; 
 	
 	/// @todo check min actual length somewhere
 	

@@ -32,6 +32,7 @@
 #include "terrain/tgBulletGround.h"
 #include "terrain/tgEmptyGround.h"
 // The Bullet Physics library
+#include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
 #include "BulletCollision/BroadphaseCollision/btAxisSweep3.h" // New broadphase
@@ -182,6 +183,20 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
     delete m_pIntermediateBuildProducts;
 }
 
+void tgWorldBulletPhysicsImpl::removeConstraints()
+{
+    const size_t nc = m_pDynamicsWorld->getNumConstraints();
+    for (int i = nc - 1; i >= 0; --i)
+    {
+        btTypedConstraint * const pTypedConstraint = m_pDynamicsWorld->getConstraint(i);
+
+        //Remove the constraint from the dynamics world
+        m_pDynamicsWorld->removeConstraint(pTypedConstraint);
+    }
+    //All constraints have been removed and deleted
+    assert(m_pDynamicsWorld->getNumConstraints() == 0);
+}
+
 /**
  * Create and return a new instance of a btSoftRigidDynamicsWorld.
  * @return a pointer to a new instance of a btSoftRigidDynamicsWorld
@@ -226,6 +241,20 @@ void tgWorldBulletPhysicsImpl::addCollisionShape(btCollisionShape* pShape)
 
       // Postcondition
       assert(invariant());
+}
+
+void tgWorldBulletPhysicsImpl::addConstraint(btTypedConstraint* pConstraint)
+{
+    assert(invariant());
+
+    if (pConstraint)
+    {
+        m_constraints.push_back(pConstraint);
+        m_pDynamicsWorld->addConstraint(pConstraint);
+    }
+
+    assert(invariant());
+
 }
 
 void tgWorldBulletPhysicsImpl::deleteCollisionShape(btCollisionShape* pShape)
