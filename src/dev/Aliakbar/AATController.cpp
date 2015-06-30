@@ -65,11 +65,12 @@ void AATController::onStep(AATModel& subject, double dt)
 {
 	total_time+=dt;
 	const std::vector<tgBasicActuator*> spring_cables = subject.getAllActuators();
-	if (total_time < 0)
+	if (total_time < 1.5)
 	{
 		std::cout <<total_time <<"\tCurrent Length " << spring_cables[0]->getCurrentLength() 
-	<< "\tTension" << spring_cables[0]->getTension() << "\tRest Length " <<  spring_cables[0]->getRestLength() <<
-	"\tTension passive" << spring_cables[8]->getTension() <<std::endl;
+		<< "\tTension" << spring_cables[0]->getTension() << "\tRest Length " <<  spring_cables[0]->getRestLength() <<
+		"\tCurrent Length " << spring_cables[8]->getCurrentLength() << "\tTension passive " << spring_cables[8]->getTension() << 
+		"\tRest Length passive " << spring_cables[8]->getRestLength() <<std::endl;
 
 	for (unsigned i=0; i<8;++i){
 		spring_cables[i+8]->setControlInput(0.01,dt);
@@ -80,7 +81,8 @@ void AATController::onStep(AATModel& subject, double dt)
 		
 	std::cout <<total_time <<"\tCurrent Length " << spring_cables[0]->getCurrentLength() 
 	<< "\tTension" << spring_cables[0]->getTension() << "\tRest Length " <<  spring_cables[0]->getRestLength() <<
-	"\tTension passive " << spring_cables[8]->getTension() << "\tRest Length passive " << spring_cables[8]->getRestLength() <<std::endl;
+	"\tCurrent Length " << spring_cables[8]->getCurrentLength() << "\tTension passive " << spring_cables[8]->getTension() << 
+	"\tRest Length passive " << spring_cables[8]->getRestLength() <<std::endl;
 
 	//spring_cables[0]->setControlInput(0.01,dt);
 	for (unsigned i=0; i<8;++i){

@@ -85,7 +85,7 @@ namespace
        1.3,      // spacing of the fixed (massless) cap (length)  
        1000.0,   // stiffness (mass / sec^2)
        500.0,     // damping (mass / sec)
-       10.0,    // pretension (mass * length / sec^2)
+       10000.0,    // pretension (mass * length / sec^2)
        10.0,     // triangle_length (length)
        10.0,     // triangle_height (length)
        40.0,     // height of the fixed (massless) cap (length)
@@ -201,6 +201,18 @@ void AATModel::addNodes(tgStructure& s,
     s.addNode(0, c.height_ml, -c.radius_ml);
     s.addNode(spacing, c.height_ml, -spacing);
 
+    const double radius_mlo = 3 * c.radius_ml;
+    const double spacing_mlo = 3 * spacing; 
+
+    s.addNode(radius_mlo, c.height_ml, 0);
+    s.addNode(spacing_mlo, c.height_ml, spacing_mlo);
+    s.addNode(0, c.height_ml, radius_mlo);
+    s.addNode(-spacing_mlo, c.height_ml, spacing_mlo);
+    s.addNode(-radius_mlo, c.height_ml, 0);
+    s.addNode(-spacing_mlo, c.height_ml, -spacing_mlo);
+    s.addNode(0, c.height_ml, -radius_mlo);
+    s.addNode(spacing_mlo, c.height_ml, -spacing_mlo);
+
     //Cable Nodes
 
     // s.addNode(cable_ratio * c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str / 4, 0);
@@ -284,6 +296,15 @@ void AATModel::addRods(tgStructure& s)
     s.addPair( 22, 23, "cap");
     s.addPair( 23, 16, "cap");
 
+    s.addPair( 24, 25, "cap");
+    s.addPair( 25, 26, "cap");
+    s.addPair( 26, 27, "cap");
+    s.addPair( 27, 28, "cap");
+    s.addPair( 28, 29, "cap");
+    s.addPair( 29, 30, "cap");
+    s.addPair( 30, 31, "cap");
+    s.addPair( 31, 24, "cap");
+
 }
 
 void AATModel::addActuators(tgStructure& s)
@@ -315,14 +336,14 @@ void AATModel::addActuators(tgStructure& s)
 
     // Normal Structure
 
-    s.addPair( 8,  1, "actuated");
-    s.addPair( 9,  2, "actuated");
-    s.addPair( 10,  3, "actuated");
-    s.addPair( 11,  4, "actuated");
-    s.addPair( 12,  5,  "actuated");
-    s.addPair( 13,  6, "actuated");
-    s.addPair( 14,  7, "actuated");
-    s.addPair( 15,  0, "actuated");
+    s.addPair( 8,  24, "actuated");
+    s.addPair( 9,  25, "actuated");
+    s.addPair( 10,  26, "actuated");
+    s.addPair( 11,  27, "actuated");
+    s.addPair( 12,  28, "actuated");
+    s.addPair( 13,  29, "actuated");
+    s.addPair( 14,  30, "actuated");
+    s.addPair( 15,  31, "actuated");
 
     // For the structure with cables attached to the middle of rods
 

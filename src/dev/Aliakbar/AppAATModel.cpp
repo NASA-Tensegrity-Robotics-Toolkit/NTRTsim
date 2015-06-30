@@ -18,7 +18,7 @@
 
 /**
  * @file AppAATModel.cpp
- * @brief Contains the definition function main() for the Three strut
+ * @brief Contains the definition function main() for the the deployable heat shield
  * tensegrity prism example application
  * @author Aliakbar Toghyan
  * $Id$
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(981); // gravity, cm/sec^2
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2
     tgWorld world(config, ground);
 
     // Second create the view
