@@ -64,18 +64,27 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view
-    //tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    #if(1)
+    tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
+    #else
     tgSimView       *view = createView(world);         // For running multiple episodes
-
+    #endif
+    
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
 
     // Fourth create the models with their controllers and add the models to the simulation
     Escape_T6Model* const model = new Escape_T6Model();
-
+    
+    /* Required for setting up learning file input/output. */
+    const std::string suffix((argc > 1) ? argv[1] : "default");
+    
     // Fifth create controller and attach it to the model
     double initialLength = 9.0; // decimeters
-    Escape_T6Controller* const controller = new Escape_T6Controller(initialLength);
+    Escape_T6Controller* const controller = new Escape_T6Controller(initialLength,
+                                                                    suffix,
+                                                                    "craterEscape/",
+                                                                    "Config.ini");
     model->attach(controller);
 
     //Sixth add model (with controller) to simulation

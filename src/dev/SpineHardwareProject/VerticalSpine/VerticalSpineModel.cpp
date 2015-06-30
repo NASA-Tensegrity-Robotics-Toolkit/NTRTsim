@@ -114,6 +114,7 @@ void VerticalSpineModel::addNodes(tgStructure& tetra, double edge, double height
     tetra.addNode(0, c.height, edge / 2.0); // node 3
     // middle
     tetra.addNode(0, c.height/2, 0); // node 4
+
 }
 
 void VerticalSpineModel::addPairs(tgStructure& tetra)
@@ -122,6 +123,7 @@ void VerticalSpineModel::addPairs(tgStructure& tetra)
     tetra.addPair(1, 4, "rod");
     tetra.addPair(2, 4, "rod");
     tetra.addPair(3, 4, "rod");
+
 }
     
 void VerticalSpineModel::addPairsB(tgStructure& tetra)
@@ -130,6 +132,7 @@ void VerticalSpineModel::addPairsB(tgStructure& tetra)
     tetra.addPair(1, 4, "rodB");
     tetra.addPair(2, 4, "rodB");
     tetra.addPair(3, 4, "rodB");
+
 }
 
 void VerticalSpineModel::addSegments(tgStructure& snake, const tgStructure& tetra, 
@@ -239,10 +242,16 @@ void VerticalSpineModel::setup(tgWorld& world)
 				  c.rollFriction, c.restitution);
     const tgRod::Config rodConfigB(c.radius, c.densityB, c.friction, 
 				  c.rollFriction, c.restitution);
+    //holder
+    const tgRod::Config rodConfigHA(0.1, c.densityA, c.friction,
+				    c.rollFriction, c.restitution);
+    const tgRod::Config rodConfigHB(0.1, c.densityB, c.friction,
+				    c.rollFriction, c.restitution);
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfigA));
     spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
-    
+
+
     // set muscle (string) parameters
     // @todo replace acceleration constraint with tgKinematicActuator if needed...
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,

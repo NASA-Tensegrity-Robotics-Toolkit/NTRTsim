@@ -31,20 +31,22 @@
 
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
+#include "learning/Configuration/configuration.h"
+#include "learning/AnnealEvolution/AnnealEvolution.h"
 
 // Forward declarations
 class Escape_T6Model;
 class tgBasicActuator;
-
-//namespace std for vectors
-using namespace std;
 
 /** Escape Controller for T6 */
 class Escape_T6Controller : public tgObserver<Escape_T6Model>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        Escape_T6Controller(const double prefLength=5.0);
+        Escape_T6Controller(const double prefLength=5.0,
+                            std::string args = "_Escape",
+                            std::string resourcePath = "",
+                            std::string config = "Config.ini");
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~Escape_T6Controller() { }
@@ -56,31 +58,36 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         virtual void onTeardown(Escape_T6Model& subject);
 
     protected:
-        virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+        virtual std::vector< std::vector <double> > transformActions(std::vector< std::vector <double> > act);
 
-        virtual void applyActions(Escape_T6Model& subject, vector< vector <double> > act);
+        virtual void applyActions(Escape_T6Model& subject, std::vector< std::vector <double> > act);
 
     private:
-        vector<double> initPosition; // Initial position of model
+        std::vector<double> initPosition; // Initial position of model
         const double m_initialLengths;
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
 
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
-        vector< vector<double> > actions; // For modifications between episodes
+        std::vector< std::vector<double> > actions; // For modifications between episodes
 
         // Muscle Clusters
         int nClusters;
         int musclesPerCluster;
         /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgBasicActuator*> > clusters; 
+        std::vector<std::vector<tgBasicActuator*> > clusters; 
 
         // Sine Wave Data
         double* amplitude;
         double* angularFrequency;
         double* phaseChange;
         double* dcOffset;
+        
+        // Configuration strings
+        std::string suffix;
+        std::string configPath;
+        std::string configName;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
@@ -104,7 +111,16 @@ class Escape_T6Controller : public tgObserver<Escape_T6Model>
         double displacement(Escape_T6Model& subject);
 
         /** Select action paramters from a comma-separated line in a file */
-        std::vector<double> readManualParams(int lineNumber, string filename);
+        std::vector<double> readManualParams(int lineNumber, std::string filename);
+
+        /** Prints displacement of center of mass (x,y,z) from origin. Each dimension is space separated, all followed by a newline to stdout */
+        void printCOM(Escape_T6Model& subject);
+        
+        /** Prints each muscle's current tension in Newtons to stdout. Each tension is space separated. */ 
+        void printMuscleTensions(Escape_T6Model& subject);
+
+        /** Prints each muscle's current length in meters to stdout. Each length is space separated. */
+        void printMuscleLengths(Escape_T6Model& subject);
 
         void printSineParams();
 };

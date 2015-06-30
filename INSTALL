@@ -61,11 +61,12 @@ anything.
 
   ** Running the setup script **
 
-  - If you want to specify setup options, copy 
-    conf/default/install.conf.default to conf/install.conf and edit as 
-    desired. This can save you time if you already have Boost installed (Mac).
-    See install.conf.default for more information.
-    You can also just run setup.sh -- it will create setup/install.conf 
+  - If you want to specify setup options, copy the files in
+    conf/default/ to conf/, removing the .default
+    (for example conf/default/bullet.conf.default becomes conf/bullet.conf)
+    and edit as desired. This can save you time if you already have Boost 
+    installed.
+    You can also just run setup.sh -- it will create the .conf files 
     for you and allow you to set certain options like the location of your 
     bullet build if you already have one. 
 

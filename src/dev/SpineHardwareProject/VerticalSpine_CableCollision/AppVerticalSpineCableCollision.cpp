@@ -26,8 +26,8 @@
  */
 
 // This application
-#include "VerticalSpineModel.h"
-#include "VerticalSpineBendingController.h"
+#include "VerticalSpineModelCableCollision.h"
+//#include "VerticalSpineCableCollisionBendingController.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -44,14 +44,18 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppVerticalSpine" << std::endl;
+    std::cout << "AppVerticalSpineCableCollision" << std::endl;
 
     // First create the world
     const tgWorld::Config config(981);
     tgWorld world(config); 
 
     // Second create the view
-    const double timestep_physics = 0.0001; // seconds
+    /* 
+       modified timestep_physics because of significant lagging.
+     */
+    //const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 1.0/1000.0; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -61,15 +65,15 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     const int segments = 5;
-    VerticalSpineModel* myModel = new VerticalSpineModel(segments);
+    VerticalSpineModelCableCollision* myModel = new VerticalSpineModelCableCollision(segments);
     
     // If desired, add on a controller now.
     // The model contains a pretension parameter, so for simple equilibrium
     // simulations, no controller is needed.
-
-    VerticalSpineBendingController* const pTC = new VerticalSpineBendingController();
+    /*
+    VerticalSpineBendingController* const pTC = new VerticalSpineCableCollisionBendingController();
     myModel->attach(pTC);
-
+    */
     // Finally, add the model (with attached objects) to the simulation.
     simulation.addModel(myModel);
 	
