@@ -60,7 +60,8 @@ namespace
         double density;
         double radius;
         double radius_ml;
-        double spacing_ml;
+        double radius_mlo;
+        double R;
         double stiffness;
         double damping;
         double pretension;
@@ -81,8 +82,9 @@ namespace
    {
        0.2,      // density (mass / length^3)
        0.31,     // radius (length)
-       1.5,     // radius of the fixed (massless) cap (length)
-       1.3,      // spacing of the fixed (massless) cap (length)  
+       15,     // radius of the fixed (massless) cap (length) where ball joints are 
+       20,      // Radius of the outer massless body where tension cables are attached
+       35,      // Radius of the lower (larger) plane
        1000.0,   // stiffness (mass / sec^2)
        500.0,     // damping (mass / sec)
        10000.0,    // pretension (mass * length / sec^2)
@@ -117,47 +119,10 @@ void AATModel::addNodes(tgStructure& s,
                             double height)
 {
 
-
-    // 6 Rod Structure
-
-    // const double half_radius_ml = c.radius_ml / 2;
-
-    // Rods
-
-    // Top nodes
-
-    // s.addNode(c.radius_ml, c.height_ml - c.cap_rod_spacing, 0);
-    // s.addNode(half_radius_ml, c.height_ml - c.cap_rod_spacing, c.spacing_ml);
-    // s.addNode(-half_radius_ml, c.height_ml - c.cap_rod_spacing, c.spacing_ml);
-    // s.addNode(-c.radius_ml, c.height_ml - c.cap_rod_spacing, 0);
-    // s.addNode(-half_radius_ml, c.height_ml - c.cap_rod_spacing, -c.spacing_ml);
-    // s.addNode(half_radius_ml, c.height_ml - c.cap_rod_spacing, -c.spacing_ml);
-
-    // // Bottom nodes
-
-    // s.addNode(c.hex_ratio * c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str, 0);
-    // s.addNode(c.hex_ratio * half_radius_ml, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * c.spacing_ml);
-    // s.addNode(c.hex_ratio * -half_radius_ml, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * c.spacing_ml);
-    // s.addNode(c.hex_ratio * -c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str, 0);
-    // s.addNode(c.hex_ratio * -half_radius_ml, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * -c.spacing_ml);
-    // s.addNode(c.hex_ratio * half_radius_ml, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * -c.spacing_ml);
-
-
     // // Cap
-
-    // s.addNode(c.radius_ml, c.height_ml, 0);
-    // s.addNode(half_radius_ml, c.height_ml, c.spacing_ml);
-    // s.addNode(-half_radius_ml, c.height_ml, c.spacing_ml);
-    // s.addNode(-c.radius_ml, c.height_ml, 0);
-    // s.addNode(-half_radius_ml, c.height_ml, -c.spacing_ml);
-    // s.addNode(half_radius_ml, c.height_ml, -c.spacing_ml);
-
-    // 8 Rod Structure
     
     const double spacing = sqrt(2) * c.radius_ml / 2;
-    const double height_str = (c.hex_ratio - 1) * c.radius_ml * tan(0.349066);
-    //const double cable_ratio = (c.hex_ratio + 3) / 4;
-    // const double gap = sqrt(2) * (c.radius_ml + height_str) / 2;
+    const double height_str = (c.R - c.radius_mlo) * tan(0.349066);
 
     // Top nodes
 
@@ -172,23 +137,16 @@ void AATModel::addNodes(tgStructure& s,
 
     // Bottom nodes
 
-    s.addNode(c.hex_ratio * c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str, 0);
-    s.addNode(c.hex_ratio * spacing, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * spacing);
-    s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * c.radius_ml);
-    s.addNode(c.hex_ratio * -spacing, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * spacing);
-    s.addNode(c.hex_ratio * -c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str, 0);
-    s.addNode(c.hex_ratio * -spacing, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * -spacing);
-    s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * -c.radius_ml);
-    s.addNode(c.hex_ratio * spacing, c.height_ml - c.cap_rod_spacing - height_str, c.hex_ratio * -spacing);
+    const double spacing_op = sqrt(2) * c.R / 2; // Spacing of the outer plane
 
-    // s.addNode(c.radius_ml + height_str, c.height_ml - c.cap_rod_spacing, 0);
-    // s.addNode(gap, c.height_ml - c.cap_rod_spacing, gap);
-    // s.addNode(0, c.height_ml - c.cap_rod_spacing, c.radius_ml + height_str);
-    // s.addNode(-gap, c.height_ml - c.cap_rod_spacing, gap);
-    // s.addNode(-c.radius_ml - height_str, c.height_ml - c.cap_rod_spacing, 0);
-    // s.addNode(-gap, c.height_ml - c.cap_rod_spacing, -gap);
-    // s.addNode(0, c.height_ml - c.cap_rod_spacing, -c.radius_ml - height_str);
-    // s.addNode(gap, c.height_ml - c.cap_rod_spacing, -gap);
+    s.addNode(c.R, c.height_ml - c.cap_rod_spacing - height_str, 0);
+    s.addNode(spacing_op, c.height_ml - c.cap_rod_spacing - height_str, spacing_op);
+    s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str, c.R);
+    s.addNode(-spacing_op, c.height_ml - c.cap_rod_spacing - height_str, spacing_op);
+    s.addNode(-c.R, c.height_ml - c.cap_rod_spacing - height_str, 0);
+    s.addNode(-spacing_op, c.height_ml - c.cap_rod_spacing - height_str, -spacing_op);
+    s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str, -c.R);
+    s.addNode(spacing_op, c.height_ml - c.cap_rod_spacing - height_str, -spacing_op);
 
     // Cap
 
@@ -201,28 +159,16 @@ void AATModel::addNodes(tgStructure& s,
     s.addNode(0, c.height_ml, -c.radius_ml);
     s.addNode(spacing, c.height_ml, -spacing);
 
-    const double radius_mlo = 3 * c.radius_ml;
-    const double spacing_mlo = 3 * spacing; 
-
-    s.addNode(radius_mlo, c.height_ml, 0);
+    const double spacing_mlo = sqrt(2) * c.radius_ml / 2;
+    
+    s.addNode(c.radius_mlo, c.height_ml, 0);
     s.addNode(spacing_mlo, c.height_ml, spacing_mlo);
-    s.addNode(0, c.height_ml, radius_mlo);
+    s.addNode(0, c.height_ml, c.radius_mlo);
     s.addNode(-spacing_mlo, c.height_ml, spacing_mlo);
-    s.addNode(-radius_mlo, c.height_ml, 0);
+    s.addNode(-c.radius_mlo, c.height_ml, 0);
     s.addNode(-spacing_mlo, c.height_ml, -spacing_mlo);
-    s.addNode(0, c.height_ml, -radius_mlo);
+    s.addNode(0, c.height_ml, -c.radius_mlo);
     s.addNode(spacing_mlo, c.height_ml, -spacing_mlo);
-
-    //Cable Nodes
-
-    // s.addNode(cable_ratio * c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str / 4, 0);
-    // s.addNode(cable_ratio * spacing, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * spacing);
-    // s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * c.radius_ml);
-    // s.addNode(cable_ratio * -spacing, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * spacing);
-    // s.addNode(cable_ratio * -c.radius_ml, c.height_ml - c.cap_rod_spacing - height_str / 4, 0);
-    // s.addNode(cable_ratio * -spacing, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * -spacing);
-    // s.addNode(0, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * -c.radius_ml);
-    // s.addNode(cable_ratio * spacing, c.height_ml - c.cap_rod_spacing - height_str / 4, cable_ratio * -spacing);
 
 
 }
@@ -422,7 +368,7 @@ void AATModel::setup(tgWorld& world)
     tgStructure s;
 
     // Add nodes to the structure
-    addNodes(s, c.radius_ml, c.spacing_ml, c.height_ml);
+    addNodes(s, c.radius_ml, c.R, c.height_ml);
 
     // Add rods to the structure
     addRods(s);
