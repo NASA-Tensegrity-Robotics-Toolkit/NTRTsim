@@ -45,9 +45,9 @@ AATController::AATController()
 	error = 0.0;
 	result = 0.0;
 	m_prevError = 0.0;
-	KP = 30;
-	KI = 10;
-	KD = 20;
+	KP = 10;
+	KI = 30;
+	KD = 5;
 
 
 }
@@ -89,9 +89,7 @@ void AATController::onStep(AATModel& subject, double dt)
 		
 		spring_cables[i+8]->setControlInput(20,dt);
 		spring_cables[i]->setControlInput(0.01,dt);
-		// for (unsigned i=0; i<8;++i){
-	// 	spring_cables[i]->moveMotors(dt);
-	// }
+		
 	// error = m_setPoint - spring_cables[i]->getCurrentLength();
 	
 	// /// Integrate using trapezoid rule to reduce error in integration over rectangle
@@ -99,6 +97,10 @@ void AATController::onStep(AATModel& subject, double dt)
 	// m_dError = (error - m_prevError) / dt;
 	// result = KP * error + KI * m_intError +
 	// 				KD * m_dError;
+	// 				if (result < 0.01)
+	// 				{
+	// 					result = 0.01;
+	// 				}
 	
 	// spring_cables[i]->setControlInput(result,dt);
 	
