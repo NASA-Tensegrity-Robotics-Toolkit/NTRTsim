@@ -1,10 +1,14 @@
-Scarr Arm Project
+Tensegrity Elbow Project
 -----------------
 
 ScarrArmModel
-    Most up-to-date model that mimics Graham Scarr's tensegrity model of the elbow in NTRT
+    - Originally based upon Dr. Graham Scarr's designs for a passive elbow 
+    tensegrity structure
+    - Three compression elements (humerus, ulna, olecranon analogs)
+    - Eighteen tension elements (brachioradialis, anconeus, pronator teres, fascial tissue analogs)
+    - Uses tgBasicActuator class for cables (tension elements)
 
 ScarrArmController
-    Basic controller that keeps all cables at the specified length (dictated in constructor)
-    Uses tgBasicActuator class for cables
+    - Actuates groups of tension elements at a time according to their tags (i.e. brachioradialis, anconeus etc.)
+    - Plug n' play control achieved by modifying onStep() function
 
