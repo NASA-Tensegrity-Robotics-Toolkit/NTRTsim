@@ -6,6 +6,7 @@ subdirs(
     btietz
     radams
     tests
+    lsharo
     atil
     steve
     kmorse
