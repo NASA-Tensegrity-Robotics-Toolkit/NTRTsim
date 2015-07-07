@@ -18,8 +18,7 @@
 
 /**
  * @file ScarrArmModel.cpp
- * @brief Contains the implementation of class ScarrArmModel. 
- * Measurements are scaled to average adult male
+ * @brief Contains the implementation of class ScarrArmModel. See README
  * $Id$
  */
 
@@ -31,6 +30,7 @@
 #include "core/abstractMarker.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -39,79 +39,69 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-namespace
-{
+namespace {
     // see tgBaseString.h for a descripton of some of these rod parameters
     // (specifically, those related to the motor moving the strings.)
     // NOTE that any parameter that depends on units of length will scale
     // with the current gravity scaling. E.g., with gravity as 98.1,
     // the length units below are in decimeters.
 
-    // Note: This current model of the SUPERball rod is 1.5m long by 3 cm radius,
-    // which is 0.00424 m^3.
-    // For SUPERball v1.5, mass = 3.5kg per strut, which comes out to 
-    // 0.825 kg / (decimeter^3).
-
-    // similarly, frictional parameters are for the tgRod objects.
-    const struct Config
-    {
+    const struct ConfigRod {
         double density;
         double radius;
-        double stiffness;
-        double damping;
         double rod_length;
         double rod_space;    
         double friction;
         double rollFriction;
         double restitution;
+    } cRod = {
+        0.05,    // density (kg / length^3)
+        0.8,     // radius (length)
+        15.0,     // rod_length (length)
+        7.5,      // rod_space (length)
+        1.0,      // friction (unitless)
+        0.01,     // rollFriction (unitless)
+        0.2      // restitution (?)
+    };
+
+    const struct ConfigCable {
+        double elasticity;
+        double damping;
+        double stiffness;
         double pretension_olecranon;
         double pretension_anconeus;
         double pretension_brachioradialis;
         double pretension_support;
         bool   history;  
         double maxTens;
-        double targetVelocity;
-    } c =
-   {
-     0.05,    // density (kg / length^3)
-     0.8,     // radius (length)
-     3000.0,   // stiffness (kg / sec^2)
-     200.0,    // damping (kg / sec)
-     15.0,     // rod_length (length)
-     7.5,      // rod_space (length)
-     1.0,      // friction (unitless)
-     0.01,     // rollFriction (unitless)
-     0.2,      // restitution (?)
-     3000.0/1,   // pretension_olecranon (force), stiffness/initial length
-     3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
-     3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
-     30000.0/1,        // pretension_support (force), stiffness/initial length 
-     false,    // history (boolean)
-     100000,   // maxTens
-     10000    // targetVelocity
-#if (0)
-     20000     // maxAcc
-#endif
-     // Use the below values for earlier versions of simulation.
-     // 1.006,    
-     // 0.31,     
-     // 300000.0, 
-     // 3000.0,   
-     // 15.0,     
-     // 7.5,      
-  };
+        double targetVelocity; 
+        double mRad;
+        double motorFriction;
+        double motorInertia;
+        bool backDrivable;
+    } cCable = {
+        1000.0,         // elasticity
+        200.0,          // damping (kg/s)
+        3000.0,         // stiffness (kg / sec^2)
+        3000.0/1,       // pretension_olecranon (force), stiffness/initial length
+        3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
+        3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
+        30000.0/1,      // pretension_support (force), stiffness/initial length 
+        false,          // history (boolean)
+        100000,         // maxTens
+        10000,           // targetVelocity  
+        1.0,            // mRad
+        10.0,           // motorFriction
+        1.0,            // motorInertia
+        false           // backDrivable (boolean)
+    };
 } // namespace
 
-ScarrArmModel::ScarrArmModel() : tgModel() 
-{
-}
+ScarrArmModel::ScarrArmModel() : tgModel() {}
 
-ScarrArmModel::~ScarrArmModel()
-{
-}
+ScarrArmModel::~ScarrArmModel() {}
 
-void ScarrArmModel::addNodes(tgStructure& s)
-{
+void ScarrArmModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
     const size_t nNodes = 15 + 2; //2 for massless rod
@@ -157,8 +147,7 @@ void ScarrArmModel::addNodes(tgStructure& s)
     }
 }
                   
-void ScarrArmModel::addRods(tgStructure& s)
-{   
+void ScarrArmModel::addRods(tgStructure& s) {   
     // ulna and radius
     s.addPair(8,  12,  "rod");
     s.addPair(12,  14,  "rod");
@@ -175,8 +164,7 @@ void ScarrArmModel::addRods(tgStructure& s)
     s.addPair(5,  6,  "humerus massless");
 }
 
-void ScarrArmModel::addMuscles(tgStructure& s)
-{
+void ScarrArmModel::addMuscles(tgStructure& s) {
     const std::vector<tgStructure*> children = s.getChildren();
 
     s.addPair(0, 3, "olecranon muscle"); //NB actually fascial tissue
@@ -202,8 +190,7 @@ void ScarrArmModel::addMuscles(tgStructure& s)
 }
  
 /*
-void ScarrArmModel::addMarkers(tgStructure &s)
-{
+void ScarrArmModel::addMarkers(tgStructure &s) {
     std::vector<tgRod *> rods=find<tgRod>("rod");
 
 	for(int i=0;i<10;i++)
@@ -217,16 +204,19 @@ void ScarrArmModel::addMarkers(tgStructure &s)
 }
 */
  
-void ScarrArmModel::setup(tgWorld& world)
-{
-    const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
-    const tgRod::Config rodConfigMassless(c.radius, 0.00/*c.density*/, c.friction, c.rollFriction, c.restitution);
+void ScarrArmModel::setup(tgWorld& world) {
+    const tgRod::Config rodConfig(cRod.radius, cRod.density, cRod.friction, cRod.rollFriction, cRod.restitution);
+    const tgRod::Config rodConfigMassless(cRod.radius, 0.00/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
 
-    tgBasicActuator::Config olecranonMuscleConfig(c.stiffness, c.damping, c.pretension_olecranon, c.history, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config anconeusMuscleConfig(c.stiffness, c.damping, c.pretension_anconeus, c.history, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config brachioradialisMuscleConfig(c.stiffness, c.damping, c.pretension_brachioradialis, c.history, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config supportstringMuscleConfig(c.stiffness, c.damping, c.pretension_support, c.history, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config olecranonMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_olecranon, 
+                                                  cCable.history, cCable.maxTens, cCable.targetVelocity);
+    tgBasicActuator::Config anconeusMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_anconeus, 
+                                                 cCable.history, cCable.maxTens, cCable.targetVelocity);
+    tgBasicActuator::Config brachioradialisMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_brachioradialis, 
+                                                        cCable.history, cCable.maxTens, cCable.targetVelocity);
+    tgBasicActuator::Config supportstringMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_support, 
+                                                      cCable.history, cCable.maxTens, cCable.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
