@@ -40,14 +40,14 @@
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
-ScarrArmController::ScarrArmController(const double initialLength, double timestep) {
-	this->m_initialLengths=initialLength;
-	this->m_totalTime=0.0;
-    this->dt = timestep;
-}
+ScarrArmController::ScarrArmController(const double initialLength, double timestep) :
+    m_initialLengths(initialLength),
+    m_totalTime(0.0),
+    dt(timestep) {}
 
 //Fetch all the muscles and set their preferred length
 void ScarrArmController::onSetup(ScarrArmModel& subject) {
+	this->m_totalTime=0.0;
     const double olecranonfascia_length = 4;
     const double brachioradialis_length = 12;
     const double anconeus_length        = 6;
