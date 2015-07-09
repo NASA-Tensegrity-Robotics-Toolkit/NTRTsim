@@ -39,7 +39,8 @@ class tgStructure;
 class tgWorld;
 
 /**
- * Class that creates the six strut "superball" model using tgcreator
+ * Class that creates the tensegrity elbow
+ * loosely based upon the designs of Graham Scarr
  */
 class ScarrArmModel : public tgSubject<ScarrArmModel>, public tgModel
 {
