@@ -18,15 +18,19 @@
 
 /**
  * @file AppBigPuppy.cpp
- * @brief Implementing the Flemons quadruped model.
+ * @brief Implementing the Flemons quadruped model on different kinds of terrain.
  * @author Dawn Hustig-Schultz
- * @date April 2015
+ * @date July 2015
  * @version 1.0.0
  * $Id$
  */
 
 // This application
 #include "BigPuppy.h"
+
+// Obstacles
+#include "models/obstacles/tgBlockField.h"
+
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgHillyGround.h"
@@ -84,12 +88,31 @@ int main(int argc, char** argv)
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 6.0;
-    double offset = 3.0;
+    double offset = 0.0;
     const tgHillyGround::Config hillyGroundConfig(eulerAngles, friction, restitution,
                                     size, origin, nx, ny, margin, triangleSize,
                                     waveHeight, offset);
 
     tgHillyGround* ground = new tgHillyGround(hillyGroundConfig);
+#endif
+
+#ifdef BLOCKY_GROUND
+     btVector3 origin = btVector3(0.0, 0.0, 0.0);
+     btScalar friction = 0.5;
+     btScalar restitution = 0.0;
+     btVector3 minPos = btVector3(-500.0, 0.0, -500.0);
+     btVector3 maxPos = btVector3(500.0, 0.0, 500.0);
+     size_t nBlocks = 500;
+     double blockLength = 20.0;
+     double blockWidth = 20.0;
+     double blockHeight = 20.0;
+
+     tgBlockField::Config blockyGroundConfig(origin,friction,restitution,
+                                     minPos,maxPos,nBlocks,blockLength,
+                                     blockWidth,blockHeight);
+
+     tgBlockField* myObstacle = new tgBlockField(blockyGroundConfig);
+
 #endif
 
 #ifdef FLAT_GROUND
@@ -117,8 +140,13 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
-    
+
+#ifdef BLOCKY_GROUND
+    simulation.addModel(myObstacle);
+#endif
     simulation.run();
+
+
 
     //Teardown is handled by delete, so that should be automatic
     return 0;

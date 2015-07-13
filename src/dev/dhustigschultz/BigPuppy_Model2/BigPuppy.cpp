@@ -393,21 +393,8 @@ void BigPuppy::setup(tgWorld& world)
         spine.addChild(t); //Add a segment to the spine
     }  
 
-#ifdef SMALL_HILLS
-    spine.move(btVector3(0.0,-yOffset_foot+5,0.0));
-#endif
+    spine.move(btVector3(0.0,-yOffset_foot,0.0));
 
-#ifdef LARGE_HILLS
-    spine.move(btVector3(0.0,-yOffset_foot+12,0.0)); 
-#endif
-
-#ifdef FLAT_GROUND
-    spine.move(btVector3(0.0,-yOffset_foot,0.0)); 
-#endif
-
-#ifdef BLOCKY_GROUND
-    spine.move(btVector3(0.0,-yOffset_foot+5,0.0));
-#endif
 
     std::vector<tgStructure*> children = spine.getChildren();
     for(std::size_t i = 2; i < (children.size() - (m_hips + m_legs + m_feet)); i++) { 

@@ -37,11 +37,6 @@
 #include <string>
 #include <vector>
 
-//#define SMALL_HILLS
-//#define LARGE_HILLS
-#define BLOCKY_GROUND
-#define FLAT_GROUND
-
 class tgSpringCableActuator;
 class tgWorld;
 class tgStructure;    //Do I need this, or tgStructureInfo?

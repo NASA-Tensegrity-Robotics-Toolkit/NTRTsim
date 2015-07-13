@@ -16,14 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef BIGPUPPY_H
-#define BIGPUPPY_H
+#ifndef BIGFOOT_H
+#define BIGFOOT_H
 
 /**
- * @file BigPuppy.h
- * @brief Implementing the Flemons quadruped model.
+ * @file BigFoot.h
+ * @brief A revised model for a foot.
  * @author Dawn Hustig-Schultz
- * @date April 2015
+ * @date July 2015
  * @version 1.0.0
  * $Id$
  */
@@ -37,24 +37,19 @@
 #include <string>
 #include <vector>
 
-//#define SMALL_HILLS
-//#define LARGE_HILLS
-#define BLOCKY_GROUND
-#define FLAT_GROUND
-
 class tgSpringCableActuator;
 class tgWorld;
-class tgStructure;    //Do I need this, or tgStructureInfo?
-class tgStructureInfo;  //Do I need this, or just tgStructure, or both?
+class tgStructure;   
+class tgStructureInfo; 
 class tgBasicActuator;  
 
-class BigPuppy: public tgSubject<BigPuppy>, public tgModel
+class BigFoot: public tgSubject<BigFoot>, public tgModel
 {
 public: 
 
-    BigPuppy();
+    BigFoot();
 
-    virtual ~BigPuppy();
+    virtual ~BigFoot();
 
     /**
      * Create the model. Place the rods and strings into the world
