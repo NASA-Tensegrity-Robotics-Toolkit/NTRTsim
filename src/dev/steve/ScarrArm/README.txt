@@ -4,9 +4,9 @@ Tensegrity Elbow Project
 ScarrArmModel
     - Originally based upon Dr. Graham Scarr's designs for a passive elbow 
       tensegrity structure
-    - Three compression elements which are analogous in function to: humerus, 
-      ulna, olecranon
-    - Eighteen tension elements which are analogous in function to: 
+    - Three compression elements which are analogous in function and placement 
+      to: humerus, ulna, olecranon
+    - Eighteen tension elements which are analogous in placement to: 
       brachioradialis, anconeus, opposing teres, other tendons and ligaments
     - Uses tgBasicActuator class for cables (tension elements)
 
