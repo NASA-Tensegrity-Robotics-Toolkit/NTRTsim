@@ -170,6 +170,7 @@ void BigPuppy::setup(tgWorld& world)
     //Create the basic unit of the spine
     tgStructure tetra;
 
+
     //Add the nodes
     tetra.addNode(0,0,0); //Node 0 
     tetra.addNode(v_size, 0, v_size); //Node 1 
