@@ -80,6 +80,94 @@ public:
     const std::vector<tgSpringCableActuator*>& getAllActuators() const;
 
 private:
+
+     /**
+    * A function called during setup that determines the positions of
+    * the nodes of the quadruped's foot based on construction parameters. Rewrite this function
+    * for your own models
+    * @param[in] s: A tgStructure that we're building into
+    * r1: one half the height of a non-foot tgStructure
+    * r2: one half the length of a bottom edge of the foot tgStructure
+    */
+    void addNodesFoot(tgStructure& s, double r1, double r2);
+
+    /**
+    * A function called during setup that creates the rods for the quadruped's foot from
+    * the relevant nodes. Rewrite this function for your own models.
+    * @param[in] s: A tgStructure that we're building into
+    */ 
+    static void addRodsFoot(tgStructure& s);
+
+     /** 
+    * A function called during setup that determines the positions of
+    * the nodes of the quadruped's leg based on construction parameters. Rewrite this function
+    * for your own models
+    * @param[in] s: A tgStructure that we're building into
+    * r: one half the height of the tgStructure
+    */
+    void addNodesLeg(tgStructure& s, double r); 
+
+    /** 
+    * A function called during setup that creates the rods for the quadruped's leg from
+    * the relevant nodes. Rewrite this function for your own models.
+    * @param[in] s: A tgStructure that we're building into
+    */ 
+    static void addRodsLeg(tgStructure& s); 
+
+     /** 
+    * A function called during setup that determines the positions of
+    * the nodes of the quadruped's hip based on construction parameters. Rewrite this function
+    * for your own models
+    * @param[in] s: A tgStructure that we're building into
+    * r: one half the height of the tgStructure
+    */
+    void addNodesHip(tgStructure& s, double r); 
+
+    /** 
+    * A function called during setup that creates the rods for the quadruped's hip from
+    * the relevant nodes. Rewrite this function for your own models.
+    * @param[in] s: A tgStructure that we're building into
+    */
+    static void addRodsHip(tgStructure& s); 
+
+     /** 
+    * A function called during setup that determines the positions of
+    * the nodes of a single vertebra (which is an X-tensegrity module) 
+    * based on construction parameters. Rewrite this function
+    * for your own models
+    * @param[in] s: A tgStructure that we're building into
+    * r: one half the height of the tgStructure
+    */
+    void addNodesVertebra(tgStructure& s, double r);
+
+    /** 
+    * A function called during setup that creates the rods of a single 
+    * vertebra (which is an X-tensegrity module) from
+    * the relevant nodes. Rewrite this function for your own models.
+    * @param[in] s: A tgStructure that we're building into
+    */
+    static void addRodsVertebra(tgStructure& s); 
+
+    /**
+    * A function called during setup that adds all the segments to the 
+    * BigPuppy structure. Rewrite this function for your own models. 
+    * @param[in] puppy: A tgStructure that we're building into
+    * r: one half the height of a substructure tgStructure
+    * segments: the number of segments in the spine of the quadruped
+    * hips: the number of hip segments
+    * legs: the number of leg segments
+    * feet: the number of feet segments
+    */
+    void addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, tgStructure& foot, 
+			double r, std::size_t segments, std::size_t hips, std::size_t legs, std::size_t feet);
+
+     /**
+    * A function called during setup that creates muscles (Strings) for the quadruped from
+    * the relevant nodes. Rewrite this function for your own models.
+    * @param[in] puppy: A tgStructure that we're building into
+    */
+    void addMuscles(tgStructure& puppy, std::size_t segments, std::size_t hips, std::size_t legs, std::size_t feet);
+
     /**
      * A list of all of the spring cable actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
