@@ -29,8 +29,8 @@
 
 // This library
 #include "core/terrain/tgBoxGround.h"
-#include "core/terrain/tgCraterShallow.h"
-#include "core/terrain/tgCraterDeep.h"
+#include "models/obstacles/tgCraterShallow.h"
+#include "models/obstacles/tgCraterDeep.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"

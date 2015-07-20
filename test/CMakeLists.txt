@@ -15,4 +15,5 @@ link_directories(${ENV_LIB_DIR})
 
 subdirs(
  helpers
- tgcreator)
+ tgcreator
+ util)

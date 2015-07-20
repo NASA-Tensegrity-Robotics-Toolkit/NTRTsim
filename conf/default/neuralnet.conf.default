@@ -40,4 +40,4 @@ NEURALNET_BUILD_DIR="$NEURALNET_PACKAGE_DIR/nnImplementationV2/Neural Network v2
 
 # NEURALNET_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
-NEURALNET_URL="http://dl.dropbox.com/u/18209754/Blog/nnImplementationV2.zip"
+NEURALNET_URL="http://ntrt.perryb.ca/storage/dependencies/nnImplementationV2.zip"

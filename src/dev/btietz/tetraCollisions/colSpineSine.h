@@ -31,7 +31,7 @@
 #include "examples/learningSpines/BaseSpineCPGControl.h"
 #include "core/tgObserver.h"
 
-#include "sensors/tgDataObserver.h"
+#include "tscDataObserver.h"
 
 class tgSineStringControl;
 
@@ -59,7 +59,7 @@ protected:
 	
 	std::vector<tgSineStringControl*> m_sineControllers;
 	
-	tgDataObserver m_dataObserver;
+	tscDataObserver m_dataObserver;
 	
 	double m_updateTime;
 	

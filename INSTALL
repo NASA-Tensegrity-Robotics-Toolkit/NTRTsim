@@ -254,11 +254,9 @@ anything.
     be enabled by default now, if you do get an error related to -fPIC, just 
     edit the CMakeLists files to include -fPIC.
 
-  - The bin/build.sh script may fail if there are directories for the log
-    files under build/examples/learningSpines, since these need to be links
-    to the actual src/examples/learningSpines/.../logs directories. Just
-    delete the empty folders in build/examples/... if you encounter this error
-    when running build.sh
+  - If you are upgrading from a prior version, be sure to delete your env directory
+    and reinstall it using setup.sh. There have been some changes to the patches,
+    particularly the neuralNetwork code, that are incompatible.
 
 
 ** MAC OSX 10.9 installation problem **

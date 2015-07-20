@@ -100,7 +100,7 @@ namespace
     {   
         size_t n = tetra.getNodes().size();
         std::cout << "Nodes size is " << n << std::endl;
-        for(int i = 1; i < n; i++) {
+        for(std::size_t i = 1; i < n; i++) {
             tetra.addPair(i-1, i, "rod");
         }
     }

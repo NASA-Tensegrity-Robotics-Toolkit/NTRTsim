@@ -31,6 +31,7 @@
 #include "AnnealEvoPopulation.h"
 #include "AnnealEvoMember.h"
 #include <fstream>
+#include <boost/iterator/iterator_concepts.hpp>
 
 class AnnealEvolution
 {
@@ -65,6 +66,8 @@ private:
     int numberOfTestsBetweenGenerations;
     int generationNumber;
     int numberOfElementsToMutate;
+    int numberOfSubtests;
+    int subTests;
 };
 
 #endif /* ANNEALEVOLUTION_H_ */

@@ -18,14 +18,13 @@
 
 /**
  * @file AppSUPERball.cpp
- * @brief Contains the definition function main() for the Super Ball applicaiton
+ * @brief Contains the definition function main() for the SUPERball applicaiton
  * application.
  * $Id$
  */
 
 // This application
 #include "T6Model.h"
-#include "T6TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -76,15 +75,12 @@ int main(int argc, char** argv)
     // simulation
     T6Model* const myModel = new T6Model();
 
-    // Fifth, select the controller to use. Uncomment desired controller.
-
-    // For the T6TensionController,
-    // Set the tension of the controller units of kg * length / s^2
-    // So 10000 units at this scale is 1000 N
-
-     //T6TensionController* const pTC = new T6TensionController(10000);
-
+    // Fifth, select the controller to use, and attach it to the model.
+    // For example, you could run the following to use the T6TensionController:
+    //T6TensionController* const pTC = new T6TensionController(10000);
     //myModel->attach(pTC);
+
+    // Finally, add out model to the simulation
     simulation.addModel(myModel);
     
     // Run until the user stops

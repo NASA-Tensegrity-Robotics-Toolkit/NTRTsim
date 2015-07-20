@@ -21,7 +21,7 @@
 
 /**
  * @file T6Model.h
- * @brief Contains the definition of class T6Model.
+ * @brief Contains the definition of class T6Model, using multiple springs.
  * $Id$
  */
 

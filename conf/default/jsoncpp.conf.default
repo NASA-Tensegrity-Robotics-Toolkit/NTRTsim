@@ -39,4 +39,4 @@ JSONCPP_PACKAGE_DIR="$JSONCPP_BUILD_DIR"
 
 # JSONCPP_URL can be either a web address or a local file address,
 # e.g. http://url.com/for/jsoncpp.tgz or file:///path/to/jsoncpp.tgz
-JSONCPP_URL="https://github.com/open-source-parsers/jsoncpp/archive/3515db184a836ce73b99c064bcc83884570657c2.zip"
+JSONCPP_URL="http://ntrt.perryb.ca/storage/dependencies/jsoncpp_1.6.zip"

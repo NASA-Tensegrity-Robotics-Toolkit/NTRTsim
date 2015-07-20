@@ -106,6 +106,16 @@ void tgWorld::reset(const tgWorld::Config& config)
   assert(invariant());
 }
 
+void tgWorld::reset(tgGround * ground)
+{
+    delete m_pGround;
+    
+    m_pGround = ground;
+    
+    // Reset as usual
+    reset();
+}
+
 void tgWorld::step(double dt) const
 {
   if (dt <= 0.0)

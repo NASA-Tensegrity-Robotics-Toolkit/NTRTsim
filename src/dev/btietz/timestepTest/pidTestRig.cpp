@@ -79,9 +79,9 @@ namespace
 } // namespace
 
 pidTestRig::pidTestRig(bool kinematic) :
+tgModel(),
 useKinematic(kinematic),
-p_ipc(NULL),
-tgModel() 
+p_ipc(NULL)
 {
 }
 

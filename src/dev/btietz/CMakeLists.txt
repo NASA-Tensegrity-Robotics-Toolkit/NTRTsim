@@ -20,4 +20,11 @@ subdirs(
     timestepTest
     kinematicString
     GATests
+    multiTerrain
+    TetraSpine_multiTerrain/
+    TC_goal
+    JSONTests
+    TC_online
+    multiTerrain_OC/
+    TS_goal/
     )

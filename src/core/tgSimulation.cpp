@@ -51,7 +51,7 @@ tgSimulation::~tgSimulation()
 {
     teardown();
     m_view.releaseFromSimulation();
-    for (int i = 0; i < m_models.size(); i++)
+    for (std::size_t i = 0; i < m_models.size(); i++)
     {
         delete m_models[i];
     }
@@ -76,6 +76,25 @@ void tgSimulation::addModel(tgModel* pModel)
     assert(!m_models.empty());
 }
 
+void tgSimulation::addObstacle(tgModel* pObstacle)
+{
+    // Precondition
+    if (pObstacle == NULL)
+    {
+        throw std::invalid_argument("NULL pointer to tgModel");
+    }
+    else
+    {
+
+        pObstacle->setup(m_view.world());
+        m_obstacles.push_back(pObstacle);
+    }
+
+    // Postcondition
+    assert(invariant());
+    assert(!m_obstacles.empty());
+}
+
 void tgSimulation::onVisit(const tgModelVisitor& r) const
 {
 #ifndef BT_NO_PROFILE 
@@ -83,8 +102,11 @@ void tgSimulation::onVisit(const tgModelVisitor& r) const
 #endif //BT_NO_PROFILE	
         // Removed sending the visitor to the world since it wasn't used
         // Write a worldVisitor if its necessary
-        for (int i = 0; i < m_models.size(); i++) {
+        for (std::size_t i = 0; i < m_models.size(); i++) {
             m_models[i]->onVisit(r);
+        }
+        for (std::size_t i = 0; i < m_obstacles.size(); i++) {
+            m_obstacles[i]->onVisit(r);
         }
 }
 
@@ -94,11 +116,31 @@ void tgSimulation::reset()
     teardown();
 
     m_view.setup();
-    for (int i = 0; i != m_models.size(); i++)
+    for (std::size_t i = 0; i != m_models.size(); i++)
     {
         
         m_models[i]->setup(m_view.world());
     }
+    
+    // Don't need to set up obstacles since they will be added after this
+}
+
+void tgSimulation::reset(tgGround* newGround)
+{
+
+    teardown();
+    
+    // This will reset the world twice (once in teardown, once here), but that shouldn't hurt anything
+    m_view.world().reset(newGround);
+    
+    m_view.setup();
+    for (std::size_t i = 0; i != m_models.size(); i++)
+    {
+        
+        m_models[i]->setup(m_view.world());
+    }
+    
+    // Don't need to set up obstacles since they were just added
 }
 
 /**
@@ -124,23 +166,45 @@ void tgSimulation::step(double dt) const
         m_view.world().step(dt);
 
         // Step the models
-        for (int i = 0; i < m_models.size(); i++)
+        for (std::size_t i = 0; i < m_models.size(); i++)
         {
             m_models[i]->step(dt);
+        }
+        
+        // Step the obstacles
+        /// @todo determine if this is necessary
+        for (std::size_t i = 0; i < m_obstacles.size(); i++)
+        {
+            m_obstacles[i]->step(dt);
         }
     }
 }
   
-void tgSimulation::teardown() const
+void tgSimulation::teardown()
 {
     const size_t n = m_models.size();
-    for (int i = 0; i < n; i++)
+    for (std::size_t i = 0; i < n; i++)
     {
         tgModel * const pModel = m_models[i];
         assert(pModel != NULL);
         
         pModel->teardown();
     }
+    
+    while(m_obstacles.size() != 0)
+    {
+        tgModel * const pModel = m_obstacles.back();
+        assert(pModel != NULL);
+        
+        pModel->teardown();
+        
+        // Remove and destroy element
+        delete pModel;
+        m_obstacles.pop_back();
+    }
+    
+    assert(m_obstacles.empty());
+    
     // Reset the world after the models - models need world info for
     // their onTeardown() functions
     m_view.world().reset();

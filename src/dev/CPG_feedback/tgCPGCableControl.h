@@ -43,10 +43,16 @@ public:
     */
     void assignNodeNumberFB (CPGEquationsFB& CPGSys, array_2D nodeParams);
     
+    void updateTensionSetpoint(double newTension);
+    
+    void updateControlLength(double newControlLength);
+    
 protected:
     const tgPIDController::Config m_config;
 
    tgPIDController* m_PID; 
+   
+   bool usePID;
 
 };
 

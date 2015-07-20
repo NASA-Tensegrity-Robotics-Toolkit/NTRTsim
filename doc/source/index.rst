@@ -14,6 +14,9 @@ Contents
 
 .. toctree::
    :maxdepth: 2
- 
+
+   setup.rst
    contribute-tutorials.rst
+   third-party-libraries.rst
    learning-library-walkthrough.rst
+   motors-and-cables.rst
