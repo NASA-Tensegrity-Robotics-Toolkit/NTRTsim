@@ -1,8 +1,7 @@
-Project(eajung)
+link_libraries(tgcreator core Adapters)
 
-subdirs( 
-    	ErikverticalSpines
-    	3_prism_trial
-	ScarrArm
-	FlemonsArm
+add_executable(AppFlemonsArm
+    FlemonsArm/FlemonsArm.cpp
+    FlemonsArm/AppFlemonsArm.cpp
 )
+ 
