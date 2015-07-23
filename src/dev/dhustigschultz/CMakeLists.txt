@@ -6,5 +6,6 @@ subdirs(
     BigPuppy_Anchored_Model
     BigPuppy_Terrain
     BigPuppy_Foot
+    BigPuppy_HT
 )
 
