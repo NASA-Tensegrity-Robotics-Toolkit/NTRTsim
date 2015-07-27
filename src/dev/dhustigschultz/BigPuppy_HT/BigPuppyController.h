@@ -64,6 +64,7 @@ private:
     void setFrontTricepTargetLength(BigPuppy& subject, double dt);
     void setRearTricepTargetLength(BigPuppy& subject, double dt);
     void setLegToAbdomenTargetLength(BigPuppy& subject, double dt);
+    void setRightShoulderTargetLength(BigPuppy& subject, double dt);
  
 };
 #endif //BIGPUPPY_CONTROLLER_H

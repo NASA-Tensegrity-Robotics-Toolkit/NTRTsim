@@ -38,6 +38,7 @@
 #include "core/tgBasicActuator.h"
 #include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgKinematicContactCableInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 #include "core/tgRod.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
@@ -439,18 +440,18 @@ void BigPuppy::addMuscles(tgStructure& puppy, std::size_t segments, std::size_t 
     puppy.addPair(n10[4], n6[1], tgString("left mid bicep muscle seg", 10) + tgString(" seg", 6));
     
     //Right front leg/shoulder
-    puppy.addPair(n12[4], n8[2], tgString("right inner bicep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n12[4], n8[3], tgString("right outer bicep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n12[4], n1[3], tgString("right front abdomen connection muscle seg", 12) + tgString(" seg", 1)); //Was n1[2]
+    puppy.addPair(n12[4], n8[2], tgString("right inner bicep muscle2 seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[4], n8[3], tgString("right outer bicep muscle2 seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[4], n1[3], tgString("right front abdomen connection muscle2 seg", 12) + tgString(" seg", 1)); //Was n1[2]
 
-    puppy.addPair(n12[3], n8[2], tgString("inner right tricep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n12[3], n8[3], tgString("outer right tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[3], n8[2], tgString("inner right tricep muscle2 seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[3], n8[3], tgString("outer right tricep muscle2 seg", 12) + tgString(" seg", 8));
 
-    puppy.addPair(n12[2], n8[2], tgString("inner right front tricep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n12[2], n8[3], tgString("outer right front tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[2], n8[2], tgString("inner right front tricep muscle2 seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[2], n8[3], tgString("outer right front tricep muscle2 seg", 12) + tgString(" seg", 8));
 
     //Adding muscle to pull up on right front leg:
-    puppy.addPair(n12[4], n8[1], tgString("right mid bicep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n12[4], n8[1], tgString("right mid bicep muscle2 seg", 12) + tgString(" seg", 8));
 
     //Left rear leg/hip
     puppy.addPair(n11[4], n7[3], tgString("left outer thigh muscle seg", 11) + tgString(" seg", 7)); 
@@ -537,9 +538,9 @@ void BigPuppy::setup(tgWorld& world)
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
 
-    const double passivePretension = 700; // 5 N. Todo: make this a #ifdef
+    const double passivePretension = 1000; // 5 N. 
 
-    const double passivePretension2 = 2000;
+    const double passivePretension2 = 1000;
 
 #ifdef USE_KINEMATIC
 
@@ -559,7 +560,11 @@ void BigPuppy::setup(tgWorld& world)
     #else
         tgKinematicActuator::Config motorConfig(stiffness, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, maxSpeed);
+
+        tgKinematicActuator::Config motorConfig2(stiffness, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);  
     #endif
 
 #else
@@ -570,6 +575,7 @@ void BigPuppy::setup(tgWorld& world)
         
     #else
         tgSpringCableActuator::Config muscleConfig(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
+        tgSpringCableActuator::Config muscleConfig2(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
     #endif
 
 #endif
@@ -621,8 +627,10 @@ void BigPuppy::setup(tgWorld& world)
 
 #ifdef USE_KINEMATIC
     spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
+    spec.addBuilder("muscle2", new tgKinematicContactCableInfo(motorConfig2));
 #else
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(muscleConfig));
+    spec.addBuilder("muscle2", new tgBasicContactCableInfo(muscleConfig2));
 #endif
     
     // Create your structureInfo

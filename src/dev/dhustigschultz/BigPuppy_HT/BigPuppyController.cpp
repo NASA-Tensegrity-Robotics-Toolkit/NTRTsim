@@ -51,8 +51,6 @@ BigPuppyController::BigPuppyController(double timestep) :
 
 void BigPuppyController::onSetup(BigPuppy& subject){
     this->m_totalTime=0.0;
-
-    
 }
     
 void BigPuppyController::onStep(BigPuppy& subject, double dt){
@@ -65,11 +63,8 @@ void BigPuppyController::onStep(BigPuppy& subject, double dt){
     setFrontTricepTargetLength(subject, dt);
     setRearTricepTargetLength(subject, dt);
     setLegToAbdomenTargetLength(subject, dt);
+    setRightShoulderTargetLength(subject, dt);
     moveAllMotors(subject, dt);
-
-    if(m_totalTime > 15) {
-        m_totalTime = 0;
-    }
 }
 
 void BigPuppyController::onTeardown(BigPuppy& subject) {
@@ -93,10 +88,11 @@ void BigPuppyController::setBicepTargetLength(BigPuppy& subject, double dt){
     double newLengthOuter = 0;
     const double bicepLength = 15.0;
 
-    const double amplitude = bicepLength/2;
+    const double amplitude1 = bicepLength/2;
+    const double amplitude2 = bicepLength/2;
     const double angular_freq = 2;
-    const double phaseMid = M_PI/2;
-    const double phaseOuter = phaseMid + M_PI;
+    const double phaseMid = 3*M_PI/2;
+    const double phaseOuter = phaseMid - M_PI;
     const double dcOffset = bicepLength/2;
 
     const std::vector<tgBasicActuator*> bicepMid = subject.find<tgBasicActuator>("right mid bicep");
@@ -107,56 +103,66 @@ void BigPuppyController::setBicepTargetLength(BigPuppy& subject, double dt){
     assert(bicepOuter[0] != NULL);
     assert(bicepInner[0] != NULL);
 
-    newLengthMid = amplitude * sin(angular_freq * m_totalTime + phaseMid) + dcOffset;
-    newLengthOuter = amplitude * sin(angular_freq * m_totalTime + phaseOuter) + 2*dcOffset;
+    newLengthMid = amplitude1 * sin(angular_freq * m_totalTime + phaseMid) + dcOffset;
+    newLengthOuter = amplitude2 * sin(angular_freq * m_totalTime + phaseOuter) + 2*dcOffset;
     
-    bicepMid[0]->setControlInput(newLengthMid, dt);
-    bicepOuter[0]->setControlInput(newLengthOuter, dt);
-    bicepInner[0]->setControlInput(newLengthOuter, dt);
+    bicepMid[0]->setControlInput(newLengthMid);
+    bicepOuter[0]->setControlInput(newLengthOuter);
+    bicepInner[0]->setControlInput(newLengthOuter);
 
 }
 
 void BigPuppyController::setFrontTricepTargetLength(BigPuppy& subject, double dt){
 
-    double newLength = 0;
+    double newLengthInner = 0;
+    double newLengthOuter = 0;
     const double frontTricepLength = sqrt(245.0);
 
-    const double amplitude = frontTricepLength/2;
+    const double amplitude = frontTricepLength/4;
     const double angular_freq = 2;
-    const double phase = 3*M_PI/2;
+    const double phase1 = M_PI/2;
+    const double phase2 = 3*M_PI/2;
     const double dcOffset = frontTricepLength;
 
-    const std::vector<tgBasicActuator*> frontTricep = subject.find<tgBasicActuator>("right front tricep");
 
-    for (size_t i=0; i < frontTricep.size(); i++) {
-        tgBasicActuator * const pMuscle = frontTricep[i];
-        assert(pMuscle != NULL);
-        newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
-        
-        pMuscle->setControlInput(newLength, dt);
-    }
+    const std::vector<tgBasicActuator*> frontOuterTricep = subject.find<tgBasicActuator>("outer right front tricep");
+    const std::vector<tgBasicActuator*> frontInnerTricep = subject.find<tgBasicActuator>("inner right front tricep");
+
+    assert(frontOuterTricep[0] != NULL);
+    assert(frontInnerTricep[0] != NULL);
     
+    newLengthInner = dcOffset - amplitude * sin(angular_freq * m_totalTime + phase1);
+    newLengthOuter = dcOffset - amplitude * sin(angular_freq * m_totalTime + phase2);
+
+    frontOuterTricep[0]->setControlInput(newLengthOuter);
+    frontInnerTricep[0]->setControlInput(newLengthInner);
+
 }
 
 void BigPuppyController::setRearTricepTargetLength(BigPuppy& subject, double dt){
 
-    double newLength = 0;
+    double newLengthInner = 0;
+    double newLengthOuter = 0;
     const double rearTricepLength = sqrt(165);
 
-    const double amplitude = rearTricepLength/2; 
+    const double amplitude = rearTricepLength/4; 
     const double angular_freq = 2;
-    const double phase = 3*M_PI/2;
+    const double phase1 = 3*M_PI/2;
+    const double phase2 = M_PI/2;
     const double dcOffset = rearTricepLength;
 
-    const std::vector<tgBasicActuator*> rearTricep = subject.find<tgBasicActuator>("right tricep");
+    const std::vector<tgBasicActuator*> rearOuterTricep = subject.find<tgBasicActuator>("outer right tricep");
+    const std::vector<tgBasicActuator*> rearInnerTricep = subject.find<tgBasicActuator>("inner right tricep");
 
-    for (size_t i=0; i < rearTricep.size(); i++) {
-        tgBasicActuator * const pMuscle = rearTricep[i];
-        assert(pMuscle != NULL);
-        newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
+    assert(rearOuterTricep[0] != NULL);
+    assert(rearInnerTricep[0] != NULL);
+    
+    newLengthInner = dcOffset - amplitude * sin(angular_freq * m_totalTime + phase1);
+    newLengthOuter = dcOffset - amplitude * sin(angular_freq * m_totalTime + phase2);
 
-        pMuscle->setControlInput(newLength, dt);
-    }
+    rearOuterTricep[0]->setControlInput(newLengthOuter);
+    rearInnerTricep[0]->setControlInput(newLengthInner);
+
 }
 
 void BigPuppyController::setLegToAbdomenTargetLength(BigPuppy& subject, double dt){
@@ -164,7 +170,7 @@ void BigPuppyController::setLegToAbdomenTargetLength(BigPuppy& subject, double d
     double newLength = 0;
     const double legToAbdomenLength = sqrt(66);
 
-    const double amplitude = 0; //See if this needs to change much first before throwing in an amplitude.
+    const double amplitude = legToAbdomenLength/1; //See if this needs to change much first before throwing in an amplitude.
     const double angular_freq = 2;
     const double phase = 3*M_PI/2;
     const double dcOffset = legToAbdomenLength;
@@ -175,7 +181,33 @@ void BigPuppyController::setLegToAbdomenTargetLength(BigPuppy& subject, double d
 
     newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
 
-    legToAbdomen[0]->setControlInput(newLength, dt);
+    legToAbdomen[0]->setControlInput(newLength);
 
 }
 
+
+void BigPuppyController::setRightShoulderTargetLength(BigPuppy& subject, double dt){
+
+    double newLengthFront = 0;
+    double newLengthRear = 0;
+    const double rightShoulderLength = sqrt(101);
+
+    const double amplitude = rightShoulderLength/2; //See if this needs to change much first before throwing in an amplitude.
+    const double angular_freq = 2;
+    const double phaseRear = 3*M_PI/2;
+    const double phaseFront = M_PI/2;
+    const double dcOffset = rightShoulderLength;
+ 
+    const std::vector<tgBasicActuator*> rightShoulderFront = subject.find<tgBasicActuator>("right shoulder front mid");
+    const std::vector<tgBasicActuator*> rightShoulderRear = subject.find<tgBasicActuator>("right shoulder rear mid");
+
+    assert(rightShoulderFront[0] != NULL);
+    assert(rightShoulderRear[0] != NULL);
+
+    newLengthFront = dcOffset - amplitude * sin(angular_freq * m_totalTime + phaseFront);
+    newLengthRear = dcOffset - amplitude * sin(angular_freq * m_totalTime + phaseRear);
+
+    rightShoulderFront[0]->setControlInput(newLengthFront);
+    rightShoulderRear[0]->setControlInput(newLengthRear);
+
+}
