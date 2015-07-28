@@ -29,6 +29,8 @@
 #include "helpers/FileHelpers.h"
 #include "tgcreator/tgUtil.h"
 
+#include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
+
 #include <json/json.h>
 
 AppGoalTensionNNW::AppGoalTensionNNW(int argc, char** argv)
@@ -171,6 +173,13 @@ bool AppGoalTensionNNW::setup()
         /// @todo fix memory leak that occurs here
         JSONGoalTensionNNW* const myControl =
         new JSONGoalTensionNNW(control_config, suffix, resourcePath);
+        
+#if (1)        
+            tgCPGJSONLogger* const myLogger = 
+      new tgCPGJSONLogger("logs/CPGValues.txt");
+    
+            myControl->attach(myLogger);
+#endif    
         
         myModel->attach(myControl);
     }

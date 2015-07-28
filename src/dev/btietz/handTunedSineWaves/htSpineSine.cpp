@@ -48,7 +48,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-//#define LOGGING
+#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -130,11 +130,11 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
     {
 		if (allMuscles[i]->hasTag("inner top"))
         {
-			tension = 2000.0;
+			tension = 2400.0;
             kPosition = 500.0;
             
-            controlLength = allMuscles[i]->getStartLength();
-            //controlLength = 19.0;
+            //controlLength = allMuscles[i]->getStartLength();
+            controlLength = 19.0;
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
@@ -229,7 +229,8 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
                                                         kVelocity);
         
         // In Won's convention
-        offset = amplitude;
+
+        offset = -amplitude;
         
         tgSineStringControl* pStringControl = new tgSineStringControl(m_controlTime,
 																		p_ipc,
