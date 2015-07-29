@@ -115,7 +115,7 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
                         mass,
                         transform,
                         shape);
-
+                body->setFlags(BT_ENABLE_GYROPSCOPIC_FORCE);
                 rigid->setRigidBody(body);
             }
         }

@@ -285,8 +285,8 @@ void TetraSpineStaticModel_hf::setup(tgWorld& world)
     
     // Two different string configs
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgSpringCableActuator::Config muscleConfig(229.16 * 2.0, 20, 2000.0, true, 5000, 7.0, 10.0, 10.0);
-    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 700.0, true, 5000, 7.0, 10.0, 10.0);
+    tgSpringCableActuator::Config muscleConfig(229.16, 20, 2000.0, true, 5000, 7.0, 1.0, 1.0);
+    tgSpringCableActuator::Config muscleConfig2(229.16, 20, 700.0, true, 5000, 7.0, 1.0, 1.0);
     spec.addBuilder("top muscle", new tgBasicActuatorInfo(muscleConfig));
     spec.addBuilder("left muscle", new tgBasicActuatorInfo(muscleConfig2));
     spec.addBuilder("right muscle", new tgBasicActuatorInfo(muscleConfig2));

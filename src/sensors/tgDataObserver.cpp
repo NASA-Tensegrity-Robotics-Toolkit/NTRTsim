@@ -106,7 +106,7 @@ void tgDataObserver::onSetup(tgModel& model)
     // Markers are written first
     const std::vector<abstractMarker>& markers = model.getMarkers();
     
-    const std::size_t n = markers.size();
+    const std::size_t n = 0;
 
     
     for (std::size_t i = 0; i < markers.size(); i++)

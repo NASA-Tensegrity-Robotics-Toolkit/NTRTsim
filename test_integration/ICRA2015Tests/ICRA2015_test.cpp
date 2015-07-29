@@ -80,7 +80,7 @@ namespace {
 				tgWorld world(config); 
 
 				// Second create the view
-				const double stepSize = 1.0/2000.0; // Seconds
+				const double stepSize = 1.0/1000.0; // Seconds
 				const double renderRate = 1.0/60.0; // Seconds
 				tgSimView view(world, stepSize, renderRate);
 
@@ -113,7 +113,7 @@ namespace {
 				int i = 0;
 				while (i < 1)
 				{
-					simulation.run(120000);
+					simulation.run(60000);
 					//simulation.reset();
 					i++;
 				}

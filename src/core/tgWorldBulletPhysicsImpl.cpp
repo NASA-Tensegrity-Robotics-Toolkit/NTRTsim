@@ -55,7 +55,7 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
 
-#define MCLP_SOLVER
+#define MLCP_SOLVER
 
 #ifdef MLCP_SOLVER
 
@@ -102,8 +102,8 @@ class IntermediateBuildProducts
 #endif
 
 #ifdef MLCP_SOLVER
-		//btDantzigSolver mlcp;
-		btSolveProjectedGaussSeidel mlcp;
+		btDantzigSolver mlcp;
+        //btSolveProjectedGaussSeidel mlcp;
 		btMLCPSolver solver;
 #else
 		btSequentialImpulseConstraintSolver solver;
@@ -132,14 +132,20 @@ tgWorldBulletPhysicsImpl::tgWorldBulletPhysicsImpl(const tgWorld::Config& config
 	 * http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo
 	 */
     #if (0) 
-		// Split impulse does not appear to apply to MLCP solver
+		// Split impulse is on by default
         m_pDynamicsWorld->getSolverInfo().m_splitImpulse = true;
         m_pDynamicsWorld->getSolverInfo().m_splitImpulsePenetrationThreshold = -0.02;
         
         // Default is 10 - increases runtime but decreases odds of penetration
         // Makes tetraspine sine waves more accurate and static test less accurate
         m_pDynamicsWorld->getSolverInfo().m_numIterations = 20;
+        
+        // Ground contact params:
+        m_pDynamicsWorld->getSolverInfo().m_erp = 0.8;
+        
     #endif	
+    
+
     
     // Postcondition
     assert(invariant());
@@ -188,6 +194,7 @@ tgWorldBulletPhysicsImpl::~tgWorldBulletPhysicsImpl()
  */
 btDynamicsWorld* tgWorldBulletPhysicsImpl::createDynamicsWorld() const
 {    
+   
   btSoftRigidDynamicsWorld* const result =
     new btSoftRigidDynamicsWorld(&m_pIntermediateBuildProducts->dispatcher,
                  &m_pIntermediateBuildProducts->broadphase,
