@@ -17,6 +17,7 @@ link_libraries(octahedralComplex
 add_library(JSONControl SHARED
                 JSONCPGControl.cpp
                 JSONFeedbackControl.cpp
+                tgCPGJSONLogger.cpp
                 )
                 
 add_executable(AppJSONTests
@@ -31,6 +32,7 @@ add_executable(AppSpineJSON
 add_executable(AppTerrainJSON
     JSONCPGControl.cpp
     JSONFeedbackControl.cpp
+    tgCPGJSONLogger.cpp
     AppTerrainJSON.cpp
     )
 

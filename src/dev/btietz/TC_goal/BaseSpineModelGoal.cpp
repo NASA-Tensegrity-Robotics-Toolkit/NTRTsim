@@ -42,29 +42,10 @@
 #include <map>
 #include <set>
 
-/// Rand seeding simular to the evolution classes. 
-/// @todo should we make this common?
-#ifdef _WIN32
-
-//  Windows
-#define rdtsc  __rdtsc
-
-#else
-
-//  For everything else
-unsigned long long rdtsc(){
-    unsigned int lo,hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((unsigned long long)hi << 32) | lo;
-}
-
-#endif
-
 BaseSpineModelGoal::BaseSpineModelGoal(int segments, double goalAngle) : 
     BaseSpineModelLearning(segments),
     m_goalAngle(goalAngle)
 {
-    srand(rdtsc());
 }
 
 BaseSpineModelGoal::~BaseSpineModelGoal()
@@ -75,8 +56,8 @@ void BaseSpineModelGoal::setup(tgWorld& world)
 {
     
     // Create goal box in a new structure
-#if (1)
-    m_goalAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415 + 3.1415;
+#if (0)
+    m_goalAngle = ((rand() / (double)RAND_MAX)) * 3.1415;    
 #endif // If we're resetting the simulation and want to change the angle    
     
     double xPos = 350 * sin(m_goalAngle);
@@ -86,6 +67,8 @@ void BaseSpineModelGoal::setup(tgWorld& world)
     
     goalBox.addNode(xPos, 20.0, zPos);
     goalBox.addNode(xPos + 5.0, 20.0, zPos);
+    
+    std::cout << "Goal Position: " << xPos << " " << zPos << std::endl;
     
     goalBox.addPair(0, 1, "goalBox");
     

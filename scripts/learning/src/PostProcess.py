@@ -36,39 +36,74 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
     numFiles = int(sys.argv[2])
-    
+    if len(sys.argv) == 4:
+        numScore = int(sys.argv[3])
+    else:
+        numScore = 1
+
     scoreSum = 0
     fileSum = 0
-    maxScore = 0
-    
+    maxScore = -1000
+    topScore = []
+    topParam = []
+
     paramList = []
-    
+
     for i in range(0, numFiles):
         scoresPath = configFile + str(i) +'.json'
         fin = open(scoresPath, 'r')
         obj = json.load(fin)
         fin.close()
-        try: 
-            paramID = obj['feedbackVals']['paramID']
+        try:
+            paramID = obj['impedenceVals']['paramID']
+            
             if (paramList.count(paramID) == 0):
-                thisScore = float(obj['feedbackVals']['avgScore'])
+                # Use this for processing monteCarlo
+                """    
+                thisScore = 0
+                for k in range(0, 4):
+                    try:
+                        thisScore += float(obj['scores'][k]['distance'])
+                    except IndexError:
+                        thisScore += 0
+                """
+                thisScore = float(obj['impedenceVals']['avgScore'])
+                
                 fileSum += 1
                 paramList.append(paramID)
+            """
             else:
+                print(str(i) + " " +str(paramID) + " " + str(paramList.count(paramID)))
                 thisScore = 0
+            """
         except KeyError:
+            print(str(i) + " " + str(KeyError))
             thisScore =  0
-        
+
         if(thisScore > maxScore):
-            topScore = i
-            maxScore = thisScore
+            j = min([numScore, len(topScore)])
+            # Sort into position
+            while j > 0:
+                if thisScore > topScore[j - 1]:
+                    j -= 1
+                else:
+                    break
+
+            topScore.insert(j, thisScore)
+            topParam.insert(j, i)
+
+            if (len(topScore) > numScore):
+                maxScore = topScore[numScore - 1]
+                topScore.pop(numScore)
+                topParam.pop(numScore)
             topObj = obj
-        
+
         scoreSum += thisScore
-        
+
     print(maxScore)
     print(scoreSum / fileSum)
     print(topScore)
-    
+    print(topParam)
+
     # Now average the scores of the top object
-    
+

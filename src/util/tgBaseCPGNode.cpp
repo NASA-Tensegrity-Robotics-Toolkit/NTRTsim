@@ -86,3 +86,27 @@ tgImpedanceController& tgBaseCPGNode::motorControl() const
         return *m_pMotorControl;
     }
 }
+
+void tgBaseCPGNode::updateTensionSetpoint(double newTension)
+{
+    if (newTension >= 0.0)
+    {
+        m_pMotorControl->setOffsetTension(newTension);
+    }
+    else
+    {
+        throw std::runtime_error("Tension setpoint is less than zero!");
+    }
+}
+
+void tgBaseCPGNode::updateControlLength(double newControlLength)
+{
+    if (newControlLength >= 0.0)
+    {
+       m_controlLength = newControlLength;
+    }
+    else
+    {
+        throw std::runtime_error("Length setpoint is less than zero!");
+    }
+}

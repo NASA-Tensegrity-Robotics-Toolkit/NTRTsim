@@ -3,13 +3,13 @@
 # Copyright (c) 2012, United States Government, as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All rights reserved.
-# 
+#
 # The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # http://www.apache.org/licenses/LICENSE-2.0.
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -37,16 +37,16 @@ import numpy as np
 import json
 
 def printParams(path, controllerNum, suffix, numActions, numControllers):
-    
+
     dataArray = []
-    
+
     for i in range(0, numControllers):
         # Format requried by learning libraries
         if suffix != None:
             inFile = path + 'bestParameters-' + controllerNum + '_' + suffix + '-' + str(i) + '.nnw'
         else:
             inFile = path + 'bestParameters-' + controllerNum + '-' + str(i) + '.nnw'
-        
+
         # We want to fail if this file doesn't exist
         fin = open(inFile, 'r')
         subList = []
@@ -54,10 +54,10 @@ def printParams(path, controllerNum, suffix, numActions, numControllers):
         for k in range(0, numActions):
             subList.append(float(line.split(',')[k]))
         fin.close()
-        
+
         print(subList)
         dataArray.append(subList)
-        
+
     return dataArray
 
 def getActionValues(configFile):
@@ -71,7 +71,7 @@ def getActionValues(configFile):
     finally:
         f.close()
     return act, cont
-    
+
 
 if __name__=="__main__":
     configFile = sys.argv[1]
@@ -88,7 +88,7 @@ if __name__=="__main__":
     else:
         suffix = None
         inFile = outFile
-    
+
     # Load existing JSON dictionary
     try:
         fin = open(inFile, 'r')
@@ -99,16 +99,16 @@ if __name__=="__main__":
         fin.close()
     except IOError:
         obj = {}
-        
 
-    
+
+
     nums = getActionValues(configFile)
     dataArray = printParams(path, controllerNum, suffix, nums[0], nums[1])
-    
+
     print(dataArray)
-    
+
     obj[varName] = dataArray
-    
+
     fout = open(outFile, 'w')
-    
+
     json.dump(obj, fout, indent=4)

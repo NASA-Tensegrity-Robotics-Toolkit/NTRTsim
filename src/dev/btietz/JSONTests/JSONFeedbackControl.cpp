@@ -132,6 +132,8 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
     
+    std::cout << nodeVals << std::endl;
+    
     nodeVals = nodeVals.get("params", "UTF-8");
     edgeVals = edgeVals.get("params", "UTF-8");
     
@@ -155,6 +157,11 @@ void JSONFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     nn->loadWeights(nnFile.c_str());
     
     initConditions = subject.getSegmentCOM(m_config.segmentNumber);
+    for (int i = 0; i < initConditions.size(); i++)
+    {
+        std::cout << initConditions[i] << " ";
+    }
+    std::cout << std::endl;
 #ifdef LOGGING // Conditional compile for data logging    
     m_dataObserver.onSetup(subject);
 #endif    
@@ -171,7 +178,7 @@ void JSONFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
     m_updateTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
-#if (0)
+#if (1)
         std::vector<double> desComs = getFeedback(subject);
 
 #else        

@@ -16,6 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
+/// Rand seeding simular to the evolution and terrain classes. 
+
 #ifndef TG_UTIL_H
 #define TG_UTIL_H
 
@@ -335,7 +337,12 @@ public:
         const int m = static_cast<int>(pow(base, precision));
         return floor(d * m + 0.5)/m;
     }
-
+    
+    static void seedRandom();
+    
+    /// @todo is this necessary? If everyone uses the above function we can just change the 
+    /// definition of rdtsc to seed random everywhere. 
+    static void seedRandom(int seed);
 };
 
 /**

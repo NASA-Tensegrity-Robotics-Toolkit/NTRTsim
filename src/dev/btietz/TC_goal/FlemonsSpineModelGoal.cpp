@@ -31,6 +31,7 @@
 #include "core/tgCast.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgBuildSpec.h"
@@ -49,8 +50,36 @@
 #include <map>
 #include <set>
 
-FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments, double goalAngle) : 
-    BaseSpineModelGoal(segments, goalAngle) 
+namespace
+{
+    void addMarkers(tgStructure& structure, FlemonsSpineModelGoal& model, int segments)
+	{
+		
+		const std::vector<tgStructure*> children = structure.getChildren();
+		
+		
+        for(int i = 0; i < segments; i++)
+        {
+            std::cout << "Rigid size " << model.getAllRigids().size() << std::endl;
+            btRigidBody* firstBody = model.getAllRigids()[4 * i]->getPRigidBody();
+            tgNodes n0 = children[i]->getNodes();
+            
+            abstractMarker marker1(firstBody, n0[2] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+            model.addMarker(marker1);
+            
+            abstractMarker marker2(firstBody, n0[4] - firstBody->getCenterOfMassPosition (), btVector3(1, 0, 0), 0);
+		
+            model.addMarker(marker2);
+        }
+
+	}   
+    
+}
+
+FlemonsSpineModelGoal::FlemonsSpineModelGoal(int segments, double goalAngle, double startAngle) : 
+    BaseSpineModelGoal(segments, goalAngle),
+    m_startAngle(startAngle)
 {
 }
 
@@ -76,7 +105,7 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     const double elasticity = 1000.0;
     const double damping = 10.0;
     const double pretension = 0.0;
-    const bool   history = false;
+    const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
 
@@ -155,7 +184,12 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
 
     }
 #endif
-  
+    
+    btVector3 fixedPoint(0.0, 0.0, 0.0);
+    btVector3 axis(0.0, 1.0, 0.0);
+    
+    snake.addRotation(fixedPoint, axis, m_startAngle);
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -177,6 +211,8 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
      
     m_allSegments = this->find<tgModel> ("segment");
     
+    //addMarkers(snake, *this, m_segments);
+    
 #if (0)
     // Debug printing
     std::cout << "StructureInfo:" << std::endl;
@@ -184,7 +220,18 @@ void FlemonsSpineModelGoal::setup(tgWorld& world)
     
     std::cout << "Model: " << std::endl;
     std::cout << *this << std::endl;
+    
+    std::cout << "Spine Length: " << getSpineLength() << std::endl;
 #endif
+
+    std::vector<tgBaseRigid*> myRigids = this->getAllRigids();
+#if (1)
+		for (int i =0; i < myRigids.size(); i++)
+		{
+			std::cout << myRigids[i]->mass() << " " <<myRigids[i]->getPRigidBody() << std::endl;
+		}
+#endif
+
     children.clear();
     
     // Actually setup the children, notify controller

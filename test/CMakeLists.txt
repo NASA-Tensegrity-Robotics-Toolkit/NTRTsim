@@ -13,6 +13,13 @@ include_directories(${SRC_DIR})
 include_directories(${ENV_INC_DIR})
 link_directories(${ENV_LIB_DIR})
 
+OPTION(USE_DOUBLE_PRECISION "Use double precision"  ON)
+
+IF (USE_DOUBLE_PRECISION)
+ADD_DEFINITIONS( -DBT_USE_DOUBLE_PRECISION)
+SET( BULLET_DOUBLE_DEF "-DBT_USE_DOUBLE_PRECISION")
+ENDIF (USE_DOUBLE_PRECISION)
+
 subdirs(
  helpers
  tgcreator

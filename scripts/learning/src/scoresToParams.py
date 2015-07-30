@@ -3,13 +3,13 @@
 # Copyright (c) 2012, United States Government, as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All rights reserved.
-# 
+#
 # The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # http://www.apache.org/licenses/LICENSE-2.0.
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -23,7 +23,7 @@
 # Date:    January 2015
 # Notes:   Converts a scores.csv file into the '.nnw' files uses by
 # the learning library. Input parameters are
-# (1) The name of the scores file, must be "single origin" See 
+# (1) The name of the scores file, must be "single origin" See
 #     splitInfile.py for preliminary work that may need to be done
 # (2) The name of the Config.ini file, may be in a different directory
 # (3) The best number of scores files to output
@@ -56,7 +56,7 @@ def sortFile(inFile, outFile):
     try:
         f = open(outFile, 'w')
         writer = csv.writer(f, delimiter=',')
-        for p in sortedDistances: 
+        for p in sortedDistances:
             p[0] = '%.5f' % p[0]
             writer.writerow(p)
     finally:
@@ -83,11 +83,11 @@ def printParams(inFile, suffix, numActions, numControllers, numScores):
                         fout.write(line.split(',')[index] + ",")
                     else:
                         fout.write(line.split(',')[index])
-    
+
     finally:
         fin.close()
         fout.close()
-        
+
     return
 
 def getActionValues(configFile):
@@ -101,7 +101,7 @@ def getActionValues(configFile):
     finally:
         f.close()
     return act, cont
-    
+
 
 if __name__=="__main__":
     scoreFile = sys.argv[1]
@@ -111,10 +111,10 @@ if __name__=="__main__":
         suffix = sys.argv[4]
     else:
         suffix = None
-    
+
     sortedFile = 'sorted_'+scoreFile
     topFile = 'sorted_top_'+scoreFile
-    
+
     nums = getActionValues(configFile)
     sortFile(scoreFile, sortedFile)
     printParams(sortedFile, suffix, nums[0], nums[1], numScores)

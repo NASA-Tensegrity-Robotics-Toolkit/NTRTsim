@@ -43,6 +43,12 @@ std::string FileHelpers::getResourcePath(std::string relPath) {
     return buffer.str();
 }
 
+std::string FileHelpers::getTestResourcePath(std::string relPath) {
+    stringstream buffer;
+    buffer << TEST_RESOURCE_PATH << "/" << relPath;
+    return buffer.str();
+}
+
 double FileHelpers::getFinalScore(std::string filePath)
 {
 	ifstream results;

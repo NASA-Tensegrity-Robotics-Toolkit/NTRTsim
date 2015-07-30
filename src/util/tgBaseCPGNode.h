@@ -48,6 +48,17 @@ public:
    // Top level model is responsible for stepping the CPG
    virtual double getCPGValue() const;
     
+   /**
+    * Give a new tension setpoint to the impedance controller m_pMotorControl
+    */
+    void updateTensionSetpoint(double newTension);
+   
+    /**
+     * Change the control length at runtime, sets m_controlLength to newControlLength
+     * newControlLength must be greater than or equal to zero.
+     */
+    void updateControlLength(double newControlLength);
+   
 protected:
 
     tgBaseCPGNode();

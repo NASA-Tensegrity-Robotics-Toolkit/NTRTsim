@@ -42,6 +42,7 @@ class tgCPGActuatorControl;
 class CPGEquations;
 class tgCPGLogger;
 class BaseSpineModelLearning;
+class BaseSpineCPGControl;
 
 typedef boost::multi_array<double, 2> array_2D;
 typedef boost::multi_array<double, 4> array_4D;

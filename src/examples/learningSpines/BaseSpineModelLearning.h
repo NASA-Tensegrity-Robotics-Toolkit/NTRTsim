@@ -39,6 +39,7 @@ class tgWorld;
 class tgStructureInfo;
 class tgSpringCableActuator;
 class tgBaseRigid;
+class btVector3;
 
 /**
  * Provides all of the interfaces for a learning spine model, which
@@ -60,6 +61,8 @@ public:
     virtual void step(double dt);
     
     virtual std::vector<double> getSegmentCOM(const int n) const;
+    
+    virtual btVector3 getSegmentCOMVector(const int n) const;
       
     virtual const std::vector<tgSpringCableActuator*>& getMuscles(const std::string& key) const;
     
@@ -73,6 +76,8 @@ public:
     {
         return m_allMuscles.size();
     }
+    
+    double getSpineLength() const;
     
 protected:
 	

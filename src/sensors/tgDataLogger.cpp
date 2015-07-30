@@ -28,6 +28,9 @@
 #include "util/tgBaseCPGNode.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgRod.h"
+#include "core/abstractMarker.h"
+
+#include "LinearMath/btVector3.h"
 
 #include <iostream>
 #include <fstream>
@@ -70,5 +73,21 @@ void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
 
 void tgDataLogger::render(const tgModel& model) const
 {
+    const std::vector<abstractMarker>& markers = model.getMarkers();
     
+    const std::size_t n = markers.size();
+    for (std::size_t i = 0; i < n; i++)
+    {
+        std::ofstream tgOutput;
+            tgOutput.open(m_fileName.c_str(), std::ios::app);
+            
+            btVector3 worldPos = markers[i].getWorldPosition();
+            
+            tgOutput << worldPos[0] << ","    
+            << worldPos[1]  << ","
+            << worldPos[2]  << ",";
+            
+            tgOutput.close();
+
+    }
 }

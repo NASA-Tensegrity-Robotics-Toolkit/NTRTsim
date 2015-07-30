@@ -48,21 +48,35 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define LOGGING
+//#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-colSpineSine::colSpineSine() :
+colSpineSine::colSpineSine(std::string args,
+                            std::string resourcePath) :
 m_dataObserver("logs/TCData")
 {    
+    if (resourcePath != "")
+    {
+        controlFilePath = FileHelpers::getResourcePath(resourcePath);
+    }
+    else
+    {
+        controlFilePath = "";
+    }
+    
+    controlFilename = controlFilePath + args;
+    
 }
 
 void colSpineSine::onSetup(BaseSpineModelLearning& subject)
 {
 
+    initConditions = subject.getSegmentCOM(0);
+    
     setupWaves(subject);
     
 #ifdef LOGGING // Conditional compile for data logging    
@@ -89,7 +103,38 @@ void colSpineSine::onStep(BaseSpineModelLearning& subject, double dt)
 
 void colSpineSine::onTeardown(BaseSpineModelLearning& subject)
 {
+    
+    std::vector<double> finalConditions = subject.getSegmentCOM(0);
+    
+    const double newX = finalConditions[0];
+    const double newZ = finalConditions[2];
+    const double oldX = initConditions[0];
+    const double oldZ = initConditions[2];
+    
+    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
+                                        (newZ-oldZ) * (newZ-oldZ));
+    
+    std::cout << "Dist travelled " << distanceMoved << std::endl;
+    
+    Json::Value root; // will contains the root value after parsing.
+    Json::Reader reader;
 
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
+    if ( !parsingSuccessful )
+    {
+        // report to the user the failure and their locations in the document.
+        std::cout << "Failed to parse configuration\n"
+            << reader.getFormattedErrorMessages();
+        throw std::invalid_argument("Bad filename for JSON");
+    }
+    
+    root["scores"] = distanceMoved;
+    
+    std::ofstream payloadLog;
+    payloadLog.open(controlFilename.c_str(),std::ofstream::out);
+    
+    payloadLog << root << std::endl;
+    
     for(size_t i = 0; i < m_sineControllers.size(); i++)
     {
 		delete m_sineControllers[i];
@@ -114,7 +159,7 @@ void colSpineSine::setupWaves(BaseSpineModelLearning& subject)
 	Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString("controlVars.json"), root );
+    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
     if ( !parsingSuccessful )
     {
         // report to the user the failure and their locations in the document.
