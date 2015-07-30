@@ -40,6 +40,7 @@
 //#define SMALL_HILLS
 //#define LARGE_HILLS
 #define BLOCKY_GROUND
+//#define STAIRS
 #define FLAT_GROUND
 
 class tgSpringCableActuator;

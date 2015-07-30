@@ -30,6 +30,7 @@
 
 // Obstacles
 #include "models/obstacles/tgBlockField.h"
+#include "models/obstacles/tgStairs.h"
 
 // This library
 #include "core/terrain/tgBoxGround.h"
@@ -115,6 +116,21 @@ int main(int argc, char** argv)
 
 #endif
 
+#ifdef STAIRS
+    btVector3 origin = btVector3(-30.0, 10.0, -40.0);
+    btScalar friction = 0.5;
+    btScalar restitution = 0.0;
+    size_t nStairs = 1;
+    double stairWidth = 80.0;
+    double stepWidth = 20.0;
+    double stepHeight = 10.0;
+    double angle = 0.0;
+    
+    tgStairs::Config stairsConfig(origin,friction,restitution,nStairs,stairWidth,stepWidth,stepHeight,angle);
+
+    tgStairs* myStairs = new tgStairs(stairsConfig);
+#endif
+
 #ifdef FLAT_GROUND
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -143,6 +159,10 @@ int main(int argc, char** argv)
 
 #ifdef BLOCKY_GROUND
     simulation.addModel(myObstacle);
+#endif
+
+#ifdef STAIRS
+    simulation.addModel(myStairs);
 #endif
     simulation.run();
 

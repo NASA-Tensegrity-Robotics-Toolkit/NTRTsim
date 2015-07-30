@@ -130,7 +130,7 @@ void BigPuppy::addRodsVertebra(tgStructure& s){
 void BigPuppy::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, tgStructure& foot, 
                  double r, std::size_t segments, std::size_t hips, std::size_t legs, std::size_t feet){
     const double offsetDist = r+1; 
-    const double offsetDist2 = r*5+5+3.3; 
+    const double offsetDist2 = r*5+8; 
     const double offsetDist3 = r*6;
     const double yOffset_leg = -(2*r+1); 
     const double yOffset_foot = -(2*r+6);
@@ -182,7 +182,6 @@ void BigPuppy::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructur
         }
         else{
             t->move(offset2);
-            t->addRotation(btVector3(offsetDist2, 0.0, offsetDist), btVector3(0, 0, 1), M_PI*1/8);
             t->addRotation(btVector3(offsetDist2, 0.0, offsetDist), btVector3(0, 1, 0), M_PI);
         }
 
@@ -195,11 +194,9 @@ void BigPuppy::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructur
 
         if(i % 2 == 0){
             t->move(offset3);
-            t->addRotation(btVector3(offsetDist*2, 0.0, -offsetDist), btVector3(1, 0, 0), 0.0);//Do I eve need this???
         }
         else{
             t->move(offset4);
-            t->addRotation(btVector3(offsetDist2, 0.0, -offsetDist), btVector3(0, 0, 1), M_PI*1/8);
         }
 
         puppy.addChild(t); //Add a segment to the puppy
@@ -213,6 +210,8 @@ void BigPuppy::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructur
         if(i % 2 == 0){
             t->move(offset7);
             t->addRotation(btVector3(r*2, yOffset_leg, offsetDist), btVector3(0, 1, 0), M_PI);
+            //the rotations for the legs are a remnant of the earlier design. Removing them now 
+            //would mean changing all my muscle attachments. I will do this someday. 
         }
         else{
             t->move(offset5);
