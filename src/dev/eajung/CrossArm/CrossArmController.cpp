@@ -18,7 +18,7 @@
 /**
 * @file CrossArmController.cpp
 * @brief Preferred Length Controller for CrossArmModel
-* @author Steven Lessard
+* @author Erik Jung
 * @version 1.0.0
 * $Id$
 */
