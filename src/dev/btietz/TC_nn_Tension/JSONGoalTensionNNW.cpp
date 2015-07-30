@@ -296,7 +296,7 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     Json::Value prevScores = root.get("scores", Json::nullValue);
     
     Json::Value subScores;
-    subScores["distance"] = distanceToGoal;
+    subScores["distance"] = distanceMoved;
     subScores["energy"] = totalEnergySpent;
     
     prevScores.append(subScores);

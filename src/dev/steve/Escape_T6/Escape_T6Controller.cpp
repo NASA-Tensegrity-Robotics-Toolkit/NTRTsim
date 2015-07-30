@@ -32,6 +32,10 @@
 #include "core/tgBasicActuator.h"
 // For AnnealEvolution
 #include "learning/Configuration/configuration.h"
+#include "learning/AnnealEvolution/AnnealEvolution.h"
+#include "learning/Adapters/AnnealAdapter.h"
+// File helpers to use resources folder
+#include "helpers/FileHelpers.h"
 // The C++ Standard Library
 #include <cassert>
 #include <cmath>
@@ -43,12 +47,18 @@
                                
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-Escape_T6Controller::Escape_T6Controller(const double initialLength) :
+Escape_T6Controller::Escape_T6Controller(const double initialLength,
+                                    std::string args,
+                                    std::string resourcePath,
+                                    std::string config) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nClusters(8),
-    musclesPerCluster(3)
+    musclesPerCluster(3),
+    suffix(args),
+    configPath(resourcePath),
+    configName(config)
 {
     clusters.resize(nClusters);
     for (int i=0; i<nClusters; i++) {
@@ -87,6 +97,7 @@ void Escape_T6Controller::onSetup(Escape_T6Model& subject)
     applyActions(subject,actions);
 }
 
+// Set target length of each muscle, then move motors accordingly
 void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
 {
     if (dt <= 0.0) {
@@ -98,42 +109,31 @@ void Escape_T6Controller::onStep(Escape_T6Model& subject, double dt)
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
     //Move motors for all the muscles
-    for (size_t i = 0; i < muscles.size(); ++i)
-    {
+    for (size_t i = 0; i < muscles.size(); ++i) {
         tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->moveMotors(dt);
     }
 
-    //instead, generate it here for now!
-    for(int i=0; i<muscles.size(); i++)
-    {
+    for(size_t i=0; i<muscles.size(); i++) {
         std::vector<double> tmp;
-        for(int j=0;j<2;j++)
-        {
+        for(int j=0;j<2;j++) {
             tmp.push_back(0.5);
         }
         actions.push_back(tmp);
     }
 
-    // prints: "m_totalTime COM(x) COM(y) COM(z) <muscle tensions/10> <muscle lengths/10>"
-    static int count = 0;
+    /*static int count = 0;
     if(count > 100) {
-        std::vector<double> currentPosition = subject.getBallCOM();
         std::cout << m_totalTime << " ";
-        std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " ";  //"x y z"
-
-        for(size_t i=0; i<muscles.size(); i++) {
-            std::cout << (muscles[i]->getTension())/10 << " ";
-        }
-        for(size_t i=0; i<muscles.size(); i++) {
-            std::cout << (muscles[i]->getCurrentLength())/10 << " ";
-        }
-        std::cout << "\n";
+        printCOM(subject);
+        printMuscleTensions(subject);
+        printMuscleLengths(subject);
         count = 0;
-    } else {
-        count++;
     }
+    else {
+        count++;
+    }*/
 }
 
 // So far, only score used for eventual fitness calculation of an Escape Model
@@ -161,12 +161,12 @@ void Escape_T6Controller::onTeardown(Escape_T6Model& subject) {
  */
 std::vector< std::vector <double> > Escape_T6Controller::transformActions(std::vector< std::vector <double> > actions)
 {
-    bool usingManualParams = true;
+    bool usingManualParams = false;
     std::vector <double> manualParams(4 * nClusters, 1); // '4' for the number of sine wave parameters
     if (usingManualParams) { 
         std::cout << "Using manually set parameters\n"; 
-        std::string filename = "logs/Jan82015/params.dat";
-        int lineNumber = 8;
+        std::string filename = "logs/Jan242015/params.dat";
+        int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);
     } 
 
@@ -184,8 +184,8 @@ std::vector< std::vector <double> > Escape_T6Controller::transformActions(std::v
                        m_initialLengths};// * (1 + maxStringLengthFactor)}; 
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
-    for(int i=0;i<actions.size();i++) { //8x
-        for (int j=0; j<actions[i].size(); j++) { //4x
+    for(size_t i=0;i<actions.size();i++) { //8x
+        for (size_t j=0; j<actions[i].size(); j++) { //4x 
             if (usingManualParams) {
                 actions[i][j] = manualParams[i*actions[i].size() + j]*(ranges[j])+mins[j];
             } else {
@@ -199,8 +199,7 @@ std::vector< std::vector <double> > Escape_T6Controller::transformActions(std::v
 /**
  * Defines each cluster's sine wave according to actions
  */
-void Escape_T6Controller::applyActions(Escape_T6Model& subject, std::vector< std::vector <double> > actions)
-{
+void Escape_T6Controller::applyActions(Escape_T6Model& subject, std::vector< std::vector <double> > actions) {
     assert(actions.size() == clusters.size());
 
     // Apply actions by cluster
@@ -215,9 +214,18 @@ void Escape_T6Controller::applyActions(Escape_T6Model& subject, std::vector< std
 }
 
 void Escape_T6Controller::setupAdapter() {
-    std::string suffix = "_Escape";
-    std::string configAnnealEvolution = "Config.ini";
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    //std::string suffix = "_Escape";
+    
+    std::string path;
+    if (configPath != "") {
+        path = FileHelpers::getResourcePath(configPath);
+    }
+    else {
+        path = "";
+    }
+    
+    std::string configAnnealEvolution = path + configName;
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configName, configPath);
     bool isLearning = true;
     configuration configEvolutionAdapter;
     configEvolutionAdapter.readFile(configAnnealEvolution);
@@ -229,12 +237,10 @@ double Escape_T6Controller::totalEnergySpent(Escape_T6Model& subject) {
     double totalEnergySpent=0;
 
     std::vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
-    for(int i=0; i<tmpStrings.size(); i++)
-    {
+    for(size_t i=0; i<tmpStrings.size(); i++) {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
 
-        for(int j=1; j<stringHist.tensionHistory.size(); j++)
-        {
+        for(size_t j=1; j<stringHist.tensionHistory.size(); j++) {
             const double previousTension = stringHist.tensionHistory[j-1];
             const double previousLength = stringHist.restLengths[j-1];
             const double currentLength = stringHist.restLengths[j];
@@ -298,24 +304,6 @@ void Escape_T6Controller::setPreferredMuscleLengths(Escape_T6Model& subject, dou
             phase += phaseChange[cluster];
         }
     }
-
-    /*
-    for(int cluster=0; cluster<nClusters; cluster++) {
-        for(int node=0; node<musclesPerCluster; node++) {
-            tgBasicActuator *const pMuscle = clusters[cluster][node];
-            assert(pMuscle != NULL);
-            double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
-            double minLength = m_initialLengths * (1-maxStringLengthFactor);
-            double maxLength = m_initialLengths * (1+maxStringLengthFactor);
-            if (newLength <= minLength) {
-                newLength = minLength;
-            } else if (newLength >= maxLength) {
-                newLength = maxLength;
-            }
-            pMuscle->setControlInput(newLength, dt);
-        }
-        phase += phaseChange[cluster];
-    }*/
 }
 
 void Escape_T6Controller::populateClusters(Escape_T6Model& subject) {
@@ -383,7 +371,7 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, std::s
     bool tweaking = false;
     if (tweaking) {
         // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])
-        for (int i=0; i < result.size(); i++) {
+        for (size_t i=0; i < result.size(); i++) {
             std::cout<<"Entered Cell " << i << ": " << result[i] << "\n";
             double seed = ((double) (rand() % 100)) / 100;
             result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
@@ -394,6 +382,28 @@ std::vector<double> Escape_T6Controller::readManualParams(int lineNumber, std::s
     }
 
     return result;
+}
+void Escape_T6Controller::printCOM(Escape_T6Model& subject) {
+    std::vector<double> currentPosition = subject.getBallCOM();
+    std::cout << currentPosition[0]/10 << " " << currentPosition[1]/10 << " " << currentPosition[2]/10 << " "; 
+    std::cout << std::endl;
+
+}
+
+void Escape_T6Controller::printMuscleTensions(Escape_T6Model& subject) {
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for(size_t i=0; i<muscles.size(); i++) {
+        std::cout << (muscles[i]->getTension())/10 << " ";
+    }
+    std::cout << "\n";     
+}
+
+void Escape_T6Controller::printMuscleLengths(Escape_T6Model& subject) {
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for(size_t i=0; i<muscles.size(); i++) {
+        std::cout << (muscles[i]->getCurrentLength())/10 << " ";
+    }
+    std::cout << "\n";  
 }
 
 void Escape_T6Controller::printSineParams() {
