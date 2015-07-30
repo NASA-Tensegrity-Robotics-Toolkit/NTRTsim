@@ -31,30 +31,13 @@
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgNode.h"
+#include "tgcreator/tgUtil.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
 #include <vector>
 #include <numeric> // RAND_MAX
-
-/// Rand seeding simular to the evolution classes. 
-/// @todo should we make this common?
-#ifdef _WIN32
-
-//  Windows
-#define rdtsc  __rdtsc
-
-#else
-
-//  For everything else
-unsigned long long rdtsc(){
-    unsigned int lo,hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((unsigned long long)hi << 32) | lo;
-}
-
-#endif
 
 tgBlockField::Config::Config(btVector3 origin,
                              btScalar friction, 
@@ -89,7 +72,7 @@ m_config()
 {
     // Seed the random number generator
     /// @todo assess if doing this multiple times in a trial (here and evolution) causes problems
-    srand(rdtsc());
+    tgUtil::seedRandom(1);
 }
 
 tgBlockField::tgBlockField(tgBlockField::Config& config) :
@@ -98,7 +81,7 @@ m_config(config)
 {
     // Seed the random number generator
     /// @todo assess if doing this multiple times in a trial (here and evolution) causes problems
-    srand(rdtsc());
+    tgUtil::seedRandom(1);
 }
 
 tgBlockField::~tgBlockField() {}
