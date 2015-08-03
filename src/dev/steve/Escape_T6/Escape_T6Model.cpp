@@ -29,6 +29,7 @@
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -205,7 +206,11 @@ void Escape_T6Model::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
+#if (0)
     spec.addBuilder("muscle", new tgBasicActuatorInfo(activeMuscleConfig));
+#else
+    spec.addBuilder("muscle", new tgBasicContactCableInfo(activeMuscleConfig));
+#endif
     //spec.addBuilder("active muscle", new tgBasicActuatorInfo(activeMuscleConfig));
     //spec.addBuilder("passive muscle", new tgBasicActuatorInfo(passiveMuscleConfig));
     

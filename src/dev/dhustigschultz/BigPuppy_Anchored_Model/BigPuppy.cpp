@@ -18,9 +18,9 @@
 
  /**
  * @file BigPuppy.cpp
- * @brief Implementing the Flemons quadruped model.
+ * @brief Implementation of the Flemons quadruped model, with hind legs anchored.
  * @author Dawn Hustig-Schultz
- * @date April 2015
+ * @date July 2015
  * @version 1.0.0
  * $Id$
  */
@@ -70,9 +70,8 @@ void BigPuppy::setup(tgWorld& world)
     const double restitution = 0.0;
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
 
-    const double radius2 = 0.15;
-    const double density2 = 1;	// Note: This needs to be high enough or things fly apart...
-    const tgRod::Config rodConfig2(radius2, density2);
+    const double density2 = 0;	// This will be used for the "anchor" segments.
+    const tgRod::Config rodConfig2(radius, density2, friction, rollFriction, restitution);
 
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
@@ -87,7 +86,7 @@ void BigPuppy::setup(tgWorld& world)
     // Calculations for the flemons spine model
     double v_size = 10.0;
 
-    //Create basic unit for right leg
+    //"Massless" right leg
     tgStructure rightLeg;
 
     //Right Leg nodes: 
@@ -111,23 +110,66 @@ void BigPuppy::setup(tgWorld& world)
     rightLeg.addNode(15,0,5); //13: Big toe
     rightLeg.addNode(14,0,-5); //14: Little toe
 
-    //Add rods for right leg:
-    rightLeg.addPair(0,1,"rod");
-    rightLeg.addPair(1,2,"rod");
-    rightLeg.addPair(1,3,"rod");
-    rightLeg.addPair(1,4,"rod");
+    //Add rods for right leg: making this massless, except the two cross rods and toes
+    rightLeg.addPair(0,1,"rod2");
+    rightLeg.addPair(1,2,"rod2");
+    rightLeg.addPair(1,3,"rod2");
+    rightLeg.addPair(1,4,"rod2");
     rightLeg.addPair(5,8,"rod");
     rightLeg.addPair(6,7,"rod");
-    //Toe extension rod
+    //Toe extension rods
     rightLeg.addPair(5,13,"rod");
     rightLeg.addPair(6,14,"rod");
 
-    rightLeg.addPair(0,9,"rod");
-    rightLeg.addPair(0,10,"rod");
-    rightLeg.addPair(0,11,"rod");
-    rightLeg.addPair(0,12,"rod");
+    //Base rods: making these massless
+    rightLeg.addPair(0,9,"rod2");
+    rightLeg.addPair(0,10,"rod2");
+    rightLeg.addPair(0,11,"rod2");
+    rightLeg.addPair(0,12,"rod2");
 
-    //Create basic unit for left leg
+    //Right leg with mass:
+    tgStructure rightLeg2;
+
+    //Right Leg nodes: 
+    rightLeg2.addNode(0,0,0); //0: Bottom Center of lower leg segment
+    rightLeg2.addNode(0,10,0);  //1: Center of lower leg segment
+    rightLeg2.addNode(10,10,0); //2: Right of lower leg segment
+    rightLeg2.addNode(-10,10,0);  //3: Left of lower leg segment
+    rightLeg2.addNode(0,20,0);  //4: Top of lower leg segment
+    rightLeg2.addNode(12,2,3);  //5: Big toe; was y=0, z=5
+    rightLeg2.addNode(12,1.5,-3.5); //6: Little toe; was y=0, z=-5
+    rightLeg2.addNode(0,10,5);  //7: Outer ankle
+    rightLeg2.addNode(0,10,-5); //8: Inner ankle
+ 
+    //Adding some extra nodes to stabilize base of leg:
+    rightLeg2.addNode(4,0,0); //9 
+    rightLeg2.addNode(-4,0,0);  //10
+    rightLeg2.addNode(0,0,4); //11
+    rightLeg2.addNode(0,0,-4);  //12
+ 
+    //Adding a toe extension
+    rightLeg2.addNode(15,0,5); //13: Big toe
+    rightLeg2.addNode(14,0,-5); //14: Little toe
+
+    //Add rods for right leg: 
+    rightLeg2.addPair(0,1,"rod");
+    rightLeg2.addPair(1,2,"rod");
+    rightLeg2.addPair(1,3,"rod");
+    rightLeg2.addPair(1,4,"rod");
+    rightLeg2.addPair(5,8,"rod");
+    rightLeg2.addPair(6,7,"rod");
+    //Toe extension rods
+    rightLeg2.addPair(5,13,"rod");
+    rightLeg2.addPair(6,14,"rod");
+
+    //Base rods:
+    rightLeg2.addPair(0,9,"rod");
+    rightLeg2.addPair(0,10,"rod");
+    rightLeg2.addPair(0,11,"rod");
+    rightLeg2.addPair(0,12,"rod");
+
+
+    //"Massless" left leg
     tgStructure leftLeg;
 
     //Left Leg nodes: 
@@ -152,20 +194,62 @@ void BigPuppy::setup(tgWorld& world)
     leftLeg.addNode(14,0,-5); //14: Big toe
 
     //Add rods for left leg:
-    leftLeg.addPair(0,1,"rod");
-    leftLeg.addPair(1,2,"rod");
-    leftLeg.addPair(1,3,"rod");
-    leftLeg.addPair(1,4,"rod");
+    leftLeg.addPair(0,1,"rod2");
+    leftLeg.addPair(1,2,"rod2");
+    leftLeg.addPair(1,3,"rod2");
+    leftLeg.addPair(1,4,"rod2");
     leftLeg.addPair(5,8,"rod");
     leftLeg.addPair(6,7,"rod");
     //Toe extension rod
     leftLeg.addPair(5,13,"rod");
     leftLeg.addPair(6,14,"rod");
+    
+    //Base rods:
+    leftLeg.addPair(0,9,"rod2");
+    leftLeg.addPair(0,10,"rod2");
+    leftLeg.addPair(0,11,"rod2");
+    leftLeg.addPair(0,12,"rod2");
 
-    leftLeg.addPair(0,9,"rod");
-    leftLeg.addPair(0,10,"rod");
-    leftLeg.addPair(0,11,"rod");
-    leftLeg.addPair(0,12,"rod");
+    //Left leg with mass:
+    tgStructure leftLeg2;
+
+    //Left Leg nodes: 
+    leftLeg2.addNode(0,0,0); //0: Bottom Center of lower leg segment
+    leftLeg2.addNode(0,10,0);  //1: Center of lower leg segment
+    leftLeg2.addNode(10,10,0); //2: Right of lower leg segment
+    leftLeg2.addNode(-10,10,0);  //3: Left of lower leg segment
+    leftLeg2.addNode(0,20,0);  //4: Top of lower leg segment
+    leftLeg2.addNode(12,2,3);  //5: Little toe; was y=0, z=5
+    leftLeg2.addNode(12,1.5,-3.5); //6: Big toe; was y=0, z=-5
+    leftLeg2.addNode(0,10,5);  //7: Inner ankle
+    leftLeg2.addNode(0,10,-5); //8: Outer ankle
+
+    //Adding some extra nodes to stabilize base of leg:
+    leftLeg2.addNode(4,0,0); //9 
+    leftLeg2.addNode(-4,0,0);  //10
+    leftLeg2.addNode(0,0,4); //11
+    leftLeg2.addNode(0,0,-4);  //12
+
+    //Adding a toe extension
+    leftLeg2.addNode(15,0,5); //13: Little toe
+    leftLeg2.addNode(14,0,-5); //14: Big toe
+
+    //Add rods for left leg:
+    leftLeg2.addPair(0,1,"rod");
+    leftLeg2.addPair(1,2,"rod");
+    leftLeg2.addPair(1,3,"rod");
+    leftLeg2.addPair(1,4,"rod");
+    leftLeg2.addPair(5,8,"rod");
+    leftLeg2.addPair(6,7,"rod");
+    //Toe extension rod
+    leftLeg2.addPair(5,13,"rod");
+    leftLeg2.addPair(6,14,"rod");
+
+    //Base rods:
+    leftLeg2.addPair(0,9,"rod");
+    leftLeg2.addPair(0,10,"rod");
+    leftLeg2.addPair(0,11,"rod");
+    leftLeg2.addPair(0,12,"rod");
 
     //Create the basic unit of the spine
     tgStructure tetra;
@@ -208,20 +292,23 @@ void BigPuppy::setup(tgWorld& world)
     //Build the spine
     tgStructure spine;
     const double offsetDist = v_size + 1; //So rod ends don't touch, may need to adjust
-    const double offsetDist2 = v_size*5 + 5 + 3.3; //I will find a better way, for now this'll do.... v_size*4 + 1 + 3.3;
+    const double offsetDist2 = v_size*5 + 5 + 3.3; 
     const double offsetDist3 = v_size*6; 
     std::size_t m_segments = 6;
     std::size_t m_hips = 4;
     std::size_t m_legs = 4; 
+    //std::size_t m_anchors = 2; //Will need to change to three, if anchor all but one leg.
     btVector3 offset(offsetDist,0.0,0);
     btVector3 offset1(offsetDist*2,0.0,offsetDist);
     btVector3 offset2(offsetDist2,0.0,offsetDist);
     btVector3 offset3(offsetDist*2,0.0,-offsetDist);
     btVector3 offset4(offsetDist2,0.0,-offsetDist);
-    btVector3 offset5(offsetDist3,-20.0,offsetDist);
-    btVector3 offset6(offsetDist3,-20.0,-offsetDist);
-    btVector3 offset7(v_size*2,-20.0,offsetDist);
-    btVector3 offset8(v_size*2,-20.0,-offsetDist);
+    btVector3 offset5(offsetDist3,-21.0,offsetDist);
+    btVector3 offset6(offsetDist3,-21.0,-offsetDist);
+    btVector3 offset7(v_size*2,-21.0,offsetDist);
+    btVector3 offset8(v_size*2,-21.0,-offsetDist);
+    //btVector3 offset9(offsetDist3,-20.5,offsetDist);
+    //btVector3 offset10(offsetDist3,-20.5,-offsetDist);
     
     for(std::size_t i = 0; i < m_segments; i++) { //Connect segments for spine
         tgStructure* t = new tgStructure (tetra);
@@ -230,12 +317,12 @@ void BigPuppy::setup(tgWorld& world)
 
         if (i % 2 == 1){
 
-            t->addRotation(btVector3((i + 1) * offsetDist, 0.0, 0.0), btVector3(1, 0, 0), 0.0); //Was y=10
+            t->addRotation(btVector3((i + 1) * offsetDist, 0.0, 0.0), btVector3(1, 0, 0), 0.0); 
 
         }
         else{
 
-            t->addRotation(btVector3((i + 1) * offsetDist, 0.0, 0.0), btVector3(1, 0, 0), M_PI/2.0); //Was y=10
+            t->addRotation(btVector3((i + 1) * offsetDist, 0.0, 0.0), btVector3(1, 0, 0), M_PI/2.0); 
 
         }
 
@@ -279,35 +366,43 @@ void BigPuppy::setup(tgWorld& world)
         tgStructure* t = new tgStructure (rightLeg);
         t->addTags(tgString("segment num", i + 1));
 
-        if(i % 2 == 0){
+        if(i % 2 == 0){//Front leg
+            tgStructure* t = new tgStructure (rightLeg2);
+            t->addTags(tgString("segment num", i + 1));
             t->move(offset7);
-            t->addRotation(btVector3(v_size*2, -20.0, offsetDist), btVector3(0, 1, 0), M_PI);
+            t->addRotation(btVector3(v_size*2, -21.0, offsetDist), btVector3(0, 1, 0), M_PI);
+            spine.addChild(t); //Add a segment to the spine
         }
-        else{
+        else{ //Hind leg
+            tgStructure* t = new tgStructure (rightLeg);
+            t->addTags(tgString("segment num", i + 1));
             t->move(offset5);
-            t->addRotation(btVector3(offsetDist3, -20.0, offsetDist), btVector3(0, 1, 0), M_PI);
+            t->addRotation(btVector3(offsetDist3, -21.0, offsetDist), btVector3(0, 1, 0), M_PI);
+            spine.addChild(t); //Add a segment to the spine
         }
-
-        spine.addChild(t); //Add a segment to the spine
     }
 
     for(std::size_t i = (m_segments + m_hips + 2); i < (m_segments + m_hips + m_legs); i++) {//left front and back legs
         tgStructure* t = new tgStructure (leftLeg);
         t->addTags(tgString("segment num", i + 1));
 
-        if(i % 2 == 0){
+        if(i % 2 == 0){//Front leg
+            tgStructure* t = new tgStructure (leftLeg2);
+            t->addTags(tgString("segment num", i + 1));
             t->move(offset8);
-            t->addRotation(btVector3(v_size*2, -20.0, -offsetDist), btVector3(0, 1, 0), M_PI);
+            t->addRotation(btVector3(v_size*2, -21.0, -offsetDist), btVector3(0, 1, 0), M_PI);
+            spine.addChild(t); //Add a segment to the spine
         }
-        else{
+        else{//Hind leg
+            tgStructure* t = new tgStructure (leftLeg);
+            t->addTags(tgString("segment num", i + 1));
             t->move(offset6);
-            t->addRotation(btVector3(offsetDist3, -20.0, -offsetDist), btVector3(0, 1, 0), M_PI);
+            t->addRotation(btVector3(offsetDist3, -21.0, -offsetDist), btVector3(0, 1, 0), M_PI);
+            spine.addChild(t); //Add a segment to the spine
         }
-
-        spine.addChild(t); //Add a segment to the spine
     }
 
-    spine.move(btVector3(0.0,20.0,0.0));
+    spine.move(btVector3(0.0,21.0,0.0));
 
 
     std::vector<tgStructure*> children = spine.getChildren();
@@ -317,6 +412,11 @@ void BigPuppy::setup(tgWorld& world)
         tgNodes n1 = children[i-1]->getNodes();
         tgNodes n2 = children[i]->getNodes();
         
+        if(i==2){
+            //Extra muscles, to keep front vertebra from swinging. Need to fold this into loop above, for consistency
+            spine.addPair(n0[3], n1[3], tgString("spine front upper right muscle seg", i-2) + tgString(" seg", i-1));
+            spine.addPair(n0[3], n1[4], tgString("spine front upper left muscle seg", i-2) + tgString(" seg", i-1));
+        }
 
         //Add muscles to the spine
         if(i < 3){
@@ -345,13 +445,13 @@ void BigPuppy::setup(tgWorld& world)
             }
         }
         if(i > 0 && i < 5){
-            if(i % 2 == 0){
+            if(i % 2 == 0){//rear
                 spine.addPair(n1[1], n2[3], tgString("spine rear upper left muscle seg", i-1) + tgString(" seg", i));
                 spine.addPair(n1[1], n2[4], tgString("spine rear lower left muscle seg", i-1) + tgString(" seg", i));
                 spine.addPair(n1[2], n2[3], tgString("spine rear upper right muscle seg", i-1) + tgString(" seg", i));
                 spine.addPair(n1[2], n2[4], tgString("spine rear lower right muscle seg", i-1) + tgString(" seg", i));
             }
-            else{
+            else{//front
 
                 spine.addPair(n1[1], n2[3], tgString("spine front lower right muscle seg", i-1) + tgString(" seg", i));
                 spine.addPair(n1[1], n2[4], tgString("spine front lower left muscle seg", i-1) + tgString(" seg", i));
@@ -360,11 +460,12 @@ void BigPuppy::setup(tgWorld& world)
             }
         }
         if(i == 5){
+            //rear
             spine.addPair(n1[1], n2[1], tgString("spine rear lower left muscle seg", i-1) + tgString(" seg", i));
             spine.addPair(n1[1], n2[2], tgString("spine rear lower right muscle seg", i-1) + tgString(" seg", i));
             spine.addPair(n1[2], n2[1], tgString("spine rear upper left muscle seg", i-1) + tgString(" seg", i));
             spine.addPair(n1[2], n2[2], tgString("spine rear upper right muscle seg", i-1) + tgString(" seg", i));   
-
+            //front
             spine.addPair(n1[1], n2[3], tgString("spine front lower right muscle seg", i-1) + tgString(" seg", i));
             spine.addPair(n1[1], n2[4], tgString("spine front lower left muscle seg", i-1) + tgString(" seg", i));
             spine.addPair(n1[2], n2[3], tgString("spine front upper right muscle seg", i-1) + tgString(" seg", i));
@@ -402,6 +503,10 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n6[2], n0[1], tgString("left shoulder front bottom muscle seg", 6) + tgString(" seg", 0));
     spine.addPair(n6[2], n2[4], tgString("left shoulder rear bottom muscle seg", 6) + tgString(" seg", 2));
 
+    //Extra muscles, to move left shoulder forward and back:
+    spine.addPair(n6[0], n1[1], tgString("left shoulder rear mid muscle seg", 6) + tgString(" seg", 1));
+    spine.addPair(n6[0], n1[4], tgString("left shoulder front mid muscle seg", 6) + tgString(" seg", 1));
+
     //Left hip muscles
     spine.addPair(n7[1], n5[1], tgString("left hip rear upper muscle seg", 7) + tgString(" seg", 5));
     spine.addPair(n7[1], n5[4], tgString("left hip front upper muscle seg", 7) + tgString(" seg", 5));
@@ -411,6 +516,10 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n7[2], n5[1], tgString("left hip rear lower muscle seg", 7) + tgString(" seg", 5));
     spine.addPair(n7[2], n5[4], tgString("left hip front lower muscle seg", 7) + tgString(" seg", 5));
     spine.addPair(n7[2], n4[1], tgString("left hip bottom muscle seg", 7) + tgString(" seg", 4));
+
+    //Extra muscles, to move left hip forward and back:
+    spine.addPair(n7[0], n3[1], tgString("left hip rear mid muscle seg", 7) + tgString(" seg", 3)); //could also be n3[3]
+    spine.addPair(n7[0], n5[4], tgString("left hip front mid muscle seg", 7) + tgString(" seg", 5));
 
     //Inter-hip connector muscle
     spine.addPair(n7[2], n9[3], tgString("inter-hip bottom muscle seg", 7) + tgString(" seg", 9)); //inter-hip bottom muscle
@@ -426,6 +535,10 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n8[3], n0[1], tgString("right shoulder front bottom muscle seg", 8) + tgString(" seg", 0));
     spine.addPair(n8[3], n2[4], tgString("right shoulder rear bottom muscle seg", 8) + tgString(" seg", 2));
 
+    //Extra muscles, to move right shoulder forward and back:
+    spine.addPair(n8[0], n1[2], tgString("right shoulder rear mid muscle seg", 8) + tgString(" seg", 1));
+    spine.addPair(n8[0], n1[3], tgString("right shoulder front mid muscle seg", 8) + tgString(" seg", 1));
+
     //Right hip muscles
     spine.addPair(n9[1], n5[2], tgString("right hip rear upper muscle seg", 9) + tgString(" seg", 5));
     spine.addPair(n9[1], n5[3], tgString("right hip front upper muscle seg", 9) + tgString(" seg", 5));
@@ -436,12 +549,16 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n9[3], n5[3], tgString("right hip front lower muscle seg", 9) + tgString(" seg", 5));
     spine.addPair(n9[3], n4[1], tgString("right hip bottom muscle seg", 9) + tgString(" seg", 4));  
 
+    //Extra muscles, to move right hip forward and back:
+    spine.addPair(n9[0], n3[2], tgString("right hip rear mid muscle seg", 9) + tgString(" seg", 3)); //could also be n3[3]
+    spine.addPair(n9[0], n5[3], tgString("right hip front mid muscle seg", 9) + tgString(" seg", 5));
+
     //Leg/hip connections:
 
     //Right front leg/shoulder
     spine.addPair(n10[4], n6[2], tgString("right outer bicep muscle seg", 10) + tgString(" seg", 6));
     spine.addPair(n10[4], n6[3], tgString("right inner bicep muscle seg", 10) + tgString(" seg", 6));
-    spine.addPair(n10[4], n1[1], tgString("right front abdomen connection muscle seg", 10) + tgString(" seg", 1)); //Was n1[4]
+    //spine.addPair(n10[4], n1[1], tgString("right front abdomen connection muscle seg", 10) + tgString(" seg", 1));
 
     spine.addPair(n10[3], n6[2], tgString("right outer tricep muscle seg", 10) + tgString(" seg", 6));
     spine.addPair(n10[3], n6[3], tgString("right inner tricep muscle seg", 10) + tgString(" seg", 6));
@@ -449,14 +566,13 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n10[2], n6[2], tgString("right outer front tricep muscle seg", 10) + tgString(" seg", 6));
     spine.addPair(n10[2], n6[3], tgString("right inner front tricep muscle seg", 10) + tgString(" seg", 6));
 
-    //Possibly take these out:
-//    spine.addPair(n10[0], n6[2], tgString("right outer foreleg muscle seg", 10) + tgString(" seg", 6));
-  //  spine.addPair(n10[0], n6[3], tgString("right inner foreleg muscle seg", 10) + tgString(" seg", 6));
+    //Adding muscle to pull up on right front leg:
+    spine.addPair(n10[4], n6[1], tgString("right mid bicep muscle seg", 10) + tgString(" seg", 6));
     
     //Left front leg/shoulder
     spine.addPair(n12[4], n8[2], tgString("left inner bicep muscle seg", 12) + tgString(" seg", 8));
     spine.addPair(n12[4], n8[3], tgString("left outer bicep muscle seg", 12) + tgString(" seg", 8));
-    spine.addPair(n12[4], n1[2], tgString("left front abdomen connection muscle seg", 12) + tgString(" seg", 1)); //Was n1[2]
+    //spine.addPair(n12[4], n1[2], tgString("left front abdomen connection muscle seg", 12) + tgString(" seg", 1)); //Was n1[2]
 
     spine.addPair(n12[3], n8[2], tgString("left inner tricep muscle seg", 12) + tgString(" seg", 8));
     spine.addPair(n12[3], n8[3], tgString("left outer tricep muscle seg", 12) + tgString(" seg", 8));
@@ -464,14 +580,13 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n12[2], n8[2], tgString("left inner front tricep muscle seg", 12) + tgString(" seg", 8));
     spine.addPair(n12[2], n8[3], tgString("left outer front tricep muscle seg", 12) + tgString(" seg", 8));
 
-    //possibly take these out:
-   // spine.addPair(n12[0], n8[2], tgString("left inner foreleg muscle seg", 12) + tgString(" seg", 8));
-   // spine.addPair(n12[0], n8[3], tgString("left outer foreleg muscle seg", 12) + tgString(" seg", 8));
+    //Adding muscle to pull up on left front leg:
+    spine.addPair(n12[4], n8[1], tgString("left mid bicep muscle seg", 12) + tgString(" seg", 8));
 
     //Right rear leg/hip
-    spine.addPair(n11[4], n7[2], tgString("right outer thigh muscle seg", 11) + tgString(" seg", 7)); //This was already added back in
-    spine.addPair(n11[4], n7[3], tgString("right inner thigh muscle seg", 11) + tgString(" seg", 7)); //Ditto
-    spine.addPair(n11[4], n3[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 4)); //was n4[1]
+    spine.addPair(n11[4], n7[2], tgString("right outer thigh muscle seg", 11) + tgString(" seg", 7)); 
+    spine.addPair(n11[4], n7[3], tgString("right inner thigh muscle seg", 11) + tgString(" seg", 7));
+    //spine.addPair(n11[4], n3[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 4)); 
 
     spine.addPair(n11[3], n7[2], tgString("right outer calf muscle seg", 11) + tgString(" seg", 7));
     spine.addPair(n11[3], n7[3], tgString("right inner calf muscle seg", 11) + tgString(" seg", 7));
@@ -479,13 +594,13 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n11[2], n7[2], tgString("right outer front calf muscle seg", 11) + tgString(" seg", 7));
     spine.addPair(n11[2], n7[3], tgString("right inner front calf muscle seg", 11) + tgString(" seg", 7));
 
-//    spine.addPair(n11[0], n7[2], tgString("right outer rearleg muscle seg", 11) + tgString(" seg", 7));
-  //  spine.addPair(n11[0], n7[3], tgString("right inner rearleg muscle seg", 11) + tgString(" seg", 7));
+    //Adding muscle to pull rear right leg up:
+    spine.addPair(n11[4], n7[1], tgString("right central thigh muscle seg", 11) + tgString(" seg", 7));
 
     //Left rear leg/hip
-    spine.addPair(n13[4], n9[2], tgString("left inner thigh muscle seg", 13) + tgString(" seg", 9)); //Ditto
+    spine.addPair(n13[4], n9[2], tgString("left inner thigh muscle seg", 13) + tgString(" seg", 9)); 
     spine.addPair(n13[4], n9[3], tgString("left outer thigh muscle seg", 13) + tgString(" seg", 9));
-    spine.addPair(n13[4], n3[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 4)); //was n4[1]
+    //spine.addPair(n13[4], n3[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 4)); 
 
     spine.addPair(n13[3], n9[2], tgString("left inner calf muscle seg", 13) + tgString(" seg", 9));
     spine.addPair(n13[3], n9[3], tgString("left outer calf muscle seg", 13) + tgString(" seg", 9));
@@ -493,9 +608,8 @@ void BigPuppy::setup(tgWorld& world)
     spine.addPair(n13[2], n9[2], tgString("left inner front calf muscle seg", 13) + tgString(" seg", 9));
     spine.addPair(n13[2], n9[3], tgString("left outer front calf muscle seg", 13) + tgString(" seg", 9));
 
-   // spine.addPair(n13[0], n9[2], tgString("left inner rearleg muscle seg", 13) + tgString(" seg", 9));
-   // spine.addPair(n13[0], n9[3], tgString("left outer rearleg muscle seg", 13) + tgString(" seg", 9));
-
+    //Adding muscle to pull rear left leg up:
+    spine.addPair(n13[4], n9[1], tgString("left central thigh muscle seg", 13) + tgString(" seg", 9));
 
     //Populate Legs with muscles
     for(std::size_t i = (m_segments + m_hips); i < children.size(); i++) { 
@@ -538,6 +652,7 @@ void BigPuppy::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("rod2", new tgRodInfo(rodConfig2));
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo

@@ -15,3 +15,6 @@ are interested in JSONcpp's API can find it here: http://open-source-parsers.git
 Examples of JSON's use within NTRT can be found in examples/3_prism_serialize
 More fully featured examples (using JSON's arrays, etc) can be found in dev/btietz/JSONTests
 
+Neural Net
+---------------------
+The blog post that is the source of our Neural Network library can be found here: https://takinginitiative.wordpress.com/2008/06/23/c-back-propagation-neural-network-code-v2/

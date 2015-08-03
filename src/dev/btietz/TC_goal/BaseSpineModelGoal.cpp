@@ -68,6 +68,8 @@ void BaseSpineModelGoal::setup(tgWorld& world)
     goalBox.addNode(xPos, 20.0, zPos);
     goalBox.addNode(xPos + 5.0, 20.0, zPos);
     
+    std::cout << "Goal Position: " << xPos << " " << zPos << std::endl;
+    
     goalBox.addPair(0, 1, "goalBox");
     
     // 1 by 1 by 1 box, fix when tgBoxInfo gets fixed

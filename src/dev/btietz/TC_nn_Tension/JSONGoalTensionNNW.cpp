@@ -194,8 +194,8 @@ void JSONGoalTensionNNW::onStep(BaseSpineModelLearning& subject, double dt)
     }
     
     
-    
 #if (0)
+
     /// @todo add to config
     if (currentHeight > 25 || currentHeight < 1.0)
     {
@@ -296,7 +296,7 @@ void JSONGoalTensionNNW::onTeardown(BaseSpineModelLearning& subject)
     Json::Value prevScores = root.get("scores", Json::nullValue);
     
     Json::Value subScores;
-    subScores["distance"] = scores[0];
+    subScores["distance"] = distanceMoved;
     subScores["energy"] = totalEnergySpent;
     
     prevScores.append(subScores);

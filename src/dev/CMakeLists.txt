@@ -15,5 +15,6 @@ subdirs(
     jbruce
     dhustigschultz
     CPG_feedback
+    eajung
 )
 
