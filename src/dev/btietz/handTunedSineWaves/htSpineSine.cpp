@@ -48,7 +48,7 @@
 // The C++ Standard Library
 #include <stdexcept>
 
-#define LOGGING
+//#define LOGGING
 
 /**
  * Defining the adapters here assumes the controller is around and
@@ -134,18 +134,20 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
             kPosition = 500.0;
             
             //controlLength = allMuscles[i]->getStartLength();
-            controlLength = 19.0;
+            
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("in_top_amp_a", "UTF-8").asDouble();
 				phase = root.get("front_offset", "UTF-8").asDouble();
-				kVelocity = 50;
+				controlLength = 19.0;
+                kVelocity = 150;
 			}
 			else if(allMuscles[i]->hasTag("seg2"))
 			{
 				amplitude = root.get("in_top_amp_b", "UTF-8").asDouble();
 				phase = root.get("back_offset", "UTF-8").asDouble();
-				kVelocity = 100.0;
+				controlLength = 18.0;
+                kVelocity = 150.0;
 			}
 			else
 			{
@@ -156,7 +158,7 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
         {
             tension = 1000.0;
             kPosition = 500.0;
-            kVelocity = 100.0;
+            kVelocity = 150.0;
             
             if (allMuscles[i]->hasTag("seg1"))
             {
@@ -181,17 +183,19 @@ void htSpineSine::setupWaves(BaseSpineModelLearning& subject)
             tension = 1000.0;
             kPosition = 300.0;
             kVelocity = 100.0;
-            controlLength = allMuscles[i]->getStartLength();
-            //controlLength = 21.5;
+            //controlLength = allMuscles[i]->getStartLength();
+            
             if (allMuscles[i]->hasTag("seg1"))
             {
 				amplitude = root.get("in_bottom_amp_a", "UTF-8").asDouble();
 				phase = root.get("front_offset", "UTF-8").asDouble();
+                controlLength = 21.5;
 			}
 			else if(allMuscles[i]->hasTag("seg2"))
 			{
 				amplitude = root.get("in_bottom_amp_b", "UTF-8").asDouble();
 				phase = root.get("back_offset", "UTF-8").asDouble();
+                controlLength = 22.5;
 			}
 			else
 			{
