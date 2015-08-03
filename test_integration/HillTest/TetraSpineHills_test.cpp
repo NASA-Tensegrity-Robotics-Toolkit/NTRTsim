@@ -150,7 +150,7 @@ namespace {
     
                 double dist = root.get("scores", 0.0).asDouble();
     
-				EXPECT_FLOAT_EQ(dist, 5.1048074);
+				EXPECT_FLOAT_EQ(dist, 5.2970085);
 				
 				// Will print out another set of dist moved on teardown
 	}
