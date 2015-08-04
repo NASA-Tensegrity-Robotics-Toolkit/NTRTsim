@@ -153,7 +153,7 @@ namespace {
 				
 				double dist = FileHelpers::getFinalScore(filePath);
 				
-				EXPECT_EQ(dist, 213.119);
+				EXPECT_EQ(dist, 215.278);
 				
 				// Will print out another set of dist moved on teardown
 	}

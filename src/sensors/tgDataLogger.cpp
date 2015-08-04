@@ -75,7 +75,7 @@ void tgDataLogger::render(const tgModel& model) const
 {
     const std::vector<abstractMarker>& markers = model.getMarkers();
     
-    const std::size_t n = markers.size();
+    const std::size_t n = 0;
     for (std::size_t i = 0; i < n; i++)
     {
         std::ofstream tgOutput;
