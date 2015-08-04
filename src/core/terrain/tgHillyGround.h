@@ -30,6 +30,10 @@
 
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
+
+// std::size_t
+#include <cstddef>
+
 // Forward declarations
 class btRigidBody;
 class btTriangleIndexVertexArray;
@@ -49,8 +53,8 @@ class tgHillyGround : public tgBulletGround
                        double restitution = 0.0,
                        btVector3 size = btVector3(500.0, 1.5, 500.0),
                        btVector3 origin = btVector3(0.0, 0.0, 0.0),
-                       size_t nx = 50,
-                       size_t ny = 50,
+                       std::size_t nx = 50,
+                       std::size_t ny = 50,
                        double margin = 0.05,
                        double triangleSize = 5.0,
                        double waveHeight = 5.0,
@@ -72,10 +76,10 @@ class tgHillyGround : public tgBulletGround
                 btVector3 m_origin;
 
                 /** Number of nodes in the x-direction */
-                size_t m_nx;
+                std::size_t m_nx;
 
                 /** Number of nodes in the y-direction */
-                size_t m_ny;
+                std::size_t m_ny;
 
                 /** See Bullet documentation on Collision Margin */
                 double m_margin;
@@ -124,7 +128,7 @@ class tgHillyGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the input parameters, 
          *                  to be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleIndexVertexArray* createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]);
+        btTriangleIndexVertexArray* createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
