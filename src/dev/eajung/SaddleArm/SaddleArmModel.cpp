@@ -224,18 +224,27 @@ s.addPair(4, 14, "left anconeus muscle");
 
 //added with shoulder 7/30/15
 
-//Anchor muscles
+//Anchor muscles (muscles need to change)
 s.addPair(26, 17, "olecranon muscle");
 s.addPair(26, 18, "olecranon muscle");
 s.addPair(25, 6, "olecranon muscle");
 s.addPair(26, 6, "olecranon muscle");
 s.addPair(24, 6, "olecranon muscle");
 
-//Saddle muscles
+//Saddle muscles (muscles need to change)
 s.addPair(17, 21, "olecranon muscle");
 s.addPair(17, 19, "olecranon muscle");
 s.addPair(18, 21, "olecranon muscle"); 
 s.addPair(18, 20, "olecranon muscle");
+
+//Tricep Muscles (muscles need to change)
+s.addPair(2, 21, "olecranon muscle");
+s.addPair(2, 6, "olecranon muscle");
+
+//Bicep Muscles (muscles need to change)
+s.addPair(12, 26, "olecranon muscle");
+s.addPair(12, 6, "olecranon muscle");
+
 
 }
 /*
