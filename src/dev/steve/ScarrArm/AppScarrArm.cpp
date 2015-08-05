@@ -73,12 +73,13 @@ int main(int argc, char** argv) {
     // Third create the simulation
     tgSimulation simulation(view);
 
-    // Fourth create the models with their controllers and add the models to the simulation
+    // Fourth create the models
     ScarrArmModel* const myModel = new ScarrArmModel();
 
     // Fifth, select the controller to use. Uncomment desired controller.
     ScarrArmController* const pTC = new ScarrArmController(2.5, timestep_physics);
 
+    // Sixth, attach the controller to the model and add the model to the simulation
     myModel->attach(pTC);
     simulation.addModel(myModel);
     
