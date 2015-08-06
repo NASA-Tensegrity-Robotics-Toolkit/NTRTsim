@@ -89,7 +89,7 @@ bool AppGoalTensionNNW::setup()
         Json::Value root; // will contains the root value after parsing.
         Json::Reader reader;
         
-        std::string resourcePath = "bmirletz/TC_nn_Tension_new/";
+        std::string resourcePath = "bmirletz/TC_nn_Tension/";
         std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
         std::string controlFilename = controlFilePath + suffix;
         
