@@ -39,7 +39,14 @@ class EvolutionJobMaster(NTRTJobMaster):
         except OSError:
             if not os.path.isdir(self.path):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
+        
+        try:
+            os.makedirs(self.path + '/logs')
+        except OSError:
+            if not os.path.isdir(self.path + '/logs'):
+                raise NTRTMasterError("Please create logs directory at" + self.path)
 
+        
         # Consider seeding random, using default (system time) now
         #random.seed(5)
 

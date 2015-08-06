@@ -89,7 +89,7 @@ bool AppGoalTensionNNW::setup()
         Json::Value root; // will contains the root value after parsing.
         Json::Reader reader;
         
-        std::string resourcePath = "bmirletz/TC_nn_Tension/";
+        std::string resourcePath = "bmirletz/TC_nn_Tension_new/";
         std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
         std::string controlFilename = controlFilePath + suffix;
         
@@ -99,7 +99,7 @@ bool AppGoalTensionNNW::setup()
             // report to the user the failure and their locations in the document.
             std::cout << "Failed to parse configuration\n"
                 << reader.getFormattedErrorMessages();
-            throw std::invalid_argument("Bad filename for JSON");
+            throw std::invalid_argument("Bad filename for JSON, check that resource path exists");
         }
         // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
         // such member.
