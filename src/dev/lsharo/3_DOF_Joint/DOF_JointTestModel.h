@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef NESTED_STRUCTURE_TEST_MODEL_H
-#define NESTED_STRUCTURE_TEST_MODEL_H
+#ifndef DOF_JOINT_TEST_MODEL_H
+#define DOF_JOINT_TEST_MODEL_H
 
 /**
- * @file NestedStructureTestModel.h
- * @brief Contains the definition of class NestedStructureTestModel
- * @author Brian Tietz
+ * @file DOF_JointTestModel.h
+ * @brief Contains the definition of class DOF_JointTestModel
+ * @author Lauren Sharo
  * $Id$
  */
 
@@ -39,11 +39,9 @@
 class tgBasicActuator;
 
 /**
- * The NestedStructureTestModel implements a tensegrity with rigid
- * tetrahedrons and six strings between segments, also known as
- * Tetraspine. 
+ * The DOF_JointTestModel implements a tensegrity with.....
  */
-class NestedStructureTestModel: public tgSubject<NestedStructureTestModel>, public tgModel
+class DOF_JointTestModel: public tgSubject<DOF_JointTestModel>, public tgModel
 {
 public: 
 	
@@ -55,15 +53,13 @@ public:
 	/**
 	 * The only constructor. The model details are instantiated once
 	 * setup is called typically when the model is added to a simulation.
-	 * @param[in] segments, a positive integer dictating how many
-	 * rigid segments will be constructed. 
 	 */
-    NestedStructureTestModel(size_t segments);
+    DOF_JointTestModel();
 	
 	/**
 	 * Nothing to do. Most functions already handled by tgModel::teardown
 	 */
-    virtual ~NestedStructureTestModel()
+    virtual ~DOF_JointTestModel()
     {}
     
     /**
@@ -89,17 +85,12 @@ public:
 	 * a string to a vector of actuators
 	 * @return a std::vector of pointers to the actuators found by the key
 	 */
-    const std::vector<tgBasicActuator*>& getActuators (const std::string& key) const;
+    const std::vector<tgBasicActuator*>& getActuators(const std::string& key) const;
     
     /**
-     * Return a std::size_t indicating the number of segments in the 
-     * tetraSpine.
-     * @return a std::size_t with the value of m_segments
+     * Return a double indicating the total mass of the structure
      */
-    size_t getSegments() const
-    {
-        return m_segments;
-    }
+    double getMass();
     
 private:
 	
@@ -114,11 +105,6 @@ private:
 	 * mapped actuators, populated during setup.
 	 */
     ActuatorMap actuatorMap;
-    
-    /**
-     * The number of segments in the spine
-     */
-    const size_t m_segments;
 };
 
 #endif

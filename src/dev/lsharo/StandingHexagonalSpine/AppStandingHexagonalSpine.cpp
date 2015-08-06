@@ -17,24 +17,23 @@
 */
 
 /**
- * @file AppNestedTetrahedrons.cpp
- * @brief Contains the definition function main() for the Nested Tetrahedrons
+ * @file AppStandingHexagonalSpineTestModel.cpp
+ * @brief Contains the definition function main() for the StandingHexagonalSpineTestModel
  * application.
- * @author Brian Tietz
+ * @author Lauren Sharo
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "NestedStructureTestModel.h"
-#include "NestedStructureSineWaves.h"
-// This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 // The C++ Standard Library
 #include <iostream>
+
+#include "StandingHexagonalSpineTestModel.h"
 
 /**
  * The entry point.
@@ -44,14 +43,14 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppNestedStructureTest" << std::endl;
+    std::cout << "AppStandingHexagonalSpineTestModel" << std::endl;
 
     // First create the world
-    const tgWorld::Config config(0);//981); // gravity, cm/sec^2
-    tgWorld world(config); 
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2
+    tgWorld world(config);
 
     // Second create the view
-    const double stepSize = 1.0/1000.0; //Seconds
+    const double stepSize = 1.0/2000.0; //Seconds
     tgSimViewGraphics view(world, stepSize);
 
     // Third create the simulation
@@ -59,13 +58,14 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 10;
-    NestedStructureTestModel* myModel = new NestedStructureTestModel(segments);
-    NestedStructureSineWaves* const pMuscleControl =
-      new NestedStructureSineWaves();
-    myModel->attach(pMuscleControl);
+    const int topSegments = 2;
+    const int bottomSegments = 1;
+    StandingHexagonalSpineTestModel* const myModel = new StandingHexagonalSpineTestModel(topSegments, bottomSegments);
     simulation.addModel(myModel);
-	
+
+    // Retrieves and prints the mass of the structure to the command line
+    myModel->getMass();
+
 	// Run until the user stops
     simulation.run();
 

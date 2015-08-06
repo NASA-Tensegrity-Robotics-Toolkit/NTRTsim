@@ -17,17 +17,16 @@
 */
 
 /**
- * @file AppNestedTetrahedrons.cpp
- * @brief Contains the definition function main() for the Nested Tetrahedrons
+ * @file App3_DOF_JointTest.cpp
+ * @brief Contains the definition function main() for the DOF_JointTestModel
  * application.
- * @author Brian Tietz
+ * @author Lauren Sharo
  * @copyright Copyright (C) 2014 NASA Ames Research Center
  * $Id$
  */
 
 // This application
-#include "NestedStructureTestModel.h"
-#include "NestedStructureSineWaves.h"
+#include "DOF_JointTestModel.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -44,10 +43,10 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppNestedStructureTest" << std::endl;
+    std::cout << "App3_DOF_JointTest" << std::endl;
 
     // First create the world
-    const tgWorld::Config config(0);//981); // gravity, cm/sec^2
+    const tgWorld::Config config(981); // gravity, cm/sec^2
     tgWorld world(config); 
 
     // Second create the view
@@ -59,13 +58,12 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 1;
-    NestedStructureTestModel* myModel = new NestedStructureTestModel(segments);
-    NestedStructureSineWaves* const pMuscleControl =
-      new NestedStructureSineWaves();
-    myModel->attach(pMuscleControl);
+    DOF_JointTestModel* myModel = new DOF_JointTestModel();;
     simulation.addModel(myModel);
 	
+    // Retrieves and prints the total mass of the structure
+    myModel->getMass();
+
 	// Run until the user stops
     simulation.run();
 

@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef NESTED_STRUCTURE_TEST_MODEL_H
-#define NESTED_STRUCTURE_TEST_MODEL_H
+#ifndef STANDING_HEXAGONAL_SPINE_TEST_MODEL_H
+#define STANDING_HEXAGONAL_SPINE_TEST_MODEL_H
 
 /**
- * @file NestedStructureTestModel.h
- * @brief Contains the definition of class NestedStructureTestModel
- * @author Brian Tietz
+ * @file StandingHexagonalSpineTestModel.h
+ * @brief Contains the definition of class StandingHexagonalSpineTestModel
+ * @author Lauren Sharo
  * $Id$
  */
 
@@ -37,13 +37,12 @@
 
 // Forward declarations
 class tgBasicActuator;
+class tgStructure;
 
 /**
- * The NestedStructureTestModel implements a tensegrity with rigid
- * tetrahedrons and six strings between segments, also known as
- * Tetraspine. 
+ * The StandingHexagonalSpineTestModel implements a tensegrity with.....
  */
-class NestedStructureTestModel: public tgSubject<NestedStructureTestModel>, public tgModel
+class StandingHexagonalSpineTestModel: public tgSubject<StandingHexagonalSpineTestModel>, public tgModel
 {
 public: 
 	
@@ -55,15 +54,17 @@ public:
 	/**
 	 * The only constructor. The model details are instantiated once
 	 * setup is called typically when the model is added to a simulation.
-	 * @param[in] segments, a positive integer dictating how many
-	 * rigid segments will be constructed. 
+	 * @param[in] topSegments, a positive integer dictating how many
+	 * rigid segments will be constructed on the top of the structure.
+	 * @param[in] bottomSegments, a positive integer dictating how many
+	 * rigid segments will be constructed on the bottom of the structure.
 	 */
-    NestedStructureTestModel(size_t segments);
+    StandingHexagonalSpineTestModel(size_t topSegments, size_t bottomSegments);
 	
 	/**
 	 * Nothing to do. Most functions already handled by tgModel::teardown
 	 */
-    virtual ~NestedStructureTestModel()
+    virtual ~StandingHexagonalSpineTestModel()
     {}
     
     /**
@@ -92,15 +93,30 @@ public:
     const std::vector<tgBasicActuator*>& getActuators (const std::string& key) const;
     
     /**
-     * Return a std::size_t indicating the number of segments in the 
-     * tetraSpine.
-     * @return a std::size_t with the value of m_segments
+     * Return a std::size_t indicating the number of top segments in the spine.
+     * @return a std::size_t with the value of m_topSegments
      */
-    size_t getSegments() const
+    size_t getTopSegments() const
     {
-        return m_segments;
+    	return m_topSegments;
     }
-    
+
+    /**
+     * Return a std::size_t indicating the number of bottom segments in the spine.
+     * @return a std::size_t with the value of m_bottomSegments
+     */
+    size_t getBottomSegments() const
+    {
+    	return m_bottomSegments;
+    }
+
+    /**
+     * Return a double indicating the total mass of the structure.
+     */
+    double getMass();
+
+    double getStartHeight();
+
 private:
 	
 	/**
@@ -116,9 +132,14 @@ private:
     ActuatorMap actuatorMap;
     
     /**
-     * The number of segments in the spine
+     * The number of top segments in the spine
      */
-    const size_t m_segments;
+    const size_t m_topSegments;
+
+    /**
+     * The number of bottom segments in the spine
+     */
+    const size_t m_bottomSegments;
 };
 
 #endif
