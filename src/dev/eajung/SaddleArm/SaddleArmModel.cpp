@@ -63,11 +63,13 @@ double pretension_olecranon;
 double pretension_anconeus;
 double pretension_brachioradialis;
 double pretension_support;
+double pretension_tricep;
+double pretension_bicep; 
 bool history;
 double maxTens;
 double targetVelocity;
 } c =
-{
+{ 
 0.05, // density (kg / length^3)
 0.8, // radius (length)
 3000.0, // stiffness (kg / sec^2)
@@ -81,6 +83,8 @@ double targetVelocity;
 3000.0/15.55, // pretension_anconeus (force), stiffness/initial length
 3000.0/262, // pretension_brachioradialis (force), stiffness/initial length
 30000.0/1, // pretension_support (force), stiffness/initial length
+30000.0/3.658, // pretension_tricep (force), stiffness/initial length
+30000.0/3.81, // pretension_bicep (force), stiffness/initial length
 false, // history (boolean)
 100000, // maxTens
 10000 // targetVelocity
@@ -183,11 +187,11 @@ s.addPair(1, 2, "rod");
 s.addPair(1, 11, "rod");
 
 // humerus
-s.addPair(3, 5, "humerus massless");
-s.addPair(4, 5, "humerus massless");
-s.addPair(5, 6, "humerus massless");
-s.addPair(6, 17, "humerus massless");
-s.addPair(6, 18, "humerus massless");
+s.addPair(3, 5, "rod");
+s.addPair(4, 5, "rod");
+s.addPair(5, 6, "rod");
+s.addPair(6, 17, "rod");
+s.addPair(6, 18, "rod");
 
 //shoulder
 s.addPair(19, 21, "humerus massless");
@@ -238,12 +242,12 @@ s.addPair(18, 21, "olecranon muscle");
 s.addPair(18, 20, "olecranon muscle");
 
 //Tricep Muscles (muscles need to change)
-s.addPair(2, 21, "olecranon muscle");
-s.addPair(2, 6, "olecranon muscle");
+s.addPair(2, 21, "tricep muscle");
+s.addPair(2, 6, "tricep muscle");
 
 //Bicep Muscles (muscles need to change)
-s.addPair(12, 26, "olecranon muscle");
-s.addPair(12, 6, "olecranon muscle");
+s.addPair(12, 26, "bicep muscle");
+s.addPair(12, 6, "bicep muscle");
 
 
 }
@@ -265,11 +269,17 @@ void SaddleArmModel::setup(tgWorld& world)
 {
 const tgRod::Config rodConfig(c.radius, c.density, c.friction, c.rollFriction, c.restitution);
 const tgRod::Config rodConfigMassless(c.radius, 0.00/*c.density*/, c.friction, c.rollFriction, c.restitution);
+
 /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
 tgBasicActuator::Config olecranonMuscleConfig(c.stiffness, c.damping, c.pretension_olecranon, c.history, c.maxTens, c.targetVelocity);
 tgBasicActuator::Config anconeusMuscleConfig(c.stiffness, c.damping, c.pretension_anconeus, c.history, c.maxTens, c.targetVelocity);
 tgBasicActuator::Config brachioradialisMuscleConfig(c.stiffness, c.damping, c.pretension_brachioradialis, c.history, c.maxTens, c.targetVelocity);
 tgBasicActuator::Config supportstringMuscleConfig(c.stiffness, c.damping, c.pretension_support, c.history, c.maxTens, c.targetVelocity);
+
+//added 8/7/15
+tgBasicActuator::Config tricepMuscleConfig(c.stiffness, c.damping, c.pretension_tricep, c.history, c.maxTens, c.targetVelocity);
+tgBasicActuator::Config bicepMuscleConfig(c.stiffness, c.damping, c.pretension_bicep, c.history, c.maxTens, c.targetVelocity);
+
 // Start creating the structure
 tgStructure s;
 addNodes(s);
@@ -286,6 +296,11 @@ spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfi
 spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
 spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
 spec.addBuilder("support muscle", new tgBasicActuatorInfo(supportstringMuscleConfig));
+
+//added 8/7/15
+spec.addBuilder("tricep muscle", new tgBasicActuatorInfo(tricepMuscleConfig));
+spec.addBuilder("bicep muscle", new tgBasicActuatorInfo(bicepMuscleConfig));
+
 // Create your structureInfo
 tgStructureInfo structureInfo(s, spec);
 // Use the structureInfo to build ourselves
