@@ -17,15 +17,15 @@
 */
 
 /**
- * @file AppScarrArm.cpp
+ * @file AppUpperLimb.cpp
  * @brief Contains the definition function main() for the tensegrity arm based upon the designs of Graham Scarr
  * application.
  * $Id$
  */
 
 // This application
-#include "ScarrArmModel.h"
-#include "ScarrArmController.h"
+#include "UpperLimbModel.h"
+#include "UpperLimbController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -44,7 +44,7 @@
  * @return 0
  */
 int main(int argc, char** argv) {
-    std::cout << "AppScarrArm" << std::endl;
+    std::cout << "AppUpperLimb" << std::endl;
 
     // First create the ground and world
     
@@ -74,10 +74,10 @@ int main(int argc, char** argv) {
     tgSimulation simulation(view);
 
     // Fourth create the models
-    ScarrArmModel* const myModel = new ScarrArmModel();
+    UpperLimbModel* const myModel = new UpperLimbModel();
 
     // Fifth, select the controller to use. Uncomment desired controller.
-    ScarrArmController* const pTC = new ScarrArmController(2.5, timestep_physics);
+    UpperLimbController* const pTC = new UpperLimbController(2.5, timestep_physics);
 
     // Sixth, attach the controller to the model and add the model to the simulation
     myModel->attach(pTC);
