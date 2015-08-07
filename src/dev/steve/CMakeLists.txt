@@ -12,6 +12,12 @@ add_executable(AppScarrArm
     ScarrArm/AppScarrArm.cpp
 )
 
+add_executable(AppUpperArm
+    UpperLimb/UpperLimbModel.cpp
+    UpperLimb/UpperLimbController.cpp
+    UpperLimb/AppUpperLimb.cpp
+)
+
 file(COPY Escape_T6/Config.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(AppEscape_T6
