@@ -64,7 +64,8 @@ double pretension_anconeus;
 double pretension_brachioradialis;
 double pretension_support;
 double pretension_tricep;
-double pretension_bicep; 
+double pretension_bicep;
+double pretension_deltoid; 
 bool history;
 double maxTens;
 double targetVelocity;
@@ -83,8 +84,9 @@ double targetVelocity;
 3000.0/15.55, // pretension_anconeus (force), stiffness/initial length
 3000.0/262, // pretension_brachioradialis (force), stiffness/initial length
 30000.0/1, // pretension_support (force), stiffness/initial length
-30000.0/3.658, // pretension_tricep (force), stiffness/initial length
-30000.0/3.81, // pretension_bicep (force), stiffness/initial length
+3000.0/3.658, // pretension_tricep (force), stiffness/initial length
+3000.0/3.81, // pretension_bicep (force), stiffness/initial length
+3000.0/1.11, // pretension_deltoid (force), stiffness/initial length
 false, // history (boolean)
 100000, // maxTens
 10000 // targetVelocity
@@ -145,6 +147,7 @@ nodePositions.push_back(btVector3(-f, c+2, 0)); // 16
 
 
 //Added 7/30/15
+
 
 //Additional Humerus Nodes to help create saddle 
 nodePositions.push_back(btVector3(0, c+2*a/3, g)); // 17
@@ -227,19 +230,20 @@ s.addPair(3, 13, "right anconeus muscle");
 s.addPair(4, 14, "left anconeus muscle");
 
 //added with shoulder 7/30/15
+//updated the deltoid muscles 8/9/15
 
 //Anchor muscles (muscles need to change)
-s.addPair(26, 17, "olecranon muscle");
-s.addPair(26, 18, "olecranon muscle");
-s.addPair(25, 6, "olecranon muscle");
-s.addPair(26, 6, "olecranon muscle");
-s.addPair(24, 6, "olecranon muscle");
+s.addPair(26, 17, "deltoid muscle");
+s.addPair(26, 18, "deltoid muscle");
+s.addPair(25, 6, "deltoid muscle");
+s.addPair(26, 6, "deltoid muscle");
+s.addPair(24, 6, "deltoid muscle");
 
 //Saddle muscles (muscles need to change)
-s.addPair(17, 21, "olecranon muscle");
-s.addPair(17, 19, "olecranon muscle");
-s.addPair(18, 21, "olecranon muscle"); 
-s.addPair(18, 20, "olecranon muscle");
+s.addPair(17, 21, "deltoid muscle");
+s.addPair(17, 19, "deltoid muscle");
+s.addPair(18, 21, "deltoid muscle"); 
+s.addPair(18, 20, "deltoid muscle");
 
 //Tricep Muscles (muscles need to change)
 s.addPair(2, 21, "tricep muscle");
@@ -280,6 +284,10 @@ tgBasicActuator::Config supportstringMuscleConfig(c.stiffness, c.damping, c.pret
 tgBasicActuator::Config tricepMuscleConfig(c.stiffness, c.damping, c.pretension_tricep, c.history, c.maxTens, c.targetVelocity);
 tgBasicActuator::Config bicepMuscleConfig(c.stiffness, c.damping, c.pretension_bicep, c.history, c.maxTens, c.targetVelocity);
 
+//added 8/9/15
+tgBasicActuator::Config deltoidMuscleConfig(c.stiffness, c.damping, c.pretension_deltoid, c.history, c.maxTens, c.targetVelocity);
+
+
 // Start creating the structure
 tgStructure s;
 addNodes(s);
@@ -300,6 +308,9 @@ spec.addBuilder("support muscle", new tgBasicActuatorInfo(supportstringMuscleCon
 //added 8/7/15
 spec.addBuilder("tricep muscle", new tgBasicActuatorInfo(tricepMuscleConfig));
 spec.addBuilder("bicep muscle", new tgBasicActuatorInfo(bicepMuscleConfig));
+
+//added 8/9/15
+spec.addBuilder("deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
 
 // Create your structureInfo
 tgStructureInfo structureInfo(s, spec);
