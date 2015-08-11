@@ -55,6 +55,7 @@ namespace
     {
         double density;
         double radius;
+	double radius_motor;
         double stiffness;
         double damping;
         double rod_length;
@@ -69,15 +70,16 @@ namespace
     } c =
    {
      0.688,    // density (kg / length^3)
-     0.31,     // radius (length)
+     0.127/2,     // radius (length) ** rod diameter / 2 **
+     0.56/2,     // radius (length) ** motor diameter / 2 **
      613.0,   // stiffness (kg / sec^2) was 1500
-     200.0,    // damping (kg / sec)
+     200.0/2,    // damping (kg / sec)
      6.5,     // rod_length (length)
      3.25,      // rod_space (length)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     2125.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -146,27 +148,27 @@ void v3Model::addNodes(tgStructure& s)
 void v3Model::addRods(tgStructure& s)
 {
     s.addPair( 0,  1, "rod");
-    s.addPair( 1,  2, "rod");
+    s.addPair( 1,  2, "motor");
     s.addPair( 2,  3, "rod");	
  
     s.addPair( 4,  5, "rod");
-    s.addPair( 5,  6, "rod");
+    s.addPair( 5,  6, "motor");
     s.addPair( 6,  7, "rod");
 
     s.addPair( 8,  9, "rod");
-    s.addPair( 9,  10, "rod");
+    s.addPair( 9,  10, "motor");
     s.addPair( 10,  11, "rod");
 
     s.addPair( 12,  13, "rod");
-    s.addPair( 13,  14, "rod");
+    s.addPair( 13,  14, "motor");
     s.addPair( 14,  15, "rod");
 
     s.addPair( 16,  17, "rod");
-    s.addPair( 17,  18, "rod");
+    s.addPair( 17,  18, "motor");
     s.addPair( 18,  19, "rod");
 
     s.addPair( 20,  21, "rod");
-    s.addPair( 21,  22, "rod");
+    s.addPair( 21,  22, "motor");
     s.addPair( 22,  23, "rod");
 }
 
@@ -213,7 +215,8 @@ void v3Model::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-    
+    const tgRod::Config motorConfig(c.radius_motor, c.density, c.friction, 
+				c.rollFriction, c.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 					    c.maxTens, c.targetVelocity);
@@ -237,6 +240,9 @@ void v3Model::setup(tgWorld& world)
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
+    // added 8/10/15 
+    spec.addBuilder("motor", new tgRodInfo(motorConfig));
+
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
