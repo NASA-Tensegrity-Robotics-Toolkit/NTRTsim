@@ -52,15 +52,15 @@ void SaddleArmController::onSetup(SaddleArmModel& subject) {
     const double brachioradialis_length = 12;
     const double anconeus_length        = 6;
     const double supportstring_length   = 0.5;
-    const double deltoid_length = 4;
-    const double bicep_length = 12;
-    const double tricep_length = 12;
+//    const double deltoid_length = 4;
+ //   const double bicep_length = 12;
+ //   const double tricep_length = 12;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
 	const std::vector<tgBasicActuator*> anconeus        = subject.find<tgBasicActuator>("anconeus");
 	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
 	const std::vector<tgBasicActuator*> supportstrings  = subject.find<tgBasicActuator>("support");
-	const std::vector<tgBasicActuator*> deltoid        = subject.find<tgBasicActuator>("deltoid");
+	//const std::vector<tgBasicActuator*> deltoid        = subject.find<tgBasicActuator>("deltoid");
 
 
 
@@ -95,7 +95,7 @@ void SaddleArmController::onSetup(SaddleArmModel& subject) {
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(deltoid_length, dt);
     }
-  */  
+  */ 
 
 }
 
