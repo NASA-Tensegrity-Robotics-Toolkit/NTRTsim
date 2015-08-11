@@ -240,10 +240,10 @@ s.addPair(26, 6, "deltoid muscle");
 s.addPair(24, 6, "deltoid muscle");
 
 //Saddle muscles (muscles need to change)
-s.addPair(17, 21, "deltoid muscle");
-s.addPair(17, 19, "deltoid muscle");
-s.addPair(18, 21, "deltoid muscle"); 
-s.addPair(18, 20, "deltoid muscle");
+s.addPair(17, 21, "right posterior deltoid muscle"); //posterior deltoid right/far
+s.addPair(17, 19, "right anterior deltoid muscle"); //anterior deltoid right/far
+s.addPair(18, 21, "left posterior deltoid muscle"); //posterior deltoid left/close
+s.addPair(18, 20, "left anterior deltoid muscle"); //anterior deltoid left/close
 
 //Tricep Muscles (muscles need to change)
 s.addPair(2, 21, "tricep muscle");
@@ -311,6 +311,13 @@ spec.addBuilder("bicep muscle", new tgBasicActuatorInfo(bicepMuscleConfig));
 
 //added 8/9/15
 spec.addBuilder("deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
+
+//added 8/10/15
+spec.addBuilder("right anterior deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
+spec.addBuilder("left anterior deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
+spec.addBuilder("right posterior deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
+spec.addBuilder("left posterior deltoid muscle", new tgBasicActuatorInfo(deltoidMuscleConfig));
+
 
 // Create your structureInfo
 tgStructureInfo structureInfo(s, spec);

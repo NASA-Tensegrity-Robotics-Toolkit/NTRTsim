@@ -23,6 +23,7 @@
 */
 // This application
 #include "SaddleArmModel.h"
+#include "SaddleArmController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -40,7 +41,7 @@
 * @return 0
 */
 int main(int argc, char** argv) {
-	std::cout << "AppSaddleArm" << std::endl;
+	std::cout << "AppSaddleArmNew" << std::endl;
 	// First create the ground and world
 	// Determine the angle of the ground in radians. All 0 is flat
 	const double yaw = 0.0;
@@ -71,9 +72,9 @@ int main(int argc, char** argv) {
 	SaddleArmModel* const myModel = new SaddleArmModel();
 
 	// Fifth, select the controller to use. Uncomment desired controller.
-	//SaddleArmController* const pTC = new SaddleArmController(2.5, timestep_physics);
+	SaddleArmController* const pTC = new SaddleArmController(2.5, timestep_physics);
 
-	//myModel->attach(pTC);
+	myModel->attach(pTC);
 	simulation.addModel(myModel);
 
 	// Run until the user stops
