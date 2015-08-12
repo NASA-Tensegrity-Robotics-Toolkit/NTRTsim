@@ -12,7 +12,7 @@ add_executable(AppScarrArm
     ScarrArm/AppScarrArm.cpp
 )
 
-add_executable(AppUpperArm
+add_executable(AppUpperLimb
     UpperLimb/UpperLimbModel.cpp
     UpperLimb/UpperLimbController.cpp
     UpperLimb/AppUpperLimb.cpp
