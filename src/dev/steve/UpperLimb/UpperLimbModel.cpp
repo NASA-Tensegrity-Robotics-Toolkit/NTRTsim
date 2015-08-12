@@ -104,43 +104,41 @@ UpperLimbModel::~UpperLimbModel() {}
 void UpperLimbModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 15 + 2; //2 for massless rod
+    const size_t nNodes = 14;
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
     const double a = 22 * scale; //ulnta distal width
     const double b = 334 * scale * bone_scale; //ulna length
-    const double c = 265 * scale * bone_scale; //humerus length //NB: in model, c==b
-    //const double d = 66 * scale; // humerus epicondylar width
-    //const double e = 246 * scale * bone_scale; //radius length
-    const double f = 25 * scale; // humerus head radius
+    const double c = 265 * scale * bone_scale; //humerus length
     const double g = 17 * scale; //ulna proximal width
-    const double x = a/2;
-    const double z = c/2;
 
     //Format: (x, z, y)
-    nodePositions.push_back(btVector3(g, 0, 0));
-    nodePositions.push_back(btVector3(0, -g, 0));
-    nodePositions.push_back(btVector3(-a/2, 0, 0));
+    nodePositions.push_back(btVector3(g, 0, 0)); //olecranon
+    nodePositions.push_back(btVector3(0, -g, 0)); //olecranon 
+    nodePositions.push_back(btVector3(-a/2, 0, 0)); //olecranon 
     nodePositions.push_back(btVector3(0, 0, g));
     nodePositions.push_back(btVector3(0, 0, -g));
     nodePositions.push_back(btVector3(0, g, 0));
     nodePositions.push_back(btVector3(0, c, 0));
-    nodePositions.push_back(btVector3(x, z, 0));
     nodePositions.push_back(btVector3(b+a/2, -g, 0));
-    nodePositions.push_back(btVector3(0, c+2, f));
-    nodePositions.push_back(btVector3(0, c+2, -f));
 
     //Added 6/17/15
     nodePositions.push_back(btVector3(a/2, -2*g, 0));
 
     //ulna and radius
-    nodePositions.push_back(btVector3(3*a/2, -g, 0));
+    nodePositions.push_back(btVector3(3*a/2, -g, 0)); //olecranon 
     nodePositions.push_back(btVector3(3*a/4, -g, g));
     nodePositions.push_back(btVector3(3*a/4, -g, -g));
 
-    nodePositions.push_back(btVector3(f, c+2, 0));
-    nodePositions.push_back(btVector3(-f, c+2, 0));
+    //top of humerus
+    nodePositions.push_back(btVector3(0,c+g,-g));
+    nodePositions.push_back(btVector3(0,c+g,g));/*
+    nodePositions.push_back(btVector3(,,));
+    nodePositions.push_back(btVector3(,,));
+    nodePositions.push_back(btVector3(,,));
+    nodePositions.push_back(btVector3(,,));
+    nodePositions.push_back(btVector3(,,));*/
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -149,19 +147,21 @@ void UpperLimbModel::addNodes(tgStructure& s) {
                   
 void UpperLimbModel::addRods(tgStructure& s) {   
     // ulna and radius
-    s.addPair(8,  12,  "rod");
-    s.addPair(12,  14,  "rod");
-    s.addPair(12,  13,  "rod");
+    s.addPair(7,  10,  "bone");
+    s.addPair(10,  12,  "bone");
+    s.addPair(10,  11,  "bone");
 
     //olecranon
-    s.addPair(0,  1,  "rod");
-    s.addPair(1,  2,  "rod");
-    s.addPair(1, 11,  "rod");
+    s.addPair(0,  1,  "bone");
+    s.addPair(1,  2,  "bone");
+    s.addPair(1, 9,  "bone");
 
     // humerus
     s.addPair(3,  5,  "humerus massless");
     s.addPair(4,  5,  "humerus massless"); 
     s.addPair(5,  6,  "humerus massless");
+    //s.addPair(6,  13,  "humerus massless");
+    //s.addPair(6,  14,  "humerus massless");
 }
 
 void UpperLimbModel::addMuscles(tgStructure& s) {
@@ -174,19 +174,19 @@ void UpperLimbModel::addMuscles(tgStructure& s) {
     s.addPair(2, 3, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(2, 4, "olecranon muscle"); //NB actually fascial tissue
     
-    s.addPair(0, 13, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 13, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(11, 13, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(0, 14, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 14, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(11, 14, "olecranon muscle"); //NB actually fascial tissue
-
+    s.addPair(0, 11, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 11, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(9, 11, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(0, 12, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(11, 12, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(1, 12, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(9, 12, "olecranon muscle"); //NB actually fascial tissue
+
+    s.addPair(0, 10, "olecranon muscle"); //NB actually fascial tissue
+    s.addPair(9, 10, "olecranon muscle"); //NB actually fascial tissue
     s.addPair(0, 5, "brachioradialis muscle");
     s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(3, 13, "right anconeus muscle");
-    s.addPair(4, 14, "left anconeus muscle");
+    s.addPair(3, 11, "right anconeus muscle");
+    s.addPair(4, 12, "left anconeus muscle");
 }
  
 /*
@@ -205,8 +205,8 @@ void UpperLimbModel::addMarkers(tgStructure &s) {
 */
  
 void UpperLimbModel::setup(tgWorld& world) {
-    const tgRod::Config rodConfig(cRod.radius, cRod.density, cRod.friction, cRod.rollFriction, cRod.restitution);
-    const tgRod::Config rodConfigMassless(cRod.radius, 0.00/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
+    const tgRod::Config boneConfig(cRod.radius, cRod.density, cRod.friction, cRod.rollFriction, cRod.restitution);
+    const tgRod::Config boneConfigMassless(cRod.radius, 0.00/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
 
     tgBasicActuator::Config olecranonMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_olecranon, 
@@ -230,8 +230,8 @@ void UpperLimbModel::setup(tgWorld& world) {
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("massless", new tgRodInfo(rodConfigMassless));
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
+    spec.addBuilder("bone", new tgRodInfo(boneConfig));
+    spec.addBuilder("massless", new tgRodInfo(boneConfigMassless));
     spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfig));
     spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
     spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
