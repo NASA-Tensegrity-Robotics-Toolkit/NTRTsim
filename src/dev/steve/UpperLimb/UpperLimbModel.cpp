@@ -71,7 +71,6 @@ namespace {
         double pretension_olecranon;
         double pretension_anconeus;
         double pretension_brachioradialis;
-        double pretension_support;
         bool   history;  
         double maxTens;
         double targetVelocity; 
@@ -86,7 +85,6 @@ namespace {
         3000.0/1,       // pretension_olecranon (force), stiffness/initial length
         3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
         3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
-        30000.0/1,      // pretension_support (force), stiffness/initial length 
         false,          // history (boolean)
         100000,         // maxTens
         10000,           // targetVelocity  
@@ -104,7 +102,7 @@ UpperLimbModel::~UpperLimbModel() {}
 void UpperLimbModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 14; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
+    const size_t nNodes = 19; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -112,34 +110,37 @@ void UpperLimbModel::addNodes(tgStructure& s) {
     const double c = 265 * scale * bone_scale; //humerus length
     const double g = 17 * scale; //ulna proximal width
     const double e = g/4;
+    const double f = c+7*e;
 
     //Format: (x, z, y)
-    // olecranon
+    // olecranon (0-3)
     nodePositions.push_back(btVector3(0, 0, 0));
     nodePositions.push_back(btVector3(-g, g, 0));
     nodePositions.push_back(btVector3(g, g, 0));
     nodePositions.push_back(btVector3(g, -g, 0));
     
-    // ulna-radius
+    // ulna-radius (4-7)
     nodePositions.push_back(btVector3(3*e, 0, g));
     nodePositions.push_back(btVector3(3*e, 0, -g));
     nodePositions.push_back(btVector3(7*e, 0, 0));
     nodePositions.push_back(btVector3(b+7*e, 0, 0));
 
-    // humerus
+    // humerus (8-13)
     nodePositions.push_back(btVector3(0, 3*e, g));
     nodePositions.push_back(btVector3(0, 3*e, -g));
     nodePositions.push_back(btVector3(0, 7*e, 0));
-    nodePositions.push_back(btVector3(0, c+7*e, 0));
+    nodePositions.push_back(btVector3(0, f, 0));
+    nodePositions.push_back(btVector3(0, f+g, g));
+    nodePositions.push_back(btVector3(0, f+g, -g));
 
-    //top of humerus
-    nodePositions.push_back(btVector3(0, c+7*e+g, g));
-    nodePositions.push_back(btVector3(0, c+7*e+g, -g));/*
-    nodePositions.push_back(btVector3(,,));
-    nodePositions.push_back(btVector3(,,));
-    nodePositions.push_back(btVector3(,,));
-    nodePositions.push_back(btVector3(,,));
-    nodePositions.push_back(btVector3(,,));*/
+    // clavicle (14-15)
+    nodePositions.push_back(btVector3(g, f+2*g, 0));
+    nodePositions.push_back(btVector3(2*g, f+2*g, 3*g));
+
+    // scapula (16-18)                                  
+    nodePositions.push_back(btVector3(-g, f+2*g, 0));
+    nodePositions.push_back(btVector3(-g, f+2*g, 3*g));
+    nodePositions.push_back(btVector3(-g, f-g, 3*g));
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -147,22 +148,30 @@ void UpperLimbModel::addNodes(tgStructure& s) {
 }
                   
 void UpperLimbModel::addRods(tgStructure& s) {   
-    //olecranon
-    s.addPair(0, 1, "bone");
-    s.addPair(0, 2, "bone");
-    s.addPair(0, 3, "bone");
+    // olecranon
+    s.addPair(0, 1, "olecranon bone");
+    s.addPair(0, 2, "olecranon bone");
+    s.addPair(0, 3, "olecranon bone");
 
     // ulna and radius
-    s.addPair(4, 6,  "bone");
-    s.addPair(5, 6,  "bone");
-    s.addPair(6, 7,  "bone");
+    s.addPair(4, 6,  "radiusulna bone");
+    s.addPair(5, 6,  "radiusulna bone");
+    s.addPair(6, 7,  "radiusulna bone");
 
     // humerus
-    s.addPair(8, 10,  "humerus massless");
-    s.addPair(9, 10,  "humerus massless"); 
-    s.addPair(10, 11,  "humerus massless");
-    s.addPair(11, 12,  "humerus massless");
-    s.addPair(11, 13,  "humerus massless");
+    s.addPair(8, 10, "humerus bone");
+    s.addPair(9, 10, "humerus bone"); 
+    s.addPair(10, 11, "humerus bone");
+    s.addPair(11, 12, "humerus bone");
+    s.addPair(11, 13, "humerus bone");
+
+    // clavicle
+    s.addPair(14, 15, "clavicle massless");
+
+    // scapula
+    s.addPair(16, 17, "scapula massless");
+    s.addPair(16, 18, "scapula massless");
+    s.addPair(17, 18, "scapula massless");
 }
 
 void UpperLimbModel::addMuscles(tgStructure& s) {
@@ -193,6 +202,14 @@ void UpperLimbModel::addMuscles(tgStructure& s) {
     
     s.addPair(10, 1, "olecranon muscle");
     s.addPair(10, 2, "brachioradialis muscle");
+
+    // humerus to clavicle
+    s.addPair(12, 14, "olecranon muscle"); //TODO: Change muscle names in entire function
+    s.addPair(13, 14, "olecranon muscle");
+
+    // humerus to scapula
+    s.addPair(12, 16, "olecranon muscle");
+    s.addPair(13, 16, "olecranon muscle");
 }
  
 /*
@@ -221,8 +238,6 @@ void UpperLimbModel::setup(tgWorld& world) {
                                                  cCable.history, cCable.maxTens, cCable.targetVelocity);
     tgBasicActuator::Config brachioradialisMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_brachioradialis, 
                                                         cCable.history, cCable.maxTens, cCable.targetVelocity);
-    tgBasicActuator::Config supportstringMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_support, 
-                                                      cCable.history, cCable.maxTens, cCable.targetVelocity);
             
     // Start creating the structure
     tgStructure s;
@@ -231,17 +246,16 @@ void UpperLimbModel::setup(tgWorld& world) {
     addMuscles(s);
     
     // Move the arm out of the ground
-    btVector3 offset(0.0, 50.0, 0.0);
+    btVector3 offset(0.0, 60.0, 0.0);
     s.move(offset);
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("bone", new tgRodInfo(boneConfig));
     spec.addBuilder("massless", new tgRodInfo(boneConfigMassless));
+    spec.addBuilder("bone", new tgRodInfo(boneConfig));
     spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfig));
     spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
     spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
-    spec.addBuilder("support muscle", new tgBasicActuatorInfo(supportstringMuscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
