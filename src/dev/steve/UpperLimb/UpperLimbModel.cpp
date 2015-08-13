@@ -104,36 +104,37 @@ UpperLimbModel::~UpperLimbModel() {}
 void UpperLimbModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 14;
+    const size_t nNodes = 14; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
-    const double a = 22 * scale; //ulnta distal width
     const double b = 334 * scale * bone_scale; //ulna length
     const double c = 265 * scale * bone_scale; //humerus length
     const double g = 17 * scale; //ulna proximal width
+    const double e = g/4;
 
     //Format: (x, z, y)
-    nodePositions.push_back(btVector3(g, 0, 0)); //olecranon
-    nodePositions.push_back(btVector3(0, -g, 0)); //olecranon 
-    nodePositions.push_back(btVector3(-a/2, 0, 0)); //olecranon 
-    nodePositions.push_back(btVector3(0, 0, g));
-    nodePositions.push_back(btVector3(0, 0, -g));
-    nodePositions.push_back(btVector3(0, g, 0));
-    nodePositions.push_back(btVector3(0, c, 0));
-    nodePositions.push_back(btVector3(b+a/2, -g, 0));
+    // olecranon
+    nodePositions.push_back(btVector3(0, 0, 0));
+    nodePositions.push_back(btVector3(-g, g, 0));
+    nodePositions.push_back(btVector3(g, g, 0));
+    nodePositions.push_back(btVector3(g, -g, 0));
+    
+    // ulna-radius
+    nodePositions.push_back(btVector3(3*e, 0, g));
+    nodePositions.push_back(btVector3(3*e, 0, -g));
+    nodePositions.push_back(btVector3(7*e, 0, 0));
+    nodePositions.push_back(btVector3(b+7*e, 0, 0));
 
-    //Added 6/17/15
-    nodePositions.push_back(btVector3(a/2, -2*g, 0));
-
-    //ulna and radius
-    nodePositions.push_back(btVector3(3*a/2, -g, 0)); //olecranon 
-    nodePositions.push_back(btVector3(3*a/4, -g, g));
-    nodePositions.push_back(btVector3(3*a/4, -g, -g));
+    // humerus
+    nodePositions.push_back(btVector3(0, 3*e, g));
+    nodePositions.push_back(btVector3(0, 3*e, -g));
+    nodePositions.push_back(btVector3(0, 7*e, 0));
+    nodePositions.push_back(btVector3(0, c+7*e, 0));
 
     //top of humerus
-    nodePositions.push_back(btVector3(0,c+g,-g));
-    nodePositions.push_back(btVector3(0,c+g,g));/*
+    nodePositions.push_back(btVector3(0, c+7*e+g, g));
+    nodePositions.push_back(btVector3(0, c+7*e+g, -g));/*
     nodePositions.push_back(btVector3(,,));
     nodePositions.push_back(btVector3(,,));
     nodePositions.push_back(btVector3(,,));
@@ -146,47 +147,52 @@ void UpperLimbModel::addNodes(tgStructure& s) {
 }
                   
 void UpperLimbModel::addRods(tgStructure& s) {   
-    // ulna and radius
-    s.addPair(7,  10,  "bone");
-    s.addPair(10,  12,  "bone");
-    s.addPair(10,  11,  "bone");
-
     //olecranon
-    s.addPair(0,  1,  "bone");
-    s.addPair(1,  2,  "bone");
-    s.addPair(1, 9,  "bone");
+    s.addPair(0, 1, "bone");
+    s.addPair(0, 2, "bone");
+    s.addPair(0, 3, "bone");
+
+    // ulna and radius
+    s.addPair(4, 6,  "bone");
+    s.addPair(5, 6,  "bone");
+    s.addPair(6, 7,  "bone");
 
     // humerus
-    s.addPair(3,  5,  "humerus massless");
-    s.addPair(4,  5,  "humerus massless"); 
-    s.addPair(5,  6,  "humerus massless");
-    //s.addPair(6,  13,  "humerus massless");
-    //s.addPair(6,  14,  "humerus massless");
+    s.addPair(8, 10,  "humerus massless");
+    s.addPair(9, 10,  "humerus massless"); 
+    s.addPair(10, 11,  "humerus massless");
+    s.addPair(11, 12,  "humerus massless");
+    s.addPair(11, 13,  "humerus massless");
 }
 
 void UpperLimbModel::addMuscles(tgStructure& s) {
     const std::vector<tgStructure*> children = s.getChildren();
 
-    s.addPair(0, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(0, 4, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 4, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(2, 3, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(2, 4, "olecranon muscle"); //NB actually fascial tissue
-    
-    s.addPair(0, 11, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 11, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(9, 11, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(0, 12, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(1, 12, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(9, 12, "olecranon muscle"); //NB actually fascial tissue
+    // ulna-radius to olecranon
+    s.addPair(6, 2, "olecranon muscle");
+    s.addPair(6, 3, "olecranon muscle");
 
-    s.addPair(0, 10, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(9, 10, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(0, 5, "brachioradialis muscle");
-    s.addPair(2, 5, "olecranon muscle"); //NB actually fascial tissue
-    s.addPair(3, 11, "right anconeus muscle");
-    s.addPair(4, 12, "left anconeus muscle");
+    s.addPair(4, 0, "olecranon muscle");
+    s.addPair(4, 2, "olecranon muscle");
+    s.addPair(4, 3, "olecranon muscle");
+    s.addPair(4, 8, "right anocneus  muscle");
+    
+    s.addPair(5, 0, "olecranon muscle");
+    s.addPair(5, 2, "olecranon muscle");
+    s.addPair(5, 3, "olecranon muscle");
+    s.addPair(5, 9, "left anconeus muscle");
+    
+    // humerus to olecranon
+    s.addPair(8, 0, "olecranon muscle");
+    s.addPair(8, 1, "olecranon muscle");
+    s.addPair(8, 2, "olecranon muscle");
+    
+    s.addPair(9, 0, "olecranon muscle");
+    s.addPair(9, 1, "olecranon muscle");
+    s.addPair(9, 2, "olecranon muscle");
+    
+    s.addPair(10, 1, "olecranon muscle");
+    s.addPair(10, 2, "brachioradialis muscle");
 }
  
 /*
