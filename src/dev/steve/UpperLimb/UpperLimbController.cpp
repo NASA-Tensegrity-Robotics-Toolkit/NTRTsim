@@ -48,6 +48,29 @@ UpperLimbController::UpperLimbController(const double initialLength, double time
 //Fetch all the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
 	this->m_totalTime=0.0;
+    initializeNeuralNet(subject);
+    initializeMusclePretensions(subject);
+}
+
+// Set target length of each muscle, then move motors accordingly
+void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
+    // Update controller's internal time
+    if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
+    m_totalTime+=dt;
+
+    setBrachioradialisTargetLength(subject, dt); //pitch
+    setAnconeusTargetLength(subject, dt);        //yaw
+    moveAllMotors(subject, dt);
+    //updateActions(dt);
+}
+
+void UpperLimbController::initializeNeuralNet(UpperLimbModel& subject) {
+    this->nInputNeurons = 3; //(x, y, z) position of end-effector TODO: add velocity
+    this->nHiddenNeurons = 10;
+    this->nOutputNeurons = subject.getAllMuscles().size(); // Initially, one output for every muscle
+}
+
+void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
     const double olecranonfascia_length = 4;
     const double brachioradialis_length = 12;
     const double anconeus_length        = 6;
@@ -74,18 +97,6 @@ void UpperLimbController::onSetup(UpperLimbModel& subject) {
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(brachioradialis_length, dt);
     }
-}
-
-// Set target length of each muscle, then move motors accordingly
-void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
-    // Update controller's internal time
-    if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
-    m_totalTime+=dt;
-
-    setBrachioradialisTargetLength(subject, dt); //pitch
-    setAnconeusTargetLength(subject, dt);        //yaw
-    moveAllMotors(subject, dt);
-    //updateActions(dt);
 }
  
 void UpperLimbController::setBrachioradialisTargetLength(UpperLimbModel& subject, double dt) {

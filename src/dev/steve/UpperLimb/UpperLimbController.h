@@ -50,7 +50,6 @@ public:
 	
   /**
    * Construct a UpperLimbController with the initial preferred length.
-   *
    */
   
   // Note that currently this is calibrated for decimeters.
@@ -60,23 +59,25 @@ public:
    * Nothing to delete, destructor must be virtual
    */
   virtual ~UpperLimbController() { }
-
   virtual void onSetup(UpperLimbModel& subject);
-    
   virtual void onStep(UpperLimbModel& subject, double dt);
 
 protected:
 
   virtual vector< vector <double> > transformActions(vector< vector <double> > act);
-
   virtual void applyActions (UpperLimbModel& subject, vector< vector <double> > act);
 
 private:
   double m_initialLengths;
   double m_totalTime;
   double dt;
+  size_t nInputNeurons;
+  size_t nHiddenNeurons; // One hidden layer
+  size_t nOutputNeurons;
   AnnealAdapter evolutionAdapter;
     
+  void initializeNeuralNet(UpperLimbModel& subject);
+  void initializeMusclePretensions(UpperLimbModel& subject);
   void setBrachioradialisTargetLength(UpperLimbModel& subject, double dt);
   void setAnconeusTargetLength(UpperLimbModel& subject, double dt);
   void moveAllMotors(UpperLimbModel& subject, double dt);
