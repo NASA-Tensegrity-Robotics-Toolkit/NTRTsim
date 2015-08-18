@@ -51,12 +51,10 @@ void UpperLimbController::onSetup(UpperLimbModel& subject) {
     const double olecranonfascia_length = 4;
     const double brachioradialis_length = 12;
     const double anconeus_length        = 6;
-    const double supportstring_length   = 0.5;
 
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
 	const std::vector<tgBasicActuator*> anconeus        = subject.find<tgBasicActuator>("anconeus");
 	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
-	const std::vector<tgBasicActuator*> supportstrings  = subject.find<tgBasicActuator>("support");
 
     for (size_t i=0; i<olecranonfascia.size(); i++) {
 		tgBasicActuator * const pMuscle = olecranonfascia[i];
@@ -75,13 +73,6 @@ void UpperLimbController::onSetup(UpperLimbModel& subject) {
 		tgBasicActuator * const pMuscle = brachioradialis[i];
 		assert(pMuscle != NULL);
 		pMuscle->setControlInput(brachioradialis_length, dt);
-    }
-    
-    for (size_t i=0; i<supportstrings.size(); i++) {
-		tgBasicActuator * const pMuscle = supportstrings[i];
-		assert(pMuscle != NULL);
-		pMuscle->setControlInput(supportstring_length, dt);
-        cout << "string " << i << "\n";
     }
 }
 
