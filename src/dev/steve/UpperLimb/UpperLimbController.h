@@ -53,7 +53,7 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-	UpperLimbController(const double prefLength, double timestep);
+  UpperLimbController(const double prefLength, double timestep);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -71,15 +71,23 @@ private:
   double m_initialLengths;
   double m_totalTime;
   double dt;
+
   size_t nInputNeurons;
-  size_t nHiddenNeurons; // One hidden layer
-  size_t nOutputNeurons;
+  size_t nHiddenNeurons;
+  size_t nOutputNeurons; 
+  size_t nWeightsInput;  //synapses between input and hidden layer
+  size_t nWeightsOutput; //synapses between hidden and output layer
+  std::vector<double> inputLayer;
+  //std::vector< std::vector<double> > hiddenLayer; // Use instead for deep learning
+  std::vector<double> hiddenLayer;
+  std::vector<double> outputLayer;
+  std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
+
   AnnealAdapter evolutionAdapter;
     
   void initializeNeuralNet(UpperLimbModel& subject);
   void initializeMusclePretensions(UpperLimbModel& subject);
-  void setBrachioradialisTargetLength(UpperLimbModel& subject, double dt);
-  void setAnconeusTargetLength(UpperLimbModel& subject, double dt);
+  void setTargetLengths(UpperLimbModel& subject, double dt);
   void moveAllMotors(UpperLimbModel& subject, double dt);
   void updateActions(UpperLimbModel& subject, double dt);
 };
