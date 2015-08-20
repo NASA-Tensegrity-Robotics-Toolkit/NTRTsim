@@ -83,21 +83,34 @@ void UpperLimbController::initializeNeuralNet(UpperLimbModel& subject) {
 }
 
 // Import random values [0,1] to set as weights in the NN
-// TODO: Import from file
 void UpperLimbController::initializeNeuralNetWeights() {
     weights.resize(2); // 1+nHiddenLayers
     weights[0].resize(nWeightsInput);
     weights[1].resize(nWeightsOutput);
+    importWeights();
+}
 
-    double x = 0.5;
-    for (size_t i = 0; i < nWeightsInput; i++) {
-        weights[0][i] = x;
-        std::cout << "weights[0][" << i << "] = " << weights[0][i] << std::endl;
-    }
+// Import (nWeightsInput + nWeightsOutput) values to be used in the NN
+void UpperLimbController::importWeights() {
+    std::ifstream f("weights.dat", std::ifstream::in);
 
-    for (size_t i = 0; i < nWeightsOutput; i++) {
-        weights[1][i] = x;
-        std::cout << "weights[1][" << i << "] = " << weights[1][i] << std::endl;
+    if (f.is_open()) {
+        std::cout << "'weights.dat' opened'" << std::endl;
+        std::string s;
+        double w = 0;
+
+        for (size_t i=0; getline(f, s); i++) {
+            w = atof(s.c_str());
+            if(i<nWeightsInput) {
+                weights[0][i] = w;
+            } else {
+                weights[1][i-nWeightsInput] = w;
+            }
+        }
+        f.close();
+    } else {
+        std::cerr << "ERROR: Weight parameters file could not be opened" << std::endl;
+        exit(1);
     }
 }
 
@@ -138,7 +151,6 @@ void UpperLimbController::populateOutputLayer() {
     // Sense end effector position for the input layer
     for (size_t i=0; i<nInputNeurons; i++) {
         inputLayer[i] = x;
-        std::cout << "inpuLayer[" << i << "]: " << inputLayer[i] << std::endl;
     }
     // Populate hidden layer neurons
     for (size_t j=0; j<nHiddenNeurons; j++) {

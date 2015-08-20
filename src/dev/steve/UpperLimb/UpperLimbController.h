@@ -70,8 +70,8 @@ private:
   size_t nInputNeurons;
   size_t nHiddenNeurons;
   size_t nOutputNeurons; 
-  size_t nWeightsInput;  //synapses between input and hidden layer
-  size_t nWeightsOutput; //synapses between hidden and output layer
+  size_t nWeightsInput;  //nSynapses between input and hidden layer
+  size_t nWeightsOutput; //nSynapses between hidden and output layer
   std::vector<double> inputLayer;
   //std::vector< std::vector<double> > hiddenLayer; // Use instead for deep learning
   std::vector<double> hiddenLayer;
@@ -81,6 +81,7 @@ private:
     
   void initializeNeuralNet(UpperLimbModel& subject);
   void initializeNeuralNetWeights();
+  void importWeights();
   void initializeMusclePretensions(UpperLimbModel& subject);
   void populateOutputLayer();
   void setTargetLengths(UpperLimbModel& subject, double dt);
