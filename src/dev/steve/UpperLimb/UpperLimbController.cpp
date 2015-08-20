@@ -60,7 +60,7 @@ void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
     if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
     m_totalTime+=dt;
 
-    //populateOutputLayer();
+    populateOutputLayer();
     setTargetLengths(subject, dt);
     moveAllMotors(subject, dt);
 }
@@ -76,6 +76,9 @@ void UpperLimbController::initializeNeuralNet(UpperLimbModel& subject) {
     this->nOutputNeurons = subject.getAllMuscles().size();
     this->nWeightsInput = nInputNeurons * nHiddenNeurons;
     this->nWeightsOutput = nOutputNeurons * nHiddenNeurons;
+    this->inputLayer.resize(nInputNeurons);
+    this->hiddenLayer.resize(nHiddenNeurons);
+    this->outputLayer.resize(nOutputNeurons);
     initializeNeuralNetWeights();
 }
 
@@ -134,9 +137,9 @@ void UpperLimbController::populateOutputLayer() {
 
     // Sense end effector position for the input layer
     for (size_t i=0; i<nInputNeurons; i++) {
-        this->inputLayer[i] = x;
+        inputLayer[i] = x;
+        std::cout << "inpuLayer[" << i << "]: " << inputLayer[i] << std::endl;
     }
-
     // Populate hidden layer neurons
     for (size_t j=0; j<nHiddenNeurons; j++) {
         sum = 0;
@@ -153,7 +156,7 @@ void UpperLimbController::populateOutputLayer() {
             sum += hiddenLayer[j] * weights[1][j*nOutputNeurons + k];
         }
         outputLayer[k] = sigmoid(sum);
-    }                      
+    }
 }
 
 void UpperLimbController::setTargetLengths(UpperLimbModel& subject, double dt) {
