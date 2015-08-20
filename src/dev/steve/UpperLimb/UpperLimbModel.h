@@ -132,7 +132,6 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    //const size_t nMuscles;
     std::vector<tgBasicActuator*> allMuscles;
 	std::vector<btVector3> nodePositions;
 };
