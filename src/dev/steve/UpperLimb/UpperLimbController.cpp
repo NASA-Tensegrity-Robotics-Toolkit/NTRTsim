@@ -32,42 +32,70 @@
 #include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <cassert>
+#include <math.h>
 #include <stdexcept>
 #include <vector>
 
-# define M_PI 3.14159265358979323846 
+# define PI 3.14159265358979323846 
+# define E 2.71828182845904523536
 
 using namespace std;
 
-//Constructor using the model subject and a single pref length for all muscles.
 UpperLimbController::UpperLimbController(const double initialLength, double timestep) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
-    dt(timestep) {}
+    dt(timestep) 
+{}
 
 //Fetch all the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
-	this->m_totalTime=0.0;
     initializeNeuralNet(subject);
     initializeMusclePretensions(subject);
+	this->m_totalTime=0.0;
 }
 
-// Set target length of each muscle, then move motors accordingly
+// Set target length of each muscle via NN, then move motors accordingly
 void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
     // Update controller's internal time
     if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
     m_totalTime+=dt;
 
-    setBrachioradialisTargetLength(subject, dt); //pitch
-    setAnconeusTargetLength(subject, dt);        //yaw
+    //populateOutputLayer();
+    setTargetLengths(subject, dt);
     moveAllMotors(subject, dt);
-    //updateActions(dt);
 }
 
+/**
+ * Create a Neural Net for the controller with a single, fully connected hidden layer
+ * that links end-effector position (inputs) to target lengths for muscles (outputs)
+ * Initialize all weights as values [0,1] randomly and uniformly 
+ */
 void UpperLimbController::initializeNeuralNet(UpperLimbModel& subject) {
-    this->nInputNeurons = 3; //(x, y, z) position of end-effector TODO: add velocity
+    this->nInputNeurons = 3; //(x, y, z) of end-effector TODO: add velocity
     this->nHiddenNeurons = 10;
-    this->nOutputNeurons = subject.getAllMuscles().size(); // Initially, one output for every muscle
+    this->nOutputNeurons = subject.getAllMuscles().size();
+    this->nWeightsInput = nInputNeurons * nHiddenNeurons;
+    this->nWeightsOutput = nOutputNeurons * nHiddenNeurons;
+    initializeNeuralNetWeights();
+}
+
+// Import random values [0,1] to set as weights in the NN
+// TODO: Import from file
+void UpperLimbController::initializeNeuralNetWeights() {
+    weights.resize(2); // 1+nHiddenLayers
+    weights[0].resize(nWeightsInput);
+    weights[1].resize(nWeightsOutput);
+
+    double x = 0.5;
+    for (size_t i = 0; i < nWeightsInput; i++) {
+        weights[0][i] = x;
+        std::cout << "weights[0][" << i << "] = " << weights[0][i] << std::endl;
+    }
+
+    for (size_t i = 0; i < nWeightsOutput; i++) {
+        weights[1][i] = x;
+        std::cout << "weights[1][" << i << "] = " << weights[1][i] << std::endl;
+    }
 }
 
 void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
@@ -98,68 +126,47 @@ void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
 		pMuscle->setControlInput(brachioradialis_length, dt);
     }
 }
- 
-void UpperLimbController::setBrachioradialisTargetLength(UpperLimbModel& subject, double dt) {
-    const double mean_brachioradialis_length = 12; //TODO: define according to vars
-    double newLength = 0;
-    const double amplitude    = mean_brachioradialis_length/1;
-    const double angular_freq = 2;
-    const double phase = 0;
-    const double dcOffset     = mean_brachioradialis_length;
-    const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
 
-    for (size_t i=0; i<brachioradialis.size(); i++) {
-		tgBasicActuator * const pMuscle = brachioradialis[i];
-		assert(pMuscle != NULL);
-        cout <<"t: " << pMuscle->getCurrentLength() << endl;
-        //newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
-        newLength = dcOffset - amplitude*m_totalTime/5;
-        if(newLength < dcOffset/8) {
-            newLength = dcOffset/8;
-        }
+// Populate outputLayer by feeding the inputLayer through the NN
+void UpperLimbController::populateOutputLayer() {
+    double sum = 0;
+    double x = 0.25; //TODO: make x meaningful odometry data
 
-        if(m_totalTime > 15) {
-            m_totalTime = 0;
-        }
-        std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
-        std::cout<<"m_totalTime: " << m_totalTime << "\n";
-		pMuscle->setControlInput(newLength, dt);
-        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+    // Sense end effector position for the input layer
+    for (size_t i=0; i<nInputNeurons; i++) {
+        this->inputLayer[i] = x;
     }
+
+    // Populate hidden layer neurons
+    for (size_t j=0; j<nHiddenNeurons; j++) {
+        sum = 0;
+        for (size_t i=0; i<nInputNeurons; i++) {
+            sum += inputLayer[i] * weights[0][i*nHiddenNeurons + j];
+        }
+        hiddenLayer[j] = sigmoid(sum);
+    }
+     
+    // Populate output layer neurons
+    for (size_t k=0; k<nOutputNeurons; k++) {
+        sum = 0;
+        for (size_t j=0; j<nHiddenNeurons; j++) {
+            sum += hiddenLayer[j] * weights[1][j*nOutputNeurons + k];
+        }
+        outputLayer[k] = sigmoid(sum);
+    }                      
 }
 
-void UpperLimbController::setAnconeusTargetLength(UpperLimbModel& subject, double dt) {
-    const double mean_anconeus_length = 6; //TODO: define according to vars
+void UpperLimbController::setTargetLengths(UpperLimbModel& subject, double dt) {
+    const std::vector<tgBasicActuator*> allMuscles = subject.getAllMuscles();
     double newLength = 0;
-    const double amplitude = mean_anconeus_length/1;
-    const double angular_freq = 2;
-    const double phaseleft = 0;
-    const double phaseright = phaseleft + M_PI;
-    const double dcOffset = mean_anconeus_length;
-    const std::vector<tgBasicActuator*> anconeusleft = subject.find<tgBasicActuator>("right anconeus");
-    const std::vector<tgBasicActuator*> anconeusright = subject.find<tgBasicActuator>("left anconeus");
 
-    for (size_t i=0; i<anconeusleft.size(); i++) {
-        tgBasicActuator * const pMuscle = anconeusleft[i];
-        assert(pMuscle != NULL);
-        if(m_totalTime > 5) {
-            newLength = amplitude * sin(angular_freq * m_totalTime + phaseleft) + dcOffset;
-        } else {
-            newLength = dcOffset;
-        }
-        pMuscle->setControlInput(newLength, dt);
+    for (size_t i=0; i<allMuscles.size(); i++) {
+        //newLength = scale * outputLayer[i];
+        newLength = 5;
+        tgBasicActuator* const pMuscle = allMuscles[i]; 
+		assert(pMuscle != NULL);
+		pMuscle->setControlInput(newLength, dt);
     }
-
-    for (size_t i=0; i<anconeusright.size(); i++) {
-        tgBasicActuator * const pMuscle = anconeusright[i];
-        assert(pMuscle != NULL);
-        if(m_totalTime > 5) {
-            newLength = amplitude * sin(angular_freq * m_totalTime + phaseright) + dcOffset;
-        } else {
-            newLength = dcOffset;
-        }
-        pMuscle->setControlInput(newLength, dt);
-    } 
 }
 
 //Move motors for all the muscles
@@ -173,53 +180,7 @@ void UpperLimbController::moveAllMotors(UpperLimbModel& subject, double dt) {
      
 }
 
-// Get actions from evolutionAdapter, transform them to this structure, and apply them
-void UpperLimbController::updateActions(UpperLimbModel& subject, double dt) {
-	/*vector<double> state=getState();
-	vector< vector<double> > actions;
-
-	//get the actions (between 0 and 1) from evolution (todo)
-	actions=evolutionAdapter.step(dt,state);
-
-	//transform them to the size of the structure
-	actions = transformActions(actions);
-
-	//apply these actions to the appropriate muscles according to the sensor values
-    applyActions(subject,actions);
-    */
+double UpperLimbController::sigmoid(double x) {
+    return 1 / (1 + pow(E, -x));
 }
 
-//Scale actions according to Min and Max length of muscles.
-vector< vector <double> > UpperLimbController::transformActions(vector< vector <double> > actions)
-{
-	double min=6;
-	double max=11;
-	double range=max-min;
-	double scaledAct;
-	for(unsigned i=0;i<actions.size();i++) {
-		for(unsigned j=0;j<actions[i].size();j++) {
-			scaledAct=actions[i][j]*(range)+min;
-			actions[i][j]=scaledAct;
-		}
-	}
-	return actions;
-}
-
-//Pick particular muscles (according to the structure's state) and apply the given actions one by one
-void UpperLimbController::applyActions(UpperLimbModel& subject, vector< vector <double> > act)
-{
-	//Get All the muscles of the subject
-	const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-	//Check if the number of the actions match the number of the muscles
-	if(act.size() != muscles.size()) {
-		cout<<"Warning: # of muscles: "<< muscles.size() << " != # of actions: "<< act.size()<<endl;
-		return;
-	}
-	//Apply actions (currently in a random order)
-	for (size_t i = 0; i < muscles.size(); ++i)	{
-		tgBasicActuator * const pMuscle = muscles[i];
-		assert(pMuscle != NULL);
-		//cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
-		pMuscle->setControlInput(act[i][0]);
-	}
-}

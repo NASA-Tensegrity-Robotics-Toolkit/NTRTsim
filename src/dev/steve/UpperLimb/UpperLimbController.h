@@ -62,11 +62,6 @@ public:
   virtual void onSetup(UpperLimbModel& subject);
   virtual void onStep(UpperLimbModel& subject, double dt);
 
-protected:
-
-  virtual vector< vector <double> > transformActions(vector< vector <double> > act);
-  virtual void applyActions (UpperLimbModel& subject, vector< vector <double> > act);
-
 private:
   double m_initialLengths;
   double m_totalTime;
@@ -83,13 +78,14 @@ private:
   std::vector<double> outputLayer;
   std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
 
-  AnnealAdapter evolutionAdapter;
     
   void initializeNeuralNet(UpperLimbModel& subject);
+  void initializeNeuralNetWeights();
   void initializeMusclePretensions(UpperLimbModel& subject);
+  void populateOutputLayer();
   void setTargetLengths(UpperLimbModel& subject, double dt);
   void moveAllMotors(UpperLimbModel& subject, double dt);
-  void updateActions(UpperLimbModel& subject, double dt);
+  double sigmoid(double x);
 };
 
 #endif // UPPERLIMB_CONTROLLER_H
