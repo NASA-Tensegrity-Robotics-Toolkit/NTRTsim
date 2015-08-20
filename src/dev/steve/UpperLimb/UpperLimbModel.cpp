@@ -184,7 +184,7 @@ void UpperLimbModel::addMuscles(tgStructure& s) {
     s.addPair(4, 0, "olecranon muscle");
     s.addPair(4, 2, "olecranon muscle");
     s.addPair(4, 3, "olecranon muscle");
-    s.addPair(4, 8, "right anocneus  muscle");
+    s.addPair(4, 8, "right anconeus  muscle");
     
     s.addPair(5, 0, "olecranon muscle");
     s.addPair(5, 2, "olecranon muscle");
