@@ -143,18 +143,21 @@ void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
     }
 }
 
-// Populate outputLayer by feeding the inputLayer through the NN
+// Populate outputLayer by feeding the inputLayer values through the NN
 void UpperLimbController::populateOutputLayer() {
+    double hiddenbias = 1;
+    double outputbias = 1;
     double sum = 0;
-    double x = 0.25; //TODO: make x meaningful odometry data
+    double x = 0.25; //TODO: make x meaningful odometry data (i.e. delta distance from target)
 
     // Sense end effector position for the input layer
     for (size_t i=0; i<nInputNeurons; i++) {
         inputLayer[i] = x;
     }
+
     // Populate hidden layer neurons
     for (size_t j=0; j<nHiddenNeurons; j++) {
-        sum = 0;
+        sum = hiddenbias;
         for (size_t i=0; i<nInputNeurons; i++) {
             sum += inputLayer[i] * weights[0][i*nHiddenNeurons + j];
         }
@@ -163,7 +166,7 @@ void UpperLimbController::populateOutputLayer() {
      
     // Populate output layer neurons
     for (size_t k=0; k<nOutputNeurons; k++) {
-        sum = 0;
+        sum = outputbias;
         for (size_t j=0; j<nHiddenNeurons; j++) {
             sum += hiddenLayer[j] * weights[1][j*nOutputNeurons + k];
         }
