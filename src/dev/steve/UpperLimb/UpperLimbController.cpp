@@ -212,6 +212,7 @@ double UpperLimbController::sigmoid(double x) {
 
 btVector3 UpperLimbController::getEndEffectorCOM(UpperLimbModel& subject) {
 	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
+    assert(endEffector != NULL);
     return endEffector[0]->centerOfMass();
 }
 
