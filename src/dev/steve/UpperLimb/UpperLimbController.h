@@ -56,7 +56,7 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-  UpperLimbController(const double prefLength, double timestep);
+  UpperLimbController(const double prefLength, double timestep, btVector3 trajectory);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -80,7 +80,10 @@ private:
   std::vector<double> hiddenLayer;
   std::vector<double> outputLayer;
   std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
+  btVector3 trajectory; // movement vector for the end-effector
+  btVector3 goal; // target position for the end-effector (initPos + trajectory)
     
+  void initializeGoal(UpperLimbModel& subject);
   void initializeNeuralNet(UpperLimbModel& subject);
   void initializeNeuralNetWeights();
   void importWeights();

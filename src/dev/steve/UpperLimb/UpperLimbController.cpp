@@ -44,14 +44,17 @@
 
 using namespace std;
 
-UpperLimbController::UpperLimbController(const double initialLength, double timestep) :
+UpperLimbController::UpperLimbController(const double initialLength, double timestep, btVector3 trajectory) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
     dt(timestep) 
-{}
+{
+    this->trajectory = trajectory;
+}
 
 // Fetch all of the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
+    initializeGoal(subject);
     initializeNeuralNet(subject);
     initializeMusclePretensions(subject);
 	this->m_totalTime=0.0;
@@ -71,6 +74,16 @@ void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
     std::cout << ee.getX() << std::endl;
     std::cout << ee.getY() << std::endl;
     std::cout << ee.getZ() << std::endl << std::endl;
+}
+
+/**
+ * Determine the position in absolute space where the end-effector is trying to reach (trajectory + initial position
+ */
+void UpperLimbController::initializeGoal(UpperLimbModel& subject) {
+    btVector3 initPos = getEndEffectorCOM(subject);
+    this->goal = btVector3(initPos.getX()+trajectory.getX(), 
+                           initPos.getY()+trajectory.getY(), 
+                           initPos.getZ()+trajectory.getZ());
 }
 
 /**
@@ -212,7 +225,7 @@ double UpperLimbController::sigmoid(double x) {
 
 btVector3 UpperLimbController::getEndEffectorCOM(UpperLimbModel& subject) {
 	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
-    assert(endEffector != NULL);
+    assert(!endEffector.empty());
     return endEffector[0]->centerOfMass();
 }
 
