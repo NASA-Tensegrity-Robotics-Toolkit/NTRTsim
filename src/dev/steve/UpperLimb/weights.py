@@ -1,3 +1,5 @@
+# uniformly distributed
+
 import random
 
 nWeights = 40
