@@ -30,6 +30,9 @@
 #include "UpperLimbModel.h"
 // This library
 #include "core/tgBasicActuator.h"
+// The Bullet Physics library
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <cassert>
 #include <math.h>
@@ -47,7 +50,7 @@ UpperLimbController::UpperLimbController(const double initialLength, double time
     dt(timestep) 
 {}
 
-//Fetch all the muscles and set their preferred length
+// Fetch all of the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
     initializeNeuralNet(subject);
     initializeMusclePretensions(subject);
@@ -63,6 +66,11 @@ void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
     populateOutputLayer();
     setTargetLengths(subject, dt);
     moveAllMotors(subject, dt);
+
+    btVector3 ee = getEndEffectorCOM(subject);
+    std::cout << ee.getX() << std::endl;
+    std::cout << ee.getY() << std::endl;
+    std::cout << ee.getZ() << std::endl << std::endl;
 }
 
 /**
@@ -200,5 +208,10 @@ void UpperLimbController::moveAllMotors(UpperLimbModel& subject, double dt) {
 
 double UpperLimbController::sigmoid(double x) {
     return 1 / (1 + pow(E, -x));
+}
+
+btVector3 UpperLimbController::getEndEffectorCOM(UpperLimbModel& subject) {
+	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
+    return endEffector[0]->centerOfMass();
 }
 

@@ -31,6 +31,9 @@
 #include "core/tgObserver.h"
 #include "learning/Adapters/AnnealAdapter.h"
 #include <vector>
+// The Bullet Physics library
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
 
 // Forward declarations
 class UpperLimbModel;
@@ -77,7 +80,6 @@ private:
   std::vector<double> hiddenLayer;
   std::vector<double> outputLayer;
   std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
-
     
   void initializeNeuralNet(UpperLimbModel& subject);
   void initializeNeuralNetWeights();
@@ -87,6 +89,7 @@ private:
   void setTargetLengths(UpperLimbModel& subject, double dt);
   void moveAllMotors(UpperLimbModel& subject, double dt);
   double sigmoid(double x);
+  btVector3 getEndEffectorCOM(UpperLimbModel& subject);
 };
 
 #endif // UPPERLIMB_CONTROLLER_H
