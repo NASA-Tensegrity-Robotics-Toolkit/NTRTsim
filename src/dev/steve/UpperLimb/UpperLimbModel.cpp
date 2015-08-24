@@ -102,7 +102,7 @@ UpperLimbModel::~UpperLimbModel() {}
 void UpperLimbModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 19; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
+    const size_t nNodes = 20; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -142,6 +142,9 @@ void UpperLimbModel::addNodes(tgStructure& s) {
     nodePositions.push_back(btVector3(-g, f+2*g, 3*g));
     nodePositions.push_back(btVector3(-g, f-g, 3*g));
 
+    // end-effector (19)
+    nodePositions.push_back(btVector3(b+7*e+1, 0, 0));
+
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
     }
@@ -157,6 +160,7 @@ void UpperLimbModel::addRods(tgStructure& s) {
     s.addPair(4, 6,  "radiusulna bone");
     s.addPair(5, 6,  "radiusulna bone");
     s.addPair(6, 7,  "radiusulna bone");
+    s.addPair(7, 19,  "radiusulna endeffector bone"); //end-marker
 
     // humerus
     s.addPair(8, 10, "humerus bone");
