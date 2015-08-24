@@ -54,6 +54,7 @@ UpperLimbController::UpperLimbController(const double initialLength, double time
 
 // Fetch all of the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
+    this->initPos = getEndEffectorCOM(subject);
     initializeGoal(subject);
     initializeNeuralNet(subject);
     initializeMusclePretensions(subject);
@@ -80,7 +81,6 @@ void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
  * Determine the position in absolute space where the end-effector is trying to reach (trajectory + initial position
  */
 void UpperLimbController::initializeGoal(UpperLimbModel& subject) {
-    btVector3 initPos = getEndEffectorCOM(subject);
     this->goal = btVector3(initPos.getX()+trajectory.getX(), 
                            initPos.getY()+trajectory.getY(), 
                            initPos.getZ()+trajectory.getZ());

@@ -80,6 +80,8 @@ private:
   std::vector<double> hiddenLayer;
   std::vector<double> outputLayer;
   std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
+
+  btVector3 initPos; // initial position of end-effector (on radius-ulna)
   btVector3 trajectory; // movement vector for the end-effector
   btVector3 goal; // target position for the end-effector (initPos + trajectory)
     
