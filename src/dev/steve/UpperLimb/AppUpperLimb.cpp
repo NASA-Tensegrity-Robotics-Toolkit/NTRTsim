@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
     // Fourth create the models
     UpperLimbModel* const myModel = new UpperLimbModel();
 
-    // Fifth, select the controller to use. Uncomment desired controller.
+    // Fifth, select the controller to use and set a goal vector
     btVector3 goalTrajectory = btVector3(10, 10, 10);
     UpperLimbController* const pTC = new UpperLimbController(2.5, timestep_physics, goalTrajectory);
 

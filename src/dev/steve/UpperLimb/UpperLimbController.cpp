@@ -44,17 +44,19 @@
 
 using namespace std;
 
-UpperLimbController::UpperLimbController(const double initialLength, double timestep, btVector3 trajectory) :
+UpperLimbController::UpperLimbController(const double initialLength, double timestep, btVector3 goalTrajectory) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
     dt(timestep) 
 {
-    this->trajectory = trajectory;
+    this->initPos = btVector3(0,0,0);
+    this->trajectory = btVector3(goalTrajectory.getX(), goalTrajectory.getY(), goalTrajectory.getZ());
+    this->goal = btVector3(0,0,0);
 }
 
 // Fetch all of the muscles and set their preferred length
 void UpperLimbController::onSetup(UpperLimbModel& subject) {
-    this->initPos = getEndEffectorCOM(subject);
+    this->initPos = endEffectorCOM(subject);
     initializeGoal(subject);
     initializeNeuralNet(subject);
     initializeMusclePretensions(subject);
@@ -67,11 +69,11 @@ void UpperLimbController::onStep(UpperLimbModel& subject, double dt) {
     if (dt <= 0.0) { throw std::invalid_argument("dt is not positive"); }
     m_totalTime+=dt;
 
-    populateOutputLayer();
+    populateOutputLayer(subject);
     setTargetLengths(subject, dt);
     moveAllMotors(subject, dt);
 
-    btVector3 ee = getEndEffectorCOM(subject);
+    btVector3 ee = endEffectorCOM(subject);
     std::cout << ee.getX() << std::endl;
     std::cout << ee.getY() << std::endl;
     std::cout << ee.getZ() << std::endl << std::endl;
@@ -165,16 +167,18 @@ void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
 }
 
 // Populate outputLayer by feeding the inputLayer values through the NN
-void UpperLimbController::populateOutputLayer() {
+void UpperLimbController::populateOutputLayer(UpperLimbModel& subject) {
     double hiddenbias = 1;
     double outputbias = 1;
     double sum = 0;
-    double x = 0.25; //TODO: make x meaningful odometry data (i.e. delta distance from target)
 
     // Sense end effector position for the input layer
-    for (size_t i=0; i<nInputNeurons; i++) {
-        inputLayer[i] = x;
-    }
+    btVector3 currPos = endEffectorCOM(subject);
+
+    // Scale and populate input layer
+    inputLayer[0] = error(currPos).getX() / trajectory.getX();
+    inputLayer[1] = error(currPos).getY() / trajectory.getY();
+    inputLayer[2] = error(currPos).getZ() / trajectory.getZ();
 
     // Populate hidden layer neurons
     for (size_t j=0; j<nHiddenNeurons; j++) {
@@ -223,9 +227,18 @@ double UpperLimbController::sigmoid(double x) {
     return 1 / (1 + pow(E, -x));
 }
 
-btVector3 UpperLimbController::getEndEffectorCOM(UpperLimbModel& subject) {
+btVector3 UpperLimbController::endEffectorCOM(UpperLimbModel& subject) {
 	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
     assert(!endEffector.empty());
     return endEffector[0]->centerOfMass();
+}
+ 
+/**
+ * goal position - current position
+ */
+btVector3 UpperLimbController::error(btVector3 currPos) {
+    return btVector3(goal.getX() - currPos.getX(),
+                     goal.getY() - currPos.getY(),
+                     goal.getZ() - currPos.getZ());
 }
 
