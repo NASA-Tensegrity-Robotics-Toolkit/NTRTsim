@@ -46,6 +46,9 @@ using namespace std;
 
 UpperLimbController::UpperLimbController(const double initialLength, double timestep, btVector3 goalTrajectory) :
     m_initialLengths(initialLength),
+    olecranonfascia_length(4.0),
+    brachioradialis_length(12.0),
+    anconeus_length(6.0),
     m_totalTime(0.0),
     dt(timestep) 
 {
@@ -138,10 +141,6 @@ void UpperLimbController::importWeights() {
 }
 
 void UpperLimbController::initializeMusclePretensions(UpperLimbModel& subject) {
-    const double olecranonfascia_length = 4;
-    const double brachioradialis_length = 12;
-    const double anconeus_length        = 6;
-
 	const std::vector<tgBasicActuator*> olecranonfascia = subject.find<tgBasicActuator>("olecranon");
 	const std::vector<tgBasicActuator*> anconeus        = subject.find<tgBasicActuator>("anconeus");
 	const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
@@ -202,17 +201,30 @@ void UpperLimbController::populateOutputLayer(UpperLimbModel& subject) {
 void UpperLimbController::setTargetLengths(UpperLimbModel& subject, double dt) {
     const std::vector<tgBasicActuator*> allMuscles = subject.getAllMuscles();
     double newLength = 0;
+    double initialLength = 0; // a particular cable's initial length
+    double scale = 4;
 
     for (size_t i=0; i<allMuscles.size(); i++) {
-        //newLength = scale * outputLayer[i];
-        newLength = 5;
         tgBasicActuator* const pMuscle = allMuscles[i]; 
 		assert(pMuscle != NULL);
+
+        if (pMuscle->hasTag("anconeus")) {
+            initialLength = anconeus_length;
+        } else if (pMuscle->hasTag("brachioradialis")) {
+            initialLength = brachioradialis_length;
+        } else if (pMuscle->hasTag("olecranon")) {
+            initialLength = olecranonfascia_length;
+        } else {
+            std::cerr << "ERROR: unknown cable tag" << std::endl;
+            exit(1);
+        }
+
+        newLength = ((pow(scale,2) * outputLayer[i]) - outputLayer[i] + 1)/scale * initialLength;
 		pMuscle->setControlInput(newLength, dt);
     }
 }
 
-//Move motors for all the muscles
+// Move motors for all the muscles
 void UpperLimbController::moveAllMotors(UpperLimbModel& subject, double dt) {
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     for (size_t i = 0; i < muscles.size(); ++i) {

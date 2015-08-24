@@ -67,23 +67,27 @@ public:
 
 private:
   double m_initialLengths;
+  double olecranonfascia_length;
+  double brachioradialis_length;
+  double anconeus_length;
+
   double m_totalTime;
   double dt;
 
   size_t nInputNeurons;
   size_t nHiddenNeurons;
   size_t nOutputNeurons; 
-  size_t nWeightsInput;  //nSynapses between input and hidden layer
-  size_t nWeightsOutput; //nSynapses between hidden and output layer
+  size_t nWeightsInput;  // nSynapses between input and hidden layer
+  size_t nWeightsOutput; // nSynapses between hidden and output layer
   std::vector<double> inputLayer;
   //std::vector< std::vector<double> > hiddenLayer; // Use instead for deep learning
   std::vector<double> hiddenLayer;
   std::vector<double> outputLayer;
-  std::vector< std::vector<double> > weights; //1+nHiddenLayers by weights-per-layer
+  std::vector< std::vector<double> > weights; // 1+nHiddenLayers by weights-per-layer
 
-  btVector3 initPos; // initial position of the end-effector
+  btVector3 initPos;    // initial position of the end-effector
   btVector3 trajectory; // movement vector for the end-effector
-  btVector3 goal; // target position of the end-effector (initPos + trajectory)
+  btVector3 goal;       // target position of the end-effector (initPos + trajectory)
     
   void initializeGoal(UpperLimbModel& subject);
   void initializeNeuralNet(UpperLimbModel& subject);
