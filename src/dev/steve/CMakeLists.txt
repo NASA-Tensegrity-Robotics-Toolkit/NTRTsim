@@ -5,11 +5,15 @@ add_executable(AppT12SuperBallPayload
     T12SuperBallPayload/T12SuperBallPayloadController.cpp
     T12SuperBallPayload/AppT12SuperBallPayload.cpp
 )
+
+add_executable(AppSineTest
+    NN/AppSineTest.cpp
+)
  
 add_executable(AppUpperLimb
-        UpperLimb/UpperLimbModel.cpp
-        UpperLimb/UpperLimbController.cpp
-        UpperLimb/AppUpperLimb.cpp
+    UpperLimb/UpperLimbModel.cpp
+    UpperLimb/UpperLimbController.cpp
+    UpperLimb/AppUpperLimb.cpp
 )
 
 add_executable(AppScarrArm
