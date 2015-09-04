@@ -27,6 +27,12 @@ add_executable(Appv3BallNew
     v3Ball/Appv3Ball.cpp
 ) 
 
+add_executable(AppUpperLimbTriangle
+    UpperLimbTriangle/AppUpperLimbTriangle.cpp
+    UpperLimbTriangle/UpperLimbTriangleModel.cpp
+    UpperLimbTriangle/UpperLimbTriangleController.cpp
+)
+
 #add_executable(AppSaddleNeckArm
 #   SaddleNeckArm/AppSaddleNeckArm.cpp
 #   SaddleNeckArm/SaddleNeckArmModel.cpp
