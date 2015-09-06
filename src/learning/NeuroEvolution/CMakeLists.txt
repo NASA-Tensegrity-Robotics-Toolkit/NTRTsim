@@ -17,5 +17,5 @@ add_library( ${PROJECT_NAME} SHARED
 	NeuroEvoPopulation.cpp
 )
 
-target_link_libraries(NeuroEvolution neuralNetwork Configuration)
+target_link_libraries(NeuroEvolution neuralNetwork Configuration FileHelpers)
 
