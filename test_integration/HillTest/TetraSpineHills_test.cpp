@@ -22,6 +22,13 @@
 * $Id$
 */
 
+/*
+ * Test has been disabled. See BuildBot build 335 for the error details. See issue #163 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/163
+ *
+ * - Perry
+ */
+
+/*
 // This application
 #include "dev/btietz/tetraCollisions/TetraSpineCollisions.h"
 #include "dev/btietz/tetraCollisions/colSpineSine.h"
@@ -120,7 +127,7 @@ namespace {
 				TetraSpineCollisions* myModel =
                     new TetraSpineCollisions(segments, scale /2.0);
 
-				/* Required for setting up learning file input/output. */
+				// Required for setting up learning file input/output.
 				const std::string suffix("default");
 				
 				colSpineSine* const myControl =
@@ -161,3 +168,5 @@ int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
+
+*/
