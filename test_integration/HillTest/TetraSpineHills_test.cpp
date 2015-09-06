@@ -120,7 +120,7 @@ namespace {
 				TetraSpineCollisions* myModel =
                     new TetraSpineCollisions(segments, scale /2.0);
 
-				/* Required for setting up learning file input/output. */
+				// Required for setting up learning file input/output.
 				const std::string suffix("default");
 				
 				colSpineSine* const myControl =
