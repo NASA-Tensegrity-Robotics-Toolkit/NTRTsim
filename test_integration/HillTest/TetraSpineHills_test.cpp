@@ -22,13 +22,6 @@
 * $Id$
 */
 
-/*
- * Test has been disabled. See BuildBot build 335 for the error details. See issue #163 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/163
- *
- * - Perry
- */
-
-/*
 // This application
 #include "dev/btietz/tetraCollisions/TetraSpineCollisions.h"
 #include "dev/btietz/tetraCollisions/colSpineSine.h"
@@ -168,5 +161,3 @@ int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
-
-*/
