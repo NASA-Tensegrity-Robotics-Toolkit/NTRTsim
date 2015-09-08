@@ -58,7 +58,7 @@ StandingHexagonalSpineTestModel::StandingHexagonalSpineTestModel(
 // Creates a biped structure
 bool PELVIS = true;
 // Creates a biped structure with legs that are divided into two segments
-bool KNEES = false;
+bool KNEES = true;
 // The length of each leg segment
 const double legSegmentHeight = 4.0;
 // If KNEES is true:
@@ -73,10 +73,9 @@ const double pretension = 600;			//
 const double rodRadius = 0.075;			// Radius of the rods in the structure
 const double structureRadius = 1.0;		// Radius of the Hexagonal structures
 const double childOffset = 1.5;			// Offset for child structure placement
-const double PI = 3.14159;				//
-const double rotation = PI / 3.0;		// Node offset for Hexagonal rings
+const double rotation = M_PI / 3.0;		// Node offset for Hexagonal rings
 const double doubleRotation = 2.0 * rotation;// Node offset for Triangular rings
-const double circumference = PI * (rodRadius * rodRadius);	// Rod Circumference
+const double circumference = M_PI * (rodRadius * rodRadius);// Rod Circumference
 const btVector3 topOffset(0, 0, -1.2);	// Top structure offset
 const btVector3 bottomOffset(0, 0, 1.2);	// Bottom structure offset
 const btVector3 startPoint(0.0, 10.0, 0.0);		// Base structure start point
@@ -94,8 +93,8 @@ void addHexNodes(tgStructure& structure, double z)
 {
 	for (int i = 0; i != 6; i++)
 	{
-		structure.addNode(structureRadius * sin(i * PI / 3.0),
-				structureRadius * cos(i * PI / 3.0), z);
+		structure.addNode(structureRadius * sin(i * M_PI / 3.0),
+				structureRadius * cos(i * M_PI / 3.0), z);
 	}
 }
 
@@ -182,7 +181,7 @@ void addAllNodes(tgStructure& hexPrime, tgStructure& topHex,
 	// Distance between the Legs and the center of the Pelvis
 	const double legOffset = 1.0;
 	// Rotational offset for the Legs
-	const double twist = (PI / 6) + PI;
+	const double twist = (M_PI / 6) + M_PI;
 
 	// If KNEES is true:
 	// Z-coordinates of the second Leg Segment
@@ -492,7 +491,7 @@ void addSegmentActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	// Actuators with high stiffness
 	for (int k = 1; k < 7; k++)
 	{
-		spine.addPair(S1[0], S2[k], j + " side baseActuator");
+		spine.addPair(S1[0], S2[k], j + " hex baseActuator");
 	}
 	// Accounts for the Actuator offset
 	// between the Top and Bottom Segments
@@ -503,12 +502,12 @@ void addSegmentActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	}
 
 	// Actuators with normal stiffness
-	spine.addPair(S1[1], S2[6], j + " side actuator");
-	spine.addPair(S1[1], S2[2], j + " side actuator");
-	spine.addPair(S1[3], S2[2], j + " side actuator");
-	spine.addPair(S1[3], S2[4], j + " side actuator");
-	spine.addPair(S1[5], S2[4], j + " side actuator");
-	spine.addPair(S1[5], S2[6], j + " side actuator");
+	spine.addPair(S1[1], S2[6], j + " hex actuator");
+	spine.addPair(S1[1], S2[2], j + " hex actuator");
+	spine.addPair(S1[3], S2[2], j + " hex actuator");
+	spine.addPair(S1[3], S2[4], j + " hex actuator");
+	spine.addPair(S1[5], S2[4], j + " hex actuator");
+	spine.addPair(S1[5], S2[6], j + " hex actuator");
 
 }
 
@@ -616,9 +615,9 @@ void addLegActuators(tgStructure& spine, std::vector<tgStructure*> children,
 		spine.addPair(leg[34], leg[41], "ring/foot actuator");
 		spine.addPair(leg[34], leg[43], "ring/foot actuator");
 
-		spine.addPair(leg[41], leg[35], "leg/toe actuator");		//
-		spine.addPair(leg[42], leg[35], "leg/toe actuator");		//
-		spine.addPair(leg[43], leg[35], "leg/toe actuator");		//
+		spine.addPair(leg[41], leg[35], "leg/toe actuator");
+		spine.addPair(leg[42], leg[35], "leg/toe actuator");
+		spine.addPair(leg[43], leg[35], "leg/toe actuator");
 
 		spine.addPair(leg[39], leg[44], "leg/foot actuator");
 		spine.addPair(leg[36], leg[47], "ring/foot actuator");
@@ -628,9 +627,9 @@ void addLegActuators(tgStructure& spine, std::vector<tgStructure*> children,
 		spine.addPair(leg[38], leg[45], "ring/foot actuator");
 		spine.addPair(leg[38], leg[47], "ring/foot actuator");
 
-		spine.addPair(leg[45], leg[39], "leg/toe actuator");		//
-		spine.addPair(leg[46], leg[39], "leg/toe actuator");		//
-		spine.addPair(leg[47], leg[39], "leg/toe actuator");		//
+		spine.addPair(leg[45], leg[39], "leg/toe actuator");
+		spine.addPair(leg[46], leg[39], "leg/toe actuator");
+		spine.addPair(leg[47], leg[39], "leg/toe actuator");
 	}
 }
 
@@ -679,30 +678,6 @@ void addAllActuators(tgStructure& spine, int topSegments, int bottomSegments)
 	}
 }
 
-/**
- Methods that are not currently in use:
- void mapActuators(StandingHexagonalSpineTestModel::ActuatorMap& actuatorMap,
- tgModel& model)
- {
- // Note that tags don't need to match exactly, we could create
- // supersets if we wanted to
- actuatorMap["inner left"]  = model.find<tgBasicActuator>("inner left actuator");
- actuatorMap["inner right"] = model.find<tgBasicActuator>("inner right actuator");
- actuatorMap["inner top"]   = model.find<tgBasicActuator>("inner top actuator");
- actuatorMap["outer left"]  = model.find<tgBasicActuator>("outer left actuator");
- actuatorMap["outer right"] = model.find<tgBasicActuator>("outer right actuator");
- actuatorMap["outer top"]   = model.find<tgBasicActuator>("outer top actuator");
- }
-
- void trace(const tgStructureInfo& structureInfo, tgModel& model)
- {
- std::cout << "StructureInfo:" << std::endl
- << structureInfo    << std::endl
- << "Model: "        << std::endl
- << model            << std::endl;
- }
- */
-
 }	// namespace
 
 void StandingHexagonalSpineTestModel::setup(tgWorld& world)
@@ -743,7 +718,7 @@ void StandingHexagonalSpineTestModel::setup(tgWorld& world)
 	// Rotate the Spine
 	const btVector3 point(0, getStartHeight(), 0);
 	const btVector3 axis(1, 0, 0);
-	spine.addRotation(point, axis, PI / 2.0);
+	spine.addRotation(point, axis, M_PI / 2.0);
 
 	// Build and place structure into the World
 	tgStructureInfo structureInfo(spine, spec);
@@ -751,12 +726,6 @@ void StandingHexagonalSpineTestModel::setup(tgWorld& world)
 
 	// Set up the World
 	tgModel::setup(world);
-
-//	// We could now use tgCast::filter or similar to pull out the models (e.g. actuators)
-//	// that we want to control.
-//	allActuators = tgCast::filter<tgModel, tgBasicActuator>(getDescendants());
-//	mapActuators(actuatorMap, *this);
-//	trace(structureInfo, *this);
 }
 
 // Retrieves the Mass of the entire structure

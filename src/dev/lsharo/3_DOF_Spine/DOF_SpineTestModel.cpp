@@ -57,9 +57,8 @@ const double stiffness = 10000.0;		// Stiffness of non-passive Actuators
 const double baseStiffness = 100000.0;	// Stiffness of passive Actuators
 const double damping = 10.0;			//
 const double pretension = 600;			//
-double PI = 3.14159;					//
-double rotation = PI / 12;				// Node offset for ring Rods
-const double circumference = PI * (rodRadius * rodRadius);	// Rod circumference
+double rotation = M_PI / 12;				// Node offset for ring Rods
+const double circumference = M_PI * (rodRadius * rodRadius);	// Rod circumference
 
 
 /**

@@ -48,19 +48,18 @@ DOF_JointTestModel::DOF_JointTestModel() :
 }
 
 // Global Variable Declarations
-const double PI = 3.14159;					//
 const double ringRadius = 15.0;				// Fixed Ring Radius
 const double armRadius = 4.78;				// Arm Ring Radius
 const double armStart_z = 0.8827;			// Arm start position
 const double armRing_z = 16.52 + armStart_z;// Arm Ring position
 const double armEnd_z = 35.0 + armRing_z;	// Arm end position
-const double ringRotation = PI / 12;
+const double ringRotation = M_PI / 12;
 
 //Rod and Ring specifications
 const double rodDensity = .00311;			// Arm Density
 const double ringDensity = 0.0;				// Fixed Ring Density
 const double rodRadius = 0.5;				// Rod Radius
-const double rodCircumference = PI * (rodRadius * rodRadius); // Rod Circumference
+const double rodCircumference = M_PI * (rodRadius * rodRadius); // Rod Circumference
 
 //Actuator specifications
 const double stiffness = 2000.0;			// Stiffness for non-passive Actuators
@@ -71,7 +70,7 @@ const double damping = 10.0;				//
 const double loadMass = 0.5;				// Load Mass
 const double loadRadius = 1.0;				// Load Radius
 const double loadHeight = 2.0;				// Load Height
-const double loadCircumference = PI * (loadRadius * loadRadius); // Load Circumference
+const double loadCircumference = M_PI * (loadRadius * loadRadius); // Load Circumference
 const double loadVolume = loadCircumference * loadHeight; // Load Volume
 const double loadDensity = loadMass / loadVolume; // Load Density; dependent on loadMass
 
@@ -92,10 +91,10 @@ void addAllNodes(tgStructure& joint)
 
 	// Arm
 	joint.addNode(0, 0, armStart_z);
-	joint.addNode(armRadius * sin(PI / 3.0), armRadius * cos(PI / 3.0),
+	joint.addNode(armRadius * sin(M_PI / 3.0), armRadius * cos(M_PI / 3.0),
 			armRing_z);
-	joint.addNode(armRadius * sin(PI), armRadius * cos(PI), armRing_z);
-	joint.addNode(armRadius * sin(5 * PI / 3.0), armRadius * cos(5 * PI / 3.0),
+	joint.addNode(armRadius * sin(M_PI), armRadius * cos(M_PI), armRing_z);
+	joint.addNode(armRadius * sin(5 * M_PI / 3.0), armRadius * cos(5 * M_PI / 3.0),
 			armRing_z);
 	joint.addNode(0, 0, armEnd_z);
 

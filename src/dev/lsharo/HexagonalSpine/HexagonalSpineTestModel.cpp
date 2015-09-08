@@ -57,25 +57,27 @@ bool PELVIS = true;
 // The height of each leg
 const double legSegmentHeight = 4.0;
 // Starting height of the structure
-const double startHeight = legSegmentHeight + 2.0;
+const double startHeight = legSegmentHeight + 15.0;
 
 const double density = 5.0;				// The total density of the structure
-const double stiffness = 5000.0;     	// For non-passive actuators
-const double baseStiffness = 40000.0; 	// For passive actuators
+const double stiffness = 2500.0;     	// For non-passive actuators
+const double baseStiffness = 10000.0; 	// For passive actuators
 const double damping = 10.0;			//
 const double pretension = 600;			//
 const double structureRadius = 1.0;		// Radius of the Hexagonal structures
 const double rodRadius = 0.075;			// Radius of the rods in the structure
 const double childOffset = 1.5;			// Offset for child structure placement
-const double PI = 3.14159;				//
-const double rotation = PI / 3.0;		// Node offset for Hexagonal rings
+const double rotation = M_PI / 3.0;		// Node offset for Hexagonal rings
 const double doubleRotation = 2.0 * rotation;// Node offset for Triangular rings
-const double circumference = PI * (rodRadius * rodRadius);	// Rod Circumference
+const double circumference = M_PI * (rodRadius * rodRadius);	// Rod Circumference
 const btVector3 leftOffset(0, 0, -1.2);		// Left structure offset
 const btVector3 rightOffset(0, 0, 1.2);	// Right structure offset
-const btVector3 startPoint(0.0, startHeight, 0.0);	// Center structure offset
-const btVector3 leftHexStart(0.0, startHeight, childOffset); // Left structure start point
-const btVector3 rightHexStart(0.0, startHeight, -childOffset); // Right structure start point
+
+const double xOffset = 0.0;
+
+const btVector3 startPoint(xOffset, startHeight, 0.0);	// Center structure offset
+const btVector3 leftHexStart(xOffset, startHeight, childOffset); // Left structure start point
+const btVector3 rightHexStart(xOffset, startHeight, -childOffset); // Right structure start point
 
 /**
  * Anonymous namespace for helper functions
@@ -88,8 +90,8 @@ void addHexNodes(tgStructure& structure, double z)
 {
 	for (int i = 0; i != 6; i++)
 	{
-		structure.addNode(structureRadius * sin(i * PI / 3.0),
-				structureRadius * cos(i * PI / 3.0), z);
+		structure.addNode(structureRadius * sin(i * M_PI / 3.0),
+				structureRadius * cos(i * M_PI / 3.0), z);
 	}
 }
 
@@ -123,27 +125,27 @@ void addAllNodes(tgStructure& hexPrime, tgStructure& leftHex,
 		tgStructure& rightPelvis)
 {
 	// The structures are built horizontally along the z-axis
-	// beginning with the Point of leftHex at 0.0
+	// beginning with the point of leftHex at 0.0
 	const double leftHex_end = 2.0;			// leftHex Hexagonal Ring
-	const double centerHex_start = 1.5;		// centerHex/left Point
+	const double centerHex_start = 1.5;		// centerHex/left point
 	const double centerHex_midStart = 3.0;	// centerHex/left Hexagonal Ring
 	const double centerHex_midEnd = 4.0;	// centerHex/right Hexagonal Ring
-	const double centerHex_end = 5.5;		// centerHex/right Point
+	const double centerHex_end = 5.5;		// centerHex/right point
 	const double rightHex_end = 5.0;		// rightHex Hexagonal Ring
-	const double rightHex_start = 7.0;		// rightHex Point
+	const double rightHex_start = 7.0;		// rightHex point
 	
 	// If PELVIS is true:
 	const double leftPelvis_center = 1.0;	// Center of leftPelvis
 	const double rightPelvis_center = 6.0;	// Center of rightPelvis
-	const double pelvicOffset = 2.5;		// x-Offset of Pelvic Point
-	const double offset = 1.25;				// x-Offset of Leg
+	const double pelvicOffset = 2.5;		// x-Offset of Pelvic point
+	const double offset = 1.5;				// x-Offset of Leg
 	const double leg_startHeight = 0.5;		// Leg start height
 	const double leg_endHeight = 0.5 - legSegmentHeight;// Leg end height
 	const double leg_ringHeight = leg_endHeight / 2;	// Leg Ring height
 	const double leg_ringRadius = 0.8;		// Leg Ring radius
 	const double footHeight = leg_endHeight + 0.5;	// Foot start height
 	const double toeHeight = leg_endHeight - 0.5;	// Foot end height
-	const double twist = PI / 6;			// Leg rotational offset
+	const double twist = M_PI / 6;			// Leg rotational offset
 
 	// Center structure Nodes 0-13
 	hexPrime.addNode(0, 0, centerHex_start);
@@ -174,18 +176,18 @@ void addAllNodes(tgStructure& hexPrime, tgStructure& leftHex,
 	for (int i = 0; i < 3; i++)
 	{
 		leftPelvis.addNode(
-				leg_ringRadius * sin(i * doubleRotation + PI) + offset,
+				leg_ringRadius*1.5 * sin(i * doubleRotation + M_PI) + offset,
 				toeHeight,
-				leg_ringRadius * cos(i * doubleRotation + PI)
+				leg_ringRadius*1.5 * cos(i * doubleRotation + M_PI)
 						+ leftPelvis_center);
 	}
 	leftPelvis.addNode(-offset, footHeight, leftPelvis_center);
 	for (int i = 0; i < 3; i++)
 	{
 		leftPelvis.addNode(
-				leg_ringRadius * sin(i * doubleRotation + PI) - offset,
+				leg_ringRadius*1.5 * sin(i * doubleRotation + M_PI) - offset,
 				toeHeight,
-				leg_ringRadius * cos(i * doubleRotation + PI)
+				leg_ringRadius*1.5 * cos(i * doubleRotation + M_PI)
 						+ leftPelvis_center);
 	}
 
@@ -203,16 +205,16 @@ void addAllNodes(tgStructure& hexPrime, tgStructure& leftHex,
 	rightPelvis.addNode(offset, footHeight, rightPelvis_center);
 	for (int i = 0; i < 3; i++)
 	{
-		rightPelvis.addNode(-leg_ringRadius * sin(i * doubleRotation) + offset,
+		rightPelvis.addNode(-leg_ringRadius*1.5 * sin(i * doubleRotation) + offset,
 				toeHeight,
-				leg_ringRadius * cos(i * doubleRotation) + rightPelvis_center);
+				leg_ringRadius*1.5 * cos(i * doubleRotation) + rightPelvis_center);
 	}
 	rightPelvis.addNode(-offset, footHeight, rightPelvis_center);
 	for (int i = 0; i < 3; i++)
 	{
-		rightPelvis.addNode(-leg_ringRadius * sin(i * doubleRotation) - offset,
+		rightPelvis.addNode(-leg_ringRadius*1.5 * sin(i * doubleRotation) - offset,
 				toeHeight,
-				leg_ringRadius * cos(i * doubleRotation) + rightPelvis_center);
+				leg_ringRadius*1.5 * cos(i * doubleRotation) + rightPelvis_center);
 	}
 }
 
@@ -390,23 +392,23 @@ void addCenterActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	{	// Attaches the first Left-hand Segment onto the Center structure
 		node = 0;
 		// Actuators with normal stiffness
-		spine.addPair(prime[1], S1[6], "center/" + j + " actuator");
-		spine.addPair(prime[1], S1[2], "center/" + j + " actuator");
-		spine.addPair(prime[3], S1[2], "center/" + j + " actuator");
-		spine.addPair(prime[3], S1[4], "center/" + j + " actuator");
-		spine.addPair(prime[5], S1[4], "center/" + j + " actuator");
-		spine.addPair(prime[5], S1[6], "center/" + j + " actuator");
+		spine.addPair(prime[1], S1[6], "center/left actuator");
+		spine.addPair(prime[1], S1[2], "center/left actuator");
+		spine.addPair(prime[3], S1[2], "center/left actuator");
+		spine.addPair(prime[3], S1[4], "center/left actuator");
+		spine.addPair(prime[5], S1[4], "center/left actuator");
+		spine.addPair(prime[5], S1[6], "center/left actuator");
 	}
 	else
 	{	// Attaches the first Right-hand Segment onto the Center structure
 		node = 13;
 		// Actuators with normal stiffness
-		spine.addPair(prime[8], S1[1], "center/" + j + " actuator");
-		spine.addPair(prime[8], S1[3], "center/" + j + " actuator");
-		spine.addPair(prime[10], S1[3], "center/" + j + " actuator");
-		spine.addPair(prime[10], S1[5], "center/" + j + " actuator");
-		spine.addPair(prime[12], S1[5], "center/" + j + " actuator");
-		spine.addPair(prime[12], S1[1], "center/" + j + " actuator");
+		spine.addPair(prime[8], S1[1], "center/right actuator");
+		spine.addPair(prime[8], S1[3], "center/right actuator");
+		spine.addPair(prime[10], S1[3], "center/right actuator");
+		spine.addPair(prime[10], S1[5], "center/right actuator");
+		spine.addPair(prime[12], S1[5], "center/right actuator");
+		spine.addPair(prime[12], S1[1], "center/right actuator");
 	}
 	// Actuators with high stiffness
 	for (int i = 1; i < 7; i++)
@@ -426,7 +428,7 @@ void addSegmentActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	// Actuators with high stiffness
 	for (int k = 1; k < 7; k++)
 	{
-		spine.addPair(S1[0], S2[k], j + " side baseActuator");
+		spine.addPair(S1[0], S2[k], j + " hex baseActuator");
 	}
 	// Accounts for the Actuator offset
 	// between the Left and Right Segments
@@ -437,12 +439,12 @@ void addSegmentActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	}
 
 	// Actuators with normal stiffness
-	spine.addPair(S1[1], S2[6], j + " side actuator");
-	spine.addPair(S1[1], S2[2], j + " side actuator");
-	spine.addPair(S1[3], S2[2], j + " side actuator");
-	spine.addPair(S1[3], S2[4], j + " side actuator");
-	spine.addPair(S1[5], S2[4], j + " side actuator");
-	spine.addPair(S1[5], S2[6], j + " side actuator");
+	spine.addPair(S1[1], S2[6], j + " hex actuator");
+	spine.addPair(S1[1], S2[2], j + " hex actuator");
+	spine.addPair(S1[3], S2[2], j + " hex actuator");
+	spine.addPair(S1[3], S2[4], j + " hex actuator");
+	spine.addPair(S1[5], S2[4], j + " hex actuator");
+	spine.addPair(S1[5], S2[6], j + " hex actuator");
 
 }
 
@@ -471,6 +473,9 @@ void addLegActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	spine.addPair(leg[21], leg[11], "leg to foot actuator");
 	spine.addPair(leg[22], leg[11], "leg to foot actuator");
 	spine.addPair(leg[22], leg[12], "leg to foot actuator");
+	spine.addPair(leg[10], leg[20], "leg to foot actuator");
+	spine.addPair(leg[10], leg[21], "leg to foot actuator");
+	spine.addPair(leg[10], leg[22], "leg to foot actuator");
 
 	// Actuators connecting the second Leg to the Pelvis
 	spine.addPair(leg[14], leg[0], "top leg baseActuator");
@@ -490,6 +495,9 @@ void addLegActuators(tgStructure& spine, std::vector<tgStructure*> children,
 	spine.addPair(leg[25], leg[16], "leg to foot actuator");
 	spine.addPair(leg[26], leg[16], "leg to foot actuator");
 	spine.addPair(leg[26], leg[17], "leg to foot actuator");
+	spine.addPair(leg[15], leg[24], "leg to foot actuator");
+	spine.addPair(leg[15], leg[25], "leg to foot actuator");
+	spine.addPair(leg[15], leg[26], "leg to foot actuator");
 }
 
 // Adds all the Actuators
@@ -547,30 +555,6 @@ void addAllActuators(tgStructure& spine, int segmentsLeft, int segmentsRight)
 	}
 }
 
-/**
- Methods currently not in use
- void mapActuators(HexagonalSpineTestModel::ActuatorMap& actuatorMap,
- tgModel& model)
- {
- //	 Note that tags don't need to match exactly, we could create
- //	 supersets if we wanted to
- actuatorMap["inner left"]  = model.find<tgBasicActuator>("inner left actuator");
- actuatorMap["inner right"] = model.find<tgBasicActuator>("inner right actuator");
- actuatorMap["inner top"]   = model.find<tgBasicActuator>("inner top actuator");
- actuatorMap["outer left"]  = model.find<tgBasicActuator>("outer left actuator");
- actuatorMap["outer right"] = model.find<tgBasicActuator>("outer right actuator");
- actuatorMap["outer top"]   = model.find<tgBasicActuator>("outer top actuator");
- }
-
- void trace(const tgStructureInfo& structureInfo, tgModel& model)
- {
- std::cout << "StructureInfo:" << std::endl
- << structureInfo    << std::endl
- << "Model: "        << std::endl
- << model            << std::endl;
- }
- */
-
 }	// namespace
 
 void HexagonalSpineTestModel::setup(tgWorld& world)
@@ -609,18 +593,17 @@ void HexagonalSpineTestModel::setup(tgWorld& world)
 	spec.addBuilder("baseActuator",
 			new tgBasicActuatorInfo(baseActuatorConfig));
 
+	// Rotate the spine
+	const btVector3 point(0, 0, 0);
+	const btVector3 axis(0, 1, 0);
+	spine.addRotation(point, axis, M_PI / 2.0);
+
 	// Build and place structure into the World
 	tgStructureInfo structureInfo(spine, spec);
 	structureInfo.buildInto(*this, world);
 
 	// Set up the world
 	tgModel::setup(world);
-
-//	// We could now use tgCast::filter or similar to pull out the models (e.g. actuators)
-//	// that we want to control.
-//	allActuators = tgCast::filter<tgModel, tgBasicActuator>(getDescendants());
-//	mapActuators(actuatorMap, *this);
-//	trace(structureInfo, *this);
 }
 
 // Retrieves the Mass of the entire structure
