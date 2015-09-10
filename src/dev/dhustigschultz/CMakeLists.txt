@@ -7,5 +7,6 @@ subdirs(
     BigPuppy_Foot
     BigPuppy_HT
     TC_MixedLearning
+    Ribbed_MixedLearning
 )
 
