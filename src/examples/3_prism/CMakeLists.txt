@@ -5,7 +5,7 @@ link_libraries(tgcreator
                 sensors
                 core    
                 terrain 
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppPrismModel
     PrismModel.cpp

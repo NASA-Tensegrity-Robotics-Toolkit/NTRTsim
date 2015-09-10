@@ -13,7 +13,7 @@ link_libraries(tetraSpineLearningSine
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppTetraSpineHT
 	htSpineSine.cpp

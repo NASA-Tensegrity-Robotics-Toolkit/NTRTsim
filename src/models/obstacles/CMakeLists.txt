@@ -6,7 +6,7 @@ link_directories(${LIB_DIR})
 link_libraries(tgcreator
                 core
                 terrain
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(${PROJECT_NAME} SHARED
 			tgBlockField.cpp

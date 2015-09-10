@@ -117,38 +117,6 @@ function unpack_bullet()
     popd > /dev/null
 }
 
-# Patch Bullet to include OpenGL Directories
-function patch_bullet()
-{
-    pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
-
-    # Copy the files we're going to change
-    create_directory_if_noexist "OpenGL_FreeGlut"
-    cp "OpenGL/CMakeLists.txt" "OpenGL_FreeGlut/CMakeLists.txt"
-    cp "OpenGL/DemoApplication.h" "OpenGL_FreeGlut/tgDemoApplication.h"
-    cp "OpenGL/DemoApplication.cpp" "OpenGL_FreeGlut/tgDemoApplication.cpp"
-    cp "OpenGL/GLDebugDrawer.h" "OpenGL_FreeGlut/tgGLDebugDrawer.h"
-    cp "OpenGL/GLDebugDrawer.cpp" "OpenGL_FreeGlut/tgGLDebugDrawer.cpp"
-    cp "OpenGL/GlutDemoApplication.h" "OpenGL_FreeGlut/tgGlutDemoApplication.h"
-    cp "OpenGL/GlutDemoApplication.cpp" "OpenGL_FreeGlut/tgGlutDemoApplication.cpp"
-    cp "OpenGL/GlutStuff.h" "OpenGL_FreeGlut/tgGlutStuff.h"
-    cp "OpenGL/GlutStuff.cpp" "OpenGL_FreeGlut/tgGlutStuff.cpp"
-
-    # Patch them
-    patch -p5 < "$SETUP_DIR/patches/CMakePatch.diff"
-    patch -p5 < "$SETUP_DIR/patches/OpenGLPatch.diff"
-
-    popd > /dev/null
-    
-    # Also fix double free error in btQuickprof
-    
-    pushd "$BULLET_BUILD_DIR/src/LinearMath" > /dev/null
-    
-    patch < "$SETUP_DIR/patches/btQuickprof.patch"
-    
-    popd > /dev/null
-}
-
 # Build the package under the build directory specified in in install.conf
 function build_bullet()
 {
@@ -251,20 +219,9 @@ function main()
         env_link_bullet
         return
     fi
-    
-    # This may not be the best test - The directory is created at the beginning of the function
-    # Is there a way to check a specific line into a file?
-    if check_directory_exists "$BULLET_BUILD_DIR/Demos/OpenGL_FreeGlut/"; then
-        echo "- Bullet Physics patches have already been applied -- skipping."
-        build_bullet
-        install_bullet
-        env_link_bullet
-        return
-    fi
 
     if check_file_exists "$BULLET_PACKAGE_DIR/CMakeLists.txt"; then
         echo "- Bullet Physics is already unpacked to $BULLET_BUILD_DIR -- skipping."
-        patch_bullet
         build_bullet
         install_bullet
         env_link_bullet
@@ -274,7 +231,6 @@ function main()
     if check_file_exists "$DOWNLOADS_DIR/$bullet_pkg"; then
         echo "- Bullet Physics package already exists under env/downloads -- skipping download."
         unpack_bullet
-        patch_bullet
         build_bullet
         install_bullet
         env_link_bullet
@@ -284,7 +240,6 @@ function main()
     # If we haven't returned by now, we have to do everything
     download_bullet
     unpack_bullet
-    patch_bullet
     build_bullet
     install_bullet
     env_link_bullet

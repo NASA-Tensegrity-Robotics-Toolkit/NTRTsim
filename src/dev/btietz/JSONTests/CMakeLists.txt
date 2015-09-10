@@ -12,7 +12,7 @@ link_libraries(octahedralComplex
                 Configuration
                 AnnealEvolution
                 FileHelpers
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(JSONControl SHARED
                 JSONCPGControl.cpp

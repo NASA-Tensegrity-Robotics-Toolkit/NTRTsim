@@ -31,7 +31,7 @@ BULLET_INSTALL_PREFIX="$ENV_DIR"
 
 # Location where bullet is to be built, or where it was built if you're using 
 # an existing package.
-BULLET_BUILD_DIR="$ENV_DIR/build/bullet-2.82-r2704"
+BULLET_BUILD_DIR="$ENV_DIR/build/bullet3-2.83.6"
 
 # This is the location where you unzipped the package (or, where it will be
 # unzipped if required). This will be the same as the build dir unless you did
@@ -40,4 +40,4 @@ BULLET_PACKAGE_DIR="$BULLET_BUILD_DIR"
 
 # BULLET_URL can be either a web address or a local file address, 
 # e.g. 'http://url.com/for/bullet.tgz' or 'file:///path/to/bullet.tgz'
-BULLET_URL="http://ntrt.perryb.ca/storage/dependencies/bullet-2.82-r2704.tgz"
+BULLET_URL="https://github.com/bulletphysics/bullet3/archive/2.83.6.tar.gz"

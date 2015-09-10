@@ -12,7 +12,7 @@ link_libraries(octahedralComplex
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppOctaCL_CPG
     AppOctaCL_CPG.cpp

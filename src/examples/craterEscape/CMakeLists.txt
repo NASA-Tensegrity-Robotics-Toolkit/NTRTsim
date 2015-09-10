@@ -10,7 +10,7 @@ link_libraries(obstacles
                 FileHelpers
                 core    
                 terrain 
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppEscape
     EscapeModel.cpp

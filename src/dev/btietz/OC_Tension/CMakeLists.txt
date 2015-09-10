@@ -16,7 +16,7 @@ link_libraries(JSONGoalTension
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport
+                OpenGLWindow
                 boost_program_options)
 
 add_executable(AppOC_Tension

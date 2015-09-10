@@ -29,28 +29,20 @@
 // This application
 #include "tgSimView.h"
 #include "tgBulletRenderer.h"
-// Bullet OpenGL_FreeGlut (patched files)
-#include "tgGlutStuff.h"
 // The Bullet Physics library
-#ifdef _WINDOWS
-#include "Win32DemoApplication.h"
-#define PlatformDemoApplication Win32DemoApplication
-#else
-#include "tgGlutDemoApplication.h"
-#define PlatformDemoApplication tgGlutDemoApplication
-#endif
+#include "ExampleBrowser/OpenGLExampleBrowser.h"
 
 #include "LinearMath/btAlignedObjectArray.h"
 // The C++ Standard library
 #include <iostream>
 
 // Forward declarations
-class tgGLDebugDrawer;
-
+class GL_ShapeDrawer;
+class btDynamicsWorld;
 
 // @todo: Provide ability to make render rate and simulation step rate independent
 
-class tgSimViewGraphics :  public tgSimView, public PlatformDemoApplication
+class tgSimViewGraphics :  public tgSimView, public OpenGLExampleBrowser
 {
 public:
 
@@ -95,7 +87,7 @@ public:
     /**
      * Clears the openGL buffer and dispatches a tgBulletRenderer to the world
      */
-    void render();
+    void render(double dt);
     
     /**
      * Run for a specified number of steps. Currently performs the
@@ -125,24 +117,10 @@ public:
         teardown();
     }
     
-    /**
-     * Requried by tgDemoApplication. Handles Rendering
-     */
-    virtual void clientMoveAndDisplay();
-    
-    /**
-     * Contains a smaller set of rendering functions than clientMoveAndDisplay
-     */
-    virtual void displayCallback();
-    
-    /**
-     * Called when the space bar is pressed. Calls reset,
-     * then updates the pointers to the world and glDebugDrawer
-     */
-    virtual void clientResetScene();
-
 private:    
-    tgGLDebugDrawer*    gDebugDrawer;   
+    GL_ShapeDrawer*    gDebugDrawer;   
+    
+    btDynamicsWorld* m_dynamicsWorld;
 };
 
 

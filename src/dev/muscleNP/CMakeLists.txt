@@ -2,7 +2,7 @@ Project(MuscleNP)
 
 link_libraries(tgcreator
 				core
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(${PROJECT_NAME} SHARED
    
@@ -10,5 +10,5 @@ add_library(${PROJECT_NAME} SHARED
             tgGhostModel.cpp
             )
             
-target_link_libraries(${PROJECT_NAME} tgcreator core tgOpenGLSupport)
+target_link_libraries(${PROJECT_NAME} tgcreator core OpenGLWindow)
 

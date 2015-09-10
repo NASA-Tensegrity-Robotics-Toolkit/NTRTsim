@@ -11,7 +11,7 @@ link_libraries(CPG_feedback
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(flemonsSpineContact 
                 FlemonsSpineModelContact.cpp

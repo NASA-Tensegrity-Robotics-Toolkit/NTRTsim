@@ -28,18 +28,20 @@
 // This application
 #include "tgBulletUtil.h"
 #include "tgSimulation.h"
-// Bullet OpenGL_FreeGlut (patched files)
-#include "tgGLDebugDrawer.h"
+
 // The Bullet Physics library
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "ExampleBrowser/GL_ShapeDrawer.h"
 
 tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
                      double stepSize,
                      double renderRate) : 
-  tgSimView(world, stepSize, renderRate)
+  tgSimView(world, stepSize, renderRate),
+  OpenGLExampleBrowser(NULL) // TODO FIX THIS!
 {
     /// @todo figure out a good time to delete this
-    gDebugDrawer = new tgGLDebugDrawer();
+    gDebugDrawer = new GL_ShapeDrawer();
     // Supress compiler warning for bullet's unused variable
     (void) btInfinityMask;
 }
@@ -47,10 +49,11 @@ tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
 tgSimViewGraphics::~tgSimViewGraphics()
 {
 #ifndef BT_NO_PROFILE
+#if 0 // TODO figure out what happend to CProfileManager
     CProfileManager::Release_Iterator(m_profileIterator);
-#endif //BT_NO_PROFILE
-    delete m_shootBoxShape;
-    delete m_shapeDrawer;
+#endif
+    #endif //BT_NO_PROFILE
+
 }
 
 void tgSimViewGraphics::setup()
@@ -67,11 +70,8 @@ void tgSimViewGraphics::setup()
         /// @todo Can this pointer become invalid if a reset occurs?
         m_dynamicsWorld = &dynamicsWorld;
 
-        // Give the pointer to demoapplication for rendering
-        dynamicsWorld.setDebugDrawer(gDebugDrawer);
-        
         // @todo Valgrind thinks this is a leak. Perhaps its a GLUT issue?
-        m_pModelVisitor = new tgBulletRenderer(world);
+        m_pModelVisitor = new tgBulletRenderer(world, *gDebugDrawer);
         std::cout << "setup graphics" << std::endl;
 }
 
@@ -82,14 +82,12 @@ void tgSimViewGraphics::teardown()
     tgSimView::teardown();
 }
 
-void tgSimViewGraphics::render()
+void tgSimViewGraphics::render(double dt)
 {
     if (m_pSimulation && m_pModelVisitor)
     {
         
-        glClear(GL_COLOR_BUFFER_BIT |
-            GL_DEPTH_BUFFER_BIT |
-            GL_STENCIL_BUFFER_BIT);
+        OpenGLExampleBrowser::update(dt);
         
         m_pSimulation->onVisit(*m_pModelVisitor);
 
@@ -105,26 +103,20 @@ void tgSimViewGraphics::run(int steps)
 {
     if (isInitialzed())
     {
-        tgglutmain(1024, 600, "Tensegrity Demo", this);
-
-        glutMainLoop();
+        OpenGLExampleBrowser::init(NULL, NULL);
+     
         
-        /* Free glut code
         // This would normally run forever, but this is just for testing
         for(int i = 0; i < steps; i++) {
-            m_pSimulation->step(dt);
+            m_pSimulation->step(m_stepSize);
             
+            // @todo fix this to actually incorperate m_renderTime
             if(i % 5 == 0) {
-                render();
+                render(m_stepSize * 5);
             }
-            if(getExitFlag())
-            {
-                break;
-            }   
+             
         }
-        std::cout << "leaving loop" << std::endl;
-        glutLeaveMainLoop();
-        */
+
     }
 }
 
@@ -135,48 +127,4 @@ void tgSimViewGraphics::reset()
     assert(isInitialzed());
     m_pSimulation->reset();
     assert(isInitialzed());
-}
-
-void tgSimViewGraphics::clientMoveAndDisplay()
-{
-    if (isInitialzed()){
-        m_pSimulation->step(m_stepSize);    
-        m_renderTime += m_stepSize; 
-        if (m_renderTime >= m_renderRate)
-        {
-            render();
-            // Doesn't appear to do anything yet...
-            m_dynamicsWorld->debugDrawWorld();
-            renderme();     
-            // Camera is updated in renderme
-            glFlush();
-            swapBuffers();      
-            m_renderTime = 0;
-        }
-    }
-}
-
-void tgSimViewGraphics::displayCallback()
-{
-    if (isInitialzed())
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-        renderme();
-        // optional but useful: debug drawing to detect problems
-        if (m_dynamicsWorld)
-        {
-            m_dynamicsWorld->debugDrawWorld();
-        }
-        glFlush();
-        swapBuffers();
-    }
-}
-
-void tgSimViewGraphics::clientResetScene()
-{
-    reset();
-    assert(isInitialzed());
-
-    tgWorld& world = m_pSimulation->getWorld();
-    tgBulletUtil::worldToDynamicsWorld(world).setDebugDrawer(gDebugDrawer);
 }

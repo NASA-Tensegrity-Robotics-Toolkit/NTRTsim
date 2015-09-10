@@ -8,7 +8,7 @@ link_libraries(controllers
                 controllers
                 core    
                 terrain 
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(TimestepTest SHARED
 			tsTestRig.cpp)

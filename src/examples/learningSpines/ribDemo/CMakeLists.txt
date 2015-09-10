@@ -9,7 +9,7 @@ link_libraries(learningSpines
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppRibModelLearning
     RibModel.cpp

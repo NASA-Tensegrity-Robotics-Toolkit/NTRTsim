@@ -10,9 +10,9 @@ SET(INC_DIR ${ENV_DIR}/include)
 
 SET(BULLET_PHYSICS_SOURCE_DIR ${ENV_DIR}/build/bullet)
 
-SET(OPENGL_LIB ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL)
+SET(OPENGL_LIB ${BULLET_PHYSICS_SOURCE_DIR}/examples/OpenGLWindow)
 
-SET(OPENGL_FG_LIB ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL_FreeGlut)
+SET(BULLET_RENDERING ${BULLET_PHYSICS_SOURCE_DIR}/examples)
 
 include_directories (
     ${BULLET_PHYSICS_SOURCE_DIR}/src
@@ -21,11 +21,11 @@ include_directories (
     ${ENV_INC_DIR}/boost
     ${ENV_INC_DIR}/tensegrity
     ${PROJECT_SOURCE_DIR}
-    ${OPENGL_FG_LIB}
+    ${BULLET_RENDERING}
     "/usr/include/glib-2.0"
 )
 
-link_directories(${LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
+link_directories(${LIB_DIR} ${OPENGL_LIB})
 
 OPTION(USE_GLUT "Use Glut"  ON)
 
@@ -103,11 +103,11 @@ ENDIF(USE_GLUT)
 IF (USE_GLUT)
 
     INCLUDE_DIRECTORIES(
-    ${BULLET_PHYSICS_SOURCE_DIR}/src ${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL 
+    ${BULLET_PHYSICS_SOURCE_DIR}/src
     )
 
     LINK_LIBRARIES(
-    tgOpenGLSupport OpenGLSupport BulletSoftBody BulletDynamics  BulletCollision LinearMath    ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
+    BulletSoftBody BulletDynamics  BulletCollision LinearMath    ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
     )
     
     # The definitions of executables are defined in the CMakeLists.txt files in subdirectories. 

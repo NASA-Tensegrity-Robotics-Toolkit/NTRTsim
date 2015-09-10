@@ -7,7 +7,7 @@ link_libraries(learningSpines
                Adapters
                Configuration
                AnnealEvolution
-               tgOpenGLSupport
+               OpenGLWindow
                obstacles
                KinematicString
                CPG_feedback

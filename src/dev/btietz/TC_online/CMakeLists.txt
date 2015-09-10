@@ -12,7 +12,7 @@ link_libraries(GoalSpine
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport
+                OpenGLWindow
                 boost_program_options)
                 
                 

@@ -8,7 +8,7 @@ link_libraries(learningSpines
                 core
                 util
                 terrain
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(${PROJECT_NAME} SHARED
 			TetraSpineStaticModel_hf.cpp

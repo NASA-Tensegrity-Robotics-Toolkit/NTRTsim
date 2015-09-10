@@ -9,7 +9,7 @@ link_libraries(sensors
                 Configuration
                 AnnealEvolution
                 FileHelpers
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(${PROJECT_NAME} SHARED
 			BaseSpineModelLearning.cpp

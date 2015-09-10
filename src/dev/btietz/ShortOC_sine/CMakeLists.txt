@@ -12,7 +12,7 @@ link_libraries(octahedralComplex
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppOctaCL_sine
     AppOctaCL_sine.cpp

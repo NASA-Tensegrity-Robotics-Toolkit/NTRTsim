@@ -34,6 +34,7 @@ class tgSpringCableActuator;
 class tgModel;
 class tgRod;
 class tgWorld;
+class GL_ShapeDrawer;
 
 /**
  * A concrete tgRenderer for Bullet Physics.
@@ -46,7 +47,7 @@ public:
    * The only constructor.
    * @param[in,out] world a reference to the tgWorld being rendered
    */
-  tgBulletRenderer(const tgWorld& world);
+  tgBulletRenderer(const tgWorld& world, const GL_ShapeDrawer& drawer);
 
   /**
    * Render a tgSpringCableActuator.
@@ -72,6 +73,8 @@ private:
    * A reference to the tgWorld being rendered.
    */
   const tgWorld& m_world;
+  
+  const GL_ShapeDrawer& m_drawer;
 };
 
 #endif

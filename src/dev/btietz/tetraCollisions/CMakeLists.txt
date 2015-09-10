@@ -9,7 +9,7 @@ link_libraries(obstacles
                 tgcreator
                 core
                 terrain
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(tetraCollisions SHARED
     tscDataLogger.cpp

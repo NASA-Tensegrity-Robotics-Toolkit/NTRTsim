@@ -9,7 +9,7 @@ link_libraries(learningSpines
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library (octahedralComplex SHARED
 				FlemonsSpineModelLearningCL.cpp)

@@ -39,14 +39,16 @@
 #include "LinearMath/btQuickprof.h"
 
 // OpenGL_FreeGlut (patched Bullet)
-#include "tgGLDebugDrawer.h"
+#include "ExampleBrowser/GL_ShapeDrawer.h"
 // The Bullet Physics library
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 // The C++ Standard Library
 #include <cassert>
 
 
-tgBulletRenderer::tgBulletRenderer(const tgWorld& world) : m_world(world)
+tgBulletRenderer::tgBulletRenderer(const tgWorld& world, const GL_ShapeDrawer& drawer) : 
+m_world(world),
+m_drawer(drawer)
 {
 }
 
@@ -64,10 +66,8 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
     BT_PROFILE("tgBulletRenderer::renderString");
 #endif //BT_NO_PROFILE 
         // Fetch the btDynamicsWorld
-        btDynamicsWorld& dynamicsWorld =
-      tgBulletUtil::worldToDynamicsWorld(m_world);
-
-    btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
+#if (0)
+    btIDebugDraw* const pDrawer = &m_drawer;
     
     const tgSpringCable* const pSpringCable = mSCA.getSpringCable();
     
@@ -93,6 +93,7 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
 		  pDrawer->drawLine(lineFrom, lineTo, color);
 		}
 	}
+#endif
 }
 
 void tgBulletRenderer::render(const tgModel& model) const
@@ -103,14 +104,13 @@ void tgBulletRenderer::render(const tgModel& model) const
 	/**
 	 * Render the markers of the model using spheres.
 	 */
-
-	// Fetch the btDynamicsWorld
-	btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
-	btIDebugDraw* const idraw = dynamicsWorld.getDebugDrawer();
+#if (0)
+	btIDebugDraw* const idraw =  &m_drawer;
 	for(int j=0;j<model.getMarkers().size() ;j++)
 	{
 		abstractMarker mark = model.getMarkers()[j];
 		idraw->drawSphere(mark.getWorldPosition(),0.6,mark.getColor());
-	}
+    }
+#endif
 }
 

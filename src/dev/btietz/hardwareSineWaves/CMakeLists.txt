@@ -18,7 +18,7 @@ link_libraries(tetraSpineHardware
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppTetraSpineHardwareSine
 	tgSineStringControl.cpp

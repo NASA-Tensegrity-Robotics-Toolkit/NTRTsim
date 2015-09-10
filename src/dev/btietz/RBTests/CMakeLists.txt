@@ -6,7 +6,7 @@ link_libraries(btietz
                 sensors
                 core    
                 terrain 
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 
 add_executable(AppContactModelTest

@@ -10,7 +10,7 @@ link_libraries(learningSpines
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_executable(AppTetraSpineLearning
     TetraSpineLearningModel.cpp

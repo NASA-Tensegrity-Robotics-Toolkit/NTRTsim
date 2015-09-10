@@ -10,7 +10,7 @@ link_libraries(KinematicString
                 Adapters
                 Configuration
                 AnnealEvolution
-                tgOpenGLSupport)
+                OpenGLWindow)
 
 add_library(TetrahedralComplex SHARED
 	FlemonsSpineModelLearning.cpp)
