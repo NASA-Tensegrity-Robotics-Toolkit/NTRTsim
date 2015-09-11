@@ -86,7 +86,7 @@ bool AppMixedLearning::setup()
         const double highAmplitude = 300.0;
         const double kt = 0.0;
         const double kp = 1000.0;
-        const double kv = 200.0;
+        const double kv = 100.0;
         const bool def = true;
             
         // Overridden by def being true
