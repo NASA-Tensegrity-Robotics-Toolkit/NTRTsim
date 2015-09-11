@@ -4,11 +4,11 @@
     "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "dhustigschultz/AppMixedLearning/",
     "executable" : "./../../../build/dev/dhustigschultz/TC_MixedLearning/AppMixedLearning",
-    "terrain" : [[[0, 0, 0, -1.517, 100000]]],
+    "terrain" : [[[0, 0, 0, -1.517, 60000]]],
     "learningParams": 
     {
         "trialLength" : 30000,
-        "numTrials" : 5,
+        "numTrials" : 20000,
         "numGenerations" : 1,
         "deterministic": 0,
         "nodeVals" :

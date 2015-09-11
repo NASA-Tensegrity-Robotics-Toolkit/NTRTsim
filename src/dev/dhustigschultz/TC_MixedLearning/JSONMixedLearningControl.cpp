@@ -17,10 +17,10 @@
 */
 
 /**
- * @file JSONFeedbackControl.cpp
+ * @file JSONMixedLearningControl.cpp
  * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz
- * @version 1.1.0
+ * @author Brian Mirletz, Dawn Hustig-Schultz
+ * @version 1.0.0
  * $Id$
  */
 
@@ -114,7 +114,7 @@ JSONMixedLearningControl::~JSONMixedLearningControl()
 
 void JSONMixedLearningControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB(100);
+	m_pCPGSys = new CPGEquationsFB(200);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -132,18 +132,21 @@ void JSONMixedLearningControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value startingEdgeVals = root.get("startingEdgeVals", "UTF-8");
     Json::Value middleEdgeVals = root.get("middleEdgeVals", "UTF-8");
+    Json::Value endingEdgeVals = root.get("endingEdgeVals", "UTF-8");
     
     std::cout << nodeVals << std::endl;
     
     nodeVals = nodeVals.get("params", "UTF-8");
     startingEdgeVals = startingEdgeVals.get("params", "UTF-8");
     middleEdgeVals = middleEdgeVals.get("params", "UTF-8");
+    endingEdgeVals = endingEdgeVals.get("params", "UTF-8");
     
     array_4D startingEdgeParams = scaleEdgeActions(startingEdgeVals);
     array_4D middleEdgeParams = scaleEdgeActions(middleEdgeVals);
+    array_4D endingEdgeParams = scaleEdgeActions(endingEdgeVals);
     array_2D nodeParams = scaleNodeActions(nodeVals);
 
-    setupCPGs(subject, nodeParams, startingEdgeParams, middleEdgeParams);
+    setupCPGs(subject, nodeParams, startingEdgeParams, middleEdgeParams, endingEdgeParams);
     
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
@@ -311,14 +314,21 @@ void JSONMixedLearningControl::onTeardown(BaseSpineModelLearning& subject)
     {
         delete m_middleControllers[i];
     }
-    m_middleControllers.clear();     
+    m_middleControllers.clear(); 
+
+    for(size_t i = 0; i < m_endingControllers.size(); i++)
+    {
+        delete m_endingControllers[i];
+    }
+    m_endingControllers.clear();    
 }
 
-void JSONMixedLearningControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D startingEdgeActions, array_4D middleEdgeActions)
+void JSONMixedLearningControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D startingEdgeActions, array_4D middleEdgeActions, array_4D endingEdgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> startMuscles = subject.find<tgSpringCableActuator> ("starting");
     std::vector <tgSpringCableActuator*> middleMuscles = subject.find<tgSpringCableActuator> ("middle");
+    std::vector <tgSpringCableActuator*> endMuscles = subject.find<tgSpringCableActuator> ("ending");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
     
@@ -392,6 +402,40 @@ void JSONMixedLearningControl::setupCPGs(BaseSpineModelLearning& subject, array_
 		}
     }
 	
+    for (std::size_t i = 0; i < endMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        endMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeActions);
+        
+        m_endingControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_endingControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_endingControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_endingControllers, endingEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
 }
 
 array_2D JSONMixedLearningControl::scaleNodeActions (Json::Value actions)

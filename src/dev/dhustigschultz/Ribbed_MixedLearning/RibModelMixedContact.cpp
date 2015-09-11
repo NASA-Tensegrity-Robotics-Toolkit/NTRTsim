@@ -293,7 +293,7 @@ void RibModelMixedContact::setup(tgWorld& world)
     const bool backDrivable = false;
     
 
-    #if (1) //Replacing with tgKinematicActuator, leaving option to turn it off. 9/9/15.
+    #if (0) //Replacing with tgKinematicActuator, leaving option to turn it off. 9/9/15.
     tgKinematicActuator::Config muscleConfig(elasticity, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);

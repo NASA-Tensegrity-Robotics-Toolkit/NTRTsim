@@ -75,7 +75,7 @@ bool AppMixedLearning::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 4;
+        const int segmentSpan = 3;
         const int numMuscles = 7;
         const int numParams = 2;
         const int segNumber = 0; // For learning results
