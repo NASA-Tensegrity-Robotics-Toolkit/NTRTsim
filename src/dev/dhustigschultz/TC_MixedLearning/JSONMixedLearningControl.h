@@ -22,8 +22,8 @@
 /**
  * @file JSONMixedLearningControl.h
  * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz
- * @version 1.1.0
+ * @author Brian Mirletz, Dawn Hustig-Schultz
+ * @version 1.0.0
  * $Id$
  */
 
@@ -41,7 +41,7 @@ class tgSpringCableActuator;
  * AnnealEvolution and used in the CPGEquations family of classes.
  * tgImpedanceController controllers are used for the detailed muscle control.
  * Due to the number of parameters, the learned parameters are split
- * into one config file for the nodes and another for the CPG's "edges"
+ * into one config file for the nodes and another 3 for the CPG's "edges".
  */
 class JSONMixedLearningControl : public JSONCPGControl
 {
@@ -106,7 +106,7 @@ struct Config : public JSONCPGControl::Config
 	
 protected:
 
-    virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D startingEdgeActions, array_4D middleEdgeActions);
+    virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D startingEdgeActions, array_4D middleEdgeActions, array_4D endingEdgeActions);
     
     virtual array_2D scaleNodeActions (Json::Value actions);
     
