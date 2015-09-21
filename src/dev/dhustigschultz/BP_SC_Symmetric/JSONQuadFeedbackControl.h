@@ -16,14 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef JSON_MIXED_LEARNING_CONTROL_H
-#define JSON_MIXED_LEARNING_CONTROL_H
+#ifndef JSON_QUAD_FEEDBACK_CONTROL_H
+#define JSON_QUAD_FEEDBACK_CONTROL_H
 
 /**
- * @file JSONMixedLearningControl.h
+ * @file JSONFeedbackControl.h
  * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz, Dawn Hustig-Schultz
- * @version 1.0.0
+ * @author Brian Mirletz
+ * @version 1.1.0
  * $Id$
  */
 
@@ -41,9 +41,9 @@ class tgSpringCableActuator;
  * AnnealEvolution and used in the CPGEquations family of classes.
  * tgImpedanceController controllers are used for the detailed muscle control.
  * Due to the number of parameters, the learned parameters are split
- * into one config file for the nodes and another 3 for the CPG's "edges".
+ * into one config file for the nodes and another for the CPG's "edges"
  */
-class JSONMixedLearningControl : public JSONCPGControl
+class JSONQuadFeedbackControl : public JSONCPGControl
 {
 public:
 
@@ -76,8 +76,8 @@ struct Config : public JSONCPGControl::Config
         double afMax = 0.0,
         double pfMin = 0.0,
         double pfMax = 0.0,
-	double maxH = 25.0,
-	double minH = 1.0
+	double maxH = 60.0, //May need to tune this value more
+	double minH = 1.0   //Perhaps same
         );
         
         const double freqFeedbackMin;
@@ -93,15 +93,14 @@ struct Config : public JSONCPGControl::Config
         // Values to be filled in by JSON file during onSetup
         int numStates;
         int numActions;
-	int numHidden;
         
     };
 
-    JSONMixedLearningControl(JSONMixedLearningControl::Config config,	
+    JSONQuadFeedbackControl(JSONQuadFeedbackControl::Config config,	
 							std::string args,
 							std::string resourcePath = "");
     
-    virtual ~JSONMixedLearningControl();
+    virtual ~JSONQuadFeedbackControl();
     
     virtual void onSetup(BaseSpineModelLearning& subject);
     
@@ -111,7 +110,7 @@ struct Config : public JSONCPGControl::Config
 	
 protected:
 
-    virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D startingEdgeActions, array_4D middleEdgeActions, array_4D endingEdgeActions);
+    virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
     
     virtual array_2D scaleNodeActions (Json::Value actions);
     
@@ -121,15 +120,13 @@ protected:
     
     std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions);
     
-    JSONMixedLearningControl::Config m_config;
-    
-    std::vector<tgCPGActuatorControl*> m_startingControllers;
-    std::vector<tgCPGActuatorControl*> m_middleControllers;
-    std::vector<tgCPGActuatorControl*> m_endingControllers;
+    JSONQuadFeedbackControl::Config m_config;
 
+    std::vector<tgCPGActuatorControl*> m_spineControllers;
+    
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
     
 };
 
-#endif // JSON_MIXED_LEARNING_CONTROL_H
+#endif // JSON_QUAD_FEEDBACK_CONTROL_H

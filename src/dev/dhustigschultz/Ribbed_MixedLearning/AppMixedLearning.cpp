@@ -83,7 +83,7 @@ bool AppMixedLearning::setup()
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
-        const double highAmplitude = 300.0;
+        const double highAmplitude = 300.0; 
         const double kt = 0.0;
         const double kp = 1000.0;
         const double kv = 100.0;
@@ -101,6 +101,9 @@ bool AppMixedLearning::setup()
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
+	
+	const double maxH = 25.0;
+	const double minH = 1.0;
 
         JSONMixedLearningControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -124,7 +127,9 @@ bool AppMixedLearning::setup()
                                                     afMin,
                                                     afMax,
                                                     pfMin,
-                                                    pfMax);
+                                                    pfMax,
+						    maxH,
+						    minH);
         /// @todo fix memory leak that occurs here
        JSONMixedLearningControl* const myControl =
         new JSONMixedLearningControl(control_config, suffix, "dhustigschultz/AppRibbedMixedLearning/");

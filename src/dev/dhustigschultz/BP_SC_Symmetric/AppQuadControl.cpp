@@ -17,17 +17,18 @@
 */
 
 /**
- * @file AppTerrainJSON.cpp
- * @brief Contains the definition of functions for multi-terrain app
- * @author Brian Mirletz, Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @file AppMixedCPG.cpp
+ * @brief Modifying the CPG parameters and coupling for first and last segments of a spine. Building off Brian's work.
+ * @author Dawn Hustig-Schultz, Brian Mirletz
+ * @date August 2015
+ * @version 1.0.0
  * $Id$
  */
 
-#include "AppMixedLearning.h"
+#include "AppQuadControl.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
 
-AppMixedLearning::AppMixedLearning(int argc, char** argv)
+AppQuadControl::AppQuadControl(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -39,11 +40,11 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
-    nSegments = 6;
+    nSegments = 7;
     nTypes = 3;
 
     startX = 0;
-    startY = 20;
+    startY = 40; //May need adjustment
     startZ = 0;
     startAngle = 0;
     
@@ -52,7 +53,7 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppMixedLearning::setup()
+bool AppQuadControl::setup()
 {
     // First create the world
     world = createWorld();
@@ -69,14 +70,22 @@ bool AppMixedLearning::setup()
     // Fourth create the models with their controllers and add the models to the
     // simulation
     /// @todo add position and angle to configuration
-        FlemonsSpineModelMixed* myModel =
-      new FlemonsSpineModelMixed(nSegments);
+        //FlemonsSpineModelContact* myModel =
+      //new FlemonsSpineModelContact(nSegments); 
+
+    //Parameters for the structure:
+    const int segments = 7;
+    const int hips = 4;
+    const int legs = 4;
+    const int feet = 4; 
+
+    BigPuppySymmetric* myModel = new BigPuppySymmetric(segments, hips, legs, feet);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 3;
-        const int numMuscles = 8;
+        const int segmentSpan = 3; //Not sure what this will be for mine!
+        const int numMuscles = 8; //This may be ok, but confirm. 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -84,7 +93,7 @@ bool AppMixedLearning::setup()
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
         const double highAmplitude = 300.0;
-        const double kt = 0.0;
+        const double kt = 0.0; //May need to retune kt, kp, and kv
         const double kp = 1000.0;
         const double kv = 200.0;
         const bool def = true;
@@ -94,7 +103,7 @@ bool AppMixedLearning::setup()
         const double lf = 0.0;
         const double hf = 30.0;
         
-        // Feedback parameters
+        // Feedback parameters... may need to retune
         const double ffMin = -0.5;
         const double ffMax = 10.0;
         const double afMin = 0.0;
@@ -102,10 +111,10 @@ bool AppMixedLearning::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
 
-	const double maxH = 25.0;
+	const double maxH = 60.0;
 	const double minH = 1.0;
 
-        JSONMixedLearningControl::Config control_config(segmentSpan, 
+        JSONQuadFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -131,8 +140,8 @@ bool AppMixedLearning::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONMixedLearningControl* const myControl =
-        new JSONMixedLearningControl(control_config, suffix, "dhustigschultz/AppMixedLearning/");
+       JSONQuadFeedbackControl* const myControl =
+        new JSONQuadFeedbackControl(control_config, suffix, "dhustigschultz/AppQuadControl/");
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -156,7 +165,7 @@ bool AppMixedLearning::setup()
     return bSetup;
 }
 
-void AppMixedLearning::handleOptions(int argc, char **argv)
+void AppQuadControl::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -204,7 +213,7 @@ void AppMixedLearning::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppMixedLearning::getHillyConfig()
+const tgHillyGround::Config AppQuadControl::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -224,7 +233,7 @@ const tgHillyGround::Config AppMixedLearning::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppMixedLearning::getBoxConfig()
+const tgBoxGround::Config AppQuadControl::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -241,14 +250,14 @@ const tgBoxGround::Config AppMixedLearning::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppMixedLearning::getBlocks()
+tgModel* AppQuadControl::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppMixedLearning::createWorld()
+tgWorld* AppQuadControl::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -270,17 +279,17 @@ tgWorld* AppMixedLearning::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppMixedLearning::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppQuadControl::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppMixedLearning::createView(tgWorld *world)
+tgSimView *AppQuadControl::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppMixedLearning::run()
+bool AppQuadControl::run()
 {
     if (!bSetup)
     {
@@ -306,7 +315,7 @@ bool AppMixedLearning::run()
     return true;
 }
 
-void AppMixedLearning::simulate(tgSimulation *simulation)
+void AppQuadControl::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -362,8 +371,8 @@ void AppMixedLearning::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppMixedLearning" << std::endl;
-    AppMixedLearning app (argc, argv);
+    std::cout << "AppQuadControl" << std::endl;
+    AppQuadControl app (argc, argv);
 
     if (app.setup())
         app.run();
@@ -371,3 +380,5 @@ int main(int argc, char** argv)
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }
+
+
