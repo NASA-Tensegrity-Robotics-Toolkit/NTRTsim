@@ -150,19 +150,19 @@ nodePositions.push_back(btVector3(-f, c+2, 0)); // 16
 
 
 //Additional Humerus Nodes to help create saddle 
-nodePositions.push_back(btVector3(0, c+2*a/3, g)); // 17
-nodePositions.push_back(btVector3(0, c+2*a/3, -g)); // 18
+nodePositions.push_back(btVector3(g, c+2*a/3, 0)); // 17
+nodePositions.push_back(btVector3(-g, c+2*a/3, 0)); // 18
 
 //Shoulder nodes (scapula)
 nodePositions.push_back(btVector3(g, c, g)); // 19
-nodePositions.push_back(btVector3(g, c, -g)); // 20
-nodePositions.push_back(btVector3(-g, c, 0)); // 21
-nodePositions.push_back(btVector3(-g-a*3/2, c, 0)); // 22
-nodePositions.push_back(btVector3(-g-a*3/2, c-2*g, 0)); // 23
+nodePositions.push_back(btVector3(-g, c, g)); // 20
+nodePositions.push_back(btVector3(0, c, -g)); // 21
+nodePositions.push_back(btVector3(0, c, -g-a*3/2)); // 22
+nodePositions.push_back(btVector3(0, c-2*g, -g-a*3/2)); // 23
 
 //Shoulder nodes (clavicle)
-nodePositions.push_back(btVector3(-c, c+a, 0)); // 24
-nodePositions.push_back(btVector3(2*g, c+a, 0)); // 25
+nodePositions.push_back(btVector3(0, c+a, -c)); // 24
+nodePositions.push_back(btVector3(0, c+a, 2*g)); // 25
 nodePositions.push_back(btVector3(0, c+a, 0)); // 26
 
 
