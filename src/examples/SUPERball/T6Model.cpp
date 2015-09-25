@@ -70,7 +70,8 @@ namespace
         double friction;
         double rollFriction;
         double restitution;
-        double pretension;
+        double pretensionPassive;
+	double pretensionActive;
         bool   hist;
         double maxTens;
         double targetVelocity;
@@ -80,10 +81,10 @@ namespace
         bool   backDrivable;
     } c =
    {
-     0.311,    // density (kg / length^3)
-     0.60,     // radius (length)
+     0.40374,    // density (kg / length^3)
+     0.35,     // radius (length)
      0.104,      // density_mp (kg / length^3) // 
-     0.35,      //radius_mp (length)
+     0.175,      //radius_mp (length)
      998.25,   // stiffnessPassive (kg / sec^2)
      3152.36,  // stiffnessActive (kg / sec^2)
      200.0,    // damping (kg / sec)
@@ -93,10 +94,11 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     1000,//2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     100.0,    // pretension -> set to 
+     100.0,   // pretension -> set to 
      0,			// History logging (boolean)
-     100000,   // maxTens
-     4,    // targetVelocity
+     4000,   // maxTens
+     10,    // targetVelocity
      0.09, // motor_radius // Spindle radius (length)
      4.24e-5, // motor_friction (kg*(length)^2/sec)
      2.749e-4, // motor_inertia (kg*(length)^2) // Inertia of motor, gearbox, and spindle all together
@@ -299,10 +301,10 @@ void T6Model::setup(tgWorld& world)
 
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     //tgBasicActuator::Config actuatedCableConfig(3100., c.damping, c.pretension, c.hist, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config passiveCableConfig(c.stiffnessPassive, c.damping, c.pretension, c.hist,
+    tgBasicActuator::Config passiveCableConfig(c.stiffnessPassive, c.damping, c.pretensionPassive, c.hist,
 					    c.maxTens, c.targetVelocity);
     // This part is added by Ali to make a more accurate model of SuperBall's Rods
-    tgKinematicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretension, c.motor_radius, c.motor_friction,
+    tgKinematicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretensionActive, c.motor_radius, c.motor_friction,
                         c.motor_inertia, c.backDrivable, c.hist, c.maxTens, c.targetVelocity);
     // Start creating the structure
     tgStructure s;
@@ -315,8 +317,17 @@ void T6Model::setup(tgWorld& world)
     // otherwise  glitches put a rod below the ground.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
-    double rotationAngle = M_PI/2;
+    //double rotationAngle = M_PI/2;
+    double rotationAngle = -0.6;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+
+    rotationAxis = btVector3(1, 0, 0);  // y-axis
+    rotationAngle = -0.6;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+
+    //rotationAxis = btVector3(0, 0, 1);  // y-axis
+    //rotationAngle = 1.7;
+    //s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
