@@ -81,10 +81,10 @@ namespace
         bool   backDrivable;
     } c =
    {
-     0.40374,    // density (kg / length^3)
-     0.35,     // radius (length)
-     0.104,      // density_mp (kg / length^3) // 
-     0.175,      //radius_mp (length)
+     0.38618,    // density (kg / length^3) weight of both endcaps: 3.3kg (1.65 kg each)
+     0.35,     // radius (length) radius of an endcap
+     0.208,      // density_mp (kg / length^3) weight of connecting rod: 200g 
+     0.175,      //radius_mp (length) radius of the connecting rod
      998.25,   // stiffnessPassive (kg / sec^2)
      3152.36,  // stiffnessActive (kg / sec^2)
      200.0,    // damping (kg / sec)
@@ -97,8 +97,8 @@ namespace
      100.0,    // pretension -> set to 
      100.0,   // pretension -> set to 
      0,			// History logging (boolean)
-     4000,   // maxTens
-     10,    // targetVelocity
+     400,   // maxTens
+     2,    // targetVelocity
      0.09, // motor_radius // Spindle radius (length)
      4.24e-5, // motor_friction (kg*(length)^2/sec)
      2.749e-4, // motor_inertia (kg*(length)^2) // Inertia of motor, gearbox, and spindle all together
