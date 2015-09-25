@@ -79,8 +79,8 @@ int main(int argc, char** argv)
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
-    T6zeroMQController* const pTC = new T6zeroMQController();
-    myModel->attach(pTC);
+    //T6zeroMQController* const pTC = new T6zeroMQController();
+    //myModel->attach(pTC);
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);

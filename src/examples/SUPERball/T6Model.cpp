@@ -61,7 +61,8 @@ namespace
         double radius;
         double density_mp;
         double radius_mp;
-        double stiffness;
+        double stiffnessPassive;
+	double stiffnessActive;
         double damping;
         double rod_length;
         double rod_space;
@@ -83,7 +84,8 @@ namespace
      0.60,     // radius (length)
      0.104,      // density_mp (kg / length^3) // 
      0.35,      //radius_mp (length)
-     613.0,   // stiffness (kg / sec^2) was 1500
+     998.25,   // stiffnessPassive (kg / sec^2)
+     3152.36,  // stiffnessActive (kg / sec^2)
      200.0,    // damping (kg / sec)
      17.4,     // rod_length (length)
      4.5,      // rod_space (length)
@@ -269,10 +271,10 @@ void T6Model::setup(tgWorld& world)
 
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     //tgBasicActuator::Config actuatedCableConfig(3100., c.damping, c.pretension, c.hist, c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config passiveCableConfig(998., c.damping, c.pretension, c.hist,
+    tgBasicActuator::Config passiveCableConfig(c.stiffnessPassive, c.damping, c.pretension, c.hist,
 					    c.maxTens, c.targetVelocity);
     // This part is added by Ali to make a more accurate model of SuperBall's Rods
-    tgKinematicActuator::Config motorConfig(998., c.damping, c.pretension, c.motor_radius, c.motor_friction,
+    tgKinematicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretension, c.motor_radius, c.motor_friction,
                         c.motor_inertia, c.backDrivable, c.hist, c.maxTens, c.targetVelocity);
     // Start creating the structure
     tgStructure s;
