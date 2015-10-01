@@ -124,7 +124,7 @@ void T6Model::addNodes(tgStructure& s)
 {
     const double half_length = c.rod_length / 2;
     const double half_length_mp = c.rod_length_mp / 2;
-/*
+/* OLD CODE!
     s.addNode(-c.rod_space,  -half_length, 0);            // 1
     s.addNode(-c.rod_space,   half_length, 0);            // 2
     s.addNode( c.rod_space,  -half_length, 0);            // 3
@@ -139,30 +139,49 @@ void T6Model::addNodes(tgStructure& s)
     s.addNode( half_length, 0,           -c.rod_space);   // 12
 */
 
-    s.addNode( c.rod_space,  -half_length, 0);            // 1
-    s.addNode( c.rod_space,   half_length, 0);            // 2
-    s.addNode(0,            c.rod_space,    half_length); // 3
-    s.addNode(0,            c.rod_space,   -half_length); // 4
-    s.addNode( half_length, 0,            c.rod_space);   // 5
-    s.addNode(-half_length, 0,            c.rod_space);   // 6
-    s.addNode(-c.rod_space,   half_length, 0);            // 7
-    s.addNode(-c.rod_space,  -half_length, 0);            // 8
-    s.addNode(0,           -c.rod_space,    half_length); // 9
-    s.addNode(0,           -c.rod_space,   -half_length); // 10
-    s.addNode( half_length, 0,           -c.rod_space);   // 11
-    s.addNode(-half_length, 0,           -c.rod_space);   // 12
-    s.addNode( c.rod_space,  -half_length_mp, 0);         // 13(1-2)
-    s.addNode( c.rod_space,   half_length_mp, 0);         // 14(2-1)
-    s.addNode(0,            c.rod_space,    half_length_mp); // 15(3-4)
-    s.addNode(0,            c.rod_space,   -half_length_mp); // 16(4-3)
-    s.addNode( half_length_mp, 0,            c.rod_space);   // 17(5-6)
-    s.addNode(-half_length_mp, 0,            c.rod_space);   // 18(6-5)
-    s.addNode(-c.rod_space,   half_length_mp, 0);            // 19(7-8)
-    s.addNode(-c.rod_space,  -half_length_mp, 0);            // 20(8-7)
-    s.addNode(0,           -c.rod_space,    half_length_mp); // 21(9-10)
-    s.addNode(0,           -c.rod_space,   -half_length_mp); // 22(10-9)
-    s.addNode( half_length_mp, 0,           -c.rod_space);   // 23(11-12)
-    s.addNode(-half_length_mp, 0,           -c.rod_space);   // 24(12-11)
+/* MATLAB Code from UKF by Jeff F. for reference
+ * This is correct
+ * nodes = [
+    barSpacing      0               -barLength*0.5;
+    barSpacing      0                barLength*0.5;
+    0               barLength*0.5    barSpacing;   %5
+    0              -barLength*0.5    barSpacing;
+    barLength*0.5   barSpacing       0;
+   -barLength*0.5   barSpacing       0;
+   -barSpacing      0                barLength*0.5;
+   -barSpacing      0               -barLength*0.5;             %8      
+    0               barLength*0.5   -barSpacing;
+    0              -barLength*0.5   -barSpacing;
+    barLength*0.5  -barSpacing       0;
+   -barLength*0.5  -barSpacing       0;
+    ];
+*/
+
+    s.addNode( c.rod_space,		 0,				-half_length);	// 1
+    s.addNode( c.rod_space,		 0,			  	 half_length);	// 2
+    s.addNode( 0,             	 half_length,	 c.rod_space);	// 3
+    s.addNode( 0,            	-half_length,	 c.rod_space);	// 4
+    s.addNode( half_length,  	 c.rod_space,	 0);			// 5
+    s.addNode(-half_length,  	 c.rod_space,	 0);			// 6
+    s.addNode(-c.rod_space,   	 0,				 half_length);	// 7
+    s.addNode(-c.rod_space,   	 0,				-half_length);	// 8
+    s.addNode( 0,            	 half_length,	-c.rod_space); 	// 9
+    s.addNode( 0,           	-half_length,	-c.rod_space); 	// 10
+    s.addNode( half_length, 	-c.rod_space,	 0);   			// 11
+    s.addNode(-half_length, 	-c.rod_space,	 0);   			// 12
+    
+    s.addNode( c.rod_space,		 0,					-half_length_mp);	// 13(1-2)
+    s.addNode( c.rod_space,		 0,			  	 	 half_length_mp);	// 14(2-1)
+    s.addNode( 0,             	 half_length_mp, 	 c.rod_space);		// 15(3-4)
+    s.addNode( 0,            	-half_length_mp, 	 c.rod_space);		// 16(4-3)
+    s.addNode( half_length_mp,   c.rod_space,	 	 0);				// 17(5-6)
+    s.addNode(-half_length_mp,   c.rod_space,	 	 0);				// 18(6-5)
+    s.addNode(-c.rod_space,   	 0,				 	 half_length_mp);	// 19(7-8)
+    s.addNode(-c.rod_space,   	 0,					-half_length_mp);	// 20(8-7)
+    s.addNode( 0,            	 half_length_mp,	-c.rod_space); 		// 21(9-10)
+    s.addNode( 0,           	-half_length_mp,	-c.rod_space); 		// 22(10-9)
+    s.addNode( half_length_mp, 	-c.rod_space,	 	 0);   				// 23(11-12)
+    s.addNode(-half_length_mp, 	-c.rod_space,	 	 0);   				// 24(12-11)
 
 }
 
@@ -190,6 +209,15 @@ void T6Model::addRods(tgStructure& s)
 
 void T6Model::addActuators(tgStructure& s)
 {
+	/* MATLAB Code from UKF by Jeff F. for reference
+	 * This is correct - Indices start at 1 for MATLAB, 0 for NTRT code
+	 strings = [1  2 3 4 5 6 7 8  9 11 12 10   1 1 11 11 10 10 3 3 7  7 6 6;
+				11 5 7 2 9 3 6 12 8 10 4  1    9 5  2  4  12  8 5 2 4 12 8 9];
+				* NTRT Conversion below *
+			   [0  1 2 3 4 5 6 7  8 10 11 9   0 0 10 10  9   9 2 2 6  6  5 5;
+				10 4 6 1 8 2 5 11 7  9 3  0   8 4  1  3  11  7 4 1 3  11 7 8];
+
+	*/
 	//Large circle
 	s.addPair(1,	4,	"actuated");
 	s.addPair(4,	8,	"actuated");
