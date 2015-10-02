@@ -72,14 +72,14 @@ namespace
      0.688,    // density (kg / length^3)
      0.127/2,     // radius (length) ** rod diameter / 2 **
      0.56/2,     // radius (length) ** motor diameter / 2 **
-     613.0,   // stiffness (kg / sec^2) was 1500
-     200.0/3,    // damping (kg / sec)
+     200.0,   // stiffness (kg / sec^2) was 1500
+     20.0,    // damping (kg / sec)
      6.5,     // rod_length (length)
      3.25,      // rod_space (length)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2100.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     170.0,        // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity

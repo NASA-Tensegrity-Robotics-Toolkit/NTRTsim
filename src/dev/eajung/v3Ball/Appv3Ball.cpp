@@ -64,8 +64,8 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 1 / 60.0 / 19.0; // Seconds
-    const double timestep_graphics = 1.f/60.f; // Seconds
+    const double timestep_physics = 0.001; // Seconds
+    const double timestep_graphics = 0.01; // Seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
