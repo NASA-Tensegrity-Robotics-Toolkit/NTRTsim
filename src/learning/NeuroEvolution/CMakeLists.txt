@@ -17,5 +17,7 @@ add_library( ${PROJECT_NAME} SHARED
 	NeuroEvoPopulation.cpp
 )
 
+# Note: FileHelpers seems to be necessary, at least for build on mac...
 target_link_libraries(NeuroEvolution neuralNetwork Configuration)
+
 

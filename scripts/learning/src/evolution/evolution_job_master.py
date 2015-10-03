@@ -39,7 +39,14 @@ class EvolutionJobMaster(NTRTJobMaster):
         except OSError:
             if not os.path.isdir(self.path):
                 raise NTRTMasterError("Directed the folder path to an invalid address")
+        
+        try:
+            os.makedirs(self.path + '/logs')
+        except OSError:
+            if not os.path.isdir(self.path + '/logs'):
+                raise NTRTMasterError("Please create logs directory at" + self.path)
 
+        
         # Consider seeding random, using default (system time) now
         #random.seed(5)
 
@@ -238,6 +245,8 @@ class EvolutionJobMaster(NTRTJobMaster):
         and then returns a new set of parameters based on the specification file
         """
 
+	numTrials = self.jConf['learningParams']['numTrials']
+
         params = self.jConf["learningParams"][paramName]
 
         useAvg = params['useAverage']
@@ -271,6 +280,8 @@ class EvolutionJobMaster(NTRTJobMaster):
 
             # Fill in remaining population with random parameters
             for i in range(len(nextGeneration), params['populationSize']):
+		if(params['monteCarlo'] and params['populationSize'] != numTrials):
+	            raise NTRTMasterError("Number of trials must equal population size!")
                 if (i < 0):
                     raise NTRTMasterError("Number of controllers greater than population size!")
 

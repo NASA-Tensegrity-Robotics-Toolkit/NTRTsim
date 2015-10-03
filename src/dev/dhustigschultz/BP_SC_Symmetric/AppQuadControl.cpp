@@ -17,23 +17,18 @@
 */
 
 /**
- * @file AppGoalTensionNNW.cpp
- * @brief Contains the definition of functions for multi-terrain app
- * @author Brian Mirletz, Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @file AppMixedCPG.cpp
+ * @brief Modifying the CPG parameters and coupling for first and last segments of a spine. Building off Brian's work.
+ * @author Dawn Hustig-Schultz, Brian Mirletz
+ * @date August 2015
+ * @version 1.0.0
  * $Id$
  */
 
-#include "AppGoalTensionNNW.h"
-
-#include "helpers/FileHelpers.h"
-#include "tgcreator/tgUtil.h"
-
+#include "AppQuadControl.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
 
-#include <json/json.h>
-
-AppGoalTensionNNW::AppGoalTensionNNW(int argc, char** argv)
+AppQuadControl::AppQuadControl(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -45,23 +40,20 @@ AppGoalTensionNNW::AppGoalTensionNNW(int argc, char** argv)
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
-    nSegments = 6;
+    nSegments = 7;
     nTypes = 3;
 
     startX = 0;
-    startY = 20;
+    startY = 40; //May need adjustment
     startZ = 0;
     startAngle = 0;
-    goalAngle = 0;
     
     suffix = "default";
 
     handleOptions(argc, argv);
-    
-    tgUtil::seedRandom();
 }
 
-bool AppGoalTensionNNW::setup()
+bool AppQuadControl::setup()
 {
     // First create the world
     world = createWorld();
@@ -77,57 +69,33 @@ bool AppGoalTensionNNW::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-#if (0)
-    startAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415;
-#endif
-        FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments, goalAngle, startAngle);
+    /// @todo add position and angle to configuration
+        //FlemonsSpineModelContact* myModel =
+      //new FlemonsSpineModelContact(nSegments); 
+
+    //Parameters for the structure:
+    const int segments = 7;
+    const int hips = 4;
+    const int legs = 4;
+    const int feet = 4; 
+
+    BigPuppySymmetric* myModel = new BigPuppySymmetric(segments, hips, legs, feet);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        Json::Value root; // will contains the root value after parsing.
-        Json::Reader reader;
-        
-        std::string resourcePath = "bmirletz/TC_nn_Tension/";
-        std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
-        std::string controlFilename = controlFilePath + suffix;
-        
-        bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
-        if ( !parsingSuccessful )
-        {
-            // report to the user the failure and their locations in the document.
-            std::cout << "Failed to parse configuration\n"
-                << reader.getFormattedErrorMessages();
-            throw std::invalid_argument("Bad filename for JSON, check that resource path exists");
-        }
-        // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
-        // such member.
-        Json::Value impedenceVals = root.get("impedenceVals", "UTF-8");
-        impedenceVals = impedenceVals.get("params", "UTF-8");
-        
-        // Keep drilling if necessary
-        if (impedenceVals[0].isArray())
-        {
-            impedenceVals = impedenceVals[0];
-        }
-        
-        const double impedanceMax = 2000.0;
-        
-        const int segmentSpan = 3;
-        const int numMuscles = 8;
+        const int segmentSpan = 3; //Not sure what this will be for mine!
+        const int numMuscles = 8; //This may be ok, but confirm. 
         const int numParams = 2;
-        const int segNumber = 5; // For learning results
+        const int segNumber = 0; // For learning results
         const double controlTime = .01;
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
         const double highAmplitude = 300.0;
-        // JSONCPP's .get really wants this to be typed...
-        int j = 0;
-        const double kt = impedanceMax * (impedenceVals.get(j, 0.0)).asDouble();
-        const double kp = impedanceMax * (impedenceVals.get(1, 0.0)).asDouble();
-        const double kv = impedanceMax * (impedenceVals.get(2, 0.0)).asDouble();
+        const double kt = 0.0; //May need to retune kt, kp, and kv
+        const double kp = 1000.0;
+        const double kv = 200.0;
         const bool def = true;
             
         // Overridden by def being true
@@ -135,16 +103,18 @@ bool AppGoalTensionNNW::setup()
         const double lf = 0.0;
         const double hf = 30.0;
         
-        // Feedback parameters
+        // Feedback parameters... may need to retune
         const double ffMin = -0.5;
         const double ffMax = 10.0;
         const double afMin = 0.0;
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
-        const double tensionFeedback = impedanceMax *(impedenceVals.get(3, 0.0)).asDouble();
 
-        JSONGoalControl::Config control_config(segmentSpan, 
+	const double maxH = 60.0;
+	const double minH = 1.0;
+
+        JSONQuadFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -167,20 +137,18 @@ bool AppGoalTensionNNW::setup()
                                                     afMax,
                                                     pfMin,
                                                     pfMax,
-                                                    tensionFeedback
-                                                    );
-        
+						    maxH,
+						    minH);
         /// @todo fix memory leak that occurs here
-        JSONGoalTensionNNW* const myControl =
-        new JSONGoalTensionNNW(control_config, suffix, resourcePath);
-        
-#if (1)        
+       JSONQuadFeedbackControl* const myControl =
+        new JSONQuadFeedbackControl(control_config, suffix, "dhustigschultz/AppQuadControl/");
+
+#if (0)        
             tgCPGJSONLogger* const myLogger = 
       new tgCPGJSONLogger("logs/CPGValues.txt");
     
-            myControl->attach(myLogger);
-#endif    
-        
+    myControl->attach(myLogger);
+#endif        
         myModel->attach(myControl);
     }
 
@@ -197,7 +165,7 @@ bool AppGoalTensionNNW::setup()
     return bSetup;
 }
 
-void AppGoalTensionNNW::handleOptions(int argc, char **argv)
+void AppQuadControl::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -245,7 +213,7 @@ void AppGoalTensionNNW::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppGoalTensionNNW::getHillyConfig()
+const tgHillyGround::Config AppQuadControl::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -253,8 +221,8 @@ const tgHillyGround::Config AppGoalTensionNNW::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 240;
-    size_t ny = 240;
+    size_t nx = 100;
+    size_t ny = 100;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;
@@ -265,7 +233,7 @@ const tgHillyGround::Config AppGoalTensionNNW::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppGoalTensionNNW::getBoxConfig()
+const tgBoxGround::Config AppQuadControl::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -282,14 +250,14 @@ const tgBoxGround::Config AppGoalTensionNNW::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppGoalTensionNNW::getBlocks()
+tgModel* AppQuadControl::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppGoalTensionNNW::createWorld()
+tgWorld* AppQuadControl::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -311,17 +279,17 @@ tgWorld* AppGoalTensionNNW::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppGoalTensionNNW::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppQuadControl::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppGoalTensionNNW::createView(tgWorld *world)
+tgSimView *AppQuadControl::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppGoalTensionNNW::run()
+bool AppQuadControl::run()
 {
     if (!bSetup)
     {
@@ -347,7 +315,7 @@ bool AppGoalTensionNNW::run()
     return true;
 }
 
-void AppGoalTensionNNW::simulate(tgSimulation *simulation)
+void AppQuadControl::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -361,46 +329,37 @@ void AppGoalTensionNNW::simulate(tgSimulation *simulation)
         }
         
         // Don't change the terrain before the last episode to avoid leaks
-        if (i != nEpisodes - 1)
-        {
-            
-            if (all_terrain)
-            {   
-                // Next run has Hills
-                if (i % nTypes == 0)
-                {
-                    
-                    const tgHillyGround::Config hillGroundConfig = getHillyConfig();
-                    tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
-                    simulation->reset(ground);
-                }
-                // Flat
-                else if (i % nTypes == 1)
-                {
-                    const tgBoxGround::Config groundConfig = getBoxConfig();
-                    tgBulletGround* ground = new tgBoxGround(groundConfig);
-                    simulation->reset(ground);
-                }
-                // Flat with blocks
-                else if (i % nTypes == 2)
-                {
-                    simulation->reset();
-                    tgModel* obstacle = getBlocks();
-                    simulation->addObstacle(obstacle);
-                }
+        if (all_terrain && i != nEpisodes - 1)
+        {   
+            // Next run has Hills
+            if (i % nTypes == 0)
+            {
+                
+                const tgHillyGround::Config hillGroundConfig = getHillyConfig();
+                tgBulletGround* ground = new tgHillyGround(hillGroundConfig);
+                simulation->reset(ground);
             }
-            else if(add_blocks)
+            // Flat
+            else if (i % nTypes == 1)
+            {
+                const tgBoxGround::Config groundConfig = getBoxConfig();
+                tgBulletGround* ground = new tgBoxGround(groundConfig);
+                simulation->reset(ground);
+            }
+            // Flat with blocks
+            else if (i % nTypes == 2)
             {
                 simulation->reset();
                 tgModel* obstacle = getBlocks();
                 simulation->addObstacle(obstacle);
             }
-            // Avoid resetting twice on the last run
-            else
-            {
-                simulation->reset();
-            }
         }
+        // Avoid resetting twice on the last run
+        else if (i != nEpisodes - 1)
+        {
+            simulation->reset();
+        }
+        
     }
 }
 
@@ -412,8 +371,8 @@ void AppGoalTensionNNW::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppGoalTensionNNW" << std::endl;
-    AppGoalTensionNNW app (argc, argv);
+    std::cout << "AppQuadControl" << std::endl;
+    AppQuadControl app (argc, argv);
 
     if (app.setup())
         app.run();
@@ -421,4 +380,5 @@ int main(int argc, char** argv)
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }
+
 
