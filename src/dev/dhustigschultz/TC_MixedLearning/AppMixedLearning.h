@@ -108,7 +108,8 @@ private:
     double startZ;
     double startAngle;
     double goalAngle;
-    
+   
+    std::string lowerPath; 
     std::string suffix;
     
     bool bSetup;

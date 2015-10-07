@@ -48,6 +48,7 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     startAngle = 0;
     
     suffix = "default";
+    lowerPath = "default";
 
     handleOptions(argc, argv);
 }
@@ -132,7 +133,7 @@ bool AppMixedLearning::setup()
 						    minH);
         /// @todo fix memory leak that occurs here
        JSONMixedLearningControl* const myControl =
-        new JSONMixedLearningControl(control_config, suffix, "dhustigschultz/AppMixedLearning/");
+        new JSONMixedLearningControl(control_config, suffix, lowerPath); //"dhustigschultz/AppMixedLearning/"
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -178,6 +179,7 @@ void AppMixedLearning::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
+	("lower_path,P", po::value<std::string>(&lowerPath), "Which resources folder in which you want to store controllers. Default = default")
     ;
 
     po::variables_map vm;
