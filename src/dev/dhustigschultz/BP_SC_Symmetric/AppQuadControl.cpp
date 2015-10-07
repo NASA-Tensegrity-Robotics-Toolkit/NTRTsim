@@ -18,7 +18,7 @@
 
 /**
  * @file AppMixedCPG.cpp
- * @brief Modifying the CPG parameters and coupling for first and last segments of a spine. Building off Brian's work.
+ * @brief Using Brian's existing spine controller for a quadruped. 
  * @author Dawn Hustig-Schultz, Brian Mirletz
  * @date August 2015
  * @version 1.0.0
@@ -49,6 +49,7 @@ AppQuadControl::AppQuadControl(int argc, char** argv)
     startAngle = 0;
     
     suffix = "default";
+    lowerPath = "default";
 
     handleOptions(argc, argv);
 }
@@ -141,7 +142,7 @@ bool AppQuadControl::setup()
 						    minH);
         /// @todo fix memory leak that occurs here
        JSONQuadFeedbackControl* const myControl =
-        new JSONQuadFeedbackControl(control_config, suffix, "dhustigschultz/AppQuadControl/");
+        new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -187,6 +188,7 @@ void AppQuadControl::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
+	("lower_path,P", po::value<std::string>(&lowerPath), "Which resources folder in which you want to store controllers. Default = default")
     ;
 
     po::variables_map vm;

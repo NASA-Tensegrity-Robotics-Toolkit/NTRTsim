@@ -21,8 +21,8 @@
 
 /**
  * @file AppQuadControl.cpp
- * @brief Contains the definition function main() for the Multiple terrains app
- * @author Dawn Hustig-Schultz, Brian Mirletz, Alexander Xydes
+ * @brief Contains the definition function main() for the Multiple terrains app, used here for control of a quadruped.
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
  * $Id$
  */
 
@@ -109,6 +109,7 @@ private:
     double startAngle;
     double goalAngle;
     
+    std::string lowerPath; 
     std::string suffix;
     
     bool bSetup;
