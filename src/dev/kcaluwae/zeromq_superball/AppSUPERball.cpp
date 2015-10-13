@@ -29,6 +29,7 @@
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgBasicActuator.h"
+#include "core/tgKinematicActuator.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -295,6 +296,8 @@ int main(int argc, char** argv)
     // Run until the user stops the simulation
     bool publish_state_update = false;
     std::vector <tgRod*> rods = myModel->find<tgRod>("rod"); 
+    // This is added to support Ali's Model
+    std::vector <tgRod*> rodmps = myModel->find<tgRod>("rodmp"); 
     float motor_targets[12];
 
     // Set up some plotting and rendering
@@ -304,12 +307,13 @@ int main(int argc, char** argv)
     std::vector<osg::MatrixTransform*> tfs;
     m_root->addChild(m_robot);
     m_root->addChild(createGroundPlane());
+    // Changed to support Ali's Model
     for (unsigned i=0; i < 6; ++i) {
         osg::MatrixTransform* tf = new osg::MatrixTransform;
         tfs.push_back(tf);
         m_robot->addChild(tf);
         osg::Cylinder* bar = new osg::Cylinder();
-        bar->setRadius(0.045);
+        bar->setRadius(0.035);
         bar->setHeight(rods[i]->length()/10);
         osg::Geode* geode = new osg::Geode;
         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(bar);

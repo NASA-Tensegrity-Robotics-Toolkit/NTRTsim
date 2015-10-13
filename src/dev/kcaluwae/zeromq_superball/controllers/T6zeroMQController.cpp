@@ -22,6 +22,7 @@
 #include "../T6Model.h"
 // This library
 #include "core/tgBasicActuator.h"
+#include "core/tgKinematicActuator.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
