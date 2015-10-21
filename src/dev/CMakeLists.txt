@@ -5,6 +5,7 @@ subdirs(
     axydes
     btietz
     radams
+    kcaluwae
     tests
     atil
     steve
