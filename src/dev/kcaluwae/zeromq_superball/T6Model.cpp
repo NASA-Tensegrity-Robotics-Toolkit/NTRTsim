@@ -101,7 +101,7 @@ namespace
      2,    // targetVelocity
      0.09, // motor_radius // Spindle radius (length)
      4.24e-5, // motor_friction (kg*(length)^2/sec)
-     2.749e-4, // motor_inertia (kg*(length)^2) // Inertia of motor, gearbox, and spindle all together
+     4*2.749e-4, // motor_inertia (kg*(length)^2) // Inertia of motor, gearbox, and spindle all together
      0, // Not backDrivable
 
      // Use the below values for earlier versions of simulation.
