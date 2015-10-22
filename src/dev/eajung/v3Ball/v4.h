@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef v3_MODEL_H
-#define v3_MODEL_H
+#ifndef v4_H
+#define v4_H
 
 /**
- * @file v3Model.h
- * @brief Contains the definition of class v3Model.
+ * @file v4.h
+ * @brief Contains the definition of class v4.
  * $Id$
  */
 
@@ -39,9 +39,9 @@ class tgStructure;
 class tgWorld;
 
 /**
- * Class that creates the six strut v3 model created at UC Berkeley using tgcreator
+ * Class that creates the six strut "superball" model using tgcreator
  */
-class v3Model : public tgSubject<v3Model>, public tgModel
+class v4 : public tgSubject<v4>, public tgModel
 {
 public: 
 	
@@ -50,13 +50,13 @@ public:
      * Configuration parameters are within the .cpp file in this case,
      * not passed in. 
      */
-    v3Model();
+    v4();
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~v3Model();
+    virtual ~v4();
     
     /**
      * Create the model. Place the rods and strings into the world
@@ -93,7 +93,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgBasicActuator*>& getAllMuscles() const;
+    const std::vector<tgBasicActuator*>& getAllActuators() const;
     
 private:
 	
@@ -103,14 +103,14 @@ private:
      * for your own models
      * @param[in] tetra: A tgStructure that we're building into
      */
-    void addNodes(tgStructure& s);
+     static void addNodes(tgStructure& s);
 	
 	/**
      * A function called during setup that creates rods from the
      * relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addRods(tgStructure& s);
+     static void addRods(tgStructure& s);
 	
 	/**
      * A function called during setup that creates muscles (Strings) from
@@ -119,15 +119,33 @@ private:
      */
     static void addMuscles(tgStructure& s);
 
+    /**
+     * Adds the 12 markers to the end of the rods so that we can visualize
+     * them and track their position
+     */
+
+    static void addActuators(tgStructure& s);
+    /**void addMarkers(tgStructure& s);
+    */
+    /**
+	 * Moves all the rods (that are actually all the rigid bodies) according to the arguments.
+	 * First rotates the structure around 3 axises given 3 angles.
+	 * Moves the structure to the target point.
+	 * Sets all the bars speed to the given speed vector.
+	 * (muscles and markers are moved automatically since they are attached).
+	 */
+     /**void moveModel(btVector3 targetPositionVector,btVector3 rotationVector,btVector3 speedVector);
+     */
 private:
 	
 	/**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    //std::vector<tgBasicActuator*> allActuators;
-     std::vector<tgBasicActuator*> allMuscles;
-     std::vector<btVector3> nodePositions;
+    std::vector<tgBasicActuator*> allActuators;
+	/** std::vector<std::vector <tgBasicActuator *> > musclesPerNodes;
+	 *std::vector<std::vector<std::vector<int> > > nodeNumberingSchema;
+         */ std::vector<btVector3> nodePositions;
 };
 
-#endif  // v3_MODEL_H
+#endif  // v4_H

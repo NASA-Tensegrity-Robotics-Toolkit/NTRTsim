@@ -30,9 +30,15 @@
 // This library
 #include "core/tgObserver.h"
 #include "controllers/tgTensionController.h"
-
+#include "learning/Adapters/AnnealAdapter.h"
+#include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <vector>
+//Bullet Physics
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
+ //namespace std for vectors 
+using namespace std;
 
 // Forward declarations
 class v3Model;
@@ -45,13 +51,7 @@ class v3TensionController : public tgObserver<v3Model>
 {
 public:
 	
-	/**
-	 * Construct a v3TensionController.
-	 * @param[in] tension, a double specifying the desired tension
-	 * throughougt structure. Must be non-negitive
-	 */
-    v3TensionController(const double tension = .01);
-    
+    v3TensionController(const double tension, double timestep, btVector3 goalTrajectory);
     /**
      * Nothing to delete, destructor must be virtual
      */
@@ -75,9 +75,18 @@ private:
 	 * The tension setpoint that will be passed to the muscles. Set
 	 * in the constructor
 	 */
-    const double m_tension;
-    
+    //const double m_tension;
+    double m_totalTime;
+    double m_initialLengths;
+    btVector3 initPos;
+    btVector3 trajectory;
+    //btVector3 goal;
+
     std::vector<tgTensionController*> m_controllers;
+
+    btVector3 endEffectorCOM(v3Model& subject);
+    
+
 };
 
 #endif // v3_TENSION_CONTROLLER_H

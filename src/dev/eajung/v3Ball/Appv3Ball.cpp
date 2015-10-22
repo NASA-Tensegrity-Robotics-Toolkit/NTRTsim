@@ -25,6 +25,8 @@
 
 // This application
 #include "v3Model.h"
+#include "v4.h"
+#include "v3TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -33,6 +35,7 @@
 #include "core/tgWorld.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btScalar.h"
 // The C++ Standard Library
 #include <iostream>
 
@@ -44,7 +47,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "Appv3BallNew" << std::endl;
+    //std::cout << "Appv3BallNew" << std::endl;
 
     // First create the ground and world
     
@@ -74,14 +77,17 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     v3Model* const myModel = new v3Model();
+    //v4* const v4Model = new v4();
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the v3TensionController:
-    //v3TensionController* const pTC = new v3TensionController(10000);
-    //myModel->attach(pTC);
+    btVector3 goalTrajectory = btVector3(0,0,0);
+    v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
+    myModel->attach(pTC);
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
+    //simulation.addModel(v4Model);
     
     // Run until the user stops
     simulation.run();

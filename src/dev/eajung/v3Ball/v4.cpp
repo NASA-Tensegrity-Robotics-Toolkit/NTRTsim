@@ -17,27 +17,22 @@
 */
 
 /**
- * @file v3Model.cpp
- * @brief Contains the implementation of class v3Model.
+ * @file v4.cpp
+ * @brief Contains the implementation of class v4.
  * $Id$
  */
 
 // This module
-#include "v3Model.h"
-#include "v3TensionController.h"
+#include "v4.h"
 // This library
 #include "core/tgBasicActuator.h"
-#include "controllers/tgTensionController.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
-#include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-//#include "core/abstractMarker.h"
 // The Bullet Physics library
-#include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
@@ -59,6 +54,7 @@ namespace
     const struct Config
     {
         double density;
+        double density_motor;
         double radius;
 	double radius_motor;
         double stiffness;
@@ -75,16 +71,19 @@ namespace
     } c =
    {
      0.688,    // density (kg / length^3)
+     0.688,    // density_motor (kg / length^3)
      0.127/2,     // radius (length) ** rod diameter / 2 **
      0.56/2,     // radius (length) ** motor diameter / 2 **
-     200.0,   // stiffness (kg / sec^2) was 1500
+     200.0, // stiffness/spring constant TRY     
+//613.0,   // stiffness (kg / sec^2) was 1500     
      20.0,    // damping (kg / sec)
+     //200/3 damping (kg/sec)
      6.5,     // rod_length (length)
      3.25,      // rod_space (length)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     170.0,        // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
+     170.0,        // pretension -> scaled to 85 which is 10 times actual because of scaling world gravity to 10 times higher
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -99,107 +98,90 @@ namespace
   };
 } // namespace
 
-v3Model::v3Model() : tgModel() 
+v4::v4() : tgModel() 
 {
 }
 
-v3Model::~v3Model()
+v4::~v4()
 {
 }
 
-void v3Model::addNodes(tgStructure& s)
+void v4::addNodes(tgStructure& s)
 {
     const double third_length = 2.26155; //226.155 mm
     const double motor_length = 1.9769; //197.69 mm
-    const size_t nNodes = 26;
 
+    // lower rod
+    s.addNode(0, -c.rod_space, -third_length - motor_length/2); //0
+    s.addNode(0, -c.rod_space, -third_length); //1
+    s.addNode(0, -c.rod_space, third_length); //2
+    s.addNode(0, -c.rod_space, third_length + motor_length/2); //3
 
-    // lower rod: ROD 1
-    nodePositions.push_back(btVector3(0, -c.rod_space, -third_length - motor_length/2)); //0
-    nodePositions.push_back(btVector3(0, -c.rod_space, -motor_length/2)); //1
-    nodePositions.push_back(btVector3(0, -c.rod_space, motor_length/2)); //2
-    nodePositions.push_back(btVector3(0, -c.rod_space, third_length + motor_length/2)); //3
+    // higher rod
+    s.addNode(0, c.rod_space, -third_length - motor_length/2); //4
+    s.addNode(0, c.rod_space, -third_length); //5
+    s.addNode(0, c.rod_space, third_length); //6
+    s.addNode(0, c.rod_space, third_length + motor_length/2); //7
 
-    // upper rod: ROD 2
-    nodePositions.push_back(btVector3(0, c.rod_space, -third_length - motor_length/2)); //4
-    nodePositions.push_back(btVector3(0, c.rod_space, -motor_length/2)); //5
-    nodePositions.push_back(btVector3(0, c.rod_space, motor_length/2)); //6
-    nodePositions.push_back(btVector3(0, c.rod_space, third_length + motor_length/2)); //7
+    //left rod
+    s.addNode(-third_length- motor_length/2, 0, c.rod_space); //8
+    s.addNode(-third_length, 0, c.rod_space); //9
+    s.addNode(third_length, 0, c.rod_space); //10
+    s.addNode(third_length + motor_length/2, 0, c.rod_space); //11
 
-    //right rod: ROD 4
-    nodePositions.push_back(btVector3(-third_length- motor_length/2, 0, c.rod_space)); //8
-    nodePositions.push_back(btVector3(-motor_length/2, 0, c.rod_space)); //9
-    nodePositions.push_back(btVector3(motor_length/2, 0, c.rod_space)); //10
-    nodePositions.push_back(btVector3(third_length + motor_length/2, 0, c.rod_space)); //11
+    //left rod
+    s.addNode(-third_length- motor_length/2, 0, -c.rod_space); //12
+    s.addNode(-third_length, 0, -c.rod_space); //13
+    s.addNode(third_length, 0, -c.rod_space); //14
+    s.addNode(third_length + motor_length/2, 0, -c.rod_space); //15
 
-    //left rod: ROD 3
-    nodePositions.push_back(btVector3(-third_length- motor_length/2, 0, -c.rod_space)); //12
-    nodePositions.push_back(btVector3(-motor_length/2, 0, -c.rod_space)); //13
-    nodePositions.push_back(btVector3(motor_length/2, 0, -c.rod_space)); //14
-    nodePositions.push_back(btVector3(third_length + motor_length/2, 0, -c.rod_space)); //15
+    //center rod close 
+    s.addNode(-c.rod_space, -third_length - motor_length/2, 0); // 16
+    s.addNode(-c.rod_space, -third_length, 0); // 17
+    s.addNode(-c.rod_space, third_length, 0); // 18
+    s.addNode(-c.rod_space, third_length + motor_length/2, 0); // 19
 
-    //center rod close: ROD 6
-    nodePositions.push_back(btVector3(-c.rod_space, -third_length - motor_length/2, 0)); // 16
-    nodePositions.push_back(btVector3(-c.rod_space, -motor_length/2, 0)); // 17
-    nodePositions.push_back(btVector3(-c.rod_space, motor_length/2, 0)); // 18
-    nodePositions.push_back(btVector3(-c.rod_space, third_length + motor_length/2, 0)); // 19
-
-    //center rod far: ROD 5 
-    nodePositions.push_back(btVector3(c.rod_space, -third_length - motor_length/2, 0)); // 20
-    nodePositions.push_back(btVector3(c.rod_space, -motor_length/2, 0)); // 21
-    nodePositions.push_back(btVector3(c.rod_space, motor_length/2, 0)); // 22
-    nodePositions.push_back(btVector3(c.rod_space, third_length + motor_length/2, 0)); // 23
-	
-
-    nodePositions.push_back(btVector3(0, c.rod_space-0.5, (-third_length - motor_length/2)/20));//24
-    nodePositions.push_back(btVector3(0, c.rod_space-0.5, (third_length + motor_length/2)/20)); //25
-
-	for(size_t i=0;i<nNodes;i++) {
-		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
-	}
+    //center rod far 
+    s.addNode(c.rod_space, -third_length - motor_length/2, 0); // 20
+    s.addNode(c.rod_space, -third_length, 0); // 21
+    s.addNode(c.rod_space, third_length, 0); // 22
+    s.addNode(c.rod_space, third_length + motor_length/2, 0); // 23
 
 }
 
-void v3Model::addRods(tgStructure& s)
+void v4::addRods(tgStructure& s)
 {
-    //ROD 1 
-    s.addPair( 0,  1, "rod");
-    s.addPair( 1,  2, "motor");
-    s.addPair( 2,  3, "rod");	
+    s.addPair( 0,  1, "motor");
+    s.addPair( 1,  2, "rod");
+    s.addPair( 2,  3, "motor");	
  
-    //ROD 2
-    s.addPair( 4,  5, "rod");
-    s.addPair( 5,  6, "motor");
-    s.addPair( 6,  7, "rod");
+    s.addPair( 4,  5, "motor");
+    s.addPair( 5,  6, "rod");
+    s.addPair( 6,  7, "motor");
 
-    s.addPair( 8,  9, "rod");
-    s.addPair( 9,  10, "motor");
-    s.addPair( 10,  11, "rod");
+    s.addPair( 8,  9, "motor");
+    s.addPair( 9,  10, "rod");
+    s.addPair( 10,  11, "motor");
 
-    s.addPair( 12,  13, "rod");
-    s.addPair( 13,  14, "motor");
-    s.addPair( 14,  15, "rod");
+    s.addPair( 12,  13, "motor");
+    s.addPair( 13,  14, "rod");
+    s.addPair( 14,  15, "motor");
 
-    //ROD 5
-    s.addPair( 20,  21, "rod");
-    s.addPair( 21,  22, "motor");
-    s.addPair( 22,  23, "rod");
+    s.addPair( 16,  17, "motor");
+    s.addPair( 17,  18, "rod");
+    s.addPair( 18,  19, "motor");
 
-    //ROD 6
-    s.addPair( 16,  17, "rod");
-    s.addPair( 17,  18, "motor");
-    s.addPair( 18,  19, "rod");
-
-    //TRACKER UPPER BAR ROD 2
-    s.addPair( 24,  25, "rod endeffector");
+    s.addPair( 20,  21, "motor");
+    s.addPair( 21,  22, "rod");
+    s.addPair( 22,  23, "motor");
 }
 
-void v3Model::addMuscles(tgStructure& s)
+void v4::addActuators(tgStructure& s)
 {
 
-    s.addPair(16, 0,  "muscle"); //cable: 6.2
-    s.addPair(16, 3,  "muscle"); //cable: 1.2
-    s.addPair(16, 8,  "muscle"); 
+    s.addPair(16, 0,  "muscle");
+    s.addPair(16, 3,  "muscle");
+    s.addPair(16, 8,  "muscle");
     s.addPair(16, 12, "muscle");
 
     s.addPair(19, 4,  "muscle");
@@ -228,41 +210,32 @@ void v3Model::addMuscles(tgStructure& s)
     s.addPair(4, 15, "muscle");
 
     s.addPair(7, 8,  "muscle");
-    s.addPair(7, 11, "muscle");
-
-    s.addPair(24, 5, "ee");  
-    s.addPair(25, 6, "ee");
-
+    s.addPair(7, 11,  "muscle");
 
 }
 
-void v3Model::setup(tgWorld& world)
+void v4::setup(tgWorld& world)
 {
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-    const tgRod::Config motorConfig(c.radius_motor, c.density, c.friction, 
+    const tgRod::Config motorConfig(c.radius_motor, c.density_motor, c.friction, 
 				c.rollFriction, c.restitution);
-    //const tgRod::Config EEConfig(0.001, 0.01, c.friction, 
-				//c.rollFriction, c.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 					    c.maxTens, c.targetVelocity);
-    tgBasicActuator::Config eeConfig(250.0, 10.0, 5.0, c.hist, 
-					    c.maxTens, c.targetVelocity);        
+            
     // Start creating the structure
     tgStructure s;
     addNodes(s);
     addRods(s);
-    addMuscles(s);
-
-    btVector3 offset (0.0, 50.0, 0.0);
-    s.move(offset);
+    addActuators(s);
+    s.move(btVector3(0, 40, 0));
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
-    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    btVector3 rotationPoint = btVector3(0, 0 , 0); // origin
+    btVector3 rotationAxis = btVector3(1, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
@@ -274,9 +247,6 @@ void v3Model::setup(tgWorld& world)
     // added 8/10/15 
     spec.addBuilder("motor", new tgRodInfo(motorConfig));
 
-    // added  10/21/15
-    //spec.addBuilder("EE", new tgRodInfo(EEConfig));
-    spec.addBuilder("ee", new tgBasicActuatorInfo(eeConfig));
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
@@ -285,7 +255,7 @@ void v3Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -294,7 +264,7 @@ void v3Model::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void v3Model::step(double dt)
+void v4::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -305,22 +275,25 @@ void v3Model::step(double dt)
     {
         // Notify observers (controllers) of the step so that they can take action
         notifyStep(dt);
+        allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants()); //TODO: might not me right 
         tgModel::step(dt);  // Step any children
     }
 }
 
-void v3Model::onVisit(tgModelVisitor& r)
+void v4::onVisit(tgModelVisitor& r)
 {
     tgModel::onVisit(r);
 }
 
-const std::vector<tgBasicActuator*>& v3Model::getAllMuscles() const
+const std::vector<tgBasicActuator*>& v4::getAllActuators() const
 {
-    return allMuscles;
+    return allActuators;
 }
     
-void v3Model::teardown()
+void v4::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
 }
+
+//TODO - try m_tension at 400N

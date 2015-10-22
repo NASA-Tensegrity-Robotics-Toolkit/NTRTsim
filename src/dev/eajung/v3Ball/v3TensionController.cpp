@@ -18,9 +18,9 @@
 
 /**
  * @file v3TensionController.cpp
- * @brief Implementation of six strut tensegrity.
+ * @brief Implementation of six strut tensegrity based from Berkeley's v3 Ball.
  * @author Erik Jung
- * @version 1.0.0
+ * @version 1.1.0
  * $Id$
  */
 
@@ -30,39 +30,48 @@
 #include "v3Model.h"
 // This library
 #include "core/tgBasicActuator.h"
+#include "controllers/tgTensionController.h"
+// The Bullet Physics library
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <cassert>
+#include <math.h>
+#include <vector>
 #include <stdexcept>
 
-v3TensionController::v3TensionController(const double tension) :
-    m_tension(tension)
+using namespace std;
+
+v3TensionController::v3TensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
+		m_initialLengths(initialLength),
+		m_totalTime(0.0)
 {
-    if (tension < 0.0)
-    {
-        throw std::invalid_argument("Negative tension");
-    }
+  this->initPos = btVector3(0,0,0);
 }
 
 v3TensionController::~v3TensionController()
 {
 	std::size_t n = m_controllers.size();
-    for(std::size_t i = 0; i < n; i++)
-    {
-        delete m_controllers[i];
-    }
-    m_controllers.clear();
-}	
+	for(std::size_t i = 0; i < n; i++)
+	{
+		delete m_controllers[i];
+	}
+	m_controllers.clear();
+}
 
 void v3TensionController::onSetup(v3Model& subject)
 {
-    const std::vector<tgBasicActuator*> actuators = subject.getAllActuators();
+    /*const std::vector<tgBasicActuator*> actuators = subject.getAllActuators();
     for (size_t i = 0; i < actuators.size(); ++i)
     {
         tgBasicActuator * const pActuator = actuators[i];
         assert(pActuator != NULL);
         tgTensionController* m_tensController = new tgTensionController(pActuator, m_tension);
         m_controllers.push_back(m_tensController);
-    }
+    }*/
+
+   this->initPos=endEffectorCOM(subject);
+   this->m_totalTime = 0.0;
 
 }
 
@@ -72,12 +81,27 @@ void v3TensionController::onStep(v3Model& subject, double dt)
     {
         throw std::invalid_argument("dt is not positive");
     }
-    else
+    /*else
     {
         std::size_t n = m_controllers.size();
 		for(std::size_t i = 0; i < n; i++)
         {
             m_controllers[i]->control(dt, m_tension);
         }
-	}
+    }*/
+
+    m_totalTime += dt;
+  
+    btVector3 ee = endEffectorCOM(subject);
+    std::cout << m_totalTime << " " << ee.getX() << " " << ee.getY() << " " << ee.getZ() << std::endl;
+
+
 }
+
+btVector3 v3TensionController::endEffectorCOM(v3Model& subject) {
+	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
+	assert(!endEffector.empty());
+	return endEffector[0]->centerOfMass();
+}
+
+
