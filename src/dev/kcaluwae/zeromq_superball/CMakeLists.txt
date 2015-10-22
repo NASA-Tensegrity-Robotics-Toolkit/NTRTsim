@@ -5,7 +5,7 @@ link_libraries(tgcreator controllers core)
 add_executable(AppSUPERballGPS
     T6Model.cpp
     AppSUPERball.cpp
-    controllers/T6zeroMQController.cpp
+    controllers/T6PIDController.cpp
 ) 
 
 # To compile a controller, add a line like the

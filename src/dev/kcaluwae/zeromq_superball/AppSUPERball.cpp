@@ -37,7 +37,7 @@
 #include "core/tgRod.h"
 
 // Controller
-#include "controllers/T6zeroMQController.h"
+#include "controllers/T6PIDController.h"
 
 // Bullet Physics
 #include "LinearMath/btVector3.h"
@@ -255,7 +255,33 @@ int main(int argc, char** argv)
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
-    T6zeroMQController* const pTC = new T6zeroMQController();
+    //T6zeroMQController* const pTC = new T6zeroMQController();
+    // Get the PID parameters from ROS
+    std::vector<double> pid_constants;
+    std::string control_mode_name;
+    if(!n.getParam("/pid",pid_constants)){
+        pid_constants.push_back(100.);//P
+        pid_constants.push_back(0);   //I
+        pid_constants.push_back(0);   //D
+        std::cout << "No ROS parameters found for PID" << std::endl;
+    }
+    T6PIDController::ControlMode control_mode;
+    if(n.getParam("/control_mode",control_mode_name)){
+        if(control_mode_name == "POSITION"){
+		control_mode = T6PIDController::POSITION;
+	} else if (control_mode_name == "VELOCITY"){
+		control_mode = T6PIDController::VELOCITY;
+	} else if (control_mode_name == "TORQUE"){
+		control_mode = T6PIDController::TORQUE;
+	} else {
+		control_mode = T6PIDController::POSITION;
+       		std::cout <<"Invalid ROS Control Mode, using position control" << std::endl;
+	}
+    } else {
+	control_mode = T6PIDController::POSITION;
+        std::cout<< "ROS Control Mode not found, using position control" << std::endl;
+    }
+    T6PIDController* const pTC = new T6PIDController(control_mode,pid_constants[0],pid_constants[1],pid_constants[2]);
     myModel->attach(pTC);
 
     // Finally, add out model to the simulation
@@ -299,7 +325,7 @@ int main(int argc, char** argv)
     std::vector <tgRod*> rods = myModel->find<tgRod>("rod"); 
     // This is added to support Ali's Model
     std::vector <tgRod*> rodmps = myModel->find<tgRod>("rodmp"); 
-    float motor_targets[12];
+    double motor_targets[12];
 
     // Set up some plotting and rendering
     osg::ref_ptr<osg::Group> m_root = new osg::Group;
@@ -350,13 +376,13 @@ int main(int argc, char** argv)
             std::cout << "advancing simulation " << step_cb.timesteps << "ms" << std::endl;
             publish_state_update = true;
 
-            //update motor target positions
+            //update motor target values
             for (unsigned i=0; i<12; ++i) {
-                motor_targets[i] = 10. - 10.*(0.018*M_PI*(motor_pos_cb[i]->motor_pos/(2*M_PI))); //input is in radians (motor spindle OD = 18mm) output is in decimeter
+                motor_targets[i] = motor_pos_cb[i]->motor_pos; //10. - 10.*(0.018*M_PI*(motor_pos_cb[i]->motor_pos/(2*M_PI))); //input is in radians (motor spindle OD = 18mm) output is in decimeter
                 //std::cout << motor_pos_cb[i]->motor_pos << "\t"<< motor_targets[i] << "\t";
             }
             //std::cout<<std::endl;
-            pTC->setTargetLengths(motor_targets);
+            pTC->setTarget(motor_targets);
 
             simulation.run(step_cb.timesteps);
             step_cb.timesteps = 0;
@@ -366,7 +392,7 @@ int main(int argc, char** argv)
         if (publish_state_update) {
             publish_state_update = false;
             gps_agent_pkg::SUPERballStateArray state_msg;
-            const std::vector<tgBasicActuator*> springCables = myModel->getAllActuators();
+            const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
             //state_msg.header.frame_id = "/base"; 
             for (unsigned i=0; i<6; ++i) {
                 gps_agent_pkg::SUPERballState state;

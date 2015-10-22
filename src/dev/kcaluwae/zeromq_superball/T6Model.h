@@ -32,7 +32,7 @@
 #include <vector>
 
 // Forward declarations
-class tgBasicActuator;
+class tgKinematicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -92,7 +92,7 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgBasicActuator*>& getAllActuators() const;
+    const std::vector<tgKinematicActuator*>& getAllActuators() const;
     
 private:
 	
@@ -124,7 +124,7 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgBasicActuator*> allActuators;
+    std::vector<tgKinematicActuator*> allActuators;
 };
 
 #endif  // T6_MODEL_H
