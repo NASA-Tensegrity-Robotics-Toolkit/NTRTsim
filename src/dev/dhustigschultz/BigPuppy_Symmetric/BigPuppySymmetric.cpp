@@ -52,7 +52,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#define USE_KINEMATIC
+//#define USE_KINEMATIC
 //#define PASSIVE_STRUCTURE
 
 BigPuppySymmetric::BigPuppySymmetric(int segments, int hips, int legs, int feet) :
@@ -540,7 +540,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
     const double pretension = 0.0;
-    const bool   history = false;
+    const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
 
@@ -572,7 +572,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
         tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
-	tgSpringCableActuator::Config muscleConfigOther(2000, damping*2, passivePretension); //May need different configs for different muscles in legs/feet... but using one to start with.
+	tgSpringCableActuator::Config muscleConfigOther(3000, damping*3, passivePretension); //May need different configs for different muscles in legs/feet... but using one to start with.
     #endif
 
 #endif
