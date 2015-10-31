@@ -33,7 +33,7 @@
         {
             "learning" : true,
             "startingControllers" : 2,
-            "monteCarlo" : true,
+            "monteCarlo" : false,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
             "numberOfInstances" : 100,
@@ -51,7 +51,7 @@
         {
             "learning" : true,
             "startingControllers" : 2,
-            "monteCarlo" : true,
+            "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 3,
             "numberHidden" : 4,

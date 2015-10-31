@@ -51,7 +51,7 @@
         {
             "learning" : true,
             "startingControllers" : 40,
-            "monteCarlo" : true,
+            "monteCarlo" : false,
             "numberOfStates" : 2,
             "numberOfOutputs" : 3,
             "numberHidden" : 4,
