@@ -200,7 +200,7 @@ void v3Model::addRods(tgStructure& s)
     //s.addPair( 24,  25, "rod endeffector");
 
     //TRACKER TOP NODES (Node 19 in NTRT, Top of Rod 6 that has cables 6.3, 6.4, 4.3, and 2.4)
-    s.addPair( 24, 25, "rod endeffector");
+    s.addPair( 24, 25, "eeRod endeffector");
 }
 
 void v3Model::addMuscles(tgStructure& s)
@@ -269,9 +269,9 @@ void v3Model::addMuscles(tgStructure& s)
     s.addPair(19, 7,  "muscle"); //cable: 6.3
     s.addPair(19, 12,  "muscle"); //cable: 6.4
 
-
-    s.addPair(24, 5, "ee");  
-    s.addPair(25, 6, "ee");
+    //use if tracker is set to center of Rod 2
+   //s.addPair(24, 5, "ee");  
+   // s.addPair(25, 6, "ee");
 
 
 }
@@ -282,6 +282,8 @@ void v3Model::setup(tgWorld& world)
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
     const tgRod::Config motorConfig(c.radius_motor, c.density_motor, c.friction, 
+				c.rollFriction, c.restitution);
+    const tgRod::Config eeRodConfig(c.radius, 0.396, c.friction, 
 				c.rollFriction, c.restitution);
     //const tgRod::Config EEConfig(0.001, 0.01, c.friction, 
 				//c.rollFriction, c.restitution);
@@ -296,13 +298,13 @@ void v3Model::setup(tgWorld& world)
     addRods(s);
     addMuscles(s);
 
-    btVector3 offset (0.0, 50.0, 0.0);
+    btVector3 offset (-10.1, 50.0, -12.1);
     s.move(offset);
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    btVector3 rotationAxis = btVector3(0.5, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
@@ -317,6 +319,7 @@ void v3Model::setup(tgWorld& world)
     // added  10/21/15
     //spec.addBuilder("EE", new tgRodInfo(EEConfig));
     spec.addBuilder("ee", new tgBasicActuatorInfo(eeConfig));
+    spec.addBuilder("eeRod", new tgRodInfo(eeRodConfig));
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
