@@ -496,29 +496,29 @@ void BigPuppySymmetric::addMuscles(tgStructure& puppy){
         tgNodes ni = children[i]->getNodes();
         tgNodes ni4 = children[i-4]->getNodes();
         
-        puppy.addPair(ni[0],ni[1],tgString("foot muscle seg", i));
-        puppy.addPair(ni[0],ni[3],tgString("foot muscle seg", i));
-        puppy.addPair(ni[1],ni[2],tgString("foot muscle seg", i));
-        puppy.addPair(ni[2],ni[3],tgString("foot muscle seg", i));
-        puppy.addPair(ni[0],ni[7],tgString("foot muscle seg", i));
-        puppy.addPair(ni[1],ni[4],tgString("foot muscle seg", i));
-        puppy.addPair(ni[2],ni[5],tgString("foot muscle seg", i));
-        puppy.addPair(ni[3],ni[6],tgString("foot muscle seg", i));
-        puppy.addPair(ni[4],ni[5],tgString("foot muscle seg", i));
-        puppy.addPair(ni[4],ni[7],tgString("foot muscle seg", i));
-        puppy.addPair(ni[5],ni[6],tgString("foot muscle seg", i));
-        puppy.addPair(ni[6],ni[7],tgString("foot muscle seg", i));
+        puppy.addPair(ni[0],ni[1],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[0],ni[3],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[1],ni[2],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[2],ni[3],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[0],ni[7],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[1],ni[4],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[2],ni[5],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[3],ni[6],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[4],ni[5],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[4],ni[7],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[5],ni[6],tgString("foot muscle2 seg", i));
+        puppy.addPair(ni[6],ni[7],tgString("foot muscle2 seg", i));
         
         //Connect feet to legs:
-        puppy.addPair(ni4[5],ni[0],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[5],ni[1],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[5],ni[2],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[5],ni[3],tgString("foot muscle seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[5],ni[0],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[5],ni[1],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[5],ni[2],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[5],ni[3],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
 
-        puppy.addPair(ni4[0],ni[4],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[0],ni[5],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[0],ni[6],tgString("foot muscle seg", i) + tgString(" seg", i-4));
-        puppy.addPair(ni4[0],ni[7],tgString("foot muscle seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[0],ni[4],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[0],ni[5],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[0],ni[6],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
+        puppy.addPair(ni4[0],ni[7],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
 
     }
 
@@ -539,7 +539,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
 
     const double stiffness = 1000.0;
     const double damping = .01*stiffness;
-    const double pretension = 0.0;
+    const double pretension = 0.0; 
     const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
@@ -564,6 +564,10 @@ void BigPuppySymmetric::setup(tgWorld& world)
 	tgKinematicActuator::Config motorConfigOther(3000, damping*3, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
+
+	tgKinematicActuator::Config motorConfigFeet(stiffness, damping, passivePretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed); 
     #endif
 
 #else
@@ -573,6 +577,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
 	tgSpringCableActuator::Config muscleConfigOther(3000, damping*3, passivePretension); //May need different configs for different muscles in legs/feet... but using one to start with.
+	tgSpringCableActuator::Config muscleConfigFeet(stiffness, damping, passivePretension); //May need different configs for different muscles in legs/feet... but using one to start with.
     #endif
 
 #endif
@@ -622,6 +627,8 @@ void BigPuppySymmetric::setup(tgWorld& world)
     #else 
 	spec.addBuilder("muscleAct", new tgKinematicContactCableInfo(motorConfigSpine));
 	spec.addBuilder("muscle ", new tgKinematicContactCableInfo(motorConfigOther));
+	spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
+	
     #endif
 
 #else
@@ -630,6 +637,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
     #else 
 	spec.addBuilder("muscleAct" , new tgBasicActuatorInfo(muscleConfigSpine));
 	spec.addBuilder("muscle " , new tgBasicActuatorInfo(muscleConfigOther));
+	spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
     #endif
     
 #endif
