@@ -197,7 +197,7 @@ void v3Model::addRods(tgStructure& s)
 void v3Model::addMuscles(tgStructure& s)
 {
 
-    s.addPair(16, 0,  "muscle"); //cable: 6.2
+    /*s.addPair(16, 0,  "muscle"); //cable: 6.2
     s.addPair(16, 3,  "muscle"); //cable: 1.2
     s.addPair(16, 8,  "muscle"); 
     s.addPair(16, 12, "muscle");
@@ -228,7 +228,38 @@ void v3Model::addMuscles(tgStructure& s)
     s.addPair(4, 15, "muscle");
 
     s.addPair(7, 8,  "muscle");
-    s.addPair(7, 11, "muscle");
+    s.addPair(7, 11, "muscle");*/
+
+    s.addPair(11, 3,  "muscle"); //cable: 1.1
+    s.addPair(3, 16,  "muscle"); //cable: 1.2
+    s.addPair(20, 0,  "muscle"); //cable: 1.3
+    s.addPair(12, 0,  "muscle"); //cable: 1.4
+
+    s.addPair(7, 23,  "muscle"); //cable: 2.1
+    s.addPair(7, 8,  "muscle"); //cable: 2.2
+    s.addPair(4, 15,  "muscle"); //cable: 2.3
+    s.addPair(4, 19,  "muscle"); //cable: 2.4
+
+    s.addPair(15, 23,  "muscle"); //cable: 3.1
+    s.addPair(15, 0,  "muscle"); //cable: 3.2
+    s.addPair(4, 12,  "muscle"); //cable: 3.3
+    s.addPair(12, 16,  "muscle"); //cable: 3.4
+
+    s.addPair(7, 11,  "muscle"); //cable: 4.1
+    s.addPair(20, 11,  "muscle"); //cable: 4.2
+    s.addPair(19, 8,  "muscle"); //cable: 4.3
+    s.addPair(3, 8,  "muscle"); //cable: 4.4
+
+    s.addPair(3, 20,  "muscle"); //cable: 5.1
+    s.addPair(15, 20,  "muscle"); //cable: 5.2
+    s.addPair(11, 23,  "muscle"); //cable: 5.3
+    s.addPair(4, 23,  "muscle"); //cable: 5.4
+
+    s.addPair(16, 8,  "muscle"); //cable: 6.1
+    s.addPair(16, 0,  "muscle"); //cable: 6.2
+    s.addPair(19, 7,  "muscle"); //cable: 6.3
+    s.addPair(19, 12,  "muscle"); //cable: 6.4
+
 
     s.addPair(24, 5, "ee");  
     s.addPair(25, 6, "ee");

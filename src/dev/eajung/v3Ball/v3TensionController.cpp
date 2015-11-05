@@ -61,14 +61,6 @@ v3TensionController::~v3TensionController()
 
 void v3TensionController::onSetup(v3Model& subject)
 {
-    /*const std::vector<tgBasicActuator*> actuators = subject.getAllActuators();
-    for (size_t i = 0; i < actuators.size(); ++i)
-    {
-        tgBasicActuator * const pActuator = actuators[i];
-        assert(pActuator != NULL);
-        tgTensionController* m_tensController = new tgTensionController(pActuator, m_tension);
-        m_controllers.push_back(m_tensController);
-    }*/
 
    this->initPos=endEffectorCOM(subject);
    this->m_totalTime = 0.0;
@@ -81,14 +73,6 @@ void v3TensionController::onStep(v3Model& subject, double dt)
     {
         throw std::invalid_argument("dt is not positive");
     }
-    /*else
-    {
-        std::size_t n = m_controllers.size();
-		for(std::size_t i = 0; i < n; i++)
-        {
-            m_controllers[i]->control(dt, m_tension);
-        }
-    }*/
 
     m_totalTime += dt;
   
