@@ -84,7 +84,7 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     170.0,        // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
+     175.0,        // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -150,9 +150,13 @@ void v3Model::addNodes(tgStructure& s)
     nodePositions.push_back(btVector3(c.rod_space, motor_length/2, 0)); // 22
     nodePositions.push_back(btVector3(c.rod_space, third_length + motor_length/2, 0)); // 23
 	
+    //Nodes of TRACKER in center of ROD 2. (If using other tracker comment the follow two lines)
+    //nodePositions.push_back(btVector3(0, c.rod_space-0.5, (-third_length - motor_length/2)/20));//24
+    //nodePositions.push_back(btVector3(0, c.rod_space-0.5, (third_length + motor_length/2)/20)); //25
 
-    nodePositions.push_back(btVector3(0, c.rod_space-0.5, (-third_length - motor_length/2)/20));//24
-    nodePositions.push_back(btVector3(0, c.rod_space-0.5, (third_length + motor_length/2)/20)); //25
+    //Nodes of TRACKER in center of ROD 2. (If using other tracker comment the follow two lines)
+    nodePositions.push_back(btVector3(-c.rod_space, third_length + motor_length/2, 0)); // 24
+    nodePositions.push_back(btVector3(-c.rod_space+ .01 , third_length + motor_length/2 + .01, 0)); // 25
 
 	for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -190,8 +194,11 @@ void v3Model::addRods(tgStructure& s)
     s.addPair( 17,  18, "motor");
     s.addPair( 18,  19, "rod");
 
-    //TRACKER UPPER BAR ROD 2
-    s.addPair( 24,  25, "rod endeffector");
+    //TRACKER UPPER BAR ROD 2 (comment out if using other tracker)
+    //s.addPair( 24,  25, "rod endeffector");
+
+    //TRACKER TOP NODES (Node 19 in NTRT, Top of Rod 6 that has cables 6.3, 6.4, 4.3, and 2.4)
+    s.addPair( 24, 25, "rod endeffector");
 }
 
 void v3Model::addMuscles(tgStructure& s)
