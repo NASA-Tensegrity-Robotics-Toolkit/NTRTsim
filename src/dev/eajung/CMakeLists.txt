@@ -25,6 +25,7 @@ add_executable(AppSaddleArmNew
 add_executable(Appv3BallNew
     v3Ball/v3Model.cpp
     v3Ball/Appv3Ball.cpp
+    v3Ball/v3TensionController.cpp
 ) 
 
 add_executable(AppUpperLimbTriangle
