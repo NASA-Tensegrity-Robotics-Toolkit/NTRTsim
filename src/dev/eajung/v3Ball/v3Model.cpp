@@ -59,6 +59,7 @@ namespace
     const struct Config
     {
         double density;
+        double density_motor;
         double radius;
 	double radius_motor;
         double stiffness;
@@ -74,7 +75,8 @@ namespace
         double targetVelocity;
     } c =
    {
-     0.688,    // density (kg / length^3)
+     0.688,    // density of rod (kg / length^3)
+     0.751,    // density of motor (kg/ length^3)
      0.127/2,     // radius (length) ** rod diameter / 2 **
      0.56/2,     // radius (length) ** motor diameter / 2 **
      200.0,   // stiffness (kg / sec^2) was 1500
@@ -279,7 +281,7 @@ void v3Model::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-    const tgRod::Config motorConfig(c.radius_motor, c.density, c.friction, 
+    const tgRod::Config motorConfig(c.radius_motor, c.density_motor, c.friction, 
 				c.rollFriction, c.restitution);
     //const tgRod::Config EEConfig(0.001, 0.01, c.friction, 
 				//c.rollFriction, c.restitution);
