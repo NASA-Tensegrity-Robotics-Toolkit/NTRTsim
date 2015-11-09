@@ -25,8 +25,9 @@
 
 // This application
 #include "v3Model.h"
-#include "v4.h"
+#include "v4Model.h"
 #include "v3TensionController.h"
+#include "v4TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -77,17 +78,19 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     v3Model* const myModel = new v3Model();
-    //v4* const v4Model = new v4();
+    v4Model* const hisModel = new v4Model();
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the v3TensionController:
     btVector3 goalTrajectory = btVector3(0,0,0);
-    v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
-    myModel->attach(pTC);
-
+    //v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
+    v4TensionController* const pTC = new v4TensionController(10000, timestep_physics, goalTrajectory);
+    //myModel->attach(pTC);
+     hisModel->attach(pTC);
     // Finally, add out model to the simulation
+    simulation.addModel(hisModel);
     simulation.addModel(myModel);
-    //simulation.addModel(v4Model);
+    
     
     // Run until the user stops
     simulation.run();
