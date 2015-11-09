@@ -83,10 +83,10 @@ int main(int argc, char** argv)
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the v3TensionController:
     btVector3 goalTrajectory = btVector3(0,0,0);
-    //v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
-    v4TensionController* const pTC = new v4TensionController(10000, timestep_physics, goalTrajectory);
-    //myModel->attach(pTC);
-     hisModel->attach(pTC);
+    v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
+    //v4TensionController* const pTC = new v4TensionController(10000, timestep_physics, goalTrajectory);
+    myModel->attach(pTC);
+    //hisModel->attach(pTC);
     // Finally, add out model to the simulation
     simulation.addModel(hisModel);
     simulation.addModel(myModel);
