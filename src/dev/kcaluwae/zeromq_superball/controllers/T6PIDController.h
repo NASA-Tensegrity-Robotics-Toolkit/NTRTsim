@@ -82,6 +82,7 @@ private:
     std::vector<double> m_target; 
     
     std::vector<tgPIDController*> m_controllers;
+    std::vector<double> prev_rest_length_values;
 
     ControlMode control_mode;
 

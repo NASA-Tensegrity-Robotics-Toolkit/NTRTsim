@@ -62,6 +62,7 @@ void T6PIDController::onSetup(T6Model& subject)
         tgPIDController* m_PIDController = new tgPIDController(pActuator, config);
         m_controllers.push_back(m_PIDController);
         m_target.push_back(0.);
+        prev_rest_length_values.push_back(pActuator->getRestLength());
     }
 
 }
@@ -107,9 +108,11 @@ void T6PIDController::onStep(T6Model& subject, double dt)
         tgKinematicActuator * const pActuator = actuators[i];
         switch(control_mode){
             case VELOCITY:
+                //DON'T USE VELOCITY CONTROL
                 //get current velocity
-		m_sensor = pActuator->getVelocity();	
-                break;
+		//m_sensor = pActuator->getVelocity(); //doesn't work bc tgKinematicActuator is flawed when not backdrivable
+                //prev_rest_length_values[i] = pActuator->getRestLength();	
+                //break;
             case POSITION:
 		//get current spring-cable REST length
                 m_sensor = pActuator->getRestLength();
@@ -118,6 +121,9 @@ void T6PIDController::onStep(T6Model& subject, double dt)
 		m_sensor = 0.; //torque is set directly
                 break;
         };
+        //if(i==11) 
+            //std::cout << i << "\tTarget: " << m_target[i] << "\tSensor: " << m_sensor << "\tVelocity:" << pActuator->getVelocity() << "\tPosition: " << pActuator->getRestLength();
         m_controllers[i]->control(dt, m_target[i], m_sensor);
     }
+    //std::cout << std::endl;
 }

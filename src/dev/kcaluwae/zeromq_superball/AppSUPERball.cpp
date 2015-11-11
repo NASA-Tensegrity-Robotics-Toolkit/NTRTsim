@@ -375,13 +375,28 @@ int main(int argc, char** argv)
         else if (step_cb.timesteps>0) {
             std::cout << "advancing simulation " << step_cb.timesteps << "ms" << std::endl;
             publish_state_update = true;
-
+            const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
+            double cur_pos, vel_step;
             //update motor target values
             for (unsigned i=0; i<12; ++i) {
-                motor_targets[i] = motor_pos_cb[i]->motor_pos; //10. - 10.*(0.018*M_PI*(motor_pos_cb[i]->motor_pos/(2*M_PI))); //input is in radians (motor spindle OD = 18mm) output is in decimeter
-                //std::cout << motor_pos_cb[i]->motor_pos << "\t"<< motor_targets[i] << "\t";
+		if(control_mode == T6PIDController::VELOCITY){
+		    //DOES NOT WORK!!!
+                    cur_pos = springCables[i]->getRestLength();
+                    vel_step = motor_pos_cb[i]->motor_pos*step_cb.timesteps/1000.;
+                    motor_targets[i] = cur_pos+vel_step;
+		    if(cur_pos>=10 && vel_step>0){
+		        motor_targets[i] = cur_pos;
+		    } else if(cur_pos<=5 && vel_step<0){
+                        motor_targets[i] = cur_pos;
+		    }
+		    //motor_targets[i] = 7.;
+		    std::cout << i << "\tpos: " << cur_pos << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";
+		} else {
+               	    motor_targets[i] = motor_pos_cb[i]->motor_pos*10.; //10. - 10.*(0.018*M_PI*(motor_pos_cb[i]->motor_pos/(2*M_PI)));
+		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
+                }
             }
-            //std::cout<<std::endl;
+            std::cout<<std::endl;
             pTC->setTarget(motor_targets);
 
             simulation.run(step_cb.timesteps);
@@ -418,8 +433,8 @@ int main(int argc, char** argv)
                 const unsigned idx = 2 * i;
                 const double motor_pos1 = springCables[idx]->getRestLength();
                 const double motor_pos2 = springCables[idx+1]->getRestLength();
-                state.motor_pos1.data = (9.5 - motor_pos1) / 0.09;
-                state.motor_pos2.data = (9.5 - motor_pos2) / 0.09;
+                state.motor_pos1.data = motor_pos1/10.;//(9.5 - motor_pos1) / 0.09;
+                state.motor_pos2.data = motor_pos2/10.;//(9.5 - motor_pos2) / 0.09;
                 state_msg.states.push_back(state);
             }
         	robot_state_pub.publish(state_msg);
