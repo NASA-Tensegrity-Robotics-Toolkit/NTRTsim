@@ -5,6 +5,7 @@ subdirs(
     BigPuppy_Model2
     BigPuppy_Symmetric
     BigPuppy_SpineOnly
+    BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
     BigPuppy_Foot
     BigPuppy_HT
@@ -12,6 +13,7 @@ subdirs(
     TC_MixedLearning
     Ribbed_MixedLearning
     BP_SC_NoLegs
+    BP_SC_NoLegs_Stats
     BP_SC_Symmetric
 )
 
