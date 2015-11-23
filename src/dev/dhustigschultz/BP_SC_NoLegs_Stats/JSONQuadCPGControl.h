@@ -155,6 +155,7 @@ protected:
     double m_updateTime;
     
     std::vector<double> scores;
+    std::vector<double> metrics;
     
     bool bogus;
     

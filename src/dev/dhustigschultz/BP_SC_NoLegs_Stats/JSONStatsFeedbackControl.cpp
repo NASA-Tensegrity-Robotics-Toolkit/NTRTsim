@@ -119,7 +119,7 @@ JSONStatsFeedbackControl::~JSONStatsFeedbackControl()
 
 void JSONStatsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB(100);
+    m_pCPGSys = new CPGEquationsFB(100);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -176,6 +176,33 @@ void JSONStatsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 #endif    
     m_updateTime = 0.0;
     bogus = false;
+
+    metrics.clear();
+
+    //Getting the center of mass of the entire structure. 
+    std::vector<double> structureCOM = subject.getCOM(m_config.segmentNumber);
+
+    for(std::size_t i=0; i<3; i++)
+    {
+	metrics.push_back(structureCOM[i]);
+    }
+    
+    //"metrics" is a new section of the controller's JSON file that is 
+    //added in the getNewFile function in evolution_job_master.py 
+    Json::Value prevMetrics = root.get("metrics", Json::nullValue);
+
+    Json::Value subMetrics;
+    subMetrics["initial COM x"] = metrics[0];
+    subMetrics["initial COM y"] = metrics[1];
+    subMetrics["initial COM z"] = metrics[2];
+    
+    prevMetrics.append(subMetrics);
+    root["metrics"] = prevMetrics;
+    
+    ofstream payloadLog;
+    payloadLog.open(controlFilename.c_str(),ofstream::out);
+    
+    payloadLog << root << std::endl;
 }
 
 void JSONStatsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
@@ -224,6 +251,7 @@ void JSONStatsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
 void JSONStatsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
 {
     scores.clear();
+    metrics.clear();
     // @todo - check to make sure we ran for the right amount of time
     
     std::vector<double> finalConditions = subject.getSegmentCOM(m_config.segmentNumber);
@@ -276,12 +304,12 @@ void JSONStatsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
 
     for(std::size_t i=0; i<3; i++)
     {
-	scores.push_back(structureCOM[i]);
+	metrics.push_back(structureCOM[i]);
     }
     
     std::cout << "Dist travelled " << scores[0] << std::endl;
     
-    Json::Value root; // will contains the root value after parsing.
+    Json::Value root; // will contain the root value after parsing.
     Json::Reader reader;
 
     bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
@@ -294,16 +322,22 @@ void JSONStatsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     }
     
     Json::Value prevScores = root.get("scores", Json::nullValue);
+    Json::Value prevMetrics = root.get("metrics", Json::nullValue);
     
     Json::Value subScores;
     subScores["distance"] = scores[0];
     subScores["energy"] = scores[1];
-    subScores["COM x"] = scores[2];
-    subScores["COM y"] = scores[3];
-    subScores["COM z"] = scores[4];
+
+    Json::Value subMetrics;
+    subMetrics["final COM x"] = metrics[0];
+    subMetrics["final COM y"] = metrics[1];
+    subMetrics["final COM z"] = metrics[2];
     
     prevScores.append(subScores);
+    prevMetrics.append(subMetrics);
+
     root["scores"] = prevScores;
+    root["metrics"] = prevMetrics;
     
     ofstream payloadLog;
     payloadLog.open(controlFilename.c_str(),ofstream::out);
