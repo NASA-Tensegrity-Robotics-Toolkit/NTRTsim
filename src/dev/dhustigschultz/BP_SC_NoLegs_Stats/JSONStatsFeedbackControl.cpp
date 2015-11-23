@@ -175,6 +175,7 @@ void JSONStatsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     std::cout << *m_pCPGSys << std::endl;
 #endif    
     m_updateTime = 0.0;
+    m_totalTime = 0.0; //For metrics. 
     bogus = false;
 
     metrics.clear();
@@ -208,6 +209,7 @@ void JSONStatsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 void JSONStatsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
 {
     m_updateTime += dt;
+    m_totalTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
 #if (1)
@@ -245,7 +247,80 @@ void JSONStatsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
 		throw std::runtime_error("Height out of range");
+    }
+    //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
+    static int count = 0;
+    if(count > 100) {
+        std::cout << m_totalTime << " ";
+
+	std::ostringstream total;
+
+	total << "Sim Time " << m_totalTime;
+	
+	std::string comX = total.str() + " COM x";
+        std::string comY = total.str() + " COM y";
+	std::string comZ = total.str() + " COM z";
+
+	//Clear the metrics vector to add new COM. 
+	metrics.clear();
+
+	Json::Value root; // will contains the root value after parsing.
+        Json::Reader reader;
+
+        bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
+        if ( !parsingSuccessful )
+        {
+            // report to the user the failure and their locations in the document.
+            std::cout << "Failed to parse configuration\n"
+                << reader.getFormattedErrorMessages();
+            throw std::invalid_argument("Bad filename for JSON");
+        }
+
+	//Getting the center of mass of the entire structure. 
+	std::vector<double> structureCOM = subject.getCOM(m_config.segmentNumber);
+
+	for(std::size_t i=0; i<3; i++)
+	{
+	metrics.push_back(structureCOM[i]);
 	}
+
+	//"metrics" is a new section of the controller's JSON file that is 
+	//added in the getNewFile function in evolution_job_master.py 
+	Json::Value prevMetrics = root.get("metrics", Json::nullValue);
+
+	Json::Value subMetrics;
+	subMetrics[comX.c_str()] = metrics[0];
+	subMetrics[comY.c_str()] = metrics[1];
+	subMetrics[comZ.c_str()] = metrics[2];
+
+	//Clear the metrics vector for ease of adding tensions. 
+	metrics.clear();
+
+	std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+
+	for(std::size_t i=0; i<tmpStrings.size(); i++)
+	{
+	    std::ostringstream muscle;
+	    muscle << "muscle " << i;
+
+	    std::string curMuscle = total.str() + " " + muscle.str();
+
+	    subMetrics[curMuscle.c_str()] = (tmpStrings[i]->getTension())/10; //metrics[i];
+	}
+
+	prevMetrics.append(subMetrics);
+	root["metrics"] = prevMetrics;
+
+	ofstream payloadLog;
+	payloadLog.open(controlFilename.c_str(),ofstream::out);
+
+	payloadLog << root << std::endl;
+
+        count = 0;
+    }
+    else {
+        count++;
+    }
 }
 
 void JSONStatsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
