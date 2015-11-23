@@ -5,7 +5,6 @@ subdirs(
     BigPuppy_Model
     BigPuppy_Model2
     BigPuppy_Symmetric
-    BigPuppy_SymmetricSpiral1
     BigPuppy_SpineOnly
     BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
