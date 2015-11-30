@@ -103,16 +103,59 @@ void TensegrityModel::setup(tgWorld& world)
     Json::Value rodParams = root["parameters"]["rods"];
     Json::Value muscleParams = root["parameters"]["muscles"];
 
-    double radius = rodParams["radius"].asDouble();
-    double density = rodParams["density"].asDouble();
-    double stiffness = muscleParams["stiffness"].asDouble();
-    double damping = muscleParams["damping"].asDouble();
-    double pretension = muscleParams["pretension"].asDouble();
+    // default rod params
+    double radius = 0.5;
+    double density = 1.0;
+    double friction = 1.0;
+    double rollFriction = 0.0;
+    double restitution = 0.2;
 
-    // Define the configurations of the rods and strings
-    // Note that pretension is defined for this string
-    const tgRod::Config rodConfig(radius, density);
-    const tgSpringCableActuator::Config muscleConfig(stiffness, damping, pretension);
+    // default muscle params
+    double stiffness = 1000.0;
+    double damping = 10.0;
+    double pretension = 0.0;
+    double hist = false;
+    double maxTens = 1000.0;
+    double targetVelocity = 100.0;
+    double minActualLength = 0.1;
+    double minRestLength = 0.1;
+    double rotation = 0;
+
+    // set rod params from JSON
+    if (rodParams.isMember("radius"))
+        radius = rodParams["radius"].asDouble();
+    if (rodParams.isMember("density"))
+        density = rodParams["density"].asDouble();
+    if (rodParams.isMember("friction"))
+        friction = rodParams["friction"].asDouble();
+    if (rodParams.isMember("rollFriction"))
+        rollFriction = rodParams["rollFriction"].asDouble();
+    if (rodParams.isMember("restitution"))
+        restitution = rodParams["restitution"].asDouble();
+
+    // set muscle params from JSON
+    if (muscleParams.isMember("stiffness"))
+       stiffness = muscleParams["stiffness"].asDouble();
+    if (muscleParams.isMember("damping"))
+        damping = muscleParams["damping"].asDouble();
+    if (muscleParams.isMember("pretension"))
+        pretension = muscleParams["pretension"].asDouble();
+    if (muscleParams.isMember("hist"))
+        hist = muscleParams["hist"].asDouble();
+    if (muscleParams.isMember("maxTens"))
+        maxTens = muscleParams["maxTens"].asDouble();
+    if (muscleParams.isMember("targetVelocity"))
+        targetVelocity = muscleParams["targetVelocity"].asDouble();
+    if (muscleParams.isMember("minActualLength"))
+        minActualLength = muscleParams["minActualLength"].asDouble();
+    if (muscleParams.isMember("minRestLength"))
+        minRestLength = muscleParams["minRestLength"].asDouble();
+    if (muscleParams.isMember("rotation"))
+        rotation = muscleParams["rotation"].asDouble();
+
+     // Define the configurations of the rods and strings
+     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
+     const tgSpringCableActuator::Config muscleConfig(stiffness, damping, pretension, hist, maxTens, targetVelocity, minActualLength, minRestLength, rotation);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
