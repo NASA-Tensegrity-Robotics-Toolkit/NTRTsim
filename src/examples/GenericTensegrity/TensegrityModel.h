@@ -32,7 +32,7 @@
 #include "core/tgSubject.h"
 // The C++ Standard Library
 #include <vector>
-#include <json/json.h>
+#include <yaml-cpp/yaml.h>
 #include <string>
 
 // Forward declarations
@@ -56,7 +56,7 @@ public:
      * .cpp file in this case, not passed in. 
      */
     TensegrityModel(std::string j);
-    static std::string jsonPath;
+    static std::string yamlPath;
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -113,21 +113,15 @@ private:
      * @param[in] height: the Y distance along the axis of the prism
      */
     static void addNodes(tgStructure& s,
-                            Json::Value root);
+                            YAML::Node root);
     
     /**
-     * A function called during setup that creates rods from the
+     * A function called during setup that creates rods and muscles from the
      * relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addRods(tgStructure& s, Json::Value root);
-    
-    /**
-     * A function called during setup that creates muscles (Strings) from
-     * the relevant nodes. Rewrite this function for your own models.
-     * @param[in] s A tgStructure that we're building into
-     */
-    static void addMuscles(tgStructure& s, Json::Value root);
+    static void addPairs(tgStructure& s, YAML::Node root);
+
 
 private:    
     /**
