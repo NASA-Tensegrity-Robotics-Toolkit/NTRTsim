@@ -12,4 +12,4 @@ add_executable(AppTensegrityModel
     AppTensegrityModel.cpp
 ) 
 
-target_link_libraries(AppTensegrityModel ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
+target_link_libraries(AppTensegrityModel ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers ${ENV_LIB_DIR}/libyaml-cpp.a)
