@@ -40,68 +40,53 @@
 #include <json/json.h>
 #include <iostream>
 #include <string>
+#include <yaml-cpp/yaml.h>
 
 using namespace std;
 
-string TensegrityModel::jsonPath;
+string TensegrityModel::yamlPath;
 
 TensegrityModel::TensegrityModel(string j) :
 tgModel() 
 {
-    jsonPath = j;
+    yamlPath = j;
 }
 
 TensegrityModel::~TensegrityModel()
 {
 }
 
-void TensegrityModel::addNodes(tgStructure& s, Json::Value root)
+void TensegrityModel::addNodes(tgStructure& s, YAML::Node root)
 {
-    Json::Value nodes = root["structure"]["nodes"];
+    YAML::Node nodes = root["structure"]["nodes"];
     for (unsigned int i = 0; i < nodes.size(); i++) {
-        double x = nodes[i]["coordinates"][0].asDouble();
-        double y = nodes[i]["coordinates"][1].asDouble();
-        double z = nodes[i]["coordinates"][2].asDouble();
+        YAML::Node xyz = nodes[i]["node"]["xyz"];
+        double x = xyz[0].as<double>();
+        double y = xyz[1].as<double>();
+        double z = xyz[2].as<double>();
         s.addNode(x, y, z);
     }
 }
 
-void TensegrityModel::addRods(tgStructure& s, Json::Value root)
+void TensegrityModel::addPairs(tgStructure& s, YAML::Node root)
 {
-    Json::Value rods = root["structure"]["rods"];
-    for (unsigned int i = 0; i < rods.size(); i++) {
-        int n1 = rods[i][0].asInt();
-        int n2 = rods[i][1].asInt();
-        s.addPair(n1 - 1, n2 - 1, "rod");
+    YAML::Node pairs = root["structure"]["pairs"];
+    for (unsigned int i = 0; i < pairs.size(); i++) {
+        YAML::Node pair = pairs[i]["pair"];
+        int n1 = pair["start"].as<int>();
+        int n2 = pair["end"].as<int>();
+        string tags = pair["tags"].as<string>();
+        s.addPair(n1 - 1, n2 - 1, tags);
     } 
-}
-
-void TensegrityModel::addMuscles(tgStructure& s, Json::Value root)
-{
-    Json::Value muscles = root["structure"]["muscles"];
-    for (unsigned int i = 0; i < muscles.size(); i++) {
-        int n1 = muscles[i][0].asInt();
-        int n2 = muscles[i][1].asInt();
-        s.addPair(n1 - 1, n2 - 1, "muscle");
-    }
 }
 
 void TensegrityModel::setup(tgWorld& world)
 {
-    // Read in JSON file
-    Json::Value root; // will contains the root value after parsing.
-    Json::Reader reader;
-    bool parsingSuccessful = reader.parse( FileHelpers::getFileString(jsonPath), root );
-    if ( !parsingSuccessful )
-    {
-        // report to the user the failure and their locations in the document.
-        std::cout << "Failed to parse configuration\n"
-            << reader.getFormattedErrorMessages();
-        return;
-    }
+    // Parse Yaml File
+    YAML::Node root = YAML::LoadFile(yamlPath);
 
-    Json::Value rodParams = root["parameters"]["rods"];
-    Json::Value muscleParams = root["parameters"]["muscles"];
+    // YAML::Node rodParams = root["parameters"]["rods"];
+    // YAML::Node muscleParams = root["parameters"]["muscles"];
 
     // default rod params
     double radius = 0.5;
@@ -121,37 +106,37 @@ void TensegrityModel::setup(tgWorld& world)
     double minRestLength = 0.1;
     double rotation = 0;
 
-    // set rod params from JSON
-    if (rodParams.isMember("radius"))
-        radius = rodParams["radius"].asDouble();
-    if (rodParams.isMember("density"))
-        density = rodParams["density"].asDouble();
-    if (rodParams.isMember("friction"))
-        friction = rodParams["friction"].asDouble();
-    if (rodParams.isMember("rollFriction"))
-        rollFriction = rodParams["rollFriction"].asDouble();
-    if (rodParams.isMember("restitution"))
-        restitution = rodParams["restitution"].asDouble();
+    // // set rod params from JSON
+    // if (rodParams.isMember("radius"))
+    //     radius = rodParams["radius"].asDouble();
+    // if (rodParams.isMember("density"))
+    //     density = rodParams["density"].asDouble();
+    // if (rodParams.isMember("friction"))
+    //     friction = rodParams["friction"].asDouble();
+    // if (rodParams.isMember("rollFriction"))
+    //     rollFriction = rodParams["rollFriction"].asDouble();
+    // if (rodParams.isMember("restitution"))
+    //     restitution = rodParams["restitution"].asDouble();
 
-    // set muscle params from JSON
-    if (muscleParams.isMember("stiffness"))
-       stiffness = muscleParams["stiffness"].asDouble();
-    if (muscleParams.isMember("damping"))
-        damping = muscleParams["damping"].asDouble();
-    if (muscleParams.isMember("pretension"))
-        pretension = muscleParams["pretension"].asDouble();
-    if (muscleParams.isMember("hist"))
-        hist = muscleParams["hist"].asDouble();
-    if (muscleParams.isMember("maxTens"))
-        maxTens = muscleParams["maxTens"].asDouble();
-    if (muscleParams.isMember("targetVelocity"))
-        targetVelocity = muscleParams["targetVelocity"].asDouble();
-    if (muscleParams.isMember("minActualLength"))
-        minActualLength = muscleParams["minActualLength"].asDouble();
-    if (muscleParams.isMember("minRestLength"))
-        minRestLength = muscleParams["minRestLength"].asDouble();
-    if (muscleParams.isMember("rotation"))
-        rotation = muscleParams["rotation"].asDouble();
+    // // set muscle params from JSON
+    // if (muscleParams.isMember("stiffness"))
+    //    stiffness = muscleParams["stiffness"].asDouble();
+    // if (muscleParams.isMember("damping"))
+    //     damping = muscleParams["damping"].asDouble();
+    // if (muscleParams.isMember("pretension"))
+    //     pretension = muscleParams["pretension"].asDouble();
+    // if (muscleParams.isMember("hist"))
+    //     hist = muscleParams["hist"].asDouble();
+    // if (muscleParams.isMember("maxTens"))
+    //     maxTens = muscleParams["maxTens"].asDouble();
+    // if (muscleParams.isMember("targetVelocity"))
+    //     targetVelocity = muscleParams["targetVelocity"].asDouble();
+    // if (muscleParams.isMember("minActualLength"))
+    //     minActualLength = muscleParams["minActualLength"].asDouble();
+    // if (muscleParams.isMember("minRestLength"))
+    //     minRestLength = muscleParams["minRestLength"].asDouble();
+    // if (muscleParams.isMember("rotation"))
+    //     rotation = muscleParams["rotation"].asDouble();
 
      // Define the configurations of the rods and strings
      const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
@@ -163,12 +148,9 @@ void TensegrityModel::setup(tgWorld& world)
     // Add nodes to the structure
     addNodes(s, root);
     
-    // Add rods to the structure
-    addRods(s, root);
-    
-    // Add muscles to the structure
-    addMuscles(s, root);
-    
+    // Add pairs to the structure
+    addPairs(s, root);
+        
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
     
