@@ -470,7 +470,9 @@ class EvolutionJobMaster(NTRTJobMaster):
             
             obj[p + "Vals"] = self.currentGeneration[p][self.getParamID(self.currentGeneration[p], paramNum)]
 
-        outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+	obj["metrics"] = [] # Added to store tension and COM data. 
+        
+	outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
         fout = open(outFile, 'w')
 

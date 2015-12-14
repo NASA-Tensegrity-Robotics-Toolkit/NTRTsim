@@ -153,8 +153,10 @@ protected:
     tgDataObserver m_dataObserver;
     
     double m_updateTime;
+    double m_totalTime;
     
     std::vector<double> scores;
+    std::vector<double> metrics;
     
     bool bogus;
     
