@@ -258,12 +258,6 @@ protected:
         return this[m_names[name]];
     }
 
-    const T& getElement(std::string name) const
-    {
-        assertNameExists(name);
-        return this[m_names[name]];
-    }
-
     /**
      * Set the index to which a name points. 
      */
