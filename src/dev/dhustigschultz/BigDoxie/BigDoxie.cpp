@@ -53,7 +53,7 @@
 #include <stdexcept>
 
 //#define USE_KINEMATIC
-#define PASSIVE_STRUCTURE
+//#define PASSIVE_STRUCTURE
 
 BigDoxie::BigDoxie(int segments, int hips, int legs, int feet) :
 BaseSpineModelLearning(segments),
@@ -294,8 +294,8 @@ void BigDoxie::addMuscles(tgStructure& puppy){
             puppy.addPair(n0[3], n1[3], tgString("spine front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
             puppy.addPair(n0[3], n1[4], tgString("spine front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
 
-            puppy.addPair(n0[4], n1[3], tgString("spine front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
-            puppy.addPair(n0[4], n1[4], tgString("spine front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[3], tgString("spine front lower right muscleAct2 seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[4], tgString("spine front lower left muscleAct2 seg", i-2) + tgString(" seg", i-1));
 
 
         }        
@@ -303,21 +303,21 @@ void BigDoxie::addMuscles(tgStructure& puppy){
         //Add muscles to the puppy
         if(i < 3){
             if(i % 2 == 0){ //front
-                puppy.addPair(n0[1], n1[3], tgString("spine front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[3], tgString("spine front lower right muscleAct2 seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[4], tgString("spine front lower left muscleAct2 seg", i-2) + tgString(" seg", i-1));
                 puppy.addPair(n0[2], n1[3], tgString("spine front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
                 puppy.addPair(n0[2], n1[4], tgString("spine front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
             }
             else{ //rear
                 puppy.addPair(n0[1], n1[3], tgString("spine rear upper left muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine rear lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[4], tgString("spine rear lower left muscleAct2 seg", i-2) + tgString(" seg", i-1));
                 puppy.addPair(n0[2], n1[3], tgString("spine rear upper right muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[4], tgString("spine rear lower right muscleAct seg", i-2) + tgString(" seg", i-1)); 
+                puppy.addPair(n0[2], n1[4], tgString("spine rear lower right muscleAct2 seg", i-2) + tgString(" seg", i-1)); 
             }
         }
         if(i < m_segments){//Was 6
             if(i % 2 == 0){
-                puppy.addPair(n0[1], n2[4], tgString("spine2 bottom muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n2[4], tgString("spine2 bottom muscleAct2 seg", i-2) + tgString(" seg", i-1));
                 puppy.addPair(n0[2], n2[3], tgString("spine2 top muscleAct seg", i-2) + tgString(" seg", i-1));
             }
             else{
@@ -329,22 +329,22 @@ void BigDoxie::addMuscles(tgStructure& puppy){
         if(i > 0 && i < m_segments){
             if(i % 2 == 0){//rear
                 puppy.addPair(n1[1], n2[3], tgString("spine rear upper left muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine rear lower left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[4], tgString("spine rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
                 puppy.addPair(n1[2], n2[3], tgString("spine rear upper right muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[4], tgString("spine rear lower right muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[2], n2[4], tgString("spine rear lower right muscleAct2 seg", i-1) + tgString(" seg", i));
             }
             else{//front
 
-                puppy.addPair(n1[1], n2[3], tgString("spine front lower right muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine front lower left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[3], tgString("spine front lower right muscleAct2 seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[4], tgString("spine front lower left muscleAct2 seg", i-1) + tgString(" seg", i));
                 puppy.addPair(n1[2], n2[3], tgString("spine front upper right muscleAct seg", i-1) + tgString(" seg", i));
                 puppy.addPair(n1[2], n2[4], tgString("spine front upper left muscleAct seg", i-1) + tgString(" seg", i));
             }
         }
         if(i == m_segments - 1){
             //rear
-            puppy.addPair(n1[1], n2[2], tgString("spine rear lower left muscleAct seg", i-1) + tgString(" seg", i));
-            puppy.addPair(n1[2], n2[2], tgString("spine rear lower right muscleAct seg", i-1) + tgString(" seg", i));
+            puppy.addPair(n1[1], n2[2], tgString("spine rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
+            puppy.addPair(n1[2], n2[2], tgString("spine rear lower right muscleAct2 seg", i-1) + tgString(" seg", i));
             puppy.addPair(n1[1], n2[1], tgString("spine rear upper left muscleAct seg", i-1) + tgString(" seg", i));
             puppy.addPair(n1[2], n2[1], tgString("spine rear upper right muscleAct seg", i-1) + tgString(" seg", i));  
         }
@@ -558,7 +558,11 @@ void BigDoxie::setup(tgWorld& world)
     const double motorInertia = 1.0;
     const bool backDrivable = false;
     #ifdef PASSIVE_STRUCTURE
-        tgKinematicActuator::Config motorConfigSpine(2000, 20, passivePretension,
+        tgKinematicActuator::Config motorConfigSpine(2*stiffness, damping, pretension,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
+
+	tgKinematicActuator::Config motorConfigStomach(3*stiffness, damping, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);
 
@@ -573,9 +577,13 @@ void BigDoxie::setup(tgWorld& world)
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);
     #else
-        tgKinematicActuator::Config motorConfigSpine(stiffness, damping, pretension,
+        tgKinematicActuator::Config motorConfigSpine(2*stiffness, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
+
+	tgKinematicActuator::Config motorConfigStomach(3*stiffness, damping, passivePretension3,
+                                            mRad, motorFriction, motorInertia, backDrivable,
+                                            history, maxTens, maxSpeed);
 
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
@@ -592,12 +600,14 @@ void BigDoxie::setup(tgWorld& world)
 #else
     
     #ifdef PASSIVE_STRUCTURE
-        tgSpringCableActuator::Config muscleConfigSpine(3000, 20, passivePretension);
+        tgSpringCableActuator::Config muscleConfigSpine(2*stiffness, damping, passivePretension);
+	tgSpringCableActuator::Config muscleConfigStomach(3*stiffness, damping, passivePretension3);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
 	tgSpringCableActuator::Config muscleConfigFeet(stiffnessPassive, damping, passivePretension); 
 	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
     #else
-        tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
+        tgSpringCableActuator::Config muscleConfigSpine(2*stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigStomach(3*stiffness, damping, passivePretension3, history, maxTens, 2*maxSpeed);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
 	tgSpringCableActuator::Config muscleConfigFeet(stiffnessPassive, damping, passivePretension); 
 	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
@@ -647,11 +657,13 @@ void BigDoxie::setup(tgWorld& world)
 
     #ifdef PASSIVE_STRUCTURE
         spec.addBuilder("muscleAct", new tgKinematicContactCableInfo(motorConfigSpine));
+	spec.addBuilder("muscleAct2", new tgKinematicContactCableInfo(motorConfigStomach));
 	spec.addBuilder("muscle ", new tgKinematicContactCableInfo(motorConfigOther));
 	spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
 	spec.addBuilder("muscle3 ", new tgKinematicContactCableInfo(motorConfigLegs));
     #else 
 	spec.addBuilder("muscleAct", new tgKinematicContactCableInfo(motorConfigSpine));
+	spec.addBuilder("muscleAct2", new tgKinematicContactCableInfo(motorConfigStomach));
 	spec.addBuilder("muscle ", new tgKinematicContactCableInfo(motorConfigOther));
 	spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
 	spec.addBuilder("muscle3 ", new tgKinematicContactCableInfo(motorConfigLegs));
@@ -661,11 +673,13 @@ void BigDoxie::setup(tgWorld& world)
 #else
     #ifdef PASSIVE_STRUCTURE
    	spec.addBuilder("muscleAct", new tgBasicActuatorInfo(muscleConfigSpine));
+	spec.addBuilder("muscleAct2", new tgBasicActuatorInfo(muscleConfigStomach));
 	spec.addBuilder("muscle " , new tgBasicActuatorInfo(muscleConfigOther));
 	spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
 	spec.addBuilder("muscle3 " , new tgBasicActuatorInfo(muscleConfigLegs));
     #else 
 	spec.addBuilder("muscleAct" , new tgBasicActuatorInfo(muscleConfigSpine));
+	spec.addBuilder("muscleAct2" , new tgBasicActuatorInfo(muscleConfigStomach));
 	spec.addBuilder("muscle " , new tgBasicActuatorInfo(muscleConfigOther));
 	spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
 	spec.addBuilder("muscle3 " , new tgBasicActuatorInfo(muscleConfigLegs));
