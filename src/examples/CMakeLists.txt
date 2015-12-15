@@ -9,7 +9,6 @@ subdirs(
     learningSpines
     testjson
     craterEscape
-    GenericTensegrity
 )
 
 
