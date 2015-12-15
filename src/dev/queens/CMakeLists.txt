@@ -1,0 +1,6 @@
+Project(queens)
+
+subdirs(
+    GenericTensegrity
+)
+
