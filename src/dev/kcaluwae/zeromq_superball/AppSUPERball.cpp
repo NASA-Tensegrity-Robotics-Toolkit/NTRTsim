@@ -64,6 +64,7 @@
 #include <osg/Array>
 #include <osg/TexEnv>
 #include <osgGA/NodeTrackerManipulator>
+#include <osgText/Text> 
 
 // The C++ Standard Library
 #include <iostream>
@@ -318,7 +319,8 @@ int main(int argc, char** argv)
     ros::Subscriber timestep_sub = n.subscribe("/superball/timestep", 1, &timestep_cb_class::cb, &step_cb);
 
     //create publishers for the current state
-    ros::Publisher robot_state_pub = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state", 1);
+    ros::Publisher robot_state_pub_gps = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state", 1);
+    ros::Publisher robot_state_pub_matlab = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state_matlab", 1);
 
     // Run until the user stops the simulation
     bool publish_state_update = false;
@@ -346,6 +348,16 @@ int main(int argc, char** argv)
         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(bar);
         geode->addDrawable(drawable);
         tf->addChild(((osg::Node*) geode));
+	for (unsigned j=0;j<2;++j){
+       	    std::stringstream ss;
+            ss << i*2+j + 1;
+            osgText::Text* textRod1 = new osgText::Text();
+            textRod1->setText(ss.str());
+            textRod1->setPosition(osg::Vec3(0,0.,1.-2.*j));
+            textRod1->setColor(osg::Vec4(1,0,0,1));
+            textRod1->setCharacterSize(0.2);
+            geode->addDrawable(textRod1);
+	}
     }
     m_viewer.setSceneData(m_root.get());
     m_viewer.setUpViewInWindow(0, 0, 640, 480);
@@ -436,8 +448,11 @@ int main(int argc, char** argv)
                 state.motor_pos1.data = motor_pos1/10.;//(9.5 - motor_pos1) / 0.09;
                 state.motor_pos2.data = motor_pos2/10.;//(9.5 - motor_pos2) / 0.09;
                 state_msg.states.push_back(state);
+                std::cout << "rod" << i << "\n";
+                std::cout << state.pos1.x << ", " << state.pos1.z << ", " << state.pos1.y << "\n";
             }
-        	robot_state_pub.publish(state_msg);
+        	//robot_state_pub_gps.publish(state_msg);
+        	robot_state_pub_matlab.publish(state_msg);
     	}
 
         for (unsigned i=0; i<6; ++i) {
