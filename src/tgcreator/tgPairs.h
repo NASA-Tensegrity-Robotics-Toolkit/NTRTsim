@@ -24,25 +24,40 @@
  * $Id$
  */
 
+
+/*
+Adding nameability to pairs
+- Add pair overloading (addNamedPair)
+- [] operator using strings for names
++ pairNameExists(name)
+- RemovePair
+- '-' operator
+x getPair (getNamedPair?) -- using [] overloading instead
+- setPair (setNamedPair?)
+- copy constructor (should also copy name->index mapping)
+- getPairKey(name) 
+- assertNameExists(name);
+*/
+
 #ifndef TG_PAIRS_H
 #define TG_PAIRS_H
 
 #include <string>
 #include <vector>
 #include <algorithm>    // std::find, std::remove
-#include "core/tgTaggables.h"
+#include "core/tgTaggedNamedList.h"
 #include "tgPair.h"
 #include "tgUtil.h"
 
-class tgPairs : public tgTaggables<tgPair>
+class tgPairs : public tgTaggedNamedList<tgPair>
 {
 public:
     
     // @todo: do we need to initialize the pairs here?
-    tgPairs() : tgTaggables() {}
+    tgPairs() : tgTaggedNamedList() {}
     
-    // tgPairs(std::vector<tgPair>& pairs) : tgTaggables(pairs) { // @todo: Fix this -- casting is a problem...
-    tgPairs(std::vector<tgPair>& pairs) : tgTaggables() {
+    // tgPairs(std::vector<tgPair>& pairs) : tgTaggedNamedList(pairs) { // @todo: Fix this -- casting is a problem...
+    tgPairs(std::vector<tgPair>& pairs) : tgTaggedNamedList() {
         // @todo: make sure each pair is unique
         for(std::size_t i = 0; i < pairs.size(); i++) {
             addElement(pairs[i]);
@@ -76,6 +91,24 @@ public:
     {
         pair.addTags(space_separated_tags);
         return addPair(pair);
+    }
+
+
+    int addNamedPair(const std::string& name, tgPair pair)
+    {
+        return addNamedElement(name, pair);
+    }
+
+    int addNamedPair(const std::string& name, tgPair pair, const tgTags& tags)
+    {
+        pair.addTags(tags);
+        return addNamedPair(name, pair);
+    }
+
+    int addNamedPair(const std::string& name, tgPair pair, const std::string& space_separated_tags)
+    {
+        pair.addTags(space_separated_tags);
+        return addNamedPair(name, pair);
     }
 
     void setPair(int key, tgPair pair) {
@@ -120,6 +153,9 @@ public:
     /**
      * Return the complement of this and other
      */
+    /*
+    // @note: Removed until we can refactor tgTaggedNamedList to handle removal
+    // of elements gracefully. 
     tgPairs& operator-=(const tgPairs& other) {
         this->removeElements(other.getElements());
         return *this;
@@ -129,10 +165,12 @@ public:
         this->removeElements(other);
         return *this;
     }
+    */
 
 };
 
-
+/*
+// @note: disabled until tgTaggedNamedList can handle removal of named elements
 inline tgPairs operator-(tgPairs lhs, const tgPairs& rhs)
 {
     lhs -= rhs;
@@ -144,7 +182,7 @@ inline tgPairs operator-(tgPairs lhs, const std::vector<tgPair*>& rhs)
     lhs -= rhs;
     return lhs;
 }
-
+*/
 
 /**
  * Overload operator<<() to handle tgPairs

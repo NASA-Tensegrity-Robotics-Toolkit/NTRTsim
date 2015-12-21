@@ -27,7 +27,7 @@
 #ifndef TG_PAIR_H
 #define TG_PAIR_H
 
-#include "core/tgTaggable.h"
+#include "core/tgComponent.h"
 
 #include "LinearMath/btVector3.h"
 
@@ -45,11 +45,12 @@ class btQuaternion;
  * @see http://stackoverflow.com/questions/3769781/stdpair-of-references
  * @todo Replace with "typedef tgPair std::pair<btVector3*, btVector3*>;"
  */
-class tgPair : public tgTaggable
+class tgPair : public tgComponent
 {
 public:
 
-    tgPair();
+    tgPair() : tgComponent() 
+    {};
 
     /**
      * Create a pair from two btVector3 objects.
@@ -57,9 +58,10 @@ public:
      * @param[in] to a btVector3
      * @todo Is it OK for from == to, either the same object or the same value?
      */
-    tgPair(btVector3 from, btVector3 to);
-
-    tgPair(btVector3 from, btVector3 to, std::string tags);
+    tgPair(btVector3 from, btVector3 to, 
+            const std::string& tags = "", 
+            const std::string& name = "") : m_pair(from, to), tgComponent(tags, name) 
+    {};
         
    /**
     * Return the from (first) member of the pair.
@@ -131,7 +133,7 @@ inline std::ostream&
 operator<<(std::ostream& os, const tgPair& pair) 
 {
         os << "tgPair(" << pair.getFrom() << ", " << pair.getTo() 
-            << ", {" << pair.getTagStr(", ") << "})";
+            << ", {" << pair.getTagStr(", ") << "}, \"" << pair.getName() << "\")";
     return os;
 }
 

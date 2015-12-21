@@ -28,7 +28,7 @@
  */
 
 #include "tgUtil.h"
-#include "core/tgTaggable.h"
+#include "core/tgComponent.h"
 
 //Bullet Physics
 #include "LinearMath/btVector3.h"
@@ -42,18 +42,19 @@
  * rotation, and other editing features (to be added).
  * Tagging just a node can allow a tgSphere to be placed there.
  */
-class tgNode : public btVector3, public tgTaggable
+class tgNode : public btVector3, public tgComponent
 {
 public:
 
     tgNode(const btVector3& v = btVector3(),
-             const std::string& tags = "") :
-        btVector3(v), tgTaggable(tags)  
+             const std::string& tags = "", const std::string& name = "") :
+        btVector3(v), tgComponent(tags, name)  
     {}
         
     tgNode(double x, double y, double z, 
-             const std::string& tags = "") : 
-        btVector3(x,y,z), tgTaggable(tags)
+             const std::string& tags = "",
+             const std::string& name = "") : 
+        btVector3(x,y,z), tgComponent(tags, name)
     {}
 
     /**
@@ -113,7 +114,7 @@ public:
 inline std::ostream&
 operator<<(std::ostream& os, const tgNode& node) 
 {
-    os << "tgNode(" << node.x() << ", " << node.y() << ", " << node.z() << ", {" << node.getTagStr(", ") << "})";
+    os << "tgNode(" << node.x() << ", " << node.y() << ", " << node.z() << ", {" << node.getTagStr(", ") << "}, \"" << node.getName() << "\")";
     return os;
 }
 

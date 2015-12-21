@@ -28,21 +28,7 @@
 
 #include "tgUtil.h"
 
-
-tgPair::tgPair() : tgTaggable() {}
-
-/**
- * Create a pair from two btVector3 objects.
- * @param[in] from a btVector3
- * @param[in] to a btVector3
- * @todo Is it OK for from == to, either the same object or the same value?
- */
-tgPair::tgPair(btVector3 from, btVector3 to) : m_pair(from, to), tgTaggable() 
-{}
-
-tgPair::tgPair(btVector3 from, btVector3 to, std::string tags) : m_pair(from, to), tgTaggable(tags) 
-{}
-    
+  
 /**
 * Return the from (first) member of the pair.
 * @return the from (first) member of the pair
