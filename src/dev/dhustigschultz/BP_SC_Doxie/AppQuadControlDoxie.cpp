@@ -85,8 +85,8 @@ bool AppQuadControlDoxie::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 8; //This may be ok, but confirm. 
+        const int segmentSpan = 3; 
+        const int numMuscles = 16; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -112,7 +112,7 @@ bool AppQuadControlDoxie::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
 
-	const double maxH = 60.0;
+	const double maxH = 100.0;
 	const double minH = 1.0;
 
         JSONQuadFeedbackControl::Config control_config(segmentSpan, 
