@@ -36,23 +36,23 @@
 #include <sstream>
 
 #include "tgNode.h"
-#include "core/tgTaggables.h"
+#include "core/tgComponentList.h"
 
 class tgPair;
- 
+
 /**
  * A node is an attachment point. The client identifies nodes with an integer
- * index or selects them using tags (see tgTaggable). 
+ * index or selects them using tags (see tgComponent). 
  * @TODO: add error checking
- * @todo: move operator[] out of tgTaggables into here
+ * @todo: move operator[] out of tgComponent into here (?)
  */
-class tgNodes : public tgTaggables<tgNode> {
+class tgNodes : public tgComponentList<tgNode> {
 public:
     
     /**
      * Create an empty set of nodes.
      */
-    tgNodes() : tgTaggables()
+    tgNodes() : tgComponentList<tgNode>()
     {
     }
 
@@ -62,7 +62,7 @@ public:
      * @author Lee Brownston
      * @date Wed 26 Feb 2014
      */
-    tgNodes(std::vector<btVector3>& nodes) : tgTaggables()
+    tgNodes(std::vector<btVector3>& nodes) : tgComponentList()
     {
         // All elements must be unique
         assertUniqueElements("All nodes must be unique.");
@@ -74,7 +74,7 @@ public:
         
     }
      
-    tgNodes(std::vector<tgNode>& nodes) : tgTaggables(nodes) {
+    tgNodes(std::vector<tgNode>& nodes) : tgComponentList(nodes) {
         // All elements must be unique
         assertUniqueElements("All nodes must be unique.");
         
@@ -135,6 +135,7 @@ public:
     };
     
     int addNode(const tgNode& node) {
+        std::cout << "tgNodes::addNode(const tgNode& node)" << std::endl;
         return addElement(node);
     }
 
@@ -213,9 +214,6 @@ public:
     }
     
 protected:
-    
-    // A map of m_nodes keys to names. Note that not all m_nodes will have names.
-    std::map<int, std::string> m_names;  // @todo: remove this...
     
     void assertNodeExists(int key) const
     {

@@ -45,19 +45,19 @@ x getPair (getNamedPair?) -- using [] overloading instead
 #include <string>
 #include <vector>
 #include <algorithm>    // std::find, std::remove
-#include "core/tgTaggedNamedList.h"
+#include "core/tgComponentList.h"
 #include "tgPair.h"
 #include "tgUtil.h"
 
-class tgPairs : public tgTaggedNamedList<tgPair>
+class tgPairs : public tgComponentList<tgPair>
 {
 public:
     
     // @todo: do we need to initialize the pairs here?
-    tgPairs() : tgTaggedNamedList() {}
+    tgPairs() : tgComponentList() {}
     
-    // tgPairs(std::vector<tgPair>& pairs) : tgTaggedNamedList(pairs) { // @todo: Fix this -- casting is a problem...
-    tgPairs(std::vector<tgPair>& pairs) : tgTaggedNamedList() {
+    // tgPairs(std::vector<tgPair>& pairs) : tgComponentList(pairs) { // @todo: Fix this -- casting is a problem...
+    tgPairs(std::vector<tgPair>& pairs) : tgComponentList() {
         // @todo: make sure each pair is unique
         for(std::size_t i = 0; i < pairs.size(); i++) {
             addElement(pairs[i]);
@@ -93,7 +93,7 @@ public:
         return addPair(pair);
     }
 
-
+    /* // temporarily disabled until tgComponentList supports addNamedElement
     int addNamedPair(const std::string& name, tgPair pair)
     {
         return addNamedElement(name, pair);
@@ -110,7 +110,8 @@ public:
         pair.addTags(space_separated_tags);
         return addNamedPair(name, pair);
     }
-
+    */
+    
     void setPair(int key, tgPair pair) {
         setElement(key, pair);
     }
@@ -154,7 +155,7 @@ public:
      * Return the complement of this and other
      */
     /*
-    // @note: Removed until we can refactor tgTaggedNamedList to handle removal
+    // @note: Removed until we can refactor tgComponentList to handle removal
     // of elements gracefully. 
     tgPairs& operator-=(const tgPairs& other) {
         this->removeElements(other.getElements());
@@ -170,7 +171,7 @@ public:
 };
 
 /*
-// @note: disabled until tgTaggedNamedList can handle removal of named elements
+// @note: disabled until tgComponentList can handle removal of named elements
 inline tgPairs operator-(tgPairs lhs, const tgPairs& rhs)
 {
     lhs -= rhs;

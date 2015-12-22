@@ -33,15 +33,15 @@
 #include <LinearMath/btQuaternion.h>
 #include <LinearMath/btVector3.h>
  
-tgStructure::tgStructure() : tgTaggable() 
+tgStructure::tgStructure() : tgComponent(), m_nodes(), m_pairs()
 {
 }
 
-tgStructure::tgStructure(const tgTags& tags) : tgTaggable(tags)
+tgStructure::tgStructure(const tgTags& tags) : tgComponent(tags), m_nodes(), m_pairs()
 {
 }
 
-tgStructure::tgStructure(const std::string& space_separated_tags) : tgTaggable(space_separated_tags)
+tgStructure::tgStructure(const std::string& space_separated_tags) : tgComponent(space_separated_tags), m_nodes(), m_pairs()
 {
 }
 
@@ -58,8 +58,15 @@ void tgStructure::addNode(double x, double y, double z, std::string tags)
     m_nodes.addNode(x, y, z, tags);
 }
 
+/*
 void tgStructure::addNode(tgNode& newNode)
 {
+    m_nodes.addNode(newNode);
+}
+*/
+void tgStructure::addNode(const tgNode& newNode)
+{
+    std::cout << "tgStructure::addNode(const tgNode& newNode)" << std::endl;
     m_nodes.addNode(newNode);
 }
 

@@ -31,7 +31,7 @@
 #include "tgNodes.h"
 #include "tgPairs.h"
 // The NTRT Core Library
-#include "core/tgTaggable.h"
+#include "core/tgComponent.h"
 // The C++ Standard Library
 #include <string>
 #include <vector>
@@ -42,6 +42,8 @@ class btVector3;
 class tgNode;
 class tgTags;
 
+class tgComponent;
+
 /**
  * Representation of a geometric structure containing nodes (points), pairs of
  * nodes, and child structures. Note that nodes, pairs, and structures are all 
@@ -50,7 +52,7 @@ class tgTags;
  * Note that tags can be anything you want -- you'll specify the tags that you 
  * want to use to build things like rods or muscles during the build phase.
  */
-class tgStructure : public tgTaggable
+class tgStructure : public tgComponent
 {
 public:
     
@@ -71,7 +73,9 @@ public:
      * Add a node using a node - since keeping track of nodes seems
      * more useful than pairs for string attachments
      */
-    void addNode(tgNode& newNode);
+    //void addNode(tgNode& newNode);
+
+    void addNode(const tgNode& newNode);  # @todo: for some reason this is not working (causing a malloc error (on Mac)??)
 
     /**
      * Add a pair that connects two of our nodes together
@@ -143,6 +147,21 @@ private:
     std::vector<tgStructure*> m_children;
     
 };
+
+
+/**
+ * Overload operator<<() to handle a tgStructure
+ * @param[in,out] os an ostream
+ * @param[in] pair a tgStructure
+ * @return os
+ * @todo Inlining this does no good; stream operations are slow.
+ */
+inline std::ostream&
+operator<<(std::ostream& os, const tgStructure& structure) 
+{
+    os << "tgStructure([print the nodes, pairs, and children?])" << std::endl;
+    return os;
+}
 
 
 #endif

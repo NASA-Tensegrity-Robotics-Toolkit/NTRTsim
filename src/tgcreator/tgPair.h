@@ -60,7 +60,7 @@ public:
      */
     tgPair(btVector3 from, btVector3 to, 
             const std::string& tags = "", 
-            const std::string& name = "") : m_pair(from, to), tgComponent(tags, name) 
+            const std::string& name = "") : tgComponent(tags, name), m_pair(from, to)
     {};
         
    /**

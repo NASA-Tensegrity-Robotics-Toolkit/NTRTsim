@@ -23,8 +23,8 @@
  * $Id$
  */
 
-#ifndef TG_TAGGABLE_H
-#define TG_TAGGABLE_H
+#ifndef TG_COMPONENT_H
+#define TG_COMPONENT_H
 
 #include <sstream>
 #include <vector>
@@ -40,6 +40,7 @@ class tgComponent
 {
 public:
     
+    /*
     tgComponent() {}
 
     tgComponent(const std::string& space_separated_tags) : m_tags(space_separated_tags) 
@@ -47,16 +48,22 @@ public:
 
     tgComponent(tgTags tags) : m_tags(tags)
     {}
-
-    tgComponent(const std::string& space_separated_tags, const std::string& name) : m_tags(space_separated_tags), m_name(name)
+    */
+    
+    tgComponent(const std::string& space_separated_tags = "", const std::string& name = "") : m_tags(space_separated_tags), m_name(name)
     {}
 
-    tgComponent(tgTags tags, const std::string& name) : m_tags(tags), m_name(name)
+    tgComponent(tgTags tags, const std::string& name = "") : m_tags(tags), m_name(name)
     {}
     
     ~tgComponent() {}
 
     std::string getName()
+    {
+        return m_name;
+    }
+    
+    const std::string& getName() const
     {
         return m_name;
     }
