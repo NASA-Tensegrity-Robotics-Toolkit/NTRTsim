@@ -75,7 +75,7 @@ public:
      */
     //void addNode(tgNode& newNode);
 
-    void addNode(const tgNode& newNode);  # @todo: for some reason this is not working (causing a malloc error (on Mac)??)
+    void addNode(const tgNode& newNode);  // @todo: for some reason this is not working (causing a malloc error (on Mac)??)
 
     /**
      * Add a pair that connects two of our nodes together
