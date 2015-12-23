@@ -66,7 +66,7 @@ void tgStructure::addNode(tgNode& newNode)
 */
 void tgStructure::addNode(const tgNode& newNode)
 {
-    std::cout << "tgStructure::addNode(const tgNode& newNode)" << std::endl;
+    //std::cout << "tgStructure::addNode(const tgNode& newNode)" << std::endl;
     m_nodes.addNode(newNode);
 }
 

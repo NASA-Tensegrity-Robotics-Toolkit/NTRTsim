@@ -119,7 +119,7 @@ public:
      * Return a non-const reference to the element that is indexed by the
      * int key. It must be in m_elements.
      * @param[in] key the key of the element to retrieve
-     * @reeturn a const reference to the element that is indexed by idx
+     * @return a reference to the element that is indexed by idx
      */
     T& operator[](int key) { 
         assertKeyExists(key);
@@ -131,6 +131,38 @@ public:
         return m_elements[key]; 
     }
     
+    /**
+     * Return a non-const reference to the element named by name. It must be 
+     * in m_elements. 
+     * @param[in] name the name of the element to retrieve
+     * @return a const reference to the element that is indexed by idx
+     */
+    T& operator[](const std::string& name) 
+    { 
+        assertNameExists(name);
+        
+        //return this[m_names.find(name)->second];
+        for(int i = 0; i < m_elements.size(); i++) {
+            if(_component(&m_elements[i])->getName() == name) {
+                return m_elements[i];
+            }
+        }
+        throw std::out_of_range("Error: name does not exist."); 
+    }
+    
+    const T& operator[](const std::string& name) const
+    {
+        assertNameExists(name);
+        // Note: we know that the name is present since we checked with 
+        // assertNameExists(), which thrown an exception if name is not found.
+        for(int i = 0; i < m_elements.size(); i++) {
+            if(_component(&m_elements[i])->getName() == name) {
+                return m_elements[i];
+            }
+        }
+        throw std::out_of_range("Error: name does not exist. This exception should not be reached.");  // Should never be reached since we already checked the name
+    }
+        
     /**
      * Remove the elements contained in 'other' from this object
      */
@@ -157,19 +189,35 @@ public:
 
 protected:
     
+    // Cast T to component (after all, T must be a tgComponent in the first place, but )
+    // there doesn't seem to be a way to enforce that with c++ templates...
+    tgComponent* _component(T* obj) {
+        return static_cast<tgComponent*>(obj);
+    }
+    
+    const tgComponent* _component(const T* obj) const
+    {
+        return static_cast<const tgComponent*>(obj);
+    }
+    
     // @todo: think about uniqueness -- if not unique, throw an error? return -1? 
     int addElement(const T& element) 
     {
-        std::cout << "tgComponentList::addElement(" << typeid(element).name() << " element)" << std::endl;
-        
-        // @todo: make sure the element is unique
+        //std::cout << "tgComponentList::addElement(" << typeid(element).name() << " element)" << std::endl;
+                
         assert(!elementExists(element));  // segfault?
         assertUnique(element);
+        
+        // @todo: make sure the name is unique if it's not ""
+        assertNameUnused(_component(&element)->getName());
+        
         // @note: not thread safe
         int idx = m_elements.size();
-        std::cout << "m_elements.size(): " << idx << std::endl;
+        //std::cout << "m_elements.size(): " << idx << std::endl;
+
+        // @todo: do we need to copy the element here? Or is it automatically copied when we push_back since the vector uses values instead of pointers? 
         T elementCopy = T(element);
-        std::cout << "Well, we successfully copied the element..." << std::endl;
+        //std::cout << "Well, we successfully copied the element..." << std::endl;
         m_elements.push_back(elementCopy);  // @note: malloc error here? (original: m_elements.push_back(element); (arg 'T element'))
         return idx;  // This is the index that was created.
     }
@@ -238,6 +286,18 @@ protected:
     {
         return (0 <= key) && (key < m_elements.size());
     }        
+
+    bool nameExists(const std::string& name) const
+    {
+        // @todo: make this work (check all elements)
+        for(int i = 0; i < m_elements.size(); i++) {
+            // This is a little strange to me, but at least it doesn't cause a segfault...
+            if(_component(&m_elements[i])->getName() == name) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     // @todo: FIX THIS -- segfaults, etc. -- what's going on? 
     bool elementExists(const T& element) const
@@ -262,30 +322,48 @@ protected:
         }        
     }
     
-    const void assertUnique(const T& element, std::string message = "Taggable elements must be unique.") const {
+    
+    void assertNameExists(std::string name, std::string message = "Name pointer does not exist") const
+    {
+        if(!nameExists(name)) {
+            std::stringstream ss; 
+            ss << name;
+            throw std::out_of_range(message + " (name '"+ ss.str() + "').");
+        }        
+    }
+    
+    void assertNameUnused(std::string name, std::string message = "Name already used") const
+    {
+        if(nameExists(name)) {
+            std::stringstream ss; 
+            ss << name;
+            throw std::logic_error(message + " (name '"+ ss.str() + "').");
+        }        
+    }
+    
+    // Used before adding elements
+    const void assertUnique(const T& element, std::string message = "tgComponentList elements must be unique.") const {
         if(elementExists(element)) {
             throw std::logic_error(message);
         }
     }
     
-    void assertUniqueElements(std::string message = "Taggable elements must be unique.") const
+    // Used to check that everything is unique (any time)
+    void assertUniqueElements(std::string message = "tgComponentList elements must be unique.") const
     {
         /* Note: this throws a "Most vexing parse" error (http://en.wikipedia.org/wiki/Most_vexing_parse)
         // Note: This would probably work if we implemented operator< on tgPair...
         */
         
         if(! (std::set<T>(m_elements.begin(), m_elements.end()).size() ==
-             m_elements.size())) {
-                 throw std::logic_error(message);
-             }
+             m_elements.size())) 
+        {
+            throw std::logic_error(message);
+        }
 
     }
     
-    // Cast T to taggable (after all, T must be a tgComponent in the first place, but )
-    // there doesn't seem to be a way to enforce that with c++ templates...
-    tgComponent* _component(T* obj) {
-        return static_cast<tgComponent*>(obj);
-    }
+
     
 private:
     std::vector<T> m_elements;

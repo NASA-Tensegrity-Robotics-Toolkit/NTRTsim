@@ -135,7 +135,7 @@ public:
     };
     
     int addNode(const tgNode& node) {
-        std::cout << "tgNodes::addNode(const tgNode& node)" << std::endl;
+        //std::cout << "tgNodes::addNode(const tgNode& node)" << std::endl;
         return addElement(node);
     }
 

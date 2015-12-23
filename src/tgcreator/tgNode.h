@@ -45,12 +45,12 @@
 class tgNode : public btVector3, public tgComponent
 {
 public:
-
+    
     tgNode(const btVector3& v = btVector3(),
              const std::string& tags = "", const std::string& name = "") :
         btVector3(v), tgComponent(tags, name)  
     {}
-        
+    
     tgNode(double x, double y, double z, 
              const std::string& tags = "",
              const std::string& name = "") : 
