@@ -41,10 +41,9 @@
 BaseQuadModelLearning::BaseQuadModelLearning(int segments, int hips) : 
     m_segments(segments),  
     m_hips(hips),
-    m_subStructures(segments+hips), 
     tgModel() 
 {
-    //m_subStructures = m_hips + m_segments;
+    m_subStructures = m_hips + m_segments;
 }
 
 BaseQuadModelLearning::~BaseQuadModelLearning()
