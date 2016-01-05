@@ -97,7 +97,7 @@ namespace
      120.0,    // pretension -> set to 
      120.0,   // pretension -> set to 
      0,			// History logging (boolean)
-     2000,   // maxTens
+     4000,   // maxTens
      2,    // targetVelocity
      0.09, // motor_radius // Spindle radius (length)
      2*4.24e-5, // motor_friction (kg*(length)^2/sec)
@@ -244,6 +244,38 @@ void T6Model::addActuators(tgStructure& s)
                             10 4 6 1 8 2 5 11 7 9  3  0   8 4  1  3  11  7 4 1 3  11 7 8];
 
 	*/
+        s.addPair(0,    10,     "actuated");
+        s.addPair(1,    4,      "actuated");
+        s.addPair(2,    6,      "actuated");
+        s.addPair(3,    1,      "actuated");
+        s.addPair(4,    8,      "actuated");
+        s.addPair(5,    2,      "actuated");
+        s.addPair(6,    5,      "actuated");
+        s.addPair(7,    11,     "actuated");
+        s.addPair(8,    7,      "actuated");
+        s.addPair(9,    0,      "actuated");
+        s.addPair(10,   9,      "actuated");
+        s.addPair(11,   3,      "actuated");
+
+        //Passive cables (triangle 1 - large circle)
+        s.addPair(0,    8,      "passive");
+        s.addPair(0,    4,      "passive");
+        s.addPair(10,   1,      "passive");
+        s.addPair(10,   3,      "passive");
+        s.addPair(9,    11,     "passive");
+        s.addPair(9,    7,      "passive");
+
+        //Passive cables (triangle 2 - large circle)
+        s.addPair(2,    4,      "passive");
+        s.addPair(2,    1,      "passive");
+        s.addPair(6,    3,      "passive");
+        s.addPair(6,    11,     "passive");
+        s.addPair(5,    7,      "passive");
+        s.addPair(5,    8,      "passive");
+
+	/*
+        THIS IS THE CORRECT PATTERN, ABOVE IS PUTTING THE ACTUATORS IT IN ORDER 
+        SO THAT WE CAN ITTERATE THROUGH THE ARRAY CORRECTLY
 	//Large circle
 	s.addPair(1,	4,	"actuated");
 	s.addPair(4,	8,	"actuated");
@@ -277,7 +309,7 @@ void T6Model::addActuators(tgStructure& s)
 	s.addPair(6,	11,	"passive");
 	s.addPair(5,	7,	"passive");
 	s.addPair(5,	8,	"passive");
-/*
+
     s.addPair(0, 4,  "passive");//OK
     s.addPair(0, 5,  "passive");//
     s.addPair(0, 8,  "passive");
@@ -345,11 +377,11 @@ void T6Model::setup(tgWorld& world)
     btVector3 rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
     btVector3 rotationAxis = btVector3(0, 0, 1);  // y-axis
     //double rotationAngle = M_PI/2;
-    double rotationAngle = 0.8;
+    double rotationAngle = -0.8;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     rotationAxis = btVector3(1, 0, 0);  // y-axis
-    rotationAngle = 0.6;
+    rotationAngle = -0.6;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     //rotationAxis = btVector3(0, 0, 1);  // y-axis

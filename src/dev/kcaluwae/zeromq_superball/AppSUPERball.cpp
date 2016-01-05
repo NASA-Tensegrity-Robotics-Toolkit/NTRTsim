@@ -448,8 +448,6 @@ int main(int argc, char** argv)
                 state.motor_pos1.data = motor_pos1/10.;//(9.5 - motor_pos1) / 0.09;
                 state.motor_pos2.data = motor_pos2/10.;//(9.5 - motor_pos2) / 0.09;
                 state_msg.states.push_back(state);
-                std::cout << "rod" << i << "\n";
-                std::cout << state.pos1.x << ", " << state.pos1.z << ", " << state.pos1.y << "\n";
             }
         	//robot_state_pub_gps.publish(state_msg);
         	robot_state_pub_matlab.publish(state_msg);
