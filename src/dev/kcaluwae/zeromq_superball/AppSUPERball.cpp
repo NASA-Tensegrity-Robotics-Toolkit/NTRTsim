@@ -404,7 +404,12 @@ int main(int argc, char** argv)
 		    //motor_targets[i] = 7.;
 		    std::cout << i << "\tpos: " << cur_pos << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";
 		} else {
-               	    motor_targets[i] = motor_pos_cb[i]->motor_pos*10.; //10. - 10.*(0.018*M_PI*(motor_pos_cb[i]->motor_pos/(2*M_PI)));
+                    // Changed motor_targets to match the real robot's input commands
+                    double tmp_motor_pos = motor_pos_cb[i]->motor_pos;
+                    if(abs(tmp_motor_pos) >= 45){
+                        tmp_motor_pos = 45;
+                    }
+               	    motor_targets[i] = (100 - abs(tmp_motor_pos)) / 10;
 		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
                 }
             }

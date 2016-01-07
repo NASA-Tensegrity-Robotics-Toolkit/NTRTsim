@@ -94,8 +94,8 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     120.0,    // pretension -> set to 
-     120.0,   // pretension -> set to 
+     100.0,    // pretension -> set to 
+     100.0,   // pretension -> set to 
      0,			// History logging (boolean)
      4000,   // maxTens
      2,    // targetVelocity
