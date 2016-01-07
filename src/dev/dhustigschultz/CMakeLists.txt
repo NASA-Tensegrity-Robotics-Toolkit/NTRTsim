@@ -18,7 +18,6 @@ subdirs(
     BP_SC_NoLegs_Stats
     BP_SC_Symmetric
     BP_SC_SymmetricSpiral
-    BP_SC_SymmetricArching
     BP_SC_NoLegs
     BP_SC_Doxie
 )
