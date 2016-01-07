@@ -83,6 +83,10 @@ void BigPuppySymmetricArching::addRodsFoot(tgStructure& s){
     s.addPair(1,7,"rod");
     s.addPair(2,4,"rod");
     s.addPair(3,5,"rod");
+    s.addPair(0,1,"rod");
+    s.addPair(0,3,"rod");
+    s.addPair(1,2,"rod");
+    s.addPair(2,3,"rod");
 }
 
 void BigPuppySymmetricArching::addNodesLeg(tgStructure& s, double r){ 
@@ -370,8 +374,8 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
     tgNodes n14 = children[14]->getNodes();
 
     //Adding long muscles to spine, for bending/arching:
-    puppy.addPair(n0[2], n6[3], tgString("spine top arching muscleAct seg", 0) + tgString(" seg", 6));
-    puppy.addPair(n0[1], n6[4], tgString("spine bottom arching muscleAct seg", 0) + tgString(" seg", 6));
+    puppy.addPair(n0[2], n6[3], tgString("spine2 top arching muscleAct seg", 0) + tgString(" seg", 6)); //Change these to something other than "spine " or "spine2" when it's time to implement new code for them!
+    puppy.addPair(n0[1], n6[4], tgString("spine2 bottom arching muscleAct seg", 0) + tgString(" seg", 6));
     //puppy.addPair(n1[4], n5[1], tgString("spine right lateral arching muscleAct seg", 1) + tgString(" seg", 5));
     //puppy.addPair(n1[3], n5[2], tgString("spine left lateral arching muscleAct seg", 1) + tgString(" seg", 5));
     
@@ -506,14 +510,14 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
         puppy.addPair(ni[0],ni[3],tgString("foot muscle seg", i));
         puppy.addPair(ni[1],ni[2],tgString("foot muscle seg", i));
         puppy.addPair(ni[2],ni[3],tgString("foot muscle seg", i));
-        puppy.addPair(ni[0],ni[7],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[1],ni[4],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[2],ni[5],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[3],ni[6],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[4],ni[5],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[4],ni[7],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[5],ni[6],tgString("foot muscle2 seg", i));
-        puppy.addPair(ni[6],ni[7],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[0],ni[7],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[1],ni[4],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[2],ni[5],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[3],ni[6],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[4],ni[5],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[4],ni[7],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[5],ni[6],tgString("foot muscle2 seg", i));
+        //puppy.addPair(ni[6],ni[7],tgString("foot muscle2 seg", i));
         
         //Connect feet to legs:
         puppy.addPair(ni4[5],ni[0],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
@@ -670,7 +674,7 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
     // models (e.g. muscles) that we want to control. 
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
-    m_allSegments = this->find<tgModel> ("spine segment");
+    m_allSegments = this->find<tgModel> ("segment");
     
     // Actually setup the children, notify controller that the setup has finished
     BaseQuadModelLearning::setup(world);
