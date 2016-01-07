@@ -11,7 +11,6 @@ subdirs(
     BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
     BigPuppy_Foot
-    BigPuppy_Foot2
     BigPuppy_HT
     BigPuppy_Terrain
     TC_MixedLearning
