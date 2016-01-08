@@ -51,6 +51,7 @@
 #include "std_msgs/UInt16.h"
 #include "gps_agent_pkg/SUPERballState.h"
 #include "gps_agent_pkg/SUPERballStateArray.h"
+#include "superball_msg/TimestampedFloat32.h"
 
 // OSG
 #include <osg/Geometry>
@@ -71,6 +72,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 /**
  * The entry point.
@@ -82,7 +84,7 @@
 class motor_pos_cb_class {
 public:
 	float motor_pos = 0.;
-	void cb(const std_msgs::Float32::ConstPtr& msg){
+	void cb(const superball_msg::TimestampedFloat32::ConstPtr& msg){
 		motor_pos = msg->data;
 	}
 };
@@ -319,7 +321,7 @@ int main(int argc, char** argv)
     ros::Subscriber timestep_sub = n.subscribe("/superball/timestep", 1, &timestep_cb_class::cb, &step_cb);
 
     //create publishers for the current state
-    ros::Publisher robot_state_pub_gps = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state", 1);
+    ros::Publisher robot_state_pub_gps = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state_sim", 1);
     ros::Publisher robot_state_pub_matlab = n.advertise<gps_agent_pkg::SUPERballStateArray>("/superball/state_matlab", 1);
 
     // Run until the user stops the simulation
@@ -371,6 +373,20 @@ int main(int argc, char** argv)
     m_viewer.setCameraManipulator(nodeTracker);
     m_viewer.frame();
     ros::Time last_frame = ros::Time::now();
+
+    // Used for face detection
+    int node_to_face[9][3] = {0,0,0,
+                              4,7,12,
+                              2,4,11,
+                              2,3,5,
+                              3,6,7,
+                              6,8,9,
+                              8,10,12,
+                              1,5,9,
+                              1,10,11};
+    ros::Publisher face_pub = n.advertise<std_msgs::String>("/imu_face_string_sim", 1);
+    double temp_motor_targets[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+
     while (ros::ok()) {
         //get new ROS messages
         ros::spinOnce();
@@ -388,11 +404,37 @@ int main(int argc, char** argv)
             std::cout << "advancing simulation " << step_cb.timesteps << "ms" << std::endl;
             publish_state_update = true;
             const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
-            double cur_pos, vel_step;
+            //double cur_pos, vel_step;
+            double motor_power = 0.7; // Percentage of usable motor power
+            double motor_speed = 26 * motor_power; // Currently 26 cm/s is maximum speed of SUPERball's motors
             //update motor target values
+            std::cout << "Control Mode: " << control_mode << std::endl;
             for (unsigned i=0; i<12; ++i) {
+                double tmp_motor_pos = motor_pos_cb[i]->motor_pos;
+                if(abs(tmp_motor_pos) >= 45){
+                    tmp_motor_pos = 45;
+                }
+               	motor_targets[i] = (100 - abs(tmp_motor_pos)) / 10;
+
 		if(control_mode == T6PIDController::VELOCITY){
-		    //DOES NOT WORK!!!
+                    if(springCables[i]->getRestLength() > motor_targets[i]){
+                        temp_motor_targets[i] += motor_speed / (1000/step_cb.timesteps);
+                    }
+                    else{
+                        temp_motor_targets[i] = motor_targets[i];
+                    }
+                    if(springCables[i]->getRestLength() < motor_targets[i]){
+                        temp_motor_targets[i] -= motor_speed / (1000/step_cb.timesteps);
+                    }
+                    else{
+                        temp_motor_targets[i] = motor_targets[i];
+                    }
+                    if(tmp_motor_pos == 0){
+                        temp_motor_targets[i] = motor_targets[i];
+                    }
+		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << temp_motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
+		    /*
+                    //DOES NOT WORK!!!
                     cur_pos = springCables[i]->getRestLength();
                     vel_step = motor_pos_cb[i]->motor_pos*step_cb.timesteps/1000.;
                     motor_targets[i] = cur_pos+vel_step;
@@ -403,18 +445,15 @@ int main(int argc, char** argv)
 		    }
 		    //motor_targets[i] = 7.;
 		    std::cout << i << "\tpos: " << cur_pos << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";
+                    */
 		} else {
                     // Changed motor_targets to match the real robot's input commands
-                    double tmp_motor_pos = motor_pos_cb[i]->motor_pos;
-                    if(abs(tmp_motor_pos) >= 45){
-                        tmp_motor_pos = 45;
-                    }
-               	    motor_targets[i] = (100 - abs(tmp_motor_pos)) / 10;
-		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
+                    temp_motor_targets[i] = motor_targets[i];
+		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << temp_motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
                 }
             }
             std::cout<<std::endl;
-            pTC->setTarget(motor_targets);
+            pTC->setTarget(temp_motor_targets);
 
             simulation.run(step_cb.timesteps);
             step_cb.timesteps = 0;
@@ -426,6 +465,11 @@ int main(int argc, char** argv)
             gps_agent_pkg::SUPERballStateArray state_msg;
             const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
             //state_msg.header.frame_id = "/base"; 
+
+            // Used in determining current robot face
+            int bottom_triangle[3] = {0,0,0};
+            double pos_array[12];
+
             for (unsigned i=0; i<6; ++i) {
                 gps_agent_pkg::SUPERballState state;
                 const tgRod* const rod = rods[i];
@@ -448,14 +492,49 @@ int main(int argc, char** argv)
                 state.pos2.y = pos2.getY();
                 state.pos2.z = pos2.getZ();
                 const unsigned idx = 2 * i;
+                pos_array[idx] = pos2.getY();
+                pos_array[idx+1] = pos1.getY();
                 const double motor_pos1 = springCables[idx]->getRestLength();
                 const double motor_pos2 = springCables[idx+1]->getRestLength();
                 state.motor_pos1.data = motor_pos1/10.;//(9.5 - motor_pos1) / 0.09;
                 state.motor_pos2.data = motor_pos2/10.;//(9.5 - motor_pos2) / 0.09;
                 state_msg.states.push_back(state);
+
             }
-        	//robot_state_pub_gps.publish(state_msg);
-        	robot_state_pub_matlab.publish(state_msg);
+
+	    // determin which face in on the "gound"
+            for(unsigned j=0; j<3; j++){
+                double small = pos_array[0];
+                unsigned index = 0;
+                for(unsigned k=1; k<12; k++){
+                    if(pos_array[k] < small){
+                        small = pos_array[k];
+                        index = k;
+                    }
+                }
+                pos_array[index] = 100;
+                bottom_triangle[j] = index+1;
+            }
+            std::sort(bottom_triangle, bottom_triangle+3);
+            unsigned current_face = 0;
+            for(unsigned i=0; i<9; i++){
+                if(node_to_face[i][0] == bottom_triangle[0])
+                    if(node_to_face[i][1] == bottom_triangle[1])
+                        if(node_to_face[i][2] == bottom_triangle[2]){
+                            current_face = i;
+                        }
+            }
+            std::cout << "Current Face:" << "\n";
+            std::stringstream ss;
+            ss << "(" << node_to_face[current_face][0] << ", " << node_to_face[current_face][1] << ", " << node_to_face[current_face][2] << ")";
+            std_msgs::String face_msg;
+            face_msg.data = ss.str();
+            face_pub.publish(face_msg);
+            std::cout << "(" << bottom_triangle[0] << ", " << bottom_triangle[1] << ", " << bottom_triangle[2] << ") " << current_face << "\n";
+            
+            // Publish the current state of the robot
+            //robot_state_pub_gps.publish(state_msg);
+            robot_state_pub_matlab.publish(state_msg);
     	}
 
         for (unsigned i=0; i<6; ++i) {
