@@ -92,7 +92,7 @@ protected:
 
     MuscleMap m_muscleMap;
 
-    const std::size_t m_subStructures; 
+    std::size_t m_subStructures; 
     
     const std::size_t m_segments;
 
