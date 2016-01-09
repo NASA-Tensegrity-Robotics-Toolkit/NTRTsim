@@ -9,6 +9,7 @@ subdirs(
     learningSpines
     testjson
     craterEscape
+    IROS_2015/
 )
 
 

@@ -14,7 +14,6 @@ subdirs(
     muscleNP
     jbruce
     dhustigschultz
-    CPG_feedback
     eajung
 )
 
