@@ -81,6 +81,7 @@ int main(int argc, char** argv)
     bool add_hills;
     double startAngle;
     double goalAngle;
+    std::string lowerPath;
     
     /* Required for setting up learning file input/output. */
     po::options_description desc("Allowed options");
@@ -92,6 +93,7 @@ int main(int argc, char** argv)
         ("hills,H", po::value<bool>(&add_hills)->implicit_value(false), "Use hilly terrain.")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
+        ("lower_path,P", po::value<std::string>(&lowerPath), "Which resources folder in which you want to store controllers. Default = default")
         ;
 
     po::variables_map vm;
