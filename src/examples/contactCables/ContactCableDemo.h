@@ -16,11 +16,11 @@
 * governing permissions and limitations under the License.
 */
 
-#ifndef MUSCLE_NP_CONS
-#define MUSCLE_NP_CONS
+#ifndef CONTACT_CABLE_DEMO
+#define CONTACT_CABLE_DEMO
 
 /**
-* @file MuscleNPCons.h
+* @file ContactCableDemo.h
 * @brief For testing MuscleNP contacts
 * @author Brian Mirletz
 * @version 1.0.0
@@ -47,19 +47,19 @@ class tgBaseRigid;
 * A class that constructs a three bar tensegrity prism using the tools
 * in tgcreator.
 */
-class MuscleNPCons : public tgSubject<MuscleNPCons>, public tgModel
+class ContactCableDemo : public tgSubject<ContactCableDemo>, public tgModel
 {
 public:
 	/**
 	* The only constructor. Configuration parameters are within the
 	* .cpp file in this case, not passed in.
 	*/
-	MuscleNPCons();
+	ContactCableDemo();
 	/**
 	* Destructor. Deletes controllers, if any were added during setup.
 	* Teardown handles everything else.
 	*/
-	virtual ~MuscleNPCons();
+	virtual ~ContactCableDemo();
 	/**
 	* Create the model. Place the rods and strings into the world
 	* that is passed into the simulation. This is triggered
@@ -107,4 +107,4 @@ private:
 	std::vector<tgBaseRigid*> allRods;
 	
 };
-#endif // SIMPLE_CORDE_TENSEGRITY_H
+#endif // CONTACT_CABLE_DEMO

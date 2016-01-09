@@ -4,6 +4,7 @@ Project(examples)
 subdirs(
     3_prism
     3_prism_serialize
+    contactCables/
     NestedTetrahedrons
     SUPERball
     learningSpines

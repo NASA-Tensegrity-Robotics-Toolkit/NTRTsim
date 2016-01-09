@@ -16,14 +16,14 @@
 * governing permissions and limitations under the License.
 */
 /**
-* @file AppMuscleNPCons.cpp
+* @file AppContactCables.cpp
 * @brief Contains the definition function main() for testing tconservation
-* of energy for MuscleNP
+* of energy for the contact cables
 * @author Brian Mirletz
 * $Id$
 */
 // This application
-#include "MuscleNPCons.h"
+#include "ContactCableDemo.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgEmptyGround.h"
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 
 	// Fourth create the models with their controllers and add the models to the
 	// simulation
-	MuscleNPCons* const myModel = new MuscleNPCons();
+	ContactCableDemo* const myModel = new ContactCableDemo();
 	// Add the model to the world
 	simulation.addModel(myModel);
 	
