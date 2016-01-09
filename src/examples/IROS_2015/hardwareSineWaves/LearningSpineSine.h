@@ -42,6 +42,7 @@ public:
 
     LearningSpineSine(BaseSpineCPGControl::Config config,	
 							std::string args,
+                            std::string resourcePath = "",
                             std::string ec = "edgeConfig.ini",
                             std::string nc = "nodeConfig.ini");
     

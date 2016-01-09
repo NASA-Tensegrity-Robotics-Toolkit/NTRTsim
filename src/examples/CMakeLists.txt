@@ -11,6 +11,7 @@ subdirs(
     testjson
     craterEscape
     IROS_2015/
+    motorModel/
 )
 
 
