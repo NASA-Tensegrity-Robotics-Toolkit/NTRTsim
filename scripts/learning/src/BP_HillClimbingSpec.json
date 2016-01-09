@@ -1,0 +1,70 @@
+{
+    "filePrefix"   : "monteOut",
+    "fileSuffix"   : ".json",
+    "resourcePath" : "../../../resources/src/",
+    "lowerPath"    : "dhustigschultz/AppQuadControl/",
+    "executable" : "./../../../build/dev/dhustigschultz/BP_SC_Symmetric/AppQuadControl",
+    "terrain" : [[[0, 0, 0, 0.0, 60000]]],
+    "learningParams": 
+    {
+        "trialLength" : 60000,
+        "numTrials" : 2,
+        "numGenerations" : 2000,
+        "deterministic": 1,
+        "nodeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 2,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 5,
+            "numberOfInstances" : 1,
+            "populationSize" : 2,
+            "useAverage" : true,
+            "numberToMutate" : 1,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.005,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "edgeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 2,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 100,
+            "populationSize" : 2,
+            "useAverage" : true,
+            "numberToMutate" : 1,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.005,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "feedbackVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 2,
+            "monteCarlo" : false,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 3,
+            "numberHidden" : 4,
+            "numberOfInstances" : 1,
+            "populationSize" : 2,
+            "useAverage" : true,
+            "numberToMutate" : 1,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.005,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.7
+        }
+    }
+}

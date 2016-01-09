@@ -80,7 +80,9 @@ JSONMixedLearningControl::Config::Config(int ss,
                                         double afMin,
                                         double afMax,
                                         double pfMin,
-                                        double pfMax) :
+                                        double pfMax,
+					double maxH,
+					double minH) :
 JSONCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
@@ -88,7 +90,9 @@ freqFeedbackMax(ffMax),
 ampFeedbackMin(afMin),
 ampFeedbackMax(afMax),
 phaseFeedbackMin(pfMin),
-phaseFeedbackMax(pfMax)
+phaseFeedbackMax(pfMax),
+maxHeight(maxH),
+minHeight(minH)
 {
     
 }
@@ -214,7 +218,7 @@ void JSONMixedLearningControl::onStep(BaseSpineModelLearning& subject, double dt
     double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
     
     /// @todo add to config
-    if (currentHeight > 25 || currentHeight < 1.0)
+    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;

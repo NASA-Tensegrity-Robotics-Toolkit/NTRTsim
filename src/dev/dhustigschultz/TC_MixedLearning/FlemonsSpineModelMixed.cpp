@@ -17,7 +17,7 @@
 */
 
 /**
- * @file FlemonsSpineModelContact.cpp
+ * @file FlemonsSpineModelMixed.cpp
  * @brief Implementing the tetrahedral complex spine inspired by Tom Flemons
  * @author Brian Mirletz, Dawn Hustig-Schultz
  * @date August 2015
@@ -75,7 +75,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
     const double elasticity = 1000.0;
     const double damping = 10.0;
     const double pretension = 0.0;
-    const bool   history = false;
+    const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
 
@@ -88,7 +88,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
                                             history, maxTens, maxSpeed);
     
     // Calculations for the flemons spine model
-    double v_size = 10.0;
+    double v_size = 10.0; 
     
     // Create the tetrahedra
     tgStructure tetra;
@@ -106,7 +106,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
 
     // Move the first one so we can create a longer snake.
     // Or you could move the snake at the end, up to you. 
-    tetra.move(btVector3(0.0,15.0,100.0));
+    tetra.move(btVector3(0.0,15.0,100.0)); //y=15.0
 
     // Create our snake segments
     tgStructure snake;
@@ -155,7 +155,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
                   tgString("starting inner back muscle seg",   i - 1) + tgString(" seg", i));
 
 	}
-	/*else if(i == children.size() - 1)
+	else if(i == children.size() - 1)
 	{
 	    snake.addPair(n0[1], n1[1],
                   tgString("ending outer front muscle seg", i - 1) + tgString(" seg", i));
@@ -175,7 +175,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
             snake.addPair(n0[3], n1[4],
                   tgString("ending inner back muscle seg",   i - 1) + tgString(" seg", i));
 
-	}*/
+	}
         else 
 	{
 	    snake.addPair(n0[1], n1[1],
@@ -202,7 +202,7 @@ void FlemonsSpineModelMixed::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     
-#if (1)
+#if (0)
     spec.addBuilder("muscle", new tgKinematicContactCableInfo(motorConfig));
 #else    
     spec.addBuilder("muscle", new tgBasicContactCableInfo(motorConfig));

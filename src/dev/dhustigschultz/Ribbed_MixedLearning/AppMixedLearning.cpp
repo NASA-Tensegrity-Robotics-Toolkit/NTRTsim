@@ -18,9 +18,10 @@
 
 /**
  * @file AppTerrainJSON.cpp
- * @brief Contains the definition of functions for multi-terrain app
- * @author Brian Mirletz, Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @brief Contains the definition of functions for multi-terrain app, 
+ * used in this instance for separate learning of parameters for the first and last segments of a ribbed spine. 
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
+ * @copyright Copyright (C) 2015 NASA Ames Research Center
  * $Id$
  */
 
@@ -48,6 +49,7 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     startAngle = 0;
     
     suffix = "default";
+    lowerPath = "default";
 
     handleOptions(argc, argv);
 }
@@ -83,7 +85,7 @@ bool AppMixedLearning::setup()
         const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
-        const double highAmplitude = 300.0;
+        const double highAmplitude = 300.0; 
         const double kt = 0.0;
         const double kp = 1000.0;
         const double kv = 100.0;
@@ -101,6 +103,9 @@ bool AppMixedLearning::setup()
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
+	
+	const double maxH = 25.0;
+	const double minH = 1.0;
 
         JSONMixedLearningControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -124,10 +129,12 @@ bool AppMixedLearning::setup()
                                                     afMin,
                                                     afMax,
                                                     pfMin,
-                                                    pfMax);
+                                                    pfMax,
+						    maxH,
+						    minH);
         /// @todo fix memory leak that occurs here
        JSONMixedLearningControl* const myControl =
-        new JSONMixedLearningControl(control_config, suffix, "dhustigschultz/AppRibbedMixedLearning/");
+        new JSONMixedLearningControl(control_config, suffix, lowerPath);
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -173,6 +180,7 @@ void AppMixedLearning::handleOptions(int argc, char **argv)
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
         ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
+	("lower_path,P", po::value<std::string>(&lowerPath), "Which resources folder in which you want to store controllers. Default = default")
     ;
 
     po::variables_map vm;

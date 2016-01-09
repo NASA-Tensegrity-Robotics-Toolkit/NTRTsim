@@ -4,7 +4,7 @@
     "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "bmirletz/GATests/",
     "executable" : "./../../../build/dev/btietz/GATests/AppJSONLearningTests",
-    "terrain" : [[0, 0, 0, 0]],
+    "terrain" : [[[0, 0, 0, 0]]],
     "learningParams": 
     {
         "trialLength" : 3000,

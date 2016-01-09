@@ -18,10 +18,11 @@
 
 /**
  * @file RibModel.cpp
- * @brief Implements a spine model with a rib cage
- * @author Brian Tietz
- * @date May 2014
- * @version 1.0.0
+ * @brief Implements a spine model with a rib cage, 
+ * with separate tags added to facilitate separate learning for first and last segments
+ * @author Brian Tietz, Dawn Hustig-Schultz
+ * @date Sept. 2015
+ * @version 1.1.0
  * $Id$
  */
 
@@ -281,7 +282,7 @@ void RibModelMixedContact::setup(tgWorld& world)
     const double damping = 5.0;
     const double dampingAct = 10.0;
     const double pretension = 0.0;
-    const bool	 history = false;
+    const bool	 history = true;
     const double maxTens = 1000.0;
     const double maxTensAct = 7000.0;
     const double maxSpeed = 100.0;

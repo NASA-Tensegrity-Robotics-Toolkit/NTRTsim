@@ -245,6 +245,8 @@ class EvolutionJobMaster(NTRTJobMaster):
         and then returns a new set of parameters based on the specification file
         """
 
+	numTrials = self.jConf['learningParams']['numTrials']
+
         params = self.jConf["learningParams"][paramName]
 
         useAvg = params['useAverage']
@@ -278,6 +280,8 @@ class EvolutionJobMaster(NTRTJobMaster):
 
             # Fill in remaining population with random parameters
             for i in range(len(nextGeneration), params['populationSize']):
+		if(params['monteCarlo'] and params['populationSize'] != numTrials):
+	            raise NTRTMasterError("Number of trials must equal population size!")
                 if (i < 0):
                     raise NTRTMasterError("Number of controllers greater than population size!")
 
@@ -466,7 +470,9 @@ class EvolutionJobMaster(NTRTJobMaster):
             
             obj[p + "Vals"] = self.currentGeneration[p][self.getParamID(self.currentGeneration[p], paramNum)]
 
-        outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
+	obj["metrics"] = [] # Added to store tension and COM data. 
+        
+	outFile = self.path + self.jConf['filePrefix'] + "_" + str(jobNum) + self.jConf['fileSuffix']
 
         fout = open(outFile, 'w')
 

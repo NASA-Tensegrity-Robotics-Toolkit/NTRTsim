@@ -75,7 +75,9 @@ struct Config : public JSONCPGControl::Config
         double afMin = 0.0,
         double afMax = 0.0,
         double pfMin = 0.0,
-        double pfMax = 0.0
+        double pfMax = 0.0,
+	double maxH = 25.0,
+	double minH = 1.0
         );
         
         const double freqFeedbackMin;
@@ -84,6 +86,9 @@ struct Config : public JSONCPGControl::Config
         const double ampFeedbackMax;
         const double phaseFeedbackMin;
         const double phaseFeedbackMax;
+
+	const double maxHeight;
+	const double minHeight;
         
         // Values to be filled in by JSON file during onSetup
         int numStates;

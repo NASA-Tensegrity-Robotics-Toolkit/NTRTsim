@@ -36,8 +36,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
     numFiles = int(sys.argv[2])
-    if len(sys.argv) == 4:
-        numScore = int(sys.argv[3])
+    # The particular set of parameters you want to sort by. Used mainly as a unique identifier for sorting the controllers.
+    #should be the name of an existing parameter set from the JSON spec file, and it is assumed that 'Vals' is the suffix of this name. 
+    paramType = sys.argv[3] 
+    if len(sys.argv) == 5:
+        numScore = int(sys.argv[4])
     else:
         numScore = 1
 
@@ -49,17 +52,19 @@ if __name__ == "__main__":
 
     paramList = []
 
+    paramVals = paramType + 'Vals'
+
     for i in range(0, numFiles):
         scoresPath = configFile + str(i) +'.json'
         fin = open(scoresPath, 'r')
         obj = json.load(fin)
         fin.close()
         try:
-            paramID = obj['impedenceVals']['paramID']
-            
+            paramID = obj[paramVals]['paramID']  
+
             if (paramList.count(paramID) == 0):
                 # Use this for processing monteCarlo
-                """    
+                 
                 thisScore = 0
                 for k in range(0, 4):
                     try:
@@ -67,8 +72,9 @@ if __name__ == "__main__":
                     except IndexError:
                         thisScore += 0
                 """
-                thisScore = float(obj['impedenceVals']['avgScore'])
                 
+                thisScore = float(obj[paramVals]['avgScore'])
+                """
                 fileSum += 1
                 paramList.append(paramID)
             """
