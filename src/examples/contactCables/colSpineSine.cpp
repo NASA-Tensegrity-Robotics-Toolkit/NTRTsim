@@ -39,7 +39,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "dev/btietz/hardwareSineWaves/tgSineStringControl.h"
+#include "examples/IROS_2015/hardwareSineWaves/tgSineStringControl.h"
 
 // JSON Serialization
 #include "helpers/FileHelpers.h"
@@ -56,8 +56,7 @@
  * and teardown functions are used for tgModel
  */
 colSpineSine::colSpineSine(std::string args,
-                            std::string resourcePath) :
-m_dataObserver("logs/TCData")
+                            std::string resourcePath)
 {    
     if (resourcePath != "")
     {
@@ -78,11 +77,7 @@ void colSpineSine::onSetup(BaseSpineModelLearning& subject)
     initConditions = subject.getSegmentCOM(0);
     
     setupWaves(subject);
-    
-#ifdef LOGGING // Conditional compile for data logging    
-    m_dataObserver.onSetup(subject);
-#endif    
-    
+        
   
     m_updateTime = 0.0;
 }
@@ -94,9 +89,6 @@ void colSpineSine::onStep(BaseSpineModelLearning& subject, double dt)
     if (m_updateTime >= m_controlTime)
     {
 
-#ifdef LOGGING // Conditional compile for data logging        
-        m_dataObserver.onStep(subject, m_updateTime);
-#endif
         m_updateTime = 0;
     }
 }
