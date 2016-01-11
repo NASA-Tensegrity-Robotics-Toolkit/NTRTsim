@@ -17,7 +17,7 @@
  */
 
  /**
- * @file BigPuppyNoFeet.cpp
+ * @file BigPuppyRigidFeet.cpp
  * @brief Implementing a quadruped based off the Flemons BigPuppy model.
  * @author Dawn Hustig-Schultz
  * @date July 2015
@@ -27,7 +27,7 @@
 
 
 //This application
-#include "BigPuppyNoFeet.h"
+#include "BigPuppyRigidFeet.h"
 
 // This library
 #include "core/tgModel.h"
@@ -55,7 +55,7 @@
 //#define USE_KINEMATIC
 #define PASSIVE_STRUCTURE
 
-BigPuppyNoFeet::BigPuppyNoFeet(int segments, int hips, int legs, int feet) :
+BigPuppyRigidFeet::BigPuppyRigidFeet(int segments, int hips, int legs, int feet) :
 BaseSpineModelLearning(segments),
 m_hips(hips),
 m_legs(legs),
@@ -63,11 +63,11 @@ m_feet(feet)
 {
 }
 
-BigPuppyNoFeet::~BigPuppyNoFeet()
+BigPuppyRigidFeet::~BigPuppyRigidFeet()
 {
 }
 
-void BigPuppyNoFeet::addNodesFoot(tgStructure& s, double r1, double r2){
+void BigPuppyRigidFeet::addNodesFoot(tgStructure& s, double r1, double r2){
     s.addNode(r2,0,r2);//0 
     s.addNode(r2,0,-r2);//1
     s.addNode(-r2,0,-r2);//2 
@@ -78,44 +78,59 @@ void BigPuppyNoFeet::addNodesFoot(tgStructure& s, double r1, double r2){
     s.addNode(0,r1/2,r2/2);//7        
 }
 
-void BigPuppyNoFeet::addRodsFoot(tgStructure& s){
+void BigPuppyRigidFeet::addRodsFoot(tgStructure& s){
     s.addPair(0,6,"rod");
     s.addPair(1,7,"rod");
     s.addPair(2,4,"rod");
     s.addPair(3,5,"rod");
 }
 
-void BigPuppyNoFeet::addNodesLeg(tgStructure& s, double r){ 
+void BigPuppyRigidFeet::addNodesLeg(tgStructure& s, double r){ 
     s.addNode(0,0,0); //0: Bottom Center of lower leg segment
     s.addNode(0,r,0);  //1: Center of lower leg segment
     s.addNode(r,r,0); //2: Right of lower leg segment
     s.addNode(-r,r,0);  //3: Left of lower leg segment
     s.addNode(0,2*r,0);  //4: Top of lower leg segment
-    s.addNode(0,-r/2,0);  //5: Leg segment extension for connections to foot.
+    //s.addNode(0,-r/2,0);  //5: Leg segment extension for connections to foot.
+
+    s.addNode(r/2,-r/2,r/2); //5:
+    s.addNode(r/2,-r/2,-r/2); //6:
+    s.addNode(-r/2,-r/2,-r/2); //7:
+    s.addNode(-r/2,-r/2,r/2); //8:
 }
 
-void BigPuppyNoFeet::addRodsLeg(tgStructure& s){
+void BigPuppyRigidFeet::addRodsLeg(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(1,2,"rod");
     s.addPair(1,3,"rod");
     s.addPair(1,4,"rod");
     s.addPair(0,5,"rod");
+
+    s.addPair(5,6,"rod");
+    s.addPair(6,7,"rod");
+    s.addPair(7,8,"rod");
+    s.addPair(8,5,"rod");
+
+    s.addPair(5,0,"rod");
+    s.addPair(6,0,"rod");
+    s.addPair(7,0,"rod");
+    s.addPair(8,0,"rod");
 }
 
-void BigPuppyNoFeet::addNodesHip(tgStructure& s, double r){
+void BigPuppyRigidFeet::addNodesHip(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(0,r,r); //Node 1 
     s.addNode(0,-r,-r); //Node 2
     s.addNode(0,-r,r); //Node 3
 }
 
-void BigPuppyNoFeet::addRodsHip(tgStructure& s){
+void BigPuppyRigidFeet::addRodsHip(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
 }
 
-void BigPuppyNoFeet::addNodesVertebra(tgStructure& s, double r){
+void BigPuppyRigidFeet::addNodesVertebra(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(r,0,r); //Node 1 
     s.addNode(r,0,-r); //Node 2
@@ -123,14 +138,14 @@ void BigPuppyNoFeet::addNodesVertebra(tgStructure& s, double r){
     s.addNode(-r,0,r); //Node 4
 }
 
-void BigPuppyNoFeet::addRodsVertebra(tgStructure& s){
+void BigPuppyRigidFeet::addRodsVertebra(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
     s.addPair(0,4,"rod");
 }
 
-void BigPuppyNoFeet::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg,
+void BigPuppyRigidFeet::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg,
                  double r){ 
     const double offsetDist = r+1; 
     const double offsetDist2 = offsetDist*6; 
@@ -279,7 +294,7 @@ void BigPuppyNoFeet::addSegments(tgStructure& puppy, tgStructure& vertebra, tgSt
     }*/
 }
 
-void BigPuppyNoFeet::addMuscles(tgStructure& puppy){ 
+void BigPuppyRigidFeet::addMuscles(tgStructure& puppy){ 
         //Time to add the muscles to the structure. Todo: try to clean this up some more.
     std::vector<tgStructure*> children = puppy.getChildren();
     for(std::size_t i = 2; i < (children.size() - (m_hips + m_legs)); i++) { 
@@ -524,7 +539,7 @@ void BigPuppyNoFeet::addMuscles(tgStructure& puppy){
 
 }
 
-void BigPuppyNoFeet::setup(tgWorld& world)
+void BigPuppyRigidFeet::setup(tgWorld& world)
 {
     //Rod and Muscle configuration. 
     const double density = 4.2/300.0; //Note: this needs to be high enough or things fly apart...
@@ -693,7 +708,7 @@ void BigPuppyNoFeet::setup(tgWorld& world)
     children.clear();
 }
 
-void BigPuppyNoFeet::step(double dt)
+void BigPuppyRigidFeet::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -707,7 +722,7 @@ void BigPuppyNoFeet::step(double dt)
     }
 }
 
-void BigPuppyNoFeet::teardown()
+void BigPuppyRigidFeet::teardown()
 {
     BaseSpineModelLearning::teardown();
 }
