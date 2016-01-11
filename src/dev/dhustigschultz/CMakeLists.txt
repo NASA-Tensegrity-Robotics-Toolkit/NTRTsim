@@ -20,5 +20,8 @@ subdirs(
     BP_SC_SymmetricSpiral
     BP_SC_NoLegs
     BP_SC_Doxie
+    BP_SC_SymmetricArching
+    BigPuppy_Foot2
+    BigPuppy_NoFeet
 )
 
