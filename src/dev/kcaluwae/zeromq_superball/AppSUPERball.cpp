@@ -486,11 +486,11 @@ int main(int argc, char** argv)
                 btVector3 pos1 = (rot * orig1) + com;
                 btVector3 pos2 = (rot * orig2) + com;
                 state.pos1.x = pos1.getX();
-                state.pos1.y = pos1.getY();
-                state.pos1.z = pos1.getZ();
+                state.pos1.y = pos1.getZ();
+                state.pos1.z = pos1.getY();
                 state.pos2.x = pos2.getX();
-                state.pos2.y = pos2.getY();
-                state.pos2.z = pos2.getZ();
+                state.pos2.y = pos2.getZ();
+                state.pos2.z = pos2.getY();
                 const unsigned idx = 2 * i;
                 pos_array[idx] = pos2.getY();
                 pos_array[idx+1] = pos1.getY();
