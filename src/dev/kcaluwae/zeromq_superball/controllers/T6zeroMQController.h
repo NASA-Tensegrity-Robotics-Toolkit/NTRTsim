@@ -56,13 +56,13 @@ public:
      */
     virtual void onStep(T6Model& subject, double dt);
 
-    virtual void setTargetLengths(const float lengths[]);
+    virtual void setTargetLengths(const double lengths[]);
     
 private:
 
 protected:
 	double total_time;
-	float target_lengths[12];
+	double target_lengths[12];
 };
 
 #endif // T6_ZEROMQ_CONTROLLER_H

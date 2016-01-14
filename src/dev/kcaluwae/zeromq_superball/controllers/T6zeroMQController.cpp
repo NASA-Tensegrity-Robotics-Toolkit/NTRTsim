@@ -46,7 +46,7 @@ void T6zeroMQController::onSetup(T6Model& subject)
 	}
 }
 
-void T6zeroMQController::setTargetLengths(const float lengths[]){
+void T6zeroMQController::setTargetLengths(const double lengths[]){
 	for(unsigned i=0;i<12;++i){
 		target_lengths[i] = lengths[i];
 	}

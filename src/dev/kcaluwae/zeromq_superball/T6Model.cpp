@@ -360,11 +360,11 @@ void T6Model::setup(tgWorld& world)
     tgBasicActuator::Config passiveCableConfig(c.stiffnessPassive, c.damping, c.pretensionPassive, c.hist,
 					    c.maxTens, c.targetVelocity);
     // This part is added by Ali to make a more accurate model of SuperBall's Rods
-    //tgBasicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretensionActive, c.hist,
-    //					    c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretensionActive, c.hist,
+    					    c.maxTens, c.targetVelocity);
     
-    tgKinematicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretensionActive, c.motor_radius, c.motor_friction,
-                        c.motor_inertia, c.backDrivable, c.hist, c.maxTens, c.targetVelocity);
+    //tgKinematicActuator::Config motorConfig(c.stiffnessActive, c.damping, c.pretensionActive, c.motor_radius, c.motor_friction,
+    //                    c.motor_inertia, c.backDrivable, c.hist, c.maxTens, c.targetVelocity);
     // Start creating the structure
     tgStructure s;
     addNodes(s);
@@ -392,8 +392,8 @@ void T6Model::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     //spec.addBuilder("rodmp", new tgRodInfo(rodConfigmp));
-    spec.addBuilder("actuated", new tgKinematicActuatorInfo(motorConfig));
-    //spec.addBuilder("actuated", new tgBasicContactCableInfo(motorConfig));
+    //spec.addBuilder("actuated", new tgKinematicActuatorInfo(motorConfig));
+    spec.addBuilder("actuated", new tgBasicContactCableInfo(motorConfig));
     spec.addBuilder("passive", new tgBasicContactCableInfo(passiveCableConfig));
 
     // Create your structureInfo
@@ -404,8 +404,8 @@ void T6Model::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control.
-    //allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
-    allActuators = this->find<tgKinematicActuator> ("actuated");
+    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+    //allActuators = this->find<tgKinematicActuator> ("actuated");
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -434,7 +434,7 @@ void T6Model::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgKinematicActuator*>& T6Model::getAllActuators() const
+const std::vector<tgBasicActuator*>& T6Model::getAllActuators() const
 {
     return allActuators;
 }

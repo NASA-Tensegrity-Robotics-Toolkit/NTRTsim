@@ -121,9 +121,9 @@ void T6PIDController::onStep(T6Model& subject, double dt)
 		m_sensor = 0.; //torque is set directly
                 break;
         };
-        //if(i==11) 
-            //std::cout << i << "\tTarget: " << m_target[i] << "\tSensor: " << m_sensor << "\tVelocity:" << pActuator->getVelocity() << "\tPosition: " << pActuator->getRestLength();
+        if(i==11) 
+            std::cout << i << "\tTarget: " << m_target[i] << "\tSensor: " << m_sensor << "\tVelocity:" << pActuator->getVelocity() << "\tPosition: " << pActuator->getRestLength();
         m_controllers[i]->control(dt, m_target[i], m_sensor);
     }
-    //std::cout << std::endl;
+    std::cout << std::endl;
 }

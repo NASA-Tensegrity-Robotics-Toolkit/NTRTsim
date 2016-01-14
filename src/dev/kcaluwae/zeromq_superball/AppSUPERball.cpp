@@ -37,7 +37,8 @@
 #include "core/tgRod.h"
 
 // Controller
-#include "controllers/T6PIDController.h"
+//#include "controllers/T6PIDController.h"
+#include "controllers/T6zeroMQController.h"
 
 // Bullet Physics
 #include "LinearMath/btVector3.h"
@@ -268,7 +269,7 @@ int main(int argc, char** argv)
         pid_constants.push_back(0);   //D
         std::cout << "No ROS parameters found for PID" << std::endl;
     }
-    T6PIDController::ControlMode control_mode;
+    /*T6PIDController::ControlMode control_mode;
     if(n.getParam("/control_mode",control_mode_name)){
         if(control_mode_name == "POSITION"){
 		control_mode = T6PIDController::POSITION;
@@ -283,8 +284,9 @@ int main(int argc, char** argv)
     } else {
 	control_mode = T6PIDController::POSITION;
         std::cout<< "ROS Control Mode not found, using position control" << std::endl;
-    }
-    T6PIDController* const pTC = new T6PIDController(control_mode,pid_constants[0],pid_constants[1],pid_constants[2]);
+    }*/
+    //T6PIDController* const pTC = new T6PIDController(control_mode,pid_constants[0],pid_constants[1],pid_constants[2]);
+    T6zeroMQController* const pTC = new T6zeroMQController();
     myModel->attach(pTC);
 
     // Finally, add out model to the simulation
@@ -403,37 +405,36 @@ int main(int argc, char** argv)
         else if (step_cb.timesteps>0) {
             std::cout << "advancing simulation " << step_cb.timesteps << "ms" << std::endl;
             publish_state_update = true;
-            const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
+            const std::vector<tgBasicActuator*> springCables = myModel->getAllActuators();
             //double cur_pos, vel_step;
             double motor_power = 0.7; // Percentage of usable motor power
-            double motor_speed = 26 * motor_power; // Currently 26 cm/s is maximum speed of SUPERball's motors
+            double motor_speed = 26.0 * motor_power; // Currently 26 cm/s is maximum speed of SUPERball's motors
             //update motor target values
-            std::cout << "Control Mode: " << control_mode << std::endl;
+            //std::cout << "Control Mode: " << control_mode << std::endl;
             for (unsigned i=0; i<12; ++i) {
-                double tmp_motor_pos = motor_pos_cb[i]->motor_pos;
-                if(abs(tmp_motor_pos) >= 45){
-                    tmp_motor_pos = 45;
+                double tmp_motor_pos = fabs(motor_pos_cb[i]->motor_pos);
+                if(tmp_motor_pos >= 45.0){
+                    tmp_motor_pos = 45.0;
                 }
-               	motor_targets[i] = (100 - abs(tmp_motor_pos)) / 10;
+               	motor_targets[i] = (0.95 - (tmp_motor_pos * 0.009))*10.0; // Convert radians back to length based on SUPERball motor spindle
 
-		if(control_mode == T6PIDController::VELOCITY){
+		/*if(control_mode == T6PIDController::VELOCITY){
                     if(springCables[i]->getRestLength() > motor_targets[i]){
-                        temp_motor_targets[i] += motor_speed / (1000/step_cb.timesteps);
+                        temp_motor_targets[i] += motor_speed / (1000.0/step_cb.timesteps);
                     }
                     else{
                         temp_motor_targets[i] = motor_targets[i];
                     }
                     if(springCables[i]->getRestLength() < motor_targets[i]){
-                        temp_motor_targets[i] -= motor_speed / (1000/step_cb.timesteps);
+                        temp_motor_targets[i] -= motor_speed / (1000.0/step_cb.timesteps);
                     }
                     else{
                         temp_motor_targets[i] = motor_targets[i];
                     }
-                    if(tmp_motor_pos == 0){
+                    if(tmp_motor_pos == 0.0){
                         temp_motor_targets[i] = motor_targets[i];
                     }
 		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << temp_motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
-		    /*
                     //DOES NOT WORK!!!
                     cur_pos = springCables[i]->getRestLength();
                     vel_step = motor_pos_cb[i]->motor_pos*step_cb.timesteps/1000.;
@@ -445,15 +446,14 @@ int main(int argc, char** argv)
 		    }
 		    //motor_targets[i] = 7.;
 		    std::cout << i << "\tpos: " << cur_pos << "\ttarget_pos: " << motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";
-                    */
-		} else {
+		} else {*/
                     // Changed motor_targets to match the real robot's input commands
                     temp_motor_targets[i] = motor_targets[i];
 		    std::cout << i << "\tpos: " << springCables[i]->getRestLength() << "\ttarget_pos: " << temp_motor_targets[i] << "\ttarget vel: " << motor_pos_cb[i]->motor_pos << "\ttension: " <<springCables[i]->getTension() <<"\n";		
-                }
+                //}
             }
             std::cout<<std::endl;
-            pTC->setTarget(temp_motor_targets);
+            pTC->setTargetLengths(temp_motor_targets);
 
             simulation.run(step_cb.timesteps);
             step_cb.timesteps = 0;
@@ -463,7 +463,7 @@ int main(int argc, char** argv)
         if (publish_state_update) {
             publish_state_update = false;
             gps_agent_pkg::SUPERballStateArray state_msg;
-            const std::vector<tgKinematicActuator*> springCables = myModel->getAllActuators();
+            const std::vector<tgBasicActuator*> springCables = myModel->getAllActuators();
             //state_msg.header.frame_id = "/base"; 
 
             // Used in determining current robot face
@@ -533,8 +533,8 @@ int main(int argc, char** argv)
             std::cout << "(" << bottom_triangle[0] << ", " << bottom_triangle[1] << ", " << bottom_triangle[2] << ") " << current_face << "\n";
             
             // Publish the current state of the robot
-            //robot_state_pub_gps.publish(state_msg);
-            robot_state_pub_matlab.publish(state_msg);
+            robot_state_pub_gps.publish(state_msg);
+            //robot_state_pub_matlab.publish(state_msg);
     	}
 
         for (unsigned i=0; i<6; ++i) {
