@@ -1,6 +1,4 @@
-Project(queens)
-
 subdirs(
-    GenericTensegrity
+    StructureFileSpec
 )
 
