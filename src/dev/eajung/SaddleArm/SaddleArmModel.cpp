@@ -125,45 +125,45 @@ const double g = 17 * scale; //ulna proximal width
 const double x = a/2;
 const double z = c/2;
 //Format: (x, z, y)
-nodePositions.push_back(btVector3(g, 0, 0)); // 0
-nodePositions.push_back(btVector3(0, -g, 0)); //1 
-nodePositions.push_back(btVector3(-a/2, 0, 0)); // 2
-nodePositions.push_back(btVector3(0, 0, g)); // 3
-nodePositions.push_back(btVector3(0, 0, -g)); // 4
-nodePositions.push_back(btVector3(0, g, 0)); //5 
-nodePositions.push_back(btVector3(0, c, 0)); // 6
-nodePositions.push_back(btVector3(x, z, 0)); // 7
-nodePositions.push_back(btVector3(b+a/2, -g, 0)); // 8
-nodePositions.push_back(btVector3(0, c+2, f)); // 9 
-nodePositions.push_back(btVector3(0, c+2, -f)); //10 
+nodePositions.push_back(btVector3(g, 0, 0)); // 0 (8.5,0,0)
+nodePositions.push_back(btVector3(0, -g, 0)); //1 (0,-8.5,0)
+nodePositions.push_back(btVector3(-a/2, 0, 0)); // 2 (-5/5,0,0)
+nodePositions.push_back(btVector3(0, 0, g)); // 3 (0, 0, 8.5)
+nodePositions.push_back(btVector3(0, 0, -g)); // 4 (0, 0, -8.5)
+nodePositions.push_back(btVector3(0, g, 0)); //5  (0, 8.5, 0)
+nodePositions.push_back(btVector3(0, c, 0)); // 6 (0, 39.75, 0)
+nodePositions.push_back(btVector3(x, z, 0)); // 7 (5.5, 19.875, 0)
+nodePositions.push_back(btVector3(b+a/2, -g, 0)); // 8 (55.6, -8.5, 0)
+nodePositions.push_back(btVector3(0, c+2, f)); // 9 (0, 41.75, 12.5)
+nodePositions.push_back(btVector3(0, c+2, -f)); //10 (0, 41.75, -12.5)
 //Added 6/17/15
-nodePositions.push_back(btVector3(a/2, -2*g, 0)); //11
+nodePositions.push_back(btVector3(a/2, -2*g, 0)); //11 (5.5, -17, 0)
 //ulna and radius
-nodePositions.push_back(btVector3(3*a/2, -g, 0)); //12
-nodePositions.push_back(btVector3(3*a/4, -g, g)); //13
-nodePositions.push_back(btVector3(3*a/4, -g, -g)); //14
-nodePositions.push_back(btVector3(f, c+2, 0)); // 15
-nodePositions.push_back(btVector3(-f, c+2, 0)); // 16
+nodePositions.push_back(btVector3(3*a/2, -g, 0)); //12 (16.5, -8.5, 0)
+nodePositions.push_back(btVector3(3*a/4, -g, g)); //13 (8.25, -8.5, 8.5)
+nodePositions.push_back(btVector3(3*a/4, -g, -g)); //14 (8.25, -8.5, -8.5)
+nodePositions.push_back(btVector3(f, c+2, 0)); // 15 (12.5, 41.75, 0)
+nodePositions.push_back(btVector3(-f, c+2, 0)); // 16 (-12.5, 41.75, 0)
 
 
 //Added 7/30/15
 
 
 //Additional Humerus Nodes to help create saddle 
-nodePositions.push_back(btVector3(g, c+2*a/3, 0)); // 17
-nodePositions.push_back(btVector3(-g, c+2*a/3, 0)); // 18
+nodePositions.push_back(btVector3(g, c+2*a/3, 0)); // 17 (8.5, 47.083, 0)
+nodePositions.push_back(btVector3(-g, c+2*a/3, 0)); // 18 (-8.5, 47.083, 0)
 
 //Shoulder nodes (scapula)
-nodePositions.push_back(btVector3(g, c, g)); // 19
-nodePositions.push_back(btVector3(-g, c, g)); // 20
-nodePositions.push_back(btVector3(0, c, -g)); // 21
-nodePositions.push_back(btVector3(0, c, -g-a*3/2)); // 22
-nodePositions.push_back(btVector3(0, c-2*g, -g-a*3/2)); // 23
+nodePositions.push_back(btVector3(g, c, g)); // 19 (8.5, 39.75, 8.5)
+nodePositions.push_back(btVector3(-g, c, g)); // 20 (-8.5, 39.75, 8.5)
+nodePositions.push_back(btVector3(0, c, -g)); // 21 (0, 39.75, -8.5)
+nodePositions.push_back(btVector3(0, c, -g-a*3/2)); // 22 (0, 39.75, -25)
+nodePositions.push_back(btVector3(0, c-2*g, -g-a*3/2)); // 23 (0, 22.75, -25)
 
 //Shoulder nodes (clavicle)
-nodePositions.push_back(btVector3(0, c+a, -c)); // 24
-nodePositions.push_back(btVector3(0, c+a, 2*g)); // 25
-nodePositions.push_back(btVector3(0, c+a, 0)); // 26
+nodePositions.push_back(btVector3(0, c+a, -c)); // 24 (0, 16.5, -39.75)
+nodePositions.push_back(btVector3(0, c+a, 2*g)); // 25 (0, 16.5, 17)
+nodePositions.push_back(btVector3(0, c+a, 0)); // 26 (0, 16.5, 0)
 
 
 for(size_t i=0;i<nNodes;i++) {
