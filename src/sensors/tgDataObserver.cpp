@@ -32,6 +32,7 @@
 #include "core/tgModel.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
+#include "core/abstractMarker.h"
 
 #include "core/tgSpringCableActuator.h"
 
@@ -102,6 +103,22 @@ void tgDataObserver::onSetup(tgModel& model)
     
     tgOutput << "Time" << ",";
     
+    // Markers are written first
+    const std::vector<abstractMarker>& markers = model.getMarkers();
+    
+    const std::size_t n = 0;
+
+    
+    for (std::size_t i = 0; i < markers.size(); i++)
+    {
+        std::stringstream name;
+        
+        name << "Marker " <<  " " << i;
+            tgOutput << name.str() << "_X" << ","
+            << name.str() << "_Y" << ","
+            << name.str() << "_Z" << ",";
+    }
+    
     for (std::size_t i = 0; i < children.size(); i++)
     {
         /* If its a type we'll be logging, record its name and the 
@@ -125,7 +142,7 @@ void tgDataObserver::onSetup(tgModel& model)
             << name.str() << "_Z" << ","
             << name.str() << "_mass" << ",";
             rodNum++;
-	}
+        }
         // Else do nothing since tgDataLogger won't touch it
     }
     

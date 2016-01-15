@@ -95,6 +95,11 @@ struct Config : public JSONCPGControl::Config
         int numActions;
         int numHidden;
         
+        // Values to be filled in by JSON file during onSetup - goal sets
+        int goalStates;
+        int goalActions;
+        int goalHidden;
+        
     };
 
     JSONGoalControl(JSONGoalControl::Config config,	
@@ -117,7 +122,7 @@ protected:
 
     std::vector<double> getGoalFeedback(const BaseSpineModelGoal* subject);
     
-    std::vector<double> getFeedback(BaseSpineModelLearning& subject);
+    virtual std::vector<double> getFeedback(BaseSpineModelLearning& subject);
     
     std::vector<double> getCableState(const tgSpringCableActuator& cable);
     
@@ -130,6 +135,7 @@ protected:
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
+    neuralNetwork* nn_goal;
     
     
 };

@@ -17,6 +17,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgKinematicContactCableInfo.cpp
     tgBasicContactCableInfo.cpp
     tgRigidAutoCompound.cpp
+    tgUtil.cpp
 )
 
 link_directories(${LIB_DIR})

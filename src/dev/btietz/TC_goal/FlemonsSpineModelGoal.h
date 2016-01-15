@@ -47,7 +47,7 @@ class FlemonsSpineModelGoal : public BaseSpineModelGoal
 {
 public: 
 
-    FlemonsSpineModelGoal(int segments, double goalAngle);
+    FlemonsSpineModelGoal(int segments, double goalAngle, double startAngle);
 
     virtual ~FlemonsSpineModelGoal();
     
@@ -56,7 +56,9 @@ public:
     virtual void teardown();
         
     virtual void step(double dt);
-    
+
+protected:
+    const double m_startAngle;
 
 };
 

@@ -41,16 +41,16 @@
 
 /**
  * @file TetraSpineGoal.cpp
- * @brief Tetraspine, configured for learning in the NTRT simulator
+ * @brief Tetraspine, configured for goal directed learning in the NTRT simulator
  * @author Brian Tietz
- * @date May 2014
- * @version 1.0.0
+ * @date May 2015
+ * @version 1.1.0
  * $Id$
  */
 
 TetraSpineGoal::TetraSpineGoal(size_t segments, double goalAngle, double scale) : 
     BaseSpineModelGoal(segments, goalAngle),
-    scaleFactor(scale / 10.0)
+    scaleFactor(scale / 20.0) // Half scale of tetraSpine to try to match Tetrahedral Complex
 {
 }
 
@@ -301,6 +301,9 @@ void TetraSpineGoal::setup(tgWorld& world)
     
     #if (0)
     trace(structureInfo, *this);
+    
+    std::cout << "Spine Length: " << getSpineLength() << std::endl;
+    
     #endif
     
     // Actually setup the children

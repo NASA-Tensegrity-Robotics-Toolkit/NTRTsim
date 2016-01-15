@@ -25,6 +25,7 @@
  */
 
 #include "AppTerrainJSON.h"
+#include "tgCPGJSONLogger.h"
 
 AppTerrainJSON::AppTerrainJSON(int argc, char** argv)
 {
@@ -128,6 +129,12 @@ bool AppTerrainJSON::setup()
        JSONFeedbackControl* const myControl =
         new JSONFeedbackControl(control_config, suffix, "bmirletz/TetrahedralComplex_Contact/");
 
+#if (0)        
+            tgCPGJSONLogger* const myLogger = 
+      new tgCPGJSONLogger("logs/CPGValues.txt");
+    
+    myControl->attach(myLogger);
+#endif        
         myModel->attach(myControl);
     }
 

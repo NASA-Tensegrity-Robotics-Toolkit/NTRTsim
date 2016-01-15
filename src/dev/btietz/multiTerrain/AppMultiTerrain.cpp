@@ -176,7 +176,7 @@ bool AppMultiTerrain::setup()
     }
 
     // Sixth add model & controller to simulation
-    simulation->addModel(myModel);
+    //simulation->addModel(myModel);
     
     if (add_blocks)
     {

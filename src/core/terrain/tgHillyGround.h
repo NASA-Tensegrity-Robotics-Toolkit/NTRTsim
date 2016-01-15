@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
  */
 
-#ifndef TG_HILLY_GROUND_H
-#define TG_HILLY_GROUND_H
+#ifndef CORE_TERRAIN_TG_HILLY_GROUND_H
+#define CORE_TERRAIN_TG_HILLY_GROUND_H
 
 /**
  * @file tgHillyGround.h
@@ -30,6 +30,10 @@
 
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
+
+// std::size_t
+#include <cstddef>
+
 // Forward declarations
 class btRigidBody;
 class btTriangleIndexVertexArray;
@@ -45,12 +49,12 @@ class tgHillyGround : public tgBulletGround
         {
             public:
                 Config(btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0),
-                       btScalar friction = 0.5,
-                       btScalar restitution = 0.0,
+                       double friction = 0.5,
+                       double restitution = 0.0,
                        btVector3 size = btVector3(500.0, 1.5, 500.0),
                        btVector3 origin = btVector3(0.0, 0.0, 0.0),
-                       size_t nx = 50,
-                       size_t ny = 50,
+                       std::size_t nx = 50,
+                       std::size_t ny = 50,
                        double margin = 0.05,
                        double triangleSize = 5.0,
                        double waveHeight = 5.0,
@@ -72,10 +76,10 @@ class tgHillyGround : public tgBulletGround
                 btVector3 m_origin;
 
                 /** Number of nodes in the x-direction */
-                size_t m_nx;
+                std::size_t m_nx;
 
                 /** Number of nodes in the y-direction */
-                size_t m_ny;
+                std::size_t m_ny;
 
                 /** See Bullet documentation on Collision Margin */
                 double m_margin;
@@ -124,7 +128,7 @@ class tgHillyGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the input parameters, 
          *                  to be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleIndexVertexArray* createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]);
+        btTriangleIndexVertexArray* createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 

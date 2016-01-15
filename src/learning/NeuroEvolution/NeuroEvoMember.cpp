@@ -36,11 +36,12 @@ using namespace std;
 NeuroEvoMember::NeuroEvoMember(configuration config)
 {
 	this->numInputs=config.getintvalue("numberOfStates");
-	this->numOutputs=config.getintvalue("numberOfActions");
+    this->numOutputs=config.getintvalue("numberOfActions");
+	int numHidden = config.getintvalue("numberHidden");
     assert(numOutputs > 0);
 	cout<<"creating NN"<<endl;
 	if(numInputs>0)
-		nn = new neuralNetwork(numInputs,numInputs*2,numOutputs);
+		nn = new neuralNetwork(numInputs, numHidden,numOutputs);
 	else
 	{
 		statelessParameters.resize(numOutputs);

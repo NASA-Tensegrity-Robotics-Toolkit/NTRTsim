@@ -103,6 +103,7 @@ tgKinematicActuator::tgKinematicActuator(tgBulletSpringCable* muscle,
                    tgKinematicActuator::Config& config) :
     m_motorVel(0.0),
     m_motorAcc(0.0),
+    m_appliedTorque(0.0),
     m_config(config),
     tgSpringCableActuator(muscle, tags, config)
 {
@@ -170,10 +171,10 @@ void tgKinematicActuator::logHistory()
     if (m_config.hist)
     {
         m_pHistory->lastLengths.push_back(m_springCable->getActualLength());
-        m_pHistory->lastVelocities.push_back(m_springCable->getVelocity());
+        m_pHistory->lastVelocities.push_back(m_motorVel);
         m_pHistory->dampingHistory.push_back(m_springCable->getDamping());
         m_pHistory->restLengths.push_back(m_springCable->getRestLength());
-        m_pHistory->tensionHistory.push_back(m_springCable->getTension());
+        m_pHistory->tensionHistory.push_back(m_appliedTorque);
     }
 }
     
@@ -185,13 +186,13 @@ const double tgKinematicActuator::getVelocity() const
 void tgKinematicActuator::integrateRestLength(double dt)
 {
 	double tension = getTension();
-	double appliedTorque = getAppliedTorque(m_desiredTorque);
+	m_appliedTorque = getAppliedTorque(m_desiredTorque);
 	// motorVel will always cause opposite acc, but tension can only
 	// cause lengthening (positive Acc)
-	m_motorAcc = (appliedTorque - m_config.motorFriction * m_motorVel 
+	m_motorAcc = (m_appliedTorque - m_config.motorFriction * m_motorVel 
 					+ tension * m_config.radius) / m_config.motorInertia;
 	
-	if (!m_config.backdrivable && m_motorAcc * appliedTorque <= 0.0)
+	if (!m_config.backdrivable && m_motorAcc * m_appliedTorque <= 0.0)
 	{
 		// Stop undesired lengthing if the motor is not backdrivable
 		m_motorVel = m_motorVel + m_motorAcc * dt > 0.0 ? 0.0 : m_motorVel + m_motorAcc * dt;
@@ -202,7 +203,7 @@ void tgKinematicActuator::integrateRestLength(double dt)
 	}
 	
 	// semi-implicit Euler integration
-	m_restLength += m_motorVel * dt; 
+	m_restLength += m_config.radius * m_motorVel * dt; 
 	
 	/// @todo check min actual length somewhere
 	

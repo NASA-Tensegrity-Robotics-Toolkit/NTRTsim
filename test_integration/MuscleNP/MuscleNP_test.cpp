@@ -105,8 +105,11 @@ namespace {
 				btVector3 momentumEnd = myModel->getMomentum();
 				btVector3 velocityEnd = myModel->getVelocityOfBody(2);
 				
-				EXPECT_EQ(momentumStart, momentumEnd);
-				
+                EXPECT_FLOAT_EQ(momentumStart[0], momentumEnd[0]);
+                EXPECT_NEAR(momentumStart[1], momentumEnd[1], 1E-10); //TODO can this be pushed down?
+				EXPECT_FLOAT_EQ(momentumStart[2], momentumEnd[2]);
+                    
+                EXPECT_LE(energyEnd, energyStart);
 				
 	}
 

@@ -26,6 +26,8 @@
 
 #include "AppGoalTerrain.h"
 
+#include "tgcreator/tgUtil.h"
+
 AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
 {
     bSetup = false;
@@ -45,10 +47,13 @@ AppGoalTerrain::AppGoalTerrain(int argc, char** argv)
     startY = 20;
     startZ = 0;
     startAngle = 0;
+    goalAngle = 0;
     
     suffix = "default";
 
     handleOptions(argc, argv);
+    
+    tgUtil::seedRandom();
 }
 
 bool AppGoalTerrain::setup()
@@ -67,9 +72,11 @@ bool AppGoalTerrain::setup()
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    /// @todo Generalize angle code
+#if (0)
+    startAngle = ((rand() / (double)RAND_MAX) - 0.5) * 3.1415;
+#endif
         FlemonsSpineModelGoal* myModel =
-      new FlemonsSpineModelGoal(nSegments, 0.0);
+      new FlemonsSpineModelGoal(nSegments, goalAngle, startAngle);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
@@ -201,6 +208,7 @@ void AppGoalTerrain::handleOptions(int argc, char **argv)
         ("start_y,y", po::value<double>(&startY), "Y Coordinate of starting position for robot. Default = 20")
         ("start_z,z", po::value<double>(&startZ), "Z Coordinate of starting position for robot. Default = 0")
         ("angle,a", po::value<double>(&startAngle), "Angle of starting rotation for robot. Degrees. Default = 0")
+        ("goal_angle,B", po::value<double>(&goalAngle), "Angle of starting rotation for goal box. Degrees. Default = 0")
         ("learning_controller,l", po::value<std::string>(&suffix), "Which learned controller to write to or use. Default = default")
     ;
 
@@ -236,8 +244,8 @@ const tgHillyGround::Config AppGoalTerrain::getHillyConfig()
     // Size doesn't affect hilly terrain
     btVector3 size = btVector3(0.0, 0.1, 0.0);
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    size_t nx = 180;
-    size_t ny = 180;
+    size_t nx = 240;
+    size_t ny = 240;
     double margin = 0.5;
     double triangleSize = 4.0;
     double waveHeight = 2.0;

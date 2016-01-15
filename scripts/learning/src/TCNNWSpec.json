@@ -1,0 +1,113 @@
+{
+    "filePrefix"   : "monteOut",
+    "fileSuffix"   : ".json",
+    "resourcePath" : "../../../resources/src/",
+    "lowerPath"    : "bmirletz/TC_nn_Tension/",
+    "executable" : "./../../../build/dev/btietz/TC_nn_Tension/AppTCNNW_Tension",
+    "terrain" : [[[0, 1, 0, -1.517, 100000]], [[0, 1, 0, -0.75, 100000]], [[0, 1, 0, -2.27, 100000]]],
+    "A"  : 15,
+    "a0" : 0.000066,
+    "c0" : 0.025,
+    "bp" : 0.5,
+    "maxStep" : 2,
+    "learningParams": 
+    {
+        "trialLength" : 30000,
+        "numTrials" : 80,
+        "numGenerations" : 150,
+        "deterministic": 0,
+        "nodeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 5,
+            "numberOfInstances" : 1,
+            "populationSize" : 1,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "edgeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 100,
+            "populationSize" : 1,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "feedbackVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 3,
+            "numberHidden" : 4,
+            "numberOfInstances" : 1,
+            "populationSize" : 1,
+            "useAverage" : true,
+            "numberToMutate" : 15,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.7
+        },
+        "goalVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 4,
+            "numberOfOutputs" : 8,
+            "numberHidden" : 8,
+            "numberOfInstances" : 1,
+            "populationSize" : 40,
+            "useAverage" : true,
+            "numberToMutate" : 15,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.01,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.7
+        },
+        "impedenceVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 1,
+            "monteCarlo" : false,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 4,
+            "numberHidden" : 0,
+            "numberOfInstances" : 1,
+            "populationSize" : 3,
+            "useAverage" : true,
+            "numberToMutate" : 1,
+            "numberOfChildren" : 0,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.7
+        }
+    }
+}

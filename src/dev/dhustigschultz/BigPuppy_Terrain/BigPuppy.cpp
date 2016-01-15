@@ -138,7 +138,7 @@ void BigPuppy::setup(tgWorld& world)
     rightLeg.addNode(10,10,0); //2: Right of lower leg segment
     rightLeg.addNode(-10,10,0);  //3: Left of lower leg segment
     rightLeg.addNode(0,20,0);  //4: Top of lower leg segment
-    rightLeg.addNode(0,-5,0);  //5: was z=3; was y=-3
+    rightLeg.addNode(0,-4,0);  //5: was z=3; was y=-3
     //rightLeg.addNode(0,-3,-3);  //6
     //rightLeg.addNode(3,-3,0);  //7
     //rightLeg.addNode(-3,-3,0);  //8
@@ -162,7 +162,7 @@ void BigPuppy::setup(tgWorld& world)
     leftLeg.addNode(10,10,0); //2: Right of lower leg segment
     leftLeg.addNode(-10,10,0);  //3: Left of lower leg segment
     leftLeg.addNode(0,20,0);  //4: Top of lower leg segment
-    leftLeg.addNode(0,-5,0);  //5: was z=3; was y=-3
+    leftLeg.addNode(0,-4,0);  //5: was z=3; was y=-3
     //leftLeg.addNode(0,-3,-3);  //6 
     //leftLeg.addNode(3,-3,0);  //7 
     //leftLeg.addNode(-3,-3,0);  //8 

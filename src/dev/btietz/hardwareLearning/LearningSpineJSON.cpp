@@ -93,7 +93,7 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
             kPosition = 500.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
-            //controlLength = 19.5;
+            controlLength = 19.0;
 		}
         else if (allMuscles[i]->hasTag("outer top"))
         {
@@ -108,14 +108,14 @@ void LearningSpineJSON::setupCPGs(BaseSpineModelLearning& subject, array_2D node
             kPosition = 300.0;
             kVelocity = 100.0;
             controlLength = allMuscles[i]->getStartLength();
-            //controlLength = 21.5;
+            controlLength = 21.5;
         }
         else if (allMuscles[i]->hasTag("outer"))
         {
 			tension = 800.0;
             kPosition = 300.0;
             kVelocity = 100.0;
-            controlLength = 19.0 ;
+            controlLength = 19.2 ;
 		}
 		else
 		{

@@ -27,4 +27,7 @@ subdirs(
     TC_online
     multiTerrain_OC/
     TS_goal/
+    TC_Tension/
+    OC_Tension/
+    TC_nn_Tension/
     )

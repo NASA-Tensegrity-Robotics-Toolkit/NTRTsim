@@ -122,6 +122,18 @@ const int BaseSpineModelLearning::getSegments() const
     
 std::vector<double> BaseSpineModelLearning::getSegmentCOM(const int n) const
 {
+    
+    btVector3 segmentCenterOfMass = getSegmentCOMVector(n);
+    
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = segmentCenterOfMass[i]; }
+    
+    return result;
+}
+
+btVector3 BaseSpineModelLearning::getSegmentCOMVector(const int n) const
+{
     if (m_allSegments.size() != m_segments)
     {
         throw std::runtime_error("Not initialized");
@@ -159,9 +171,13 @@ std::vector<double> BaseSpineModelLearning::getSegmentCOM(const int n) const
     
     segmentCenterOfMass /= segmentMass;
 
-    // Copy to the result std::vector
-    std::vector<double> result(3);
-    for (size_t i = 0; i < 3; ++i) { result[i] = segmentCenterOfMass[i]; }
+    return segmentCenterOfMass;
+}
+
+double BaseSpineModelLearning::getSpineLength() const
+{
+    const btVector3 start = getSegmentCOMVector(0);
+    const btVector3 end = getSegmentCOMVector(m_segments - 1);
     
-    return result;
+    return (start - end).length();
 }

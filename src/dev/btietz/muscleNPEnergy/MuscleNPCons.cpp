@@ -155,7 +155,7 @@ void MuscleNPCons::step(double dt)
 		forceSum += anchorList[i]->getForce();
 	}
 	
-#if (1)	
+#if (0)	
     std::cout << "Time " << totalTime << std::endl;
 	std::cout << "Momentum " << vCom << std::endl;
 	std::cout << "Energy " << energy << std::endl;

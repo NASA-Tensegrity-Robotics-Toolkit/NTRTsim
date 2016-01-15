@@ -39,12 +39,12 @@
 #include <iostream>
 
 tgHillyGround::Config::Config(btVector3 eulerAngles,
-        btScalar friction,
-        btScalar restitution,
+        double friction,
+        double restitution,
         btVector3 size,
         btVector3 origin,
-        size_t nx,
-        size_t ny,
+        std::size_t nx,
+        std::size_t ny,
         double margin,
         double triangleSize,
         double waveHeight,
@@ -126,11 +126,11 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
     btCollisionShape * pShape = 0;
     // The number of vertices in the mesh
     // Hill Paramenters: Subject to Change
-    const size_t vertexCount = m_config.m_nx * m_config.m_ny;
+    const std::size_t vertexCount = m_config.m_nx * m_config.m_ny;
 
     if (vertexCount > 0) {
         // The number of triangles in the mesh
-        const size_t triangleCount = 2 * (m_config.m_nx - 1) * (m_config.m_ny - 1);
+        const std::size_t triangleCount = 2 * (m_config.m_nx - 1) * (m_config.m_ny - 1);
 
         // A flattened array of all vertices in the mesh
         m_vertices = new btVector3[vertexCount];
@@ -159,7 +159,7 @@ btCollisionShape* tgHillyGround::hillyCollisionShape() {
     return pShape; 
 }
 
-btTriangleIndexVertexArray *tgHillyGround::createMesh(size_t triangleCount, int indices[], size_t vertexCount, btVector3 vertices[]) {
+btTriangleIndexVertexArray *tgHillyGround::createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]) {
     const int vertexStride = sizeof(btVector3);
     const int indexStride = 3 * sizeof(int);
 
@@ -181,12 +181,12 @@ btCollisionShape *tgHillyGround::createShape(btTriangleIndexVertexArray *pMesh) 
 }
 
 void tgHillyGround::setVertices(btVector3 vertices[]) {
-    for (size_t i = 0; i < m_config.m_nx; i++)
+    for (std::size_t i = 0; i < m_config.m_nx; i++)
     {
-        for (size_t j = 0; j < m_config.m_ny; j++)
+        for (std::size_t j = 0; j < m_config.m_ny; j++)
         {
             const btScalar x = (i - (m_config.m_nx * 0.5)) * m_config.m_triangleSize;
-            const btScalar y = (m_config.m_waveHeight * sinf((float)i) * cosf((float)j) +
+            const btScalar y = (m_config.m_waveHeight * sin((double)i) * cos((double)j) +
                     m_config.m_offset);
             const btScalar z = (j - (m_config.m_ny * 0.5)) * m_config.m_triangleSize;
             vertices[i + (j * m_config.m_nx)].setValue(x, y, z);

@@ -80,7 +80,7 @@ namespace {
 				tgWorld world(config); 
 
 				// Second create the view
-				const double stepSize = 1.0/2000.0; // Seconds
+				const double stepSize = 1.0/1000.0; // Seconds
 				const double renderRate = 1.0/60.0; // Seconds
 				tgSimView view(world, stepSize, renderRate);
 
@@ -113,7 +113,7 @@ namespace {
 				int i = 0;
 				while (i < 1)
 				{
-					simulation.run(120000);
+					simulation.run(60000);
 					//simulation.reset();
 					i++;
 				}
@@ -132,22 +132,22 @@ namespace {
 				double error;
 				std::cout << "Inner front top max tension " << simMaxTens[1] / 100.0 << " N" << std::endl;
 				error = abs ((34.3954 - simMaxTens[1] / 100.0) / 34.3954);
-				EXPECT_LE(error, 0.1441);
+				EXPECT_LE(error, 0.06);
 				std::cout << "Inner front left max tension " << simMaxTens[5] / 100.0 << " N" << std::endl;
 				error = abs ((18.0986 - simMaxTens[5] / 100.0) / 18.0986);
-				EXPECT_LE(error, 0.0263763);
+				EXPECT_LE(error, 0.0715);
 				std::cout << "Inner front right max tension " << simMaxTens[9] / 100.0 << " N" << std::endl;
 				error = abs ((22.0161 - simMaxTens[9] / 100.0) / 22.0161);
-				EXPECT_LE(error, 0.113424);
+				EXPECT_LE(error, 0.06);
 				std::cout << "Outer front top max tension " << simMaxTens[0] / 100.0 << " N" << std::endl;
 				error = abs ((24.6800 - simMaxTens[0] / 100.0) / 24.6800);
-				EXPECT_LE(error, 0.3281);
+				EXPECT_LE(error, 0.19);
 				std::cout << "Outer front left max tension " << simMaxTens[4] / 100.0 << " N" << std::endl;
 				error = abs ((15.5914 - simMaxTens[4] / 100.0) / 15.5914);
-				EXPECT_LE(error, 0.335482);
+				EXPECT_LE(error, 0.35);
 				std::cout << "Outer front right max tension " << simMaxTens[8] / 100.0 << " N" << std::endl;
 				error = abs ((14.1811 - simMaxTens[8] / 100.0) / 14.1811);
-				EXPECT_LE(error, 0.1988);
+				EXPECT_LE(error, 0.2251);
 				
 				/** @todo test median tension as well, also maybe sum of errors **/
 	}

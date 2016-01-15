@@ -75,7 +75,7 @@ void simpleMuscleNP::setup(tgWorld& world)
 
 	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "rod");
-	s.addPair(4, 5, "rod2");
+	s.addPair(4, 5, "box");
 
 	s.addPair(0, 2, "muscle");
 	s.addPair(1, 3, "muscle");
