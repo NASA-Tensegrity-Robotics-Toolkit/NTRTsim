@@ -21,6 +21,33 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="learning\src\algorithms\AsexualMutation.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\algorithms\CrossOver.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\algorithms\Elitism.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\algorithms\GaussianSampling.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\algorithms\MonteCarlo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\algorithms\NeuralNetwork.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\helpersNew\GenerationManager.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\jobs\ControllerJobMaster.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\src\jobs\LearningJobMaster.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="learning\src\concurrent_scheduler.py" />
     <Compile Include="learning\src\evolution\evolution_job.py" />
     <Compile Include="learning\src\evolution\evolution_job_master.py" />
@@ -34,6 +61,9 @@
     <Compile Include="learning\src\interfaces\ntrt_job_master.py" />
     <Compile Include="learning\src\interfaces\ntrt_master_error.py" />
     <Compile Include="learning\src\interfaces\__init__.py" />
+    <Compile Include="learning\src\jobs\ParameterJobMaster.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="learning\src\NTRTJobMaster.py" />
     <Compile Include="learning\src\SPSA\SPSATest.py" />
   </ItemGroup>
@@ -43,6 +73,9 @@
     <Folder Include="learning\src\evolution" />
     <Folder Include="learning\src\helpers" />
     <Folder Include="learning\src\interfaces" />
+    <Folder Include="learning\src\jobs\" />
+    <Folder Include="learning\src\algorithms\" />
+    <Folder Include="learning\src\helpersNew\" />
     <Folder Include="learning\src\SPSA" />
   </ItemGroup>
   <ItemGroup>
