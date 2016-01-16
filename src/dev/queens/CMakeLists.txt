@@ -1,0 +1,4 @@
+subdirs(
+    StructureFileSpec
+)
+
