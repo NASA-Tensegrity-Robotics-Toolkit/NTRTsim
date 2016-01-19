@@ -35,6 +35,8 @@
 #include <yaml-cpp/yaml.h>
 #include <string>
 
+typedef YAML::Node Yam; // to avoid confusion with structure nodes
+
 // Forward declarations
 class tgSpringCableActuator;
 class tgModelVisitor;
@@ -112,15 +114,14 @@ private:
      * @param[in] width: the Z distance of the base triangle
      * @param[in] height: the Y distance along the axis of the prism
      */
-    static void addNodes(tgStructure& s,
-                            YAML::Node root);
+    static void addNodes(tgStructure& s, const Yam& root);
     
     /**
      * A function called during setup that creates rods and muscles from the
      * relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addPairs(tgStructure& s, YAML::Node root);
+    static void addPairs(tgStructure& s, const Yam& root);
 
 
 private:    

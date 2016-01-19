@@ -1,0 +1,10 @@
+structure:
+
+  substructures:
+    superball: "SuperBall.yaml"
+    3prism: "3Prism.yaml"
+
+  links:
+    - ["3prism/top1+top2", "superball/right_vert_top"]
+    - ["3prism/top2+top3", "superball/prox_horiz_right"]
+    - ["3prism/top3+top1", "superball/top_horiz_prox"]

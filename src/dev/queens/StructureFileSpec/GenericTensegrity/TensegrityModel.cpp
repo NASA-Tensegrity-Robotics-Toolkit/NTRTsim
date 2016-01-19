@@ -44,6 +44,8 @@
 
 using namespace std;
 
+typedef YAML::Node Yam; // to avoid confusion with structure nodes
+
 string TensegrityModel::yamlPath;
 
 TensegrityModel::TensegrityModel(string j) :
@@ -56,37 +58,44 @@ TensegrityModel::~TensegrityModel()
 {
 }
 
-void TensegrityModel::addNodes(tgStructure& s, YAML::Node root)
+void TensegrityModel::addNodes(tgStructure& s, const Yam& root)
 {
-    YAML::Node nodes = root["structure"]["nodes"];
-    for (unsigned int i = 0; i < nodes.size(); i++) {
-        YAML::Node xyz = nodes[i]["node"]["xyz"];
+    Yam nodes = root["structure"]["nodes"];
+    for (YAML::const_iterator node = nodes.begin(); node!=nodes.end(); ++node) {
+        string name = node->first.as<string>();
+        Yam xyz = node->second;
         double x = xyz[0].as<double>();
         double y = xyz[1].as<double>();
         double z = xyz[2].as<double>();
-        s.addNode(x, y, z);
+        s.addNode(x, y, z, name);
     }
 }
 
-void TensegrityModel::addPairs(tgStructure& s, YAML::Node root)
+void TensegrityModel::addPairs(tgStructure& s, const Yam& root)
 {
-    YAML::Node pairs = root["structure"]["pairs"];
-    for (unsigned int i = 0; i < pairs.size(); i++) {
-        YAML::Node pair = pairs[i]["pair"];
-        int n1 = pair["start"].as<int>();
-        int n2 = pair["end"].as<int>();
-        string tags = pair["tags"].as<string>();
-        s.addPair(n1 - 1, n2 - 1, tags);
+    tgNodes nodes = s.getNodes();
+    Yam pair_groups = root["structure"]["pair_groups"];
+    for (YAML::const_iterator pair_group = pair_groups.begin(); pair_group!=pair_groups.end(); ++pair_group) {
+        string tags = pair_group->first.as<string>();
+        Yam pairs = pair_group->second;
+        for (unsigned int i = 0; i < pairs.size(); i++) {
+            string node1Name = pairs[i][0].as<string>();
+            int node1Index = nodes.findFirstIndex(node1Name);
+            string node2Name = pairs[i][1].as<string>();
+            int node2Index = nodes.findFirstIndex(node2Name);
+            s.addPair(node1Index, node2Index, tags);
+        }
     } 
 }
 
 void TensegrityModel::setup(tgWorld& world)
 {
-    // Parse Yaml File
-    YAML::Node root = YAML::LoadFile(yamlPath);
 
-    // YAML::Node rodParams = root["parameters"]["rods"];
-    // YAML::Node muscleParams = root["parameters"]["muscles"];
+    // Create the build spec that uses tags to turn the structure into a real model
+    tgBuildSpec spec;
+
+    // Parse Yaml File
+    Yam root = YAML::LoadFile(yamlPath);
 
     // default rod params
     double radius = 0.5;
@@ -106,42 +115,12 @@ void TensegrityModel::setup(tgWorld& world)
     double minRestLength = 0.1;
     double rotation = 0;
 
-    // // set rod params from JSON
-    // if (rodParams.isMember("radius"))
-    //     radius = rodParams["radius"].asDouble();
-    // if (rodParams.isMember("density"))
-    //     density = rodParams["density"].asDouble();
-    // if (rodParams.isMember("friction"))
-    //     friction = rodParams["friction"].asDouble();
-    // if (rodParams.isMember("rollFriction"))
-    //     rollFriction = rodParams["rollFriction"].asDouble();
-    // if (rodParams.isMember("restitution"))
-    //     restitution = rodParams["restitution"].asDouble();
+    // Define the configurations of the rods and strings
+    const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
+    spec.addBuilder("rods", new tgRodInfo(rodConfig));
+    const tgBasicActuator::Config muscleConfig(stiffness, damping, pretension, hist, maxTens, targetVelocity, minActualLength, minRestLength, rotation);
+    spec.addBuilder("muscles", new tgBasicActuatorInfo(muscleConfig));
 
-    // // set muscle params from JSON
-    // if (muscleParams.isMember("stiffness"))
-    //    stiffness = muscleParams["stiffness"].asDouble();
-    // if (muscleParams.isMember("damping"))
-    //     damping = muscleParams["damping"].asDouble();
-    // if (muscleParams.isMember("pretension"))
-    //     pretension = muscleParams["pretension"].asDouble();
-    // if (muscleParams.isMember("hist"))
-    //     hist = muscleParams["hist"].asDouble();
-    // if (muscleParams.isMember("maxTens"))
-    //     maxTens = muscleParams["maxTens"].asDouble();
-    // if (muscleParams.isMember("targetVelocity"))
-    //     targetVelocity = muscleParams["targetVelocity"].asDouble();
-    // if (muscleParams.isMember("minActualLength"))
-    //     minActualLength = muscleParams["minActualLength"].asDouble();
-    // if (muscleParams.isMember("minRestLength"))
-    //     minRestLength = muscleParams["minRestLength"].asDouble();
-    // if (muscleParams.isMember("rotation"))
-    //     rotation = muscleParams["rotation"].asDouble();
-
-     // Define the configurations of the rods and strings
-     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
-     const tgSpringCableActuator::Config muscleConfig(stiffness, damping, pretension, hist, maxTens, targetVelocity, minActualLength, minRestLength, rotation);
-    
     // Create a structure that will hold the details of this model
     tgStructure s;
     
@@ -153,11 +132,6 @@ void TensegrityModel::setup(tgWorld& world)
         
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
-    
-    // Create the build spec that uses tags to turn the structure into a real model
-    tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

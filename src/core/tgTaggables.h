@@ -71,6 +71,19 @@ public:
         }
         return result;
     }
+
+    /**
+     * Return the index of the first T that has all of
+     * the specified tags
+     */
+    int findFirstIndex(std::string tags) 
+    {
+        for(int i = 0; i < m_elements.size(); i++) {
+            if(_taggable(&m_elements[i])->hasAllTags(tags)) {
+                return i;
+            }
+        }
+    }
     
     int size() const
     {

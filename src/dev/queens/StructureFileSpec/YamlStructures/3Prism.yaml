@@ -1,79 +1,44 @@
----
-structure: 
-    name: 3Prism
-    nodes:
-    - node:
-        name: 1
-        xyz: [-5, 0, 0]
-    - node:
-        name: 2
-        xyz: [5, 0, 0]
-    - node:
-        name: 3
-        xyz: [0, 0, 10]
-    - node:
-        name: 4
-        xyz: [-5, 20, 0]
-    - node:
-        name: 5
-        xyz: [5, 20, 0]
-    - node:
-        name: 6
-        xyz: [0, 20, 10]
-    pairs:
-        - pair:
-            start: 1
-            end: 5
-            tags: rod
-        - pair:
-            start: 2
-            end: 6
-            tags: rod
-        - pair:
-            start: 3
-            end: 4
-            tags: rod
-        - pair:
-            start: 1
-            end: 2
-            tags: muscle
-        - pair:
-            start: 2
-            end: 3
-            tags: muscle
-        - pair:
-            start: 3
-            end: 1
-            tags: muscle
-        - pair:
-            start: 4
-            end: 5
-            tags: muscle
-        - pair:
-            start: 5
-            end: 6
-            tags: muscle
-        - pair:
-            start: 6
-            end: 4
-            tags: muscle
-        - pair:
-            start: 1
-            end: 4
-            tags: muscle
-        - pair:
-            start: 2
-            end: 5
-            tags: muscle
-        - pair:
-            start: 3
-            end: 6
-            tags: muscle
-    parameters:
-        rods:
-            density: 0.2
-            radius: 0.31
-        muscles:
-            stiffness: 1000.0
-            damping: 10.0
-            pretension: 500.0
+structure:
+
+  nodes:
+    bottom1: [-5, 0, 0]  # name is mandatory and must be unique among nodes
+    bottom2: [5, 0, 0]
+    bottom3: [0, 0, 10]
+
+    top1: [-5, 20, 0]
+    top2: [5, 20, 0]
+    top3: [0, 20, 10]
+
+  pair_groups:
+    rods:
+      - ["bottom1", "top2"]
+      - ["bottom2", "top3"]
+      - ["bottom3", "top1"]
+
+    muscles:
+      - ["bottom1", "bottom2"]
+      - ["bottom2", "bottom3"]
+      - ["bottom1", "bottom3"]
+
+      - ["top1", "top2"]
+      - ["top2", "top3"]
+      - ["top1", "top3"]
+
+      - ["bottom1", "top1"]
+      - ["bottom2", "top2"]
+      - ["bottom3", "top3"]
+
+# builders:
+#   - builder:
+#       tag_match: "rod"
+#       class: "tgRodInfo"
+#       parameters:
+#         density: 0.2
+#         radius: 0.31
+#   - builder:
+#       tag_match: "muscle"
+#       class: "tgBasicActuatorInfo"
+#       parameters:
+#         stiffness: 1000
+#         damping: 10
+#         pretension: 500

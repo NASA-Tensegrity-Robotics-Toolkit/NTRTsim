@@ -45,7 +45,6 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppTensegrityModelTest" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -55,7 +54,7 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(9.81); // gravity, m/sec^2
+    const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
     // Second create the view
