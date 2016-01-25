@@ -24,6 +24,5 @@ subdirs(
     BP_SC_Doxie
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
-    BigPuppy_SemiRigidFeet
 )
 
