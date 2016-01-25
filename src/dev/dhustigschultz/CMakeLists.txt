@@ -7,6 +7,7 @@ subdirs(
     BigPuppy_Symmetric
     BigPuppy_SymmetricArching
     BigPuppy_SymmetricSpiral1
+    BigPuppy_SymmetricSpiral2
     BigPuppy_SpineOnly
     BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
@@ -18,9 +19,11 @@ subdirs(
     BP_SC_NoLegs_Stats
     BP_SC_Symmetric
     BP_SC_SymmetricSpiral
+    BP_SC_SymmetricSpiral2
     BP_SC_NoLegs
     BP_SC_Doxie
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
+    BigPuppy_SemiRigidFeet
 )
 
