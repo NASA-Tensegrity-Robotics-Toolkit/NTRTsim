@@ -29,7 +29,6 @@
  */
 
 #include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
-//#include "examples/learningSpines/BaseSpineModelLearning.h"
 
 // This library
 #include "core/tgModel.h" 
@@ -42,11 +41,11 @@
 
 class tgSpringCableActuator;
 class tgWorld;
-class tgStructure;    //Do I need this, or tgStructureInfo?
-class tgStructureInfo;  //Do I need this, or just tgStructure, or both?
+class tgStructure;    
+class tgStructureInfo;  
 class tgBasicActuator;  
 
-class BigPuppySymmetricArching: public tgSubject<BigPuppySymmetricArching>, public BaseQuadModelLearning 
+class BigPuppySymmetricArching: public BaseQuadModelLearning 
 {
 public: 
 

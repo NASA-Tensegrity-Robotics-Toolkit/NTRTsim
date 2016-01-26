@@ -24,5 +24,6 @@ subdirs(
     BP_SC_Doxie
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
+    BP_SC_SymmetricArching
 )
 
