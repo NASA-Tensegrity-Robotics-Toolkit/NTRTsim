@@ -86,7 +86,7 @@ bool AppQuadControlArching::setup()
     if (add_controller)
     {
         const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 8; //This may be ok, but confirm. 
+        const int numMuscles = 57; //Changed for experiment. Learning different params for all strings in the spine! 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;

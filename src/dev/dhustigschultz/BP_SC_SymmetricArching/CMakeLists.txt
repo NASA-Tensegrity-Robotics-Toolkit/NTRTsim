@@ -16,12 +16,24 @@ link_libraries(JSONQuadControl
 	       BaseQuadModelLearning
 	       BigPuppySymmetricArching)
 
+add_library(tgCPGGeneralActuatorControl SHARED
+	    tgCPGGeneralActuatorControl.cpp)
+
+add_library(tgCPGGeneralCableControl
+	    tgCPGGeneralCableControl.cpp)
+
+add_library(JSONQuadCPGGeneralControl
+	    JSONQuadCPGGeneralControl.cpp)
+
 add_library(JSONNonlinearFeedback
 	    JSONNonlinearFeedbackControl.cpp)
 
 add_executable(AppQuadControlArching
                AppQuadControlArching.cpp
-	       JSONNonlinearFeedbackControl.cpp)
+	       JSONNonlinearFeedbackControl.cpp
+               JSONQuadCPGGeneralControl.cpp
+	       tgCPGGeneralActuatorControl.cpp
+	       tgCPGGeneralCableControl.cpp)
 
 target_link_libraries(JSONNonlinearFeedback ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONQuadControl)
 target_link_libraries(AppQuadControlArching ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles JSONQuadControl)

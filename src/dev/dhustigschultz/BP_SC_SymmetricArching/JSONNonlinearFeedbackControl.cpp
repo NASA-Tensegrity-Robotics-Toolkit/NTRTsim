@@ -34,8 +34,8 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
-#include "examples/learningSpines/tgCPGActuatorControl.h"
-#include "dev/CPG_feedback/tgCPGCableControl.h"
+#include "tgCPGGeneralActuatorControl.h"
+#include "tgCPGGeneralCableControl.h"
 
 #include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
 #include "helpers/FileHelpers.h"
@@ -84,7 +84,7 @@ JSONNonlinearFeedbackControl::Config::Config(int ss,
                                         double pfMax,
 					double maxH,
 					double minH) :
-JSONQuadCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
+JSONQuadCPGGeneralControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
 freqFeedbackMax(ffMax),
@@ -105,7 +105,7 @@ minHeight(minH)
 JSONNonlinearFeedbackControl::JSONNonlinearFeedbackControl(JSONNonlinearFeedbackControl::Config config,	
                                                 std::string args,
                                                 std::string resourcePath) :
-JSONQuadCPGControl(config, args, resourcePath),
+JSONQuadCPGGeneralControl(config, args, resourcePath),
 m_config(config)
 {
     // Path and filename handled by base class
@@ -119,7 +119,7 @@ JSONNonlinearFeedbackControl::~JSONNonlinearFeedbackControl()
 
 void JSONNonlinearFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
-    m_pCPGSys = new CPGEquationsFB(100);
+    m_pCPGSys = new CPGEquationsFB(5000);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -389,7 +389,6 @@ void JSONNonlinearFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     m_spineControllers.clear();    
 }
 
-//ToDo: Need to restructure the for loops in here, so that have separate cases for the first and last segments (long muscles)....
 void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
@@ -401,7 +400,7 @@ void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
     {
 
         tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
-        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+        tgCPGGeneralCableControl* pStringControl = new tgCPGGeneralCableControl(config);
 
         spineMuscles[i]->attach(pStringControl);
         
@@ -414,7 +413,7 @@ void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
     // Then determine connectivity and setup string
     for (std::size_t i = 0; i < m_spineControllers.size(); i++)
     {
-        tgCPGActuatorControl * const pStringInfo = m_spineControllers[i];
+        tgCPGGeneralActuatorControl * const pStringInfo = m_spineControllers[i];
         assert(pStringInfo != NULL);
         pStringInfo->setConnectivity(m_spineControllers, edgeActions); //May need a new function, written in a subclass, to deal with the long muscles, though this will be fine for segments 1 through 5.
         
@@ -474,8 +473,88 @@ array_2D JSONNonlinearFeedbackControl::scaleNodeActions (Json::Value actions)
     return nodeActions;
 }
 
-//ToDo: May have to write a new function in this subclass, to handle the fact that we'll be skipping segments now. Not sure if scale edge actions will work in all cases.... and maybe there's something better?
 
+array_4D JSONNonlinearFeedbackControl::scaleEdgeActions  
+                            (Json::Value edgeParam)
+{
+    assert(edgeParam[0].size() == 2);
+    
+    double lowerLimit = m_config.lowPhase;
+    double upperLimit = m_config.highPhase;
+    double range = upperLimit - lowerLimit;
+    
+    array_4D actionList(boost::extents[m_config.segmentSpan]
+										[m_config.theirMuscles]
+										[m_config.ourMuscles]
+										[m_config.params]);
+    
+    /* Horrid while loop to populate upper diagonal of matrix, since
+    * its symmetric and we want to minimze parameters used in learing
+    * note that i==1, j==k will refer to the same muscle
+    * @todo use boost to set up array so storage is only allocated for 
+    * elements that are used
+    */
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    
+    // Quirk of the old learning code. Future examples can move forward
+    Json::Value::iterator edgeIt = edgeParam.end();
+    
+    int count = 0;
+    
+    while (i < m_config.segmentSpan)
+    {
+        while(j < m_config.theirMuscles)
+        {
+            while(k < m_config.ourMuscles)
+            {
+                if (edgeIt == edgeParam.begin())
+                {
+                    std::cout << "ran out before table populated!"
+                    << std::endl;
+                    /// @todo consider adding exception here
+                    break;
+                }
+                else
+                {
+                    if (i == 1 && j == k)
+                    {
+                        // std::cout << "Skipped identical muscle" << std::endl;
+                        //Skip since its the same muscle
+                    }
+                    else
+                    {
+                        edgeIt--;
+                        Json::Value edgeParam = *edgeIt;
+                        assert(edgeParam.size() == 2);
+                        // Weight from 0 to 1
+                        actionList[i][j][k][0] = edgeParam[0].asDouble();
+                        //std::cout << actionList[i][j][k][0] << " ";
+                        // Phase offset from -pi to pi
+                        actionList[i][j][k][1] = edgeParam[1].asDouble() * 
+                                                (range) + lowerLimit;
+                        //std::cout <<  actionList[i][j][k][1] << std::endl;
+                        count++;
+                    }
+                }
+                k++;
+            }
+            j++;
+            k = j;
+            
+        }
+        j = 0;
+        k = 0;
+        i++;
+    }
+    
+    std::cout<< "Params used: " << count << std::endl;
+    
+    assert(edgeParam.begin() == edgeIt);
+    
+    return actionList;
+}
 std::vector<double> JSONNonlinearFeedbackControl::getFeedback(BaseQuadModelLearning& subject)
 {
     // Placeholder

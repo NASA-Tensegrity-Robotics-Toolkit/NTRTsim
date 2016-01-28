@@ -28,13 +28,15 @@
  * $Id$
  */
 
-#include "dev/dhustigschultz/BP_SC_NoLegs_Stats/JSONQuadCPGControl.h"
+#include "JSONQuadCPGGeneralControl.h"
 
 #include <json/value.h>
 
 // Forward Declarations
 class neuralNetwork;
 class tgSpringCableActuator;
+
+typedef boost::multi_array<double, 4> array_4D; //Will treat entire spine (and eventually body) as one big segment, so reducing the multi_array by one dimension.
 
 /**
  * JSONFeedbackControl learns the parameters for a CPG system on a
@@ -44,11 +46,11 @@ class tgSpringCableActuator;
  * Due to the number of parameters, the learned parameters are split
  * into one config file for the nodes and another for the CPG's "edges"
  */
-class JSONNonlinearFeedbackControl : public JSONQuadCPGControl
+class JSONNonlinearFeedbackControl : public JSONQuadCPGGeneralControl
 {
 public:
 
-struct Config : public JSONQuadCPGControl::Config
+struct Config : public JSONQuadCPGGeneralControl::Config
     {
     public:
         /**
@@ -113,6 +115,7 @@ protected:
 //ToDo: Need to restructure the for loops in here, so that have separate cases for the first and last segments (long muscles)....
     virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
     
+    virtual array_4D scaleEdgeActions (Json::Value edgeParam);
     virtual array_2D scaleNodeActions (Json::Value actions);
 
 //ToDo: May have to write a new function in this subclass, to handle the fact that we'll be skipping segments now. Not sure if scale edge actions will work in all cases.... and maybe there's something better?
@@ -125,7 +128,7 @@ protected:
     
     JSONNonlinearFeedbackControl::Config m_config;
 
-    std::vector<tgCPGActuatorControl*> m_spineControllers;
+    std::vector<tgCPGGeneralActuatorControl*> m_spineControllers;
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
