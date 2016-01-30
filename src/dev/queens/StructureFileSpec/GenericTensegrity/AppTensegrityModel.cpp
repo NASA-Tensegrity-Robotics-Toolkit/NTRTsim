@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
+
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
@@ -68,10 +68,10 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1]);
-    
+
     // Add the model to the world
     simulation.addModel(myModel);
-    
+
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

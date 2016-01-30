@@ -1,44 +1,40 @@
-structure:
+nodes:
+  bottom1: [-2.5, 0, 0]  # name is mandatory and must be unique among nodes
+  bottom2: [2.5, 0, 0]
+  bottom3: [0, 0, 5]
 
-  nodes:
-    bottom1: [-5, 0, 0]  # name is mandatory and must be unique among nodes
-    bottom2: [5, 0, 0]
-    bottom3: [0, 0, 10]
+  top1: [-2.5, 10, 0]
+  top2: [2.5, 10, 0]
+  top3: [0, 10, 5]
 
-    top1: [-5, 20, 0]
-    top2: [5, 20, 0]
-    top3: [0, 20, 10]
+pair_groups:
+  rods:
+    - ["bottom1", "top2"]
+    - ["bottom2", "top3"]
+    - ["bottom3", "top1"]
 
-  pair_groups:
-    rods:
-      - ["bottom1", "top2"]
-      - ["bottom2", "top3"]
-      - ["bottom3", "top1"]
+  muscles:
+    - ["bottom1", "bottom2"]
+    - ["bottom2", "bottom3"]
+    - ["bottom1", "bottom3"]
 
-    muscles:
-      - ["bottom1", "bottom2"]
-      - ["bottom2", "bottom3"]
-      - ["bottom1", "bottom3"]
+    - ["top1", "top2"]
+    - ["top2", "top3"]
+    - ["top1", "top3"]
 
-      - ["top1", "top2"]
-      - ["top2", "top3"]
-      - ["top1", "top3"]
+    - ["bottom1", "top1"]
+    - ["bottom2", "top2"]
+    - ["bottom3", "top3"]
 
-      - ["bottom1", "top1"]
-      - ["bottom2", "top2"]
-      - ["bottom3", "top3"]
-
-# builders:
-#   - builder:
-#       tag_match: "rod"
-#       class: "tgRodInfo"
-#       parameters:
-#         density: 0.2
-#         radius: 0.31
-#   - builder:
-#       tag_match: "muscle"
-#       class: "tgBasicActuatorInfo"
-#       parameters:
-#         stiffness: 1000
-#         damping: 10
-#         pretension: 500
+builders:
+  rods:
+    class: "tgRodInfo"
+    parameters:
+      density: 0.2
+      radius: 0.31
+  muscles:
+    class: "tgBasicActuatorInfo"
+    parameters:
+      stiffness: 1000
+      damping: 10
+      pretension: 500

@@ -1,10 +1,55 @@
-structure:
+substructures:
+  superball: "src/dev/queens/StructureFileSpec/YamlStructures/SuperBall.yaml"
+  3prism1: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism2: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism3: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism4: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism5: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism6: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism7: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
+  3prism8: "src/dev/queens/StructureFileSpec/YamlStructures/3Prism.yaml"
 
-  substructures:
-    superball: "SuperBall.yaml"
-    3prism: "3Prism.yaml"
+link_groups:
+  muscles:
+    3prism1/top1: ["superball/right_vert_top", "superball/prox_horiz_right"]
+    3prism1/top2: ["superball/prox_horiz_right", "superball/top_horiz_prox"]
+    3prism1/top3: ["superball/top_horiz_prox", "superball/right_vert_top"]
+  muscles:
+    3prism2/top1: ["superball/left_vert_top", "superball/top_horiz_prox"]
+    3prism2/top2: ["superball/top_horiz_prox", "superball/prox_horiz_left"]
+    3prism2/top3: ["superball/prox_horiz_left", "superball/left_vert_top"]
+  muscles:
+    3prism3/top1: ["superball/right_vert_top", "superball/top_horiz_dist"]
+    3prism3/top2: ["superball/top_horiz_dist", "superball/dist_horiz_right"]
+    3prism3/top3: ["superball/dist_horiz_right", "superball/right_vert_top"]
+  muscles:
+    3prism4/top1: ["superball/left_vert_top", "superball/dist_horiz_left"]
+    3prism4/top2: ["superball/dist_horiz_left", "superball/top_horiz_dist"]
+    3prism4/top3: ["superball/top_horiz_dist", "superball/left_vert_top"]
+  muscles:
+    3prism5/top1: ["superball/right_vert_bottom", "superball/bottom_horiz_prox"]
+    3prism5/top2: ["superball/bottom_horiz_prox", "superball/prox_horiz_right"]
+    3prism5/top3: ["superball/prox_horiz_right", "superball/right_vert_bottom"]
+  muscles:
+    3prism6/top1: ["superball/left_vert_bottom", "superball/prox_horiz_left"]
+    3prism6/top2: ["superball/prox_horiz_left", "superball/bottom_horiz_prox"]
+    3prism6/top3: ["superball/bottom_horiz_prox", "superball/left_vert_bottom"]
+  muscles:
+    3prism7/top1: ["superball/right_vert_bottom", "superball/dist_horiz_right"]
+    3prism7/top2: ["superball/dist_horiz_right", "superball/bottom_horiz_dist"]
+    3prism7/top3: ["superball/bottom_horiz_dist", "superball/right_vert_bottom"]
+  muscles:
+    3prism8/top1: ["superball/left_vert_bottom", "superball/bottom_horiz_dist"]
+    3prism8/top2: ["superball/bottom_horiz_dist", "superball/dist_horiz_left"]
+    3prism8/top3: ["superball/dist_horiz_left", "superball/left_vert_bottom"]
 
-  links:
-    - ["3prism/top1+top2", "superball/right_vert_top"]
-    - ["3prism/top2+top3", "superball/prox_horiz_right"]
-    - ["3prism/top3+top1", "superball/top_horiz_prox"]
+builders:
+  muscles:
+    class: "tgBasicActuatorInfo"
+    parameters:
+      stiffness: 613.0,
+      damping: 200.0,
+      pretension: 2452.0,
+      hist: 0,
+      maxTens: 100000,
+      targetVelocity: 10000

@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -18,7 +18,7 @@
 
 /**
  * @file tgPairs.h
- * @brief Definition of class tgPairs 
+ * @brief Definition of class tgPairs
  * @author Ryan Adams
  * @date March 2014
  * $Id$
@@ -37,10 +37,10 @@
 class tgPairs : public tgTaggables<tgPair>
 {
 public:
-    
+
     // @todo: do we need to initialize the pairs here?
     tgPairs() : tgTaggables() {}
-    
+
     // tgPairs(std::vector<tgPair>& pairs) : tgTaggables(pairs) { // @todo: Fix this -- casting is a problem...
     tgPairs(std::vector<tgPair>& pairs) : tgTaggables() {
         // @todo: make sure each pair is unique
@@ -78,6 +78,11 @@ public:
         return addPair(pair);
     }
 
+    void removePair(const tgPair& pair)
+    {
+        removeElement(pair);
+    }
+
     void setPair(int key, tgPair pair) {
         setElement(key, pair);
     }
@@ -102,7 +107,7 @@ public:
                      const btVector3& fromOrientation,
                      const btVector3& toOrientation)
     {
-        btQuaternion rotation = tgUtil::getQuaternionBetween(fromOrientation, 
+        btQuaternion rotation = tgUtil::getQuaternionBetween(fromOrientation,
                                                              toOrientation);
         addRotation(fixedPoint, rotation);
     }

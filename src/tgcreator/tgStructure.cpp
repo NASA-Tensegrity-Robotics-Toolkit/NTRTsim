@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -32,8 +32,8 @@
 // The Bullet Physics library
 #include <LinearMath/btQuaternion.h>
 #include <LinearMath/btVector3.h>
- 
-tgStructure::tgStructure() : tgTaggable() 
+
+tgStructure::tgStructure() : tgTaggable()
 {
 }
 
@@ -84,6 +84,16 @@ void tgStructure::addPair(const btVector3& from, const btVector3& to, std::strin
     }
 }
 
+void tgStructure::removePair(const btVector3& from, const btVector3& to) {
+    tgPair matchingPair;
+    for (unsigned int i = 0; i < m_pairs.size(); i++) {
+        if (m_pairs[i].getFrom() == from && m_pairs[i].getTo() == to || m_pairs[i].getFrom() == to && m_pairs[i].getTo() == from) {
+            matchingPair = m_pairs[i];
+        }
+    }
+    m_pairs.removePair(matchingPair);
+}
+
 void tgStructure::move(const btVector3& offset)
 {
     m_nodes.move(offset);
@@ -108,8 +118,8 @@ void tgStructure::addRotation(const btVector3& fixedPoint,
                  const btVector3& fromOrientation,
                  const btVector3& toOrientation)
 {
-    addRotation(fixedPoint, 
-                tgUtil::getQuaternionBetween(fromOrientation, 
+    addRotation(fixedPoint,
+                tgUtil::getQuaternionBetween(fromOrientation,
                                              toOrientation));
 }
 
@@ -136,5 +146,12 @@ void tgStructure::addChild(tgStructure* pChild)
     if (pChild != NULL)
     {
         m_children.push_back(pChild);
+    }
+}
+
+tgStructure& tgStructure::findFirstChild(std::string tags) {
+    for (unsigned int i = 0; i < m_children.size(); i++) {
+        if (m_children[i]->hasAllTags(tags))
+            return *(m_children[i]);
     }
 }

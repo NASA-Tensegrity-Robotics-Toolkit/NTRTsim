@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -44,16 +44,16 @@ class tgTags;
 
 /**
  * Representation of a geometric structure containing nodes (points), pairs of
- * nodes, and child structures. Note that nodes, pairs, and structures are all 
+ * nodes, and child structures. Note that nodes, pairs, and structures are all
  * taggable and searchable by tags. Further tools in the chain are used to
  * create physical representations of the structures with rods, muscles, etc.
- * Note that tags can be anything you want -- you'll specify the tags that you 
+ * Note that tags can be anything you want -- you'll specify the tags that you
  * want to use to build things like rods or muscles during the build phase.
  */
 class tgStructure : public tgTaggable
 {
 public:
-    
+
     tgStructure();
 
     tgStructure(const tgTags& tags);
@@ -66,7 +66,7 @@ public:
      * Add a node using x, y, and z (just for convenience)
      */
     void addNode(double x, double y, double z, std::string tags = "");
-    
+
     /**
      * Add a node using a node - since keeping track of nodes seems
      * more useful than pairs for string attachments
@@ -77,14 +77,19 @@ public:
      * Add a pair that connects two of our nodes together
      */
     void addPair(int fromNodeIdx, int toNodeIdx, std::string tags = "");
-    
+
     /**
-     * Add a pair that connects any two vector3s 
+     * Add a pair that connects any two vector3s
      */
     void addPair(const btVector3& from, const btVector3& to, std::string tags = "");
 
+    /**
+     * Remove a pair that connects any two vector3s
+     */
+    void removePair(const btVector3& from, const btVector3& to);
+
     void move(const btVector3& offset);
-    
+
     /**
      * @todo add rotate functionality
      */
@@ -103,7 +108,7 @@ public:
      * Add a child structure. Note that this will be copied rather than
      * being a reference or a pointer.
      */
-    void addChild(tgStructure* child);    
+    void addChild(tgStructure* child);
 
     /**
      * Get all of our nodes
@@ -115,16 +120,21 @@ public:
         return m_nodes;
     }
 
+    tgNodes& getNodes()
+    {
+        return m_nodes;
+    }
+
     /**
      * Get all of our pairs
-     * Note: This only includes nodes owned by this structure. Use 'findPairs' 
-     * to search child nodes as well. 
+     * Note: This only includes nodes owned by this structure. Use 'findPairs'
+     * to search child nodes as well.
      */
     const tgPairs& getPairs() const
     {
         return m_pairs;
     }
-	
+
     /**
      * Return our child structures
      */
@@ -132,6 +142,8 @@ public:
     {
         return m_children;
     }
+
+    tgStructure& findFirstChild(std::string tags);
 
 private:
 
@@ -141,7 +153,7 @@ private:
 
     // we own these
     std::vector<tgStructure*> m_children;
-    
+
 };
 
 

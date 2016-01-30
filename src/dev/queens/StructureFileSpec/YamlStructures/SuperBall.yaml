@@ -1,82 +1,83 @@
-structure:
+nodes:
+  # left vertical rod
+  left_vert_bottom: [-7.5, -8.42, 0]
+  left_vert_top: [-7.5, 8.42, 0]
+  # right vertical rod
+  right_vert_bottom: [7.5, -8.42, 0]
+  right_vert_top: [7.5, 8.42, 0]
 
-  nodes:
-    # left vertical rod
-    left_vert_bottom: [-7.5, -8.42, 0]
-    left_vert_top: [-7.5, 8.42, 0]
-    # right vertical rod
-    right_vert_bottom: [7.5, -8.42, 0]
-    right_vert_top: [7.5, 8.42, 0]
+  # bottom horizontal rod
+  bottom_horiz_prox: [0, -7.5, -8.42]
+  bottom_horiz_dist: [0, -7.5, 8.42]
+  # top horizontal rod
+  top_horiz_prox: [0, 7.5, -8.42]
+  top_horiz_dist: [0, 7.5, 8.42]
 
-    # bottom horizontal rod
-    bottom_horiz_prox: [0, -7.5, -8.42]
-    bottom_horiz_dist: [0, -7.5, 8.42]
-    # top horizontal rod
-    top_horiz_prox: [0, 7.5, 8.42]
-    top_horiz_dist: [0, 7.5, -8.42]
+  # proxal horiztonal rod
+  prox_horiz_left: [-8.42, 0, -7.5]
+  prox_horiz_right: [8.42, 0, -7.5]
+  # distal horizontal rod
+  dist_horiz_left: [-8.42, 0, 7.5]
+  dist_horiz_right: [8.42, 0, 7.5]
 
-    # proximal horizontal rod
-    prox_horiz_left: [-8.42, 0, 7.5]
-    prox_horiz_right: [8.42, 0, 7.5]
-    # distal horiztonal rod
-    dist_horiz_left: [-8.42, 0, -7.5]
-    dist_horiz_right: [8.42, 0, -7.5]
+pair_groups:
+  rods:
+    # coronal plane
+    - ["left_vert_bottom","left_vert_top"]
+    - ["right_vert_bottom","right_vert_top"]
+    # sagital plane
+    - ["bottom_horiz_prox","bottom_horiz_dist"]
+    - ["top_horiz_dist","top_horiz_prox"]
+    # trasverse plane
+    - ["dist_horiz_left","dist_horiz_right"]
+    - ["prox_horiz_left","prox_horiz_right"]
 
-    edges:
-      rod:
-        # coronal plane
-        - ["left_vert_bottom","left_vert_top"]
-        - ["right_vert_bottom","right_vert_top"]
-        # sagital plane
-        - ["bottom_horiz_prox","bottom_horiz_dist"]
-        - ["top_horiz_prox","top_horiz_dist"]
-        # trasverse plane
-        - ["prox_horiz_left","prox_horiz_right"]
-        - ["dist_horiz_left","dist_horiz_right"]
+  muscles:
+    - ["left_vert_bottom","bottom_horiz_prox"]
+    - ["left_vert_bottom","bottom_horiz_dist"]
+    - ["left_vert_bottom","dist_horiz_left"]
+    - ["left_vert_bottom","prox_horiz_left"]
 
-      muscle:
-        - ["left_vert_bottom","bottom_horiz_prox"]
-        - ["left_vert_bottom","bottom_horiz_dist"]
-        - ["left_vert_bottom","prox_horiz_left"]
-        - ["left_vert_bottom","dist_horiz_left"]
+    - ["left_vert_top","top_horiz_dist"]
+    - ["left_vert_top","top_horiz_prox"]
+    - ["left_vert_top","dist_horiz_left"]
+    - ["left_vert_top","prox_horiz_left"]
 
-        - ["left_vert_top","top_horiz_prox"]
-        - ["left_vert_top","top_horiz_dist"]
-        - ["left_vert_top","prox_horiz_left"]
-        - ["left_vert_top","dist_horiz_left"]
+    - ["right_vert_bottom","bottom_horiz_prox"]
+    - ["right_vert_bottom","bottom_horiz_dist"]
+    - ["right_vert_bottom","dist_horiz_right"]
+    - ["right_vert_bottom","prox_horiz_right"]
 
-        - ["right_vert_bottom","bottom_horiz_prox"]
-        - ["right_vert_bottom","bottom_horiz_dist"]
-        - ["right_vert_bottom","prox_horiz_right"]
-        - ["right_vert_bottom","dist_horiz_right"]
+    - ["right_vert_top","top_horiz_prox"]
+    - ["right_vert_top","top_horiz_dist"]
+    - ["right_vert_top","dist_horiz_right"]
+    - ["right_vert_top","prox_horiz_right"]
 
-        - ["right_vert_top","top_horiz_dist"],
-        - ["right_vert_top","top_horiz_prox"],
-        - ["right_vert_top","prox_horiz_right"]
-        - ["right_vert_top","dist_horiz_right"]
+    - ["bottom_horiz_prox","prox_horiz_left"]
+    - ["bottom_horiz_prox","prox_horiz_right"]
+    - ["bottom_horiz_dist","dist_horiz_left"]
+    - ["bottom_horiz_dist","dist_horiz_right"]
 
-        - ["bottom_horiz_prox","right_vert_bottom"]
-        - ["bottom_horiz_prox","dist_horiz_left"]
-        - ["bottom_horiz_prox","dist_horiz_right"]
-        - ["bottom_horiz_dist","prox_horiz_left"]
-        - ["bottom_horiz_dist","prox_horiz_right"]
+    - ["top_horiz_prox","prox_horiz_left"]
+    - ["top_horiz_prox","prox_horiz_right"]
+    - ["top_horiz_dist","dist_horiz_left"]
+    - ["top_horiz_dist","dist_horiz_right"]
 
-        - ["top_horiz_prox","dist_horiz_left"]
-        - ["top_horiz_prox","dist_horiz_right"]
-        - ["top_horiz_dist","prox_horiz_left"],
-        - ["top_horiz_dist","prox_horiz_right"]
-
-# parameters:
-#   rods:
-#     density: 0.688,
-#     radius: 0.31,
-#     friction: 0.99,
-#     rollFriction: 0.01,
-#     restitution: 0.0
-#   muscles:
-#     stiffness: 613.0,
-#     damping: 200.0,
-#     pretension: 2452.0,
-#     hist: 0,
-#     maxTens: 100000,
-#     targetVelocity: 10000
+builders:
+  rods:
+    class: "tgRodInfo"
+    parameters:
+      density: 0.688,
+      radius: 0.31,
+      friction: 0.99,
+      rollFriction: 0.01,
+      restitution: 0.0
+  muscles:
+    class: "tgBasicActuatorInfo"
+    parameters:
+      stiffness: 613.0,
+      damping: 200.0,
+      pretension: 2452.0,
+      hist: 0,
+      maxTens: 100000,
+      targetVelocity: 10000

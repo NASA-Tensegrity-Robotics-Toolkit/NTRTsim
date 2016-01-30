@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -37,7 +37,7 @@ template <class T>
 class tgTaggables
 {
 public:
-    
+
     tgTaggables() {
         // Postcondition
         assert(m_elements.empty());
@@ -52,16 +52,16 @@ public:
     tgTaggables(std::vector<T>& elements) : m_elements(elements) {
         // All elements must be unique
         assertUniqueElements("All elements must be unique.");
-        
+
     }
-        
+
     virtual ~tgTaggables() {};
-    
+
     /**
      * Return a vector of pointers to Ts that have all of
      * the specified tags.
      */
-    std::vector<T*> find(std::string tags) 
+    std::vector<T*> find(std::string tags)
     {
         std::vector<T*> result;
         for(int i = 0; i < m_elements.size(); i++) {
@@ -73,23 +73,23 @@ public:
     }
 
     /**
-     * Return the index of the first T that has all of
+     * Return a reference to the first T that has all of
      * the specified tags
      */
-    int findFirstIndex(std::string tags) 
+    T& findFirst(std::string tags)
     {
         for(int i = 0; i < m_elements.size(); i++) {
             if(_taggable(&m_elements[i])->hasAllTags(tags)) {
-                return i;
+                return m_elements[i];
             }
         }
     }
-    
+
     int size() const
     {
         return m_elements.size();
     }
-    
+
     std::vector<T*> findAll()
     {
         std::vector<T*> result;
@@ -98,7 +98,7 @@ public:
         }
         return result;
     }
-    
+
     std::vector<T*> findUntagged()
     {
         std::vector<T*> result;
@@ -125,24 +125,24 @@ public:
         }
         return false;
     }
-    
-    
+
+
     /**
      * Return a non-const reference to the element that is indexed by the
      * int key. It must be in m_elements.
      * @param[in] key the key of the element to retrieve
      * @reeturn a const reference to the element that is indexed by idx
      */
-    T& operator[](int key) { 
+    T& operator[](int key) {
         assertKeyExists(key);
-        return m_elements[key]; 
+        return m_elements[key];
     }
-    
-    const T& operator[](int key) const { 
+
+    const T& operator[](int key) const {
         assertKeyExists(key);
-        return m_elements[key]; 
+        return m_elements[key];
     }
-    
+
     /**
      * Remove the elements contained in 'other' from this object
      */
@@ -165,12 +165,12 @@ public:
         this->addElements(other);
         return *this;
     }
-    
+
 
 protected:
-    
-    // @todo: think about uniqueness -- if not unique, throw an error? return -1? 
-    int addElement(T element) 
+
+    // @todo: think about uniqueness -- if not unique, throw an error? return -1?
+    int addElement(T element)
     {
         // @todo: make sure the element is unique
         assert(!elementExists(element));  // segfault?
@@ -179,7 +179,7 @@ protected:
         return m_elements.size();  // This is the index that was created.
     }
 
-    void addElements(std::vector<T*> elements) 
+    void addElements(std::vector<T*> elements)
     {
         for(int i = 0; i < elements.size(); i++) {
             this->addElement(elements[i]);
@@ -190,8 +190,8 @@ protected:
         assert((0 <= key) && (key <= m_elements.size()));
         m_elements[key] = element;
     }
-        
-    std::vector<T>& getElements() 
+
+    std::vector<T>& getElements()
     {
         return m_elements;
     };
@@ -222,7 +222,7 @@ protected:
     }
 
     // To make subclassing operators easier...
-    T& getElement(int key) 
+    T& getElement(int key)
     {
         return m_elements[key];
     }
@@ -242,11 +242,11 @@ protected:
     bool keyExists(int key) const
     {
         return (0 <= key) && (key < m_elements.size());
-    }        
-    
-    // @todo: FIX THIS -- segfaults, etc. -- what's going on? 
+    }
+
+    // @todo: FIX THIS -- segfaults, etc. -- what's going on?
     bool elementExists(const T& element) const
-    {        
+    {
         //return std::find(m_elements.begin(), m_elements.end(), element) != m_elements.end(); // segfault?
         for(int i = 0; i < m_elements.size(); i++) {
             // This is a little strange to me, but at least it doesn't cause a segfault...
@@ -257,41 +257,41 @@ protected:
         }
         return false;
     }
-    
+
     void assertKeyExists(int key, std::string message = "Element at index does not exist") const
     {
         if(!keyExists(key)) {
-            std::stringstream ss; 
+            std::stringstream ss;
             ss << key;
             throw std::out_of_range(message + " (index "+ ss.str() + ").");
-        }        
+        }
     }
-    
+
     void assertUnique(T& element, std::string message = "Taggable elements must be unique.") {
         if(elementExists(element)) {
             throw std::logic_error(message);
         }
     }
-    
+
     void assertUniqueElements(std::string message = "Taggable elements must be unique.") const
     {
         /* Note: this throws a "Most vexing parse" error (http://en.wikipedia.org/wiki/Most_vexing_parse)
         // Note: This would probably work if we implemented operator< on tgPair...
         */
-        
+
         if(! std::set<T>(m_elements.begin(), m_elements.end()).size() ==
              m_elements.size()) {
                  throw std::logic_error(message);
              }
 
     }
-    
+
     // Cast T to taggable (after all, T must be a tgTaggable in the first place, but )
     // there doesn't seem to be a way to enforce that with c++ templates...
     tgTaggable* _taggable(T* obj) {
         return static_cast<tgTaggable*>(obj);
     }
-    
+
 private:
     std::vector<T> m_elements;
 };
