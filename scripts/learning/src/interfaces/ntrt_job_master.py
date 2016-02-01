@@ -1,6 +1,6 @@
 import logging
 
-class NTRTJobMaster:
+class NTRTJobMaster(object):
     """
     One NTRTJobMaster will exist for the entire learning run. It's responsible for managing our
     NTRTJob objects.

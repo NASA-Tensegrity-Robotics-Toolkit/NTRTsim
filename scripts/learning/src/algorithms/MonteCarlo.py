@@ -1,50 +1,104 @@
-    def __getNewParams(self, paramName):
-        """
-        Generate a new set of paramters based on learning method and config file
-        Returns a dictionary paramName : values
-        This is the implementation of monteCarlo
-        """
-        params = self.jConf["learningParams"][paramName]
+import random
+from helpersNew import Generation
+from helpersNew import dictTools
 
-        pMax = params['paramMax']
-        pMin = params['paramMin']
+class MonteCarlo:
 
-        newController = {}
-        newController['paramID'] = str(self.paramID)
+    """
+    Performs basic Monte Carlo by replicating the given component.
+    All of the attributes of the component are randomized based on the config.
 
-        # Neural network or not. Slightly different data structure
-        if params['numberOfStates'] == 0 :
+    """
 
-            newParams = []
+def monteCarlo(monteCarloConfig, rangeDictionary, templateComponent):
 
-            for i in range(0, params['numberOfInstances']) :
-                subParams = []
-                for j in range(0, params['numberOfOutputs']) :
-                    # Assume scaling happens elsewhere
-                    subParams.append(random.uniform(pMin, pMax))
-                newParams.append(subParams)
-        else :
-            newParams = { 'numActions' : params['numberOfOutputs'],
-                         'numStates' : params['numberOfStates'],
-                         'numHidden' : params['numberHidden'],
-                         'neuralFilename' : "logs/bestParameters-test_fb-"+ newController['paramID'] +".nnw"}
+    newComponentPopulation = []
+    # Not sure how dictionary passing/copying is working out here. check it later.
+    spawned = 0
+    for item in range(monteCarloConfig['spawnCount']):
+        newComponent = generateNewComponent(rangeDictionary, templateComponent.copy())
+        newComponentPopulation.append(newComponent)
+        spawned += 1
+    return newComponentPopulation
 
-            neuralParams = []
+def generateNewComponent(rangeDictionary, templateComponent, tagStack=[]):
+    for key, value in templateComponent.iteritems():
+        nextTagStack = list(tagStack)
+        nextTagStack.append(key)
+        if type(value) == type({}):
+            templateComponent[key] = generateNewComponent(rangeDictionary, value, nextTagStack)
+        elif type(value) == type([]):
+            newList = generateNewComponentFromList(rangeDictionary, value, nextTagStack)
+            """
+            TODO:
+            There is a case here where if there are some values already set in a nested list,
+            they will be overwritten with null.
+            Do a "deep sweep" to make sure that this doesn't happen.
+            """
+            templateComponent[key] = newList
+        # Assume that value is an integer
+        else:
+            newItem = getValueFromTagStack(rangeDictionary, nextTagStack)
+            # Check that we actually updated the value
+            if newItem:
+                templateComponent[key] = newItem
+    return templateComponent
 
-            numStates = params['numberOfStates']
-            numOutputs=  params['numberOfOutputs']
-            numHidden = params['numberHidden']
+def generateNewComponentFromList(rangeDictionary, value, tagStack):
+    if type(value) == type([]):
+        newValue = []
+        for item in value:
+            # May not need a new list(tagStack) here. doing it as a precaution
+            newItem = generateNewComponentFromList(rangeDictionary, item, list(tagStack))
+            newValue.append(newItem)
+    else:
+        newValue = getValueFromTagStack(rangeDictionary, list(tagStack))
 
-            totalParams = (numStates + 1) * (numHidden) + (numHidden + 1) * numOutputs
+    return newValue
 
-            for i in range(0,  totalParams) :
-                neuralParams.append(random.uniform(pMin, pMax))
 
-            newParams['neuralParams'] = neuralParams
+"""
+Walking through a rangedictionary/tag stack SHOULD NOT BE NECESSARY!!!
+The rangeDictionary must include all the parameters&ranges you want to learn over,
+in a 1-D dictionary.
+This means that the tag you are looking up just has to do a direct check in the
+range dictionary, nothing more.
 
-            self.__writeToNNW(neuralParams, self.path + newParams['neuralFilename'])
+TODO:
+Allow the "getValueFromTagStack" to evaluate more than just a min/max range.
+Allow it to also do an enum (check if type is list, if so then enum, else range.)
 
-        newController['params'] = newParams
-        newController['scores'] = []
+***Consider:
+Non-float ranges? integers only?
+"""
 
-        return newController
+"""
+It would be nice to have running out of stack being an error flag, but that won't work.
+In the event that a learning run is done where not all of the parameters are learned
+(i.e. builder only learns on a specific set of tags)
+then this would throw errors and not complete.
+Instead, we'll throw warnings WHEN LOGGING WORKS and let the user proceed.
+"""
+def getValueFromTagStack(rangeDictionary, tagStack):
+    newItem = None
+    baseTag = tagStack[-1]
+    while not newItem:
+        if len(tagStack) > 0:
+            currentTag = tagStack.pop()
+            #print "currentTag: " + currentTag
+        else:
+            # We didn't find a tag for it.
+            # See block comment above
+            break
+        # THIS IS CASE SENSITIVE FOR NOW
+        if currentTag in rangeDictionary:
+            #print "Found currentTag in dictionary: " + currentTag
+            try:
+                min = rangeDictionary[currentTag]['min']
+                max = rangeDictionary[currentTag]['max']
+            except KeyError:
+                raise Exception("Couldn't find min/max range values for tag " + currentTag + ". Check your range section of the learning spec.")
+            newItem = random.uniform(min, max)
+    #if not newItem:
+        #print "Could not find a match for base tag: " + baseTag
+    return newItem

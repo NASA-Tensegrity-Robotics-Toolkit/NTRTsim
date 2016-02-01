@@ -26,14 +26,23 @@
 import sys
 import logging
 from evolution import EvolutionJobMaster
+from jobs import ControllerJobMaster
 
-
-
-
-
+"""
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     configFile = sys.argv[1]
     numProcesses = int(sys.argv[2])
     jobMaster = EvolutionJobMaster(configFile, numProcesses)
+    jobMaster.beginTrial()
+"""
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    configFile = sys.argv[1]
+    numProcesses = int(sys.argv[2])
+    if ".yaml" in sys.argv[1]:
+        jobMaster = ControllerJobMaster(configFile, numProcesses)
+    elif ".json" in sys.argv[1]:
+        jobMaster = EvolutionJobMaster(configFile, numProcesses)
     jobMaster.beginTrial()

@@ -1,68 +1,94 @@
-    def __getChildController(self, c1, c2, params):
+import random
+from GenerationManager import Generation
+
+class CrossOver:
+    """
+    Performs basic genetic algorithm on the given generation.
+    
+    Configuration Format:
+    Number of Offspring = integer
+    Selection Method = "random" or "50/50"
+
+    YAML Format:
+    CrossOver:
+        spawnCount: int
+        selectionMethod: "50/50" or "random"
+        mutationChance: float
+
+    Assumes that the sum of scores is expressible as an integer.
+    """
+    
+    def generateOffspring(self, learningConfig, generation, component="All"):
         """
-        Takes two controllers and merges them with a 50/50 chance of selecting
-        a parameter from each controller
+        learningConfig -- The dictionary parsed by LearningJobMaster with specifications
+                          for how to perform the CrossOver algorithm.
+        parameterSubset (optional) -- The string indexing the dictionary to a parameter array
+                                      if absent, assumed to be entire set of parameters.
+        generation -- A LearningDictionary containing members with scores.
         """
 
-        if(params['numberOfStates'] > 0):
-            c1 = list(c1['neuralParams'])
-            c2 = list(c2['neuralParams'])
+        self._offspringCount = learningConfig['spawnCount']
+        self._selectionMethod = learningConfig['selectionMethod']
+        self._component = component
+        self._generation = generation
 
-        cNew = []
+        return self._createOffspring(self, generation)
 
-        if (len(c1) == 0):
-            raise NTRTMasterError("Error in length")
+    def _createOffspring(self, generation):
+        totalScore = generation.getTotalScore()
 
-        """
-        # Old code for random params
-        for i, j in zip(c1, c2):
-            # Go to the deepest level of the parameters (see instances in the specification)
-            if isinstance(i, collections.Iterable):
-                cNew.append(self.__getChildController(i, j, params))
-            else:
-                # @todo should this be adjustable?
-                if (random.random() > 0.5):
-                    cNew.append(i)
-                else:
-                    cNew.append(j)
-        """
-        crossOver = random.randint(0, len(c1) - 1)
+        newComponents = []
 
-        print(crossOver)
+        for i in range(self._offspringCount):
 
-        cNew[0:crossOver] = c1[0:crossOver]
-        print(len(cNew))
+            parents = self._getParents(self._generation)
+            child = self._createChild(self, parents[0], parents[1])
+            newComponents.append(child)
+        
+        return newComponents
+    
+    # Should this take a tuple or an array instead of two parents?
+    def _createChild(self, parentA, parentB):
+        # Assumed that the two parents are of the same type, length, etc...
+        # This DOES NOT support a nested structure as you'd find with parameters
+        # Will work for controllers where a component just has a list of floats
+        parentAValues = list(parentA.components[self._component])
+        parentBValues = list(parentB.components[self._component])
 
-        cNew[crossOver:len(c2)+1] = c2[crossOver:len(c2)+1]
-        print(len(cNew))
+        splitIndex = random.random() * len(parentAValues)
 
+        childValues = parentAValues[:splitIndex]+parentBValues[splitIndex:]
+        child = {
+            self._component : childValues
+            }
+        return child
 
-        if (len(cNew) != len(c1)):
-            raise NTRTMasterError("Error in length")
+    def _getParents(self, generation):
+        totalScore = generation.getTotalScore()
+        parentAIndex = random.randint(0, totalScore)
+        parentBIndex = random.randint(0, totalScore)
 
-        if(params['numberOfStates'] > 0):
-            newNeuro = {}
-            newNeuro['neuralParams'] = cNew
-            newNeuro['numStates'] = params['numberOfStates']
-            newNeuro['numActions'] =  params['numberOfOutputs']
-            newNeuro['numHidden'] =  params['numberHidden']
-            return newNeuro
-        else:
-            return cNew
+        sum = 0
+        parentA = None
+        parentB = None
 
-
-    def __getControllerFromProbability(self, currentGeneration, prob):
-        """
-        A support function for genetic algorithms that selects a controller
-        based on the distribution of probabilities for all of their controllers (their
-        contriution to the total score of the generation)
-        """
-        for c in currentGeneration.itervalues():
-            if (c['probability'] < prob):
+        for index in len(generation):
+            member = generation[index]
+            sum += member.getScore()
+            index += 1
+            if sum > parentAIndex and not parentA:
+                parentA = member
+            if sum > parentBIndex and not parentB:
+                parentB = member
+            # == may need to be replaced by 'is' here
+            # Parents cannot be the same.
+            # Randomly select a second new parent
+            if parentA == parentB:
+                parentBIndex = random.randint(0, totalScore)
+                index = 0
+            # Found two valid parents, can exit
+            elif parentA and parentB:
                 break
+        # <TODO> Catch case of no 2 parents found
 
-        return c
-
-        raise NTRTMasterError("Insufficient values to satisfy requested probability")
-
-
+        return (parentA, parentB)
