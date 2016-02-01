@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -44,12 +44,12 @@ public:
     struct RigidAgent
     {
     public:
-        RigidAgent(tgTagSearch s, tgRigidInfo* b) : tagSearch(s), infoFactory(b) 
+        RigidAgent(tgTagSearch s, tgRigidInfo* b) : tagSearch(s), infoFactory(b)
         {}
-        RigidAgent(std::string s, tgRigidInfo* b) : tagSearch(tgTagSearch(s)), infoFactory(b) 
+        RigidAgent(std::string s, tgRigidInfo* b) : tagSearch(tgTagSearch(s)), infoFactory(b)
         {}
         ~RigidAgent();
-        
+
         tgTagSearch tagSearch;
 
         // We own this (@todo: do we?)
@@ -59,9 +59,9 @@ public:
     struct ConnectorAgent
     {
     public:
-        ConnectorAgent(tgTagSearch s, tgConnectorInfo* b) : tagSearch(s), infoFactory(b) 
+        ConnectorAgent(tgTagSearch s, tgConnectorInfo* b) : tagSearch(s), infoFactory(b)
         {}
-        ConnectorAgent(std::string s, tgConnectorInfo* b) : tagSearch(tgTagSearch(s)), infoFactory(b) 
+        ConnectorAgent(std::string s, tgConnectorInfo* b) : tagSearch(tgTagSearch(s)), infoFactory(b)
         {}
         ~ConnectorAgent();
 
@@ -75,22 +75,24 @@ public:
     virtual ~tgBuildSpec();
 
     void addBuilder(std::string tag_search, tgRigidInfo* infoFactory);
-    
+
     void addBuilder(std::string tag_search, tgConnectorInfo* infoFactory);
-    
+
     std::vector<RigidAgent*> getRigidAgents()
     {
         return m_rigidAgents;
     }
-    
+
     std::vector<ConnectorAgent*> getConnectorAgents()
     {
         return m_connectorAgents;
     }
-    
+
 private:
     std::vector<RigidAgent*> m_rigidAgents;
-    std::vector<ConnectorAgent*> m_connectorAgents;  
+    std::vector<ConnectorAgent*> m_connectorAgents;
+
+    bool containsBuilder(std::string space_separated_tags);
 };
 
 #endif

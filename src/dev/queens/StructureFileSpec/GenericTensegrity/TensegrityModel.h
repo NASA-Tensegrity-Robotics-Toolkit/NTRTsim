@@ -115,11 +115,11 @@ private:
      */
     vector<tgSpringCableActuator*> allActuators;
 
-    void addChildren(tgStructure& structure, const Yam& substructures);
+    void addChildren(tgStructure& structure, tgBuildSpec& spec, const Yam& substructures);
 
     void connectChildren(tgStructure& structure, const Yam& linkGroups);
 
-    void connectChild(tgStructure& structure, tgStructure& limbStructure, tgStructure& bodyStructure, const Yam& links);
+    void connectChild(tgStructure& structure, tgStructure& limbStructure, tgStructure& bodyStructure, string tags, const Yam& links);
 
     void findLinkNodes(tgStructure& structure, vector<tgNode*>& limbLinkNodes,
         vector< pair<tgNode*, tgNode*> >& bodyLinkPairs, vector<tgNode*>& bodyLinkPairMidpoints, const Yam& links);

@@ -21,7 +21,7 @@ nodes:
   dist_horiz_right: [8.42, 0, 7.5]
 
 pair_groups:
-  rods:
+  superball_rods:
     # coronal plane
     - ["left_vert_bottom","left_vert_top"]
     - ["right_vert_bottom","right_vert_top"]
@@ -32,7 +32,7 @@ pair_groups:
     - ["dist_horiz_left","dist_horiz_right"]
     - ["prox_horiz_left","prox_horiz_right"]
 
-  muscles:
+  superball_strings:
     - ["left_vert_bottom","bottom_horiz_prox"]
     - ["left_vert_bottom","bottom_horiz_dist"]
     - ["left_vert_bottom","dist_horiz_left"]
@@ -64,20 +64,20 @@ pair_groups:
     - ["top_horiz_dist","dist_horiz_right"]
 
 builders:
-  rods:
+  superball_rods:
     class: "tgRodInfo"
     parameters:
-      density: 0.688,
-      radius: 0.31,
-      friction: 0.99,
-      rollFriction: 0.01,
+      density: 0.688
+      radius: 0.31
+      friction: 0.99
+      rollFriction: 0.01
       restitution: 0.0
-  muscles:
+  superball_strings:
     class: "tgBasicActuatorInfo"
     parameters:
-      stiffness: 613.0,
-      damping: 200.0,
-      pretension: 2452.0,
-      hist: 0,
-      maxTens: 100000,
+      stiffness: 613.0
+      damping: 200.0
+      pretension: 2452.0
+      hist: 0
+      maxTens: 100000
       targetVelocity: 10000

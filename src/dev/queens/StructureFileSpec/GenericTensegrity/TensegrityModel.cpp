@@ -67,7 +67,10 @@ void TensegrityModel::setup(tgWorld& world) {
     // Create a structure that will hold the details of this model
     tgStructure structure;
 
-    addChildren(structure, root["substructures"]);
+    // Create the build spec that uses tags to turn the structure into a real model
+    tgBuildSpec spec;
+
+    addChildren(structure, spec, root["substructures"]);
 
     connectChildren(structure, root["link_groups"]);
 
@@ -77,12 +80,11 @@ void TensegrityModel::setup(tgWorld& world) {
     // Add pairs to the structure
     addPairs(structure, root["pair_groups"]);
 
-    // Create the build spec that uses tags to turn the structure into a real model
-    tgBuildSpec spec;
+
     addBuilders(spec, root["builders"]);
 
     // Move the structure so it doesn't start in the ground
-    structure.move(btVector3(0, 10, 0));
+    structure.move(btVector3(0, 20, 0));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(structure, spec);
@@ -101,7 +103,7 @@ void TensegrityModel::setup(tgWorld& world) {
     tgModel::setup(world);
 }
 
-void TensegrityModel::addChildren(tgStructure& structure, const Yam& substructures) {
+void TensegrityModel::addChildren(tgStructure& structure, tgBuildSpec& spec, const Yam& substructures) {
     if (!substructures) return;
     for (YAML::const_iterator substructure = substructures.begin(); substructure!=substructures.end(); ++substructure) {
         tgStructure* childStructure = new tgStructure();
@@ -111,6 +113,7 @@ void TensegrityModel::addChildren(tgStructure& structure, const Yam& substructur
         addPairs(*childStructure, childRoot["pair_groups"]);
         childStructure->addTags(name);
         structure.addChild(childStructure);
+        addBuilders(spec, childRoot["builders"]);
     }
 }
 
@@ -118,21 +121,22 @@ void TensegrityModel::connectChildren(tgStructure& structure, const Yam& linkGro
     if (!linkGroups) return;
     for (YAML::const_iterator linkPairGroup = linkGroups.begin(); linkPairGroup!=linkGroups.end(); ++linkPairGroup) {
 
-        Yam links = linkPairGroup->second;
+        string groupTags = linkPairGroup->first.as<string>();
+        Yam groupLinks = linkPairGroup->second;
 
-        string limbStructureNodePath = links.begin()->first.as<string>();
+        string limbStructureNodePath = groupLinks.begin()->first.as<string>();
         string limbStructureName = limbStructureNodePath.substr(0, limbStructureNodePath.find("/"));
         tgStructure& limbStructure = structure.findFirstChild(limbStructureName);
 
-        string bodyStructureNodePath = links.begin()->second[0].as<string>();
+        string bodyStructureNodePath = groupLinks.begin()->second[0].as<string>();
         string bodyStructureName = bodyStructureNodePath.substr(0, bodyStructureNodePath.find("/"));
         tgStructure& bodyStructure = structure.findFirstChild(bodyStructureName);
 
-        connectChild(structure, limbStructure, bodyStructure, links);
+        connectChild(structure, limbStructure, bodyStructure, groupTags, groupLinks);
     }
 }
 
-void TensegrityModel::connectChild(tgStructure& structure, tgStructure& limbStructure, tgStructure& bodyStructure, const Yam& links) {
+void TensegrityModel::connectChild(tgStructure& structure, tgStructure& limbStructure, tgStructure& bodyStructure, string tags, const Yam& links) {
     if (!links) return;
 
     vector<tgNode*> limbLinkNodes;
@@ -152,8 +156,8 @@ void TensegrityModel::connectChild(tgStructure& structure, tgStructure& limbStru
         }
 
         // make new connections
-        structure.addPair(*(bodyLinkPairs[i].first), *limbLinkNodes[i], "muscles");
-        structure.addPair(*limbLinkNodes[i], *(bodyLinkPairs[i].second), "muscles");
+        structure.addPair(*(bodyLinkPairs[i].first), *limbLinkNodes[i], tags);
+        structure.addPair(*limbLinkNodes[i], *(bodyLinkPairs[i].second), tags);
 
     }
 }
@@ -207,6 +211,7 @@ void TensegrityModel::rotateAndTranslate(tgStructure& limbStructure, vector<tgNo
     // rotate and translate
     limbStructure.addRotation(limbLinkNodesCentroid, limbPlaneNormal, bodyPlaneNormal);
     limbStructure.move(bodyLinkNodesCentroid - limbLinkNodesCentroid);
+    limbStructure.addRotation(bodyLinkNodesCentroid, *limbLinkNodes[0] - bodyLinkNodesCentroid, *bodyLinkPairMidpoints[0] - bodyLinkNodesCentroid);
 }
 
 btVector3 TensegrityModel::getCentroid(const vector<tgNode*>& points) const {
@@ -251,29 +256,65 @@ void TensegrityModel::addPairs(tgStructure& structure, const Yam& pair_groups)
 }
 
 void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
+
+    map<string, double> rodParameters;
+    map<string, double> stringParameters;
+
     // default rod params
-    double radius = 0.5;
-    double density = 1.0;
-    double friction = 1.0;
-    double rollFriction = 0.0;
-    double restitution = 0.2;
+    rodParameters["radius"] = 0.5;
+    rodParameters["density"] = 1.0;
+    rodParameters["friction"] = 1.0;
+    rodParameters["rollFriction"] = 0.0;
+    rodParameters["restitution"] = 0.2;
 
     // default muscle params
-    double stiffness = 1000.0;
-    double damping = 10.0;
-    double pretension = 0.0;
-    double hist = false;
-    double maxTens = 1000.0;
-    double targetVelocity = 100.0;
-    double minActualLength = 0.1;
-    double minRestLength = 0.1;
-    double rotation = 0;
+    stringParameters["stiffness"] = 1000.0;
+    stringParameters["damping"] = 10.0;
+    stringParameters["pretension"] = 0.0;
+    stringParameters["hist"] = 0;
+    stringParameters["maxTens"] = 1000.0;
+    stringParameters["targetVelocity"] = 100.0;
+    stringParameters["minActualLength"] = 0.1;
+    stringParameters["minRestLength"] = 0.1;
+    stringParameters["rotation"] = 0;
 
-    // Define the configurations of the rods and strings
-    const tgRod::Config* rodConfig = new tgRod::Config(radius, density, friction, rollFriction, restitution);
-    spec.addBuilder("rods", new tgRodInfo(*rodConfig));
-    const tgBasicActuator::Config* muscleConfig = new tgBasicActuator::Config(stiffness, damping, pretension, hist, maxTens, targetVelocity, minActualLength, minRestLength, rotation);
-    spec.addBuilder("muscles", new tgBasicActuatorInfo(*muscleConfig));
+    if (!builders || builders.size() == 0) {
+        const tgRod::Config* rodConfig = new tgRod::Config(rodParameters["radius"], rodParameters["density"],
+            rodParameters["friction"], rodParameters["rollFriction"], rodParameters["restitution"]);
+        spec.addBuilder("rods", new tgRodInfo(*rodConfig));
+        const tgBasicActuator::Config* muscleConfig = new tgBasicActuator::Config(stringParameters["stiffness"], stringParameters["damping"],
+            stringParameters["pretension"], stringParameters["hist"], stringParameters["maxTens"], stringParameters["targetVelocity"],
+            stringParameters["minActualLength"], stringParameters["minRestLength"], stringParameters["rotation"]);
+        spec.addBuilder("strings", new tgBasicActuatorInfo(*muscleConfig));
+    }
+
+    for (YAML::const_iterator builder = builders.begin(); builder!=builders.end(); ++builder) {
+        string tag_match = builder->first.as<string>();
+        string builderClass = builder->second["class"].as<string>();
+        Yam parameters = builder->second["parameters"];
+        if (builderClass == "tgRodInfo") {
+            for (YAML::const_iterator parameter = parameters.begin(); parameter!=parameters.end(); ++parameter) {
+                rodParameters[parameter->first.as<string>()] = parameter->second.as<double>();
+            }
+            const tgRod::Config* rodConfig = new tgRod::Config(rodParameters["radius"], rodParameters["density"],
+                rodParameters["friction"], rodParameters["rollFriction"], rodParameters["restitution"]);
+            spec.addBuilder(tag_match, new tgRodInfo(*rodConfig));
+        }
+        else {
+            for (YAML::const_iterator parameter = parameters.begin(); parameter!=parameters.end(); ++parameter) {
+                stringParameters[parameter->first.as<string>()] = parameter->second.as<double>();
+            }
+            if (builderClass == "tgBasicActuatorInfo") {
+                const tgBasicActuator::Config* muscleConfig = new tgBasicActuator::Config(stringParameters["stiffness"], stringParameters["damping"],
+                    stringParameters["pretension"], stringParameters["hist"], stringParameters["maxTens"], stringParameters["targetVelocity"],
+                    stringParameters["minActualLength"], stringParameters["minRestLength"], stringParameters["rotation"]);
+                spec.addBuilder(tag_match, new tgBasicActuatorInfo(*muscleConfig));
+            }
+            else {
+                throw invalid_argument(builderClass + " builder class is not supported.");
+            }
+        }
+    }
 }
 
 void TensegrityModel::step(double dt)
