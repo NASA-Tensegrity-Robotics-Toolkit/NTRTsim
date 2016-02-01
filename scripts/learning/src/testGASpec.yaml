@@ -1,0 +1,74 @@
+
+PathInfo:
+    trialPath: "bmirletz/GATests/"                      # All files have this base name
+    fileName: "monteOut"
+    executable: "./../../../build/dev/btietz/GATests/AppJSONLearningTests"
+    seedDirectory: "/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/GATestsYAMLSeed/"                                     # Path to directory holding ONLY seed members
+TrialProperties:
+    learningType: "controller"                          # ["controller", "parameter", "structure"]
+    trialLength: 3000
+    generationCount: 1
+    generationSize: 40
+    scoreMethod: "average"                              # ["average", "max"]
+    fitnessFunction: "distance"
+    terrains:
+        - "flat"                                    # Terrains are referenced by the YAML definitions
+
+nodeVals:
+    Algorithms:
+        MonteCarlo:
+            spawnCount: 100
+    NeuralNetwork:
+        numberOfStates: 0
+        numberOfOutputs: 5
+        numberOfInstances: 1
+    PopulationSize: 1
+    Ranges:
+        params:
+                min: 0
+                max: 1
+
+edgeVals:
+    Algorithms:
+        MonteCarlo:
+            spawnCount: 100
+    NeuralNetwork:
+        numberOfStates: 0
+        numberOfOutputs: 1
+        numberOfInstances: 15
+    PopulationSize: 2
+    Ranges:
+        params:
+                min: 0
+                max: 1
+
+feedbackVals:
+    Algorithms:
+        MonteCarlo:
+            spawnCount: 100
+    NeuralNetwork:
+        numberOfStates: 2
+        numberOfOutputs: 5
+        numberOfHidden: 5
+        numberOfInstances: 1
+    PopulationSize: 40
+    Ranges:
+        neuralParams:
+                min: -1
+                max: 1
+
+goalVals:
+    Algorithms:
+        MonteCarlo:
+            spawnCount: 100
+    NeuralNetwork:
+        numberOfStates: 5
+        numberOfOutputs: 5
+        numberOfHidden: 5
+        numberOfInstances: 1
+    PopulationSize: 1
+    Ranges:
+        neuralParams:
+                min: -1
+                max: 1
+
