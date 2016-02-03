@@ -8,6 +8,7 @@ subdirs(
     BigPuppy_SymmetricArching
     BigPuppy_SymmetricSpiral1
     BigPuppy_SymmetricSpiral2
+    BigPuppy_SymmetricSpiral_Segments
     BigPuppy_SpineOnly
     BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
