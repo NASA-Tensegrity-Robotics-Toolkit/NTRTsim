@@ -83,7 +83,11 @@ JSONSegmentsFeedbackControl::Config::Config(int ss,
                                         double pfMin,
                                         double pfMax,
 					double maxH,
-					double minH) :
+					double minH,
+					int ohm,
+					int thm,
+					int olm,
+					int tlm) :
 JSONQuadCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
@@ -93,7 +97,11 @@ ampFeedbackMax(afMax),
 phaseFeedbackMin(pfMin),
 phaseFeedbackMax(pfMax),
 maxHeight(maxH),
-minHeight(minH)
+minHeight(minH),
+ourHipMuscles(ohm),
+theirHipMuscles(thm),
+ourLegMuscles(olm),
+theirLegMuscles(tlm)
 {
     
 }
@@ -119,7 +127,7 @@ JSONSegmentsFeedbackControl::~JSONSegmentsFeedbackControl()
 
 void JSONSegmentsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
-    m_pCPGSys = new CPGEquationsFB(100);
+    m_pCPGSys = new CPGEquationsFB(2000);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -136,16 +144,26 @@ void JSONSegmentsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     // such member.
     Json::Value nodeVals = root.get("nodeVals", "UTF-8");
     Json::Value edgeVals = root.get("edgeVals", "UTF-8");
+    //New sets of -Vals for hips/shoulders and legs:
+    Json::Value hipEdgeVals = root.get("hipEdgeVals", "UTF-8");
+    Json::Value legEdgeVals = root.get("legEdgeVals", "UTF-8");
     
     std::cout << nodeVals << std::endl;
     
     nodeVals = nodeVals.get("params", "UTF-8");
     edgeVals = edgeVals.get("params", "UTF-8");
+    //New sets of -Vals for hips/shoulders and legs:
+    hipEdgeVals = hipEdgeVals.get("params", "UTF-8");
+    legEdgeVals = legEdgeVals.get("params", "UTF-8");
     
-    array_4D edgeParams = scaleEdgeActions(edgeVals);
+    array_4D edgeParams = scaleEdgeActions(edgeVals,m_config.theirMuscles,m_config.ourMuscles);
+    //New sets of Params for hips/shoulders and legs:
+    array_4D hipEdgeParams = scaleEdgeActions(hipEdgeVals,m_config.theirHipMuscles,m_config.ourHipMuscles);
+    array_4D legEdgeParams = scaleEdgeActions(legEdgeVals,m_config.theirLegMuscles,m_config.ourLegMuscles);
+
     array_2D nodeParams = scaleNodeActions(nodeVals);
 
-    setupCPGs(subject, nodeParams, edgeParams);
+    setupCPGs(subject, nodeParams, edgeParams, hipEdgeParams, legEdgeParams);
     
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
@@ -261,17 +279,48 @@ void JSONSegmentsFeedbackControl::onStep(BaseQuadModelLearning& subject, double 
 		//Clear the metrics vector for ease of adding tensions. 
 		//metrics.clear();
 
+		//Print out all spine tensions and lengths: 
 		std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
 
 		for(std::size_t i=0; i<tmpStrings.size(); i++)
 		{
-		    std::cout << "Muscle Tension " << i << ": " << tmpStrings[i]->getTension() << std::endl;
+		    std::cout << "Spine Muscle Tension " << i << ": " << tmpStrings[i]->getTension() << std::endl;
 		}
 		std::cout << std::endl;
 		
 		for(std::size_t i=0; i<tmpStrings.size(); i++)
 		{
-		    std::cout << "Muscle Length " << i << ": " << tmpStrings[i]->getCurrentLength() << std::endl;
+		    std::cout << "Spine Muscle Length " << i << ": " << tmpStrings[i]->getCurrentLength() << std::endl;
+		}
+		std::cout << std::endl;
+
+		//Print out all hip tensions and lengths:
+		std::vector<tgSpringCableActuator* > tmpHipStrings = subject.find<tgSpringCableActuator> ("hip ");
+
+		for(std::size_t i=0; i<tmpHipStrings.size(); i++)
+		{
+		    std::cout << "Hip Muscle Tension " << i << ": " << tmpHipStrings[i]->getTension() << std::endl;
+		}
+		std::cout << std::endl;
+
+		for(std::size_t i=0; i<tmpHipStrings.size(); i++)
+		{
+		    std::cout << "Hip Muscle Length " << i << ": " << tmpHipStrings[i]->getCurrentLength() << std::endl;
+		}
+		std::cout << std::endl;
+
+		//Print out all leg tensions and lengths:
+		std::vector<tgSpringCableActuator* > tmpLegStrings = subject.find<tgSpringCableActuator> ("leg ");
+
+		for(std::size_t i=0; i<tmpLegStrings.size(); i++)
+		{
+		    std::cout << "Leg Muscle Tension " << i << ": " << tmpLegStrings[i]->getTension() << std::endl;
+		}
+		std::cout << std::endl;
+
+		for(std::size_t i=0; i<tmpLegStrings.size(); i++)
+		{
+		    std::cout << "Leg Muscle Length " << i << ": " << tmpLegStrings[i]->getCurrentLength() << std::endl;
 		}
 		std::cout << std::endl;
 
@@ -312,6 +361,7 @@ void JSONSegmentsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
+    //Calculating total enery for spine:
     std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
     
     for(std::size_t i=0; i<tmpStrings.size(); i++)
@@ -323,6 +373,48 @@ void JSONSegmentsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
             const double previousTension = stringHist.tensionHistory[j-1];
             const double previousLength = stringHist.restLengths[j-1];
             const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    
+    //Repeating the process for hips:
+    std::vector<tgSpringCableActuator* > tmpHipStrings = subject.find<tgSpringCableActuator> ("hip ");
+    
+    for(std::size_t i=0; i<tmpHipStrings.size(); i++)
+    {
+        tgSpringCableActuator::SpringCableActuatorHistory stringHipHist = tmpHipStrings[i]->getHistory();
+        
+        for(std::size_t j=1; j<stringHipHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHipHist.tensionHistory[j-1];
+            const double previousLength = stringHipHist.restLengths[j-1];
+            const double currentLength = stringHipHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    
+    //Repeating the process for legs:
+    std::vector<tgSpringCableActuator* > tmpLegStrings = subject.find<tgSpringCableActuator> ("leg ");
+    
+    for(std::size_t i=0; i<tmpLegStrings.size(); i++)
+    {
+        tgSpringCableActuator::SpringCableActuatorHistory stringLegHist = tmpLegStrings[i]->getHistory();
+        
+        for(std::size_t j=1; j<stringLegHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringLegHist.tensionHistory[j-1];
+            const double previousLength = stringLegHist.restLengths[j-1];
+            const double currentLength = stringLegHist.restLengths[j];
             //TODO: examine this assumption - free spinning motor may require more power
             double motorSpeed = (currentLength-previousLength);
             if(motorSpeed > 0) // Vestigial code
@@ -389,10 +481,12 @@ void JSONSegmentsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     m_spineControllers.clear();    
 }
 
-void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
+void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions, array_4D hipEdgeActions, array_4D legEdgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
+    std::vector <tgSpringCableActuator*> hipMuscles = subject.find<tgSpringCableActuator> ("hip ");
+    std::vector <tgSpringCableActuator*> legMuscles = subject.find<tgSpringCableActuator> ("leg ");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
     
@@ -430,7 +524,156 @@ void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arra
 			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
 		}
     }
+    
+    for (std::size_t i = 0; i < hipMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        hipMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeActions);
+        
+        m_hipControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_hipControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_hipControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_hipControllers, hipEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    for (std::size_t i = 0; i < legMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        legMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeActions);
+        
+        m_legControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_legControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_legControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_legControllers, legEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
 	
+}
+
+array_4D JSONSegmentsFeedbackControl::scaleEdgeActions  
+                            (Json::Value edgeParam, int theirMuscles, int ourMuscles)
+{
+    assert(edgeParam[0].size() == 2);
+    
+    double lowerLimit = m_config.lowPhase;
+    double upperLimit = m_config.highPhase;
+    double range = upperLimit - lowerLimit;
+    
+    array_4D actionList(boost::extents[m_config.segmentSpan][theirMuscles][ourMuscles][m_config.params]);
+    
+    /* Horrid while loop to populate upper diagonal of matrix, since
+    * its symmetric and we want to minimze parameters used in learing
+    * note that i==1, j==k will refer to the same muscle
+    * @todo use boost to set up array so storage is only allocated for 
+    * elements that are used
+    */
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    
+    // Quirk of the old learning code. Future examples can move forward
+    Json::Value::iterator edgeIt = edgeParam.end();
+    
+    int count = 0;
+    
+    while (i < m_config.segmentSpan)
+    {
+        while(j < theirMuscles)
+        {
+            while(k < ourMuscles)
+            {
+                if (edgeIt == edgeParam.begin())
+                {
+                    std::cout << "ran out before table populated!"
+                    << std::endl;
+                    /// @todo consider adding exception here
+                    break;
+                }
+                else
+                {
+                    if (i == 1 && j == k)
+                    {
+                        // std::cout << "Skipped identical muscle" << std::endl;
+                        //Skip since its the same muscle
+                    }
+                    else
+                    {
+                        edgeIt--;
+                        Json::Value edgeParam = *edgeIt;
+                        assert(edgeParam.size() == 2);
+                        // Weight from 0 to 1
+                        actionList[i][j][k][0] = edgeParam[0].asDouble();
+                        //std::cout << actionList[i][j][k][0] << " ";
+                        // Phase offset from -pi to pi
+                        actionList[i][j][k][1] = edgeParam[1].asDouble() * 
+                                                (range) + lowerLimit;
+                        //std::cout <<  actionList[i][j][k][1] << std::endl;
+                        count++;
+                    }
+                }
+                k++;
+            }
+            j++;
+            k = j;
+            
+        }
+        j = 0;
+        k = 0;
+        i++;
+    }
+    
+    std::cout<< "Params used: " << count << std::endl;
+    
+    assert(edgeParam.begin() == edgeIt);
+    
+    return actionList;
 }
 
 array_2D JSONSegmentsFeedbackControl::scaleNodeActions (Json::Value actions)
@@ -488,6 +731,65 @@ std::vector<double> JSONSegmentsFeedbackControl::getFeedback(BaseQuadModelLearni
         std::vector< std::vector<double> > actions;
         
         const tgSpringCableActuator& cable = *(spineCables[i]);
+        std::vector<double > state = getCableState(cable);
+        
+        // Rescale to 0 to 1 (consider doing this inside getState
+        for (std::size_t i = 0; i < state.size(); i++)
+        {
+            inputs[i]=state[i] / 2.0 + 0.5;
+        }
+        
+        double *output = nn->feedForwardPattern(inputs);
+        vector<double> tmpAct;
+        for(int j=0;j<m_config.numActions;j++)
+        {
+            tmpAct.push_back(output[j]);
+        }
+        actions.push_back(tmpAct);
+
+        std::vector<double> cableFeedback = transformFeedbackActions(actions);
+        
+        feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
+    }
+    
+    //Doing the same for the hips and legs... consider changing this to allMuscles, by including the short muscles in the spine, to shorten this function. 
+    const std::vector<tgSpringCableActuator*>& hipCables = subject.find<tgSpringCableActuator> ("hip ");
+    
+    std::size_t n2 = hipCables.size();
+    for(std::size_t i = 0; i != n2; i++)
+    {
+        std::vector< std::vector<double> > actions;
+        
+        const tgSpringCableActuator& cable = *(hipCables[i]);
+        std::vector<double > state = getCableState(cable);
+        
+        // Rescale to 0 to 1 (consider doing this inside getState
+        for (std::size_t i = 0; i < state.size(); i++)
+        {
+            inputs[i]=state[i] / 2.0 + 0.5;
+        }
+        
+        double *output = nn->feedForwardPattern(inputs);
+        vector<double> tmpAct;
+        for(int j=0;j<m_config.numActions;j++)
+        {
+            tmpAct.push_back(output[j]);
+        }
+        actions.push_back(tmpAct);
+
+        std::vector<double> cableFeedback = transformFeedbackActions(actions);
+        
+        feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
+    }
+
+    const std::vector<tgSpringCableActuator*>& legCables = subject.find<tgSpringCableActuator> ("leg ");
+    
+    std::size_t n3 = legCables.size();
+    for(std::size_t i = 0; i != n3; i++)
+    {
+        std::vector< std::vector<double> > actions;
+        
+        const tgSpringCableActuator& cable = *(legCables[i]);
         std::vector<double > state = getCableState(cable);
         
         // Rescale to 0 to 1 (consider doing this inside getState

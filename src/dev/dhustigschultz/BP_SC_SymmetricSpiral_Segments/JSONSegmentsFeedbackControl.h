@@ -55,8 +55,8 @@ struct Config : public JSONQuadCPGControl::Config
          * The only constructor. 
          */
         Config( int ss,
-        int tm,
-        int om,
+        int tm,	//These now apply to spine segments only.
+        int om, //Same.
         int param,
         int segnum = 6,
         double ct = 0.1,
@@ -78,7 +78,11 @@ struct Config : public JSONQuadCPGControl::Config
         double pfMin = 0.0,
         double pfMax = 0.0,
 	double maxH = 60.0, //May need to tune this value more
-	double minH = 1.0   //Perhaps same
+	double minH = 1.0,   //Perhaps same
+	int ohm = 10,
+	int thm = 10,
+	int olm = 10,
+	int tlm = 10
         );
         
         const double freqFeedbackMin;
@@ -91,10 +95,16 @@ struct Config : public JSONQuadCPGControl::Config
 	const double maxHeight;
 	const double minHeight;
         
-        // Values to be filled in by JSON file during onSetup
+        // Values to be filled in by JSON file during onSetup:
         int numStates;
         int numActions;
         
+	// New values of numMuscles, for non-spine segments:
+	int ourHipMuscles;
+	int theirHipMuscles;
+	int ourLegMuscles;
+	int theirLegMuscles;
+
     };
 
     JSONSegmentsFeedbackControl(JSONSegmentsFeedbackControl::Config config,	
@@ -111,8 +121,10 @@ struct Config : public JSONQuadCPGControl::Config
 	
 protected:
 
-    virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
-    
+    virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions, array_4D hipEdgeActions, array_4D legEdgeActions);
+
+
+    virtual array_4D scaleEdgeActions (Json::Value actions, int theirMuscles, int ourMuscles);    
     virtual array_2D scaleNodeActions (Json::Value actions);
     
     std::vector<double> getFeedback(BaseQuadModelLearning& subject);
@@ -124,6 +136,8 @@ protected:
     JSONSegmentsFeedbackControl::Config m_config;
 
     std::vector<tgCPGActuatorControl*> m_spineControllers;
+    std::vector<tgCPGActuatorControl*> m_hipControllers;
+    std::vector<tgCPGActuatorControl*> m_legControllers;
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;

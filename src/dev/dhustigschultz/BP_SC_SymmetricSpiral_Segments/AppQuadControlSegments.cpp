@@ -84,8 +84,8 @@ bool AppQuadControlSegments::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 16; //This may be ok, but confirm. 
+        const int segmentSpan = 3; 
+        const int numMuscles = 16; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -114,6 +114,10 @@ bool AppQuadControlSegments::setup()
 	const double maxH = 30.0;
 	const double minH = 1.0;
 
+	// New params for number of muscles in hips/legs:
+	const int numHipMuscles = 20;
+	const int numLegMuscles = 20;
+
         JSONSegmentsFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
@@ -138,7 +142,11 @@ bool AppQuadControlSegments::setup()
                                                     pfMin,
                                                     pfMax,
 						    maxH,
-						    minH);
+						    minH,
+						    numHipMuscles,
+						    numHipMuscles,
+						    numLegMuscles,
+						    numLegMuscles);
         /// @todo fix memory leak that occurs here
        JSONSegmentsFeedbackControl* const myControl =
         new JSONSegmentsFeedbackControl(control_config, suffix, lowerPath);

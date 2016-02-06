@@ -329,19 +329,19 @@ void BigPuppySymmetricSpiralSegments::addMuscles(tgStructure& puppy){
     //puppy.addPair(n1[3], n5[2], tgString("spine left lateral arching muscleAct seg", 1) + tgString(" seg", 5));
     
     //Left shoulder muscles
-    puppy.addPair(n7[1], n1[1], tgString("left shoulder rear upper muscleAct seg", 6) + tgString(" seg", 1));
-    puppy.addPair(n7[1], n1[4], tgString("left shoulder front upper muscleAct seg", 6) + tgString(" seg", 1));
-    puppy.addPair(n7[1], n0[2], tgString("left shoulder front top muscleAct seg", 6) + tgString(" seg", 0));
-    puppy.addPair(n7[1], n2[3], tgString("left shoulder rear top muscleAct seg", 6) + tgString(" seg", 2));
+    puppy.addPair(n7[1], n1[1], tgString("left hip shoulder rear upper muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[1], n1[4], tgString("left hip shoulder front upper muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[1], n0[2], tgString("left hip shoulder front top muscleAct seg", 6) + tgString(" seg", 0));
+    puppy.addPair(n7[1], n2[3], tgString("left hip shoulder rear top muscleAct seg", 6) + tgString(" seg", 2));
 
-    puppy.addPair(n7[3], n1[1], tgString("left shoulder rear lower muscleAct seg", 6) + tgString(" seg", 1));
-    puppy.addPair(n7[3], n1[4], tgString("left shoulder front lower muscleAct seg", 6) + tgString(" seg", 1));
-    puppy.addPair(n7[3], n0[1], tgString("left shoulder front bottom muscleAct seg", 6) + tgString(" seg", 0));
-    puppy.addPair(n7[3], n2[4], tgString("left shoulder rear bottom muscleAct seg", 6) + tgString(" seg", 2));
+    puppy.addPair(n7[3], n1[1], tgString("left hip shoulder rear lower muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[3], n1[4], tgString("left hip shoulder front lower muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[3], n0[1], tgString("left hip shoulder front bottom muscleAct seg", 6) + tgString(" seg", 0));
+    puppy.addPair(n7[3], n2[4], tgString("left hip shoulder rear bottom muscleAct seg", 6) + tgString(" seg", 2));
 
     //Extra muscles, to move left shoulder forward and back:
-    puppy.addPair(n7[0], n1[1], tgString("left shoulder rear mid muscleAct seg", 6) + tgString(" seg", 1));
-    puppy.addPair(n7[0], n1[4], tgString("left shoulder front mid muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[0], n1[1], tgString("left hip shoulder rear mid muscleAct seg", 6) + tgString(" seg", 1));
+    puppy.addPair(n7[0], n1[4], tgString("left hip shoulder front mid muscleAct seg", 6) + tgString(" seg", 1));
 
     //Left hip muscles
     puppy.addPair(n8[1], n5[1], tgString("left hip rear upper muscleAct seg", 7) + tgString(" seg", 5));
@@ -355,23 +355,23 @@ void BigPuppySymmetricSpiralSegments::addMuscles(tgStructure& puppy){
     puppy.addPair(n8[3], n6[4], tgString("left hip front bottom muscleAct seg", 7) + tgString(" seg", 6));
 
     //Extra muscles, to move left hip forward and back:
-    puppy.addPair(n8[0], n5[1], tgString("left hip rear mid muscleAct seg", 7) + tgString(" seg", 3)); //could also be n3[3]
+    puppy.addPair(n8[0], n5[1], tgString("left hip rear mid muscleAct seg", 7) + tgString(" seg", 3)); 
     puppy.addPair(n8[0], n5[4], tgString("left hip front mid muscleAct seg", 7) + tgString(" seg", 5));
 
     //Right shoulder muscles
-    puppy.addPair(n9[1], n1[2], tgString("right shoulder rear upper muscleAct seg", 8) + tgString(" seg", 1));
-    puppy.addPair(n9[1], n1[3], tgString("right shoulder front upper muscleAct seg", 8) + tgString(" seg", 1));
-    puppy.addPair(n9[1], n0[2], tgString("right shoulder front top muscleAct seg", 8) + tgString(" seg", 0));
-    puppy.addPair(n9[1], n2[3], tgString("right shoulder rear top muscleAct seg", 8) + tgString(" seg", 2));
+    puppy.addPair(n9[1], n1[2], tgString("right hip shoulder rear upper muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[1], n1[3], tgString("right hip shoulder front upper muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[1], n0[2], tgString("right hip shoulder front top muscleAct seg", 8) + tgString(" seg", 0));
+    puppy.addPair(n9[1], n2[3], tgString("right hip shoulder rear top muscleAct seg", 8) + tgString(" seg", 2));
 
-    puppy.addPair(n9[3], n1[2], tgString("right shoulder rear lower muscleAct seg", 8) + tgString(" seg", 1));
-    puppy.addPair(n9[3], n1[3], tgString("right shoulder front lower muscleAct seg", 8) + tgString(" seg", 1));
-    puppy.addPair(n9[3], n0[1], tgString("right shoulder front bottom muscleAct seg", 8) + tgString(" seg", 0));
-    puppy.addPair(n9[3], n2[4], tgString("right shoulder rear bottom muscleAct seg", 8) + tgString(" seg", 2));
+    puppy.addPair(n9[3], n1[2], tgString("right hip shoulder rear lower muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[3], n1[3], tgString("right hip shoulder front lower muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[3], n0[1], tgString("right hip shoulder front bottom muscleAct seg", 8) + tgString(" seg", 0));
+    puppy.addPair(n9[3], n2[4], tgString("right hip shoulder rear bottom muscleAct seg", 8) + tgString(" seg", 2));
 
     //Extra muscles, to move right shoulder forward and back:
-    puppy.addPair(n9[0], n1[2], tgString("right shoulder rear mid muscleAct seg", 8) + tgString(" seg", 1));
-    puppy.addPair(n9[0], n1[3], tgString("right shoulder front mid muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[0], n1[2], tgString("right hip shoulder rear mid muscleAct seg", 8) + tgString(" seg", 1));
+    puppy.addPair(n9[0], n1[3], tgString("right hip shoulder front mid muscleAct seg", 8) + tgString(" seg", 1));
 
     //Right hip muscles
     puppy.addPair(n10[1], n5[2], tgString("right hip rear upper muscleAct seg", 9) + tgString(" seg", 5));
@@ -391,72 +391,72 @@ void BigPuppySymmetricSpiralSegments::addMuscles(tgStructure& puppy){
     //Leg/hip connections:
 
     //Left front leg/shoulder
-    puppy.addPair(n11[4], n7[3], tgString("right outer bicep muscle seg", 10) + tgString(" seg", 6));
-    puppy.addPair(n11[4], n7[2], tgString("right inner bicep muscle seg", 10) + tgString(" seg", 6));
-    puppy.addPair(n11[4], n1[4], tgString("right front abdomen connection muscle seg", 10) + tgString(" seg", 1));
-    puppy.addPair(n11[3], n1[1],tgString("right front abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
-    puppy.addPair(n11[2], n1[4],tgString("right front abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n11[4], n7[3], tgString("right leg outer bicep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[4], n7[2], tgString("right leg inner bicep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[4], n1[4], tgString("right leg front abdomen connection muscle seg", 10) + tgString(" seg", 1));
+    puppy.addPair(n11[3], n1[1],tgString("right leg front abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n11[2], n1[4],tgString("right leg front abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
 
-    puppy.addPair(n11[3], n7[3], tgString("right outer tricep muscle seg", 10) + tgString(" seg", 6));
-    puppy.addPair(n11[3], n7[2], tgString("right inner tricep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[3], n7[3], tgString("right leg outer tricep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[3], n7[2], tgString("right leg inner tricep muscle seg", 10) + tgString(" seg", 6));
 
-    puppy.addPair(n11[2], n7[3], tgString("right outer front tricep muscle seg", 10) + tgString(" seg", 6));
-    puppy.addPair(n11[2], n7[2], tgString("right inner front tricep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[2], n7[3], tgString("right leg outer front tricep muscle seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[2], n7[2], tgString("right leg inner front tricep muscle seg", 10) + tgString(" seg", 6));
 
     //Adding muscle to pull up on right front leg:
-    puppy.addPair(n11[4], n7[1], tgString("right mid bicep muscle3 seg", 10) + tgString(" seg", 6));
+    puppy.addPair(n11[4], n7[1], tgString("right leg mid bicep muscle3 seg", 10) + tgString(" seg", 6));
     
     //Right front leg/shoulder
-    puppy.addPair(n13[4], n9[2], tgString("left inner bicep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n13[4], n9[3], tgString("left outer bicep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n13[4], n1[3], tgString("left front abdomen connection muscle seg", 12) + tgString(" seg", 1));
-    puppy.addPair(n13[3], n1[2], tgString("left front abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
-    puppy.addPair(n13[2], n1[3], tgString("left front abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n13[4], n9[2], tgString("left leg inner bicep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[4], n9[3], tgString("left leg outer bicep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[4], n1[3], tgString("left leg front abdomen connection muscle seg", 12) + tgString(" seg", 1));
+    puppy.addPair(n13[3], n1[2], tgString("left leg front abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n13[2], n1[3], tgString("left leg front abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
 
 
-    puppy.addPair(n13[3], n9[2], tgString("left inner tricep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n13[3], n9[3], tgString("left outer tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[3], n9[2], tgString("left leg inner tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[3], n9[3], tgString("left leg outer tricep muscle seg", 12) + tgString(" seg", 8));
 
-    puppy.addPair(n13[2], n9[2], tgString("left inner front tricep muscle seg", 12) + tgString(" seg", 8));
-    puppy.addPair(n13[2], n9[3], tgString("left outer front tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[2], n9[2], tgString("left leg inner front tricep muscle seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[2], n9[3], tgString("left leg outer front tricep muscle seg", 12) + tgString(" seg", 8));
 
     //Adding muscle to pull up on left front leg:
-    puppy.addPair(n13[4], n9[1], tgString("left mid bicep muscle3 seg", 12) + tgString(" seg", 8));
+    puppy.addPair(n13[4], n9[1], tgString("left leg mid bicep muscle3 seg", 12) + tgString(" seg", 8));
 
     //Left rear leg/hip
-    puppy.addPair(n12[4], n8[3], tgString("right outer thigh muscle seg", 11) + tgString(" seg", 7)); 
-    puppy.addPair(n12[4], n8[2], tgString("right inner thigh muscle seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[4], n8[3], tgString("right leg outer thigh muscle seg", 11) + tgString(" seg", 7)); 
+    puppy.addPair(n12[4], n8[2], tgString("right leg inner thigh muscle seg", 11) + tgString(" seg", 7));
 
-    puppy.addPair(n12[4], n3[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 3)); 
-    puppy.addPair(n12[3], n5[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
-    puppy.addPair(n12[2], n5[4],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n12[4], n3[1],tgString("right leg rear abdomen connection muscle seg", 11) + tgString(" seg", 3)); 
+    puppy.addPair(n12[3], n5[1],tgString("right leg rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n12[2], n5[4],tgString("right leg rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
 
-    puppy.addPair(n12[3], n8[3], tgString("right outer calf muscle seg", 11) + tgString(" seg", 7));
-    puppy.addPair(n12[3], n8[2], tgString("right inner calf muscle seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[3], n8[3], tgString("right leg outer calf muscle seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[3], n8[2], tgString("right leg inner calf muscle seg", 11) + tgString(" seg", 7));
 
-    puppy.addPair(n12[2], n8[3], tgString("right outer front calf muscle seg", 11) + tgString(" seg", 7));
-    puppy.addPair(n12[2], n8[2], tgString("right inner front calf muscle seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[2], n8[3], tgString("right leg outer front calf muscle seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[2], n8[2], tgString("right leg inner front calf muscle seg", 11) + tgString(" seg", 7));
 
     //Adding muscle to pull rear right leg up:
-    puppy.addPair(n12[4], n8[1], tgString("right central thigh muscle3 seg", 11) + tgString(" seg", 7));
+    puppy.addPair(n12[4], n8[1], tgString("right leg central thigh muscle3 seg", 11) + tgString(" seg", 7));
 
     //Right rear leg/hip
-    puppy.addPair(n14[4], n10[2], tgString("left inner thigh muscle seg", 13) + tgString(" seg", 9)); 
-    puppy.addPair(n14[4], n10[3], tgString("left outer thigh muscle seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[4], n10[2], tgString("left leg inner thigh muscle seg", 13) + tgString(" seg", 9)); 
+    puppy.addPair(n14[4], n10[3], tgString("left leg outer thigh muscle seg", 13) + tgString(" seg", 9));
 
-    puppy.addPair(n14[4], n3[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 3)); 
-    puppy.addPair(n14[3], n5[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
-    puppy.addPair(n14[2], n5[3], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n14[4], n3[2], tgString("left leg rear abdomen connection muscle seg", 13) + tgString(" seg", 3)); 
+    puppy.addPair(n14[3], n5[2], tgString("left leg rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n14[2], n5[3], tgString("left leg rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
 
 
-    puppy.addPair(n14[3], n10[2], tgString("left inner calf muscle seg", 13) + tgString(" seg", 9));
-    puppy.addPair(n14[3], n10[3], tgString("left outer calf muscle seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[3], n10[2], tgString("left leg inner calf muscle seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[3], n10[3], tgString("left leg outer calf muscle seg", 13) + tgString(" seg", 9));
 
-    puppy.addPair(n14[2], n10[2], tgString("left inner front calf muscle seg", 13) + tgString(" seg", 9));
-    puppy.addPair(n14[2], n10[3], tgString("left outer front calf muscle seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[2], n10[2], tgString("left leg inner front calf muscle seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[2], n10[3], tgString("left leg outer front calf muscle seg", 13) + tgString(" seg", 9));
 
     //Adding muscle to pull rear left leg up:
-    puppy.addPair(n14[4], n10[1], tgString("left central thigh muscle3 seg", 13) + tgString(" seg", 9));
+    puppy.addPair(n14[4], n10[1], tgString("left leg central thigh muscle3 seg", 13) + tgString(" seg", 9));
 
 }
 
