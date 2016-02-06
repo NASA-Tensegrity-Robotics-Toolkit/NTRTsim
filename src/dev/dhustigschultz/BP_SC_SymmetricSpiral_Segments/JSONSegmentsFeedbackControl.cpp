@@ -127,7 +127,7 @@ JSONSegmentsFeedbackControl::~JSONSegmentsFeedbackControl()
 
 void JSONSegmentsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
-    m_pCPGSys = new CPGEquationsFB(2000);
+    m_pCPGSys = new CPGEquationsFB(5000);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -486,7 +486,7 @@ void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arra
 	    
     std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
     std::vector <tgSpringCableActuator*> hipMuscles = subject.find<tgSpringCableActuator> ("hip ");
-    std::vector <tgSpringCableActuator*> legMuscles = subject.find<tgSpringCableActuator> ("leg ");
+    //std::vector <tgSpringCableActuator*> legMuscles = subject.find<tgSpringCableActuator> ("legAct ");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
     
@@ -560,7 +560,7 @@ void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arra
 		}
     }
 
-    for (std::size_t i = 0; i < legMuscles.size(); i++)
+    /*for (std::size_t i = 0; i < legMuscles.size(); i++)
     {
 
         tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
@@ -593,7 +593,7 @@ void JSONSegmentsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arra
 		{
 			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
 		}
-    }
+    }*/
 	
 }
 
@@ -782,7 +782,7 @@ std::vector<double> JSONSegmentsFeedbackControl::getFeedback(BaseQuadModelLearni
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
 
-    const std::vector<tgSpringCableActuator*>& legCables = subject.find<tgSpringCableActuator> ("leg ");
+    /*const std::vector<tgSpringCableActuator*>& legCables = subject.find<tgSpringCableActuator> ("legAct ");
     
     std::size_t n3 = legCables.size();
     for(std::size_t i = 0; i != n3; i++)
@@ -809,7 +809,7 @@ std::vector<double> JSONSegmentsFeedbackControl::getFeedback(BaseQuadModelLearni
         std::vector<double> cableFeedback = transformFeedbackActions(actions);
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
-    }
+    }*/
     
     
     return feedback;

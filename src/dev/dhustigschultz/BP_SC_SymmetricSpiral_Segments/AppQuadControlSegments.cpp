@@ -85,7 +85,7 @@ bool AppQuadControlSegments::setup()
     if (add_controller)
     {
         const int segmentSpan = 3; 
-        const int numMuscles = 16; 
+        const int numMuscles = 32; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -115,7 +115,7 @@ bool AppQuadControlSegments::setup()
 	const double minH = 1.0;
 
 	// New params for number of muscles in hips/legs:
-	const int numHipMuscles = 20;
+	const int numHipMuscles = 30;
 	const int numLegMuscles = 20;
 
         JSONSegmentsFeedbackControl::Config control_config(segmentSpan, 
