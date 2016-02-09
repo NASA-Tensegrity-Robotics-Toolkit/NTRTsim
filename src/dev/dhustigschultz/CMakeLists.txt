@@ -27,5 +27,6 @@ subdirs(
     BigPuppy_RigidFeet
     BP_SC_SymmetricArching
     BP_SC_SymmetricSpiral_Segments
-)
+    BP_SC_SymmetricSpiral_All
 
+)
