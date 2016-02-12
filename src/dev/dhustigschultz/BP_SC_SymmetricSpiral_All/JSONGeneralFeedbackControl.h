@@ -28,7 +28,7 @@
  * $Id$
  */
 
-#include "dev/dhustigschultz/BP_SC_SymmetricArching/JSONQuadCPGGeneralControl.h"
+#include "JSONQuadCPGGeneralControl.h"
 
 #include <json/value.h>
 

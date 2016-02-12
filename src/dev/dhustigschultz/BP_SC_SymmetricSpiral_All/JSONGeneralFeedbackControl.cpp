@@ -34,8 +34,8 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
-#include "dev/dhustigschultz/BP_SC_SymmetricArching/tgCPGGeneralActuatorControl.h"
-#include "dev/dhustigschultz/BP_SC_SymmetricArching/tgCPGGeneralCableControl.h"
+#include "tgCPGGeneralActuatorControl.h"
+#include "tgCPGGeneralCableControl.h"
 
 #include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
 #include "helpers/FileHelpers.h"
