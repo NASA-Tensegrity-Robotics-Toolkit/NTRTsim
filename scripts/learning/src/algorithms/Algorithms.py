@@ -3,7 +3,7 @@
 
 def dispatchLearning(componentName=None,
                      componentDictionary=None,
-                     templateComponent=None,
+                     baseComponent=None,
                      previousGeneration=None):
 
     """
@@ -16,7 +16,7 @@ def dispatchLearning(componentName=None,
     for algorithm in componentDictionary['Algorithms']:
         print algorithm
         if algorithm == "MonteCarlo":
-            newComponentPopulation = monteCarlo(componentDictionary['Algorithms']['MonteCarlo'],componentDictionary['Ranges'],templateComponent)
+            newComponentPopulation = monteCarlo(componentDictionary['Algorithms']['MonteCarlo'], componentDictionary['Ranges'], baseComponent)
         """
         elif algorithm == "Elitism":
             return

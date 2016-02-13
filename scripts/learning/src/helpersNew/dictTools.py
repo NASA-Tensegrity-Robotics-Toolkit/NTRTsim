@@ -100,18 +100,20 @@ def compareListDeepType(listA, listB):
         print "listA len: " + str(len(listA))
         print "listB len: " + str(len(listB))
         sameDeepType = False
-    index = 0
-    # Importing from certain file formats may not preserve order
-    # Sorting makes sure that elements are compared in the same order
-    listASorted = list(listA)
-    listASorted.sort()
-    listBSorted = list(listB)
-    listBSorted.sort()
+    else:
+        index = 0
 
-    # Fold type comparisons
-    while index < len(listASorted):
-        sameDeepType &= compareDeepType(listASorted[index], listBSorted[index])
-        index += 1
+        # Importing from certain file formats may not preserve order
+        # Sorting makes sure that elements are compared in the same order
+        listASorted = list(listA)
+        listASorted.sort()
+        listBSorted = list(listB)
+        listBSorted.sort()
+
+        # Fold type comparisons
+        while index < len(listASorted):
+            sameDeepType &= compareDeepType(listASorted[index], listBSorted[index])
+            index += 1
 
     return sameDeepType
 
@@ -124,17 +126,17 @@ def compareVarTypes(varA, varB):
 def compareDeepType(varA, varB):
     sameDeepType = True
     dispatcher = {
-        type([]) : compareListDeepType,
-        type({}) : compareDictDeepType,
-        type('a'): compareVarTypes,
-        type(1)  : compareVarTypes,
-        type(0.1): compareVarTypes,
-        type(u'a'):compareVarTypes
+        type([])  : compareListDeepType,
+        type({})  : compareDictDeepType,
+        type('a') : compareVarTypes,
+        type(1)   : compareVarTypes,
+        type(0.1) : compareVarTypes,
+        type(u'a'): compareVarTypes
     }
     if type(varA) == type(varB):
-        sameDeepType = dispatcher[type(varA)](varA, varB)
+        sameDeepType &= dispatcher[type(varA)](varA, varB)
     else:
-        sameDeepType = False
+        sameDeepType &= False
 
     return sameDeepType
 

@@ -45,4 +45,6 @@ if __name__ == "__main__":
         jobMaster = ControllerJobMaster(configFile, numProcesses)
     elif ".json" in sys.argv[1]:
         jobMaster = EvolutionJobMaster(configFile, numProcesses)
+    else:
+        raise Exception("Unkown config file type passed in. Expecting yaml or json.")
     jobMaster.beginTrial()

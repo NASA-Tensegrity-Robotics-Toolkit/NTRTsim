@@ -34,41 +34,44 @@ class ControllerJobMaster(LearningJobMaster):
         dictTools.tryMakeDir(neuralNetDirectory)
 
     def generationGenerator(self, previousGeneration):
-        components = self.getComponents()
+        componentsDictionary = self.getComponentsDictionary()
         generationID = self.getNewGenerationID(previousGeneration)
 
         logging.info("Starting algorithms")
-        componentPopulations = self.generateComponentPopulations(components, previousGeneration, generationID)
+        componentPopulations = self.generateComponentPopulations(componentsDictionary, previousGeneration)
         # Perform generation creation
+        # Need a better name for this
         newGeneration = self.createNewGeneration(componentPopulations, generationID)
 
         return newGeneration
 
-    def generateComponentPopulations(self, componentDictionary, previousGeneration, generationID):
+    def generateComponentPopulations(self, componentsDictionary, previousGeneration):
         #print "genID in generateComponentPopulations: " + str(generationID)
         componentPopulations = {}
-        for componentName in componentDictionary:
+        for componentName in componentsDictionary:
             population = self.generateComponentPopulation(componentName,
-                                                          componentDictionary,
-                                                          previousGeneration,
-                                                          generationID)
+                                                          componentsDictionary,
+                                                          previousGeneration)
             componentPopulations[componentName] = population
         return componentPopulations
 
-    # "Generation" is expliclty the generation object
+    # "Generation" is explicitly the generation object
     # "Population" is just a list or dictionary
-    def generateComponentPopulation(self, componentName, components, previousGeneration, generationID):
+    def generateComponentPopulation(self, componentName, componentsDictionary, previousGeneration):
         #print "genID in generateComponentPopulation: " + str(generationID)
-        componentDictionary = components[componentName]
-        emptyComponent = self.createEmptyComponent(componentName, components[componentName]['NeuralNetwork'], generationID)
+        generationID = self.getNewGenerationID(previousGeneration)
+        # Note singular from plural
+        componentDictionary = componentsDictionary[componentName]
+        emptyComponent = self.createEmptyComponent(componentName, componentsDictionary[componentName]['NeuralNetwork'], generationID)
         componentPopulation = dispatchLearning(componentName=componentName,
                                             componentDictionary=componentDictionary,
-                                            templateComponent=emptyComponent,
+                                            baseComponent=emptyComponent,
                                             previousGeneration=previousGeneration
                                             )
-        ### Make component backwards compatible
-        ### Move this to its own function when possible
-        ### Metrics is not added because it is never seen to be used
+
+        # Move this to its own function when possible
+        # Backward Compatibility
+        # Metrics is not added because it is never seen to be used
         for component in componentPopulation:
             # Index the component in the line of all of these components made so far in learning
             populationSize = self.config[componentName]['PopulationSize']
@@ -77,6 +80,7 @@ class ControllerJobMaster(LearningJobMaster):
 
             ### Hacky hacky hacky
             ### HACKY HACKY HACKY
+            # Backward Compatibility
             if "numHidden" in component['params']:
                 baseFileName = self.config['PathInfo']['fileName'] + "_" + componentName + "_" + str(component['generationID']) + "_" + str(component['populationID']) + '.nnw'
                 fileName = self.trialDirectory + '/' + self.NEURAL_NET_DIRECTORY_NAME + baseFileName
@@ -88,7 +92,11 @@ class ControllerJobMaster(LearningJobMaster):
     """
     This is taken straight from Brian's code.
     Clean up later before major commit
+    This does not belong here.
+    Related: Why is the NNW file path being stored at all?
+             It should be synthesized from info in the dictionary.
     """
+    # Backward Compatibility
     def writeToNNW(self, neuralParams, fileName):
         fout = open(fileName, 'w')
         first = True
@@ -142,23 +150,3 @@ class ControllerJobMaster(LearningJobMaster):
     # Maybe pass it a function of type generation -> generation?
     def beginTrial(self):
         self.beginTrialMaster(generationGeneratorFuction=self.generationGenerator)
-
-"""
-    def temp(self):
-        for keys in lParams:
-            if keys[-4:] == "Vals":
-                self.prefixes.append(keys[:-4])
-
-        print (self.prefixes)
-
-        self.currentGeneration = {}
-        for p in self.prefixes:
-            self.currentGeneration[p] = {}
-
-        for n in range(generationCount):
-            # Create the generation'
-            for p in self.prefixes:
-                self.currentGeneration[p] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
-
-        return super(ControllerJobMaster, self).generationGenerator()
-"""

@@ -9,9 +9,6 @@ from helpersNew import dictTools
 # TREATED AS LIST UNTIL CLARIFIED
 #
 
-# <TODO> ID calculation system
-
-
 class LearningDictionary(collections.OrderedDict):
     """
     Dictionary for storing entities for learning trials.

@@ -5,11 +5,8 @@ import logging
 import random
 from interfaces import NTRTJobMaster, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
-import collections
 #TODO: This is hackety, fix it.
-from evolution import evolution_job
-#TODO: This is hackety, fix it.
-from evolution import EvolutionJob
+from LearningJob import LearningJob
 from helpersNew import Generation
 from helpersNew import Member
 from helpersNew import dictTools
@@ -65,7 +62,6 @@ class LearningJobMaster(NTRTJobMaster):
         except IOError:
             raise NTRTMasterError("Please provide a valid configuration file")
 
-        self.trialProperties = self.config['TrialProperties']
         self.trialDirectory = os.path.abspath(self.RESOURCE_DIRECTORY_NAME + self.config['PathInfo']['trialPath'])
         dictTools.tryMakeDir(self.trialDirectory)
         dictTools.tryMakeDir(self.trialDirectory + '/' + self.GENERAL_DIRECTORY_NAME)
@@ -77,18 +73,34 @@ class LearningJobMaster(NTRTJobMaster):
         logging.basicConfig(filename=self.logFileName, format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 
         # Hack for terrain compatibility
-        if self.config['TrialProperties']['terrains'] == "flat":
-            self.terrains = [[[0, 0, 0, 0]]]
+        # Backwards Compatibility
 
-    def getComponents(self):
-        components = {}
+        terrainMap = {
+            "flat" : [[0, 0, 0, 0]],
+            "hill" : [[0, 0, 0, 0.0, 60000]]
+        }
+
+        terrains = []
+        for terrain in self.config['TrialProperties']['terrains']:
+            try:
+                terrains.append(terrainMap[terrain])
+            except Exception:
+                raise Exception("Could not find terrain of type " + terrain + " in terrainMap.")
+
+        # Backwards compatibility
+        self.config['TrialProperties']['terrains'] = terrains
+
+        self.trialProperties = self.config['TrialProperties']
+
+    def getComponentsDictionary(self):
+        componentsDictionary = {}
         for key in self.config:
             #if key == 'PathInfo' or key == 'TrialProperties':
             if key in self.PROTECTED_TERMS:
                 pass
             else:
-                components[key] = self.config[key]
-        return components
+                componentsDictionary[key] = self.config[key]
+        return componentsDictionary
 
     # This should be moved to the member class
     # Assumes a fully structured member, with components
@@ -114,8 +126,6 @@ class LearningJobMaster(NTRTJobMaster):
     # ID is id of previousGeneration + 1
     # if not previousGeneration then ID = 0
     def createNewGeneration(self, componentPopulations, generationID):
-        # Running into issues with instantiating new controller objects
-        # Will probably have the same issue here with Generation objects
         newGeneration = Generation(generationID)
         # print "genID in createNewGeneration: " + str(generationID)
         # Not really using id here...
@@ -128,6 +138,7 @@ class LearningJobMaster(NTRTJobMaster):
             #dictTools.pause()
             # if "edgeVals" in newMember.components:
             #    dictTools.printDict(newMember.components['edgeVals'])
+            # Dictionaries here might be pass by ref instead of pass by val
             for component, population in componentPopulations.iteritems():
                 randomPopulation = random.choice(population)
                 newMember.components[component] = randomPopulation
@@ -157,10 +168,9 @@ class LearningJobMaster(NTRTJobMaster):
 
         return previousGeneration
 
-
     # Better to pass the generation object instead of doing this
     # If not used by commit, delete this
-    def getPreviousComponentGeneration(self, component, previousGeneration=None):
+    def getPreviousComponentGeneration(self, component, previousGeneration):
         previousComponentGeneration = []
         if len(previousGeneration.getMembers()) > 0:
             for member in previousGeneration.getMembers():
@@ -168,40 +178,25 @@ class LearningJobMaster(NTRTJobMaster):
                 previousComponentGeneration.append(previousComponent)
         return previousComponentGeneration
 
-    def getNewGenerationID(self, previousGeneration):
+    def getNewGenerationID(self, previousGeneration=None):
         if previousGeneration:
             newID = previousGeneration.ID + 1
         else:
             newID = -1
         return newID
 
-
     # This is a really hacky solution
     def beginTrialMaster(self, generationGeneratorFuction):
-
-        """
-        Override this. It should just contain a loop where you keep constructing NTRTJobs, then calling
-        runJob on it (which will block you until the NTRT instance returns), parsing the result from the job, then
-        deciding if you should run another trial or if you want to terminate.
-        """
-
-        # Start a counter job ids to be use in dictionaries
-        self.paramID = 1
 
         generationCount = self.trialProperties['generationCount']
         populationSize = self.trialProperties['generationSize']
 
         jobList = []
 
-        lParams = self.trialProperties
-
         previousGeneration = self.importSeedGeneration()
         for genNum in range(generationCount):
             # We want to write all of the trials for post processing
             activeGeneration = generationGeneratorFuction(previousGeneration)
-
-            # for member in activeGeneration.getMembers():
-            index = 0
 
             for member in activeGeneration.getMembers():
 
@@ -210,8 +205,6 @@ class LearningJobMaster(NTRTJobMaster):
                 # dictTools.pause("fileName: " + fileName)
 
                 for terrain in self.trialProperties['terrains']:
-                    # Default to flat terrain for now
-                    terrain = [[0, 0, 0, 0]]
                     # All args to be passed to subprocess must be strings
                     # TODO check if these args need to be passed from the yamlconfig
 
@@ -221,9 +214,7 @@ class LearningJobMaster(NTRTJobMaster):
                             'executable' : self.config['PathInfo']['executable'],
                             'length'   : self.trialProperties['trialLength'],
                             'terrain'  : terrain}
-                    jobList.append(EvolutionJob(args))
-
-                index += 1
+                    jobList.append(LearningJob(args))
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)

@@ -13,11 +13,15 @@ TrialProperties:
     fitnessFunction: "distance"
     terrains:
         - "flat"                                    # Terrains are referenced by the YAML definitions
+        - "hill"                                    # Terrains are referenced by the YAML definitions
 
 nodeVals:
     Algorithms:
         MonteCarlo:
             spawnCount: 100
+        Elitism:
+            selectionMethod: "max"
+            survivalCount: 5
     NeuralNetwork:
         numberOfStates: 0
         numberOfOutputs: 5

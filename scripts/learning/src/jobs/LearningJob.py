@@ -5,9 +5,19 @@ import json
 import logging
 from interfaces import NTRTMasterError, NTRTJob
 
+
+
 class LearningJob(NTRTJob):
 
     def __init__(self, jobArgs):
+        """
+        Override this in your subclass. Be sure that at the end of your method your init method
+        you make a call to self._setup(). I'll clean this up later so that we're properly doing a super
+        call (rather than invoking setup in the child), no need for you to handle that now.
+
+        You can put args into this however you want, just depends on what convention you want to use. I'd personally
+        use a dictionary. If you use a dictionary, just use the jobArgs keyword from this function's signature.
+        """
         logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
 
@@ -15,6 +25,8 @@ class LearningJob(NTRTJob):
 
     def _setup(self):
         """
+        This is where you'll handle setup related to this *single* learning trial. Each instance of NTRT
+        we run will have its own NTRTJob instance.
         """
 
     def startJob(self):
@@ -35,9 +47,9 @@ class LearningJob(NTRTJob):
             # This will expand in the future.
             terrainMatrix = self.args['terrain']
             # Update this if the subprocess call gets changed
-            if len(terrainMatrix[0]) < 4: 
+            if len(terrainMatrix[0]) < 4:
                 raise NTRTMasterError("Not enough terrain args!")
-            
+
             # Run through a set of binary job options. Currently handles terrain switches
             for run in terrainMatrix:
                 if (len(run)) >= 5:
@@ -45,7 +57,14 @@ class LearningJob(NTRTJob):
                 else:
                     trialLength = self.args['length']
                 #TODO improve error handling here
+                """
+                raw_input("Preparing process with:")
+                for arg in [self.args['executable'], "-l", self.args['filename'], "-P", self.args['path'], "-s", str(trialLength), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2]), "-B", str(run[3])]:
+                    print arg
+                raw_input("About to execute process.")
+                """
                 subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-P", self.args['path'], "-s", str(trialLength), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2]), "-B", str(run[3])], stdout=logFile)
+                # raw_input("Process executed.")
             sys.exit()
 
     def processJobOutput(self):

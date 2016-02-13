@@ -14,19 +14,21 @@ def monteCarlo(monteCarloConfig, rangeDictionary, templateComponent):
 
     newComponentPopulation = []
     # Not sure how dictionary passing/copying is working out here. check it later.
-    spawned = 0
+    # spawned = 0
     for item in range(monteCarloConfig['spawnCount']):
         newComponent = generateNewComponent(rangeDictionary, templateComponent.copy())
         newComponentPopulation.append(newComponent)
-        spawned += 1
+        # spawned += 1
     return newComponentPopulation
 
-def generateNewComponent(rangeDictionary, templateComponent, tagStack=[]):
-    for key, value in templateComponent.iteritems():
+def generateNewComponent(rangeDictionary, componentDictionary, tagStack=None):
+    if not tagStack:
+        tagStack = []
+    for key, value in componentDictionary.iteritems():
         nextTagStack = list(tagStack)
         nextTagStack.append(key)
         if type(value) == type({}):
-            templateComponent[key] = generateNewComponent(rangeDictionary, value, nextTagStack)
+            componentDictionary[key] = generateNewComponent(rangeDictionary, value, nextTagStack)
         elif type(value) == type([]):
             newList = generateNewComponentFromList(rangeDictionary, value, nextTagStack)
             """
@@ -35,14 +37,14 @@ def generateNewComponent(rangeDictionary, templateComponent, tagStack=[]):
             they will be overwritten with null.
             Do a "deep sweep" to make sure that this doesn't happen.
             """
-            templateComponent[key] = newList
+            componentDictionary[key] = newList
         # Assume that value is an integer
         else:
             newItem = getValueFromTagStack(rangeDictionary, nextTagStack)
             # Check that we actually updated the value
             if newItem:
-                templateComponent[key] = newItem
-    return templateComponent
+                componentDictionary[key] = newItem
+    return componentDictionary
 
 def generateNewComponentFromList(rangeDictionary, value, tagStack):
     if type(value) == type([]):
