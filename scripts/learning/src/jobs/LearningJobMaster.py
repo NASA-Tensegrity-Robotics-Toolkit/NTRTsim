@@ -54,21 +54,46 @@ class LearningJobMaster(NTRTJobMaster):
         if self.config['TrialProperties']['terrains'] == "flat":
             self.terrains = [[[0, 0, 0, 0]]]
 
+    # This should be moved to the member class
+    # Assumes a fully structured member, with components
+    def writeMemberToFile(self, member):
+        components = member.components
+        #dictTools.printDict(components)
+        #dictTools.pause()
+        #print self.config['PathInfo']['fileName']
+        # for key in components:
+        #    print key
+        # print components['generationID']
+        # print components['memberID']
+        # dictTools.pause()
+        basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) + "_" + str(components['memberID']) + ".json"
+        filePath = self.trialDirectory + '/' + basename
+        # print "writing file to: " + filePath
+        jsonFile = open(filePath, 'w')
+        json.dump(components, jsonFile, indent=4)
+        jsonFile.close()
+        # dictTools.pause("Check that file was created.")
+        return basename
+
+
     def importSeedMembers(self):
         seedDirectory = self.config['PathInfo']['seedDirectory']
         logging.info(seedDirectory)
-        if not os.path.isdir(seedDirectory):
-            raise Exception("Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo.")
-
         seedMembers = []
         id = 0
-        for file in os.listdir(seedDirectory):
-            absFilePath = os.path.abspath(seedDirectory) + '/' + file
-            logging.info(absFilePath)
-            seedFile = open(absFilePath, 'r')
-            seedInput = json.load(seedFile)
-            seedFile.close()
-            newMember = Member(components=seedInput)
-            seedMembers.append(newMember)
-            id += 1
+        if os.path.isdir(seedDirectory):
+            for file in os.listdir(seedDirectory):
+                absFilePath = os.path.abspath(seedDirectory) + '/' + file
+                logging.info(absFilePath)
+                seedFile = open(absFilePath, 'r')
+                seedInput = json.load(seedFile)
+                seedFile.close()
+                newMember = Member(components=seedInput)
+                seedMembers.append(newMember)
+                id += 1
+        else:
+            #raise Exception("Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo.")
+            print "Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo."
+
+        previousGeneration = Generation(-1)
         return seedMembers

@@ -173,6 +173,7 @@ class EvolutionJobMaster(NTRTJobMaster):
 
         raise NTRTMasterError("Insufficient values to satisfy requested probability")
 
+
     def __getChildController(self, c1, c2, params):
         """
         Takes two controllers and merges them with a 50/50 chance of selecting

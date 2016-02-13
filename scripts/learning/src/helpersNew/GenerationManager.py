@@ -112,7 +112,7 @@ class LearningDictionary(collections.OrderedDict):
 
 class Generation:
 
-    def __init__(self, ID):
+    def __init__(self, ID, membersParam=None):
         self.ID = ID
         
         # Create internal variables for dynamic calculation
@@ -123,6 +123,10 @@ class Generation:
 
         # Member dictionary
         self._members = []
+
+        if membersParam:
+            for member in membersParam:
+                self._members.append(member)
 
     def addMember(self, member):
         self._totalScoreUpdated = False
@@ -191,25 +195,38 @@ class Member(object):
     Create a copy() function.
     """
 
-    def __init__(self, memberID=-1, generationID = -1, components={}):
-        """
-        Constructor for a LearningDictionary.
-        Requires an ID to reference the dictionary.
-        """
-        self.memberID = memberID
+    # DEFAULTS = {
+    #     'nodeVals' : {
+    #         'Min' : 0,
+    #         'Max' : 1
+    #         },
+    #     'edgeVals' : {
+    #         'Min' : 0,
+    #         'Max' : 1
+    #         },
+    #     'feedbackVals' : {
+    #         'Min'  : -1,
+    #         'Max'  : 1
+    #         },
+    #     'goalVals' : {
+    #         'Min' : -1,
+    #         'Max' : 1
+    #         }
+    #     }
 
-        # The subsets of parameters which define the member
-        # i.e. Edge, Node, Feedback vals for Controllers
-        # How is this different from parameters for the start?
-        self.components = components
-
-        # List representing the Trials of this Member
-        # Not populated until the member has been simulated
-        self._trials = []
-
-        # Score is calculated based on Trials of simulation results
-        # Can be by average or maximum of Trial scores
-        self._score = None
+    def __init__(self, memberID=-1, generationID=-1, components={}, seedMember=None):
+        assert type(generationID) == type(1)
+        if seedMember:
+            self._score = seedMember._score
+            self._trials = seedMember._trials
+            self.components = seedMember.components
+        else:
+            # This is necessary because calling the super constructor returns a pointer to the same instance
+            # Why? Unknown. Investigating.
+            self.memberID = memberID
+            self.components = components
+            self._trials = []
+            self._score = None
 
         if not "memberID" in self.components:
             print "Setting memberID to: " + str(memberID)
@@ -252,25 +269,25 @@ class Member(object):
 
 
 class Controller(Member):
-    
-    DEFAULTS = {
-        'nodeVals' : {
-            'Min' : 0,
-            'Max' : 1
-            },
-        'edgeVals' : {
-            'Min' : 0,
-            'Max' : 1
-            },
-        'feedbackVals' : {
-            'Min'  : -1,
-            'Max'  : 1
-            },
-        'goalVals' : {
-            'Min' : -1,
-            'Max' : 1
-            }
-        }
+
+    # DEFAULTS = {
+    #     'nodeVals' : {
+    #         'Min' : 0,
+    #         'Max' : 1
+    #         },
+    #     'edgeVals' : {
+    #         'Min' : 0,
+    #         'Max' : 1
+    #         },
+    #     'feedbackVals' : {
+    #         'Min'  : -1,
+    #         'Max'  : 1
+    #         },
+    #     'goalVals' : {
+    #         'Min' : -1,
+    #         'Max' : 1
+    #         }
+    #     }
 
     def __init__(self, memberID=-1, generationID=-1, seedMember=None):
         assert type(generationID) == type(1)

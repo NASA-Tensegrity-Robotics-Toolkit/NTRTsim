@@ -132,8 +132,8 @@ class ControllerJobMaster(LearningJobMaster):
             #print "size of controller.components: " + str(len(newController.components))
             #print "--"
             #dictTools.pause()
-            if "edgeVals" in newController.components:
-                dictTools.printDict(newController.components['edgeVals'])
+            # if "edgeVals" in newController.components:
+            #    dictTools.printDict(newController.components['edgeVals'])
             for component, population in componentPopulations.iteritems():
                 randomPopulation = random.choice(population)
                 newController.components[component] = randomPopulation
@@ -205,25 +205,25 @@ class ControllerJobMaster(LearningJobMaster):
         }
         return {'params' : newNeuro}
 
-    # This should be moved to the member class
-    def writeControllerToFile(self, controller):
-        components = controller.components
-        #dictTools.printDict(components)
-        #dictTools.pause()
-        #print self.config['PathInfo']['fileName']
-        for key in components:
-            print key
-        # print components['generationID']
-        # print components['memberID']
-        # dictTools.pause()
-        basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) + "_" + str(components['memberID']) + ".json"
-        filePath = self.trialDirectory + '/' + basename
-        # print "writing file to: " + filePath
-        jsonFile = open(filePath, 'w')
-        json.dump(components, jsonFile, indent=4)
-        jsonFile.close()
-        # dictTools.pause("Check that file was created.")
-        return basename
+    # # This should be moved to the learningMaster class
+    # def writeControllerToFile(self, controller):
+    #     components = controller.components
+    #     #dictTools.printDict(components)
+    #     #dictTools.pause()
+    #     #print self.config['PathInfo']['fileName']
+    #     for key in components:
+    #         print key
+    #     # print components['generationID']
+    #     # print components['memberID']
+    #     # dictTools.pause()
+    #     basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) + "_" + str(components['memberID']) + ".json"
+    #     filePath = self.trialDirectory + '/' + basename
+    #     # print "writing file to: " + filePath
+    #     jsonFile = open(filePath, 'w')
+    #     json.dump(components, jsonFile, indent=4)
+    #     jsonFile.close()
+    #     # dictTools.pause("Check that file was created.")
+    #     return basename
 
     # Need to set up a call system to this from child jobs
     # Maybe pass it a function of type generation -> generation?
@@ -256,7 +256,7 @@ class ControllerJobMaster(LearningJobMaster):
             for member in activeGeneration.getMembers():
 
                 # Expecting a json-compatible dictionary
-                fileName = self.writeControllerToFile(member)
+                fileName = self.writeMemberToFile(member)
                 # dictTools.pause("fileName: " + fileName)
 
                 for terrain in self.trialProperties['terrains']:
@@ -264,17 +264,6 @@ class ControllerJobMaster(LearningJobMaster):
                     terrain = [[0, 0, 0, 0]]
                     # All args to be passed to subprocess must be strings
                     # TODO check if these args need to be passed from the yamlconfig
-
-
-                    """
-                    args = {'filename' : fileName,
-                            'resourcePrefix' : self.jConf['resourcePath'],
-                            'path'     : self.jConf['lowerPath'],
-                            'executable' : self.jConf['executable'],
-                            'length'   : self.jConf['learningParams']['trialLength'],
-                            'terrain'  : j}
-                    if (n == 0 or i >= startTrial):
-                    """
 
                     args = {'filename' : fileName,
                             'resourcePrefix' : self.RESOURCE_DIRECTORY_NAME,
