@@ -1,8 +1,9 @@
-from MonteCarlo import monteCarlo
+
+
 
 def dispatchLearning(componentName=None,
-                     templateComponent=None,
                      componentDictionary=None,
+                     templateComponent=None,
                      previousGeneration=None):
 
     """
@@ -33,3 +34,5 @@ def dispatchLearning(componentName=None,
 
     # Map component to each of the possible algorithms
     return newComponentPopulation
+
+from MonteCarlo import monteCarlo

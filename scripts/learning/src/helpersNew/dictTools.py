@@ -1,5 +1,8 @@
 import os
-from interfaces import NTRTMasterError
+import json
+import sys
+import yaml
+# from interfaces import NTRTMasterError
 
 def dictionaryToList(dictionary):
 
@@ -72,7 +75,83 @@ def tryMakeDir(dirPath):
         os.makedirs(dirPath)
     except OSError:
         if not os.path.isdir(dirPath):
-            raise NTRTMasterError("Could not make directory at " + dirPath)
+            raise Exception("Could not make directory at " + dirPath)
 
     def generationGenerator(self):
         return
+
+def compareDictDeepType(dictA, dictB):
+    sameDeepType = True
+    if not dictA.keys() == dictB.keys():
+        print "dictionaries have different keys:"
+        print "dictA keys: " + str(dictA.keys())
+        print "dictB keys: " + str(dictB.keys())
+        sameDeepType = False
+    else:
+        # Fold type comparisons
+        for key in dictA:
+            sameDeepType &= compareDeepType(dictA[key], dictB[key])
+    return sameDeepType
+
+def compareListDeepType(listA, listB):
+    sameDeepType = True
+    if not len(listA) == len(listB):
+        print "lists have different lengths:"
+        print "listA len: " + str(len(listA))
+        print "listB len: " + str(len(listB))
+        sameDeepType = False
+    index = 0
+    # Importing from certain file formats may not preserve order
+    # Sorting makes sure that elements are compared in the same order
+    listASorted = list(listA)
+    listASorted.sort()
+    listBSorted = list(listB)
+    listBSorted.sort()
+
+    # Fold type comparisons
+    while index < len(listASorted):
+        sameDeepType &= compareDeepType(listASorted[index], listBSorted[index])
+        index += 1
+
+    return sameDeepType
+
+def compareVarTypes(varA, varB):
+    sameDeepType = True
+    if not type(varA) == type(varB):
+        sameDeepType = False
+    return sameDeepType
+
+def compareDeepType(varA, varB):
+    sameDeepType = True
+    dispatcher = {
+        type([]) : compareListDeepType,
+        type({}) : compareDictDeepType,
+        type('a'): compareVarTypes,
+        type(1)  : compareVarTypes,
+        type(0.1): compareVarTypes,
+        type(u'a'):compareVarTypes
+    }
+    if type(varA) == type(varB):
+        sameDeepType = dispatcher[type(varA)](varA, varB)
+    else:
+        sameDeepType = False
+
+    return sameDeepType
+
+def compareJSONDicts(jsonPathA, jsonPathB):
+    sameDicts = True
+    try:
+        jsonFileA = open(jsonPathA, 'r')
+        jsonDictA = json.load(jsonFileA)
+        jsonFileA.close()
+
+        jsonFileB = open(jsonPathB, 'r')
+        jsonDictB = json.load(jsonFileB)
+        jsonFileB.close()
+
+        sameDicts &= compareDeepType(jsonDictA, jsonDictB)
+
+    except IOError:
+        raise Exception("Could not load one of the json files for comparing dictionaries.")
+
+    return sameDicts

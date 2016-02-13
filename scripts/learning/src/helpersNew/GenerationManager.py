@@ -184,7 +184,6 @@ class Generation:
         if max == 0:
             raise Exception("Only negative scores in generation. Is this really an error?")
         return maxIndex
-        
 
 class Member(object):
     """
@@ -195,27 +194,7 @@ class Member(object):
     Create a copy() function.
     """
 
-    # DEFAULTS = {
-    #     'nodeVals' : {
-    #         'Min' : 0,
-    #         'Max' : 1
-    #         },
-    #     'edgeVals' : {
-    #         'Min' : 0,
-    #         'Max' : 1
-    #         },
-    #     'feedbackVals' : {
-    #         'Min'  : -1,
-    #         'Max'  : 1
-    #         },
-    #     'goalVals' : {
-    #         'Min' : -1,
-    #         'Max' : 1
-    #         }
-    #     }
-
-    def __init__(self, memberID=-1, generationID=-1, components={}, seedMember=None):
-        assert type(generationID) == type(1)
+    def __init__(self, memberID=-1, generationID=-1, components=None, seedMember=None):
         if seedMember:
             self._score = seedMember._score
             self._trials = seedMember._trials
@@ -224,11 +203,15 @@ class Member(object):
             # This is necessary because calling the super constructor returns a pointer to the same instance
             # Why? Unknown. Investigating.
             self.memberID = memberID
-            self.components = components
+            if not components:
+                self.components = {}
+            else:
+                self.components = components
             self._trials = []
             self._score = None
 
         if not "memberID" in self.components:
+            assert type(generationID) == type(1)
             print "Setting memberID to: " + str(memberID)
             self.components['memberID'] = memberID
         if not "generationID" in self.components:
@@ -268,6 +251,8 @@ class Member(object):
             raise Exception("MEMBER: <TODO>: Exception Hierarchy.")
 
 
+# In the process of removing calls to subclasses of Member.
+# Replacing them all with just "Member"
 class Controller(Member):
 
     # DEFAULTS = {
@@ -310,8 +295,6 @@ class Controller(Member):
             assert type(generationID) == type(1)
             print "Setting generationID to: " + str(generationID)
             self.components['generationID'] = generationID
-
-
 
 class ParameterSet(Member):
 
