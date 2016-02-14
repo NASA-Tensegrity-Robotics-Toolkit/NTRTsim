@@ -2,9 +2,9 @@
 
 
 def dispatchLearning(componentName=None,
-                     componentDictionary=None,
+                     componentConfig=None,
                      baseComponent=None,
-                     previousGeneration=None):
+                     componentPopulation=None):
 
     """
     Cannot rely on yaml to return an in-order dictionary.
@@ -13,10 +13,10 @@ def dispatchLearning(componentName=None,
     if elitism in -> ... etc
     """
     newComponentPopulation = []
-    for algorithm in componentDictionary['Algorithms']:
+    for algorithm in componentConfig['Algorithms']:
         print algorithm
         if algorithm == "MonteCarlo":
-            newComponentPopulation = monteCarlo(componentDictionary['Algorithms']['MonteCarlo'], componentDictionary['Ranges'], baseComponent)
+            newComponentPopulation = monteCarlo(componentConfig['Algorithms']['MonteCarlo'], componentConfig['Ranges'], baseComponent)
         """
         elif algorithm == "Elitism":
             return

@@ -33,7 +33,11 @@ class LearningJobMaster(NTRTJobMaster):
         # These two are currently used when extracting component libraries
         "PathInfo",
         "TrialProperties",
-        # These are added as a precaution. Remove if not used after multiple commits.
+        # These are to strip fields from seed members
+        "generationID",
+        "scores",
+        "memberID",
+        # These are added for filtering learning config files
         "trialPath",
         "fileName",
         "executable",
@@ -92,18 +96,17 @@ class LearningJobMaster(NTRTJobMaster):
 
         self.trialProperties = self.config['TrialProperties']
 
-    def getComponentsDictionary(self):
-        componentsDictionary = {}
+    def getComponentsConfig(self):
+        componentsConfig = {}
         for key in self.config:
             #if key == 'PathInfo' or key == 'TrialProperties':
-            if key in self.PROTECTED_TERMS:
-                pass
-            else:
-                componentsDictionary[key] = self.config[key]
-        return componentsDictionary
+            if not key in self.PROTECTED_TERMS:
+                componentsConfig[key] = self.config[key]
+        return componentsConfig
 
     # This should be moved to the member class
     # Assumes a fully structured member, with components
+    # ALSO ASSIGNS MEMBER's filePath FIELD
     def writeMemberToFile(self, member):
         components = member.components
         #dictTools.printDict(components)
@@ -116,6 +119,7 @@ class LearningJobMaster(NTRTJobMaster):
         # dictTools.pause()
         basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) + "_" + str(components['memberID']) + ".json"
         filePath = self.trialDirectory + '/' + basename
+        member.filePath = filePath
         # print "writing file to: " + filePath
         jsonFile = open(filePath, 'w')
         json.dump(components, jsonFile, indent=4)
@@ -125,6 +129,7 @@ class LearningJobMaster(NTRTJobMaster):
 
     # ID is id of previousGeneration + 1
     # if not previousGeneration then ID = 0
+    # TODO: No longer used
     def createNewGeneration(self, componentPopulations, generationID):
         newGeneration = Generation(generationID)
         # print "genID in createNewGeneration: " + str(generationID)
@@ -150,18 +155,22 @@ class LearningJobMaster(NTRTJobMaster):
     def importSeedGeneration(self):
         seedDirectory = self.config['PathInfo']['seedDirectory']
         logging.info(seedDirectory)
-        id = 0
         previousGeneration = Generation(-1)
         if os.path.isdir(seedDirectory):
+            memberID = 0
             for file in os.listdir(seedDirectory):
                 absFilePath = os.path.abspath(seedDirectory) + '/' + file
                 logging.info(absFilePath)
                 seedFile = open(absFilePath, 'r')
                 seedInput = json.load(seedFile)
                 seedFile.close()
-                newMember = Member(components=seedInput)
-                previousGeneration.addMember(newMember)
-                id += 1
+                # newMember = Member(generationID=-1, memberID=memberID, components=seedInput)
+                for componentName, component in seedInput.iteritems():
+                    # print str(componentName)
+                    if componentName not in self.PROTECTED_TERMS:
+                        # print "Adding " + componentName + " to seed generation."
+                        previousGeneration.addComponentMember(componentName, component)
+                memberID += 1
         else:
             #raise Exception("Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo.")
             print "Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo."
@@ -189,7 +198,6 @@ class LearningJobMaster(NTRTJobMaster):
     def beginTrialMaster(self, generationGeneratorFuction):
 
         generationCount = self.trialProperties['generationCount']
-        populationSize = self.trialProperties['generationSize']
 
         jobList = []
 
@@ -214,13 +222,17 @@ class LearningJobMaster(NTRTJobMaster):
                             'executable' : self.config['PathInfo']['executable'],
                             'length'   : self.trialProperties['trialLength'],
                             'terrain'  : terrain}
-                    jobList.append(LearningJob(args))
+                    # Pass member by reference for updating scores
+                    jobList.append(LearningJob(args, member))
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
             completedJobs = conSched.processJobs()
 
-            for job in completedJobs:
-                job.processJobOutput()
+            # for job in completedJobs:
+            #     job.processJobOutput()
+            #     scores = job.obj['scores']
+            #     paramID = job.obj['paramID']
+            #     activeGeneration.getMembers(paramID)
 
             previousGeneration = activeGeneration

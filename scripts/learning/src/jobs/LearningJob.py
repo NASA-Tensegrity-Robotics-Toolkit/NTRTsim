@@ -9,7 +9,7 @@ from interfaces import NTRTMasterError, NTRTJob
 
 class LearningJob(NTRTJob):
 
-    def __init__(self, jobArgs):
+    def __init__(self, jobArgs, member):
         """
         Override this in your subclass. Be sure that at the end of your method your init method
         you make a call to self._setup(). I'll clean this up later so that we're properly doing a super
@@ -20,6 +20,7 @@ class LearningJob(NTRTJob):
         """
         logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
+        self.member = member
 
         self._setup()
 
@@ -67,6 +68,8 @@ class LearningJob(NTRTJob):
                 # raw_input("Process executed.")
             sys.exit()
 
+    # Object/dictionary was written to in C++, so we get the updated version here
+    # Why not just perform the component/NN updates in C++?
     def processJobOutput(self):
         scoresPath = self.args['resourcePrefix'] + self.args['path'] + self.args['filename']
 

@@ -16,6 +16,8 @@ If the same component is used in different learning scenarios, then it may be of
 for when different terrains / fitness functions are used.
 Otherwise, single-run scores get watered down.
 
+EmptyComponent is sticking around to give a template to MonteCarlo when there is no seed.
+
 TODO:
 Exception Hierarchy
 Refactor out component name from generatecomponent(s)population

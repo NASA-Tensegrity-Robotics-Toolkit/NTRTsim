@@ -1,6 +1,8 @@
 # TODO check that both of these imports are needed
 from collections import OrderedDict
 import collections
+import copy
+import random
 from helpersNew import dictTools
 
 #
@@ -109,14 +111,16 @@ class LearningDictionary(collections.OrderedDict):
 
 class Generation:
 
-    def __init__(self, ID, membersParam=None):
-        self.ID = ID
+    def __init__(self, generationID, membersParam=None):
+        self.generationID = generationID
+        self._nextMemberID = 0
         
         # Create internal variables for dynamic calculation
         self._totalScoreUpdated = False
         self._totalScore = 0
 
         self._sorted = False
+        self._componentPopulations = {}
 
         # Member dictionary
         self._members = []
@@ -124,6 +128,46 @@ class Generation:
         if membersParam:
             for member in membersParam:
                 self._members.append(member)
+
+    def getID(self):
+        return self.generationID
+
+    def getComponentPopulation(self, componentName):
+        return copy.deepcopy(self._componentPopulations[componentName])
+
+    def getComponentPopulations(self):
+        return copy.deepcopy(self._componentPopulations)
+
+    def addComponentPopulation(self, componentName, componentPopulation):
+        for component in componentPopulation:
+            self.addComponentMember(componentName, component)
+
+    def addComponentMember(self, componentName, component):
+        localComponent = copy.deepcopy(component)
+        localComponent["generationID"] = self.generationID
+        if not componentName in self._componentPopulations:
+            self._componentPopulations[componentName] = []
+        self._componentPopulations[componentName].append(localComponent)
+
+    def generateMemberFromComponents(self):
+        memberID = self._getNextMemberID()
+        newMember = Member(memberID=memberID,
+                           generationID=self.generationID)
+
+        for componentName, componentPopulation in self._componentPopulations.iteritems():
+            print str(type(componentPopulation))
+            print str(componentPopulation[0])
+            newMember.components[componentName] = copy.deepcopy(random.choice(componentPopulation))
+        self.addMember(newMember)
+        return newMember
+
+    def _getNextMemberID(self):
+        memberID = self._nextMemberID
+        self._nextMemberID += 1
+        return memberID
+
+    def getComponentNames(self):
+        return self._componentPopulations.keys()
 
     def addMember(self, member):
         self._totalScoreUpdated = False
@@ -192,6 +236,7 @@ class Member(object):
     """
 
     def __init__(self, memberID=-1, generationID=-1, components=None, seedMember=None):
+        self.filePath = None
         if seedMember:
             self._score = seedMember._score
             self._trials = seedMember._trials
@@ -246,7 +291,6 @@ class Member(object):
         # Raise exception on unknown scoring method
         else:
             raise Exception("MEMBER: <TODO>: Exception Hierarchy.")
-
 
 # In the process of removing calls to subclasses of Member.
 # Replacing them all with just "Member"
