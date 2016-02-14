@@ -5,11 +5,11 @@ link_libraries(tgcreator core Adapters)
 #    FlemonsArm/AppFlemonsArm.cpp
 #)
  
-#add_executable(AppScarrArmModel
-#    ScarrArm/ScarrArmModel.cpp
-#    ScarrArm/AppScarrArm.cpp
-#    ScarrArm/ScarrArmController.cpp
-#)
+add_executable(AppScarrArmModel
+    ScarrArm/ScarrArmModel.cpp
+    ScarrArm/AppScarrArm.cpp
+    ScarrArm/ScarrArmController.cpp
+)
 #add_executable(AppCrossArm
 #    CrossArm/CrossArmModel.cpp
 #    CrossArm/AppCrossArm.cpp
@@ -36,8 +36,8 @@ add_executable(AppUpperLimbTriangle
     UpperLimbTriangle/UpperLimbTriangleController.cpp
 )
 
-#add_executable(AppSaddleNeckArm
-#   SaddleNeckArm/AppSaddleNeckArm.cpp
-#   SaddleNeckArm/SaddleNeckArmModel.cpp
-#)
+add_executable(AppSaddleNeckArm
+   SaddleNeckArm/AppSaddleNeckArm.cpp
+   SaddleNeckArm/SaddleNeckArmModel.cpp
+)
 
