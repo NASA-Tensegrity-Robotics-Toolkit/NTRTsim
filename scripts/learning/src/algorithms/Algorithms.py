@@ -3,6 +3,7 @@ import random
 from MonteCarlo import monteCarlo
 from Elitism import elitism
 from GaussianSampling import gaussianSampling
+from CrossOver import crossOver
 
 
 def dispatchLearning(componentConfig,
@@ -11,6 +12,7 @@ def dispatchLearning(componentConfig,
                      baseComponent=None,
                      componentPopulation=None):
 
+    algorithms = componentConfig['Algorithms']
     """
     Cannot rely on yaml to return an in-order dictionary.
     Thus, the order is instead inforced here
@@ -18,36 +20,43 @@ def dispatchLearning(componentConfig,
     """
     # TODO: validity of component values after mutation (vs. rangeDictionary)
     newComponentPopulation = copy.deepcopy(componentPopulation)
-    if "MonteCarlo" in componentConfig['Algorithms']:
-        newComponentPopulation = monteCarlo(monteCarloConfig=componentConfig['Algorithms']['MonteCarlo'],
+    if "MonteCarlo" in algorithms:
+        print "in MonteCarlo"
+        newComponentPopulation = monteCarlo(monteCarloConfig=algorithms['MonteCarlo'],
                                             rangeConfig=componentConfig['Ranges'],
                                             templateComponent=baseComponent)
         # MonteCarlo is a stand-alone algorithm.
         # The other algorithms can be used in concert.
         # Theoretically, this doesn't need to be here.
 
-    if "Elitism" in componentConfig['Algorithms']:
-            newComponentPopulation = elitism(elitismConfig=componentConfig['Algorithms']['Elitism'],
-                                             componentPopulation=newComponentPopulation,
-                                             scoreMethod=scoreMethod,
-                                             fitnessFunction=fitnessFunction)
-            #print newComponentPopulation[0]
-            #raw_input("check this component from Elitism.")
+    if "Elitism" in algorithms:
+        print "in Elitism"
+        newComponentPopulation = elitism(elitismConfig=algorithms['Elitism'],
+                                         componentPopulation=newComponentPopulation,
+                                         scoreMethod=scoreMethod,
+                                         fitnessFunction=fitnessFunction)
+        #print newComponentPopulation[0]
+        #raw_input("check this component from Elitism.")
 
-    if "GaussainSampling" in componentConfig['Algorithms']:
-            # print "before:"
-            # print newComponentPopulation[0]
-            newComponentPopulation = gaussianSampling(gaussianConfig=componentConfig['Algorithms']['GaussianSampling'],
-                                                      rangeConfig=componentConfig['Ranges'],
-                                                      componentPopulation=newComponentPopulation)
-            # print "after:"
-            # print newComponentPopulation[0]
-            # raw_input("check this component from Gaussian Sampling.")
+    if "GaussianSampling" in algorithms:
+        print "in GaussianSampling"
+        # print "before:"
+        # print newComponentPopulation[0]
+        newComponentPopulation += gaussianSampling(gaussianConfig=algorithms['GaussianSampling'],
+                                                  rangeConfig=componentConfig['Ranges'],
+                                                  componentPopulation=newComponentPopulation)
+        # print "after:"
+        # print newComponentPopulation[0]
+        # raw_input("check this component from Gaussian Sampling.")
 
-        # elif algorithm == "CrossOver":
-        #     return
-        # else:
-        #     raise Exception("Unknown algorithm \"" + algorithm + "\" passed in. Check the Algorithms sections of your yaml learning spec.")
+    if "CrossOver" in algorithms:
+        print "in CrossOver"
+        newComponentPopulation += crossOver(crossOverConfig=algorithms['CrossOver'],
+                                           rangeConfig=componentConfig['Ranges'],
+                                           componentPopulation=newComponentPopulation,
+                                           scoreMethod=scoreMethod,
+                                           fitnessFunction=fitnessFunction)
+
     populationID = 0
     for component in newComponentPopulation:
         component['populationID'] = populationID
@@ -55,6 +64,9 @@ def dispatchLearning(componentConfig,
 
     # Map componentMember to each of the possible algorithms
     return newComponentPopulation
+
+# Once components are modeled as ComponentPopulation and Component objects, this section will move to Generationmanager
+# See the ReadMe
 
 def getComponentByRandom(componentPopulation):
     randomComponent = random.choice(componentPopulation)
@@ -74,22 +86,30 @@ def getBestComponentIndex(componentPopulation, scoreMethod="max", fitnessFunctio
 
     return maxIndex
 
-# TODO: Check the logic of this
+# Unused
+# Not deleting -- will be moved to ComponentPopulation object later
 def getComponentByProbability(componentPopulation, scoreMethod="max", fitnessFunction="distance"):
+    selectIndex = getComponentIndexByProbability(componentPopulation, scoreMethod, fitnessFunction)
+    chosenComponent = componentPopulation[selectIndex]
+    return copy.deepcopy(chosenComponent)
+
+# TODO: Check the logic of this
+def getComponentIndexByProbability(componentPopulation, scoreMethod="max", fitnessFunction="distance"):
     totalScore = getNormalizedTotalScore(componentPopulation, scoreMethod, fitnessFunction)
     targetScore = random.uniform(0, totalScore)
     minScore = getMinScore(componentPopulation, scoreMethod, fitnessFunction)
     currentScore = 0
-    chosenComponent = None
-    for component in componentPopulation:
+    selectIndex = None
+    for index in range(len(componentPopulation)):
+        component = componentPopulation[index]
         # Adjust for negative scores
         currentScore -= minScore
         currentScore += getComponentScore(component, scoreMethod, fitnessFunction)
         if currentScore > targetScore:
-            chosenComponent = component
+            selectIndex = index
             break
 
-    return copy.deepcopy(chosenComponent)
+    return selectIndex
 
 # Fitness scores can have negative values
 # To adjust for this, gross each score up by the lowest score
@@ -160,3 +180,42 @@ def computeComponentAverageScore(scores):
     else:
         avgScore = sum(scores) / len(scores)
     return avgScore
+
+# Ranges format:
+# tag:
+#     tag:
+#         min: number
+#         max: number
+#     tag:
+#         - option1
+#         - option2
+
+# Get the number of rangeConfig items in dict
+# This can be generalized
+# Could have a list of iterable elements, hence recursing on each one
+# See ReadMe.md about assumptions for Ranges
+# TODO: Rename. This is closer to config = subset of element, get the # of shared elements
+def getConfigCount(element, keyConfig):
+    count = 0
+    if type(element) == type({}):
+        for key in keyConfig.keys():
+            # print "key: " + str(key)
+            # print "inKeyConfig: " + str(key in keyConfig.keys())
+            # print str(element.keys())
+            count += getConfigCount(element[key], keyConfig[key])
+    elif type(element) == type([]):
+        for entry in element:
+            count += getConfigCount(entry, keyConfig)
+    # If element is a tuple, this is inaccurate
+    # Make sure that config is at a terminating type
+    elif isMinMax(keyConfig) or type(keyConfig) == type([]):
+        count += 1
+    else:
+        raise Exception("Unknown element/config combination in getConfigCount")
+    return count
+
+def isMinMax(dictionary):
+    dictKeys = dictionary.keys()
+    dictKeys.sort()
+    minMaxKeys = ["max", "min"]
+    return dictKeys == minMaxKeys

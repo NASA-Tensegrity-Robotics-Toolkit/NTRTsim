@@ -119,7 +119,10 @@ def compareListDeepType(listA, listB):
 
 def compareVarTypes(varA, varB):
     sameDeepType = True
-    if not type(varA) == type(varB):
+    if not eqTypes(varA, varB):
+        print "type inconsistency:"
+        print varA
+        print varB
         sameDeepType = False
     return sameDeepType
 
@@ -133,9 +136,13 @@ def compareDeepType(varA, varB):
         type(0.1) : compareVarTypes,
         type(u'a'): compareVarTypes
     }
-    if type(varA) == type(varB):
+    # Necessary to avoid indexing errors
+    if eqTypes(varA, varB):
         sameDeepType &= dispatcher[type(varA)](varA, varB)
     else:
+        print "type inconsistency:"
+        print varA
+        print varB
         sameDeepType &= False
 
     return sameDeepType
@@ -157,3 +164,11 @@ def compareJSONDicts(jsonPathA, jsonPathB):
         raise Exception("Could not load one of the json files for comparing dictionaries.")
 
     return sameDicts
+
+def eqTypes(varA, varB):
+    sameType = False
+    if (type(varA) == type(0) or type(varA) == type(0.1)) and (type(varB) == type(0) or type(varB) == type(0.1)):
+        sameType |= True
+    else:
+        sameType |= type(varA) == type(varB)
+    return sameType

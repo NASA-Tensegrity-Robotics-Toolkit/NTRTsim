@@ -7,12 +7,12 @@ import Algorithms
 def gaussianSampling(gaussianConfig,
                      rangeConfig,
                      componentPopulation):
-
     outPopulation = []
     for component in componentPopulation:
         newComponent = copy.deepcopy(component)
         newComponent = mutateComponent(newComponent, rangeConfig, gaussianConfig)
         outPopulation.append(newComponent)
+
     return outPopulation
 
 # GenerateX assumes that rangeConfig is a dictionary except for generateValue
@@ -54,8 +54,8 @@ def mutateElement(value, rangeConfig, gaussianConfig):
         #TODO: Allow different list-selection methods
         if type(rangeConfig) == type([]):
             newValue = random.choice(rangeConfig)
-        elif isMinMax(rangeConfig):
-            # print "rangeConfig isMinMax==true."
+        elif Algorithms.isMinMax(rangeConfig):
+            # print "rangeConfig Algorithms.isMinMax==true."
             # calculation an adjustment value based on the range in the config
             # NOTE!!! This is slightly different from Brian's implementation (see Readme)
             deviation = random.uniform(0, gaussianConfig["mutationDev"])
@@ -97,9 +97,3 @@ def mutateList(list, rangeConfig, gaussianConfig):
         # print "newElement: " + str(newElement)
         newList.append(newElement)
     return newList
-
-def isMinMax(dictionary):
-    dictKeys = dictionary.keys()
-    dictKeys.sort()
-    minMaxKeys = ["max", "min"]
-    return dictKeys == minMaxKeys

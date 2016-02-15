@@ -7,7 +7,7 @@ def elitism(elitismConfig,
             scoreMethod="max",
             fitnessFunction="distance"):
 
-    selectionMethod = elitismConfig['selectionMethod']
+    # selectionMethod = elitismConfig['selectionMethod']
     survivalCount = elitismConfig['survivalCount']
     localPopulation = copy.deepcopy(componentPopulation)
 

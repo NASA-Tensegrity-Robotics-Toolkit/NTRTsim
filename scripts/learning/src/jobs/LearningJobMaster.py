@@ -204,6 +204,7 @@ class LearningJobMaster(NTRTJobMaster):
         for genNum in range(generationCount):
             # We want to write all of the trials for post processing
             activeGeneration = generationGeneratorFuction(previousGeneration)
+            # dictTools.pause("PAUSE IN LEARNINGJOBMASTER LINE 207")
 
             for member in activeGeneration.getMembers():
 

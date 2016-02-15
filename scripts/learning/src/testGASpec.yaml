@@ -19,12 +19,15 @@ nodeVals:
     Algorithms:
 #        MonteCarlo:
 #            spawnCount: 100
-#        Elitism:
-#            selectionMethod: "max"
-#            survivalCount: 7
+        Elitism:
+            selectionMethod: "max"
+            survivalCount: 7
         GaussianSampling:
-            mutationChance: 1.0
+            mutationChance: 0.4
             mutationDev: 0.05
+        CrossOver:
+#            selectionMethod: "split" # split or random, future feature
+            spawnCount: 10
     NeuralNetwork:
         numberOfStates: 0
         numberOfOutputs: 5
@@ -32,8 +35,8 @@ nodeVals:
     PopulationSize: 50
     Ranges:
         params:
-                min: 0
-                max: 1
+            min: 0.0
+            max: 1.0
 
 edgeVals:
     Algorithms:
@@ -42,6 +45,12 @@ edgeVals:
         Elitism:
             selectionMethod: "max"
             survivalCount: 5
+        GaussianSampling:             # Need to support sampling different #
+            mutationChance: 0.4
+            mutationDev: 0.05
+        CrossOver:
+#            selectionMethod: "split" # split or random, future feature
+            spawnCount: 10
     NeuralNetwork:
         numberOfStates: 0
         numberOfOutputs: 1
@@ -49,8 +58,8 @@ edgeVals:
     PopulationSize: 50
     Ranges:
         params:
-                min: 0
-                max: 1
+            min: 0.0
+            max: 1.0
 
 feedbackVals:
     Algorithms:
@@ -59,6 +68,12 @@ feedbackVals:
         Elitism:
             selectionMethod: "max"
             survivalCount: 3
+        GaussianSampling:
+            mutationChance: 0.4
+            mutationDev: 0.05
+        CrossOver:
+#            selectionMethod: "split" # split or random, future feature
+            spawnCount: 10
     NeuralNetwork:
         numberOfStates: 2
         numberOfOutputs: 5
@@ -66,17 +81,24 @@ feedbackVals:
         numberOfInstances: 1
     PopulationSize: 40
     Ranges:
-        neuralParams:
-                min: -1
-                max: 1
+        params:               # This is only necessary for backwards compatibility.
+            neuralParams:     # neuralparams should be moved to the same leve as params
+                min: -1.0
+                max: 1.0
 
 goalVals:
     Algorithms:
 #        MonteCarlo:
 #            spawnCount: 100
         Elitism:
-            selectionMethod: "max"
+            selectionMethod: "max" # "max" is a bad name for this
             survivalCount: 4
+        GaussianSampling:
+            mutationChance: 0.4
+            mutationDev: 0.05
+        CrossOver:
+#            selectionMethod: "split" # split or random, future feature
+            spawnCount: 10
     NeuralNetwork:
         numberOfStates: 5
         numberOfOutputs: 5
@@ -84,7 +106,8 @@ goalVals:
         numberOfInstances: 1
     PopulationSize: 50
     Ranges:
-        neuralParams:
-                min: -1
-                max: 1
+        params:
+            neuralParams:
+                min: -1.0
+                max: 1.0
 
