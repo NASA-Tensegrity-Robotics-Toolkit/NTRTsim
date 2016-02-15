@@ -13,6 +13,11 @@ fileA="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/monteOut_0_
 fileB="/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/GATestsYAMLSeed/monteOut_0_3.json"
 python $compare "$fileA" "$fileB"
 
+nnGitIgnore="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/NeuralNet/.gitignore"
+gaGitIgnore="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/.gitignore"
+printf "*.nnw">$nnGitIgnore
+printf "*.json\n*.txt">$gaGitIgnore
+
 # For testing a different terrain
 # fileC="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/monteOut_0_0.json"
 # fileD="/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/GATestsYAMLSeed/monteOut_0_12.json"

@@ -1,0 +1,5 @@
+jsonTestScript.sh
+../../../resources/src/bmirletz/GATests/NeuralNet/
+../../../resources/src/leifrf/
+../../scripts.sln
+testGASpecModified.json

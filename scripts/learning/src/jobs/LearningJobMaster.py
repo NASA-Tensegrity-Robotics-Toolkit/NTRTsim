@@ -54,7 +54,6 @@ class LearningJobMaster(NTRTJobMaster):
         "Ranges"
     ]
 
-    # Change to a YAML config file later
     def _setup(self):
 
         # If this fails, the program should fail. Input file is required

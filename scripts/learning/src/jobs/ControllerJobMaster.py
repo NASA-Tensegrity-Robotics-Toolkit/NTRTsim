@@ -60,13 +60,16 @@ class ControllerJobMaster(LearningJobMaster):
         return nextGeneration
 
     # Once backwards compatibility is dealt with, this can be moved up to LearningJobMaster
+    # componentName does not need to be passed here
+    # just get it earlier from self.getComponentsConfig()[componentName]
     def generateComponentPopulation(self, componentName, componentsConfig, componentPopulation, generationID):
         #print "genID in generateComponentPopulation: " + str(generationID)
         # Note singular from plural
         componentConfig = componentsConfig[componentName]
         emptyComponent = self.createEmptyComponent(componentsConfig[componentName]['NeuralNetwork'])
-        newComponentPopulation = dispatchLearning(componentName=componentName,
-                                                  componentConfig=componentConfig,
+        newComponentPopulation = dispatchLearning(componentConfig=componentConfig,
+                                                  scoreMethod=self.config["TrialProperties"]["scoreMethod"],
+                                                  fitnessFunction=self.config["TrialProperties"]["fitnessFunction"],
                                                   baseComponent=emptyComponent,
                                                   componentPopulation=componentPopulation
                                                   )
@@ -74,6 +77,7 @@ class ControllerJobMaster(LearningJobMaster):
         # Move this to its own function when possible
         # Backwards Compatibility
         # Metrics is not added because it is never seen to be used
+        # Move this to its own function afterwards
         for componentMember in newComponentPopulation:
             # Index the component in the line of all of these components made so far in learning
             # Consider skipping this
@@ -102,6 +106,7 @@ class ControllerJobMaster(LearningJobMaster):
              It should be synthesized from info in the dictionary.
     """
     # Backwards Compatibility
+    # Something about this function doesn't belong
     def writeToNNW(self, neuralParams, fileName):
         fout = open(fileName, 'w')
         first = True

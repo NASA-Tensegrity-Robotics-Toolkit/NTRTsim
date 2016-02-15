@@ -17,16 +17,19 @@ TrialProperties:
 
 nodeVals:
     Algorithms:
-        MonteCarlo:
-            spawnCount: 100
-        Elitism:
-            selectionMethod: "max"
-            survivalCount: 5
+#        MonteCarlo:
+#            spawnCount: 100
+#        Elitism:
+#            selectionMethod: "max"
+#            survivalCount: 7
+        GaussianSampling:
+            mutationChance: 1.0
+            mutationDev: 0.05
     NeuralNetwork:
         numberOfStates: 0
         numberOfOutputs: 5
         numberOfInstances: 1
-    PopulationSize: 1
+    PopulationSize: 50
     Ranges:
         params:
                 min: 0
@@ -34,13 +37,16 @@ nodeVals:
 
 edgeVals:
     Algorithms:
-        MonteCarlo:
-            spawnCount: 100
+#        MonteCarlo:
+#            spawnCount: 100
+        Elitism:
+            selectionMethod: "max"
+            survivalCount: 5
     NeuralNetwork:
         numberOfStates: 0
         numberOfOutputs: 1
         numberOfInstances: 15
-    PopulationSize: 2
+    PopulationSize: 50
     Ranges:
         params:
                 min: 0
@@ -48,8 +54,11 @@ edgeVals:
 
 feedbackVals:
     Algorithms:
-        MonteCarlo:
-            spawnCount: 100
+#        MonteCarlo:
+#            spawnCount: 100
+        Elitism:
+            selectionMethod: "max"
+            survivalCount: 3
     NeuralNetwork:
         numberOfStates: 2
         numberOfOutputs: 5
@@ -63,14 +72,17 @@ feedbackVals:
 
 goalVals:
     Algorithms:
-        MonteCarlo:
-            spawnCount: 100
+#        MonteCarlo:
+#            spawnCount: 100
+        Elitism:
+            selectionMethod: "max"
+            survivalCount: 4
     NeuralNetwork:
         numberOfStates: 5
         numberOfOutputs: 5
         numberOfHidden: 5
         numberOfInstances: 1
-    PopulationSize: 1
+    PopulationSize: 50
     Ranges:
         neuralParams:
                 min: -1

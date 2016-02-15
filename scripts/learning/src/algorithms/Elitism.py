@@ -1,52 +1,22 @@
+import copy
 import random
-from helpersNew import Generation
+import Algorithms
 
-class Elitism:
-    
-    def elitism(self, learningConfig, generation):
-        
-        method = learningConfig['selectionMethod']
-        count = learningConfig['survivalCount']
-        outGeneration = []
-        
-        # Copy to avoid accidentally mutating the generation argument
-        generationLocal = list(generation)
+def elitism(elitismConfig,
+            componentPopulation,
+            scoreMethod="max",
+            fitnessFunction="distance"):
 
-        if count > len(generation):
-            raise Exception("Elitism trying to keep more members than there are in the generation.")
-        elif method == "absolute":
-            generationLocal.sortMembers()
-            outGeneration = generationLocal[:count]
-        elif method == "probability":
-            for index in range(count):
-                newMember = self._popByProbability(generationLocal)
-                outGeneration.append(newMember)
-        else:
-            raise Exception("Did not recognize selection method " + method + " in Elitism.")
-        
-        return outGeneration
+    selectionMethod = elitismConfig['selectionMethod']
+    survivalCount = elitismConfig['survivalCount']
+    localPopulation = copy.deepcopy(componentPopulation)
 
-    def _popByProbability(self, generation):
-        """
-        TODO
-        THIS CODE IS NEARLY COPY-PASTED FROM CROSSOVER
-        Either the learning methods should fall under one class
-        or this should be generalized and imported.
-        """
-        totalScore = generation.getTotalScore()
-        selectScore = random.randint(0, totalScore)
+    outPopulation = []
+    # TODO: Handle error here were survivalCount > len(previousPopulation)
+    # localPopulation is automatically pruned each iteration with .pop
+    while len(outPopulation) < survivalCount:
+        bestIndex = Algorithms.getBestComponentIndex(localPopulation, scoreMethod, fitnessFunction)
+        newComponent = localPopulation.pop(bestIndex)
+        outPopulation.append(newComponent)
 
-        sum = 0
-        popIndex = None
-        for index in range(len(generation)):
-            member = generation[index]
-            sum += member.getScore()
-            index += 1
-            if sum > selectScore:
-                popIndex = index
-                break
-
-        if not popIndex:
-            raise Exception("Could not find a member for selection in Elitism.")
-
-        return generation.pop(popIndex)
+    return outPopulation

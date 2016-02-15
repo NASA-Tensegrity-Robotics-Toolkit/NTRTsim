@@ -155,8 +155,6 @@ class Generation:
                            generationID=self.generationID)
 
         for componentName, componentPopulation in self._componentPopulations.iteritems():
-            print str(type(componentPopulation))
-            print str(componentPopulation[0])
             newMember.components[componentName] = copy.deepcopy(random.choice(componentPopulation))
         self.addMember(newMember)
         return newMember
@@ -294,6 +292,7 @@ class Member(object):
 
 # In the process of removing calls to subclasses of Member.
 # Replacing them all with just "Member"
+# TODO: Refactored out in favor of Member
 class Controller(Member):
 
     # DEFAULTS = {

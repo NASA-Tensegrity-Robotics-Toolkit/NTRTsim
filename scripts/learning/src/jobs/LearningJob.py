@@ -10,32 +10,18 @@ from interfaces import NTRTMasterError, NTRTJob
 class LearningJob(NTRTJob):
 
     def __init__(self, jobArgs, member):
-        """
-        Override this in your subclass. Be sure that at the end of your method your init method
-        you make a call to self._setup(). I'll clean this up later so that we're properly doing a super
-        call (rather than invoking setup in the child), no need for you to handle that now.
-
-        You can put args into this however you want, just depends on what convention you want to use. I'd personally
-        use a dictionary. If you use a dictionary, just use the jobArgs keyword from this function's signature.
-        """
         logging.info("Constructing job with args %r" % jobArgs)
         self.args = jobArgs
         self.member = member
 
         self._setup()
 
+    # Unused
+    # Must be implemented since LearningJob implements the NTRTJob interface
     def _setup(self):
-        """
-        This is where you'll handle setup related to this *single* learning trial. Each instance of NTRT
-        we run will have its own NTRTJob instance.
-        """
+        pass
 
     def startJob(self):
-        """
-        Override this to start the NTRT instance and pass it the relevant parameters.. This is called
-        by NTRTJobMaster when it wants to start this NTRT process.
-        """
-
         logging.info("STARTING job with args %r" % self.args)
         self.pid = os.fork()
 

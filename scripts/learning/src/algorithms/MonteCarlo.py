@@ -2,33 +2,26 @@ import random
 from helpersNew import Generation
 from helpersNew import dictTools
 
-class MonteCarlo:
-
-    """
-    Performs basic Monte Carlo by replicating the given component.
-    All of the attributes of the component are randomized based on the config.
-
-    """
-
-def monteCarlo(monteCarloConfig, rangeDictionary, templateComponent):
+def monteCarlo(monteCarloConfig, rangeConfig, templateComponent):
 
     newComponentPopulation = []
     # Not sure how dictionary passing/copying is working out here. check it later.
     # spawned = 0
     for item in range(monteCarloConfig['spawnCount']):
-        newComponent = generateNewComponent(rangeDictionary, templateComponent.copy())
+        newComponent = generateNewComponent(rangeConfig, templateComponent.copy())
         newComponentPopulation.append(newComponent)
         # spawned += 1
     return newComponentPopulation
 
-def generateNewComponent(rangeDictionary, componentDictionary, tagStack=None):
+# TODO: Refactor this to follow the dispatcher pattern in dictTools for compareDeepType
+def generateNewComponent(rangeDictionary, component, tagStack=None):
     if not tagStack:
         tagStack = []
-    for key, value in componentDictionary.iteritems():
+    for key, value in component.iteritems():
         nextTagStack = list(tagStack)
         nextTagStack.append(key)
         if type(value) == type({}):
-            componentDictionary[key] = generateNewComponent(rangeDictionary, value, nextTagStack)
+            component[key] = generateNewComponent(rangeDictionary, value, nextTagStack)
         elif type(value) == type([]):
             newList = generateNewComponentFromList(rangeDictionary, value, nextTagStack)
             """
@@ -37,14 +30,14 @@ def generateNewComponent(rangeDictionary, componentDictionary, tagStack=None):
             they will be overwritten with null.
             Do a "deep sweep" to make sure that this doesn't happen.
             """
-            componentDictionary[key] = newList
+            component[key] = newList
         # Assume that value is an integer
         else:
             newItem = getValueFromTagStack(rangeDictionary, nextTagStack)
             # Check that we actually updated the value
             if newItem:
-                componentDictionary[key] = newItem
-    return componentDictionary
+                component[key] = newItem
+    return component
 
 def generateNewComponentFromList(rangeDictionary, value, tagStack):
     if type(value) == type([]):
