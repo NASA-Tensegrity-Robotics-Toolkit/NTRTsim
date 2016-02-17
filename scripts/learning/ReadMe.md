@@ -1,9 +1,5 @@
-
 When creating a member from component populations,
 the components are chosen randomly.
-
-How should different scores be stored?
-By extension, the current recording method for different terrains should change.
 
 In algorithms, a member of the previous generation is selected for mutation.
 This is the same approach as with the previous architecture (Elitism).
@@ -16,9 +12,8 @@ If the same component is used in different learning scenarios, then it may be of
 for when different terrains / fitness functions are used.
 Otherwise, single-run scores get watered down.
 
-EmptyComponent is sticking around to give a template to MonteCarlo when there is no seed.
-    __Removed template component for all implementations. You must have a seed file.
-    This requirement for the ControllerJobMaster class could be introduced with interface inheritance.
+Removed template component for all implementations. You must have a seed file.
+This requirement for the ControllerJobMaster class could be introduced with interface inheritance.
 
 I would like to change Generation in the following manner:
     - Add a ComponentPopulation subclass which extends list
@@ -34,26 +29,19 @@ I would like to change Generation in the following manner:
 
     - Given that this is not a functionality improvement, I have deferred it
 
-Consider making an AlgorithmJob object:
-    - Takes the scoreMethod and fitnessFunction values so they don't need to be passed in Algorithms
-
 There is a concurrency read/write error for the .json controller files
     - Easily shows in testGASpec.json with 1< terrains
-
-Currently, rangeConfig is being passed through dictionary recursion when mutating values.
-This is in anticipation of property or structure learning needing to select a value from a
-list, instead of from a range.
-    - Might not be necessary
+    - Likely only a problem for testGASpec, since it runs so fast
 
 Currently, mutateParams is mutating by random.normalvariate(0, config['mutationAmount']
     - The random value is used for BOTH ranges of -1..1 and 0..1
     - This seems to be inconsistent with standard mutation
         - Double the change for 0..1 as for -1..1
+    - This approach is NOT used in the new learning
 
 The dictionary walkers used for the learning algorithms are all very similar.
     - Would be nice to find a way to use one walker and call it for each alg
-        - pass by function for element mutating?
-    __There are two ways to do this:
+    There are two ways to do this:
         1. Implement a "tagStack"
             1.1 mutateDictionary(dictionary, mutatorFunction): 
             1.2 mutatorFunction, specified by the developer, is applied to every leaf node in the dictionary
@@ -76,7 +64,7 @@ The dictionary walkers used for the learning algorithms are all very similar.
         In either case, the passed-in dictionary is MUTATED
             Could possibly avoid this by doing a copy operation at each level (expensive)
         For now, a direct implementation of the walker for each algorithm is used
-            This will be refactored to follow a single walker, such as 1, or 2, after property learning is implemented
+            This may be refactored to follow a single walker, such as 1, or 2, after property learning is implemented
             
     - An even better option would be to be able to both mutate the target value and get a separate return value
         - i.e. fold over all elements
@@ -99,16 +87,14 @@ Brian's implementation of crossOver may have a flaw:
 				0.60541811415525382
 			]
 		],    
-            
-During the refactoring pass, check each use of copy.deepcopy(x). Likely overusing it
+
 
 The overall process of creating a new component from an old component is as follows:
     1. Copy the old component
     2. Walk through it, matching its elements with those of rangeConfig
-        2.1 At each matched element, update according to the algorithm
+        2.1 At each matched element, mutate it according to the algorithm
         
-__ASSUMPTION
-    The Ranges section of a learningSpec must follow this format:
+The Ranges section of a learningSpec must follow this format:
     A tag is a dictionary.
     If a tag contains another tag, then it can only contain tags.
     If a tag has the two elements min: number max: number, it is a terminal.
@@ -121,13 +107,14 @@ __ASSUMPTION
             tag:
                 - option1
                 - option2
-               
+                ...
 
-If a value is specified in the learning config range but not in the structure/controller file, it's an error.
-This would require all parameters that want to be learned over to be pre-defined in the yaml file.
-    - Something to consider for the future...
+If a value is specified in the learning range config but not in the component, it's an error.
+This requires all parameters that want to be learned over to be pre-defined in the yaml file.
+    - May reduce usability for large descriptions
 
 TODO:
 Exception Hierarchy
 Refactor out component name from generatecomponent(s)populationss
 Update scores after beginTrial
+During the refactoring pass, check each use of copy.deepcopy(x). Likely overusing it

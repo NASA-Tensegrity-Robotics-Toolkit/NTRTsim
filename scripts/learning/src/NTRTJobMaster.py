@@ -25,20 +25,11 @@
 
 import sys
 import logging
-import yaml
+from helpersNew import dictTools
 from evolution import EvolutionJobMaster
 from jobs import ControllerJobMaster
 from jobs import BuilderJobMaster
 from jobs import StructureJobMaster
-
-"""
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    configFile = sys.argv[1]
-    numProcesses = int(sys.argv[2])
-    jobMaster = EvolutionJobMaster(configFile, numProcesses)
-    jobMaster.beginTrial()
-"""
 
 DISPATCH_JOB = {
     "controller" : ControllerJobMaster,
@@ -51,9 +42,7 @@ if __name__ == "__main__":
     configFilePath = sys.argv[1]
     numProcesses = int(sys.argv[2])
     if ".yaml" in sys.argv[1]:
-        configFile = open(configFilePath, 'r')
-        config = yaml.load(configFile)
-        configFile.close()
+        config = dictTools.loadFile(configFilePath)
         learningType = config['TrialProperties']['learningType']
         jobMaster = DISPATCH_JOB[learningType](configFilePath, numProcesses)
     elif ".json" in sys.argv[1]:

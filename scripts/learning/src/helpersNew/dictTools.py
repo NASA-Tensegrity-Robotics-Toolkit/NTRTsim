@@ -1,54 +1,8 @@
 import os
 import json
-import sys
 import yaml
-# from interfaces import NTRTMasterError
 
-def dictionaryToList(dictionary):
-
-    outputList = []
-
-    for key in dictionary:
-        value = dictionary[key]
-        if type(value) == type({}):
-            outputList.extend(dictionaryToList(value))
-        elif type(value) == type(1):
-            outputList.append(value)
-        elif type(value) == type([]):
-            outputList.extend(value)
-        else:
-            raise Exception("Trying to convert unrecognized dictionary element type into list.")
-
-    return outputList
-
-# Hack way of list->dictionary in O(N)
-_list  = []
-_index = 0
-def listToDictionary(list, dictionary):
-    _list = list
-    outputDictionary = _listToDictionaryWorker(dictionary.copy())
-    _list = []
-    _index = 0
-    return outputDictionary
-
-def _listToDictionaryWorker(dictionary):
-    outputDictionary = {}
-
-    for key in dictionary:
-        value = dictionary[key]
-        if type(value) == type([]):
-            for i in range(value):
-                value[i] = _list[_index]
-                _index += 1
-        elif type(value) == type(1):
-            outputDictionary[key] = _list[_index]
-            _index += 1
-        else:
-            outputDictionary[key] = _listToDictionaryWorker(value)
-
-    return outputDictionary
-
-def printDict(dictionary, indent =0):
+def printDict(dictionary, indent=0):
     assert type(dictionary) == type({})
     for key in dictionary:
         # print key
@@ -77,8 +31,35 @@ def tryMakeDir(dirPath):
         if not os.path.isdir(dirPath):
             raise Exception("Could not make directory at " + dirPath)
 
-    def generationGenerator(self):
-        return
+def eqTypes(varA, varB):
+    sameType = False
+    if (type(varA) == type(0) or type(varA) == type(0.1)) and (type(varB) == type(0) or type(varB) == type(0.1)):
+        sameType |= True
+    else:
+        sameType |= type(varA) == type(varB)
+    return sameType
+
+def loadFile(dictFilePath):
+    file = open(dictFilePath, 'r')
+    if ".json" in dictFilePath:
+        dictionary = json.load(file)
+    elif ".yaml" in dictFilePath:
+        dictionary = yaml.load(file)
+    else:
+        raise Exception("Unknown file type in loadFile.")
+    file.close()
+    return dictionary
+
+def dumpFile(contents, filePath):
+    file = open(filePath, 'w')
+    if ".json" in filePath:
+        dictionary = json.dump(contents, file, indent=4)
+    elif ".yaml" in filePath:
+        dictionary = yaml.dump(contents, file)
+    else:
+        raise Exception("Unknown file type in dumpFile.")
+    file.close()
+    return dictionary
 
 def compareDictDeepType(dictA, dictB):
     sameDeepType = True
@@ -86,7 +67,7 @@ def compareDictDeepType(dictA, dictB):
         print "dictionaries have different keys:"
         print "dictA keys: " + str(dictA.keys())
         print "dictB keys: " + str(dictB.keys())
-        sameDeepType = False
+        sameDeepType &= False
     else:
         # Fold type comparisons
         for key in dictA:
@@ -99,7 +80,7 @@ def compareListDeepType(listA, listB):
         print "lists have different lengths:"
         print "listA len: " + str(len(listA))
         print "listB len: " + str(len(listB))
-        sameDeepType = False
+        sameDeepType &= False
     else:
         index = 0
 
@@ -117,13 +98,14 @@ def compareListDeepType(listA, listB):
 
     return sameDeepType
 
+# TODO: This function always returns true with how it is called. Refactor the dispatcher.
 def compareVarTypes(varA, varB):
     sameDeepType = True
     if not eqTypes(varA, varB):
         print "type inconsistency:"
         print varA
         print varB
-        sameDeepType = False
+        sameDeepType &= False
     return sameDeepType
 
 def compareDeepType(varA, varB):
@@ -157,33 +139,3 @@ def compareFileDicts(pathA, pathB):
         raise Exception("Could not load one of the files for comparing dictionaries.")
 
     return sameDicts
-
-def eqTypes(varA, varB):
-    sameType = False
-    if (type(varA) == type(0) or type(varA) == type(0.1)) and (type(varB) == type(0) or type(varB) == type(0.1)):
-        sameType |= True
-    else:
-        sameType |= type(varA) == type(varB)
-    return sameType
-
-def loadFile(dictFilePath):
-    file = open(dictFilePath, 'r')
-    if ".json" in dictFilePath:
-        dictionary = json.load(file)
-    elif ".yaml" in dictFilePath:
-        dictionary = yaml.load(file)
-    else:
-        raise Exception("Unknown file type in loadFile.")
-    file.close()
-    return dictionary
-
-def dumpFile(contents, filePath):
-    file = open(filePath, 'w')
-    if ".json" in filePath:
-        dictionary = json.dump(contents, file, indent=4)
-    elif ".yaml" in filePath:
-        dictionary = yaml.dump(contents, file)
-    else:
-        raise Exception("Unknown file type in dumpFile.")
-    file.close()
-    return dictionary

@@ -4,41 +4,28 @@ import logging
 from interfaces import NTRTJobMaster, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
 from algorithms import dispatchLearning
-#TODO: This is hackety, fix it.
 from LearningJob import LearningJob
 from helpersNew import Generation
-from helpersNew import Member
 from helpersNew import dictTools
 
 class LearningJobMaster(NTRTJobMaster):
 
-    ## Refactoring out directory names, using a flat file system
-    # Directory Names
     RESOURCE_DIRECTORY_NAME    = "../../../resources/src/"
-    GENERATIONS_DIRECTORY_NAME = "Generations/"
-    MEMBERS_DIRECTORY_NAME     = "Members/"
-    TRIALS_DIRECTORY_NAME      = "Trials/"
-    # Rename this
-    # GENERAL_DIRECTORY_NAME = "OutputMembers/"
 
     # File Names
-    LOG_FILE_NAME              = "output.log"
-    LOGGING_NAME               = "NTRT Learning"
-    SUMMARY_FILE_NAME          = "summary.txt"
+    LOG_FILE_NAME = "output.log"
+    LOGGING_NAME = "NTRT Learning"
+    SUMMARY_FILE_NAME = "summary.txt"
 
     LEARNING_CONFIG_KEYWORDS = [
         "PathInfo",
         "TrialProperties",
     ]
 
-    # Protected Words
-    # These are words used in defining basic learning properties in YAML
     PROTECTED_TERMS = [
-        # These are to strip fields from seed members
         "generationID",
         "scores",
         "memberID",
-        # These are added for filtering learning config files
         "trialPath",
         "fileName",
         "executable",
@@ -62,8 +49,7 @@ class LearningJobMaster(NTRTJobMaster):
 
     def _setup(self):
 
-        # If this fails, the program should fail. Input file is required
-        # for useful output
+        # If this fails, the program should fail. Input file is required.
         try:
             configFile = open(self.configFileName, 'r')
             self.config = yaml.load(configFile)
@@ -73,17 +59,12 @@ class LearningJobMaster(NTRTJobMaster):
 
         self.trialDirectory = os.path.abspath(self.RESOURCE_DIRECTORY_NAME + self.config['PathInfo']['trialPath'])
         dictTools.tryMakeDir(self.trialDirectory)
-        # dictTools.tryMakeDir(self.trialDirectory + '/' + self.GENERAL_DIRECTORY_NAME)
 
-        # Logging not behaving as expected
-        # Pretty much just a console print right now
         self.logFileName = self.trialDirectory + '/' + self.LOG_FILE_NAME
         logging.getLogger("NTRT Learning")
         logging.basicConfig(filename=self.logFileName, format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 
-        # Hack for terrain compatibility
-        # Backwards Compatibility
-
+        # Backwards compatibility
         terrains = []
         for terrain in self.config['TrialProperties']['terrains']:
             try:
@@ -91,19 +72,23 @@ class LearningJobMaster(NTRTJobMaster):
             except Exception:
                 raise Exception("Could not find terrain of type " + terrain + " in terrainMap.")
 
-        # Backwards compatibility
         self.config['TrialProperties']['terrains'] = terrains
-
         self.trialProperties = self.config['TrialProperties']
 
     memberTemplate = None
     def getMemberTemplate(self):
         if not self.memberTemplate:
             seedDirectory = self.config['PathInfo']['seedDirectory']
-            templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
+            try:
+                templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
+            except Exception:
+                raise Exception("Seed Directory is empty. At least one seed member is needed to run a trial.")
             print templateFilePath
             self.memberTemplate = dictTools.loadFile(templateFilePath)
         return self.memberTemplate
+
+    def getComponentsKey(self):
+        return NotImplementedError("ComponentsPath must be implemented in subclass.")
 
     def getComponentsConfig(self):
         componentsConfig = {}
@@ -116,18 +101,13 @@ class LearningJobMaster(NTRTJobMaster):
                 componentsConfig[key] = componentsConfigDict[key]
         return componentsConfig
 
-    def getComponentsKey(self):
-        return NotImplementedError("ComponentsPath must be implemented in subclass.")
-
+    # TODO: Consider a better name for this function. There is a Member class which makes this confusing.
     def getMemberFileType(self):
         seedDirectory = self.config['PathInfo']['seedDirectory']
         templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
         filename, fileExtension = os.path.splitext(templateFilePath)
         return fileExtension
 
-    # This should be moved to the member class
-    # Assumes a fully structured member, with components
-    # ALSO ASSIGNS MEMBER's filePath FIELD
     def writeMemberToFile(self, member):
         memberTemplate = self.getMemberTemplate()
         componentsKey = self.getComponentsKey()
@@ -139,20 +119,15 @@ class LearningJobMaster(NTRTJobMaster):
         basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) \
                    + "_" + str(components['memberID']) + self.getMemberFileType()
         filePath = self.trialDirectory + '/' + basename
-        member.filePath = filePath
+        # TODO: dictTools is becoming a longterm helper tool. It needs the "Pretty Woman" treatment.
         dictTools.dumpFile(memberTemplate, filePath)
         return basename
 
     def generateComponentPopulation(self, componentConfig, componentPopulation):
         trialProperties = self.config["TrialProperties"]
-        #print "genID in generateComponentPopulation: " + str(generationID)
-        # templateComponent = self.generateTemplateComponent(componentConfig)
-        #dictTools.printDict(componentConfig)
-        #dictTools.pause("Check output.")
         newComponentPopulation = dispatchLearning(componentConfig=componentConfig,
                                                   scoreMethod=trialProperties["scoreMethod"],
                                                   fitnessFunction=trialProperties["fitnessFunction"],
-                                                  # templateComponent=templateComponent,
                                                   componentPopulation=componentPopulation
                                                   )
         return newComponentPopulation
@@ -161,8 +136,8 @@ class LearningJobMaster(NTRTJobMaster):
         componentsConfig = self.getComponentsConfig()
         componentPopulations = previousGeneration.getComponentPopulations()
         generationID = previousGeneration.getID() + 1
-
         nextGeneration = Generation(generationID)
+
         for componentName in componentsConfig:
             population = self.generateComponentPopulation(componentsConfig[componentName],
                                                           componentPopulations[componentName])
@@ -192,42 +167,19 @@ class LearningJobMaster(NTRTJobMaster):
                             "Check the seedDirectory element in PathInfo.")
         return previousGeneration
 
-    # Better to pass the generation object instead of doing this
-    # If not used by commit, delete this
-    def getPreviousComponentGeneration(self, component, previousGeneration):
-        previousComponentGeneration = []
-        if len(previousGeneration.getMembers()) > 0:
-            for member in previousGeneration.getMembers():
-                previousComponent = member.components[component]
-                previousComponentGeneration.append(previousComponent)
-        return previousComponentGeneration
-
-    def getNewGenerationID(self, previousGeneration=None):
-        if previousGeneration:
-            newID = previousGeneration.ID + 1
-        else:
-            newID = -1
-        return newID
-
     def beginTrial(self):
 
+        jobList = []
+        previousGeneration = self.importSeedGeneration()
         generationCount = self.trialProperties['generationCount']
 
-        jobList = []
-
-        previousGeneration = self.importSeedGeneration()
         for genNum in range(generationCount):
             activeGeneration = self.generationGenerator(previousGeneration)
-            # dictTools.pause("PAUSE IN LEARNINGJOBMASTER LINE 207")
 
             for member in activeGeneration.getMembers():
-
-                # Expecting a json-compatible dictionary
                 fileName = self.writeMemberToFile(member)
-                # dictTools.pause("fileName: " + fileName)
 
                 for terrain in self.trialProperties['terrains']:
-                    # TODO check if these args need to be passed from the yamlconfig
                     args = {'filename' : fileName,
                             'resourcePrefix' : self.RESOURCE_DIRECTORY_NAME,
                             'path'     : self.config['PathInfo']['trialPath'],
@@ -237,8 +189,7 @@ class LearningJobMaster(NTRTJobMaster):
                     # Pass member by reference for updating scores
                     jobList.append(LearningJob(args, member))
 
-            # Run the jobs
-            # Only controller simulation is implemented right now
+            # Only controller simulation is implemented currently
             if self.trialProperties['learningType'] == "controller":
                 conSched = ConcurrentScheduler(jobList, self.numProcesses)
                 completedJobs = conSched.processJobs()

@@ -12,4 +12,3 @@ if __name__ == "__main__":
         print "Files are of equiavlent deep format."
     else:
         print "~~~ Files are NOT of equivalent deep format. ~~~"
-    exit(0)
