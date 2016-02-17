@@ -17,6 +17,8 @@ for when different terrains / fitness functions are used.
 Otherwise, single-run scores get watered down.
 
 EmptyComponent is sticking around to give a template to MonteCarlo when there is no seed.
+    __Removed template component for all implementations. You must have a seed file.
+    This requirement for the ControllerJobMaster class could be introduced with interface inheritance.
 
 I would like to change Generation in the following manner:
     - Add a ComponentPopulation subclass which extends list
@@ -120,6 +122,10 @@ __ASSUMPTION
                 - option1
                 - option2
                
+
+If a value is specified in the learning config range but not in the structure/controller file, it's an error.
+This would require all parameters that want to be learned over to be pre-defined in the yaml file.
+    - Something to consider for the future...
 
 TODO:
 Exception Hierarchy

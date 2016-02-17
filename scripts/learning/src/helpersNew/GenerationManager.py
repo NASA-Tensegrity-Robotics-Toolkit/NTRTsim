@@ -142,13 +142,6 @@ class Generation:
         for component in componentPopulation:
             self.addComponentMember(componentName, component)
 
-    def addComponentMember(self, componentName, component):
-        localComponent = copy.deepcopy(component)
-        localComponent["generationID"] = self.generationID
-        if not componentName in self._componentPopulations:
-            self._componentPopulations[componentName] = []
-        self._componentPopulations[componentName].append(localComponent)
-
     def generateMemberFromComponents(self):
         memberID = self._getNextMemberID()
         newMember = Member(memberID=memberID,
@@ -158,6 +151,13 @@ class Generation:
             newMember.components[componentName] = copy.deepcopy(random.choice(componentPopulation))
         self.addMember(newMember)
         return newMember
+
+    def addComponentMember(self, componentName, component):
+        localComponent = copy.deepcopy(component)
+        localComponent["generationID"] = self.generationID
+        if not componentName in self._componentPopulations:
+            self._componentPopulations[componentName] = []
+        self._componentPopulations[componentName].append(localComponent)
 
     def _getNextMemberID(self):
         memberID = self._nextMemberID
@@ -240,8 +240,6 @@ class Member(object):
             self._trials = seedMember._trials
             self.components = seedMember.components
         else:
-            # This is necessary because calling the super constructor returns a pointer to the same instance
-            # Why? Unknown. Investigating.
             self.memberID = memberID
             if not components:
                 self.components = {}
@@ -336,90 +334,5 @@ class Controller(Member):
             print "Setting generationID to: " + str(generationID)
             self.components['generationID'] = generationID
 
-class ParameterSet(Member):
-
-    """
-    Taken from TensegrityModel.cpp 1/28/2016
-
-    default rod params
-    double radius = 0.5;
-    double density = 1.0;
-    double friction = 1.0;
-    double rollFriction = 0.0;
-    double restitution = 0.2;
-
-    default muscle params
-    double stiffness = 1000.0;
-    double damping = 10.0;
-    double pretension = 0.0;
-    double hist = false;
-    double maxTens = 1000.0;
-    double targetVelocity = 100.0;
-    double minActualLength = 0.1;
-    double minRestLength = 0.1;
-    double rotation = 0;
-    """
-
-    DEFAULTS = {
-        'tgRod' : {
-            'Radius' : {
-                'Min' : 0.1,
-                'Max' : 0.9
-                },
-            'Density' : {
-                'Min' : 0.1,
-                'Max' : 1.0
-                },
-            'Friction' : {
-                'Min' : 0.5,
-                'Max' : 1.5
-                },
-            'RollFriction' : {
-                'Min' : 0.0,
-                'Max' : 1.0
-                },
-            'Restitution' : {
-                'Min' : 0.1,
-                'Max' : 0.3
-                }
-            },
-        'tgBasicActuator' : {
-            'Stiffness' : {
-                'Min' : 500.0,
-                'Max' : 1500.0
-                },
-            'Damping' : {
-                'Min' : 5.0,
-                'Max' : 15.0
-                },
-            'Pretension' : {
-                'Min' : 0.0,
-                'Max' : 1.0
-                },
-            # Hist boolean?
-            'MaxTens' : {
-                'Min' : 500.0,
-                'Max' : 1500.0
-                },
-            'TargetVelocity' : {
-                'Min' : 50.0,
-                'Max' : 150.0
-                },
-            'MinActualLength' : {
-                'Min' : 0.05,
-                'Max' : 0.15
-                },
-            'MinRestingLength' : {
-                'Min' : 0.05,
-                'Max' : 0.15
-                },
-            'Rotation' : {
-                'Min' : 0.0,
-                'Max' : 0.1
-                }
-            }
-        }
-
-class Structure(Member):
-    def __init__(self):
-        return 0
+class Model(Member):
+    ""

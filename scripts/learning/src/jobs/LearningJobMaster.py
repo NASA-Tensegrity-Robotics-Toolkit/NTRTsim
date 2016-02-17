@@ -1,10 +1,9 @@
 import os
-import json
 import yaml
 import logging
-import random
 from interfaces import NTRTJobMaster, NTRTMasterError
 from concurrent_scheduler import ConcurrentScheduler
+from algorithms import dispatchLearning
 #TODO: This is hackety, fix it.
 from LearningJob import LearningJob
 from helpersNew import Generation
@@ -20,19 +19,21 @@ class LearningJobMaster(NTRTJobMaster):
     MEMBERS_DIRECTORY_NAME     = "Members/"
     TRIALS_DIRECTORY_NAME      = "Trials/"
     # Rename this
-    GENERAL_DIRECTORY_NAME = "OutputMembers/"
+    # GENERAL_DIRECTORY_NAME = "OutputMembers/"
 
     # File Names
     LOG_FILE_NAME              = "output.log"
     LOGGING_NAME               = "NTRT Learning"
     SUMMARY_FILE_NAME          = "summary.txt"
 
+    LEARNING_CONFIG_KEYWORDS = [
+        "PathInfo",
+        "TrialProperties",
+    ]
+
     # Protected Words
     # These are words used in defining basic learning properties in YAML
     PROTECTED_TERMS = [
-        # These two are currently used when extracting component libraries
-        "PathInfo",
-        "TrialProperties",
         # These are to strip fields from seed members
         "generationID",
         "scores",
@@ -54,6 +55,11 @@ class LearningJobMaster(NTRTJobMaster):
         "Ranges"
     ]
 
+    TERRAINS = {
+        "flat" : [[0, 0, 0, 0]],
+        "hill" : [[0, 0, 0, 0.0, 60000]]
+    }
+
     def _setup(self):
 
         # If this fails, the program should fail. Input file is required
@@ -67,7 +73,7 @@ class LearningJobMaster(NTRTJobMaster):
 
         self.trialDirectory = os.path.abspath(self.RESOURCE_DIRECTORY_NAME + self.config['PathInfo']['trialPath'])
         dictTools.tryMakeDir(self.trialDirectory)
-        dictTools.tryMakeDir(self.trialDirectory + '/' + self.GENERAL_DIRECTORY_NAME)
+        # dictTools.tryMakeDir(self.trialDirectory + '/' + self.GENERAL_DIRECTORY_NAME)
 
         # Logging not behaving as expected
         # Pretty much just a console print right now
@@ -78,15 +84,10 @@ class LearningJobMaster(NTRTJobMaster):
         # Hack for terrain compatibility
         # Backwards Compatibility
 
-        terrainMap = {
-            "flat" : [[0, 0, 0, 0]],
-            "hill" : [[0, 0, 0, 0.0, 60000]]
-        }
-
         terrains = []
         for terrain in self.config['TrialProperties']['terrains']:
             try:
-                terrains.append(terrainMap[terrain])
+                terrains.append(self.TERRAINS[terrain])
             except Exception:
                 raise Exception("Could not find terrain of type " + terrain + " in terrainMap.")
 
@@ -95,85 +96,100 @@ class LearningJobMaster(NTRTJobMaster):
 
         self.trialProperties = self.config['TrialProperties']
 
+    memberTemplate = None
+    def getMemberTemplate(self):
+        if not self.memberTemplate:
+            seedDirectory = self.config['PathInfo']['seedDirectory']
+            templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
+            print templateFilePath
+            self.memberTemplate = dictTools.loadFile(templateFilePath)
+        return self.memberTemplate
+
     def getComponentsConfig(self):
         componentsConfig = {}
-        for key in self.config:
-            #if key == 'PathInfo' or key == 'TrialProperties':
-            if not key in self.PROTECTED_TERMS:
-                componentsConfig[key] = self.config[key]
+        componentsKey = self.getComponentsKey()
+        componentsConfigDict = self.config
+        if componentsKey:
+            componentsConfigDict = self.config[componentsKey]
+        for key in componentsConfigDict:
+            if not key in self.LEARNING_CONFIG_KEYWORDS:
+                componentsConfig[key] = componentsConfigDict[key]
         return componentsConfig
+
+    def getComponentsKey(self):
+        return NotImplementedError("ComponentsPath must be implemented in subclass.")
+
+    def getMemberFileType(self):
+        seedDirectory = self.config['PathInfo']['seedDirectory']
+        templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
+        filename, fileExtension = os.path.splitext(templateFilePath)
+        return fileExtension
 
     # This should be moved to the member class
     # Assumes a fully structured member, with components
     # ALSO ASSIGNS MEMBER's filePath FIELD
     def writeMemberToFile(self, member):
+        memberTemplate = self.getMemberTemplate()
+        componentsKey = self.getComponentsKey()
         components = member.components
-        #dictTools.printDict(components)
-        #dictTools.pause()
-        #print self.config['PathInfo']['fileName']
-        # for key in components:
-        #    print key
-        # print components['generationID']
-        # print components['memberID']
-        # dictTools.pause()
-        basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) + "_" + str(components['memberID']) + ".json"
+        if componentsKey:
+            memberTemplate[componentsKey] = components
+        else:
+            memberTemplate = components
+        basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) \
+                   + "_" + str(components['memberID']) + self.getMemberFileType()
         filePath = self.trialDirectory + '/' + basename
         member.filePath = filePath
-        # print "writing file to: " + filePath
-        jsonFile = open(filePath, 'w')
-        json.dump(components, jsonFile, indent=4)
-        jsonFile.close()
-        # dictTools.pause("Check that file was created.")
+        dictTools.dumpFile(memberTemplate, filePath)
         return basename
 
-    # ID is id of previousGeneration + 1
-    # if not previousGeneration then ID = 0
-    # TODO: No longer used
-    def createNewGeneration(self, componentPopulations, generationID):
-        newGeneration = Generation(generationID)
-        # print "genID in createNewGeneration: " + str(generationID)
-        # Not really using id here...
-        for id in range(self.config['TrialProperties']['generationSize']):
-            #print "newMember memID & genID: " + str(id) +" "+str(generationID)
-            newMember = Member(memberID=id,generationID=generationID)
-            #print "newMember memID & genID: " + str(newMember.components['memberID']) +" "+str(newMember.components['generationID'])
-            #print "size of controller.components: " + str(len(newMember.components))
-            #print "--"
-            #dictTools.pause()
-            # if "edgeVals" in newMember.components:
-            #    dictTools.printDict(newMember.components['edgeVals'])
-            # Dictionaries here might be pass by ref instead of pass by val
-            for component, population in componentPopulations.iteritems():
-                randomPopulation = random.choice(population)
-                newMember.components[component] = randomPopulation
-            #dictTools.printDict(newMember.components['edgeVals'])
-            newGeneration.addMember(newMember)
+    def generateComponentPopulation(self, componentConfig, componentPopulation):
+        trialProperties = self.config["TrialProperties"]
+        #print "genID in generateComponentPopulation: " + str(generationID)
+        # templateComponent = self.generateTemplateComponent(componentConfig)
+        #dictTools.printDict(componentConfig)
+        #dictTools.pause("Check output.")
+        newComponentPopulation = dispatchLearning(componentConfig=componentConfig,
+                                                  scoreMethod=trialProperties["scoreMethod"],
+                                                  fitnessFunction=trialProperties["fitnessFunction"],
+                                                  # templateComponent=templateComponent,
+                                                  componentPopulation=componentPopulation
+                                                  )
+        return newComponentPopulation
 
-        return newGeneration
+    def generationGenerator(self, previousGeneration):
+        componentsConfig = self.getComponentsConfig()
+        componentPopulations = previousGeneration.getComponentPopulations()
+        generationID = previousGeneration.getID() + 1
+
+        nextGeneration = Generation(generationID)
+        for componentName in componentsConfig:
+            population = self.generateComponentPopulation(componentsConfig[componentName],
+                                                          componentPopulations[componentName])
+            nextGeneration.addComponentPopulation(componentName, population)
+
+        generationSize = self.config['TrialProperties']['generationSize']
+        for i in range(generationSize):
+            nextGeneration.generateMemberFromComponents()
+
+        return nextGeneration
 
     def importSeedGeneration(self):
         seedDirectory = self.config['PathInfo']['seedDirectory']
-        logging.info(seedDirectory)
         previousGeneration = Generation(-1)
         if os.path.isdir(seedDirectory):
-            memberID = 0
             for file in os.listdir(seedDirectory):
                 absFilePath = os.path.abspath(seedDirectory) + '/' + file
-                logging.info(absFilePath)
-                seedFile = open(absFilePath, 'r')
-                seedInput = json.load(seedFile)
-                seedFile.close()
-                # newMember = Member(generationID=-1, memberID=memberID, components=seedInput)
+                seedInput = dictTools.loadFile(absFilePath)
+                componentsKey = self.getComponentsKey()
+                if componentsKey:
+                    seedInput = seedInput[componentsKey]
                 for componentName, component in seedInput.iteritems():
-                    # print str(componentName)
                     if componentName not in self.PROTECTED_TERMS:
-                        # print "Adding " + componentName + " to seed generation."
                         previousGeneration.addComponentMember(componentName, component)
-                memberID += 1
         else:
-            #raise Exception("Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo.")
-            print "Trying to import from a seed directory that is not a seed directory. Check the seedDirectory element in PathInfo."
-
+            raise Exception("Trying to import from a seed directory that is not a seed directory. "
+                            "Check the seedDirectory element in PathInfo.")
         return previousGeneration
 
     # Better to pass the generation object instead of doing this
@@ -193,8 +209,7 @@ class LearningJobMaster(NTRTJobMaster):
             newID = -1
         return newID
 
-    # This is a really hacky solution
-    def beginTrialMaster(self, generationGeneratorFuction):
+    def beginTrial(self):
 
         generationCount = self.trialProperties['generationCount']
 
@@ -202,8 +217,7 @@ class LearningJobMaster(NTRTJobMaster):
 
         previousGeneration = self.importSeedGeneration()
         for genNum in range(generationCount):
-            # We want to write all of the trials for post processing
-            activeGeneration = generationGeneratorFuction(previousGeneration)
+            activeGeneration = self.generationGenerator(previousGeneration)
             # dictTools.pause("PAUSE IN LEARNINGJOBMASTER LINE 207")
 
             for member in activeGeneration.getMembers():
@@ -213,9 +227,7 @@ class LearningJobMaster(NTRTJobMaster):
                 # dictTools.pause("fileName: " + fileName)
 
                 for terrain in self.trialProperties['terrains']:
-                    # All args to be passed to subprocess must be strings
                     # TODO check if these args need to be passed from the yamlconfig
-
                     args = {'filename' : fileName,
                             'resourcePrefix' : self.RESOURCE_DIRECTORY_NAME,
                             'path'     : self.config['PathInfo']['trialPath'],
@@ -226,8 +238,10 @@ class LearningJobMaster(NTRTJobMaster):
                     jobList.append(LearningJob(args, member))
 
             # Run the jobs
-            conSched = ConcurrentScheduler(jobList, self.numProcesses)
-            completedJobs = conSched.processJobs()
+            # Only controller simulation is implemented right now
+            if self.trialProperties['learningType'] == "controller":
+                conSched = ConcurrentScheduler(jobList, self.numProcesses)
+                completedJobs = conSched.processJobs()
 
             # for job in completedJobs:
             #     job.processJobOutput()

@@ -9,7 +9,7 @@ python $ntrtjob "$file" $num
 
 # Verify test output format
 compare="helpersNew/testOutputFormat.py"
-fileA="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/monteOut_0_30.json"
+fileA="/media/leif/Data/Repos/NTRTsim/resources/src/bmirletz/GATests/monteOut_1_30.json"
 fileB="/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/GATestsYAMLSeed/monteOut_0_3.json"
 python $compare "$fileA" "$fileB"
 

@@ -1,4 +1,6 @@
+import Algorithms
 import random
+import copy
 from helpersNew import Generation
 from helpersNew import dictTools
 
@@ -6,12 +8,58 @@ def monteCarlo(monteCarloConfig, rangeConfig, templateComponent):
 
     newComponentPopulation = []
     # Not sure how dictionary passing/copying is working out here. check it later.
-    # spawned = 0
     for item in range(monteCarloConfig['spawnCount']):
-        newComponent = generateNewComponent(rangeConfig, templateComponent.copy())
+        # newComponent = generateNewComponent(rangeConfig, copy.deepcopy(templateComponent))
+        newComponent = generateComponent(copy.deepcopy(templateComponent), rangeConfig)
+        # print newComponent
+        # dictTools.pause()
         newComponentPopulation.append(newComponent)
-        # spawned += 1
     return newComponentPopulation
+
+def generateComponent(component, rangeConfig):
+    dispatchMutateComponent = {
+        type({}) : generateDict,
+        type([]) : generateList,
+        type('a') : generateElement,
+        type(1)   : generateElement,
+        type(0.1) : generateElement,
+        type(u'a'): generateElement
+    }
+    # print "Component:~~~~~~"
+    # print component
+    # print "rangeConfig:~~~~~~~"
+    # print rangeConfig
+    # dictTools.pause()
+    return dispatchMutateComponent[type(component)](component, rangeConfig)
+
+def generateDict(dictionary, rangeConfig):
+    assert type(dictionary) == type(rangeConfig) == type({})
+    newDict = copy.deepcopy(dictionary)
+    for key in rangeConfig.keys():
+        newDict[key] = generateComponent(newDict[key], rangeConfig[key])
+    return newDict
+
+def generateElement(value, rangeConfig):
+    #TODO: Allow different list-selection methods
+    if type(rangeConfig) == type([]):
+        newValue = random.choice(rangeConfig)
+    elif Algorithms.isMinMax(rangeConfig):
+        newValue = random.uniform(rangeConfig["min"], rangeConfig["max"])
+    else:
+        raise Exception("Recursed to value and rangeConfig is of unknown configuration:"
+                        "\nValue: " + str(value) + "\nConfig: " + str(rangeConfig))
+    return newValue
+
+def generateList(list, rangeConfig):
+    # print "in mutateList"
+    # print str(list)
+    newList = []
+    for element in list:
+        # print "element: " + str(element)
+        newElement = generateComponent(element, rangeConfig)
+        # print "newElement: " + str(newElement)
+        newList.append(newElement)
+    return newList
 
 # TODO: Refactor this to follow the dispatcher pattern in dictTools for compareDeepType
 def generateNewComponent(rangeDictionary, component, tagStack=None):
@@ -51,29 +99,6 @@ def generateNewComponentFromList(rangeDictionary, value, tagStack):
 
     return newValue
 
-
-"""
-Walking through a rangedictionary/tag stack SHOULD NOT BE NECESSARY!!!
-The rangeDictionary must include all the parameters&ranges you want to learn over,
-in a 1-D dictionary.
-This means that the tag you are looking up just has to do a direct check in the
-range dictionary, nothing more.
-
-TODO:
-Allow the "getValueFromTagStack" to evaluate more than just a min/max range.
-Allow it to also do an enum (check if type is list, if so then enum, else range.)
-
-***Consider:
-Non-float ranges? integers only?
-"""
-
-"""
-It would be nice to have running out of stack being an error flag, but that won't work.
-In the event that a learning run is done where not all of the parameters are learned
-(i.e. builder only learns on a specific set of tags)
-then this would throw errors and not complete.
-Instead, we'll throw warnings WHEN LOGGING WORKS and let the user proceed.
-"""
 def getValueFromTagStack(rangeDictionary, tagStack):
     newItem = None
     baseTag = tagStack[-1]
@@ -88,12 +113,20 @@ def getValueFromTagStack(rangeDictionary, tagStack):
         # THIS IS CASE SENSITIVE FOR NOW
         if currentTag in rangeDictionary:
             #print "Found currentTag in dictionary: " + currentTag
-            try:
-                min = rangeDictionary[currentTag]['min']
-                max = rangeDictionary[currentTag]['max']
-            except KeyError:
-                raise Exception("Couldn't find min/max range values for tag " + currentTag + ". Check your range section of the learning spec.")
-            newItem = random.uniform(min, max)
-    #if not newItem:
+            if type(rangeDictionary[currentTag]) == type([]):
+                newItem = random.choice(rangeDictionary[currentTag])
+            elif type(rangeDictionary[currentTag]) == type({}):
+                try:
+                    min = rangeDictionary[currentTag]['min']
+                    max = rangeDictionary[currentTag]['max']
+                    newItem = random.uniform(min, max)
+                except KeyError:
+                    print rangeDictionary[currentTag]
+                    print "tagStack: " + str(tagStack)
+                    print "currentTag: " + str(currentTag)
+                    raise Exception("Couldn't find min/max range values for tag " + currentTag + ". Check your range section of the learning spec.")
+            else:
+                raise Exception("rangeDictionary terminates in neither an options list or minMax.")
+            #if not newItem:
         #print "Could not find a match for base tag: " + baseTag
     return newItem

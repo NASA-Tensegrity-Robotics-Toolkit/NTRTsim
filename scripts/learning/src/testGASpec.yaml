@@ -1,13 +1,12 @@
-
 PathInfo:
     trialPath: "bmirletz/GATests/"                      # All files have this base name
     fileName: "monteOut"
     executable: "./../../../build/dev/btietz/GATests/AppJSONLearningTests"
     seedDirectory: "/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/GATestsYAMLSeed/"                                     # Path to directory holding ONLY seed members
 TrialProperties:
-    learningType: "controller"                          # ["controller", "parameter", "structure"]
+    learningType: "controller"                          # ["controller", "builder", "structure"]
     trialLength: 3000
-    generationCount: 1
+    generationCount: 2
     generationSize: 40
     scoreMethod: "average"                              # ["average", "max"]
     fitnessFunction: "distance"
@@ -17,8 +16,8 @@ TrialProperties:
 
 nodeVals:
     Algorithms:
-#        MonteCarlo:
-#            spawnCount: 100
+        MonteCarlo:
+            spawnCount: 100
         Elitism:
             selectionMethod: "max"
             survivalCount: 7
@@ -82,7 +81,7 @@ feedbackVals:
     PopulationSize: 40
     Ranges:
         params:               # This is only necessary for backwards compatibility.
-            neuralParams:     # neuralparams should be moved to the same leve as params
+            neuralParams:     # neuralparams should be moved to the same level as params
                 min: -1.0
                 max: 1.0
 

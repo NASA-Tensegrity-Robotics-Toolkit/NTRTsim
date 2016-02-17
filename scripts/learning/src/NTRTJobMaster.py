@@ -25,8 +25,11 @@
 
 import sys
 import logging
+import yaml
 from evolution import EvolutionJobMaster
 from jobs import ControllerJobMaster
+from jobs import BuilderJobMaster
+from jobs import StructureJobMaster
 
 """
 if __name__ == "__main__":
@@ -37,14 +40,24 @@ if __name__ == "__main__":
     jobMaster.beginTrial()
 """
 
+DISPATCH_JOB = {
+    "controller" : ControllerJobMaster,
+    "builder"    : BuilderJobMaster,
+    "structure"  : StructureJobMaster
+}
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    configFile = sys.argv[1]
+    configFilePath = sys.argv[1]
     numProcesses = int(sys.argv[2])
     if ".yaml" in sys.argv[1]:
-        jobMaster = ControllerJobMaster(configFile, numProcesses)
+        configFile = open(configFilePath, 'r')
+        config = yaml.load(configFile)
+        configFile.close()
+        learningType = config['TrialProperties']['learningType']
+        jobMaster = DISPATCH_JOB[learningType](configFilePath, numProcesses)
     elif ".json" in sys.argv[1]:
-        jobMaster = EvolutionJobMaster(configFile, numProcesses)
+        jobMaster = EvolutionJobMaster(configFilePath, numProcesses)
     else:
         raise Exception("Unkown config file type passed in. Expecting yaml or json.")
     jobMaster.beginTrial()

@@ -3,12 +3,12 @@ import dictTools
 
 if __name__ == "__main__":
     argv = sys.argv
-    jsonFileA = argv[1]
-    jsonFileB = argv[2]
+    fileA = argv[1]
+    fileB = argv[2]
     print "Testing json files for equivalent deep format:"
-    print jsonFileA
-    print jsonFileB
-    if dictTools.compareJSONDicts(jsonFileA, jsonFileB):
+    print fileA
+    print fileB
+    if dictTools.compareFileDicts(fileA, fileB):
         print "Files are of equiavlent deep format."
     else:
         print "~~~ Files are NOT of equivalent deep format. ~~~"

@@ -9,7 +9,6 @@ from CrossOver import crossOver
 def dispatchLearning(componentConfig,
                      scoreMethod="max",
                      fitnessFunction="distance",
-                     baseComponent=None,
                      componentPopulation=None):
 
     algorithms = componentConfig['Algorithms']
@@ -22,24 +21,27 @@ def dispatchLearning(componentConfig,
     newComponentPopulation = copy.deepcopy(componentPopulation)
     if "MonteCarlo" in algorithms:
         print "in MonteCarlo"
+        templateComponent = getBestComponent(componentPopulation, scoreMethod, fitnessFunction)
         newComponentPopulation = monteCarlo(monteCarloConfig=algorithms['MonteCarlo'],
                                             rangeConfig=componentConfig['Ranges'],
-                                            templateComponent=baseComponent)
+                                            templateComponent=templateComponent)
         # MonteCarlo is a stand-alone algorithm.
         # The other algorithms can be used in concert.
         # Theoretically, this doesn't need to be here.
 
     if "Elitism" in algorithms:
         print "in Elitism"
+        #print "preElitism popSize: " + str(len(newComponentPopulation))
         newComponentPopulation = elitism(elitismConfig=algorithms['Elitism'],
                                          componentPopulation=newComponentPopulation,
                                          scoreMethod=scoreMethod,
                                          fitnessFunction=fitnessFunction)
+        #print "postElitism popSize: " + str(len(newComponentPopulation))
         #print newComponentPopulation[0]
         #raw_input("check this component from Elitism.")
 
     if "GaussianSampling" in algorithms:
-        print "in GaussianSampling"
+        # print "in GaussianSampling"
         # print "before:"
         # print newComponentPopulation[0]
         newComponentPopulation += gaussianSampling(gaussianConfig=algorithms['GaussianSampling'],
@@ -71,6 +73,10 @@ def dispatchLearning(componentConfig,
 def getComponentByRandom(componentPopulation):
     randomComponent = random.choice(componentPopulation)
     return copy.deepcopy(randomComponent)
+
+def getBestComponent(componentPopulation, scoreMethod="max", fitnessFunction="distance"):
+    index = getBestComponentIndex(componentPopulation, scoreMethod, fitnessFunction)
+    return componentPopulation[index]
 
 def getBestComponentIndex(componentPopulation, scoreMethod="max", fitnessFunction="distance"):
     maxScore = getComponentScore(componentPopulation[0], scoreMethod, fitnessFunction)
@@ -145,7 +151,7 @@ def getComponentScore(component, scoreMethod="max", fitnessFunction="distance"):
     # No scores yet assigned to this component.
     # Should never get to Elitism if this is the case.
     # TODO: THIS IS A HACK
-    if len(component["scores"]) == 0:
+    if "scores" not in component or len(component["scores"]) == 0:
         # Bad form to return mid-function
         return -1000
     elif type(component["scores"][0]) == type(1):
@@ -208,7 +214,7 @@ def getConfigCount(element, keyConfig):
             count += getConfigCount(entry, keyConfig)
     # If element is a tuple, this is inaccurate
     # Make sure that config is at a terminating type
-    elif isMinMax(keyConfig) or type(keyConfig) == type([]):
+    elif type(keyConfig) == type([]) or isMinMax(keyConfig):
         count += 1
     else:
         raise Exception("Unknown element/config combination in getConfigCount")

@@ -147,21 +147,14 @@ def compareDeepType(varA, varB):
 
     return sameDeepType
 
-def compareJSONDicts(jsonPathA, jsonPathB):
+def compareFileDicts(pathA, pathB):
     sameDicts = True
     try:
-        jsonFileA = open(jsonPathA, 'r')
-        jsonDictA = json.load(jsonFileA)
-        jsonFileA.close()
-
-        jsonFileB = open(jsonPathB, 'r')
-        jsonDictB = json.load(jsonFileB)
-        jsonFileB.close()
-
-        sameDicts &= compareDeepType(jsonDictA, jsonDictB)
-
+        dictA = loadFile(pathA)
+        dictB = loadFile(pathB)
+        sameDicts &= compareDeepType(dictA, dictB)
     except IOError:
-        raise Exception("Could not load one of the json files for comparing dictionaries.")
+        raise Exception("Could not load one of the files for comparing dictionaries.")
 
     return sameDicts
 
@@ -172,3 +165,25 @@ def eqTypes(varA, varB):
     else:
         sameType |= type(varA) == type(varB)
     return sameType
+
+def loadFile(dictFilePath):
+    file = open(dictFilePath, 'r')
+    if ".json" in dictFilePath:
+        dictionary = json.load(file)
+    elif ".yaml" in dictFilePath:
+        dictionary = yaml.load(file)
+    else:
+        raise Exception("Unknown file type in loadFile.")
+    file.close()
+    return dictionary
+
+def dumpFile(contents, filePath):
+    file = open(filePath, 'w')
+    if ".json" in filePath:
+        dictionary = json.dump(contents, file, indent=4)
+    elif ".yaml" in filePath:
+        dictionary = yaml.dump(contents, file)
+    else:
+        raise Exception("Unknown file type in dumpFile.")
+    file.close()
+    return dictionary

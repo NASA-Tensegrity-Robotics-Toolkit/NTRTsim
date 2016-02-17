@@ -85,7 +85,7 @@ def mutateDict(childBase, parentB, rangeConfig, updatesRemaining):
         raise Exception("Negative updates reamining in crossOver. this should never happen.")
     elif updatesRemaining > 0:
         for key in rangeConfig.keys():
-            print key
+            # print key
             newValue, updatedCount = mutateComponent(childBase[key], parentB[key], rangeConfig[key], updatesRemaining)
             # print "before" + str(newDict[key])
             newDict[key] = newValue
@@ -102,8 +102,8 @@ def mutateElement(value, parentBValue, rangeConfig, updatesRemaining):
     updatesPerformed = 0
     newValue = copy.deepcopy(value)
     # print "updatesRemaining:" + str(updatesRemaining)
-    print "previousElement: " + str(value)
-    print "newElement: " + str((parentBValue))
+    # print "previousElement: " + str(value)
+    # print "newElement: " + str((parentBValue))
     if updatesRemaining > 0:
         if type(rangeConfig) == type([]):
             newValue = random.choice(rangeConfig)
@@ -128,10 +128,9 @@ def mutateList(list, parentB, rangeConfig, updatesRemaining):
         newElement, updatedCount = mutateComponent(element, parentB[index], rangeConfig, updatesRemaining)
         # print "type after: " + str(type(newElement))
         if type(element) != type(newElement):
-            print "newElement is of inconsistent type with origina!:"
             print "previousElement: " + str(element)
             print "newElement: " + str((newElement))
-            dictTools.pause()
+            raise Exception("newElement is of inconsistent type with original")
         newList.append(newElement)
         updatesRemaining -= updatedCount
         updatesPerformed += updatedCount
