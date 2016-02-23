@@ -256,7 +256,9 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     T6Model* const myModel = new T6Model();
-    myModel->rotate(1);
+    int bottom_face;
+    n.getParam("/bottom_face",bottom_face);
+    myModel->rotate(bottom_face);
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
