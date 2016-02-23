@@ -256,6 +256,7 @@ int main(int argc, char** argv)
     // Fourth create the models with their controllers and add the models to the
     // simulation
     T6Model* const myModel = new T6Model();
+    myModel->rotate(1);
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
@@ -397,8 +398,11 @@ int main(int argc, char** argv)
         if (ctrl_cb.action=="reset") {
             std::cout << "resetting simulation" << std::endl;
             ctrl_cb.action = "";
+            int bottom_face;
+            n.getParam("/bottom_face",bottom_face);
+            myModel->rotate(bottom_face);
             simulation.reset();
-            rods = myModel->find<tgRod>("rod"); 
+	    rods = myModel->find<tgRod>("rod"); 
         } 
 
         //do we need to run a number of simulation steps?

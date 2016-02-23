@@ -40,6 +40,9 @@
 // The C++ Standard Library
 #include <stdexcept>
 
+// Global Variable?
+int bottom_face = 0;
+
 namespace
 {
     // see tgBasicActuator and tgRod for a descripton of these rod parameters
@@ -173,34 +176,6 @@ void T6Model::addNodes(tgStructure& s)
     s.addNode( 0,             -half_length,    c.rod_space); 	// 10
     s.addNode( half_length,   -c.rod_space,    0);		// 11
     s.addNode(-half_length,   -c.rod_space,    0);   		// 12
-/*    
-    s.addNode( c.rod_space,   -half_length,   0);	// 1
-    s.addNode( c.rod_space,    half_length,    0);	// 2
-    s.addNode( 0,              c.rod_space,    half_length);	// 3
-    s.addNode( 0,              c.rod_space,   -half_length);	// 4
-    s.addNode( half_length,    0,              c.rod_space);		// 5
-    s.addNode(-half_length,    0,              c.rod_space);		// 6
-    s.addNode(-c.rod_space,    half_length,    0);	// 7
-    s.addNode(-c.rod_space,   -half_length,    0);	// 8
-    s.addNode( 0,             -c.rod_space,    half_length); 	// 9
-    s.addNode( 0,             -c.rod_space,   -half_length); 	// 10
-    s.addNode( half_length,    0,             -c.rod_space);		// 11
-    s.addNode(-half_length,    0,             -c.rod_space);   		// 12
-*/
-/*    
-    s.addNode( c.rod_space,    0,             -half_length_mp);	// 13(1-2)
-    s.addNode( c.rod_space,    0,              half_length_mp);	// 14(2-1)
-    s.addNode( 0,              half_length_mp, c.rod_space);	// 15(3-4)
-    s.addNode( 0,             -half_length_mp, c.rod_space);	// 16(4-3)
-    s.addNode( half_length_mp, c.rod_space,    0);		// 17(5-6)
-    s.addNode(-half_length_mp, c.rod_space,    0);		// 18(6-5)
-    s.addNode(-c.rod_space,    0,              half_length_mp);	// 19(7-8)
-    s.addNode(-c.rod_space,    0,             -half_length_mp);	// 20(8-7)
-    s.addNode( 0,              half_length_mp,-c.rod_space); 	// 21(9-10)
-    s.addNode( 0,             -half_length_mp,-c.rod_space); 	// 22(10-9)
-    s.addNode( half_length_mp,-c.rod_space,    0);   		// 23(11-12)
-    s.addNode(-half_length_mp,-c.rod_space,    0);   		// 24(12-11)
-*/
 }
 
 void T6Model::addRods(tgStructure& s)
@@ -211,26 +186,6 @@ void T6Model::addRods(tgStructure& s)
     s.addPair( 6, 7, "rod");
     s.addPair( 8, 9, "rod");
     s.addPair( 10, 11, "rod");
-/*
-    s.addPair( 0,  12, "rod");
-    s.addPair( 1,  13, "rod");
-    s.addPair( 12,  13, "rodmp");   //middle part
-    s.addPair( 2,  14, "rod");
-    s.addPair( 3,  15, "rod");
-    s.addPair( 14,  15, "rodmp");   //middle part
-    s.addPair( 4,  16, "rod");
-    s.addPair( 5,  17, "rod");
-    s.addPair( 16,  17, "rodmp");   //middle part
-    s.addPair( 6,  18, "rod");
-    s.addPair( 7,  19, "rod");
-    s.addPair( 18,  19, "rodmp");   //middle part
-    s.addPair( 8,  20, "rod");
-    s.addPair( 9,  21, "rod");
-    s.addPair( 20,  21, "rodmp");   //middle part
-    s.addPair( 10, 22, "rod");
-    s.addPair( 11, 23, "rod");
-    s.addPair( 22,  23, "rodmp");   //middle part
-*/
 }
 
 void T6Model::addActuators(tgStructure& s)
@@ -273,76 +228,10 @@ void T6Model::addActuators(tgStructure& s)
         s.addPair(5,    7,      "passive");
         s.addPair(5,    8,      "passive");
 
-	/*
-        THIS IS THE CORRECT PATTERN, ABOVE IS PUTTING THE ACTUATORS IT IN ORDER 
-        SO THAT WE CAN ITTERATE THROUGH THE ARRAY CORRECTLY
-	//Large circle
-	s.addPair(1,	4,	"actuated");
-	s.addPair(4,	8,	"actuated");
-	s.addPair(8,	7,	"actuated");
-	s.addPair(7,	11,	"actuated");
-	s.addPair(11,	3,	"actuated");
-	s.addPair(3,	1,	"actuated");
-
-	//Triangle 1
-	s.addPair(0,	10,	"actuated");
-	s.addPair(10,	9,	"actuated");
-	s.addPair(9,	0, 	"actuated");
-
-	//Triangle 2
-	s.addPair(2,	6,	"actuated");
-	s.addPair(6,	5,	"actuated");
-	s.addPair(5,	2,	"actuated");
-
-	//Passive cables (triangle 1 - large circle)
-	s.addPair(0,	8,	"passive");
-	s.addPair(0,	4,	"passive");
-	s.addPair(10,	1,	"passive");
-	s.addPair(10,	3,	"passive");
-	s.addPair(9,	11,	"passive");
-	s.addPair(9,	7,	"passive");
-
-	//Passive cables (triangle 2 - large circle)
-	s.addPair(2,	4,	"passive");
-	s.addPair(2,	1,	"passive");
-	s.addPair(6,	3,	"passive");
-	s.addPair(6,	11,	"passive");
-	s.addPair(5,	7,	"passive");
-	s.addPair(5,	8,	"passive");
-
-    s.addPair(0, 4,  "passive");//OK
-    s.addPair(0, 5,  "passive");//
-    s.addPair(0, 8,  "passive");
-    s.addPair(0, 10, "passive");
-
-    s.addPair(1, 6,  "passive");
-    s.addPair(1, 7,  "passive");
-    s.addPair(1, 8,  "passive");
-    s.addPair(1, 10, "passive");
-
-    s.addPair(2, 4,  "passive");
-    s.addPair(2, 5,  "passive");
-    s.addPair(2, 9,  "passive");
-    s.addPair(2, 11, "passive");
-
-    s.addPair(3, 7,  "passive");
-    s.addPair(3, 6,  "passive");
-    s.addPair(3, 9,  "passive");
-    s.addPair(3, 11, "passive");
-
-    s.addPair(4, 2,  "passive");
-    s.addPair(4, 10, "passive");
-    s.addPair(4, 11, "passive");
-
-    s.addPair(5, 8,  "passive");
-    s.addPair(5, 9,  "passive");
-
-    s.addPair(6, 10, "passive");
-    s.addPair(6, 11, "passive");
-
-    s.addPair(7, 8,  "passive");
-    s.addPair(7, 9,  "passive");
-*/
+}
+const void T6Model::rotate(int face)
+{
+    bottom_face = face;
 }
 
 void T6Model::setup(tgWorld& world)
@@ -373,20 +262,142 @@ void T6Model::setup(tgWorld& world)
     s.move(btVector3(0, (c.rod_length/2)-1, 0));
 
     // Add a rotation. This is needed if the ground slopes too much,
-    // otherwise  glitches put a rod below the ground.
+    // Also rotates the robot to a desired face 
+    
+    // This rotation sets the robot to match the state estimator
     btVector3 rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
-    btVector3 rotationAxis = btVector3(0, 0, 1);  // y-axis
-    //double rotationAngle = M_PI/2;
-    double rotationAngle = -0.8;
+    btVector3 rotationAxis = btVector3(1, 0, 0);  // x-axis
+    double rotationAngle = 1.5708;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
-    rotationAxis = btVector3(1, 0, 0);  // y-axis
-    rotationAngle = -0.6;
-    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
-    //rotationAxis = btVector3(0, 0, 1);  // y-axis
-    //rotationAngle = 1.7;
-    //s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    // This rotation sets the robot to match the state estimator
+    
+    if(bottom_face == 1) {
+	    /*********** FACE: 2-4-11 ************************/
+	    /*************************************************/ 
+	    rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 3.1416;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(0, 0, 1);  // z-axis
+	    rotationAngle = -0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 2-4-11 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 2) {
+	    /*********** FACE: 2-3-5 ************************/
+	    /*************************************************/ 
+	    rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 3.1416;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(0, 0, 1);  // y-axis
+	    rotationAngle = -0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = -0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 2-3-5 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 3) {
+	    /*********** FACE: 1-5-9 ************************/
+	    /*************************************************/ 
+	    rotationAxis = btVector3(0, 0, 1);  // z-axis
+	    rotationAngle = -0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 1-5-9 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 4) {
+	    /*********** FACE: 6-8-9 ************************/
+	    /*************************************************/ 
+	    rotationAxis = btVector3(0, 0, 1);  // y-axis
+	    rotationAngle = 0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 6-8-9 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 5) {
+	    /*********** FACE: 8-10-12 ************************/
+	    /*************************************************/ 
+	    rotationAxis = btVector3(0, 0, 1);  // z-axis
+	    rotationAngle = 0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = -0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 8-10-12 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 6) {
+	    /*********** FACE: 4-7-12 ************************/
+	    /*************************************************/ 
+	    rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 3.1416;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(0, 0, 1);  // y-axis
+	    rotationAngle = 0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 4-7-12 ************************/
+    }
+    /*************** TO ******************************/ 
+    else if(bottom_face == 7) { 
+	    /*********** FACE: 1-10-11 ************************/
+	    /*********** Fully Actuated Face*******************/ 
+	    rotationAxis = btVector3(0, 0, 1);  // y-axis
+	    rotationAngle = -0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = -0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 1-10-11 ************************/
+	    /*************************************************/ 
+    }
+    else if( bottom_face == 8) {
+	    /*********** FACE: 3-6-7 ************************/
+	    /*********** Fully Actuated Face*******************/ 
+	    rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 3.1416;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(0, 0, 1);  // z-axis
+	    rotationAngle = 0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = -0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 3-6-7 ************************/
+	    /*************************************************/ 
+    }
+    else {
+	    /*********** FACE: 2-4-11 ************************/
+	    /*************************************************/ 
+	    rotationPoint = btVector3(0, (c.rod_length/2), 0); // origin
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 3.1416;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(0, 0, 1);  // z-axis
+	    rotationAngle = -0.8;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    rotationAxis = btVector3(1, 0, 0);  // x-axis
+	    rotationAngle = 0.6;
+	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+	    /*********** FACE: 2-4-11 ************************/
+    }
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
@@ -400,7 +411,7 @@ void T6Model::setup(tgWorld& world)
     tgStructureInfo structureInfo(s, spec);
 
     // Use the structureInfo to build ourselves
-    structureInfo.buildInto(*this, world);
+    structureInfo.buildInto(*this,  world);
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control.

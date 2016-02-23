@@ -93,6 +93,12 @@ public:
      * @return A vector of all of the muscles
      */
     const std::vector<tgBasicActuator*>& getAllActuators() const;
+
+    /**
+     * Calls setup() to build the model and tgWorld for the correct
+     * oirentation.
+     */
+    const void rotate(int face = 0);
     
 private:
 	
