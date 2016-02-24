@@ -300,6 +300,9 @@ void T6Model::setup(tgWorld& world)
 	    rotationAxis = btVector3(1, 0, 0);  // x-axis
 	    rotationAngle = -0.6;
 	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+            rotationAxis = btVector3(0, 1, 0);  // y-axis
+            rotationAngle = 1.3708;
+            s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 	    /*********** FACE: 2-3-5 ************************/
     }
     /*************** TO ******************************/ 
@@ -312,6 +315,9 @@ void T6Model::setup(tgWorld& world)
 	    rotationAxis = btVector3(1, 0, 0);  // x-axis
 	    rotationAngle = 0.6;
 	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+            rotationAxis = btVector3(0, 1, 0);  // y-axis
+            rotationAngle = -1.9708;
+            s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 	    /*********** FACE: 1-5-9 ************************/
     }
     /*************** TO ******************************/ 
@@ -336,6 +342,9 @@ void T6Model::setup(tgWorld& world)
 	    rotationAxis = btVector3(1, 0, 0);  // x-axis
 	    rotationAngle = -0.6;
 	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+            rotationAxis = btVector3(0, 1, 0);  // y-axis
+            rotationAngle = -0.8708;
+            s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 	    /*********** FACE: 8-10-12 ************************/
     }
     /*************** TO ******************************/ 
@@ -352,6 +361,9 @@ void T6Model::setup(tgWorld& world)
 	    rotationAxis = btVector3(1, 0, 0);  // x-axis
 	    rotationAngle = 0.6;
 	    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+            rotationAxis = btVector3(0, 1, 0);  // y-axis
+            rotationAngle = 2.2708;
+            s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 	    /*********** FACE: 4-7-12 ************************/
     }
     /*************** TO ******************************/ 
