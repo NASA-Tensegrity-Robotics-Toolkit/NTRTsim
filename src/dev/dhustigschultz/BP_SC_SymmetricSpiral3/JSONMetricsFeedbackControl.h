@@ -121,7 +121,7 @@ protected:
     
     std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions);
 
-    virtual void printMetrics();
+    virtual void printMetrics(BaseQuadModelLearning& subject);
     
     JSONMetricsFeedbackControl::Config m_config;
 
@@ -238,6 +238,9 @@ protected:
     std::vector<double> m_muscleLengthFortyNine;
     std::vector<double> m_muscleLengthFifty;
     std::vector<double> m_muscleLengthFiftyOne;
+
+    std::vector< std::vector<double> > m_muscleTensionsAll;
+    std::vector< std::vector<double> > m_muscleLengthsAll; 
 
     std::vector< std::vector<double> > m_quadCOM;
     std::vector<double> m_timeStep;

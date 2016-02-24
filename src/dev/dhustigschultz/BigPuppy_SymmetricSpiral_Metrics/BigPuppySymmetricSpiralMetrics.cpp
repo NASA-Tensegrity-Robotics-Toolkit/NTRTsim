@@ -238,11 +238,11 @@ void BigPuppySymmetricSpiralMetrics::addMuscles(tgStructure& puppy){
 
         if(i==2){
             //Extra muscles, to keep front vertebra from swinging. 
-            puppy.addPair(n0[3], n1[3], tgString("spine all main front upper right muscleAct1 seg", i-2) + tgString(" seg", i-1));
-            puppy.addPair(n0[3], n1[4], tgString("spine all main front upper left muscleAct1 seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[3], n1[3], tgString("spine all main front upper right muscleAct1 seg", i-2) + tgString("node", 3) + tgString(" seg", i-1)  + tgString("node", 3));
+            puppy.addPair(n0[3], n1[4], tgString("spine all main front upper left muscleAct1 seg", i-2) + tgString("node", 3) + tgString(" seg", i-1)  + tgString("node", 4));
 
-            puppy.addPair(n0[4], n1[3], tgString("spine all main front lower right muscleAct1 seg", i-2) + tgString(" seg", i-1));
-            puppy.addPair(n0[4], n1[4], tgString("spine all main front lower left muscleAct1 seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[3], tgString("spine all main front lower right muscleAct1 seg", i-2) + tgString("node", 4) + tgString(" seg", i-1) + tgString("node", 3));
+            puppy.addPair(n0[4], n1[4], tgString("spine all main front lower left muscleAct1 seg", i-2) + tgString("node", 4) + tgString(" seg", i-1) + tgString("node", 4));
 
 
         }        
@@ -250,16 +250,16 @@ void BigPuppySymmetricSpiralMetrics::addMuscles(tgStructure& puppy){
         //Add muscles to the puppy
         if(i < 3){
             if(i % 2 == 0){ //front
-                puppy.addPair(n0[1], n1[3], tgString("spine all main front lower right muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine all main front lower left muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[3], tgString("spine all main front upper right muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[4], tgString("spine all main front upper left muscleAct1 seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[3], tgString("spine all main front lower right muscleAct1 seg", i-2) + tgString("node", 1) + tgString(" seg", i-1) + tgString("node", 3));
+                puppy.addPair(n0[1], n1[4], tgString("spine all main front lower left muscleAct1 seg", i-2) + tgString("node", 1) + tgString(" seg", i-1) + tgString("node", 4));
+                puppy.addPair(n0[2], n1[3], tgString("spine all main front upper right muscleAct1 seg", i-2) + tgString("node", 2) + tgString(" seg", i-1) + tgString("node", 3));
+                puppy.addPair(n0[2], n1[4], tgString("spine all main front upper left muscleAct1 seg", i-2) + tgString("node", 2) + tgString(" seg", i-1) + tgString("node", 4));
             }
             else{ //rear
-                puppy.addPair(n0[1], n1[3], tgString("spine all main rear upper left muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine all main rear lower left muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[3], tgString("spine all main rear upper right muscleAct1 seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[4], tgString("spine all main rear lower right muscleAct1 seg", i-2) + tgString(" seg", i-1)); 
+                puppy.addPair(n0[1], n1[3], tgString("spine all main rear upper left muscleAct1 seg", i-2) + tgString("node", 1) + tgString(" seg", i-1) + tgString("node", 3));
+                puppy.addPair(n0[1], n1[4], tgString("spine all main rear lower left muscleAct1 seg", i-2) + tgString("node", 1) + tgString(" seg", i-1) + tgString("node", 4));
+                puppy.addPair(n0[2], n1[3], tgString("spine all main rear upper right muscleAct1 seg", i-2) + tgString("node", 2) + tgString(" seg", i-1) + tgString("node", 3));
+                puppy.addPair(n0[2], n1[4], tgString("spine all main rear lower right muscleAct1 seg", i-2) + tgString("node", 2) + tgString(" seg", i-1) + tgString("node", 4)); 
             }
         }
         if(i < 7){//Was 6
@@ -275,31 +275,31 @@ void BigPuppySymmetricSpiralMetrics::addMuscles(tgStructure& puppy){
         }
         if(i > 0 && i < 7){
             if(i % 2 == 0){//rear
-                puppy.addPair(n1[1], n2[3], tgString("spine all main rear upper left muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine all main rear lower left muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[3], tgString("spine all main rear upper right muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[4], tgString("spine all main rear lower right muscleAct1 seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[3], tgString("spine all main rear upper left muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 3));
+                puppy.addPair(n1[1], n2[4], tgString("spine all main rear lower left muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 4));
+                puppy.addPair(n1[2], n2[3], tgString("spine all main rear upper right muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 3));
+                puppy.addPair(n1[2], n2[4], tgString("spine all main rear lower right muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 4));
             }
             else{//front
 
-                puppy.addPair(n1[1], n2[3], tgString("spine all main front lower right muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine all main front lower left muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[3], tgString("spine all main front upper right muscleAct1 seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[4], tgString("spine all main front upper left muscleAct1 seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[3], tgString("spine all main front lower right muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 3));
+                puppy.addPair(n1[1], n2[4], tgString("spine all main front lower left muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 4));
+                puppy.addPair(n1[2], n2[3], tgString("spine all main front upper right muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 3));
+                puppy.addPair(n1[2], n2[4], tgString("spine all main front upper left muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 4));
             }
         }
 	if (i >= 2 && i < 7){
-	    puppy.addPair(n1[3], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    puppy.addPair(n1[4], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    puppy.addPair(n1[3], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    puppy.addPair(n1[4], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[3], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString("node", 3) + tgString(" seg", i) + tgString("node", 3));
+	    puppy.addPair(n1[4], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString("node", 4) + tgString(" seg", i) + tgString("node", 3));
+	    puppy.addPair(n1[3], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString("node", 3) + tgString(" seg", i) + tgString("node", 4));
+	    puppy.addPair(n1[4], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString("node", 4) + tgString(" seg", i) + tgString("node", 4));
 	}
         if(i == 6){
             //rear
-            puppy.addPair(n1[1], n2[2], tgString("spine all rear lower left muscleAct1 seg", i-1) + tgString(" seg", i));
-            puppy.addPair(n1[2], n2[2], tgString("spine all rear lower right muscleAct1 seg", i-1) + tgString(" seg", i));
-            puppy.addPair(n1[1], n2[1], tgString("spine all rear upper left muscleAct1 seg", i-1) + tgString(" seg", i));
-            puppy.addPair(n1[2], n2[1], tgString("spine all rear upper right muscleAct1 seg", i-1) + tgString(" seg", i));  
+            puppy.addPair(n1[1], n2[2], tgString("spine all rear lower left muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 2));
+            puppy.addPair(n1[2], n2[2], tgString("spine all rear lower right muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 2));
+            puppy.addPair(n1[1], n2[1], tgString("spine all rear upper left muscleAct1 seg", i-1) + tgString("node", 1) + tgString(" seg", i) + tgString("node", 1));
+            puppy.addPair(n1[2], n2[1], tgString("spine all rear upper right muscleAct1 seg", i-1) + tgString("node", 2) + tgString(" seg", i) + tgString("node", 1));  
         }
         
     }
