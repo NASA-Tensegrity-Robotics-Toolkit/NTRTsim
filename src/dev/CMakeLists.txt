@@ -10,7 +10,7 @@ subdirs(
     steve
     kmorse
     apsabelhaus
-    SpineHardwareProject
+    ultra-spine
     muscleNP
     jbruce
     dhustigschultz
