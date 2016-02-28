@@ -2,7 +2,7 @@ PathInfo:
     trialPath: "leifrf/BuilderTests/"
     fileName: "builderOut"
     executable: "./../../../build/dev/btietz/GATests/AppJSONLearningTests"
-    seedDirectory: "/media/leif/Data/Repos/NTRTsim/resources/src/leifrf/3PrismBuilderSeed/"
+    seedDirectory: "./../../../resources/src/leifrf/SpiderBuilderSeed/"
 TrialProperties:
     learningType: "builder"
     trialLength: 3000
@@ -17,11 +17,11 @@ TrialProperties:
 builders:
     prism_rods:
         Algorithms:
-            MonteCarlo:
-                spawnCount: 100
             Elitism:
                 selectionMethod: "max"
                 survivalCount: 60
+            MonteCarlo:
+                spawnCount: 100
             GaussianSampling:
                 mutationChance: 1.0
                 mutationDev: 0.05
@@ -31,7 +31,7 @@ builders:
         Ranges:
             class:
                 - "tgRodInfo"
-                - "tgRigidInfo"
+                #- "tgRigidInfo"
             parameters:
                 density:
                     min: 0.0
@@ -46,14 +46,12 @@ builders:
         Ranges:
             class:
                 - "tgBasicActuatorInfo"
-                - "tgKinematicActuatorInfo"
+                #- "tgKinematicActuatorInfo"
             parameters:
-                stiffness:
-                    min: 500.0
-                    max: 1500.0
+                stiffness: [500, 700, 1000]
                 damping:
                     min: 150.0
                     max: 250.0
                 pretension:
-                    min: 1000.0
-                    max: 2500.0
+                    min: 400.0
+                    max: 800.0

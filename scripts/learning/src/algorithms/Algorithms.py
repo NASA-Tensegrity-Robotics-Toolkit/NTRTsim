@@ -15,7 +15,6 @@ def dispatchLearning(componentConfig,
     """
     Cannot rely on yaml to return an in-order dictionary.
     Thus, the order is instead inforced here
-
     """
     # TODO: validity of component values after mutation (vs. rangeDictionary)
     newComponentPopulation = copy.deepcopy(componentPopulation)
@@ -23,8 +22,8 @@ def dispatchLearning(componentConfig,
         print "in MonteCarlo"
         templateComponent = getBestComponent(componentPopulation, scoreMethod, fitnessFunction)
         newComponentPopulation = monteCarlo(monteCarloConfig=algorithms['MonteCarlo'],
-                                            rangeConfig=componentConfig['Ranges'],
-                                            templateComponent=templateComponent)
+                                           rangeConfig=componentConfig['Ranges'],
+                                           templateComponent=templateComponent)
         # MonteCarlo is a stand-alone algorithm.
         # The other algorithms can be used in concert.
         # Theoretically, this doesn't need to be here.
@@ -33,9 +32,9 @@ def dispatchLearning(componentConfig,
         print "in Elitism"
         #print "preElitism popSize: " + str(len(newComponentPopulation))
         newComponentPopulation = elitism(elitismConfig=algorithms['Elitism'],
-                                         componentPopulation=newComponentPopulation,
-                                         scoreMethod=scoreMethod,
-                                         fitnessFunction=fitnessFunction)
+                                        componentPopulation=newComponentPopulation,
+                                        scoreMethod=scoreMethod,
+                                        fitnessFunction=fitnessFunction)
         #print "postElitism popSize: " + str(len(newComponentPopulation))
         #print newComponentPopulation[0]
         #raw_input("check this component from Elitism.")

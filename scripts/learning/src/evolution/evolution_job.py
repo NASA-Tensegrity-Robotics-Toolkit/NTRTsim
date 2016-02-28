@@ -63,6 +63,11 @@ class EvolutionJob(NTRTJob):
                     print arg
                 raw_input("About to execute process.")
                 """
+                cmd = [self.args['executable'], "-l", self.args['filename'], "-P", self.args['path'], "-s", str(trialLength), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2]), "-B", str(run[3])]
+                out = ""
+                for i in cmd:
+                        out += str(i) + " "
+                print out        
                 subprocess.check_call([self.args['executable'], "-l", self.args['filename'], "-P", self.args['path'], "-s", str(trialLength), "-b", str(run[0]), "-H", str(run[1]), "-a", str(run[2]), "-B", str(run[3])], stdout=logFile)
                 # raw_input("Process executed.")
             sys.exit()

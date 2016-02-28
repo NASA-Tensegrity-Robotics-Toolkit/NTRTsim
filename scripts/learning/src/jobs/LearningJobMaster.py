@@ -26,6 +26,7 @@ class LearningJobMaster(NTRTJobMaster):
         "generationID",
         "scores",
         "memberID",
+        "populationID",
         "trialPath",
         "fileName",
         "executable",
@@ -42,6 +43,7 @@ class LearningJobMaster(NTRTJobMaster):
         "Ranges"
     ]
 
+    # TODO: These are not accurate. Consult with Brian & Dawny for good default terrains.
     TERRAINS = {
         "flat" : [[0, 0, 0, 0]],
         "hill" : [[0, 0, 0, 0.0, 60000]]
@@ -75,17 +77,17 @@ class LearningJobMaster(NTRTJobMaster):
         self.config['TrialProperties']['terrains'] = terrains
         self.trialProperties = self.config['TrialProperties']
 
-    memberTemplate = None
+    _memberTemplate = None
     def getMemberTemplate(self):
-        if not self.memberTemplate:
+        if not self._memberTemplate:
             seedDirectory = self.config['PathInfo']['seedDirectory']
             try:
                 templateFilePath = seedDirectory + os.listdir(seedDirectory)[0]
             except Exception:
                 raise Exception("Seed Directory is empty. At least one seed member is needed to run a trial.")
             print templateFilePath
-            self.memberTemplate = dictTools.loadFile(templateFilePath)
-        return self.memberTemplate
+            self._memberTemplate = dictTools.loadFile(templateFilePath)
+        return self._memberTemplate
 
     def getComponentsKey(self):
         return NotImplementedError("ComponentsPath must be implemented in subclass.")
@@ -109,18 +111,21 @@ class LearningJobMaster(NTRTJobMaster):
         return fileExtension
 
     def writeMemberToFile(self, member):
-        memberTemplate = self.getMemberTemplate()
+        newMemberDictionary = self.getMemberTemplate()
         componentsKey = self.getComponentsKey()
         components = member.components
         if componentsKey:
-            memberTemplate[componentsKey] = components
+            newMemberDictionary[componentsKey] = components
         else:
-            memberTemplate = components
+            newMemberDictionary = components
+
         basename = self.config['PathInfo']['fileName'] + "_" + str(components['generationID']) \
                    + "_" + str(components['memberID']) + self.getMemberFileType()
         filePath = self.trialDirectory + '/' + basename
+        # TODO: This is hacky. keys should never be stored if they are not printed.
+        dictTools.deleteKeys(newMemberDictionary, self.PROTECTED_TERMS)
         # TODO: dictTools is becoming a longterm helper tool. It needs the "Pretty Woman" treatment.
-        dictTools.dumpFile(memberTemplate, filePath)
+        dictTools.dumpFile(newMemberDictionary, filePath)
         return basename
 
     def generateComponentPopulation(self, componentConfig, componentPopulation):
@@ -155,6 +160,7 @@ class LearningJobMaster(NTRTJobMaster):
         if os.path.isdir(seedDirectory):
             for file in os.listdir(seedDirectory):
                 absFilePath = os.path.abspath(seedDirectory) + '/' + file
+                print absFilePath
                 seedInput = dictTools.loadFile(absFilePath)
                 componentsKey = self.getComponentsKey()
                 if componentsKey:

@@ -61,6 +61,15 @@ def dumpFile(contents, filePath):
     file.close()
     return dictionary
 
+def deleteKeys(dictionary, badKeys):
+    for key in badKeys:
+        if key in dictionary.keys():
+            dictionary.pop(key)
+
+    for value in dictionary.values():
+        if type(value) == type({}):
+            deleteKeys(value, badKeys)
+
 def compareDictDeepType(dictA, dictB):
     sameDeepType = True
     if not dictA.keys() == dictB.keys():

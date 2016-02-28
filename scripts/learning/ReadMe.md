@@ -117,4 +117,5 @@ TODO:
 Exception Hierarchy
 Refactor out component name from generatecomponent(s)populationss
 Update scores after beginTrial
+Feed CrossOver results back to GaussianSampling
 During the refactoring pass, check each use of copy.deepcopy(x). Likely overusing it

@@ -32,6 +32,7 @@ class Generation:
         self._nextMemberID += 1
         return memberID
 
+    # TODO: Pure Co-Evolution implemented here. Offer different options
     def generateMemberFromComponents(self):
         memberID = self._getNextMemberID()
         newMember = Member(memberID=memberID, generationID=self._generationID)
@@ -48,10 +49,10 @@ class Member(object):
     # For later use
     _score = None
 
+    # TODO: Make components pseudo-private with accessors/mutators
     def __init__(self, memberID, generationID):
         self.filePath = None
         self.memberID = memberID
-        # TODO: Should components be made "pseudo-private"?
         self.components = {"memberID" : memberID, "generationID" : generationID}
 
     # Score mutator/accessor added for later use
