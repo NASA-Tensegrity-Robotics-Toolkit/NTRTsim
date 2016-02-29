@@ -2,7 +2,7 @@ PathInfo:
     trialPath: "leifrf/BuilderTests/"
     fileName: "builderOut"
     executable: "./../../../build/dev/btietz/GATests/AppJSONLearningTests"
-    seedDirectory: "./../../../resources/src/leifrf/SpiderBuilderSeed/"
+    seedDirectory: "./../../../resources/src/leifrf/SuperballBuilderSeed/"
 TrialProperties:
     learningType: "builder"
     trialLength: 3000
@@ -15,43 +15,32 @@ TrialProperties:
         - "hill"
 
 builders:
-    prism_rods:
-        Algorithms:
-            Elitism:
-                selectionMethod: "max"
-                survivalCount: 60
-            MonteCarlo:
-                spawnCount: 100
-            GaussianSampling:
-                mutationChance: 1.0
-                mutationDev: 0.05
-            CrossOver:
-    #            selectionMethod: "split" # split or random, future feature
-                spawnCount: 10
-        Ranges:
-            class:
-                - "tgRodInfo"
-                #- "tgRigidInfo"
-            parameters:
-                density:
-                    min: 0.0
-                    max: 1.0
-                radius:
-                    min: 0.0
-                    max: 1.0
-    prism_strings:
+    superball_strings:
         Algorithms:
             MonteCarlo:
                 spawnCount: 100
         Ranges:
             class:
                 - "tgBasicActuatorInfo"
-                #- "tgKinematicActuatorInfo"
             parameters:
                 stiffness: [500, 700, 1000]
                 damping:
                     min: 150.0
                     max: 250.0
                 pretension:
-                    min: 400.0
-                    max: 800.0
+                    min: 1400.0
+                    max: 2000.0
+    superball_rods:
+        Algorithms:
+            MonteCarlo:
+                spawnCount: 100
+        Ranges:
+            class:
+                - "tgRodInfo"
+            parameters:
+                density:
+                    min: 0.2
+                    max: 0.9
+                radius:
+                    min: 0.1
+                    max: 0.8

@@ -1,0 +1,40 @@
+nodes:
+  bottom1: [-2.5, 0, 0]  # name is mandatory and must be unique among nodes
+  bottom2: [2.5, 0, 0]
+  bottom3: [0, 0, 5]
+
+  top1: [-2.5, 10, 0]
+  top2: [2.5, 10, 0]
+  top3: [0, 10, 5]
+
+pair_groups:
+  prism_rods:
+    - ["bottom1", "top2"]
+    - ["bottom2", "top3"]
+    - ["bottom3", "top1"]
+
+  prism_strings:
+    - ["bottom1", "bottom2"]
+    - ["bottom2", "bottom3"]
+    - ["bottom1", "bottom3"]
+
+    - ["top1", "top2"]
+    - ["top2", "top3"]
+    - ["top1", "top3"]
+
+    - ["bottom1", "top1"]
+    - ["bottom2", "top2"]
+    - ["bottom3", "top3"]
+
+builders:
+  prism_rods:
+    class: "tgRodInfo"
+    parameters:
+      density: 0.2
+      radius: 0.31
+  prism_strings:
+    class: "tgBasicActuatorInfo"
+    parameters:
+      stiffness: 1000
+      damping: 10
+      pretension: 1000
