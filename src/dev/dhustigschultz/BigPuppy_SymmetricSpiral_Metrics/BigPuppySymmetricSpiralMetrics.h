@@ -16,14 +16,14 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef BIGPUPPY_SYMMETRIC_ARCHING_H
-#define BIGPUPPY_SYMMETRIC_ARCHING_H
+#ifndef BIGPUPPY_SYMMETRIC_SPIRAL_METRICS_H
+#define BIGPUPPY_SYMMETRIC_SPIRAL_METRICS_H
 
 /**
- * @file BigPuppySymmetricArching.h
+ * @file BigPuppySymmetricSpiralMetrics.h
  * @brief Implementing the Flemons quadruped model (roughly), but as a subclass of Brian's BaseSpineModelLearning module.
  * @author Dawn Hustig-Schultz
- * @date Dec 2015
+ * @date Feb. 2016
  * @version 1.0.0
  * $Id$
  */
@@ -45,13 +45,13 @@ class tgStructure;
 class tgStructureInfo;  
 class tgBasicActuator;  
 
-class BigPuppySymmetricArching: public BaseQuadModelLearning 
+class BigPuppySymmetricSpiralMetrics: public BaseQuadModelLearning 
 {
 public: 
 
-    BigPuppySymmetricArching(int segments, int hips, int legs, int feet);
+    BigPuppySymmetricSpiralMetrics(int segments, int hips, int legs);
 
-    virtual ~BigPuppySymmetricArching();
+    virtual ~BigPuppySymmetricSpiralMetrics();
 
     /**
      * Create the model. Place the rods and strings into the world
@@ -77,28 +77,9 @@ public:
 
 protected: 
 
-    //const std::size_t m_hips;
     const std::size_t m_legs;
-    const std::size_t m_feet;
 
 private:
-
-     /**
-    * A function called during setup that determines the positions of
-    * the nodes of the quadruped's foot based on construction parameters. Rewrite this function
-    * for your own models
-    * @param[in] s: A tgStructure that we're building into
-    * r1: one half the height of a non-foot tgStructure
-    * r2: one half the length of a bottom edge of the foot tgStructure
-    */
-    void addNodesFoot(tgStructure& s, double r1, double r2);
-
-    /**
-    * A function called during setup that creates the rods for the quadruped's foot from
-    * the relevant nodes. Rewrite this function for your own models.
-    * @param[in] s: A tgStructure that we're building into
-    */ 
-    static void addRodsFoot(tgStructure& s);
 
      /** 
     * A function called during setup that determines the positions of
@@ -160,8 +141,7 @@ private:
     * legs: the number of leg segments
     * feet: the number of feet segments
     */
-    void addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, tgStructure& foot, 
-			double r); //, std::size_t segments, std::size_t hips, std::size_t legs, std::size_t feet
+    void addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, double r); 
 
      /**
     * A function called during setup that creates muscles (Strings) for the quadruped from

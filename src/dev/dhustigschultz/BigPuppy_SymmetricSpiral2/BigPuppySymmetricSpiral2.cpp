@@ -17,17 +17,17 @@
  */
 
  /**
- * @file BigPuppySymmetricArching.cpp
+ * @file BigPuppySymmetricSpiral2.cpp
  * @brief Implementing a quadruped based off the Flemons BigPuppy model.
  * @author Dawn Hustig-Schultz
- * @date Dec 2015
+ * @date July 2015
  * @version 1.1.0
  * $Id$
  */
 
 
 //This application
-#include "BigPuppySymmetricArching.h"
+#include "BigPuppySymmetricSpiral2.h"
 
 // This library
 #include "core/tgModel.h"
@@ -53,21 +53,21 @@
 #include <stdexcept>
 
 //#define USE_KINEMATIC
-//#define PASSIVE_STRUCTURE
+#define PASSIVE_STRUCTURE
 
-BigPuppySymmetricArching::BigPuppySymmetricArching(int segments, int hips, int legs, int feet) :
-BaseQuadModelLearning(segments, hips),
+BigPuppySymmetricSpiral2::BigPuppySymmetricSpiral2(int segments, int hips, int legs, int feet) :
+BaseSpineModelLearning(segments),
+m_hips(hips),
 m_legs(legs),
 m_feet(feet)
 {
-    m_subStructures = segments + hips + legs + feet;
 }
 
-BigPuppySymmetricArching::~BigPuppySymmetricArching()
+BigPuppySymmetricSpiral2::~BigPuppySymmetricSpiral2()
 {
 }
 
-void BigPuppySymmetricArching::addNodesFoot(tgStructure& s, double r1, double r2){
+void BigPuppySymmetricSpiral2::addNodesFoot(tgStructure& s, double r1, double r2){
     s.addNode(r2,0,r2);//0 
     s.addNode(r2,0,-r2);//1
     s.addNode(-r2,0,-r2);//2 
@@ -78,18 +78,14 @@ void BigPuppySymmetricArching::addNodesFoot(tgStructure& s, double r1, double r2
     s.addNode(0,r1/2,r2/2);//7        
 }
 
-void BigPuppySymmetricArching::addRodsFoot(tgStructure& s){
+void BigPuppySymmetricSpiral2::addRodsFoot(tgStructure& s){
     s.addPair(0,6,"rod");
     s.addPair(1,7,"rod");
     s.addPair(2,4,"rod");
     s.addPair(3,5,"rod");
-    //s.addPair(0,1,"rod");
-    //s.addPair(0,3,"rod");
-    //s.addPair(1,2,"rod");
-    //s.addPair(2,3,"rod");
 }
 
-void BigPuppySymmetricArching::addNodesLeg(tgStructure& s, double r){ 
+void BigPuppySymmetricSpiral2::addNodesLeg(tgStructure& s, double r){ 
     s.addNode(0,0,0); //0: Bottom Center of lower leg segment
     s.addNode(0,r,0);  //1: Center of lower leg segment
     s.addNode(r,r,0); //2: Right of lower leg segment
@@ -98,7 +94,7 @@ void BigPuppySymmetricArching::addNodesLeg(tgStructure& s, double r){
     s.addNode(0,-r/2,0);  //5: Leg segment extension for connections to foot.
 }
 
-void BigPuppySymmetricArching::addRodsLeg(tgStructure& s){
+void BigPuppySymmetricSpiral2::addRodsLeg(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(1,2,"rod");
     s.addPair(1,3,"rod");
@@ -106,20 +102,20 @@ void BigPuppySymmetricArching::addRodsLeg(tgStructure& s){
     s.addPair(0,5,"rod");
 }
 
-void BigPuppySymmetricArching::addNodesHip(tgStructure& s, double r){
+void BigPuppySymmetricSpiral2::addNodesHip(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(0,r,r); //Node 1 
     s.addNode(0,-r,-r); //Node 2
     s.addNode(0,-r,r); //Node 3
 }
 
-void BigPuppySymmetricArching::addRodsHip(tgStructure& s){
+void BigPuppySymmetricSpiral2::addRodsHip(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
 }
 
-void BigPuppySymmetricArching::addNodesVertebra(tgStructure& s, double r){
+void BigPuppySymmetricSpiral2::addNodesVertebra(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(r,0,r); //Node 1 
     s.addNode(r,0,-r); //Node 2
@@ -127,15 +123,14 @@ void BigPuppySymmetricArching::addNodesVertebra(tgStructure& s, double r){
     s.addNode(-r,0,r); //Node 4
 }
 
-void BigPuppySymmetricArching::addRodsVertebra(tgStructure& s){
+void BigPuppySymmetricSpiral2::addRodsVertebra(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
     s.addPair(0,4,"rod");
 }
 
-void BigPuppySymmetricArching::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, tgStructure& foot, 
-                 double r){ 
+void BigPuppySymmetricSpiral2::addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, double r){ 
     const double offsetDist = r+1; 
     const double offsetDist2 = offsetDist*6; 
     const double offsetDist3 = offsetDist2+2;
@@ -248,7 +243,7 @@ void BigPuppySymmetricArching::addSegments(tgStructure& puppy, tgStructure& vert
         puppy.addChild(t); //Add a segment to the puppy
     }
 
-    for(std::size_t i = (m_segments + m_hips + m_legs); i < (m_segments + m_hips + m_legs + 2); i++) {//right front and back feet
+    /*for(std::size_t i = (m_segments + m_hips + m_legs); i < (m_segments + m_hips + m_legs + 2); i++) {//right front and back feet
         tgStructure* t = new tgStructure (foot);
         t->addTags(tgString("segment num", i + 1));
 
@@ -280,13 +275,13 @@ void BigPuppySymmetricArching::addSegments(tgStructure& puppy, tgStructure& vert
         }
 
         puppy.addChild(t); //Add a segment to the puppy
-    } 
+    } */
 }
 
-void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){ 
+void BigPuppySymmetricSpiral2::addMuscles(tgStructure& puppy){ 
         //Time to add the muscles to the structure. Todo: try to clean this up some more.
     std::vector<tgStructure*> children = puppy.getChildren();
-    for(std::size_t i = 2; i < (children.size() - (m_hips + m_legs + m_feet)); i++) { 
+    for(std::size_t i = 2; i < (children.size() - (m_hips + m_legs)); i++) { 
 
         tgNodes n0 = children[i-2]->getNodes();
         tgNodes n1 = children[i-1]->getNodes();
@@ -295,11 +290,11 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
 
         if(i==2){
             //Extra muscles, to keep front vertebra from swinging. 
-            puppy.addPair(n0[3], n1[3], tgString("spine main front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
-            puppy.addPair(n0[3], n1[4], tgString("spine main front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[3], n1[3], tgString("spine front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[3], n1[4], tgString("spine front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
 
-            puppy.addPair(n0[4], n1[3], tgString("spine main front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
-            puppy.addPair(n0[4], n1[4], tgString("spine main front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[3], tgString("spine front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[4], tgString("spine front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
 
 
         }        
@@ -307,16 +302,16 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
         //Add muscles to the puppy
         if(i < 3){
             if(i % 2 == 0){ //front
-                puppy.addPair(n0[1], n1[3], tgString("spine main front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine main front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[3], tgString("spine main front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[4], tgString("spine main front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[3], tgString("spine front lower right muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[4], tgString("spine front lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[2], n1[3], tgString("spine front upper right muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[2], n1[4], tgString("spine front upper left muscleAct seg", i-2) + tgString(" seg", i-1));
             }
             else{ //rear
-                puppy.addPair(n0[1], n1[3], tgString("spine main rear upper left muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[1], n1[4], tgString("spine main rear lower left muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[3], tgString("spine main rear upper right muscleAct seg", i-2) + tgString(" seg", i-1));
-                puppy.addPair(n0[2], n1[4], tgString("spine main rear lower right muscleAct seg", i-2) + tgString(" seg", i-1)); 
+                puppy.addPair(n0[1], n1[3], tgString("spine rear upper left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[1], n1[4], tgString("spine rear lower left muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[2], n1[3], tgString("spine rear upper right muscleAct seg", i-2) + tgString(" seg", i-1));
+                puppy.addPair(n0[2], n1[4], tgString("spine rear lower right muscleAct seg", i-2) + tgString(" seg", i-1)); 
             }
         }
         if(i < 7){//Was 6
@@ -332,19 +327,41 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
         }
         if(i > 0 && i < 7){
             if(i % 2 == 0){//rear
-                puppy.addPair(n1[1], n2[3], tgString("spine main rear upper left muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine main rear lower left muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[3], tgString("spine main rear upper right muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[4], tgString("spine main rear lower right muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[3], tgString("spine rear upper left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[4], tgString("spine rear lower left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[2], n2[3], tgString("spine rear upper right muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[2], n2[4], tgString("spine rear lower right muscleAct seg", i-1) + tgString(" seg", i));
             }
             else{//front
 
-                puppy.addPair(n1[1], n2[3], tgString("spine main front lower right muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[1], n2[4], tgString("spine main front lower left muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[3], tgString("spine main front upper right muscleAct seg", i-1) + tgString(" seg", i));
-                puppy.addPair(n1[2], n2[4], tgString("spine main front upper left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[3], tgString("spine front lower right muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[1], n2[4], tgString("spine front lower left muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[2], n2[3], tgString("spine front upper right muscleAct seg", i-1) + tgString(" seg", i));
+                puppy.addPair(n1[2], n2[4], tgString("spine front upper left muscleAct seg", i-1) + tgString(" seg", i));
             }
         }
+	if (i >= 2 && i < 7){
+	    puppy.addPair(n1[3], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[3], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	}
+	/*if(i==2 || i==6){
+	    puppy.addPair(n1[3], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	}
+	if(i==3){
+	    puppy.addPair(n1[3], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[3], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	}
+	if(i==4){
+	    puppy.addPair(n1[3], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	}
+	if(i==5){
+	    puppy.addPair(n1[4], n2[3], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[4], tgString("spine spiral muscleAct seg", i-1) + tgString(" seg", i));
+	}*/
         if(i == 6){
             //rear
             puppy.addPair(n1[1], n2[2], tgString("spine rear lower left muscleAct seg", i-1) + tgString(" seg", i));
@@ -372,12 +389,6 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
     tgNodes n12 = children[12]->getNodes();
     tgNodes n13 = children[13]->getNodes();
     tgNodes n14 = children[14]->getNodes();
-
-    //Adding long muscles to spine, for bending/arching:
-    puppy.addPair(n0[2], n6[3], tgString("spine secondary top arching muscleAct seg", 0) + tgString(" seg", 6)); //Change these to something other than "spine " or "spine2" when it's time to implement new code for them!
-    //puppy.addPair(n0[1], n6[4], tgString("spine bottom arching muscleAct seg", 0) + tgString(" seg", 6));
-    //puppy.addPair(n1[4], n5[1], tgString("spine right lateral arching muscleAct seg", 1) + tgString(" seg", 5));
-    //puppy.addPair(n1[3], n5[2], tgString("spine left lateral arching muscleAct seg", 1) + tgString(" seg", 5));
     
     //Left shoulder muscles
     puppy.addPair(n7[1], n1[1], tgString("left shoulder rear upper muscleAct seg", 6) + tgString(" seg", 1));
@@ -445,6 +456,8 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
     puppy.addPair(n11[4], n7[3], tgString("right outer bicep muscle seg", 10) + tgString(" seg", 6));
     puppy.addPair(n11[4], n7[2], tgString("right inner bicep muscle seg", 10) + tgString(" seg", 6));
     puppy.addPair(n11[4], n1[4], tgString("right front abdomen connection muscle seg", 10) + tgString(" seg", 1));
+    puppy.addPair(n11[3], n1[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n11[2], n1[4],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
 
     puppy.addPair(n11[3], n7[3], tgString("right outer tricep muscle seg", 10) + tgString(" seg", 6));
     puppy.addPair(n11[3], n7[2], tgString("right inner tricep muscle seg", 10) + tgString(" seg", 6));
@@ -459,6 +472,8 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
     puppy.addPair(n13[4], n9[2], tgString("left inner bicep muscle seg", 12) + tgString(" seg", 8));
     puppy.addPair(n13[4], n9[3], tgString("left outer bicep muscle seg", 12) + tgString(" seg", 8));
     puppy.addPair(n13[4], n1[3], tgString("left front abdomen connection muscle seg", 12) + tgString(" seg", 1)); //Was n1[2]
+    puppy.addPair(n13[3], n1[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n13[2], n1[3], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
 
     puppy.addPair(n13[3], n9[2], tgString("left inner tricep muscle seg", 12) + tgString(" seg", 8));
     puppy.addPair(n13[3], n9[3], tgString("left outer tricep muscle seg", 12) + tgString(" seg", 8));
@@ -475,6 +490,7 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
 
     puppy.addPair(n12[4], n3[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 3)); 
     puppy.addPair(n12[3], n5[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n12[2], n5[4],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
 
     puppy.addPair(n12[3], n8[3], tgString("right outer calf muscle seg", 11) + tgString(" seg", 7));
     puppy.addPair(n12[3], n8[2], tgString("right inner calf muscle seg", 11) + tgString(" seg", 7));
@@ -491,6 +507,7 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
 
     puppy.addPair(n14[4], n3[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 3)); 
     puppy.addPair(n14[3], n5[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n14[2], n5[3], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
 
     puppy.addPair(n14[3], n10[2], tgString("left inner calf muscle seg", 13) + tgString(" seg", 9));
     puppy.addPair(n14[3], n10[3], tgString("left outer calf muscle seg", 13) + tgString(" seg", 9));
@@ -502,7 +519,7 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
     puppy.addPair(n14[4], n10[1], tgString("left central thigh muscle3 seg", 13) + tgString(" seg", 9));
 
     //Populate feet with muscles. Todo: think up names to differentiate each!
-    for(std::size_t i = (m_segments + m_hips + m_legs); i < children.size(); i++) { 
+    /*for(std::size_t i = (m_segments + m_hips + m_legs); i < children.size(); i++) { 
         tgNodes ni = children[i]->getNodes();
         tgNodes ni4 = children[i-4]->getNodes();
         
@@ -530,11 +547,11 @@ void BigPuppySymmetricArching::addMuscles(tgStructure& puppy){
         puppy.addPair(ni4[0],ni[6],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
         puppy.addPair(ni4[0],ni[7],tgString("foot muscle2 seg", i) + tgString(" seg", i-4));
 
-    }
+    }*/
 
 }
 
-void BigPuppySymmetricArching::setup(tgWorld& world)
+void BigPuppySymmetricSpiral2::setup(tgWorld& world)
 {
     //Rod and Muscle configuration. 
     const double density = 4.2/300.0; //Note: this needs to be high enough or things fly apart...
@@ -569,6 +586,7 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
         tgKinematicActuator::Config motorConfig(2000, 20, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);
+
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
@@ -576,7 +594,7 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
 	tgKinematicActuator::Config motorConfigFeet(stiffnessPassive, damping, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
-	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive, damping, passivePretension3,
+	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive, 20, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);
     #else
@@ -603,6 +621,7 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
 	tgSpringCableActuator::Config muscleConfigFeet(stiffnessPassive, damping, passivePretension); 
 	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+
 
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
@@ -638,7 +657,7 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
 
     const double yOffset_foot = -(2*rod_space+6);
 
-    addSegments(puppy,vertebra,hip,leg,foot,rod_space); //,m_segments,m_hips,m_legs,m_feet
+    addSegments(puppy,vertebra,hip,leg,rod_space); 
 
     puppy.move(btVector3(0.0,-yOffset_foot,0.0));
 
@@ -656,12 +675,12 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
     #ifdef PASSIVE_STRUCTURE
         spec.addBuilder("muscleAct", new tgKinematicContactCableInfo(motorConfig));
 	spec.addBuilder("muscle ", new tgKinematicContactCableInfo(motorConfigOther));
-	spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
+	//spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
 	spec.addBuilder("muscle3 ", new tgKinematicContactCableInfo(motorConfigLegs));
     #else 
 	spec.addBuilder("muscleAct", new tgKinematicContactCableInfo(motorConfigSpine));
 	spec.addBuilder("muscle ", new tgKinematicContactCableInfo(motorConfigOther));
-	spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
+	//spec.addBuilder("muscle2 ", new tgKinematicContactCableInfo(motorConfigFeet));
 	spec.addBuilder("muscle3 ", new tgKinematicContactCableInfo(motorConfigLegs));
 	
     #endif
@@ -670,12 +689,12 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
     #ifdef PASSIVE_STRUCTURE
    	spec.addBuilder("muscleAct", new tgBasicActuatorInfo(muscleConfig));
 	spec.addBuilder("muscle " , new tgBasicActuatorInfo(muscleConfigOther));
-	spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
+	//spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
 	spec.addBuilder("muscle3 " , new tgBasicActuatorInfo(muscleConfigLegs));
     #else 
 	spec.addBuilder("muscleAct" , new tgBasicActuatorInfo(muscleConfigSpine));
 	spec.addBuilder("muscle " , new tgBasicActuatorInfo(muscleConfigOther));
-	spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
+	//spec.addBuilder("muscle2 " , new tgBasicActuatorInfo(muscleConfigFeet));
 	spec.addBuilder("muscle3 " , new tgBasicActuatorInfo(muscleConfigLegs));
     #endif
     
@@ -693,15 +712,15 @@ void BigPuppySymmetricArching::setup(tgWorld& world)
     // models (e.g. muscles) that we want to control. 
     m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
-    m_allSegments = this->find<tgModel> ("segment");
+    m_allSegments = this->find<tgModel> ("spine segment");
     
     // Actually setup the children, notify controller that the setup has finished
-    BaseQuadModelLearning::setup(world);
+    BaseSpineModelLearning::setup(world);
 
     children.clear();
 }
 
-void BigPuppySymmetricArching::step(double dt)
+void BigPuppySymmetricSpiral2::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -711,11 +730,11 @@ void BigPuppySymmetricArching::step(double dt)
     else
     {
         // Notify observers (controllers) of the step so that they can take action
-	BaseQuadModelLearning::step(dt);
+	BaseSpineModelLearning::step(dt);
     }
 }
 
-void BigPuppySymmetricArching::teardown()
+void BigPuppySymmetricSpiral2::teardown()
 {
-    BaseQuadModelLearning::teardown();
+    BaseSpineModelLearning::teardown();
 }

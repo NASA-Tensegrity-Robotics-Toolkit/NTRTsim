@@ -17,18 +17,18 @@
 */
 
 /**
- * @file AppQuadControlSpiral.cpp
+ * @file AppQuadControlGeneral.cpp
  * @brief Using Brian's existing spine controller for a quadruped, using more muscles to increase torsion. 
  * @author Dawn Hustig-Schultz, Brian Mirletz
- * @date Nov. 2015
+ * @date Feb. 2016
  * @version 1.0.0
  * $Id$
  */
 
-#include "AppQuadControlArching.h"
+#include "AppQuadControlGeneral.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
 
-AppQuadControlArching::AppQuadControlArching(int argc, char** argv)
+AppQuadControlGeneral::AppQuadControlGeneral(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -54,7 +54,7 @@ AppQuadControlArching::AppQuadControlArching(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppQuadControlArching::setup()
+bool AppQuadControlGeneral::setup()
 {
     // First create the world
     world = createWorld();
@@ -78,15 +78,14 @@ bool AppQuadControlArching::setup()
     const int segments = 7;
     const int hips = 4;
     const int legs = 4;
-    const int feet = 4; 
 
-    BigPuppySymmetricArching* myModel = new BigPuppySymmetricArching(segments, hips, legs, feet);
+    BigPuppySymmetricSpiralSegments* myModel = new BigPuppySymmetricSpiralSegments(segments, hips, legs);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
         const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 8; //This may be ok, but confirm. 
+        const int numMuscles = 112 + 40; //+ 40; //Changed for experiment. Learning different params for all strings in the spine! 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -115,7 +114,7 @@ bool AppQuadControlArching::setup()
 	const double maxH = 70.0;
 	const double minH = 1.0;
 
-        JSONNonlinearFeedbackControl::Config control_config(segmentSpan, 
+        JSONGeneralFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -141,8 +140,8 @@ bool AppQuadControlArching::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONNonlinearFeedbackControl* const myControl =
-        new JSONNonlinearFeedbackControl(control_config, suffix, lowerPath);
+       JSONGeneralFeedbackControl* const myControl =
+        new JSONGeneralFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -166,7 +165,7 @@ bool AppQuadControlArching::setup()
     return bSetup;
 }
 
-void AppQuadControlArching::handleOptions(int argc, char **argv)
+void AppQuadControlGeneral::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -215,7 +214,7 @@ void AppQuadControlArching::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppQuadControlArching::getHillyConfig()
+const tgHillyGround::Config AppQuadControlGeneral::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -235,7 +234,7 @@ const tgHillyGround::Config AppQuadControlArching::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppQuadControlArching::getBoxConfig()
+const tgBoxGround::Config AppQuadControlGeneral::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -252,14 +251,14 @@ const tgBoxGround::Config AppQuadControlArching::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppQuadControlArching::getBlocks()
+tgModel* AppQuadControlGeneral::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppQuadControlArching::createWorld()
+tgWorld* AppQuadControlGeneral::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -281,17 +280,17 @@ tgWorld* AppQuadControlArching::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppQuadControlArching::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppQuadControlGeneral::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppQuadControlArching::createView(tgWorld *world)
+tgSimView *AppQuadControlGeneral::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppQuadControlArching::run()
+bool AppQuadControlGeneral::run()
 {
     if (!bSetup)
     {
@@ -317,7 +316,7 @@ bool AppQuadControlArching::run()
     return true;
 }
 
-void AppQuadControlArching::simulate(tgSimulation *simulation)
+void AppQuadControlGeneral::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -373,8 +372,8 @@ void AppQuadControlArching::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppQuadControlArching" << std::endl;
-    AppQuadControlArching app (argc, argv);
+    std::cout << "AppQuadControlGeneral" << std::endl;
+    AppQuadControlGeneral app (argc, argv);
 
     if (app.setup())
         app.run();

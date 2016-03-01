@@ -16,19 +16,19 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef BIGPUPPY_SYMMETRIC_ARCHING_H
-#define BIGPUPPY_SYMMETRIC_ARCHING_H
+#ifndef BIGPUPPY_SYMMETRIC_SPIRAL2_H
+#define BIGPUPPY_SYMMETRIC_SPIRAL2_H
 
 /**
- * @file BigPuppySymmetricArching.h
+ * @file BigPuppySymmetricSpiral2.h
  * @brief Implementing the Flemons quadruped model (roughly), but as a subclass of Brian's BaseSpineModelLearning module.
  * @author Dawn Hustig-Schultz
- * @date Dec 2015
+ * @date Jan 2016
  * @version 1.0.0
  * $Id$
  */
 
-#include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
+#include "examples/learningSpines/BaseSpineModelLearning.h"
 
 // This library
 #include "core/tgModel.h" 
@@ -41,17 +41,17 @@
 
 class tgSpringCableActuator;
 class tgWorld;
-class tgStructure;    
-class tgStructureInfo;  
+class tgStructure;    //Do I need this, or tgStructureInfo?
+class tgStructureInfo;  //Do I need this, or just tgStructure, or both?
 class tgBasicActuator;  
 
-class BigPuppySymmetricArching: public BaseQuadModelLearning 
+class BigPuppySymmetricSpiral2: public BaseSpineModelLearning //public tgSubject<BigPuppy>, public tgModel
 {
 public: 
 
-    BigPuppySymmetricArching(int segments, int hips, int legs, int feet);
+    BigPuppySymmetricSpiral2(int segments, int hips, int legs, int feet);
 
-    virtual ~BigPuppySymmetricArching();
+    virtual ~BigPuppySymmetricSpiral2();
 
     /**
      * Create the model. Place the rods and strings into the world
@@ -77,7 +77,7 @@ public:
 
 protected: 
 
-    //const std::size_t m_hips;
+    const std::size_t m_hips;
     const std::size_t m_legs;
     const std::size_t m_feet;
 
@@ -160,8 +160,7 @@ private:
     * legs: the number of leg segments
     * feet: the number of feet segments
     */
-    void addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, tgStructure& foot, 
-			double r); //, std::size_t segments, std::size_t hips, std::size_t legs, std::size_t feet
+    void addSegments(tgStructure& puppy, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, double r); 
 
      /**
     * A function called during setup that creates muscles (Strings) for the quadruped from

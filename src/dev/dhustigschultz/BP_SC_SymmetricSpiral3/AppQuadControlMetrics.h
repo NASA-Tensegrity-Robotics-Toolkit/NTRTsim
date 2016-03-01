@@ -16,21 +16,21 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef APP_QUAD_CONTROL_ARCHING_H
-#define APP_QUAD_CONTROL_ARCHING_H
+#ifndef APP_QUAD_CONTROL_METRICS_H
+#define APP_QUAD_CONTROL_METRICS_H
 
 /**
- * @file AppQuadControlArching.cpp
+ * @file AppQuadControlMetrics.h
  * @brief Contains the definition function main() for the Multiple terrains app, used here for control of a quadruped.
  * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
  * $Id$
  */
 
 //robot
-#include "dev/dhustigschultz/BigPuppy_SymmetricArching/BigPuppySymmetricArching.h"
+#include "dev/dhustigschultz/BigPuppy_SymmetricSpiral_Metrics/BigPuppySymmetricSpiralMetrics.h"
 
 // controller 
-#include "JSONNonlinearFeedbackControl.h"
+#include "JSONMetricsFeedbackControl.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"
@@ -53,10 +53,10 @@
 
 namespace po = boost::program_options;
 
-class AppQuadControlArching
+class AppQuadControlMetrics
 {
 public:
-    AppQuadControlArching(int argc, char** argv);
+    AppQuadControlMetrics(int argc, char** argv);
 
     /** Setup the simulation */
     bool setup();
@@ -115,5 +115,5 @@ private:
     bool bSetup;
 };
 
-#endif  // APP_QUAD_CONTROL_ARCHING_H
+#endif  // APP_QUAD_CONTROL_METRICS_H
 

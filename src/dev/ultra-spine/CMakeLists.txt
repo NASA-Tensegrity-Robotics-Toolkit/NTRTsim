@@ -1,4 +1,4 @@
-Project(SpineHardwareProject)
+Project(ultra-spine)
 
 subdirs(
     VerticalSpine

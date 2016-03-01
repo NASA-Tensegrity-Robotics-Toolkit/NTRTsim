@@ -17,7 +17,7 @@
 */
 
 /**
- * @file JSONNonlinearFeedbackControl.cpp
+ * @file JSONStatsFeedbackControl.cpp
  * @brief A controller for the template class BaseSpineModelLearning. 
  * @Includes more metrics, such as center of mass of entire structure.
  * @author Brian Mirletz, Dawn Hustig-Schultz
@@ -25,7 +25,7 @@
  * $Id$
  */
 
-#include "JSONNonlinearFeedbackControl.h"
+#include "JSONMetricsFeedbackControl.h"
 
 
 // Should include tgString, but compiler complains since its been
@@ -56,10 +56,11 @@
 
 //#define LOGGING
 #define USE_KINEMATIC
+#define PRINT_METRICS
 
 using namespace std;
 
-JSONNonlinearFeedbackControl::Config::Config(int ss,
+JSONMetricsFeedbackControl::Config::Config(int ss,
                                         int tm,
                                         int om,
                                         int param,
@@ -102,7 +103,7 @@ minHeight(minH)
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-JSONNonlinearFeedbackControl::JSONNonlinearFeedbackControl(JSONNonlinearFeedbackControl::Config config,	
+JSONMetricsFeedbackControl::JSONMetricsFeedbackControl(JSONMetricsFeedbackControl::Config config,	
                                                 std::string args,
                                                 std::string resourcePath) :
 JSONQuadCPGControl(config, args, resourcePath),
@@ -112,12 +113,12 @@ m_config(config)
     
 }
 
-JSONNonlinearFeedbackControl::~JSONNonlinearFeedbackControl()
+JSONMetricsFeedbackControl::~JSONMetricsFeedbackControl()
 {
     delete nn;
 }
 
-void JSONNonlinearFeedbackControl::onSetup(BaseQuadModelLearning& subject)
+void JSONMetricsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
     m_pCPGSys = new CPGEquationsFB(100);
 
@@ -204,9 +205,19 @@ void JSONNonlinearFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
+
+#ifdef PRINT_METRICS
+    //Just so we know how many vector rows we need:
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+    //Add the rows:
+    for(std::size_t i=0; i<tmpStrings.size(); i++){
+	m_muscleTensionsAll.push_back(vector <double> ());
+        m_muscleLengthsAll.push_back(vector <double> ());
+    }
+#endif
 }
 
-void JSONNonlinearFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
+void JSONMetricsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
 {
     m_updateTime += dt;
     m_totalTime += dt;
@@ -248,42 +259,43 @@ void JSONNonlinearFeedbackControl::onStep(BaseQuadModelLearning& subject, double
 		bogus = true;
 		throw std::runtime_error("Height out of range");
     }
-    //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
-    if(1){
-	    static int count = 0;
-	    if(count > 100) {
-		std::cout << m_totalTime << std::endl;
 
-		//Getting the center of mass of the entire structure. 
-		std::vector<double> structureCOM = subject.getCOM(m_config.segmentNumber);
-		std::cout  << "COM: " << structureCOM[0] << " " << structureCOM[1] << " " << structureCOM[2] << " "; 
-	    	std::cout << std::endl;
-		//Clear the metrics vector for ease of adding tensions. 
-		//metrics.clear();
+    //every 100 steps, get the COM, tensions, and lengths of active muscles and store them in 2D vectors:
+#ifdef PRINT_METRICS
+    static int count = 0;
+    if(count > 100) {
+	m_timeStep.push_back(m_totalTime);
 
-		std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+	//Getting the center of mass of the entire structure:
+	std::vector<double> structureCOM = subject.getCOM(m_config.segmentNumber);
+	m_quadCOM.push_back(structureCOM);
 
-		for(std::size_t i=0; i<tmpStrings.size(); i++)
-		{
-		    std::cout << "Muscle Tension " << i << ": " << tmpStrings[i]->getTension() << std::endl;
-		}
-		std::cout << std::endl;
-		
-		for(std::size_t i=0; i<tmpStrings.size(); i++)
-		{
-		    std::cout << "Muscle Length " << i << ": " << tmpStrings[i]->getCurrentLength() << std::endl;
-		}
-		std::cout << std::endl;
+	std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
 
-		count = 0;
-	    }
-	    else {
-		count++;
-	    }
+        //The tensions of all active muscles during this timestep
+	m_tensions.clear();
+	for(std::size_t i=0; i<tmpStrings.size(); i++)
+	{
+	    double tension = tmpStrings[i]->getTension();
+            m_muscleTensionsAll.at(i).push_back(tension);
+	}
+
+	//The lengths of all active muscles during this timestep
+	for(std::size_t i=0; i<tmpStrings.size(); i++)
+	{
+	    double length = tmpStrings[i]->getCurrentLength();
+            m_muscleLengthsAll.at(i).push_back(length);
+	}
+
+	count = 0;
     }
+    else {
+	count++;
+    }
+#endif
 }
 
-void JSONNonlinearFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
+void JSONMetricsFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
 {
     scores.clear();
     metrics.clear();
@@ -378,6 +390,10 @@ void JSONNonlinearFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
+
+#ifdef PRINT_METRICS
+    printMetrics(subject);
+#endif
     
     delete m_pCPGSys;
     m_pCPGSys = NULL;
@@ -389,8 +405,7 @@ void JSONNonlinearFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     m_spineControllers.clear();    
 }
 
-//ToDo: Need to restructure the for loops in here, so that have separate cases for the first and last segments (long muscles)....
-void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
+void JSONMetricsFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
@@ -416,7 +431,7 @@ void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
     {
         tgCPGActuatorControl * const pStringInfo = m_spineControllers[i];
         assert(pStringInfo != NULL);
-        pStringInfo->setConnectivity(m_spineControllers, edgeActions); //May need a new function, written in a subclass, to deal with the long muscles, though this will be fine for segments 1 through 5.
+        pStringInfo->setConnectivity(m_spineControllers, edgeActions);
         
         //String will own this pointer
         tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
@@ -434,7 +449,7 @@ void JSONNonlinearFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
 	
 }
 
-array_2D JSONNonlinearFeedbackControl::scaleNodeActions (Json::Value actions)
+array_2D JSONMetricsFeedbackControl::scaleNodeActions (Json::Value actions)
 {
     std::size_t numControllers = actions.size();
     std::size_t numActions = actions[0].size();
@@ -474,9 +489,7 @@ array_2D JSONNonlinearFeedbackControl::scaleNodeActions (Json::Value actions)
     return nodeActions;
 }
 
-//ToDo: May have to write a new function in this subclass, to handle the fact that we'll be skipping segments now. Not sure if scale edge actions will work in all cases.... and maybe there's something better?
-
-std::vector<double> JSONNonlinearFeedbackControl::getFeedback(BaseQuadModelLearning& subject)
+std::vector<double> JSONMetricsFeedbackControl::getFeedback(BaseQuadModelLearning& subject)
 {
     // Placeholder
     std::vector<double> feedback;
@@ -516,7 +529,7 @@ std::vector<double> JSONNonlinearFeedbackControl::getFeedback(BaseQuadModelLearn
     return feedback;
 }
 
-std::vector<double> JSONNonlinearFeedbackControl::getCableState(const tgSpringCableActuator& cable)
+std::vector<double> JSONMetricsFeedbackControl::getCableState(const tgSpringCableActuator& cable)
 {
 	// For each string, scale value from -1 to 1 based on initial length or max tension of motor
     
@@ -532,7 +545,7 @@ std::vector<double> JSONNonlinearFeedbackControl::getCableState(const tgSpringCa
 	return state;
 }
 
-std::vector<double> JSONNonlinearFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
+std::vector<double> JSONMetricsFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
 {
 	// Placeholder
 	std::vector<double> feedback;
@@ -556,3 +569,38 @@ std::vector<double> JSONNonlinearFeedbackControl::transformFeedbackActions(std::
 	return feedback;
 }
 
+//A function for printing lengths and tensions that were gathered while the controller was running:
+void JSONMetricsFeedbackControl::printMetrics(BaseQuadModelLearning& subject){
+
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+    //Printing the tags for each muscle in order, so we know which tensions and lengths correspond to each muscle
+    for(std::size_t i=0; i<tmpStrings.size(); i++)
+    {
+        std::string delim = " ";
+        std::string muscle = tmpStrings[i]->getTagStr(delim); 
+        cout << muscle << endl;
+    }
+    cout << endl;
+
+    //Printing the timesteps for which metrics were gathered: 
+    for (int i = 0; i < m_timeStep.size(); ++i) {
+        cout << m_timeStep[i] << ",";
+    }
+    cout << endl;
+
+    //Printing the tensions of each muscle:
+    for (int i = 0; i < m_muscleTensionsAll.size(); i++){
+	for(int j = 0; j < m_muscleTensionsAll[i].size(); j++){
+	    cout << m_muscleTensionsAll[i][j] << ",";
+	}
+	cout << endl;
+    }
+
+    //Printing the lengths of each muscle:
+    for (int i = 0; i < m_muscleLengthsAll.size(); i++){
+	for(int j = 0; j < m_muscleLengthsAll[i].size(); j++){
+	    cout << m_muscleLengthsAll[i][j] << ",";
+	}
+	cout << endl;
+    }   
+}

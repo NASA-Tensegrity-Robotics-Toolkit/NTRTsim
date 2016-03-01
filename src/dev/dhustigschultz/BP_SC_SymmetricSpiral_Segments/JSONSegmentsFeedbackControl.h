@@ -16,11 +16,11 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef JSON_NONLINEAR_FEEDBACK_CONTROL_H
-#define JSON_NONLINEAR_FEEDBACK_CONTROL_H
+#ifndef JSON_SEGMENTS_FEEDBACK_CONTROL_H
+#define JSON_SEGMENTS_FEEDBACK_CONTROL_H
 
 /**
- * @file JSONNonlinearFeedbackControl.h
+ * @file JSONSegmentsFeedbackControl.h
  * @brief A controller for the template class BaseSpineModelLearning
  * @Includes more metrics, such as center of mass of entire structure.
  * @author Brian Mirletz, Dawn Hustig-Schultz
@@ -44,7 +44,7 @@ class tgSpringCableActuator;
  * Due to the number of parameters, the learned parameters are split
  * into one config file for the nodes and another for the CPG's "edges"
  */
-class JSONNonlinearFeedbackControl : public JSONQuadCPGControl
+class JSONSegmentsFeedbackControl : public JSONQuadCPGControl
 {
 public:
 
@@ -55,8 +55,8 @@ struct Config : public JSONQuadCPGControl::Config
          * The only constructor. 
          */
         Config( int ss,
-        int tm,
-        int om,
+        int tm,	//These now apply to spine segments only.
+        int om, //Same.
         int param,
         int segnum = 6,
         double ct = 0.1,
@@ -78,7 +78,11 @@ struct Config : public JSONQuadCPGControl::Config
         double pfMin = 0.0,
         double pfMax = 0.0,
 	double maxH = 60.0, //May need to tune this value more
-	double minH = 1.0   //Perhaps same
+	double minH = 1.0,   //Perhaps same
+	int ohm = 10,
+	int thm = 10,
+	int olm = 10,
+	int tlm = 10
         );
         
         const double freqFeedbackMin;
@@ -91,17 +95,23 @@ struct Config : public JSONQuadCPGControl::Config
 	const double maxHeight;
 	const double minHeight;
         
-        // Values to be filled in by JSON file during onSetup
+        // Values to be filled in by JSON file during onSetup:
         int numStates;
         int numActions;
         
+	// New values of numMuscles, for non-spine segments:
+	int ourHipMuscles;
+	int theirHipMuscles;
+	int ourLegMuscles;
+	int theirLegMuscles;
+
     };
 
-    JSONNonlinearFeedbackControl(JSONNonlinearFeedbackControl::Config config,	
+    JSONSegmentsFeedbackControl(JSONSegmentsFeedbackControl::Config config,	
 							std::string args,
 							std::string resourcePath = "");
     
-    virtual ~JSONNonlinearFeedbackControl();
+    virtual ~JSONSegmentsFeedbackControl();
     
     virtual void onSetup(BaseQuadModelLearning& subject);
     
@@ -110,12 +120,12 @@ struct Config : public JSONQuadCPGControl::Config
     virtual void onTeardown(BaseQuadModelLearning& subject);
 	
 protected:
-//ToDo: Need to restructure the for loops in here, so that have separate cases for the first and last segments (long muscles)....
-    virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
-    
-    virtual array_2D scaleNodeActions (Json::Value actions);
 
-//ToDo: May have to write a new function in this subclass, to handle the fact that we'll be skipping segments now. Not sure if scale edge actions will work in all cases.... and maybe there's something better?
+    virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions, array_4D hipEdgeActions, array_4D legEdgeActions);
+
+
+    virtual array_4D scaleEdgeActions (Json::Value actions, int theirMuscles, int ourMuscles);    
+    virtual array_2D scaleNodeActions (Json::Value actions);
     
     std::vector<double> getFeedback(BaseQuadModelLearning& subject);
     
@@ -123,13 +133,15 @@ protected:
     
     std::vector<double> transformFeedbackActions(std::vector< std::vector<double> >& actions);
     
-    JSONNonlinearFeedbackControl::Config m_config;
+    JSONSegmentsFeedbackControl::Config m_config;
 
     std::vector<tgCPGActuatorControl*> m_spineControllers;
+    std::vector<tgCPGActuatorControl*> m_hipControllers;
+    std::vector<tgCPGActuatorControl*> m_legControllers;
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
     
 };
 
-#endif // JSON_NONLINEAR_FEEDBACK_CONTROL_H
+#endif // JSON_SEGMENTS_FEEDBACK_CONTROL_H
