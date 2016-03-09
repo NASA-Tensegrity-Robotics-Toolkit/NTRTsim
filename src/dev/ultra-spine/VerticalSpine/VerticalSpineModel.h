@@ -46,22 +46,22 @@ class VerticalSpineModel: public tgSubject<VerticalSpineModel>, public tgModel
 {
 public: 
 	
-	/**
-	 * Used within this function to map segments to string keys
-	 */
+    /**
+     * Used within this function to map segments to string keys
+     */
     typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
 	
-	/**
-	 * The only constructor. The model details are instantiated once
-	 * setup is called typically when the model is added to a simulation.
-	 * @param[in] segments, a positive integer dictating how many
-	 * rigid segments will be constructed. 
-	 */
+    /**
+     * The only constructor. The model details are instantiated once
+     * setup is called typically when the model is added to a simulation.
+     * @param[in] segments, a positive integer dictating how many
+     * rigid segments will be constructed. 
+     */
     VerticalSpineModel(size_t segments);
 	
-	/**
-	 * Nothing to do. Most functions already handled by tgModel::teardown
-	 */
+    /**
+     * Nothing to do. Most functions already handled by tgModel::teardown
+     */
     virtual ~VerticalSpineModel()
     {}
     
@@ -75,21 +75,24 @@ public:
      */
     virtual void setup(tgWorld& world);
 	
-	/**
+    /**
      * Step the model, its children. Notifies controllers of step.
      * @param[in] dt, the timestep. Must be positive.
      */
     virtual void step(const double dt);
 	
-	/**
-	 * Get a group of muscles according to the provided key. Groups are
-	 * populated during setup.
-	 * @param[in] key - a std:string* used as a key to a std::map from
-	 * a string to a vector of muscles
-	 * @return a std::vector of pointers to the muscles found by the key
-	 */
+    /**
+     * Get a group of muscles according to the provided key. Groups are
+     * populated during setup.
+     * @param[in] key - a std:string* used as a key to a std::map from
+     * a string to a vector of muscles
+     * @return a std::vector of pointers to the muscles found by the key
+     */
     const std::vector<tgSpringCableActuator*>& getMuscles (const std::string& key) const;
-     
+
+    /**
+     * What is this? Drew 2016-03-08
+     */
     const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
     
     /**
@@ -109,13 +112,13 @@ private:
      */
 
     /**
-     * Generate the five nodes for a tetrahedron, inside the tgStructure
-     * that's passed in.
-     * @param[in] tetra: the structure to build the nodes into
+     * Generate the five nodes for a vertebra tetrahedron, inside the 
+     * tgStructure that's passed in.
+     * @param[in] vertebra: the structure to build the nodes into
      * @param[in] edge: edge length for this one tetrahedron
      * @param[in] height: height length for this one tetrahedron
      */
-    static void addNodes(tgStructure& tetra, double edge, double height);
+    static void addNodes(tgStructure& vertebra, double edge, double height);
 
     /**
      * Output debugging information for this model and structure.
@@ -125,19 +128,19 @@ private:
     /**
      * Pair together the nodes for the first type of rod
      */
-    static void addPairs(tgStructure& tetra);
+    static void addPairs(tgStructure& vertebra);
 
     /**
      * Pair together the nods for the second type of rod
      */
-    static void addPairsB(tgStructure& tetra);
+    static void addPairsB(tgStructure& vertebra);
 
     /**
-     * Generate the full spine structure by copying and translating one tetra
-     * into segmentCount number of tetras, and build that into spine.
+     * Generate the full spine structure by copying and translating one vertebra
+     * into segmentCount number of vertebrae, and build that into spine.
      */
-    static void addSegments(tgStructure& spine, const tgStructure& tetra, double
-			    edge, size_t segmentCount);
+    static void addSegments(tgStructure& spine, const tgStructure& vertebra,
+			    double edge, size_t segmentCount);
 
     /**
      * Add the muscles that connect between the segments of the spine.
@@ -150,16 +153,16 @@ private:
     static void mapMuscles(VerticalSpineModel::MuscleMap& muscleMap, tgModel&
 			   model, size_t segmentCount);
 
-	/**
-	 * A std::vector containing all of the tgStringCableActuators amongst
-	 * the children of this model. Populated during setup
-	 */
+    /**
+     * A std::vector containing all of the tgStringCableActuators amongst
+     * the children of this model. Populated during setup
+     */
     std::vector<tgSpringCableActuator*> allMuscles;
 	
-	/**
-	 * A typdef of std::map from std::string to tgLinearMuscle*. Contains
-	 * mapped muscles, populated during setup.
-	 */
+    /**
+     * A typdef of std::map from std::string to tgLinearMuscle*. Contains
+     * mapped muscles, populated during setup.
+     */
     MuscleMap muscleMap;
     
     /**

@@ -51,7 +51,7 @@ VerticalSpineBendingController::VerticalSpineBendingController():
   dL(0.002),        // Length Change, 0.01
   state(-1.0),
   m_updateTime(0.0),
-  m_dataObserver("/home/drew/NTRTsim_logs/vertspine/vertspine_1-2-3-4_")
+  m_dataObserver("logs/vertspine_1-2-3-4_")
 {
   // verticalRL = 1; // cm
     //verticalRL = 7.38; //cm
