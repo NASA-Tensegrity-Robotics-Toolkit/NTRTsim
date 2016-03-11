@@ -146,7 +146,6 @@ private:
      * Add a tgPair for each rod in the vertebra. This maps two nodes into
      * a rod (of the vertebra_name of the ConfigVertebra).
      */
-    static void addPairs(tgStructure& vertebra);
     static void addRodPairs(tgStructure& vertebra, ConfigVertebra& conf_vertebra);
 
     /**
@@ -166,15 +165,11 @@ private:
      * dynamics in MATLAB for this structure.
      */
     static double getEdgeLength(ConfigVertebra& conf_vertebra);
-    
-    /**
-     * Pair together the nods for the second type of rod
-     */
-    static void addPairsB(tgStructure& vertebra);
 
     /**
      * Generate the full spine structure by copying and translating one vertebra
      * into segmentCount number of vertebrae, and build that into spine.
+     * DEPRECATED AS OF 2016-03-11
      */
     static void addSegments(tgStructure& spine, const tgStructure& vertebra,
 			    double edge, size_t segmentCount);

@@ -200,24 +200,7 @@ void VerticalSpineModel::addRodPairs(tgStructure& vertebra, ConfigVertebra& conf
     vertebra.addPair(3, 4, "rod_" + conf_vertebra.vertebra_name);
 }
 
-void VerticalSpineModel::addPairs(tgStructure& vertebra)
-{
-    vertebra.addPair(0, 4, "rod");
-    vertebra.addPair(1, 4, "rod");
-    vertebra.addPair(2, 4, "rod");
-    vertebra.addPair(3, 4, "rod");
-
-}
-    
-void VerticalSpineModel::addPairsB(tgStructure& vertebra)
-{
-    vertebra.addPair(0, 4, "rodB");
-    vertebra.addPair(1, 4, "rodB");
-    vertebra.addPair(2, 4, "rodB");
-    vertebra.addPair(3, 4, "rodB");
-
-}
-
+// DEPRECATED AS OF 2016-03-11
 void VerticalSpineModel::addSegments(tgStructure& spine, const tgStructure& vertebra, 
 				     double edge, size_t segment_count)
 {
@@ -251,9 +234,13 @@ void VerticalSpineModel::addVertebra(tgStructure& spine,
     // HACK FOR NOW: just pick the first element, we know that's the base.
     tgStructure* const new_vertebra = new tgStructure( *(spine_vertebrae[0]) );
 
+    // TO-DO: REMOVE THE OLD TAG FROM THE FIRST VERTEBRA!
+    // Need to remove "segment1".
+    // DO WE ALSO NEED TO REMOVE OTHER OLD STUFF?
+
     // Add the nodes and pairs to this new vertebra
     addNodes( *new_vertebra, conf_vertebra);
-    addPairs( *new_vertebra);
+    addRodPairs( *new_vertebra, conf_vertebra);
 
     // Move it into place.
     // Remember that the vertical direction is dimension 2 in Bullet Physics.
@@ -265,7 +252,6 @@ void VerticalSpineModel::addVertebra(tgStructure& spine,
 
     // Add the created vertebra to the rest of the spine.
     spine.addChild(new_vertebra);
-
 }
 
 // Add muscles that connect the segments
@@ -336,8 +322,7 @@ void VerticalSpineModel::setup(tgWorld& world)
     // and is non-moving since it has mass = 0.
     tgStructure base_vertebra;
     addNodes(base_vertebra, conf_base_vertebra);
-    addPairsB(base_vertebra);
-    //addRodPairs(base_vertebra, conf_base_vertebra);
+    addRodPairs(base_vertebra, conf_base_vertebra);
     
     // Remember that the second dimension here is vertical.
     // (Y is the vertical, not Z.)
@@ -353,60 +338,15 @@ void VerticalSpineModel::setup(tgWorld& world)
     // The second and 4th vertebrae are actuated.
     addVertebra(spine, conf_active_vertebra, 2);
     addVertebra(spine, conf_passive_vertebra, 3);
-    //std::cout << "got to: " << 7 << std::endl;
     addVertebra(spine, conf_active_vertebra, 4);
     addVertebra(spine, conf_passive_vertebra, 5);
 
-    // Debugging: this is the new version that *should work*
-    // tgStructure vertebra2;
-    // addNodes(vertebra2, conf_passive_vertebra);
-    // //addRodPairs(vertebra2, conf_passive_vertebra);
-    // addPairs(vertebra2);
-    // vertebra2.move(btVector3(0.0, conf_spine.base_vertical_offset, 0));
-    // vertebra2.addTags(tgString("segment", 2));
-    // tgStructure* const vertebra2_copy = new tgStructure(vertebra2);
-    // spine.addChild(vertebra2_copy);
-
-    // Debugging: this is the old version that *does work*
-    // tgStructure vertebra2;
-    // addNodes(vertebra2, conf_passive_vertebra);
-    // addPairs(vertebra2);
-    // //addSegments(spine, vertebra2, getEdgeLength(conf_passive_vertebra), m_segments);
-    // vertebra2.move( btVector3(0.0, conf_spine.vertebra_separation, 0.0) );
-    // addVertebraChild(spine, vertebra2, 2);
-
-    // another test
-    // tgStructure* const vertebra2 = new tgStructure(base_vertebra);
-    // addNodes(*vertebra2, conf_passive_vertebra);
-    // addPairs(*vertebra2);
-    // vertebra2 -> move( btVector3(0.0, conf_spine.vertebra_separation, 0.0) );
-    // addVertebraChild(spine, *vertebra2, 2);
-
-    
-    // tgStructure* const vertebra3 = new tgStructure(base_vertebra);
-    // addNodes(*vertebra3, conf_passive_vertebra);
-    // addPairs(*vertebra3);
-    // vertebra3 -> move( btVector3(0.0, 2 * conf_spine.vertebra_separation, 0.0) );
-    // addVertebraChild(spine, *vertebra3, 3);
     
     addMuscles(spine);
 
     // Create the build spec that uses tags to turn the structure into a real model.
     // This is where the tagged pairs are matched up with an actual geometric object.
-
-    // For the old ULTRA Spine v0.1:
-    // length of inner strut = 12.25 cm
-    // m = 1 kg
-    // volume of 1 rod = 9.62 cm^3
-    // total volume = 38.48 cm^3
-    //const double density = 1/38.48; = 0.026 // kg / length^3 - see app for length
-
     tgBuildSpec spec;
-    
-    const tgRod::Config rodConfigA(c.radius, c.densityA, c.friction, 
-				  c.rollFriction, c.restitution);
-    const tgRod::Config rodConfigB(c.radius, c.densityB, c.friction, 
-				  c.rollFriction, c.restitution);
 
     // For the base
     const tgRod::Config rodConfigBase(conf_base_vertebra.radius,
@@ -438,35 +378,21 @@ void VerticalSpineModel::setup(tgWorld& world)
     spec.addBuilder("rod_" + conf_active_vertebra.vertebra_name,
 		    new tgRodInfo(rodConfigActive));
 
-    spec.addBuilder("rod", new tgRodInfo(rodConfigA));
-    spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
-
 
     // set muscle (string) parameters
     // @todo replace acceleration constraint with tgKinematicActuator if needed...
     tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
 					 c.hist, c.maxTens, c.targetVelocity);
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
-
     
-    // Create your structureInfo
+    // Create the structureInfo
     tgStructureInfo structureInfo(spine, spec);
-    // Use the structureInfo to build ourselves
-
-    //std::vector<tgStructure*> structure_children = spine.getChildren();
-    //std::cout << structure_children.toString() << std::endl;
-    // debugging
-    //for (size_t i = 0; i < structure_children.size(); i++)
-      //{
-      //std::cout << *(structure_children[i]) << std::endl;
-      //}
 
     // Debugging: print out the tgStructure of the spine and its children
     std::cout << spine << std::endl;
-
-
-    //std::cout << "got to: " << 9 << std::endl;
     trace(structureInfo, *this);
+
+    // Use the structureInfo to build this model
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
