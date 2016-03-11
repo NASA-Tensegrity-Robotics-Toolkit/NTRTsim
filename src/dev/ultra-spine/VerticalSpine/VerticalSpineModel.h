@@ -180,6 +180,16 @@ private:
 			    double edge, size_t segmentCount);
 
     /**
+     * Add one additional vertebra to the spine.
+     * @param[in] spine: the tgStructure of the whole spine
+     * @param[in] conf_vertebra: the config of the type of vertebra to add.
+     * @param[in] vertebra_number: the number of the vertebra to add
+     * TO-DO: make vertebra_number a private integer.
+     */
+    static void addVertebra(tgStructure& spine, ConfigVertebra& conf_vertebra,
+			    size_t vertebra_number);
+
+    /**
      * Add the muscles that connect between the segments of the spine.
      */
     static void addMuscles(tgStructure& spine);

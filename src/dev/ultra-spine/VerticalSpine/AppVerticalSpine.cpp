@@ -60,15 +60,15 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 5;
+    const int segments = 3; // used to be 5
     VerticalSpineModel* myModel = new VerticalSpineModel(segments);
     
     // If desired, add on a controller now.
     // The model contains a pretension parameter, so for simple equilibrium
     // simulations, no controller is needed.
 
-    VerticalSpineBendingController* const pTC = new VerticalSpineBendingController();
-    myModel->attach(pTC);
+    //VerticalSpineBendingController* const pTC = new VerticalSpineBendingController();
+    //myModel->attach(pTC);
 
     // Finally, add the model (with attached objects) to the simulation.
     simulation.addModel(myModel);

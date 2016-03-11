@@ -9,4 +9,5 @@ add_executable(AppVerticalSpine
     VerticalSpineModel.cpp
     AppVerticalSpine.cpp
     VerticalSpineBendingController.cpp
+    VerticalSpinePassiveController.cpp
 )

@@ -140,7 +140,7 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension
+     2452.0,        // pretension. used to be 2452.0
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -151,8 +151,8 @@ namespace
 
 // Helper functions, with explicit scopes, moved from implicit namespace.
 void VerticalSpineModel::trace(const tgStructureInfo& structureInfo, tgModel& model)
-{ 
-   std::cout << "StructureInfo:" << std::endl
+{
+    std::cout << std::endl << "StructureInfo Trace:" << std::endl
     << structureInfo    << std::endl
     << "Model: "        << std::endl
     << model            << std::endl;
@@ -239,6 +239,35 @@ void VerticalSpineModel::addSegments(tgStructure& spine, const tgStructure& vert
         
 }
 
+void VerticalSpineModel::addVertebra(tgStructure& spine,
+				     ConfigVertebra& conf_vertebra,
+				     size_t vertebra_number)
+{
+    // we have to pull out the base vertebra here to copy it.
+    // TO-DO: Why can't we just make a new object?
+    // What does this call to new tgStructure(something) really do?
+    std::vector<tgStructure*> spine_vertebrae = spine.getChildren();
+    // Find the first vertebra
+    // HACK FOR NOW: just pick the first element, we know that's the base.
+    tgStructure* const new_vertebra = new tgStructure( *(spine_vertebrae[0]) );
+
+    // Add the nodes and pairs to this new vertebra
+    addNodes( *new_vertebra, conf_vertebra);
+    addPairs( *new_vertebra);
+
+    // Move it into place.
+    // Remember that the vertical direction is dimension 2 in Bullet Physics.
+    new_vertebra -> move( btVector3(0.0,
+		      (vertebra_number - 1) * conf_spine.vertebra_separation, 0.0) );
+
+    // Tag it with the segment number
+    new_vertebra -> addTags( tgString("segment", vertebra_number) );
+
+    // Add the created vertebra to the rest of the spine.
+    spine.addChild(new_vertebra);
+
+}
+
 // Add muscles that connect the segments
 void VerticalSpineModel::addMuscles(tgStructure& spine)
 {
@@ -299,7 +328,8 @@ void VerticalSpineModel::setup(tgWorld& world)
 	getEdgeLength(conf_passive_vertebra) << std::endl;
     }
 
-    // This is the container for the whole spine object, including all rigid bodies and all cables.
+    // This is the container for the whole spine object,
+    // including all rigid bodies and all cables.
     tgStructure spine;
   
     // Create the first spine vertebra. This one is fixed to the ground,
@@ -307,25 +337,57 @@ void VerticalSpineModel::setup(tgWorld& world)
     tgStructure base_vertebra;
     addNodes(base_vertebra, conf_base_vertebra);
     addPairsB(base_vertebra);
-    // Remember that the second dimension here is vertical (Y is the vertical, not Z.)
+    //addRodPairs(base_vertebra, conf_base_vertebra);
+    
+    // Remember that the second dimension here is vertical.
+    // (Y is the vertical, not Z.)
     base_vertebra.move(btVector3(0.0, conf_spine.base_vertical_offset, 0));
+    
     // Tag this vertebra as the first segment in the spine   
     base_vertebra.addTags(tgString("segment", 1));
     // Apparently we need a const pointer here. Hrrmmmm... Drew 2016-03-10
     tgStructure* const base_vertebra_copy = new tgStructure(base_vertebra);
     spine.addChild(base_vertebra_copy);
+
+    // Add the rest of the vertebrae! As of 2016-03-11, have four more.
+    // The second and 4th vertebrae are actuated.
+    addVertebra(spine, conf_active_vertebra, 2);
+    addVertebra(spine, conf_passive_vertebra, 3);
+    //std::cout << "got to: " << 7 << std::endl;
+    addVertebra(spine, conf_active_vertebra, 4);
+    addVertebra(spine, conf_passive_vertebra, 5);
+
+    // Debugging: this is the new version that *should work*
+    // tgStructure vertebra2;
+    // addNodes(vertebra2, conf_passive_vertebra);
+    // //addRodPairs(vertebra2, conf_passive_vertebra);
+    // addPairs(vertebra2);
+    // vertebra2.move(btVector3(0.0, conf_spine.base_vertical_offset, 0));
+    // vertebra2.addTags(tgString("segment", 2));
+    // tgStructure* const vertebra2_copy = new tgStructure(vertebra2);
+    // spine.addChild(vertebra2_copy);
+
+    // Debugging: this is the old version that *does work*
+    // tgStructure vertebra2;
+    // addNodes(vertebra2, conf_passive_vertebra);
+    // addPairs(vertebra2);
+    // //addSegments(spine, vertebra2, getEdgeLength(conf_passive_vertebra), m_segments);
+    // vertebra2.move( btVector3(0.0, conf_spine.vertebra_separation, 0.0) );
+    // addVertebraChild(spine, vertebra2, 2);
+
+    // another test
+    // tgStructure* const vertebra2 = new tgStructure(base_vertebra);
+    // addNodes(*vertebra2, conf_passive_vertebra);
+    // addPairs(*vertebra2);
+    // vertebra2 -> move( btVector3(0.0, conf_spine.vertebra_separation, 0.0) );
+    // addVertebraChild(spine, *vertebra2, 2);
+
     
-    // Create the first non-fixed tetrahedra
-    tgStructure tetra;
-    addNodes(tetra, conf_passive_vertebra);
-    addPairs(tetra);
-    
-    // Move the first tetrahedra
-    // @todo move these hard-coded parameters into config
-    tetra.move(btVector3(0.0, -6, 0));
-    
-    // add rest of segments using original tetra configuration
-    addSegments(spine, tetra, getEdgeLength(conf_passive_vertebra), m_segments);
+    // tgStructure* const vertebra3 = new tgStructure(base_vertebra);
+    // addNodes(*vertebra3, conf_passive_vertebra);
+    // addPairs(*vertebra3);
+    // vertebra3 -> move( btVector3(0.0, 2 * conf_spine.vertebra_separation, 0.0) );
+    // addVertebraChild(spine, *vertebra3, 3);
     
     addMuscles(spine);
 
@@ -390,6 +452,21 @@ void VerticalSpineModel::setup(tgWorld& world)
     // Create your structureInfo
     tgStructureInfo structureInfo(spine, spec);
     // Use the structureInfo to build ourselves
+
+    //std::vector<tgStructure*> structure_children = spine.getChildren();
+    //std::cout << structure_children.toString() << std::endl;
+    // debugging
+    //for (size_t i = 0; i < structure_children.size(); i++)
+      //{
+      //std::cout << *(structure_children[i]) << std::endl;
+      //}
+
+    // Debugging: print out the tgStructure of the spine and its children
+    std::cout << spine << std::endl;
+
+
+    //std::cout << "got to: " << 9 << std::endl;
+    trace(structureInfo, *this);
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
