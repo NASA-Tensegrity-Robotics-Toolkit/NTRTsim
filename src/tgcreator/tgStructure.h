@@ -144,5 +144,38 @@ private:
     
 };
 
+/**
+ * Overload operator<<() to handle a tgStructure
+ * @param[in,out] os an ostream
+ * @param[in] tgStructure, its nodes, pairs, and children.
+ * @return os
+ * @todo Inlining this does no good; stream operations are slow.
+ */
+inline std::ostream&
+operator<<(std::ostream& os, const tgStructure& structure) 
+{
+  os << "tgStructure with the following tgNodes and tgPairs: " << std::endl;
+  os << structure.getNodes() << std::endl;
+  os << structure.getPairs() << std::endl;
+  os << "This tgStructure has the following children (also tgStructures): "
+     << std::endl;
+
+  // add each child structure's string output to the output stream
+  std::vector<tgStructure*> children = structure.getChildren();
+  for(std::size_t i= 0; i < children.size(); i++)
+  {
+    os << "Child " << i << ": " << std::endl;
+    os << *(children[i]) << std::endl;
+  }
+
+  // If this tgStructure has no children, say so.
+  if( children.size() == 0)
+  {
+    os << "(no children)" << std::endl;
+  }
+
+  return os;
+}
+
 
 #endif
