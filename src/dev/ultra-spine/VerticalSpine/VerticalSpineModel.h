@@ -22,7 +22,7 @@
 /**
  * @file VerticalSpineModel.h
  * @brief Contains the definition of class VerticalSpineModel
- * @author Brian Tietz, Drew Sabelhaus, Michael Fanton
+ * @author Drew Sabelhaus
  * $Id$
  */
 
@@ -41,6 +41,22 @@
 class tgSpringCableActuator;
 class tgStructure;
 class tgStructureInfo;
+
+// Declare the configuration struct(s) here. This allows us to re-use the
+// struct type later, and also pass it around in functions.
+
+// A structure containing all the parameters of a spine vertebra (rigid body only.)
+// This assumes that a vertebra is four rods.
+struct ConfigVertebra {
+    std::string vertebra_name; // a name for this type of vertebra. This is used for naming the rods when calling addRodPairs.
+    double mass;  // mass of this rigid body, kg
+    double radius;  // radius of the cylinders that make up this body (length)
+    double leg_length;  // the length of one of the cylinders, a "leg" of the tetrahedron (length)
+    double height;  // total height of one vertebra, from the bottommost node to topmost (length)
+    double friction;  // A constant passed down to the underlying bullet physics solver (unitless)
+    double rollFriction;  // A constant passed down to the underlying bullet physics solver (unitless)
+    double restitution;  // A constant passed down to the underlying bullet physics solver (unitless)
+};
 
 class VerticalSpineModel: public tgSubject<VerticalSpineModel>, public tgModel
 {
@@ -113,12 +129,13 @@ private:
 
     /**
      * Generate the five nodes for a vertebra tetrahedron, inside the 
-     * tgStructure that's passed in.
+     * tgStructure that's passed in, with the geometry from the 
+     * ConfigVertebra that's also passed in.
      * @param[in] vertebra: the structure to build the nodes into
-     * @param[in] edge: edge length for this one tetrahedron
-     * @param[in] height: height length for this one tetrahedron
+     * @param[in] conf_vertebra: the ConfigVertebra struct with all
+     *      the information about lengths and height
      */
-    static void addNodes(tgStructure& vertebra, double edge, double height);
+    static void addNodes(tgStructure& vertebra, ConfigVertebra& conf_vertebra);
 
     /**
      * Output debugging information for this model and structure.
@@ -126,10 +143,30 @@ private:
     static void trace(const tgStructureInfo& structureInfo, tgModel& model);
 
     /**
-     * Pair together the nodes for the first type of rod
+     * Add a tgPair for each rod in the vertebra. This maps two nodes into
+     * a rod (of the vertebra_name of the ConfigVertebra).
      */
     static void addPairs(tgStructure& vertebra);
+    static void addRodPairs(tgStructure& vertebra, ConfigVertebra& conf_vertebra);
 
+    /**
+     * Convert between mass and density. This is a hack! See issue 187.
+     * Ideally, we'd have a constructor for tgRod or tgRigidBody that 
+     * takes mass directly as an option (e.g. one construction for mass,
+     * another one for density.)
+     * Passing the address here guarantees that we only have one object.
+     */
+    static double getDensity(ConfigVertebra& conf_vertebra);
+
+    /**
+     * Calculate the edge length of a vertebra given its configuration.
+     * Here, edge length means the horizontal dimension of the spine.
+     * It's calculated from the length of a leg of the vertebra and total
+     * vertebra height. This is done to be consistent with the anaytical
+     * dynamics in MATLAB for this structure.
+     */
+    static double getEdgeLength(ConfigVertebra& conf_vertebra);
+    
     /**
      * Pair together the nods for the second type of rod
      */
