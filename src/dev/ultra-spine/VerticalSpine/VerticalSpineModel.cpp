@@ -19,7 +19,7 @@
 /**
  * @file VerticalSpineModel.cpp
  * @brief Contains the implementation of class VerticalSpineModel
- * @author Brian Tietz, Drew Sabelhaus, Michael Fanton
+ * @author Andrew P. Sabelhaus
  * $Id$
  */
 
@@ -42,9 +42,9 @@
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
+#include <math.h>
 
-// @todo move hard-coded parameters into config
-
+// The single constructor.
 VerticalSpineModel::VerticalSpineModel(size_t segments) :
     m_segments(segments),
     tgModel() 
@@ -52,12 +52,65 @@ VerticalSpineModel::VerticalSpineModel(size_t segments) :
 }
 
 /**
- * Anonomous namespace for config struct. This makes changing the parameters
- * of the model much easier (they're all at the top of this file!).
+ * See the header file for the declaration of various struct types.
+ * These are used to create different vertebra nice and easily!
+ * Note that we have different configurations here: a config for...
+ *      - first base vertebra (unmoving)
+ *      - passive vertebra (moving, the ones without the actuator mass)
+ *      - active vertebra (moving, with actuator mass)
+ *      - vertical cables (vertical muscles)
+ *      - saddle cables (saddle muscles)
+ *      - the spine as a whole (initial separation between vertebrae, etc.)
+ * Note that this configuration below does NOT enforce any angle between rods!
+ * So, this is NOT necessarily a symmetric tetrahedron.
+ * To get one that's symmetric, set height == edge, or equivalently, leg_length == height / sqrt(2).
  */
 namespace
 {
-    const struct Config
+  ConfigVertebra conf_base_vertebra = {
+    "base", // the name of this type of vertebra
+    0.0,  // mass. Note that setting a rigid body's mass to 0 makes it fixed in space.
+    0.5,  // radius
+    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
+    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    0.99,  // friction
+    0.01,  // rollFriction
+    0.0,  // restitution
+  };
+
+  // On 2016-03-08, the two-segment model of ULTRA Spine (one active, one passive)
+  // weighed 231g. Estimate: 2/5 passive (92.4), 3/5 active (138.6).
+  ConfigVertebra conf_passive_vertebra = {
+    "passive", // the name of this type of vertebra
+    0.0924,  // mass
+    0.5,  // radius
+    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
+    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    0.99,  // friction
+    0.01,  // rollFriction
+    0.0,  // restitution
+  };
+
+  ConfigVertebra conf_active_vertebra = {
+    "active", // the name of this type of vertebra
+    0.1386,  // mass
+    0.5,  // radius
+    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
+    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    0.99,  // friction
+    0.01,  // rollFriction
+    0.0,  // restitution
+  };
+
+  struct ConfigSpine {
+    double vertebra_separation; // Length in the vertical direction of the initial separation between adjacent vertebrae
+    double base_vertical_offset; // The bottom vertebra clips below the ground a bit. Move it up by this amount.
+  } conf_spine = {
+    7.5,  // vertebra_separation
+    2.0  // base_vertical_offset
+  };
+  
+  const struct Config
     {
         double densityA;
         double densityB;
@@ -75,6 +128,8 @@ namespace
         double targetVelocity;
     } c =
    {
+     // On 2016-03-08, the two-segment model of ULTRA Spine (one active, one passive)
+     // weighed 231g. 
      0.026,    // densityA (kg / length^3)
      0.0,    // densityB (kg / length^3)
      0.5,     // radius (length)
@@ -85,7 +140,7 @@ namespace
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension
+     2452.0,        // pretension. used to be 2452.0
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -97,81 +152,128 @@ namespace
 // Helper functions, with explicit scopes, moved from implicit namespace.
 void VerticalSpineModel::trace(const tgStructureInfo& structureInfo, tgModel& model)
 {
-    std::cout << "StructureInfo:" << std::endl
+    std::cout << std::endl << "StructureInfo Trace:" << std::endl
     << structureInfo    << std::endl
     << "Model: "        << std::endl
     << model            << std::endl;
 }
 
-void VerticalSpineModel::addNodes(tgStructure& tetra, double edge, double height)
+void VerticalSpineModel::addNodes(tgStructure& vertebra, ConfigVertebra& conf_vertebra)
 {
     // right
-    tetra.addNode( c.edge / 2.0, 0, 0); // node 0
+    vertebra.addNode( getEdgeLength(conf_vertebra) / 2.0, 0, 0); // node 0
     // left
-    tetra.addNode( -c.edge / 2.0, 0, 0); // node 1
+    vertebra.addNode( -getEdgeLength(conf_vertebra) / 2.0, 0, 0); // node 1
     // top
-    tetra.addNode(0, c.height, -edge / 2.0); // node 2
+    vertebra.addNode(0, conf_vertebra.height, -getEdgeLength(conf_vertebra) / 2.0); // node 2
     // front
-    tetra.addNode(0, c.height, edge / 2.0); // node 3
+    vertebra.addNode(0, conf_vertebra.height, getEdgeLength(conf_vertebra) / 2.0); // node 3
     // middle
-    tetra.addNode(0, c.height/2, 0); // node 4
+    vertebra.addNode(0, conf_vertebra.height/2, 0); // node 4
 
 }
 
-void VerticalSpineModel::addPairs(tgStructure& tetra)
+double VerticalSpineModel::getDensity(ConfigVertebra& conf_vertebra)
 {
-    tetra.addPair(0, 4, "rod");
-    tetra.addPair(1, 4, "rod");
-    tetra.addPair(2, 4, "rod");
-    tetra.addPair(3, 4, "rod");
-
+  // do we want an assert() here?
+  // Remember that the mass here is distributed over the whole volume of
+  // the vertebra. Assume that one vertebra is 4 rods.
+  int num_rods = 4;
+  double volume = num_rods * M_PI * pow(conf_vertebra.radius, 2) * conf_vertebra.leg_length;
+  double density = conf_vertebra.mass / volume;
+  return density;
 }
-    
-void VerticalSpineModel::addPairsB(tgStructure& tetra)
+
+double VerticalSpineModel::getEdgeLength(ConfigVertebra& conf_vertebra)
 {
-    tetra.addPair(0, 4, "rodB");
-    tetra.addPair(1, 4, "rodB");
-    tetra.addPair(2, 4, "rodB");
-    tetra.addPair(3, 4, "rodB");
-
+  // Do we want an assert here?
+  // Leg length is hypotenuse with triangle with sides h/2 and e/2.
+  double edge = 2 * sqrt( pow(conf_vertebra.leg_length, 2) - pow( conf_vertebra.height / 2, 2) );
+  return edge;
 }
 
-void VerticalSpineModel::addSegments(tgStructure& snake, const tgStructure& tetra, 
-				     double edge, size_t segmentCount)
+void VerticalSpineModel::addRodPairs(tgStructure& vertebra, ConfigVertebra& conf_vertebra)
+{
+    vertebra.addPair(0, 4, "rod_" + conf_vertebra.vertebra_name);
+    vertebra.addPair(1, 4, "rod_" + conf_vertebra.vertebra_name);
+    vertebra.addPair(2, 4, "rod_" + conf_vertebra.vertebra_name);
+    vertebra.addPair(3, 4, "rod_" + conf_vertebra.vertebra_name);
+}
+
+// DEPRECATED AS OF 2016-03-11
+void VerticalSpineModel::addSegments(tgStructure& spine, const tgStructure& vertebra, 
+				     double edge, size_t segment_count)
 {
     //const btVector3 offset(0, 0, -edge * 1.15);
-    const btVector3 offset(0, 7.5, 0);
-    for (size_t i = 1; i < segmentCount; ++i)
+    //const btVector3 offset(0, 7.5, 0);
+    const btVector3 offset(0, conf_spine.vertebra_separation, 0);
+    // For segment_count many more vertebrae...
+    for (size_t i = 1; i < segment_count; i++)
     {
-        tgStructure* const t = new tgStructure(tetra);
-        t->addTags(tgString("segment", i + 1));
-        t->move((i + 1) * offset);
-        // Add a child to the snake
-        snake.addChild(t);
+        // Make a copy of the given vertebra object 
+        tgStructure* const new_vertebra = new tgStructure(vertebra);
+	// Name the new vertebra
+        new_vertebra -> addTags(tgString("segment", i + 1));
+	// Move it into its new location.
+        new_vertebra -> move((i + 1) * offset);
+        // Add this new vertebra to the spine
+        spine.addChild(new_vertebra);
     }
         
 }
 
-// Add muscles that connect the segments
-void VerticalSpineModel::addMuscles(tgStructure& snake)
+void VerticalSpineModel::addVertebra(tgStructure& spine,
+				     ConfigVertebra& conf_vertebra,
+				     size_t vertebra_number)
 {
-    const std::vector<tgStructure*> children = snake.getChildren();
-    for (size_t i = 1; i < children.size(); ++i)
+    // we have to pull out the base vertebra here to copy it.
+    // TO-DO: Why can't we just make a new object?
+    // What does this call to new tgStructure(something) really do?
+    std::vector<tgStructure*> spine_vertebrae = spine.getChildren();
+    // Find the first vertebra
+    // HACK FOR NOW: just pick the first element, we know that's the base.
+    tgStructure* const new_vertebra = new tgStructure( *(spine_vertebrae[0]) );
+
+    // TO-DO: REMOVE THE OLD TAG FROM THE FIRST VERTEBRA!
+    // Need to remove "segment1".
+    // DO WE ALSO NEED TO REMOVE OTHER OLD STUFF?
+
+    // Add the nodes and pairs to this new vertebra
+    addNodes( *new_vertebra, conf_vertebra);
+    addRodPairs( *new_vertebra, conf_vertebra);
+
+    // Move it into place.
+    // Remember that the vertical direction is dimension 2 in Bullet Physics.
+    new_vertebra -> move( btVector3(0.0,
+		      (vertebra_number - 1) * conf_spine.vertebra_separation, 0.0) );
+
+    // Tag it with the segment number
+    new_vertebra -> addTags( tgString("segment", vertebra_number) );
+
+    // Add the created vertebra to the rest of the spine.
+    spine.addChild(new_vertebra);
+}
+
+// Add muscles that connect the segments
+void VerticalSpineModel::addMuscles(tgStructure& spine)
+{
+    const std::vector<tgStructure*> children = spine.getChildren();
+    for (size_t i = 1; i < children.size(); i++)
     {
         tgNodes n0 = children[i-1]->getNodes();
         tgNodes n1 = children[i  ]->getNodes();
                 
         // vertical muscles
-        snake.addPair(n0[0], n1[0], "vertical muscle a");
-        snake.addPair(n0[1], n1[1], "vertical muscle b");
-        snake.addPair(n0[2], n1[2], "vertical muscle c");
-        snake.addPair(n0[3], n1[3], "vertical muscle d");
+        spine.addPair(n0[0], n1[0], "vertical muscle a");
+        spine.addPair(n0[1], n1[1], "vertical muscle b");
+        spine.addPair(n0[2], n1[2], "vertical muscle c");
+        spine.addPair(n0[3], n1[3], "vertical muscle d");
 
         // saddle muscles
-        snake.addPair(n0[2], n1[1], tgString("saddle muscle seg", i-1));
-        snake.addPair(n0[3], n1[1], tgString("saddle muscle seg", i-1));
-        snake.addPair(n0[2], n1[0], tgString("saddle muscle seg", i-1));
-        snake.addPair(n0[3], n1[0], tgString("saddle muscle seg", i-1));
+        spine.addPair(n0[2], n1[1], tgString("saddle muscle seg", i-1));
+        spine.addPair(n0[3], n1[1], tgString("saddle muscle seg", i-1));
+        spine.addPair(n0[2], n1[0], tgString("saddle muscle seg", i-1));
+        spine.addPair(n0[3], n1[0], tgString("saddle muscle seg", i-1));
     }
 }
 
@@ -187,7 +289,7 @@ void VerticalSpineModel::mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
     muscleMap["vertical d"] = model.find<tgSpringCableActuator>("vertical muscle d");
         
     // saddle muscles
-    for (size_t i = 1; i < segmentCount ; ++i)
+    for (size_t i = 1; i < segmentCount ; i++)
     {
         muscleMap[tgString("saddle", i-1)] = model.find<tgSpringCableActuator>(tgString("saddle muscle seg", i-1));
             
@@ -199,58 +301,82 @@ void VerticalSpineModel::mapMuscles(VerticalSpineModel::MuscleMap& muscleMap,
  **************************************/
 void VerticalSpineModel::setup(tgWorld& world)
 {
-    // debugging output: edge and height length
-    //std::cout << "edge: " << c.edge << "; height: " << c.height << std::endl;
-    
-    // Create the first fixed snake segment
-    // @todo move these hard-coded parameters into config
-    tgStructure tetraB;
-    addNodes(tetraB, c.edge, c.height);
-    addPairsB(tetraB);
-    tetraB.move(btVector3(0.0, 2, 0));
-    
-    // Create our snake segments
-    tgStructure snake;
-    
-    // add 1st child to snake
-    tgStructure* const tB = new tgStructure(tetraB);
-    snake.addChild(tB);
-    tB->addTags(tgString("segment", 1));
-    
-    // Create the first non-fixed tetrahedra
-    tgStructure tetra;
-    addNodes(tetra, c.edge, c.height);
-    addPairs(tetra);
-    
-    // Move the first tetrahedra
-    // @todo move these hard-coded parameters into config
-    tetra.move(btVector3(0.0, -6, 0));
-    
-    // add rest of segments using original tetra configuration
-    addSegments(snake, tetra, c.edge, m_segments);
-    
-    addMuscles(snake);
 
-    // Create the build spec that uses tags to turn the structure into a real model
-    // Note: This needs to be high enough or things fly apart...
+    // Flag for debugging output: set to 1 to get more information output
+    // to the command line when the app is run
+    bool debug_flag = 0;
+
+    // A bit of debugging about this spine's geometry and shape.
+    if( debug_flag ){
+      std::cout << "passive vertebra height: " << conf_passive_vertebra.height
+		<< std::endl;
+      std::cout << "passive vertebra edge length: " <<
+	getEdgeLength(conf_passive_vertebra) << std::endl;
+    }
+
+    // This is the container for the whole spine object,
+    // including all rigid bodies and all cables.
+    tgStructure spine;
+  
+    // Create the first spine vertebra. This one is fixed to the ground,
+    // and is non-moving since it has mass = 0.
+    tgStructure base_vertebra;
+    addNodes(base_vertebra, conf_base_vertebra);
+    addRodPairs(base_vertebra, conf_base_vertebra);
     
-    // length of inner strut = 12.25 cm
-    // m = 1 kg
-    // volume of 1 rod = 9.62 cm^3
-    // total volume = 38.48 cm^3
-    //const double density = 1/38.48; = 0.026 // kg / length^3 - see app for length
-    const tgRod::Config rodConfigA(c.radius, c.densityA, c.friction, 
-				  c.rollFriction, c.restitution);
-    const tgRod::Config rodConfigB(c.radius, c.densityB, c.friction, 
-				  c.rollFriction, c.restitution);
-    //holder
-    const tgRod::Config rodConfigHA(0.1, c.densityA, c.friction,
-				    c.rollFriction, c.restitution);
-    const tgRod::Config rodConfigHB(0.1, c.densityB, c.friction,
-				    c.rollFriction, c.restitution);
+    // Remember that the second dimension here is vertical.
+    // (Y is the vertical, not Z.)
+    base_vertebra.move(btVector3(0.0, conf_spine.base_vertical_offset, 0));
+    
+    // Tag this vertebra as the first segment in the spine   
+    base_vertebra.addTags(tgString("segment", 1));
+    // Apparently we need a const pointer here. Hrrmmmm... Drew 2016-03-10
+    tgStructure* const base_vertebra_copy = new tgStructure(base_vertebra);
+    spine.addChild(base_vertebra_copy);
+
+    // Add the rest of the vertebrae! As of 2016-03-11, have four more.
+    // The second and 4th vertebrae are actuated.
+    addVertebra(spine, conf_active_vertebra, 2);
+    addVertebra(spine, conf_passive_vertebra, 3);
+    addVertebra(spine, conf_active_vertebra, 4);
+    addVertebra(spine, conf_passive_vertebra, 5);
+
+    
+    addMuscles(spine);
+
+    // Create the build spec that uses tags to turn the structure into a real model.
+    // This is where the tagged pairs are matched up with an actual geometric object.
     tgBuildSpec spec;
-    spec.addBuilder("rod", new tgRodInfo(rodConfigA));
-    spec.addBuilder("rodB", new tgRodInfo(rodConfigB));
+
+    // For the base
+    const tgRod::Config rodConfigBase(conf_base_vertebra.radius,
+				      getDensity(conf_base_vertebra),
+				      conf_base_vertebra.friction,
+				      conf_base_vertebra.rollFriction,
+				      conf_base_vertebra.restitution);
+
+    // For the passive vertebra
+    const tgRod::Config rodConfigPassive(conf_passive_vertebra.radius,
+				      getDensity(conf_passive_vertebra),
+				      conf_passive_vertebra.friction,
+				      conf_passive_vertebra.rollFriction,
+				      conf_passive_vertebra.restitution);
+
+    // For the active vertebra
+    const tgRod::Config rodConfigActive(conf_active_vertebra.radius,
+				      getDensity(conf_active_vertebra),
+				      conf_active_vertebra.friction,
+				      conf_active_vertebra.rollFriction,
+				      conf_active_vertebra.restitution);
+
+    // Add to the build specification: these tgRod::Config objects matched up
+    // with the vertebra name. This correlates to what's used in addRodPairs.
+    spec.addBuilder("rod_" + conf_base_vertebra.vertebra_name,
+		    new tgRodInfo(rodConfigBase));
+    spec.addBuilder("rod_" + conf_passive_vertebra.vertebra_name,
+		    new tgRodInfo(rodConfigPassive));
+    spec.addBuilder("rod_" + conf_active_vertebra.vertebra_name,
+		    new tgRodInfo(rodConfigActive));
 
 
     // set muscle (string) parameters
@@ -258,11 +384,15 @@ void VerticalSpineModel::setup(tgWorld& world)
     tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
 					 c.hist, c.maxTens, c.targetVelocity);
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
-
     
-    // Create your structureInfo
-    tgStructureInfo structureInfo(snake, spec);
-    // Use the structureInfo to build ourselves
+    // Create the structureInfo
+    tgStructureInfo structureInfo(spine, spec);
+
+    // Debugging: print out the tgStructure of the spine and its children
+    std::cout << spine << std::endl;
+    trace(structureInfo, *this);
+
+    // Use the structureInfo to build this model
     structureInfo.buildInto(*this, world);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
@@ -270,6 +400,20 @@ void VerticalSpineModel::setup(tgWorld& world)
     allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
     mapMuscles(muscleMap, *this, m_segments);
 
+    // Let's see what type of objects are inside the spine.
+    std::vector<tgModel*> all_children = getDescendants();
+    // Pick out the tgBaseRigid objects
+    std::vector<tgBaseRigid*> all_tgBaseRigid = tgCast::filter<tgModel, tgBaseRigid>(all_children);
+
+    // Print out the tgBaseRigids
+    // std::cout << "Spine tgBaseRigids: " << std::endl;
+    // for (size_t i = 0; i < all_tgBaseRigid.size(); i++)
+    //   {
+    // 	std::cout << "object number " << i << ": " << std::endl;
+    // 	std::cout << "mass: " << all_tgBaseRigid[i]->mass() << std::endl;
+    // 	std::cout << all_tgBaseRigid[i]->toString() << std::endl;
+    //   }
+    
     //trace(structureInfo, *this);
 
     // Actually setup the children
