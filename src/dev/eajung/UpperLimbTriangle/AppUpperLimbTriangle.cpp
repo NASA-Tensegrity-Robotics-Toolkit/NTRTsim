@@ -75,9 +75,9 @@ int main(int argc, char** argv) {
 
     // Fourth create the models
     UpperLimbTriangleModel* const myModel = new UpperLimbTriangleModel();
-
+    btVector3 goalTrajectory = btVector3(0,0,0);
     // Fifth, select the controller to use. Uncomment desired controller.
-    UpperLimbTriangleController* const pTC = new UpperLimbTriangleController(2.5, timestep_physics);
+    UpperLimbTriangleController* const pTC = new UpperLimbTriangleController(2.5, timestep_physics, goalTrajectory);
 
     // Sixth, attach the controller to the model and add the model to the simulation
     myModel->attach(pTC);

@@ -102,7 +102,7 @@ UpperLimbTriangleModel::~UpperLimbTriangleModel() {}
 void UpperLimbTriangleModel::addNodes(tgStructure& s) {
     const double scale = 0.5;
     const double bone_scale = 0.3;
-    const size_t nNodes = 21; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
+    const size_t nNodes = 28; //TODO: Change to variable, incremented by calling sub-structure node adding functions (i.e. one for olecranon, one for humerus, etc.)
     
     // Average Adult Male Measurements with scale
     // Lengths are in mm
@@ -149,6 +149,23 @@ void UpperLimbTriangleModel::addNodes(tgStructure& s) {
     // Humerus tetrahedron: 20
     nodePositions.push_back(btVector3(g, f+9*g/16, 3*g/2));
 
+    //added object 2/27/16
+    // Added Object: 21
+    nodePositions.push_back(btVector3(b+7*e+1 + 4, 50, 28));
+    // Added Object: 22
+    nodePositions.push_back(btVector3(1+b+7*e +4, 50, 25));
+    // Added Object: 23
+    nodePositions.push_back(btVector3(1+b+7*e +4, 47, 25));
+    // Added Object: 24
+    nodePositions.push_back(btVector3(1+b+7*e +4, -47, 25));
+    // Added Object: 25
+    nodePositions.push_back(btVector3(1+b+7*e +4, -50, 28));
+    // Added Object: 26
+    nodePositions.push_back(btVector3(1+b+7*e +4, -50, 25));
+
+    //end effector (27)
+    nodePositions.push_back(btVector3(b+7*e, 1, 0));
+
 
     for(size_t i=0;i<nNodes;i++) {
 		s.addNode(nodePositions[i][0],nodePositions[i][1],nodePositions[i][2]);
@@ -165,6 +182,8 @@ void UpperLimbTriangleModel::addRods(tgStructure& s) {
     s.addPair(4, 6,  "radiusulna bone");
     s.addPair(5, 6,  "radiusulna bone");
     s.addPair(6, 7,  "radiusulna bone");
+    s.addPair(7, 27,  "eeRod endeffector");
+
 
     // humerus
     s.addPair(8, 10, "humerus bone");
@@ -189,6 +208,11 @@ void UpperLimbTriangleModel::addRods(tgStructure& s) {
     s.addPair(16, 19, "scapula massless");
     s.addPair(17, 19, "scapula massless");
     s.addPair(18, 19, "scapula massless");
+
+    //added 2/27/16
+    s.addPair(23, 24, "humerus bone");
+    s.addPair(22, 21, "scapula massless");
+    s.addPair(26, 25, "scapula massless");    
 }
 
 void UpperLimbTriangleModel::addMuscles(tgStructure& s) {
@@ -237,6 +261,8 @@ void UpperLimbTriangleModel::addMuscles(tgStructure& s) {
     s.addPair(13, 17, "brachioradialis muscle");
     s.addPair(13, 19, "brachioradialis muscle");
     
+    s.addPair(23, 21, "olecranon muscle");
+    s.addPair(24, 25, "olecranon muscle");
 }
  
 /*
@@ -257,6 +283,7 @@ void UpperLimbTriangleModel::addMarkers(tgStructure &s) {
 void UpperLimbTriangleModel::setup(tgWorld& world) {
     const tgRod::Config boneConfig(cRod.radius, cRod.density, cRod.friction, cRod.rollFriction, cRod.restitution);
     const tgRod::Config boneConfigMassless(cRod.radius, 0.00/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
+const tgRod::Config eeConfig(cRod.radius, cRod.density/4/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
 
     tgBasicActuator::Config olecranonMuscleConfig(cCable.stiffness, cCable.damping, cCable.pretension_olecranon, 
@@ -283,7 +310,7 @@ void UpperLimbTriangleModel::setup(tgWorld& world) {
     spec.addBuilder("olecranon muscle", new tgBasicActuatorInfo(olecranonMuscleConfig));
     spec.addBuilder("anconeus muscle", new tgBasicActuatorInfo(anconeusMuscleConfig));
     spec.addBuilder("brachioradialis muscle", new tgBasicActuatorInfo(brachioradialisMuscleConfig));
-    
+    spec.addBuilder("eeRod", new tgRodInfo(eeConfig));
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 

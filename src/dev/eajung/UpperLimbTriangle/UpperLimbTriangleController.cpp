@@ -30,24 +30,34 @@
 #include "UpperLimbTriangleModel.h"
 // This library
 #include "core/tgBasicActuator.h"
+#include "controllers/tgTensionController.h"
+// The Bullet Physics library
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 #include <vector>
+#include <math.h>
 
 # define M_PI 3.14159265358979323846 
 
 using namespace std;
 
 //Constructor using the model subject and a single pref length for all muscles.
-UpperLimbTriangleController::UpperLimbTriangleController(const double initialLength, double timestep) :
+UpperLimbTriangleController::UpperLimbTriangleController(const double initialLength, double timestep, btVector3 goalTrajectory) :
     m_initialLengths(initialLength),
     m_totalTime(0.0),
-    dt(timestep) {}
+    dt(timestep) {
+    this->initPos = btVector3(0,0,0); 
+    this->trajectory = btVector3(goalTrajectory.getX(),goalTrajectory.getY(),goalTrajectory.getZ());
+    //this->goal = btVector3(0,0,0); 
+}
 
 //Fetch all the muscles and set their preferred length
 void UpperLimbTriangleController::onSetup(UpperLimbTriangleModel& subject) {
 	this->m_totalTime=0.0;
+ 	this->initPos = endEffectorCOM(subject);
     const double olecranonfascia_length = 4;
     const double brachioradialis_length = 12;
     const double anconeus_length        = 6;
@@ -95,6 +105,9 @@ void UpperLimbTriangleController::onStep(UpperLimbTriangleModel& subject, double
     setAnconeusTargetLength(subject, dt);        //yaw
     moveAllMotors(subject, dt);
     //updateActions(dt);
+
+    btVector3 ee = endEffectorCOM(subject);
+    std::cout << ee.getX() << " " << ee.getY() << " " << ee.getZ() << std::endl;
 }
  
 void UpperLimbTriangleController::setBrachioradialisTargetLength(UpperLimbTriangleModel& subject, double dt) {
@@ -109,7 +122,7 @@ void UpperLimbTriangleController::setBrachioradialisTargetLength(UpperLimbTriang
     for (size_t i=0; i<brachioradialis.size(); i++) {
 		tgBasicActuator * const pMuscle = brachioradialis[i];
 		assert(pMuscle != NULL);
-        cout <<"t: " << pMuscle->getCurrentLength() << endl;
+        //cout <<"t: " << pMuscle->getCurrentLength() << endl;
         //newLength = amplitude * sin(angular_freq * m_totalTime + phase) + dcOffset;
         newLength = dcOffset - amplitude*m_totalTime/5;
         if(newLength < dcOffset/8) {
@@ -119,10 +132,10 @@ void UpperLimbTriangleController::setBrachioradialisTargetLength(UpperLimbTriang
         if(m_totalTime > 15) {
             m_totalTime = 0;
         }
-        std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
-        std::cout<<"m_totalTime: " << m_totalTime << "\n";
+        //std::cout<<"calculating brachioradialis target length:" << newLength << "\n";
+        //std::cout<<"m_totalTime: " << m_totalTime << "\n";
 		pMuscle->setControlInput(newLength, dt);
-        cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
+        //cout <<"t+1: " << pMuscle->getCurrentLength() << endl;
     }
 }
 
@@ -220,4 +233,10 @@ void UpperLimbTriangleController::applyActions(UpperLimbTriangleModel& subject, 
 		//cout<<"i: "<<i<<" length: "<<act[i][0]<<endl;
 		pMuscle->setControlInput(act[i][0]);
 	}
+}
+
+btVector3 UpperLimbTriangleController::endEffectorCOM(UpperLimbTriangleModel& subject) {
+	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
+	assert(!endEffector.empty());
+	return endEffector[0]->centerOfMass();
 }

@@ -29,9 +29,14 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "controllers/tgTensionController.h"
 #include "learning/Adapters/AnnealAdapter.h"
+#include "core/tgBasicActuator.h"
 #include <vector>
-
+//Bullet Physics
+#include "LinearMath/btScalar.h"
+#include "LinearMath/btVector3.h"
+// Forward declarations
 // Forward declarations
 class UpperLimbTriangleModel;
 
@@ -54,7 +59,7 @@ public:
    */
   
   // Note that currently this is calibrated for decimeters.
-	UpperLimbTriangleController(const double prefLength, double timestep);
+	UpperLimbTriangleController(const double prefLength, double timestep, btVector3 goalTrajectory);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -81,6 +86,10 @@ private:
   void setAnconeusTargetLength(UpperLimbTriangleModel& subject, double dt);
   void moveAllMotors(UpperLimbTriangleModel& subject, double dt);
   void updateActions(UpperLimbTriangleModel& subject, double dt);
+
+  btVector3 initPos;
+  btVector3 trajectory;
+  btVector3 endEffectorCOM(UpperLimbTriangleModel& subject);
 };
 
 #endif // UPPERLIMBTRIANGLE_CONTROLLER_H
