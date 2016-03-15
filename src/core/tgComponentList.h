@@ -189,8 +189,8 @@ public:
 
 protected:
     
-    // Cast T to component (after all, T must be a tgComponent in the first place, but )
-    // there doesn't seem to be a way to enforce that with c++ templates...
+    // Cast T to component (after all, T must be a tgComponent in the first place, but
+    // there doesn't seem to be a way to enforce that with c++ templates...)
     tgComponent* _component(T* obj) {
         return static_cast<tgComponent*>(obj);
     }
@@ -334,7 +334,7 @@ protected:
     
     void assertNameUnused(std::string name, std::string message = "Name already used") const
     {
-        if(nameExists(name)) {
+        if(name != "" && nameExists(name)) {
             std::stringstream ss; 
             ss << name;
             throw std::logic_error(message + " (name '"+ ss.str() + "').");

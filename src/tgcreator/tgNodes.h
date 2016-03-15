@@ -126,14 +126,11 @@ public:
      * @return the key under which btVector3 is stored
      * @todo If node is already a value in the map, return its key.
      */
-    int addNode(const btVector3& node) {
-        return addNode(tgNode(node));
-    };
-
-    int addNode(const btVector3& node, std::string tags) {
-        return addNode(tgNode(node, tags));
+    int addNode(const btVector3& node, const std::string& tags = "", const std::string& name = "") {
+        return addNode(tgNode(node, tags, name));
     };
     
+    // @note: name and tags should already be set if we're adding a node this way @todo: is that what we want? 
     int addNode(const tgNode& node) {
         //std::cout << "tgNodes::addNode(const tgNode& node)" << std::endl;
         return addElement(node);
@@ -151,22 +148,23 @@ public:
      // @todo: Maybe replace this with something like:
      //     myNodes += tgNode(1,2,3, "some tags");
      //     or just use myNodes.addNode(tgNode(1,2,3, "tags here"));
+     /*
     int addNode(double x, double y, double z)
     {
         const btVector3 node(x, y, z);
         return addNode(node);
     }
-
-    int addNode(double x, double y, double z, std::string tags)
+    */
+    int addNode(double x, double y, double z, const std::string& tags = "", const std::string& name = "")
     {
-        const tgNode node(x, y, z, tags);
+        const tgNode node(x, y, z, tags, name);
         return addNode(node);
     }
 
     /**
      * Create a tgPair by connecting two contained nodes
      */
-    tgPair pair(int from, int to, std::string tags = "");
+    tgPair pair(int from, int to, const std::string& tags = "", const std::string& name = "");
 
     /**
      * Add the given btVector3 to all btVector3 objects in elements.

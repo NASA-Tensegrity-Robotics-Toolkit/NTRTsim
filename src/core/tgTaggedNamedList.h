@@ -136,9 +136,19 @@ public:
      * a map (since the [] operator on a map will automatically add an element,
      * a const accessor would cause a compiler error). 
      */
-    T& operator[](const std::string& name) { 
+    T& operator[](const std::string& name) 
+    { 
         assertNameExists(name);
-        return this[name]; 
+        int idx = m_names[name];
+        return this[idx];
+    }
+    
+    const T& operator[](const std::string& name) const
+    {
+        assertNameExists(name);
+        // Note: we know that the name is present since we checked with 
+        // assertNameExists(), which thrown an exception if name is not found.
+        return this[m_names.find(name)->second];
     }
     
     /**
@@ -185,7 +195,7 @@ protected:
         return idx;  // This is the index that was created.
     }
 
-    int addElement(T element, std::string name)
+    int addNamedElement(const std::string& name, T element)
     {
         assertNameUnused(name);
         int idx = addElement(element);

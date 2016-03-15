@@ -67,25 +67,23 @@ public:
     /**
      * Add a node using x, y, and z (just for convenience)
      */
-    void addNode(double x, double y, double z, std::string tags = "");
+    void addNode(double x, double y, double z, const std::string& tags = "", const std::string& name = "");
     
     /**
      * Add a node using a node - since keeping track of nodes seems
      * more useful than pairs for string attachments
      */
-    //void addNode(tgNode& newNode);
-
-    void addNode(const tgNode& newNode);  // @todo: for some reason this is not working (causing a malloc error (on Mac)??)
+    void addNode(const tgNode& newNode);
 
     /**
      * Add a pair that connects two of our nodes together
      */
-    void addPair(int fromNodeIdx, int toNodeIdx, std::string tags = "");
+    void addPair(int fromNodeIdx, int toNodeIdx, const std::string& tags = "", const std::string& name = "");
     
     /**
      * Add a pair that connects any two vector3s 
      */
-    void addPair(const btVector3& from, const btVector3& to, std::string tags = "");
+    void addPair(const btVector3& from, const btVector3& to, const std::string& tags = "", const std::string& name = "");
 
     void move(const btVector3& offset);
     
@@ -105,9 +103,11 @@ public:
 
     /**
      * Add a child structure. Note that this will be copied rather than
-     * being a reference or a pointer.
+     * being a reference or a pointer. @todo: where do we copy this? 
+     * @note: if name is not provided, it is not overwritten. 
+     * @todo: is the desired behavior in the case of a name="" arg to keep the name of the structure if it already has one? 
      */
-    void addChild(tgStructure* child);    
+    void addChild(tgStructure* child, const std::string& name = "");     
 
     /**
      * Get all of our nodes
@@ -155,6 +155,7 @@ private:
  * @return os
  * @todo Inlining this does no good; stream operations are slow.
  */
+/*
 inline std::ostream&
 operator<<(std::ostream& os, const tgStructure& structure) 
 {
@@ -180,7 +181,7 @@ operator<<(std::ostream& os, const tgStructure& structure)
 
   return os;
 }
-
+*/
 
 /**
  * Overload operator<<() to handle a tgStructure
@@ -192,7 +193,17 @@ operator<<(std::ostream& os, const tgStructure& structure)
 inline std::ostream&
 operator<<(std::ostream& os, const tgStructure& structure) 
 {
-    os << "tgStructure([print the nodes, pairs, and children?])" << std::endl;
+    os << "tgStructure: {name=\"" <<structure.getName() << "\"}" << std::endl;
+    os << "Structure Nodes:" << std::endl;
+    os << structure.getNodes() << std::endl;
+    os << "Structure Pairs:" << std::endl;
+    os << structure.getPairs() << std::endl;
+    os << "Structure Children:" << std::endl;
+    const std::vector<tgStructure*> children = structure.getChildren();
+    for(int i = 0; i < children.size(); i++) {
+        os << (*children[i]) << std::endl;
+    }
+    //os << structure.getChildren() << std::endl;
     return os;
 }
 

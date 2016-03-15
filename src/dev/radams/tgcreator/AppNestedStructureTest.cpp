@@ -42,40 +42,33 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppTgNamesTest" << std::endl;
-    tgNode node = tgNode(1,2,3,"these are tags", "node1");
-    std::cout << "node print test: " << node << std::endl;
+    std::cout << "AppNestedStructureTest" << std::endl;
+
+    std::cout << "creating structure 'root'" << std::endl;
+    tgStructure* root = new tgStructure();
+    std::cout << "creating structure 'sub1'" << std::endl;
+    tgStructure* sub1 = new tgStructure();
+    std::cout << "creating structure 'sub2'" << std::endl;
+    tgStructure* sub2 = new tgStructure();
     
-    tgNodes nodes;
+    std::cout << "Adding nodes and pairs to the leaf" << std::endl;
+
+    // Add some nodes and pairs to the leaf
+    sub2->addNode(1,2,3);
+    sub2->addNode(4,5,6);
+    sub2->addPair(0,1);
     
-    nodes.addNode(node);
+    // Add the child to the middle parent
+    sub1->addChild(sub2);
     
-    tgNodes nodes2 = tgNodes(nodes);
-    nodes2.move(btVector3(2,2,2));
+    // Add a copy of the child to the middle parent and move it
+
+    tgStructure* sub3 = new tgStructure(*sub2);
+    sub3->move(btVector3(0,4,0));
     
-    std::cout << "nodes: " << nodes << std::endl;
-    std::cout << "nodes2: " << nodes2 << std::endl;
+    sub1->addChild(sub3);
     
-    tgStructure* s = new tgStructure();
-    s->addNode(1,2,3,"");
-    s->addNode(node);
+    std::cout << "sub 1:" << std::endl;
+    std::cout << *sub1 << std::endl;
     
-    s->setName("test structure 1");
-    
-    tgStructure* p = new tgStructure();
-    p->addChild(s);
-    s->setName("after change");
-    p->addChild(s);
-    
-    //tgStructure s = tgStructure();
-    //s.addNode(2,3,4,"more tags");  // This works, but s.addNode(node) does not (malloc error)
-    //s.addNode(node);
-    // s.addNode(tgNode(1,2,3,"these are tags", "node1"));
-    
-    std::cout << "structure print test: " << s << std::endl;
-    std::cout << "node access by name test: " << nodes["node1"] << std::endl;
-    
-    std::cout << std::endl;
-    std::cout << "Structure copy test:" << std::endl;
-    std::cout << *p << std::endl;
 }

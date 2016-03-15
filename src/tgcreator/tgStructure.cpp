@@ -53,9 +53,9 @@ tgStructure::~tgStructure()
     }
 }
 
-void tgStructure::addNode(double x, double y, double z, std::string tags)
+void tgStructure::addNode(double x, double y, double z, const std::string& tags, const std::string& name)
 {
-    m_nodes.addNode(x, y, z, tags);
+    m_nodes.addNode(x, y, z, tags, name);
 }
 
 /*
@@ -70,18 +70,18 @@ void tgStructure::addNode(const tgNode& newNode)
     m_nodes.addNode(newNode);
 }
 
-void tgStructure::addPair(int fromNodeIdx, int toNodeIdx, std::string tags)
+void tgStructure::addPair(int fromNodeIdx, int toNodeIdx, const std::string& tags, const std::string& name)
 {
-    addPair(m_nodes[fromNodeIdx], m_nodes[toNodeIdx], tags);
+    addPair(m_nodes[fromNodeIdx], m_nodes[toNodeIdx], tags, name);
 }
 
-void tgStructure::addPair(const btVector3& from, const btVector3& to, std::string tags)
+void tgStructure::addPair(const btVector3& from, const btVector3& to, const std::string& tags, const std::string& name)
 {
     // @todo: do we need to pass in tags here? might be able to save some proc time if not...
     tgPair p = tgPair(from, to);
     if (!m_pairs.contains(p))
     {
-        m_pairs.addPair(tgPair(from, to, tags));
+        m_pairs.addPair(tgPair(from, to, tags, name));
     }
     else
     {
@@ -134,12 +134,13 @@ void tgStructure::addRotation(const btVector3& fixedPoint,
     }
 }
 
-void tgStructure::addChild(tgStructure* pChild)
+void tgStructure::addChild(tgStructure* pChild, const std::string& name)
 {
     /// @todo: check to make sure we don't already have one of these structures
     /// (what does that mean?)
     /// @note: We only want to check that pairs are the same at build time, since one
     /// structure may build the pairs, while another may not depending on its tags.
+    // @todo: handle name -- since this is a pointer, can we set the name without causing problems? For that matter, can we move, rotate, etc? 
     if (pChild != NULL)
     {
         m_children.push_back(pChild);

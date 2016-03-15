@@ -27,8 +27,8 @@
 #include "tgNodes.h"
 #include "tgPair.h"
 
-tgPair tgNodes::pair(int from, int to, std::string tags)
+tgPair tgNodes::pair(int from, int to, const std::string& tags, const std::string& name)
 {
     std::vector<tgNode>& nodes = getNodes();
-    return tgPair(nodes[from], nodes[to], tags);
+    return tgPair(nodes[from], nodes[to], tags, name);
 }
