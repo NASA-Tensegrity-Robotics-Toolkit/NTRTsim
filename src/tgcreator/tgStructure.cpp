@@ -37,6 +37,14 @@ tgStructure::tgStructure() : tgTaggable()
 {
 }
 
+tgStructure::tgStructure(const tgStructure& orig) : tgTaggable(), 
+        m_children(orig.m_children.size()), m_nodes(orig.m_nodes), m_pairs(orig.m_pairs)
+{
+    for (std::size_t i = 0; i < orig.m_children.size(); ++i) {
+        m_children[i] = new tgStructure(*orig.m_children[i]);
+    }
+}
+
 tgStructure::tgStructure(const tgTags& tags) : tgTaggable(tags)
 {
 }
@@ -135,6 +143,12 @@ void tgStructure::addChild(tgStructure* pChild)
     /// structure may build the pairs, while another may not depending on its tags.
     if (pChild != NULL)
     {
-        m_children.push_back(pChild);
+        m_children.push_back(*pChild);
     }
+}
+
+void tgStructure::addChild(const tgStructure& child)
+{
+    m_children.push_back(new tgStructure(child));
+    
 }

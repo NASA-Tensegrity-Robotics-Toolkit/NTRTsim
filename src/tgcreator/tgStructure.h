@@ -56,6 +56,8 @@ public:
     
     tgStructure();
 
+    tgStructure(const tgStructure& orig);
+
     tgStructure(const tgTags& tags);
 
     tgStructure(const std::string& space_separated_tags);
