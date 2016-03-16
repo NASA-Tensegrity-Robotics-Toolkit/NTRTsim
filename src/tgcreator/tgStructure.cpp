@@ -135,7 +135,6 @@ void tgStructure::addRotation(const btVector3& fixedPoint,
     }
 }
 
-
 void tgStructure::addChild(tgStructure* pChild)
 {
     /// @todo: check to make sure we don't already have one of these structures
