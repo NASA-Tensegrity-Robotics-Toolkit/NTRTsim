@@ -163,7 +163,7 @@ protected:
         assert(!elementExists(element));  // segfault?
         assertUnique(element);
         m_elements.push_back(element);
-        return m_elements.size();  // This is the index that was created.
+        return m_elements.size() - 1;  // This is the index that was created.
     }
 
     void addElements(std::vector<T*> elements) 
