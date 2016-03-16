@@ -148,10 +148,8 @@ void tgStructure::addChild(tgStructure* pChild)
     }
 }
 
-/*
 void tgStructure::addChild(const tgStructure& child)
 {
     m_children.push_back(new tgStructure(child));
     
 }
-*/

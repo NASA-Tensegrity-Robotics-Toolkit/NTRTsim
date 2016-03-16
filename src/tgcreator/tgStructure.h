@@ -107,6 +107,8 @@ public:
      */
     void addChild(tgStructure* child);    
 
+    void addChild(const tgStructure& child);
+
     /**
      * Get all of our nodes
      * Note: This only includes nodes owned by this structure. use 'findNodes'
