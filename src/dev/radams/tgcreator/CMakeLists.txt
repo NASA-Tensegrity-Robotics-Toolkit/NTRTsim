@@ -13,8 +13,8 @@ include_directories(${INC_DIR})
 #) 
 
 
-add_executable(AppNestedStructureTest
-    AppNestedStructureTest.cpp
+add_executable(AppNestedStructureDepthTest
+    AppNestedStructureDepthTest.cpp
 ) 
 
 add_executable(AppStructuresOnStack
