@@ -144,7 +144,7 @@ void tgStructure::addChild(tgStructure* pChild)
     /// structure may build the pairs, while another may not depending on its tags.
     if (pChild != NULL)
     {
-        m_children.push_back(*pChild);
+        m_children.push_back(pChild);
     }
 }
 
