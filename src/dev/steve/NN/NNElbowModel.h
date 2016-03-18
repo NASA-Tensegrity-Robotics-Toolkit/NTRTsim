@@ -126,6 +126,11 @@ private:
      */
     void addMarkers(tgStructure& s);
 
+    /**
+     * Return position of end effector
+     */
+     btVector3 getTrackerPosition(tgStructure& s);
+
 private:
 	
 	/**

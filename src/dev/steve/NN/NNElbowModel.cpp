@@ -205,6 +205,11 @@ void NNElbowModel::addMarkers(tgStructure &s) {
 	}
 }
  
+btVector3 NNElbowModel::getTrackerPosition(tgStructure &s) {
+    std::vector<tgRod *> tracker = find<tgRod>("tracker");
+    return tracker[0]->centerOfMass();
+}
+
 void NNElbowModel::setup(tgWorld& world) {
     const tgRod::Config rodConfig(cRod.radius, cRod.density, cRod.friction, cRod.rollFriction, cRod.restitution);
     const tgRod::Config rodConfigMassless(cRod.radius, 0.00/*c.density*/, cRod.friction, cRod.rollFriction, cRod.restitution);
