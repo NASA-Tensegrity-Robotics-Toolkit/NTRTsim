@@ -1,30 +1,11 @@
-link_directories(${LIB_DIR})
-
-link_libraries(
-    tgcreator
-    core
-    Adapters
-    Configuration
-    NeuroEvolution
-    FileHelpers
-)
+link_libraries(tgcreator core Adapters)
 
 add_executable(AppT12SuperBallPayload
     T12SuperBallPayload/T12SuperBallPayload.cpp
     T12SuperBallPayload/T12SuperBallPayloadController.cpp
     T12SuperBallPayload/AppT12SuperBallPayload.cpp
 )
-
-add_executable(AppSineTest
-    NN/AppSineTest.cpp
-)
-
-add_executable(AppUpperLimb
-    UpperLimb/UpperLimbModel.cpp
-    UpperLimb/UpperLimbController.cpp
-    UpperLimb/AppUpperLimb.cpp
-)
-
+ 
 add_executable(AppScarrArm
     ScarrArm/ScarrArmModel.cpp
     ScarrArm/ScarrArmController.cpp
@@ -41,5 +22,11 @@ add_executable(AppEscape_T6
     Escape_T6/AppEscape_T6.cpp
 ) 
 
+add_executable(AppNNElbow
+    NN/NNElbowModel.cpp
+    NN/NNElbowController.cpp
+    NN/AppNNElbow.cpp
+) 
+
 add_custom_command(TARGET AppEscape_T6 POST_BUILD
-    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/Escape_T6/logs)
+					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/Escape_T6/logs)
