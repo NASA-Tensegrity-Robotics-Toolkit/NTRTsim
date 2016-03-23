@@ -3,13 +3,13 @@
 # Copyright © 2012, United States Government, as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All rights reserved.
-# 
+#
 # The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # http://www.apache.org/licenses/LICENSE-2.0.
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -60,7 +60,7 @@ yamlcpp_pkg=`echo $YAMLCPP_URL|awk -F/ '{print $NF}'`  # get the package name fr
 # Check to see if yamlcpp has been built already
 function check_yamlcpp_built()
 {
-    # Check for a library that's created when yamlcpp is built   
+    # Check for a library that's created when yamlcpp is built
     fname=$(find "$YAMLCPP_BUILD_DIR" -iname libyaml-cpp* 2>/dev/null)
     if [ -f "$fname" ]; then
         return $TRUE
@@ -126,7 +126,7 @@ function build_yamlcpp()
         -DUSE_DOUBLE_PRECISION=OFF \
         -DCMAKE_INSTALL_NAME_DIR="$YAMLCPP_INSTALL_PREFIX" || { echo "- ERROR: CMake for YamlCPP failed."; exit 1; }
     #If you turn this on, turn it on in inc.CMakeYamlCPP.txt as well for the NTRT build
-    # Additional yamlcpp options: 
+    # Additional yamlcpp options:
     # -DFRAMEWORK=ON
     # -DBUILD_DEMOS=ON
 
