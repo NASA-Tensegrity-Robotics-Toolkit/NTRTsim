@@ -156,6 +156,7 @@ private:
  * @return os
  * @todo Inlining this does no good; stream operations are slow.
  */
+ /*
 inline std::ostream&
 operator<<(std::ostream& os, const tgStructure& structure) 
 {
@@ -181,6 +182,24 @@ operator<<(std::ostream& os, const tgStructure& structure)
 
   return os;
 }
+*/
+/**
+ * Overload operator<<() to handle a tgStructure
+ * @param[in,out] os an ostream
+ * @param[in] tgStructure, its nodes, pairs, and children.
+ * @return os
+ * @todo Inlining this does no good; stream operations are slow.
+ */
+#include "tgYamlStringHelper.h"
+ 
+inline std::ostream&
+operator<<(std::ostream& os, const tgStructure& structure) 
+{
+    //os << asYamlElement(os, structure) << std::endl;
+    os << asYamlElement(structure) << std::endl;
+    return os;
+}
+
 
 
 #endif

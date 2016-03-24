@@ -44,10 +44,10 @@ int main(int argc, char** argv)
 {
     std::cout << "AppNestedStructureTest" << std::endl;
     
-    tgStructure* sub0 = new tgStructure();
+    tgStructure* sub0 = new tgStructure("sub0");
     // sub0->setName("sub0");
     
-    tgStructure* sub1_1 = new tgStructure();
+    tgStructure* sub1_1 = new tgStructure("sub1_1");
     //sub1_1->setName("s1_1");
     
     sub1_1->addNode(1,2,3,"one two three");
@@ -55,6 +55,7 @@ int main(int argc, char** argv)
     sub1_1->addPair(0,1,"one two");
     
     tgStructure* sub1_2 = new tgStructure(*sub1_1);
+    sub1_2->setTags(tgTags("sub1_2"));
     sub1_2->move(btVector3(4,4,4));
     //sub1_2->setName("s1_2");
     
@@ -64,6 +65,7 @@ int main(int argc, char** argv)
     tgStructure* root = new tgStructure();
     //root->setName("root");
     root->addChild(sub0);
+    root->setTags(tgTags("root"));
 
     tgStructure* sub1 = new tgStructure(*sub0);
     //sub1->setName("sub1");

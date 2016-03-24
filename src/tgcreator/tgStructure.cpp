@@ -37,9 +37,14 @@ tgStructure::tgStructure() : tgTaggable()
 {
 }
 
-tgStructure::tgStructure(const tgStructure& orig) : tgTaggable(), 
+/**
+ * Copy constructor
+ */
+tgStructure::tgStructure(const tgStructure& orig) : tgTaggable(orig.getTags()), 
         m_children(orig.m_children.size()), m_nodes(orig.m_nodes), m_pairs(orig.m_pairs)
 {
+    
+    // Copy children
     for (std::size_t i = 0; i < orig.m_children.size(); ++i) {
         m_children[i] = new tgStructure(*orig.m_children[i]);
     }
