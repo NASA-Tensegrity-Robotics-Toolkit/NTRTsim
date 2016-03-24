@@ -244,7 +244,6 @@ protected:
 inline std::ostream&
 operator<<(std::ostream& os, const tgNodes& n)
 {
-
     os << "tgNodes(" << std::endl;
     const std::vector<tgNode>& nodes = n.getNodes();
     for(std::size_t i = 0; i < nodes.size(); i++) {
@@ -253,7 +252,31 @@ operator<<(std::ostream& os, const tgNodes& n)
     os << ")";
 
     return os;
-}
+};
+
+
+/**
+ * Represent nodes as a YAML list (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItems(const tgNodes& nodes, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+
+    if (nodes.size() == 0) {
+        os << indent << "nodes: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "nodes:" << std::endl;
+    for(size_t i = 0; i < nodes.size(); i++)
+    {
+        os << asYamlItem(nodes[i], indentLevel+1);
+    }
+    return os.str();
+};
+
 
 
 #endif

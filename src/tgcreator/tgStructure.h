@@ -183,6 +183,27 @@ operator<<(std::ostream& os, const tgStructure& structure)
   return os;
 }
 */
+
+
+
+/**
+ * Represent a structure as a YAML element
+ * Note: this function has no dependencies on external libraries
+ */
+std::string asYamlElement(const tgStructure& structure, int indentLevel=0);
+
+/** 
+ * Represent a structure as a YAML list item (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+std::string asYamlItem(const tgStructure& structure, int indentLevel=0);
+
+/**
+ * Represent a vector of tgStructure* as YAML items
+ * Note: this function has no dependencies on external libraries
+ */
+std::string asYamlItems(const std::vector<tgStructure*> structures, int indentLevel=0);
+
 /**
  * Overload operator<<() to handle a tgStructure
  * @param[in,out] os an ostream
@@ -190,16 +211,54 @@ operator<<(std::ostream& os, const tgStructure& structure)
  * @return os
  * @todo Inlining this does no good; stream operations are slow.
  */
-#include "tgYamlStringHelper.h"
- 
 inline std::ostream&
 operator<<(std::ostream& os, const tgStructure& structure) 
 {
     //os << asYamlElement(os, structure) << std::endl;
     os << asYamlElement(structure) << std::endl;
     return os;
-}
+};
 
+/*
+std::string asYamlElement(const tgStructure& structure, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "structure:" << std::endl;
+    os << indent << "  tags: " << asYamlList(structure.getTags()) << std::endl;
+    os << asYamlItems(structure.getNodes(), indentLevel + 1);
+    os << asYamlItems(structure.getPairs(), indentLevel + 1);
+    os << asYamlItems(structure.getChildren(), indentLevel + 1);
+    return os.str();
+};
 
+inline std::string asYamlItem(const tgStructure& structure, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "- tags: " << asYamlList(structure.getTags()) << std::endl;
+    os << asYamlItems(structure.getNodes(), indentLevel + 1);
+    os << asYamlItems(structure.getPairs(), indentLevel + 1);
+    os << asYamlItems(structure.getChildren(), indentLevel + 1);
+    return os.str();
+};
 
+inline std::string asYamlItems(const std::vector<tgStructure*> structures, int indentLevel)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    if (structures.size() == 0) {
+        os << indent << "structures: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "structures:" << std::endl;
+    for(size_t i = 0; i < structures.size(); i++)
+    {
+        os << asYamlItem(*structures[i], indentLevel+1);
+    }
+    return os.str();
+};
+
+*/
 #endif

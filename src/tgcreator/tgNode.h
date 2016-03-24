@@ -115,7 +115,21 @@ operator<<(std::ostream& os, const tgNode& node)
 {
     os << "tgNode(" << node.x() << ", " << node.y() << ", " << node.z() << ", {" << node.getTagStr(", ") << "})";
     return os;
-}
+};
+
+
+/**
+ * Represent a node as a YAML item (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItem(const tgNode& node, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "- tags: " << asYamlList(node.getTags()) << std::endl;
+    os << indent << "  xyz: [" << node.x() << ", " << node.y() << ", " << node.z() << "]" << std::endl;
+    return os.str();
+};
 
 
 #endif

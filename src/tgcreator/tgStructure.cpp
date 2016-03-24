@@ -157,3 +157,45 @@ void tgStructure::addChild(const tgStructure& child)
     m_children.push_back(new tgStructure(child));
     
 }
+
+
+/* Standalone functions */
+std::string asYamlElement(const tgStructure& structure, int indentLevel)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "structure:" << std::endl;
+    os << indent << "  tags: " << asYamlList(structure.getTags()) << std::endl;
+    os << asYamlItems(structure.getNodes(), indentLevel + 1);
+    os << asYamlItems(structure.getPairs(), indentLevel + 1);
+    os << asYamlItems(structure.getChildren(), indentLevel + 1);
+    return os.str();
+}
+
+std::string asYamlItem(const tgStructure& structure, int indentLevel)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "- tags: " << asYamlList(structure.getTags()) << std::endl;
+    os << asYamlItems(structure.getNodes(), indentLevel + 1);
+    os << asYamlItems(structure.getPairs(), indentLevel + 1);
+    os << asYamlItems(structure.getChildren(), indentLevel + 1);
+    return os.str();
+}
+
+std::string asYamlItems(const std::vector<tgStructure*> structures, int indentLevel)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    if (structures.size() == 0) {
+        os << indent << "structures: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "structures:" << std::endl;
+    for(size_t i = 0; i < structures.size(); i++)
+    {
+        os << asYamlItem(*structures[i], indentLevel+1);
+    }
+    return os.str();
+}

@@ -165,6 +165,30 @@ operator<<(std::ostream& os, const tgPairs& p)
     os << ")";
 
     return os;
-}
+};
+
+
+/**
+ * Represent pairs as a YAML list (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItems(const tgPairs& pairs, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+
+    if (pairs.size() == 0) {
+        os << indent << "pairs: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "pairs:" << std::endl;
+    for(size_t i = 0; i < pairs.size(); i++)
+    {
+        os << asYamlItem(pairs[i], indentLevel+1);
+    }
+    return os.str();
+};
+
 
 #endif

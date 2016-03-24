@@ -136,5 +136,21 @@ operator<<(std::ostream& os, const tgPair& pair)
 }
 
 
+/**
+ * Represent a pair as a YAML item (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItem(const tgPair& pair, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "- tags: " << asYamlList(pair.getTags()) << std::endl;
+    os << indent << "  pair: ["
+        << "[" << pair.getFrom().x() << ", " << pair.getFrom().y() << ", " << pair.getFrom().z() << "]" << ", "
+        << "[" << pair.getTo().x() << ", " << pair.getTo().y() << ", " << pair.getTo().z() << "]"
+    << "]" << std::endl;
+    return os.str();    
+};
+
 
 #endif

@@ -331,6 +331,23 @@ inline tgTags operator+(tgTags lhs, const tgTags& rhs)
   return lhs;
 }
 
+/**
+ * Represent tags as a YAML list
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlList(const tgTags& tags)
+{
+    std::stringstream os;
+    os << "[";
+    for(size_t i = 0; i < tags.size(); i++) {
+        os << '"' << tags[i] << '"';
+        if(i != tags.size() - 1) 
+            os << ", ";
+    }    
+    os << "]";
+    return os.str();
+};
+
 inline bool operator< (const tgTags& lhs, const tgTags& rhs){ return lhs.asSet() < rhs.asSet(); }
 inline bool operator> (const tgTags& lhs, const tgTags& rhs){return rhs < lhs;}
 inline bool operator<=(const tgTags& lhs, const tgTags& rhs){return !(lhs > rhs);}
