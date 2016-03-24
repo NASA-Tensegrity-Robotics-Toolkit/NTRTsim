@@ -37,6 +37,7 @@ tgStructure::tgStructure() : tgTaggable()
 {
 }
 
+
 /**
  * Copy constructor
  */
