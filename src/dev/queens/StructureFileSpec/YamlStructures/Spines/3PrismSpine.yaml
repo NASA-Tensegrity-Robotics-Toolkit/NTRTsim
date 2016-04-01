@@ -1,0 +1,10 @@
+substructures:
+  3prism1/3prism2/3prism3/3prism4/3prism5/3prism6:
+    path: ../BaseStructures/3Prism.yaml
+
+bond_groups:
+  horizontal_string:
+    3prism1/3prism2/3prism3/3prism4/3prism5/3prism6/node_edge:
+      - [top1, bottom1/bottom2]
+      - [top2, bottom2/bottom3]
+      - [top3, bottom3/bottom1]

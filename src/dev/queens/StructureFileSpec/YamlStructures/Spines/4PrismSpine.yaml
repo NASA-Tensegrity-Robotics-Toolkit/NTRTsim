@@ -1,0 +1,11 @@
+substructures:
+  4prism1/4prism2/4prism3/4prism4/4prism5:
+    path: ../BaseStructures/4Prism.yaml
+
+bond_groups:
+  horizontal_string:
+    4prism1/4prism2/4prism3/4prism4/4prism5/node_edge:
+      - [top1, bottom1/bottom2]
+      - [top2, bottom2/bottom3]
+      - [top3, bottom3/bottom4]
+      - [top4, bottom4/bottom1]

@@ -1,0 +1,10 @@
+substructures:
+  s1/s2:
+    path: ../BaseStructures/SuperBall.yaml
+
+bond_groups:
+  superball_string:
+    s1/s2/node_edge:
+      - [top_horiz_prox, left_vert_bottom/bottom_horiz_dist]
+      - [prox_horiz_right, bottom_horiz_dist/dist_horiz_left]
+      - [right_vert_top, dist_horiz_left/left_vert_bottom]
