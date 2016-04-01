@@ -1,0 +1,33 @@
+nodes:
+  bottom1: [8, 0, 8]
+  bottom2: [8, 0, -8]
+  bottom3: [-8, 0, -8]
+  bottom4: [-8, 0, 8]
+
+  top1: [0, 5, 4]
+  top2: [4, 5, 0]
+  top3: [0, 5, -4]
+  top4: [-4, 5, 0]
+
+pair_groups:
+  rod:
+    - [top1, bottom2]
+    - [top2, bottom3]
+    - [top3, bottom4]
+    - [top4, bottom1]
+
+  string:
+    - [bottom1, bottom2]
+    - [bottom2, bottom3]
+    - [bottom3, bottom4]
+    - [bottom4, bottom1]
+
+    - [top2, top3]
+    - [top3, top4]
+    - [top4, top1]
+    - [top1, top2]
+
+    - [bottom1, top1]
+    - [bottom2, top2]
+    - [bottom3, top3]
+    - [bottom4, top4]

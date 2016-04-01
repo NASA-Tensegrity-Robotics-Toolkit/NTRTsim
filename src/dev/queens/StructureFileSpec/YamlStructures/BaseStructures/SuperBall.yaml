@@ -1,0 +1,83 @@
+nodes:
+  # left vertical rod
+  left_vert_bottom: [-7.5, 0, 0]
+  left_vert_top: [-7.5, 16.84, 0]
+  # right vertical rod
+  right_vert_bottom: [7.5, 0, 0]
+  right_vert_top: [7.5, 16.84, 0]
+
+  # bottom horizontal rod
+  bottom_horiz_prox: [0, 0.92, -8.42]
+  bottom_horiz_dist: [0, 0.92, 8.42]
+  # top horizontal rod
+  top_horiz_prox: [0, 15.92, -8.42]
+  top_horiz_dist: [0, 15.92, 8.42]
+
+  # proxal horiztonal rod
+  prox_horiz_left: [-8.42, 8.42, -7.5]
+  prox_horiz_right: [8.42, 8.42, -7.5]
+  # distal horizontal rod
+  dist_horiz_left: [-8.42, 8.42, 7.5]
+  dist_horiz_right: [8.42, 8.42, 7.5]
+
+pair_groups:
+  superball_rod:
+    # coronal plane
+    - [left_vert_bottom,left_vert_top]
+    - [right_vert_bottom,right_vert_top]
+    # sagital plane
+    - [bottom_horiz_prox,bottom_horiz_dist]
+    - [top_horiz_dist,top_horiz_prox]
+    # trasverse plane
+    - [dist_horiz_left,dist_horiz_right]
+    - [prox_horiz_left,prox_horiz_right]
+
+  superball_string:
+    - [left_vert_bottom,bottom_horiz_prox]
+    - [left_vert_bottom,bottom_horiz_dist]
+    - [left_vert_bottom,dist_horiz_left]
+    - [left_vert_bottom,prox_horiz_left]
+
+    - [left_vert_top,top_horiz_dist]
+    - [left_vert_top,top_horiz_prox]
+    - [left_vert_top,dist_horiz_left]
+    - [left_vert_top,prox_horiz_left]
+
+    - [right_vert_bottom,bottom_horiz_prox]
+    - [right_vert_bottom,bottom_horiz_dist]
+    - [right_vert_bottom,dist_horiz_right]
+    - [right_vert_bottom,prox_horiz_right]
+
+    - [right_vert_top,top_horiz_prox]
+    - [right_vert_top,top_horiz_dist]
+    - [right_vert_top,dist_horiz_right]
+    - [right_vert_top,prox_horiz_right]
+
+    - [bottom_horiz_prox,prox_horiz_left]
+    - [bottom_horiz_prox,prox_horiz_right]
+    - [bottom_horiz_dist,dist_horiz_left]
+    - [bottom_horiz_dist,dist_horiz_right]
+
+    - [top_horiz_prox,prox_horiz_left]
+    - [top_horiz_prox,prox_horiz_right]
+    - [top_horiz_dist,dist_horiz_left]
+    - [top_horiz_dist,dist_horiz_right]
+
+builders:
+  superball_rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.688
+      radius: 0.31
+      friction: 0.99
+      roll_friction: 0.01
+      restitution: 0.0
+  superball_string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613.0
+      damping: 200.0
+      pretension: 2452.0
+      history: 0
+      max_tension: 100000
+      target_velocity: 10000

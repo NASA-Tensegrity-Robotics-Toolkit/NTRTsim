@@ -1,0 +1,54 @@
+nodes:
+  bottom1: [-5, 0, 0]
+  bottom2: [-5, 0, 10]
+  bottom3: [5, 0, 10]
+  bottom4: [5, 0, 0]
+
+  top1: [-5, 10, 0]
+  top2: [-5, 10, 10]
+  top3: [5, 10, 10]
+  top4: [5, 10, 0]
+
+pair_groups:
+
+  prism_rod:
+    - [bottom1, top2]
+    - [bottom2, top3]
+    - [bottom3, top4]
+    - [bottom4, top1]
+
+  horizontal_string:
+    - [bottom1, bottom2]
+    - [bottom2, bottom3]
+    - [bottom3, bottom4]
+    - [bottom4, bottom1]
+
+    - [top1, top2]
+    - [top2, top3]
+    - [top3, top4]
+    - [top4, top1]
+
+  vertical_string:
+    - [bottom1, top1]
+    - [bottom2, top2]
+    - [bottom3, top3]
+    - [bottom4, top4]
+
+builders:
+  prism_rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.688
+      radius: 0.31
+  horizontal_string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 10
+      pretension: 3000
+  vertical_string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 10
+      pretension: 1000
