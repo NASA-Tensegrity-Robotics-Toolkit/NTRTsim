@@ -94,7 +94,6 @@ void tgStructureInfo::createTree(tgStructureInfo& structureInfo,
         tgStructureInfo* const pStructureInfo =
         new tgStructureInfo(*pStructure, m_buildSpec, pStructure->getTags());
         structureInfo.addChild(pStructureInfo);
-        createTree(*pStructureInfo, *pStructure);
     }
 }
 
