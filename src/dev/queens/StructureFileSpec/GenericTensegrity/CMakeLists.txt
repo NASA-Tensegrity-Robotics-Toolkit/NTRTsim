@@ -1,15 +1,18 @@
 link_directories(${LIB_DIR})
 
-link_libraries(tgcreator
-                util
-                sensors
-                core    
-                terrain 
-                tgOpenGLSupport)
+link_libraries(core
+               tgcreator
+               util
+               sensors
+               terrain
+               tgOpenGLSupport
+               yaml-cpp)
 
-add_executable(AppTensegrityModel
+add_library(TensegrityModel
+    TensegrityModel.cpp)
+
+add_executable(BuildModel
     TensegrityModel.cpp
-    AppTensegrityModel.cpp
-) 
+    BuildTensegrityModel.cpp)
 
-target_link_libraries(AppTensegrityModel ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers ${ENV_LIB_DIR}/libyaml-cpp.a)
+
