@@ -35,6 +35,7 @@
 // The C++ Standard Library
 #include <string>
 #include <vector>
+#include <queue>
 
 // Forward declarations
 class btQuaternion;
@@ -85,6 +86,13 @@ public:
      */
     void addPair(const btVector3& from, const btVector3& to, std::string tags = "");
 
+    /*
+     * Removes the pair that's passed in as a parameter from the structure
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] pair a reference to the pair to remove
+     */
+    void removePair(const tgPair& pair);
+
     void move(const btVector3& offset);
     
     /**
@@ -100,6 +108,19 @@ public:
 
     void addRotation(const btVector3& fixedPoint,
              const btQuaternion& rotation);
+
+    /*
+     * Scales structure by a scale factor
+     * @param[in] scaleFactor the scale factor by which to scale the structure
+     */
+    void scale(double scaleFactor);
+
+    /*
+     * Scales structure relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the structure from/to
+     * @param[in] scaleFactor the scale factor by which to scale the structure
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor);
 
     /**
      * Add a child structure. Note that this will be copied rather than
@@ -120,6 +141,23 @@ public:
     }
 
     /**
+     * Looks through nodes that we own and those that belong to child nodes
+     * (using BFS) and returns the first node with a matching name.
+     * Throws an error if a node is not a found with a matching name.
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] name the name of the node to find and return
+     * @return a reference to the node that was found
+     */
+    tgNode& findNode(const std::string& name);
+
+    /**
+     * Returns the mean position of the nodes in the structure (including children)
+     * (added to accommodate structures encoded in YAML)
+     * @return a btVector3 that represents the centroid of the structure
+     */
+    btVector3 getCentroid() const;
+
+    /**
      * Get all of our pairs
      * Note: This only includes nodes owned by this structure. Use 'findPairs' 
      * to search child nodes as well. 
@@ -128,6 +166,17 @@ public:
     {
         return m_pairs;
     }
+
+    /**
+     * Looks through pairs that we own and those that belong to child nodes
+     * (using BFS) and returns the first pair with matching endpoint coordinates.
+     * Throws an error if a pair is not a found.
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] from the vector on one end of the pair to find and return
+     * @param[in] to the vector on the other end of the pair to find and return
+     * @return a reference to the pair that was found
+     */
+    tgPair& findPair(const btVector3& from, const btVector3& to);
 	
     /**
      * Return our child structures
@@ -137,6 +186,15 @@ public:
         return m_children;
     }
 
+    /**
+     * Looks through children we own and those that belong to our children (using BFS)
+     * and returns the first child with a matching name.
+     * Throws an error if a child is not a found with a matching name.
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] name the name of the structure to find and return
+     * @return a reference to the structure that was found
+     */
+    tgStructure& findChild(const std::string& name);
 
 private:
 
