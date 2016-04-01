@@ -1,0 +1,27 @@
+substructures:
+  o1/o2/o3/o4/o5/o6:
+    path: ../BaseStructures/Octahedron.yaml
+    offset: [0, 0 , -12]
+
+bond_groups:
+  o1/o2/o3/o4/o5/o6/node_node:
+    string:
+      - [front, front]
+      - [right, right]
+      - [back, back]
+      - [left, left]
+      - [right, front]
+      - [right, left]
+      - [back, front]
+      - [back, left]
+
+builders:
+  string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0

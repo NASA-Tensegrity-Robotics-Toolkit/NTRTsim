@@ -27,6 +27,8 @@
 #ifndef TG_STRUCTURE_INFO_H
 #define TG_STRUCTURE_INFO_H
 
+// This library
+#include "tgBuildSpec.h"
 // NTRT Core library
 #include "core/tgTaggable.h"
 // The C++ Standard Library
@@ -71,12 +73,24 @@ public:
 
 private:
 
-    // Initialize the rigid info for this structureInfo, then apply to children
-    void initRigidInfo();
+    /*
+     * Initialize all the rigidInfo and connectorInfo objects for this structureInfo and all of its children
+     */
+    void addRigidsAndConnectors();
+
+    /*
+     * Create and return a rigidInfo object using a matching rigidAgent
+     */
+    template <class T>
+    tgRigidInfo* initRigidInfo(const T& rigidCandidate, const std::vector<tgBuildSpec::RigidAgent*>& rigidAgents) const;
+
+    /*
+     * Create and return a connectorInfo object using a matching connectorAgent
+     */
+    template <class T>
+    tgConnectorInfo* initConnectorInfo(const T& connectorCandidate, const std::vector<tgBuildSpec::ConnectorAgent*>& connectorAgents) const;
 
     void autoCompoundRigids();
-
-    void initConnectorInfo();
     
     void chooseConnectorRigids();
 

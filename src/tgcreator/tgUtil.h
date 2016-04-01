@@ -191,11 +191,12 @@ public:
      * with vector b.
      * @param[in] a a btVector3, passed by value
      * @param[in] b a btVector3, passed by value
+     * @param[in] fallbackAxis a btVector3, passed by reference
      * @return a quaternion that, if applied, would rotate vector a to align
      * with vector b
      * @todo get some sensible value if a or b = (0, 0, 0). See getTransform
      */
-    static btQuaternion getQuaternionBetween(btVector3 a, btVector3 b) 
+    static btQuaternion getQuaternionBetween(btVector3 a, btVector3 b, const btVector3& fallbackAxis = btVector3(0,0,0))
     {
         a.normalize();
         b.normalize();
@@ -209,19 +210,22 @@ public:
         } else if (almostEqual(a, -b)) {
             // Account for opposing vectors (can't calculate c in
             // this case either)
-            btVector3 xAxis(1.0, 0.0, 0.0);
-            if (a.dot(xAxis) == 0.0)
+            if (!fallbackAxis.isZero())
             {
-				// Gets around bad btTransforms with an up vector
-				result = btQuaternion (-1.0, 0.0, 0.0, 0.0);
-			}
-			else
-			{	
-				const btVector3 arb =
-				a + getArbitraryNonParallelVector(a);
-				const btVector3 c = (a.cross(arb)).normalize();
-				result = btQuaternion(c, M_PI).normalize();
-			}
+                result = btQuaternion(fallbackAxis, M_PI).normalize();
+            }
+            else if (a.dot(btVector3(1.0, 0.0, 0.0)) == 0.0)
+            {
+                // Gets around bad btTransforms with an up vector
+                result = btQuaternion (-1.0, 0.0, 0.0, 0.0);
+            }
+            else
+            {
+                const btVector3 arb =
+                a + getArbitraryNonParallelVector(a);
+                const btVector3 c = (a.cross(arb)).normalize();
+                result = btQuaternion(c, M_PI).normalize();
+            }
         } else {
             // Create a vector normal to both a and b
             const btVector3 c = (a.cross(b)).normalize();
@@ -231,6 +235,22 @@ public:
             result = btQuaternion(c, acos(a.dot(b))).normalize();
         }
         return result;
+    }
+
+    /**
+     * Returns the mean position of a set of btVector3 points.
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] points a vector of btVector3, passed by reference
+     * @return a btVector3 that represents the centroid of the points vector
+     */
+    static btVector3 getCentroid(const std::vector<btVector3>& points) {
+        int numPoints = points.size();
+        btVector3 centroid = btVector3(0, 0, 0);
+        for (int i = 0; i < numPoints; i++) {
+            centroid += points[i];
+        }
+        centroid /= numPoints;
+        return centroid;
     }
 
     /**

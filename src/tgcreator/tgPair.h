@@ -113,6 +113,13 @@ public:
     }
         
     void move(const btVector3& offset);
+
+    /*
+     * Scales pair relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the pair from/to
+     * @param[in] scaleFactor the scale factor by which to scale the pair
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor);
     
 protected:
 

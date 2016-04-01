@@ -27,7 +27,6 @@
 // This module
 #include "tgStructureInfo.h"
 // This library
-#include "tgBuildSpec.h"
 #include "tgConnectorInfo.h"
 #include "tgRigidAutoCompound.h"
 #include "tgStructure.h"
@@ -95,7 +94,6 @@ void tgStructureInfo::createTree(tgStructureInfo& structureInfo,
         tgStructureInfo* const pStructureInfo =
         new tgStructureInfo(*pStructure, m_buildSpec, pStructure->getTags());
         structureInfo.addChild(pStructureInfo);
-        createTree(*pStructureInfo, *pStructure);
     }
 }
 
@@ -120,95 +118,93 @@ std::vector<tgRigidInfo*> tgStructureInfo::getAllRigids() const
 // Build methods
 ////////////////////////////
 
-void tgStructureInfo::initRigidInfo()
-{
-    // Step through each of the nodes and pairs, passing them through the rigidAgents to get a list of tgRigidInfos to be added to this. 
-
+void tgStructureInfo::addRigidsAndConnectors() {
     const std::vector<tgBuildSpec::RigidAgent*> rigidAgents = m_buildSpec.getRigidAgents();
+    const std::vector<tgBuildSpec::ConnectorAgent*> connectorAgents = m_buildSpec.getConnectorAgents();
 
-    for (std::size_t i = 0; i < rigidAgents.size(); i++)
-    {
-        tgBuildSpec::RigidAgent * const pRigidAgent = rigidAgents[i];
+    const tgNodes& nodes = m_structure.getNodes();
+    const tgPairs& pairs = m_structure.getPairs();
+
+    // for each node, create a rigidInfo object using a matching rigidAgent
+    for (int i = 0; i < nodes.size(); i++) {
+        tgRigidInfo* nodeRigid = initRigidInfo<tgNode>(nodes[i], rigidAgents);
+        if (nodeRigid) {
+            m_rigids.push_back(nodeRigid);
+        }
+    }
+    // for each pair, create a rigidInfo or connectorInfo object using a matching rigidAgent or connectorAgent
+    for (int i = 0; i < pairs.size(); i++) {
+        tgRigidInfo* pairRigid = initRigidInfo<tgPair>(pairs[i], rigidAgents);
+        if (pairRigid) {
+            m_rigids.push_back(pairRigid);
+        }
+        else {
+            tgConnectorInfo* pairConnector = initConnectorInfo<tgPair>(pairs[i], connectorAgents);
+            if (pairConnector) {
+                m_connectors.push_back(pairConnector);
+            }
+        }
+    }
+
+    // Children
+    for (std::size_t i = 0; i < m_children.size(); i++) {
+        tgStructureInfo* const pStructureInfo = m_children[i];
+
+        assert(pStructureInfo != NULL);
+        pStructureInfo->addRigidsAndConnectors();
+    }
+}
+
+template <class T>
+tgRigidInfo* tgStructureInfo::initRigidInfo(const T& rigidCandidate, const std::vector<tgBuildSpec::RigidAgent*>& rigidAgents) const {
+    for (int i = rigidAgents.size() - 1; i >= 0; i--) {
+        const tgBuildSpec::RigidAgent* pRigidAgent = rigidAgents[i];
         assert(pRigidAgent != NULL);
 
         tgTagSearch tagSearch = tgTagSearch(pRigidAgent->tagSearch);
 
         // Remove our tags so that subcomponents 'inherit' them (because of the
-        // way tags work, removing a tag from the search is the same as adding 
+        // way tags work, removing a tag from the search is the same as adding
         // the tag to children to be searched)
         tagSearch.remove(getTags());
 
         tgRigidInfo* pRigidInfo = pRigidAgent->infoFactory;
         assert(pRigidInfo != NULL);
 
-        // Nodes
-        std::vector<tgRigidInfo*> nodeRigids =
-        pRigidInfo->createRigidInfos(m_structure.getNodes(), tagSearch);
-        m_rigids.insert(m_rigids.end(), nodeRigids.begin(), nodeRigids.end());
-
-        // Pairs
-        std::vector<tgRigidInfo*> pairRigids =
-       pRigidInfo->createRigidInfos(m_structure.getPairs(), tagSearch);
-        m_rigids.insert(m_rigids.end(), pairRigids.begin(), pairRigids.end());
-
+        tgRigidInfo* rigid = pRigidInfo->createRigidInfo(rigidCandidate, tagSearch);
+        if (rigid) // check if a tgRigidInfo was found
+            return rigid;
     }
-    
-    // Children
-    for (std::size_t i = 0; i < m_children.size(); i++)
-    {
-        tgStructureInfo* const pStructureInfo = m_children[i];
-        
-        assert(pStructureInfo != NULL);
-        pStructureInfo->initRigidInfo();
+    return 0;
+}
+
+template <class T>
+tgConnectorInfo* tgStructureInfo::initConnectorInfo(const T& connectorCandidate, const std::vector<tgBuildSpec::ConnectorAgent*>& connectorAgents) const {
+    for (int i = connectorAgents.size() - 1; i >= 0; i--) {
+        const tgBuildSpec::ConnectorAgent*  pConnectorAgent = connectorAgents[i];
+        assert(pConnectorAgent != NULL);
+
+        tgTagSearch tagSearch = tgTagSearch(pConnectorAgent->tagSearch);
+
+        // Remove our tags so that subcomponents 'inherit' them (because of the
+        // way tags work, removing a tag from the search is the same as adding
+        // the tag to children to be searched)
+        tagSearch.remove(getTags());
+
+        tgConnectorInfo* pConnectorInfo = pConnectorAgent->infoFactory;
+        assert(pConnectorInfo != NULL);
+
+        tgConnectorInfo* connector = pConnectorInfo->createConnectorInfo(connectorCandidate, tagSearch);
+        if (connector) // check if a tgConnectorInfo was found
+            return connector;
     }
+    return 0;
 }
 
 void tgStructureInfo::autoCompoundRigids()
 {
     tgRigidAutoCompound c(getAllRigids());
     m_compounded = c.execute();
-}
-
-void tgStructureInfo::initConnectorInfo()
-{
-    // Step through each of the nodes and pairs, passing them through the
-    // rigidAgents to get a list of tgRigidInfos to be added to this. 
-
-    const std::vector<tgBuildSpec::ConnectorAgent*> connectorAgents =
-        m_buildSpec.getConnectorAgents();
-
-    for (std::size_t i = 0; i < connectorAgents.size(); i++)
-    {
-        tgBuildSpec::ConnectorAgent* const pConnectorAgent = connectorAgents[i];
-        assert(pConnectorAgent != NULL);
-        
-        tgTagSearch tagSearch = tgTagSearch(pConnectorAgent->tagSearch);
-
-        // Remove our tags so that subcomponents 'inherit' them (because of the
-        // way tags work, removing a tag from the search is the same as adding 
-        // the tag to children to be searched)
-        tagSearch.remove(getTags());
-        
-        tgConnectorInfo* const pConnectorInfo = pConnectorAgent->infoFactory;
-        assert(pConnectorInfo != NULL);
-
-        // Note: we don't have to do nodes here since connectors are always based on pairs.
-
-        // Pairs
-        std::vector<tgConnectorInfo*> pairConnectors =
-        pConnectorInfo->createConnectorInfos(m_structure.getPairs(), tagSearch);
-        m_connectors.insert(m_connectors.end(), pairConnectors.begin(),
-                pairConnectors.end());
-
-    }
-    
-    // Children
-    for (std::size_t i = 0; i < m_children.size(); i++)
-    {
-        tgStructureInfo * const pStructureInfo = m_children[i];
-        assert(pStructureInfo != NULL);
-        pStructureInfo->initConnectorInfo();
-    }
 }
 
 void tgStructureInfo::chooseConnectorRigids()
@@ -275,9 +271,8 @@ void tgStructureInfo::initConnectors(tgWorld& world)
 void tgStructureInfo::buildInto(tgModel& model, tgWorld& world) 
 {
     // These take care of things on a global level
-    initRigidInfo();
+    addRigidsAndConnectors();
     autoCompoundRigids();    
-    initConnectorInfo();
     chooseConnectorRigids();
     initRigidBodies(world);
     // Note: Muscle2Ps won't show up yet -- 

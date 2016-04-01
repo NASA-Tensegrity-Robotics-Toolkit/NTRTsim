@@ -211,6 +211,20 @@ public:
             nodes[i].addRotation(fixedPoint, rotation);
         }
     }
+
+    /*
+     * Scales nodes relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the nodes from/to
+     * @param[in] scaleFactor the scale factor by which to scale the nodes
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor) {
+        std::vector<tgNode>& nodes = getNodes();
+        for(int i = 0; i < nodes.size(); i++) {
+            nodes[i].setX((nodes[i].x() - referencePoint.x()) * scaleFactor + referencePoint.x());
+            nodes[i].setY((nodes[i].y() - referencePoint.y()) * scaleFactor + referencePoint.y());
+            nodes[i].setZ((nodes[i].z() - referencePoint.z()) * scaleFactor + referencePoint.z());
+        }
+    }
     
 protected:
     

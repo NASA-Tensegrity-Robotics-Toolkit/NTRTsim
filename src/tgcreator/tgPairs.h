@@ -78,6 +78,15 @@ public:
         return addPair(pair);
     }
 
+    /*
+     * Removes the pair that's passed in as a parameter
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] pair a reference to the pair to remove
+     */
+    void removePair(const tgPair& pair) {
+        removeElement(pair);
+    }
+
     void setPair(int key, tgPair pair) {
         setElement(key, pair);
     }
@@ -113,6 +122,18 @@ public:
         std::vector<tgPair>& pairs = getPairs();
         for(std::size_t i = 0; i < pairs.size(); i++) {
             pairs[i].addRotation(fixedPoint, rotation);
+        }
+    }
+
+    /*
+     * Scales pairs relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the pairs from/to
+     * @param[in] scaleFactor the scale factor by which to scale the pairs
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor) {
+        std::vector<tgPair>& pairs = getPairs();
+        for(int i = 0; i < pairs.size(); i++) {
+            pairs[i].scale(referencePoint, scaleFactor);
         }
     }
 
