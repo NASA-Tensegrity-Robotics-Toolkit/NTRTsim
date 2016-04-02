@@ -89,7 +89,7 @@ protected:
 
     MuscleMap m_muscleMap;
     
-    const std::size_t m_segments;
+    std::size_t m_segments;
 };
 
 #endif // BASE_SPINE_MODEL_H

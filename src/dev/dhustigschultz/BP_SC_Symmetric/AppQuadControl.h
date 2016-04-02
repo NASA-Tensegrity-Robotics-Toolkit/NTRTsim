@@ -27,7 +27,7 @@
  */
 
 //robot
-#include "dev/dhustigschultz/BigPuppy_Symmetric/BigPuppySymmetric.h"
+#include "yamlbuilder/TensegrityModel.h"
 
 // controller 
 #include "JSONQuadFeedbackControl.h"
@@ -53,15 +53,21 @@
 
 namespace po = boost::program_options;
 
+/*
+ * run from: scripts/learning/src
+ * run with the command:
+ * ../../../build/dev/dhustigschultz/BP_SC_Symmetric/AppQuadControl ../../../resources/YamlStructures/BaseStructures/3Prism.yaml -l monteOut_0.json -P dhustigschultz/AppQuadControl/ -G 1
+ */
+
 class AppQuadControl
 {
 public:
     AppQuadControl(int argc, char** argv);
 
     /** Setup the simulation */
-    bool setup();
+    bool setup(char** argv);
     /** Run the simulation */
-    bool run();
+    bool run(char** argv);
 
 private:
     /** Parse command line options */

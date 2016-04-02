@@ -38,7 +38,7 @@
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructureInfo.h"
 
-TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
+TensegrityModel::TensegrityModel(const std::string& structurePath) : BaseSpineModelLearning(0) {
     topLvlStructurePath = structurePath;
 }
 
@@ -62,6 +62,9 @@ void TensegrityModel::setup(tgWorld& world) {
 
     // use tgCast::filterto pull out the muscles that we want to control
     allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+
+    m_allSegments = this->find<tgModel> ("segment");
+    m_segments = m_allSegments.size();
 
     // notify controllers that setup has finished
     notifySetup();

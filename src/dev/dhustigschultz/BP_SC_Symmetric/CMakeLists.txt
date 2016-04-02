@@ -13,6 +13,7 @@ link_libraries(learningSpines
                CPG_feedback
                sensors
                controllers
+               TensegrityModel
 	       BigPuppySymmetric)
 
 add_library(JSONQuadFeedback

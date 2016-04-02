@@ -54,7 +54,7 @@ AppQuadControl::AppQuadControl(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppQuadControl::setup()
+bool AppQuadControl::setup(char** argv)
 {
     // First create the world
     world = createWorld();
@@ -80,7 +80,8 @@ bool AppQuadControl::setup()
     const int legs = 4;
     const int feet = 4; 
 
-    BigPuppySymmetric* myModel = new BigPuppySymmetric(segments, hips, legs, feet);
+    TensegrityModel* myModel = new TensegrityModel(argv[1]);
+
 
     // Fifth create the controllers, attach to model
     if (add_controller)
@@ -262,7 +263,7 @@ tgModel* AppQuadControl::getBlocks()
 tgWorld* AppQuadControl::createWorld()
 {
     const tgWorld::Config config(
-        981 // gravity, cm/sec^2
+        98.1 // gravity, dm/sec^2
     );
     
     tgBulletGround* ground;
@@ -291,11 +292,11 @@ tgSimView *AppQuadControl::createView(tgWorld *world)
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppQuadControl::run()
+bool AppQuadControl::run(char** argv)
 {
     if (!bSetup)
     {
-        setup();
+        setup(argv);
     }
 
     if (use_graphics)
@@ -376,8 +377,8 @@ int main(int argc, char** argv)
     std::cout << "AppQuadControl" << std::endl;
     AppQuadControl app (argc, argv);
 
-    if (app.setup())
-        app.run();
+    if (app.setup(argv))
+        app.run(argv);
     
     //Teardown is handled by delete, so that should be automatic
     return 0;

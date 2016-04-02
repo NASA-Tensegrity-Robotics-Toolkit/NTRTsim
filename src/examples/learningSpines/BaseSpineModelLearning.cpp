@@ -149,6 +149,9 @@ btVector3 BaseSpineModelLearning::getSegmentCOMVector(const int n) const
     
     std::vector<tgRod*> p_rods =
         tgCast::filter<tgModel, tgRod> (m_allSegments[n]->getDescendants());
+
+    if (p_rods.empty())
+        p_rods = tgCast::filter<tgModel, tgRod> (m_allSegments);
     
     // Ensure our segments are being populated correctly
     assert(!p_rods.empty());

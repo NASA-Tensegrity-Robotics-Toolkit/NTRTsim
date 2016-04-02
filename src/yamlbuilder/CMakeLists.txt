@@ -1,6 +1,7 @@
 link_directories(${LIB_DIR})
 
 link_libraries(core
+               learningSpines
                tgcreator
                util
                sensors

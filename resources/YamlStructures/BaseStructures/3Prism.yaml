@@ -8,12 +8,12 @@ nodes:
   top3: [0, 5, 8.66]
 
 pair_groups:
-  prism_rod:
+  prism_rod segment:
     - [bottom1, top2]
     - [bottom2, top3]
     - [bottom3, top1]
 
-  horizontal_string:
+  muscle:
     - [bottom1, bottom2]
     - [bottom2, bottom3]
     - [bottom1, bottom3]
@@ -22,7 +22,6 @@ pair_groups:
     - [top2, top3]
     - [top1, top3]
 
-  vertical_string:
     - [bottom1, top1]
     - [bottom2, top2]
     - [bottom3, top3]
@@ -33,13 +32,7 @@ builders:
     parameters:
       density: 0.688
       radius: 0.31
-  horizontal_string:
-    class: tgBasicActuatorInfo
-    parameters:
-      stiffness: 1000
-      damping: 10
-      pretension: 3000
-  vertical_string:
+  muscle:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1000

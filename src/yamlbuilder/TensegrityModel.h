@@ -26,6 +26,7 @@
  * $Id$
  */
 
+#include "examples/learningSpines/BaseSpineModelLearning.h"
 // C++ Standard Library
 #include <map>
 #include <string>
@@ -50,7 +51,7 @@ typedef YAML::Node Yam; // to avoid confusion with structure nodes
 /**
  * A class that constructs a model based on a tensegrity structure encoded in YAML.
  */
-class TensegrityModel : public tgSubject<TensegrityModel>, public tgModel
+class TensegrityModel : public BaseSpineModelLearning
 {
 public:
 

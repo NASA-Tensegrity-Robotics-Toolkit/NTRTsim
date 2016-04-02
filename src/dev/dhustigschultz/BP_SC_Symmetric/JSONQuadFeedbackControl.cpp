@@ -248,7 +248,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("muscle");
     
     for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
@@ -311,7 +311,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
 void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
 	    
-    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
+    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("muscle");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
     
@@ -397,7 +397,7 @@ std::vector<double> JSONQuadFeedbackControl::getFeedback(BaseSpineModelLearning&
     // Placeholder
     std::vector<double> feedback;
     
-    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> ("spine ");
+    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> ("muscle");
     
     double *inputs = new double[m_config.numStates];
     
