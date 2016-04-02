@@ -1,0 +1,41 @@
+substructures:
+  superball:
+    path: BaseStructures/SuperBall.yaml
+    translation: [0, 5, 0]
+  3prism1/3prism2/3prism3/3prism4/3prism5/3prism6/3prism7/3prism8:
+    path: BaseStructures/3Prism.yaml
+
+bond_groups:
+  superball_string:
+    superball/3prism1/node_edge:
+      - [right_vert_top/prox_horiz_right, top1]
+      - [prox_horiz_right/top_horiz_prox, top2]
+      - [top_horiz_prox/right_vert_top, top3]
+    superball/3prism2/node_edge:
+      - [left_vert_top/top_horiz_prox, top1]
+      - [top_horiz_prox/prox_horiz_left, top2]
+      - [prox_horiz_left/left_vert_top, top3]
+    superball/3prism3/node_edge:
+      - [right_vert_top/top_horiz_dist, top1]
+      - [top_horiz_dist/dist_horiz_right, top2]
+      - [dist_horiz_right/right_vert_top, top3]
+    superball/3prism4/node_edge:
+      - [left_vert_top/dist_horiz_left, top1]
+      - [dist_horiz_left/top_horiz_dist, top2]
+      - [top_horiz_dist/left_vert_top, top3]
+    superball/3prism5/node_edge:
+      - [right_vert_bottom/bottom_horiz_prox, top1]
+      - [bottom_horiz_prox/prox_horiz_right, top2]
+      - [prox_horiz_right/right_vert_bottom, top3]
+    superball/3prism6/node_edge:
+      - [left_vert_bottom/prox_horiz_left, top1]
+      - [prox_horiz_left/bottom_horiz_prox, top2]
+      - [bottom_horiz_prox/left_vert_bottom, top3]
+    superball/3prism7/node_edge:
+      - [right_vert_bottom/dist_horiz_right, top1]
+      - [dist_horiz_right/bottom_horiz_dist, top2]
+      - [bottom_horiz_dist/right_vert_bottom, top3]
+    superball/3prism8/node_edge:
+      - [left_vert_bottom/bottom_horiz_dist, top1]
+      - [bottom_horiz_dist/dist_horiz_left, top2]
+      - [dist_horiz_left/left_vert_bottom, top3]

@@ -1,0 +1,11 @@
+substructures:
+  3prism1/3prism2:
+    path: BaseStructures/3PrismSymmetric.yaml
+
+bond_groups:
+  prism_string:
+    3prism1/3prism2/node_edge:
+      - [top1, bottom1/top1]
+      - [top2, bottom2/bottom1]
+      - [bottom2, top2/bottom2]
+      - [bottom1, top1/top2]

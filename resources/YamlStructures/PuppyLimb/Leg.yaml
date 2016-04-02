@@ -1,0 +1,33 @@
+substructures:
+  hip:
+    path: Hip.yaml
+    translation: [0, 26, -11]
+  foot:
+    path: Foot.yaml
+    translation: [0, 0, -11]
+  knee:
+    path: Knee.yaml
+    translation: [0, 0, -11]
+
+bond_groups:
+  string:
+      knee/foot/node_node:
+        - [base_bottom, bottom1]
+        - [base_bottom, bottom2]
+        - [base_bottom, bottom3]
+        - [base_bottom, bottom4]
+        - [base_top, top1]
+        - [base_top, top2]
+        - [base_top, top3]
+        - [base_top, top4]
+
+      hip/knee/node_node:
+        - [inner_bottom, top]
+        - [inner_bottom, front]
+        - [inner_bottom, back]
+
+        - [outer_bottom, top]
+        - [outer_bottom, front]
+        - [outer_bottom, back]
+
+        - [inner_top, top]

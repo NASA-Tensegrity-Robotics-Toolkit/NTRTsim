@@ -98,6 +98,13 @@ void tgStructure::addPair(const btVector3& from, const btVector3& to, std::strin
     }
 }
 
+void tgStructure::removePair(const tgPair& pair) {
+    m_pairs.removePair(pair);
+    for (unsigned int i = 0; i < m_children.size(); i++) {
+        m_children[i]->removePair(pair);
+    }
+}
+
 void tgStructure::move(const btVector3& offset)
 {
     m_nodes.move(offset);
@@ -141,6 +148,22 @@ void tgStructure::addRotation(const btVector3& fixedPoint,
     }
 }
 
+void tgStructure::scale(double scaleFactor) {
+    btVector3 structureCentroid = getCentroid();
+    scale(structureCentroid, scaleFactor);
+}
+
+void tgStructure::scale(const btVector3& referencePoint, double scaleFactor) {
+    m_nodes.scale(referencePoint, scaleFactor);
+    m_pairs.scale(referencePoint, scaleFactor);
+
+    for (int i = 0; i < m_children.size(); i++) {
+        tgStructure* const childStructure = m_children[i];
+        assert(childStructure != NULL);
+        childStructure->scale(referencePoint, scaleFactor);
+    }
+}
+
 void tgStructure::addChild(tgStructure* pChild)
 {
     /// @todo: check to make sure we don't already have one of these structures
@@ -159,6 +182,89 @@ void tgStructure::addChild(const tgStructure& child)
     
 }
 
+btVector3 tgStructure::getCentroid() const {
+    btVector3 centroid = btVector3(0, 0, 0);
+    int numNodes = 0;
+    std::queue< const tgStructure*> q;
+
+    q.push(this);
+
+    while (!q.empty()) {
+        const tgStructure* structure = q.front();
+        q.pop();
+        for (int i = 0; i < structure->m_nodes.size(); i++) {
+            centroid += structure->m_nodes[i];
+            numNodes++;
+        }
+        for (int i = 0; i < structure->m_children.size(); i++) {
+            q.push(structure->m_children[i]);
+        }
+    }
+    return centroid/numNodes;
+}
+
+tgNode& tgStructure::findNode(const std::string& tags) {
+    std::queue<tgStructure*> q;
+
+    q.push(this);
+
+    while (!q.empty()) {
+        tgStructure* structure = q.front();
+        q.pop();
+        for (int i = 0; i < structure->m_nodes.size(); i++) {
+            if (structure->m_nodes[i].hasAllTags(tags)) {
+                return structure->m_nodes[i];
+            }
+        }
+        for (int i = 0; i < structure->m_children.size(); i++) {
+            q.push(structure->m_children[i]);
+        }
+    }
+    throw std::invalid_argument("Node not found: " + tags);
+}
+
+tgPair& tgStructure::findPair(const btVector3& from, const btVector3& to) {
+    std::queue<tgStructure*> q;
+
+    q.push(this);
+
+    while (!q.empty()) {
+        tgStructure* structure = q.front();
+        q.pop();
+        for (int i = 0; i < structure->m_pairs.size(); i++) {
+            if ((structure->m_pairs[i].getFrom() == from && structure->m_pairs[i].getTo() == to) ||
+                (structure->m_pairs[i].getFrom() == to && structure->m_pairs[i].getTo() == from)) {
+                return structure->m_pairs[i];
+            }
+        }
+        for (int i = 0; i < structure->m_children.size(); i++) {
+            q.push(structure->m_children[i]);
+        }
+    }
+    std::ostringstream pairString;
+    pairString << from << ", " << to;
+    throw std::invalid_argument("Pair not found: " + pairString.str());
+}
+
+tgStructure& tgStructure::findChild(const std::string& tags) {
+    std::queue<tgStructure*> q;
+
+    for (int i = 0; i < m_children.size(); i++) {
+        q.push(m_children[i]);
+    }
+
+    while (!q.empty()) {
+        tgStructure* structure = q.front();
+        q.pop();
+        if (structure->hasAllTags(tags)) {
+            return *structure;
+        }
+        for (int i = 0; i < structure->m_children.size(); i++) {
+            q.push(structure->m_children[i]);
+        }
+    }
+    throw std::invalid_argument("Child structure not found: " + tags);
+}
 
 /* Standalone functions */
 std::string asYamlElement(const tgStructure& structure, int indentLevel)

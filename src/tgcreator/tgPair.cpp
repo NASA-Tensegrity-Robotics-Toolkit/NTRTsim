@@ -123,3 +123,13 @@ void tgPair::move(const btVector3& offset)
     m_pair.second += offset;
 }
 
+void tgPair::scale(const btVector3& referencePoint, double scaleFactor) {
+    m_pair.first.setX((m_pair.first.x() - referencePoint.x()) * scaleFactor + referencePoint.x());
+    m_pair.first.setY((m_pair.first.y() - referencePoint.y()) * scaleFactor + referencePoint.y());
+    m_pair.first.setZ((m_pair.first.z() - referencePoint.z()) * scaleFactor + referencePoint.z());
+
+    m_pair.second.setX((m_pair.second.x() - referencePoint.x()) * scaleFactor + referencePoint.x());
+    m_pair.second.setY((m_pair.second.y() - referencePoint.y()) * scaleFactor + referencePoint.y());
+    m_pair.second.setZ((m_pair.second.z() - referencePoint.z()) * scaleFactor + referencePoint.z());
+}
+

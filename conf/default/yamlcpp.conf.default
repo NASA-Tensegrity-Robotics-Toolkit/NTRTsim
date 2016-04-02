@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Copyright © 2012, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# All rights reserved.
+#
+# The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Purpose: Define configuration directives for setup_yamlcpp.sh.
+# Date:    2015-12-12
+# Usage:   Copy/rename this file to '../yamlcpp.conf' and run setup.sh
+
+# YamlCPP installation prefix
+
+# Global install: /usr/local, env install: "$ENV_DIR"
+# By default, setup will download and install YamlCPP under your env directory.
+# If you have an existing YamlCPP install, you should change
+# YAMLCPP_INSTALL_PREFIX to what was used for installation (likely /usr/local).
+YAMLCPP_INSTALL_PREFIX="$ENV_DIR"
+
+# Location where YamlCPP is to be built if necessary, or where it was built if
+# you're using an existing package. This doesn't need to be set unless yamlcpp is
+# not already installed.
+YAMLCPP_BUILD_DIR="$ENV_DIR/build/yamlcpp_0_5_2"
+
+# This is the location where you unzipped the package (or, where it will
+# be unzipped if necessary).
+YAMLCPP_PACKAGE_DIR="$YAMLCPP_BUILD_DIR"
+
+# YAMLCPP_URL can be either a web address or a local file address,
+# e.g. http://url.com/for/yamlcpp.tgz or file:///path/to/yamlcpp.tgz
+YAMLCPP_URL="https://github.com/jbeder/yaml-cpp/archive/release-0.5.2.zip"
