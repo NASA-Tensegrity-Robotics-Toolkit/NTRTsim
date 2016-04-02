@@ -106,7 +106,7 @@ void tgSpringCableActuator::constructorAux()
     }
     else if (m_restLength < 0.0)
     {
-        throw std::invalid_argument("Starting rest length is negative.");
+        // throw std::invalid_argument("Starting rest length is negative.");
     }
 }
 tgSpringCableActuator::tgSpringCableActuator(tgSpringCable* springCable,

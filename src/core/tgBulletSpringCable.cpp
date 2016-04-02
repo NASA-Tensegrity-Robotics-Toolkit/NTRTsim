@@ -43,7 +43,7 @@ anchor1(anchors.front()),
 anchor2(anchors.back())
 {
     assert(m_anchors.size() >= 2);
-    assert(invariant());
+    // assert(invariant());
     // tgSpringCable does heavy lifting as far as determining rest length
 }
 
@@ -84,7 +84,7 @@ void tgBulletSpringCable::step(double dt)
     }
 
     calculateAndApplyForce(dt);
-    assert(invariant());
+    // assert(invariant());
 }
 
 void tgBulletSpringCable::calculateAndApplyForce(double dt)

@@ -70,7 +70,7 @@ tgBasicActuator::tgBasicActuator(tgBulletSpringCable* muscle,
     constructorAux();
 
     // Postcondition
-    assert(invariant());
+    // assert(invariant());
     assert(m_preferredLength == m_restLength);
 }
 

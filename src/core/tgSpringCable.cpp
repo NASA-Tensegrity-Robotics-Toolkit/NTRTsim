@@ -53,7 +53,7 @@ m_dampingCoefficient(dampingCoefficient)
 	
 	if (m_restLength <= 0.0)
 	{
-		throw std::invalid_argument("Pretension causes string to shorten past rest length!");
+		// throw std::invalid_argument("Pretension causes string to shorten past rest length!");
 	}
 	
 	m_prevLength = m_restLength;
