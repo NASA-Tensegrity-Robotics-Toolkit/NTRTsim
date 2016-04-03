@@ -128,8 +128,8 @@ void TensegrityModel::addChild(tgStructure& structure, const std::string &parent
     if (childPath[0] != '/') {
         childPath = parentPath.substr(0, parentPath.rfind("/") + 1) + childPath;
     }
-    tgStructure* childStructure = new tgStructure(childName);
-    buildStructure(*childStructure, childPath, spec);
+    tgStructure childStructure = tgStructure(childName);
+    buildStructure(childStructure, childPath, spec);
     structure.addChild(childStructure);
 }
 
@@ -384,7 +384,7 @@ void TensegrityModel::parseAttachmentPoint(tgStructure& structure, const std::st
     }
 }
 
-// todo: should use a best fit transformation from one set of points to another
+/// @todo should use a best fit transformation from one set of points to another
 void TensegrityModel::rotateAndTranslate(tgStructure& childStructure2,
     std::vector<btVector3>& structure1RefNodes, std::vector<btVector3>& structure2RefNodes) {
 
@@ -512,10 +512,11 @@ void TensegrityModel::addRodBuilder(const std::string& builderClass, const std::
         }
     }
 
-    const tgRod::Config* rodConfig = new tgRod::Config(rp["radius"], rp["density"], rp["friction"],
+    const tgRod::Config rodConfig = tgRod::Config(rp["radius"], rp["density"], rp["friction"],
         rp["roll_friction"], rp["restitution"]);
     if (builderClass == "tgRodInfo") {
-        spec.addBuilder(tagMatch, new tgRodInfo(*rodConfig));
+        // tgBuildSpec takes ownership of the tgRodInfo object
+        spec.addBuilder(tagMatch, new tgRodInfo(rodConfig));
     }
     // add more builders that use tgRod::Config here
 }
@@ -544,14 +545,16 @@ void TensegrityModel::addBasicActuatorBuilder(const std::string& builderClass, c
         }
     }
 
-    const tgBasicActuator::Config* basicActuatorConfig = new tgBasicActuator::Config(bap["stiffness"],
+    const tgBasicActuator::Config basicActuatorConfig = tgBasicActuator::Config(bap["stiffness"],
         bap["damping"], bap["pretension"], bap["history"], bap["max_tension"], bap["target_velocity"],
         bap["min_actual_length"], bap["min_rest_length"], bap["rotation"]);
     if (builderClass == "tgBasicActuatorInfo") {
-        spec.addBuilder(tagMatch, new tgBasicActuatorInfo(*basicActuatorConfig));
+        // tgBuildSpec takes ownership of the tgBasicActuatorInfo object
+        spec.addBuilder(tagMatch, new tgBasicActuatorInfo(basicActuatorConfig));
     }
     else if (builderClass == "tgBasicContactCableInfo") {
-        spec.addBuilder(tagMatch, new tgBasicContactCableInfo(*basicActuatorConfig));
+        // tgBuildSpec takes ownership of the tgBasicContactCableInfo object
+        spec.addBuilder(tagMatch, new tgBasicContactCableInfo(basicActuatorConfig));
     }
     // add more builders that use tgBasicActuator::Config here
 }
@@ -584,15 +587,17 @@ void TensegrityModel::addKinematicActuatorBuilder(const std::string& builderClas
         }
     }
 
-    const tgKinematicActuator::Config* kinematicActuatorConfig =
-        new tgKinematicActuator::Config(kap["stiffness"], kap["damping"], kap["pretension"], kap["radius"],
+    const tgKinematicActuator::Config kinematicActuatorConfig =
+        tgKinematicActuator::Config(kap["stiffness"], kap["damping"], kap["pretension"], kap["radius"],
         kap["motor_friction"], kap["motor_inertia"],  kap["back_drivable"], kap["history"], kap["max_tension"],
         kap["target_velocity"],kap["min_actual_length"], kap["min_rest_length"], kap["rotation"]);
     if (builderClass == "tgKinematicContactCableInfo") {
-        spec.addBuilder(tagMatch, new tgKinematicContactCableInfo(*kinematicActuatorConfig));
+        // tgBuildSpec takes ownership of the tgKinematicContactCableInfo object
+        spec.addBuilder(tagMatch, new tgKinematicContactCableInfo(kinematicActuatorConfig));
     }
     else if (builderClass == "tgKinematicActuatorInfo") {
-        spec.addBuilder(tagMatch, new tgKinematicActuatorInfo(*kinematicActuatorConfig));
+        // tgBuildSpec takes ownership of the tgKinematicActuatorInfo object
+        spec.addBuilder(tagMatch, new tgKinematicActuatorInfo(kinematicActuatorConfig));
     }
     // add more builders that use tgKinematicActuator::Config here
 }
