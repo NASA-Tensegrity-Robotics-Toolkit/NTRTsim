@@ -228,7 +228,7 @@ private:
     const tgPair m_pair;
     
     /** Radius and density values. */
-    const tgBox::Config& m_config;     
+    const tgBox::Config m_config;     
 
 };
 
