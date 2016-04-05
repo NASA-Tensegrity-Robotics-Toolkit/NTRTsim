@@ -11,7 +11,6 @@ link_libraries(learningSpines
                 tgOpenGLSupport)
 
 add_library(${PROJECT_NAME} SHARED
-            TetraSpineStaticModel_hf_pair_ordering.cpp
 			TetraSpineStaticModel_hf.cpp
             TetraSpineStaticModel.cpp
             SerializedSpineControl.cpp
