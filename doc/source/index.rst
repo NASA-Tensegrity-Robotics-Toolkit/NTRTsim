@@ -16,7 +16,8 @@ Contents
    :maxdepth: 2
 
    setup.rst
-   contribute-tutorials.rst
-   third-party-libraries.rst
+   yaml-model-builder.rst
    learning-library-walkthrough.rst
    motors-and-cables.rst
+   third-party-libraries.rst
+   contribute-tutorials.rst

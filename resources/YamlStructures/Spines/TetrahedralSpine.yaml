@@ -1,11 +1,11 @@
 substructures:
-  o1/o2/o3/o4/o5/o6:
-    path: ../BaseStructures/Octahedron.yaml
+  t1/t2/t3/t4/t5/t6:
+    path: ../BaseStructures/Tetrahedron.yaml
     offset: [0, 0 , -12]
 
 bond_groups:
-  o1/o2/o3/o4/o5/o6/node_node:
-    string:
+  string:
+    t1/t2/t3/t4/t5/t6/node_node:
       - [front, front]
       - [right, right]
       - [back, back]
