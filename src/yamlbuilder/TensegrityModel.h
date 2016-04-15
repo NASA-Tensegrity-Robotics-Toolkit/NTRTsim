@@ -57,76 +57,76 @@ public:
     /*
      * Default rod radius.
      */
-    const double rodRadius = 0.5;
+    const static double rodRadius = 0.5;
     /*
      * Default rod density.
      */
-    const double rodDensity = 1.0;
+    const static double rodDensity = 1.0;
     /*
      * Default rod friction.
      */
-    const double rodFriction = 1.0;
+    const static double rodFriction = 1.0;
     /*
      * Default rod roll friction.
      */
-    const double rodRollFriction = 0.0;
+    const static double rodRollFriction = 0.0;
     /*
      * Default rod restitution.
      */
-    const double rodRestitution = 0.2;
+    const static double rodRestitution = 0.2;
 
     /*
      * Default string stiffness.
      */
-    const double stringStiffness = 1000.0;
+    const static double stringStiffness = 1000.0;
     /*
      * Default string damping.
      */
-    const double stringDamping = 10.0;
+    const static double stringDamping = 10.0;
     /*
      * Default string pretension.
      */
-    const double stringPretension = 0.0;
+    const static double stringPretension = 0.0;
     /*
      * Default string radius.
      */
-    const double stringRadius = 1.0;
+    const static double stringRadius = 1.0;
     /*
      * Default string motor friction.
      */
-    const double stringMotorFriction = 0.0;
+    const static double stringMotorFriction = 0.0;
     /*
      * Default string motor intertia.
      */
-    const double stringMotorInertia = 1.0;
+    const static double stringMotorInertia = 1.0;
     /*
      * Default string back drivable (boolean).
      */
-    const double stringBackDrivable = 0;
+    const static double stringBackDrivable = 0;
     /*
      * Default string history (boolean).
      */
-    const double stringHistory = 0;
+    const static double stringHistory = 0;
     /*
      * Default string max tension.
      */
-    const double stringMaxTension = 1000.0;
+    const static double stringMaxTension = 1000.0;
     /*
      * Default string target velocity.
      */
-    const double stringTargetVelocity = 100.0;
+    const static double stringTargetVelocity = 100.0;
     /*
      * Default string min actual length.
      */
-    const double stringMinActualLength = 0.1;
+    const static double stringMinActualLength = 0.1;
     /*
      * Default string min rest length.
      */
-    const double stringMinRestLength = 0.1;
+    const static double stringMinRestLength = 0.1;
     /*
      * Default string rotation.
      */
-    const double stringRotation = 0;
+    const static double stringRotation = 0;
 
     /*
      * YAML-encoded structure path.
@@ -322,6 +322,27 @@ private:
      * Responsible for adding a builder that uses the tgKinematicActuator config
      */
     void addKinematicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
+     * Perform basic error checking in the structure of the YAML file
+     */
+    void validateYaml(Yam& root);
+
+    /*
+     * Ensures YAML node contains only keys from the supplied vector
+     */
+    void yamlContainsOnly(Yam& yam, std::string yamName, std::vector<std::string> keys);
+
+    /*
+     * Ensures keys in the YAML node match exactly the ones supplied in the vector
+     */
+    void yamlContainsExactly(Yam& yam, std::string yamName, std::vector<std::string> keys);
+
+    /*
+     * Ensures that YAML has all unique keys within each map
+     */
+    void yamlNoDuplicates(Yam& yam, std::string yamName);
+
 };
 
 #endif  // TENSEGRITY_MODEL_H
