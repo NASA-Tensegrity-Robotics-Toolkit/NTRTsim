@@ -324,24 +324,14 @@ private:
     void addKinematicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
 
     /*
-     * Perform basic error checking in the structure of the YAML file
-     */
-    void validateYaml(Yam& root);
-
-    /*
      * Ensures YAML node contains only keys from the supplied vector
      */
-    void yamlContainsOnly(Yam& yam, std::string yamName, std::vector<std::string> keys);
-
-    /*
-     * Ensures keys in the YAML node match exactly the ones supplied in the vector
-     */
-    void yamlContainsExactly(Yam& yam, std::string yamName, std::vector<std::string> keys);
+    void yamlContainsOnly(const Yam& yam, const std::string structurePath, const std::vector<std::string> keys);
 
     /*
      * Ensures that YAML has all unique keys within each map
      */
-    void yamlNoDuplicates(Yam& yam, std::string yamName);
+    void yamlNoDuplicates(const Yam& yam, const std::string structurePath);
 
 };
 
