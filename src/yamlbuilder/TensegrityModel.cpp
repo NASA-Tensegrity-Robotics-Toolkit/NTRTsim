@@ -72,10 +72,13 @@ void TensegrityModel::setup(tgWorld& world) {
 
 void TensegrityModel::addChildren(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec, const Yam& children) {
     if (!children) return;
+    std::string structureAttributeKeys[] = {"path", "rotation", "translation", "scale", "offset"};
+    std::vector<std::string> structureAttributeKeysVector(structureAttributeKeys, structureAttributeKeys + sizeof(structureAttributeKeys) / sizeof(std::string));
 
     // add all the children first
     for (YAML::const_iterator child = children.begin(); child != children.end(); ++child) {
         Yam childAttributes = child->second;
+        yamlContainsOnly(childAttributes, structurePath, structureAttributeKeysVector);
         // multiple children can be defined using the syntax: child1/child2/child3...
         // (add a slash so that each child is a string with a its name and a slash at the end)
         std::string childCombos = child->first.as<std::string>() + "/";
@@ -187,6 +190,12 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
     Yam root = YAML::LoadFile(structurePath);
+    // Validate YAML
+    std::string rootKeys[] = {"nodes", "pair_groups", "builders", "substructures", "bond_groups"};
+    std::vector<std::string> rootKeysVector(rootKeys, rootKeys + sizeof(rootKeys) / sizeof(std::string));
+    yamlContainsOnly(root, structurePath, rootKeysVector);
+    yamlNoDuplicates(root, structurePath);
+
     addChildren(structure, structurePath, spec, root["substructures"]);
     addBuilders(spec, root["builders"]);
     addNodes(structure, root["nodes"]);
@@ -471,8 +480,8 @@ tgStructure& TensegrityModel::getStructure(tgStructure& parentStructure, const s
 
 void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
     for (YAML::const_iterator builder = builders.begin(); builder != builders.end(); ++builder) {
-
         std::string tagMatch = builder->first.as<std::string>();
+        if (!builder->second["class"]) throw std::invalid_argument("Builder class not supplied for tag: " + tagMatch);
         std::string builderClass = builder->second["class"].as<std::string>();
         Yam parameters = builder->second["parameters"];
 
@@ -600,6 +609,32 @@ void TensegrityModel::addKinematicActuatorBuilder(const std::string& builderClas
         spec.addBuilder(tagMatch, new tgKinematicActuatorInfo(kinematicActuatorConfig));
     }
     // add more builders that use tgKinematicActuator::Config here
+}
+
+void TensegrityModel::yamlNoDuplicates(const Yam& yam, const std::string structurePath) {
+    std::set<std::string> keys;
+    for (YAML::const_iterator iter = yam.begin(); iter != yam.end(); ++iter) {
+        Yam child = iter->second;
+        if (child.Type() == YAML::NodeType::Map) {
+            yamlNoDuplicates(child, structurePath);
+        }
+        std::string keyName = iter->first.as<std::string>();
+        if (keys.find(keyName) == keys.end()) {
+            keys.insert(keyName);
+        }
+        else {
+            throw std::invalid_argument(structurePath.substr(structurePath.rfind("/") + 1) + " contains duplicate key: " + keyName);
+        }
+    }
+}
+
+void TensegrityModel::yamlContainsOnly(const Yam& yam, const std::string structurePath, const std::vector<std::string> keys) {
+    for (YAML::const_iterator key = yam.begin(); key != yam.end(); ++key) {
+        std::string keyName = key->first.as<std::string>();
+        if (std::find(keys.begin(), keys.end(), keyName) == keys.end()) {
+            throw std::invalid_argument(structurePath.substr(structurePath.rfind("/") + 1) + " contains invalid key: " + keyName);
+        }
+    }
 }
 
 void TensegrityModel::step(double timeStep) {
