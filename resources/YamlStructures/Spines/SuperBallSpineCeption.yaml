@@ -1,0 +1,12 @@
+substructures:
+  superBallSpine:
+    path: SuperBallSpine.yaml
+  superBall:
+    path: ../BaseStructures/SuperBall.yaml
+
+bond_groups:
+  superball_string:
+    superBallSpine/superBall/node_edge:
+      - [s2.top_horiz_prox, left_vert_bottom/bottom_horiz_dist]
+      - [s2.prox_horiz_right, bottom_horiz_dist/dist_horiz_left]
+      - [s2.right_vert_top, dist_horiz_left/left_vert_bottom]

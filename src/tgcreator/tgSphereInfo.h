@@ -219,7 +219,7 @@ private:
     const tgNode m_node;
     
     /** Radius and density values. */
-    const tgSphere::Config& m_config;     
+    const tgSphere::Config m_config;     
 
 };
 

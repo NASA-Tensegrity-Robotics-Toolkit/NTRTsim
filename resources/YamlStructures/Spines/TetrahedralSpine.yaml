@@ -1,0 +1,27 @@
+substructures:
+  t1/t2/t3/t4/t5/t6:
+    path: ../BaseStructures/Tetrahedron.yaml
+    offset: [0, 0 , -12]
+
+bond_groups:
+  string:
+    t1/t2/t3/t4/t5/t6/node_node:
+      - [front, front]
+      - [right, right]
+      - [back, back]
+      - [left, left]
+      - [right, front]
+      - [right, left]
+      - [back, front]
+      - [back, left]
+
+builders:
+  string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0

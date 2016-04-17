@@ -78,6 +78,15 @@ public:
         return addPair(pair);
     }
 
+    /*
+     * Removes the pair that's passed in as a parameter
+     * (added to accommodate structures encoded in YAML)
+     * @param[in] pair a reference to the pair to remove
+     */
+    void removePair(const tgPair& pair) {
+        removeElement(pair);
+    }
+
     void setPair(int key, tgPair pair) {
         setElement(key, pair);
     }
@@ -113,6 +122,18 @@ public:
         std::vector<tgPair>& pairs = getPairs();
         for(std::size_t i = 0; i < pairs.size(); i++) {
             pairs[i].addRotation(fixedPoint, rotation);
+        }
+    }
+
+    /*
+     * Scales pairs relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the pairs from/to
+     * @param[in] scaleFactor the scale factor by which to scale the pairs
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor) {
+        std::vector<tgPair>& pairs = getPairs();
+        for(int i = 0; i < pairs.size(); i++) {
+            pairs[i].scale(referencePoint, scaleFactor);
         }
     }
 
@@ -165,6 +186,30 @@ operator<<(std::ostream& os, const tgPairs& p)
     os << ")";
 
     return os;
-}
+};
+
+
+/**
+ * Represent pairs as a YAML list (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItems(const tgPairs& pairs, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+
+    if (pairs.size() == 0) {
+        os << indent << "pairs: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "pairs:" << std::endl;
+    for(size_t i = 0; i < pairs.size(); i++)
+    {
+        os << asYamlItem(pairs[i], indentLevel+1);
+    }
+    return os.str();
+};
+
 
 #endif

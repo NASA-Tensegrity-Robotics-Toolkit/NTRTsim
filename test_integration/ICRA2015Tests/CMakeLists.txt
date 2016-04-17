@@ -4,7 +4,7 @@ link_libraries(
                 tgOpenGLSupport)
              
 add_executable(ICRA2015_test
-	ICRA2015_test.cpp)
+  ICRA2015_test.cpp)
 
 target_link_libraries(ICRA2015_test ${ENV_LIB_DIR}/libgtest.a pthread 
 			${NTRT_BUILD_DIR}/core/libcore.so 

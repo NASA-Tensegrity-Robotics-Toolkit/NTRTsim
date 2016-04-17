@@ -14,6 +14,7 @@ subdirs(
     controllers
     #dev
     examples
+    yamlbuilder
 )
 
 add_definitions(

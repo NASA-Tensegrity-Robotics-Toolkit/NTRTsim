@@ -130,23 +130,23 @@ namespace {
 				 * as of 2/28/15. Try to make them smaller!
 				 */
 				double error;
-				std::cout << "Inner front top max tension " << simMaxTens[1] / 100.0 << " N" << std::endl;
-				error = abs ((34.3954 - simMaxTens[1] / 100.0) / 34.3954);
+				std::cout << "Inner front top max tension " << simMaxTens[5] / 100.0 << " N" << std::endl;
+				error = abs ((34.3954 - simMaxTens[5] / 100.0) / 34.3954);
 				EXPECT_LE(error, 0.06);
-				std::cout << "Inner front left max tension " << simMaxTens[5] / 100.0 << " N" << std::endl;
-				error = abs ((18.0986 - simMaxTens[5] / 100.0) / 18.0986);
+				std::cout << "Inner front left max tension " << simMaxTens[4] / 100.0 << " N" << std::endl;
+				error = abs ((18.0986 - simMaxTens[4] / 100.0) / 18.0986);
 				EXPECT_LE(error, 0.0715);
-				std::cout << "Inner front right max tension " << simMaxTens[9] / 100.0 << " N" << std::endl;
-				error = abs ((22.0161 - simMaxTens[9] / 100.0) / 22.0161);
-				EXPECT_LE(error, 0.06);
-				std::cout << "Outer front top max tension " << simMaxTens[0] / 100.0 << " N" << std::endl;
-				error = abs ((24.6800 - simMaxTens[0] / 100.0) / 24.6800);
+				std::cout << "Inner front right max tension " << simMaxTens[3] / 100.0 << " N" << std::endl;
+				error = abs ((22.0161 - simMaxTens[3] / 100.0) / 22.0161);
+				EXPECT_LE(error, 0.0601);
+				std::cout << "Outer front top max tension " << simMaxTens[2] / 100.0 << " N" << std::endl;
+				error = abs ((24.6800 - simMaxTens[2] / 100.0) / 24.6800);
 				EXPECT_LE(error, 0.19);
-				std::cout << "Outer front left max tension " << simMaxTens[4] / 100.0 << " N" << std::endl;
-				error = abs ((15.5914 - simMaxTens[4] / 100.0) / 15.5914);
-				EXPECT_LE(error, 0.35);
-				std::cout << "Outer front right max tension " << simMaxTens[8] / 100.0 << " N" << std::endl;
-				error = abs ((14.1811 - simMaxTens[8] / 100.0) / 14.1811);
+				std::cout << "Outer front left max tension " << simMaxTens[1] / 100.0 << " N" << std::endl;
+				error = abs ((15.5914 - simMaxTens[1] / 100.0) / 15.5914);
+				EXPECT_LE(error, 0.3501);
+				std::cout << "Outer front right max tension " << simMaxTens[0] / 100.0 << " N" << std::endl;
+				error = abs ((14.1811 - simMaxTens[0] / 100.0) / 14.1811);
 				EXPECT_LE(error, 0.2251);
 				
 				/** @todo test median tension as well, also maybe sum of errors **/

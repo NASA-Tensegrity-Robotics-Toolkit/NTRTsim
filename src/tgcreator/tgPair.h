@@ -113,6 +113,13 @@ public:
     }
         
     void move(const btVector3& offset);
+
+    /*
+     * Scales pair relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the pair from/to
+     * @param[in] scaleFactor the scale factor by which to scale the pair
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor);
     
 protected:
 
@@ -135,6 +142,22 @@ operator<<(std::ostream& os, const tgPair& pair)
     return os;
 }
 
+
+/**
+ * Represent a pair as a YAML item (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItem(const tgPair& pair, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+    os << indent << "- tags: " << asYamlList(pair.getTags()) << std::endl;
+    os << indent << "  pair: ["
+        << "[" << pair.getFrom().x() << ", " << pair.getFrom().y() << ", " << pair.getFrom().z() << "]" << ", "
+        << "[" << pair.getTo().x() << ", " << pair.getTo().y() << ", " << pair.getTo().z() << "]"
+    << "]" << std::endl;
+    return os.str();    
+};
 
 
 #endif

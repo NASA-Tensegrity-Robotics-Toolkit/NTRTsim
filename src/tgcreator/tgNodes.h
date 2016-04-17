@@ -211,6 +211,20 @@ public:
             nodes[i].addRotation(fixedPoint, rotation);
         }
     }
+
+    /*
+     * Scales nodes relative to a reference point
+     * @param[in] referencePoint a btVector3 reference point to scale the nodes from/to
+     * @param[in] scaleFactor the scale factor by which to scale the nodes
+     */
+    void scale(const btVector3& referencePoint, double scaleFactor) {
+        std::vector<tgNode>& nodes = getNodes();
+        for(int i = 0; i < nodes.size(); i++) {
+            nodes[i].setX((nodes[i].x() - referencePoint.x()) * scaleFactor + referencePoint.x());
+            nodes[i].setY((nodes[i].y() - referencePoint.y()) * scaleFactor + referencePoint.y());
+            nodes[i].setZ((nodes[i].z() - referencePoint.z()) * scaleFactor + referencePoint.z());
+        }
+    }
     
 protected:
     
@@ -244,7 +258,6 @@ protected:
 inline std::ostream&
 operator<<(std::ostream& os, const tgNodes& n)
 {
-
     os << "tgNodes(" << std::endl;
     const std::vector<tgNode>& nodes = n.getNodes();
     for(std::size_t i = 0; i < nodes.size(); i++) {
@@ -253,7 +266,31 @@ operator<<(std::ostream& os, const tgNodes& n)
     os << ")";
 
     return os;
-}
+};
+
+
+/**
+ * Represent nodes as a YAML list (prepended by '-', multi-line)
+ * Note: this function has no dependencies on external libraries
+ */
+inline std::string asYamlItems(const tgNodes& nodes, int indentLevel=0)
+{
+    std::stringstream os;
+    std::string indent = std::string(2 * (indentLevel), ' ');
+
+    if (nodes.size() == 0) {
+        os << indent << "nodes: []" << std::endl;
+        return os.str();
+    }
+
+    os << indent << "nodes:" << std::endl;
+    for(size_t i = 0; i < nodes.size(); i++)
+    {
+        os << asYamlItem(nodes[i], indentLevel+1);
+    }
+    return os.str();
+};
+
 
 
 #endif

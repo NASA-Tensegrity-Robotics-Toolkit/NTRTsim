@@ -228,7 +228,7 @@ private:
     const tgPair m_pair;
     
     /** Radius and density values. */
-    const tgRod::Config& m_config;     
+    const tgRod::Config m_config;
 
 };
 

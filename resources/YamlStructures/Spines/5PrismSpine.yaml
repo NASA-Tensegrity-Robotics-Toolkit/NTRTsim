@@ -1,0 +1,17 @@
+substructures:
+  5prism1:
+    rotation:
+      axis: [1,0,0]
+      angle: 90
+    translation: [0,5,0]
+  5prism1/5prism2/5prism3/5prism4/5prism5/5prism6:
+    path: ../BaseStructures/5Prism.yaml
+
+bond_groups:
+  prism_string:
+    5prism1/5prism2/5prism3/5prism4/5prism5/5prism6/node_edge:
+      - [top1, bottom1/bottom2]
+      - [top2, bottom2/bottom3]
+      - [top3, bottom3/bottom4]
+      - [top4, bottom4/bottom5]
+      - [top5, bottom5/bottom1]

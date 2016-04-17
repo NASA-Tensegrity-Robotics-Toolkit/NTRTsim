@@ -1,0 +1,23 @@
+substructures:
+  p1/p2/p3/p4:
+    path: BigPuppy.yaml
+    offset: [-95, 0 , 0]
+
+bond_groups:
+  p1/p2/p3/p4/node_node:
+    low_tension_string:
+      - [vertebra1.front1, vertebra7.back2]
+      - [vertebra1.front2, vertebra7.back1]
+      - [vertebra2.front1, vertebra6.back2]
+      - [vertebra2.front2, vertebra6.back1]
+
+builders:
+  low_tension_string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
