@@ -31,4 +31,6 @@ subdirs(
 
     BP_SC_SymmetricSpiral3
     BigPuppy_SymmetricSpiral_Metrics
+    MountainGoat
+    MG_Controller
 )
