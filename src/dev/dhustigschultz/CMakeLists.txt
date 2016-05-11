@@ -27,7 +27,6 @@ subdirs(
     BigPuppy_RigidFeet
 
     BP_SC_SymmetricSpiral_Segments
-    BP_SC_SymmetricSpiral_All
 
     BP_SC_SymmetricSpiral3
     BigPuppy_SymmetricSpiral_Metrics
