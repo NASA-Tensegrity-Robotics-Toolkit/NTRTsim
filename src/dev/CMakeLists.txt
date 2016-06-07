@@ -16,5 +16,6 @@ subdirs(
     dhustigschultz
     CPG_feedback
     eajung
+    ezhu
 )
 
