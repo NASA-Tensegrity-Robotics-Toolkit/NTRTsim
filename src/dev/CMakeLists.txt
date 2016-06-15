@@ -17,5 +17,6 @@ subdirs(
     CPG_feedback
     eajung
     ezhu
+    mcdaly
 )
 
