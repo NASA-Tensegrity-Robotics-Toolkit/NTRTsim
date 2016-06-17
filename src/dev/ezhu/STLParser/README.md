@@ -7,7 +7,7 @@ Each line of the output file will consist of 3 verticies defining a triangle. Th
 
 USAGE
 -----------
-$ ./appSTLParser [path/filename of .stl to be converted] [path/filename of .txt to be created with parsed info]
+    $ ./appSTLParser [path/filename of .stl to be converted] [path/filename of .txt to be created with parsed info]
 
 Author
 -----------
