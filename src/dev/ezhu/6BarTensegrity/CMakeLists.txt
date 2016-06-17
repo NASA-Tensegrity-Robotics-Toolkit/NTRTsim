@@ -1,7 +1,10 @@
 link_directories(${LIB_DIR})
 
+message(STATUS "LIB_DIR: " ${LIB_DIR})
+
 link_libraries(core
                tgcreator
+               controllers
                util
                sensors
                terrain
@@ -15,6 +18,8 @@ link_libraries(core
 
 add_executable(App6Bar
 #    TensegrityModel.cpp
+    RPLengthController.h
+    RPLengthController_rand.cpp
     App6Bar.cpp)
 
 

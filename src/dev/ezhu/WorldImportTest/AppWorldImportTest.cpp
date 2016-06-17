@@ -25,7 +25,7 @@
  */
 
 // This application
-#include "../../../yamlbuilder/TensegrityModel.h"
+#include "yamlbuilder/TensegrityModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -38,6 +38,8 @@
 #include <iostream>
 // Controller for tension sensing
 #include "RPLengthController.h"
+// Bullet world import
+#include "btBulletWorldImporter.h"
 
 /**
  * The entry point.
