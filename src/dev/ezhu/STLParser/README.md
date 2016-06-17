@@ -4,7 +4,7 @@ An application for parsing ASCII STL files for easy import of triangle meshes in
 
 USAGE
 -----------
-$ ./appSTLParser [filename is .stl to be converted]
+$ ./appSTLParser [path/filename of .stl to be converted] [path/filename of .txt to be created with parsed info]
 
 Author
 -----------

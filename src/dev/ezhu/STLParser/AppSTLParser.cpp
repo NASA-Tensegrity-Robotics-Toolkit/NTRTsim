@@ -9,18 +9,18 @@ using namespace std;
 int main(int argc, char* argv[]) {
 	// Check for number of arguments
 	if (argc <= 2) {
-		cout << "Not enough arguments, please use ./AppSTLParser [filename_in] [filename_out]" << endl;
+		cout << "Not enough arguments, please use ./AppSTLParser [path/filename_in] [path/filename_out]" << endl;
 		exit(EXIT_FAILURE);
 	}
 	else if (argc > 3) {
-		cout << "Too many arguments, please use ./AppSTLParser [filename_in] [filename_out]" << endl;
+		cout << "Too many arguments, please use ./AppSTLParser [path/filename_in] [path/filename_out]" << endl;
 		exit(EXIT_FAILURE);
 	}
 	else {
 		// Get filenames from argv
 		string filename_in = argv[1];
 		string filename_out = argv[2];
-		string  out_path = "/home/edward/NTRTsim/src/dev/ezhu/STLParser/";
+		//string  out_path = "/home/edward/NTRTsim/src/dev/ezhu/STLParser/";
 		// Check for valid file extension
 		if (strstr(filename_in.c_str(), ".stl") == NULL) {
 			cout << "Incorrect filetype, application for ASCII STL files only" << endl;
@@ -41,10 +41,10 @@ int main(int argc, char* argv[]) {
 		else {
 			cout << "Input file opened successfully" << endl;
 		}		
-		out_path = out_path + filename_out;
-		cout << "Parsed info writing to: " << out_path  << endl;
+		//out_path = out_path + filename_out;
+		cout << "Parsed info writing to: " << filename_out << endl;
 		// Open output file
-		file_out.open(out_path.c_str(), fstream::out);
+		file_out.open(filename_out.c_str(), fstream::out);
 		// Check if output file opened successfully
 		if (!file_out.is_open()) {
 			cout << "Failed to open output file" << endl;
