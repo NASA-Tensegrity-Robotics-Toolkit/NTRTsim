@@ -1,6 +1,7 @@
 project(WorldImportTest)
 
-set(BULLET_HOME_DIR /home/edward/NTRTsim/env/build/bullet)
+#set(BULLET_HOME_DIR /home/edward/NTRTsim/env/build/bullet)
+set(BULLET_HOME_DIR ../../../../env/build/bullet)
 set(BULLET_SERIALIZE_DIR ${BULLET_HOME_DIR}/Extras/Serialize)
 
 message(STATUS "BULLET_HOME_DIR: " ${BULLET_HOME_DIR})

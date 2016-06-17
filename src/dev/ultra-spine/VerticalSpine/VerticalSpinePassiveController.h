@@ -39,7 +39,7 @@
 class VerticalSpineModel;
 
 /**
- * A controller that does nothing. 
+ * A controller that does nothing but log data.
  */
 class VerticalSpinePassiveController : public tgObserver<VerticalSpineModel>, public tgSubject <VerticalSpinePassiveController>
 {
@@ -89,7 +89,7 @@ private:
    /* double verticalRLB4; */
    /* double dL; */
    /* double state; */
-   /* double updateTime; */
+  double updateTime;
 
   // For data logging. TO-DO: implement this fully.
   tgDataObserver m_dataObserver;
