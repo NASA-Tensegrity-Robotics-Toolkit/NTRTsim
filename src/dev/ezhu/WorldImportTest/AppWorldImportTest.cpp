@@ -27,7 +27,7 @@
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 // This library
-#include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgImportGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -38,8 +38,6 @@
 #include <iostream>
 // Controller for tension sensing
 #include "RPLengthController.h"
-// Bullet world import
-#include "btBulletWorldImporter.h"
 
 /**
  * The entry point.
@@ -54,9 +52,14 @@ int main(int argc, char** argv)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+
+    btVector3 orientation = btVector3(yaw, pitch, roll);
+
+    const tgImportGround::Config groundConfig(orientation);
+
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    //tgBoxGround* ground = new tgBoxGround(groundConfig);
+    tgImportGround* ground = new tgImportGround();
 
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
@@ -76,7 +79,7 @@ int main(int argc, char** argv)
     RPLengthController* const tension_sensor = new RPLengthController();
 
     // Attach controller to the model
-    myModel -> attach(tension_sensor);
+    //myModel -> attach(tension_sensor);
 
     // Add the model to the world
     simulation.addModel(myModel);
