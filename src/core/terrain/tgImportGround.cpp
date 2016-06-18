@@ -28,7 +28,7 @@
 
 //Bullet Physics
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h"
+//#include "BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h"
 #include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "LinearMath/btDefaultMotionState.h"
@@ -37,6 +37,7 @@
 // The C++ Standard Library
 #include <cassert>
 #include <iostream>
+#include <string>
 
 tgImportGround::Config::Config(btVector3 eulerAngles,
         double friction,
@@ -72,24 +73,24 @@ tgImportGround::Config::Config(btVector3 eulerAngles,
     assert(m_offset >= 0.0);
 }
 
-tgImportGround::tgImportGround() :
+tgImportGround::tgImportGround(std::fstream& file) :
     m_config(Config())
 {
     // @todo make constructor aux to avoid repeated code
-    pGroundShape = importCollisionShape();
+    pGroundShape = importCollisionShape_alt(file);
 }
 
-tgImportGround::tgImportGround(const tgImportGround::Config& config) :
+tgImportGround::tgImportGround(const tgImportGround::Config& config, std::fstream& file) :
     m_config(config)
 {
-    pGroundShape = importCollisionShape();
+    pGroundShape = importCollisionShape_alt(file);
 }
 
 tgImportGround::~tgImportGround()
 {
     delete m_pMesh;
-    delete[] m_pIndices;
-    delete[] m_vertices;
+    //delete[] m_pIndices;
+    //delete[] m_vertices;
 }
 
 btRigidBody* tgImportGround::getGroundRigidBody() const
@@ -122,6 +123,7 @@ btRigidBody* tgImportGround::getGroundRigidBody() const
     return pGroundBody;
 }  
 
+/*
 btCollisionShape* tgImportGround::importCollisionShape() {
     btCollisionShape * pShape = 0;
     // The number of vertices in the mesh
@@ -158,7 +160,25 @@ btCollisionShape* tgImportGround::importCollisionShape() {
     assert(pShape);
     return pShape; 
 }
+*/
 
+btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file) {
+    btCollisionShape * pShape = 0;
+
+    // Create the mesh object
+    m_pMesh = createMesh_alt(file);
+
+    // Create the shape object
+    pShape = createShape_alt(m_pMesh);
+
+    // Set the margin
+    pShape -> setMargin(m_config.m_margin);
+
+    assert(pShape);
+    return pShape;
+}
+
+/*
 btTriangleIndexVertexArray *tgImportGround::createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]) {
     const int vertexStride = sizeof(btVector3);
     const int indexStride = 3 * sizeof(int);
@@ -172,14 +192,96 @@ btTriangleIndexVertexArray *tgImportGround::createMesh(std::size_t triangleCount
                 vertexStride);
     return pMesh;
 }
+*/
 
+btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file) {
+    // Lines are input in the following format: [x1,y1,z1] [x2,y2,z2] [x3,y3,z3]
+
+    btVector3 v0, v1, v2;
+
+    double scalingFactor = 10;
+
+    btTriangleMesh* const pMesh = 
+        new btTriangleMesh();
+
+    while (file.good()) {
+    //for (int line = 0; line < 200; line++) {
+
+        std::string line_in;
+        std::getline(file, line_in);
+
+        std::size_t found_left_brac_last = -1, found_right_brac_last = -1, found_comma_last = -1;
+        
+        // Iterate over 3 sets of vertecies
+        for (int i = 0; i < 3; i++) {
+            std::size_t found_left_brac = line_in.find_first_of("[", found_left_brac_last + 1);
+            std::size_t found_right_brac = line_in.find_first_of("]", found_right_brac_last + 1);
+            std::size_t found_comma_1 = line_in.find_first_of(",", found_comma_last + 1);
+            std::size_t found_comma_2 = line_in.find_first_of(",", found_comma_1 + 1);
+
+            // Extract x value
+            std::string x_str = line_in.substr(found_left_brac + 1, found_comma_1 - 1 - found_left_brac);
+            double x = atof(x_str.c_str()) * scalingFactor;
+
+            // Extract y value
+            std::string y_str = line_in.substr(found_comma_1 + 1, found_comma_2 - 1 - found_comma_1);
+            double y = atof(y_str.c_str()) * scalingFactor;
+
+            // Extrack z value
+            std::string z_str = line_in.substr(found_comma_2 + 1, found_right_brac - 1 - found_comma_2);
+            double z = atof(z_str.c_str()) * scalingFactor;
+
+            found_left_brac_last = found_left_brac;
+            found_right_brac_last = found_right_brac;
+            found_comma_last = found_comma_2;
+
+            //std::cout << x << " " << y << " " << z << std::endl;
+
+            switch (i) {
+                case 0:
+                    v0.setValue(x, y, z);
+                    break;
+                case 1:
+                    v1.setValue(x, y, z);
+                    break;
+                case 2:
+                    v2.setValue(x, y, z);
+                    break;
+            }
+        }
+    
+    pMesh -> addTriangle(v0, v1, v2);
+
+    }
+
+    /*
+    // Test triangle
+    btVector3 v0_test(1, 0, 0);
+    btVector3 v1_test(0, 1, 0);
+    btVector3 v2_test(0, 0, 1);
+
+    pMesh -> addTriangle(v0_test, v1_test, v2_test);
+    */
+
+    return pMesh;
+}
+
+/*
 btCollisionShape *tgImportGround::createShape(btTriangleIndexVertexArray *pMesh) {
     const bool useQuantizedAabbCompression = true;
     btCollisionShape *const pShape = 
         new btBvhTriangleMeshShape(pMesh, useQuantizedAabbCompression);
     return pShape;
 }
+*/
 
+btCollisionShape *tgImportGround::createShape_alt(btTriangleMesh *pMesh) {
+    btCollisionShape *const pShape =
+        new btBvhTriangleMeshShape(pMesh, true);
+    return pShape;
+}
+
+/*
 void tgImportGround::setVertices(btVector3 vertices[]) {
     for (std::size_t i = 0; i < m_config.m_nx; i++)
     {
@@ -193,7 +295,9 @@ void tgImportGround::setVertices(btVector3 vertices[]) {
         }
     }
 }
+*/
 
+/*
 void tgImportGround::setIndices(int indices[]) {
     int index = 0;
     for (std::size_t i = 0; i < m_config.m_nx - 1; i++)
@@ -210,4 +314,4 @@ void tgImportGround::setIndices(int indices[]) {
         }
     }
 }
-
+*/

@@ -38,6 +38,8 @@
 #include <iostream>
 // Controller for tension sensing
 #include "RPLengthController.h"
+// C++ Filestream
+#include <fstream>
 
 /**
  * The entry point.
@@ -57,9 +59,15 @@ int main(int argc, char** argv)
 
     const tgImportGround::Config groundConfig(orientation);
 
+    //Create filestream
+    std::fstream file_in;
+
+    // Open filestream
+    file_in.open("/home/edward/NTRTsim/src/dev/ezhu/WorldImportTest/LunarScape.txt", std::fstream::in);
+
     // the world will delete this
     //tgBoxGround* ground = new tgBoxGround(groundConfig);
-    tgImportGround* ground = new tgImportGround();
+    tgImportGround* ground = new tgImportGround(file_in);
 
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);

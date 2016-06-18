@@ -101,11 +101,11 @@ int main(int argc, char* argv[]) {
 
 						switch (element_index) {
 							case 0:
-								file_out << "[" << num << ", ";
+								file_out << "[" << num << ",";
 								element_index += 1;
 								break;
 							case 1:
-								file_out << num << ", ";
+								file_out << num << ",";
 								element_index += 1;
 								break;
 							case 2:

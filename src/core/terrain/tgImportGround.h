@@ -34,9 +34,14 @@
 // std::size_t
 #include <cstddef>
 
+#include <fstream>
+
+#include "BulletCollision/CollisionShapes/btTriangleMesh.h"
+
 // Forward declarations
 class btRigidBody;
-class btTriangleIndexVertexArray;
+//class btTriangleIndexVertexArray;
+class btTriangelMesh;
 
 /**
  * Ground imported from user generated .stl files
@@ -99,12 +104,12 @@ class tgImportGround : public tgBulletGround
          * Sets up a collision object that is stored in the bulletGround
          * object
          */
-        tgImportGround();
+        tgImportGround(std::fstream& file);
 
         /**
          * Allows a user to specify their own config
          */
-        tgImportGround(const tgImportGround::Config& config);
+        tgImportGround(const tgImportGround::Config& config, std::fstream& file);
 
         /** Clean up the implementation. Deletes m_pMesh */
         virtual ~tgImportGround();
@@ -118,7 +123,12 @@ class tgImportGround : public tgBulletGround
         /**
          * Returns the collision shape that forms the imported ground
          */
-        btCollisionShape* importCollisionShape();
+        //btCollisionShape* importCollisionShape();
+
+        /**
+         * Returns the collision shape that forms the imported ground from filestream
+         */
+        btCollisionShape* importCollisionShape_alt(std::fstream& file);
 
     private:  
         /** Store the configuration data for use later */
@@ -128,27 +138,38 @@ class tgImportGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the input parameters, 
          *                  to be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleIndexVertexArray* createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]);
+        //btTriangleIndexVertexArray* createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]);
+
+        /** Pre-condition: Pointer to a filestream 
+         *  Post-condition: Returns a mesh, as configured by the information read from the filestream
+                            To be used as a template for a btBvhTriangleMeshShape
+         */
+        btTriangleMesh* createMesh_alt(std::fstream& file);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
          */
-        btCollisionShape *createShape(btTriangleIndexVertexArray * pMesh);
+        //btCollisionShape *createShape(btTriangleIndexVertexArray * pMesh);
+
+        /** Pre-condition: Given mesh is a valid btTriangleMesh
+         *  Post-condition: Returns a btBvhTriangleMeshShape of the user created landscape
+         */
+        btCollisionShape* createShape_alt(btTriangleMesh* pMesh);
 
         /**
          * @param[out] A flattened array of vertices in the mesh
          */
-        void setVertices(btVector3 vertices[]);
+        //void setVertices(btVector3 vertices[]);
 
         /**
          * @param[out] A flattened array of indices in the mesh
          */
-        void setIndices(int indices[]);
+        //void setIndices(int indices[]);
         
         // Store this so we can delete it later
-        btTriangleIndexVertexArray* m_pMesh;
-        btVector3 * m_vertices;
-        int * m_pIndices;
+        btTriangleMesh* m_pMesh;
+        //btVector3 * m_vertices;
+        //int * m_pIndices;
 
 };
 
