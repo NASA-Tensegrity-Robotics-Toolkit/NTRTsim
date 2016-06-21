@@ -17,9 +17,9 @@
 */
 
 /**
- * @file App6Bar.cpp
- * @brief Contains the definition function main() for App6Bar
- * which builds a 6 bar tensegrity structure defined in YAML
+ * @file AppWorldImportTest.cpp
+ * @brief Contains the definition function main() for AppWorldImportTest
+ * which imports user generated terrain as the simulation ground
  * @author Edward Zhu
  * $Id$
  */
@@ -40,34 +40,68 @@
 #include "RPLengthController.h"
 // C++ Filestream
 #include <fstream>
+// C++ String
+#include <string>
+// C++ Math
+#include <math.h>
 
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
  * @param[in] argv argv[0] is the executable name
  * @param[in] argv argv[1] is the path of the YAML encoded structure
+ * @param[in] argv argv[2] is the path of the .txt file with triangle verticies
  * @return 0
  */
 int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
+    //const double pitch = -M_PI/2;
     const double pitch = 0.0;
     const double roll = 0.0;
 
     btVector3 orientation = btVector3(yaw, pitch, roll);
 
-    const tgImportGround::Config groundConfig(orientation);
+    // Set other ground parameters
+    const double friction = 0.5;
+    const double restitution = 0.0;
+    btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    const double margin = 0.05;
+    const double offset = 0.5;
+    const double scalingFactor = 100;
+
+    // Configure ground characteristics
+    const tgImportGround::Config groundConfig(orientation, friction, restitution,
+        origin, margin, offset, scalingFactor);
+
+    // Get filename from argv
+    std::string filename_in = argv[2];
+
+    // Check filename
+    if (filename_in.find(".txt") == std::string::npos) {
+        std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     //Create filestream
     std::fstream file_in;
 
     // Open filestream
-    file_in.open("/home/edward/NTRTsim/src/dev/ezhu/WorldImportTest/LunarScape.txt", std::fstream::in);
+    file_in.open(filename_in.c_str(), std::fstream::in);
+
+    // Check if input file opened successfully
+    if (!file_in.is_open()) {
+        std::cout << "Failed to open input file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else {
+        std::cout << "Input file opened successfully" << std::endl;
+    }
 
     // the world will delete this
     //tgBoxGround* ground = new tgBoxGround(groundConfig);
-    tgImportGround* ground = new tgImportGround(file_in);
+    tgImportGround* ground = new tgImportGround(groundConfig, file_in);
 
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);

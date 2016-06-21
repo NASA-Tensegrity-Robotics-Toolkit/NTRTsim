@@ -19,7 +19,7 @@
 /**
  * @file tgImportGround.cpp
  * @brief Contains the implementation of class tgImportGround
- * @author Steven Lessard
+ * @author Edward Zhu
  * $Id$
  */
 
@@ -42,48 +42,39 @@
 tgImportGround::Config::Config(btVector3 eulerAngles,
         double friction,
         double restitution,
-        btVector3 size,
+        //btVector3 size,
         btVector3 origin,
-        std::size_t nx,
-        std::size_t ny,
         double margin,
-        double triangleSize,
-        double waveHeight,
-        double offset) :
+        double offset,
+        double scalingFactor) :
     m_eulerAngles(eulerAngles),
     m_friction(friction),
     m_restitution(restitution),
-    m_size(size),
+    //m_size(size),
     m_origin(origin),
-    m_nx(nx),
-    m_ny(ny),
     m_margin(margin),
-    m_triangleSize(triangleSize),
-    m_waveHeight(waveHeight),
-    m_offset(offset)
+    m_offset(offset),
+    m_scalingFactor(scalingFactor)
 {
     assert((m_friction >= 0.0) && (m_friction <= 1.0));
     assert((m_restitution >= 0.0) && (m_restitution <= 1.0));
-    assert((m_size[0] >= 0.0) && (m_size[1] >= 0.0) && (m_size[2] >= 0.0));
-    assert(m_nx > 0);
-    assert(m_ny > 0);
+    //assert((m_size[0] >= 0.0) && (m_size[1] >= 0.0) && (m_size[2] >= 0.0));
     assert(m_margin >= 0.0);
-    assert(m_triangleSize >= 0.0);
-    assert(m_waveHeight >= 0.0);
     assert(m_offset >= 0.0);
+    assert(m_scalingFactor >= 0.0);
 }
 
 tgImportGround::tgImportGround(std::fstream& file) :
     m_config(Config())
 {
     // @todo make constructor aux to avoid repeated code
-    pGroundShape = importCollisionShape_alt(file);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor);
 }
 
 tgImportGround::tgImportGround(const tgImportGround::Config& config, std::fstream& file) :
     m_config(config)
 {
-    pGroundShape = importCollisionShape_alt(file);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor);
 }
 
 tgImportGround::~tgImportGround()
@@ -162,11 +153,11 @@ btCollisionShape* tgImportGround::importCollisionShape() {
 }
 */
 
-btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file) {
+btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file, double scalingFactor) {
     btCollisionShape * pShape = 0;
 
     // Create the mesh object
-    m_pMesh = createMesh_alt(file);
+    m_pMesh = createMesh_alt(file, scalingFactor);
 
     // Create the shape object
     pShape = createShape_alt(m_pMesh);
@@ -194,12 +185,12 @@ btTriangleIndexVertexArray *tgImportGround::createMesh(std::size_t triangleCount
 }
 */
 
-btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file) {
+btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalingFactor) {
     // Lines are input in the following format: [x1,y1,z1] [x2,y2,z2] [x3,y3,z3]
 
     btVector3 v0, v1, v2;
 
-    double scalingFactor = 10;
+    //double scalingFactor = 100;
 
     btTriangleMesh* const pMesh = 
         new btTriangleMesh();
@@ -231,6 +222,12 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file) {
             std::string z_str = line_in.substr(found_comma_2 + 1, found_right_brac - 1 - found_comma_2);
             double z = atof(z_str.c_str()) * scalingFactor;
 
+            // Swap y and z values to match NTRT coordinate convention
+            double temp = y;
+            y = z;
+            z = -temp;
+
+            // Update last found positions
             found_left_brac_last = found_left_brac;
             found_right_brac_last = found_right_brac;
             found_comma_last = found_comma_2;

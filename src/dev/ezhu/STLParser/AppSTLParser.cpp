@@ -1,3 +1,29 @@
+/**
+ * Copyright © 2012, United States Government, as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ * 
+ * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+
+/**
+ * @file AppSTLParser.cpp
+ * @brief Contains the implementation of a parser for ASCII STL files
+ * @author Edward Zhu
+ * $Id$
+ */
+
+// C++ Libraries
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -22,6 +48,7 @@ int main(int argc, char* argv[]) {
 		string filename_in = argv[1];
 		string filename_out = argv[2];
 		//string  out_path = "/home/edward/NTRTsim/src/dev/ezhu/STLParser/";
+		
 		// Check for valid file extension
 		if (filename_in.find(".stl") == string::npos) {
 			cout << "Incorrect filetype, application for ASCII STL files only" << endl;
@@ -30,10 +57,14 @@ int main(int argc, char* argv[]) {
 		else {
 			cout << "File to parse: " << filename_in << endl;
 		}
+		
+		// Create filestream objects
 		fstream file_in;
 		fstream file_out;
+		
 		// Open input file
 		file_in.open(filename_in.c_str(), fstream::in);
+		
 		// Check if input file opened successfully
 		if (!file_in.is_open()) {
 			cout << "Failed to open input file, please check filename" << endl;
@@ -44,8 +75,10 @@ int main(int argc, char* argv[]) {
 		}		
 		//out_path = out_path + filename_out;
 		cout << "Parsed info writing to: " << filename_out << endl;
+		
 		// Open output file
 		file_out.open(filename_out.c_str(), fstream::out);
+		
 		// Check if output file opened successfully
 		if (!file_out.is_open()) {
 			cout << "Failed to open output file" << endl;
@@ -55,6 +88,7 @@ int main(int argc, char* argv[]) {
 			cout << "Output file opened successfully" << endl;
 		}
 		// file_out << "Test 1 2 3" << endl;
+		
 		string key = "vertex";
 		string line_out;
 		int vertex_index = 0;
@@ -62,22 +96,35 @@ int main(int argc, char* argv[]) {
 		int triangle_count = 0;
 		int element_index = 0;
 		int line_index = 0;
+		
 		// Parse triangle verticies from .stl file
 		//for (int i = 0; i < 204; i++) {
 		while (1) {
 			if (file_in.good()) {
 				string line_in;
 				getline(file_in, line_in);
+				// Check for valid file header
+				if (line_index == 0) {
+					if (line_in.find("solid") == string::npos) {
+						cout << "Incorrect file header, make sure the input file is an ASCII STL file" << endl;
+						exit(EXIT_FAILURE);
+					}
+					else {
+						cout << "Valid header found, continuing with parsing" << endl;
+					}
+				}
 				line_index += 1;
 				cout << "Lines processed: " << line_index << endl;
 				//cout << line << endl;
 				size_t found_key = line_in.find(key);
+				
 				// Look for "vertex" tag
 				if (found_key != string::npos) {
 					//cout << line_in << endl;
 					// Coordinates are space delimited
 					size_t found_char_last = line_in.find_first_of(" ", found_key);
 					size_t found_char_curr;
+
 					while (found_char_last != string::npos) {
 						found_char_curr = line_in.find_first_of(" ", found_char_last + 1);
 						string element;
@@ -117,13 +164,13 @@ int main(int argc, char* argv[]) {
 					}
 					vertex_index += 1;
 					vertex_count += 1;
+					
 					if (vertex_index >= 3) {
 						file_out << endl;
 						vertex_index = 0;
 						triangle_count += 1;
 					}
 				}
-
 			}
 			else {
 				// Check for read failures or end of file
@@ -136,8 +183,7 @@ int main(int argc, char* argv[]) {
 				else if (file_in.fail()) {
 					cout << "Read failed" << endl;
 					break;
-				}
-				
+				}	
 			}
 		}
 		file_in.close();

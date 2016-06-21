@@ -3,7 +3,7 @@
 substructures:
   6BarSphere:
     path: ./6BarSphere.yaml
-    translation: [0, 10, 0]
+    translation: [0, 100, -250]
     rotation:
       axis: [1, 1, 0]
       angle: 50

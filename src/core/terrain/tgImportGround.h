@@ -56,14 +56,15 @@ class tgImportGround : public tgBulletGround
                 Config(btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0),
                        double friction = 0.5,
                        double restitution = 0.0,
-                       btVector3 size = btVector3(500.0, 1.5, 500.0),
+                       //btVector3 size = btVector3(500.0, 1.5, 500.0),
                        btVector3 origin = btVector3(0.0, 0.0, 0.0),
-                       std::size_t nx = 50,
-                       std::size_t ny = 50,
+                       //std::size_t nx = 50,
+                       //std::size_t ny = 50,
                        double margin = 0.05,
-                       double triangleSize = 5.0,
-                       double waveHeight = 5.0,
-                       double offset = 0.5);
+                       //double triangleSize = 5.0,
+                       //double waveHeight = 5.0,
+                       double offset = 0.5,
+                       double scalingFactor = 10);
 
                 /** Euler angles are specified as yaw pitch and roll */
                 btVector3 m_eulerAngles;
@@ -75,28 +76,31 @@ class tgImportGround : public tgBulletGround
                 btScalar  m_restitution;
 
                 /** Size of the ground, must be between non-negitive */
-                btVector3 m_size;
+                //btVector3 m_size;
 
                 /** Origin position of the ground */
                 btVector3 m_origin;
 
                 /** Number of nodes in the x-direction */
-                std::size_t m_nx;
+                //std::size_t m_nx;
 
                 /** Number of nodes in the y-direction */
-                std::size_t m_ny;
+                //std::size_t m_ny;
 
                 /** See Bullet documentation on Collision Margin */
                 double m_margin;
 
                 /** Scale factor for the X and Z axes, varies according to m_nx and m_ny */
-                double m_triangleSize;
+                //double m_triangleSize;
 
                 /** Scale factor for the Y axis */
-                double m_waveHeight;
+                //double m_waveHeight;
 
                 /** Translation factor for the Y axis */
                 double m_offset;
+
+                /** Scaling factor for the triangle mesh */
+                double m_scalingFactor;
         };
 
         /**
@@ -128,7 +132,7 @@ class tgImportGround : public tgBulletGround
         /**
          * Returns the collision shape that forms the imported ground from filestream
          */
-        btCollisionShape* importCollisionShape_alt(std::fstream& file);
+        btCollisionShape* importCollisionShape_alt(std::fstream& file, double scalingFactor);
 
     private:  
         /** Store the configuration data for use later */
@@ -144,7 +148,7 @@ class tgImportGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the information read from the filestream
                             To be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleMesh* createMesh_alt(std::fstream& file);
+        btTriangleMesh* createMesh_alt(std::fstream& file, double scalingFactor);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 

@@ -76,7 +76,7 @@ builders:
     parameters:
       stiffness: 400.0 # N/m no scaling required
       damping: 20.0 # Ns/m no scaling required
-      pretension: 100.0 # N scaled by 10
+      pretension: 200.0 # N scaled by 10
       history: 0
       max_tension: 2000 # N scaled by 10
       target_velocity: 10
