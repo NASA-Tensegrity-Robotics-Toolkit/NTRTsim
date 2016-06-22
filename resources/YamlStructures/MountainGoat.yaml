@@ -1,0 +1,106 @@
+substructures:
+  spine:
+    path: MountainGoatSpine/MGSpine.yaml
+  
+  front_right_leg/back_right_leg/front_left_leg/back_left_leg:
+    path: MountainGoatLimb/MGLeg.yaml
+  front_right_leg/back_right_leg:
+    rotation:
+      reference: [0, 0, 0]
+      axis: [0, 1, 0]
+      angle: 180
+
+  front_right_leg/front_left_leg:
+    translation: [22, 0, 0]
+  back_right_leg/back_left_leg:
+    translation: [66, 0, 0]
+
+bond_groups:
+  string:
+      front_right_leg/spine/node_node:
+        - [hip.inner_top, vertebra1.back2]
+        - [hip.inner_top, vertebra2.front2]
+        - [hip.inner_top, vertebra2.back1]
+        - [hip.inner_top, vertebra3.front1]
+        
+        - [hip.inner_bottom, vertebra1.back1]
+        - [hip.inner_bottom, vertebra2.front2]
+        - [hip.inner_bottom, vertebra2.back1]
+        - [hip.inner_bottom, vertebra3.front2]
+
+        - [hip.center, vertebra2.back1]
+        - [hip.center, vertebra2.front2]
+        - [knee.top, vertebra2.front2]
+        - [knee.back, vertebra2.front2]
+        - [knee.front, vertebra2.back1]
+
+      front_left_leg/spine/node_node:
+        - [hip.inner_top, vertebra1.back2]
+        - [hip.inner_top, vertebra2.back2]
+        - [hip.inner_top, vertebra2.front1]
+        - [hip.inner_top, vertebra3.front1]
+
+        - [hip.inner_bottom, vertebra1.back1]
+        - [hip.inner_bottom, vertebra2.back2]
+        - [hip.inner_bottom, vertebra2.front1]
+        - [hip.inner_bottom, vertebra3.front2]
+
+        - [hip.center, vertebra2.back2]
+        - [hip.center, vertebra2.front1]
+        - [knee.top, vertebra2.front1]
+        - [knee.front, vertebra2.front1]
+        - [knee.back, vertebra2.back2]
+
+      back_right_leg/spine/node_node:
+        - [hip.inner_top, vertebra5.back2]
+        - [hip.inner_top, vertebra6.back1]
+        - [hip.inner_top, vertebra6.front2]
+        - [hip.inner_top, vertebra7.front1]
+
+        - [hip.inner_bottom, vertebra5.back1]
+        - [hip.inner_bottom, vertebra6.back1]
+        - [hip.inner_bottom, vertebra6.front2]
+        - [hip.inner_bottom, vertebra7.front2]
+
+        - [hip.center, vertebra6.back1]
+        - [hip.center, vertebra6.front2]
+        - [knee.top, vertebra4.back1]
+        - [knee.back, vertebra6.front2]
+        - [knee.front, vertebra6.back1]
+
+      back_left_leg/spine/node_node:
+        - [hip.inner_top, vertebra6.back2]
+        - [hip.inner_top, vertebra6.front1]
+        - [hip.inner_top, vertebra5.back2]
+        - [hip.inner_top, vertebra7.front1]
+
+        - [hip.inner_bottom, vertebra6.back2]
+        - [hip.inner_bottom, vertebra6.front1]
+        - [hip.inner_bottom, vertebra5.back1]
+        - [hip.inner_bottom, vertebra7.front2]
+
+        - [hip.center, vertebra6.back2]
+        - [hip.center, vertebra6.front1]
+        - [knee.top, vertebra4.back2]
+        - [knee.back, vertebra6.back2]
+        - [knee.front, vertebra6.front1]
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5
+      friction: 0.5
+  string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 20
+      pretension: 1000
+      # motor_friction: 10
+      max_tension: 7000
+      target_velocity: 12
+
+
+
