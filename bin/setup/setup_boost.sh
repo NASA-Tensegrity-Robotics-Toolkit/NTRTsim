@@ -105,7 +105,7 @@ function build_boost()
     fi
 
     #To make gcc as the default compiler, this line uncomments the line ';using gcc' in user-config.jam file of the boost library.
-    sed -i '' 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+    sed -i 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
 
     # Perform the build
     #./bootstrap.sh --prefix="$BOOST_INSTALL_PREFIX" --with-libraries=system || { echo "Boost bootstrap failed."; exit 1; } # Lite
