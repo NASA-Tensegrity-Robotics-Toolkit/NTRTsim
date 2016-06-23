@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     const double restitution = 0.0;
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
     const double margin = 0.05;
-    const double offset = 0.5;
+    const double offset = -1000;
     const double scalingFactor = 100;
 
     // Configure ground characteristics

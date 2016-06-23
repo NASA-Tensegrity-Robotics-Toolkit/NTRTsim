@@ -222,7 +222,7 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
             std::string z_str = line_in.substr(found_comma_2 + 1, found_right_brac - 1 - found_comma_2);
             double z = atof(z_str.c_str()) * scalingFactor;
 
-            // Swap y and z values to match NTRT coordinate convention
+            // Swap y and z values to match NTRT coordinate convention (y is height)
             double temp = y;
             y = z;
             z = -temp;
