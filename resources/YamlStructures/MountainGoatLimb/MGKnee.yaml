@@ -1,0 +1,15 @@
+nodes:
+  base_bottom: [0, 0, 0]
+  base_top: [0, 5, 0]
+  center: [0, 15, 0]
+  back: [10, 15, 0]
+  front: [-10, 15, 0]
+  top: [0, 25, 0]
+
+pair_groups:
+  rod:
+    - [base_bottom, base_top]
+    - [center, base_top]
+    - [center, back]
+    - [center, front]
+    - [center, top]
