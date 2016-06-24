@@ -20,6 +20,8 @@ add_executable(App6Bar
 #    TensegrityModel.cpp
     RPLengthController.h
     RPLengthController_rand.cpp
+    sixBarModel.cpp
+    sixBarModel.h
     App6Bar.cpp)
 
 

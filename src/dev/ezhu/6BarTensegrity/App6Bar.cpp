@@ -19,13 +19,16 @@
 /**
  * @file App6Bar.cpp
  * @brief Contains the definition function main() for App6Bar
- * which builds a 6 bar tensegrity structure defined in YAML
+ * which builds a 6 bar tensegrity structure defined in YAML or through tgCreator
  * @author Edward Zhu
  * $Id$
  */
 
 // This application
-#include "../../../yamlbuilder/TensegrityModel.h"
+// For yaml model builder
+//#include "../../../yamlbuilder/TensegrityModel.h"
+// For tgCreator
+#include "sixBarModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -68,13 +71,16 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    // Use yaml model builder
+    //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    // Use direct tgCreator
+    sixBarModel* const myModel = new sixBarModel();
 
     // Create the controller
     RPLengthController* const tension_sensor = new RPLengthController();
 
     // Attach controller to the model
-    myModel -> attach(tension_sensor);
+    //myModel -> attach(tension_sensor);
 
     // Add the model to the world
     simulation.addModel(myModel);
