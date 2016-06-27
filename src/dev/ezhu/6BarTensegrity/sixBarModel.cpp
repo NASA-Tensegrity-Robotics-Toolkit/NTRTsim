@@ -132,6 +132,12 @@ void sixBarModel::setup(tgWorld& world)
 	// Get actuators
 	allActuators = getAllActuators();
 
+	// Get the rod rigid bodies for controller
+	std::vector<tgRod *> sixBarRods = sixBarModel::find<tgRod>("rod");
+	tgRod* rod0 = sixBarRods[0];
+	btRigidBody* rod0RigidBody = rod0->getPRigidBody();
+	rodBodies.push_back(rod0RigidBody);
+
 	// Notify controllers that setup has finished
 	notifySetup();
 

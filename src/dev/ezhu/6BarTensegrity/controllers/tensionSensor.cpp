@@ -17,9 +17,9 @@
  */
 
 /**
- * @file RPTensionController.cpp
- * @brief Implementation of six strut tensegrity.
- * @author Brian Tietz
+ * @file TensionSensor.cpp
+ * @brief Implementation of tension sensor.
+ * @author Edward Zhu
  * @version 1.0.0
  * $Id$
  */
@@ -28,9 +28,9 @@
 #include <fstream>
 #include <string>
 // This module
-#include "RPLengthController.h"
+#include "tensionSensor.h"
 // This application
-#include "../../../yamlbuilder/TensegrityModel.h"
+#include "../../../../yamlbuilder/TensegrityModel.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgCast.h"
@@ -41,7 +41,7 @@
 
 using namespace std;
 
-RPLengthController::RPLengthController(const double length) :
+tensionSensor::tensionSensor(const double length) :
   m_length(length)
 {
   if (length < 0.0)
@@ -50,18 +50,18 @@ RPLengthController::RPLengthController(const double length) :
     }
 }
 
-RPLengthController::~RPLengthController()
+tensionSensor::~tensionSensor()
 {
 }	
 
-void RPLengthController::onSetup(TensegrityModel& subject)
+void tensionSensor::onSetup(TensegrityModel& subject)
 {
 
   actuators = subject.getAllActuators();
   
 }
 
-void RPLengthController::onStep(TensegrityModel& subject, double dt)
+void tensionSensor::onStep(TensegrityModel& subject, double dt)
 {
   if (dt <= 0.0) {
     throw std::invalid_argument("dt is not positive");

@@ -108,6 +108,8 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	     */
 	    const std::vector<tgSpringCableActuator*>& getAllActuators() const;
 
+	    std::vector<btRigidBody*> rodBodies;
+
 	private:
 		/**
 	     * A function called during setup that determines the positions of

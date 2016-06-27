@@ -40,7 +40,8 @@
 // The C++ Standard Library
 #include <iostream>
 // Controller for tension sensing
-#include "RPLengthController.h"
+//#include "controllers/tensionSensor.h"
+#include "controllers/T6RollingController.h"
 
 /**
  * The entry point.
@@ -76,11 +77,16 @@ int main(int argc, char** argv)
     // Use direct tgCreator
     sixBarModel* const myModel = new sixBarModel();
 
+    // Configure the controlller
+    const T6RollingController::Config controllerConfig("face", 1);
+    
     // Create the controller
-    RPLengthController* const tension_sensor = new RPLengthController();
-
+    //tensionSensor* const tension_sensor = new tensionSensor();
+    T6RollingController* const rolling_controller = new T6RollingController(controllerConfig);
+    
     // Attach controller to the model
     //myModel -> attach(tension_sensor);
+    myModel->attach(rolling_controller);
 
     // Add the model to the world
     simulation.addModel(myModel);

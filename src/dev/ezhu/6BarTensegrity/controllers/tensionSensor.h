@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef RP_LENGTH_CONTROLLER_H
-#define RP_LENGTH_CONTROLLER_H
+#ifndef TENSION_SENSOR_H
+#define TENSION_SENSOR_H
 
 /**
- * @file RPTensionController.h
- * @brief Contains the definition of class RPTensionController.
- * @author Brian Tietz
+ * @file tensionSensor.h
+ * @brief Contains the definition of class TensionSensor.
+ * @author Edward Zhu
  * @version 1.0.0
  * $Id$
  */
@@ -30,7 +30,7 @@
 // This library
 #include "core/tgObserver.h"
 #include "controllers/tgBasicController.h"
- #include "core/tgBasicActuator.h"
+#include "core/tgBasicActuator.h"
 
 // The C++ Standard Library
 #include <vector>
@@ -44,21 +44,21 @@ class TensegrityModel;
  * A controller to apply uniform tension to a RPModel. Iterates through
  * all tgLinearString members and calls tensionMinLengthController
  */
-class RPLengthController : public tgObserver<TensegrityModel>
+class tensionSensor : public tgObserver<TensegrityModel>
 {
 public:
 	
 	/**
-	 * Construct a RPTensionController.
+	 * Construct a TensionSensor.
 	 * @param[in] tension, a double specifying the desired tension
 	 * throughougt structure. Must be non-negitive
 	 */
-    RPLengthController(const double length = 400);
+    tensionSensor(const double length = 400);
     
     /**
      * Nothing to delete, destructor must be virtual
      */
-    virtual ~RPLengthController();
+    virtual ~tensionSensor();
     
     virtual void onSetup(TensegrityModel& subject);
     
@@ -88,4 +88,4 @@ private:
 
 };
 
-#endif // RP_LENGTH_CONTROLLER_H
+#endif // TENSION_SENSOR_H
