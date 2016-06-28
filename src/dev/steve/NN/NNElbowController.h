@@ -81,6 +81,7 @@ private:
   void setAnconeusTargetLength(NNElbowModel& subject, double dt);
   void moveAllMotors(NNElbowModel& subject, double dt);
   void updateActions(NNElbowModel& subject, double dt);
+  void readfromANN();
 };
 
 #endif // NNELBOW_CONTROLLER_H

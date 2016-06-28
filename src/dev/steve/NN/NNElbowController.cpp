@@ -83,6 +83,11 @@ void NNElbowController::onSetup(NNElbowModel& subject) {
 		pMuscle->setControlInput(supportstring_length, dt);
         //cout << "string " << i << "\n";
     }
+
+    // Populate ANN
+    //trainANN();
+
+    readfromANN();
 }
 
 // Set target length of each muscle, then move motors accordingly
@@ -99,14 +104,21 @@ void NNElbowController::onStep(NNElbowModel& subject, double dt) {
 }
  
 void NNElbowController::setBrachioradialisTargetLength(NNElbowModel& subject, double dt) {
-    const double mean_brachioradialis_length = 12; //TODO: define according to vars
+    const double mean_brachioradialis_length = 1; //TODO: define according to vars
     const std::vector<tgBasicActuator*> brachioradialis = subject.find<tgBasicActuator>("brachioradialis");
     double newLength = 0;
+
+    // Run current length on ANN
+    double output = 0;
+    //double output = readfromANN();
 
     for (size_t i=0; i<brachioradialis.size(); i++) {
 		tgBasicActuator * const pMuscle = brachioradialis[i];
 		assert(pMuscle != NULL);
-        newLength = mean_brachioradialis_length; //TODO: Change to outsourced code
+        if (m_totalTime < 10)
+            newLength = 50; // let it get to equilibrium
+        else
+            newLength = output;
         
         std::cout<<"m_totalTime: " << m_totalTime << "\n";
         cout <<"current length at t: " << pMuscle->getCurrentLength() << endl;
@@ -158,7 +170,6 @@ void NNElbowController::moveAllMotors(NNElbowModel& subject, double dt) {
 		assert(pMuscle != NULL);
 		pMuscle->moveMotors(dt);
 	}
-     
 }
 
 // Get actions from evolutionAdapter, transform them to this structure, and apply them
@@ -211,4 +222,20 @@ void NNElbowController::applyActions(NNElbowModel& subject, vector< vector <doub
 		pMuscle->setControlInput(act[i][0]);
 	}
 }
+
+void NNElbowController::readfromANN() {
+    double input = -77;
+
+    ifstream ifile;
+    ifile.open("input.dat");
+    ifile >> input;
+    ifile.close();
+
+    ofstream ofile;
+    ofile.open("results.dat");
+    ofile << "Results: " << input << " \n";
+    ofile.close();
+
+}
+
 
