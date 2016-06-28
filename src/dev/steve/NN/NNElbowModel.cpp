@@ -85,11 +85,11 @@ namespace {
         3000.0,         // stiffness (kg / sec^2)
         3000.0/1,       // pretension_olecranon (force), stiffness/initial length
         3000.0/15.55,   // pretension_anconeus (force), stiffness/initial length
-        3000.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
+        30.0/262,     // pretension_brachioradialis (force), stiffness/initial length 
         30000.0/1,      // pretension_support (force), stiffness/initial length 
         false,          // history (boolean)
-        100000,         // maxTens
-        10000,           // targetVelocity  
+        80000,         // maxTens
+        800,           // targetVelocity  
         1.0,            // mRad
         10.0,           // motorFriction
         1.0,            // motorInertia
