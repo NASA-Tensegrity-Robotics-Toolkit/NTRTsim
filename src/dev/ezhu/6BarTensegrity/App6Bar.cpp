@@ -60,7 +60,8 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(98.1); // gravity, dm/sec^2
+    double gravity = 98.1;
+    const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
     // create the view
@@ -78,7 +79,7 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel();
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig("face", 1);
+    const T6RollingController::Config controllerConfig(gravity, "face", 1);
     
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

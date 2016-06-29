@@ -110,6 +110,21 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 
 	    std::vector<btRigidBody*> rodBodies;
 
+	    double rodDist;
+
+	    btVector3 node0;
+	    btVector3 node1;
+	    btVector3 node2;
+	    btVector3 node3;
+	    btVector3 node4;
+	    btVector3 node5;
+	    btVector3 node6;
+	    btVector3 node7;
+	    btVector3 node8;
+	    btVector3 node9;
+	    btVector3 node10;
+	    btVector3 node11;
+
 	private:
 		/**
 	     * A function called during setup that determines the positions of

@@ -59,8 +59,10 @@ public:
 	{
 	public:
 		// Overloaded Config function for two controller modes
-		Config (const std::string& mode, int face_goal);
-		Config (const std::string& mode, btVector3 dr_goal);
+		Config (double gravity, const std::string& mode, int face_goal);
+		Config (double gravity, const std::string& mode, btVector3 dr_goal);
+
+		double m_gravity;
 
 		// Use "face" for rolling to a goal triangle, use "dr" for dead reckoning
 		std::string m_mode;
@@ -87,6 +89,8 @@ public:
 
 	virtual void onStep(sixBarModel& subject, double dt);
 
+	int contactSurfaceDetection();
+
 private:
 	// Store the configuration data for use later
 	Config m_config;
@@ -97,7 +101,69 @@ private:
 
 	// Rigid body objects
 	btRigidBody* sixBarRod0;
+	btRigidBody* sixBarRod1;
+	btRigidBody* sixBarRod2;
+	btRigidBody* sixBarRod3;
+	btRigidBody* sixBarRod4;
+	btRigidBody* sixBarRod5;
 
+	// Edge vectors of all closed triangles
+	btVector3 face0Edge0;
+	btVector3 face0Edge1;
+	btVector3 face0Edge2;
+
+	btVector3 face2Edge0;
+	btVector3 face2Edge1;
+	btVector3 face2Edge2;
+
+	btVector3 face5Edge0;
+	btVector3 face5Edge1;
+	btVector3 face5Edge2;
+
+	btVector3 face7Edge0;
+	btVector3 face7Edge1;
+	btVector3 face7Edge2;
+
+	btVector3 face8Edge0;
+	btVector3 face8Edge1;
+	btVector3 face8Edge2;
+
+	btVector3 face10Edge0;
+	btVector3 face10Edge1;
+	btVector3 face10Edge2;
+
+	btVector3 face13Edge0;
+	btVector3 face13Edge1;
+	btVector3 face13Edge2;
+	
+	btVector3 face15Edge0;
+	btVector3 face15Edge1;
+	btVector3 face15Edge2;
+
+	// Normal vectors of all icosahedron faces
+	btVector3 face0Norm;
+	btVector3 face1Norm;
+	btVector3 face2Norm;
+	btVector3 face3Norm;
+	btVector3 face4Norm;
+	btVector3 face5Norm;
+	btVector3 face6Norm;
+	btVector3 face7Norm;
+	btVector3 face8Norm;
+	btVector3 face9Norm;
+	btVector3 face10Norm;
+	btVector3 face11Norm;
+	btVector3 face12Norm;
+	btVector3 face13Norm;
+	btVector3 face14Norm;
+	btVector3 face15Norm;
+	btVector3 face16Norm;
+	btVector3 face17Norm;
+	btVector3 face18Norm;
+	btVector3 face19Norm;
+
+	// Gravity world vector
+	btVector3 gravVectWorld;
 };
 
 #endif

@@ -71,6 +71,26 @@ namespace
 
 sixBarModel::sixBarModel() : tgModel() 
 {
+	// Calculate the space between two parallel rods based on the rod length from Config
+	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+
+	// Nodes in the x-z plane
+	node0 = btVector3(-rodDist/2, 0, config.rodLength/2); // 0
+	node1 = btVector3(-rodDist/2, 0, -config.rodLength/2); // 1
+	node2 = btVector3(rodDist/2, 0, -config.rodLength/2); // 2
+	node3 = btVector3(rodDist/2, 0, config.rodLength/2); // 3
+
+	// Nodes in the y-z plane
+	node4 = btVector3(0, -config.rodLength/2, rodDist/2); // 4
+	node5 = btVector3(0, config.rodLength/2, rodDist/2); // 5
+	node6 = btVector3(0, config.rodLength/2, -rodDist/2); // 6
+	node7 = btVector3(0, -config.rodLength/2, -rodDist/2); // 7
+
+	// Nodes in the x-y plane
+	node8 = btVector3(-config.rodLength/2, -rodDist/2, 0); // 8
+	node9 = btVector3(-config.rodLength/2, rodDist/2, 0); // 9
+	node10 = btVector3(config.rodLength/2, rodDist/2, 0); // 10
+	node11 = btVector3(config.rodLength/2, -rodDist/2, 0); // 11
 }
 
 sixBarModel::~sixBarModel()
@@ -177,16 +197,16 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	double rodSpace = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
 
 	// Nodes in the x-z plane
-	s.addNode(-rodSpace/2, 0, -config.rodLength/2); // 0
-	s.addNode(-rodSpace/2, 0, config.rodLength/2); // 1
-	s.addNode(rodSpace/2, 0, config.rodLength/2); // 2
-	s.addNode(rodSpace/2, 0, -config.rodLength/2); // 3
+	s.addNode(-rodSpace/2, 0, config.rodLength/2); // 0
+	s.addNode(-rodSpace/2, 0, -config.rodLength/2); // 1
+	s.addNode(rodSpace/2, 0, -config.rodLength/2); // 2
+	s.addNode(rodSpace/2, 0, config.rodLength/2); // 3
 
 	// Nodes in the y-z plane
-	s.addNode(0, -config.rodLength/2, -rodSpace/2); // 4
-	s.addNode(0, config.rodLength/2, -rodSpace/2); // 5
-	s.addNode(0, config.rodLength/2, rodSpace/2); // 6
-	s.addNode(0, -config.rodLength/2, rodSpace/2); // 7
+	s.addNode(0, -config.rodLength/2, rodSpace/2); // 4
+	s.addNode(0, config.rodLength/2, rodSpace/2); // 5
+	s.addNode(0, config.rodLength/2, -rodSpace/2); // 6
+	s.addNode(0, -config.rodLength/2, -rodSpace/2); // 7
 
 	// Nodes in the x-y plane
 	s.addNode(-config.rodLength/2, -rodSpace/2, 0); // 8
@@ -198,9 +218,9 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 void sixBarModel::addSixBarRods(tgStructure& s)
 {
 	s.addPair(0, 1, "rod");
-	s.addPair(2, 3, "rod");
+	s.addPair(3, 2, "rod");
 	s.addPair(4, 5, "rod");
-	s.addPair(6, 7, "rod");
+	s.addPair(7, 6, "rod");
 	s.addPair(8, 11, "rod");
 	s.addPair(9, 10, "rod");
 }
