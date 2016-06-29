@@ -50,13 +50,13 @@
 
 namespace
 {
-  double sf = 10; // scaling factor
+  double sf = 50; // scaling factor
   double worldTime = 0.0; // clock for world time
   double shootTime = 0.0; // used for thrust timing in multiple hop scenarios
-  double initiateThrustTime = 8; // wait time until thrust initiation
+  double initiateThrustTime = 2; // wait time until thrust initiation
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
-  double thrustPeriod = 10; // duration of thrust on
+  double thrustPeriod = 100; // duration of thrust on
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
   const btVector3 targetLocation = btVector3(targetDistance*sf, 0.0, 0.0); // target is located 1000m away in +X direction	
@@ -65,19 +65,17 @@ namespace
   std::ofstream simlog; // log file for thruster related variables
   bool doLog = false; // choose to log thruster related variables
   double timePassed = 0.0; // controls logging frequency
-  bool includeNoise = true; //turn on/off Gaussian Noise for thruster orientation
+  bool includeNoise = false;
   double prev_alpha = 0;
   double prev_beta = 0;
   double prev_gimbalYaw = 0;
   double prev_gimbalPitch = 0;
-  btVector3 prev_GimbalHeading = btVector3(0,0,-1);
+  btVector3 prev_thrusterHeading = btVector3(0,0,-1);
   int numTankOrientations = 1; //Averaging Filter
   int count = 0;
   
   //##### BCera - moved from onStep to namespace, to initialize jetDirections onSetup
-  double thrust = 100*sf;
-  //double thrust = 0;
-  //double final_thrust = 100*sf;
+  double thrust = 0*sf;
 
   btRigidBody* tankRigidBody;
   btRigidBody* thrusterRigidBody; // payload body
@@ -159,9 +157,9 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  
 	  if(worldTime > reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
-	    double finalGoalAltitude = -0;
+	    double finalGoalAltitude = -45;
 	    double finalGoalYaw = 10;
-	    double inc = 40*dt;
+	    double inc = 10*dt;
 	    bool AltSet = false;
 	    bool YawSet = false;
 	    if(abs(finalGoalAltitude - goalAltitude) > inc){
@@ -290,28 +288,21 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    sol_vector.setZ(-sol_vector.getZ()); //Reoriented goal vector for thruster
 	    des_moment = -des_moment;
 	  }
-	  double theta = des_moment/(0.1*sf+0.1*sf+0.05*sf)/thrust; //externalRadius+tanktogimbal+payloadlength/2
-	  if(des_moment > (0.1*sf+0.1*sf+0.05*sf)*thrust)
+	  double theta = des_moment/(1.0+1.0+0.5)/thrust;
+	  if(des_moment > (1.0+1.0+0.5)*thrust)
 	    theta = M_PI/2;
 	  else
 	    theta = asin(theta);
 	  sol_vector.setY(sqrt(pow(sol_vector.getX(),2)+pow(sol_vector.getZ(),2))/tan(theta));
 	  sol_vector.normalize();
-	  double Gimbal_Speed = acos(sol_vector.dot(prev_GimbalHeading))/dt;
-	  prev_GimbalHeading = sol_vector;
-	  std::cout << "Gimbal Change Speed: " << Gimbal_Speed*180/M_PI << std::endl;
 	  //Generate noise for solution vector here (i.e. noisy orientation sensors for payload)
 	  if(includeNoise){
 	    btTransform noiseRotation;
 	    btQuaternion rotation;
-	    btVector3 noiseAxis;
-	    noiseAxis.setX(rand());
-	    noiseAxis.setY(rand());
-	    noiseAxis.setZ(rand());
-	    noiseAxis.normalize();
-	    rotation.setRotation(noiseAxis, generateGaussianNoise(0,0.01*M_PI/180));
+	    rotation.setRotation(btVector3(1,0,0), generateGaussianNoise(0,2*M_PI/180));
+	    rotation.setRotation(btVector3(0,1,0), generateGaussianNoise(0,2*M_PI/180));
+	    rotation.setRotation(btVector3(0,0,1), generateGaussianNoise(0,2*M_PI/180));
 	    noiseRotation.setRotation(rotation);
-	    std::cout << "Sensor Noise Error Introduced: " << rotation.getAngle()*180/M_PI << std::endl;
 	    sol_vector = noiseRotation*sol_vector;
 	  }
 	  std::cout << "Thruster Goal Vector: " << sol_vector << std::endl;
@@ -332,7 +323,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  prev_beta = beta;
 
 	  double tolerance = 1; //Degree
-	  double speed = 3; //Degrees - No scaling factor here (?)
+	  double speed = 1; //Degrees - No scaling factor here (?)
 	  
 	  //Set altitude
 	  double deltaAltitude = beta*180/M_PI - altitudeAngle;
@@ -379,9 +370,11 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  btMatrix3x3 rotation = thrusterRigidBody->getWorldTransform().getBasis();
 	  btVector3 unit = btVector3(0,0,1);
 	  unit = rotation*unit;
-	  
+	  double Thruster_Speed = acos(unit.dot(prev_thrusterHeading))/dt;
+	  prev_thrusterHeading = unit;
 	  //std::cout << "Thruster Heading: " << unit.x() << " " << unit.y() << " " << unit.z() << std::endl << std::endl;;
 	  std::cout << "Thruster Heading|| Altitude: " << acos(unit.y())*180/M_PI-90 << ", Yaw:  " << atan2(unit.z(),-unit.x())*180/M_PI-90 << std::endl;
+	  std::cout << "Thruster Change Speed: " << Thruster_Speed*180/M_PI << std::endl;
 	  /*
 	    if (yawInPosition && altitudeInPosition){
 	    goalYaw = std::rand() % 360 - 180;
@@ -396,8 +389,6 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Get thruster transform
 	  //tgRod* thrusterRod = thrusterParts[0]; //Outer
 	  //btRigidBody* thrusterRigidBody = thrusterRod->getPRigidBody();
-	  
-	  std::cout << "Thrust: " << thrust << std::endl;
 	  double gimbalAngleTol = 200;
 	  if ( shootTime > initiateThrustTime && shootTime <= (initiateThrustTime + thrustPeriod) && abs(deltaAltitude)<gimbalAngleTol && abs(deltaYaw)<gimbalAngleTol)
 	    {
@@ -528,7 +519,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
      * have a normal distribution with mean \mu and standard deviation \sigma. 
      */ 
     const double epsilon = std::numeric_limits<double>::min();
-    const double two_pi = 2*M_PI;
+    const double two_pi = 2*M_PI;//2.0*3.14159265358979323846;
 
     static double z0, z1;
     static bool generate;

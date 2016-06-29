@@ -46,7 +46,7 @@
  */
 int main(int argc, char** argv)
 {
-  double sf = 10; //Scaling Factor - match with model and controller files
+  double sf = 100; //Scaling Factor - match with model and controller files
    
   // First create the ground and world. Specify ground rotation in radians
   const double yaw = 0.0;
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-  const tgWorld::Config config(1.618*sf); // gravity, cm/sec^2
+  const tgWorld::Config config(0*sf); // gravity, cm/sec^2
   tgWorld world(config, ground);
 
   // Second create the view
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 
   //Create Active Thruster
   RPThruster* const thrust_control = new RPThruster();
-  myModel->attach(thrust_control);
+  //myModel->attach(thrust_control);
     
   // Add the model to the world
   simulation.addModel(myModel);

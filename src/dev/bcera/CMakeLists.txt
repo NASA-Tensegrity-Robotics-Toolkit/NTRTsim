@@ -4,6 +4,7 @@ subdirs(
 orient
 thruster
 payload_thruster
+TT3_payload_thruster
 )
 	
  add_executable(AppWorkspace

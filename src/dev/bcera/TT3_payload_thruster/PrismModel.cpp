@@ -39,7 +39,7 @@ namespace
    * All parameters must be positive.
    */
 
-  double sf = 10; //scaling factor. Match with App file and Controller file
+  double sf = 100; //scaling factor. Match with App file and Controller file
   
   const struct Config
   {
@@ -57,19 +57,35 @@ namespace
     double targetVelocity;
   } c =
     {
+      //TT-3 Parameters
+      2700/pow(sf,3),    // density (kg / length^3)
+      .00625*sf,     // radius (length)
+      1500.0,   // stiffness (kg / sec^2) was 1500
+      200.0,    // damping (kg / sec)
+      0.668*sf,     // rod_length (length)
+      0.99,      // friction (unitless)
+      0.01,     // rollFriction (unitless)
+      0.0,      // restitution (?)
+      10.0*sf,        // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      0,         // History logging (boolean)
+      1000*sf,   // maxTens (kg-m/s^2)
+      10*sf,    // targetVelocity (m/s)
+
+      /*
       //Superball Parameters
-      688/pow(sf,3),    // density (kg / length^3)
-      .031*sf,          // radius (length)
-      2500.0,           // stiffness (kg / sec^2) was 1500
-      200.0,            // damping (kg / sec)
-      1.615*sf,         // rod_length (length)
-      0.99,             // friction (unitless)
-      0.01,             // rollFriction (unitless)
-      0.0,              // restitution (?)
-      300.0*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,                // History logging (boolean)
-      10000*sf,         // maxTens (kg-m/s^2)
-      1000*sf,          // targetVelocity (m/s) 
+      2700/pow(sf,3),    // density (kg / length^3)
+      .031*sf,     // radius (length)
+      1500.0,   // stiffness (kg / sec^2) was 1500
+      200.0,    // damping (kg / sec)
+      1.615*sf,     // rod_length (length)
+      0.99,      // friction (unitless)
+      0.01,     // rollFriction (unitless)
+      0.0,      // restitution (?)
+      300.0*sf,        // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      0,         // History logging (boolean)
+      10000*sf,   // maxTens (kg-m/s^2)
+      1000*sf,    // targetVelocity (m/s) 
+      */
     };
 } // namespace
 
@@ -102,19 +118,26 @@ void PrismModel::setup(tgWorld& world)
     
   /*DEBUG*/
   //this->btWorld->setDebugDrawer(this->gDebugDraw);
-  
+
+  double tankRadius = 0.05*sf;
+  double internalRadius = 0.05*sf;
+  double externalRadius = 0.055*sf; 
+  double tankToOuterRing = 0.05*sf;
+  double payloadLength = 0.05*sf;
+  /*
   //Superball Parameters
   double tankRadius = 0.1*sf;
   double internalRadius = 0.06*sf;
   double externalRadius = 0.1*sf; 
   double tankToOuterRing = 0.1*sf;
   double payloadLength = 0.1*sf;
+  */
 
   // Define the configurations of the rods and strings
   // Note that pretension is defined for this string
   const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-  const tgRod::Config tankConfig(tankRadius, c.density*50, c.friction, 
+  const tgRod::Config tankConfig(tankRadius, c.density*3.75, c.friction, 
 				 c.rollFriction, c.restitution);
   const tgRod::Config linkConfig(c.radius/4.0, 0.0, c.friction, 
 				 c.rollFriction, c.restitution);
@@ -125,7 +148,7 @@ void PrismModel::setup(tgWorld& world)
 
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
-  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension, c.hist, 
+  tgBasicActuator::Config tankLinkConfig(c.stiffness, 100000, c.pretension, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
     
@@ -184,7 +207,7 @@ void PrismModel::setup(tgWorld& world)
   std::cout << "After Thruster: " << globalOffset << std::endl;
   
   //Inner Payload Strings
-  addStrings(s,baseStartLink,beforeRobot); //**Comment out robot constructor above as well
+  //addStrings(s,baseStartLink,beforeRobot); //**Comment out robot constructor above as well
   
   // Move the structure so it doesn't start in the ground
   //Rotate so that payload faces up
