@@ -89,6 +89,8 @@ public:
 
 	virtual void onStep(sixBarModel& subject, double dt);
 
+	btVector3& getRobotGravity();
+
 	int contactSurfaceDetection();
 
 private:
@@ -135,10 +137,13 @@ private:
 	btVector3 face13Edge0;
 	btVector3 face13Edge1;
 	btVector3 face13Edge2;
-	
+
 	btVector3 face15Edge0;
 	btVector3 face15Edge1;
 	btVector3 face15Edge2;
+
+	// A vector to hold all normal vectors
+	std::vector<btVector3> normVects;
 
 	// Normal vectors of all icosahedron faces
 	btVector3 face0Norm;
@@ -162,8 +167,19 @@ private:
 	btVector3 face18Norm;
 	btVector3 face19Norm;
 
-	// Gravity world vector
+	// Transformation information
+	btTransform worldTrans;
+
+	// Gravity vectors
 	btVector3 gravVectWorld;
+	btVector3 gravVectRobot;
+
+	// Transformation matricies
+	btMatrix3x3 robotToWorld;
+	btMatrix3x3 worldToRobot;
+
+	// Debugging counter
+	int counter;
 };
 
 #endif

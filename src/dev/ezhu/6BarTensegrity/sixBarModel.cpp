@@ -154,9 +154,30 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Get the rod rigid bodies for controller
 	std::vector<tgRod *> sixBarRods = sixBarModel::find<tgRod>("rod");
+
 	tgRod* rod0 = sixBarRods[0];
 	btRigidBody* rod0RigidBody = rod0->getPRigidBody();
 	rodBodies.push_back(rod0RigidBody);
+
+	tgRod* rod1 = sixBarRods[1];
+	btRigidBody* rod1RigidBody = rod1->getPRigidBody();
+	rodBodies.push_back(rod1RigidBody);
+
+	tgRod* rod2 = sixBarRods[2];
+	btRigidBody* rod2RigidBody = rod2->getPRigidBody();
+	rodBodies.push_back(rod2RigidBody);
+
+	tgRod* rod3 = sixBarRods[3];
+	btRigidBody* rod3RigidBody = rod3->getPRigidBody();
+	rodBodies.push_back(rod3RigidBody);
+
+	tgRod* rod4 = sixBarRods[4];
+	btRigidBody* rod4RigidBody = rod4->getPRigidBody();
+	rodBodies.push_back(rod4RigidBody);
+
+	tgRod* rod5 = sixBarRods[5];
+	btRigidBody* rod5RigidBody = rod5->getPRigidBody();
+	rodBodies.push_back(rod5RigidBody);
 
 	// Notify controllers that setup has finished
 	notifySetup();
@@ -194,7 +215,7 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	 */
 	
 	// Calculate the space between two parallel rods based on the rod length from Config
-	double rodSpace = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+	double rodSpace = 10*(-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
 
 	// Nodes in the x-z plane
 	s.addNode(-rodSpace/2, 0, config.rodLength/2); // 0

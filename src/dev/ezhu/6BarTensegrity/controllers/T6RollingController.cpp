@@ -72,6 +72,8 @@ T6RollingController::~T6RollingController()
 
 void T6RollingController::onSetup(sixBarModel& subject)
 {
+	std::cout << "T6RollingController::onSetup" << std::endl;
+
 	std::cout << c_mode << " mode chosen" << std::endl;
 	if (c_mode.compare("face") == 0) {
 		std::cout << "Goal face: " << c_face_goal << std::endl;
@@ -83,10 +85,15 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		controller_mode = 2;
 	}
 
+	// Retrieve btRigid bodies from model
 	sixBarRod0 = subject.rodBodies[0];
+	sixBarRod1 = subject.rodBodies[1];
+	sixBarRod2 = subject.rodBodies[2];
+	sixBarRod3 = subject.rodBodies[3];
+	sixBarRod4 = subject.rodBodies[4];
+	sixBarRod5 = subject.rodBodies[5];
 
-	std::cout << "T6RollingController::onSetup" << std::endl;
-
+	// Find all edge vectors of closed triangles
 	face0Edge0 = subject.node8 - subject.node4;
 	face0Edge1 = subject.node0 - subject.node8;
 	face0Edge2 = subject.node4 - subject.node0;
@@ -119,6 +126,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	face15Edge1 = subject.node9 - subject.node6;
 	face15Edge2 = subject.node1 - subject.node9;
 
+	// Find normal vectors to all faces
 	face0Norm = (face0Edge0.cross(face0Edge2)).normalize();
 	face1Norm = (face0Edge1.cross(face2Edge0)).normalize();
 	face2Norm = (face2Edge0.cross(face2Edge2)).normalize();
@@ -141,6 +149,28 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	face17Norm = (face15Edge1.cross(face2Edge1)).normalize();
 	face18Norm = (face7Edge1.cross(face10Edge1)).normalize();
 	face19Norm = (face8Edge0.cross(face5Edge2)).normalize();
+
+	// Place all normal vectors into vector
+	normVects.push_back(face0Norm);
+	normVects.push_back(face1Norm);
+	normVects.push_back(face2Norm);
+	normVects.push_back(face3Norm);
+	normVects.push_back(face4Norm);
+	normVects.push_back(face5Norm);
+	normVects.push_back(face6Norm);
+	normVects.push_back(face7Norm);
+	normVects.push_back(face8Norm);
+	normVects.push_back(face9Norm);
+	normVects.push_back(face10Norm);
+	normVects.push_back(face11Norm);
+	normVects.push_back(face12Norm);
+	normVects.push_back(face13Norm);
+	normVects.push_back(face14Norm);
+	normVects.push_back(face15Norm);
+	normVects.push_back(face16Norm);
+	normVects.push_back(face17Norm);
+	normVects.push_back(face18Norm);
+	normVects.push_back(face19Norm);
 
 	/*
 	std::cout << "Face 0: " << face0Norm << std::endl;
@@ -168,6 +198,8 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
 {
+	int currSurface;
+
 	if (dt <= 0.0) {
     	throw std::invalid_argument("dt is not positive");
   	}
@@ -178,6 +210,12 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
   	switch (controller_mode) {
   		case 1:
   			// Code for face mode
+  			counter++;
+  			if (counter >= 1000) {
+  				currSurface = contactSurfaceDetection();
+  				counter = 0;
+  			}
+  			
   			break;
   		case 2:
   			// Code for dead reckoning mode
@@ -187,6 +225,36 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 int T6RollingController::contactSurfaceDetection()
 {
-	int currSurface = 0;
+	double dotProd;
+	double maxDotProd = 0;
+	int currSurface = -1;
+	btVector3& robotGravity = getRobotGravity();
+	for (int i = 0; i < normVects.size(); i++) {
+		dotProd = robotGravity.dot(normVects[i]);
+		//std::cout << dotProd << std::endl;
+		if (dotProd > maxDotProd) {
+			maxDotProd = dotProd;
+			currSurface = i;
+		}
+  	}
+
+  	if (currSurface == -1) {
+  		std::cout << "No surface found" << std::endl;
+  	}
+
+  	std::cout << "Contact surface: " << currSurface << std::endl;
+
 	return currSurface;
+}
+
+btVector3& T6RollingController::getRobotGravity() {
+	worldTrans = sixBarRod2->getWorldTransform();
+	robotToWorld = worldTrans.getBasis();
+	//std::cout << robotToWorld.getRow(0) << std::endl;
+	//std::cout << robotToWorld.getRow(1) << std::endl;
+	//std::cout << robotToWorld.getRow(2) << std::endl;
+	worldToRobot = robotToWorld.inverse();
+  	gravVectRobot = worldToRobot * gravVectWorld;
+  	std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
+  	return gravVectRobot;
 }
