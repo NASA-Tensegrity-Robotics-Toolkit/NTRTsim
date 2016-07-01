@@ -1,21 +1,21 @@
 project(WorldImportTest)
 
 #set(BULLET_HOME_DIR /home/edward/NTRTsim/env/build/bullet)
-set(BULLET_HOME_DIR ../../../../env/build/bullet)
-set(BULLET_SERIALIZE_DIR ${BULLET_HOME_DIR}/Extras/Serialize)
+#set(BULLET_HOME_DIR ../../../../env/build/bullet)
+#set(BULLET_SERIALIZE_DIR ${BULLET_HOME_DIR}/Extras/Serialize)
 
-message(STATUS "BULLET_HOME_DIR: " ${BULLET_HOME_DIR})
-message(STATUS "BULLET_SERIALIZE_DIR: " ${BULLET_SERIALIZE_DIR})
+#message(STATUS "BULLET_HOME_DIR: " ${BULLET_HOME_DIR})
+#message(STATUS "BULLET_SERIALIZE_DIR: " ${BULLET_SERIALIZE_DIR})
 
-include_directories(
-${BULLET_SERIALIZE_DIR}/BulletFileLoader
-${BULLET_SERIALIZE_DIR}/BulletWorldImporter
-)
+#include_directories(
+#${BULLET_SERIALIZE_DIR}/BulletFileLoader
+#${BULLET_SERIALIZE_DIR}/BulletWorldImporter
+#)
 
 link_directories(
 ${LIB_DIR}
-${BULLET_SERIALIZE_DIR}/BulletFileLoader
-${BULLET_SERIALIZE_DIR}/BulletWorldImporter
+#${BULLET_SERIALIZE_DIR}/BulletFileLoader
+#${BULLET_SERIALIZE_DIR}/BulletWorldImporter
 )
 
 link_libraries(core
@@ -28,8 +28,9 @@ link_libraries(core
                yaml-cpp
 	       Adapters
 	       TensegrityModel
-               BulletFileLoader
-               BulletWorldImporter)
+               #BulletFileLoader
+               #BulletWorldImporter
+)
 
 # add_library(TensegrityModel
 #     TensegrityModel.cpp)

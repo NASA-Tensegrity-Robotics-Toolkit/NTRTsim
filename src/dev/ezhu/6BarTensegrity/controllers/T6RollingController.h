@@ -76,22 +76,50 @@ public:
 	};
 
 	/**
-	  * Allow a user to specify their own config
-	  */
+	 * Constructor, allows a user to specify their own config
+	 */
 	T6RollingController(const T6RollingController::Config& config);
 
 	/**
-	  * Destructor
-	  */
+	 * Destructor
+	 */
 	virtual ~T6RollingController();
 
+	/**
+	 * Select controller mode based on configuration. Define the normal vectors for 
+	 * all icosahedron faces as well as the adjacency matrix.
+	 * @param[in] subject - the model that the controller attaches to
+	 */
 	virtual void onSetup(sixBarModel& subject);
 
+	/**
+	 * Run the controller.
+	 * @param[in] subject - the model that the controller attaches to
+	 * @param[in] dt - the physics time step from the app file
+	 */
 	virtual void onStep(sixBarModel& subject, double dt);
 
+	/**
+	 * Calculate the gravity vector in the robot frame
+	 * @return The direction of gravity in the robot frame
+	 */
 	btVector3& getRobotGravity();
 
+	/**
+	 * Detect which surface of the robot is in contact with the ground
+	 * ToDo: test and improve for any arbitrary ground orientation
+	 * @return The number of the face which is in contact with the ground
+	 */
 	int contactSurfaceDetection();
+
+	/**
+	 * Find the shortest path using Dijkstra to get from the start node to the end node
+	 * @param[in] adjMat - The adjacency matrix of the robot where each face is representated as a node
+	 * @param[in] startNode - The starting node
+	 * @param[in] endNode - The destination node
+	 * @return A vector containing the sequence of steps to get from the start node to end node
+	 */
+	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode);
 
 private:
 	// Store the configuration data for use later
@@ -167,16 +195,36 @@ private:
 	btVector3 face18Norm;
 	btVector3 face19Norm;
 
-	// Transformation information
-	btTransform worldTrans;
-
 	// Gravity vectors
 	btVector3 gravVectWorld;
-	btVector3 gravVectRobot;
 
-	// Transformation matricies
-	btMatrix3x3 robotToWorld;
-	btMatrix3x3 worldToRobot;
+	// Vector to hold path found using Dijkstra's
+	std::vector<int> path;
+
+	// Rows of adjacency matrix
+	std::vector<int> node0Adj;
+	std::vector<int> node1Adj;
+	std::vector<int> node2Adj;
+	std::vector<int> node3Adj;
+	std::vector<int> node4Adj;
+	std::vector<int> node5Adj;
+	std::vector<int> node6Adj;
+	std::vector<int> node7Adj;
+	std::vector<int> node8Adj;
+	std::vector<int> node9Adj;
+	std::vector<int> node10Adj;
+	std::vector<int> node11Adj;
+	std::vector<int> node12Adj;
+	std::vector<int> node13Adj;
+	std::vector<int> node14Adj;
+	std::vector<int> node15Adj;
+	std::vector<int> node16Adj;
+	std::vector<int> node17Adj;
+	std::vector<int> node18Adj;
+	std::vector<int> node19Adj;
+
+	// Vector holding row information of adjacency matrix
+	std::vector< std::vector<int> > A;
 
 	// Debugging counter
 	int counter;
