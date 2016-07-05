@@ -119,7 +119,7 @@ sixBarModel::sixBarModel() : tgModel()
 	face10Edge1 = node6 - node10;	// 21
 	face10Edge2 = node2 - node6;	// 8
 
-	face13Edge0 = node1 - node7;	// 7
+	face13Edge0 = node1 - node7;	// 5
 	face13Edge1 = node8 - node1;	// 6
 	face13Edge2 = node7 - node8;	// 22
 
@@ -216,7 +216,7 @@ void sixBarModel::setup(tgWorld& world)
 	//addPayload(s);
 
 	// Move the structure
-	rotateToFace(s, 10);
+	rotateToFace(s, 0);
 	s.move(btVector3(0,10,0));
 
 	// Create the build spec that uses tags to turn the structure into a real model

@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel();
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 1);
+    const T6RollingController::Config controllerConfig(gravity, "face", 10);
     
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

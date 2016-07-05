@@ -42,7 +42,7 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, in
 m_gravity(gravity), m_mode(mode), m_face_goal(face_goal)
 {
 	assert(m_gravity >= 0);
-	assert((m_face_goal >= 0) && (m_face_goal <=7));
+	assert((m_face_goal >= 0) && (m_face_goal <= 19));
 
 	if (m_mode.compare("face") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
@@ -86,6 +86,10 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	if (c_mode.compare("face") == 0) {
 		std::cout << "onSetup: Goal face: " << c_face_goal << std::endl;
 		controller_mode = 1;
+		if (!isClosedFace(c_face_goal)) {
+			std::cout << "onSetup: Goal face is not a closed face, exiting..." << std::endl;
+			exit(EXIT_FAILURE);
+		}
 	}
 	else {
 		std::cout << "onSetup: Dead reckoning direction: [" << c_dr_goal.x() << ", " 
@@ -141,7 +145,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0); // 1
 	node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
 	node3Adj  = boost::assign::list_of(0)(0)(1)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 3
-	node4Adj  = boost::assign::list_of(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 4
+	node4Adj  = boost::assign::list_of(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 4
 	node5Adj  = boost::assign::list_of(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1); // 5
 	node6Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 6
 	node7Adj  = boost::assign::list_of(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0); // 7
@@ -165,7 +169,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 1
 	node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
 	node3Adj  = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 3
-	node4Adj  = boost::assign::list_of(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 4
+	node4Adj  = boost::assign::list_of(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 4
 	node5Adj  = boost::assign::list_of(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1); // 5
 	node6Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 6
 	node7Adj  = boost::assign::list_of(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0); // 7
@@ -233,6 +237,50 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		m_controllers.push_back(m_lenController);
 		//std::cout << "onSetup: Cable " << i << ": " << pActuator->getCurrentLength() << std::endl;
 	}
+
+	// Actuation policy table
+	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
+	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
+	node1AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
+	node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
+	node3AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
+	node4AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
+	node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
+	node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
+	node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
+	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
+	node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
+	node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
+	node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 11
+	node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 12
+	node13AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)( 5)(-1)( 6)(-1)(-1)(-1); // 13
+	node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 14
+	node15AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)( 4)(-1)(-1)( 7)(-1)(-1); // 15
+	node16AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 16
+	node17AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 17
+	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
+	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
+
+	actuationPolicy.push_back(node0AP);
+	actuationPolicy.push_back(node1AP);
+	actuationPolicy.push_back(node2AP);
+	actuationPolicy.push_back(node3AP);
+	actuationPolicy.push_back(node4AP);
+	actuationPolicy.push_back(node5AP);
+	actuationPolicy.push_back(node6AP);
+	actuationPolicy.push_back(node7AP);
+	actuationPolicy.push_back(node8AP);
+	actuationPolicy.push_back(node9AP);
+	actuationPolicy.push_back(node10AP);
+	actuationPolicy.push_back(node11AP);
+	actuationPolicy.push_back(node12AP);
+	actuationPolicy.push_back(node13AP);
+	actuationPolicy.push_back(node14AP);
+	actuationPolicy.push_back(node15AP);
+	actuationPolicy.push_back(node16AP);
+	actuationPolicy.push_back(node17AP);
+	actuationPolicy.push_back(node18AP);
+	actuationPolicy.push_back(node19AP);
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
@@ -249,12 +297,15 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	  			bool isOnGround = checkOnGround();
 	  			
 	  			// Remove later
-	  			int currSurface = contactSurfaceDetection();
+	  			//int currSurface = contactSurfaceDetection();
 
-	  			/*
-	  			if (isOnGround == true && runPathGen == false) {
-	  				int currSurface = contactSurfaceDetection();
-	  				if (currSurface >= 0) {
+	  			if (isOnGround == true && runPathGen == false && stepFin == true) {
+	  				currSurface = contactSurfaceDetection();
+	  				if (currSurface == c_face_goal) {
+	  					goalReached = true;
+	  					std::cout << "onStep: Destination face reached" << std::endl;
+	  				}
+	  				if (currSurface >= 0 && goalReached == false) {
 	  					path = findPath(A, currSurface, c_face_goal);
 	  					utility::printVector(path);
 	  				}
@@ -263,11 +314,17 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	  			else if (isOnGround == false && runPathGen == true) {
 	  				runPathGen = false;
 	  			}
-	  			*/
 
-	  			int cable = 8;
+	  			if (currSurface >= 0 && goalReached == false) {
+	  				stepFin = stepToFace(currSurface, path[1], dt);
+	  			}
+
+	  			//std::cout << isOnGround << runPathGen << stepFin << goalReached << std::endl;
+	  			/*
+	  			int cable = 7;
 	  			m_controllers[cable]->control(dt, 4);
 	  			actuators[cable]->moveMotors(dt);
+	  			*/
 	  			break;
   			}
   		case 2:
@@ -277,15 +334,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
   			}
   		}
   	}
-  	else {
-  		for (size_t i = 0; i < actuators.size(); i++) {
-  			m_controllers[i]->control(dt, restLength);
-  			actuators[i]->moveMotors(dt);
-  		}
-  		if (actuators[actuators.size()-1]->getCurrentLength()-restLength < 0.01) {
-  			robotReady = true;
-  		}
-  	}
+  	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
 }
 
 bool T6RollingController::checkOnGround()
@@ -458,4 +507,64 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 
 	//std::cout << "End Reached: " << endReached << ", No Solution: " << noSolution << std::endl;
 	return pathVect;
+}
+
+bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
+{
+	bool stepFinished;
+	int cableToActuate = actuationPolicy[startFace][endFace];
+	int currFace = contactSurfaceDetection();
+	if (cableToActuate >= 0) {
+		if (currFace != path[2]) {
+			m_controllers[cableToActuate]->control(dt, 3);
+			std::cout << "stepToFace: Stepping..." << std::endl;
+			stepFinished = false;
+		}
+		else if (currFace == path[2]) {
+			m_controllers[cableToActuate]->control(dt, restLength);
+			std::cout << "stepToFace: Returning to rest length..." << std::endl;
+			stepFinished = false;
+			std::cout << actuators[cableToActuate]->getCurrentLength() << ", " << restLength << std::endl;
+			if (actuators[cableToActuate]->getCurrentLength()-restLength < 1.5) {
+				std::cout << "Step finished" << std::endl;
+				stepFinished = true;
+	  		}
+		}
+		actuators[cableToActuate]->moveMotors(dt);
+	}
+	else {
+		std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	return stepFinished;
+}
+
+bool T6RollingController::isClosedFace(int desFace)
+{
+	bool isClosedFace = false;
+	std::vector<int> closedFaces;
+	closedFaces  = boost::assign::list_of(0)(2)(5)(7)(8)(10)(13)(15);
+
+	for (size_t i = 0; i < closedFaces.size(); i++) {
+		if (desFace == closedFaces[i]) {
+			isClosedFace = true;
+		}
+	}
+
+	return isClosedFace;
+}
+
+bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& controllers, 
+										  std::vector<tgBasicActuator*>& actuators, 
+										  double setLength, double dt)
+{
+	bool returnFin = false;
+	for (size_t i = 0; i < actuators.size(); i++) {
+		controllers[i]->control(dt, setLength);
+		actuators[i]->moveMotors(dt);
+	}
+	if (actuators[actuators.size()-1]->getCurrentLength()-setLength < 1.5) {
+		returnFin = true;
+	}
+	return returnFin;
 }

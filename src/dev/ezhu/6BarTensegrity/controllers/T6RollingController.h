@@ -129,6 +129,14 @@ public:
 	 */
 	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode);
 
+	bool stepToFace(int currFace, int desFace, double dt);
+
+	bool isClosedFace(int desFace);
+
+	bool setAllActuators(std::vector<tgBasicController*>& controllers, 
+						 std::vector<tgBasicActuator*>& actuators, 
+						 double setLength, double dt);
+
 private:
 	// Store the configuration data for use later
 	Config m_config;
@@ -192,8 +200,37 @@ private:
 	// Rest length of cables
 	double restLength;
 
+	// Rows of actuation policy matrix
+	std::vector<int> node0AP;
+	std::vector<int> node1AP;
+	std::vector<int> node2AP;
+	std::vector<int> node3AP;
+	std::vector<int> node4AP;
+	std::vector<int> node5AP;
+	std::vector<int> node6AP;
+	std::vector<int> node7AP;
+	std::vector<int> node8AP;
+	std::vector<int> node9AP;
+	std::vector<int> node10AP;
+	std::vector<int> node11AP;
+	std::vector<int> node12AP;
+	std::vector<int> node13AP;
+	std::vector<int> node14AP;
+	std::vector<int> node15AP;
+	std::vector<int> node16AP;
+	std::vector<int> node17AP;
+	std::vector<int> node18AP;
+	std::vector<int> node19AP;
+
 	// Actuation policy table
 	std::vector< std::vector<int> > actuationPolicy;
+
+	// Hold current surface from contact surface detection
+	int currSurface = -1;
+
+	bool stepFin = true;
+
+	bool goalReached = false;
 };
 
 #endif
