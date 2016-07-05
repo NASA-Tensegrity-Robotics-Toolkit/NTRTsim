@@ -74,7 +74,7 @@ namespace
 sixBarModel::sixBarModel() : tgModel() 
 {
 	// Calculate the space between two parallel rods based on the rod length from Config
-	rodDist = sf * (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 
 	// Nodes in the x-z plane
 	node0 = btVector3(-rodDist/2, 0, config.rodLength/2); // 0
@@ -217,7 +217,7 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Move the structure
 	rotateToFace(s, 0);
-	s.move(btVector3(0,10,0));
+	s.move(btVector3(100,1300,-100));
 
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
@@ -282,7 +282,7 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	 */
 	
 	// Calculate the space between two parallel rods based on the rod length from Config
-	double rodSpace = sf * (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+	double rodSpace = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 
 	// Nodes in the x-z plane
 	s.addNode(-rodSpace/2, 0, config.rodLength/2); // 0

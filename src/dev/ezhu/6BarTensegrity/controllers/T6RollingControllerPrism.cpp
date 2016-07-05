@@ -17,7 +17,7 @@
  */
 
 /**
- * @file T6RollingController.cpp
+ * @file T6RollingControllerPrism.cpp
  * @brief Implementation of the rolling controller.
  * @author Edward Zhu
  * @version 1.0.0
@@ -25,7 +25,7 @@
  */
 
 // This module
-#include "T6RollingController.h"
+#include "T6RollingControllerPrism.h"
 // The C++ Standard Library
 #include <iostream>
 #include <cassert>
@@ -80,7 +80,7 @@ T6RollingController::~T6RollingController()
 	m_controllers.clear();
 }
 
-void T6RollingController::onSetup(sixBarModel& subject)
+void T6RollingController::onSetup(PrismModel& subject)
 {
 	std::cout << "onSetup: " << c_mode << " mode chosen" << std::endl;
 	if (c_mode.compare("face") == 0) {
@@ -283,7 +283,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	actuationPolicy.push_back(node19AP);
 }
 
-void T6RollingController::onStep(sixBarModel& subject, double dt)
+void T6RollingController::onStep(PrismModel& subject, double dt)
 {
 	if (dt <= 0.0) {
     	throw std::invalid_argument("onStep: dt is not positive");

@@ -31,6 +31,7 @@
 #include "sixBarModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgImportGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -39,8 +40,10 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
-// Controller for tension sensing
-//#include "controllers/tensionSensor.h"
+#include <fstream>
+#include <string>
+#include <math.h>
+// Controller
 #include "controllers/T6RollingController.h"
 
 /**
@@ -56,9 +59,48 @@ int main(int argc, char** argv)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    //tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    // Set ground parameters
+    btVector3 orientation = btVector3(yaw, pitch, roll);
+    const double friction = 0.5;
+    const double restitution = 0.0;
+    btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    const double margin = 0.05;
+    const double offset = 0.5;
+    const double scalingFactor = 100;
+
+    // Configure ground characteristics
+    const tgImportGround::Config groundConfig(orientation, friction, restitution,
+        origin, margin, offset, scalingFactor);
+
+    // Get filename from argv
+    std::string filename_in = argv[1];
+
+    // Check filename
+    if (filename_in.find(".txt") == std::string::npos) {
+        std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    //Create filestream
+    std::fstream file_in;
+
+    // Open filestream
+    file_in.open(filename_in.c_str(), std::fstream::in);
+
+    // Check if input file opened successfully
+    if (!file_in.is_open()) {
+        std::cout << "Failed to open input file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else {
+        std::cout << "Input file opened successfully" << std::endl;
+    }
+
+    tgImportGround* ground = new tgImportGround(groundConfig, file_in);
 
     double gravity = 98.1;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
