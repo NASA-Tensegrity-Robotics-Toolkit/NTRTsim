@@ -29,6 +29,8 @@
 
 // This Library
 #include "core/tgObserver.h"
+#include "core/tgRod.h"
+#include "controllers/tgBasicController.h"
 
 // The Model
 #include "../sixBarModel.h"
@@ -103,7 +105,13 @@ public:
 	 * Calculate the gravity vector in the robot frame
 	 * @return The direction of gravity in the robot frame
 	 */
-	btVector3& getRobotGravity();
+	btVector3 getRobotGravity();
+
+	/**
+	 * Check to see if the robot is in contact with the ground
+	 * @return A boolean indicating whether or not the robot is on the ground
+	 */
+	bool checkOnGround();
 
 	/**
 	 * Detect which surface of the robot is in contact with the ground
@@ -129,71 +137,11 @@ private:
 	btVector3 c_dr_goal;
 	int controller_mode;
 
-	// Rigid body objects
-	btRigidBody* sixBarRod0;
-	btRigidBody* sixBarRod1;
-	btRigidBody* sixBarRod2;
-	btRigidBody* sixBarRod3;
-	btRigidBody* sixBarRod4;
-	btRigidBody* sixBarRod5;
-
-	// Edge vectors of all closed triangles
-	btVector3 face0Edge0;
-	btVector3 face0Edge1;
-	btVector3 face0Edge2;
-
-	btVector3 face2Edge0;
-	btVector3 face2Edge1;
-	btVector3 face2Edge2;
-
-	btVector3 face5Edge0;
-	btVector3 face5Edge1;
-	btVector3 face5Edge2;
-
-	btVector3 face7Edge0;
-	btVector3 face7Edge1;
-	btVector3 face7Edge2;
-
-	btVector3 face8Edge0;
-	btVector3 face8Edge1;
-	btVector3 face8Edge2;
-
-	btVector3 face10Edge0;
-	btVector3 face10Edge1;
-	btVector3 face10Edge2;
-
-	btVector3 face13Edge0;
-	btVector3 face13Edge1;
-	btVector3 face13Edge2;
-
-	btVector3 face15Edge0;
-	btVector3 face15Edge1;
-	btVector3 face15Edge2;
+	// Vector of rigid body objects
+	std::vector<btRigidBody*> rodBodies;
 
 	// A vector to hold all normal vectors
 	std::vector<btVector3> normVects;
-
-	// Normal vectors of all icosahedron faces
-	btVector3 face0Norm;
-	btVector3 face1Norm;
-	btVector3 face2Norm;
-	btVector3 face3Norm;
-	btVector3 face4Norm;
-	btVector3 face5Norm;
-	btVector3 face6Norm;
-	btVector3 face7Norm;
-	btVector3 face8Norm;
-	btVector3 face9Norm;
-	btVector3 face10Norm;
-	btVector3 face11Norm;
-	btVector3 face12Norm;
-	btVector3 face13Norm;
-	btVector3 face14Norm;
-	btVector3 face15Norm;
-	btVector3 face16Norm;
-	btVector3 face17Norm;
-	btVector3 face18Norm;
-	btVector3 face19Norm;
 
 	// Gravity vectors
 	btVector3 gravVectWorld;
@@ -226,8 +174,26 @@ private:
 	// Vector holding row information of adjacency matrix
 	std::vector< std::vector<int> > A;
 
+	bool runPathGen = false;
+
 	// Debugging counter
 	int counter;
+
+	// Ready flag
+	bool robotReady = false;
+
+	// Vectors to hold actuators and rods
+	std::vector<tgBasicActuator*> actuators;
+	std::vector<tgRod*> rods;
+
+	// Vector to hold controllers for the cables
+	std::vector<tgBasicController*> m_controllers;
+	
+	// Rest length of cables
+	double restLength;
+
+	// Actuation policy table
+	std::vector< std::vector<int> > actuationPolicy;
 };
 
 #endif

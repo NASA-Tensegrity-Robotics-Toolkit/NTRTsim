@@ -83,11 +83,11 @@ int main(int argc, char** argv)
     
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
-    T6RollingController* const rolling_controller = new T6RollingController(controllerConfig);
+    T6RollingController* const rollingController = new T6RollingController(controllerConfig);
     
     // Attach controller to the model
     //myModel -> attach(tension_sensor);
-    myModel->attach(rolling_controller);
+    myModel->attach(rollingController);
 
     // Add the model to the world
     simulation.addModel(myModel);

@@ -28,6 +28,8 @@
 #include <math.h>
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
+// Utility Library
+#include "utility.hpp"
 
 namespace 
 {
@@ -36,7 +38,7 @@ namespace
    * All parameters must be positive.
    */
 
-   double sf = 1;
+   double sf = 10;
 
    const struct Config 
    {
@@ -54,25 +56,25 @@ namespace
    		double targetVelocity;
    	} config =
    		{
-   			0.688/pow(sf,3),    // density (kg / length^3)
-	        0.31*sf,     // radius (length)
+   			688/pow(sf,3),    // density (kg / length^3)
+	        0.031*sf,     // radius (length)
 	        1615.0,   // stiffness (kg / sec^2) was 1500
 	        200.0,    // damping (kg / sec)
-	        16.84*sf,     // rodLength (length)
+	        1.684*sf,     // rodLength (length)
 	        0.99,      // friction (unitless)
 	        0.01,     // rollFriction (unitless)
 	        0.0,      // restitution (?)
-	        3000.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+	        300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
 	        0,         // History logging (boolean)
-	        100000*sf,   // maxTension
-	        10000*sf,    // targetVelocity   
+	        10000*sf,   // maxTension
+	        0.5*sf,    // targetVelocity   
    		};
 }
 
 sixBarModel::sixBarModel() : tgModel() 
 {
 	// Calculate the space between two parallel rods based on the rod length from Config
-	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+	rodDist = sf * (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
 
 	// Nodes in the x-z plane
 	node0 = btVector3(-rodDist/2, 0, config.rodLength/2); // 0
@@ -91,6 +93,85 @@ sixBarModel::sixBarModel() : tgModel()
 	node9 = btVector3(-config.rodLength/2, rodDist/2, 0); // 9
 	node10 = btVector3(config.rodLength/2, rodDist/2, 0); // 10
 	node11 = btVector3(config.rodLength/2, -rodDist/2, 0); // 11
+
+	// Find all edge vectors of closed triangles	// Actuator #
+	face0Edge0 = node8 - node4;		// 16
+	face0Edge1 = node0 - node8;		// 2
+	face0Edge2 = node4 - node0;		// 0
+
+	face2Edge0 = node9 - node0;		// 3
+	face2Edge1 = node5 - node9;		// 18
+	face2Edge2 = node0 - node5;		// 1
+
+	face5Edge0 = node3 - node4;		// 12
+	face5Edge1 = node11 - node3;	// 15
+	face5Edge2 = node4 - node11;	// 17
+
+	face7Edge0 = node5 - node3;		// 13
+	face7Edge1 = node10 - node5;	// 19
+	face7Edge2 = node3 - node10;	// 14
+
+	face8Edge0 = node11 - node7;	// 23
+	face8Edge1 = node2 - node11;	// 11
+	face8Edge2 = node7 - node2;		// 9
+
+	face10Edge0 = node10 - node2;	// 10
+	face10Edge1 = node6 - node10;	// 21
+	face10Edge2 = node2 - node6;	// 8
+
+	face13Edge0 = node1 - node7;	// 7
+	face13Edge1 = node8 - node1;	// 6
+	face13Edge2 = node7 - node8;	// 22
+
+	face15Edge0 = node6 - node1;	// 4
+	face15Edge1 = node9 - node6;	// 20
+	face15Edge2 = node1 - node9;	// 7
+
+	// Find normal vectors to all faces
+	face0Norm = (face0Edge0.cross(face0Edge2)).normalize();
+	face1Norm = (face0Edge1.cross(face2Edge0)).normalize();
+	face2Norm = (face2Edge0.cross(face2Edge2)).normalize();
+	face3Norm = (face7Edge0.cross(face2Edge2)).normalize();
+	face4Norm = (face0Edge2.cross(face5Edge0)).normalize();
+	face5Norm = (face5Edge0.cross(face5Edge2)).normalize();
+	face6Norm = (face7Edge2.cross(face5Edge1)).normalize();
+	face7Norm = (face7Edge0.cross(face7Edge2)).normalize();
+
+	face8Norm = (face8Edge0.cross(face8Edge2)).normalize();
+	face9Norm = (face8Edge1.cross(face10Edge0)).normalize();
+	face10Norm = (face10Edge0.cross(face10Edge2)).normalize();
+	face11Norm = (face15Edge0.cross(face10Edge2)).normalize();
+	face12Norm = (face8Edge2.cross(face13Edge0)).normalize();
+	face13Norm = (face13Edge0.cross(face13Edge2)).normalize();
+	face14Norm = (face15Edge2.cross(face13Edge1)).normalize();
+	face15Norm = (face15Edge0.cross(face15Edge2)).normalize();
+
+	face16Norm = (face0Edge0.cross(face13Edge2)).normalize();
+	face17Norm = (face15Edge1.cross(face2Edge1)).normalize();
+	face18Norm = (face7Edge1.cross(face10Edge1)).normalize();
+	face19Norm = (face8Edge0.cross(face5Edge2)).normalize();
+
+	// Place all normal vectors into vector
+	normalVectors.push_back(face0Norm);
+	normalVectors.push_back(face1Norm);
+	normalVectors.push_back(face2Norm);
+	normalVectors.push_back(face3Norm);
+	normalVectors.push_back(face4Norm);
+	normalVectors.push_back(face5Norm);
+	normalVectors.push_back(face6Norm);
+	normalVectors.push_back(face7Norm);
+	normalVectors.push_back(face8Norm);
+	normalVectors.push_back(face9Norm);
+	normalVectors.push_back(face10Norm);
+	normalVectors.push_back(face11Norm);
+	normalVectors.push_back(face12Norm);
+	normalVectors.push_back(face13Norm);
+	normalVectors.push_back(face14Norm);
+	normalVectors.push_back(face15Norm);
+	normalVectors.push_back(face16Norm);
+	normalVectors.push_back(face17Norm);
+	normalVectors.push_back(face18Norm);
+	normalVectors.push_back(face19Norm);
 }
 
 sixBarModel::~sixBarModel()
@@ -135,7 +216,7 @@ void sixBarModel::setup(tgWorld& world)
 	//addPayload(s);
 
 	// Move the structure
-	//s.addRotation(btVector3(0,0,0), btVector3(0,0,1), M_PI);
+	rotateToFace(s, 10);
 	s.move(btVector3(0,10,0));
 
 	// Create the build spec that uses tags to turn the structure into a real model
@@ -149,35 +230,11 @@ void sixBarModel::setup(tgWorld& world)
 	tgStructureInfo structureInfo(s, spec);
 	structureInfo.buildInto(*this, world);
 
-	// Get actuators
-	allActuators = getAllActuators();
-
 	// Get the rod rigid bodies for controller
-	std::vector<tgRod *> sixBarRods = sixBarModel::find<tgRod>("rod");
+	allRods = sixBarModel::find<tgRod>("rod");
 
-	tgRod* rod0 = sixBarRods[0];
-	btRigidBody* rod0RigidBody = rod0->getPRigidBody();
-	rodBodies.push_back(rod0RigidBody);
-
-	tgRod* rod1 = sixBarRods[1];
-	btRigidBody* rod1RigidBody = rod1->getPRigidBody();
-	rodBodies.push_back(rod1RigidBody);
-
-	tgRod* rod2 = sixBarRods[2];
-	btRigidBody* rod2RigidBody = rod2->getPRigidBody();
-	rodBodies.push_back(rod2RigidBody);
-
-	tgRod* rod3 = sixBarRods[3];
-	btRigidBody* rod3RigidBody = rod3->getPRigidBody();
-	rodBodies.push_back(rod3RigidBody);
-
-	tgRod* rod4 = sixBarRods[4];
-	btRigidBody* rod4RigidBody = rod4->getPRigidBody();
-	rodBodies.push_back(rod4RigidBody);
-
-	tgRod* rod5 = sixBarRods[5];
-	btRigidBody* rod5RigidBody = rod5->getPRigidBody();
-	rodBodies.push_back(rod5RigidBody);
+	// Get the actuators for controller
+	allActuators = sixBarModel::find<tgBasicActuator>("actuator");
 
 	// Notify controllers that setup has finished
 	notifySetup();
@@ -197,9 +254,19 @@ void sixBarModel::onVisit(tgModelVisitor& r)
 	tgModel::onVisit(r);
 }
 
-const std::vector<tgSpringCableActuator*>& sixBarModel::getAllActuators() const
+std::vector<tgBasicActuator*>& sixBarModel::getAllActuators()
 {
 	return allActuators;
+}
+
+std::vector<tgRod*>& sixBarModel::getAllRods()
+{
+	return allRods;
+}
+
+std::vector<btVector3>& sixBarModel::getNormVects()
+{
+	return normalVectors;
 }
 
 void sixBarModel::teardown()
@@ -215,7 +282,7 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	 */
 	
 	// Calculate the space between two parallel rods based on the rod length from Config
-	double rodSpace = 10*(-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
+	double rodSpace = sf * (-config.rodLength + sqrt(pow(config.rodLength,2)+4*config.rodLength))/2;
 
 	// Nodes in the x-z plane
 	s.addNode(-rodSpace/2, 0, config.rodLength/2); // 0
@@ -238,47 +305,47 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 
 void sixBarModel::addSixBarRods(tgStructure& s)
 {
-	s.addPair(0, 1, "rod");
-	s.addPair(3, 2, "rod");
-	s.addPair(4, 5, "rod");
-	s.addPair(7, 6, "rod");
-	s.addPair(8, 11, "rod");
-	s.addPair(9, 10, "rod");
+	s.addPair(0, 1, "rod"); // 0
+	s.addPair(3, 2, "rod"); // 1
+	s.addPair(4, 5, "rod"); // 2
+	s.addPair(7, 6, "rod"); // 3
+	s.addPair(8, 11, "rod"); // 4
+	s.addPair(9, 10, "rod"); // 5
 }
 
 void sixBarModel::addSixBarActuators(tgStructure& s)
 {
-	s.addPair(0, 4, "actuator");
-	s.addPair(0, 5, "actuator");
-	s.addPair(0, 8, "actuator");
-	s.addPair(0, 9, "actuator");
+	s.addPair(0, 4, "actuator"); // 0
+	s.addPair(0, 5, "actuator"); // 1
+	s.addPair(0, 8, "actuator"); // 2
+	s.addPair(0, 9, "actuator"); // 3
 
-	s.addPair(1, 6, "actuator");
-	s.addPair(1, 7, "actuator");
-	s.addPair(1, 8, "actuator");
-	s.addPair(1, 9, "actuator");
+	s.addPair(1, 6, "actuator"); // 4
+	s.addPair(1, 7, "actuator"); // 5
+	s.addPair(1, 8, "actuator"); // 6
+	s.addPair(1, 9, "actuator"); // 7
 
-	s.addPair(2, 6, "actuator");
-	s.addPair(2, 7, "actuator");
-	s.addPair(2, 10, "actuator");
-	s.addPair(2, 11, "actuator");
+	s.addPair(2, 6, "actuator"); // 8
+	s.addPair(2, 7, "actuator"); // 9
+	s.addPair(2, 10, "actuator"); // 10
+	s.addPair(2, 11, "actuator"); // 11
 
-	s.addPair(3, 4, "actuator");
-	s.addPair(3, 5, "actuator");
-	s.addPair(3, 10, "actuator");
-	s.addPair(3, 11, "actuator");
+	s.addPair(3, 4, "actuator"); // 12
+	s.addPair(3, 5, "actuator"); // 13
+	s.addPair(3, 10, "actuator"); // 14
+	s.addPair(3, 11, "actuator"); // 15
 
-	s.addPair(4, 8, "actuator");
-	s.addPair(4, 11, "actuator");
+	s.addPair(4, 8, "actuator"); // 16
+	s.addPair(4, 11, "actuator"); // 17
 
-	s.addPair(5, 9, "actuator");
-	s.addPair(5, 10, "actuator");
+	s.addPair(5, 9, "actuator"); // 18
+	s.addPair(5, 10, "actuator"); // 19
 
-	s.addPair(6, 9, "actuator");
-	s.addPair(6, 10, "actuator");
+	s.addPair(6, 9, "actuator"); // 20
+	s.addPair(6, 10, "actuator"); // 21
 
-	s.addPair(7, 8, "actuator");
-	s.addPair(7, 11, "actuator");
+	s.addPair(7, 8, "actuator"); // 22
+	s.addPair(7, 11, "actuator"); // 23
 }
 
 void sixBarModel::addPayloadNodes(tgStructure& s)
@@ -296,4 +363,15 @@ void sixBarModel::addPayloadRods(tgStructure& s)
 void sixBarModel::addPayloadStrings(tgStructure& s)
 {
 
+}
+
+void sixBarModel::rotateToFace(tgStructure& s, int face)
+{
+	btVector3 faceNorm = normalVectors[face];
+	btVector3 goalDir = btVector3(0, -1, 0);
+	double dotProd = faceNorm.dot(goalDir);
+	double theta = acos(dotProd);
+	btVector3 crossProd = faceNorm.cross(goalDir);
+
+	s.addRotation(btVector3(0,0,0), crossProd, theta);
 }

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <cassert>
 #include <algorithm>
+#include <math.h>
 // Boost Matrix Library
 //#include "numeric/ublas/matrix.hpp"
 //#include "numeric/ublas/io.hpp" 
@@ -76,7 +77,7 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 
 T6RollingController::~T6RollingController()
 {
-
+	m_controllers.clear();
 }
 
 void T6RollingController::onSetup(sixBarModel& subject)
@@ -92,92 +93,23 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		controller_mode = 2;
 	}
 
-	// Retrieve btRigid bodies from model
-	sixBarRod0 = subject.rodBodies[0];
-	sixBarRod1 = subject.rodBodies[1];
-	sixBarRod2 = subject.rodBodies[2];
-	sixBarRod3 = subject.rodBodies[3];
-	sixBarRod4 = subject.rodBodies[4];
-	sixBarRod5 = subject.rodBodies[5];
+	// Retrieve rods from model
+	rods = subject.getAllRods();
+	//std::cout << "onSetup: Number of rods: " << rods.size() << std::endl;
 
-	// Find all edge vectors of closed triangles
-	face0Edge0 = subject.node8 - subject.node4;
-	face0Edge1 = subject.node0 - subject.node8;
-	face0Edge2 = subject.node4 - subject.node0;
+	// Convert from tgRod objects to btRigidBody objects
+	for (size_t i = 0; i < rods.size(); i++) {
+		tgRod* rod = rods[i];
+		btRigidBody* rodBody = rod->getPRigidBody();
+		rodBodies.push_back(rodBody);
+	}
 
-	face2Edge0 = subject.node9 - subject.node0;
-	face2Edge1 = subject.node5 - subject.node9;
-	face2Edge2 = subject.node0 - subject.node5;
+	// Retrieve normal vectors from model
+	normVects = subject.getNormVects();
 
-	face5Edge0 = subject.node3 - subject.node4;
-	face5Edge1 = subject.node11 - subject.node3;
-	face5Edge2 = subject.node4 - subject.node11;
-
-	face7Edge0 = subject.node5 - subject.node3;
-	face7Edge1 = subject.node10 - subject.node5;
-	face7Edge2 = subject.node3 - subject.node10;
-
-	face8Edge0 = subject.node11 - subject.node7;
-	face8Edge1 = subject.node2 - subject.node11;
-	face8Edge2 = subject.node7 - subject.node2;
-
-	face10Edge0 = subject.node10 - subject.node2;
-	face10Edge1 = subject.node6 - subject.node10;
-	face10Edge2 = subject.node2 - subject.node6;
-
-	face13Edge0 = subject.node1 - subject.node7;
-	face13Edge1 = subject.node8 - subject.node1;
-	face13Edge2 = subject.node7 - subject.node8;
-
-	face15Edge0 = subject.node6 - subject.node1;
-	face15Edge1 = subject.node9 - subject.node6;
-	face15Edge2 = subject.node1 - subject.node9;
-
-	// Find normal vectors to all faces
-	face0Norm = (face0Edge0.cross(face0Edge2)).normalize();
-	face1Norm = (face0Edge1.cross(face2Edge0)).normalize();
-	face2Norm = (face2Edge0.cross(face2Edge2)).normalize();
-	face3Norm = (face7Edge0.cross(face2Edge2)).normalize();
-	face4Norm = (face0Edge2.cross(face5Edge0)).normalize();
-	face5Norm = (face5Edge0.cross(face5Edge2)).normalize();
-	face6Norm = (face7Edge2.cross(face5Edge1)).normalize();
-	face7Norm = (face7Edge0.cross(face7Edge2)).normalize();
-
-	face8Norm = (face8Edge0.cross(face8Edge2)).normalize();
-	face9Norm = (face8Edge1.cross(face10Edge0)).normalize();
-	face10Norm = (face10Edge0.cross(face10Edge2)).normalize();
-	face11Norm = (face15Edge0.cross(face10Edge2)).normalize();
-	face12Norm = (face8Edge2.cross(face13Edge0)).normalize();
-	face13Norm = (face13Edge0.cross(face13Edge2)).normalize();
-	face14Norm = (face15Edge2.cross(face13Edge1)).normalize();
-	face15Norm = (face15Edge0.cross(face15Edge2)).normalize();
-
-	face16Norm = (face0Edge0.cross(face13Edge2)).normalize();
-	face17Norm = (face15Edge1.cross(face2Edge1)).normalize();
-	face18Norm = (face7Edge1.cross(face10Edge1)).normalize();
-	face19Norm = (face8Edge0.cross(face5Edge2)).normalize();
-
-	// Place all normal vectors into vector
-	normVects.push_back(face0Norm);
-	normVects.push_back(face1Norm);
-	normVects.push_back(face2Norm);
-	normVects.push_back(face3Norm);
-	normVects.push_back(face4Norm);
-	normVects.push_back(face5Norm);
-	normVects.push_back(face6Norm);
-	normVects.push_back(face7Norm);
-	normVects.push_back(face8Norm);
-	normVects.push_back(face9Norm);
-	normVects.push_back(face10Norm);
-	normVects.push_back(face11Norm);
-	normVects.push_back(face12Norm);
-	normVects.push_back(face13Norm);
-	normVects.push_back(face14Norm);
-	normVects.push_back(face15Norm);
-	normVects.push_back(face16Norm);
-	normVects.push_back(face17Norm);
-	normVects.push_back(face18Norm);
-	normVects.push_back(face19Norm);
+	// Find the rest length of the cables
+	restLength = subject.face0Edge0.norm();
+	//std::cout << "onSetup: Cable rest length: " << restLength << std::endl;
 
 	/*
 	std::cout << "Face 0: " << face0Norm << std::endl;
@@ -202,7 +134,8 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	std::cout << "Face 19: " << face19Norm << std::endl;
 	*/
 
-	// Create adjacency matrix
+	/*
+	// Create adjacency matrix (with open triangles connected)
 	// 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
 	node0Adj  = boost::assign::list_of(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 0
 	node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0); // 1
@@ -224,6 +157,30 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node17Adj = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0); // 17
 	node18Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 18
 	node19Adj = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 19
+	*/
+
+	// Open triangles not connected
+	// 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
+	node0Adj  = boost::assign::list_of(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 0
+	node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 1
+	node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
+	node3Adj  = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 3
+	node4Adj  = boost::assign::list_of(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 4
+	node5Adj  = boost::assign::list_of(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1); // 5
+	node6Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 6
+	node7Adj  = boost::assign::list_of(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0); // 7
+	node8Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1); // 8
+	node9Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 9
+	node10Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0); // 10
+	node11Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(1)(0)(0)(0)(0); // 11
+	node12Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0); // 12
+	node13Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0); // 13
+	node14Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0); // 14
+	node15Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(1)(0)(0); // 15
+	node16Adj = boost::assign::list_of(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(0); // 16
+	node17Adj = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0); // 17
+	node18Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 18
+	node19Adj = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 19
 
 	A.push_back(node0Adj);
 	A.push_back(node1Adj);
@@ -248,9 +205,9 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 	/*
 	// Adjacency matrix debug print out
-	for (int i = 0; i < A.size(); i++) {
+	for (size_t i = 0; i < A.size(); i++) {
 		std::vector<int> row = A[i];
-		for (int j = 0; j < row.size(); j++) {
+		for (size_t j = 0; j < row.size(); j++) {
 			std::cout << row[j] << ", ";
 		}
 		std::cout << std::endl;
@@ -262,40 +219,84 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	int cols = A[1].size();
 	if (rows!= cols) {
 		std::cout << "onSetup: Adjacency matrix not square, exiting..." << std::endl;
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
+	}
+
+	// Set up controllers for the cables
+	m_controllers.clear();
+	actuators = subject.getAllActuators();
+	//std::cout << "onSetup: Number of actuators: " << actuators.size() << std::endl;
+	for (size_t i = 0; i < actuators.size(); i++) {
+		tgBasicActuator* const pActuator = actuators[i];
+		assert(pActuator != NULL);
+		tgBasicController* m_lenController = new tgBasicController(pActuator, restLength);
+		m_controllers.push_back(m_lenController);
+		//std::cout << "onSetup: Cable " << i << ": " << pActuator->getCurrentLength() << std::endl;
 	}
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
 {
-	int currSurface;
-
 	if (dt <= 0.0) {
     	throw std::invalid_argument("onStep: dt is not positive");
   	}
 
-  	//btVector3 rod0Pos = sixBarRod0->getCenterOfMassPosition();
-  	//std::cout << rod0Pos << std::endl;
-
-  	switch (controller_mode) {
+  	if (robotReady == true) {
+  		switch (controller_mode) {
   		case 1:
-  			// Code for face mode
-  			counter++;
-  			if (counter >= 1000) {
-  				currSurface = contactSurfaceDetection();
-  				if (currSurface >= 0) {
-  					path = findPath(A, currSurface, 10);
-  					utility::printVector(path);
+  			{
+	  			// Code for face mode
+	  			bool isOnGround = checkOnGround();
+	  			
+	  			// Remove later
+	  			int currSurface = contactSurfaceDetection();
 
-  				}
-  				counter = 0;
+	  			/*
+	  			if (isOnGround == true && runPathGen == false) {
+	  				int currSurface = contactSurfaceDetection();
+	  				if (currSurface >= 0) {
+	  					path = findPath(A, currSurface, c_face_goal);
+	  					utility::printVector(path);
+	  				}
+	  				runPathGen = true;
+	  			}
+	  			else if (isOnGround == false && runPathGen == true) {
+	  				runPathGen = false;
+	  			}
+	  			*/
+
+	  			int cable = 8;
+	  			m_controllers[cable]->control(dt, 4);
+	  			actuators[cable]->moveMotors(dt);
+	  			break;
   			}
-  			
-  			break;
   		case 2:
-  			// Code for dead reckoning mode
-  			break;
+  			{
+  				// Code for dead reckoning mode
+  				break;
+  			}
+  		}
   	}
+  	else {
+  		for (size_t i = 0; i < actuators.size(); i++) {
+  			m_controllers[i]->control(dt, restLength);
+  			actuators[i]->moveMotors(dt);
+  		}
+  		if (actuators[actuators.size()-1]->getCurrentLength()-restLength < 0.01) {
+  			robotReady = true;
+  		}
+  	}
+}
+
+bool T6RollingController::checkOnGround()
+{
+	bool onGround = false;
+	
+	btVector3 rodVel = rodBodies[2]->getLinearVelocity();
+	double rodSpeed = rodVel.norm();
+	if (abs(rodSpeed) < 0.001) onGround = true;
+
+	return onGround;
 }
 
 int T6RollingController::contactSurfaceDetection()
@@ -306,12 +307,12 @@ int T6RollingController::contactSurfaceDetection()
 	int currSurface = -1;
 
 	// Get the gravity vector
-	btVector3& robotGravity = getRobotGravity();
+	btVector3 robotGravity = getRobotGravity();
 
 	// Find the dot product between the gravity vector and each face
 	// As all normal vectors point away from the center of the robot,
 	// The larger dot product indicates better alignment
-	for (int i = 0; i < normVects.size(); i++) {
+	for (size_t i = 0; i < normVects.size(); i++) {
 		dotProd = robotGravity.dot(normVects[i]);
 		//std::cout << dotProd << std::endl;
 		if (dotProd > maxDotProd) {
@@ -330,9 +331,9 @@ int T6RollingController::contactSurfaceDetection()
 	return currSurface;
 }
 
-btVector3& T6RollingController::getRobotGravity() 
+btVector3 T6RollingController::getRobotGravity() 
 {
-	btTransform worldTrans = sixBarRod2->getWorldTransform();
+	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
 	//std::cout << robotToWorld.getRow(0) << std::endl;
 	//std::cout << robotToWorld.getRow(1) << std::endl;
@@ -392,7 +393,7 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 		int minDist = 1000;
 
 		// Find next unvisited node with the shortest tentative distance
-		for (int uvNode_idx = 0; uvNode_idx < unvisited.size(); uvNode_idx++) {
+		for (size_t uvNode_idx = 0; uvNode_idx < unvisited.size(); uvNode_idx++) {
 			if (distances[unvisited[uvNode_idx]] < minDist) {
 				minDist = distances[unvisited[uvNode_idx]];
 				currNode = unvisited[uvNode_idx];
@@ -414,7 +415,7 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 			std::vector<int> neighbors;
 			std::vector<int> weights;
 			// Find its neighbors and their corresponding weights
-			for (int col_idx = 0; col_idx < currRow.size(); col_idx++) {
+			for (size_t col_idx = 0; col_idx < currRow.size(); col_idx++) {
 				if (currRow[col_idx] > 0) {
 					neighbors.push_back(col_idx);
 					weights.push_back(currRow[col_idx]);
@@ -423,7 +424,7 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 			//utility::printVector(neighbors);
 			//utility::printVector(weights);
 			// Check if neighbors have been visited already, if not calculate distance
-			for (int neigh_idx = 0; neigh_idx < neighbors.size(); neigh_idx++) {
+			for (size_t neigh_idx = 0; neigh_idx < neighbors.size(); neigh_idx++) {
 				if (find(visited.begin(), visited.end(), neighbors[neigh_idx]) != visited.end()) {
 					continue;
 				}
@@ -455,6 +456,6 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 		node = prev[node];
 	}
 
-	std::cout << "End Reached: " << endReached << ", No Solution: " << noSolution << std::endl;
+	//std::cout << "End Reached: " << endReached << ", No Solution: " << noSolution << std::endl;
 	return pathVect;
 }

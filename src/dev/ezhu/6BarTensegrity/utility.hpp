@@ -30,6 +30,9 @@
 #include <iostream>
 #include <vector>
 
+// The Bullet Physics Library
+#include "LinearMath/btVector3.h"
+
 namespace utility {
 
 /**
