@@ -53,10 +53,10 @@ namespace
   double sf = 10; // scaling factor
   double worldTime = 0.0; // clock for world time
   double shootTime = 0.0; // used for thrust timing in multiple hop scenarios
-  double initiateThrustTime = 8; // wait time until thrust initiation
+  double initiateThrustTime = 0; // wait time until thrust initiation
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
-  double thrustPeriod = 10; // duration of thrust on
+  double thrustPeriod = 100; // duration of thrust on
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
   const btVector3 targetLocation = btVector3(targetDistance*sf, 0.0, 0.0); // target is located 1000m away in +X direction	
@@ -65,7 +65,7 @@ namespace
   std::ofstream simlog; // log file for thruster related variables
   bool doLog = false; // choose to log thruster related variables
   double timePassed = 0.0; // controls logging frequency
-  bool includeNoise = true; //turn on/off Gaussian Noise for thruster orientation
+  bool includeNoise = false; //turn on/off Gaussian Noise for thruster orientation
   double prev_alpha = 0;
   double prev_beta = 0;
   double prev_gimbalYaw = 0;
@@ -73,14 +73,15 @@ namespace
   btVector3 prev_GimbalHeading = btVector3(0,0,-1);
   int numTankOrientations = 1; //Averaging Filter
   int count = 0;
-  
-  //##### BCera - moved from onStep to namespace, to initialize jetDirections onSetup
-  double thrust = 100*sf;
-  //double thrust = 0;
-  //double final_thrust = 100*sf;
 
+  double thrust = 50*sf;//100*sf;
+  
   btRigidBody* tankRigidBody;
   btRigidBody* thrusterRigidBody; // payload body
+
+  //Initialize state and disturbance estimation
+  double X_hat[4];
+  double prev_U[1];
 }
 
 RPThruster::RPThruster(const int thrust) :
@@ -94,7 +95,11 @@ RPThruster::RPThruster(const int thrust) :
 
 void RPThruster::onSetup(PrismModel& subject)
 {
-
+  for(int l=0;l<4;l++)
+    X_hat[l] = 0;
+  prev_U[0] = 0;
+  
+    
   tankRigidBody = subject.TankBodies[0];
   thrusterRigidBody = subject.ThrusterBodies[0]; // payload body
 
@@ -112,11 +117,6 @@ void RPThruster::onSetup(PrismModel& subject)
   goalVector = goalVector.normalized();
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-  //tankRigidBody = subject.TankBodies[0];
-  //thrusterRigidBody = subject.ThrusterBodies[0]; // payload body
-
-  
   std::cout << "------------------ On Setup -------------------" << std::endl;
     
   if ( doLog ) { simlog.open("./log/rotation.csv"); }
@@ -159,7 +159,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  
 	  if(worldTime > reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
-	    double finalGoalAltitude = -0;
+	    double finalGoalAltitude = -45;
 	    double finalGoalYaw = 0;
 	    double inc = 40*dt;
 	    bool AltSet = false;
@@ -284,7 +284,162 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  double des_moment = (5.4678*(angle_error) + 3.4543*(d_angle_error)); //discrete LQR with Q=[30 0; 0 1], R=1
 	  //double des_moment = (5.4682*(angle_error) + 3.3070*(d_angle_error)); //discrete LQR with Q=[30 0; 0 0], R=1
 	  des_moment = des_moment*200;//542.4; //Uncomment this line for with-robot control
-	  std::cout << "des_moment: " << des_moment << std::endl;
+	  std::cout << "LQR des_moment: " << des_moment << std::endl;
+
+	  //Disturbance Rejection
+	  double k = 87.5;
+	  double b = 5;
+	  double I_t = 0.0901;
+	  double I_g = I_t*500;
+	  double A[4] =	    
+	    {
+	      0, 1, 
+	      -k/I_t, -b/I_t
+	    };
+	  double B[2] =
+	    {
+	      0,
+	      1,
+	    };
+	  double C[4] =
+	    {
+	      1, 0, 
+	      0, 1
+	    };
+	  double D[2] =
+	    {
+	      0,
+	      0
+	    };
+	  double Bd[4] =
+	    {
+	      0, 0,
+	      1, 0
+	    };
+	  double Dd[4] =
+	    {
+	      0, 0,
+	      0, 0
+	    };
+	  double Ce[2] = 
+	    {
+	      1, 0
+	    };
+	  double z1[2] =
+	    {
+	      0,
+	      0
+	    };
+	  double z2[1] =
+	    {
+	      0
+	    };
+	  double z3[4] =
+	    {
+	      0, 0,
+	      0, 0
+	    };
+	  double omega = sqrt(k/I_t);
+	  std::cout << "Omega: " << omega << std::endl;
+	  double S[4] =
+	    {
+	      0, omega,
+	      -omega, 0
+	    };
+	  double y[2] =
+	    {
+	      angle_error,
+	      d_angle_error,
+	    };
+
+	  double De[1] =
+	    {
+	      0
+	    };
+	  double Ded[2] =
+	    {
+	      0, 0
+	    };
+
+	  //Calculated Gain Matrices from MATLAB
+	  
+	  double F_G[4] =
+	    {
+	      959.1432, 48.4939, -1, 0
+	    };
+	  double L[8] =
+	    {
+	      -0.0019e4, -0.0001e4,
+	      0.0513e4, 0.0000,
+	      -1.6969e4, -0.0048e4,
+	      0.9276e4, 0.1525e4	      
+	    };
+
+	  
+
+	  //Manipulate Matrices
+	  double* A_Bd = matrixConcatLeftRight(A,2,2,Bd,2,2);
+	  //double* z1z2 = matrixConcatLeftRight(z1,1,2,z2,1,1);
+	  double* z3S = matrixConcatLeftRight(z3,2,2,S,2,2);
+	  double* A_ex = matrixConcatTopBottom(A_Bd,2,4,z3S,2,4);
+	  double* B_ex = matrixConcatTopBottom(B,2,1,z1,2,1);
+	  double* C_ex = matrixConcatLeftRight(C,2,2,Dd,2,2);
+	  double* y_hat = matrixMultiply(C_ex,2,4,X_hat,4,1);
+	  //Neglect D*u term in y_hat (0)**
+	  if(isnan(y_hat[3]))
+	    throw std::invalid_argument("Y_hat NaN");
+	  double* y_error = matrixSubtract(y,2,1,y_hat,2,1);
+	  double* A1 = matrixMultiply(A_ex,4,4,X_hat,4,1);
+	  if(isnan(A1[3]))
+	    throw std::invalid_argument("A1 NaN");
+	  double* B1 = matrixMultiply(B_ex,4,1,prev_U,1,1);
+	  if(isnan(B1[3]))
+	    throw std::invalid_argument("B1 NaN");
+	  double* L1 = matrixMultiply(L,4,2,y_error,2,1);
+	  if(isnan(L1[3]))
+	    throw std::invalid_argument("L1 NaN");
+	  double* A1_B1 = matrixAdd(A1,4,1,B1,4,1);
+	  matrixPrint(L1,4,1);
+	  matrixPrint(A1_B1,4,1);
+	  double* X_hat_dot = matrixAdd(A1_B1,4,1,L1,4,1);
+	  std::cout << "X_hat_dot: ";
+	  for(int p=0;p<4;p++){
+	    std::cout << X_hat_dot[p]*180/M_PI*dt << " ";
+	  }
+	  std::cout << std::endl;
+	  std::cout << "X_hat: ";
+	  for(int p=0;p<2;p++){
+	    X_hat[p] += X_hat_dot[p]*dt;
+	    std::cout << X_hat[p]*180/M_PI << " ";
+	  }
+	  for(int p=2;p<4;p++){
+	    X_hat[p] += X_hat_dot[p]*dt;
+	    std::cout << X_hat[p] << " ";
+	  }
+	  std::cout << std::endl;
+	  double* moment = matrixMultiply(F_G,1,4,X_hat,4,1);
+	  if(isnan(moment[0]))
+	    throw std::invalid_argument("moment NaN");
+	  des_moment = moment[0];
+	  prev_U[0] = des_moment;
+	  des_moment = des_moment*I_t*60;
+	  std::cout << "DR Input: " << des_moment << std::endl;
+	  
+	  delete A_Bd;
+	  //delete z1z2;
+	  delete z3S;
+	  delete A_ex;
+	  delete B_ex;
+	  delete C_ex;
+	  delete y_hat;
+	  delete y_error;
+	  delete A1;
+	  delete B1;
+	  delete L1;
+	  delete A1_B1;
+	  delete X_hat_dot;
+	  delete moment;
+	  
 	  if(des_moment < 0){
 	    sol_vector.setX(-sol_vector.getX());
 	    sol_vector.setZ(-sol_vector.getZ()); //Reoriented goal vector for thruster
@@ -337,13 +492,13 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Set altitude
 	  double deltaAltitude = beta*180/M_PI - altitudeAngle;
 	  if (deltaAltitude > tolerance){
-	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,1);
+	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,0.1*dt);
 	    //subject.altitudeHinge->enableAngularMotor(true,speed,1e4);
 	    //subject.altitudeHinge->setMotorTarget((btScalar)beta,dt);
 	    //subject.altitudeHinge->enableMotor(true);
 	  }
 	  else if (deltaAltitude < -tolerance){
-	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,1);
+	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,0.1*dt);
 	    //subject.altitudeHinge->enableAngularMotor(true,-speed,1e4);
 	    //subject.altitudeHinge->setMotorTarget((btScalar)beta,dt);
 	    //subject.altitudeHinge->enableMotor(true);
@@ -356,13 +511,13 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Set yaw
 	  double deltaYaw = alpha*180/M_PI - yawAngle;
 	  if (deltaYaw-speed*dt > tolerance){
-	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,1);
+	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,0.1*dt);
 	    //subject.yawHinge->enableAngularMotor(true,speed,10);
 	    //subject.yawHinge->setMotorTarget((btScalar)alpha,dt);
 	    //subject.yawHinge->enableMotor(true);
 	  }
 	  else if (deltaYaw+speed*dt < -tolerance){
-	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,1);
+	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,0.1*dt);
 	    //subject.yawHinge->enableAngularMotor(true,-speed,10);
 	    //subject.yawHinge->setMotorTarget((btScalar)alpha,dt);
 	    //subject.yawHinge->enableMotor(true);
@@ -397,7 +552,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	      std::cout << "Thruster Active~" << std::endl;
 	      for(int k=0; k<force.size(); k++)
 		{
-		  force[k] = sf*thrust/jetnumber*jetDirections[k]; // assume target is towards +X direction
+		  force[k] = thrust/jetnumber*jetDirections[k]; // assume target is towards +X direction
 		  force[k] = rotation*force[k]; //rotate to match thruster body
 		}
 
@@ -508,37 +663,158 @@ void RPThruster::onStep(PrismModel& subject, double dt)
     }
 }
   
-  double RPThruster::generateGaussianNoise(double mu, double sigma)
-  {
-    /**
-     * (From Wikipedia)
-     * The standard Box-Muller transform generates 
-     * values from the standard normal distribution 
-     * (i.e. standard normal deviates) with mean 0 and standard deviation 1. 
-     * The implementation below in standard C++ generates values 
-     * from any normal distribution with mean \mu and variance \sigma^2. 
-     * If Z is a standard normal deviate, then X = Z\sigma + \mu will 
-     * have a normal distribution with mean \mu and standard deviation \sigma. 
-     */ 
-    const double epsilon = std::numeric_limits<double>::min();
-    const double two_pi = 2*M_PI;
+double RPThruster::generateGaussianNoise(double mu, double sigma)
+{
+  /**
+   * (From Wikipedia)
+   * The standard Box-Muller transform generates 
+   * values from the standard normal distribution 
+   * (i.e. standard normal deviates) with mean 0 and standard deviation 1. 
+   * The implementation below in standard C++ generates values 
+   * from any normal distribution with mean \mu and variance \sigma^2. 
+   * If Z is a standard normal deviate, then X = Z\sigma + \mu will 
+   * have a normal distribution with mean \mu and standard deviation \sigma. 
+   */ 
+  const double epsilon = std::numeric_limits<double>::min();
+  const double two_pi = 2*M_PI;
 
-    static double z0, z1;
-    static bool generate;
-    generate = !generate;
+  static double z0, z1;
+  static bool generate;
+  generate = !generate;
 
-    if (!generate)
-      return z1 * sigma + mu;
+  if (!generate)
+    return z1 * sigma + mu;
 
-    double u1, u2;
-    do
-      {
-	u1 = rand() * (1.0 / RAND_MAX);
-	u2 = rand() * (1.0 / RAND_MAX);
+  double u1, u2;
+  do
+    {
+      u1 = rand() * (1.0 / RAND_MAX);
+      u2 = rand() * (1.0 / RAND_MAX);
+    }
+  while ( u1 <= epsilon );
+
+  z0 = sqrt(-2.0 * log(u1)) * cos(two_pi * u2);
+  z1 = sqrt(-2.0 * log(u1)) * sin(two_pi * u2);
+  return z0 * sigma + mu;
+}
+
+
+double* RPThruster::matrixMultiply(double* a, int num_a_row, int num_a_col, double* b, int num_b_row, int num_b_col)
+{
+  double* mat = new double[num_a_row*num_b_col];
+  if(num_a_col!=num_b_row)
+    throw std::invalid_argument("Matrix Multiply - Dimension Mismatch!");
+  for(int i=0;i<num_a_row;i++){
+      for(int j=0;j<num_b_col;j++){
+	mat[i*num_b_col+j] = 0;
+	for(int k=0;k<num_b_row;k++)
+	  mat[i*num_b_col+j] += a[i*num_a_col+k]*b[k*num_b_col+j];
       }
-    while ( u1 <= epsilon );
-
-    z0 = sqrt(-2.0 * log(u1)) * cos(two_pi * u2);
-    z1 = sqrt(-2.0 * log(u1)) * sin(two_pi * u2);
-    return z0 * sigma + mu;
   }
+  //if(isnan(mat[num_a_row*num_b_col-1]))
+  //  throw std::invalid_argument("Matrix Multiply NaN");
+  return mat;
+}
+
+double* RPThruster::matrixConcatLeftRight(double* a, int num_a_row, int num_a_col, double* b, int num_b_row, int num_b_col)
+{
+  //a is left matrix, b is right matrix
+  double* mat = new double[num_a_row*(num_a_col+num_b_col)];
+  if(num_a_row!=num_b_row)
+    throw std::invalid_argument("Matrix Concatenate Left/Right - Dimension Mismatch!");
+  for(int i=0;i<num_a_row;i++){
+    for(int j=0;j<num_a_col+num_b_col;j++){
+      if(j<num_a_col)
+	mat[i*(num_a_col+num_b_col)+j] = a[i*num_a_col+j];
+      else
+	mat[i*(num_a_col+num_b_col)+j] = b[i*num_b_col+(j-num_a_col)];
+    }
+  }
+  //if(isnan(mat[num_a_row*num_b_col-1]))
+  //  throw std::invalid_argument("Matrix Concatenate L/R NaN");
+  return mat;
+}
+
+double* RPThruster::matrixConcatTopBottom(double* a, int num_a_row, int num_a_col, double* b, int num_b_row, int num_b_col)
+{
+  //a is top matrix, b is bottom matrix
+  double *mat = new double[(num_a_row+num_b_row)*num_a_col];
+  if(num_a_col!=num_b_col)
+    throw std::invalid_argument("Matrix Concatenate Top/Bottom - Dimension Mismatch!");
+  for(int i=0;i<num_a_row+num_b_row;i++){
+    if(i<num_a_row){
+      for(int j=0;j<num_a_col;j++)
+	mat[i*num_a_col+j] = a[i*num_a_col+j];
+    }
+    else{
+      for(int j=0;j<num_b_col;j++)
+	mat[i*num_a_col+j] = b[(i-num_a_row)*num_b_col+j];
+    }
+  }
+  //if(isnan(mat[num_a_row*num_b_col-1]))
+  //  throw std::invalid_argument("Matrix Concatenate T/B NaN");
+  return mat;
+}
+
+double* RPThruster::matrixAdd(double* a, int num_a_row, int num_a_col, double* b, int num_b_row, int num_b_col)
+{
+  //a+b
+  if(num_a_row!=num_b_row || num_a_col!=num_b_col)
+    throw std::invalid_argument("Matrix Add - Dimension Mismatch!");
+  double* mat = new double[num_a_row*num_a_col];
+  for(int i=0;i<num_a_row;i++){
+    for(int j=0;j<num_a_col;j++){
+	mat[i*num_a_col+j] = a[i*num_a_col+j] + b[i*num_b_col+j];
+    }
+  }
+  //if(isnan(mat[num_a_row*num_b_col-1]))
+  //  throw std::invalid_argument("Matrix Add NaN");
+  return mat;
+}
+
+double* RPThruster::matrixSubtract(double* a, int num_a_row, int num_a_col, double* b, int num_b_row, int num_b_col)
+{
+  //a-b
+  if(num_a_row!=num_b_row || num_a_col!=num_b_col)
+    throw std::invalid_argument("Matrix Add - Dimension Mismatch!");
+  double* mat = new double[num_a_row*num_a_col];
+  for(int i=0;i<num_a_row;i++){
+    for(int j=0;j<num_a_col;j++){
+	mat[i*num_a_col+j] = a[i*num_a_col+j] - b[i*num_b_col+j];
+    }
+  }
+  //if(isnan(mat[num_a_row*num_b_col-1]))
+  //  throw std::invalid_argument("Matrix Subtract NaN");
+  return mat;
+}
+
+/*
+void RPThruster::matrixDimensionCheck(double* a, int num_a_row, int num_a_col)
+{
+  //Checks to make sure every row has the same number of elements
+  
+  int num_a_row = sizeof(a)/sizeof(a[0]);
+  int num_a_col = sizeof(a[0])/sizeof(a[0][0]);
+  for(int i=0;i<num_a_row;i++){
+    if(sizeof(a[i])/sizeof(a[i][0])!=num_a_col)
+      throw std::invalid_argument("Matrix Dimension Error, Non-Rectangular!");
+  }
+  
+  std::cout<< sizeof(a)/sizeof(a[0]) <<std::endl;
+  if(sizeof(a)/sizeof(a[0]) != num_a_row*num_a_col)
+    throw std::invalid_argument("Matrix Dimension Error, Incorrect Number of Elements!");
+}
+*/
+    
+void RPThruster::matrixPrint(double* a, int num_a_row, int num_a_col)
+{
+  std::cout << "[";
+  for(int i=0;i<num_a_row;i++){
+    for(int j=0;j<num_a_col-1;j++){
+      std::cout << a[i*num_a_col+j] << ", ";
+    }
+    std::cout << a[i*num_a_col+num_a_col-1] << "]" << std::endl;
+  }
+}    
+
+       

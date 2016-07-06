@@ -47,7 +47,6 @@
 // The C++ Standard Library
 #include <stdexcept>
 #include <math.h>
-#include <vector>
 
 //Debug Drawers
 #include "GL_ShapeDrawer.h"
@@ -119,69 +118,8 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    std::vector<tgBasicActuator*>& getAllActuators();
+    const std::vector<tgSpringCableActuator*>& getAllActuators() const;
 
-    std::vector<tgRod*>& getAllRods();
-
-    std::vector<btVector3>& getNormVects();
-
-    std::vector<btRigidBody*>& getTank();
-
-    btQuaternion rotateToFace(tgStructure& s, int face);
-
-    void rotateNormVectors(btQuaternion rotation);
-
-    void changeRobotState(int state);
-
-    double rodDist;
-
-    // Nodes at the end of each of the rods
-    btVector3 node0;
-    btVector3 node1;
-    btVector3 node2;
-    btVector3 node3;
-    btVector3 node4;
-    btVector3 node5;
-    btVector3 node6;
-    btVector3 node7;
-    btVector3 node8;
-    btVector3 node9;
-    btVector3 node10;
-    btVector3 node11;
-
-    // Edge vectors of all closed triangles
-    btVector3 face0Edge0;
-    btVector3 face0Edge1;
-    btVector3 face0Edge2;
-
-    btVector3 face2Edge0;
-    btVector3 face2Edge1;
-    btVector3 face2Edge2;
-
-    btVector3 face5Edge0;
-    btVector3 face5Edge1;
-    btVector3 face5Edge2;
-
-    btVector3 face7Edge0;
-    btVector3 face7Edge1;
-    btVector3 face7Edge2;
-
-    btVector3 face8Edge0;
-    btVector3 face8Edge1;
-    btVector3 face8Edge2;
-
-    btVector3 face10Edge0;
-    btVector3 face10Edge1;
-    btVector3 face10Edge2;
-
-    btVector3 face13Edge0;
-    btVector3 face13Edge1;
-    btVector3 face13Edge2;
-
-    btVector3 face15Edge0;
-    btVector3 face15Edge1;
-    btVector3 face15Edge2;
- 
     btTransform* thrusterTransform;
     btDynamicsWorld* btWorld;
     GLDebugDrawer* gDebugDraw;
@@ -195,8 +133,6 @@ public:
     */
     std::vector<btRigidBody*> ThrusterBodies;
     std::vector<btRigidBody*> TankBodies;
-
-    int robotState = 1;
 
 
 private:
@@ -236,39 +172,12 @@ private:
 
     static double* returnCOM(tgStructure &s, int firstNode, int numberofNodes);
 
-
 private:    
     /**
      * A list of all of the spring cable actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgBasicActuator*> allActuators;
-
-    std::vector<btVector3> normalVectors;
-    std::vector<btVector3> normalVectors_rotated;
-    std::vector<tgRod*> allRods;
-    
-    // Normal vectors of all icosahedron faces
-    btVector3 face0Norm;
-    btVector3 face1Norm;
-    btVector3 face2Norm;
-    btVector3 face3Norm;
-    btVector3 face4Norm;
-    btVector3 face5Norm;
-    btVector3 face6Norm;
-    btVector3 face7Norm;
-    btVector3 face8Norm;
-    btVector3 face9Norm;
-    btVector3 face10Norm;
-    btVector3 face11Norm;
-    btVector3 face12Norm;
-    btVector3 face13Norm;
-    btVector3 face14Norm;
-    btVector3 face15Norm;
-    btVector3 face16Norm;
-    btVector3 face17Norm;
-    btVector3 face18Norm;
-    btVector3 face19Norm;
+    std::vector<tgSpringCableActuator*> allActuators;
 };
 
 #endif  // Prism_MODEL_H

@@ -39,7 +39,7 @@ namespace
    * All parameters must be positive.
    */
 
-  double sf = 100; //scaling factor. Match with App file and Controller file
+  double sf = 30; //scaling factor. Match with App file and Controller file
   
   const struct Config
   {
@@ -57,34 +57,33 @@ namespace
     double targetVelocity;
   } c =
     {
-      //TT-3 Parameters
-      2700/pow(sf,3),    // density (kg / length^3)
-      .00625*sf,     // radius (length)
-      1500.0,   // stiffness (kg / sec^2) was 1500
-      200.0,    // damping (kg / sec)
-      0.668*sf,     // rod_length (length)
-      0.99,      // friction (unitless)
-      0.01,     // rollFriction (unitless)
-      0.0,      // restitution (?)
-      10.0*sf,        // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,         // History logging (boolean)
-      1000*sf,   // maxTens (kg-m/s^2)
-      10*sf,    // targetVelocity (m/s)
-
+      //TT3 Parameters
+      2990/pow(sf,3),    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
+      .0127/2*sf,          // radius (length)
+      200.0,           // stiffness (kg / sec^2) was 1500
+      20.0,            // damping (kg / sec)
+      0.66*sf,         // rod_length (length)
+      0.99,             // friction (unitless)
+      0.01,             // rollFriction (unitless)
+      0.0,              // restitution (?)
+      17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      0,                // History logging (boolean)
+      10000*sf,         // maxTens (kg-m/s^2)
+      1000*sf,          // targetVelocity (m/s)
       /*
       //Superball Parameters
-      2700/pow(sf,3),    // density (kg / length^3)
-      .031*sf,     // radius (length)
-      1500.0,   // stiffness (kg / sec^2) was 1500
-      200.0,    // damping (kg / sec)
-      1.615*sf,     // rod_length (length)
-      0.99,      // friction (unitless)
-      0.01,     // rollFriction (unitless)
-      0.0,      // restitution (?)
-      300.0*sf,        // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,         // History logging (boolean)
-      10000*sf,   // maxTens (kg-m/s^2)
-      1000*sf,    // targetVelocity (m/s) 
+      688/pow(sf,3),    // density (kg / length^3)
+      .031*sf,          // radius (length)
+      3500.0,           // stiffness (kg / sec^2) was 1500
+      200.0,            // damping (kg / sec)
+      1.615*sf,         // rod_length (length)
+      0.99,             // friction (unitless)
+      0.01,             // rollFriction (unitless)
+      0.0,              // restitution (?)
+      300.0*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      0,                // History logging (boolean)
+      10000*sf,         // maxTens (kg-m/s^2)
+      1000*sf,          // targetVelocity (m/s) 
       */
     };
 } // namespace
@@ -118,7 +117,8 @@ void PrismModel::setup(tgWorld& world)
     
   /*DEBUG*/
   //this->btWorld->setDebugDrawer(this->gDebugDraw);
-
+  
+  //TT3 Parameters
   double tankRadius = 0.05*sf;
   double internalRadius = 0.05*sf;
   double externalRadius = 0.055*sf; 
@@ -132,23 +132,22 @@ void PrismModel::setup(tgWorld& world)
   double tankToOuterRing = 0.1*sf;
   double payloadLength = 0.1*sf;
   */
-
   // Define the configurations of the rods and strings
   // Note that pretension is defined for this string
   const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-  const tgRod::Config tankConfig(tankRadius, c.density*3.75, c.friction, 
+  const tgRod::Config tankConfig(tankRadius, 21645/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
 				 c.rollFriction, c.restitution);
-  const tgRod::Config linkConfig(c.radius/4.0, 0.0, c.friction, 
+  const tgRod::Config linkConfig(c.radius/2.0, 0.0, c.friction, 
 				 c.rollFriction, c.restitution);
-  const tgRod::Config thrusterConfig(0.2, c.density/10, c.friction, 
+  const tgRod::Config thrusterConfig(0.2, c.density/5, c.friction, 
 				     c.rollFriction, c.restitution);
-  const tgRod::Config gimbalConfig(0.05, c.density/10, c.friction, 
+  const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
 				   c.rollFriction, c.restitution);
 
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
-  tgBasicActuator::Config tankLinkConfig(c.stiffness, 100000, c.pretension, c.hist, 
+  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
     
@@ -184,31 +183,31 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(-COM[0], 0, -COM[2]));
   std::cout << "COM: " << *COM << " " << *(COM+1) << " " << *(COM+2) << std::endl;
   //*/
-
-  /*GIMBAL*/
+  
+  //GIMBAL
   int gimbalStart = globalOffset;
   addRing(s,externalRadius,nPtsExtRing,globalOffset);
   addRing(s,internalRadius,nPtsIntRing,globalOffset);
   std::cout << "After Rings: " << globalOffset << std::endl;
   
-  /*TANK (aka PAYLOAD)*/ 
+  //TANK (aka PAYLOAD) 
   int baseStartLink = globalOffset; //Save the node position before adding new nodes
   addBottomStructure(s,externalRadius,payloadLength,tankToOuterRing,globalOffset);
   std::cout << "After Tank: " << globalOffset << std::endl;
   
-  /*HINGES*/
+  //HINGES
   int hingeStart = globalOffset;
   makeLinks(s,externalRadius,internalRadius,tankToOuterRing,tankRadius,nPtsExtRing,globalOffset,baseStartLink,gimbalStart); //Adds 4 nodes
   std::cout << "After Hinges: " << globalOffset << std::endl;
   
-  /*THRUSTER*/
+  //THRUSTER
   int thrusterNode = globalOffset;
   addThruster(s,nPtsExtRing,globalOffset,gimbalStart); 
   std::cout << "After Thruster: " << globalOffset << std::endl;
-  
+ 
   //Inner Payload Strings
-  //addStrings(s,baseStartLink,beforeRobot); //**Comment out robot constructor above as well
-  
+  addStrings(s,baseStartLink,beforeRobot); //**Comment out robot constructor above as well
+ 
   // Move the structure so it doesn't start in the ground
   //Rotate so that payload faces up
   s.addRotation(btVector3(0,0,0), btVector3(0,0,1), M_PI);
@@ -231,7 +230,7 @@ void PrismModel::setup(tgWorld& world)
 
   // Get actuators
   allActuators = getAllActuators();
-
+  
   //Get linking rods
   std::vector<tgRod *> linkingRods = find<tgRod>("link");
   std::cout << "[ ] -> There are " << linkingRods.size() << " links" << std::endl;
@@ -402,7 +401,7 @@ void PrismModel::addStrings(tgStructure& s, int baseStartLink, int nPtBeforeRobo
 void PrismModel::addNodes(tgStructure& s, int offset, double tankToOuterRing)
 {
 
-  double L = c.rod_length;
+  double L = c.rod_length; //already scaled
   double t = 1.2213*L/1.9912; //find exact geometric ratio later
   double r = t/(2*sin(36*M_PI/180)); 
   double theta = asin(r/t)*180/M_PI;
