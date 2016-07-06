@@ -110,11 +110,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
-
-	// Find the rest length of the cables
-	restLength = subject.face0Edge0.norm();
-	//std::cout << "onSetup: Cable rest length: " << restLength << std::endl;
-
+	
 	/*
 	std::cout << "Face 0: " << face0Norm << std::endl;
 	std::cout << "Face 1: " << face1Norm << std::endl;
@@ -238,7 +234,11 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		//std::cout << "onSetup: Cable " << i << ": " << pActuator->getCurrentLength() << std::endl;
 	}
 
-	// Actuation policy table
+	// Find the rest length of the cables
+	restLength = actuators[0]->getRestLength();
+
+	/*
+	// Actuation policy table (No policy for open faces)
 	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
 	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
 	node1AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
@@ -260,6 +260,30 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node17AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 17
 	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
 	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
+	*/
+
+	// Actuation policy table (With policy for open faces)
+	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
+	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
+	node1AP  = boost::assign::list_of( 0)(-1)( 1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
+	node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
+	node3AP  = boost::assign::list_of(-1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
+	node4AP  = boost::assign::list_of(16)(-1)(-1)(-1)(-1)(17)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
+	node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
+	node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(12)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
+	node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
+	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
+	node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)( 8)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
+	node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
+	node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(21)(-1)(-1)(-1)(-1)(20)(-1)(-1)(-1)(-1); // 11
+	node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(23)(-1)(-1)(-1)(-1)(22)(-1)(-1)(-1)(-1)(-1)(-1); // 12
+	node13AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)( 5)(-1)( 6)(-1)(-1)(-1); // 13
+	node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 5)(-1)( 4)(-1)(-1)(-1)(-1); // 14
+	node15AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)( 4)(-1)(-1)( 7)(-1)(-1); // 15
+	node16AP = boost::assign::list_of( 2)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 6)(-1)(-1)(-1)(-1)(-1)(-1); // 16
+	node17AP = boost::assign::list_of(-1)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 7)(-1)(-1)(-1)(-1); // 17
+	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
+	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)(-1)(11)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
 
 	actuationPolicy.push_back(node0AP);
 	actuationPolicy.push_back(node1AP);
@@ -294,37 +318,34 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
   		case 1:
   			{
 	  			// Code for face mode
-	  			bool isOnGround = checkOnGround();
-	  			
-	  			// Remove later
-	  			//int currSurface = contactSurfaceDetection();
-
-	  			if (isOnGround == true && runPathGen == false && stepFin == true) {
-	  				currSurface = contactSurfaceDetection();
-	  				if (currSurface == c_face_goal) {
-	  					goalReached = true;
-	  					std::cout << "onStep: Destination face reached" << std::endl;
-	  				}
-	  				if (currSurface >= 0 && goalReached == false) {
-	  					path = findPath(A, currSurface, c_face_goal);
-	  					utility::printVector(path);
-	  				}
-	  				runPathGen = true;
+	  			if (goalReached) {
+	  				setAllActuators(m_controllers, actuators, restLength, dt);
 	  			}
-	  			else if (isOnGround == false && runPathGen == true) {
+
+	  			bool isOnGround = checkOnGround();
+
+	  			if (isOnGround && !runPathGen && stepFin) {
+	  				currSurface = contactSurfaceDetection();
+					if (currSurface == c_face_goal) {
+						goalReached = true;
+						std::cout << "onStep: Destination face reached" << std::endl;
+					}
+					if (currSurface >= 0 && !goalReached) {
+						path = findPath(A, currSurface, c_face_goal);
+						utility::printVector(path);
+					}
+					runPathGen = true;
+	  			}
+	  			else if (!isOnGround && runPathGen) {
 	  				runPathGen = false;
 	  			}
 
-	  			if (currSurface >= 0 && goalReached == false) {
+	  			if (currSurface >= 0 && !goalReached) {
 	  				stepFin = stepToFace(currSurface, path[1], dt);
 	  			}
 
-	  			//std::cout << isOnGround << runPathGen << stepFin << goalReached << std::endl;
-	  			/*
-	  			int cable = 7;
-	  			m_controllers[cable]->control(dt, 4);
-	  			actuators[cable]->moveMotors(dt);
-	  			*/
+	  			std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
+
 	  			break;
   			}
   		case 2:
@@ -511,31 +532,76 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 
 bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 {
-	bool stepFinished;
-	int cableToActuate = actuationPolicy[startFace][endFace];
+	// Initialize flags
+	bool stepFinished = true;
+	bool isOnPath = false;
+	// Length for cables to retract to
+	double controlLength = 3;
+	// Find current face
 	int currFace = contactSurfaceDetection();
-	if (cableToActuate >= 0) {
-		if (currFace != path[2]) {
-			m_controllers[cableToActuate]->control(dt, 3);
-			std::cout << "stepToFace: Stepping..." << std::endl;
-			stepFinished = false;
-		}
-		else if (currFace == path[2]) {
-			m_controllers[cableToActuate]->control(dt, restLength);
-			std::cout << "stepToFace: Returning to rest length..." << std::endl;
-			stepFinished = false;
-			//std::cout << actuators[cableToActuate]->getCurrentLength() << ", " << restLength << std::endl;
-			if (actuators[cableToActuate]->getCurrentLength()-restLength < 1.5) {
-				std::cout << "stepToFace: Step finished" << std::endl;
-				stepFinished = true;
-	  		}
-		}
-		actuators[cableToActuate]->moveMotors(dt);
+	// Check if current face is on the path
+	for (size_t i = 0; i < path.size(); i++) {
+		if (currFace == path[i])
+			isOnPath = true;
 	}
+
+	//if (isOnPath) {
+		// Get which cable to actuate from actuation policy table
+		int cableToActuate = actuationPolicy[startFace][endFace];
+		// Perform actuation from one closed face to another
+		if (isClosedFace(startFace)) {
+			if (cableToActuate >= 0) {
+				// path[0] is current face, path[1] is the adjacent open face, 
+				// path[2] is the next closed face
+				// Check if the robot has reached the next closed face
+				if (currFace != path[2]) {
+					m_controllers[cableToActuate]->control(dt, controlLength);
+					actuators[cableToActuate]->moveMotors(dt);
+					std::cout << "stepToFace: Stepping..." << std::endl;
+					stepFinished = false;
+				}
+				// If it has, return all cables to rest length
+				else {
+					std::cout << "stepToFace: Returning to rest length..." << std::endl;
+					stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
+				}
+			}
+			// Triggers if element called from actuation policy table is -1
+			else {
+				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+				//exit(EXIT_FAILURE);
+			}
+		}
+		// Perfom actuation to get from an open face to a closed face
+		else {
+			if (cableToActuate >= 0) {
+				// Check to see if robot has reached a closed face
+				if (!isClosedFace(currFace)) {
+					m_controllers[cableToActuate]->control(dt, controlLength);
+					actuators[cableToActuate]->moveMotors(dt);
+					std::cout << "stepToFace: Stepping to closed face" << std::endl;
+					stepFinished = false;
+				}
+				// If it has, return all cables to rest length
+				else {
+					std::cout << "stepToFace: Returning to rest length..." << std::endl;
+					stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
+				}
+			}
+			// Triggers if element called from actuation policy table is -1
+			else {
+				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+				//exit(EXIT_FAILURE);
+			}
+		}
+	//}
+	/*
 	else {
-		std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "stepToFace: Robot not on path, finding new path" << std::endl;
+		stepFinished = true;
 	}
+	*/
+
 	return stepFinished;
 }
 
@@ -558,13 +624,13 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 										  std::vector<tgBasicActuator*>& actuators, 
 										  double setLength, double dt)
 {
-	bool returnFin = false;
+	bool returnFin = true;
 	for (size_t i = 0; i < actuators.size(); i++) {
 		controllers[i]->control(dt, setLength);
 		actuators[i]->moveMotors(dt);
 	}
-	if (actuators[actuators.size()-1]->getCurrentLength()-setLength < 1.5) {
-		returnFin = true;
+	if (actuators[actuators.size()-1]->getRestLength()-setLength > 0.01) {
+		returnFin = false;
 	}
 	return returnFin;
 }

@@ -59,10 +59,9 @@ int main(int argc, char** argv)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    //tgBoxGround* ground = new tgBoxGround(groundConfig);
 
+    /*
+    // Import Ground
     // Set ground parameters
     btVector3 orientation = btVector3(yaw, pitch, roll);
     const double friction = 0.5;
@@ -99,8 +98,13 @@ int main(int argc, char** argv)
     else {
         std::cout << "Input file opened successfully" << std::endl;
     }
-
     tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+    */
+
+    // Box ground
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // the world will delete this
+    tgBoxGround* ground = new tgBoxGround(groundConfig);    
 
     double gravity = 98.1;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
@@ -121,7 +125,7 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel();
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 10);
+    const T6RollingController::Config controllerConfig(gravity, "face", 15);
     
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

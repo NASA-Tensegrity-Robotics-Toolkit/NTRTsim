@@ -73,6 +73,29 @@ namespace
 
 sixBarModel::sixBarModel() : tgModel() 
 {
+
+}
+
+sixBarModel::~sixBarModel()
+{
+}
+
+void sixBarModel::addSixBar(tgStructure& s)
+{
+	addSixBarNodes(s);
+	addSixBarRods(s);
+	addSixBarActuators(s);
+}
+
+void sixBarModel::addPayload(tgStructure& s)
+{
+	addPayloadNodes(s);
+	addPayloadRods(s);
+	addPayloadStrings(s);
+}
+
+void sixBarModel::setup(tgWorld& world)
+{
 	// Calculate the space between two parallel rods based on the rod length from Config
 	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 
@@ -172,28 +195,7 @@ sixBarModel::sixBarModel() : tgModel()
 	normalVectors.push_back(face17Norm);
 	normalVectors.push_back(face18Norm);
 	normalVectors.push_back(face19Norm);
-}
 
-sixBarModel::~sixBarModel()
-{
-}
-
-void sixBarModel::addSixBar(tgStructure& s)
-{
-	addSixBarNodes(s);
-	addSixBarRods(s);
-	addSixBarActuators(s);
-}
-
-void sixBarModel::addPayload(tgStructure& s)
-{
-	addPayloadNodes(s);
-	addPayloadRods(s);
-	addPayloadStrings(s);
-}
-
-void sixBarModel::setup(tgWorld& world)
-{
 	// Define the configurations of the rods and strings
   	// Note that pretension is defined for this string
 	const tgRod::Config sixBarRodConfig(config.radius, config.density, config.friction,
@@ -216,8 +218,9 @@ void sixBarModel::setup(tgWorld& world)
 	//addPayload(s);
 
 	// Move the structure
-	rotateToFace(s, 0);
-	s.move(btVector3(100,1300,-100));
+	rotateToFace(s, 1);
+	//s.move(btVector3(100, 700,-100));
+	s.move(btVector3(0, config.rodLength, 0));
 
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;

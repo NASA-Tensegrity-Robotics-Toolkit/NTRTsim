@@ -185,7 +185,7 @@ private:
 	bool runPathGen = false;
 
 	// Debugging counter
-	int counter;
+	int counter = 0;
 
 	// Ready flag
 	bool robotReady = false;
