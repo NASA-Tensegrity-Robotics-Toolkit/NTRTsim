@@ -2,7 +2,12 @@ substructures:
   t1/t2/t3/t4/t5/t6:
     path: ./Tetrahedron.yaml
     offset: [0, 0 , -12]
+    translation: [0, 0, 30]
+  shoulders: 
+    path: ../BaseStructures/shoulders.yaml
+    translation: [-15, 5, 30]
 
+  
 bond_groups:
   string:
     t1/t2/t3/t4/t5/t6/node_node:
@@ -25,3 +30,4 @@ builders:
       history: 1
       max_tension: 7000.0
       target_velocity: 12.0
+

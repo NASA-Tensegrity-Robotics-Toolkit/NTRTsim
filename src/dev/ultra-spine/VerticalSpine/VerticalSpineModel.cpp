@@ -71,8 +71,8 @@ namespace
     "base", // the name of this type of vertebra
     0.0,  // mass. Note that setting a rigid body's mass to 0 makes it fixed in space.
     0.5,  // radius
-    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
-    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    9.303,  // leg_length.
+    13.141,  // height.
     0.99,  // friction
     0.01,  // rollFriction
     0.0,  // restitution
@@ -84,8 +84,8 @@ namespace
     "passive", // the name of this type of vertebra
     0.0924,  // mass
     0.5,  // radius
-    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
-    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    9.303,  // leg_length
+    13.141,  // height
     0.99,  // friction
     0.01,  // rollFriction
     0.0,  // restitution
@@ -95,8 +95,8 @@ namespace
     "active", // the name of this type of vertebra
     0.1386,  // mass
     0.5,  // radius
-    12.25,  // leg_length. Was calculated on 2016-03-08 from sqrt( (height/2)^2 + (edge/2)^2 )
-    14.14,  // height. Was calculated on 2016-03-08 from edge / sqrt(2). Previously, edge = 20.
+    9.303,  // leg_length
+    13.141,  // height
     0.99,  // friction
     0.01,  // rollFriction
     0.0,  // restitution
@@ -112,11 +112,6 @@ namespace
   
   const struct Config
     {
-        double densityA;
-        double densityB;
-        double radius;
-        double edge;
-        double height;
         double stiffness;
         double damping;  
         double friction;
@@ -129,18 +124,16 @@ namespace
     } c =
    {
      // On 2016-03-08, the two-segment model of ULTRA Spine (one active, one passive)
-     // weighed 231g. 
-     0.026,    // densityA (kg / length^3)
-     0.0,    // densityB (kg / length^3)
-     0.5,     // radius (length)
-     20.0,      // edge (length)
-     tgUtil::round(c.edge / std::sqrt(2.0)),    // height (length)
-     1000.0,   // stiffness (kg / sec^2)
+     // weighed 231g.
+     // On 2016-04-04, spring constant is 2.01 lb/in
+     // 1 lbf = 4.448222 N, 1 in = 2.54 cm
+     // thus, y N/m = x lb/in * 175.1269
+     352.005,   // stiffness (kg / sec^2)
      10.0,    // damping (kg / sec)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension. used to be 2452.0
+     150.0,        // pretension. used to be 2452.0
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity

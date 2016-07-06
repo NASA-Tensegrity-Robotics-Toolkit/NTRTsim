@@ -26,6 +26,7 @@
 
 // This application
 #include "../../../yamlbuilder/TensegrityModel.h"
+#include "RPLengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -36,8 +37,6 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
-// Controller for tension sensing
-#include "RPLengthController.h"
 
 /**
  * The entry point.
@@ -70,16 +69,12 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
-    // Create the controller
     RPLengthController* const tension_sensor = new RPLengthController();
-
-    // Attach controller to the model
     myModel -> attach(tension_sensor);
 
     // Add the model to the world
     simulation.addModel(myModel);
-    
-    // Run the simulation
+
     simulation.run();
 
     // teardown is handled by delete

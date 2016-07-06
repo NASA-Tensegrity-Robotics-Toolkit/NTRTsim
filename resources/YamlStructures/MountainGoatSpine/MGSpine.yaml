@@ -1,0 +1,38 @@
+substructures:
+  vertebra1/vertebra2/vertebra3/vertebra4/vertebra5/vertebra6/vertebra7:
+    path: MGVertebra.yaml
+    translation: [11, 0, 0]
+    offset: [11, 0, 0]
+  vertebra1/vertebra3/vertebra5/vertebra7:
+    rotation:
+      axis: [1, 0, 0]
+      angle: 90
+
+bond_groups:
+  string:
+      vertebra1/vertebra2/vertebra3/vertebra4/vertebra5/vertebra6/vertebra7/node_node:
+        - [back1, front1]
+        - [back1, front2]
+        - [back2, front1]
+        - [back2, front2]
+      vertebra1/vertebra3/vertebra5/vertebra7/node_node:
+        - [back1, front2]
+        - [back2, front1]
+      vertebra2/vertebra4/vertebra6/node_node:
+        - [back1, front2]
+        - [back2, front1]
+      vertebra1/vertebra2/node_node:
+        - [front1, front1]
+        - [front2, front2]
+        - [front1, front2]
+        - [front2, front1]
+      vertebra6/vertebra7/node_node:
+        - [back1, back1]
+        - [back1, back2]
+        - [back2, back1]
+        - [back2, back2]
+      vertebra2/vertebra3/vertebra4/vertebra5/vertebra6/vertebra7/node_node:
+        - [front1, front1]
+        - [front1, front2]
+        - [front2, front1]
+        - [front2, front2]
