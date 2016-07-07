@@ -67,7 +67,7 @@ namespace
       0.99,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
-      25*sf,////17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
       0.1*sf,          // targetVelocity (m/s)
@@ -249,7 +249,7 @@ void PrismModel::setup(tgWorld& world)
 
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
-  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension, c.hist, 
+  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
     
@@ -306,7 +306,7 @@ void PrismModel::setup(tgWorld& world)
   //TANK (aka PAYLOAD) 
   int baseStartLink = globalOffset; //Save the node position before adding new nodes
   addBottomStructure(s,externalRadius,payloadLength,tankToOuterRing,globalOffset);
-  std::cout << "After Tank: " << globalOffset << std::end;l
+  std::cout << "After Tank: " << globalOffset << std::endl;
   
   //HINGES
   int hingeStart = globalOffset;
