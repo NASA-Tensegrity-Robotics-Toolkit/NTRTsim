@@ -189,7 +189,7 @@ private:
 	bool runPathGen = false;
 
 	// Debugging counter
-	double counter = 0;
+	double replanCounter = 0;
 
 	// Ready flag
 	bool robotReady = false;

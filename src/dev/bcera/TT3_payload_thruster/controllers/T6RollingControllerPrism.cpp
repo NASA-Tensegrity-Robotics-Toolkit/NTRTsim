@@ -167,7 +167,7 @@ void T6RollingController::onSetup(PrismModel& subject)
   */
 
   // Open triangles not connected
-  // 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
+  // 			    Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
   node0Adj  = boost::assign::list_of(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 0
   node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 1
   node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
@@ -243,7 +243,7 @@ void T6RollingController::onSetup(PrismModel& subject)
   }
 
   // Actuation policy table (With policy for open faces)
-  // 			 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19   // rows:
+  // 		 	   Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19   // rows:
   node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
   node1AP  = boost::assign::list_of( 0)(-1)( 1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
   node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
@@ -300,8 +300,6 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
       case 1:
 	{
 	  
-	  if(goalReached == true)
-	    setAllActuators(m_controllers, actuators, restLength, dt);
 	  if(resetFlag==true){
 	    resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
 	    resetFlag = !resetFlag;
@@ -311,21 +309,25 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	    if (isOnGround == true && runPathGen == false && stepFin == true && resetFlag == false) {
 	      currSurface = contactSurfaceDetection();
 	      std::cout << "1st Check~~~~~~~~~~~~~~~~~~" << std::endl;
+	      runPathGen = true;
 	      if (currSurface == c_face_goal) {
 		std::cout << "onStep: Destination face reached" << std::endl;
 		goalReached = true;
-		bool completeReset = false;
-		completeReset = setAllActuators(m_controllers, actuators, restLength, dt);
-		if(completeReset){
+		//if(completeReset){
 		  subject.changeRobotState(2);
+		  isOnGround = true;
+		  runPathGen = false;
+		  stepFin = true;
+		  resetFlag = false;
+		  goalReached = false;
 		  std::cout << "Switching to Thrust Control" << std::endl;
-		}
+		  //}
 	      }
 	      if (currSurface >= 0 && goalReached == false) {
 		path = findPath(A, currSurface, c_face_goal);
+		replanCounter = 0;
 		utility::printVector(path);
 	      }
-	      runPathGen = true;
 	    }
 	    else if (isOnGround == false && runPathGen == true) {
 	      std::cout << "2nd Check~~~~~~~~~~~~~~~~~~" << std::endl;
@@ -334,6 +336,14 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	    if (currSurface >= 0 && goalReached == false) {
 	      std::cout << "3rd Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	      stepFin = stepToFace(currSurface, path[1], dt);
+	      replanCounter++;
+	      if(replanCounter > 3000){
+		runPathGen = false;
+		stepFin = true;
+		resetFlag = true;
+	      }
+		
+	      
 	    }
 	    else
 	      std::cout << "4th Check~~~~~~~~~~~~~~~~~~" << std::endl;

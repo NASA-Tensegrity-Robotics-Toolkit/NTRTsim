@@ -53,13 +53,13 @@ namespace
   double sf = 30; // scaling factor
   double worldTime = 0.0; // clock for world time (UPDATED: clock for time thruster controller is on)
   double shootTime = 0.0; // used for thrust timing in multiple hop scenarios
-  double initiateThrustTime = 3; // wait time until thrust initiation
+  double initiateThrustTime = 1; // wait time until thrust initiation
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
-  double thrustPeriod = 100; // duration of thrust on
+  double thrustPeriod = 1; // duration of thrust on
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
-  const btVector3 targetLocation = btVector3(targetDistance*sf, 0.0, 0.0); // target is located 1000m away in +X direction	
+  const btVector3 targetLocation = btVector3(10*sf, 0, -5*sf); // target is located 1000m away in +X direction	
   bool doneHopping = false; // end hopping when this is true
   int numberOfHops = 0; // count the number of hops the robot made in this simulation	
   std::ofstream simlog; // log file for thruster related variables
@@ -73,6 +73,8 @@ namespace
   btVector3 prev_GimbalHeading = btVector3(0,0,-1);
   int numTankOrientations = 1; //Averaging Filter
   int count = 0;
+  bool positionAcquired = false;
+  btVector3 launchPosition;
   
   //##### BCera - moved from onStep to namespace, to initialize jetDirections onSetup
   double thrust = 50*sf;//50*sf;
@@ -160,10 +162,33 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	}
       else
 	{
+	  if(positionAcquired==false){
+	    launchPosition = tankRigidBody->getCenterOfMassPosition();
+	    positionAcquired = true;
+	  }
+	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<0.05){
+	    subject.changeRobotState(1);
+	    worldTime = -dt; //dt added at end of onStep
+	    timePassed = -dt;	
+	    shootTime = -dt;
+	    positionAcquired = false;
+	    isReoriented = false;
+	    //Set Initial Launch Orientation Here ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	    goalAltitude = -90;
+	    goalYaw = 0;
+	    goalVector.setX(sin((goalAltitude+90)*M_PI/180)*sin(goalYaw*M_PI/180));
+	    goalVector.setY(cos((goalAltitude+90)*M_PI/180));
+	    goalVector.setZ(sin((goalAltitude+90)*M_PI/180)*cos(goalYaw*M_PI/180));
+	    goalVector = goalVector.normalized();
+	    //goalVector = goalVector.rotate(btVector3(1,0,0),M_PI); // Rotate goalVector 180 degrees! To match Ed's walking controller
+	    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  }
 	  if(worldTime > reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
 	    double finalGoalAltitude = -10;
 	    double finalGoalYaw = 45;
+	    //Calculate Yaw Based on Target
+	    finalGoalYaw = atan2(targetLocation.getX()-launchPosition.getX(),targetLocation.getZ()-launchPosition.getZ())*180/M_PI;
 	    double inc = 40*dt;
 	    bool AltSet = false;
 	    bool YawSet = false;
@@ -245,6 +270,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  std::cout << "Tank Position: " << tank_pos << std::endl;
 	  btVector3 tank_lin_vel = tankRigidBody->getLinearVelocity();
 	  std::cout << "Tank Velocity Magnitude: " << tank_lin_vel.length() << std::endl;
+	  robotSpeed = tank_lin_vel.length();
 	  tank_lin_vel = tank_lin_vel.normalized();
 	  std::cout << "Tank Velocity Direction|| Altitude: " << acos(tank_lin_vel.y())*180/M_PI-90 << ", Yaw:  " << atan2(tank_lin_vel.z(),-tank_lin_vel.x())*180/M_PI-90 << std::endl;
 	  btVector3  sol_vector = world_rot_mat.transpose()*goalVector; //P_p

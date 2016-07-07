@@ -97,6 +97,7 @@ private:
   double prev_angle_err;
   double error_sum;
   btVector3 goalVector;
+  btScalar robotSpeed = 0;
 
   std::ofstream sim_out;
 
