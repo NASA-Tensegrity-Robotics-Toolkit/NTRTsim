@@ -262,6 +262,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
 	*/
 
+	/*
 	// Actuation policy table (With policy for open faces)
 	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
 	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
@@ -284,6 +285,30 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node17AP = boost::assign::list_of(-1)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 7)(-1)(-1)(-1)(-1); // 17
 	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
 	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)(-1)(11)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
+	*/
+
+	// Actuation policy table (With policy for open faces)
+	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
+	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
+	node1AP  = boost::assign::list_of( 2)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
+	node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
+	node3AP  = boost::assign::list_of(-1)(-1)( 1)(-1)(-1)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
+	node4AP  = boost::assign::list_of( 0)(-1)(-1)(-1)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
+	node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
+	node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)( 9)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
+	node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
+	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
+	node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(11)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
+	node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
+	node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(-1)(-1)(-1)( 4)(-1)(-1)(-1)(-1); // 11
+	node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(-1)(-1)( 5)(-1)(-1)(-1)(-1)(-1)(-1); // 12
+	node13AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)( 5)(-1)( 6)(-1)(-1)(-1); // 13
+	node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 6)(-1)( 7)(-1)(-1)(-1)(-1); // 14
+	node15AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)( 4)(-1)(-1)( 7)(-1)(-1); // 15
+	node16AP = boost::assign::list_of(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)(-1)(-1)(-1)(-1)(-1); // 16
+	node17AP = boost::assign::list_of(-1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)(-1)(-1); // 17
+	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(19)(-1)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
+	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(17)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
 
 	actuationPolicy.push_back(node0AP);
 	actuationPolicy.push_back(node1AP);
@@ -313,39 +338,40 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
     	throw std::invalid_argument("onStep: dt is not positive");
   	}
 
+  	bool isOnGround = checkOnGround();
+
   	if (robotReady == true) {
   		switch (controller_mode) {
   		case 1:
   			{
 	  			// Code for face mode
-	  			if (goalReached) {
-	  				setAllActuators(m_controllers, actuators, restLength, dt);
+	  			if (resetFlag) {
+	  				resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	  				resetCounter = 0;
 	  			}
+	  			else {
+	  				if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+		  				currSurface = contactSurfaceDetection();
+		  				runPathGen = true;
+						if (currSurface == c_face_goal) {
+							goalReached = true;
+							std::cout << "onStep: Destination face reached" << std::endl;
+						}
+						if (currSurface >= 0 && !goalReached) {
+							path = findPath(A, currSurface, c_face_goal);
+							utility::printVector(path);
+						}
+						runPathGen = true;
+		  			}
+		  			else if (!isOnGround && runPathGen) {
+		  				runPathGen = false;
+		  			}
 
-	  			bool isOnGround = checkOnGround();
-
-	  			if (isOnGround && !runPathGen && stepFin) {
-	  				currSurface = contactSurfaceDetection();
-					if (currSurface == c_face_goal) {
-						goalReached = true;
-						std::cout << "onStep: Destination face reached" << std::endl;
-					}
-					if (currSurface >= 0 && !goalReached) {
-						path = findPath(A, currSurface, c_face_goal);
-						utility::printVector(path);
-					}
-					runPathGen = true;
+		  			if (currSurface >= 0 && !goalReached) {
+		  				stepFin = stepToFace(currSurface, path[1], dt);
+		  			}
 	  			}
-	  			else if (!isOnGround && runPathGen) {
-	  				runPathGen = false;
-	  			}
-
-	  			if (currSurface >= 0 && !goalReached) {
-	  				stepFin = stepToFace(currSurface, path[1], dt);
-	  			}
-
-	  			std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
-
+	  			//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
 	  			break;
   			}
   		case 2:
@@ -536,72 +562,59 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 	bool stepFinished = true;
 	bool isOnPath = false;
 	// Length for cables to retract to
-	double controlLength = 3;
-	// Find current face
-	int currFace = contactSurfaceDetection();
-	// Check if current face is on the path
-	for (size_t i = 0; i < path.size(); i++) {
-		if (currFace == path[i])
-			isOnPath = true;
-	}
+	double controlLength = 1;
+	
+	// Get which cable to actuate from actuation policy table
+	int cableToActuate = actuationPolicy[startFace][endFace];
 
-	//if (isOnPath) {
-		// Get which cable to actuate from actuation policy table
-		int cableToActuate = actuationPolicy[startFace][endFace];
-		// Perform actuation from one closed face to another
-		if (isClosedFace(startFace)) {
-			if (cableToActuate >= 0) {
-				// path[0] is current face, path[1] is the adjacent open face, 
-				// path[2] is the next closed face
-				// Check if the robot has reached the next closed face
-				if (currFace != path[2]) {
-					m_controllers[cableToActuate]->control(dt, controlLength);
-					actuators[cableToActuate]->moveMotors(dt);
-					std::cout << "stepToFace: Stepping..." << std::endl;
-					stepFinished = false;
-				}
-				// If it has, return all cables to rest length
-				else {
-					std::cout << "stepToFace: Returning to rest length..." << std::endl;
-					stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
-				}
+	// Perform actuation from one closed face to another
+	if (isClosedFace(startFace)) {
+		if (cableToActuate >= 0) {
+			// Find current face
+			int currFace = contactSurfaceDetection();
+			// path[0] is current face, path[1] is the adjacent open face, 
+			// path[2] is the next closed face
+			// Check if the robot has reached the next closed face
+			if (currFace != path[2]) {
+				m_controllers[cableToActuate]->control(dt, controlLength);
+				actuators[cableToActuate]->moveMotors(dt);
+				std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
+				stepFinished = false;
+				resetCounter++;
+				if (resetCounter > 3000) resetFlag = true;
 			}
-			// Triggers if element called from actuation policy table is -1
-			else {
-				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-				//exit(EXIT_FAILURE);
-			}
+			// If it has, return all cables to rest length
+			else resetFlag = true;
 		}
-		// Perfom actuation to get from an open face to a closed face
+		// Triggers if element called from actuation policy table is -1
 		else {
-			if (cableToActuate >= 0) {
-				// Check to see if robot has reached a closed face
-				if (!isClosedFace(currFace)) {
-					m_controllers[cableToActuate]->control(dt, controlLength);
-					actuators[cableToActuate]->moveMotors(dt);
-					std::cout << "stepToFace: Stepping to closed face" << std::endl;
-					stepFinished = false;
-				}
-				// If it has, return all cables to rest length
-				else {
-					std::cout << "stepToFace: Returning to rest length..." << std::endl;
-					stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
-				}
-			}
-			// Triggers if element called from actuation policy table is -1
-			else {
-				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-				//exit(EXIT_FAILURE);
-			}
+			std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+			//exit(EXIT_FAILURE);
 		}
-	//}
-	/*
-	else {
-		std::cout << "stepToFace: Robot not on path, finding new path" << std::endl;
-		stepFinished = true;
 	}
-	*/
-
+	// Perfom actuation to get from an open face to a closed face
+	else {
+		if (cableToActuate >= 0) {
+			// Find current face
+			int currFace = contactSurfaceDetection();
+			// Check to see if robot has reached a closed face
+			if (!isClosedFace(currFace)) {
+				m_controllers[cableToActuate]->control(dt, controlLength);
+				actuators[cableToActuate]->moveMotors(dt);
+				std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
+				stepFinished = false;
+				resetCounter++;
+				if (resetCounter > 3000) resetFlag = true;
+			}
+			// If it has, return all cables to rest length
+			else resetFlag = true;
+		}
+		// Triggers if element called from actuation policy table is -1
+		else {
+			std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+			//exit(EXIT_FAILURE);
+		}
+	}
 	return stepFinished;
 }
 
@@ -628,9 +641,13 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 	for (size_t i = 0; i < actuators.size(); i++) {
 		controllers[i]->control(dt, setLength);
 		actuators[i]->moveMotors(dt);
-		if (actuators[actuators.size()-1]->getRestLength()-setLength > 0.01) {
-			returnFin = false;
-		}
+		if (actuators[i]->getRestLength()-setLength > 0.01) {
+      		returnFin = false;
+    	}
+    	if (actuators[i]->getRestLength()-setLength < -0.01) {
+      	returnFin = false;
+    	}
 	}
+	std::cout << "Resetting Cable Lengths " << std::endl;
 	return returnFin;
 }

@@ -60,6 +60,7 @@ int main(int argc, char** argv)
     const double pitch = 0.0;
     const double roll = 0.0;
 
+    /*
     // Import Ground
     // Set ground parameters
     btVector3 orientation = btVector3(yaw, pitch, roll);
@@ -76,6 +77,7 @@ int main(int argc, char** argv)
 
     // Get filename from argv
     std::string filename_in = argv[1];
+    //std::string filename_in = "./LunarScape_mission.txt";
 
     // Check filename
     if (filename_in.find(".txt") == std::string::npos) {
@@ -98,11 +100,11 @@ int main(int argc, char** argv)
         std::cout << "Input file opened successfully" << std::endl;
     }
     tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+    */
 
     // Box ground
-    //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    //tgBoxGround* ground = new tgBoxGround(groundConfig);    
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    tgBoxGround* ground = new tgBoxGround(groundConfig);    
 
     double gravity = 98.1;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
@@ -123,7 +125,7 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel();
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 15);
+    const T6RollingController::Config controllerConfig(gravity, "face", 0);
     
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

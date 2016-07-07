@@ -38,6 +38,7 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 tgImportGround::Config::Config(btVector3 eulerAngles,
         double friction,
@@ -195,6 +196,8 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
     btTriangleMesh* const pMesh = 
         new btTriangleMesh();
 
+    double max_X = 0, max_Y = 0, max_Z = 0;
+
     while (file.good()) {
     //for (int line = 0; line < 200; line++) {
 
@@ -227,6 +230,10 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
             y = z;
             z = -temp;
 
+            if (abs(x) > abs(max_X)) max_X = x;
+            if (abs(y) > abs(max_Y)) max_Y = y;
+            if (abs(z) > abs(max_Z)) max_Z = z;
+
             // Update last found positions
             found_left_brac_last = found_left_brac;
             found_right_brac_last = found_right_brac;
@@ -251,6 +258,8 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
 
     }
 
+    std::cout << "Max X coordinate: " << max_X << ", Max Y coordinate: " << max_Y << ", Max Z coordinate: " << max_Z << std::endl;
+    
     /*
     // Test triangle
     btVector3 v0_test(1, 0, 0);

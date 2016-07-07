@@ -218,8 +218,8 @@ void sixBarModel::setup(tgWorld& world)
 	//addPayload(s);
 
 	// Move the structure
-	rotateToFace(s, 1);
-	//s.move(btVector3(100, 700,-100));
+	rotateToFace(s, 9);
+	//s.move(btVector3(100, 3420,-100));
 	s.move(btVector3(0, config.rodLength, 0));
 
 	// Create the build spec that uses tags to turn the structure into a real model
