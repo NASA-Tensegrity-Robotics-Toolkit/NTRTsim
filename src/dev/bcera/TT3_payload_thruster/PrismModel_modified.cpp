@@ -67,7 +67,7 @@ namespace
       0.99,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
-      17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      25*sf,////17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
       0.1*sf,          // targetVelocity (m/s)
@@ -219,8 +219,8 @@ void PrismModel::setup(tgWorld& world)
   
   //TT3 Parameters
   double tankRadius = 0.05*sf;
-  double internalRadius = 0.05*sf;
-  double externalRadius = 0.055*sf; 
+  double internalRadius = 0.025*sf;//0.05*sf;
+  double externalRadius = 0.03*sf;//0.055*sf; 
   double tankToOuterRing = 0.05*sf;
   double payloadLength = 0.05*sf;
   /*
@@ -306,7 +306,7 @@ void PrismModel::setup(tgWorld& world)
   //TANK (aka PAYLOAD) 
   int baseStartLink = globalOffset; //Save the node position before adding new nodes
   addBottomStructure(s,externalRadius,payloadLength,tankToOuterRing,globalOffset);
-  std::cout << "After Tank: " << globalOffset << std::endl;
+  std::cout << "After Tank: " << globalOffset << std::end;l
   
   //HINGES
   int hingeStart = globalOffset;
@@ -329,7 +329,8 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
   //rotateToFace(s, 15);
-  s.move(btVector3(0, 0, 0));
+  //s.move(btVector3(100, 700, -100));
+  
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
   spec.addBuilder("rod", new tgRodInfo(rodConfig));

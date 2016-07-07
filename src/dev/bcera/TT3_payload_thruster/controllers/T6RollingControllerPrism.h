@@ -137,6 +137,10 @@ public:
 						 std::vector<tgBasicActuator*>& actuators, 
 						 double setLength, double dt);
 
+	int resetCounter = 0;
+
+	bool resetFlag = false;
+
 private:
 	// Store the configuration data for use later
 	Config m_config;
