@@ -628,9 +628,9 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 	for (size_t i = 0; i < actuators.size(); i++) {
 		controllers[i]->control(dt, setLength);
 		actuators[i]->moveMotors(dt);
-	}
-	if (actuators[actuators.size()-1]->getRestLength()-setLength > 0.01) {
-		returnFin = false;
+		if (actuators[actuators.size()-1]->getRestLength()-setLength > 0.01) {
+			returnFin = false;
+		}
 	}
 	return returnFin;
 }

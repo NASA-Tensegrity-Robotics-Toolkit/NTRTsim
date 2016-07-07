@@ -17,9 +17,7 @@
 #     TensegrityModel.cpp)
 
 add_executable(AppSTLParser
-#    TensegrityModel.cpp
-#    RPLengthController.h
-#    RPLengthController_rand.cpp
     AppSTLParser.cpp)
 
-
+add_executable(AppElevationGrabber
+	AppElevationGrabber.cpp)
