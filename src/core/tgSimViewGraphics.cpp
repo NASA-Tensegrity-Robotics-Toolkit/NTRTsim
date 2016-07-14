@@ -132,9 +132,9 @@ void tgSimViewGraphics::run(int steps)
 // since it knows when the new world is available
 void tgSimViewGraphics::reset() 
 {
-    assert(isInitialzed());
-    m_pSimulation->reset();
-    assert(isInitialzed());
+  assert(isInitialzed());
+  m_pSimulation->reset();
+  assert(isInitialzed());
 }
 
 void tgSimViewGraphics::clientMoveAndDisplay()

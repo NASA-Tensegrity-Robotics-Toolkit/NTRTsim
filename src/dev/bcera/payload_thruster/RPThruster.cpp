@@ -53,7 +53,7 @@ namespace
   double sf = 10; // scaling factor
   double worldTime = 0.0; // clock for world time
   double shootTime = 0.0; // used for thrust timing in multiple hop scenarios
-  double initiateThrustTime = 8; // wait time until thrust initiation
+  double initiateThrustTime = 5; // wait time until thrust initiation
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
   double thrustPeriod = 10; // duration of thrust on
@@ -134,8 +134,11 @@ void RPThruster::onSetup(PrismModel& subject)
 				 
   std::cout << "------------------ On Step -------------------" << std::endl;
 
-  sim_out.open("Payload Thruster Control Data",std::ios::app);
-  sim_out << "Goal Altitude, " << goalAltitude << ", Goal Yaw: " << goalYaw << std::endl;
+  if(doLog){
+    sim_out.open("50percentmass.txt",std::ios::app);
+    sim_out << "Label-Goal Altitude, GoalAltitude, Label-GoalYaw, GoalYaw, Label-SimTime, SimTime, Label-GimbalPitch, GimbalPitch, Label-GimbalYaw, GimbalYaw, Label-TankPitch, TankPitch, Label-TankYaw, TankYaw, Label-TankPos, TankPosX, TankPosY, TankPosZ, Label-TankVelPitch, TankVelPitch, Label-TankVelYaw, TankVelYaw, Label-Alpha, Alpha, Label-Beta, Beta, Label-Error, Error, Label-d_error, d_Error" << std::endl;
+    sim_out << std::endl;
+  }
 }
 
 
@@ -159,7 +162,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  
 	  if(worldTime > reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
-	    double finalGoalAltitude = -0;
+	    double finalGoalAltitude = -20;
 	    double finalGoalYaw = 0;
 	    double inc = 40*dt;
 	    bool AltSet = false;
@@ -467,9 +470,9 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    {
 	      std::cout << "Robot fell outside of the world!" << std::endl;
 	    }
-
-	  std::cout << fmod(worldTime,0.1) << std::endl;
-	  if(doLog){
+	  /*
+	  std::cout << fmod(worldTime,0.01) << std::endl;
+	  if(doLog && fmod(w){
 	    sim_out << "Sim Time, " << worldTime << ", Gimbal Pitch, " << altitudeAngle << ", Gimbal Yaw, " << yawAngle << ", ";
 	    sim_out << "Tank Pitch, " << acos(unit_tank.y())*180/M_PI-90 << ", Tank Yaw, " << atan2(unit_tank.z(),-unit_tank.x())*180/M_PI-90 << ", ";
 	    sim_out << "Tank Pos, " << tank_pos[0] << ", " << tank_pos[1] << ", " << tank_pos[2] << ", ";
@@ -477,8 +480,21 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    sim_out << "Alpha, " << alpha*180/M_PI << ", Beta, " << beta*180/M_PI << ", ";
 	    //sim_out << "Scaling Factor, " << scalingFactor << ", error, " << angle_error*180/M_PI << ", d_error, " << d_angle_error << ", i_error, " << error_sum << std::endl;
 	  }
+	  */
+	  if(doLog && fmod(worldTime,0.01)<0.001){
+	    std::cout << "PRINTING TO FILE~~~~~"  << std::endl;
+	    sim_out << "Goal Altitude, " << goalAltitude << ", Goal Yaw, " << goalYaw << ", ";
+	    sim_out << "Sim Time, " << worldTime << ", Gimbal Pitch, " << altitudeAngle << ", Gimbal Yaw, " << yawAngle << ", ";
+	    sim_out << "Tank Pitch, " << acos(unit_tank.y())*180/M_PI-90 << ", Tank Yaw, " << atan2(unit_tank.x(),-unit_tank.z())*180/M_PI+90 << ", ";
+	    sim_out << "Tank Pos, " << tank_pos[0] << ", " << tank_pos[1] << ", " << tank_pos[2] << ", ";
+	    sim_out << "Tank Vel Pitch, " << acos(tank_lin_vel.y())*180/M_PI-90 << ", Tank Vel Yaw,  " << atan2(tank_lin_vel.x(),-tank_lin_vel.z())*180/M_PI+90 << ", ";
+	    sim_out << "Alpha, " << alpha*180/M_PI << ", Beta, " << beta*180/M_PI << ", ";
+	    //sim_out << "Scaling Factor, " << scalingFactor << ", error, " << angle_error*180/M_PI << ", d_error, " << d_angle_error << ", i_error, " << error_sum << std::endl;
+	    sim_out << "Error, " << angle_error*180/M_PI << ", d_Error, " << d_angle_error << std::endl;
+	    sim_out << std::endl;
+	  }
 
-	  if(worldTime > 30 && doLog){
+	  if(worldTime > 20 && doLog){
 	    doLog = false;
 	    sim_out.close();
 	  }

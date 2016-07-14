@@ -57,6 +57,8 @@ int main(int argc, char** argv)
   const double yaw = 0.0;
   const double pitch = 0.0;
   const double roll = 0.0;
+
+  
   const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
@@ -75,7 +77,8 @@ int main(int argc, char** argv)
   const tgImportGround::Config groundConfig(orientation, friction, restitution,
 					    origin, margin, offset, scalingFactor);
   // Get filename from argv
-  std::string filename_in = argv[1];
+  //std::string filename_in = argv[1];
+  std::string filename_in = "./lunarscape_mission.txt";
   // Check filename
   if (filename_in.find(".txt") == std::string::npos) {
     std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;

@@ -70,7 +70,7 @@ namespace
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
-      0.1*sf,          // targetVelocity (m/s)
+      0.25*sf,          // targetVelocity (m/s)
       
       /*
       //Superball Parameters
@@ -329,7 +329,7 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
   //rotateToFace(s, 15);
-  //s.move(btVector3(100, 700, -100));
+  s.move(btVector3(100, 700, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -393,25 +393,27 @@ void PrismModel::setup(tgWorld& world)
   btTransform inverseTransform = thrusterRigidBody->getWorldTransform().inverse();
   btVector3 pos = btVector3(0,0,7);
   abstractMarker thrust_dir=abstractMarker(thrusterRigidBody,pos,btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
-  this->addMarker(thrust_dir); //added thruster orientation marker
+  //this->addMarker(thrust_dir); //added thruster orientation marker
 
   
   // Get the rod rigid bodies for controller
   allRods = PrismModel::find<tgRod>("rod");
-  /*
+  
   btRigidBody* rodBody = allRods[0]->getPRigidBody();
-  abstractMarker NODE0 = abstractMarker(rodBody,btVector3(0,-c.rod_length/2,0),btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
-  this->addMarker(NODE0); //added thruster orientation marker
-  */
+  abstractMarker NODE0 = abstractMarker(rodBody,btVector3(0,-c.rod_length/2,0),btVector3(1,0,.0),thrusterNode); // body, position, color, node number
+  //this->addMarker(NODE0); //added thruster orientation marker
+  
   btRigidBody* rodBody0 = allRods[3]->getPRigidBody();
-  abstractMarker NODE7  = abstractMarker(rodBody0,btVector3(0,-c.rod_length/2,0),btVector3(.1,0,.0),thrusterNode); // body, position, color, node number
+  abstractMarker NODE7  = abstractMarker(rodBody0,btVector3(0,-c.rod_length/2,0),btVector3(0,0,1),thrusterNode); // body, position, color, node number
   btRigidBody* rodBody1 = allRods[4]->getPRigidBody();
   abstractMarker NODE8 = abstractMarker(rodBody1,btVector3(0,-c.rod_length/2,0),btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
   btRigidBody* rodBody2 = allRods[0]->getPRigidBody();
   abstractMarker NODE1 = abstractMarker(rodBody2,btVector3(0,c.rod_length/2,0),btVector3(.0,0,.1),thrusterNode); // body, position, color, node number
-  this->addMarker(NODE7); //added thruster orientation marker
+   btRigidBody* rodBody3 = allRods[2]->getPRigidBody();
+  abstractMarker NODE4 = abstractMarker(rodBody3,btVector3(0,-c.rod_length/2,0),btVector3(.0,0,1),thrusterNode); // body, position, color, node number
+  this->addMarker(NODE0); //added thruster orientation marker
   this->addMarker(NODE8); //added thruster orientation marker
-  this->addMarker(NODE1); //added thruster orientation marker
+  this->addMarker(NODE4); //added thruster orientation marker
 
   
   // Get the actuators for controller

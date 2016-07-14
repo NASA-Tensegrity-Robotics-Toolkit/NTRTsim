@@ -5,8 +5,9 @@ orient
 thruster
 payload_thruster
 payload_thruster_disturbance_rejection
-TT3_payload_thruster
+TT3_payload_thruster_w_Walking
 V3_V4
+OLD_TT3_payload_thruster
 )
 	
  add_executable(AppWorkspace
