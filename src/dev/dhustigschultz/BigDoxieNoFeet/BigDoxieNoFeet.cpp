@@ -341,6 +341,12 @@ void BigDoxieNoFeet::addMuscles(tgStructure& puppy){
                 puppy.addPair(n1[2], n2[4], tgString("spine front upper left muscleAct1 seg", i-1) + tgString(" seg", i));
             }
         }
+	if (i >= 2 && i < m_segments){
+	    puppy.addPair(n1[3], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[3], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	    puppy.addPair(n1[4], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	}
         if(i == m_segments - 1){
             //rear
             puppy.addPair(n1[1], n2[2], tgString("spine rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
