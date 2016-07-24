@@ -3,6 +3,8 @@ Project(dhustigschultz)
 subdirs(
     BigDoxie
     BigDoxieNoFeet
+    BigDoxieSpirals
+
     BigPuppy_Model
     BigPuppy_Model2
     BigPuppy_Symmetric
@@ -25,6 +27,7 @@ subdirs(
     BP_SC_NoLegs
     BP_SC_Doxie
     BP_SC_Doxie_NoFeet
+    BP_SC_DoxieSpirals
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
 
