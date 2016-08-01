@@ -18,5 +18,6 @@ subdirs(
     eajung
     ezhu
     mcdaly
+	bgigous
 )
 
