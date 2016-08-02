@@ -1,0 +1,43 @@
+Some notes during the process of creating the groundforcesensor functionality.
+-Drew Sabelhaus 2016-08-02
+
+First, find out exactly how the tgBasicActuator and friends are created.
+
+-----------------------------
+Notes about the classes themselves:
+
+tgSpringCableActuator
+	constructor requires a tgSpringCable reference to be passed in
+
+tgSpringCable
+	does NOT inherent from anything
+	does NOT contain references to any underlying Bullet classes
+	but, does have a list of tgSpringCableAnchor .
+	
+tgBulletSpringCable
+	inherets from tgSpringCable, is a type of tgSringCable
+	FORMERLY KNOWN AS muscle2p
+	this is the class that applies a force to the anchors!
+
+-----------------------------
+What I will need to do:
+
+FOR THE COMPRESSION SPRING ITSELF:
+Create the classes:
+
+tgCompressionSpring (equivalent to tgSpringCable)
+	not-quite-abstract class that defines the behavior of a compression spring
+	just like tgSpringCable, but with requirements about pos/neg of spring constants to be flipped etc.
+
+tgBulletCompressionSpring (equivalent to tgBulletSpringCable)
+	just like tgBulletSpringCable. Might actually be almost exactly the same code.
+
+TO CHECK:
+   can we re-use tgSpringCableAnchor and tgBulletSpringCableAnchor?
+       Probably. In particular, tgBulletSpringCableAnchor refers to a btRigidBody directly, and
+       since our world is a btRigidBody, then it could attach.
+       Additionally, we may not even need two anchors for our ground force sensor: the sensor could
+       just have a reference to its own non-moving point in space (a btVector3) as the anchor of the spring.
+
+
+
