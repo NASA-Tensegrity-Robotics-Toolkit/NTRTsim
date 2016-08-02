@@ -40,6 +40,4 @@ subdirs(
     MG_Controller
     MG_CPGHierarchy
 
-    HexagonalSpine
-
 )
