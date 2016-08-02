@@ -38,5 +38,8 @@ subdirs(
 
     MountainGoat
     MG_Controller
+    MG_CPGHierarchy
+
+    HexagonalSpine
 
 )
