@@ -79,9 +79,6 @@ void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
  */
 void tgDataLogger::render(const tgCompressionSpringActuator& compressionSpringActuator) const
 {
-#ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgBulletRenderer::renderCompressionSpring");
-#endif //BT_NO_PROFILE 
     // do nothing.
 }
 

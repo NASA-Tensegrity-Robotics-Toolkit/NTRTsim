@@ -194,6 +194,23 @@ public:
     return m_compressionSpring;
   }
 
+  /**
+   * Functions required by tgControllable.
+   * As of 2016-08-02, all of these do nothing.
+   */
+
+  /**
+   * Does nothing as of 2016-08-02.
+   * See tgBasicActuator for an implementation that could be re-used here.
+   */
+  virtual void setControlInput(double input);
+	
+  /**
+   * Does nothing as of 2016-08-02.
+   * See tgBasicActuator for an implementation that could be re-used here.
+   */
+  virtual void setControlInput(double input, double dt);
+
 protected:
 
     /**

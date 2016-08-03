@@ -155,16 +155,29 @@ void tgCompressionSpringActuator::step(double dt)
 }
 
 // Renders the spring in the NTRT window
-void tgBasicActuator::onVisit(const tgModelVisitor& r) const
+void tgCompressionSpringActuator::onVisit(const tgModelVisitor& r) const
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("tgCompressionSpringActuator::onVisit");
 #endif //BT_NO_PROFILE	
     r.render(*this);
 }
-    
-bool tgBasicActuator::invariant() const
+
+/**
+ * The two required methods for this class to be a tgControllable.
+ */
+void tgCompressionSpringActuator::setControlInput(double input)
+{
+  // do nothing. See tgBasic Actuator for an example implementation.
+}    
+void tgCompressionSpringActuator::setControlInput(double input, double dt)
+{
+  // do nothing. See tgBasic Actuator for an example implementation.
+}
+
+// Finally, the invariant for assertions.
+bool tgCompressionSpringActuator::invariant() const
 {
     return
-      (m_springCable != NULL);
+      (m_compressionSpring != NULL);
 }

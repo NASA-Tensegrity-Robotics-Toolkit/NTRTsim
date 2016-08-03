@@ -99,6 +99,8 @@ ORDER OF OPERATIONS FOR THE CLASSES TO CREATE:
 3) tgBulletCompressionSpring
 	Use the class from tgBulletSpringCable.
 
+^ above done 7pm 2016-08-02
+
 4) Demo using a tgCompressionSpringActuator
 
 CHANGES TO THINK ABOUT WHEN COPYING OVER tgSpringCableActuator INTO tgCompressionSpringActuator:

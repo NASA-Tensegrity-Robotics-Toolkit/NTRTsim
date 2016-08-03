@@ -24,8 +24,10 @@
  * $Id$
  */
 
+// This class
 #include "tgCompressionSpringActuatorInfo.h"
 
+// Other classes from core
 #include "core/tgBulletCompressionSpring.h"
 #include "core/tgBulletSpringCableAnchor.h"
 
@@ -67,7 +69,7 @@ tgModel* tgCompressionSpringActuatorInfo::createModel(tgWorld& world)
     return new tgCompressionSpringActuator(m_bulletCompressionSpring, getTags(), m_config);
 }
 
-double tgBasicActuatorInfo::getMass() 
+double tgCompressionSpringActuatorInfo::getMass() 
 {
     // @todo: this should never be called, unless we wanted to model the mass of
     // a compression spring at some point. For now, maybe throw an error?

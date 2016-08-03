@@ -44,6 +44,7 @@
  * TO-DO: why not just include tgBulletCompressionSpring.h? */
 
 class tgBulletCompressionSpring;
+//class tgCompressionSpringActuator;
 
 class tgCompressionSpringActuatorInfo : public tgConnectorInfo
 {
@@ -75,7 +76,7 @@ public:
     /**
      * virtual destructor, does nothing
      */
-    virtual ~tgCompressionSpringInfo() {}
+    virtual ~tgCompressionSpringActuatorInfo() {}
     
     /**
      * Create a tgConnectorInfo* from a tgPair.
