@@ -160,7 +160,7 @@ const double tgBulletCompressionSpring::getCurrentSpringLength() const
     {
         // if the distance between the two anchors is larger than the rest length of the spring,
         // it means (intuitively) that one end of the spring is not touching a rigid body.
-        std::cout << "Compression spring is unloaded" << std::endl;
+        //std::cout << "Compression spring is unloaded" << std::endl;
 	springLength = m_restLength;
     }
     else
@@ -211,14 +211,16 @@ void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
 	// copied from tgBulletSpringCable. Not quite sure why this check
 	// is done. Why do we want to flip the direction of the spring force
 	// if the damping force is greater than the spring force?
-	if (abs(magnitude) * 1.0 < abs(m_dampingForce))
+	/*if (abs(magnitude) * 1.0 < abs(m_dampingForce))
 	{
 	  m_dampingForce =
           (m_dampingForce > 0.0 ? magnitude * 1.0 : -magnitude * 1.0);
-	}
+	  }*/
 
 	// Add the damping force to the force from the spring.
 	magnitude += m_dampingForce;
+
+	std::cout << magnitude << std::endl;
 
 	// Debugging
         #if (0)

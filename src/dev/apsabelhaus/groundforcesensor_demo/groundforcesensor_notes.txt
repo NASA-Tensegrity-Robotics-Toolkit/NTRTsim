@@ -114,4 +114,10 @@ CHANGES TO THINK ABOUT WHEN COPYING OVER tgSpringCableActuator INTO tgCompressio
 	      ^ might be something in tgBulletRenderer...
 	Check all the CMakeLists files to be sure all the new files are included.
 
+As of 8:30pm 2016-08-02, it looks like this is actually working. The one potential problem might be the calculations inside
+tgBulletCompressionSpring, since I couldn't quite tell if the calculations from tgBulletSpringCable would still apply... there
+is something weird with changing the magnitude of the spring force vs. damping force.
 
+To-Do 2016-08-03: Make a TwoBoxesModel class instead of a TwoRods class, since the rods just rolled around and I couldn't
+determine if the forces were being applied correctly.
+See Brian's BoxFeet model for a useage of tgBox.
