@@ -74,6 +74,12 @@ void MountainGoat::addNodesLeg(tgStructure& s, double r){
     s.addNode(-r,r,0);  //3: Left of lower leg segment
     s.addNode(0,2*r,0);  //4: Top of lower leg segment
     s.addNode(0,-r/2,0);  //5: Leg segment extension for connections to foot.
+
+    //Extra nodes, for supporting rod structures on bottom
+    s.addNode(0,-r/2,-r/2); //6
+    s.addNode(0,-r/2,r/2); //7
+    s.addNode(r/2,-r/2,0); //8
+    s.addNode(-r/2,-r/2,0); //9 
 }
 
 void MountainGoat::addRodsLeg(tgStructure& s){
@@ -82,6 +88,12 @@ void MountainGoat::addRodsLeg(tgStructure& s){
     s.addPair(1,3,"rod");
     s.addPair(1,4,"rod");
     s.addPair(0,5,"rod");
+
+    //Extra rods, for support
+    s.addPair(5,6,"rod");
+    s.addPair(5,7,"rod");
+    s.addPair(5,8,"rod");
+    s.addPair(5,9,"rod");
 }
 
 void MountainGoat::addNodesHip(tgStructure& s, double r){
@@ -330,19 +342,19 @@ void MountainGoat::addMuscles(tgStructure& goat){
     //goat.addPair(n1[3], n5[2], tgString("spine left lateral arching muscleAct seg", 1) + tgString(" seg", 5));
     
     //Left shoulder muscles
-    goat.addPair(n7[1], n1[1], tgString("all left shoulder rear upper muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[1], n1[4], tgString("all left shoulder front upper muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[1], n0[2], tgString("all left shoulder front top muscleAct1 seg", 7) + tgString(" seg", 0));
-    goat.addPair(n7[1], n2[3], tgString("all left shoulder rear top muscleAct1 seg", 7) + tgString(" seg", 2));
+    goat.addPair(n7[1], n1[1], tgString("all left shoulder hip rear upper muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[1], n1[4], tgString("all left shoulder hip front upper muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[1], n0[2], tgString("all left shoulder hip front top muscleAct1 seg", 7) + tgString(" seg", 0));
+    goat.addPair(n7[1], n2[3], tgString("all left shoulder hip rear top muscleAct1 seg", 7) + tgString(" seg", 2));
 
-    goat.addPair(n7[3], n1[1], tgString("all left shoulder rear lower muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[3], n1[4], tgString("all left shoulder front lower muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[3], n0[1], tgString("all left shoulder front bottom muscleAct1 seg", 7) + tgString(" seg", 0));
-    goat.addPair(n7[3], n2[4], tgString("all left shoulder rear bottom muscleAct1 seg", 7) + tgString(" seg", 2));
+    goat.addPair(n7[3], n1[1], tgString("all left shoulder hip rear lower muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[3], n1[4], tgString("all left shoulder hip front lower muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[3], n0[1], tgString("all left shoulder hip front bottom muscleAct1 seg", 7) + tgString(" seg", 0));
+    goat.addPair(n7[3], n2[4], tgString("all left shoulder hip rear bottom muscleAct1 seg", 7) + tgString(" seg", 2));
 
     //Extra muscles, to move left shoulder forward and back:
-    goat.addPair(n7[0], n1[1], tgString("all left shoulder rear mid muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[0], n1[4], tgString("all left shoulder front mid muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[0], n1[1], tgString("all left shoulder hip rear mid muscleAct1 seg", 7) + tgString(" seg", 1));
+    goat.addPair(n7[0], n1[4], tgString("all left shoulder hip front mid muscleAct1 seg", 7) + tgString(" seg", 1));
 
     //Left hip muscles
     goat.addPair(n8[1], n5[1], tgString("all left hip rear upper muscleAct1 seg", 8) + tgString(" seg", 5));
@@ -360,25 +372,25 @@ void MountainGoat::addMuscles(tgStructure& goat){
     goat.addPair(n8[0], n5[4], tgString("all left hip front mid muscleAct1 seg", 8) + tgString(" seg", 5));
 
     //Right shoulder muscles
-    goat.addPair(n9[1], n1[2], tgString("all right shoulder rear upper muscleAct1 seg", 9) + tgString(" seg", 1));
-    goat.addPair(n9[1], n1[3], tgString("all right shoulder front upper muscleAct1 seg", 9) + tgString(" seg", 1));
-    goat.addPair(n9[1], n0[2], tgString("all right shoulder front top muscleAct1 seg", 9) + tgString(" seg", 0));
-    goat.addPair(n9[1], n2[3], tgString("all right shoulder rear top muscleAct1 seg", 9) + tgString(" seg", 2));
+    goat.addPair(n9[1], n1[2], tgString("all right shoulder hip rear upper muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[1], n1[3], tgString("all right shoulder hip front upper muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[1], n0[2], tgString("all right shoulder hip front top muscleAct1 seg", 9) + tgString(" seg", 0));
+    goat.addPair(n9[1], n2[3], tgString("all right shoulder hip rear top muscleAct1 seg", 9) + tgString(" seg", 2));
 
-    goat.addPair(n9[3], n1[2], tgString("all right shoulder rear lower muscleAct1 seg", 9) + tgString(" seg", 1));
-    goat.addPair(n9[3], n1[3], tgString("all right shoulder front lower muscleAct1 seg", 9) + tgString(" seg", 1));
-    goat.addPair(n9[3], n0[1], tgString("all right shoulder front bottom muscleAct1 seg", 9) + tgString(" seg", 0));
-    goat.addPair(n9[3], n2[4], tgString("all right shoulder rear bottom muscleAct1 seg", 9) + tgString(" seg", 2));
+    goat.addPair(n9[3], n1[2], tgString("all right shoulder hip rear lower muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[3], n1[3], tgString("all right shoulder hip front lower muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[3], n0[1], tgString("all right shoulder hip front bottom muscleAct1 seg", 9) + tgString(" seg", 0));
+    goat.addPair(n9[3], n2[4], tgString("all right shoulder hip rear bottom muscleAct1 seg", 9) + tgString(" seg", 2));
 
     //Extra muscles, to move right shoulder forward and back:
-    goat.addPair(n9[0], n1[2], tgString("all right shoulder rear mid muscleAct1 seg", 9) + tgString(" seg", 1));
-    goat.addPair(n9[0], n1[3], tgString("all right shoulder front mid muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[0], n1[2], tgString("all right shoulder hip rear mid muscleAct1 seg", 9) + tgString(" seg", 1));
+    goat.addPair(n9[0], n1[3], tgString("all right shoulder hip front mid muscleAct1 seg", 9) + tgString(" seg", 1));
 
     //Right hip muscles
     goat.addPair(n10[1], n5[2], tgString("all right hip rear upper muscleAct1 seg", 10) + tgString(" seg", 5));
     goat.addPair(n10[1], n5[3], tgString("all right hip front upper muscleAct1 seg", 10) + tgString(" seg", 5));
     goat.addPair(n10[1], n4[2], tgString("all right hip front top muscleAct1 seg", 10) + tgString(" seg", 4));
-    goat.addPair(n10[1], n6[3], tgString("all right hip rear top muscleAct1 seg", 10) + tgString(" seg", 4));
+    goat.addPair(n10[1], n6[3], tgString("all right hip rear top muscleAct1 seg", 10) + tgString(" seg", 6));
 
     goat.addPair(n10[3], n5[2], tgString("all right hip rear lower muscleAct1 seg", 10) + tgString(" seg", 5));
     goat.addPair(n10[3], n5[3], tgString("all right hip front lower muscleAct1 seg", 10) + tgString(" seg", 5));
@@ -392,72 +404,72 @@ void MountainGoat::addMuscles(tgStructure& goat){
     //Leg/hip connections:
 
     //Left front leg/shoulder
-    goat.addPair(n11[4], n7[3], tgString("left foreleg outer bicep muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[4], n7[2], tgString("left foreleg inner bicep muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[4], n1[4], tgString("left foreleg front abdomen connection muscle seg", 11) + tgString(" seg", 1));
-    goat.addPair(n11[3], n1[1],tgString("left foreleg front abdomen connection muscle3 seg", 11) + tgString(" seg", 1)); 
-    goat.addPair(n11[2], n1[4],tgString("left foreleg front abdomen connection muscle3 seg", 11) + tgString(" seg", 1)); 
+    goat.addPair(n11[4], n7[3], tgString("all left foreleg limb outer bicep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[4], n7[2], tgString("all left foreleg limb inner bicep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[4], n1[4], tgString("all left foreleg limb front abdomen connection muscle seg", 11) + tgString(" seg", 1));
+    goat.addPair(n11[3], n1[1],tgString("all left foreleg limb front abdomen connection muscle3 seg", 11) + tgString(" seg", 1)); //Active
+    goat.addPair(n11[2], n1[4],tgString("all left foreleg limb rear abdomen connection muscle3 seg", 11) + tgString(" seg", 1)); //Active
 
-    goat.addPair(n11[3], n7[3], tgString("left foreleg outer tricep muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[3], n7[2], tgString("left foreleg inner tricep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[3], n7[3], tgString("all left foreleg limb outer tricep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[3], n7[2], tgString("all left foreleg limb inner tricep muscle seg", 11) + tgString(" seg", 7));
 
-    goat.addPair(n11[2], n7[3], tgString("left foreleg outer front tricep muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[2], n7[2], tgString("left foreleg inner front tricep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[2], n7[3], tgString("all left foreleg limb outer front tricep muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[2], n7[2], tgString("all left foreleg limb inner front tricep muscle seg", 11) + tgString(" seg", 7));
 
     //Adding muscle to pull up on right front leg:
-    goat.addPair(n11[4], n7[1], tgString("left foreleg mid bicep muscle3 seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[4], n7[1], tgString("all left foreleg limb mid bicep muscle3 seg", 11) + tgString(" seg", 7)); //Active
     
     //Right front leg/shoulder
-    goat.addPair(n13[4], n9[2], tgString("right foreleg inner bicep muscle seg", 13) + tgString(" seg", 9));
-    goat.addPair(n13[4], n9[3], tgString("right foreleg outer bicep muscle seg", 13) + tgString(" seg", 9));
-    goat.addPair(n13[4], n1[3], tgString("right foreleg front abdomen connection muscle seg", 13) + tgString(" seg", 1));
-    goat.addPair(n13[3], n1[2], tgString("right foreleg front abdomen connection muscle3 seg", 13) + tgString(" seg", 1)); 
-    goat.addPair(n13[2], n1[3], tgString("right foreleg front abdomen connection muscle3 seg", 13) + tgString(" seg", 1)); 
+    goat.addPair(n13[4], n9[2], tgString("all right foreleg limb inner bicep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[4], n9[3], tgString("all right foreleg limb outer bicep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[4], n1[3], tgString("all right foreleg limb front abdomen connection muscle seg", 13) + tgString(" seg", 1));
+    goat.addPair(n13[3], n1[2], tgString("all right foreleg limb front abdomen connection muscle3 seg", 13) + tgString(" seg", 1)); //Active
+    goat.addPair(n13[2], n1[3], tgString("all right foreleg limb rear abdomen connection muscle3 seg", 13) + tgString(" seg", 1)); //Active
 
 
-    goat.addPair(n13[3], n9[2], tgString("right foreleg inner tricep muscle seg", 13) + tgString(" seg", 9));
-    goat.addPair(n13[3], n9[3], tgString("right foreleg outer tricep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[3], n9[2], tgString("all right foreleg limb inner tricep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[3], n9[3], tgString("all right foreleg limb outer tricep muscle seg", 13) + tgString(" seg", 9));
 
-    goat.addPair(n13[2], n9[2], tgString("right foreleg inner front tricep muscle seg", 13) + tgString(" seg", 9));
-    goat.addPair(n13[2], n9[3], tgString("right foreleg outer front tricep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[2], n9[2], tgString("all right foreleg limb inner front tricep muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[2], n9[3], tgString("all right foreleg limb outer front tricep muscle seg", 13) + tgString(" seg", 9));
 
     //Adding muscle to pull up on left front leg:
-    goat.addPair(n13[4], n9[1], tgString("right foreleg mid bicep muscle3 seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[4], n9[1], tgString("all right foreleg limb mid bicep muscle3 seg", 13) + tgString(" seg", 9)); //Active
 
     //Left rear leg/hip
-    goat.addPair(n12[4], n8[3], tgString("left hindleg outer thigh muscle seg", 12) + tgString(" seg", 8)); 
-    goat.addPair(n12[4], n8[2], tgString("left hindleg inner thigh muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[4], n8[3], tgString("all left hindleg limb outer thigh muscle seg", 12) + tgString(" seg", 8)); 
+    goat.addPair(n12[4], n8[2], tgString("all left hindleg inner limb thigh muscle seg", 12) + tgString(" seg", 8));
 
-    goat.addPair(n12[4], n3[1],tgString("left hindleg rear abdomen connection muscle seg", 12) + tgString(" seg", 3)); 
-    goat.addPair(n12[3], n5[1],tgString("left hindleg rear abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); 
-    goat.addPair(n12[2], n5[4],tgString("left hindleg rear abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); 
+    goat.addPair(n12[4], n3[1],tgString("all left hindleg limb rear abdomen connection muscle seg", 12) + tgString(" seg", 3)); 
+    goat.addPair(n12[3], n5[1],tgString("all left hindleg limb front abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); //Active
+    goat.addPair(n12[2], n5[4],tgString("all left hindleg limb rear abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); //Active
 
-    goat.addPair(n12[3], n8[3], tgString("left hindleg outer calf muscle seg", 12) + tgString(" seg", 8));
-    goat.addPair(n12[3], n8[2], tgString("left hindleg inner calf muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[3], n8[3], tgString("all left hindleg limb outer calf muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[3], n8[2], tgString("all left hindleg limb inner calf muscle seg", 12) + tgString(" seg", 8));
 
-    goat.addPair(n12[2], n8[3], tgString("left hindleg outer front calf muscle seg", 12) + tgString(" seg", 8));
-    goat.addPair(n12[2], n8[2], tgString("left hindleg inner front calf muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[2], n8[3], tgString("all left hindleg limb outer front calf muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[2], n8[2], tgString("all left hindleg limb inner front calf muscle seg", 12) + tgString(" seg", 8));
 
     //Adding muscle to pull rear right leg up:
-    goat.addPair(n12[4], n8[1], tgString("left hindleg central thigh muscle3 seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[4], n8[1], tgString("all left hindleg limb central thigh muscle3 seg", 12) + tgString(" seg", 8)); //Active
 
     //Right rear leg/hip
-    goat.addPair(n14[4], n10[2], tgString("right hindleg inner thigh muscle seg", 14) + tgString(" seg", 10)); 
-    goat.addPair(n14[4], n10[3], tgString("right hindleg outer thigh muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[4], n10[2], tgString("all right hindleg limb inner thigh muscle seg", 14) + tgString(" seg", 10)); 
+    goat.addPair(n14[4], n10[3], tgString("all right hindleg limb outer thigh muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[4], n3[2], tgString("right hindleg rear abdomen connection muscle seg", 14) + tgString(" seg", 3)); 
-    goat.addPair(n14[3], n5[2], tgString("right hindleg rear abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); 
-    goat.addPair(n14[2], n5[3], tgString("right hindleg rear abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); 
+    goat.addPair(n14[4], n3[2], tgString("all right hindleg limb rear abdomen connection muscle seg", 14) + tgString(" seg", 3)); 
+    goat.addPair(n14[3], n5[2], tgString("all right hindleg limb front abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); //Active
+    goat.addPair(n14[2], n5[3], tgString("all right hindleg limb rear abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); //Active
 
 
-    goat.addPair(n14[3], n10[2], tgString("right hindleg inner calf muscle seg", 14) + tgString(" seg", 10));
-    goat.addPair(n14[3], n10[3], tgString("right hindleg outer calf muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[3], n10[2], tgString("all right hindleg limb inner calf muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[3], n10[3], tgString("all right hindleg limb outer calf muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[2], n10[2], tgString("right hindleg inner front calf muscle seg", 14) + tgString(" seg", 10));
-    goat.addPair(n14[2], n10[3], tgString("right hindleg outer front calf muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[2], n10[2], tgString("all right hindleg limb inner front calf muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[2], n10[3], tgString("all right hindleg limb outer front calf muscle seg", 14) + tgString(" seg", 10));
 
     //Adding muscle to pull rear left leg up:
-    goat.addPair(n14[4], n10[1], tgString("right hindleg central thigh muscle3 seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[4], n10[1], tgString("all right hindleg limb central thigh muscle3 seg", 14) + tgString(" seg", 10)); //Active
 
 }
 
@@ -479,7 +491,7 @@ void MountainGoat::setup(tgWorld& world)
     const double stiffnessPassive2 = 4000.0;
     const double stiffnessPassive3 = 10000.0;
     const double damping = .01*stiffness;
-    const double pretension = 0.0; 
+    const double pretension = 0.0;
     const bool   history = true;
     const double maxTens = 7000.0;
     const double maxSpeed = 12.0;
@@ -536,9 +548,9 @@ void MountainGoat::setup(tgWorld& world)
 
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
-	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
-	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history);
+	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3, history);
     #endif
 
 #endif
@@ -569,7 +581,6 @@ void MountainGoat::setup(tgWorld& world)
 
     addMuscles(goat); //,m_segments,m_hips,m_legs,m_feet
 
-    //Time to add the muscles to the structure. Todo: make this a function; also try to clean this up.
     std::vector<tgStructure*> children = goat.getChildren();
    
     // Create the build spec that uses tags to turn the structure into a real model
