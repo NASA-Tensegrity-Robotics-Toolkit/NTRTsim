@@ -6,6 +6,8 @@ First, find out exactly how the tgBasicActuator and friends are created.
 -----------------------------
 Notes about the classes themselves:
 
+IN CORE:
+
 tgSpringCableActuator
 	constructor requires a tgSpringCable reference to be passed in
 
@@ -19,7 +21,39 @@ tgBulletSpringCable
 	FORMERLY KNOWN AS muscle2p
 	this is the class that applies a force to the anchors!
 
+IN TGCREATOR:
+
+tgStructureInfo
+	actually creates the parts of the model by calling functions like
+
+...
+
 -----------------------------
+Notes about the flow of function calls:
+
+App creates simulation
+App creates tgModel
+    simulation calls setup in tgModel
+    	       setup creates:
+	       	     tgStructure
+		     tgStructureInfo
+		     tgBuildSpec
+			setup adds builders to the buildspec (for example, tgRodInfo and tgBasicActuatorInfo)
+	        setup calls tgStructureInfo's buildInto method
+		      buildInto calls helper functions inside tgStructureInfo, specifically, calls addRigidsAndConnectors
+		      		addRigidsAndConnectors calls the methods:
+					getConnectorAgents, inside tgBuildSpec
+					initConnectorInfo, inside itself (the tgStructureInfo class). Uses the connectorAgents from getConnectorAgents.
+						calls infoFactory from each connectorAgent. connectorAgent is inside tgBuildSpec.
+						infoFactory returns a tgConnectorInfo (NOTE THAT tgRigidInfo and tgConnectorInfo are infoFactories.)
+						tgConnectorInfo calls its createConnectorInfo method.
+					initConnectors, inside itself
+						calls initConnector from each tgConnectorInfo
+						      initConnector is only defined in subclasses of ConnectorInfo. For example, in tgBasicActuatorInfo,
+						      
+
+-----------------------------
+
 What I will need to do:
 
 FOR THE COMPRESSION SPRING ITSELF:
@@ -28,6 +62,7 @@ Create the classes:
 tgCompressionSpring (equivalent to tgSpringCable)
 	not-quite-abstract class that defines the behavior of a compression spring
 	just like tgSpringCable, but with requirements about pos/neg of spring constants to be flipped etc.
+	MIGHT NOT NEED THIS ONE, unless we want fancy polymorphism.
 
 tgBulletCompressionSpring (equivalent to tgBulletSpringCable)
 	just like tgBulletSpringCable. Might actually be almost exactly the same code.
@@ -39,5 +74,42 @@ TO CHECK:
        Additionally, we may not even need two anchors for our ground force sensor: the sensor could
        just have a reference to its own non-moving point in space (a btVector3) as the anchor of the spring.
 
+   where is tgSpringCable used in the builder? it looks like tgBulletCompressionSpring is used directly.
+
+FOR THE BUILDER:
+
+tgCompressionSpringInfo
+	see: tgBasicActuatorInfo
+
+ORDER OF OPERATIONS FOR THE CLASSES TO CREATE:
+
+1) tgCompressionSpringActuatorInfo
+	will call or use:
+	     tgBulletCompressionSpring
+	     tgBulletSpringCableAnchor (...this should be OK, unless Bullet tries to apply a force on the world ground and then crashes...)
+	      ^ the header file for this is added in the .cpp file for tgCompressionSpringActuatorInfo.
+
+2) tgCompressionSpringActuator
+        As per the tgBulletSpringCable/tgBasicActuatorInfo/tgBasicActuator trio of classes, the new compression spring should also have
+	the trio of tgBulletCompressionSpring/tgCompressionSpringActuator/tgCompressionSpringActuator.
+	Look into the tgBasicActuator class for this one.
+	Need to (a) put the config from tgSpringCableActuator here, and (b) modify it to have restLength and not pretension, (c) add this class to the YAML builder.
+	     see tgCompressionSpringActuatorInfo versus tgBasicActuatorInfo for the use of the config struct.
+	     
+3) tgBulletCompressionSpring
+	Use the class from tgBulletSpringCable.
+
+4) Demo using a tgCompressionSpringActuator
+
+CHANGES TO THINK ABOUT WHEN COPYING OVER tgSpringCableActuator INTO tgCompressionSpringActuator:
+	Check on tgBulletRenderer. Calls a method from tgSpringCableActuator that returned a tgSpringCable.
+	      tgCompressionSpringActuator's onVisit method calls the render method of tgModelVisitor.
+	      Might have to implement virtual void render(const tgCompressionSpringActuator& compressionSpringActuator) const {}; in tgDataLogger and tscDataLogger.
+	      ^ done as of 5pm 2016-08-02.
+	      Fill in the getRestLength() and related methods in tgCompressionSpringActuator once I've written them in tgBulletCompressionSpring.
+	      ^ this is needed if we actually want to drawn the force sensors in the NTRT window.
+	There is some "scale" thing going on in tgSpringCableActuator. Is this called from somewhere else? Does it need to be implemented in tgCompressionSpring?
+	      ^ might be something in tgBulletRenderer...
+	Check all the CMakeLists files to be sure all the new files are included.
 
 

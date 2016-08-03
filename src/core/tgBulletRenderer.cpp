@@ -31,6 +31,7 @@
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgSpringCableActuator.h"
+#include "tgCompressionSpringActuator.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
 
@@ -93,6 +94,19 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
 		  pDrawer->drawLine(lineFrom, lineTo, color);
 		}
 	}
+}
+
+/**
+ * Render a tgCompressionSpringActuator
+ * As of 2016-08-02, no lines need to be drawn, since we'll only be using the 
+ * compression spring as a force sensor (very small lengths.)
+ */
+void tgBulletRenderer::render(const tgCompressionSpringActuator& compressionSpringActuator) const
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderCompressionSpring");
+#endif //BT_NO_PROFILE 
+    // do nothing.
 }
 
 void tgBulletRenderer::render(const tgModel& model) const

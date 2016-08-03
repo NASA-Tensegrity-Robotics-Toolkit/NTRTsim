@@ -22,7 +22,7 @@
 /**
  * @file tgModelVisitor.h
  * @brief Contains the definition of interface class tgModelVisitor.
- * @author Brian Tietz
+ * @author Brian Mirletz, Drew Sabelhaus
  * $Id$
  */
 
@@ -30,6 +30,7 @@
 class tgSpringCableActuator;
 class tgModel;
 class tgRod;
+class tgCompressionSpringActuator;
 
 /**
  * Interface for ModelVisitor.
@@ -52,6 +53,12 @@ public:
    * @param[in] linearString a const reference to a tgSpringCableActuator to render
    */
   virtual void render(const tgSpringCableActuator& linearString) const {};
+
+ /**
+   * Render a tgCompressionSpringActuator.
+   * @param[in] compressionSpringActuator a const reference to a tgCompressionSpringActuator to render
+   */
+  virtual void render(const tgCompressionSpringActuator& compressionSpringActuator) const {};
  
   /**
    * Render a tgModel.

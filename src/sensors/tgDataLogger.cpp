@@ -27,6 +27,7 @@
 
 #include "util/tgBaseCPGNode.h"
 #include "core/tgSpringCableActuator.h"
+#include "core/tgCompressionSpringActuator.h"
 #include "core/tgRod.h"
 #include "core/abstractMarker.h"
 
@@ -69,6 +70,19 @@ void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
     << mSCA.getTension() << ",";
     
     tgOutput.close();
+}
+
+/**
+ * Render a tgCompressionSpringActuator
+ * As of 2016-08-02, do nothing (not ready to test this out yet, just need
+ * to compile.)
+ */
+void tgDataLogger::render(const tgCompressionSpringActuator& compressionSpringActuator) const
+{
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::renderCompressionSpring");
+#endif //BT_NO_PROFILE 
+    // do nothing.
 }
 
 void tgDataLogger::render(const tgModel& model) const
