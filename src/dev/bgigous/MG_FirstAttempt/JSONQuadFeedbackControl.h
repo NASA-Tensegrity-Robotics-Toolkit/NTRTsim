@@ -116,9 +116,10 @@ struct Config : public JSONCPGControl::Config
 protected:
 
     virtual void setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions);
-	virtual void setupHighCouplings(array_4D highEdgeActions);
+	virtual void setupHighCPGs(array_2D nodeActions, array_4D highEdgeActions, Json::Value highLowEdgeActions);
+	//virtual void setupHighCouplings(array_4D highEdgeActions);
 	// I'm cheating and just using the Json thing directly. ~B
-	virtual void setupHighLowCouplings(Json::Value highLowEdgeActions);
+	//virtual void setupHighLowCouplings(Json::Value highLowEdgeActions);
     
     virtual array_4D scaleEdgeActions (Json::Value edgeParam);
     virtual array_2D scaleNodeActions (Json::Value actions);
@@ -132,8 +133,8 @@ protected:
     
     JSONQuadFeedbackControl::Config m_config;
 
-	// Hacky and probably temporary.
-	// Make array of 5 basic body parts. Each body part has vector of CPG controllers.
+	// Hacky and probably temporary. Or maybe not. ¯\_(ツ)_/¯
+	// Make array of 9 basic body parts. Each body part has vector of CPG controllers.
     std::vector<tgCPGActuatorControl*> m_controllers[9];
 
 	// Higher level CPGs
@@ -141,6 +142,13 @@ protected:
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
+
+	// How many different body parts we're using in the goat/puppy dealy thing
+	int n_bodyParts;
+	// Helps us keep track of the number of muscles in each body part
+	int n_muscSpine;	// how many controllable muscles in the spine
+	int n_muscHip;		// how many controllable muscles in each hip/shoulder
+	int n_muscLeg;		// how many controllable muscles in each leg
     
 };
 

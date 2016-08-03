@@ -36,7 +36,7 @@
             "monteCarlo" : true,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
-            "numberOfInstances" : 1632,
+            "numberOfInstances" : 752,
             "populationSize" : 100,
             "useAverage" : true,
             "numberToMutate" : 2,

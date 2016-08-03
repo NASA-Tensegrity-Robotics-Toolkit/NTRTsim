@@ -58,6 +58,17 @@
 
 using namespace std;
 
+const string strSpineTag = "spine ";
+const string strLeftShoulderTag = "left shoulder ";
+const string strLeftHipTag = "left hip ";
+// Have to use underscores (arbitrary) for some of these because of the way tags work
+const string strLeftFrontLegTag = "left_front_leg ";
+const string strLeftHindLegTag = "left_hind_leg ";
+const string strRightShoulderTag = "right shoulder ";
+const string strRightHipTag = "right hip ";
+const string strRightFrontLegTag = "right_front_leg ";
+const string strRightHindLegTag = "right_hind_leg ";
+
 JSONQuadFeedbackControl::Config::Config(int ss,
                                         int tm,
                                         int om,
@@ -122,6 +133,9 @@ JSONQuadFeedbackControl::~JSONQuadFeedbackControl()
 
 void JSONQuadFeedbackControl::onSetup(BaseSpineModelLearning& subject)
 {
+	// spine, 4 legs, 4 hips/shoulers
+	n_bodyParts = 9;
+
 	m_pCPGSys = new CPGEquationsFB(100);
 
     Json::Value root; // will contains the root value after parsing.
@@ -153,13 +167,21 @@ void JSONQuadFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     Json::Value highLowEdgeVals = root.get("hLowVals", "UTF-8");
 	highLowEdgeVals = highLowEdgeVals.get("params", "UTF-8");
 
+	// This is kinda nasty and out of place to put here, but I need to initialize
+	// some important variables.
+    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> (strSpineTag);
+	std::vector <tgSpringCableActuator*> leftShoulderMuscles = subject.find<tgSpringCableActuator> (strLeftShoulderTag);
+	std::vector <tgSpringCableActuator*> leftFrontLegMuscles = subject.find<tgSpringCableActuator> (strLeftFrontLegTag);
+	n_muscSpine = spineMuscles.size();
+	n_muscHip = leftShoulderMuscles.size();
+	n_muscLeg = leftFrontLegMuscles.size();
+
     array_4D edgeParams = scaleEdgeActions(edgeVals);
     array_2D nodeParams = scaleNodeActions(nodeVals);
 	array_4D highEdgeParams = scaleHighEdgeActions(highEdgeVals);
 
     setupCPGs(subject, nodeParams, edgeParams);
-	setupHighCouplings(highEdgeParams);
-	setupHighLowCouplings(highLowEdgeVals);
+	setupHighCPGs(nodeParams, highEdgeParams, highLowEdgeVals);
     
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
@@ -265,7 +287,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> (strSpineTag);
     
     for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
@@ -318,7 +340,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     delete m_pCPGSys;
     m_pCPGSys = NULL;
     
-	for (size_t b = 0; b < 5; b++)
+	for (size_t b = 0; b < 9; b++)
 	{
 		for(size_t i = 0; i < m_controllers[b].size(); i++)
 		{
@@ -338,40 +360,21 @@ void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2
 {
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
 
-	// Make higher level CPGs, give them node params
-	for (std::size_t b = 0; b < 5; b++)
-	{
-        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
-        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
-
-		// need to make a 1 row 2D array so we can pass it into assignNodeNumber.
-		// 	using nodeActions will not work. (notice subtle name difference) ~B
-		array_2D nodeAction(boost::extents[1][nodeActions.shape()[1]]);
-		for (std::size_t a = 0; a < nodeActions.shape()[1]; a++)
-			nodeAction[0][a] = nodeActions[b][a];
-
-		// must give node number, to make things easier and stuff
-		pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeAction);
-
-		m_highControllers.push_back(pStringControl);
-	}
-	// So the higher level CPGs are indices 0-4
-
-    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
-	std::vector <tgSpringCableActuator*> leftShoulderMuscles = subject.find<tgSpringCableActuator> ("left shoulder ");
-	std::vector <tgSpringCableActuator*> leftHipMuscles = subject.find<tgSpringCableActuator> ("left hip ");
-	std::vector <tgSpringCableActuator*> leftFrontLegMuscles = subject.find<tgSpringCableActuator> ("left front leg ");
-	std::vector <tgSpringCableActuator*> leftHindLegMuscles = subject.find<tgSpringCableActuator> ("left hind leg ");
-	std::vector <tgSpringCableActuator*> rightShoulderMuscles = subject.find<tgSpringCableActuator> ("right shoulder ");
-	std::vector <tgSpringCableActuator*> rightHipMuscles = subject.find<tgSpringCableActuator> ("right hip ");
-	std::vector <tgSpringCableActuator*> rightFrontLegMuscles = subject.find<tgSpringCableActuator> ("right front leg ");
-	std::vector <tgSpringCableActuator*> rightHindLegMuscles = subject.find<tgSpringCableActuator> ("right hind leg ");
+    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> (strSpineTag);
+	std::vector <tgSpringCableActuator*> leftShoulderMuscles = subject.find<tgSpringCableActuator> (strLeftShoulderTag);
+	std::vector <tgSpringCableActuator*> leftHipMuscles = subject.find<tgSpringCableActuator> (strLeftHipTag);
+	std::vector <tgSpringCableActuator*> leftFrontLegMuscles = subject.find<tgSpringCableActuator> (strLeftFrontLegTag);
+	std::vector <tgSpringCableActuator*> leftHindLegMuscles = subject.find<tgSpringCableActuator> (strLeftHindLegTag);
+	std::vector <tgSpringCableActuator*> rightShoulderMuscles = subject.find<tgSpringCableActuator> (strRightShoulderTag);
+	std::vector <tgSpringCableActuator*> rightHipMuscles = subject.find<tgSpringCableActuator> (strRightHipTag);
+	std::vector <tgSpringCableActuator*> rightFrontLegMuscles = subject.find<tgSpringCableActuator> (strRightFrontLegTag);
+	std::vector <tgSpringCableActuator*> rightHindLegMuscles = subject.find<tgSpringCableActuator> (strRightHindLegTag);
     
 	std::vector <tgSpringCableActuator*> allMuscles[9] = { spineMuscles, leftShoulderMuscles, leftFrontLegMuscles, rightShoulderMuscles, rightFrontLegMuscles, leftHipMuscles, leftHindLegMuscles, rightHipMuscles, rightHindLegMuscles };
 
 	// which muscle groups get which node params
-	const size_t node_assignment[9] = { 0, 1, 1, 2, 2, 3, 3, 4, 4 };
-	for (std::size_t b = 0; b < 9; b++)
+	//const size_t node_assignment[n_bodyParts] = { 0, 1, 1, 2, 2, 3, 3, 4, 4 };
+	for (std::size_t b = 0; b < n_bodyParts; b++)
 	{
 		for (std::size_t i = 0; i < allMuscles[b].size(); i++)
 		{
@@ -385,7 +388,8 @@ void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2
 			// 	using nodeActions will not work. (notice subtle name difference) ~B
 			array_2D nodeAction(boost::extents[1][nodeActions.shape()[1]]);
 			for (std::size_t a = 0; a < nodeActions.shape()[1]; a++)
-				nodeAction[0][a] = nodeActions[node_assignment[b]+5][a];
+				nodeAction[0][a] = nodeActions[(b+1)/2 + 5][a];
+				//nodeAction[0][a] = nodeActions[node_assignment[b]+5][a];
 				// Why b+5? Because node params 0-4 have already been assigned to high level CPGs (above)
 			
 			// assign node number
@@ -395,15 +399,17 @@ void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2
 		}
 	} 
 
+	// The starting index (x and y) for the edgeActions matrix
+	// Remember this 4D matrix contains a block matrix
+	size_t actionsStart = 0;
     // Then determine connectivity and setup string
-	for (size_t b = 0; b < 9; b++)
+	for (size_t b = 0; b < n_bodyParts; b++)
 	{
 		for (std::size_t i = 0; i < m_controllers[b].size(); i++)
 		{
-			// The starting index (x and y) for the edgeActions matrix
-			size_t actionsStart = b == 0 ? 0 : 16 + 10*(b-1);
-			// There are 16 for spine, 10 for hip/shoulder/leg
-			size_t numMuscles = b == 0 ? 16 : 10;
+			// Have fun understanding this. It was fun to write. :)
+			// Hint: numMuscles is how many muscles exist in body part b
+			size_t numMuscles = b == 0 ? n_muscSpine : (b % 2 ? n_muscHip : n_muscLeg);
 
 			array_4D edgeActionsForBodyPart(boost::extents[3][numMuscles][numMuscles][edgeActions.shape()[3]]);
 			// I'm doing a nasty copy. boost's documentation for copying a subarray is too confusing.
@@ -427,9 +433,92 @@ void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2
 				pStringInfo->setupControl(*p_ipc, m_config.controlLength);
 			}
 		}
+		// I love one-liners. ~BG
+		actionsStart += b == 0 ? 16 : (b % 2 ? n_muscHip : n_muscLeg);
 	}
 }
 
+void JSONQuadFeedbackControl::setupHighCPGs(array_2D nodeActions, array_4D highEdgeActions, Json::Value highLowEdgeActions)
+{
+    CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
+
+	// Make higher level CPGs, give them node params
+	for (std::size_t b = 5; b < 10; b++)
+	{
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+		// need to make a 1 row 2D array so we can pass it into assignNodeNumber.
+		// 	using nodeActions will not work. (notice subtle name difference) ~B
+		array_2D nodeAction(boost::extents[1][nodeActions.shape()[1]]);
+		for (std::size_t a = 0; a < nodeActions.shape()[1]; a++)
+			nodeAction[0][a] = nodeActions[b][a];
+
+		// must give node number, to make things easier and stuff
+		pStringControl->assignNodeNumberFB(m_CPGFBSys, nodeAction);
+
+		m_highControllers.push_back(pStringControl);
+	}
+	// So the higher level CPGs are indices 5-9
+
+
+
+    // Determine connectivity between higher level CPGs
+	for (std::size_t i = 0; i < m_highControllers.size(); i++)
+	{
+		tgCPGActuatorControl * const pStringInfo = m_highControllers[i];
+		assert(pStringInfo != NULL);
+		// TODO make sure this works
+		pStringInfo->setConnectivity(m_highControllers, highEdgeActions);
+	}
+
+
+
+
+	// Now couple high level with low level
+
+    double lowerLimit = m_config.lowPhase;
+    double upperLimit = m_config.highPhase;
+    double range = upperLimit - lowerLimit;
+
+    Json::Value::iterator edgeIt = highLowEdgeActions.end();
+
+	// Number of node to start at (Note that nodes for low-level CPGs are added first)
+	int nodeStart = 0;
+	// iterate through high-level CPGs
+	for (size_t b = 0; b < 5; b++)
+	{
+		edgeIt--;
+
+		std::vector<int> connectivityList;
+		std::vector<double> weights;
+		std::vector<double> phases;
+		
+		Json::Value param = *edgeIt;
+		assert(param.size() == 2);
+															
+		// n is number of muscles for body part b
+		int n = b == 0 ? n_muscSpine : n_muscHip + n_muscLeg;
+
+										// !
+		for (size_t i = 0; i < n; i++, nodeStart++)
+		{
+			connectivityList.push_back(nodeStart);
+			weights.push_back(param[0].asDouble());
+			phases.push_back(param[1].asDouble() * (range) + lowerLimit);
+		}
+		
+		int highCPGnode = b + n_muscSpine + n_muscHip*4 + n_muscLeg*4;
+		m_CPGFBSys.defineConnections(highCPGnode, connectivityList, weights, phases);
+	}
+
+	//assert(nodeStart == 16+10*8+5);
+
+	// TODO?
+	assert(highLowEdgeActions.begin() == edgeIt);
+}
+
+/*
 void JSONQuadFeedbackControl::setupHighCouplings(array_4D highEdgeActions)
 {
     // Determine connectivity between higher level CPGs
@@ -439,7 +528,6 @@ void JSONQuadFeedbackControl::setupHighCouplings(array_4D highEdgeActions)
 		assert(pStringInfo != NULL);
 		pStringInfo->setConnectivity(m_highControllers, highEdgeActions);
 		
-		/*
 		//String will own this pointer
 		tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
 														m_config.kPosition,
@@ -452,7 +540,6 @@ void JSONQuadFeedbackControl::setupHighCouplings(array_4D highEdgeActions)
 		{
 			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
 		}
-		*/
 	}
 }
 
@@ -502,10 +589,17 @@ void JSONQuadFeedbackControl::setupHighLowCouplings(Json::Value highLowEdgeActio
 	// TODO?
 	assert(highLowEdgeActions.begin() == edgeIt);
 }
+*/
 
 array_4D JSONQuadFeedbackControl::scaleEdgeActions  
                             (Json::Value edgeParam)
 {
+	// This creates a gigantic 4D array where the 2nd and 3rd dimensions
+	// form a block matrix (wikipedia it) with blocks along the diagonal. 
+	// Each block corresponds to the couplings among muscles in the same body part.
+	// So, the first block is couplings between spine muscles only, the next block
+	// is couplings between left front shoulder muscles only, etc.
+
     assert(edgeParam[0].size() == 2);
     
     double lowerLimit = m_config.lowPhase;
@@ -531,21 +625,35 @@ array_4D JSONQuadFeedbackControl::scaleEdgeActions
     Json::Value::iterator edgeIt = edgeParam.end();
     
     int count = 0;
-    
+ 
+	// 16 is the number of muscles per segment in the spine
+	// I don't know how to find this dynamically if this number changes
+	// This might be findable using tags, but we'll leave this as an exercise for the reader
 	int musc = 16;
-	for (size_t b = 0; b < 9; b++)
+	for (size_t b = 0; b < n_bodyParts; b++)
 	{
 		while (i < m_config.segmentSpan)
 		{
+			// Only the spine will have couplings with muscles on other rigid bodies
+			// For legs and hips and stuff, only the muscles on the same rigid body
+			// can couple
+			if (b != 0 && i != 1)
+			{
+				i++;
+				continue;
+			}
+
 			while(j < musc)
 			{
 				while(k < musc)
 				{
-					//cout << b << " " << i << " " << j << " " << k << endl;
+					//cout << b << " " << i << " " << j << " " << k << " " << musc << endl;
 					if (edgeIt == edgeParam.begin())
 					{
 						std::cout << "ran out before table populated!"
 						<< std::endl;
+						cout << count << endl;
+						cout << b << " " << i << " " << j << " " << k << " " << musc << endl;
 						/// @todo consider adding exception here
 						break;
 					}
@@ -558,6 +666,7 @@ array_4D JSONQuadFeedbackControl::scaleEdgeActions
 						}
 						else
 						{
+							cout << b << " " << i << " " << j << " " << k << " " << musc << endl;
 							edgeIt--;
 							Json::Value edgeParam1 = *edgeIt;
 							assert(edgeParam1.size() == 2);
@@ -567,8 +676,6 @@ array_4D JSONQuadFeedbackControl::scaleEdgeActions
 							// Phase offset from -pi to pi
 							actionList[i][j][k][1] = edgeParam1[1].asDouble() * 
 													(range) + lowerLimit;
-							//actionList[i][j][k][0] = 0.0;
-							//actionList[i][j][k][1] = 0.0;
 							//std::cout <<  actionList[i][j][k][1] << std::endl;
 							count++;
 						}
@@ -579,14 +686,14 @@ array_4D JSONQuadFeedbackControl::scaleEdgeActions
 				k = j;
 				
 			}
-			j = musc - (b > 0 ? 10 : 16);
+			j = musc - (b > 0 ? (b % 2 ? n_muscHip : n_muscLeg) : 16);
 			k = j;
 			i++;
 		}
 		j = musc;
 		k = musc;
 		i = 0;
-		musc += 10;
+		musc += b % 2 ? n_muscHip : n_muscLeg;
 	}
     
     std::cout<< "Params used: " << count << std::endl;
@@ -606,6 +713,8 @@ array_4D JSONQuadFeedbackControl::scaleHighEdgeActions (Json::Value highEdgePara
     
 	// This is a 4d array, but we don't really worry about 1st dimension
 	// since these higher CPGs aren't attached to any rigid bodies
+	// Using 5 by 5 because there are 5 higher level CPGs
+	// Maybe someday someone will program a more elegant solution... Nah, that won't happen.
     array_4D actionList(boost::extents[m_config.segmentSpan]
 										[5]
 										[5]
@@ -706,8 +815,11 @@ array_2D JSONQuadFeedbackControl::scaleNodeActions (Json::Value actions)
     // This one is square
     for( std::size_t i = 0; i < numControllers; i++)
     {
-		if (i < 5)
+		// Recall that high CPG nodes are added last
+		if (i > n_muscSpine + n_muscHip*4 + n_muscLeg*4)
 		{
+			// We use separate parameters for the frequency of the high
+			// CPGs since they control entire body parts, y'know?
 			limits[0][2] = m_config.highFreqFeedbackMin;
 			limits[1][2] = m_config.highFreqFeedbackMax;
 		}
@@ -728,15 +840,15 @@ std::vector<double> JSONQuadFeedbackControl::getFeedback(BaseSpineModelLearning&
     // Placeholder
     std::vector<double> feedback;
     
-    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> ("spine ");
-	const std::vector<tgSpringCableActuator*>& leftShoulderCables = subject.find<tgSpringCableActuator> ("left shoulder ");
-	const std::vector<tgSpringCableActuator*>& leftHipCables = subject.find<tgSpringCableActuator> ("left hip ");
-	const std::vector<tgSpringCableActuator*>& leftFrontLegCables = subject.find<tgSpringCableActuator> ("left front leg ");
-	const std::vector<tgSpringCableActuator*>& leftHindLegCables = subject.find<tgSpringCableActuator> ("left hind leg ");
-	const std::vector<tgSpringCableActuator*>& rightShoulderCables = subject.find<tgSpringCableActuator> ("right shoulder ");
-	const std::vector<tgSpringCableActuator*>& rightHipCables = subject.find<tgSpringCableActuator> ("right hip ");
-	const std::vector<tgSpringCableActuator*>& rightFrontLegCables = subject.find<tgSpringCableActuator> ("right front leg ");
-	const std::vector<tgSpringCableActuator*>& rightHindLegCables = subject.find<tgSpringCableActuator> ("right hind leg ");
+    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> (strSpineTag);
+	const std::vector<tgSpringCableActuator*>& leftShoulderCables = subject.find<tgSpringCableActuator> (strLeftShoulderTag);
+	const std::vector<tgSpringCableActuator*>& leftHipCables = subject.find<tgSpringCableActuator> (strLeftHipTag);
+	const std::vector<tgSpringCableActuator*>& leftFrontLegCables = subject.find<tgSpringCableActuator> (strLeftFrontLegTag);
+	const std::vector<tgSpringCableActuator*>& leftHindLegCables = subject.find<tgSpringCableActuator> (strLeftHindLegTag);
+	const std::vector<tgSpringCableActuator*>& rightShoulderCables = subject.find<tgSpringCableActuator> (strRightShoulderTag);
+	const std::vector<tgSpringCableActuator*>& rightHipCables = subject.find<tgSpringCableActuator> (strRightHipTag);
+	const std::vector<tgSpringCableActuator*>& rightFrontLegCables = subject.find<tgSpringCableActuator> (strRightFrontLegTag);
+	const std::vector<tgSpringCableActuator*>& rightHindLegCables = subject.find<tgSpringCableActuator> (strRightHindLegTag);
     
 	const std::vector <tgSpringCableActuator*> allCables[9] = { spineCables, leftShoulderCables, leftFrontLegCables, rightShoulderCables, rightFrontLegCables, leftHipCables, leftHindLegCables, rightHipCables, rightHindLegCables };
 
