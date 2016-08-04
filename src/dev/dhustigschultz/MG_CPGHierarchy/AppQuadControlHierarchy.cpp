@@ -104,7 +104,7 @@ bool AppQuadControlHierarchy::setup()
         const double hf = 30.0;
         
         // Feedback parameters... may need to retune
-        const double ffMin = -0.5;
+        const double ffMin = 0.1;
         const double ffMax = 10.0;
         const double afMin = 0.0;
         const double afMax = 200.0;
@@ -112,12 +112,15 @@ bool AppQuadControlHierarchy::setup()
         const double pfMax =  6.28;
 
 	const double maxH = 30.0;
-	const double minH = 1.0;
+	const double minH = 7.0;
 
 	const double numHipMuscles = 20; // I don't know why I need to double this in order for learning/app to work. This should be 10.
 	const double numLegMuscles = 10;//3; 
 
+	// For the higher level of CPGs
 	const double numHighCPGs = 5;
+	const double hf2 = 25.0;	//Not sure this one is necessary, if is overridden by def being true. 
+	const double ffMax2 = 8.0;
 
         JSONHierarchyFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -149,7 +152,9 @@ bool AppQuadControlHierarchy::setup()
                 				    numLegMuscles,
                 				    numLegMuscles,
  						    numHighCPGs,
-						    numHighCPGs);
+						    numHighCPGs,
+						    hf2,
+						    ffMax2);
         /// @todo fix memory leak that occurs here
        JSONHierarchyFeedbackControl* const myControl =
         new JSONHierarchyFeedbackControl(control_config, suffix, lowerPath);
@@ -250,7 +255,7 @@ const tgBoxGround::Config AppQuadControlHierarchy::getBoxConfig()
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const double friction = 0.5;
+    const double friction = 0.9;
     const double restitution = 0.0;
     const btVector3 size(1000.0, 1.5, 1000.0);
     

@@ -85,7 +85,9 @@ struct Config : public JSONQuadCPGControl::Config
   	int olm = 10,
   	int tlm = 10,
         int ohighm = 5,
-        int thighm = 5
+        int thighm = 5,
+	double hf2 = 20.0,
+	double ffMax2 = 0.0
         );
         
         const double freqFeedbackMin;
@@ -110,6 +112,10 @@ struct Config : public JSONQuadCPGControl::Config
  	int theirLegMuscles;
         int ourHighMuscles;
         int theirHighMuscles;
+
+	// These are for the higher level CPGs
+	const double highFreq2;
+        const double freqFeedbackMax2;
     };
 
     JSONHierarchyFeedbackControl(JSONHierarchyFeedbackControl::Config config,	
@@ -131,9 +137,9 @@ protected:
     virtual void setupHighCPGs(BaseQuadModelLearning& subject, array_2D highNodeActions, array_4D highEdgeActions);
 
     //If need to couple the other way, then may need to pass more arrays as parameters
-    virtual void setupHighLowCouplings(Json::Value highLowEdgeActions); 
+    virtual void setupHighLowCouplings(BaseQuadModelLearning& subject, Json::Value highLowEdgeActions); 
     
-    virtual array_2D scaleNodeActions (Json::Value actions);
+    virtual array_2D scaleNodeActions (Json::Value actions, double highFreq, double freqFeedbackMax);
 
     virtual array_4D scaleEdgeActions (Json::Value actions, int segmentSpan, int theirMuscles, int ourMuscles); 
  
@@ -145,10 +151,23 @@ protected:
     
     JSONHierarchyFeedbackControl::Config m_config;
 
-    // @todo: doing separate vectors of controllers, until I can find a way to split vectors that I like.
+    // @todo: doing separate vectors of controllers, until I can find a way to make them into a vector of vectors, without segfaulting.
     std::vector<tgCPGActuatorControl*> m_spineControllers;
-    std::vector<tgCPGActuatorControl*> m_hipControllers;
-    std::vector<tgCPGActuatorControl*> m_legControllers;
+
+    std::vector<tgCPGActuatorControl*> m_leftShoulderControllers;
+    std::vector<tgCPGActuatorControl*> m_rightShoulderControllers;
+
+    std::vector<tgCPGActuatorControl*> m_leftHipControllers;
+    std::vector<tgCPGActuatorControl*> m_rightHipControllers;
+
+    std::vector<tgCPGActuatorControl*> m_leftForelegControllers;
+    std::vector<tgCPGActuatorControl*> m_rightForelegControllers;
+
+    std::vector<tgCPGActuatorControl*> m_leftHindlegControllers;
+    std::vector<tgCPGActuatorControl*> m_rightHindlegControllers;
+
+    //std::vector<tgCPGActuatorControl*> m_hipControllers;
+    //std::vector<tgCPGActuatorControl*> m_legControllers;
 
     std::vector<tgCPGActuatorControl*> m_highControllers;
     
