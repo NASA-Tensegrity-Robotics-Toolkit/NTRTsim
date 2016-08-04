@@ -482,7 +482,7 @@ void MountainGoat::setup(tgWorld& world)
     const double radius = 0.5;
     const double rod_space = 10.0;
     const double rod_space2 = 8.0;
-    const double friction = 0.9;
+    const double friction = 0.5;
     const double rollFriction = 0.0;
     const double restitution = 0.0;
 

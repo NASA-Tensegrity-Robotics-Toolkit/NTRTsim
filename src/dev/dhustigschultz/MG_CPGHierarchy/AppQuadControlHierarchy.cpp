@@ -119,8 +119,8 @@ bool AppQuadControlHierarchy::setup()
 
 	// For the higher level of CPGs
 	const double numHighCPGs = 5;
-	const double hf2 = 25.0;	//Not sure this one is necessary, if is overridden by def being true. 
-	const double ffMax2 = 8.0;
+	const double hf2 = 30.0;	//Not sure this one is necessary, if is overridden by def being true. 
+	const double ffMax2 = 10.0;
 
         JSONHierarchyFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -255,7 +255,7 @@ const tgBoxGround::Config AppQuadControlHierarchy::getBoxConfig()
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const double friction = 0.9;
+    const double friction = 0.5;
     const double restitution = 0.0;
     const btVector3 size(1000.0, 1.5, 1000.0);
     
