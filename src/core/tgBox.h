@@ -37,7 +37,7 @@
 //class btRigidBody;
 
 /**
- * A rod is a rigid body. Length is defined by nodes, width, height and density
+ * A rod is a rigid body. Length is defined by nodes. Width, height and density
  * are defined by config.
  */
 class tgBox : public tgBaseRigid
@@ -59,7 +59,7 @@ public:
             Config(double w = 1.0,
                     double h = 1.0,
                     double d = 1.0,
-					double f = 1.0,
+		    double f = 1.0,
                     double rf = 0.0,
                     double res = 0.2);
 

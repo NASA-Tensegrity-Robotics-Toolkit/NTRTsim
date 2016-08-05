@@ -68,16 +68,25 @@ public:
      * Parameter defaults 
      */
     Config(
+	   bool iFEA = false,
 	 double s = 1000.0,
 	 double d = 10.0,
-	 double rL = 0.0,
-	 double rot = 0);
+	 double rL = 0.0);
 
     /**
      * List of the parameters themselves.
      * All are passed in to tgBulletCompressionSpring.
      */
-    
+
+    /**
+     * Boolean flag for attached-ness of the free end of the spring.
+     * If no, the spring only provides compression force. 
+     * If yes, the spring is "attached" to both anchors, and provides a 
+     * tension force too when the distance between anchors is greater 
+     * than rest length.
+     */
+    bool isFreeEndAttached;
+
     /**
      * Linear Hookean stiffness of the spring (k). Must be non-negative.
      * Upper limit depends on the timestep - stiffer springs will
@@ -100,13 +109,7 @@ public:
      */
     double restLength;
     
-    /**
-     * Specifies the rotation around the face of the object its attached
-     * to.  +/- PI is the most meaningful. absolute value must be < 2 * PI
-     * Units are radians.
-     * @todo Is this meaningful for non-rod shapes? Copied from tgSpringCableActuator...
-     */
-    double rotation;
+
   };
   
   /**

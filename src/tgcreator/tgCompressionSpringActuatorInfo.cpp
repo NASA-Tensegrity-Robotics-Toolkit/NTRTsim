@@ -90,8 +90,8 @@ tgBulletCompressionSpring* tgCompressionSpringActuatorInfo::createTgBulletCompre
 
     // get the two rigid bodies that correspond to the locations that this compression spring
     // will be attached between.
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
+    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo());
+    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom());
 
     // Note that even though this object is definitely not a SpringCable, and does not inherit from
     // that class at all, it's still more useful to re-use the spring cable version of anchor.
@@ -108,10 +108,11 @@ tgBulletCompressionSpring* tgCompressionSpringActuatorInfo::createTgBulletCompre
     tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
     anchorList.push_back(anchor2);
 
-    // call the constructor fot tgBulletCompressionSpring.
+    // call the constructor for tgBulletCompressionSpring.
     // Unlike the spring-cable, it makes more sense to state the rest length of a compression
     // spring. That way, it's easy to only apply a force if the total distance between the two
     // anchors is less than restLength.
-    return new tgBulletCompressionSpring(anchorList, m_config.stiffness, m_config.damping, m_config.restLength);
+    return new tgBulletCompressionSpring(anchorList, m_config.isFreeEndAttached,
+		       m_config.stiffness, m_config.damping, m_config.restLength);
 }
     

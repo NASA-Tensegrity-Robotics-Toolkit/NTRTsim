@@ -27,6 +27,7 @@
 
 // This application
 #include "TwoRodsModel.h"
+#include "TwoBoxesModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // Fourth create the models
-    TwoRodsModel* const myModel = new TwoRodsModel();
+    tgModel* const myModel = new TwoBoxesModel();
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);

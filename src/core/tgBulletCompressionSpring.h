@@ -53,11 +53,17 @@ public:
      * of stiffness, a coefficent of damping, and rest length
      * of the spring.
      * @param[in] anchors - a list of this spring cable's attachements
+     * @param[in] isFreeEndAttached - boolean flag.
+     * If no, the spring only provides compression force. 
+     * If yes, the spring is "attached" to both anchors, and provides a 
+     * tension force too when the distance between anchors is greater 
+     * than rest length.
      * @param[in] coefK - the stiffness of the spring. Must be positive
-     * @param[in] dampingCoefficient - the damping in the spring. Must be non-negative
+     * @param[in] dampingCoefficient - the damping in the spring. Must be non-negative.
      * @param[in] restLength - the length of the compression spring when unloaded.
      */
     tgBulletCompressionSpring( const std::vector<tgBulletSpringCableAnchor*>& anchors,
+	        bool isFreeEndAttached,
                 double coefK,
                 double coefD,
                 double restLength);
@@ -78,18 +84,17 @@ public:
      * the length between them
      */
     virtual const double getCurrentAnchorDistance() const;
-    
-    /**
-     * Returns the force currently in the spring, calculated by 
-     * either returning 0 if current anchor distance > rest length,
-     * else returning (rest length - current length) * coefK
-     */
-    virtual const double getSpringForce() const;
 
     /**
-     * Returns either restLength or current anchor distance (if less than restlength.)
+     * Returns either restLength or current anchor distance, 
+     * depending on isFreeEndAttached.
      */
     virtual const double getCurrentSpringLength() const;
+    
+    /**
+     * Returns the force currently in the spring, either compression only / a positive force only (if isFreeEndAttached is false), or potentially either + or - force (if isFreeEndAttached == true).
+     */
+    virtual const double getSpringForce() const;
     
     /**
      * Get the coefficent of stiffness
@@ -121,6 +126,23 @@ public:
     virtual const double getDampingForce() const
     {
         return m_dampingForce;
+    }
+
+    /**
+     * Get the rest length of the spring
+     * (we're using these accessor functions per C++ style guidelines.)
+     */
+    virtual const double getRestLength() const
+    {
+        return m_restLength;
+    }
+
+    /**
+     * Return the boolean: is the free end attached?
+     */
+    virtual const bool isFreeEndAttached() const
+    {
+        return m_isFreeEndAttached;
     }
     
     /**
@@ -156,10 +178,6 @@ protected:
 private:
 
     /**
-     * The following protected variables are from tgSpringCable.
-     */
-
-    /**
      * The force in the spring due to damping, at the last update step. 
      * Stored so we can get it without passing a dt
      */
@@ -170,6 +188,11 @@ private:
      * can get it without passing a dt
      */
     double m_velocity;
+
+    /**
+     * Boolean flag controlling the application of either tension forces or not.
+     */
+    bool m_isFreeEndAttached;
 
     /**
      * The stiffness coefficient

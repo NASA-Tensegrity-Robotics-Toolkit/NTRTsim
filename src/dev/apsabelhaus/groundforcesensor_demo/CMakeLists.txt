@@ -2,6 +2,7 @@ link_libraries(tgcreator controllers core)
 
 add_executable(AppGroundForceSensorDemo
     TwoRodsModel.cpp
+    TwoBoxesModel.cpp
     AppGroundForceSensorDemo.cpp
 ) 
 

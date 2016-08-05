@@ -41,14 +41,14 @@
 using namespace std;
 
 // Declaration of the config struct (...again? Hmmm...), copied from tgSpringCableActuator.
-tgCompressionSpringActuator::Config::Config(double s,
+tgCompressionSpringActuator::Config::Config(bool iFEA,
+		   double s,
                    double d,
-                   double rL,
-                   double rot) :
+                   double rL) :
+  isFreeEndAttached(iFEA),
   stiffness(s),
   damping(d),
-  restLength(rL),
-  rotation(rot)        
+  restLength(rL)       
 {
     ///@todo is this the right place for this, or the constructor of this class?
     if (s < 0.0)
@@ -62,10 +62,6 @@ tgCompressionSpringActuator::Config::Config(double s,
     else if (rL < 0.0)
     {
         throw std::invalid_argument("Rest length is negative. Compression springs have a positive rest length.");
-    }
-    else if (abs(rot) > M_PI * 2.0)
-    {
-	throw std::invalid_argument("Abs of rotation is greater than 2pi. Are you sure you're setting the right parameters?");
     }
 }
 
