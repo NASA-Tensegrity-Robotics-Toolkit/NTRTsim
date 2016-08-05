@@ -51,7 +51,7 @@ public:
      */
     struct Config
     {
-            /**
+        /**
          * Initialize with radius and density, which may default.
          * @param[in] radius the rod's radius; must be non-negative
          * @param[in] density the rod's density; must be non-negative
@@ -59,7 +59,7 @@ public:
             Config(double w = 1.0,
                     double h = 1.0,
                     double d = 1.0,
-					double f = 1.0,
+		    double f = 1.0,
                     double rf = 0.0,
                     double res = 0.2);
 
@@ -70,7 +70,7 @@ public:
             /** The rod's height; must be nonnegative. */
             const double height;
             
-			/** The rod's density; must be nonnegative. */
+            /** The rod's density; must be nonnegative. */
             const double density;
             
             /** The rod's friction; 

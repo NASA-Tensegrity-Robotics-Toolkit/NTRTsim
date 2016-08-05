@@ -22,7 +22,8 @@
 /**
  * @file TensegrityModel.cpp
  * @brief Contains the definition of the members of the class TensegrityModel.
- * @author Simon Kotwicz & Jonah Eisen
+ * @author Simon Kotwicz, Jonah Eisen, Drew Sabelhaus
+ * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
 
@@ -54,6 +55,13 @@ class TensegrityModel : public tgSubject<TensegrityModel>, public tgModel
 {
 public:
 
+    /**
+     * List of all the default config parameters for all the
+     * types of objects that wil be supported.
+     */
+
+    // Rod parameters:
+  
     /*
      * Default rod radius.
      */
@@ -75,6 +83,35 @@ public:
      */
     const static double rodRestitution = 0.2;
 
+    // Box parameters:
+  
+    /*
+     * Default box width. (see tgBox.h)
+     */
+    const static double boxWidth = 1.0;
+    /*
+     * Default box height. (see tgBox.h)
+     */
+    const static double boxHeight = 1.0;
+    /*
+     * Default box density. (see tgBox.h)
+     */
+    const static double boxDensity = 1.0;
+    /*
+     * Default box friction. (see tgBox.h)
+     */
+    const static double boxFriction = 1.0;
+    /*
+     * Default box rolling friction. (see tgBox.h)
+     */
+    const static double boxRollFriction = 0.0;
+    /*
+     * Default box restitution. (see tgBox.h)
+     */
+    const static double boxRestitution = 0.2;
+
+    // String parameters:
+    
     /*
      * Default string stiffness.
      */
@@ -322,6 +359,11 @@ private:
      * Responsible for adding a builder that uses the tgKinematicActuator config
      */
     void addKinematicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
+     * Responsible for adding a builder that uses the tgBox config
+     */
+    void addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
 
     /*
      * Ensures YAML node contains only keys from the supplied vector

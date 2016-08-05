@@ -19,7 +19,7 @@
 /**
  * @file TensegrityModel.cpp
  * @brief Contains the definition of the members of the class TensegrityModel.
- * @author Simon Kotwicz & Jonah Eisen
+ * @author Simon Kotwicz, Jonah Eisen, Drew Sabelhaus
  * $Id$
  */
 
@@ -31,11 +31,13 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgKinematicActuator.h"
 #include "core/tgRod.h"
+#include "core/tgBox.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructureInfo.h"
 
 TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
@@ -48,11 +50,12 @@ void TensegrityModel::setup(tgWorld& world) {
     // create the build spec that uses tags to turn the structure into a model
     tgBuildSpec spec;
 
-    // add default rod and string builders that match the tags rods & strings
+    // add default builders (rods, strings, boxes) that match the tags (rods, strings, boxes)
     // (these will be overwritten if a different builder is specified for those tags)
     Yam emptyYam = Yam();
     addRodBuilder("tgRodInfo", "rod", emptyYam, spec);
     addBasicActuatorBuilder("tgBasicActuatorInfo", "string", emptyYam, spec);
+    addBoxBuilder("tgBoxInfo", "box", emptyYam, spec);
 
     tgStructure structure;
     buildStructure(structure, topLvlStructurePath, spec);
@@ -494,6 +497,9 @@ void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
         else if (builderClass == "tgKinematicContactCableInfo" || builderClass == "tgKinematicActuatorInfo") {
             addKinematicActuatorBuilder(builderClass, tagMatch, parameters, spec);
         }
+	if (builderClass == "tgBoxInfo") {
+            addBoxBuilder(builderClass, tagMatch, parameters, spec);
+        }
         // add more builders here if they use a different Config
         else {
             throw std::invalid_argument("Unsupported builder class: " + builderClass);
@@ -609,6 +615,66 @@ void TensegrityModel::addKinematicActuatorBuilder(const std::string& builderClas
         spec.addBuilder(tagMatch, new tgKinematicActuatorInfo(kinematicActuatorConfig));
     }
     // add more builders that use tgKinematicActuator::Config here
+}
+
+void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec) {
+    /**
+     * Builder procedure: 
+     * (1) create a list (a map, really) of all the possible parameters, and initialize
+     * them to the defaults in TensegrityModel.h
+     * (2) substitute these defaults with any parameters from the YAMl file
+     * (3) create the tgBoxInfo object and add it to the list of builders
+     * @TO-DO: this seems to be called multiple times per "builder" block in a YAML file.
+     * That's probably not correct. Why?
+     */
+
+    // Debugging
+    #if (0)
+      std::cout << "addBoxBuilder" << std::endl; 
+    #endif
+
+    // (1)
+    // Parameters to be used in tgBox::Config. See core/tgBox.h
+    // Boxes are treated like rods with a rectangular cross-section: the box length
+    // is specified by the distance between nodes, and the width and height come from
+    // the Config struct.
+    // Create a map of strings to doubles that will hold the parameters
+    std::map<std::string, double> bp;
+    bp["width"] = boxWidth;
+    bp["height"] = boxHeight;
+    bp["density"] = boxDensity;
+    bp["friction"] = boxFriction;
+    bp["roll_friction"] = boxRollFriction;
+    bp["restitution"] = boxRestitution;
+
+    // (2)
+    // Debugging
+    #if (0)
+    std::cout << "Box Builder Parameters: " << std::endl << std::flush; 
+    #endif
+    
+    if (parameters) {
+        for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
+            std::string parameterName = parameter->first.as<std::string>();
+            if (bp.find(parameterName) == bp.end()) {
+                throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+            }
+            // if defined overwrite default parameter value
+            bp[parameterName] = parameter->second.as<double>();
+        }
+    }
+
+    // (3)
+    // this usage is the same as in NTRT v1.0 models.
+    const tgBox::Config boxConfig = tgBox::Config(bp["width"], bp["height"],
+			 bp["density"], bp["friction"], bp["roll_friction"], bp["restitution"]);
+    if (builderClass == "tgBoxInfo") {
+        // tgBuildSpec takes ownership of the tgBoxInfo object
+        spec.addBuilder(tagMatch, new tgBoxInfo(boxConfig));
+        #if (0)
+        std::cout << "Box Builder Added. " << std::endl << std::flush; 
+        #endif	
+    }
 }
 
 void TensegrityModel::yamlNoDuplicates(const Yam& yam, const std::string structurePath) {
