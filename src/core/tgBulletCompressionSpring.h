@@ -69,7 +69,8 @@ public:
                 double restLength);
     
     /**
-     * The virtual destructor. Deletes all of the anchors including anchor1 and anchor2
+     * The virtual destructor. Deletes all of the anchors including 
+     * anchor1 and anchor2
      */
     virtual ~tgBulletCompressionSpring();
 
@@ -174,8 +175,6 @@ protected:
      * The other permanent attachment for this spring cable. 
      */
     tgBulletSpringCableAnchor * const anchor2;
-    
-private:
 
     /**
      * The force in the spring due to damping, at the last update step. 
