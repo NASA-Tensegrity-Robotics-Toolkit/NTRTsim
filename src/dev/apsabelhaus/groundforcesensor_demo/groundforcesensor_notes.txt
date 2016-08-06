@@ -164,3 +164,18 @@ Classes to make:
 2) tgUnidirectionalCompressionSpringActuator
 
 3) tgUnidirectionalCompressionSpringActuatorInfo
+
+^ done.
+
+Need to check: Memory usage and the passing around of the btVector3 'direction'.
+Needs to be stored as a pointer, and then the initialized value needs to be
+deleted before storing a new value.
+
+Need to implement checks on 'direction' as it's passed in. Find a good way
+of checking that it's solely a unit vector.
+
+Need to include some warnings in this class, including:
+"Reminder: in NTRT, the three axes are (X, Y, Z), but Y is the vertical direction.
+So, (0, 1, 0) will create a vertical unidirectional compression spring."
+
+It would be good to render these springs in the view window now, too.
