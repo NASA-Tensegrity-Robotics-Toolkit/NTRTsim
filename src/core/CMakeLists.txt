@@ -15,6 +15,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgBasicActuator.cpp
     tgKinematicActuator.cpp
     tgCompressionSpringActuator.cpp
+    tgUnidirectionalCompressionSpringActuator.cpp
     tgWorld.cpp
     tgSimulation.cpp
     tgBulletRenderer.cpp

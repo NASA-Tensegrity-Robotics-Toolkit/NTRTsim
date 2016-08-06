@@ -86,7 +86,7 @@ ORDER OF OPERATIONS FOR THE CLASSES TO CREATE:
 1) tgCompressionSpringActuatorInfo
 	will call or use:
 	     tgBulletCompressionSpring
-	     tgBulletSpringCableAnchor (...this should be OK, unless Bullet tries to apply a force on the world ground and then crashes...)
+	     tgBulletSpringCableAnchor (...this should be OK, unless Bullet tries to apply a force on the world ground and then crashes...) < nope, works fine.
 	      ^ the header file for this is added in the .cpp file for tgCompressionSpringActuatorInfo.
 
 2) tgCompressionSpringActuator
@@ -146,3 +146,21 @@ Classes to make:
 2) tgFixedVerticalCompressionSpringInfo (corresponds to tgCompressionSpringActuator)
 
 3) tgBulletFixedVerticalCompressionSpring
+
+--------------------------------------------------------------------------------------------------------------------
+
+2016-08-03:
+
+It will be difficult to make a floating spring, especially one that will integrate well with the YAMl infrastructure.
+
+So, let's just make a tgModel of the force plate, with some unidirectional compression springs attached.
+
+Classes to make:
+
+1) tgBulletUnidirectionalCompressionSpring
+
+^ done.
+
+2) tgUnidirectionalCompressionSpringActuator
+
+3) tgUnidirectionalCompressionSpringActuatorInfo

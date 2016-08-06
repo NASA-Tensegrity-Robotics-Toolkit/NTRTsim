@@ -28,10 +28,12 @@
 #include "TwoBoxesModel.h"
 // This library
 #include "core/tgCompressionSpringActuator.h"
+#include "core/tgUnidirectionalCompressionSpringActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -52,6 +54,7 @@ namespace
         bool isFreeEndAttached;
         double stiffness;
         double damping;
+        btVector3 direction;
         double boxLength;
         double boxWidth;
         double boxHeight;
@@ -66,6 +69,7 @@ namespace
      false,   // isFreeEndAttached
      200.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
+     *(new btVector3(0, 1, 0) ),  // direction
      3.0,   // boxLength (length)
      3.0,   // boxWidth (length)
      3.0,   // boxHeight (length)
@@ -118,9 +122,14 @@ void TwoBoxesModel::setup(tgWorld& world)
 				  c.friction, c.rollFriction, c.restitution);
 
     // config struct for the compression spring
-    tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
-				       c.stiffness, c.damping, c.springRestLength);
-            
+    //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
+    //				       c.stiffness, c.damping, c.springRestLength);
+    tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
+				       c.isFreeEndAttached,
+				       c.stiffness, c.damping, c.springRestLength,
+				       c.direction);
+
+    
     // Start creating the structure
     tgStructure s;
     addNodes(s);
@@ -139,7 +148,9 @@ void TwoBoxesModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
-    spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
+    spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);

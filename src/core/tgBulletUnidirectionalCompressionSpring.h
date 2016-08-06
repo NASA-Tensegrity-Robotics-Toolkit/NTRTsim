@@ -73,6 +73,7 @@ public:
      * @param[in] restLength - the length of the compression spring when unloaded.
      * @param[in] direction - the direction of the force to be applied, a btVector3.
      * the current version will only support (1,0,0), (0,1,0), or (0,0,1).
+     *     Direction is a constant pointer.
      */
     tgBulletUnidirectionalCompressionSpring(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,
@@ -117,75 +118,15 @@ protected:
 
     /**
      * Direction of the force that this spring will apply
+     * A constant pointer to a constant direction.
      */
-    btVector3 const m_direction;
-
-    /**
-     * The list of contact points. tgBulletSpringCable typically has two
-     * whereas tgBulletContactSpringCable will have more. 
-     * Needs to be stored here for consistent rendering.
-     * Vector has the convienence of tgCast functions, and we used to
-     * need a random iterator to sort
-     */
-   std::vector<tgBulletSpringCableAnchor*> m_anchors;
-    
-    /**
-     * The first attachement point for this spring cable. Storing it
-     * seperately makes a number of functions easier
-     */
-    tgBulletSpringCableAnchor * const anchor1;
-
-    /**
-     * The other permanent attachment for this spring cable. 
-     */
-    tgBulletSpringCableAnchor * const anchor2;
-
-    /**
-     * The force in the spring due to damping, at the last update step. 
-     * Stored so we can get it without passing a dt
-     */
-    double m_dampingForce;
-    
-    /**
-     * The velocity of the spring tip at the last update step. Stored so we
-     * can get it without passing a dt
-     */
-    double m_velocity;
-
-    /**
-     * Boolean flag controlling the application of either tension forces or not.
-     */
-    bool m_isFreeEndAttached;
-
-    /**
-     * The stiffness coefficient
-     * Units of mass / sec ^2
-     * Must be positive
-     */
-    const double m_coefK;
-
-    /**
-     * The damping coefficient.
-     * Units of mass / sec. 
-     * Must be non-negative
-     */
-    const double m_coefD;
-    
-    /**
-     * The rest length of the spring. Must be non negative
-     */
-    double m_restLength;
- 
-    /**
-     * The previous actual length of the spring. Used when calculating
-     * force and velocity
-     */
-    double m_prevLength;
+    btVector3 m_direction;
     
     /**
      * Calculates the current forces that need to be applied to 
      * the rigid bodies, and applies them to the bodies of anchor1 and 
      * anchor2
+     * Need to re-declare it here so it can be redefined in this child class.
      */
     virtual void calculateAndApplyForce(double dt);
 

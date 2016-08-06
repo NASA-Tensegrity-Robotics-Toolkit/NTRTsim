@@ -36,8 +36,9 @@
 
 /**
  * The main constructor for this class
- * TO-DO as of 2016-08-04: this constructor needs to call the constructor
- * for tgBulletCompressionSpring. Look up an example of how to do this...
+ * In comparison to the tgSpringCable vs. tgBulletSpringCable class inheritance,
+ * there is no need for the tgCast here, since the same type of anchor is used
+ * in both tgBulletCompressionSpring and tgBulletUnidirectionalCompressionSpring.
  */
 tgBulletUnidirectionalCompressionSpring::tgBulletUnidirectionalCompressionSpring(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,
@@ -46,40 +47,31 @@ tgBulletUnidirectionalCompressionSpring::tgBulletUnidirectionalCompressionSpring
                 double coefD,
                 double restLength,
 		btVector3 direction) :
-m_dampingForce(0.0),
-m_velocity(0.0),
-m_isFreeEndAttached(isFreeEndAttached),
-m_coefK(coefK),
-m_coefD(coefD),
-m_restLength(restLength),
-m_direction(direction),
-m_anchors(anchors),
-anchor1(anchors.front()),
-anchor2(anchors.back())
+tgBulletCompressionSpring(anchors, isFreeEndAttached, coefK, coefD, restLength),
+m_direction(direction)
 {
-    // There should be two anchors for a compression spring.
-    assert(m_anchors.size() == 2);
+    // Since tgBulletCompressionSpring takes care of everything else,
+    // just need to check that direction is valid, and then check the invariant.
 
-    // Constructor from tgSpringCable:
-    assert(coefK > 0.0);
-    assert(coefD >= 0.0);
+  // @TO-DO: checks on the btVector3 direction.
 
-    // the rest length of the spring has to be positive
-    if (m_restLength <= 0.0)
-    {
-	throw std::invalid_argument("Rest length for a compression spring must be postive.");
-    }
-	
-    m_prevLength = m_restLength;
+    #if (1)
+    std::cout << "Creating a tgBulletUnidirectionalCompressionSpring." << std::endl;
+    std::cout << "Direction is: ";
+    std::cout << "(" << m_direction.x() << ",";
+    std::cout << m_direction.y() << ",";
+    std::cout << m_direction.z() << ")" << std::endl;
+    #endif
     
     assert(invariant());
 }
 
-// Destructor has to the responsibility of destroying the anchors also.
+// Destructor has to the responsibility of destroying the anchors also,
+// as well as the btVector3 direction.
 tgBulletUnidirectionalCompressionSpring::~tgBulletUnidirectionalCompressionSpring()
 {
     #if (0)
-    std::cout << "Destroying tgBulletCompressionSpring" << std::endl;
+    std::cout << "Destroying tgBulletUnidirectionalCompressionSpring" << std::endl;
     #endif
     
     std::size_t n = m_anchors.size();
@@ -234,6 +226,7 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
 
     // Debugging
     #if (0)
+      std::cout << "tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce  " << std::endl;
       std::cout << "Length: " << getCurrentSpringLength() << " rl: " << getRestLength() <<std::endl;
       std::cout << "SpringForce: " << magnitude << " DampingForce: " << m_dampingForce <<std::endl;
     #endif
