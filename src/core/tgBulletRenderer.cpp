@@ -28,6 +28,7 @@
 // This application
 #include "abstractMarker.h"
 #include "tgSpringCable.h"
+#include "tgBulletCompressionSpring.h"
 #include "tgSpringCableAnchor.h"
 #include "tgBulletUtil.h"
 #include "tgSpringCableActuator.h"
@@ -98,15 +99,100 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
 
 /**
  * Render a tgCompressionSpringActuator
- * As of 2016-08-02, no lines need to be drawn, since we'll only be using the 
- * compression spring as a force sensor (very small lengths.)
+ * Just like a spring-cable actuator.
  */
-void tgBulletRenderer::render(const tgCompressionSpringActuator& compressionSpringActuator) const
+void tgBulletRenderer::render(const tgCompressionSpringActuator& mCSA) const
 {
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("tgBulletRenderer::renderCompressionSpring");
 #endif //BT_NO_PROFILE 
-    // do nothing.
+    // Fetch the btDynamicsWorld
+    btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+
+    btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
+    
+    const tgBulletCompressionSpring* const pCompressionSpring =
+      mCSA.getCompressionSpring();
+    
+    if(pDrawer && pCompressionSpring)
+    {
+		const std::vector<const tgSpringCableAnchor*>& anchors =
+		  pCompressionSpring->getAnchors();
+		// This for loop is designed for the multiple-anchor SpringCable,
+		// but works fine here too where there are only two anchors.
+		std::size_t n = anchors.size() - 1;
+		for (std::size_t i = 0; i < n; i++)
+		{
+
+		  // This method assumes the spring is "attached" to the first anchor,
+		  // although it doesn't really matter mathematically.
+		  const btVector3 springStartLoc =
+			 anchors[i]->getWorldPosition();
+		  const btVector3 springEndLoc =
+		         anchors[i+1] ->getWorldPosition();
+		  
+		  // Different behavior depending on if the spring is attached
+		  // at its free end.
+		  // If it *is* attached, render like a SpringCable:
+
+		  if( pCompressionSpring->isFreeEndAttached() )
+		  {
+		    // The color of the spring is according to its current force.
+		    // According to the Bullet Physics API for btIDebugDraw.drawLine,
+		    // "For color arguments the X,Y,Z components refer to
+		    // Red, Green and Blue each in the range [0..1]"
+		    // Let's do red for tension and green for compression
+		    // (note that if the free end is attached, there is always an
+		    // applied force, no "blue" for no force.")
+		    // Negative forces pull the anchors together, positive pushes
+		    // them apart.
+		    const btVector3 color =
+		      ( pCompressionSpring->getSpringForce() < 0.0 ) ?
+		      btVector3(1.0, 0.0, 0.0) :
+		      btVector3(0.0, 1.0, 0.0);
+
+		    // The spring endpoint will always be anchor2.
+		    pDrawer->drawLine(springStartLoc, springEndLoc, color);
+		  }
+		  else
+		  {
+		    // Like above, the color will depend on force.
+		    // Here, though, there will never be any tension force,
+		    // since the spring will provide zero force when anchor distance
+		    // is greater than rest length.
+		    // Less than or equal to zero: blue, no force
+		    const btVector3 color =
+		      ( pCompressionSpring->getSpringForce() <= 0.0 ) ?
+		      btVector3(0.0, 0.0, 1.0) :
+		      btVector3(0.0, 1.0, 0.0);
+
+		    // The location of the free end of the spring is calculated
+		    // by the spring itself:
+		    const btVector3 springTrueEndLoc =
+		      pCompressionSpring->getSpringEndpoint();
+
+		    // Draw the spring line.
+		    pDrawer->drawLine(springStartLoc, springTrueEndLoc, color);
+		  }
+		  
+		  /*
+			const btVector3 lineFrom =
+			anchors[i]->getWorldPosition();
+		  const btVector3 lineTo = 
+			anchors[i+1]->getWorldPosition();
+		   // Should this be normalized??
+		  const double stretch = 
+			mSCA.getCurrentLength() - mSCA.getRestLength();
+		  const btVector3 color =
+			(stretch < 0.0) ?
+			btVector3(0.0, 0.0, 1.0) :
+			btVector3(0.5 + stretch / 3.0, 
+				  0.5 - stretch / 2.0, 
+				  0.0);
+		  pDrawer->drawLine(lineFrom, lineTo, color);
+		  */
+		}
+	}
 }
 
 void tgBulletRenderer::render(const tgModel& model) const

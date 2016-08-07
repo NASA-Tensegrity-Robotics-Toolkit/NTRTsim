@@ -74,7 +74,7 @@ public:
     tgCompressionSpringActuatorInfo(const tgCompressionSpringActuator::Config& config, const tgPair& pair);
     
     /**
-     * virtual destructor, does nothing
+     * virtual destructor, does nothing.
      */
     virtual ~tgCompressionSpringActuatorInfo() {}
     

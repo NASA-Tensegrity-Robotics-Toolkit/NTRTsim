@@ -73,7 +73,11 @@ public:
      * @param[in] restLength - the length of the compression spring when unloaded.
      * @param[in] direction - the direction of the force to be applied, a btVector3.
      * the current version will only support (1,0,0), (0,1,0), or (0,0,1).
-     *     Direction is a constant pointer.
+     * NOTE that although direction is a pointer, it is not deleted in this class or any 
+     * of the other related classes in core. That is because
+     * it's stored in the const Config struct of an application: it's only created once,
+     * not dynamically, so it's only deleted at the very end of the application (NOT during
+     * any individual setups or teardowns.)
      */
     tgBulletUnidirectionalCompressionSpring(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,
@@ -81,7 +85,7 @@ public:
                 double coefK,
                 double coefD,
                 double restLength,
-		btVector3 direction);
+		btVector3 * direction);
     
     /**
      * The virtual destructor. Deletes all of the anchors including 
@@ -109,7 +113,7 @@ public:
     /**
      * Return the direction of applied force for this spring
      */
-    virtual const btVector3 getDirection() const
+    virtual const btVector3 * getDirection() const
     {
         return m_direction;
     }
@@ -120,7 +124,7 @@ protected:
      * Direction of the force that this spring will apply
      * A constant pointer to a constant direction.
      */
-    btVector3 m_direction;
+    btVector3 * m_direction;
     
     /**
      * Calculates the current forces that need to be applied to 

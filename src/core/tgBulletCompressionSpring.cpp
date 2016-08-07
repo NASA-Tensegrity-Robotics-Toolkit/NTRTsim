@@ -64,6 +64,19 @@ anchor2(anchors.back())
     {
 	throw std::invalid_argument("Rest length for a compression spring must be postive.");
     }
+
+    // Debugging
+    #if (1)
+    btVector3 anchor1pos = anchor1->getWorldPosition();
+    btVector3 anchor2pos = anchor2->getWorldPosition();
+    std::cout << "Location of the starting and ending point of the two anchors:" << std::endl;
+    std::cout << "Anchor1: (" << anchor1pos.x() << ", ";
+    std::cout << anchor1pos.y() << ", ";
+    std::cout << anchor1pos.z() << ")" << std::endl;
+    std::cout << "Anchor2: (" << anchor2pos.x() << ", ";
+    std::cout << anchor2pos.y() << ", ";
+    std::cout << anchor2pos.z() << ")" << std::endl;
+    #endif
 	
     m_prevLength = m_restLength;
     
@@ -161,6 +174,38 @@ const double tgBulletCompressionSpring::getCurrentSpringLength() const
     return springLength;
 }
 
+
+/**
+ * Returns the unit vector in the direction of this spring.
+ */
+const btVector3 tgBulletCompressionSpring::getDirectionUnitVector() const
+{
+    // Get the unit vector for the direction of the force, this is needed for
+    // applying the force to the rigid bodies.
+    const btVector3 dist =
+	  anchor2->getWorldPosition() - anchor1->getWorldPosition();
+    // The unit vector of the direction of the force will be needed later
+    // In order to have a positive force move the two rigid bodies away
+    // from each other, this unit vector must be in the opposite direction
+    // of this calculation. Otherwise, a positive force brings them closer
+    // together. Needs a minus.
+    // note that dist.length is a scalar double.
+    const btVector3 unitVector = - dist / getCurrentSpringLength();
+    return unitVector;
+}
+
+/**
+ * Returns the location of the endpoint of the spring in space. 
+ * The renderer uses this to draw lines more easily.
+ */
+const btVector3 tgBulletCompressionSpring::getSpringEndpoint() const
+{
+  // The spring endpoint will always be the sum of the beginning point
+  // and the (spring length times the unit vector in the direction of the spring).
+  return anchor1->getWorldPosition() + 
+    getCurrentSpringLength() * getDirectionUnitVector();
+}
+
 /**
  * Returns the current force in the spring.
  * If ~isFreeEndAttached, 
@@ -243,20 +288,9 @@ void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
     // the following ONLY includes forces due to K, not due to damping.
     double magnitude = getSpringForce();
 
-    // hold this variable so we don't have to call the accessor function twice.
+    // hold these variables so we don't have to call the accessor function twice.
     const double currLength = getCurrentSpringLength();
-
-    // Get the unit vector for the direction of the force, this is needed for
-    // applying the force to the rigid bodies.
-    const btVector3 dist =
-	  anchor2->getWorldPosition() - anchor1->getWorldPosition();
-    // The unit vector of the direction of the force will be needed later
-    // In order to have a positive force move the two rigid bodies away
-    // from each other, this unit vector must be in the opposite direction
-    // of this calculation. Otherwise, a positive force brings them closer
-    // together. Needs a minus.
-    // note that dist.length is a scalar double.
-    const btVector3 unitVector = - dist / currLength;
+    const btVector3 unitVector = getDirectionUnitVector();
 
     // Calculate the damping force for this timestep.
     // Take an approximated derivative to estimate the velocity of the

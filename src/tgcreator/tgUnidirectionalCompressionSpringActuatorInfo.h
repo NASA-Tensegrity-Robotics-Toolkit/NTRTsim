@@ -87,7 +87,7 @@ public:
 		   const tgPair& pair);
     
     /**
-     * virtual destructor, does nothing
+     * virtual destructor. does nothing.
      */
     virtual ~tgUnidirectionalCompressionSpringActuatorInfo() {}
 
@@ -112,20 +112,19 @@ protected:
 
     /**
      * Helper function: actually creates the tgBulletCompressionSpring.
+     * Note that the m_bulletCompressionSpring is stored in the parent class.
      */
     tgBulletUnidirectionalCompressionSpring* createTgBulletUnidirectionalCompressionSpring();
 
     /**
-     * reference to the tgBulletCompressionSpring that's created by the above method.
-     * This should not be needed: since tgBulletUnidirectionalCompressionSpring is
-     * a tgBulletCompressionSpring, m_bulletCompressionSpring in the superclass
-     * should be able to hold the tgBulletUnidirectionalCompressionSpring 
-     * of this class.
+     * Auxiliary helper to the constructors. This makes it easy to do
+     * the same checks in multiple constructors without copy-pasting code.
      */
-    //tgBulletCompressionSpring* m_bulletCompressionSpring;
+    void constructorAux();
     
 private:
-    
+
+    // local copy of the config struct.
     tgUnidirectionalCompressionSpringActuator::Config m_config;
     
 };

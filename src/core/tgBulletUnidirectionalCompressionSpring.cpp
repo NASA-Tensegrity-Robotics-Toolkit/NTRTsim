@@ -46,7 +46,7 @@ tgBulletUnidirectionalCompressionSpring::tgBulletUnidirectionalCompressionSpring
                 double coefK,
                 double coefD,
                 double restLength,
-		btVector3 direction) :
+		btVector3 * direction) :
 tgBulletCompressionSpring(anchors, isFreeEndAttached, coefK, coefD, restLength),
 m_direction(direction)
 {
@@ -56,11 +56,11 @@ m_direction(direction)
   // @TO-DO: checks on the btVector3 direction.
 
     #if (1)
-    std::cout << "Creating a tgBulletUnidirectionalCompressionSpring." << std::endl;
-    std::cout << "Direction is: ";
-    std::cout << "(" << m_direction.x() << ",";
-    std::cout << m_direction.y() << ",";
-    std::cout << m_direction.z() << ")" << std::endl;
+    std::cout << "tgBulletUnidirectionalCompressionSpring constructor, ";
+    std::cout << "direction is: ";
+    std::cout << "(" << m_direction->x() << ",";
+    std::cout << m_direction->y() << ",";
+    std::cout << m_direction->z() << ")" << std::endl;
     #endif
     
     assert(invariant());
@@ -73,31 +73,6 @@ tgBulletUnidirectionalCompressionSpring::~tgBulletUnidirectionalCompressionSprin
     #if (0)
     std::cout << "Destroying tgBulletUnidirectionalCompressionSpring" << std::endl;
     #endif
-    
-    std::size_t n = m_anchors.size();
-    
-    // Make absolutely sure these are deleted, in case we have a poorly timed reset
-    if (m_anchors[0] != anchor1)
-    {
-        delete anchor1;
-    }
-    
-    if (m_anchors[n-1] != anchor2)
-    {
-        delete anchor2;
-    }
-    
-    for (std::size_t i = 0; i < n; i++)
-    {
-        delete m_anchors[i];
-    }
-
-    
-    m_anchors.clear();
-
-    // Delete the btVector3 also.
-    // TO-DO: does this need to happen? ...
-    //delete m_direction;
 }
 
 // The step function is what's called from other places in NTRT.
@@ -140,7 +115,8 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentSpringLength() c
 
     if( isFreeEndAttached() )
     {
-      // The spring length is always the distance between anchors.
+      // The spring length is always the distance between anchors, projected along
+      // the direction vector.
       springLength = currAnchorDist;
     }
     else if( currAnchorDist < getRestLength() )
@@ -258,5 +234,6 @@ bool tgBulletUnidirectionalCompressionSpring::invariant(void) const
     m_restLength >= 0.0 &&
     anchor1 != NULL &&
     anchor2 != NULL &&
+    m_direction != NULL &&
     m_anchors.size() >= 2);
 }

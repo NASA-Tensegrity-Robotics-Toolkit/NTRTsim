@@ -36,6 +36,20 @@
 #include "core/tgBulletUnidirectionalCompressionSpring.h"
 
 /**
+ * Constructor auxiliary method, does some debugging and error checking.
+ */
+void tgUnidirectionalCompressionSpringActuatorInfo::constructorAux()
+{
+    // Debugging
+    #if (0)
+    std::cout << "tgUnidirectionalCompressionSpringActuatorInfo constructor. Direction is:" << std::endl;
+    std::cout << "(" << m_config.direction->x() << ",";
+    std::cout << m_config.direction->y() << ",";
+    std::cout << m_config.direction->z() << ")" << std::endl;
+    #endif 
+}
+
+/**
  * Constructors.
  * All must call the constructor for tgCompressionSpringActuator.
  */
@@ -43,18 +57,26 @@
 tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config) : 
 m_config(config),
 tgCompressionSpringActuatorInfo(config)
-{}
+{
+  // call the helper function for the constructors
+  constructorAux();
+}
 
 tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config, tgTags tags) : 
 m_config(config),
 tgCompressionSpringActuatorInfo(config, tags)
-{}
+{
+  // call the helper function for the constructors
+  constructorAux();
+}
 
 tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config, const tgPair& pair) :
 m_config(config),
 tgCompressionSpringActuatorInfo(config, pair)
-{}
-    
+{
+  // call the helper function for the constructors
+  constructorAux();
+}
 
 tgConnectorInfo* tgUnidirectionalCompressionSpringActuatorInfo::createConnectorInfo(const tgPair& pair)
 {
@@ -90,19 +112,6 @@ tgModel* tgUnidirectionalCompressionSpringActuatorInfo::createModel(tgWorld& wor
 tgBulletUnidirectionalCompressionSpring* tgUnidirectionalCompressionSpringActuatorInfo::createTgBulletUnidirectionalCompressionSpring()
 {
   //std::cout << "tgUnidirectionalCompressionSpringActuatorInfo::createTgBulletUnidirectionalCompressionSpring()" << std::endl;
-
-    // @TODO: At this point, did tgCompressionSpringActuatorInfo create a
-    // tgBulletCompressionSpring already? If so, that needs to be deleted
-    // before making the new tgBulletUnidirectionalCompressionSpring below.
-
-    if( m_bulletCompressionSpring)
-      {
-	// There already exists something inside m_bulletCompressionSpring.
-	std::cout << "Something already exists in m_bulletCompressionSpring, " <<
-	  "that spring's parameters are: " << std::endl;
-	std::cout << "Spring Length: " << m_bulletCompressionSpring->getCurrentSpringLength() << std::endl;
-	std::cout << "CoefK: " << m_bulletCompressionSpring->getCoefK() << std::endl;
-      }
     
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
     //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
@@ -139,4 +148,4 @@ tgBulletUnidirectionalCompressionSpring* tgUnidirectionalCompressionSpringActuat
 		  m_config.isFreeEndAttached, m_config.stiffness, m_config.damping,
 		  m_config.restLength, m_config.direction);
 }
-    
+

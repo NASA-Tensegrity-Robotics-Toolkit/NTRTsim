@@ -110,8 +110,19 @@ tgCompressionSpringActuator::tgCompressionSpringActuator(tgBulletCompressionSpri
 
 tgCompressionSpringActuator::~tgCompressionSpringActuator()
 {
-    std::cout << "deleting compression spring within tgCompressionSpringActuator" << std::endl;
+    // Debugging
+    #if(0) 
+    std::cout << "Destroying tgCompressionSpringActuator" << std::endl;
+    #endif
+
+    // This is the only location where the compression spring should be
+    // deleted. Do not re-delete it in any of its child classes.
+    // Note also that the pointer may not be NULL in other locations in
+    // other objects, since the pointer is being passed around, and will
+    // only change locally but not globally.
+    // @TODO: make this a pointer to a pointer so we can check everywhere?
     delete m_compressionSpring;
+    m_compressionSpring = NULL;
 }
     
 void tgCompressionSpringActuator::setup(tgWorld& world)

@@ -84,7 +84,7 @@ public:
 	 double s = 1000.0,
 	 double d = 10.0,
 	 double rL = 0.0,
-	 btVector3 dir = *(new btVector3(0, 1, 0)) );
+	 btVector3 * dir = (new btVector3(0, 1, 0)) );
 
     /**
      * List of the new parameters.
@@ -97,7 +97,7 @@ public:
     * Should be checked in constructor: only allowed to be a unit vector
     * along one of the three axes.
     */
-    btVector3 direction;
+    btVector3 * direction;
   };
   
   /**
@@ -116,7 +116,7 @@ public:
          tgUnidirectionalCompressionSpringActuator::Config& config);
     
   /**
-   * Destructor deletes the tgBulletUnidirectionalCompressionSpring
+   * Destructor does nothing.
    */
   virtual ~tgUnidirectionalCompressionSpringActuator();
     

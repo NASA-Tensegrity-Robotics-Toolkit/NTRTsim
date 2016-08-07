@@ -49,18 +49,23 @@ tgUnidirectionalCompressionSpringActuator::Config::Config(bool iFEA,
 		   double s,
                    double d,
 		   double rL,
-		   btVector3 dir) :
+		   btVector3 * dir) :
   tgCompressionSpringActuator::Config::Config(iFEA, s, d, rL),
   direction(dir)       
 {
-    ///@todo is this the right place for this, or the constructor of this class?
-  /*
-   * TO-DO: perform a check on dir.
-  if ()
+    // Direction cannot be null.
+    if( dir == NULL)
     {
-        throw std::invalid_argument("");
+      throw std::invalid_argument("Pointer to btVector3 direction is NULL, inside constructor for tgUnidirectionalCompressionSpringActuator Config.");
     }
-  */
+  
+    // Debugging
+    #if (0)
+    std::cout << "tgUnidirectionalCompressionSpringActuator Config constructor. Direction is:" << std::endl;
+    std::cout << "(" << direction->x() << ",";
+    std::cout << direction->y() << ",";
+    std::cout << direction->z() << ")" << std::endl;
+    #endif  
 }
 
 // A helper function for the constructor.
@@ -71,11 +76,20 @@ void tgUnidirectionalCompressionSpringActuator::constructorAux()
     {
         throw std::invalid_argument("Pointer to tgBulletCompressionSpring is NULL.");
     }
-    /* Some check about direction
-    else if (m_config.restLength < 0.0)
+
+    // Direction cannot be null.
+    if( m_config.direction == NULL)
     {
-        throw std::invalid_argument("Rest length is less than zero..");
-    }*/
+      throw std::invalid_argument("Pointer to btVector3 direction is NULL, inside constructor aux for tgUnidirectionalCompressionSpringActuator.");
+    }
+
+    // Debugging
+    #if (0)
+    std::cout << "tgUnidirectionalCompressionSpringActuator constructor aux. Direction is:" << std::endl;
+    std::cout << "(" << m_config.direction->x() << ",";
+    std::cout << m_config.direction->y() << ",";
+    std::cout << m_config.direction->z() << ")" << std::endl;
+    #endif  
 }
 
 /**
@@ -105,10 +119,12 @@ tgUnidirectionalCompressionSpringActuator::tgUnidirectionalCompressionSpringActu
 
 tgUnidirectionalCompressionSpringActuator::~tgUnidirectionalCompressionSpringActuator()
 {
-    std::cout << "deleting compression spring within tgCompressionSpringActuator" << std::endl;
-    delete m_compressionSpring;
-    // This may not need to happen. Does ~tgCompressonSpringActuator get called
-    // automatically? ...
+    //Debugging
+    #if(0)
+    std::cout << "Destroying tgUnidirectionalCompressionSpringActuator" << std::endl;
+    std::cout << "This class does not delete m_compressionSpring." << std::endl;
+    #endif
+
 }
     
 void tgUnidirectionalCompressionSpringActuator::setup(tgWorld& world)
@@ -164,5 +180,6 @@ void tgUnidirectionalCompressionSpringActuator::onVisit(const tgModelVisitor& r)
 bool tgUnidirectionalCompressionSpringActuator::invariant() const
 {
     return
-      (m_compressionSpring != NULL);
+      (m_compressionSpring != NULL &&
+      m_config.direction != NULL);
 }

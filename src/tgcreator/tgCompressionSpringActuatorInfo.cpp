@@ -45,7 +45,6 @@ tgCompressionSpringActuatorInfo::tgCompressionSpringActuatorInfo(const tgCompres
 m_config(config),
 tgConnectorInfo(pair)
 {}
-    
 
 tgConnectorInfo* tgCompressionSpringActuatorInfo::createConnectorInfo(const tgPair& pair)
 {
@@ -81,8 +80,8 @@ tgBulletCompressionSpring* tgCompressionSpringActuatorInfo::createTgBulletCompre
 {
     std::cout << "tgCompressionSpringActuatorInfo::createTgBulletCompressionSpring()" << std::endl;
     
-    std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
-    std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
+    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
+    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
     
     // @todo: need to check somewhere that the rigid bodies have been set...
     btRigidBody* fromBody = getFromRigidBody();

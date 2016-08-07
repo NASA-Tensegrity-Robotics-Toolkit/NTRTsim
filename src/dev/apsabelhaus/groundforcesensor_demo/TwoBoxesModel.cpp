@@ -29,11 +29,13 @@
 // This library
 #include "core/tgCompressionSpringActuator.h"
 #include "core/tgUnidirectionalCompressionSpringActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -54,7 +56,7 @@ namespace
         bool isFreeEndAttached;
         double stiffness;
         double damping;
-        btVector3 direction;
+        btVector3 * direction;
         double boxLength;
         double boxWidth;
         double boxHeight;
@@ -62,14 +64,18 @@ namespace
         double rollFriction;
         double restitution;
         double springRestLength;
+        double pretension; // parameters for basic actuator
+        bool   hist;
+        double maxTens;
+        double targetVelocity;
     } c =
    {
      0.1,    // density (kg / length^3)
      0.31,     // radius (length)
-     false,   // isFreeEndAttached
+     true,   // isFreeEndAttached
      200.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
-     *(new btVector3(0, 1, 0) ),  // direction
+     new btVector3(0, 1, 0),  // direction
      3.0,   // boxLength (length)
      3.0,   // boxWidth (length)
      3.0,   // boxHeight (length)
@@ -77,6 +83,10 @@ namespace
      1.0,     // rollFriction (unitless)
      0.2,      // restitution (?)
      2.0,   // springRestLength (length)
+     600.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     0,			// History logging (boolean)
+     100000,   // maxTens
+     10000,    // targetVelocity
   };
 } // namespace
 
@@ -86,9 +96,25 @@ TwoBoxesModel::TwoBoxesModel() : tgModel()
 {
 }
 
-// Destructor: does nothing
+// Destructor MUST DELETE the btVector3 in the config struct.
+// Since the pointer is created here, it must also be deleted here, and not
+// in any of the classes in core.
 TwoBoxesModel::~TwoBoxesModel()
 {
+    #if (1)
+    std::cout << "TwoBoxesModel destructor." << std::endl;
+    if( c.direction != NULL )
+      {
+	std::cout << "Direction vector is not null, deleting it." << std::endl;
+	delete c.direction;
+	//c.direction = NULL;
+	std::cout << "c.direction has been deleted." << std::endl;
+      }
+    else
+      {
+	std::cout << "Direction vector is NULL, not deleting it." << std::endl;
+      }
+    #endif   
 }
 
 // a helper function to add a bunch of nodes
@@ -111,7 +137,8 @@ void TwoBoxesModel::addBoxes(tgStructure& s)
 void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
-  s.addPair(1, 2,  "compressionSpring");
+  //s.addPair(1, 2,  "compressionSpring");
+  s.addPair(1, 2,  "basicActuator");
 }
 
 // Finally, create the model!
@@ -123,12 +150,21 @@ void TwoBoxesModel::setup(tgWorld& world)
 
     // config struct for the compression spring
     //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
-    //				       c.stiffness, c.damping, c.springRestLength);
-    tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
-				       c.isFreeEndAttached,
-				       c.stiffness, c.damping, c.springRestLength,
-				       c.direction);
+    //  				       c.stiffness, c.damping, c.springRestLength);
+    //tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
+    //				       c.isFreeEndAttached,
+    //				       c.stiffness, c.damping, c.springRestLength,
+    //				       c.direction);
 
+    tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
+					 c.hist, c.maxTens, c.targetVelocity);
+
+    #if (0)
+    std::cout << "TwoBoxesModel::setup. Direction is: ";
+    std::cout << "(" << c.direction->x() << ",";
+    std::cout << c.direction->y() << ",";
+    std::cout << c.direction->z() << ")" << std::endl;
+    #endif    
     
     // Start creating the structure
     tgStructure s;
@@ -149,7 +185,8 @@ void TwoBoxesModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
     //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
-    spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     
     // Create your structureInfo
@@ -160,7 +197,8 @@ void TwoBoxesModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allActuators = tgCast::filter<tgModel, tgCompressionSpringActuator> (getDescendants());
+    //allActuators = tgCast::filter<tgModel, tgCompressionSpringActuator> (getDescendants());
+    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -189,7 +227,8 @@ void TwoBoxesModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-const std::vector<tgCompressionSpringActuator*>& TwoBoxesModel::getAllActuators() const
+//const std::vector<tgCompressionSpringActuator*>& TwoBoxesModel::getAllActuators() const
+const std::vector<tgBasicActuator*>& TwoBoxesModel::getAllActuators() const
 {
     return allActuators;
 }
