@@ -78,7 +78,7 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
      else
        {
  	updateTime += dt;
- 	if (updateTime >= 1.0/100)  //Speed of actuators
+ 	if (updateTime >= 1.0/100)  //Speed of actuators 
  	  {
  	    updateTime = 0.0;
 
@@ -88,7 +88,7 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
 
  	    // Bend & Unbend
  	    if(verticalRLA1 <= 2.0 && state == -1.0)  //min length of cable
- 	      {
+ 	      { 
  		state = 1.0;
  	      }
  	    else if (verticalRLA1 >= 4.0 && state == 1.0)  //stop at upright position
@@ -126,6 +126,12 @@ void VerticalSpineBendingController::onStep(VerticalSpineModel& subject, double 
              assert(pMuscleA != NULL);
              pMuscleA->setControlInput(verticalRLA1,dt);
            
+	     //(*(v_musclesA[i])).setControlInput(verticalRLA1,dt);
+  	     //(v_musclesA[i])->setControlInput(verticalRLA1, dt);
+                    //Need assert for NULL 
+
+
+
              //B   **Elongating Cable
              tgSpringCableActuator * const pMuscleB = v_musclesB[i];
              assert(pMuscleB != NULL);
