@@ -497,7 +497,7 @@ void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
         else if (builderClass == "tgKinematicContactCableInfo" || builderClass == "tgKinematicActuatorInfo") {
             addKinematicActuatorBuilder(builderClass, tagMatch, parameters, spec);
         }
-	if (builderClass == "tgBoxInfo") {
+	else if (builderClass == "tgBoxInfo") {
             addBoxBuilder(builderClass, tagMatch, parameters, spec);
         }
         // add more builders here if they use a different Config
