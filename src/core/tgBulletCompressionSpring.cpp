@@ -151,7 +151,7 @@ const double tgBulletCompressionSpring::getCurrentAnchorDistance() const
 const double tgBulletCompressionSpring::getCurrentSpringLength() const
 {
     // initialize to the default value.
-    // if the distance between the two anchors is larger
+    // If not attached, if the distance between the two anchors is larger
     // than the rest length of the spring, it means (intuitively) that
     // one end of the spring is not touching a rigid body.
     double springLength = getRestLength();
@@ -178,7 +178,7 @@ const double tgBulletCompressionSpring::getCurrentSpringLength() const
 /**
  * Returns the unit vector in the direction of this spring.
  */
-const btVector3 tgBulletCompressionSpring::getDirectionUnitVector() const
+const btVector3 tgBulletCompressionSpring::getAnchorDirectionUnitVector() const
 {
     // Get the unit vector for the direction of the force, this is needed for
     // applying the force to the rigid bodies.
@@ -190,7 +190,7 @@ const btVector3 tgBulletCompressionSpring::getDirectionUnitVector() const
     // of this calculation. Otherwise, a positive force brings them closer
     // together. Needs a minus.
     // note that dist.length is a scalar double.
-    const btVector3 unitVector = - dist / getCurrentSpringLength();
+    const btVector3 unitVector = - dist / dist.length();
     return unitVector;
 }
 
@@ -202,8 +202,9 @@ const btVector3 tgBulletCompressionSpring::getSpringEndpoint() const
 {
   // The spring endpoint will always be the sum of the beginning point
   // and the (spring length times the unit vector in the direction of the spring).
-  return anchor1->getWorldPosition() + 
-    getCurrentSpringLength() * getDirectionUnitVector();
+  // Unit vector is in opposite direction here.
+  return anchor1->getWorldPosition() - 
+    getCurrentSpringLength() * getAnchorDirectionUnitVector();
 }
 
 /**
@@ -290,7 +291,7 @@ void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
 
     // hold these variables so we don't have to call the accessor function twice.
     const double currLength = getCurrentSpringLength();
-    const btVector3 unitVector = getDirectionUnitVector();
+    const btVector3 unitVector = getAnchorDirectionUnitVector();
 
     // Calculate the damping force for this timestep.
     // Take an approximated derivative to estimate the velocity of the

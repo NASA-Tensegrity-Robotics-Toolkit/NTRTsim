@@ -95,7 +95,7 @@ public:
     /**
      * Return the unit vector in the direction of this spring
      */
-    virtual const btVector3 getDirectionUnitVector() const;
+    virtual const btVector3 getAnchorDirectionUnitVector() const;
 
     /**
      * Return the location of the free end of the spring.

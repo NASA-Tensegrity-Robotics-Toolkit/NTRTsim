@@ -97,8 +97,8 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    //const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
-    const std::vector<tgBasicActuator*>& getAllActuators() const;
+    const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
+    //const std::vector<tgBasicActuator*>& getAllActuators() const;
     
 private:
 	
@@ -130,8 +130,8 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    //std::vector<tgCompressionSpringActuator*> allActuators;
-    std::vector<tgBasicActuator*> allActuators;
+    std::vector<tgCompressionSpringActuator*> allActuators;
+    //std::vector<tgBasicActuator*> allActuators;
 };
 
 #endif  // TWO_BOXES_MODEL_H

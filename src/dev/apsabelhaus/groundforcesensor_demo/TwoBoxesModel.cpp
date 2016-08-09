@@ -72,8 +72,8 @@ namespace
    {
      0.1,    // density (kg / length^3)
      0.31,     // radius (length)
-     true,   // isFreeEndAttached
-     200.0,   // stiffness (kg / sec^2) was 1500
+     false,   // isFreeEndAttached
+     500.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
      new btVector3(0, 1, 0),  // direction
      3.0,   // boxLength (length)
@@ -82,7 +82,7 @@ namespace
      1.0,      // friction (unitless)
      1.0,     // rollFriction (unitless)
      0.2,      // restitution (?)
-     2.0,   // springRestLength (length)
+     4.0,   // springRestLength (length)
      600.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
@@ -137,8 +137,8 @@ void TwoBoxesModel::addBoxes(tgStructure& s)
 void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
-  //s.addPair(1, 2,  "compressionSpring");
-  s.addPair(1, 2,  "basicActuator");
+  s.addPair(1, 2,  "compressionSpring");
+  //s.addPair(1, 2,  "basicActuator");
 }
 
 // Finally, create the model!
@@ -149,8 +149,8 @@ void TwoBoxesModel::setup(tgWorld& world)
 				  c.friction, c.rollFriction, c.restitution);
 
     // config struct for the compression spring
-    //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
-    //  				       c.stiffness, c.damping, c.springRestLength);
+    tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
+      				       c.stiffness, c.damping, c.springRestLength);
     //tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
     //				       c.isFreeEndAttached,
     //				       c.stiffness, c.damping, c.springRestLength,
@@ -184,7 +184,7 @@ void TwoBoxesModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
-    //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
+    spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
     //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
     spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
@@ -197,8 +197,8 @@ void TwoBoxesModel::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    //allActuators = tgCast::filter<tgModel, tgCompressionSpringActuator> (getDescendants());
-    allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
+    allActuators = tgCast::filter<tgModel, tgCompressionSpringActuator> (getDescendants());
+    //allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -227,8 +227,8 @@ void TwoBoxesModel::onVisit(tgModelVisitor& r)
     tgModel::onVisit(r);
 }
 
-//const std::vector<tgCompressionSpringActuator*>& TwoBoxesModel::getAllActuators() const
-const std::vector<tgBasicActuator*>& TwoBoxesModel::getAllActuators() const
+const std::vector<tgCompressionSpringActuator*>& TwoBoxesModel::getAllActuators() const
+//const std::vector<tgBasicActuator*>& TwoBoxesModel::getAllActuators() const
 {
     return allActuators;
 }

@@ -100,6 +100,13 @@ public:
     virtual void step(double dt);
 
     /**
+     * Returns the distance between anchors along the vector m_direction.
+     * This function just calculates the dot product between m_direction and
+     * getCurrentAnchorDistance from the parent class.
+     */
+    virtual const double getCurrentAnchorDistanceAlongDirection() const;
+    
+    /**
      * Returns either restLength or the length of the spring along the 
      * single direction, depending on isFreeEndAttached.
      */

@@ -96,6 +96,20 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
 }
 
 /**
+ * Dot getCurrentAnchorDistance with m_direction.
+ */
+virtual const double getCurrentAnchorDistanceAlongDirection() const
+{
+  // btVector3 between the two anchors
+  const btVector3 dist =
+    anchor2->getWorldPosition() - anchor1->getWorldPosition();
+
+  // Dot it with the direction of this spring, should return a double.
+  double currAnchDistAlongDir = dist * m_direction;
+  return currAnchDistAlongDir;
+}
+
+/**
  * Returns the current length of the spring. If isFreeEndAttached,
  * this can be either greater or less than m_restLength. If not, then spring
  * can only exist in compression (less than m_restLength).
@@ -178,16 +192,7 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
     const double currLength = getCurrentSpringLength();
 
     // Get the unit vector for the direction of the force, this is needed for
-    // applying the force to the rigid bodies.
-    const btVector3 dist =
-	  anchor2->getWorldPosition() - anchor1->getWorldPosition();
-    // The unit vector of the direction of the force will be needed later
-    // In order to have a positive force move the two rigid bodies away
-    // from each other, this unit vector must be in the opposite direction
-    // of this calculation. Otherwise, a positive force brings them closer
-    // together. Needs a minus.
-    // note that dist.length is a scalar double.
-    const btVector3 unitVector = - dist / currLength;
+    const btVector3 unitVector = getAnchorDirectionUnitVector();
 
     // Calculate the damping force for this timestep.
     // Take an approximated derivative to estimate the velocity of the
