@@ -32,8 +32,8 @@ bond_groups:
       - [back, front]
       - [back, left]  
 
-  rod:
-     t1/hips/node_node:
+  rod: 
+   t1/hips/node_node:
       - [front, V2]
       - [front, V3]
       - [left, V1]
@@ -43,26 +43,25 @@ bond_groups:
       - [back, V5]
       - [back, V8]
 
-     t6/front/node_node: 
+   t6/front/node_node: 
       - [front, V11]
       - [front, V12]
       - [back, V5]
       - [back, V6]
-     
-     hips/backlegsleft/node_node:
+   
+   hips/backlegsleft/node_node:
       - [V15, V6]
       - [V19, V7]
 
-     hips/backlegsright/node_node:
+   hips/backlegsright/node_node:
       - [V16, V6]
       - [V20, V7]
-    
-     front/frontlegsleft/node_node:
+ 
+   front/frontlegsleft/node_node:
       - [V19, V7]
       - [V15, V6]
-      
-
-     front/frontlegsright/node_node:  
+  
+   front/frontlegsright/node_node:  
       - [V20, V7]
       - [V18, V6]
 

@@ -23,7 +23,6 @@
  * @file TensegrityModelController.h
  * @brief Contains the definition of class TensegrityModelController.
  * @author Drew Sabelhaus, Lara Janse van Vuuren
- * @version 1.0.0
  * $Id$
  */
 
@@ -32,7 +31,7 @@
 #include "core/tgSubject.h"
 
 // the data collection class
-#include "sensors/tgDataObserver.h"
+//#include "sensors/tgDataObserver.h"
 #include <string>
 
 // Forward declarations
@@ -44,7 +43,7 @@ class TensegrityModel;
  * tightening up the structure and keeping it held together without
  * further control input.
  */
-class TensegrityModelController : public tgObserver<TensegrityModel>, public tgSubject <TensegrityModelController>
+class TensegrityModelController : public tgObserver<TensegrityModel>, public tgSubject<TensegrityModelController>
 {
 public:
 	
@@ -86,17 +85,7 @@ private:
    * in the constructor.
    */
     
-   double horizontalRLA1;
-   double horizontalRLA2;
-   double horizontalRLA3;
-   double horizontalRLA4;
-   double horizontalRLB1;
-   double horizontalRLB2;
-   double horizontalRLB3;
-   double horizontalRLB4;
-   double dL;
-   double state;
-   double updateTime;
+ 
 
   // For data logging. TO-DO: implement this fully.
   //tgDataObserver m_dataObserver;
