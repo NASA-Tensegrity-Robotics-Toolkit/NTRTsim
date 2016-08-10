@@ -217,7 +217,32 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 }
 
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
-    Yam root = YAML::LoadFile(structurePath);
+    /** 
+     * This call to YAML::LoadFile can return the exception YAML::BadFile 
+     * if any of the substructures cannot be found. 
+     * Make this error more explicit through a try and catch.
+     */
+    Yam root;
+    try
+    {
+      root = YAML::LoadFile(structurePath);
+    }
+    catch( YAML::BadFile badfileexception )
+    {
+      // If a BadFile exception is thrown, output a detailed message first:
+      std::cout << std::endl << "The YAML parser threw a BadFile exception when" <<
+	" trying to load one of your substructure YAML files. " <<
+	" This likely means that one of the substructure files cannot be found." <<
+	" Check if you are using relative paths for your substructures," <<
+	" which would mean that you need to change into a specific directory" <<
+	" when running this parser. " <<
+	" For example, writing 'path: ./Tetrahedron.yaml' assumes that the" <<
+	" Tetrahedron.yaml file is in your current directory. " <<
+	" In this example, change to the directory that contains Tetrahedron.yaml" <<
+	" and try to run your application again." << std::endl << std::endl;
+      // Then, throw the exception again, so that the program stops.
+      throw badfileexception;
+    }
     // Validate YAML
     std::string rootKeys[] = {"nodes", "pair_groups", "builders", "substructures", "bond_groups"};
     std::vector<std::string> rootKeysVector(rootKeys, rootKeys + sizeof(rootKeys) / sizeof(std::string));
