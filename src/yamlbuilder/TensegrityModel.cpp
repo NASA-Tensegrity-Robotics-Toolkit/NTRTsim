@@ -46,6 +46,26 @@ TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
 
 TensegrityModel::~TensegrityModel() {}
 
+/**
+ * Debugging function. Outputs the tgStructure, tgStructureInfo, and tgModel,
+ * as created by this class.
+ */
+void TensegrityModel::trace(const tgStructure& structure,
+			    const tgStructureInfo& structureInfo, tgModel& model)
+{
+    std::cout << std::endl << "Structure Trace inside TensegrityModel:" << std::endl
+    << structure        << std::endl 
+    << std::endl << "StructureInfo Trace inside TensegrityModel:" << std::endl
+    << structureInfo    << std::endl
+    << std::endl << "tgModel Trace inside Tensegrity Model: " << std::endl
+    << model            << std::endl;
+}
+
+/**
+ * The setup function is what's called from outside this class.
+ * It is responsible for creating all the parts of this tgModel and
+ * calling the tgStructureInfo to build the structure into the world.
+ */
 void TensegrityModel::setup(tgWorld& world) {
     // create the build spec that uses tags to turn the structure into a model
     tgBuildSpec spec;
@@ -65,6 +85,11 @@ void TensegrityModel::setup(tgWorld& world) {
 
     // use tgCast::filterto pull out the muscles that we want to control
     allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+
+    // DEBUGGING: print out the tgStructure, tgStructureInfo, and tgModel.
+    #if(1)
+        trace(structure, structureInfo, *this);
+    #endif
 
     // notify controllers that setup has finished
     notifySetup();

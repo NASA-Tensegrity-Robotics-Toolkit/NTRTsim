@@ -45,6 +45,7 @@
 class tgSpringCableActuator;
 class tgModelVisitor;
 class tgWorld;
+class tgStructureInfo;
 
 typedef YAML::Node Yam; // to avoid confusion with structure nodes
 
@@ -374,6 +375,12 @@ private:
      * Ensures that YAML has all unique keys within each map
      */
     void yamlNoDuplicates(const Yam& yam, const std::string structurePath);
+
+    /**
+     * Output debugging information for this model and structure.
+     */
+    void trace(const tgStructure& structure,
+		      const tgStructureInfo& structureInfo, tgModel& model);
 
 };
 
