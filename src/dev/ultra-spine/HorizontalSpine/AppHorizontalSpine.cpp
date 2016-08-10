@@ -26,7 +26,7 @@
 
 // This application
 #include "../../../yamlbuilder/TensegrityModel.h"
-//#include "../../../yamlbuilder/TensegrityModelController.h"
+#include "../../../yamlbuilder/TensegrityModelController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -69,8 +69,8 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
-    //TensegrityModelController* const controller = new TensegrityModelController();
-    //myModel->attach(controller);
+    TensegrityModelController* const controller = new TensegrityModelController();
+    myModel->attach(controller);
 
     // Add the model to the world
     simulation.addModel(myModel);

@@ -38,7 +38,6 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
-
 #include "helpers/FileHelpers.h"
 
 //Constructor does nothing at the moment
@@ -50,6 +49,19 @@ TensegrityModelController::TensegrityModelController()
 void TensegrityModelController::onSetup(TensegrityModel& subject)
 {
 	std::cout << "Setting up the tensegrity model controller" << std::endl;
+	//Tags from entire structure
+        const tgTags AllTags = subject.getTags(); 
+	//Get array of strings
+	const std::deque<std::string>& AllTagStringsArray = AllTags.getTags();
+ 	//Iterate through array and output strings to command line
+	for (std::size_t i = 0; i < AllTagStringsArray.size(); i ++) 
+	{	
+		std::cout << AllTagStringsArray[i] << std::endl;
+	}   
+   	std::cout << "Finished outputting tags" << std::endl;    
+	//Outputting entire model
+	std::cout << "Contents of model: " << std::endl;
+	std::cout << subject << std::endl;
 }
 
 void TensegrityModelController::onStep(TensegrityModel& subject, double dt)
