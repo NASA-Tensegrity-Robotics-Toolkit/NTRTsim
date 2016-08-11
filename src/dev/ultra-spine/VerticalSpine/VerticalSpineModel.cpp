@@ -151,6 +151,22 @@ void VerticalSpineModel::trace(const tgStructureInfo& structureInfo, tgModel& mo
     << model            << std::endl;
 }
 
+/**
+ * Debugging function. Outputs the tgStructure, tgStructureInfo, and tgModel,
+ * as created by this class.
+ */
+void VerticalSpineModel::trace(const tgStructure& structure,
+			    const tgStructureInfo& structureInfo, tgModel& model)
+{
+    std::cout << std::endl << "Structure Trace inside VerticalSpineModel:" << std::endl
+    << structure        << std::endl 
+    << std::endl << "StructureInfo Trace inside VerticalSpineModel:" << std::endl
+    << structureInfo    << std::endl
+    << std::endl << "tgModel Trace inside VerticalSpineModel: " << std::endl
+    << model            << std::endl;
+}
+
+
 void VerticalSpineModel::addNodes(tgStructure& vertebra, ConfigVertebra& conf_vertebra)
 {
     // right
@@ -382,9 +398,10 @@ void VerticalSpineModel::setup(tgWorld& world)
     tgStructureInfo structureInfo(spine, spec);
 
     // Debugging: print out the tgStructure of the spine and its children
-    std::cout << spine << std::endl;
-    trace(structureInfo, *this);
-
+    //std::cout << spine << std::endl;
+    //trace(structureInfo, *this);
+    trace(spine, structureInfo, *this);
+    
     // Use the structureInfo to build this model
     structureInfo.buildInto(*this, world);
 

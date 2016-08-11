@@ -46,6 +46,13 @@
  */
 int main(int argc, char** argv)
 {
+    // For this YAML parser app, need to check that an argument path was
+    // passed in.
+    if (argv[1] == NULL)
+    {
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+    }
+  
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;

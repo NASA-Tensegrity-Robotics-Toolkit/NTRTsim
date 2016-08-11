@@ -50,6 +50,10 @@ void VerticalSpinePassiveController::onSetup(VerticalSpineModel& subject){
   // Since this class only updates the logs every so often (according to
   // m_updateTime), need to track a counter of time between steps.
   updateTime = 0.0;
+
+  // Debugging: what does this model look like?
+  //std::cout << "This VerticalSpineModel has the following contents:" << std::endl;
+  //std::cout << subject << std::endl;
 }
 
 void VerticalSpinePassiveController::onStep(VerticalSpineModel& subject, double dt)

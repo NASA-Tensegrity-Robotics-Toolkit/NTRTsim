@@ -1,6 +1,6 @@
 # Units are currently in cm
 
-nodes:    # Look for shoulder.png for a pictoral reference of each node
+nodes:    
   V1: [0, 0, 0]   
   V2: [0, 10, 0]
   V3: [25, 10, 0]
@@ -13,6 +13,15 @@ nodes:    # Look for shoulder.png for a pictoral reference of each node
   V10: [0, 0, 3] 
   V11: [7.5, 0, 10]
   V12: [17, 0, 10]
+  V13: [0, 5.5, 3]
+  V14: [25, 5.5, 3]
+  V15: [-4, 5.5, 3] 
+  V16: [-4, 10, 0]
+  V17: [29, 10, 0]
+  V18: [29, 5.5, 3]
+  V19: [-4, 0, 0]
+  V20: [29, 0, 0]
+
 pair_groups:
   rod:
     - [V1, V2]
@@ -33,6 +42,16 @@ pair_groups:
     - [V9, V10]
     - [V10, V11]
     - [V11, V12]
+    - [V2, V13]
+    - [V1, V13]
+    - [V4, V14]
+    - [V3, V14]
+    - [V13, V15]
+    - [V2, V16]
+    - [V3, V17]
+    - [V13, V18]
+    - [V1, V19]
+    - [V4, V20]
 
 builders:
   rod:

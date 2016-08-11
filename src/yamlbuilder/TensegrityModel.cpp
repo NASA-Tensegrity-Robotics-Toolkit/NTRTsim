@@ -46,6 +46,26 @@ TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
 
 TensegrityModel::~TensegrityModel() {}
 
+/**
+ * Debugging function. Outputs the tgStructure, tgStructureInfo, and tgModel,
+ * as created by this class.
+ */
+void TensegrityModel::trace(const tgStructure& structure,
+			    const tgStructureInfo& structureInfo, tgModel& model)
+{
+    std::cout << std::endl << "Structure Trace inside TensegrityModel:" << std::endl
+    << structure        << std::endl 
+    << std::endl << "StructureInfo Trace inside TensegrityModel:" << std::endl
+    << structureInfo    << std::endl
+    << std::endl << "tgModel Trace inside Tensegrity Model: " << std::endl
+    << model            << std::endl;
+}
+
+/**
+ * The setup function is what's called from outside this class.
+ * It is responsible for creating all the parts of this tgModel and
+ * calling the tgStructureInfo to build the structure into the world.
+ */
 void TensegrityModel::setup(tgWorld& world) {
     // create the build spec that uses tags to turn the structure into a model
     tgBuildSpec spec;
@@ -65,6 +85,11 @@ void TensegrityModel::setup(tgWorld& world) {
 
     // use tgCast::filterto pull out the muscles that we want to control
     allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+
+    // DEBUGGING: print out the tgStructure, tgStructureInfo, and tgModel.
+    #if(1)
+        trace(structure, structureInfo, *this);
+    #endif
 
     // notify controllers that setup has finished
     notifySetup();
@@ -192,7 +217,38 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 }
 
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
-    Yam root = YAML::LoadFile(structurePath);
+    /** 
+     * This call to YAML::LoadFile can return the exception YAML::BadFile 
+     * if any of the substructures cannot be found. 
+     * Make this error more explicit through a try and catch.
+     */
+    Yam root;
+    try
+    {
+      root = YAML::LoadFile(structurePath);
+    }
+    catch( YAML::BadFile badfileexception )
+    {
+      // If a BadFile exception is thrown, output a detailed message first:
+      std::cout << std::endl << "The YAML parser threw a BadFile exception when" <<
+	" trying to load one of your substructure YAML files. " << std::endl <<
+	"The path of the structure that the parser attempted to load is: '" <<
+	structurePath << "'. " << "Check to be sure that the file exists, and " <<
+	"that it is a proper YAML file according to the specification." <<
+	std::endl << std::endl;
+
+	/*" This likely means that one of the substructure files cannot be found." <<
+	" Check if you are using relative paths for your substructures," <<
+	" which would mean that you need to change into a specific directory" <<
+	" when running this parser. " <<
+	" For example, writing 'path: ./Tetrahedron.yaml' assumes that the" <<
+	" Tetrahedron.yaml file is in your current directory. " <<
+	" In this example, change to the directory that contains Tetrahedron.yaml" <<
+	" and try to run your application again." << std::endl << std::endl;*/
+	
+      // Then, throw the exception again, so that the program stops.
+      throw badfileexception;
+    }
     // Validate YAML
     std::string rootKeys[] = {"nodes", "pair_groups", "builders", "substructures", "bond_groups"};
     std::vector<std::string> rootKeysVector(rootKeys, rootKeys + sizeof(rootKeys) / sizeof(std::string));
@@ -497,7 +553,7 @@ void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
         else if (builderClass == "tgKinematicContactCableInfo" || builderClass == "tgKinematicActuatorInfo") {
             addKinematicActuatorBuilder(builderClass, tagMatch, parameters, spec);
         }
-	if (builderClass == "tgBoxInfo") {
+	else if (builderClass == "tgBoxInfo") {
             addBoxBuilder(builderClass, tagMatch, parameters, spec);
         }
         // add more builders here if they use a different Config
