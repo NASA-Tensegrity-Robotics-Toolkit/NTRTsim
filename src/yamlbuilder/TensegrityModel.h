@@ -165,6 +165,14 @@ public:
      * Default string rotation.
      */
     const static double stringRotation = 0;
+    /*
+     * Default flags for automatic movement of cable anchor points.
+     * See the config struct in tgBasicActuator.h for more information.
+     * NTRTsim defaults to moving cable anchor points to the edges of
+     * a rigid body.
+     */
+    const static bool stringMoveCablePointAToEdge = true;
+    const static bool stringMoveCablePointBToEdge = true;
 
     /*
      * YAML-encoded structure path.

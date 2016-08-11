@@ -649,32 +649,75 @@ void TensegrityModel::addRodBuilder(const std::string& builderClass, const std::
 }
 
 void TensegrityModel::addBasicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec) {
-    // basicActuatorParameters
-    std::map<std::string, double> bap;
-    bap["stiffness"] = stringStiffness;
-    bap["damping"] = stringDamping;
-    bap["pretension"] = stringPretension;
-    bap["history"] = stringHistory;
-    bap["max_tension"] = stringMaxTension;
-    bap["target_velocity"] = stringTargetVelocity;
-    bap["min_actual_length"] = stringMinActualLength;
-    bap["min_rest_length"] = stringMinRestLength;
-    bap["rotation"] = stringRotation;
+    // tgbBasicActuator parameters.
+    // This method assigns default values based on TensegrityModel.h,
+    // then overwrites them if a parameter is specified in the YAML file.
+    // See tgBasicActuator.h for a description of each parameter.
+    // Since tgBasicActuator has both double and boolean config parameters,
+    // store two lists of parameters based on type.
+    // We use the abbreviation "bap" as basic actuator parameters.
+    std::map<std::string, double> bap_doubles;
+    std::map<std::string, bool> bap_booleans;
+    bap_doubles["stiffness"] = stringStiffness;
+    bap_doubles["damping"] = stringDamping;
+    bap_doubles["pretension"] = stringPretension;
+    bap_doubles["history"] = stringHistory;
+    bap_doubles["max_tension"] = stringMaxTension;
+    bap_doubles["target_velocity"] = stringTargetVelocity;
+    bap_doubles["min_actual_length"] = stringMinActualLength;
+    bap_doubles["min_rest_length"] = stringMinRestLength;
+    bap_doubles["rotation"] = stringRotation;
+    bap_booleans["moveCablePointAToEdge"] = stringMoveCablePointAToEdge;
+    bap_booleans["moveCablePointBToEdge"] = stringMoveCablePointBToEdge;
 
+    // If no parameters are passed in, do not change anything.
     if (parameters) {
+        // Iterate through all the parameters passed in for this builder.
         for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
-            std::string parameterName = parameter->first.as<std::string>();
-            if (bap.find(parameterName) == bap.end()) {
-                throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+	    // The key for both maps is a string.
+	    std::string parameterName = parameter->first.as<std::string>();
+	    // However, the value may be either a double or a boolean. Check both
+	    // lists, and mark a flag depending on the output.
+	    bool paramIsDouble = true;
+	    // Check the doubles first:
+            if( bap_doubles.find(parameterName) == bap_doubles.end()) {
+	        // The parameter is not a double, since it's not in the doubles map.
+  	        paramIsDouble = false;
+	        // Then, check to see if the parameter is in the booleans map.
+		if( bap_booleans.find(parameterName) == bap_booleans.end()) {
+		  // The parameter is in neither list, throw an exception.
+		  throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+		}
             }
-            // if defined overwrite default parameter value
-            bap[parameterName] = parameter->second.as<double>();
+            // if defined, overwrite default parameter value to the appropriate map.
+	    if( paramIsDouble ) {
+	      // change the value in the doubles list
+	      bap_doubles[parameterName] = parameter->second.as<double>();
+	    }
+	    else {
+	      // the value is in the booleans list.
+	      bap_booleans[parameterName] = parameter->second.as<bool>();
+	    }
         }
     }
 
-    const tgBasicActuator::Config basicActuatorConfig = tgBasicActuator::Config(bap["stiffness"],
-        bap["damping"], bap["pretension"], bap["history"], bap["max_tension"], bap["target_velocity"],
-        bap["min_actual_length"], bap["min_rest_length"], bap["rotation"]);
+    // Create the config struct.
+    // Note that this calls the constructor for Config, so the parameters
+    // are passed in according to order not name.
+    // @TO-DO: instead, create a Config with nothing passed in, and then change
+    // parameters if defined. That way, no defaults would need to be defined
+    // in TensegrityModel.h. Currently, defaults are defined in BOTH the
+    // actual config struct definition as well as in this .h file.
+    const tgBasicActuator::Config basicActuatorConfig =
+      tgBasicActuator::Config(bap_doubles["stiffness"], bap_doubles["damping"],
+			      bap_doubles["pretension"], bap_doubles["history"],
+			      bap_doubles["max_tension"],
+			      bap_doubles["target_velocity"],
+			      bap_doubles["min_actual_length"],
+			      bap_doubles["min_rest_length"],
+			      bap_doubles["rotation"],
+			      bap_booleans["moveCablePointAToEdge"],
+			      bap_booleans["moveCablePointBToEdge"]);
     if (builderClass == "tgBasicActuatorInfo") {
         // tgBuildSpec takes ownership of the tgBasicActuatorInfo object
         spec.addBuilder(tagMatch, new tgBasicActuatorInfo(basicActuatorConfig));
