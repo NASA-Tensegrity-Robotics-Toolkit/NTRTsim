@@ -65,6 +65,8 @@ namespace
         bool   hist;
         double maxTens;
         double targetVelocity;
+        bool moveCablePointAToEdge;
+        bool moveCablePointBToEdge;
     } c =
    {
      0.688,    // density (kg / length^3)
@@ -79,6 +81,8 @@ namespace
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
+     false,    // moveCablePointAToEdge
+     false,     // moveCablePointBToEdge
 
      // Use the below values for earlier versions of simulation.
      // 1.006,    
@@ -126,15 +130,63 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
 				c.rollFriction, c.restitution);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
-    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
-					    c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
+					 c.hist, c.maxTens, c.targetVelocity);
+    // Since the boolean flags for moving the anchor attachment points
+    // are not next in line in the Config constructor, assign them explicitly
+    // after the config struct has been constructed:
+    muscleConfig.moveCablePointAToEdge = c.moveCablePointAToEdge;
+    muscleConfig.moveCablePointBToEdge = c.moveCablePointBToEdge;
             
     // Start creating the structure
     tgStructure s;
     addNodes(s);
+
+    /*
+    // DEBUGGING
+    // Check: did the nodes move?
+    std::cout << "Nodes in the structure after addNodes: " <<
+      s.getNodes() << std::endl;
+    */
+    
     addRods(s);
     addActuators(s);
+
+    /*
+    // DEBUGGING
+    // Check: did the nodes move?
+    std::cout << "Nodes in the structure after addPairs: " <<
+      s.getNodes() << std::endl;
+    // Check: did the pairs move?
+    std::cout << "Pairs in the structure after addPairs: " << std::endl;
+    // need to iterate through the std::vector of tgPair objects
+    std::vector<tgPair> pairsAfterAdd = s.getPairs().getPairs();
+    for( size_t i = 0; i < pairsAfterAdd.size(); i++ ) {
+      // Print the pair.
+      std::cout << pairsAfterAdd[i] << ", from and to: " <<
+	pairsAfterAdd[i].getFrom() << " , " << pairsAfterAdd[i].getTo() << std::endl;
+    }
+    */
+
+    // Move the whole structure up a bit.
     s.move(btVector3(0, 5, 0));
+
+    /*
+    // DEBUGGING
+    // Check: did the nodes move?
+    std::cout << "Nodes in the structure after move: " <<
+      s.getNodes() << std::endl;
+    // Check: did the pairs move?
+    std::cout << "Pairs in the structure after move: " << std::endl;
+    // need to iterate through the std::vector of tgPair objects
+    std::vector<tgPair> pairsAfterMove = s.getPairs().getPairs();
+    for( size_t i = 0; i < pairsAfterMove.size(); i++ ) {
+      // Print the pair.
+      std::cout << pairsAfterMove[i] << ", from and to: " <<
+	pairsAfterMove[i].getFrom() << " , " << pairsAfterMove[i].getTo() <<
+	std::endl;
+    }
+    */
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.

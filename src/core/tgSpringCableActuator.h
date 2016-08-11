@@ -64,7 +64,9 @@ public:
         double tVel = 100.0,
         double mnAL = 0.1,
         double mnRL = 0.1,
-        double rot = 0);
+	double rot = 0,
+	bool moveCPA = true,
+	bool moveCPB = true);
       
       /**
        * Scale parameters that depend on the length of the simulation.
@@ -148,7 +150,32 @@ public:
        * Units are radians.
        * @todo Is this meaningful for non-rod shapes?
        */
-      double rotation;  
+      double rotation;
+
+      /**
+       * Control the automatic re-locating of cable anchor points.
+       * 
+       * When true, the default behavior, the specified attachment point
+       * of a cable is moved from the actual node location (for example, at the
+       * center of the circle at the end of a rod) to a location at the edge
+       * of the rigid body it's attached to (for example, on the edge of the
+       * circle at the end of a rod.) 
+       * 
+       * If unsure, leave default, because when set to 'false', the cable will
+       * likely clip through the rod.
+       * Disabling automatic movement of anchor points is most useful for
+       * structures that need very particular cable placement.
+       * Here, cable attachment point "A" corresponds to the first of the two
+       * anchors of the spring-cable, or the "From" point in the tgcreator files.
+       * The "B" point corresponds to the second anchor location, or the "To" point
+       * in the tgcreator files.
+       * 
+       * These parameters are used in the createTgBulletSpringCable method inside
+       * the tgBasicActuatorInfo class.
+       */
+      bool moveCablePointAToEdge;
+      bool moveCablePointBToEdge;
+      
     };
     
     /** Encapsulate the history members. */
