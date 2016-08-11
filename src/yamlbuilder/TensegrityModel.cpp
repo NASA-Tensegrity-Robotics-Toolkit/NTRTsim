@@ -304,6 +304,13 @@ void TensegrityModel::addBonds(tgStructure& structure, const std::string& bonds,
         structureCombos = structureCombos.substr(structureCombos.find("/") + 1);
         std::string childStructure2Name = structureCombos.substr(0, structureCombos.find("/"));
         if (bondType == "node_node") {
+
+	  // Debugging
+            #if(1)
+	       std::cout << "Adding node_node bonds " << tags << " between structures " <<
+	         childStructure1Name << " and " << childStructure2Name << std::endl;
+	    #endif
+	       
             addNodeNodePairs(structure, tags, pairs, &childStructure1Name, &childStructure2Name);
         }
         else if (bondType == "node_edge") {
@@ -332,6 +339,13 @@ void TensegrityModel::addNodeNodePairs(tgStructure& structure, const std::string
             node1 = &getNode(structure, node1Path);
             node2 = &getNode(structure, node2Path);
         }
+
+	// Debugging
+        #if(1)
+	  std::cout << "Adding node_node pair " << tags << " between structures "
+	    << childStructure1Name << " and " << childStructure2Name
+	    << " for nodes " << *node1 << *node2 << std::endl;
+        #endif
         structure.addPair(*node1, *node2, tags);
     }
 }
