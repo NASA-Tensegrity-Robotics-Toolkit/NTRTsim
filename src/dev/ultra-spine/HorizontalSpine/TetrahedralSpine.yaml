@@ -21,15 +21,29 @@ substructures:
     translation: [-17, 0, -30]
 
 bond_groups:
-  string1: 
+  HF:
    t1/t2/t3/t4/t5/t6/node_node:
-      - [front, front]
-      - [right, right]
-      - [back, back]
-      - [left, left]
-      - [right, front]
-      - [right, left]
-      - [back, front]
+     - [front, front]
+  HR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, right]      
+  HL: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, left]
+  HB:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [back, back]
+  SFR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, front] 
+  SRL:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [right, left]
+  SBF: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [back, front]
+  SBL: 
+   t1/t2/t3/t4/t5/t6/node_node: 
       - [back, left]  
 
   rod: 
@@ -72,7 +86,7 @@ builders:
       density: 0.014
       radius: 0.5
 
-  string1:
+  HR:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
@@ -82,10 +96,69 @@ builders:
       max_tension: 7000.0
       target_velocity: 12.0
 
-  string2:
+  HF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
       damping: 10.0
       pretension: 0.0
       history: 1
