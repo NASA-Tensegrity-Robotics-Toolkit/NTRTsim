@@ -236,16 +236,6 @@ void TensegrityModel::buildStructure(tgStructure& structure, const std::string& 
 	structurePath << "'. " << "Check to be sure that the file exists, and " <<
 	"that it is a proper YAML file according to the specification." <<
 	std::endl << std::endl;
-
-	/*" This likely means that one of the substructure files cannot be found." <<
-	" Check if you are using relative paths for your substructures," <<
-	" which would mean that you need to change into a specific directory" <<
-	" when running this parser. " <<
-	" For example, writing 'path: ./Tetrahedron.yaml' assumes that the" <<
-	" Tetrahedron.yaml file is in your current directory. " <<
-	" In this example, change to the directory that contains Tetrahedron.yaml" <<
-	" and try to run your application again." << std::endl << std::endl;*/
-	
       // Then, throw the exception again, so that the program stops.
       throw badfileexception;
     }
