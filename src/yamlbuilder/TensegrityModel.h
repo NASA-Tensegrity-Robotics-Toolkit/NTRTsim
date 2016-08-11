@@ -172,10 +172,25 @@ public:
     std::string topLvlStructurePath;
 
     /**
-     * The only constructor.
+     * Boolean flag that enables or disables debugging.
+     * All places this flag works in TensegrityModel.cpp can be found
+     * by searching through that file for the string "DEBUGGING".
+     */
+    bool debugging_on = false;
+
+    /**
+     * The simplest constructor.
+     * This constructor sets debugging_on = false.
      * @param[in] structurePath the path of the YAML-encoded structure
      */
     TensegrityModel(const std::string& structurePath);
+
+    /**
+     * Constructor that takes 'debugging' as a parameter.
+     * @param[in] structurePath the path of the YAML-encoded structure
+     * @param[in] debugging the flag that controls debugging output on/off.
+     */
+    TensegrityModel(const std::string& structurePath, bool debugging);
 
     /**
      * Destructor. Deletes controllers, if any were added during setup.

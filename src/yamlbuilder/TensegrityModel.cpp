@@ -40,8 +40,22 @@
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructureInfo.h"
 
+/**
+ * Constructor that only takes the path to the YAML file.
+ */
 TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
     topLvlStructurePath = structurePath;
+}
+
+/**
+ * Constructor that includes the debugging flag.
+ */
+TensegrityModel::TensegrityModel(const std::string& structurePath,
+				 bool debugging) : tgModel() {
+    topLvlStructurePath = structurePath;
+    // All places in this file controlled by 'debugging_on' are labelled
+    // with comments with the string DEBUGGING.
+    debugging_on = debugging;
 }
 
 TensegrityModel::~TensegrityModel() {}
@@ -87,9 +101,9 @@ void TensegrityModel::setup(tgWorld& world) {
     allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
 
     // DEBUGGING: print out the tgStructure, tgStructureInfo, and tgModel.
-    #if(1)
+    if(debugging_on) {
         trace(structure, structureInfo, *this);
-    #endif
+    }
 
     // notify controllers that setup has finished
     notifySetup();
@@ -236,16 +250,6 @@ void TensegrityModel::buildStructure(tgStructure& structure, const std::string& 
 	structurePath << "'. " << "Check to be sure that the file exists, and " <<
 	"that it is a proper YAML file according to the specification." <<
 	std::endl << std::endl;
-
-	/*" This likely means that one of the substructure files cannot be found." <<
-	" Check if you are using relative paths for your substructures," <<
-	" which would mean that you need to change into a specific directory" <<
-	" when running this parser. " <<
-	" For example, writing 'path: ./Tetrahedron.yaml' assumes that the" <<
-	" Tetrahedron.yaml file is in your current directory. " <<
-	" In this example, change to the directory that contains Tetrahedron.yaml" <<
-	" and try to run your application again." << std::endl << std::endl;*/
-	
       // Then, throw the exception again, so that the program stops.
       throw badfileexception;
     }
@@ -335,14 +339,15 @@ void TensegrityModel::addBonds(tgStructure& structure, const std::string& bonds,
         structureCombos = structureCombos.substr(structureCombos.find("/") + 1);
         std::string childStructure2Name = structureCombos.substr(0, structureCombos.find("/"));
         if (bondType == "node_node") {
-
-	  // Debugging
-            #if(1)
-	       std::cout << "Adding node_node bonds " << tags << " between structures " <<
-	         childStructure1Name << " and " << childStructure2Name << std::endl;
-	    #endif
-	       
-            addNodeNodePairs(structure, tags, pairs, &childStructure1Name, &childStructure2Name);
+	  // DEBUGGING: output the bonds that are about to be created.
+	  if(debugging_on) {
+	      std::cout << "Adding node_node bonds " << tags <<
+		" between structures " << childStructure1Name <<
+		" and " << childStructure2Name << std::endl;
+	  }
+	  // Add the node_node pairs, regardless of debugging
+	  addNodeNodePairs(structure, tags, pairs, &childStructure1Name,
+	    &childStructure2Name);
         }
         else if (bondType == "node_edge") {
             addNodeEdgePairs(structure, tags, pairs, &childStructure1Name, &childStructure2Name, spec);
@@ -353,32 +358,69 @@ void TensegrityModel::addBonds(tgStructure& structure, const std::string& bonds,
     }
 }
 
-void TensegrityModel::addNodeNodePairs(tgStructure& structure, const std::string& tags, const Yam& pairs,
-    const std::string* childStructure1Name, const std::string* childStructure2Name) {
-
-    for (YAML::const_iterator pairPtr = pairs.begin(); pairPtr != pairs.end(); ++pairPtr) {
-        Yam pair = *pairPtr;
-        std::string node1Path = pair[0].as<std::string>();
-        std::string node2Path = pair[1].as<std::string>();
-        tgNode* node1;
-        tgNode* node2;
-        if (childStructure1Name && childStructure2Name) {
-            node1 = &getNode(structure.findChild(*childStructure1Name), node1Path);
-            node2 = &getNode(structure.findChild(*childStructure2Name), node2Path);
-        }
-        else {
-            node1 = &getNode(structure, node1Path);
-            node2 = &getNode(structure, node2Path);
-        }
-
-	// Debugging
-        #if(1)
-	  std::cout << "Adding node_node pair " << tags << " between structures "
-	    << childStructure1Name << " and " << childStructure2Name
-	    << " for nodes " << *node1 << *node2 << std::endl;
-        #endif
-        structure.addPair(*node1, *node2, tags);
+void TensegrityModel::addNodeNodePairs(tgStructure& structure,
+	    const std::string& tags, const Yam& pairs,
+	    const std::string* childStructure1Name,
+	    const std::string* childStructure2Name) {
+	  
+  // NOTE that this method can be called with the childStructureName pointers
+  // equal 0. That's the case if there is no child structure (e.g., this method
+  // is adding a pair to a base structure.)
+  
+  //DEBUGGING: output the node_node pairs about to be created.
+  if(debugging_on) {
+    // This statement is true if the pointer is nonzero.
+    if (childStructure1Name && childStructure2Name) {
+      std::cout << "Adding all the node_node pairs between structures "
+		<< *childStructure1Name << " and " << *childStructure2Name
+		<< std::endl;
     }
+    else {
+      std::cout << "Adding all the node_node pairs within a base structure." <<
+	std::endl;
+    }
+  }
+  // Iterate over the pairs and add them
+  for (YAML::const_iterator pairPtr = pairs.begin(); pairPtr != pairs.end(); ++pairPtr) {
+    Yam pair = *pairPtr;
+    std::string node1Path = pair[0].as<std::string>();
+    std::string node2Path = pair[1].as<std::string>();
+    tgNode* node1;
+    tgNode* node2;
+    // This method may add additional tags. So, make a new variable here
+    // and then change it later if needed.
+    std::string pairNewTags = tags;
+    // This statement is true if the pointer is nonzero.
+    if (childStructure1Name && childStructure2Name) {
+      node1 = &getNode(structure.findChild(*childStructure1Name), node1Path);
+      node2 = &getNode(structure.findChild(*childStructure2Name), node2Path);
+      // DEBUGGING: List the specific pairs about to be added
+      if(debugging_on) {
+	std::cout << "Adding node_node pair " << tags << " between structures "
+		  << *childStructure1Name << " and " << *childStructure2Name
+		  << " for nodes " << *node1 << " and " << *node2
+		  << " with original tag " << tags << std::endl;
+      }
+      // Add one additional tag: the names of the two structures that
+      // a pair connects. This is useful for controllers, where tags are used
+      // to designate one actuator from another.
+      // As per tgTaggable, tags are separated by spaces.
+      // Three tags are added: the two connecting structure names, and the
+      // two names connected by a slash, like in the YAML file.
+      pairNewTags = tags + " " + *childStructure1Name + " " + *childStructure2Name
+	+ " " + *childStructure1Name + "/" + *childStructure2Name;
+      std::cout << "New set of tags for this pair: " << pairNewTags << std::endl;
+    }
+    else {
+      // Pointers are zero, add directly to this structure and not any
+      // of its children (since there ARE no children!)
+      node1 = &getNode(structure, node1Path);
+      node2 = &getNode(structure, node2Path);
+    }
+    // finally, add the actual pair.
+    //structure.addPair(*node1, *node2, tags);
+    structure.addPair(*node1, *node2, pairNewTags);
+  }
 }
 
 void TensegrityModel::addNodeEdgePairs(tgStructure& structure, const std::string& tags, const Yam& pairs,
@@ -698,11 +740,6 @@ void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::
      * That's probably not correct. Why?
      */
 
-    // Debugging
-    #if (0)
-      std::cout << "addBoxBuilder" << std::endl; 
-    #endif
-
     // (1)
     // Parameters to be used in tgBox::Config. See core/tgBox.h
     // Boxes are treated like rods with a rectangular cross-section: the box length
@@ -716,12 +753,6 @@ void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::
     bp["friction"] = boxFriction;
     bp["roll_friction"] = boxRollFriction;
     bp["restitution"] = boxRestitution;
-
-    // (2)
-    // Debugging
-    #if (0)
-    std::cout << "Box Builder Parameters: " << std::endl << std::flush; 
-    #endif
     
     if (parameters) {
         for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
@@ -741,9 +772,6 @@ void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::
     if (builderClass == "tgBoxInfo") {
         // tgBuildSpec takes ownership of the tgBoxInfo object
         spec.addBuilder(tagMatch, new tgBoxInfo(boxConfig));
-        #if (0)
-        std::cout << "Box Builder Added. " << std::endl << std::flush; 
-        #endif	
     }
 }
 

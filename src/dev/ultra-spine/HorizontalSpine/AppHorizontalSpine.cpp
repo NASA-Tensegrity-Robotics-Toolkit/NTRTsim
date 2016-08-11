@@ -74,7 +74,9 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    // This constructor for TensegrityModel takes the 'debugging' flag as the
+    // second argument.
+    TensegrityModel* const myModel = new TensegrityModel(argv[1], true);
 
     TensegrityModelController* const controller = new TensegrityModelController();
     myModel->attach(controller);
