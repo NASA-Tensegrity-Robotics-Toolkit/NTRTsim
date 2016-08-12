@@ -98,14 +98,20 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
 /**
  * Dot getCurrentAnchorDistance with m_direction.
  */
-virtual const double getCurrentAnchorDistanceAlongDirection() const
+const double tgBulletUnidirectionalCompressionSpring::getCurrentAnchorDistanceAlongDirection() const
 {
   // btVector3 between the two anchors
   const btVector3 dist =
     anchor2->getWorldPosition() - anchor1->getWorldPosition();
 
+  // Need to pull out the anchors from the parent class.
+  // The getAnchor methods are defined in tgBulletCompressionSpring.
+  //const btVector3 dist = getAnchor2()->getWorldPosition() -
+  //  getAnchor1()->getWorldPosition();
+
   // Dot it with the direction of this spring, should return a double.
-  double currAnchDistAlongDir = dist * m_direction;
+  // m_direction is a pointer, so dereference first.
+  double currAnchDistAlongDir = dist.dot( (*m_direction) );
   return currAnchDistAlongDir;
 }
 

@@ -84,6 +84,8 @@ public:
 	 double s = 1000.0,
 	 double d = 10.0,
 	 double rL = 0.0,
+	 bool moveCPA = true,
+	 bool moveCPB = true,
 	 btVector3 * dir = (new btVector3(0, 1, 0)) );
 
     /**
@@ -92,11 +94,11 @@ public:
      * All are passed in to tgBulletUnidirectionalCompressionSpring.
      */
 
-   /**
-    * Direction vector along which the force from this spring acts.
-    * Should be checked in constructor: only allowed to be a unit vector
-    * along one of the three axes.
-    */
+    /**
+     * Direction vector along which the force from this spring acts.
+     * Should be checked in constructor: only allowed to be a unit vector
+     * along one of the three axes.
+     */
     btVector3 * direction;
   };
   

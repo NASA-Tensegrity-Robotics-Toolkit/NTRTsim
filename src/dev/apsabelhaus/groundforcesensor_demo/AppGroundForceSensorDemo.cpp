@@ -75,6 +75,7 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // Fourth create the models
+    //tgModel* const myModel = new TwoBoxesModel();
     tgModel* const myModel = new TwoBoxesModel();
 
     // Finally, add out model to the simulation

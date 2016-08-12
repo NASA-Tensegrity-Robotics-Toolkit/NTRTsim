@@ -124,12 +124,19 @@ void tgBulletRenderer::render(const tgCompressionSpringActuator& mCSA) const
 		for (std::size_t i = 0; i < n; i++)
 		{
 
-		  // This method assumes the spring is "attached" to the first anchor,
-		  // although it doesn't really matter mathematically.
+		  // This method assumes the spring is "attached" to the first
+		  // anchor, although it doesn't really matter mathematically.
 		  const btVector3 springStartLoc =
 			 anchors[i]->getWorldPosition();
+
+		  // Have the spring state its end point location, instead of
+		  // assuming it's at anchor 2.
 		  const btVector3 springEndLoc =
-		         anchors[i+1] ->getWorldPosition();
+		    pCompressionSpring->getSpringEndpoint();
+
+		  // The 'color' variable will be set according to if the
+		  // free end of the spring is attached or not.
+		  btVector3 color;
 		  
 		  // Different behavior depending on if the spring is attached
 		  // at its free end.
@@ -146,13 +153,10 @@ void tgBulletRenderer::render(const tgCompressionSpringActuator& mCSA) const
 		    // applied force, no "blue" for no force.")
 		    // Negative forces pull the anchors together, positive pushes
 		    // them apart.
-		    const btVector3 color =
+		    color = 
 		      ( pCompressionSpring->getSpringForce() < 0.0 ) ?
 		      btVector3(1.0, 0.0, 0.0) :
 		      btVector3(0.0, 1.0, 0.0);
-
-		    // The spring endpoint will always be anchor2.
-		    pDrawer->drawLine(springStartLoc, springEndLoc, color);
 		  }
 		  else
 		  {
@@ -161,36 +165,13 @@ void tgBulletRenderer::render(const tgCompressionSpringActuator& mCSA) const
 		    // since the spring will provide zero force when anchor distance
 		    // is greater than rest length.
 		    // Less than or equal to zero: blue, no force
-		    const btVector3 color =
+		    color = 
 		      ( pCompressionSpring->getSpringForce() <= 0.0 ) ?
 		      btVector3(0.0, 0.0, 1.0) :
 		      btVector3(0.0, 1.0, 0.0);
-
-		    // The location of the free end of the spring is calculated
-		    // by the spring itself:
-		    const btVector3 springTrueEndLoc =
-		      pCompressionSpring->getSpringEndpoint();
-
-		    // Draw the spring line.
-		    pDrawer->drawLine(springStartLoc, springTrueEndLoc, color);
 		  }
-		  
-		  /*
-			const btVector3 lineFrom =
-			anchors[i]->getWorldPosition();
-		  const btVector3 lineTo = 
-			anchors[i+1]->getWorldPosition();
-		   // Should this be normalized??
-		  const double stretch = 
-			mSCA.getCurrentLength() - mSCA.getRestLength();
-		  const btVector3 color =
-			(stretch < 0.0) ?
-			btVector3(0.0, 0.0, 1.0) :
-			btVector3(0.5 + stretch / 3.0, 
-				  0.5 - stretch / 2.0, 
-				  0.0);
-		  pDrawer->drawLine(lineFrom, lineTo, color);
-		  */
+		  // Draw the string, now that color has been set.
+		  pDrawer->drawLine(springStartLoc, springEndLoc, color);
 		}
 	}
 }

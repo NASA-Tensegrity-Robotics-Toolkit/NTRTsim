@@ -49,8 +49,10 @@ tgUnidirectionalCompressionSpringActuator::Config::Config(bool iFEA,
 		   double s,
                    double d,
 		   double rL,
+		   bool moveCPA,
+		   bool moveCPB,
 		   btVector3 * dir) :
-  tgCompressionSpringActuator::Config::Config(iFEA, s, d, rL),
+  tgCompressionSpringActuator::Config::Config(iFEA, s, d, rL, moveCPA, moveCPB),
   direction(dir)       
 {
     // Direction cannot be null.

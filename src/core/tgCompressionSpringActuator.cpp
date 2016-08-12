@@ -40,15 +40,20 @@
 
 using namespace std;
 
-// Declaration of the config struct (...again? Hmmm...), copied from tgSpringCableActuator.
+// Constructor for the Config struct. Assigns variables but also does some
+// checks on what's passed in.
 tgCompressionSpringActuator::Config::Config(bool iFEA,
 		   double s,
                    double d,
-                   double rL) :
+		   double rL,
+		   bool moveCPA,
+		   bool moveCPB) :
   isFreeEndAttached(iFEA),
   stiffness(s),
   damping(d),
-  restLength(rL)       
+  restLength(rL),
+  moveCablePointAToEdge(moveCPA),
+  moveCablePointBToEdge(moveCPB)
 {
     ///@todo is this the right place for this, or the constructor of this class?
     if (s < 0.0)

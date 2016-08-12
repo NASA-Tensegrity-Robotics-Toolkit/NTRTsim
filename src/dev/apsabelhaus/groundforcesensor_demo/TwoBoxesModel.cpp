@@ -64,6 +64,8 @@ namespace
         double rollFriction;
         double restitution;
         double springRestLength;
+        bool moveCablePointAToEdge;
+        bool moveCablePointBToEdge;
         double pretension; // parameters for basic actuator
         bool   hist;
         double maxTens;
@@ -72,7 +74,7 @@ namespace
    {
      0.1,    // density (kg / length^3)
      0.31,     // radius (length)
-     false,   // isFreeEndAttached
+     true,   // isFreeEndAttached
      500.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
      new btVector3(0, 1, 0),  // direction
@@ -83,6 +85,8 @@ namespace
      1.0,     // rollFriction (unitless)
      0.2,      // restitution (?)
      4.0,   // springRestLength (length)
+     false,   // moveCablePointAToEdge
+     false,   // moveCablePointBToEdge
      600.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
@@ -99,6 +103,8 @@ TwoBoxesModel::TwoBoxesModel() : tgModel()
 // Destructor MUST DELETE the btVector3 in the config struct.
 // Since the pointer is created here, it must also be deleted here, and not
 // in any of the classes in core.
+// @TO-DO: DO WE NEED THIS? IT DOESN'T SEEM TO BE CALLED AT THE END OF THE
+// SIMULATION ANYWAY...
 TwoBoxesModel::~TwoBoxesModel()
 {
     #if (1)
@@ -149,17 +155,18 @@ void TwoBoxesModel::setup(tgWorld& world)
 				  c.friction, c.rollFriction, c.restitution);
 
     // config struct for the compression spring
-    tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
-      				       c.stiffness, c.damping, c.springRestLength);
-    //tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
-    //				       c.isFreeEndAttached,
-    //				       c.stiffness, c.damping, c.springRestLength,
-    //				       c.direction);
+    //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
+    //				c.stiffness, c.damping, c.springRestLength,
+    //				c.moveCablePointAToEdge, c.moveCablePointBToEdge);
+    tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
+				c.isFreeEndAttached, c.stiffness, c.damping,
+				c.springRestLength, c.moveCablePointAToEdge,
+				c.moveCablePointBToEdge, c.direction);
 
-    tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
-					 c.hist, c.maxTens, c.targetVelocity);
+    //tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
+    //					 c.hist, c.maxTens, c.targetVelocity);
 
-    #if (0)
+    #if (1)
     std::cout << "TwoBoxesModel::setup. Direction is: ";
     std::cout << "(" << c.direction->x() << ",";
     std::cout << c.direction->y() << ",";
@@ -184,9 +191,9 @@ void TwoBoxesModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
-    spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
+    //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
+    spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     
     // Create your structureInfo

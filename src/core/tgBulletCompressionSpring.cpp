@@ -66,7 +66,7 @@ anchor2(anchors.back())
     }
 
     // Debugging
-    #if (1)
+    #if (0)
     btVector3 anchor1pos = anchor1->getWorldPosition();
     btVector3 anchor2pos = anchor2->getWorldPosition();
     std::cout << "Location of the starting and ending point of the two anchors:" << std::endl;
@@ -329,10 +329,27 @@ void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
 }
 
-const std::vector<const tgSpringCableAnchor*> tgBulletCompressionSpring::getAnchors() const
+// returns the list of (two) anchors for this class.
+const std::vector<const tgSpringCableAnchor*>tgBulletCompressionSpring::getAnchors() const
 {
     return tgCast::constFilter<tgBulletSpringCableAnchor, const tgSpringCableAnchor>(m_anchors);
 }
+
+// return each of the (two) anchors individually.
+/*
+const tgBulletSpringCableAnchor* tgBulletCompressionSpring::getAnchor1()
+{
+  // make sure this pointer is not null
+  assert(invariant());
+  return anchor1;
+}
+const tgBulletSpringCableAnchor* tgBulletCompressionSpring::getAnchor2()
+{
+  // make sure this pointer is not null
+  assert(invariant());
+  return anchor2;
+}
+*/
 
 bool tgBulletCompressionSpring::invariant(void) const
 {

@@ -111,19 +111,38 @@ tgModel* tgUnidirectionalCompressionSpringActuatorInfo::createModel(tgWorld& wor
 
 tgBulletUnidirectionalCompressionSpring* tgUnidirectionalCompressionSpringActuatorInfo::createTgBulletUnidirectionalCompressionSpring()
 {
-  //std::cout << "tgUnidirectionalCompressionSpringActuatorInfo::createTgBulletUnidirectionalCompressionSpring()" << std::endl;
-    
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
-    
+    // @TO-DO: make this more object-oriented. Currently, there is code re-use
+    // between this method and the create compression spring method in
+    // the parent class.
     // @todo: need to check somewhere that the rigid bodies have been set...
     btRigidBody* fromBody = getFromRigidBody();
     btRigidBody* toBody = getToRigidBody();
+    
+    // This method can create the spring-cable either at the node location
+    // as specified, or it can automatically re-locate either anchor end
+    // to the edge of a rigid body.
+    btVector3 from;
+    btVector3 to;
 
-    // get the two rigid bodies that correspond to the locations that this compression spring
-    // will be attached between.
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo());
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom());
+    // Choose either the node location (as given by the tgConnectorInfo's point),
+    // or the point returned by the attached rigid body's getConnectorInfo method.
+    
+    // Point "A" is the "From" point, the first btVector3 in the pair.
+    if( m_config.moveCablePointAToEdge ){
+      from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo());
+    }
+    else {
+      // The getFrom method is inherited from tgConnectorInfo.
+      from = getFrom();
+    }
+    // Point "B" is the "To" point, the second btVector3 in the pair.
+    if( m_config.moveCablePointBToEdge ){
+      to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom());
+    }
+    else {
+      // The getTo method is inherited from tgConnectorInfo.
+      to = getTo();
+    }    
 
     // Note that even though this object is definitely not a SpringCable, and does not inherit from
     // that class at all, it's still more useful to re-use the spring cable version of anchor.
