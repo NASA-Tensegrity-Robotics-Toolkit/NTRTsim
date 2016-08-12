@@ -74,10 +74,10 @@ namespace
    {
      0.1,    // density (kg / length^3)
      0.31,     // radius (length)
-     false,   // isFreeEndAttached
+     true,   // isFreeEndAttached
      500.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
-     new btVector3(0, 1, 0),  // direction
+     new btVector3(1, 0, 0),  // direction
      3.0,   // boxLength (length)
      3.0,   // boxWidth (length)
      3.0,   // boxHeight (length)

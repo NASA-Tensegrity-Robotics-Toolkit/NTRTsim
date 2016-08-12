@@ -55,7 +55,7 @@ m_direction(direction)
 
     assert(invariant());
 
-    #if (1)
+#if (0)
     std::cout << "tgBulletUnidirectionalCompressionSpring constructor, ";
     std::cout << "direction is: ";
     std::cout << "(" << m_direction->x() << ",";
