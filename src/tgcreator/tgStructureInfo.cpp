@@ -268,10 +268,15 @@ void tgStructureInfo::initConnectors(tgWorld& world)
     } 
 }
 
+/**
+ * This is the entry point from other classes.
+ * The buildInto method starts the building process, and calls
+ * most (all?) of the other methods in this class.
+ */
 void tgStructureInfo::buildInto(tgModel& model, tgWorld& world) 
 {
     // These take care of things on a global level
-    addRigidsAndConnectors();
+    addRigidsAndConnectors();    
     autoCompoundRigids();    
     chooseConnectorRigids();
     initRigidBodies(world);
@@ -279,7 +284,29 @@ void tgStructureInfo::buildInto(tgModel& model, tgWorld& world)
     // they need to be part of a model to have rendering...
     initConnectors(world);
     // Now build into the model
-    buildIntoHelper(model, world, *this);    
+    buildIntoHelper(model, world, *this);
+
+    /*
+    // DEBUGGING: What are the connector infos and rigid infos that
+    // were created?
+    std::cout << "Inside tgStructureInfo: " << std::endl;
+    std::cout << "rigidInfo(s) and connectorInfo(s) that were created and built: " <<
+      std::endl;
+    // The vectors of pointers to info objects are m_rigids and m_connectors.
+    // Iterate through both lists.
+    for( size_t i = 0; i < m_rigids.size(); i++ ) {
+      // Print the info object. There should be overloaded methods for printing.
+      // this is a list of pointers, so need a dereference.
+      std::cout << *(m_rigids[i]) << std::endl;
+    }
+    for( size_t i = 0; i < m_connectors.size(); i++ ) {
+      // Print the info object. There should be overloaded methods for printing.
+      // this is a list of pointers, so need a dereference.
+      std::cout << "tgConnectorInfo: " << *(m_connectors[i]) << " with points " <<
+	m_connectors[i]->getFrom() << " and " <<
+	m_connectors[i]->getTo() << std::endl;
+    }
+    */
 }
 
 void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,

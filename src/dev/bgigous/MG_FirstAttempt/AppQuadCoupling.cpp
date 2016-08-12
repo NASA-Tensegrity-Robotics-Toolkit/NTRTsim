@@ -17,18 +17,18 @@
 */
 
 /**
- * @file AppQuadControlHierarchy.cpp
- * @brief Implementing Multiple layers of CPGs
- * @author Dawn Hustig-Schultz, Brandon Gigous
- * @date Aug 2016
+ * @file AppQuadControlSpiral.cpp
+ * @brief Using Brian's existing spine controller for a quadruped, using more muscles to increase torsion. 
+ * @author Dawn Hustig-Schultz, Brandon Gigous, Brian Mirletz
+ * @date July 2016
  * @version 1.0.0
  * $Id$
  */
 
-#include "AppQuadControlHierarchy.h"
+#include "AppQuadCoupling.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
 
-AppQuadControlHierarchy::AppQuadControlHierarchy(int argc, char** argv)
+AppQuadCoupling::AppQuadCoupling(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -44,7 +44,7 @@ AppQuadControlHierarchy::AppQuadControlHierarchy(int argc, char** argv)
     nTypes = 3;
 
     startX = 0;
-    startY = 20; //May need adjustment
+    startY = 40; //May need adjustment
     startZ = 0;
     startAngle = 0;
     
@@ -54,7 +54,7 @@ AppQuadControlHierarchy::AppQuadControlHierarchy(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppQuadControlHierarchy::setup()
+bool AppQuadCoupling::setup()
 {
     // First create the world
     world = createWorld();
@@ -78,14 +78,15 @@ bool AppQuadControlHierarchy::setup()
     const int segments = 7;
     const int hips = 4;
     const int legs = 4;
+    const int feet = 4; 
 
-    MountainGoat* myModel = new MountainGoat(segments, hips, legs);
+    BigPuppySymmetricSpiral2* myModel = new BigPuppySymmetricSpiral2(segments, hips, legs, feet);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 3; 
-        const int numMuscles = 16; //This may be ok, but confirm. 
+        const int segmentSpan = 3; //Not sure what this will be for mine!
+        const int numMuscles = 16 + 10*8; // Number of muscles we're considering right now, which is 16 for spine and 10 for each hip/shoulder
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -104,25 +105,20 @@ bool AppQuadControlHierarchy::setup()
         const double hf = 30.0;
         
         // Feedback parameters... may need to retune
-        const double ffMin = 0.1;
+        const double ffMin = -0.5;
         const double ffMax = 10.0;
         const double afMin = 0.0;
         const double afMax = 200.0;
         const double pfMin = -0.5;
         const double pfMax =  6.28;
 
-	const double maxH = 30.0;
-	const double minH = 7.0;
+	const double maxH = 70.0;
+	const double minH = 15.0;
 
-	const double numHipMuscles = 20; // I don't know why I need to double this in order for learning/app to work. This should be 10.
-	const double numLegMuscles = 10;//3; 
+	const double hffMin = 0.0;
+	const double hffMax = 1.0;
 
-	// For the higher level of CPGs
-	const double numHighCPGs = 5;
-	const double hf2 = 30.0;	//Not sure this one is necessary, if is overridden by def being true. 
-	const double ffMax2 = 10.0;
-
-        JSONHierarchyFeedbackControl::Config control_config(segmentSpan, 
+        JSONQuadFeedbackControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -147,17 +143,11 @@ bool AppQuadControlHierarchy::setup()
                                                     pfMax,
 						    maxH,
 						    minH,
-						    numHipMuscles,
-						    numHipMuscles,
-                				    numLegMuscles,
-                				    numLegMuscles,
- 						    numHighCPGs,
-						    numHighCPGs,
-						    hf2,
-						    ffMax2);
+							hffMin,
+							hffMax);
         /// @todo fix memory leak that occurs here
-       JSONHierarchyFeedbackControl* const myControl =
-        new JSONHierarchyFeedbackControl(control_config, suffix, lowerPath);
+       JSONQuadFeedbackControl* const myControl =
+        new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -181,7 +171,7 @@ bool AppQuadControlHierarchy::setup()
     return bSetup;
 }
 
-void AppQuadControlHierarchy::handleOptions(int argc, char **argv)
+void AppQuadCoupling::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -230,7 +220,7 @@ void AppQuadControlHierarchy::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppQuadControlHierarchy::getHillyConfig()
+const tgHillyGround::Config AppQuadCoupling::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -250,7 +240,7 @@ const tgHillyGround::Config AppQuadControlHierarchy::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppQuadControlHierarchy::getBoxConfig()
+const tgBoxGround::Config AppQuadCoupling::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -267,14 +257,14 @@ const tgBoxGround::Config AppQuadControlHierarchy::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppQuadControlHierarchy::getBlocks()
+tgModel* AppQuadCoupling::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppQuadControlHierarchy::createWorld()
+tgWorld* AppQuadCoupling::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -296,17 +286,17 @@ tgWorld* AppQuadControlHierarchy::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppQuadControlHierarchy::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppQuadCoupling::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppQuadControlHierarchy::createView(tgWorld *world)
+tgSimView *AppQuadCoupling::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppQuadControlHierarchy::run()
+bool AppQuadCoupling::run()
 {
     if (!bSetup)
     {
@@ -332,7 +322,7 @@ bool AppQuadControlHierarchy::run()
     return true;
 }
 
-void AppQuadControlHierarchy::simulate(tgSimulation *simulation)
+void AppQuadCoupling::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -388,8 +378,8 @@ void AppQuadControlHierarchy::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppQuadControlHierarchy" << std::endl;
-    AppQuadControlHierarchy app (argc, argv);
+    std::cout << "AppQuadCoupling" << std::endl;
+    AppQuadCoupling app (argc, argv);
 
     if (app.setup())
         app.run();

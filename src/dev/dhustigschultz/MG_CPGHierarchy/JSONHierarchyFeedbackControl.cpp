@@ -90,7 +90,9 @@ JSONHierarchyFeedbackControl::Config::Config(int ss,
           				int olm,
           				int tlm, 
 					int ohighm,
-					int thighm) :
+					int thighm,
+					double hf2,
+					double ffMax2) :
 JSONQuadCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
@@ -106,7 +108,9 @@ theirHipMuscles(thm),
 ourLegMuscles(olm),
 theirLegMuscles(tlm),
 ourHighMuscles(ohighm),
-theirHighMuscles(thighm)
+theirHighMuscles(thighm),
+highFreq2(hf2),
+freqFeedbackMax2(ffMax2)
 {
     
 }
@@ -166,8 +170,8 @@ void JSONHierarchyFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     array_4D spineEdgeParams = scaleEdgeActions(spineEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
     array_4D hipEdgeParams = scaleEdgeActions(hipEdgeVals,m_config.segmentSpan,m_config.theirHipMuscles,m_config.ourHipMuscles);
     array_4D legEdgeParams = scaleEdgeActions(legEdgeVals,m_config.segmentSpan,m_config.theirLegMuscles,m_config.ourLegMuscles);
-    array_2D spineNodeParams = scaleNodeActions(spineNodeVals);
-    array_2D legNodeParams = scaleNodeActions(legNodeVals);
+    array_2D spineNodeParams = scaleNodeActions(spineNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
+    array_2D legNodeParams = scaleNodeActions(legNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
 
 
     // Higher level CPG node and edge params:
@@ -182,16 +186,16 @@ void JSONHierarchyFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     highLowEdgeVals = highLowEdgeVals.get("params", "UTF-8");
 
     array_4D highEdgeParams = scaleEdgeActions(highEdgeVals,2,m_config.theirHighMuscles,m_config.ourHighMuscles); 
-    array_2D highNodeParams = scaleNodeActions(highNodeVals);
+    array_2D highNodeParams = scaleNodeActions(highNodeVals, m_config.highFreq2, m_config.freqFeedbackMax2);
 
-    // Setup the lower level of CPGs
-    setupCPGs(subject, spineNodeParams, legNodeParams, spineEdgeParams, hipEdgeParams, legEdgeParams);
-    
     // Setup the higher level of CPGs
     setupHighCPGs(subject, highNodeParams, highEdgeParams);
 
+    // Setup the lower level of CPGs
+    setupCPGs(subject, spineNodeParams, legNodeParams, spineEdgeParams, hipEdgeParams, legEdgeParams);
+
     // Setup the couplings between higher and lower level CPGs
-    
+    setupHighLowCouplings(subject, highLowEdgeVals);
 
     Json::Value feedbackParams = root.get("feedbackVals", "UTF-8");
     feedbackParams = feedbackParams.get("params", "UTF-8");
@@ -403,17 +407,53 @@ void JSONHierarchyFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
     }
     m_spineControllers.clear();    
 
-    for(size_t i = 0; i < m_hipControllers.size(); i++)
+    for(size_t i = 0; i < m_leftShoulderControllers.size(); i++)
     {
-        delete m_hipControllers[i];
+        delete m_leftShoulderControllers[i];
     }
-    m_hipControllers.clear(); 
- 
-    for(size_t i = 0; i < m_legControllers.size(); i++)
+    m_leftShoulderControllers.clear(); 
+
+    for(size_t i = 0; i < m_rightShoulderControllers.size(); i++)
     {
-        delete m_legControllers[i];
+        delete m_rightShoulderControllers[i];
     }
-    m_legControllers.clear();  
+    m_rightShoulderControllers.clear(); 
+
+    for(size_t i = 0; i < m_leftHipControllers.size(); i++)
+    {
+        delete m_leftHipControllers[i];
+    }
+    m_leftHipControllers.clear(); 
+
+    for(size_t i = 0; i < m_rightHipControllers.size(); i++)
+    {
+        delete m_rightHipControllers[i];
+    }
+    m_rightHipControllers.clear(); 
+
+    for(size_t i = 0; i < m_leftForelegControllers.size(); i++)
+    {
+        delete m_leftForelegControllers[i];
+    }
+    m_leftForelegControllers.clear();  
+
+    for(size_t i = 0; i < m_rightForelegControllers.size(); i++)
+    {
+        delete m_rightForelegControllers[i];
+    }
+    m_rightForelegControllers.clear(); 
+
+    for(size_t i = 0; i < m_leftHindlegControllers.size(); i++)
+    {
+        delete m_leftHindlegControllers[i];
+    }
+    m_leftHindlegControllers.clear();  
+
+    for(size_t i = 0; i < m_rightHindlegControllers.size(); i++)
+    {
+        delete m_rightHindlegControllers[i];
+    }
+    m_rightHindlegControllers.clear();  
 
     for(size_t i = 0; i < m_highControllers.size(); i++)
     {
@@ -423,15 +463,32 @@ void JSONHierarchyFeedbackControl::onTeardown(BaseQuadModelLearning& subject)
 
 }
 
-
+//Note: Will make a more compact, reuseable function later when I decide on how want to handle m_xControllers for different body parts
+//Perhaps a vector of vectors can be created, so looping can be done instead, or the function can be reused. 
+//For now, I'll settle for horrendous but works. 
+//This way makes it easier to grab the right node numbers again when doing high-low couplings.
 void JSONHierarchyFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, array_2D spineNodeActions, array_2D legNodeActions, array_4D spineEdgeActions, array_4D hipEdgeActions, array_4D legEdgeActions)
 {
 	    
     std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spine ");
-    std::vector <tgSpringCableActuator*> hipMuscles = subject.find<tgSpringCableActuator> ("hip ");
-    std::vector <tgSpringCableActuator*> legMuscles = subject.find<tgSpringCableActuator> ("limb ");
+
+    std::vector <tgSpringCableActuator*> leftShoulderMuscles = subject.find<tgSpringCableActuator> ("left_shoulder");
+    std::vector <tgSpringCableActuator*> rightShoulderMuscles = subject.find<tgSpringCableActuator> ("right_shoulder");  
+
+    std::vector <tgSpringCableActuator*> leftHipMuscles = subject.find<tgSpringCableActuator> ("left_hip ");
+    std::vector <tgSpringCableActuator*> rightHipMuscles = subject.find<tgSpringCableActuator> ("right_hip ");
+
+    std::vector <tgSpringCableActuator*> leftForelegMuscles = subject.find<tgSpringCableActuator> ("left_foreleg");
+    std::vector <tgSpringCableActuator*> rightForelegMuscles = subject.find<tgSpringCableActuator> ("right_foreleg");
+
+    std::vector <tgSpringCableActuator*> leftHindlegMuscles = subject.find<tgSpringCableActuator> ("left_hindleg");
+    std::vector <tgSpringCableActuator*> rightHindlegMuscles = subject.find<tgSpringCableActuator> ("right_hindleg");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
+
+    /*
+     * SPINE COUPLING STARTS HERE
+     */
     
     for (std::size_t i = 0; i < spineMuscles.size(); i++)
     {
@@ -468,28 +525,31 @@ void JSONHierarchyFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
 		}
     }
 
-    //Doing this again for the hips/shoulders. 
-    //Will make a more compact, reuseable function when decide on how want to handle m_xControllers for different body parts
-    for (std::size_t i = 0; i < hipMuscles.size(); i++)
+    /*
+     * HIPS START HERE
+     */
+
+    //Left shoulder first.
+    for (std::size_t i = 0; i < leftShoulderMuscles.size(); i++)
     {
 
         tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
         tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
 
-        hipMuscles[i]->attach(pStringControl);
+        leftShoulderMuscles[i]->attach(pStringControl);
         
         // First assign node numbers
         pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
         
-        m_hipControllers.push_back(pStringControl);
+        m_leftShoulderControllers.push_back(pStringControl);
     }
     
     // Then determine connectivity and setup string
-    for (std::size_t i = 0; i < m_hipControllers.size(); i++)
+    for (std::size_t i = 0; i < m_leftShoulderControllers.size(); i++)
     {
-        tgCPGActuatorControl * const pStringInfo = m_hipControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_leftShoulderControllers[i];
         assert(pStringInfo != NULL);
-        pStringInfo->setConnectivity(m_hipControllers, hipEdgeActions);
+        pStringInfo->setConnectivity(m_leftShoulderControllers, hipEdgeActions);
         
         //String will own this pointer
         tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
@@ -505,27 +565,247 @@ void JSONHierarchyFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
 		}
     }
 
-    // Doing again for lower legs
-    for (std::size_t i = 0; i < legMuscles.size(); i++)
+    //Now right shoulder.
+    for (std::size_t i = 0; i < rightShoulderMuscles.size(); i++)
     {
 
         tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
         tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
 
-        legMuscles[i]->attach(pStringControl);
+        rightShoulderMuscles[i]->attach(pStringControl);
         
         // First assign node numbers
         pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
         
-        m_legControllers.push_back(pStringControl);
+        m_rightShoulderControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_rightShoulderControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_rightShoulderControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_rightShoulderControllers, hipEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    // Now the left hip
+    for (std::size_t i = 0; i < leftHipMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        leftHipMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_leftHipControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_leftHipControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_leftHipControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_leftHipControllers, hipEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    // Now the right hip
+    for (std::size_t i = 0; i < rightHipMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        leftHipMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_rightHipControllers.push_back(pStringControl);
+    }
+    
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_rightHipControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_rightHipControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_rightHipControllers, hipEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    /*
+     * LEGS START HERE
+     */
+
+    // Left foreleg first
+    for (std::size_t i = 0; i < leftForelegMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        leftForelegMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_leftForelegControllers.push_back(pStringControl);
     }
 	
     // Then determine connectivity and setup string
-    for (std::size_t i = 0; i < m_legControllers.size(); i++)
+    for (std::size_t i = 0; i < m_leftForelegControllers.size(); i++)
     {
-        tgCPGActuatorControl * const pStringInfo = m_legControllers[i];
+        tgCPGActuatorControl * const pStringInfo = m_leftForelegControllers[i];
         assert(pStringInfo != NULL);
-        pStringInfo->setConnectivity(m_legControllers, legEdgeActions);
+        pStringInfo->setConnectivity(m_leftForelegControllers, legEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    // Now right foreleg
+    for (std::size_t i = 0; i < rightForelegMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        rightForelegMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_rightForelegControllers.push_back(pStringControl);
+    }
+	
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_rightForelegControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_rightForelegControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_rightForelegControllers, legEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    // Now left hindleg
+    for (std::size_t i = 0; i < leftHindlegMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        leftHindlegMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_leftHindlegControllers.push_back(pStringControl);
+    }
+	
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_leftHindlegControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_leftHindlegControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_leftHindlegControllers, legEdgeActions);
+        
+        //String will own this pointer
+        tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
+                                                        m_config.kPosition,
+                                                        m_config.kVelocity);
+        if (m_config.useDefault)
+        {
+			pStringInfo->setupControl(*p_ipc);
+		}
+		else
+		{
+			pStringInfo->setupControl(*p_ipc, m_config.controlLength);
+		}
+    }
+
+    // Finally, right hindleg
+    for (std::size_t i = 0; i < rightHindlegMuscles.size(); i++)
+    {
+
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
+        tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
+
+        rightHindlegMuscles[i]->attach(pStringControl);
+        
+        // First assign node numbers
+        pStringControl->assignNodeNumberFB(m_CPGFBSys, legNodeActions);
+        
+        m_rightHindlegControllers.push_back(pStringControl);
+    }
+	
+    // Then determine connectivity and setup string
+    for (std::size_t i = 0; i < m_rightHindlegControllers.size(); i++)
+    {
+        tgCPGActuatorControl * const pStringInfo = m_rightHindlegControllers[i];
+        assert(pStringInfo != NULL);
+        pStringInfo->setConnectivity(m_rightHindlegControllers, legEdgeActions);
         
         //String will own this pointer
         tgImpedanceController* p_ipc = new tgImpedanceController( m_config.tension,
@@ -542,7 +822,7 @@ void JSONHierarchyFeedbackControl::setupCPGs(BaseQuadModelLearning& subject, arr
     }
 }
 
-void JSONHierarchyFeedbackControl::setupHighLowCouplings(Json::Value highLowEdgeActions)
+void JSONHierarchyFeedbackControl::setupHighLowCouplings(BaseQuadModelLearning& subject, Json::Value highLowEdgeActions)
 {
 	// Now couple high level with low level
 	// 											list of other nodenums, eq size list of weights/phases
@@ -557,33 +837,187 @@ void JSONHierarchyFeedbackControl::setupHighLowCouplings(Json::Value highLowEdge
     Json::Value::iterator edgeIt = highLowEdgeActions.end();
 
 	// Number of node to start at (Note that nodes 0-4 are high CPGs)
-	int nodeStart = 5;
-	for (size_t b = 0; b < 5; b++)
+
+	//Unrolling loop for now... again, horrendous, and will think of a way to roll it back up eventually
+	//First high CPG, b == 0:
+	int b = 0;
+	edgeIt--;
+
+	std::vector<int> spineConnectivityList;
+	std::vector<double> spineWeights;
+	std::vector<double> spinePhases;
+
+	std::vector<int> leftShoulderConnectivityList;
+	std::vector<double> leftShoulderWeights;
+	std::vector<double> leftShoulderPhases;
+
+	std::vector<int> leftForelegConnectivityList;
+	std::vector<double> leftForelegWeights;
+	std::vector<double> leftForelegPhases;
+
+	std::vector<int> rightShoulderConnectivityList;
+	std::vector<double> rightShoulderWeights;
+	std::vector<double> rightShoulderPhases;
+
+	std::vector<int> rightForelegConnectivityList;
+	std::vector<double> rightForelegWeights;
+	std::vector<double> rightForelegPhases;
+
+	std::vector<int> leftHipConnectivityList;
+	std::vector<double> leftHipWeights;
+	std::vector<double> leftHipPhases;
+
+	std::vector<int> leftHindlegConnectivityList;
+	std::vector<double> leftHindlegWeights;
+	std::vector<double> leftHindlegPhases;
+
+	std::vector<int> rightHipConnectivityList;
+	std::vector<double> rightHipWeights;
+	std::vector<double> rightHipPhases;
+
+	std::vector<int> rightHindlegConnectivityList;
+	std::vector<double> rightHindlegWeights;
+	std::vector<double> rightHindlegPhases;
+	
+	Json::Value param = *edgeIt;	
+	assert(param.size() == 2);
+
+	// Use the vector of "m_controllers" vector for the part in question, to find the right node numbers
+														
+	for (size_t i = 0; i < m_spineControllers.size(); i++)
 	{
-		edgeIt--;
+		// Get the node number for each muscle 
+		int nodeNum = m_spineControllers[i]->getNodeNumber();
 
-		std::vector<int> connectivityList;
-		std::vector<double> weights;
-		std::vector<double> phases;
-		
-		Json::Value param = *edgeIt;	
-		assert(param.size() == 2);
-															
-		// Nasty brute forcing. Don't try this at home. Shield your eyes if necessary.
-		int n = b == 0 ? 16*7 : 10;
-		// 20 because each hip/shoulder + leg pair has 20 total strings
-										// !
-		for (size_t i = 0; i < n; i++, nodeStart++)
-		{
-			connectivityList.push_back(nodeStart);
-			weights.push_back(param[0].asDouble());
-			phases.push_back(param[1].asDouble() * (range) + lowerLimit);
-		}
-		
-		m_CPGFBSys.defineConnections(b, connectivityList, weights, phases);
+		// And then add to the connectivity list. 
+		spineConnectivityList.push_back(nodeNum);
+		spineWeights.push_back(param[0].asDouble());
+		spinePhases.push_back(param[1].asDouble() * (range) + lowerLimit);
 	}
+	m_CPGFBSys.defineConnections(b, spineConnectivityList, spineWeights, spinePhases);
 
-	assert(nodeStart == 16*7+30*4+5);
+	b++;
+	edgeIt--;
+
+	for (size_t i = 0; i < m_leftShoulderControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_leftShoulderControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		leftShoulderConnectivityList.push_back(nodeNum);
+		leftShoulderWeights.push_back(param[0].asDouble());
+		leftShoulderPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, leftShoulderConnectivityList, leftShoulderWeights, leftShoulderPhases);
+
+	//Do not increment/decrement b/edgeIt again, until full left foreleg leg is done!
+
+	for (size_t i = 0; i < m_leftForelegControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_leftForelegControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		leftForelegConnectivityList.push_back(nodeNum);
+		leftForelegWeights.push_back(param[0].asDouble());
+		leftForelegPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, leftForelegConnectivityList, leftForelegWeights, leftForelegPhases);
+
+	// Now it's safe to increment/decrement
+
+	b++;
+	edgeIt--;
+
+	for (size_t i = 0; i < m_rightShoulderControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_rightShoulderControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		rightShoulderConnectivityList.push_back(nodeNum);
+		rightShoulderWeights.push_back(param[0].asDouble());
+		rightShoulderPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, rightShoulderConnectivityList, rightShoulderWeights, rightShoulderPhases);
+
+	//Again, do not increment/decrement b/edgeIt until full right foreleg leg is done!
+	
+	for (size_t i = 0; i < m_rightForelegControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_rightForelegControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		rightForelegConnectivityList.push_back(nodeNum);
+		rightForelegWeights.push_back(param[0].asDouble());
+		rightForelegPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, rightForelegConnectivityList, rightForelegWeights, rightForelegPhases);
+
+	// Now it's safe to increment/decrement
+
+	b++;
+	edgeIt--;
+	
+	for (size_t i = 0; i < m_leftHipControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_leftHipControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		leftHipConnectivityList.push_back(nodeNum);
+		leftHipWeights.push_back(param[0].asDouble());
+		leftHipPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, leftHipConnectivityList, leftHipWeights, leftHipPhases);
+
+	//Do not increment/decrement b/edgeIt again, until full left hindleg leg is done!
+
+	for (size_t i = 0; i < m_leftHindlegControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_leftHindlegControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		leftHindlegConnectivityList.push_back(nodeNum);
+		leftHindlegWeights.push_back(param[0].asDouble());
+		leftHindlegPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, leftHindlegConnectivityList, leftHindlegWeights, leftHindlegPhases);
+
+	// Now it's safe to increment/decrement
+
+	b++;
+	edgeIt--;
+
+	for (size_t i = 0; i < m_rightHipControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_rightHipControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		rightHipConnectivityList.push_back(nodeNum);
+		rightHipWeights.push_back(param[0].asDouble());
+		rightHipPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, rightHipConnectivityList, rightHipWeights, rightHipPhases);
+
+	//Again, do not increment/decrement b/edgeIt until full right foreleg leg is done!
+
+	
+	for (size_t i = 0; i < m_rightHindlegControllers.size(); i++)
+	{
+		// Get the node number for each muscle 
+		int nodeNum = m_rightHindlegControllers[i]->getNodeNumber();
+
+		// And then add to the connectivity list. 
+		rightHindlegConnectivityList.push_back(nodeNum);
+		rightHindlegWeights.push_back(param[0].asDouble());
+		rightHindlegPhases.push_back(param[1].asDouble() * (range) + lowerLimit);
+	}
+	m_CPGFBSys.defineConnections(b, rightHindlegConnectivityList, rightHindlegWeights, rightHindlegPhases);
 
 	// TODO?
 	assert(highLowEdgeActions.begin() == edgeIt);
@@ -621,7 +1055,7 @@ void JSONHierarchyFeedbackControl::setupHighCPGs(BaseQuadModelLearning& subject,
 
 }
 
-array_2D JSONHierarchyFeedbackControl::scaleNodeActions (Json::Value actions)
+array_2D JSONHierarchyFeedbackControl::scaleNodeActions (Json::Value actions, double highFreq, double freqFeedbackMax)
 {
     std::size_t numControllers = actions.size();
     std::size_t numActions = actions[0].size();
@@ -634,11 +1068,11 @@ array_2D JSONHierarchyFeedbackControl::scaleNodeActions (Json::Value actions)
     assert(numActions == 5);
     
 	limits[0][0] = m_config.lowFreq;
-	limits[1][0] = m_config.highFreq;
+	limits[1][0] = highFreq;
 	limits[0][1] = m_config.lowAmp;
 	limits[1][1] = m_config.highAmp;
     limits[0][2] = m_config.freqFeedbackMin;
-    limits[1][2] = m_config.freqFeedbackMax;
+    limits[1][2] = freqFeedbackMax;
     limits[0][3] = m_config.ampFeedbackMin;
     limits[1][3] = m_config.ampFeedbackMax;
     limits[0][4] = m_config.phaseFeedbackMin;

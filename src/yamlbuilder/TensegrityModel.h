@@ -22,7 +22,8 @@
 /**
  * @file TensegrityModel.cpp
  * @brief Contains the definition of the members of the class TensegrityModel.
- * @author Simon Kotwicz & Jonah Eisen
+ * @author Simon Kotwicz, Jonah Eisen, Drew Sabelhaus
+ * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
 
@@ -44,6 +45,7 @@
 class tgSpringCableActuator;
 class tgModelVisitor;
 class tgWorld;
+class tgStructureInfo;
 
 typedef YAML::Node Yam; // to avoid confusion with structure nodes
 
@@ -54,6 +56,13 @@ class TensegrityModel : public tgSubject<TensegrityModel>, public tgModel
 {
 public:
 
+    /**
+     * List of all the default config parameters for all the
+     * types of objects that wil be supported.
+     */
+
+    // Rod parameters:
+  
     /*
      * Default rod radius.
      */
@@ -75,6 +84,35 @@ public:
      */
     const static double rodRestitution = 0.2;
 
+    // Box parameters:
+  
+    /*
+     * Default box width. (see tgBox.h)
+     */
+    const static double boxWidth = 1.0;
+    /*
+     * Default box height. (see tgBox.h)
+     */
+    const static double boxHeight = 1.0;
+    /*
+     * Default box density. (see tgBox.h)
+     */
+    const static double boxDensity = 1.0;
+    /*
+     * Default box friction. (see tgBox.h)
+     */
+    const static double boxFriction = 1.0;
+    /*
+     * Default box rolling friction. (see tgBox.h)
+     */
+    const static double boxRollFriction = 0.0;
+    /*
+     * Default box restitution. (see tgBox.h)
+     */
+    const static double boxRestitution = 0.2;
+
+    // String parameters:
+    
     /*
      * Default string stiffness.
      */
@@ -127,6 +165,14 @@ public:
      * Default string rotation.
      */
     const static double stringRotation = 0;
+    /*
+     * Default flags for automatic movement of cable anchor points.
+     * See the config struct in tgBasicActuator.h for more information.
+     * NTRTsim defaults to moving cable anchor points to the edges of
+     * a rigid body.
+     */
+    const static bool stringMoveCablePointAToEdge = true;
+    const static bool stringMoveCablePointBToEdge = true;
 
     /*
      * YAML-encoded structure path.
@@ -134,10 +180,25 @@ public:
     std::string topLvlStructurePath;
 
     /**
-     * The only constructor.
+     * Boolean flag that enables or disables debugging.
+     * All places this flag works in TensegrityModel.cpp can be found
+     * by searching through that file for the string "DEBUGGING".
+     */
+    bool debugging_on = false;
+
+    /**
+     * The simplest constructor.
+     * This constructor sets debugging_on = false.
      * @param[in] structurePath the path of the YAML-encoded structure
      */
     TensegrityModel(const std::string& structurePath);
+
+    /**
+     * Constructor that takes 'debugging' as a parameter.
+     * @param[in] structurePath the path of the YAML-encoded structure
+     * @param[in] debugging the flag that controls debugging output on/off.
+     */
+    TensegrityModel(const std::string& structurePath, bool debugging);
 
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -324,6 +385,11 @@ private:
     void addKinematicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
 
     /*
+     * Responsible for adding a builder that uses the tgBox config
+     */
+    void addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
      * Ensures YAML node contains only keys from the supplied vector
      */
     void yamlContainsOnly(const Yam& yam, const std::string structurePath, const std::vector<std::string> keys);
@@ -332,6 +398,12 @@ private:
      * Ensures that YAML has all unique keys within each map
      */
     void yamlNoDuplicates(const Yam& yam, const std::string structurePath);
+
+    /**
+     * Output debugging information for this model and structure.
+     */
+    void trace(const tgStructure& structure,
+		      const tgStructureInfo& structureInfo, tgModel& model);
 
 };
 

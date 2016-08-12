@@ -19,7 +19,7 @@
 /**
  * @file TensegrityModel.cpp
  * @brief Contains the definition of the members of the class TensegrityModel.
- * @author Simon Kotwicz & Jonah Eisen
+ * @author Simon Kotwicz, Jonah Eisen, Drew Sabelhaus
  * $Id$
  */
 
@@ -31,28 +31,65 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgKinematicActuator.h"
 #include "core/tgRod.h"
+#include "core/tgBox.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgStructureInfo.h"
 
+/**
+ * Constructor that only takes the path to the YAML file.
+ */
 TensegrityModel::TensegrityModel(const std::string& structurePath) : tgModel() {
     topLvlStructurePath = structurePath;
 }
 
+/**
+ * Constructor that includes the debugging flag.
+ */
+TensegrityModel::TensegrityModel(const std::string& structurePath,
+				 bool debugging) : tgModel() {
+    topLvlStructurePath = structurePath;
+    // All places in this file controlled by 'debugging_on' are labelled
+    // with comments with the string DEBUGGING.
+    debugging_on = debugging;
+}
+
 TensegrityModel::~TensegrityModel() {}
 
+/**
+ * Debugging function. Outputs the tgStructure, tgStructureInfo, and tgModel,
+ * as created by this class.
+ */
+void TensegrityModel::trace(const tgStructure& structure,
+			    const tgStructureInfo& structureInfo, tgModel& model)
+{
+    std::cout << std::endl << "Structure Trace inside TensegrityModel:" << std::endl
+    << structure        << std::endl 
+    << std::endl << "StructureInfo Trace inside TensegrityModel:" << std::endl
+    << structureInfo    << std::endl
+    << std::endl << "tgModel Trace inside Tensegrity Model: " << std::endl
+    << model            << std::endl;
+}
+
+/**
+ * The setup function is what's called from outside this class.
+ * It is responsible for creating all the parts of this tgModel and
+ * calling the tgStructureInfo to build the structure into the world.
+ */
 void TensegrityModel::setup(tgWorld& world) {
     // create the build spec that uses tags to turn the structure into a model
     tgBuildSpec spec;
 
-    // add default rod and string builders that match the tags rods & strings
+    // add default builders (rods, strings, boxes) that match the tags (rods, strings, boxes)
     // (these will be overwritten if a different builder is specified for those tags)
     Yam emptyYam = Yam();
     addRodBuilder("tgRodInfo", "rod", emptyYam, spec);
     addBasicActuatorBuilder("tgBasicActuatorInfo", "string", emptyYam, spec);
+    addBoxBuilder("tgBoxInfo", "box", emptyYam, spec);
 
     tgStructure structure;
     buildStructure(structure, topLvlStructurePath, spec);
@@ -62,6 +99,11 @@ void TensegrityModel::setup(tgWorld& world) {
 
     // use tgCast::filterto pull out the muscles that we want to control
     allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+
+    // DEBUGGING: print out the tgStructure, tgStructureInfo, and tgModel.
+    if(debugging_on) {
+        trace(structure, structureInfo, *this);
+    }
 
     // notify controllers that setup has finished
     notifySetup();
@@ -189,7 +231,29 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 }
 
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
-    Yam root = YAML::LoadFile(structurePath);
+    /** 
+     * This call to YAML::LoadFile can return the exception YAML::BadFile 
+     * if any of the yaml files or substructure files cannot be found. 
+     * Make this error more explicit through a try and catch.
+     */
+    Yam root;
+    try
+    {
+      root = YAML::LoadFile(structurePath);
+    }
+    catch( YAML::BadFile badfileexception )
+    {
+      // If a BadFile exception is thrown, output a detailed message first:
+      std::cout << std::endl << "The YAML parser threw a BadFile exception when" <<
+	" trying to load one of your YAML files. " << std::endl <<
+	"The path of the structure that the parser attempted to load is: '" <<
+	structurePath << "'. " << std::endl <<
+	"Check to be sure that the file exists, and " <<
+	"that you didn't spell the path name incorrectly." <<
+	std::endl << std::endl;
+      // Then, throw the exception again, so that the program stops.
+      throw badfileexception;
+    }
     // Validate YAML
     std::string rootKeys[] = {"nodes", "pair_groups", "builders", "substructures", "bond_groups"};
     std::vector<std::string> rootKeysVector(rootKeys, rootKeys + sizeof(rootKeys) / sizeof(std::string));
@@ -276,7 +340,15 @@ void TensegrityModel::addBonds(tgStructure& structure, const std::string& bonds,
         structureCombos = structureCombos.substr(structureCombos.find("/") + 1);
         std::string childStructure2Name = structureCombos.substr(0, structureCombos.find("/"));
         if (bondType == "node_node") {
-            addNodeNodePairs(structure, tags, pairs, &childStructure1Name, &childStructure2Name);
+	  // DEBUGGING: output the bonds that are about to be created.
+	  if(debugging_on) {
+	      std::cout << "Adding node_node bonds " << tags <<
+		" between structures " << childStructure1Name <<
+		" and " << childStructure2Name << std::endl;
+	  }
+	  // Add the node_node pairs, regardless of debugging
+	  addNodeNodePairs(structure, tags, pairs, &childStructure1Name,
+	    &childStructure2Name);
         }
         else if (bondType == "node_edge") {
             addNodeEdgePairs(structure, tags, pairs, &childStructure1Name, &childStructure2Name, spec);
@@ -287,25 +359,68 @@ void TensegrityModel::addBonds(tgStructure& structure, const std::string& bonds,
     }
 }
 
-void TensegrityModel::addNodeNodePairs(tgStructure& structure, const std::string& tags, const Yam& pairs,
-    const std::string* childStructure1Name, const std::string* childStructure2Name) {
-
-    for (YAML::const_iterator pairPtr = pairs.begin(); pairPtr != pairs.end(); ++pairPtr) {
-        Yam pair = *pairPtr;
-        std::string node1Path = pair[0].as<std::string>();
-        std::string node2Path = pair[1].as<std::string>();
-        tgNode* node1;
-        tgNode* node2;
-        if (childStructure1Name && childStructure2Name) {
-            node1 = &getNode(structure.findChild(*childStructure1Name), node1Path);
-            node2 = &getNode(structure.findChild(*childStructure2Name), node2Path);
-        }
-        else {
-            node1 = &getNode(structure, node1Path);
-            node2 = &getNode(structure, node2Path);
-        }
-        structure.addPair(*node1, *node2, tags);
+void TensegrityModel::addNodeNodePairs(tgStructure& structure,
+	    const std::string& tags, const Yam& pairs,
+	    const std::string* childStructure1Name,
+	    const std::string* childStructure2Name) {
+	  
+  // NOTE that this method can be called with the childStructureName pointers
+  // equal 0. That's the case if there is no child structure (e.g., this method
+  // is adding a pair to a base structure.)
+  
+  //DEBUGGING: output the node_node pairs about to be created.
+  if(debugging_on) {
+    // This statement is true if the pointer is nonzero.
+    if (childStructure1Name && childStructure2Name) {
+      std::cout << "Adding all the node_node pairs between structures "
+		<< *childStructure1Name << " and " << *childStructure2Name
+		<< std::endl;
     }
+    else {
+      std::cout << "Adding all the node_node pairs within a base structure." <<
+	std::endl;
+    }
+  }
+  // Iterate over the pairs and add them
+  for (YAML::const_iterator pairPtr = pairs.begin(); pairPtr != pairs.end(); ++pairPtr) {
+    Yam pair = *pairPtr;
+    std::string node1Path = pair[0].as<std::string>();
+    std::string node2Path = pair[1].as<std::string>();
+    tgNode* node1;
+    tgNode* node2;
+    // This method may add additional tags. So, make a new variable here
+    // and then change it later if needed.
+    std::string pairNewTags = tags;
+    // This statement is true if the pointer is nonzero.
+    if (childStructure1Name && childStructure2Name) {
+      node1 = &getNode(structure.findChild(*childStructure1Name), node1Path);
+      node2 = &getNode(structure.findChild(*childStructure2Name), node2Path);
+      // DEBUGGING: List the specific pairs about to be added
+      if(debugging_on) {
+	std::cout << "Adding node_node pair " << tags << " between structures "
+		  << *childStructure1Name << " and " << *childStructure2Name
+		  << " for nodes " << *node1 << " and " << *node2
+		  << " with original tag " << tags << std::endl;
+      }
+      // Add three additional tags: the names of the two structures that
+      // a pair connects. This is useful for controllers, where tags are used
+      // to designate one actuator from another.
+      // As per tgTaggable, tags are separated by spaces.
+      // Three tags are added: the two connecting structure names, and the
+      // two names connected by a slash, like in the YAML file.
+      pairNewTags = tags + " " + *childStructure1Name + " " + *childStructure2Name
+	+ " " + *childStructure1Name + "/" + *childStructure2Name;
+    }
+    else {
+      // Pointers are zero, add directly to this structure and not any
+      // of its children (since there ARE no children!)
+      node1 = &getNode(structure, node1Path);
+      node2 = &getNode(structure, node2Path);
+    }
+    // finally, add the actual pair.
+    //structure.addPair(*node1, *node2, tags);
+    structure.addPair(*node1, *node2, pairNewTags);
+  }
 }
 
 void TensegrityModel::addNodeEdgePairs(tgStructure& structure, const std::string& tags, const Yam& pairs,
@@ -494,6 +609,9 @@ void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
         else if (builderClass == "tgKinematicContactCableInfo" || builderClass == "tgKinematicActuatorInfo") {
             addKinematicActuatorBuilder(builderClass, tagMatch, parameters, spec);
         }
+	else if (builderClass == "tgBoxInfo") {
+            addBoxBuilder(builderClass, tagMatch, parameters, spec);
+        }
         // add more builders here if they use a different Config
         else {
             throw std::invalid_argument("Unsupported builder class: " + builderClass);
@@ -531,32 +649,75 @@ void TensegrityModel::addRodBuilder(const std::string& builderClass, const std::
 }
 
 void TensegrityModel::addBasicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec) {
-    // basicActuatorParameters
-    std::map<std::string, double> bap;
-    bap["stiffness"] = stringStiffness;
-    bap["damping"] = stringDamping;
-    bap["pretension"] = stringPretension;
-    bap["history"] = stringHistory;
-    bap["max_tension"] = stringMaxTension;
-    bap["target_velocity"] = stringTargetVelocity;
-    bap["min_actual_length"] = stringMinActualLength;
-    bap["min_rest_length"] = stringMinRestLength;
-    bap["rotation"] = stringRotation;
+    // tgbBasicActuator parameters.
+    // This method assigns default values based on TensegrityModel.h,
+    // then overwrites them if a parameter is specified in the YAML file.
+    // See tgBasicActuator.h for a description of each parameter.
+    // Since tgBasicActuator has both double and boolean config parameters,
+    // store two lists of parameters based on type.
+    // We use the abbreviation "bap" as basic actuator parameters.
+    std::map<std::string, double> bap_doubles;
+    std::map<std::string, bool> bap_booleans;
+    bap_doubles["stiffness"] = stringStiffness;
+    bap_doubles["damping"] = stringDamping;
+    bap_doubles["pretension"] = stringPretension;
+    bap_doubles["history"] = stringHistory;
+    bap_doubles["max_tension"] = stringMaxTension;
+    bap_doubles["target_velocity"] = stringTargetVelocity;
+    bap_doubles["min_actual_length"] = stringMinActualLength;
+    bap_doubles["min_rest_length"] = stringMinRestLength;
+    bap_doubles["rotation"] = stringRotation;
+    bap_booleans["moveCablePointAToEdge"] = stringMoveCablePointAToEdge;
+    bap_booleans["moveCablePointBToEdge"] = stringMoveCablePointBToEdge;
 
+    // If no parameters are passed in, do not change anything.
     if (parameters) {
+        // Iterate through all the parameters passed in for this builder.
         for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
-            std::string parameterName = parameter->first.as<std::string>();
-            if (bap.find(parameterName) == bap.end()) {
-                throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+	    // The key for both maps is a string.
+	    std::string parameterName = parameter->first.as<std::string>();
+	    // However, the value may be either a double or a boolean. Check both
+	    // lists, and mark a flag depending on the output.
+	    bool paramIsDouble = true;
+	    // Check the doubles first:
+            if( bap_doubles.find(parameterName) == bap_doubles.end()) {
+	        // The parameter is not a double, since it's not in the doubles map.
+  	        paramIsDouble = false;
+	        // Then, check to see if the parameter is in the booleans map.
+		if( bap_booleans.find(parameterName) == bap_booleans.end()) {
+		  // The parameter is in neither list, throw an exception.
+		  throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+		}
             }
-            // if defined overwrite default parameter value
-            bap[parameterName] = parameter->second.as<double>();
+            // if defined, overwrite default parameter value to the appropriate map.
+	    if( paramIsDouble ) {
+	      // change the value in the doubles list
+	      bap_doubles[parameterName] = parameter->second.as<double>();
+	    }
+	    else {
+	      // the value is in the booleans list.
+	      bap_booleans[parameterName] = parameter->second.as<bool>();
+	    }
         }
     }
 
-    const tgBasicActuator::Config basicActuatorConfig = tgBasicActuator::Config(bap["stiffness"],
-        bap["damping"], bap["pretension"], bap["history"], bap["max_tension"], bap["target_velocity"],
-        bap["min_actual_length"], bap["min_rest_length"], bap["rotation"]);
+    // Create the config struct.
+    // Note that this calls the constructor for Config, so the parameters
+    // are passed in according to order not name.
+    // @TO-DO: instead, create a Config with nothing passed in, and then change
+    // parameters if defined. That way, no defaults would need to be defined
+    // in TensegrityModel.h. Currently, defaults are defined in BOTH the
+    // actual config struct definition as well as in this .h file.
+    const tgBasicActuator::Config basicActuatorConfig =
+      tgBasicActuator::Config(bap_doubles["stiffness"], bap_doubles["damping"],
+			      bap_doubles["pretension"], bap_doubles["history"],
+			      bap_doubles["max_tension"],
+			      bap_doubles["target_velocity"],
+			      bap_doubles["min_actual_length"],
+			      bap_doubles["min_rest_length"],
+			      bap_doubles["rotation"],
+			      bap_booleans["moveCablePointAToEdge"],
+			      bap_booleans["moveCablePointBToEdge"]);
     if (builderClass == "tgBasicActuatorInfo") {
         // tgBuildSpec takes ownership of the tgBasicActuatorInfo object
         spec.addBuilder(tagMatch, new tgBasicActuatorInfo(basicActuatorConfig));
@@ -609,6 +770,52 @@ void TensegrityModel::addKinematicActuatorBuilder(const std::string& builderClas
         spec.addBuilder(tagMatch, new tgKinematicActuatorInfo(kinematicActuatorConfig));
     }
     // add more builders that use tgKinematicActuator::Config here
+}
+
+void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec) {
+    /**
+     * Builder procedure: 
+     * (1) create a list (a map, really) of all the possible parameters, and initialize
+     * them to the defaults in TensegrityModel.h
+     * (2) substitute these defaults with any parameters from the YAMl file
+     * (3) create the tgBoxInfo object and add it to the list of builders
+     * @TO-DO: this seems to be called multiple times per "builder" block in a YAML file.
+     * That's probably not correct. Why?
+     */
+
+    // (1)
+    // Parameters to be used in tgBox::Config. See core/tgBox.h
+    // Boxes are treated like rods with a rectangular cross-section: the box length
+    // is specified by the distance between nodes, and the width and height come from
+    // the Config struct.
+    // Create a map of strings to doubles that will hold the parameters
+    std::map<std::string, double> bp;
+    bp["width"] = boxWidth;
+    bp["height"] = boxHeight;
+    bp["density"] = boxDensity;
+    bp["friction"] = boxFriction;
+    bp["roll_friction"] = boxRollFriction;
+    bp["restitution"] = boxRestitution;
+    
+    if (parameters) {
+        for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
+            std::string parameterName = parameter->first.as<std::string>();
+            if (bp.find(parameterName) == bp.end()) {
+                throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+            }
+            // if defined overwrite default parameter value
+            bp[parameterName] = parameter->second.as<double>();
+        }
+    }
+
+    // (3)
+    // this usage is the same as in NTRT v1.0 models.
+    const tgBox::Config boxConfig = tgBox::Config(bp["width"], bp["height"],
+			 bp["density"], bp["friction"], bp["roll_friction"], bp["restitution"]);
+    if (builderClass == "tgBoxInfo") {
+        // tgBuildSpec takes ownership of the tgBoxInfo object
+        spec.addBuilder(tagMatch, new tgBoxInfo(boxConfig));
+    }
 }
 
 void TensegrityModel::yamlNoDuplicates(const Yam& yam, const std::string structurePath) {

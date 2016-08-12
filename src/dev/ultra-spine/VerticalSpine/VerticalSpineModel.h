@@ -141,6 +141,9 @@ private:
      * Output debugging information for this model and structure.
      */
     static void trace(const tgStructureInfo& structureInfo, tgModel& model);
+    // A version that includes the tgStructure:
+    static void trace(const tgStructure& structure,
+		      const tgStructureInfo& structureInfo, tgModel& model);
 
     /**
      * Add a tgPair for each rod in the vertebra. This maps two nodes into
