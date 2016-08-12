@@ -183,10 +183,10 @@ If the “leg” structure is itself a superstructure with multiple substructure
       foot/leg/node_node:
         - [top, knee.bottom]
 
-Spine Structures
+Series of Substructures (Including Spine Structures)
 '''''''''''''''''''''''''''''''''''''''''
 
-Spines structures can be easily defined using the syntax below. The syntax makes it possible to define a set of pairs that is used to connect more than two structures.
+A series of substructures, for example the vertebrae in a spine structure, can be easily defined using the syntax below. The syntax makes it possible to define a set of pairs that is used to connect more than two structures. When using this syntax with slashes between multiple substructures, the connections are only made between adjacent substructures in the series of slashes. In this example, the front-to-front connection is made between t1 and t2 (since they are next to each other) as well as t2 to t3 (for the same reason), but no connection is made from t1 to t3.
 ::
 
   bond_groups:
