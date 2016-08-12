@@ -111,6 +111,13 @@ public:
      * single direction, depending on isFreeEndAttached.
      */
     virtual const double getCurrentSpringLength() const;
+
+    /**
+     * Return the location of the free end of the spring.
+     * This is used, in particular, for rendering.
+     * See tgBulletRenderer.
+     */
+    virtual const btVector3 getSpringEndpoint() const;
     
     /**
      * Returns the force currently in the spring, either compression only / a positive force only (if isFreeEndAttached is false), or potentially either + or - force (if isFreeEndAttached == true).

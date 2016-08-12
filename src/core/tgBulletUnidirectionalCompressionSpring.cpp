@@ -53,7 +53,7 @@ m_direction(direction)
     // Since tgBulletCompressionSpring takes care of everything else,
     // just need to check that direction is valid, and then check the invariant.
 
-  // @TO-DO: checks on the btVector3 direction.
+    assert(invariant());
 
     #if (1)
     std::cout << "tgBulletUnidirectionalCompressionSpring constructor, ";
@@ -62,8 +62,18 @@ m_direction(direction)
     std::cout << m_direction->y() << ",";
     std::cout << m_direction->z() << ")" << std::endl;
     #endif
-    
-    assert(invariant());
+
+    // Check that m_direction is indeed a unit vector.
+    // A dot product with (1,1,1) should always return the scalar 1 if
+    // the vector is indeed a unit vector.
+    // @TODO: make this work with arbitrary unit vectors. Those dot products
+    // are probably not exactly 1.0, but 1.0somethingsmall. 
+    double dotproduct = m_direction->dot( btVector3(1,1,1) );
+    if( dotproduct != 1.0 ){
+      std::cout << "Error: m_direction is not a unit vector. Its dot product" <<
+	" with (1,1,1) is " << dotproduct << std::endl;
+      throw std::invalid_argument("Direction must be a unit vector.");
+    }
 }
 
 // Destructor has to the responsibility of destroying the anchors also,
@@ -89,7 +99,7 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
     // TO-DO: find a way to apply a hard stop here instead.
     if( getCurrentSpringLength() <= 0.0)
     {
-      throw std::runtime_error("Compression spring has negative length, simulation stopping. Increase your stiffness coefficient.");
+      throw std::runtime_error("Unidirectional compression spring has negative length, simulation stopping. Increase your stiffness coefficient.");
     }
     
     assert(invariant());
@@ -104,14 +114,9 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentAnchorDistanceAl
   const btVector3 dist =
     anchor2->getWorldPosition() - anchor1->getWorldPosition();
 
-  // Need to pull out the anchors from the parent class.
-  // The getAnchor methods are defined in tgBulletCompressionSpring.
-  //const btVector3 dist = getAnchor2()->getWorldPosition() -
-  //  getAnchor1()->getWorldPosition();
-
   // Dot it with the direction of this spring, should return a double.
   // m_direction is a pointer, so dereference first.
-  double currAnchDistAlongDir = dist.dot( (*m_direction) );
+  double currAnchDistAlongDir = dist.dot( (*getDirection()) );
   return currAnchDistAlongDir;
 }
 
@@ -131,22 +136,40 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentSpringLength() c
     double springLength = getRestLength();
 
     // store this variable so we don't have multiple calls to the same function.
-    double currAnchorDist = getCurrentAnchorDistance();
+    //double currAnchorDist = getCurrentAnchorDistance();
+    double currAnchorDistAlongDir = getCurrentAnchorDistanceAlongDirection();
 
     if( isFreeEndAttached() )
     {
       // The spring length is always the distance between anchors, projected along
       // the direction vector.
-      springLength = currAnchorDist;
+      springLength = currAnchorDistAlongDir;
     }
-    else if( currAnchorDist < getRestLength() )
+    else if( currAnchorDistAlongDir < getRestLength() )
     {
       // the spring is not attached at its free end, but is in compression,
       // so there is a length change.
-      springLength = currAnchorDist;
+      springLength = currAnchorDistAlongDir;
     }
     
     return springLength;
+}
+
+/**
+ * Returns the location of the endpoint of the spring in space. 
+ * The renderer uses this to draw lines more easily.
+ */
+const btVector3 tgBulletUnidirectionalCompressionSpring::getSpringEndpoint() const
+{
+  // The spring endpoint will always be the sum of the beginning point
+  // and the (spring length times the vector in the direction of the spring).
+  // Note that, by this point, it should have been checked that m_direction,
+  // which is what's returned by getDirection, is indeed a unit vector.
+  // Direction is a pointer, so it must be dereferenced first.
+  // Direction has the opposite magnitude of what unitVector woudld be in the parent
+  // class, so this is a "+" instead of a "-".
+  return anchor1->getWorldPosition() + 
+    getCurrentSpringLength() * (*getDirection());
 }
 
 /**
@@ -159,7 +182,7 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentSpringLength() c
 const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
 {
     // Since the getCurrentSpringLength function already includes the check
-    // against m_isFreeEndAttached:
+    // against m_isFreeEndAttached, as well as a projection along m_direction,
     double springForce = - getCoefK() * (getCurrentSpringLength() - getRestLength());
 
     // Debugging
@@ -197,8 +220,11 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
     // hold this variable so we don't have to call the accessor function twice.
     const double currLength = getCurrentSpringLength();
 
-    // Get the unit vector for the direction of the force, this is needed for
-    const btVector3 unitVector = getAnchorDirectionUnitVector();
+    // Get the unit vector for the direction of the force.
+    // This spring applies a force only along m_direction.
+    // again, it should have been checked that m_direction is a unit vector by now.
+    // Direction is a pointer, so must be dereferenced first.
+    const btVector3 unitVector = - (*getDirection());
 
     // Calculate the damping force for this timestep.
     // Take an approximated derivative to estimate the velocity of the
@@ -227,7 +253,12 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
     // Store the calculated length as the previous length
     m_prevLength = currLength;
     
-    //Now Apply it to the connected two bodies
+    //Now Apply it to the connected two bodies.
+    //Note that the point of applied force on the second body is NOT the same
+    // as the location specified by getSpringEndpoint. The anchor is the point
+    // to apply the force, and getSpringEndpoint is only used for rendering
+    // purposes: it makes more sense to have the spring free end "floating in space"
+    // in the rendering.
     btVector3 point1 = this->anchor1->getRelativePosition();
     this->anchor1->attachedBody->activate();
     this->anchor1->attachedBody->applyImpulse(force*dt,point1);

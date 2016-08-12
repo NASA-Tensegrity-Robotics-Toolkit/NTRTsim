@@ -74,7 +74,7 @@ namespace
    {
      0.1,    // density (kg / length^3)
      0.31,     // radius (length)
-     true,   // isFreeEndAttached
+     false,   // isFreeEndAttached
      500.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
      new btVector3(0, 1, 0),  // direction
@@ -127,9 +127,9 @@ TwoBoxesModel::~TwoBoxesModel()
 void TwoBoxesModel::addNodes(tgStructure& s)
 {
   s.addNode(0, 0, 0);              // 0, origin
-  s.addNode(0, c.boxLength, 0);      // 1, top of box 1
-  s.addNode(0, 3 * c.boxLength, 0);  // 2, bottom of box 2
-  s.addNode(0, 4 * c.boxLength, 0);  // 3, top of box 3
+  s.addNode(0, 2 * c.boxLength, 0);      // 1, top of box 1
+  s.addNode(0, 4 * c.boxLength, 0);  // 2, bottom of box 2
+  s.addNode(0, 5 * c.boxLength, 0);  // 3, top of box 3
 }
 
 // helper function to tag two sets of nodes as boxes
