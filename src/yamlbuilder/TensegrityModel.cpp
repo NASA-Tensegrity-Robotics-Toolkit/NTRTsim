@@ -233,7 +233,7 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
     /** 
      * This call to YAML::LoadFile can return the exception YAML::BadFile 
-     * if any of the substructures cannot be found. 
+     * if any of the yaml files or substructure files cannot be found. 
      * Make this error more explicit through a try and catch.
      */
     Yam root;
@@ -245,10 +245,11 @@ void TensegrityModel::buildStructure(tgStructure& structure, const std::string& 
     {
       // If a BadFile exception is thrown, output a detailed message first:
       std::cout << std::endl << "The YAML parser threw a BadFile exception when" <<
-	" trying to load one of your substructure YAML files. " << std::endl <<
+	" trying to load one of your YAML files. " << std::endl <<
 	"The path of the structure that the parser attempted to load is: '" <<
-	structurePath << "'. " << "Check to be sure that the file exists, and " <<
-	"that it is a proper YAML file according to the specification." <<
+	structurePath << "'. " << std::endl <<
+	"Check to be sure that the file exists, and " <<
+	"that you didn't spell the path name incorrectly." <<
 	std::endl << std::endl;
       // Then, throw the exception again, so that the program stops.
       throw badfileexception;
@@ -401,7 +402,7 @@ void TensegrityModel::addNodeNodePairs(tgStructure& structure,
 		  << " for nodes " << *node1 << " and " << *node2
 		  << " with original tag " << tags << std::endl;
       }
-      // Add one additional tag: the names of the two structures that
+      // Add three additional tags: the names of the two structures that
       // a pair connects. This is useful for controllers, where tags are used
       // to designate one actuator from another.
       // As per tgTaggable, tags are separated by spaces.
@@ -409,7 +410,6 @@ void TensegrityModel::addNodeNodePairs(tgStructure& structure,
       // two names connected by a slash, like in the YAML file.
       pairNewTags = tags + " " + *childStructure1Name + " " + *childStructure2Name
 	+ " " + *childStructure1Name + "/" + *childStructure2Name;
-      std::cout << "New set of tags for this pair: " << pairNewTags << std::endl;
     }
     else {
       // Pointers are zero, add directly to this structure and not any
