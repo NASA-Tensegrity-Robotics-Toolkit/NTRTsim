@@ -18,3 +18,12 @@
  * Contains a tensegrity model and the applicaiton for running that
  * model. 
  */
+
+/**
+ * \dir examples\forcePlateDemo
+ * @brief A demonstration application that makes use of a ForcePlateModel
+ *
+ * Contains an example force plate, and an app that loads in the force plate,
+ * another tgModel for testing purposes, and a tgDataObserver/Logger that
+ * takes data from the force plate.
+ */
