@@ -24,7 +24,7 @@
  */
 
 // This application
-#include "T6Model.h"
+#include "sensors/forceplate/ForcePlateModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -73,7 +73,17 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    T6Model* const myModel = new T6Model();
+    //T6Model* const myModel = new T6Model();
+
+    // For this demo, create the force plate by passing in its config struct.
+    // There is no need to create another model file here, since the
+    // force plate is already a model.
+    // This line creates a config with all the default parameters:
+    ForcePlateModel::Config forcePlateConfig();
+    // This line determines the location of the force plate at (0,0,0).
+    btVector3 location = btVector3(0,0,0);
+    // Create the force plate model:
+    tgModel* myModel = new ForcePlateModel(forcePlateConfig, location);
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:

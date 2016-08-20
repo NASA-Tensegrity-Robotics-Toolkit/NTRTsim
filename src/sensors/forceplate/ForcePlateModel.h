@@ -32,6 +32,8 @@
 #include "core/tgSubject.h"
 // The C++ Standard Library
 #include <vector>
+// The Bullet Physics library
+#include "LinearMath/btVector3.h"
 
 // Forward declarations
 class tgUnidirectionalCompressionSpringActuator;
@@ -55,22 +57,178 @@ class tgWorld;
  * In order to take data using this force plate, a tgDataObserver/Logger must
  * be attached to this model.
  */
-class TwoBoxesModel : public tgSubject<TwoBoxesModel>, public tgModel
+class ForcePlateModel : public tgSubject<ForcePlateModel>, public tgModel
 {
 public: 
-	
+
+  /**
+   * The configuration struct for this force plate.
+   * See the Solidworks model files for a graphical representation of
+   * the geometric parameters here.
+   */
+  struct Config
+  {
+  public:
     /**
-     * The only constructor. Utilizes default constructor of tgModel
-     * Configuration parameters are within the .cpp file in this case,
-     * not passed in. 
+     * The 'constructor' for this struct assigns variables if they're passed in,
+     * otherwise, defaults are chosen.
+     * Unlike with some of the other models, such as tgSpringCable Actuator,
+     * where abbreviations are used for the dummy variables and longer names
+     * are used for the actual variables in the struct, this is reversed:
+     * since there will be a LOT of calculations using these names, typing out
+     * a whole word will be very cumbersome as I'm writing this class.
+     * Just use this class in the same way as done with the demo, and it should
+     * work fine. 
+     *
+     * This model also takes a vector as input, below, specifying the location of
+     * the center of the bottom of the housing. This is preferable to taking
+     * two points like a tgBox, since that would involve validating that the 
+     * two points were along a horizontal line (this class will not support 
+     * force plates at angles, at least for now.)
+     *
+     * So, the config struct is for parameters related to the actual construction,
+     * not the location, of the force plate.
      */
-    TwoBoxesModel();
+    Config( double length = 5.0,
+	    double width = 5.0,
+	    double height = 2.0,
+	    double thickness = 0.1,
+	    double platethickness = 1.0,
+	    double wallgap = 0.2,
+	    double bottomgap = 0.5,
+	    double lateralStiffness = 500.0,
+	    double verticalStiffness = 1000.0,
+	    double lateralDamping = 50.0,
+	    double verticalDamping = 100.0,
+	    double lateralRestLength = 0.2,
+	    double verticalRestLength = 0.5);
+
+    /**
+     * Length of the whole force plate assembly.
+     * Use a capital letter here since lower-case "l" is difficult to read.
+     * Units: length.
+     */
+    double L;
+
+    /**
+     * Width of the whole force plate assembly
+     * Units: length.
+     */
+    double w;
+    
+    /**
+     * Height of the whole force plate assembly
+     * Units: length.
+     */
+    double h;
+    
+    /**
+     * Thickness of the walls of the force plate assembly. This is
+     * the distance between the outer edge of housing to the inner edge
+     * of the housing, along the lateral directions.
+     * Must be greater than zero, and less than (TO-DO)
+     * Units: length.
+     */
+    double t;
+    
+    /**
+     * Thickness of the force plate itself. The force plate will be
+     * this "tall", inside the housing.  Must be greater than zero,
+     * and less than (TO-DO)
+     * Units: length.
+     */
+    double pt;
+
+    /**
+     * Thickness of the gap between the housing and the sides of the force plate 
+     * (in the lateral directions.) This is the displacement of those lateral springs
+     * by default. If equal to lat_RL, springs will apply zero force when
+     * the plate is unloaded.
+     * Units: length.
+     */
+    double wgap;
+    
+    /**
+     * Thickness of the gap between the housing and the bottom of the force plate.
+     * If equal to vert_RL, springs will only have a force equal to the gravitational
+     * force of the weight of the plate itself, when unloaded.
+     * Units: length.
+     */
+    double bgap;
+    
+    /**
+     * Stiffness of the springs between the housing and the sides of the force plate 
+     * (in the lateral directions.) This applies to all 8 of the lateral springs.
+     * Units: spring stiffness, Force / length.
+     */
+    double latK;
+    
+    /**
+     * Stiffness of the springs between the housing and the bottom of the force
+     * plate. This applies to all 4 of the vertical springs.
+     * Units: spring stiffness, Force / length.
+     */
+    double vertK;
+
+    /**
+     * Damping constant of the springs between the housing and the sides of the 
+     * force plate (in the lateral directions.) This applies to all 8 of the 
+     * lateral springs.
+     * Units: spring damping, Force / velocity.
+     */
+    double latD;
+
+    /**
+     * Damping constant of the springs between the housing and the bottom of the 
+     * force plate. This applies to all 4 of the vertical springs.
+     * Units: spring damping, Force / velocity.
+     */
+    double vertD;
+
+    /**
+     * Rest length of the springs between the housing and the sides of the 
+     * force plate (in the lateral directions.) This applies to all 8 of the 
+     * lateral springs.
+     * Units: length.
+     */
+    double latRL;
+
+    /**
+     * Rest length of the springs between the housing and the bottom of the force
+     * plate. This applies to all 4 of the vertical springs.
+     * Units: length.
+     */
+    double vertRL;
+    
+  }
+  
+    /**
+     * The first constructor. Takes a config struct and a location to put
+     * the force plate at.
+     * @param[in] config, a struct as defined above
+     * @param[in] location, the location of the center point of 
+     * the bottom of the force plate housing. A vector, assumed to start
+     * from (0, 0, 0).
+     */
+    ForcePlateModel(ForcePlateModel::Config config, btVector3 location);
+
+    /**
+     * The other constructor. Takes a config struct and a location to put
+     * the force plate at, as well as tgTags to mass in to tgModel.
+     * @param[in] config, a struct as defined above
+     * @param[in] location, the location of the center point of 
+     * the bottom of the force plate housing. A vector, assumed to start
+     * from (0, 0, 0).
+     * @param[in] tags as passed through tgStructure and tgStructureInfo
+     */
+    //ForcePlateModel(ForcePlateModel::Config config, btVector3 location,
+    //		    const tgTags& tags);
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~TwoBoxesModel();
+    virtual ~ForcePlateModel();
     
     /**
      * Create the model. Place the boxess and springs into the world
@@ -107,12 +265,24 @@ public:
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
-    const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
+    //const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
     //const std::vector<tgBasicActuator*>& getAllActuators() const;
-    
+
+protected:
+
+    /**
+     * The config struct for this specific force plate.
+     */
+    Config m_config;
+
+    /**
+     * The btVector3 location of this specific force plate.
+     */
+    btVector3 m_location;
+
 private:
 	
-	/**
+    /**
      * A function called during setup that determines the positions of
      * the nodes based on construction parameters. Rewrite this function
      * for your own models
@@ -120,19 +290,19 @@ private:
      */
     static void addNodes(tgStructure& s);
 	
-	/**
+    /**
      * A function called during setup that creates boxes from the
      * relevant nodes. Rewrite this function for your own models.
      * @param[in] s: A tgStructure that we're building into
      */
     static void addBoxes(tgStructure& s);
 	
-	/**
-     * A function called during setup that creates muscles (Strings) from
+    /**
+     * A function called during setup that creates springs from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addActuators(tgStructure& s);
+    static void addSprings(tgStructure& s);
 
 private:
 	
@@ -140,8 +310,8 @@ private:
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
-    std::vector<tgCompressionSpringActuator*> allActuators;
+    //std::vector<tgCompressionSpringActuator*> allActuators;
     //std::vector<tgBasicActuator*> allActuators;
 };
 
-#endif  // TWO_BOXES_MODEL_H
+#endif  // FORCE_PLATE_MODEL_H
