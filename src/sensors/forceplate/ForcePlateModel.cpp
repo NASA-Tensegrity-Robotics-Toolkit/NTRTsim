@@ -50,18 +50,19 @@
  * must be specified too.
  */
 ForcePlateModel::Config::Config(double length,
-			       double width,
-			       double height,
-			       double thickness,
-			       double platethickness,
-			       double wallGap,
-			       double bottomGap,
-			       double lateralStiffness,
-			       double verticalStiffness,
-			       double lateralDamping,
-			       double verticalDamping,
-			       double lateralRestLength,
-			       double verticalRestLength) :
+				double width,
+				double height,
+				double thickness,
+				double platethickness,
+				double wallGap,
+				double bottomGap,
+				double lateralStiffness,
+				double verticalStiffness,
+				double lateralDamping,
+				double verticalDamping,
+				double lateralRestLength,
+				double verticalRestLength,
+				double springAnchorOffset) :
   L(length),
   w(width),
   h(height),
@@ -74,7 +75,8 @@ ForcePlateModel::Config::Config(double length,
   latD(lateralDamping),
   vertD(verticalDamping),
   latRL(lateralRestLength),
-  vertRL(verticalRestLength)
+  vertRL(verticalRestLength),
+  sOff(springAnchorOffset)
 {
   // do nothing.
 }
@@ -83,22 +85,107 @@ ForcePlateModel::Config::Config(double length,
  * This function calculates all the locations of the node positions for the 
  * force plate. This requires that m_config be populated first.
  */
-void ForcePlateModel::calculateNodePositions() {
+void ForcePlateModel::calculatePlateNodePositions() {
   // check that m_config is populated
   assert(invariant());
   // Calculate each of the locations of the corners of the force plate
   // box. These are all assuming the plate is centered at
   // (0, h - pt/2, 0).
   // All these positions are (X, Y, Z) where Y is the vertical coordinate.
-  
+
+  // Example: a1 = ( -w/2 + t + wgap,   h - pt,   -L/2 + t + wgap).
   a1 = btVector3( -(m_config.w/2) + m_config.t + m_config.wgap,
 		  m_config.h - m_config.pt,
 		  -(m_config.L/2) + m_config.t + m_config.wgap);
+  // a2 is translated up to the top of the box, e.g. Y == h.
+  a2 = a1 + btVector3( 0, m_config.pt, 0);
   
-  a2 = btVector3( -(m_config.w/2) + m_config.t + m_config.wgap,
-		  m_config.h,
+  b1 = btVector3( (m_config.w/2) - m_config.t - m_config.wgap,
+		  m_config.h - m_config.pt,
 		  -(m_config.L/2) + m_config.t + m_config.wgap);
+  b2 = b1 + btVector3( 0, m_config.pt, 0);
 
+  c1 = btVector3( (m_config.w/2) - m_config.t - m_config.wgap,
+		  m_config.h - m_config.pt,
+		  (m_config.L/2) - m_config.t - m_config.wgap);
+  c2 = c1 + btVector3( 0, m_config.pt, 0);
+
+  d1 = btVector3( -(m_config.w/2) + m_config.t + m_config.wgap,
+		  m_config.h - m_config.pt,
+		  (m_config.L/2) - m_config.t - m_config.wgap);
+  d2 = d1 + btVector3( 0, m_config.pt, 0);
+
+  // DEBUGGING:
+  if( m_debugging ) {
+    std::cout << std::endl << "Calculated plate node positions:" << std::endl;
+    std::cout << "a1, a2: " << a1 << "   " << a2 << std::endl;
+    std::cout << "b1, b2: " << b1 << "   " << b2 << std::endl;
+    std::cout << "c1, c2: " << c1 << "   " << c2 << std::endl;
+    std::cout << "d1, d2: " << d1 << "   " << d2 << std::endl << std::endl;
+  }
+
+  // Now calculate the positions of the force anchor points on the force plate.
+  // See this file's .h for more information about where each of these
+  // points are located.
+  
+  s_ab = btVector3( a1.x() + m_config.sOff,
+		    m_config.h - (m_config.pt/2),
+		    a1.z());
+  
+  s_ba = btVector3( b1.x() - m_config.sOff,
+		    m_config.h - (m_config.pt/2),
+		    b1.z());
+
+  s_bc = btVector3( b1.x(),
+		    m_config.h - (m_config.pt/2),
+		    b1.z() + m_config.sOff);
+
+  s_cb = btVector3( c1.x(),
+		    m_config.h - (m_config.pt/2),
+		    c1.z() - m_config.sOff);
+
+  s_cd = btVector3( c1.x() - m_config.sOff,
+		    m_config.h - (m_config.pt/2),
+		    c1.z());
+
+  s_dc = btVector3( d1.x() + m_config.sOff,
+		    m_config.h - (m_config.pt/2),
+		    b1.z());
+
+  s_da = btVector3( d1.x(),
+		    m_config.h - (m_config.pt/2),
+		    d1.z() - m_config.sOff);
+
+  s_ad = btVector3( a1.x(),
+		    m_config.h - (m_config.pt/2),
+		    a1.z() + m_config.sOff);
+  
+  // DEBUGGING:
+  if( m_debugging ) {
+    std::cout << std::endl << "Calculated lateral spring anchor positions on the force plate itself:" << std::endl;
+    std::cout << "s_ab, s_ba: " << s_ab << "   " << s_ba << std::endl;
+    std::cout << "s_bc, s_cb: " << s_bc << "   " << s_cb << std::endl;
+    std::cout << "s_cd, s_dc: " << s_cd << "   " << s_dc << std::endl;
+    std::cout << "s_da, s_ad: " << s_da << "   " << s_ad << std::endl << std::endl;
+  }
+
+  // Finally, calculate the spring anchor locations for the vertical springs,
+  // located on the bottom side of the plate.
+  // As always, see the .h file for more information.
+
+  s_bot_a = btVector3( s_ab.x(), a1.y(), s_ad.z() );
+  s_bot_b = btVector3( s_ba.x(), b1.y(), s_bc.z() );
+  s_bot_c = btVector3( s_cd.x(), c1.y(), s_cb.z() );
+  s_bot_d = btVector3( s_dc.x(), d1.y(), s_da.z() );
+
+  // DEBUGGING:
+  if( m_debugging ) {
+    std::cout << std::endl << "Calculated vertical spring anchor positions on the bottom of the force plate:" << std::endl;
+    std::cout << "s_bot_a: " << s_bot_a << std::endl;
+    std::cout << "s_bot_b: " << s_bot_b << std::endl;
+    std::cout << "s_bot_c: " << s_bot_c << std::endl;
+    std::cout << "s_bot_d: " << s_bot_d << std::endl << std::endl;
+  }
 }
 
 /** 
@@ -161,15 +248,38 @@ void ForcePlateModel::constructorAux()
   if( m_config.vertRL <= 0.0 ) {
     throw std::invalid_argument("Vertical spring rest length (vertRL) must be positive.");
   }
+  if( m_config.sOff <= 0.0 ){
+    throw std::invalid_argument("Spring anchor offset (sOff) must be positive.");
+  }
   // Note that since we're using unidirectional compression springs that are
   // attached at the free end, the spring will provide force whether or not
   // its rest length is greater or less than wgap or bgap (respectively), so there
   // is no need to check things like latRL < wgap, for example.
 
+  // DEBUGGING: output the config variables passed in.
+  if( m_debugging) {
+    std::cout << std::endl << "Config variables passed in to ForcePlateModel: "
+	      << std::endl;
+    std::cout << "L: " <<  m_config.L << std::endl;
+    std::cout << "w: " <<  m_config.w << std::endl;
+    std::cout << "h: " <<  m_config.h << std::endl;
+    std::cout << "t: " <<  m_config.t << std::endl;
+    std::cout << "pt: " <<  m_config.pt << std::endl;
+    std::cout << "wgap: " <<  m_config.wgap << std::endl;
+    std::cout << "bgap: " <<  m_config.bgap << std::endl;
+    std::cout << "latK: " <<  m_config.latK << std::endl;
+    std::cout << "vertK: " <<  m_config.vertK << std::endl;
+    std::cout << "latD: " <<  m_config.latD << std::endl;
+    std::cout << "vertD: " <<  m_config.vertD << std::endl;
+    std::cout << "latRL " <<  m_config.latRL << std::endl;
+    std::cout << "vertRL: " <<  m_config.vertRL << std::endl;
+    std::cout << "sOff: " << m_config.sOff << std::endl << std::endl;
+  }
+
   // When the force plate is constructed, the node positions should
   // be calculated.
   // Creation of the actual NTRT objects happens in setup, though.
-  calculateNodePositions();
+  calculatePlateNodePositions();
 }
 
 /**

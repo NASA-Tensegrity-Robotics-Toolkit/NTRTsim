@@ -103,7 +103,8 @@ public:
 	    double lateralDamping = 50.0,
 	    double verticalDamping = 100.0,
 	    double lateralRestLength = 0.2,
-	    double verticalRestLength = 0.5);
+	    double verticalRestLength = 0.5,
+	    double springAnchorOffset = 0.1);
 
     /**
      * Length of the whole force plate assembly.
@@ -201,6 +202,13 @@ public:
      * Units: length.
      */
     double vertRL;
+
+    /**
+     * Spring anchor offset amount. This is the distance between the edges
+     * of the force plate and the spring, for both lateral and horizontal.
+     * For example, a lateral spring is attached this far away from a plate edge.
+     */
+    double sOff;
     
   };
 
@@ -300,6 +308,32 @@ protected:
     btVector3 d2;
 
     /**
+     * The spring anchor positions on the force plate, for the lateral springs.
+     * These are denoted as s_(node1)(node2), where for example s_ab is the 
+     * spring anchor location on the ab face that's closest to point a, while
+     * s_ba is the anchor location on the ab face closest to point b.
+     */
+    btVector3 s_ab;
+    btVector3 s_ba;
+    btVector3 s_bc;
+    btVector3 s_cb;
+    btVector3 s_cd;
+    btVector3 s_dc;
+    btVector3 s_da;
+    btVector3 s_ad;
+
+    /**
+     * The spring anchor positions on the bottom side of the force plate,
+     * for the vertical springs. There are only four bottom springs,
+     * so the variable name denotes which corner of the box is closest to that 
+     * spring anchor location.
+     */
+    btVector3 s_bot_a;
+    btVector3 s_bot_b;
+    btVector3 s_bot_c;
+    btVector3 s_bot_d;
+    
+    /**
      * The btVector3 location of this specific force plate.
      */
     btVector3 m_location;
@@ -338,7 +372,7 @@ private:
      * Calculates all the node positions for this force plate.
      * Uses m_config.
      */
-    void calculateNodePositions();
+    void calculatePlateNodePositions();
 	
     /**
      * A list of all of the muscles. Will be empty until most of the way
