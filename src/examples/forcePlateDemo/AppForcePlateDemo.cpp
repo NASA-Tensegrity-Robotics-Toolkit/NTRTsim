@@ -78,12 +78,18 @@ int main(int argc, char** argv)
     // For this demo, create the force plate by passing in its config struct.
     // There is no need to create another model file here, since the
     // force plate is already a model.
-    // This line creates a config with all the default parameters:
-    ForcePlateModel::Config forcePlateConfig();
+    // 
+    double L = 10.0;
+    
+    ForcePlateModel::Config forcePlateConfig(L);
     // This line determines the location of the force plate at (0,0,0).
-    btVector3 location = btVector3(0,0,0);
-    // Create the force plate model:
-    tgModel* myModel = new ForcePlateModel(forcePlateConfig, location);
+    btVector3 forcePlateLocation = btVector3(0,0,0);
+    // The force plate takes a boolean that turns debugging information on or off.
+    // This is optional: the constructor defaults to "off"/"false".
+    bool forcePlateDebugging = true;
+    // Create the force plate model.
+    tgModel* myModel = new ForcePlateModel(forcePlateConfig, forcePlateLocation,
+					   forcePlateDebugging);
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
@@ -92,6 +98,11 @@ int main(int argc, char** argv)
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
+
+    // We can also add in another model to the simulation.
+    // This is how the force plate is used: the plate is added,
+    // then the actual tensegrity system model is added.
+    //@TO-DO pick a model.
     
     // Run until the user stops
     simulation.run();

@@ -70,6 +70,8 @@ public:
   {
   public:
     /**
+     * This is the definition of the config struct. It's 'constructor' is in 
+     * the cpp file.
      * The 'constructor' for this struct assigns variables if they're passed in,
      * otherwise, defaults are chosen.
      * Unlike with some of the other models, such as tgSpringCable Actuator,
@@ -94,8 +96,8 @@ public:
 	    double height = 2.0,
 	    double thickness = 0.1,
 	    double platethickness = 1.0,
-	    double wallgap = 0.2,
-	    double bottomgap = 0.5,
+	    double wallGap = 0.2,
+	    double bottomGap = 0.5,
 	    double lateralStiffness = 500.0,
 	    double verticalStiffness = 1000.0,
 	    double lateralDamping = 50.0,
@@ -200,7 +202,12 @@ public:
      */
     double vertRL;
     
-  }
+  };
+
+    /**
+     * Helper function for the constructor. Validates all the passed-in parameters.
+     */
+    void constructorAux();
   
     /**
      * The first constructor. Takes a config struct and a location to put
@@ -210,19 +217,23 @@ public:
      * the bottom of the force plate housing. A vector, assumed to start
      * from (0, 0, 0).
      */
-    ForcePlateModel(ForcePlateModel::Config config, btVector3 location);
+    ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location);
 
     /**
-     * The other constructor. Takes a config struct and a location to put
+     * Another constructor. Takes a config struct and a location to put
      * the force plate at, as well as tgTags to mass in to tgModel.
-     * @param[in] config, a struct as defined above
-     * @param[in] location, the location of the center point of 
-     * the bottom of the force plate housing. A vector, assumed to start
-     * from (0, 0, 0).
      * @param[in] tags as passed through tgStructure and tgStructureInfo
      */
     //ForcePlateModel(ForcePlateModel::Config config, btVector3 location,
     //		    const tgTags& tags);
+
+    /**
+     * Another constructor that allows for a debugging on/off flag to be passed in.
+     * @param[in] debugging: a boolean that controls the output of 
+     * various debugging information to the terminal.
+     */
+    ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
+		    bool debugging);
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -276,10 +287,29 @@ protected:
     Config m_config;
 
     /**
+     * The node positions for this specific force plate.
+     * This is populated in setup by the calculateNodePositions function.
+     */
+    btVector3 a1;
+    btVector3 a2;
+    btVector3 b1;
+    btVector3 b2;
+    btVector3 c1;
+    btVector3 c2;
+    btVector3 d1;
+    btVector3 d2;
+
+    /**
      * The btVector3 location of this specific force plate.
      */
     btVector3 m_location;
 
+    /**
+     * Flag for debugging. If on, information about the force plate construction
+     * is output to the terminal.
+     */
+    bool m_debugging;
+    
 private:
 	
     /**
@@ -302,16 +332,24 @@ private:
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addSprings(tgStructure& s);
-
-private:
+    static void addSprings(tgStructure& s);    
+    
+    /**
+     * Calculates all the node positions for this force plate.
+     * Uses m_config.
+     */
+    void calculateNodePositions();
 	
-	/**
+    /**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
     //std::vector<tgCompressionSpringActuator*> allActuators;
     //std::vector<tgBasicActuator*> allActuators;
+
+    // The "invariant" function just checks the integrity of the member
+    // variables of this class.
+    bool invariant() const;
 };
 
 #endif  // FORCE_PLATE_MODEL_H

@@ -1,5 +1,10 @@
 project(sensors)
 
+# specify the force plate as a separate library.
+subdirs(
+  forceplate
+)
+
 link_directories(${LIB_DIR})
 
 link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
@@ -11,5 +16,6 @@ link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
 add_library( ${PROJECT_NAME} SHARED
     tgDataLogger.cpp
     tgDataObserver.cpp
-    forceplate/ForcePlateModel.cpp
 )
+#forceplate/ForcePlateModel.cpp
+  

@@ -17,9 +17,9 @@ subdirs(
     yamlbuilder
 )
 
-add_definitions(
-    -Wall
-)
+#add_definitions(
+#    -Wall
+#)
 
 # Don't need to edit below this line.
 

@@ -1,4 +1,4 @@
-link_libraries(tgcreator controllers core sensors)
+link_libraries(tgcreator controllers core sensors forceplate)
 
 # @to-do: what needs to be compiled in to use another tgModel?
 add_executable(AppForcePlateDemo
