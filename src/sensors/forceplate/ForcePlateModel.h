@@ -30,6 +30,7 @@
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+#include "tgcreator/tgNode.h"
 // The C++ Standard Library
 #include <vector>
 // The Bullet Physics library
@@ -297,15 +298,17 @@ protected:
     /**
      * The node positions for this specific force plate.
      * This is populated in setup by the calculateNodePositions function.
+     * Note that tgNode is a child of btVector3, so has all the same
+     * functions and a similar constructor.
      */
-    btVector3 a1;
-    btVector3 a2;
-    btVector3 b1;
-    btVector3 b2;
-    btVector3 c1;
-    btVector3 c2;
-    btVector3 d1;
-    btVector3 d2;
+    tgNode a1;
+    tgNode a2;
+    tgNode b1;
+    tgNode b2;
+    tgNode c1;
+    tgNode c2;
+    tgNode d1;
+    tgNode d2;
 
     /**
      * The spring anchor positions on the force plate, for the lateral springs.
@@ -313,14 +316,14 @@ protected:
      * spring anchor location on the ab face that's closest to point a, while
      * s_ba is the anchor location on the ab face closest to point b.
      */
-    btVector3 s_ab;
-    btVector3 s_ba;
-    btVector3 s_bc;
-    btVector3 s_cb;
-    btVector3 s_cd;
-    btVector3 s_dc;
-    btVector3 s_da;
-    btVector3 s_ad;
+    tgNode s_ab;
+    tgNode s_ba;
+    tgNode s_bc;
+    tgNode s_cb;
+    tgNode s_cd;
+    tgNode s_dc;
+    tgNode s_da;
+    tgNode s_ad;
 
     /**
      * The spring anchor positions on the bottom side of the force plate,
@@ -328,10 +331,10 @@ protected:
      * so the variable name denotes which corner of the box is closest to that 
      * spring anchor location.
      */
-    btVector3 s_bot_a;
-    btVector3 s_bot_b;
-    btVector3 s_bot_c;
-    btVector3 s_bot_d;
+    tgNode s_bot_a;
+    tgNode s_bot_b;
+    tgNode s_bot_c;
+    tgNode s_bot_d;
     
     /**
      * The btVector3 location of this specific force plate.
@@ -347,26 +350,18 @@ protected:
 private:
 	
     /**
-     * A function called during setup that determines the positions of
-     * the nodes based on construction parameters. Rewrite this function
-     * for your own models
-     * @param[in] s: A tgStructure that we're building into
-     */
-    static void addNodes(tgStructure& s);
-	
-    /**
      * A function called during setup that creates boxes for the force plate,
      * the ones that will be used for the lateral springs.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addLateralPlateBoxes(tgStructure& s);
+    void addLateralPlateBoxesPairs(tgStructure& s);
 	
     /**
      * A function called during setup that creates springs from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addSprings(tgStructure& s);    
+    //static void addSprings(tgStructure& s);    
     
     /**
      * Calculates all the node positions for this force plate.

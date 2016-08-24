@@ -136,7 +136,7 @@ void tgStructureInfo::addRigidsAndConnectors() {
     for (int i = 0; i < pairs.size(); i++) {
         tgRigidInfo* pairRigid = initRigidInfo<tgPair>(pairs[i], rigidAgents);
         if (pairRigid) {
-            m_rigids.push_back(pairRigid);
+	  m_rigids.push_back(pairRigid);
         }
         else {
             tgConnectorInfo* pairConnector = initConnectorInfo<tgPair>(pairs[i], connectorAgents);
@@ -172,8 +172,9 @@ tgRigidInfo* tgStructureInfo::initRigidInfo(const T& rigidCandidate, const std::
         assert(pRigidInfo != NULL);
 
         tgRigidInfo* rigid = pRigidInfo->createRigidInfo(rigidCandidate, tagSearch);
-        if (rigid) // check if a tgRigidInfo was found
-            return rigid;
+        if (rigid) {// check if a tgRigidInfo was found
+	  return rigid;
+	}
     }
     return 0;
 }

@@ -69,7 +69,8 @@ namespace
         bool moveCablePointBToEdge;
     } c =
    {
-     0.688,    // density (kg / length^3)
+     //0.688,    // density (kg / length^3)
+     0.0,    // density (kg / length^3)
      3.0,     // radius (length)
      2.0,      // rodLength (length)
      613.0,   // stiffness (kg / sec^2) was 1500
@@ -128,6 +129,9 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
+
+    std::cout << "rodConfig: " << std::endl;
+    std::cout << rodConfig << std::endl;
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
@@ -137,6 +141,9 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     // after the config struct has been constructed:
     muscleConfig.moveCablePointAToEdge = c.moveCablePointAToEdge;
     muscleConfig.moveCablePointBToEdge = c.moveCablePointBToEdge;
+
+    //std::cout << "muscleConfig: " << std::endl;
+    //std::cout << muscleConfig << std::endl;
             
     // Start creating the structure
     tgStructure s;
@@ -169,7 +176,7 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     */
 
     // Move the whole structure up a bit.
-    s.move(btVector3(0, 5, 0));
+    //s.move(btVector3(0, 5, 0));
 
     /*
     // DEBUGGING
@@ -203,6 +210,9 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
+
+    
+    std::cout << s << std::endl;
 
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);

@@ -57,7 +57,8 @@ int main(int argc, char** argv)
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    //tgBoxGround* ground = new tgBoxGround(groundConfig);
+    tgBoxGround* ground = new tgBoxGround();
     
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've

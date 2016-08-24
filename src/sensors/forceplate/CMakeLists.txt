@@ -2,13 +2,15 @@
 #project(sensors)
 project(forceplate)
 
-link_directories(${LIB_DIR})
+#link_directories(${LIB_DIR})
 
-link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
+link_libraries(tgcreator util core tgOpenGLSupport)
 
 # The force plate library has only one file: the force plate model.
+#add_library( ${PROJECT_NAME} SHARED
+#add_executable(
 add_library( ${PROJECT_NAME} SHARED
-    ForcePlateModel.cpp
+  ForcePlateModel.cpp
 )
 
   

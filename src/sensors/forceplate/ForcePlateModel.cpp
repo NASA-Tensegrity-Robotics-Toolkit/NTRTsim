@@ -92,28 +92,35 @@ void ForcePlateModel::calculatePlateNodePositions() {
   // box. These are all assuming the plate is centered at
   // (0, h - pt/2, 0).
   // All these positions are (X, Y, Z) where Y is the vertical coordinate.
+  // Note that tgNode is a subclass of btVector3, so has those constructors
+  // and functions.
 
   // Example: a1 = ( -w/2 + t + wgap,   h - pt,   -L/2 + t + wgap).
-  a1 = btVector3( -(m_config.w/2) + m_config.t + m_config.wgap,
-		  m_config.h - m_config.pt,
-		  -(m_config.L/2) + m_config.t + m_config.wgap);
+  a1 = tgNode( -(m_config.w/2) + m_config.t + m_config.wgap,
+	       m_config.h - m_config.pt,
+	       -(m_config.L/2) + m_config.t + m_config.wgap, "a1");
   // a2 is translated up to the top of the box, e.g. Y == h.
-  a2 = a1 + btVector3( 0, m_config.pt, 0);
+  a2 = a1 + tgNode( 0, m_config.pt, 0);
+  // add the tag to the tgNode, since the "+" operator doesn't include tags.
+  a2.addTags("a2");
   
-  b1 = btVector3( (m_config.w/2) - m_config.t - m_config.wgap,
-		  m_config.h - m_config.pt,
-		  -(m_config.L/2) + m_config.t + m_config.wgap);
-  b2 = b1 + btVector3( 0, m_config.pt, 0);
+  b1 = tgNode( (m_config.w/2) - m_config.t - m_config.wgap,
+	       m_config.h - m_config.pt,
+	       -(m_config.L/2) + m_config.t + m_config.wgap, "b1");
+  b2 = b1 + tgNode( 0, m_config.pt, 0);
+  b2.addTags("b2");
 
-  c1 = btVector3( (m_config.w/2) - m_config.t - m_config.wgap,
-		  m_config.h - m_config.pt,
-		  (m_config.L/2) - m_config.t - m_config.wgap);
-  c2 = c1 + btVector3( 0, m_config.pt, 0);
+  c1 = tgNode( (m_config.w/2) - m_config.t - m_config.wgap,
+	       m_config.h - m_config.pt,
+	       (m_config.L/2) - m_config.t - m_config.wgap, "c1");
+  c2 = c1 + tgNode( 0, m_config.pt, 0);
+  c2.addTags("c2");
 
-  d1 = btVector3( -(m_config.w/2) + m_config.t + m_config.wgap,
-		  m_config.h - m_config.pt,
-		  (m_config.L/2) - m_config.t - m_config.wgap);
-  d2 = d1 + btVector3( 0, m_config.pt, 0);
+  d1 = tgNode( -(m_config.w/2) + m_config.t + m_config.wgap,
+	       m_config.h - m_config.pt,
+	       (m_config.L/2) - m_config.t - m_config.wgap, "d1");
+  d2 = d1 + tgNode( 0, m_config.pt, 0);
+  d2.addTags("d2");
 
   // DEBUGGING:
   if( m_debugging ) {
@@ -128,37 +135,46 @@ void ForcePlateModel::calculatePlateNodePositions() {
   // See this file's .h for more information about where each of these
   // points are located.
   
-  s_ab = btVector3( a1.x() + m_config.sOff,
-		    m_config.h - (m_config.pt/2),
-		    a1.z());
+  s_ab = tgNode( a1.x() + m_config.sOff,
+		 m_config.h - (m_config.pt/2),
+		 a1.z(),
+		 "s_ab");
   
-  s_ba = btVector3( b1.x() - m_config.sOff,
-		    m_config.h - (m_config.pt/2),
-		    b1.z());
+  s_ba = tgNode( b1.x() - m_config.sOff,
+		 m_config.h - (m_config.pt/2),
+		 b1.z(),
+		 "s_ba");
 
-  s_bc = btVector3( b1.x(),
-		    m_config.h - (m_config.pt/2),
-		    b1.z() + m_config.sOff);
+  s_bc = tgNode( b1.x(),
+		 m_config.h - (m_config.pt/2),
+		 b1.z() + m_config.sOff,
+		 "s_bc");
 
-  s_cb = btVector3( c1.x(),
-		    m_config.h - (m_config.pt/2),
-		    c1.z() - m_config.sOff);
+  s_cb = tgNode( c1.x(),
+		 m_config.h - (m_config.pt/2),
+		 c1.z() - m_config.sOff,
+		 "s_cb");
 
-  s_cd = btVector3( c1.x() - m_config.sOff,
-		    m_config.h - (m_config.pt/2),
-		    c1.z());
+  s_cd = tgNode( c1.x() - m_config.sOff,
+		 m_config.h - (m_config.pt/2),
+		 c1.z(),
+		 "s_cd");
 
-  s_dc = btVector3( d1.x() + m_config.sOff,
-		    m_config.h - (m_config.pt/2),
-		    b1.z());
+  s_dc = tgNode( d1.x() + m_config.sOff,
+		 m_config.h - (m_config.pt/2),
+		 b1.z(),
+		 "s_dc");
 
-  s_da = btVector3( d1.x(),
-		    m_config.h - (m_config.pt/2),
-		    d1.z() - m_config.sOff);
+  s_da = tgNode( d1.x(),
+		 m_config.h - (m_config.pt/2),
+		 d1.z() - m_config.sOff,
+		 "s_da");
 
-  s_ad = btVector3( a1.x(),
-		    m_config.h - (m_config.pt/2),
-		    a1.z() + m_config.sOff);
+  s_ad = tgNode( a1.x(),
+		 m_config.h - (m_config.pt/2),
+		 //m_config.h,
+		 a1.z() + m_config.sOff,
+		 "s_ad");
   
   // DEBUGGING:
   if( m_debugging ) {
@@ -173,10 +189,10 @@ void ForcePlateModel::calculatePlateNodePositions() {
   // located on the bottom side of the plate.
   // As always, see the .h file for more information.
 
-  s_bot_a = btVector3( s_ab.x(), a1.y(), s_ad.z() );
-  s_bot_b = btVector3( s_ba.x(), b1.y(), s_bc.z() );
-  s_bot_c = btVector3( s_cd.x(), c1.y(), s_cb.z() );
-  s_bot_d = btVector3( s_dc.x(), d1.y(), s_da.z() );
+  s_bot_a = tgNode( s_ab.x(), a1.y(), s_ad.z(), "s_bot_a" );
+  s_bot_b = tgNode( s_ba.x(), b1.y(), s_bc.z(), "s_bot_b" );
+  s_bot_c = tgNode( s_cd.x(), c1.y(), s_cb.z(), "s_bot_c" );
+  s_bot_d = tgNode( s_dc.x(), d1.y(), s_da.z(), "s_bot_d" );
 
   // DEBUGGING:
   if( m_debugging ) {
@@ -321,88 +337,92 @@ ForcePlateModel::~ForcePlateModel()
 }
 
 // helper function to tag two sets of nodes as boxes
-void ForcePlateModel::addLateralPlateBoxes(tgStructure& s)
+void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
 {
-  //s.addPair( 0,  1, "box");
-  //s.addPair( 2,  3, "box");
-}
+  // @TO-DO: is it necessary to add a node if we're going to
+  // add a pair separately?
+  
+  s.addNode( s_ab ); // 0
+  s.addNode( s_ba ); // 1
+  s.addNode( s_bc ); // 2
+  s.addNode( s_cb ); // 3
+  s.addNode( s_cd ); // 4
+  s.addNode( s_dc ); // 5
+  s.addNode( s_da ); // 6
+  s.addNode( s_ad ); // 7
+  
 
-// helper function to add our single compression spring actuator
-void ForcePlateModel::addSprings(tgStructure& s)
-{
-  // spring is vertical between top of box 1 and bottom of box 2.
-  //s.addPair(1, 2,  "compressionSpring");
-  //s.addPair(1, 2,  "basicActuator");
+  // add the pairs for the force plate boxes.
+  //s.addPair( s_ad, s_bc, "xyPlateBox");
+  s.addPair( 7, 2, "xyPlateBox");
+  //s.addPair( s_da, s_cb, "xyPlateBox");
+  //s.addPair( s_ab, s_dc, "yzPlateBox");
+  //s.addPair( s_ba, s_cd, "yzPlateBox");
+
+  // Then, add the nodes for the filler box (the one that
+  // fills in the empty space not taken up by the other boxes.)
+  tgNode fillerBoxFrom = tgNode(0,
+				m_config.h - (m_config.pt/2),
+				a1.z() + 2 * m_config.sOff);
+  tgNode fillerBoxTo = tgNode(0,
+			      m_config.h - (m_config.pt/2),
+			      d1.z() - 2 * m_config.sOff);
+  // Add these two nodes as a pair for the plate filler box.
+  //s.addPair( fillerBoxFrom, fillerBoxTo, "plateFillerBox");
 }
 
 // Finally, create the model!
 void ForcePlateModel::setup(tgWorld& world)
 {
-  // The structure that will be built into:
-  //tgStructure s;
+  // @TO-DO: Make sure that the nodes are assigned by now.
   
-  // Create the force plate first.
-  // Create the boxes that will be used as the connecting points
+  // The structure that will be built into:
+  //tgStructure s = tgStructure();
+  tgStructure s;
+
+  // Add the pairs for the force plate first.
+  // Add the the boxes that will be used as the connecting points
   // for the lateral springs.
-  //addLateralPlateBoxes(s);
+  addLateralPlateBoxesPairs(s);
 
-  /*
-    // config struct for the rods
-    const tgBox::Config boxConfig(c.boxWidth, c.boxHeight, c.density, 
-				  c.friction, c.rollFriction, c.restitution);
+  // Create the config structs for the various different boxes and springs.
+  // This config takes: w, h, density, friction, rollFriction, restitution.
+  //const tgBox::Config plateBoxConfig( 2 * m_config.sOff, m_config.pt,
+  tgBox::Config xyPlateBoxConfig( m_config.pt, 2 * m_config.sOff, 
+  				      0.0,
+  				      1.0,
+  				      1.0,
+  				      1.0);
+  tgBox::Config yzPlateBoxConfig( 2 * m_config.sOff, m_config.pt, 
+  				      0.0,
+  				      1.0,
+  				      1.0,
+  				      1.0);
 
-    // config struct for the compression spring
-    //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
-    //				c.stiffness, c.damping, c.springRestLength,
-    //				c.moveCablePointAToEdge, c.moveCablePointBToEdge);
-    tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
-				c.isFreeEndAttached, c.stiffness, c.damping,
-				c.springRestLength, c.moveCablePointAToEdge,
-				c.moveCablePointBToEdge, c.direction);
+  // Create the build spec that uses tags to turn the structure into a real model
+  tgBuildSpec spec;
+  spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
+  spec.addBuilder("yzPlateBox", new tgBoxInfo(yzPlateBoxConfig));
 
-    //tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
-    //					 c.hist, c.maxTens, c.targetVelocity);
+  std::cout << "yzPlateBoxConfig height: " << std::endl;
+  std::cout << yzPlateBoxConfig.height << std::endl;
+  std::cout << "xyPlateBoxConfig height: " << std::endl;
+  std::cout << xyPlateBoxConfig.height << std::endl;
+  std::cout << s << std::endl;
 
-    #if (1)
-    std::cout << "TwoBoxesModel::setup. Direction is: ";
-    std::cout << "(" << c.direction->x() << ",";
-    std::cout << c.direction->y() << ",";
-    std::cout << c.direction->z() << ")" << std::endl;
-    #endif    
-    
-    // Start creating the structure
-    tgStructure s;
-    addNodes(s);
-    addBoxes(s);
-    addActuators(s);
+  // Create your structureInfo
+  tgStructureInfo structureInfo(s, spec);
 
+  //std::cout << spec << std::endl;
 
-    // Create the build spec that uses tags to turn the structure into a real model
-    tgBuildSpec spec;
-    spec.addBuilder("box", new tgBoxInfo(boxConfig));
-    //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
-    spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
+  // Use the structureInfo to build ourselves
+  structureInfo.buildInto(*this, world);
 
-    
-    // Create your structureInfo
-    tgStructureInfo structureInfo(s, spec);
+  // call the onSetup methods of all observed things e.g. controllers
+  notifySetup();
 
-    // Use the structureInfo to build ourselves
-    structureInfo.buildInto(*this, world);
-
-    // We could now use tgCast::filter or similar to pull out the
-    // models (e.g. muscles) that we want to control. 
-    allActuators = tgCast::filter<tgModel, tgCompressionSpringActuator> (getDescendants());
-    //allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
-
-    // call the onSetup methods of all observed things e.g. controllers
-    notifySetup();
-
-    // Actually setup the children
-    tgModel::setup(world);
-
-  */
+  // Actually setup the children
+  tgModel::setup(world);
 }
 
 void ForcePlateModel::step(double dt)

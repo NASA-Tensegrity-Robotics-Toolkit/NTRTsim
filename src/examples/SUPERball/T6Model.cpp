@@ -68,7 +68,8 @@ namespace
         double targetVelocity;
     } c =
    {
-     0.688,    // density (kg / length^3)
+     //0.688,    // density (kg / length^3)
+     0.0,    // density (kg / length^3)
      0.31,     // radius (length)
      613.0,   // stiffness (kg / sec^2) was 1500
      200.0,    // damping (kg / sec)
@@ -180,14 +181,15 @@ void T6Model::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addActuators(s);
-    s.move(btVector3(0, 10, 0));
+    //s.move(btVector3(0, 10, 0));
+    s.move(btVector3(0, c.rod_length/2, 0));
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
     btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
     double rotationAngle = M_PI/2;
-    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    //s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
