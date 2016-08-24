@@ -29,9 +29,11 @@
 // This library
 #include "core/tgUnidirectionalCompressionSpringActuator.h"
 #include "core/tgBox.h"
+#include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 // The Bullet Physics library
@@ -162,7 +164,7 @@ void ForcePlateModel::calculatePlateNodePositions() {
 
   s_dc = tgNode( d1.x() + m_config.sOff,
 		 m_config.h - (m_config.pt/2),
-		 b1.z(),
+		 d1.z(),
 		 "s_dc");
 
   s_da = tgNode( d1.x(),
@@ -172,7 +174,6 @@ void ForcePlateModel::calculatePlateNodePositions() {
 
   s_ad = tgNode( a1.x(),
 		 m_config.h - (m_config.pt/2),
-		 //m_config.h,
 		 a1.z() + m_config.sOff,
 		 "s_ad");
   
@@ -353,11 +354,13 @@ void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
   
 
   // add the pairs for the force plate boxes.
-  //s.addPair( s_ad, s_bc, "xyPlateBox");
-  s.addPair( 7, 2, "xyPlateBox");
-  //s.addPair( s_da, s_cb, "xyPlateBox");
-  //s.addPair( s_ab, s_dc, "yzPlateBox");
-  //s.addPair( s_ba, s_cd, "yzPlateBox");
+  s.addPair( s_ad, s_bc, "xyPlateBox");
+  //s.addPair( 7, 2, "xyPlateBox");
+  s.addPair( s_da, s_cb, "xyPlateBox");
+  s.addPair( s_ab, s_dc, "yzPlateBox");
+  //s.addPair( 5, 0, "xyPlateBox");
+  s.addPair( s_ba, s_cd, "yzPlateBox");
+  //s.addPair( s_ba, s_dc, "xyPlateBox");
 
   // Then, add the nodes for the filler box (the one that
   // fills in the empty space not taken up by the other boxes.)
@@ -368,7 +371,7 @@ void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
 			      m_config.h - (m_config.pt/2),
 			      d1.z() - 2 * m_config.sOff);
   // Add these two nodes as a pair for the plate filler box.
-  //s.addPair( fillerBoxFrom, fillerBoxTo, "plateFillerBox");
+  s.addPair( fillerBoxFrom, fillerBoxTo, "fillerPlateBox");
 }
 
 // Finally, create the model!
@@ -380,34 +383,53 @@ void ForcePlateModel::setup(tgWorld& world)
   //tgStructure s = tgStructure();
   tgStructure s;
 
+  // Manually specify a few nodes and pairs so that we can force rigids to intersect.
+  s.addNode(-0.5, 0, 0);
+  s.addNode(0.5, 0, 0);
+  s.addNode(0, 0, -0.5);
+  s.addNode(0, 0, 0.5);
+  s.addPair(0, 1, "rod");
+  s.addPair(2, 3, "rod");
+
+  tgRod::Config rodConfig(0.1, 2.0);
+
   // Add the pairs for the force plate first.
   // Add the the boxes that will be used as the connecting points
   // for the lateral springs.
-  addLateralPlateBoxesPairs(s);
+  //addLateralPlateBoxesPairs(s);
 
+  // Move the structure to the location passed in to the constructor.
+  s.move(m_location);
+
+  /*
   // Create the config structs for the various different boxes and springs.
   // This config takes: w, h, density, friction, rollFriction, restitution.
-  //const tgBox::Config plateBoxConfig( 2 * m_config.sOff, m_config.pt,
   tgBox::Config xyPlateBoxConfig( m_config.pt, 2 * m_config.sOff, 
-  				      0.0,
+  				      1.0,
   				      1.0,
   				      1.0,
   				      1.0);
   tgBox::Config yzPlateBoxConfig( 2 * m_config.sOff, m_config.pt, 
-  				      0.0,
+  				      1.0,
   				      1.0,
   				      1.0,
   				      1.0);
+  //std::cout << s_ba.x() - s_ab.x() - (2 * m_config.sOff) << std::endl;
+  tgBox::Config fillerPlateBoxConfig( (s_ba.x() - s_ab.x() - (2 * m_config.sOff))/2,
+				      m_config.pt, 
+  				      1.0,
+  				      1.0,
+  				      1.0,
+  				      1.0);
+  */
 
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
-  spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
-  spec.addBuilder("yzPlateBox", new tgBoxInfo(yzPlateBoxConfig));
+  //spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
+  //spec.addBuilder("yzPlateBox", new tgBoxInfo(yzPlateBoxConfig));
+  //spec.addBuilder("fillerPlateBox", new tgBoxInfo(fillerPlateBoxConfig));
+  spec.addBuilder("rod", new tgRodInfo(rodConfig));
 
-  std::cout << "yzPlateBoxConfig height: " << std::endl;
-  std::cout << yzPlateBoxConfig.height << std::endl;
-  std::cout << "xyPlateBoxConfig height: " << std::endl;
-  std::cout << xyPlateBoxConfig.height << std::endl;
   std::cout << s << std::endl;
 
   // Create your structureInfo

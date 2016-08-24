@@ -83,7 +83,7 @@ int main(int argc, char** argv)
     
     ForcePlateModel::Config forcePlateConfig(L);
     // This line determines the location of the force plate at (0,0,0).
-    btVector3 forcePlateLocation = btVector3(0,0,0);
+    btVector3 forcePlateLocation = btVector3(0,3,0);
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
     bool forcePlateDebugging = true;
