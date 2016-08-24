@@ -24,7 +24,8 @@
  */
 
 // This application
-#include "sensors/forceplate/ForcePlateModel.h"
+//#include "sensors/forceplate/ForcePlateModel.h"
+#include "ForcePlateModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -49,19 +50,20 @@ int main(int argc, char** argv)
     // First create the ground and world
     
     // Determine the angle of the ground in radians. All 0 is flat
-    const double yaw = 0.0;
+    //const double yaw = 0.0;
     //const double pitch = M_PI/15.0;
-    const double pitch = 0.0;
-    const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    //const double pitch = 0.0;
+    //const double roll = 0.0;
+    //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    //tgBoxGround* ground = new tgBoxGround(groundConfig);
     
     const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've
         // scaled the world length scale to decimeters not cm.
 
-    tgWorld world(config, ground);
+    //tgWorld world(config, ground);
+    tgWorld world(config);
 
     // Second create the view
     const double timestep_physics = 0.001; // Seconds
@@ -80,6 +82,7 @@ int main(int argc, char** argv)
     // force plate is already a model.
     // 
     double L = 10.0;
+    //double L = 5.0;
     
     ForcePlateModel::Config forcePlateConfig(L);
     // This line determines the location of the force plate at (0,0,0).

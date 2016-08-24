@@ -69,8 +69,8 @@ namespace
         bool moveCablePointBToEdge;
     } c =
    {
-     //0.688,    // density (kg / length^3)
-     0.0,    // density (kg / length^3)
+     0.688,    // density (kg / length^3)
+     //0.0,    // density (kg / length^3)
      3.0,     // radius (length)
      2.0,      // rodLength (length)
      613.0,   // stiffness (kg / sec^2) was 1500
@@ -176,7 +176,7 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     */
 
     // Move the whole structure up a bit.
-    //s.move(btVector3(0, 5, 0));
+    s.move(btVector3(0, 5, 0));
 
     /*
     // DEBUGGING
@@ -202,8 +202,7 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     double rotationAngle = M_PI/2;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
     */
-
-    // Create the build spec that uses tags to turn the structure into a real model
+    
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));

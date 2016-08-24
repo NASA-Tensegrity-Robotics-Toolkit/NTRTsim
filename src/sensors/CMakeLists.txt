@@ -1,9 +1,9 @@
 project(sensors)
 
 # specify the force plate as a separate library.
-subdirs(
-  forceplate
-)
+#subdirs(
+#  forceplate
+#)
 
 link_directories(${LIB_DIR})
 
