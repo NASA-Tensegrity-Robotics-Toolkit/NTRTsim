@@ -28,10 +28,12 @@
 #include "ForcePlateModel.h"
 // This library
 #include "core/tgUnidirectionalCompressionSpringActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgBox.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
@@ -241,6 +243,43 @@ void ForcePlateModel::calculateHousingNodePositions() {
     std::cout << "hb_c: " << hb_c << std::endl;
     std::cout << "hb_d: " << hb_d << std::endl << std::endl;
   }
+
+  // Then, calculate the spring anchor positions on the housing.
+  // NOTE THAT THIS REQUIRES THAT ALL THE s_() NODES ARE POPULATED!
+  // @TO-DO: implement a check on this.
+
+  s_ab_housing = s_ab + tgNode( 0, 0, -m_config.wgap);
+  s_ab_housing.addTags("s_ab_housing");
+  s_ba_housing = s_ba + tgNode( 0, 0, -m_config.wgap);
+  s_ba_housing.addTags("s_ba_housing");
+
+  s_bc_housing = s_ba + tgNode( m_config.wgap, 0, 0);
+  s_bc_housing.addTags("s_bc_housing");
+  s_cb_housing = s_cb + tgNode( m_config.wgap, 0, 0);
+  s_cb_housing.addTags("s_cb_housing");
+
+  s_cd_housing = s_cd + tgNode( 0, 0, m_config.wgap);
+  s_cd_housing.addTags("s_cd_housing");
+  s_dc_housing = s_dc + tgNode( 0, 0, m_config.wgap);
+  s_dc_housing.addTags("s_dc_housing");
+
+  s_da_housing = s_da + tgNode( -m_config.wgap, 0, 0);
+  s_da_housing.addTags("s_da_housing");
+  s_ad_housing = s_ad + tgNode( -m_config.wgap, 0, 0);
+  s_ad_housing.addTags("s_ad_housing");
+
+  // DEBUGGING:
+  if( m_debugging ) {
+    std::cout << std::endl << "Calculated lateral spring anchor positions on the housing:" << std::endl;
+    std::cout << "s_ab_housing, s_ba_housing: " << s_ab_housing
+	      << "   " << s_ba_housing << std::endl;
+    std::cout << "s_bc_housing, s_cb_housing: " << s_bc_housing
+	      << "   " << s_cb_housing << std::endl;
+    std::cout << "s_cd_housing, s_dc_housing: " << s_cd_housing
+	      << "   " << s_dc_housing << std::endl;
+    std::cout << "s_da_housing, s_ad_housing: " << s_da_housing
+	      << "   " << s_ad_housing << std::endl << std::endl;
+  }
 }
 
 /** 
@@ -334,6 +373,8 @@ void ForcePlateModel::constructorAux()
   // be calculated.
   // Creation of the actual NTRT objects happens in setup, though.
   calculatePlateNodePositions();
+  // Housing node position calculations rely on the plate positions,
+  // so this function MUST be called after the above one.
   calculateHousingNodePositions();
 
 }
@@ -440,6 +481,18 @@ void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
   s.addPair( hb_d, hb_a, "housingWallZ" );
 }
 
+// Adds the pairs for the lateral springs (attaching the housing to the plate.
+void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
+{
+  // On each side, springs can start from the housing and attach the free end
+  // to the plate.
+  s.addNode( s_bc );
+  s.addNode( s_bc_housing );
+  //s.addPair( 0, 1, "lateralSpringBC" );
+  s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
+  
+}
+
 // Finally, create the model!
 void ForcePlateModel::setup(tgWorld& world)
 {
@@ -454,32 +507,14 @@ void ForcePlateModel::setup(tgWorld& world)
   // for the lateral springs.
   addLateralPlateBoxesPairs(s);
   addHousingBoxesPairs(s);
+  // Add the pairs for the springs
+  addLateralSpringsPairs(s);
 
   // Move the structure to the location passed in to the constructor.
   s.move(m_location);
 
   
   // Create the config structs for the various different boxes and springs.
-  // This config takes: w, h, density, friction, rollFriction, restitution.
-  /*
-  tgBox::Config xyPlateBoxConfig( m_config.pt, 2 * m_config.sOff, 
-  				      1.0,
-  				      1.0,
-  				      1.0,
-  				      1.0);
-  tgBox::Config yzPlateBoxConfig( 2 * m_config.sOff, m_config.pt, 
-  				      1.0,
-  				      1.0,
-  				      1.0,
-  				      1.0);
-  //std::cout << s_ba.x() - s_ab.x() - (2 * m_config.sOff) << std::endl;
-  tgBox::Config fillerPlateBoxConfig( (s_ba.x() - s_ab.x() - (2 * m_config.sOff))/2,
-				      m_config.pt, 
-  				      1.0,
-  				      1.0,
-  				      1.0,
-  				      1.0);
-  */
 
   // Config for the force plate box itself:
   double plateWidth = m_config.w - (2 * m_config.t) - (2 * m_config.wgap);
@@ -497,6 +532,19 @@ void ForcePlateModel::setup(tgWorld& world)
   tgBox::Config housingWallConfigZ( m_config.t, m_config.h, 1.0);
   tgBox::Config housingWallConfigX( m_config.h, m_config.t, 1.0);
 
+  // For the springs:
+  // Config here is isFreeEndAttached, stiffness, damping, restlength,
+  // movecablepointA, movecablepointB, direction.
+  // Note that since the direction changes for each face of the plate,
+  // there will need to be four configs here.
+  // They are named by face: AB, BC, CD, DA.
+  tgUnidirectionalCompressionSpringActuator::Config
+    lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
+			  false, false, new btVector3(1, 0, 0));
+
+  // stiffness, damping, pretension.
+  tgBasicActuator::Config testSpring(100, 10, 0);
+  
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
   //spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
@@ -506,6 +554,9 @@ void ForcePlateModel::setup(tgWorld& world)
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxInfo(housingWallConfigZ));
   spec.addBuilder("housingWallX", new tgBoxInfo(housingWallConfigX));
+  //spec.addBuilder("lateralSpringBC",
+  //		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  //spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpring));
 
   std::cout << s << std::endl;
 

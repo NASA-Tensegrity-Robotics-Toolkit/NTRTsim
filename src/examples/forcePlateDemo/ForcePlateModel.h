@@ -347,6 +347,19 @@ protected:
     tgNode hb_b;
     tgNode hb_c;
     tgNode hb_d;
+
+    /**
+     * Spring anchor positions on the housing.
+     * These are all located opposite the spring anchor points on the plate.
+     */
+    tgNode s_ab_housing;
+    tgNode s_ba_housing;
+    tgNode s_bc_housing;
+    tgNode s_cb_housing;
+    tgNode s_cd_housing;
+    tgNode s_dc_housing;
+    tgNode s_da_housing;
+    tgNode s_ad_housing;
     
     /**
      * The btVector3 location of this specific force plate.
@@ -379,7 +392,7 @@ private:
      * the relevant nodes. This is for the lateral springs.
      * @param[in] s: A tgStructure that we're building into
      */
-    //void addLateralSprings(tgStructure& s);    
+    void addLateralSpringsPairs(tgStructure& s);    
     
     /**
      * Calculates all the node positions for this force plate.
@@ -392,7 +405,8 @@ private:
      * the plate.
      * Uses m_config.
      */
-    void calculateHousingNodePositions();	
+    void calculateHousingNodePositions();
+    
     /**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
