@@ -280,6 +280,7 @@ void ForcePlateModel::constructorAux()
   // be calculated.
   // Creation of the actual NTRT objects happens in setup, though.
   calculatePlateNodePositions();
+
 }
 
 /**
@@ -319,19 +320,8 @@ ForcePlateModel::~ForcePlateModel()
 { 
 }
 
-// a helper function to add a bunch of nodes
-void ForcePlateModel::addNodes(tgStructure& s)
-{
-  /*
-  s.addNode(0, 0, 0);              // 0, origin
-  s.addNode(0, 2 * c.boxLength, 0);      // 1, top of box 1
-  s.addNode(0, 4 * c.boxLength, 0);  // 2, bottom of box 2
-  s.addNode(0, 5 * c.boxLength, 0);  // 3, top of box 3
-  */
-}
-
 // helper function to tag two sets of nodes as boxes
-void ForcePlateModel::addBoxes(tgStructure& s)
+void ForcePlateModel::addLateralPlateBoxes(tgStructure& s)
 {
   //s.addPair( 0,  1, "box");
   //s.addPair( 2,  3, "box");
@@ -348,6 +338,13 @@ void ForcePlateModel::addSprings(tgStructure& s)
 // Finally, create the model!
 void ForcePlateModel::setup(tgWorld& world)
 {
+  // The structure that will be built into:
+  //tgStructure s;
+  
+  // Create the force plate first.
+  // Create the boxes that will be used as the connecting points
+  // for the lateral springs.
+  //addLateralPlateBoxes(s);
 
   /*
     // config struct for the rods

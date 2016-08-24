@@ -355,11 +355,11 @@ private:
     static void addNodes(tgStructure& s);
 	
     /**
-     * A function called during setup that creates boxes from the
-     * relevant nodes. Rewrite this function for your own models.
+     * A function called during setup that creates boxes for the force plate,
+     * the ones that will be used for the lateral springs.
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addBoxes(tgStructure& s);
+    static void addLateralPlateBoxes(tgStructure& s);
 	
     /**
      * A function called during setup that creates springs from
