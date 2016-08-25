@@ -51,36 +51,42 @@ namespace
     // frictional parameters are for the tgBox objects.
     const struct Config
     {
-        double density;
-        double radius;
-        bool isFreeEndAttached;
-        double stiffness;
-        double damping;
-        btVector3 * direction;
-        double boxLength;
-        double boxWidth;
-        double boxHeight;
-        double friction;
-        double rollFriction;
-        double restitution;
-        double springRestLength;
-        bool moveCablePointAToEdge;
-        bool moveCablePointBToEdge;
-        double pretension; // parameters for basic actuator
-        bool   hist;
-        double maxTens;
-        double targetVelocity;
+      double density;
+      double radius;
+      bool isFreeEndAttached;
+      double stiffness;
+      double damping;
+      btVector3 * direction;
+      double boxLength;
+      double boxWidth;
+      double boxHeight;
+      btVector3 boxStart;
+      btVector3 boxEnd;
+      double friction;
+      double rollFriction;
+      double restitution;
+      double springRestLength;
+      bool moveCablePointAToEdge;
+      bool moveCablePointBToEdge;
+      double pretension; // parameters for basic actuator
+      bool   hist;
+      double maxTens;
+      double targetVelocity;
     } c =
    {
-     0.1,    // density (kg / length^3)
+     //0.1,    // density (kg / length^3)
+     0.0,    // density (kg / length^3)
      0.31,     // radius (length)
      true,   // isFreeEndAttached
      500.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
-     new btVector3(1, 0, 0),  // direction
-     3.0,   // boxLength (length)
-     4.0,   // boxWidth (length)
-     3.0,   // boxHeight (length)
+     //new btVector3(1, 0, 0),  // direction
+     new btVector3(0, 1, 0),  // direction
+     0.0,   // boxLength (length)
+     4,   // boxWidth (length)
+     1,   // boxHeight (length)
+     btVector3(0, 0, 0 ), // boxStart
+     btVector3(0, 3, 0 ), // boxEnd
      1.0,      // friction (unitless)
      1.0,     // rollFriction (unitless)
      0.2,      // restitution (?)
@@ -126,27 +132,53 @@ TwoBoxesModel::~TwoBoxesModel()
 // a helper function to add a bunch of nodes
 void TwoBoxesModel::addNodes(tgStructure& s)
 {
+  // Version with vertical boxes:
+  /*
   s.addNode(0, 0, 0);              // 0, origin, bottom of box 1
   s.addNode(0, 2 * c.boxLength, 0);      // 1, top of box 1
   s.addNode(0, 4 * c.boxLength, 0);  // 2, bottom of box 2
   s.addNode(0, 5 * c.boxLength, 0);  // 3, top of box 2
-  // CHECK ON THIS 2016-08-25
-  s.addNode(-c.boxWidth/2, c.boxLength,  0); // 4, side of box 1
-  s.addNode( -c.boxWidth/2, 4.5 * c.boxLength, 0); // 5, side of box 2
+  // Note that box width is distance from center to outside,
+  // NOT the distance from one side to another.
+  s.addNode(-c.boxWidth, c.boxLength,  0); // 4, side of box 1
+  s.addNode( -c.boxWidth, 4.5 * c.boxLength, 0); // 5, side of box 2
+  */
+  // Remember, boxes are created with (x, y, z) == (w, L, h) before rotation.
+  // Version with horizontal boxes:
+  
+  //s.addNode(0, c.boxWidth, 0);              // 0, origin, start of box 1
+  //s.addNode(c.boxLength, c.boxWidth, 0);      // 1, end of box 1
+  //s.addNode(2 * c.boxLength, c.boxWidth, 0);  // 2, start of box 2
+  //.addNode(3 * c.boxLength, c.boxWidth, 0);  // 3, end of box 2
+  // Note that box width is distance from center to outside,
+  // NOT the distance from one side to another.
+  //s.addNode( 1.5 * c.boxLength, c.boxWidth, c.boxHeight); // 4, side of box 1
+  //s.addNode( 2.5 * c.boxLength, c.boxWidth, c.boxHeight); // 5, side of box 2
+
+  // Testing to see how boxes are extruded. What is width, and what is height,
+  // for different directions?
+  // This test has (L = 3, w = 4, h = 1.)
+  // Below gives a box with "width" as the
+  s.addNode( tgNode(c.boxStart) ); // 0
+  s.addNode( tgNode(c.boxEnd) ); // 1
+  //s.addNode( c.boxLength, c.boxHeight, 0); // 6
 }
 
 // helper function to tag two sets of nodes as boxes
 void TwoBoxesModel::addBoxes(tgStructure& s)
 {
-    s.addPair( 0,  1, "box");
-    s.addPair( 2,  3, "box");
+  s.addPair( 0,  1, "box");
+  //s.addPair( 2,  3, "box");
+  // Testing for determining the direction that a box gets created in:
+  //s.addPair(0, 6, "box");
 }
 
 // helper function to add our single compression spring actuator
 void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
-  s.addPair(1, 2,  "compressionSpring");
+  //s.addPair(1, 2,  "compressionSpring");
+  s.addPair(1, 2,  "basicActuator");
   s.addPair(4, 5,  "basicActuator");
 }
 
@@ -168,6 +200,9 @@ void TwoBoxesModel::setup(tgWorld& world)
 
     tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
     					 c.hist, c.maxTens, c.targetVelocity);
+    // Modify: do not move the basic actuator to the edge on either side.
+    basActConfig.moveCablePointAToEdge = c.moveCablePointAToEdge;
+    basActConfig.moveCablePointBToEdge = c.moveCablePointBToEdge;
 
     #if (1)
     std::cout << "TwoBoxesModel::setup. Direction is: ";
@@ -181,7 +216,7 @@ void TwoBoxesModel::setup(tgWorld& world)
     addNodes(s);
     addBoxes(s);
     addActuators(s);
-    //s.move(btVector3(0, 10, 0));
+    s.move(btVector3(0, 2, 0));
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
@@ -195,8 +230,9 @@ void TwoBoxesModel::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
     //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
-    spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
+    //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("basicActuator", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     
     // Create your structureInfo

@@ -58,6 +58,13 @@ class tgWorld;
  * In order to take data using this force plate, a tgDataObserver/Logger must
  * be attached to this model.
  */
+
+// @TO-DO: BOXES ARE DECLARED WITH HALF-EXTENTS, NOT FULL!
+// All this code assumes that, for example, "w" is from one side of the box
+// to another, but that's not true: "w" and "h" act like "radius" for rods,
+// in that they're the distance from the center to one side.
+// Change all w/2 to just w.
+
 class ForcePlateModel : public tgSubject<ForcePlateModel>, public tgModel
 {
 public: 
