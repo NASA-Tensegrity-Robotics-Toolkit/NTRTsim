@@ -421,9 +421,16 @@ void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
    * adds them as a pair.
    * The two endpoints are at the center of two rectangles on the face of the plate.
    */
+  // Note that even though rigid bodies are created properly when
+  // pairs are specified directly, connectors will fail unless
+  // their pairs are specified as numerical indices into the list
+  // of nodes (which requires that nodes are added first before
   tgNode plateBoxFrom = tgNode( 0, m_config.h - (m_config.pt/2), a1.z() );
   tgNode plateBoxTo = tgNode( 0, m_config.h - (m_config.pt/2), d1.z() );
-  s.addPair(plateBoxFrom, plateBoxTo, "plateBox");
+  s.addNode(plateBoxFrom); // 0
+  s.addNode(plateBoxTo);  // 1
+  s.addPair(0, 1, "plateBox");
+  //s.addPair(plateBoxFrom, plateBoxTo, "plateBox");
   
   // @TO-DO: is it necessary to add a node if we're going to
   // add a pair separately?
@@ -473,12 +480,26 @@ void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
 // helper function to tag two sets of nodes as boxes
 void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
 {
+  // Note that even though rigid bodies are created properly when
+  // pairs are specified directly, connectors will fail unless
+  // their pairs are specified as numerical indices into the list
+  // of nodes (which requires that nodes are added first before
+  // adding pairs.) For consistency, use this method too for the rigids.
+  // Add the nodes:
+  s.addNode( hb_a ); // 2
+  s.addNode( hb_b ); // 3
+  s.addNode( hb_c ); // 4
+  s.addNode( hb_d ); // 5
   // First, the sides of the housing, as pairs between the
   // "hb" nodes.
   //s.addPair( hb_a, hb_b, "housingWallX" );
-  s.addPair( hb_b, hb_c, "housingWallZ" );
-  s.addPair( hb_c, hb_d, "housingWallX" );
-  s.addPair( hb_d, hb_a, "housingWallZ" );
+  //s.addPair( hb_b, hb_c, "housingWallZ" );
+  //s.addPair( hb_c, hb_d, "housingWallX" );
+  //s.addPair( hb_d, hb_a, "housingWallZ" );
+  //s.addPair( 2, 3, "housingWallX" ); // hb_a, hb_b
+  s.addPair( 3, 4, "housingWallZ" ); // hb_b, hb_c
+  s.addPair( 4, 5, "housingWallX" ); // hb_c, hb_d
+  s.addPair( 5, 2, "housingWallZ" ); // hb_d, hb_a
 }
 
 // Adds the pairs for the lateral springs (attaching the housing to the plate.
@@ -486,10 +507,10 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
 {
   // On each side, springs can start from the housing and attach the free end
   // to the plate.
-  s.addNode( s_bc );
-  s.addNode( s_bc_housing );
+  s.addNode( s_bc ); // 6
+  s.addNode( s_bc_housing ); // 7
   //s.addPair( 0, 1, "lateralSpringBC" );
-  s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
+  //s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
   
 }
 
@@ -542,6 +563,14 @@ void ForcePlateModel::setup(tgWorld& world)
     lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(1, 0, 0));
 
+  //DEBUGGING
+  // See if we can get a proper error when a connector is at a node
+  // which has multiple rigid bodies connected there.
+  // On the plate:
+  //tgNode plateBoxFromTemp = tgNode( 0, m_config.h - (m_config.pt/2), a1.z() );
+  //s.addPair(plateBoxFromTemp, hb_c, "lateralSpringTemp");
+  s.addPair(0, 4, "lateralSpringTemp"); // plateBoxFrom, hb_c
+
   // stiffness, damping, pretension.
   tgBasicActuator::Config testSpring(100, 10, 0);
   
@@ -556,7 +585,7 @@ void ForcePlateModel::setup(tgWorld& world)
   spec.addBuilder("housingWallX", new tgBoxInfo(housingWallConfigX));
   //spec.addBuilder("lateralSpringBC",
   //		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
-  //spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpring));
+  spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));
 
   std::cout << s << std::endl;
 

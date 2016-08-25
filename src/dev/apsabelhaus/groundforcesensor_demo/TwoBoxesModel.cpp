@@ -79,7 +79,7 @@ namespace
      20.0,    // damping (kg / sec)
      new btVector3(1, 0, 0),  // direction
      3.0,   // boxLength (length)
-     3.0,   // boxWidth (length)
+     4.0,   // boxWidth (length)
      3.0,   // boxHeight (length)
      1.0,      // friction (unitless)
      1.0,     // rollFriction (unitless)
@@ -126,10 +126,13 @@ TwoBoxesModel::~TwoBoxesModel()
 // a helper function to add a bunch of nodes
 void TwoBoxesModel::addNodes(tgStructure& s)
 {
-  s.addNode(0, 0, 0);              // 0, origin
+  s.addNode(0, 0, 0);              // 0, origin, bottom of box 1
   s.addNode(0, 2 * c.boxLength, 0);      // 1, top of box 1
   s.addNode(0, 4 * c.boxLength, 0);  // 2, bottom of box 2
-  s.addNode(0, 5 * c.boxLength, 0);  // 3, top of box 3
+  s.addNode(0, 5 * c.boxLength, 0);  // 3, top of box 2
+  // CHECK ON THIS 2016-08-25
+  s.addNode(-c.boxWidth/2, c.boxLength,  0); // 4, side of box 1
+  s.addNode( -c.boxWidth/2, 4.5 * c.boxLength, 0); // 5, side of box 2
 }
 
 // helper function to tag two sets of nodes as boxes
@@ -144,7 +147,7 @@ void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
   s.addPair(1, 2,  "compressionSpring");
-  //s.addPair(1, 2,  "basicActuator");
+  s.addPair(4, 5,  "basicActuator");
 }
 
 // Finally, create the model!
@@ -163,8 +166,8 @@ void TwoBoxesModel::setup(tgWorld& world)
 				c.springRestLength, c.moveCablePointAToEdge,
 				c.moveCablePointBToEdge, c.direction);
 
-    //tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
-    //					 c.hist, c.maxTens, c.targetVelocity);
+    tgBasicActuator::Config basActConfig(c.stiffness, c.damping, c.pretension,
+    					 c.hist, c.maxTens, c.targetVelocity);
 
     #if (1)
     std::cout << "TwoBoxesModel::setup. Direction is: ";
@@ -193,7 +196,7 @@ void TwoBoxesModel::setup(tgWorld& world)
     spec.addBuilder("box", new tgBoxInfo(boxConfig));
     //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
     spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
+    spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     
     // Create your structureInfo
