@@ -207,6 +207,11 @@ bool tgBoxInfo::isNodeOnBoxSurface(const btVector3& nodeVector) const {
   btVector3 heightContributionToHalfExtents;
   // HOWEVER, we need to figure out which dimension corresponds to the length,
   // width, and height of the box.
+  // This is not well-determined within NTRT
+
+  // NOTE that width and height are used in btBoxShape in the same way that
+  // radius is used for rods: they are from the center to the outside of the box,
+  // NOT from one side of the box to another. 
   
   // Length dimension is along the getFrom(), getTo() axis.
   // Subtracting getTo() from getFrom() should result in zero along two axes...
@@ -222,22 +227,22 @@ bool tgBoxInfo::isNodeOnBoxSurface(const btVector3& nodeVector) const {
     //DEBUGGING
     std::cout << "Length is in z direction, so width will be in y, "
 	      << "and height will be in x. " << std::endl;
-    widthContributionToHalfExtents = btVector3( 0, m_config.width/2, 0);
-    heightContributionToHalfExtents = btVector3( m_config.height/2, 0, 0);
+    widthContributionToHalfExtents = btVector3( 0, m_config.width, 0);
+    heightContributionToHalfExtents = btVector3( m_config.height, 0, 0);
   }
   else if( lengthContributionToHalfExtents.y() != 0 ) {
     //DEBUGGING
     std::cout << "Length is in y direction, so width will be in x, "
 	      << "and height will be in z. " << std::endl;
-    widthContributionToHalfExtents = btVector3( m_config.width/2, 0, 0);
-    heightContributionToHalfExtents = btVector3( 0, 0, m_config.height/2);
+    widthContributionToHalfExtents = btVector3( m_config.width, 0, 0);
+    heightContributionToHalfExtents = btVector3( 0, 0, m_config.height);
   }
   else if( lengthContributionToHalfExtents.x() != 0 ) {
     //DEBUGGING
     std::cout << "Length is in x direction, so width will be in z, "
       	      << "and height will be in y. " << std::endl;
-    widthContributionToHalfExtents = btVector3( 0, 0, m_config.width/2);
-    heightContributionToHalfExtents = btVector3(0, m_config.height/2, 0);
+    widthContributionToHalfExtents = btVector3( 0, 0, m_config.width);
+    heightContributionToHalfExtents = btVector3(0, m_config.height, 0);
   }
   else {
     throw std::runtime_error("Length of box seems to be zero inside tgBoxInfo, something is very wrong.");
@@ -312,6 +317,7 @@ bool tgBoxInfo::containsNode(const btVector3& nodeVector) const {
     if( isNodeOnBoxSurface(nodeVector) ) {
       //DEBUGGING
       std::cout << "Node is on box surface, true! " << std::endl;
+      return true;
     }
 
     std::cout << "containsNode: false." << std::endl;
