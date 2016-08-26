@@ -102,7 +102,7 @@ tgRigidInfo* tgConnectorInfo::chooseRigid(std::set<tgRigidInfo*> rigids, const b
       // next to another, and the connector is supposed to be from one body at a
       // node, but ends up getting connected at the surface of the other rigid body.
       //DEBUGGING:
-      if( 1 ) {
+      if( 0 ) {
 	std::cout << std::endl << "WARNING: A connector is being created that has more than one potential connecting point. This behavior is not well defined. If your model does not behave as you expect, try moving these multiple rigid bodies apart by some distance, and having the connector attach to only one node." << std::endl
 		  << std::endl;
       }
