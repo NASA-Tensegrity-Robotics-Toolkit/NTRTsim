@@ -159,8 +159,10 @@ void TwoBoxesModel::addNodes(tgStructure& s)
   // for different directions?
   // This test has (L = 3, w = 4, h = 1.)
   // Below gives a box with "width" as the
-  s.addNode( tgNode(c.boxStart) ); // 0
-  s.addNode( tgNode(c.boxEnd) ); // 1
+  //s.addNode( c.boxStart ); // 0
+  s.addNode( 0, 0, 0 ); // 0
+  //s.addNode( c.boxEnd ); // 1
+  s.addNode( 0, 3, 0 ); // 1
   //s.addNode( c.boxLength, c.boxHeight, 0); // 6
 }
 
@@ -178,8 +180,8 @@ void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
   //s.addPair(1, 2,  "compressionSpring");
-  s.addPair(1, 2,  "basicActuator");
-  s.addPair(4, 5,  "basicActuator");
+  //s.addPair(1, 2,  "basicActuator");
+  //s.addPair(4, 5,  "basicActuator");
 }
 
 // Finally, create the model!

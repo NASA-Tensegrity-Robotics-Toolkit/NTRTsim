@@ -108,7 +108,8 @@ private:
      * for your own models
      * @param[in] s: A tgStructure that we're building into
      */
-    static void addNodes(tgStructure& s);
+    //static void addNodes(tgStructure& s);
+    void addNodes(tgStructure& s);
 	
 	/**
      * A function called during setup that creates boxes from the
