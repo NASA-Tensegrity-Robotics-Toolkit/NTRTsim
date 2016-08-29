@@ -233,10 +233,11 @@ void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         m_updateTime = 0;
     }
     
-    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
-    
-    /// Max and min heights added to config
-    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight)
+	double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+	double currentHeightTail = subject.getSegmentCOM(6)[1];
+	/// Max and min heights added to config
+	if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight 
+    || currentHeightTail > m_config.maxHeight || currentHeightTail < m_config.minHeight)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
