@@ -554,6 +554,17 @@ void BigPuppySymmetricSpiral2::addMuscles(tgStructure& puppy){
 	puppy.addPair(n6[3], n13[0], tgString("left front leg_to spine middle muscleAct seg", 11) + tgString(" seg", 7));
 	puppy.addPair(n0[2], n14[0], tgString("left hind leg_to spine middle muscleAct seg", 11) + tgString(" seg", 7));
 
+	puppy.addPair(n13[5], n9[2], tgString("left front leg_to extra muscleAct seg", 13) + tgString(" seg", 9));
+	puppy.addPair(n13[5], n9[3], tgString("left front leg_to extra muscleAct seg", 13) + tgString(" seg", 9));
+
+	puppy.addPair(n11[5], n7[2], tgString("right front leg_to inner extra muscleAct seg", 11) + tgString(" seg", 7));
+	puppy.addPair(n11[5], n7[3], tgString("right front leg_to inner extra muscleAct seg", 11) + tgString(" seg", 7));
+
+	puppy.addPair(n12[5], n8[2], tgString("right hind leg_to extra muscleAct seg", 12) + tgString(" seg", 8));
+	puppy.addPair(n12[5], n8[3], tgString("right hind leg_to extra muscleAct seg", 12) + tgString(" seg", 8));
+
+	puppy.addPair(n14[5], n10[2], tgString("left hind leg_to extra muscleAct seg", 14) + tgString(" seg", 10));
+	puppy.addPair(n14[5], n10[3], tgString("left hind leg_to extra muscleAct seg", 14) + tgString(" seg", 10));
     //puppy.addPair(n14[5], n10[2], tgString("left_hind_leg extra muscle seg", 14) + tgString(" seg", 10));
     //puppy.addPair(n14[5], n10[3], tgString("left_hind_leg extra muscle seg", 14) + tgString(" seg", 10));
     //Populate feet with muscles. Todo: think up names to differentiate each!

@@ -116,7 +116,7 @@ bool AppQuadSimpleActuation::setup()
 		const double impedanceMax = 2000.0;
 
         const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 8; //This may be ok, but confirm. 
+        const int numMuscles = 16; //This may be ok, but confirm. 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -175,7 +175,7 @@ bool AppQuadSimpleActuation::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONQuadFeedbackControl* const myControl =
+       myControl =
         new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -347,6 +347,7 @@ bool AppQuadSimpleActuation::run()
    delete simulation;
    delete view;
    delete world;
+   delete myControl;
     
     return true;
 }
