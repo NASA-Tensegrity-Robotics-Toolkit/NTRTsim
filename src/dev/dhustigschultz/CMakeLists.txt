@@ -43,6 +43,7 @@ subdirs(
     MountainGoatAchilles
     MG_Achilles_CPGHierarchy
     MG_AchillesOnly_CPGH
+    MG_FewerMuscles1
 
     MountainGoatNL2
 
