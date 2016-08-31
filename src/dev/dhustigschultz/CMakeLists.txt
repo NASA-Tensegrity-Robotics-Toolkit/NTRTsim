@@ -42,9 +42,8 @@ subdirs(
 
     MountainGoatAchilles
     MG_Achilles_CPGHierarchy
+    MG_AchillesOnly_CPGH
 
     MountainGoatNL2
 
 )
-
-
