@@ -32,8 +32,6 @@
 #include <algorithm>
 #include <math.h>
 // Boost Matrix Library
-//#include "numeric/ublas/matrix.hpp"
-//#include "numeric/ublas/io.hpp" 
 #include "assign/list_of.hpp"
 // Utility Library
 #include "../utility.hpp"
@@ -46,7 +44,7 @@ m_gravity(gravity), m_mode(mode), m_face_goal(face_goal)
 
 	if (m_mode.compare("face") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face' or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -58,7 +56,19 @@ m_gravity(gravity), m_mode(mode), m_dr_goal(dr_goal)
 	assert(m_gravity >= 0);
 	if (mode.compare("dr") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face' or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Exiting..." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+T6RollingController::Config::Config (double gravity, const std::string& mode, int *path, int pathSize) :
+m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize)
+{
+	assert(m_gravity >= 0);
+	if (mode.compare("path") != 0) {
+		std::cout << "Config: invalid arguments" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -69,6 +79,8 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_mode = config.m_mode;
 	c_face_goal = config.m_face_goal;
 	c_dr_goal = config.m_dr_goal;
+	c_path = config.m_path;
+	c_path_size = config.m_path_size;
 
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
@@ -91,10 +103,19 @@ void T6RollingController::onSetup(sixBarModel& subject)
 			exit(EXIT_FAILURE);
 		}
 	}
-	else {
-		std::cout << "onSetup: Dead reckoning direction: [" << c_dr_goal.x() << ", " 
+	else if (c_mode.compare("dr") == 0) {
+		std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", " 
 			<< c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
 		controller_mode = 2;
+	}
+	else {
+		std::cout << "onSetup: Path size is " << c_path_size << " elements" << std::endl;
+		std::cout << "onSetup: Path: [";
+		for (int i = 0; i < c_path_size-1; i++) {
+			std::cout << *(c_path+i) << ", ";
+		}
+		std::cout << *(c_path+c_path_size-1) << "]" << std::endl;
+		controller_mode = 3;
 	}
 
 	// Retrieve rods from model
@@ -110,54 +131,6 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
-	
-	/*
-	std::cout << "Face 0: " << face0Norm << std::endl;
-	std::cout << "Face 1: " << face1Norm << std::endl;
-	std::cout << "Face 2: " << face2Norm << std::endl;
-	std::cout << "Face 3: " << face3Norm << std::endl;
-	std::cout << "Face 4: " << face4Norm << std::endl;
-	std::cout << "Face 5: " << face5Norm << std::endl;
-	std::cout << "Face 6: " << face6Norm << std::endl;
-	std::cout << "Face 7: " << face7Norm << std::endl;
-	std::cout << "Face 8: " << face8Norm << std::endl;
-	std::cout << "Face 9: " << face9Norm << std::endl;
-	std::cout << "Face 10: " << face10Norm << std::endl;
-	std::cout << "Face 11: " << face11Norm << std::endl;
-	std::cout << "Face 12: " << face12Norm << std::endl;
-	std::cout << "Face 13: " << face13Norm << std::endl;
-	std::cout << "Face 14: " << face14Norm << std::endl;
-	std::cout << "Face 15: " << face15Norm << std::endl;
-	std::cout << "Face 16: " << face16Norm << std::endl;
-	std::cout << "Face 17: " << face17Norm << std::endl;
-	std::cout << "Face 18: " << face18Norm << std::endl;
-	std::cout << "Face 19: " << face19Norm << std::endl;
-	*/
-
-	/*
-	// Create adjacency matrix (with open triangles connected)
-	// 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
-	node0Adj  = boost::assign::list_of(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 0
-	node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0); // 1
-	node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
-	node3Adj  = boost::assign::list_of(0)(0)(1)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 3
-	node4Adj  = boost::assign::list_of(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 4
-	node5Adj  = boost::assign::list_of(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1); // 5
-	node6Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 6
-	node7Adj  = boost::assign::list_of(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0); // 7
-	node8Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1); // 8
-	node9Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 9
-	node10Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0); // 10
-	node11Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(1)(0)(0)(0)(0); // 11
-	node12Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0); // 12
-	node13Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0); // 13
-	node14Adj = boost::assign::list_of(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0); // 14
-	node15Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(1)(0)(0); // 15
-	node16Adj = boost::assign::list_of(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(1); // 16
-	node17Adj = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0); // 17
-	node18Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 18
-	node19Adj = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 19
-	*/
 
 	// Open triangles not connected
 	// 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
@@ -262,31 +235,6 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
 	*/
 
-	/*
-	// Actuation policy table (With policy for open faces)
-	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
-	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
-	node1AP  = boost::assign::list_of( 0)(-1)( 1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
-	node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
-	node3AP  = boost::assign::list_of(-1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
-	node4AP  = boost::assign::list_of(16)(-1)(-1)(-1)(-1)(17)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
-	node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
-	node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(12)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
-	node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
-	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
-	node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)( 8)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
-	node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
-	node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(21)(-1)(-1)(-1)(-1)(20)(-1)(-1)(-1)(-1); // 11
-	node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(23)(-1)(-1)(-1)(-1)(22)(-1)(-1)(-1)(-1)(-1)(-1); // 12
-	node13AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)( 5)(-1)( 6)(-1)(-1)(-1); // 13
-	node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 5)(-1)( 4)(-1)(-1)(-1)(-1); // 14
-	node15AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)( 4)(-1)(-1)( 7)(-1)(-1); // 15
-	node16AP = boost::assign::list_of( 2)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 6)(-1)(-1)(-1)(-1)(-1)(-1); // 16
-	node17AP = boost::assign::list_of(-1)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 7)(-1)(-1)(-1)(-1); // 17
-	node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
-	node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)(-1)(11)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
-	*/
-
 	// Actuation policy table (With policy for open faces)
 	// 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
 	node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
@@ -335,24 +283,23 @@ void T6RollingController::onSetup(sixBarModel& subject)
 void T6RollingController::onStep(sixBarModel& subject, double dt)
 {
 	if (dt <= 0.0) {
-    	throw std::invalid_argument("onStep: dt is not positive");
-  	}
+		throw std::invalid_argument("onStep: dt is not positive");
+		}
+	isOnGround = checkOnGround();
 
-  	bool isOnGround = checkOnGround();
-
-  	if (robotReady == true) {
-  		switch (controller_mode) {
-  		case 1:
-  			{
-	  			// Code for face mode
-	  			if (resetFlag) {
-	  				resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
-	  				resetCounter = 0;
-	  			}
-	  			else {
-	  				if (isOnGround && !runPathGen && stepFin && !resetFlag) {
-		  				currSurface = contactSurfaceDetection();
-		  				runPathGen = true;
+	if (robotReady == true) {
+		switch (controller_mode) {
+		case 1:
+			{
+				// Code for face mode
+				if (resetFlag) {
+					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+					resetCounter = 0;
+				}
+				else {
+					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+						currSurface = contactSurfaceDetection();
+						runPathGen = true;
 						if (currSurface == c_face_goal) {
 							goalReached = true;
 							std::cout << "onStep: Destination face reached" << std::endl;
@@ -362,26 +309,80 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 							utility::printVector(path);
 						}
 						runPathGen = true;
-		  			}
-		  			else if (!isOnGround && runPathGen) {
-		  				runPathGen = false;
-		  			}
+					}
+					else if (!isOnGround && runPathGen) {
+						runPathGen = false;
+					}
 
-		  			if (currSurface >= 0 && !goalReached) {
-		  				stepFin = stepToFace(currSurface, path[1], dt);
-		  			}
-	  			}
-	  			//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
-	  			break;
-  			}
-  		case 2:
-  			{
-  				// Code for dead reckoning mode
-  				break;
-  			}
-  		}
-  	}
-  	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
+					if (currSurface >= 0 && !goalReached) {
+						stepFin = stepToFace(currSurface, path[1], dt);
+					}
+				}
+				//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
+				break;
+			}
+		case 2:
+			{
+				// Code for dead reckoning mode
+				if (resetFlag) {
+					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+					resetCounter = 0;
+				}
+				else {
+					if (isOnGround && !drGoalReached) {
+						currPos = rodBodies[2]->getCenterOfMassPosition();
+						if (abs(currPos.x()-c_dr_goal.x())<5 && abs(currPos.z()-c_dr_goal.z())<5) {
+							std::cout << "onStep: Goal reached" << std::endl;
+							drGoalReached = true;
+						}
+						if (!reorient) {
+							travelDir = c_dr_goal - currPos;
+							std::cout << "onStep: Current position: " << currPos << std::endl;
+							std::cout << "onStep: Travel direction: " << travelDir << std::endl;
+							reorient = true;
+						}
+						goalSurface = headingSurfaceDetection(travelDir);
+
+					}
+				}
+				break;
+			}
+		case 3:
+			{
+				// Code for path mode
+				if (resetFlag) {
+					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+					resetCounter = 0;
+				}
+				else {
+					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+						currSurface = contactSurfaceDetection();
+						runPathGen = true;
+						if (pathIdx == c_path_size) {
+							pathIdx = 1;
+							//goalReached = true;
+							//std::cout << "onStep: Destination reached" << std::endl;
+						}
+						if (currSurface >= 0 && !goalReached) {
+							path = findPath(A, currSurface, *(c_path+pathIdx));
+							pathIdx++;
+							utility::printVector(path);
+						}
+						runPathGen = true;
+					}
+					else if (!isOnGround && runPathGen) {
+						runPathGen = false;
+					}
+
+					if (currSurface >= 0 && !goalReached) {
+						stepFin = stepToFace(currSurface, path[1], dt);
+					}
+				}
+				break;
+			}
+		}
+	}
+	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
 }
 
 bool T6RollingController::checkOnGround()
@@ -415,32 +416,58 @@ int T6RollingController::contactSurfaceDetection()
 			maxDotProd = dotProd;
 			currSurface = i;
 		}
-  	}
+	}
 
-  	// Catch all error state
-  	if (currSurface == -1) {
-  		std::cout << "contactSurfaceDetection: No surface found" << std::endl;
-  	}
+	// Catch all error state
+	if (currSurface == -1) {
+		std::cout << "contactSurfaceDetection: No surface found" << std::endl;
+	}
 
-  	std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
+	std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
 
 	return currSurface;
+}
+
+int T6RollingController::headingSurfaceDetection(btVector3& travelDir)
+{
+	// Initialize variables
+	double dotProd;
+	double maxDotProd = 0;
+	int goalSurface = -1;
+
+	// Find the dot product between the gravity vector and each face
+	// As all normal vectors point away from the center of the robot,
+	// The larger dot product indicates better alignment
+	for (size_t i = 0; i < normVects.size(); i++) {
+		dotProd = travelDir.dot(normVects[i]);
+		//std::cout << dotProd << std::endl;
+		if (dotProd > maxDotProd) {
+			maxDotProd = dotProd;
+			goalSurface = i;
+		}
+	}
+
+	// Catch all error state
+	if (goalSurface == -1) {
+		std::cout << "headingSurfaceDetection: No surface found" << std::endl;
+	}
+
+	std::cout << "headingSurfaceDetection: Goal surface: " << goalSurface << std::endl;
+
+	return goalSurface;
 }
 
 btVector3 T6RollingController::getRobotGravity() 
 {
 	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
-	//std::cout << robotToWorld.getRow(0) << std::endl;
-	//std::cout << robotToWorld.getRow(1) << std::endl;
-	//std::cout << robotToWorld.getRow(2) << std::endl;
 	// The basis of getWorldTransform() returns the rotation matrix from robot frame
 	// to world frame. Invert this matrix to go from world to robot frame
 	btMatrix3x3 worldToRobot = robotToWorld.inverse();
-  	// Transform the gravity vector from world frame to robot frame
-  	btVector3 gravVectRobot = worldToRobot * gravVectWorld;
-  	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
-  	return gravVectRobot;
+	// Transform the gravity vector from world frame to robot frame
+	btVector3 gravVectRobot = worldToRobot * gravVectWorld;
+	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
+	return gravVectRobot;
 }
 
 std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 
@@ -471,7 +498,6 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 	for (int i = 0; i < nodes; i++) {
 		unvisited.push_back(i);
 	}
-	//std::cout << "Unvisited init: ";
 	//utility::printVector(unvisited);
 	std::vector<int> visited;
 	std::vector<int> distances(nodes, 1000); // Intialize distance vector to some arbitrarily large value
@@ -482,7 +508,7 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 	std::vector<int> pathVect;
 	pathVect.push_back(endNode); // Last element in pathVect is the destination node
 
-	while ((endReached == false) && (noSolution == false)) {
+	while (!endReached && !noSolution) {
 		// Initialize variables
 		bool currNodeFound = false;
 		int currNode = -1;
@@ -499,13 +525,13 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 		//std::cout << "Current node : " << currNode << std::endl;
 
 		// Check if new node is found
-		if (currNodeFound == false) {
+		if (!currNodeFound) {
 			std::cout << "findPath: No solution found" << std::endl;
 			noSolution = true;
 		}
 
 		// If node is found, continue with path finding
-		if (noSolution == false) {
+		if (!noSolution) {
 			// Extract row corresponding to the current node
 			std::vector<int> currRow = adjMat[currNode];
 			std::vector<int> neighbors;
@@ -562,7 +588,7 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 	bool stepFinished = true;
 	bool isOnPath = false;
 	// Length for cables to retract to
-	double controlLength = 1;
+	double controlLength = 0.2;
 	
 	// Get which cable to actuate from actuation policy table
 	int cableToActuate = actuationPolicy[startFace][endFace];
@@ -642,11 +668,11 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 		controllers[i]->control(dt, setLength);
 		actuators[i]->moveMotors(dt);
 		if (actuators[i]->getRestLength()-setLength > 0.01) {
-      		returnFin = false;
-    	}
-    	if (actuators[i]->getRestLength()-setLength < -0.01) {
-      	returnFin = false;
-    	}
+			returnFin = false;
+		}
+		if (actuators[i]->getRestLength()-setLength < -0.01) {
+		returnFin = false;
+		}
 	}
 	std::cout << "Resetting Cable Lengths " << std::endl;
 	return returnFin;

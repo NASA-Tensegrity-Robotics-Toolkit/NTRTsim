@@ -10,6 +10,14 @@ USAGE
 -----------
     $ ./appSTLParser [path/filename of .stl to be converted] [path/filename of .txt to be created with parsed info]
 
+ELEVATION GRABBER
+-----------
+An application for grabbing elevation profiles along a vector defined by a start coordinate and end coordinate from the txt files generated through the STL parser
+
+USAGE
+-----------
+    $ ./appElevationGrabber [x0] [z0] [xe] [ze] [path/filename_in] [path/filename_out]
+
 Author
 -----------
 Created by Edward Zhu under the MIT License

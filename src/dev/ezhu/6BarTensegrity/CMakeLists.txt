@@ -16,11 +16,8 @@ link_libraries(core
                terrain
                tgOpenGLSupport
                yaml-cpp
-	       Adapters
-	       TensegrityModel)
-
-# add_library(TensegrityModel
-#     TensegrityModel.cpp)
+	             Adapters
+	             TensegrityModel)
 
 add_executable(App6Bar
 #    TensegrityModel.cpp

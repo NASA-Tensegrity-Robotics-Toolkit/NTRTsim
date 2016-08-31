@@ -63,18 +63,22 @@ public:
 		// Overloaded Config function for two controller modes
 		Config (double gravity, const std::string& mode, int face_goal);
 		Config (double gravity, const std::string& mode, btVector3 dr_goal);
+		Config (double gravity, const std::string& mode, int *path, int pathSize);
 
 		double m_gravity;
 
 		// Use "face" for rolling to a goal triangle, use "dr" for dead reckoning
 		std::string m_mode;
 
-		// Goal face to roll to, must be between 0 and 7 for the 8 closed triangles
+		// Goal face to roll to
 		int m_face_goal;
 
 		// Goal direction to roll towards, specified as an [x,y,z] vector, height (y)
 		// is ignored
 		btVector3 m_dr_goal;
+
+		int *m_path;
+		int m_path_size;
 	};
 
 	/**
@@ -121,18 +125,47 @@ public:
 	int contactSurfaceDetection();
 
 	/**
+	 * Detect which surface of the robot is in alignment with the direction of travel
+	 * @param[in] travelDir - Direction to travel in
+	 * @return The number of the face which is in alignment with the direction of travel
+	 */
+	int headingSurfaceDetection(btVector3& travelDir);
+
+	/**
 	 * Find the shortest path using Dijkstra to get from the start node to the end node
 	 * @param[in] adjMat - The adjacency matrix of the robot where each face is representated as a node
 	 * @param[in] startNode - The starting node
 	 * @param[in] endNode - The destination node
 	 * @return A vector containing the sequence of steps to get from the start node to end node
 	 */
-	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode);
+	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, 
+							  int startNode, int endNode);
 
+	/**
+	 * Perform actuation to move robot to desired face
+	 * @param[in] currFace - The face that the robot is on when this function is called
+	 * @param[in] desFace - Desired face to travel to
+	 * @param[in] dt - Time step
+	 * @return A boolean indicating whether or not the step has been completed
+	 */
 	bool stepToFace(int currFace, int desFace, double dt);
 
+	/**
+	 * Function for determining whether or not a certain face is a closed triangle on the
+	 * robot
+	 * @param[in] desFace - Face to check
+	 * @return A boolean indicating whether or not the face is a closed triangle
+	 */
 	bool isClosedFace(int desFace);
 
+	/**
+	 * Function for setting all actuators in a vector to a certain length
+	 * @param[in] controllers - Vector of tgBasicController objects
+	 * @param[in] actuators - Vector of tgBasicActuator objects
+	 * @param[in] setLength - Desired cable length
+	 * @param[in] dt - Time step
+	 * @return A boolean indicating whether or not the action has completed
+	 */
 	bool setAllActuators(std::vector<tgBasicController*>& controllers, 
 						 std::vector<tgBasicActuator*>& actuators, 
 						 double setLength, double dt);
@@ -146,6 +179,8 @@ private:
 	std::string c_mode;
 	int c_face_goal;
 	btVector3 c_dr_goal;
+	int *c_path;
+	int c_path_size;
 	int controller_mode;
 
 	// Vector of rigid body objects
@@ -185,13 +220,8 @@ private:
 	// Vector holding row information of adjacency matrix
 	std::vector< std::vector<int> > A;
 
-	bool runPathGen = false;
-
 	// Debugging counter
 	int counter = 0;
-
-	// Ready flag
-	bool robotReady = false;
 
 	// Vectors to hold actuators and rods
 	std::vector<tgBasicActuator*> actuators;
@@ -230,10 +260,21 @@ private:
 
 	// Hold current surface from contact surface detection
 	int currSurface = -1;
+	int goalSurface = -1;
 
+	// Initialize flags
+	bool robotReady = false;
 	bool stepFin = true;
-
 	bool goalReached = false;
+	bool runPathGen = false;
+	bool reorient = false;
+	bool drGoalReached = false;
+	bool isOnGround;
+	int pathIdx = 0;
+
+	// Direction to travel
+	btVector3 travelDir;
+	btVector3 currPos;
 };
 
 #endif

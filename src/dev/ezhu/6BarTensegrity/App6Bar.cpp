@@ -56,10 +56,15 @@
 int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
-    const double yaw = 0.0;
-    const double pitch = 0.0;
+    const double yaw = 0;
+    const double pitch = 0.26;
     const double roll = 0.0;
 
+    // [0, 0.1, 0] rad works
+    // [0, 0.15, 0] rad works
+    // [0, 0.2, 0] rad works
+
+    // 0.26 rad ~= 15 deg
     /*
     // Import Ground
     // Set ground parameters
@@ -69,7 +74,7 @@ int main(int argc, char** argv)
     btVector3 origin = btVector3(0.0, 0.0, 0.0);
     const double margin = 0.05;
     const double offset = 0.5;
-    const double scalingFactor = 100;
+    const double scalingFactor = 1;
 
     // Configure ground characteristics
     const tgImportGround::Config groundConfig(orientation, friction, restitution,
@@ -121,12 +126,20 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     // Use yaml model builder
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
-    // Use direct tgCreator
+
+    // Use tgCreator
     sixBarModel* const myModel = new sixBarModel();
 
+    // Define path for controller
+    int *ptr;
+    int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
+    int pathSize = sizeof(path)/sizeof(int);
+    ptr = path;
+
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 0);
-    
+    //const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(10, 0, 10));
+    const T6RollingController::Config controllerConfig(gravity, "path", ptr, pathSize);
+
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
     T6RollingController* const rollingController = new T6RollingController(controllerConfig);
