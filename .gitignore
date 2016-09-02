@@ -24,7 +24,8 @@ src/.settings/org.eclipse.cdt.codan.core.prefs
 
 *~
 *#
-*.#
+#*
+.#*
 *.DS_Store
 
 *.pdfsync
