@@ -140,12 +140,6 @@ public:
      * this function just checked if the nodeVector was either of the two endpoints.
      */
     virtual bool containsNode(const btVector3& nodeVector) const;
-    
-    /* Older version from tgBoxInfo:
-    {
-        return ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero());
-    }
-    */
 
     /**
      * Return a set containing all the nodes in this box. Note that
@@ -170,13 +164,50 @@ protected:
      */
     bool isNodeOnBoxSurface(const btVector3& nodeVector) const;
 
+    /**
+     * This function is a helper to isNodeOnBoxSurface.
+     * It returns the correct geometry of the box around which to check for nodes.
+     * This is needed because it's unclear what direction is width and which
+     * is height for a box. We fix this by testing and hard-coding the width/height
+     * ordering for different orientations of the box.
+     * This is done because the Bullet Physics object is not created yet:
+     * containsNode is called before the methods that create the Bullet object.
+     * @TODO: can this program determine what orientation and rotations will
+     * be used by Bullet, and do that instead of hard-coding?
+     * @retval a btVector3 of half extents, just like Bullet uses for btBoxShape.
+     */
+    btVector3 getHalfExtents() const;
+
+    /**
+     * This function is a helper inside getHalfExtents.
+     * It returns the orientation of the box.
+     * @retval a string with the axis along which this box exists.
+     * This should be enough to determine how to orient the half extents.
+     */
+    std::string getBoxOrientation() const;
+
+    /**
+     * The following three functions are helpers to getHalfExtents.
+     * They each assign the half extents according to the specific orientation
+     * of the box.
+     */
+    btVector3 getHalfExtentsOrientedX() const;
+    btVector3 getHalfExtentsOrientedY() const;
+    btVector3 getHalfExtentsOrientedZ() const;
+
 private:
 
     /** Disable the copy constructor. */
     tgBoxMoreAnchorsInfo(const tgBoxMoreAnchorsInfo&);
 
     /** Disable the assignment operator. */
-    tgBoxMoreAnchorsInfo& operator=(const tgBoxMoreAnchorsInfo&);  
+    tgBoxMoreAnchorsInfo& operator=(const tgBoxMoreAnchorsInfo&);
+
+    // The following variable is used in the half extents checking.
+    // This "SIMD_EPSILON" is what btVector3 uses in its fuzzyZero method,
+    // which motivates its use here.
+    // @TODO: will this not work sometimes??
+    double tgEpsilon = SIMD_EPSILON * 10;
 
     // note that tgBoxInfo has the following two private variables:
     //const tgPair m_pair;

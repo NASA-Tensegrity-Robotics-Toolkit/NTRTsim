@@ -255,7 +255,7 @@ void ForcePlateModel::calculateHousingNodePositions() {
   s_ba_housing = s_ba + tgNode( 0, 0, -m_config.wgap);
   s_ba_housing.addTags("s_ba_housing");
 
-  s_bc_housing = s_ba + tgNode( m_config.wgap, 0, 0);
+  s_bc_housing = s_bc + tgNode( m_config.wgap, 0, 0);
   s_bc_housing.addTags("s_bc_housing");
   s_cb_housing = s_cb + tgNode( m_config.wgap, 0, 0);
   s_cb_housing.addTags("s_cb_housing");
@@ -500,8 +500,8 @@ void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
   //s.addPair( hb_d, hb_a, "housingWallZ" );
   //s.addPair( 2, 3, "housingWallX" ); // hb_a, hb_b
   s.addPair( 3, 4, "housingWallZ" ); // hb_b, hb_c
-  s.addPair( 4, 5, "housingWallX" ); // hb_c, hb_d
-  s.addPair( 5, 2, "housingWallZ" ); // hb_d, hb_a
+  //s.addPair( 4, 5, "housingWallX" ); // hb_c, hb_d
+  //s.addPair( 5, 2, "housingWallZ" ); // hb_d, hb_a
 }
 
 // Adds the pairs for the lateral springs (attaching the housing to the plate.
@@ -535,12 +535,16 @@ void ForcePlateModel::setup(tgWorld& world)
   addLateralSpringsPairs(s);
 
   // Move the structure to the location passed in to the constructor.
-  s.move(m_location);
+  //s.move(m_location);
 
   
   // Create the config structs for the various different boxes and springs.
 
-  // Config for the force plate box itself:
+  // Config for the force plate box itself.
+  // NOTE that tgBox uses half-extents, meaning that the width and height
+  // passed in are the width of HALF the box and the height of HALF the box.
+  // So, all heights and widths from Drew's calculations must be halved.
+  // But, display plate width and height in the terms of my derivation.
   double plateWidth = m_config.w - (2 * m_config.t) - (2 * m_config.wgap);
   double plateHeight = m_config.pt;
   //DEBUGGING
@@ -548,15 +552,15 @@ void ForcePlateModel::setup(tgWorld& world)
     std::cout << "Plate width: " << plateWidth << ", Plate height: " << plateHeight
 	      << std::endl;
   }
-  // @TO-DO: tgBox does half-extents, fix all the math above. :(
-  // Temporarily, plateWidth is halved here.
+  // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig(plateWidth/2, plateHeight, 1.0);
+  tgBox::Config plateBoxConfig(plateWidth/2, plateHeight/2, 0.0);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.
-  tgBox::Config housingWallConfigZ( m_config.t, m_config.h, 1.0);
-  tgBox::Config housingWallConfigX( m_config.h, m_config.t, 1.0);
+  // Halve the width and height here also.
+  tgBox::Config housingWallConfigZ( m_config.t/2, m_config.h/2, 0.0);
+  tgBox::Config housingWallConfigX( m_config.h/2, m_config.t/2, 0.0);
 
   // For the springs:
   // Config here is isFreeEndAttached, stiffness, damping, restlength,
@@ -587,8 +591,8 @@ void ForcePlateModel::setup(tgWorld& world)
   //spec.addBuilder("plateBox", new tgBoxInfo(plateBoxConfig));
   spec.addBuilder("plateBox", new tgBoxMoreAnchorsInfo(plateBoxConfig));
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
-  spec.addBuilder("housingWallZ", new tgBoxInfo(housingWallConfigZ));
-  spec.addBuilder("housingWallX", new tgBoxInfo(housingWallConfigX));
+  spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
+  spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
   spec.addBuilder("lateralSpringBC",
   		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
   //spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));

@@ -32,12 +32,14 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
+#include "core/tgBoxMoreAnchors.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgBoxMoreAnchorsInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
 // The Bullet Physics library
@@ -82,9 +84,9 @@ namespace
      20.0,    // damping (kg / sec)
      //new btVector3(1, 0, 0),  // direction
      new btVector3(0, 1, 0),  // direction
-     0.0,   // boxLength (length)
-     4,   // boxWidth (length)
-     1,   // boxHeight (length)
+     2.0,   // boxLength (length)
+     4.0,   // boxWidth (length)
+     1.0,   // boxHeight (length)
      btVector3(0, 0, 0 ), // boxStart
      btVector3(0, 3, 0 ), // boxEnd
      1.0,      // friction (unitless)
@@ -133,7 +135,6 @@ TwoBoxesModel::~TwoBoxesModel()
 void TwoBoxesModel::addNodes(tgStructure& s)
 {
   // Version with vertical boxes:
-  /*
   s.addNode(0, 0, 0);              // 0, origin, bottom of box 1
   s.addNode(0, 2 * c.boxLength, 0);      // 1, top of box 1
   s.addNode(0, 4 * c.boxLength, 0);  // 2, bottom of box 2
@@ -141,8 +142,11 @@ void TwoBoxesModel::addNodes(tgStructure& s)
   // Note that box width is distance from center to outside,
   // NOT the distance from one side to another.
   s.addNode(-c.boxWidth, c.boxLength,  0); // 4, side of box 1
-  s.addNode( -c.boxWidth, 4.5 * c.boxLength, 0); // 5, side of box 2
-  */
+  s.addNode(-c.boxWidth, 4.5 * c.boxLength, 0); // 5, side of box 2
+  // Now, a node on the other side of the box:
+  s.addNode(0, c.boxLength, -c.boxHeight); // 6, on the other side of box 1
+  s.addNode(0, 4.5 * c.boxLength, -c.boxHeight); // 7, on the other side of box 2
+  
   // Remember, boxes are created with (x, y, z) == (w, L, h) before rotation.
   // Version with horizontal boxes:
   
@@ -160,9 +164,9 @@ void TwoBoxesModel::addNodes(tgStructure& s)
   // This test has (L = 3, w = 4, h = 1.)
   // Below gives a box with "width" as the
   //s.addNode( c.boxStart ); // 0
-  s.addNode( 0, 0, 0 ); // 0
+  //s.addNode( 0, 0, 0 ); // 0
   //s.addNode( c.boxEnd ); // 1
-  s.addNode( 0, 3, 0 ); // 1
+  //s.addNode( 0, 3, 0 ); // 1
   //s.addNode( c.boxLength, c.boxHeight, 0); // 6
 }
 
@@ -170,7 +174,7 @@ void TwoBoxesModel::addNodes(tgStructure& s)
 void TwoBoxesModel::addBoxes(tgStructure& s)
 {
   s.addPair( 0,  1, "box");
-  //s.addPair( 2,  3, "box");
+  s.addPair( 2,  3, "box");
   // Testing for determining the direction that a box gets created in:
   //s.addPair(0, 6, "box");
 }
@@ -180,8 +184,9 @@ void TwoBoxesModel::addActuators(tgStructure& s)
 {
   // spring is vertical between top of box 1 and bottom of box 2.
   //s.addPair(1, 2,  "compressionSpring");
-  //s.addPair(1, 2,  "basicActuator");
-  //s.addPair(4, 5,  "basicActuator");
+  s.addPair(1, 2, "basicActuator");
+  s.addPair(4, 5, "basicActuator");
+  s.addPair(6, 7, "basicActuator");
 }
 
 // Finally, create the model!
@@ -230,11 +235,12 @@ void TwoBoxesModel::setup(tgWorld& world)
 
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
-    spec.addBuilder("box", new tgBoxInfo(boxConfig));
+    //spec.addBuilder("box", new tgBoxInfo(boxConfig));
+    spec.addBuilder("box", new tgBoxMoreAnchorsInfo(boxConfig));
     //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
     //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
     //spec.addBuilder("basicActuator", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
+    spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     
     // Create your structureInfo
