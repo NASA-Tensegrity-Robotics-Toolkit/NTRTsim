@@ -356,6 +356,16 @@ protected:
     tgNode hb_d;
 
     /**
+     * The nodal coordiantes for the bottom part of the housing.
+     * Note that these need to be attached to the sides via a 
+     * very small "support beam" so that they get auto-compounded properly.
+     * See the addSupportBeamPairs() method.
+     * These are named according to the face they are closest to: the ab or cd face.
+     */
+    tgNode hb_bot_ab;
+    tgNode hb_bot_cd;
+
+    /**
      * Spring anchor positions on the housing.
      * These are all located opposite the spring anchor points on the plate.
      */
@@ -367,6 +377,15 @@ protected:
     tgNode s_dc_housing;
     tgNode s_da_housing;
     tgNode s_ad_housing;
+
+    /**
+     * Spring anchor positions on the bottom part of the housing.
+     * These correspond to the positions on the bottom of the force plate itself.
+     */
+    tgNode s_bot_a_housing;
+    tgNode s_bot_b_housing;
+    tgNode s_bot_c_housing;
+    tgNode s_bot_d_housing;
     
     /**
      * The btVector3 location of this specific force plate.
@@ -413,6 +432,11 @@ private:
      * Uses m_config.
      */
     void calculateHousingNodePositions();
+
+    /**
+     * Calculates the node positions for the bottom part of the housing structure.
+     */
+    void calculateBottomHousingNodePositions();
     
     /**
      * A list of all of the muscles. Will be empty until most of the way

@@ -214,7 +214,6 @@ void ForcePlateModel::calculatePlateNodePositions() {
  * This function calculates all the locations of the node positions for the 
  * housing structure. This requires that m_config be populated first.
  */
-
 void ForcePlateModel::calculateHousingNodePositions() {
   // check that m_config is populated
   assert(invariant());
@@ -281,6 +280,41 @@ void ForcePlateModel::calculateHousingNodePositions() {
 	      << "   " << s_dc_housing << std::endl;
     std::cout << "s_da_housing, s_ad_housing: " << s_da_housing
 	      << "   " << s_ad_housing << std::endl << std::endl;
+  }
+}
+
+/**
+ * Calculates the positions of the two nodes that are the from and to nodes
+ * for the bottom plate of the housing.
+ */
+void ForcePlateModel::calculateBottomHousingNodePositions() {
+  // check that m_config is populated
+  assert(invariant());
+  // The node on the ab face is at x=0 and the z-position of the side housing node.
+  // The height is found by subtracting the plate thickness and bottom gap from the
+  // total height. The center of the rectangle is then half that remaining dist.
+  hb_bot_ab = tgNode( 0, (m_config.h - m_config.pt - m_config.bgap)/2, hb_a.z(),
+		      "hb_bot_ab");
+  hb_bot_cd = tgNode( 0, (m_config.h - m_config.pt - m_config.bgap)/2, hb_d.z(),
+		      "hb_bot_cd");
+
+  // The spring bottom positions are exactly bgap below the positions on the plate.
+  s_bot_a_housing = s_bot_a - tgNode( 0, -m_config.bgap, 0);
+  s_bot_a_housing.addTags("s_bot_a_housing");
+  s_bot_b_housing = s_bot_b - tgNode( 0, -m_config.bgap, 0);
+  s_bot_b_housing.addTags("s_bot_b_housing");
+  s_bot_c_housing = s_bot_c - tgNode( 0, -m_config.bgap, 0);
+  s_bot_c_housing.addTags("s_bot_c_housing");
+  s_bot_d_housing = s_bot_d - tgNode( 0, -m_config.bgap, 0);
+  s_bot_d_housing.addTags("s_bot_d_housing");
+
+  //DEBUGGING
+  if( m_debugging ) {
+    std::cout << std::endl << "Calculated vertical spring anchor positions on the bottom of the housing:" << std::endl;
+    std::cout << "s_bot_a_housing: " << s_bot_a_housing << std::endl;
+    std::cout << "s_bot_b_housing: " << s_bot_b_housing << std::endl;
+    std::cout << "s_bot_c_housing: " << s_bot_c_housing << std::endl;
+    std::cout << "s_bot_d_housing: " << s_bot_d_housing << std::endl;
   }
 }
 
@@ -370,7 +404,6 @@ void ForcePlateModel::constructorAux()
     std::cout << "vertRL: " <<  m_config.vertRL << std::endl;
     std::cout << "sOff: " << m_config.sOff << std::endl << std::endl;
   }
-
   // When the force plate is constructed, the node positions should
   // be calculated.
   // Creation of the actual NTRT objects happens in setup, though.
@@ -378,7 +411,9 @@ void ForcePlateModel::constructorAux()
   // Housing node position calculations rely on the plate positions,
   // so this function MUST be called after the above one.
   calculateHousingNodePositions();
-
+  // Similarly, the bottom part of the housing depends on the sides of
+  // the housing being created. MUST be called after the above one.
+  calculateBottomHousingNodePositions();
 }
 
 /**
@@ -429,54 +464,11 @@ void ForcePlateModel::addLateralPlateBoxesPairs(tgStructure& s)
   // of nodes (which requires that nodes are added first before
   tgNode plateBoxFrom = tgNode( 0, m_config.h - (m_config.pt/2), a1.z() );
   tgNode plateBoxTo = tgNode( 0, m_config.h - (m_config.pt/2), d1.z() );
+  // Add the nodes:
   s.addNode(plateBoxFrom); // 0
   s.addNode(plateBoxTo);  // 1
+  // Add the pair that connects the nodes:
   s.addPair(0, 1, "plateBox");
-  //s.addPair(plateBoxFrom, plateBoxTo, "plateBox");
-  
-  // @TO-DO: is it necessary to add a node if we're going to
-  // add a pair separately?
-  // @ANSWER: it seems not, at least for creating rigids. Not sure about connectors.
-  /*
-  s.addNode( s_ab ); // 0
-  s.addNode( s_ba ); // 1
-  s.addNode( s_bc ); // 2
-  s.addNode( s_cb ); // 3
-  s.addNode( s_cd ); // 4
-  s.addNode( s_dc ); // 5
-  s.addNode( s_da ); // 6
-  s.addNode( s_ad ); // 7
-  */
-  
-  /**
-   * Older version of this function that tried to make multiple
-   * boxes and auto-compound them.
-   * Didn't work right, because rigids have to share at least one common node
-   * to be compounded automatically.
-   * See above for the version that just creates the one box plate.
-   */
-  /*
-  // add the pairs for the force plate boxes.
-  s.addPair( s_ad, s_bc, "xyPlateBox");
-  //s.addPair( 7, 2, "xyPlateBox");
-  s.addPair( s_da, s_cb, "xyPlateBox");
-  s.addPair( s_ab, s_dc, "yzPlateBox");
-  //s.addPair( 5, 0, "xyPlateBox");
-  s.addPair( s_ba, s_cd, "yzPlateBox");
-  //s.addPair( s_ba, s_dc, "xyPlateBox");
-
-  // Then, add the nodes for the filler box (the one that
-  // fills in the empty space not taken up by the other boxes.)
-  tgNode fillerBoxFrom = tgNode(0,
-				m_config.h - (m_config.pt/2),
-				a1.z() + 2 * m_config.sOff);
-  tgNode fillerBoxTo = tgNode(0,
-			      m_config.h - (m_config.pt/2),
-			      d1.z() - 2 * m_config.sOff);
-  // Add these two nodes as a pair for the plate filler box.
-  s.addPair( fillerBoxFrom, fillerBoxTo, "fillerPlateBox");
-  */
-  //END OLD FUNCTION.
 }
 
 // helper function to tag two sets of nodes as boxes
@@ -487,21 +479,29 @@ void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
   // their pairs are specified as numerical indices into the list
   // of nodes (which requires that nodes are added first before
   // adding pairs.) For consistency, use this method too for the rigids.
-  // Add the nodes:
+  // Add the nodes for the sides:
   s.addNode( hb_a ); // 2
   s.addNode( hb_b ); // 3
   s.addNode( hb_c ); // 4
   s.addNode( hb_d ); // 5
-  // First, the sides of the housing, as pairs between the
-  // "hb" nodes.
-  //s.addPair( hb_a, hb_b, "housingWallX" );
-  //s.addPair( hb_b, hb_c, "housingWallZ" );
-  //s.addPair( hb_c, hb_d, "housingWallX" );
-  //s.addPair( hb_d, hb_a, "housingWallZ" );
-  //s.addPair( 2, 3, "housingWallX" ); // hb_a, hb_b
+  // Add the pairs for the sides:
+  s.addPair( 2, 3, "housingWallX" ); // hb_a, hb_b
   s.addPair( 3, 4, "housingWallZ" ); // hb_b, hb_c
-  //s.addPair( 4, 5, "housingWallX" ); // hb_c, hb_d
-  //s.addPair( 5, 2, "housingWallZ" ); // hb_d, hb_a
+  s.addPair( 4, 5, "housingWallX" ); // hb_c, hb_d
+  s.addPair( 5, 2, "housingWallZ" ); // hb_d, hb_a
+  // Add the nodes for the bottom:
+  s.addNode( hb_bot_ab ); // 6
+  s.addNode( hb_bot_cd ); // 7
+  // Add the pair for the bottom:
+  s.addPair( 6, 7, "housingBottom" ); // hb_bot_ab, hb_bot_cd
+  // Finally, add the "supporting beams" that are needed to auto-compound
+  // the sides to the bottom.
+  // Even though only one beam is needed, technically, let's add four for symmetry.
+  // These are at an angle.
+  s.addPair( 2, 6, "supportBeam" ); // hb_a, hb_bot_ab
+  s.addPair( 3, 6, "supportBeam" ); // hb_b, hb_bot_ab
+  s.addPair( 4, 7, "supportBeam" ); // hb_c, hb_bot_cd
+  s.addPair( 5, 7, "supportBeam" ); // hb_d, hb_bot_cd
 }
 
 // Adds the pairs for the lateral springs (attaching the housing to the plate.
@@ -509,9 +509,35 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
 {
   // On each side, springs can start from the housing and attach the free end
   // to the plate.
-  s.addNode( s_bc ); // 6
-  s.addNode( s_bc_housing ); // 7
-  s.addPair( 6, 7, "lateralSpringBC" );
+  // Add the nodes on the plate itself:
+  s.addNode( s_ab ); // 8
+  s.addNode( s_ba ); // 9
+  s.addNode( s_bc ); // 10
+  s.addNode( s_cb ); // 11
+  s.addNode( s_cd ); // 12
+  s.addNode( s_dc ); // 13
+  s.addNode( s_da ); // 14
+  s.addNode( s_ad ); // 15
+  // Add the corresponding nodes on the housing:
+  //s.addNode( s_bc ); // 6
+  s.addNode( s_ab_housing ); // 16
+  s.addNode( s_ba_housing ); // 17
+  s.addNode( s_bc_housing ); // 18
+  s.addNode( s_cb_housing ); // 19
+  s.addNode( s_cd_housing ); // 20
+  s.addNode( s_dc_housing ); // 21
+  s.addNode( s_da_housing ); // 22
+  s.addNode( s_ad_housing ); // 23
+  
+  //s.addNode( s_bc_housing ); // 7
+
+  // Add the pairs corresponding to each spring.
+  // Note that there have to be different tags/labels for the springs
+  // on each side of the plate, since they have to have different 'direction'
+  // vectors for their tgUnidirectionalCompressionSpring.
+  //s.addPair( 6, 7, "lateralSpringBC" );
+  s.addPair( 10, 18, "lateralSpringBC" ); // s_bc, s_bc_housing
+  s.addPair( 11, 19, "lateralSpringBC" ); // s_cb, s_cb_housing
   //s.addPair( 0, 1, "lateralSpringBC" );
   //s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
   
@@ -535,7 +561,7 @@ void ForcePlateModel::setup(tgWorld& world)
   addLateralSpringsPairs(s);
 
   // Move the structure to the location passed in to the constructor.
-  //s.move(m_location);
+  s.move(m_location);
 
   
   // Create the config structs for the various different boxes and springs.
@@ -554,13 +580,19 @@ void ForcePlateModel::setup(tgWorld& world)
   }
   // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig(plateWidth/2, plateHeight/2, 0.0);
+  tgBox::Config plateBoxConfig(plateWidth/2, plateHeight/2, 1.0);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.
   // Halve the width and height here also.
   tgBox::Config housingWallConfigZ( m_config.t/2, m_config.h/2, 0.0);
   tgBox::Config housingWallConfigX( m_config.h/2, m_config.t/2, 0.0);
+
+  // Config for the bottom part of the housing: @TO-DO: CHANGE DENSITY.
+  // Halve the width and height here also.
+  // First, get the correct height of the bottom plate, based on m_config.
+  double housingBottomHeight = (m_config.h - m_config.pt - m_config.bgap)/2;
+  tgBox::Config housingBottomConfig( m_config.w/2, housingBottomHeight, 0.0);
 
   // For the springs:
   // Config here is isFreeEndAttached, stiffness, damping, restlength,
@@ -593,6 +625,7 @@ void ForcePlateModel::setup(tgWorld& world)
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
   spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
+  spec.addBuilder("housingBottom", new tgBoxMoreAnchorsInfo(housingBottomConfig));
   spec.addBuilder("lateralSpringBC",
   		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
   //spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));
