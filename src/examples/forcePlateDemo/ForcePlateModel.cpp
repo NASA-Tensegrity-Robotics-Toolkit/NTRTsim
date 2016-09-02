@@ -30,11 +30,13 @@
 #include "core/tgUnidirectionalCompressionSpringActuator.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgBox.h"
+#include "core/tgBoxMoreAnchors.h"
 #include "core/tgRod.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgBoxMoreAnchorsInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
@@ -509,6 +511,7 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
   // to the plate.
   s.addNode( s_bc ); // 6
   s.addNode( s_bc_housing ); // 7
+  s.addPair( 6, 7, "lateralSpringBC" );
   //s.addPair( 0, 1, "lateralSpringBC" );
   //s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
   
@@ -545,7 +548,9 @@ void ForcePlateModel::setup(tgWorld& world)
     std::cout << "Plate width: " << plateWidth << ", Plate height: " << plateHeight
 	      << std::endl;
   }
-  // @TO-DO: WHY IS THIS HALVED I DON'T UNDERSTAND.
+  // @TO-DO: tgBox does half-extents, fix all the math above. :(
+  // Temporarily, plateWidth is halved here.
+  // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
   tgBox::Config plateBoxConfig(plateWidth/2, plateHeight, 1.0);
 
 
@@ -579,13 +584,14 @@ void ForcePlateModel::setup(tgWorld& world)
   //spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
   //spec.addBuilder("yzPlateBox", new tgBoxInfo(yzPlateBoxConfig));
   //spec.addBuilder("fillerPlateBox", new tgBoxInfo(fillerPlateBoxConfig));
-  spec.addBuilder("plateBox", new tgBoxInfo(plateBoxConfig));
+  //spec.addBuilder("plateBox", new tgBoxInfo(plateBoxConfig));
+  spec.addBuilder("plateBox", new tgBoxMoreAnchorsInfo(plateBoxConfig));
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxInfo(housingWallConfigZ));
   spec.addBuilder("housingWallX", new tgBoxInfo(housingWallConfigX));
-  //spec.addBuilder("lateralSpringBC",
-  //		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
-  spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));
+  spec.addBuilder("lateralSpringBC",
+  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  //spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));
 
   std::cout << s << std::endl;
 

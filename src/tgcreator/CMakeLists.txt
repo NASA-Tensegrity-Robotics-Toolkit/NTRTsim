@@ -5,6 +5,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgRigidInfo.cpp
     tgRodInfo.cpp
     tgBoxInfo.cpp
+    tgBoxMoreAnchorsInfo.cpp
     tgSphereInfo.cpp
     tgStructure.cpp
     tgBuildSpec.cpp

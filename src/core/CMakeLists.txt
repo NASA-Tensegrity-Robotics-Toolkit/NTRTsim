@@ -26,6 +26,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgBaseRigid.cpp
     tgRod.cpp
     tgBox.cpp
+    tgBoxMoreAnchors.cpp
     tgSphere.cpp
     
     abstractMarker.cpp

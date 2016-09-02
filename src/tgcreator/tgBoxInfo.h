@@ -191,20 +191,14 @@ public:
     virtual std::set<tgRigidInfo*> getLeafRigids();
     
      /**
-     * OLD: Is the given vector either of the endpoints?
-     * NEW: Is the given vector either of the endpoints, or within
-     * the space of this box? (Or on its surface?)
-     * @retval true if nodeVector is either endpoint / inside / on surface
-     * @retval false if nodeVector is neither endpoint / inside / on surface
+     * Is the given vector either of the endpoints?
+     * @retval true if nodeVector is either endpoint
+     * @retval false if nodeVector is neither endpoint
      */
-    virtual bool containsNode(const btVector3& nodeVector) const;
-    // Function defined in the .cpp file now.
-    /*
+    virtual bool containsNode(const btVector3& nodeVector) const 
     {
-      // Older version that only checks for endpoint inclusion:
-      return ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero());
+        return ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero());
     }
-    */
 
     /**
      * Return a set contiaining the two endpoints.
@@ -219,33 +213,22 @@ public:
     double getLength() const {
         return getFrom().distance(getTo());
     }
-
-protected:
-
-    /**
-     * This function checks if a node is on the surface of the tgBox that will be
-     * created with this tgBoxInfo. 
-     * NOTE that it does NOT work for boxes that start off rotated:
-     * unless a box is orthogonal to the axes of the world, 
-     * this function will always return false.
-     * @param[in] nodeVector a btVector3 that is to be checked against this box.
-     * @retval result, true if the node is on or inside the box, false else.
-     */
-    bool isNodeOnBoxSurface(const btVector3& nodeVector) const;
   
-private:    
+private:
 
     /** Disable the copy constructor. */
     tgBoxInfo(const tgBoxInfo&);
 
     /** Disable the assignment operator. */
     tgBoxInfo& operator=(const tgBoxInfo&);  
+    
+private:
 
     /** The pair representing the endpoints of the Box. */
     const tgPair m_pair;
     
     /** Radius and density values. */
-    const tgBox::Config m_config;
+    const tgBox::Config m_config;     
 
 };
 
