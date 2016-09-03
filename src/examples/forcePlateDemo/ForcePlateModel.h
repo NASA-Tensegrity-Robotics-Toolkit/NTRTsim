@@ -104,15 +104,17 @@ public:
 	    double height = 2.0,
 	    double thickness = 0.1,
 	    double platethickness = 1.0,
-	    double wallGap = 0.2,
+	    double wallGap = 0.4, // Used to be 0.2
 	    double bottomGap = 0.5,
+	    double massPlate = 10.0, // Worked with > 10?
+	    double massHousing = 0.0,
 	    double lateralStiffness = 500.0,
 	    double verticalStiffness = 1000.0,
 	    double lateralDamping = 50.0,
 	    double verticalDamping = 100.0,
 	    double lateralRestLength = 0.2,
 	    double verticalRestLength = 0.5,
-	    double springAnchorOffset = 0.1);
+	    double springAnchorOffset = 0.2); // Used to be 0.1
 
     /**
      * Length of the whole force plate assembly.
@@ -166,6 +168,16 @@ public:
      * Units: length.
      */
     double bgap;
+
+    /**
+     * Mass of the force plate itself.
+     */
+    double mP;
+
+    /**
+     * Mass of the surrounding housing structure that supports the plate.
+     */
+    double mH;
     
     /**
      * Stiffness of the springs between the housing and the sides of the force plate 

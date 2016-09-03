@@ -97,14 +97,22 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
 
     calculateAndApplyForce(dt);
 
-    // If the spring distance has gone negative, crash the simulator on purpose.
+    // If the spring distance has gone negative, output a scary warning.
     // TO-DO: find a way to apply a hard stop here instead.
     if( getCurrentSpringLength() < 0.0)
     {
+      std::cout << "WARNING! UNIDIRECTIONAL COMPRESSION SPRING IS "
+		<< "LESS THAN ZERO LENGTH. YOUR SIMULATION MAY BE INACCURATE FOR "
+		<< "ANY TIMESTEPS WHEN THIS MESSAGE APPEARS. " << std::endl;
+      std::cout << "Current spring length is " << getCurrentSpringLength()
+		<< std::endl << std::endl;
+
+      /* Previous error message:
       std::cout << "Error, unidirectional compression spring length "
 		<< "is negative. Length is: " << getCurrentSpringLength()
-		<< std::endl;
+       		<< std::endl;
       throw std::runtime_error("Unidirectional compression spring has negative length, simulation stopping. Increase your stiffness coefficient.");
+      */
     }
     
     assert(invariant());
@@ -275,12 +283,20 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
 
 bool tgBulletUnidirectionalCompressionSpring::invariant(void) const
 {
-    return (m_coefK > 0.0 &&
-    m_coefD >= 0.0 &&
-    m_prevLength >= 0.0 &&
-    m_restLength >= 0.0 &&
-    anchor1 != NULL &&
-    anchor2 != NULL &&
-    m_direction != NULL &&
-    m_anchors.size() >= 2);
+  // Instead of checking for less than zero length, just output a warning.
+  // @TODO: find some way of dealing with Bullet's less-than-zero-length between
+  // rigid bodies that are colliding.
+  if( (m_prevLength < 0) ) {
+    std::cout << "WARNING! UNIDIRECTIONAL COMPRESSION SPRING IS "
+	      << "LESS THAN ZERO LENGTH. YOUR SIMULATION MAY BE INACCURATE FOR "
+	      << "ANY TIMESTEPS WHEN THIS MESSAGE APPEARS. " << std::endl;
+  }
+  // Used to have m_prevLength >= 0.0 && 
+  return (m_coefK > 0.0 &&
+	  m_coefD >= 0.0 &&
+	  m_restLength >= 0.0 &&
+	  anchor1 != NULL &&
+	  anchor2 != NULL &&
+	  m_direction != NULL &&
+	  m_anchors.size() >= 2);
 }

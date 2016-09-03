@@ -242,7 +242,7 @@ bool tgBoxMoreAnchorsInfo::isNodeOnBoxSurface(const btVector3& nodeVector) const
   btVector3 halfExtents = getHalfExtents();
 
   //DEBUGGING
-  if( 1 ){
+  if( 0 ){
     std::cout << "Box has half extents: " << halfExtents << std::endl;
   }
   
@@ -320,7 +320,7 @@ bool tgBoxMoreAnchorsInfo::isNodeOnBoxSurface(const btVector3& nodeVector) const
  */
 bool tgBoxMoreAnchorsInfo::containsNode(const btVector3& nodeVector) const {
   // DEBUGGING
-  if( 1 ){
+  if( 0 ){
     std::cout << "Called containsNode inside tgBoxMoreAnchorsInfo with pair "
 	      << getFrom() << ", " << getTo() << std::endl
 	      << " and tags " << getTags()
@@ -330,21 +330,22 @@ bool tgBoxMoreAnchorsInfo::containsNode(const btVector3& nodeVector) const {
   // first do the older check:
   if( ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero()) ){
     //DEBUGGING:
-    std::cout << "containsNode: true, is part of pair." << std::endl << std::endl;
+    //std::cout << "containsNode: true, is part of pair." << std::endl << std::endl;
     return true;
   }
   else {
     // Check if it's inside or on the surface of the box.
     //DEBUGGING:
-    std::cout << "Node not either of the coordinates in this box's pair. "
-	      << "Now checking inside or on surface of box... " << std::endl;
+    //std::cout << "Node not either of the coordinates in this box's pair. "
+    //	      << "Now checking inside or on surface of box... " << std::endl;
     if( isNodeOnBoxSurface(nodeVector) ) {
       //DEBUGGING
-      std::cout << "Node is on box surface, true! " << std::endl << std::endl;
+      //std::cout << "Node is on box surface, true! " << std::endl << std::endl;
       return true;
     }
 
-    std::cout << "containsNode: false." << std::endl << std::endl;
+    //DEBUGGING
+    //std::cout << "containsNode: false." << std::endl << std::endl;
     return false;
   }
 }

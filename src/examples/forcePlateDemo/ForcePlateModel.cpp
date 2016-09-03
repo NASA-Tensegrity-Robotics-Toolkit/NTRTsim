@@ -62,6 +62,8 @@ ForcePlateModel::Config::Config(double length,
 				double platethickness,
 				double wallGap,
 				double bottomGap,
+				double massPlate,
+				double massHousing,
 				double lateralStiffness,
 				double verticalStiffness,
 				double lateralDamping,
@@ -76,6 +78,8 @@ ForcePlateModel::Config::Config(double length,
   pt(platethickness),
   wgap(wallGap),
   bgap(bottomGap),
+  mP(massPlate),
+  mH(massHousing),
   latK(lateralStiffness),
   vertK(verticalStiffness),
   latD(lateralDamping),
@@ -329,7 +333,7 @@ void ForcePlateModel::constructorAux()
 {
   // DEBUGGING:
   if( m_debugging ) {
-    std::cout << "Constructor for ForcePlateModel." << std::endl;
+    std::cout << "Constructor for ForcePlateModel..." << std::endl;
   }
 
   // Do a check on all the parameters.
@@ -361,6 +365,18 @@ void ForcePlateModel::constructorAux()
   if( m_config.bgap >= m_config.h - m_config.pt ) {
     // There must be a bottom surface to the force plate housing.
     throw std::invalid_argument("Error, plate thickness and bottom gap would cut through the bottom of the housing. Adjust pt, h, and/or bgap.");
+  }
+  if( m_config.mP < 0.0 ) {
+    throw std::invalid_argument("Mass of the plate (mP) must be greater than zero.");
+  }
+  if( m_config.mH < 0.0 ) {
+    throw std::invalid_argument("Mass of the housing structure (mH) must be greater than zero.");
+  }
+  //TEMPORARY: this class can only take in housing masses that are zero.
+  // This is because I do not have time to calculate the total volume of all the
+  // housing boxes (including the support beams).
+  if( m_config.mH != 0.0 ) {
+    throw std::invalid_argument("Currently, this class only supports housing mass of zero (fixed in space.) Mass of the housing is not zero, exiting.");
   }
   if( m_config.latK <= 0.0 ){
     throw std::invalid_argument("Lateral spring constant (latK) must be positive.");
@@ -399,6 +415,8 @@ void ForcePlateModel::constructorAux()
     std::cout << "pt: " <<  m_config.pt << std::endl;
     std::cout << "wgap: " <<  m_config.wgap << std::endl;
     std::cout << "bgap: " <<  m_config.bgap << std::endl;
+    std::cout << "mP: " << m_config.mP << std::endl;
+    std::cout << "mH: " << m_config.mH << std::endl;
     std::cout << "latK: " <<  m_config.latK << std::endl;
     std::cout << "vertK: " <<  m_config.vertK << std::endl;
     std::cout << "latD: " <<  m_config.latD << std::endl;
@@ -573,12 +591,6 @@ void ForcePlateModel::addVerticalSpringsPairs(tgStructure& s) {
   s.addPair( 29, 25, "verticalSpring" ); // s_bot_b_housing, s_bot_b
   s.addPair( 30, 26, "verticalSpring" ); // s_bot_c_housing, s_bot_c
   s.addPair( 31, 27, "verticalSpring" ); // s_bot_d_housing, s_bot_d
-  
-  // Version where springs originate on the force plate:
-  //s.addPair( 24, 28, "verticalSpring" ); // s_bot_a, s_bot_a_housing
-  //s.addPair( 25, 29, "verticalSpring" ); // s_bot_b, s_bot_b_housing
-  //s.addPair( 26, 30, "verticalSpring" ); // s_bot_c, s_bot_c_housing
-  //s.addPair( 27, 31, "verticalSpring" ); // s_bot_d, s_bot_d_housing
 }
 
 // Finally, create the model!
@@ -616,14 +628,22 @@ void ForcePlateModel::setup(tgWorld& world)
   // But, display plate width and height in the terms of my derivation.
   double plateWidth = m_config.w - (2 * m_config.t) - (2 * m_config.wgap);
   double plateHeight = m_config.pt;
+  // Calculate the density of the plate based on its volume.
+  // NOTE that this does in fact work properly, since the width and height here
+  // are what we define, NOT what is passed in to Bullet's btBoxShape.
+  // As per addLateralPlateBoxesPairs, the length of the box can be calculated as:
+  double plateLength = abs( a1.z() - d1.z() );
+  double plateVolume = plateLength * plateWidth * plateHeight;
+  double plateDensity = m_config.mP / plateVolume;
   //DEBUGGING
   if( m_debugging ){
-    std::cout << "Plate width: " << plateWidth << ", Plate height: " << plateHeight
-	      << std::endl;
+    std::cout << "Plate length: " << plateLength << ", Plate width: "
+	      << plateWidth << ", Plate height: " << plateHeight
+	      << ", Plate density: " << plateDensity << std::endl << std::endl;
   }
   // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, 1.0);
+  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, plateDensity);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.
@@ -673,20 +693,6 @@ void ForcePlateModel::setup(tgWorld& world)
   tgUnidirectionalCompressionSpringActuator::Config
     verticalSpringConfig(true, m_config.vertK, m_config.vertD, m_config.vertRL,
 			 false, false, new btVector3(0, 1, 0));
-
-  //DEBUGGING
-  // See if we can get a proper error when a connector is at a node
-  // which has multiple rigid bodies connected there.
-  // On the plate:
-  //tgNode plateBoxFromTemp = tgNode( 0, m_config.h - (m_config.pt/2), a1.z() );
-  //s.addPair(plateBoxFromTemp, hb_c, "lateralSpringTemp");
-  //s.addPair(0, 4, "lateralSpringTemp"); // plateBoxFrom, hb_c
-
-  // stiffness, damping, pretension.
-  tgBasicActuator::Config testSpringConfig(10, 1, 0);
-  // Need to disable movement of the spring anchors.
-  testSpringConfig.moveCablePointAToEdge = false;
-  testSpringConfig.moveCablePointBToEdge = false;
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -714,16 +720,12 @@ void ForcePlateModel::setup(tgWorld& world)
   		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
 
   //DEBUGGING
-  // Try out an actuator that won't crash on less than zero length.
-  //spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpringConfig));
-  //spec.addBuilder("verticalSpring", new tgBasicActuatorInfo(testSpringConfig));
-
-  std::cout << s << std::endl;
+  if( m_debugging){
+    std::cout << s << std::endl;
+  }
 
   // Create your structureInfo
   tgStructureInfo structureInfo(s, spec);
-
-  //std::cout << spec << std::endl;
 
   // Use the structureInfo to build ourselves
   structureInfo.buildInto(*this, world);
