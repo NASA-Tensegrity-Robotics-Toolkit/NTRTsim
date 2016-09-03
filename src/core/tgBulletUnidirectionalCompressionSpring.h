@@ -72,12 +72,15 @@ public:
      * @param[in] dampingCoefficient - the damping in the spring. Must be non-negative.
      * @param[in] restLength - the length of the compression spring when unloaded.
      * @param[in] direction - the direction of the force to be applied, a btVector3.
-     * the current version will only support (1,0,0), (0,1,0), or (0,0,1).
-     * NOTE that although direction is a pointer, it is not deleted in this class or any 
-     * of the other related classes in core. That is because
-     * it's stored in the const Config struct of an application: it's only created once,
-     * not dynamically, so it's only deleted at the very end of the application (NOT during
-     * any individual setups or teardowns.)
+     * the current version will only support (1,0,0), (0,1,0), or (0,0,1), or
+     * the negatives of those vectors.
+     * NOTE that if the To anchor is in the negative direction with respect to the
+     * From anchor, then direction should be NEGATIVE.
+     * NOTE that although direction is a pointer, it is not deleted in this class 
+     * or any of the other related classes in core. That is because
+     * it's stored in the const Config struct of an application: it's only 
+     * created once, not dynamically, so it's only deleted at the very 
+     * end of the application (NOT during any individual setups or teardowns.)
      */
     tgBulletUnidirectionalCompressionSpring(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,

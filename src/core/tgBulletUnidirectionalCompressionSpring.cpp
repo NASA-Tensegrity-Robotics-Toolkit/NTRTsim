@@ -30,7 +30,7 @@
 #include "tgCast.h"
 // The BulletPhysics library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
-
+// The C++ standard library
 #include <iostream>
 #include <stdexcept>
 
@@ -69,7 +69,9 @@ m_direction(direction)
     // @TODO: make this work with arbitrary unit vectors. Those dot products
     // are probably not exactly 1.0, but 1.0somethingsmall. 
     double dotproduct = m_direction->dot( btVector3(1,1,1) );
-    if( dotproduct != 1.0 ){
+    // @TODO: Note that this should also check if the length at start is negative:
+    // this would indicate that the dotproduct must be negative.
+    if( fabs(dotproduct) != 1.0 ){
       std::cout << "Error: m_direction is not a unit vector. Its dot product" <<
 	" with (1,1,1) is " << dotproduct << std::endl;
       throw std::invalid_argument("Direction must be a unit vector.");

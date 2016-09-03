@@ -98,6 +98,9 @@ public:
      * Direction vector along which the force from this spring acts.
      * Should be checked in constructor: only allowed to be a unit vector
      * along one of the three axes.
+     * NOTE: to have springs where the To node is in the negative direction
+     * with respect to the From node, this direction parameter should be
+     * negative.
      */
     btVector3 * direction;
   };

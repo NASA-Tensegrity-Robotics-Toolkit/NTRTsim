@@ -91,7 +91,6 @@ ForcePlateModel::Config::Config(double length,
  * This function calculates all the locations of the node positions for the 
  * force plate. This requires that m_config be populated first.
  */
-
 void ForcePlateModel::calculatePlateNodePositions() {
   // check that m_config is populated
   assert(invariant());
@@ -138,7 +137,7 @@ void ForcePlateModel::calculatePlateNodePositions() {
     std::cout << "d1, d2: " << d1 << "   " << d2 << std::endl << std::endl;
   }
 
-  // Now calculate the positions of the force anchor points on the force plate.
+  // Now calculate the positions of the spring anchor points on the force plate.
   // See this file's .h for more information about where each of these
   // points are located.
   
@@ -499,9 +498,12 @@ void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
   // Add the pair for the bottom:
   s.addPair( 6, 7, "housingBottom" ); // hb_bot_ab, hb_bot_cd
   // Finally, add the "supporting beams" that are needed to auto-compound
-  // the sides to the bottom.
+  // the sides of the housing to the bottom of the housing.
   // Even though only one beam is needed, technically, let's add four for symmetry.
   // These are at an angle.
+  // Without these, the bottom of the housing would fall out, since because it
+  // would not share any nodes with the sides, it would not be auto-compounded
+  // with them.
   s.addPair( 2, 6, "supportBeam" ); // hb_a, hb_bot_ab
   s.addPair( 3, 6, "supportBeam" ); // hb_b, hb_bot_ab
   s.addPair( 4, 7, "supportBeam" ); // hb_c, hb_bot_cd
@@ -536,9 +538,17 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
   // Note that there have to be different tags/labels for the springs
   // on each side of the plate, since they have to have different 'direction'
   // vectors for their tgUnidirectionalCompressionSpring.
+  // These are named for the face of the force plate they are on.
+  // The springs along x:
   s.addPair( 10, 18, "lateralSpringBC" ); // s_bc, s_bc_housing
   s.addPair( 11, 19, "lateralSpringBC" ); // s_cb, s_cb_housing
-  
+  s.addPair( 14, 22, "lateralSpringAD" ); // s_da, s_da_housing
+  s.addPair( 15, 23, "lateralSpringAD" ); // s_ad, s_ad_housing
+  // The springs along Z:
+  s.addPair( 8, 16, "lateralSpringAB" ); // s_ab, s_ab_housing
+  s.addPair( 9, 17, "lateralSpringAB" ); // s_ba, s_ba_housing
+  s.addPair( 12, 20, "lateralSpringCD" ); // s_dc, s_cd_housing
+  s.addPair( 13, 21, "lateralSpringCD" ); // s_dc, s_dc_housing
 }
 
 // Adds the pairs for the vertical springs (attaches the plate to the bottom
@@ -565,12 +575,6 @@ void ForcePlateModel::addVerticalSpringsPairs(tgStructure& s) {
   s.addPair( 31, 27, "verticalSpring" ); // s_bot_d_housing, s_bot_d
   
   // Version where springs originate on the force plate:
-  //DEBUGGING
-  // Check exactly the nodes that will be paired together.
-  tgNodes tempNodes = s.getNodes();
-  std::cout << "Nodes number 24 and 28 are currently: " << std::endl
-	    << tempNodes[24] << std::endl
-	    << tempNodes[28] << std::endl;
   //s.addPair( 24, 28, "verticalSpring" ); // s_bot_a, s_bot_a_housing
   //s.addPair( 25, 29, "verticalSpring" ); // s_bot_b, s_bot_b_housing
   //s.addPair( 26, 30, "verticalSpring" ); // s_bot_c, s_bot_c_housing
@@ -650,9 +654,21 @@ void ForcePlateModel::setup(tgWorld& world)
   // Note that since the direction changes for each face of the plate,
   // there will need to be four configs here.
   // They are named by face: AB, BC, CD, DA.
+  // The springs along X:
   tgUnidirectionalCompressionSpringActuator::Config
     lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(1, 0, 0));
+  tgUnidirectionalCompressionSpringActuator::Config
+    lateralSpringConfigAD(true, m_config.latK, m_config.latD, m_config.latRL,
+			  false, false, new btVector3(-1, 0, 0));
+  // The springs along Z:
+  tgUnidirectionalCompressionSpringActuator::Config
+    lateralSpringConfigAB(true, m_config.latK, m_config.latD, m_config.latRL,
+			  false, false, new btVector3(0, 0, -1));
+  tgUnidirectionalCompressionSpringActuator::Config
+    lateralSpringConfigCD(true, m_config.latK, m_config.latD, m_config.latRL,
+			  false, false, new btVector3(0, 0, 1));
+  
   // The vertical springs can all share the same config:
   tgUnidirectionalCompressionSpringActuator::Config
     verticalSpringConfig(true, m_config.vertK, m_config.vertD, m_config.vertRL,
@@ -674,14 +690,12 @@ void ForcePlateModel::setup(tgWorld& world)
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
-  //spec.addBuilder("xyPlateBox", new tgBoxInfo(xyPlateBoxConfig));
-  //spec.addBuilder("yzPlateBox", new tgBoxInfo(yzPlateBoxConfig));
-  //spec.addBuilder("fillerPlateBox", new tgBoxInfo(fillerPlateBoxConfig));
-  //spec.addBuilder("plateBox", new tgBoxInfo(plateBoxConfig));
+
+  // Add the configs for the boxes
   spec.addBuilder("plateBox", new tgBoxMoreAnchorsInfo(plateBoxConfig));
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
-  //spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
+  spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
   spec.addBuilder("housingBottom", new tgBoxMoreAnchorsInfo(housingBottomConfig));
   // Note that the support beams will not have any extra nodes on them, so use
   // a regular tgBox here for them.
@@ -690,6 +704,12 @@ void ForcePlateModel::setup(tgWorld& world)
   // Add the configs for the springs:
   spec.addBuilder("lateralSpringBC",
   		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  spec.addBuilder("lateralSpringAD",
+  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAD));
+  spec.addBuilder("lateralSpringAB",
+		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAB));
+  spec.addBuilder("lateralSpringCD",
+		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigCD));
   spec.addBuilder("verticalSpring",
   		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
 
