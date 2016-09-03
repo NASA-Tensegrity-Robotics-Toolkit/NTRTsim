@@ -418,7 +418,15 @@ private:
      * the relevant nodes. This is for the lateral springs.
      * @param[in] s: A tgStructure that we're building into
      */
-    void addLateralSpringsPairs(tgStructure& s);    
+    void addLateralSpringsPairs(tgStructure& s);
+
+    /**
+     * A function called during setup that creates springs from the
+     * relevant nodes. This is for the vertical springs, between the bottom
+     * of the housing and the housing plate.
+     * @param[in] s: a tgStructure we're building into.
+     */
+    void addVerticalSpringsPairs(tgStructure& s);
     
     /**
      * Calculates all the node positions for this force plate.

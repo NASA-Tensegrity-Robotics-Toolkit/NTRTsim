@@ -97,8 +97,11 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
 
     // If the spring distance has gone negative, crash the simulator on purpose.
     // TO-DO: find a way to apply a hard stop here instead.
-    if( getCurrentSpringLength() <= 0.0)
+    if( getCurrentSpringLength() < 0.0)
     {
+      std::cout << "Error, unidirectional compression spring length "
+		<< "is negative. Length is: " << getCurrentSpringLength()
+		<< std::endl;
       throw std::runtime_error("Unidirectional compression spring has negative length, simulation stopping. Increase your stiffness coefficient.");
     }
     

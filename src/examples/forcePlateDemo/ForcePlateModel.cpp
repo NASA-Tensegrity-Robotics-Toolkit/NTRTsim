@@ -310,11 +310,15 @@ void ForcePlateModel::calculateBottomHousingNodePositions() {
 
   //DEBUGGING
   if( m_debugging ) {
+    std::cout << std::endl << "Calculated nodes of the bottom plate of the housing: "
+	      << std::endl << "hb_bot_ab: " << hb_bot_ab
+	      << std::endl << "hb_bot_cd: " << hb_bot_cd;
+    
     std::cout << std::endl << "Calculated vertical spring anchor positions on the bottom of the housing:" << std::endl;
     std::cout << "s_bot_a_housing: " << s_bot_a_housing << std::endl;
     std::cout << "s_bot_b_housing: " << s_bot_b_housing << std::endl;
     std::cout << "s_bot_c_housing: " << s_bot_c_housing << std::endl;
-    std::cout << "s_bot_d_housing: " << s_bot_d_housing << std::endl;
+    std::cout << "s_bot_d_housing: " << s_bot_d_housing << std::endl << std::endl;
   }
 }
 
@@ -504,7 +508,7 @@ void ForcePlateModel::addHousingBoxesPairs(tgStructure& s)
   s.addPair( 5, 7, "supportBeam" ); // hb_d, hb_bot_cd
 }
 
-// Adds the pairs for the lateral springs (attaching the housing to the plate.
+// Adds the pairs for the lateral springs (attaching the housing to the plate.)
 void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
 {
   // On each side, springs can start from the housing and attach the free end
@@ -519,7 +523,6 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
   s.addNode( s_da ); // 14
   s.addNode( s_ad ); // 15
   // Add the corresponding nodes on the housing:
-  //s.addNode( s_bc ); // 6
   s.addNode( s_ab_housing ); // 16
   s.addNode( s_ba_housing ); // 17
   s.addNode( s_bc_housing ); // 18
@@ -529,18 +532,37 @@ void ForcePlateModel::addLateralSpringsPairs(tgStructure& s)
   s.addNode( s_da_housing ); // 22
   s.addNode( s_ad_housing ); // 23
   
-  //s.addNode( s_bc_housing ); // 7
-
   // Add the pairs corresponding to each spring.
   // Note that there have to be different tags/labels for the springs
   // on each side of the plate, since they have to have different 'direction'
   // vectors for their tgUnidirectionalCompressionSpring.
-  //s.addPair( 6, 7, "lateralSpringBC" );
   s.addPair( 10, 18, "lateralSpringBC" ); // s_bc, s_bc_housing
   s.addPair( 11, 19, "lateralSpringBC" ); // s_cb, s_cb_housing
-  //s.addPair( 0, 1, "lateralSpringBC" );
-  //s.addPair( s_bc, s_bc_housing, "lateralSpringBC" );
   
+}
+
+// Adds the pairs for the vertical springs (attaches the plate to the bottom
+// of the housing.)
+// Note that this must be called in order, otherwise the added pairs
+// will not correspond to the order of the nodes.
+void ForcePlateModel::addVerticalSpringsPairs(tgStructure& s) {
+  // First, add the nodes for the vertical springs.
+  // The nodes on the plate are:
+  s.addNode( s_bot_a ); // 24
+  s.addNode( s_bot_b ); // 25
+  s.addNode( s_bot_c ); // 26
+  s.addNode( s_bot_d ); // 27
+  // The nodes on the housing are:
+  s.addNode( s_bot_a_housing ); // 28
+  s.addNode( s_bot_b_housing ); // 29
+  s.addNode( s_bot_c_housing ); // 30
+  s.addNode( s_bot_d_housing ); // 31
+  // Finally, add the pairs for each spring.
+  // Springs originate on the housing.
+  s.addPair( 28, 24, "verticalSpring" ); // s_bot_a_housing, s_bot_a
+  s.addPair( 29, 25, "verticalSpring" ); // s_bot_b_housing, s_bot_b
+  s.addPair( 30, 26, "verticalSpring" ); // s_bot_c_housing, s_bot_c
+  s.addPair( 31, 27, "verticalSpring" ); // s_bot_d_housing, s_bot_d
 }
 
 // Finally, create the model!
@@ -559,9 +581,14 @@ void ForcePlateModel::setup(tgWorld& world)
   addHousingBoxesPairs(s);
   // Add the pairs for the springs
   addLateralSpringsPairs(s);
+  addVerticalSpringsPairs(s);
 
   // Move the structure to the location passed in to the constructor.
   s.move(m_location);
+
+  //DEBUGGING
+  // Move the plate up a bit more.
+  s.move( btVector3(0, 2, 0) );
 
   
   // Create the config structs for the various different boxes and springs.
@@ -580,7 +607,7 @@ void ForcePlateModel::setup(tgWorld& world)
   }
   // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig(plateWidth/2, plateHeight/2, 1.0);
+  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, 0.0);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.
@@ -591,8 +618,19 @@ void ForcePlateModel::setup(tgWorld& world)
   // Config for the bottom part of the housing: @TO-DO: CHANGE DENSITY.
   // Halve the width and height here also.
   // First, get the correct height of the bottom plate, based on m_config.
-  double housingBottomHeight = (m_config.h - m_config.pt - m_config.bgap)/2;
+  double housingBottomHeight = ( m_config.h - m_config.pt - m_config.bgap)/2;
   tgBox::Config housingBottomConfig( m_config.w/2, housingBottomHeight, 0.0);
+
+  // Config for the support beams that connect the housing walls to bottom,
+  // so that it's all auto-compounded by tgcreator.
+  // These beams should be extremely small and thin, contributing almost nothing
+  // to the mass of the housing.
+  // How much smaller should the beams be than m_config thickness?
+  double supportBeamDivisor = 10;
+  double supportBeamDensity = 0.0;
+  tgBox::Config supportBeamConfig( m_config.t/supportBeamDivisor,
+				   m_config.t/supportBeamDivisor,
+				   supportBeamDensity);
 
   // For the springs:
   // Config here is isFreeEndAttached, stiffness, damping, restlength,
@@ -603,6 +641,10 @@ void ForcePlateModel::setup(tgWorld& world)
   tgUnidirectionalCompressionSpringActuator::Config
     lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(1, 0, 0));
+  // The vertical springs can all share the same config:
+  tgUnidirectionalCompressionSpringActuator::Config
+    verticalSpringConfig(true, m_config.vertK, m_config.vertD, m_config.vertRL,
+			 false, false, new btVector3(0, 1, 0));
 
   //DEBUGGING
   // See if we can get a proper error when a connector is at a node
@@ -610,10 +652,13 @@ void ForcePlateModel::setup(tgWorld& world)
   // On the plate:
   //tgNode plateBoxFromTemp = tgNode( 0, m_config.h - (m_config.pt/2), a1.z() );
   //s.addPair(plateBoxFromTemp, hb_c, "lateralSpringTemp");
-  s.addPair(0, 4, "lateralSpringTemp"); // plateBoxFrom, hb_c
+  //s.addPair(0, 4, "lateralSpringTemp"); // plateBoxFrom, hb_c
 
   // stiffness, damping, pretension.
-  tgBasicActuator::Config testSpring(100, 10, 0);
+  tgBasicActuator::Config testSpringConfig(10, 1, 0);
+  // Need to disable movement of the spring anchors.
+  testSpringConfig.moveCablePointAToEdge = false;
+  testSpringConfig.moveCablePointBToEdge = false;
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -626,9 +671,20 @@ void ForcePlateModel::setup(tgWorld& world)
   spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
   spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
   spec.addBuilder("housingBottom", new tgBoxMoreAnchorsInfo(housingBottomConfig));
-  spec.addBuilder("lateralSpringBC",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
-  //spec.addBuilder("lateralSpringTemp", new tgBasicActuatorInfo(testSpring));
+  // Note that the support beams will not have any extra nodes on them, so use
+  // a regular tgBox here for them.
+  spec.addBuilder("supportBeam", new tgBoxInfo(supportBeamConfig));
+
+  // Add the configs for the springs:
+  //spec.addBuilder("lateralSpringBC",
+  //		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  //spec.addBuilder("verticalSpring",
+  //		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
+
+  //DEBUGGING
+  // Try out an actuator that won't crash on less than zero length.
+  spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpringConfig));
+  //spec.addBuilder("verticalSpring", new tgBasicActuatorInfo(testSpringConfig));
 
   std::cout << s << std::endl;
 
