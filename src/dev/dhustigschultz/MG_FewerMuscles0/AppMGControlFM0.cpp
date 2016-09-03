@@ -113,7 +113,7 @@ bool AppMGControlFM0::setup()
         const double pfMax =  6.28;
 
 	const double maxH = 60.0;
-	const double minH = 1.0;
+	const double minH = 7.0;
 
         JSONMGFeedbackControlFM0::Config control_config(segmentSpan, 
                                                     numMuscles,

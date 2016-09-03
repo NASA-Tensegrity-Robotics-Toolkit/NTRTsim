@@ -213,9 +213,10 @@ void JSONMGFeedbackControlFM0::onStep(BaseQuadModelLearning& subject, double dt)
     }
     
     double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+    double currentHeightRear =  subject.getSegmentCOM(6)[1];
     
     /// Max and min heights added to config
-    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight)
+    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight || currentHeightRear > m_config.maxHeight || currentHeightRear < m_config.minHeight)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;

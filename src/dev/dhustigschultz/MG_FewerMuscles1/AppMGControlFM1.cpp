@@ -113,7 +113,7 @@ bool AppMGControlFM1::setup()
         const double pfMax =  6.28;
 
 	const double maxH = 60.0;
-	const double minH = 1.0;
+	const double minH = 7.0;
 
         JSONMGFeedbackControlFM1::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -140,8 +140,9 @@ bool AppMGControlFM1::setup()
                                                     pfMax,
 						    maxH,
 						    minH);
-        /// @todo fix memory leak that occurs here
-       JSONMGFeedbackControlFM1* const myControl =
+        // Memory leak fixed here by deleting myControl later. 
+        //TODO: See about deleting the dynamically allocated tgImpedanceController objects in this controller.
+        myControl =
         new JSONMGFeedbackControlFM1(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -310,9 +311,10 @@ bool AppMGControlFM1::run()
     }
     
     ///@todo consider app.cleanup()
-   delete simulation;
-   delete view;
-   delete world;
+    delete simulation;
+    delete view;
+    delete world;
+    delete myControl;
     
     return true;
 }

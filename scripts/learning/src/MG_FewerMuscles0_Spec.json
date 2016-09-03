@@ -4,7 +4,7 @@
     "resourcePath" : "../../../resources/src/",
     "lowerPath"    : "dhustigschultz/AppMGFM0/",
     "executable" : "./../../../build/dev/dhustigschultz/MG_FewerMuscles0/AppMGControlFM0",
-    "terrain" : [[[0, 1, 0, 0.0, 60000]]],
+    "terrain" : [[[0, 0, 0, 0.0, 60000]]],
     "learningParams": 
     {
         "trialLength" : 60000,
