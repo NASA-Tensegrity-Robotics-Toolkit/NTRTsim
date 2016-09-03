@@ -107,8 +107,8 @@ std::string tgBoxMoreAnchorsInfo::getBoxOrientation() const {
   // along the length of the box with (1,0,0), (0,1,0), and (0,0,1).
   btVector3 lengthVector = getTo() - getFrom();
   //DEBUGGING:
-  std::cout << "Inside tgBoxMoreAnchorsInfo::getBoxOrientation, lengthVector is "
-	    << lengthVector << "." << std::endl;
+  //std::cout << "Inside tgBoxMoreAnchorsInfo::getBoxOrientation, lengthVector is "
+  //	    << lengthVector << "." << std::endl;
   // Only one of the dimensions in lengthVector should be nonzero.
   if( lengthVector.dot( btVector3(1, 0, 0)) != 0.0 ) {
     // There is a nonzero in x.
@@ -240,6 +240,11 @@ bool tgBoxMoreAnchorsInfo::isNodeOnBoxSurface(const btVector3& nodeVector) const
 
   // Use the helper function to get the dimensions of the box:
   btVector3 halfExtents = getHalfExtents();
+
+  //DEBUGGING
+  if( 1 ){
+    std::cout << "Box has half extents: " << halfExtents << std::endl;
+  }
   
   //DEBUGGING
   if( 0 ){
@@ -317,9 +322,10 @@ bool tgBoxMoreAnchorsInfo::containsNode(const btVector3& nodeVector) const {
   // DEBUGGING
   if( 1 ){
     std::cout << "Called containsNode inside tgBoxMoreAnchorsInfo with pair "
-	      << getFrom() << ", " << getTo() << " and tags " << getTags()
+	      << getFrom() << ", " << getTo() << std::endl
+	      << " and tags " << getTags()
 	      << " for nodeVector "
-	      << nodeVector << std::endl;
+	      << nodeVector << " ..." << std::endl;
   }
   // first do the older check:
   if( ((getFrom() - nodeVector).fuzzyZero() || (getTo() - nodeVector).fuzzyZero()) ){

@@ -299,13 +299,13 @@ void ForcePlateModel::calculateBottomHousingNodePositions() {
 		      "hb_bot_cd");
 
   // The spring bottom positions are exactly bgap below the positions on the plate.
-  s_bot_a_housing = s_bot_a - tgNode( 0, -m_config.bgap, 0);
+  s_bot_a_housing = s_bot_a - tgNode( 0, m_config.bgap, 0);
   s_bot_a_housing.addTags("s_bot_a_housing");
-  s_bot_b_housing = s_bot_b - tgNode( 0, -m_config.bgap, 0);
+  s_bot_b_housing = s_bot_b - tgNode( 0, m_config.bgap, 0);
   s_bot_b_housing.addTags("s_bot_b_housing");
-  s_bot_c_housing = s_bot_c - tgNode( 0, -m_config.bgap, 0);
+  s_bot_c_housing = s_bot_c - tgNode( 0, m_config.bgap, 0);
   s_bot_c_housing.addTags("s_bot_c_housing");
-  s_bot_d_housing = s_bot_d - tgNode( 0, -m_config.bgap, 0);
+  s_bot_d_housing = s_bot_d - tgNode( 0, m_config.bgap, 0);
   s_bot_d_housing.addTags("s_bot_d_housing");
 
   //DEBUGGING
@@ -558,11 +558,23 @@ void ForcePlateModel::addVerticalSpringsPairs(tgStructure& s) {
   s.addNode( s_bot_c_housing ); // 30
   s.addNode( s_bot_d_housing ); // 31
   // Finally, add the pairs for each spring.
-  // Springs originate on the housing.
+  // Version where springs originate on the housing:
   s.addPair( 28, 24, "verticalSpring" ); // s_bot_a_housing, s_bot_a
   s.addPair( 29, 25, "verticalSpring" ); // s_bot_b_housing, s_bot_b
   s.addPair( 30, 26, "verticalSpring" ); // s_bot_c_housing, s_bot_c
   s.addPair( 31, 27, "verticalSpring" ); // s_bot_d_housing, s_bot_d
+  
+  // Version where springs originate on the force plate:
+  //DEBUGGING
+  // Check exactly the nodes that will be paired together.
+  tgNodes tempNodes = s.getNodes();
+  std::cout << "Nodes number 24 and 28 are currently: " << std::endl
+	    << tempNodes[24] << std::endl
+	    << tempNodes[28] << std::endl;
+  //s.addPair( 24, 28, "verticalSpring" ); // s_bot_a, s_bot_a_housing
+  //s.addPair( 25, 29, "verticalSpring" ); // s_bot_b, s_bot_b_housing
+  //s.addPair( 26, 30, "verticalSpring" ); // s_bot_c, s_bot_c_housing
+  //s.addPair( 27, 31, "verticalSpring" ); // s_bot_d, s_bot_d_housing
 }
 
 // Finally, create the model!
@@ -588,7 +600,7 @@ void ForcePlateModel::setup(tgWorld& world)
 
   //DEBUGGING
   // Move the plate up a bit more.
-  s.move( btVector3(0, 2, 0) );
+  //s.move( btVector3(0, 2, 0) );
 
   
   // Create the config structs for the various different boxes and springs.
@@ -607,7 +619,7 @@ void ForcePlateModel::setup(tgWorld& world)
   }
   // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, 0.0);
+  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, 1.0);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.
@@ -669,21 +681,21 @@ void ForcePlateModel::setup(tgWorld& world)
   spec.addBuilder("plateBox", new tgBoxMoreAnchorsInfo(plateBoxConfig));
   //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
-  spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
+  //spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
   spec.addBuilder("housingBottom", new tgBoxMoreAnchorsInfo(housingBottomConfig));
   // Note that the support beams will not have any extra nodes on them, so use
   // a regular tgBox here for them.
   spec.addBuilder("supportBeam", new tgBoxInfo(supportBeamConfig));
 
   // Add the configs for the springs:
-  //spec.addBuilder("lateralSpringBC",
-  //		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
-  //spec.addBuilder("verticalSpring",
-  //		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
+  spec.addBuilder("lateralSpringBC",
+  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  spec.addBuilder("verticalSpring",
+  		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
 
   //DEBUGGING
   // Try out an actuator that won't crash on less than zero length.
-  spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpringConfig));
+  //spec.addBuilder("lateralSpringBC", new tgBasicActuatorInfo(testSpringConfig));
   //spec.addBuilder("verticalSpring", new tgBasicActuatorInfo(testSpringConfig));
 
   std::cout << s << std::endl;
