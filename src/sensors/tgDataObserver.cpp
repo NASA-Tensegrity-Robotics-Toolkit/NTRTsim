@@ -109,12 +109,14 @@ void tgDataObserver::onSetup(tgModel& model)
      */
     if(tgCast::cast<tgModel, ForcePlateModel>(model) != 0) {
       //DEBUGGING
-      std::cout << "Creating the title for a ForcePlateModel in tgDataObserver."
-		<< " Tags are: " << model.getTags() << std::endl;
+      //std::cout << "Creating the title for a ForcePlateModel in tgDataObserver."
+      //		<< " Tags are: " << model.getTags() << std::endl;
       //		<< "Location is: " << model.getLocation() << std::endl;
+
       // Make the heading for a ForcePlateModel.
+      std::string label = (tgCast::cast<tgModel, ForcePlateModel>(model))->getLabel();
       std::stringstream name;
-      name << model.getTags();
+      name << label;
       tgOutput << name.str();
     }
     

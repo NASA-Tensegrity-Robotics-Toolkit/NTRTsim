@@ -449,7 +449,8 @@ ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
   tgModel(),
   m_config(config),
   m_location(location),
-  m_debugging(false)
+  m_debugging(false),
+  m_label("")
 {
   // Call the constructor helper that will do all the checks on
   // these variables.
@@ -460,11 +461,12 @@ ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
  * Constructor with tags passed in
  */
 ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
-				 btVector3& location, const tgTags& tags) :
-  tgModel(tags),
+				 btVector3& location, const std::string label) :
+  tgModel(),
   m_config(config),
   m_location(location),
-  m_debugging(false)
+  m_debugging(false),
+  m_label(label)
 {
   // call the helper.
   constructorAux();
@@ -490,11 +492,12 @@ ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
  */
 ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
 				 btVector3& location, bool debugging,
-				 const tgTags& tags) :
-  tgModel(tags),
+				 const std::string label) :
+  tgModel(),
   m_config(config),
   m_location(location),
-  m_debugging(debugging)
+  m_debugging(debugging),
+  m_label(label)
 {
   // call the helper.
   constructorAux();
@@ -800,6 +803,15 @@ void ForcePlateModel::teardown()
 btVector3 ForcePlateModel::getLocation() const
 {
   return m_location;
+}
+
+/**
+ * Return the label for this force plate
+ * @TODO fix tags and use that instead!!
+ */
+std::string ForcePlateModel::getLabel() const
+{
+  return m_label;
 }
 
 /**

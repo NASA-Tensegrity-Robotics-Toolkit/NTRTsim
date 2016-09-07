@@ -33,6 +33,7 @@
 #include "tgcreator/tgNode.h"
 // The C++ Standard Library
 #include <vector>
+#include <string>
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 
@@ -244,8 +245,12 @@ public:
      * Another constructor that includes tags. 
      * @param[in] tags, as passed in by an App file.
      */
+    //ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
+    //		    const tgTags& tags);
+
+    // Temporarily: just use a string instead. Tags didn't work right.
     ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
-    		    const tgTags& tags);
+    		    const std::string label);
 
     /**
      * Another constructor that allows for a debugging on/off flag to be passed in.
@@ -261,8 +266,12 @@ public:
      * @param[in] tags: a tgTags of the tags that should be attached to this model.
      * various debugging information to the terminal.
      */
+    //ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
+    //		    bool debugging, const tgTags& tags);
+
+    // Temporarily: just use a string instead. Tags didn't work right.
     ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
-		    bool debugging, const tgTags& tags);
+		    bool debugging, const std::string label);
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -312,6 +321,12 @@ public:
      * Returns the location of the base of this force plate.
      */
     btVector3 getLocation() const;
+
+    /**
+     * Returns the string that's the label for this force plate.
+     * @TODO make tags work instead and get rid of this!!
+     */
+    std::string getLabel() const;
 
 protected:
 
@@ -415,6 +430,12 @@ protected:
      * is output to the terminal.
      */
     bool m_debugging;
+
+    /**
+     * String that's the label of this force plate sensor.
+     * @TODO: use tgTags, and get rid of this. Why were tags not assigned??
+     */
+    std::string m_label;
     
 private:
 	

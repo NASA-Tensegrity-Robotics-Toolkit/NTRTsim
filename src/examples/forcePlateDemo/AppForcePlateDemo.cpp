@@ -132,11 +132,15 @@ int main(int argc, char** argv)
     btVector3 forcePlateLocation = btVector3(0,3,0);
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
-    bool forcePlateDebugging = true;
+    bool forcePlateDebugging = false;
     // We can also tag the force plate with an arbitrary string.
     // This will be recorded to the correct place in a log file if a sensor is
     // attached to this force plate.
-    tgTags tags = tgTags("FP");
+    //tgTags tags = tgTags("FP1");
+
+    // TEMPORARILY: use a string instead. Not sure why tags didn't work.
+    std::string label = "FP1";
+    
     // Create the force plate model.
     // Note that in order to call the 'attach' method below, to attach the sensor,
     // this pointer has to be a ForcePlateModel pointer not just a tgModel pointer.
@@ -144,12 +148,12 @@ int main(int argc, char** argv)
     ForcePlateModel* forcePlate = new ForcePlateModel(forcePlateConfig,
 						      forcePlateLocation,
 						      forcePlateDebugging,
-						      tags);
+						      label);
 
 
     //DEBUGGING
-    std::cout << "In the App, this force plate model has tags: "
-	      << forcePlate->getTags() << std::endl;
+    std::cout << "In the App, this force plate model has label: "
+	      << forcePlate->getLabel() << std::endl;
     
     // Optionally, add a sensor for the force plate.
     // The ForcePlateSensor class takes:
