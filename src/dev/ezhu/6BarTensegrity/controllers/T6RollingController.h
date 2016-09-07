@@ -41,6 +41,8 @@
 // The C++ Standard Library
 #include <vector>
 #include <string>
+#include <fstream>
+#include <ostream>
 
 // Forward declarations
 class sixBarModel;
@@ -186,6 +188,9 @@ private:
 	// Vector of rigid body objects
 	std::vector<btRigidBody*> rodBodies;
 
+	// Payload rigid body object
+	btRigidBody* payloadBody;
+
 	// A vector to hold all normal vectors
 	std::vector<btVector3> normVects;
 
@@ -226,12 +231,14 @@ private:
 	// Vectors to hold actuators and rods
 	std::vector<tgBasicActuator*> actuators;
 	std::vector<tgRod*> rods;
+	std::vector<tgRod*> payload;
 
 	// Vector to hold controllers for the cables
 	std::vector<tgBasicController*> m_controllers;
 	
-	// Rest length of cables
+	// Rest length and start length of cables
 	double restLength;
+	double startLength;
 
 	// Rows of actuation policy matrix
 	std::vector<int> node0AP;
@@ -270,11 +277,18 @@ private:
 	bool reorient = false;
 	bool drGoalReached = false;
 	bool isOnGround;
-	int pathIdx = 0;
+	int pathIdx = 1;
 
 	// Direction to travel
 	btVector3 travelDir;
 	btVector3 currPos;
+
+	// Initialize filestream and data
+	std::ofstream data_out;
+	double worldTime = 0;
+	int actuatedCable;
+	int currentFace;
+	double percentChange = 0;
 };
 
 #endif

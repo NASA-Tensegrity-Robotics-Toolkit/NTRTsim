@@ -26,4 +26,7 @@ add_executable(App6Bar
     sixBarModel.cpp
     App6Bar.cpp)
 
-
+add_executable(AppUphillRolling
+    controllers/T6RollingControllerPrism.cpp
+    PrismModel_mini.cpp
+    AppPrismModel.cpp)

@@ -54,8 +54,11 @@ namespace
    		bool hist;
    		double maxTension;
    		double targetVelocity;
+   		double motorLength;
    	} config =
    		{
+   			
+   			// SuperBall parameters
    			688/pow(sf,3),    // density (kg / length^3)
 	        0.031*sf,     // radius (length)
 	        1615.0,   // stiffness (kg / sec^2) was 1500
@@ -67,7 +70,24 @@ namespace
 	        300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
 	        0,         // History logging (boolean)
 	        10000*sf,   // maxTension
-	        0.5*sf,    // targetVelocity   
+	        0.5*sf,    // targetVelocity
+	        0.3175*sf, // Motor length
+	        
+	        /*
+	        //TT4-Mini parameters
+	        2485/pow(sf,3),
+	        0.0045*sf,
+	        46.173,
+	        200.0,
+	        0.245*sf,
+	        0.99,
+	        0.01,
+	        0.0,
+	        0.7*sf,
+	        0,
+	        10000*sf,
+	        0.3*sf,
+	        */
    		};
 }
 
@@ -200,8 +220,10 @@ void sixBarModel::setup(tgWorld& world)
   	// Note that pretension is defined for this string
 	const tgRod::Config sixBarRodConfig(config.radius, config.density, config.friction,
 		config.rollFriction, config.restitution);
-	const tgRod::Config PayloadRodConfig(config.radius, config.density, config.friction,
+	const tgRod::Config PayloadRodConfig(config.radius*4, config.density/16, config.friction,
 		config.rollFriction, config.restitution);
+	//const tgRod::Config motorConfig(config.radius*2, config.density, config.friction,
+	//	config.rollFriction, config.restitution);
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
@@ -215,13 +237,14 @@ void sixBarModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	//addPayload(s);
+	addPayload(s);
 
 	// Move the structure
 	rotateToFace(s, 2);
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
-	s.move(btVector3(0, config.rodLength-8, 0));
+	s.move(btVector3(0, config.rodLength-9, 0));
+	//s.move(btVector3(0, config.rodLength, 0));
 
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
@@ -229,6 +252,7 @@ void sixBarModel::setup(tgWorld& world)
 	spec.addBuilder("payload", new tgRodInfo(PayloadRodConfig));
 	spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
 	spec.addBuilder("cable", new tgBasicActuatorInfo(staticCableConfig));
+	//spec.addBuilder("motor", new tgRodInfo(motorConfig));
 
 	// Create the structureInfo
 	tgStructureInfo structureInfo(s, spec);
@@ -239,6 +263,9 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Get the actuators for controller
 	allActuators = sixBarModel::find<tgBasicActuator>("actuator");
+
+	// Get the payload for controller
+	payload = sixBarModel::find<tgRod>("payload");
 
 	// Notify controllers that setup has finished
 	notifySetup();
@@ -266,6 +293,11 @@ std::vector<tgBasicActuator*>& sixBarModel::getAllActuators()
 std::vector<tgRod*>& sixBarModel::getAllRods()
 {
 	return allRods;
+}
+
+std::vector<tgRod*>& sixBarModel::getPayload()
+{
+	return payload;
 }
 
 std::vector<btVector3>& sixBarModel::getNormVects()
@@ -305,6 +337,23 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	s.addNode(-config.rodLength/2, rodSpace/2, 0); // 9
 	s.addNode(config.rodLength/2, rodSpace/2, 0); // 10
 	s.addNode(config.rodLength/2, -rodSpace/2, 0); // 11
+
+	/*
+	s.addNode(-rodSpace/2, 0, config.motorLength/2); // 12
+	s.addNode(-rodSpace/2, 0, -config.motorLength/2); // 13
+	s.addNode(rodSpace/2, 0, -config.motorLength/2); //14
+	s.addNode(rodSpace/2, 0, config.motorLength/2); //15
+
+	s.addNode(0, -config.motorLength/2, rodSpace/2); // 16
+	s.addNode(0, config.motorLength/2, rodSpace/2); // 17
+	s.addNode(0, config.motorLength/2, -rodSpace/2); // 18
+	s.addNode(0, -config.motorLength/2, -rodSpace/2); // 19
+
+	s.addNode(-config.motorLength/2, -rodSpace/2, 0); // 20
+	s.addNode(-config.motorLength/2, rodSpace/2, 0); // 21
+	s.addNode(config.motorLength/2, rodSpace/2, 0); // 22
+	s.addNode(config.motorLength/2, -rodSpace/2, 0); // 23
+	*/
 }
 
 void sixBarModel::addSixBarRods(tgStructure& s)
@@ -316,6 +365,35 @@ void sixBarModel::addSixBarRods(tgStructure& s)
 	s.addPair(8, 11, "rod"); // 4
 	s.addPair(9, 10, "rod"); // 5
 }
+
+/*
+void sixBarModel::addSixBarRods(tgStructure& s)
+{
+	s.addPair(0, 12, "rod");
+	s.addPair(12, 13, "motor");
+	s.addPair(13, 1, "rod");
+
+	s.addPair(3, 15, "rod");
+	s.addPair(15, 14, "motor");
+	s.addPair(14, 2, "rod");
+
+	s.addPair(4, 16, "rod");
+	s.addPair(16, 17, "motor");
+	s.addPair(17, 5, "rod");
+
+	s.addPair(7, 19, "rod");
+	s.addPair(19, 18, "motor");
+	s.addPair(18, 6, "rod");
+
+	s.addPair(8, 20, "rod");
+	s.addPair(20, 23, "motor");
+	s.addPair(23, 11, "rod");
+
+	s.addPair(9, 21, "rod");
+	s.addPair(21, 22, "motor");
+	s.addPair(22, 10, "rod");
+}
+*/
 
 void sixBarModel::addSixBarActuators(tgStructure& s)
 {
@@ -366,7 +444,13 @@ void sixBarModel::addPayloadRods(tgStructure& s)
 
 void sixBarModel::addPayloadStrings(tgStructure& s)
 {
+	s.addPair(0, 12, "cable");
+	s.addPair(4, 12, "cable");
+	s.addPair(8, 12, "cable");
 
+	s.addPair(6, 13, "cable");
+	s.addPair(10, 13, "cable");
+	s.addPair(2, 13, "cable");
 }
 
 void sixBarModel::rotateToFace(tgStructure& s, int face)

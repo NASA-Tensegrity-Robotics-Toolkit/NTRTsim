@@ -129,6 +129,11 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		rodBodies.push_back(rodBody);
 	}
 
+	// Retrive payload body from model
+	payload = subject.getPayload();
+	tgRod* payloadRod = payload[0];
+	payloadBody = payloadRod->getPRigidBody();
+
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
 
@@ -207,8 +212,9 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		//std::cout << "onSetup: Cable " << i << ": " << pActuator->getCurrentLength() << std::endl;
 	}
 
-	// Find the rest length of the cables
+	// Find the rest length and start length of the cables
 	restLength = actuators[0]->getRestLength();
+	startLength = actuators[0]->getStartLength();
 
 	/*
 	// Actuation policy table (No policy for open faces)
@@ -278,13 +284,27 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	actuationPolicy.push_back(node17AP);
 	actuationPolicy.push_back(node18AP);
 	actuationPolicy.push_back(node19AP);
+
+	std::string filename = "InclineRollingData.txt";
+	// Create filestream for data log and open it
+	data_out.open(filename.c_str(), std::fstream::out);
+	if (!data_out.is_open()) {
+		std::cout << "Failed to open output file" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	else {
+		data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+	}
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
 {
 	if (dt <= 0.0) {
 		throw std::invalid_argument("onStep: dt is not positive");
-		}
+	}
+	else {
+		worldTime += dt;
+	}
 	isOnGround = checkOnGround();
 
 	if (robotReady == true) {
@@ -352,18 +372,21 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				// Code for path mode
 				if (resetFlag) {
 					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+					currentFace = contactSurfaceDetection();
 					resetCounter = 0;
 				}
 				else {
 					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
 						currSurface = contactSurfaceDetection();
 						runPathGen = true;
+						//std::cout << pathIdx << std::endl;
 						if (pathIdx == c_path_size) {
 							pathIdx = 1;
 							//goalReached = true;
 							//std::cout << "onStep: Destination reached" << std::endl;
 						}
 						if (currSurface >= 0 && !goalReached) {
+							//std::cout << currSurface << ", " << pathIdx << ", " << *(c_path+pathIdx) << std::endl;
 							path = findPath(A, currSurface, *(c_path+pathIdx));
 							pathIdx++;
 							utility::printVector(path);
@@ -383,6 +406,12 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 		}
 	}
 	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
+	
+	btVector3 payload_vel = payloadBody->getLinearVelocity();
+    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
+    data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	
 }
 
 bool T6RollingController::checkOnGround()
@@ -588,16 +617,19 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 	bool stepFinished = true;
 	bool isOnPath = false;
 	// Length for cables to retract to
-	double controlLength = 0.2;
+	//double controlLength = 0.2;
+	double controlLength = restLength * 0;
 	
 	// Get which cable to actuate from actuation policy table
 	int cableToActuate = actuationPolicy[startFace][endFace];
+	actuatedCable = cableToActuate;
 
 	// Perform actuation from one closed face to another
 	if (isClosedFace(startFace)) {
 		if (cableToActuate >= 0) {
 			// Find current face
 			int currFace = contactSurfaceDetection();
+			currentFace = currFace;
 			// path[0] is current face, path[1] is the adjacent open face, 
 			// path[2] is the next closed face
 			// Check if the robot has reached the next closed face
@@ -671,7 +703,7 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 			returnFin = false;
 		}
 		if (actuators[i]->getRestLength()-setLength < -0.01) {
-		returnFin = false;
+			returnFin = false;
 		}
 	}
 	std::cout << "Resetting Cable Lengths " << std::endl;

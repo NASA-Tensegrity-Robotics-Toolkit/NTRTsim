@@ -115,6 +115,12 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	    std::vector<tgRod*>& getAllRods();
 
 	    /**
+	     * Return a vector of the payload body for the controllers to work with.
+	     * @return A vector of the payload rigid body
+	     */
+	    std::vector<tgRod*>& getPayload();
+
+	    /**
 	     * Return a vector of all normal vectors for the controllers to work with.
 	     * @return A vector of all of the normal vectors
 	     */
@@ -237,6 +243,7 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	    // Vectors to hold actuators and rods
 		std::vector<tgBasicActuator*> allActuators;
 	    std::vector<tgRod*> allRods;
+	    std::vector<tgRod*> payload;
 
 	    // A vector to hold all normal vectors
 		std::vector<btVector3> normalVectors;

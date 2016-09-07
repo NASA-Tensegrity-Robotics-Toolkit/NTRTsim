@@ -46,6 +46,8 @@
 // Controller
 #include "controllers/T6RollingController.h"
 
+#define PI 3.14159
+
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -56,8 +58,8 @@
 int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
-    const double yaw = 0;
-    const double pitch = 0.26;
+    const double yaw = 0.0;
+    const double pitch = 13*PI/180;
     const double roll = 0.0;
 
     // [0, 0.1, 0] rad works
@@ -111,7 +113,8 @@ int main(int argc, char** argv)
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     tgBoxGround* ground = new tgBoxGround(groundConfig);    
 
-    double gravity = 98.1;
+    double sf = 10;
+    double gravity = 9.81*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
@@ -145,7 +148,7 @@ int main(int argc, char** argv)
     T6RollingController* const rollingController = new T6RollingController(controllerConfig);
     
     // Attach controller to the model
-    //myModel -> attach(tension_sensor);
+    //myModel->attach(tension_sensor);
     myModel->attach(rollingController);
 
     // Add the model to the world
