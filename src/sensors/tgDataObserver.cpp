@@ -19,23 +19,24 @@
 /**
  * @file tgDataObserver.cpp
  * @brief Implementation of tgObserver class
- * @author Brian Tietz
- * @date April 28, 2014
+ * @author Brian Tietz, Drew Sabelhaus
+ * @date Sept. 9, 2016
  * $Id$
  */
 
+// This application
 #include "tgDataObserver.h"
-
+// Required libraries
 #include "tgDataLogger.h"
-
+// Classes that will be needed for rendering
 #include "core/tgCast.h"
 #include "core/tgModel.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
 #include "core/abstractMarker.h"
-
 #include "core/tgSpringCableActuator.h"
-
+#include "sensors/forceplate/ForcePlateModel.h"
+// The C++ standard library
 #include <iostream>
 #include <sstream>  
 #include <time.h>
@@ -87,14 +88,11 @@ void tgDataObserver::onSetup(tgModel& model)
     // First time opening this, so nothing to append to
     tgOutput.open(m_fileName.c_str());
     
-	if (!tgOutput.is_open())
-	{
-		throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
-	}
+    if (!tgOutput.is_open()) {
+      throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+    }
     
-    std::vector<tgModel*> children = model.getDescendants();
-    
-    /*
+    /**
      * Numbers to ensure uniqueness of variable names in log
      * May be redundant with tag
      */
@@ -102,6 +100,26 @@ void tgDataObserver::onSetup(tgModel& model)
     int rodNum = 0;
     
     tgOutput << "Time" << ",";
+   
+    /**
+     * Two checks to make:
+     * First, should this model itself be rendered?
+     * Second, should any of its children be rendered?
+     * NOTE that a force plate model may be both!
+     */
+    if(tgCast::cast<tgModel, ForcePlateModel>(model) != 0) {
+      //DEBUGGING
+      std::cout << "Creating the title for a ForcePlateModel in tgDataObserver."
+		<< " Tags are: " << model.getTags() << std::endl;
+      //		<< "Location is: " << model.getLocation() << std::endl;
+      // Make the heading for a ForcePlateModel.
+      std::stringstream name;
+      name << model.getTags();
+      tgOutput << name.str();
+    }
+    
+    std::vector<tgModel*> children = model.getDescendants();
+    
     
     // Markers are written first
     const std::vector<abstractMarker>& markers = model.getMarkers();
@@ -118,7 +136,12 @@ void tgDataObserver::onSetup(tgModel& model)
             << name.str() << "_Y" << ","
             << name.str() << "_Z" << ",";
     }
-    
+
+    /**
+     * For all types of tgModels that we'll be logging, create
+     * a heading. This will be the top row of the comma-separated-value
+     * file which is the log.
+     */
     for (std::size_t i = 0; i < children.size(); i++)
     {
         /* If its a type we'll be logging, record its name and the 
@@ -143,6 +166,14 @@ void tgDataObserver::onSetup(tgModel& model)
             << name.str() << "_mass" << ",";
             rodNum++;
         }
+	else if(tgCast::cast<tgModel, ForcePlateModel>(children[i]) != 0) {
+	  // Create a title for the force plate model
+	  //DEBUGGING
+	  
+	  name << children[i]->getTags();
+	  tgOutput << name.str();
+	}
+	    
         // Else do nothing since tgDataLogger won't touch it
     }
     

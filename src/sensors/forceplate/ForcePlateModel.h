@@ -58,13 +58,6 @@ class tgWorld;
  * In order to take data using this force plate, a tgDataObserver/Logger must
  * be attached to this model.
  */
-
-// @TO-DO: BOXES ARE DECLARED WITH HALF-EXTENTS, NOT FULL!
-// All this code assumes that, for example, "w" is from one side of the box
-// to another, but that's not true: "w" and "h" act like "radius" for rods,
-// in that they're the distance from the center to one side.
-// Change all w/2 to just w.
-
 class ForcePlateModel : public tgSubject<ForcePlateModel>, public tgModel
 {
 public: 
@@ -248,12 +241,11 @@ public:
     ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location);
 
     /**
-     * Another constructor. Takes a config struct and a location to put
-     * the force plate at, as well as tgTags to mass in to tgModel.
-     * @param[in] tags as passed through tgStructure and tgStructureInfo
+     * Another constructor that includes tags. 
+     * @param[in] tags, as passed in by an App file.
      */
-    //ForcePlateModel(ForcePlateModel::Config config, btVector3 location,
-    //		    const tgTags& tags);
+    ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
+    		    const tgTags& tags);
 
     /**
      * Another constructor that allows for a debugging on/off flag to be passed in.
@@ -262,6 +254,15 @@ public:
      */
     ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
 		    bool debugging);
+
+    /**
+     * Another constructor that allows for a debugging plus tags to be passed in.
+     * @param[in] debugging: a boolean that controls the output of 
+     * @param[in] tags: a tgTags of the tags that should be attached to this model.
+     * various debugging information to the terminal.
+     */
+    ForcePlateModel(const ForcePlateModel::Config& config, btVector3& location,
+		    bool debugging, const tgTags& tags);
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -306,6 +307,11 @@ public:
      */
     //const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
     //const std::vector<tgBasicActuator*>& getAllActuators() const;
+
+    /**
+     * Returns the location of the base of this force plate.
+     */
+    btVector3 getLocation() const;
 
 protected:
 

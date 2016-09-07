@@ -334,6 +334,8 @@ void ForcePlateModel::constructorAux()
   // DEBUGGING:
   if( m_debugging ) {
     std::cout << "Constructor for ForcePlateModel..." << std::endl;
+    std::cout << "The tags for this ForcePlateModel are: "
+	      << getTags() << std::endl;
   }
 
   // Do a check on all the parameters.
@@ -455,6 +457,20 @@ ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
 }
 
 /**
+ * Constructor with tags passed in
+ */
+ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
+				 btVector3& location, const tgTags& tags) :
+  tgModel(tags),
+  m_config(config),
+  m_location(location),
+  m_debugging(false)
+{
+  // call the helper.
+  constructorAux();
+}
+
+/**
  * Constructor with debugging flag passed in.
  */
 ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
@@ -466,6 +482,21 @@ ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
 {
   // Call the constructor helper that will do all the checks on
   // these variables.
+  constructorAux();
+}
+
+/**
+ * Constructor with both tags and the debugging flag.
+ */
+ForcePlateModel::ForcePlateModel(const ForcePlateModel::Config& config,
+				 btVector3& location, bool debugging,
+				 const tgTags& tags) :
+  tgModel(tags),
+  m_config(config),
+  m_location(location),
+  m_debugging(debugging)
+{
+  // call the helper.
   constructorAux();
 }
 
@@ -756,19 +787,19 @@ void ForcePlateModel::onVisit(tgModelVisitor& r)
 {
     tgModel::onVisit(r);
 }
-
-/*
-const std::vector<tgCompressionSpringActuator*>& TwoBoxesModel::getAllActuators() const
-//const std::vector<tgBasicActuator*>& TwoBoxesModel::getAllActuators() const
-{
-    return allActuators;
-}
-*/
     
 void ForcePlateModel::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
+}
+
+/**
+ * Return the location of the base of this force plate
+ */
+btVector3 ForcePlateModel::getLocation() const
+{
+  return m_location;
 }
 
 /**
