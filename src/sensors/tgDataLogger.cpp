@@ -19,20 +19,22 @@
 /**
  * @file tgDataLogger.cpp
  * @brief Contains the definition of interface class tgDataLogger.
- * @author Brian Tietz
+ * @author Brian Tietz, Drew Sabelhaus
  * $Id$
  */
 
+// This applicaiton
 #include "tgDataLogger.h"
-
+// Classes that will be rendered
 #include "util/tgBaseCPGNode.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgCompressionSpringActuator.h"
 #include "core/tgRod.h"
 #include "core/abstractMarker.h"
-
+#include "sensors/forceplate/ForcePlateModel.h"
+// The Bullet Physics library
 #include "LinearMath/btVector3.h"
-
+// The C++ standard library
 #include <iostream>
 #include <fstream>
 
@@ -80,29 +82,56 @@ void tgDataLogger::render(const tgSpringCableActuator& mSCA) const
 void tgDataLogger::render(const tgCompressionSpringActuator& compressionSpringActuator) const
 {
     // do nothing.
+  //DEBUGGING
+  //std::cout << "Rendering a CompressionSpringActuator inside tgDataLogger" << std::endl;
 }
 
 /**
  * Render a ForcePlateModel. Output its forces to the log file.
  */
+void tgDataLogger::render(const ForcePlateModel& forcePlate) const
+{
+  //DEBUGGING
+  //std::cout << "Rendering a ForcePlateModel inside tgDataLogger" << std::endl;
+  // Open up the log
+  std::ofstream tgOutput;
+  tgOutput.open(m_fileName.c_str(), std::ios::app);
+  // Output the forces in X, Y, and Z
+  tgOutput << forcePlate.getFx() << ","
+  	   << forcePlate.getFy() << ","
+  	   << forcePlate.getFz() << ",";
+  // Close the output
+  // Note that a newline will be added later.
+  tgOutput.close();
+}
 
 void tgDataLogger::render(const tgModel& model) const
 {
-    const std::vector<abstractMarker>& markers = model.getMarkers();
+  // PLEASE EXCUSE THIS HACK. NOT SURE WHY THE RENDER FUNCTION FOR
+  // FORCEPLATEMODEL IS NOT BEING CALLED DIRECTLY.
+  // @TODO FIX THIS!!!!!
+  if( 1 ) {
+    // Detect if the model being passed in is a ForcePlateModel.
+    const ForcePlateModel* forcePlate = tgCast::cast<tgModel, ForcePlateModel>(&model);
+    if( forcePlate != 0) {
+      // Forcibly call the render function for ForcePlateModel inside this class.
+      // @TODO figure out why this has to happen.
+      render(*forcePlate);
+    }
+  }
+  const std::vector<abstractMarker>& markers = model.getMarkers();
     
-    const std::size_t n = 0;
-    for (std::size_t i = 0; i < n; i++)
-    {
-        std::ofstream tgOutput;
-            tgOutput.open(m_fileName.c_str(), std::ios::app);
+  const std::size_t n = 0;
+  for (std::size_t i = 0; i < n; i++) {
+    std::ofstream tgOutput;
+    tgOutput.open(m_fileName.c_str(), std::ios::app);
+    
+    btVector3 worldPos = markers[i].getWorldPosition();
+    
+    tgOutput << worldPos[0] << ","    
+	     << worldPos[1]  << ","
+	     << worldPos[2]  << ",";
             
-            btVector3 worldPos = markers[i].getWorldPosition();
-            
-            tgOutput << worldPos[0] << ","    
-            << worldPos[1]  << ","
-            << worldPos[2]  << ",";
-            
-            tgOutput.close();
-
+    tgOutput.close();
     }
 }

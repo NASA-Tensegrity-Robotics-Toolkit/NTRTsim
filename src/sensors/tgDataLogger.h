@@ -22,7 +22,7 @@
 /**
  * @file tgDataLogger.h
  * @brief Contains the definition of interface class tgDataLogger.
- * @author Brian Tietz
+ * @author Brian Tietz, Drew Sabelhaus
  * $Id$
  */
  
@@ -36,6 +36,7 @@ class tgCompressionSpringActuator;
 class tgBasicActuator;
 class tgModel;
 class tgRod;
+class ForcePlateModel;
 
 /**
  * Interface for Data Logger.
@@ -68,7 +69,7 @@ public:
    * @param[in] forcePlate: a const reference to a ForcePlateModel from which to
    * read the forces from.
    */
-  //virtual void render(const ForcePlateModel& forcePlate) const;
+  virtual void render(const ForcePlateModel& forcePlate) const;
     
   virtual void render(const tgModel& model) const;
 

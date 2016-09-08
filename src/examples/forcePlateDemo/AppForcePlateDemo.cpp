@@ -167,7 +167,7 @@ int main(int argc, char** argv)
     // you use the force plate in another file.
     std::string forcePlateLogPath = "../../../resources/src/forcePlate/forcePlateDemo/logs/";
     // A reasonable time between samples is 0.01 seconds.
-    double timeBetweenSamples = 0.1;
+    double timeBetweenSamples = 0.01;
 
     // Create the sensor
     ForcePlateSensor* forceSensor = new ForcePlateSensor(forcePlateLogPath,

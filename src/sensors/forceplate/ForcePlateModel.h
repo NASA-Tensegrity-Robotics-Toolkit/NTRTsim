@@ -59,7 +59,7 @@ class tgWorld;
  * In order to take data using this force plate, a tgDataObserver/Logger must
  * be attached to this model.
  */
-class ForcePlateModel : public tgSubject<ForcePlateModel>, public tgModel
+class ForcePlateModel :  public tgModel, public tgSubject<ForcePlateModel>
 {
 public: 
 
@@ -305,10 +305,10 @@ public:
      * Receives a tgModelVisitor and dispatches itself into the
      * visitor's "render" function. This model will go to the default
      * tgModel function, which does nothing.
-     * @param[in] r - a tgModelVisitor which will pass this model back
+     * @param[in] v - a tgModelVisitor which will pass this model back
      * to itself 
      */
-    virtual void onVisit(tgModelVisitor& r);
+    virtual void onVisit(tgModelVisitor& v);
     
     /**
      * Return a vector of all muscles for the controllers to work with.
@@ -333,10 +333,10 @@ public:
      * These are used inside tgDataLogger, as called by ForcePlateSensor,
      * to log the forces on this plate.
      */
-    double getPlateGravitationalForce();
-    double getFx();
-    double getFy();
-    double getFz();
+    double getPlateGravitationalForce() const;
+    double getFx() const;
+    double getFy() const;
+    double getFz() const;
     
 
 protected:
