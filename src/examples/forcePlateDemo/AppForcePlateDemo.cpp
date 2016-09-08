@@ -132,7 +132,7 @@ int main(int argc, char** argv)
     btVector3 forcePlateLocation = btVector3(0,3,0);
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
-    bool forcePlateDebugging = false;
+    bool forcePlateDebugging = true;
     // We can also tag the force plate with an arbitrary string.
     // This will be recorded to the correct place in a log file if a sensor is
     // attached to this force plate.

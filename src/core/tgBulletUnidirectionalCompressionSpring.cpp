@@ -198,12 +198,18 @@ const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
     // against m_isFreeEndAttached, as well as a projection along m_direction,
     double springForce = - getCoefK() * (getCurrentSpringLength() - getRestLength());
 
-    // Debugging
+    //DEBUGGING
     #if (0)
     std::cout << "getCoefK: " << getCoefK() << " getCurrentSpringLength(): "
 	      << getCurrentSpringLength() << " getRestLength: "
 	      << getRestLength() <<std::endl;
     #endif
+
+    //DEBUGGING
+    if (0) {
+      std::cout << "Called getSpringForce "
+		<< "inside tgBulletUnidirectionalCompressionSpring" << std::endl;
+    }
     
     // A negative delta_X should result in a positive force.
     // note that if m_isFreeEndAttached == false, then springForce >= 0 always,
@@ -213,7 +219,6 @@ const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
     {
         assert(springForce >= 0.0);
     }
-    
     return springForce;
 }
 

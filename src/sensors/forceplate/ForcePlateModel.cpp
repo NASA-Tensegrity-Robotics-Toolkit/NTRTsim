@@ -32,6 +32,9 @@
 #include "core/tgBox.h"
 #include "core/tgBoxMoreAnchors.h"
 #include "core/tgRod.h"
+// Note that the world h-file must be included here so that the world.getWorldGravity
+// function can be called below.
+#include "core/tgWorld.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
@@ -659,7 +662,7 @@ void ForcePlateModel::setup(tgWorld& world)
   // NOTE that tgBox uses half-extents, meaning that the width and height
   // passed in are the width of HALF the box and the height of HALF the box.
   // So, all heights and widths from Drew's calculations must be halved.
-  // But, display plate width and height in the terms of my derivation.
+  // But, let's display plate width and height in the terms of my derivation.
   double plateWidth = m_config.w - (2 * m_config.t) - (2 * m_config.wgap);
   double plateHeight = m_config.pt;
   // Calculate the density of the plate based on its volume.
@@ -764,6 +767,33 @@ void ForcePlateModel::setup(tgWorld& world)
   // Use the structureInfo to build ourselves
   structureInfo.buildInto(*this, world);
 
+  // Now that all the child models are created, pick out pointers to each
+  // one, and store them for later use (specifically in the getFx, Fy, Fz methods.)
+  assignSpringPointers();
+
+  // Record the gravity in the world. This is used below in getFy.
+  worldGravity = world.getWorldGravity();
+
+  //DEBUGGING
+  if( m_debugging ) {
+    // output the world gravitational constant
+    std::cout << "Gravitational constant of this world: "
+	      << worldGravity << std::endl;
+  }
+
+  //DEBUGGING
+  if( m_debugging){
+    std::cout << "Result of assignSpringPointers: " << std::endl
+	      << "+X: " << std::endl;
+    // Use an iterator
+    std::vector<tgUnidirectionalCompressionSpringActuator*>::iterator it;
+    // loop using the iterator
+    for( it = springsPlusX.begin(); it < springsPlusX.end(); it++ ) {
+      // print the tags for the spring
+      std::cout << (*it)->getTags() << std::endl;
+    }
+  }
+
   // call the onSetup methods of all observed things e.g. controllers
   notifySetup();
 
@@ -812,6 +842,100 @@ btVector3 ForcePlateModel::getLocation() const
 std::string ForcePlateModel::getLabel() const
 {
   return m_label;
+}
+
+/**
+ * Assign the pointers for the springs.
+ * This needs to be called AFTER setting up the model, but BEFORE
+ * any of the getFx, Fy, Fz methods are called.
+ */
+void ForcePlateModel::assignSpringPointers()
+{
+  // The "find" method is part of tgModel, so it should be OK to just call it here
+  // and assume that this call refers to the "find" for this object.
+  // The springs in the +x direction are lateralSpringBC.
+  // -x are lateralSpringAD
+  // +y are verticalSpring
+  // +z are lateralSpringCD
+  // -z are lateralSpringAB
+  springsPlusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringBC");
+  springsMinusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAD");
+  springsPlusY = find<tgUnidirectionalCompressionSpringActuator>("verticalSpring");
+  springsPlusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringCD");
+  springsMinusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAB");
+}
+
+/**
+ * These functions are used to calculate the forces that this plate
+ * measures.
+ */
+double ForcePlateModel::getPlateGravitationalForce()
+{
+  // The total force of the plate is F = -mg
+  //return -m_config.mP * worldGravity;
+  // @TODO: CALIBRATION!
+  return -m_config.mP * 9.81;
+}
+double ForcePlateModel::getFx()
+{
+  // An accumulator variable of the total force in Fx
+  double Fx = 0.0;
+  // Ask each of the springs for their force and add.
+  // Use an iterator:
+  std::vector<tgUnidirectionalCompressionSpringActuator*>::iterator it;
+  // loop using the iterator, for the +X direction
+  for( it = springsPlusX.begin(); it < springsPlusX.end(); it++ ) {
+    Fx += (*it)->getActuatorSpringForce();
+  }
+  // Then, subtract away the forces from the other direction
+  // The same iterator can be used here
+  for( it = springsMinusX.begin(); it < springsMinusX.end(); it++ ) {
+    Fx -= (*it)->getActuatorSpringForce();
+  }
+  // The final result is the +X springs minus the -X springs.
+  return Fx;
+}
+double ForcePlateModel::getFy()
+{
+  // An accumulator variable of the total force in Fy
+  double Fy = 0.0;
+  // Ask each of the springs for their force and add.
+  // Use an iterator:
+  std::vector<tgUnidirectionalCompressionSpringActuator*>::iterator it;
+  // loop using the iterator
+  for( it = springsPlusY.begin(); it < springsPlusY.end(); it++ ) {
+    //DEBUGGING
+    // print the force in the spring
+    //std::cout << "Actuator Spring Forces for +Y springs: "
+    //	      << (*it)->getActuatorSpringForce() << std::endl;
+    // add to the accumulator
+    Fy += (*it)->getActuatorSpringForce();
+  }
+  // Then, subtract away the forces due to the plate itself
+  //DEBUGGING
+  std::cout << "-Y forces due to the force plate itself are: "
+	    << getPlateGravitationalForce() << std::endl;
+  Fy += getPlateGravitationalForce();
+  return Fy;
+}
+double ForcePlateModel::getFz()
+{
+  // An accumulator variable of the total force in Fz
+  double Fz = 0.0;
+  // Ask each of the springs for their force and add.
+  // Use an iterator:
+  std::vector<tgUnidirectionalCompressionSpringActuator*>::iterator it;
+  // loop using the iterator, for the +X direction
+  for( it = springsPlusZ.begin(); it < springsPlusZ.end(); it++ ) {
+    Fz += (*it)->getActuatorSpringForce();
+  }
+  // Then, subtract away the forces from the other direction
+  // The same iterator can be used here
+  for( it = springsMinusZ.begin(); it < springsMinusZ.end(); it++ ) {
+    Fz -= (*it)->getActuatorSpringForce();
+  }
+  // The final result is the +Z springs minus the -Z springs.
+  return Fz;
 }
 
 /**

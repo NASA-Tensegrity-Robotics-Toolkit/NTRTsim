@@ -181,6 +181,8 @@ public:
    * Returns the current force in the spring.
    * This is equivalent to "tension" in a sense, but since this is a 
    * compression spring, it's better termed "spring force."
+   * Used in places like ForcePlateModel to pass through information
+   * about the underlying tgBulletUnidirectionalCompressionSpring.
    */
   //virtual const double getSpringForce() const;
 

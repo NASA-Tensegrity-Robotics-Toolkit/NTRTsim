@@ -75,11 +75,15 @@ void ForcePlateSensor::onStep(ForcePlateModel& subject, double dt) {
     // call the data observer and reset the counter.
     if (m_updateTime >= m_timeBetweenSamples) {
       //DEBUGGING
-      if( 1 ) {
+      if( 0 ) {
 	std::cout << "ForcePlateSensor notifying dataObserver, m_updateTime : "
 		  << m_updateTime << std::endl
 		  << "This force plate model has tags: "
-		  << subject.getTags() << std::endl;
+		  << subject.getTags() << std::endl
+		  << "The +X forces in this model are: "
+		  << subject.getFx() << std::endl
+		  << "The +Z forces in this model are: "
+		  << subject.getFz() << std::endl;
       }
       // Notify the observer (log the data)
       notifyStep(m_updateTime);

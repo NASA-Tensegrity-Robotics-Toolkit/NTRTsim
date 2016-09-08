@@ -211,7 +211,7 @@ public:
    * This is equivalent to "tension" in a sense, but since this is a 
    * compression spring, it's better termed "spring force."
    */
-  //virtual const double getSpringForce() const;
+  virtual double getActuatorSpringForce();
 
   /**
    * Returns a pointer to this spring's tgBulletCompressionSpring.

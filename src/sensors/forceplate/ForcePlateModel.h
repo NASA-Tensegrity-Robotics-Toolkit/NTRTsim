@@ -328,6 +328,17 @@ public:
      */
     std::string getLabel() const;
 
+    /**
+     * Functions that calculate the forces on the plate.
+     * These are used inside tgDataLogger, as called by ForcePlateSensor,
+     * to log the forces on this plate.
+     */
+    double getPlateGravitationalForce();
+    double getFx();
+    double getFy();
+    double getFz();
+    
+
 protected:
 
     /**
@@ -419,6 +430,29 @@ protected:
     tgNode s_bot_b_housing;
     tgNode s_bot_c_housing;
     tgNode s_bot_d_housing;
+
+    /**
+     * Pointers to all the springs.
+     * These are populated in onSetup, and are used later in the getFx etc. methods.
+     * Store them as a list of springs in each direction: since we don't need
+     * to differentiate between different springs on a single side of the plate
+     * (at least for the moment), this is easier than naming all the springs.
+     * @TODO: if we want to calculate moments on the plate, then use a map instead.
+     * Note that there are no springs in the minus Y direction (only the springs
+     * between the bottom of the plate and the housing bed, e.g., in +Y).
+     */
+    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusX;
+    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusX;
+    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusY;
+    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusZ;
+    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusZ;
+
+    /**
+     * The amount of gravity in the world.
+     * This is stored here and used inside the getFy function, to calibrate out
+     * the force applied by the force plate box itself.
+     */
+    double worldGravity;
     
     /**
      * The btVector3 location of this specific force plate.
@@ -436,6 +470,13 @@ protected:
      * @TODO: use tgTags, and get rid of this. Why were tags not assigned??
      */
     std::string m_label;
+
+    /**
+     * A method that assigns the spring pointers to the vectors above.
+     * NOTE that this should ONLY be called after setting up the model! Otherwise,
+     * there won't be any spring pointers to assign.
+     */
+    void assignSpringPointers();
     
 private:
 	

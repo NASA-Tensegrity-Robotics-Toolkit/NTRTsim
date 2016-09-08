@@ -82,6 +82,10 @@ void tgDataLogger::render(const tgCompressionSpringActuator& compressionSpringAc
     // do nothing.
 }
 
+/**
+ * Render a ForcePlateModel. Output its forces to the log file.
+ */
+
 void tgDataLogger::render(const tgModel& model) const
 {
     const std::vector<abstractMarker>& markers = model.getMarkers();

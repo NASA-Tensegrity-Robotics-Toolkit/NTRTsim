@@ -175,6 +175,14 @@ void tgCompressionSpringActuator::onVisit(const tgModelVisitor& r) const
     r.render(*this);
 }
 
+// Returns the force in the underlying compression spring.
+// This should be polymorphic: if the spring is actually a Unidirectional spring,
+// for example, this method should call the getSpringForce method of that spring.
+double tgCompressionSpringActuator::getActuatorSpringForce() {
+  // Just return the force of the underlying spring.
+  return m_compressionSpring->getSpringForce();
+}
+
 /**
  * The two required methods for this class to be a tgControllable.
  */
