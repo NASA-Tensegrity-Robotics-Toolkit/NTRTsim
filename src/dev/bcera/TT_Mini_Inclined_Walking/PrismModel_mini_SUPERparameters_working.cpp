@@ -39,7 +39,7 @@ namespace
    * All parameters must be positive.
    */
 
-  double sf = 30; //scaling factor. Match with App file and Controller file
+  double sf = 10; //scaling factor. Match with App file and Controller file
   
   const struct Config
   {
@@ -57,28 +57,43 @@ namespace
     double targetVelocity;
   } c =
     {
-      
+      /*
+      //TT_MINI Parameters
+      2485/pow(sf,3)*1.4,    // density (kg / length^3) 
+      .0045*sf,          // radius (length)
+      47.173,           // stiffness (kg / sec^2) was 1500
+      2,            // damping (kg / sec)
+      0.245*sf,         // rod_length (length) (10 inches for mini)
+      0.99,             // friction (unitless)
+      0.99,             // rollFriction (unitless)
+      1,              // restitution (?)
+      1.65*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+      0,                // History logging (boolean)
+      1000*sf,         // maxTens (kg-m/s^2)
+      0.025*sf,          // targetVelocity (m/s)
+      */
+      /*
       //TT3 Parameters
       2990/pow(sf,3),    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
       .0127/2*sf,          // radius (length)
       300.0,           // stiffness (kg / sec^2) was 1500
       20.0,            // damping (kg / sec)
-      0.66*sf,         // rod_length (length)
+      0.66*sf,         // rod_length (length) (10 inches for mini)
       0.99,             // friction (unitless)
       0.01,             // rollFriction (unitless)
-      0.0,              // restitution (?)
+      0.5,              // restitution (?)
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
       0.25*sf,          // targetVelocity (m/s)
+      */
       
-      /*
       //Superball Parameters
       688/pow(sf,3),    // density (kg / length^3)
       .031*sf,          // radius (length)
-      3500.0,           // stiffness (kg / sec^2) was 1500
+      1615.0,           // stiffness (kg / sec^2) was 1500
       200.0,            // damping (kg / sec)
-      1.615*sf,         // rod_length (length)
+      1.684*sf,         // rod_length (length)
       0.99,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
@@ -86,7 +101,7 @@ namespace
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
       0.5*sf,          // targetVelocity (m/s) 
-      */
+      
     };
 } // namespace
 
@@ -206,53 +221,75 @@ void PrismModel::addRobot(tgStructure& s, int& offset, double tankToOuterRing){
   addNodes(s,offset,tankToOuterRing);
   addRods(s,offset);
   addActuators(s,offset);
-  offset += 12;
+  offset += 24;
 }
 
 void PrismModel::setup(tgWorld& world)
-{
-
+{  
   //Get the dynamics world
   tgWorldImpl& impl = world.implementation();
   tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
   this->btWorld = &bulletWorld.dynamicsWorld();
+
+  /*
+  //TT MINI
+  double tankRadius = 0.03*sf;//0.015*sf;
+  double internalRadius = 0.01*sf;//0.05*sf;
+  double externalRadius = 0.01*sf;//0.055*sf; 
+  double tankToOuterRing = 0.01*sf;
+  double payloadLength = 0.03*sf;//0.015*sf;
+  */
   
+  //SUPERBALL
+  double tankRadius = 0.15*sf;
+  double internalRadius = 0.1*sf;//0.05*sf;
+  double externalRadius = 0.1*sf;//0.055*sf; 
+  double tankToOuterRing = 0.1*sf;
+  double payloadLength = 0.15*sf;
+  
+  /*
   //TT3 Parameters
   double tankRadius = 0.05*sf;
   double internalRadius = 0.025*sf;//0.05*sf;
   double externalRadius = 0.03*sf;//0.055*sf; 
   double tankToOuterRing = 0.05*sf;
   double payloadLength = 0.05*sf;
-  /*
-  //Superball Parameters
-  double tankRadius = 0.1*sf;
-  double internalRadius = 0.06*sf;
-  double externalRadius = 0.1*sf; 
-  double tankToOuterRing = 0.1*sf;
-  double payloadLength = 0.1*sf;
   */
+  
   // Define the configurations of the rods and strings
   // Note that pretension is defined for this string
   const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
-  //std::cout << "Density Sanity Check: " << c.density << std::endl;
-  const tgRod::Config tankConfig(tankRadius, 21645/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
-				 c.rollFriction, c.restitution);
+  const tgRod::Config motorConfig(c.radius*2, c.density/2, c.friction, 
+				c.rollFriction, c.restitution);
+  
+  const tgRod::Config tankConfig(tankRadius, 1355/pow(sf,3)/10, c.friction, //density calculated so tank - 8.5 kg
+  				 c.rollFriction, c.restitution);
+  
+  //  const tgRod::Config tankConfig(tankRadius, 21645/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
+  //				 c.rollFriction, c.restitution);
   
   //const tgRod::Config tankConfig(tankRadius, 2/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
   //				 c.rollFriction, c.restitution);
-  const tgRod::Config linkConfig(c.radius/2.0, 0.0, c.friction, 
+  
+  const tgRod::Config linkConfig(c.radius/2.0, 0, c.friction, 
 				 c.rollFriction, c.restitution);
-  const tgRod::Config thrusterConfig(0.2, c.density/5, c.friction, 
+  /*
+  const tgRod::Config thrusterConfig(0.2, c.density/2, c.friction, 
 				     c.rollFriction, c.restitution);
   const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
 				   c.rollFriction, c.restitution);
-
+  */
+  
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
+  
+  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension, c.hist, 
+					 c.maxTens, c.targetVelocity);
+					 /*
   tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 
 					 c.maxTens, c.targetVelocity);
-
+  */
     
   // Create a structure that will hold the details of this model
   tgStructure s;
@@ -297,49 +334,61 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(-COM[0], -COM[1]-tankToOuterRing-externalRadius-payloadLength/2, -COM[2]));
   std::cout << "COM: " << *COM << " " << *(COM+1) << " " << *(COM+2) << std::endl;
   //*/
+
   
   //GIMBAL
   int gimbalStart = globalOffset;
+  /*
   addRing(s,externalRadius,nPtsExtRing,globalOffset);
   addRing(s,internalRadius,nPtsIntRing,globalOffset);
   std::cout << "After Rings: " << globalOffset << std::endl;
+  */
+
   
   //TANK (aka PAYLOAD) 
   int baseStartLink = globalOffset; //Save the node position before adding new nodes
   addBottomStructure(s,externalRadius,payloadLength,tankToOuterRing,globalOffset);
   std::cout << "After Tank: " << globalOffset << std::endl;
   
+
+  
   //HINGES
   int hingeStart = globalOffset;
   makeLinks(s,externalRadius,internalRadius,tankToOuterRing,tankRadius,nPtsExtRing,globalOffset,baseStartLink,gimbalStart); //Adds 4 nodes
   std::cout << "After Hinges: " << globalOffset << std::endl;
   
+    /*
   //THRUSTER
   int thrusterNode = globalOffset;
   addThruster(s,nPtsExtRing,globalOffset,gimbalStart); 
   std::cout << "After Thruster: " << globalOffset << std::endl;
+  */
+
   //Inner Payload Strings
   addStrings(s,baseStartLink,beforeRobot); //**Comment out robot constructor above as well
- 
+
+  
   // Move the structure so it doesn't start in the ground
   //Rotate so that payload faces up
   //btQuaternion norm_rotation = btQuaternion(btVector3(0,0,1), M_PI);
   //rotateNormVectors(norm_rotation);
   //s.addRotation(btVector3(0,0,0), btVector3(0,0,1), M_PI);
   
-  s.move(btVector3(0, c.rod_length/1.5, 0));
-
+  //s.move(btVector3(0, c.rod_length, 0));
+  //s.move(btVector3(0, c.rod_length-9, 0));
+  s.move(btVector3(0, c.rod_length+2, 0));
   //rotateToFace(s, 15);
-  s.move(btVector3(100, 700, -100));
+  //s.move(btVector3(100, 700, -100));
   //s.move(btVector3(100, 1800, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
   spec.addBuilder("rod", new tgRodInfo(rodConfig));
+  spec.addBuilder("motor", new tgRodInfo(motorConfig));
   spec.addBuilder("tank", new tgRodInfo(tankConfig));
-  spec.addBuilder("gimbal", new tgRodInfo(gimbalConfig));
+  //spec.addBuilder("gimbal", new tgRodInfo(gimbalConfig));
   spec.addBuilder("link", new tgRodInfo(linkConfig));
-  spec.addBuilder("thruster", new tgRodInfo(thrusterConfig));
+  //spec.addBuilder("thruster", new tgRodInfo(thrusterConfig));
   spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
   spec.addBuilder("string", new tgBasicActuatorInfo(tankLinkConfig));
 
@@ -349,7 +398,8 @@ void PrismModel::setup(tgWorld& world)
 
   // Get actuators
   allActuators = getAllActuators();
-  
+
+  /*
   //Get linking rods
   std::vector<tgRod *> linkingRods = find<tgRod>("link");
   std::cout << "[ ] -> There are " << linkingRods.size() << " links" << std::endl;
@@ -375,7 +425,7 @@ void PrismModel::setup(tgWorld& world)
   this->btWorld->addConstraint(yawHinge); //Outer
   //altitudeHinge->setLimit(-M_PI/2+M_PI/4,-M_PI/2-M_PI/4);
   //yawHinge->setLimit(-M_PI,M_PI);
-
+  
   //Debug thruster orientation
   std::vector<tgRod *> thrusterParts = PrismModel::find<tgRod>("thruster");
   //Get thruster transform
@@ -383,24 +433,29 @@ void PrismModel::setup(tgWorld& world)
   btRigidBody* thrusterRigidBody = thrusterRod->getPRigidBody();
   ThrusterBodies.push_back(thrusterRigidBody);
   this->thrusterTransform = &(btTransform&)thrusterRigidBody->getCenterOfMassTransform();
+  */
 
-
-  //Get tank rigidbody for controller
+  
+  //Get tank rigidbody for walking controller
   std::vector<tgRod *> tankParts = PrismModel::find<tgRod>("tank");
   tgRod* tankRod = tankParts[0]; //Outer
   btRigidBody* tankRigidBody = tankRod->getPRigidBody();
   TankBodies.push_back(tankRigidBody);
-
+  
+  
+  /*
   //Add Marker to Visualize Thruster Orientation
   btTransform inverseTransform = thrusterRigidBody->getWorldTransform().inverse();
   btVector3 pos = btVector3(0,0,7);
   abstractMarker thrust_dir=abstractMarker(thrusterRigidBody,pos,btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
   //this->addMarker(thrust_dir); //added thruster orientation marker
+  */
 
   
   // Get the rod rigid bodies for controller
   allRods = PrismModel::find<tgRod>("rod");
-  
+
+  /*
   btRigidBody* rodBody = allRods[0]->getPRigidBody();
   abstractMarker NODE0 = abstractMarker(rodBody,btVector3(0,-c.rod_length/2,0),btVector3(1,0,.0),thrusterNode); // body, position, color, node number
   //this->addMarker(NODE0); //added thruster orientation marker
@@ -413,9 +468,13 @@ void PrismModel::setup(tgWorld& world)
   abstractMarker NODE1 = abstractMarker(rodBody2,btVector3(0,c.rod_length/2,0),btVector3(.0,0,.1),thrusterNode); // body, position, color, node number
    btRigidBody* rodBody3 = allRods[2]->getPRigidBody();
   abstractMarker NODE4 = abstractMarker(rodBody3,btVector3(0,-c.rod_length/2,0),btVector3(.0,0,1),thrusterNode); // body, position, color, node number
+  */
+
+  /*
   this->addMarker(NODE0); //added thruster orientation marker
   this->addMarker(NODE8); //added thruster orientation marker
   this->addMarker(NODE4); //added thruster orientation marker
+  */
 
   
   // Get the actuators for controller
@@ -512,18 +571,22 @@ void PrismModel::makeLinks(tgStructure& s, double extRadius, double intRadius, d
   s.addNode(intRadius+offsetInt,0,0); //2N+1
 
   //Outer-Link node for outer ring
-  s.addNode(0,-extRadius-offsetOut,0);//2N+2
+  //s.addNode(0,-extRadius-offsetOut,0);//2N+2
+
+  //Outer-Link node for outer ring
+  s.addNode(0,-.0*sf,0);//2N+2
+  
   //Inner-link node for bottom structure
   s.addNode(0,-extRadius-tankToOuterRing+offsetOut,0);//2N+3
-
+  /*
   //Make inner links
   s.addPair(gimbalStart,pointOffset2,"link"); //pointOffset2 is global count of nodes at start of function call
   s.addPair(gimbalStart+pointOffset1,pointOffset2+1,"link"); //pointOffset1 is #ofnodes for external ring
-
+*/
   //Make outer links
-  s.addPair(gimbalStart+3*pointOffset1/4,pointOffset2+2,"link");
+  //s.addPair(gimbalStart+3*pointOffset1/4,pointOffset2+2,"link");
   s.addPair(pointOffset2+3,baseStartLink,"link");
-
+  
   pointOffset2 += 4;
 }
 
@@ -547,41 +610,20 @@ void PrismModel::addStrings(tgStructure& s, int baseStartLink, int nPtBeforeRobo
   
   //Add the strings to hold the gimbal
   // inner cables
+  //one side
   s.addPair( 0+nPtBeforeRobot,  baseStartLink, "string"); //24
   s.addPair( 4+nPtBeforeRobot,  baseStartLink, "string"); //25
   s.addPair( 8+nPtBeforeRobot,  baseStartLink, "string"); //26
+  //other side
   s.addPair( 6+nPtBeforeRobot, baseStartLink+1, "string"); //27
   s.addPair( 10+nPtBeforeRobot,  baseStartLink+1, "string"); //28
   s.addPair( 2+nPtBeforeRobot,  baseStartLink+1, "string"); //29 
+  
 }
 
 
 void PrismModel::addNodes(tgStructure& s, int offset, double tankToOuterRing)
 {
-  /*
-  double L = c.rod_length; //already scaled
-  double t = 1.2213*L/1.9912; //find exact geometric ratio later
-  double r = t/(2*sin(36*M_PI/180)); 
-  double theta = asin(r/t)*180/M_PI;
-  double m = sqrt(pow(t,2)+pow((2*t*sin(54*M_PI/180)),2)); //tip to tip of reg. icosahedron
-  double var = m-t*cos(theta*M_PI/180);
-
-  //Values below copied from Icosahderon_w_payload.m, with Y_ntrt = Z_matlab  and Z_ntrt = -Y_matlab
-  //Coordinate transformation necessary as NTRT height direction is (0,1,0) Y unit vector
-
-  s.addNode(0, -m/2-tankToOuterRing, 0);  // 0
-  s.addNode(0, var-m/2-tankToOuterRing, r);  // 1
-  s.addNode(0, t*cos(theta*M_PI/180)-m/2-tankToOuterRing, -r);  // 2
-  s.addNode(0, m-m/2-tankToOuterRing, 0); // 3
-  s.addNode(-r*cos(18*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    -r*sin(18*M_PI/180));   // 4
-  s.addNode(r*cos(18*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    -r*sin(18*M_PI/180));  // 5
-  s.addNode(-r*cos(18*M_PI/180),   var-m/2-tankToOuterRing,    r*sin(18*M_PI/180));  // 6
-  s.addNode(r*cos(18*M_PI/180),   var-m/2-tankToOuterRing,    r*sin(18*M_PI/180));  // 7
-  s.addNode(-r*sin(36*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    r*cos(36*M_PI/180));  // 8
-  s.addNode(-r*sin(36*M_PI/180),   var-m/2-tankToOuterRing,    -r*cos(36*M_PI/180));  // 9
-  s.addNode(r*sin(36*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    r*cos(36*M_PI/180));  // 10
-  s.addNode(r*sin(36*M_PI/180),   var-m/2-tankToOuterRing,    -r*cos(36*M_PI/180));  // 11
-  */
 
   // Calculate the space between two parallel rods based on the rod length from Config
   double rodSpace = (-c.rod_length + sqrt(pow(c.rod_length,2)+4*pow(c.rod_length,2)))/2;
@@ -603,6 +645,24 @@ void PrismModel::addNodes(tgStructure& s, int offset, double tankToOuterRing)
   s.addNode(-c.rod_length/2, rodSpace/2, 0); // 9
   s.addNode(c.rod_length/2, rodSpace/2, 0); // 10
   s.addNode(c.rod_length/2, -rodSpace/2, 0); // 11
+
+  // Nodes for motors in the x-z plane
+  s.addNode(-rodSpace/2, 0, c.rod_length/16); // 12
+  s.addNode(-rodSpace/2, 0, -c.rod_length/16); // 13
+  s.addNode(rodSpace/2, 0, -c.rod_length/16); // 14
+  s.addNode(rodSpace/2, 0, c.rod_length/16); // 15
+
+  // Nodes for motors in the y-z plane
+  s.addNode(0, -c.rod_length/16, rodSpace/2); // 16
+  s.addNode(0, c.rod_length/16, rodSpace/2); // 17
+  s.addNode(0, c.rod_length/16, -rodSpace/2); // 18
+  s.addNode(0, -c.rod_length/16, -rodSpace/2); // 19
+
+  // Nodes for motors in the x-y plane
+  s.addNode(-c.rod_length/16, -rodSpace/2, 0); // 20
+  s.addNode(-c.rod_length/16, rodSpace/2, 0); // 21
+  s.addNode(c.rod_length/16, rodSpace/2, 0); // 22
+  s.addNode(c.rod_length/16, -rodSpace/2, 0); // 23
 
 }
 
@@ -628,19 +688,34 @@ double* PrismModel::returnCOM(tgStructure &s, int firstNode, int numberofNodes){
 void PrismModel::addRods(tgStructure& s, int offset)
 {
   /*
-  s.addPair( 0+offset,  1+offset, "rod");
-  s.addPair( 2+offset,  3+offset, "rod");
-  s.addPair( 4+offset,  5+offset, "rod");
-  s.addPair( 6+offset,  7+offset, "rod");
-  s.addPair( 8+offset,  9+offset, "rod");
-  s.addPair( 10+offset, 11+offset, "rod");
-  */
+  //Original 
   s.addPair(0+offset, 1+offset, "rod"); // 0
   s.addPair(3+offset, 2+offset, "rod"); // 1
   s.addPair(4+offset, 5+offset, "rod"); // 2
   s.addPair(7+offset, 6+offset, "rod"); // 3
   s.addPair(8+offset, 11+offset, "rod"); // 4
   s.addPair(9+offset, 10+offset, "rod"); // 5
+  */
+  
+  //Updated with Motors at center of rod
+  s.addPair(0+offset, 0+offset+12, "rod"); // 0
+  s.addPair(0+offset+12, 1+offset+12, "motor"); // 0
+  s.addPair(1+offset+12, 1+offset, "rod"); // 0
+  s.addPair(3+offset, 3+offset+12, "rod"); // 1
+  s.addPair(3+offset+12, 2+offset+12, "motor"); // 1
+  s.addPair(2+offset+12, 2+offset, "rod"); // 1
+  s.addPair(4+offset, 4+offset+12, "rod"); // 2
+  s.addPair(4+offset+12, 5+offset+12, "motor"); // 2
+  s.addPair(5+offset+12, 5+offset, "rod"); // 2
+  s.addPair(7+offset, 7+offset+12, "rod"); // 3
+  s.addPair(7+offset+12, 6+offset+12, "motor"); // 3
+  s.addPair(6+offset+12, 6+offset, "rod"); // 3
+  s.addPair(8+offset, 8+offset+12, "rod"); // 4
+  s.addPair(8+offset+12, 11+offset+12, "motor"); // 4
+  s.addPair(11+offset+12, 11+offset, "rod"); // 4
+  s.addPair(9+offset, 9+offset+12, "rod"); // 5
+  s.addPair(9+offset+12, 10+offset+12, "motor"); // 5
+  s.addPair(10+offset+12, 10+offset, "rod"); // 5
   
 }
 

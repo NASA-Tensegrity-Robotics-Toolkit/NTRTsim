@@ -1,0 +1,27 @@
+set(BOOST_HOME_DIR ../../../../env/build/boost/boost)
+
+include_directories(${BOOST_HOME_DIR})
+link_directories(${LIB_DIR})
+
+message(STATUS "LIB_DIR: " ${LIB_DIR})
+message(STATUS "BOOST_HOME_DIR: " ${BOOST_HOME_DIR})
+
+
+link_directories(${LIB_DIR})
+
+link_libraries(tgcreator
+                util
+                sensors
+                core    
+                terrain 
+		controllers
+		Adapters
+                tgOpenGLSupport)
+
+add_executable(App_TT_Mini_Inclined_Walking
+    PrismModel_mini.cpp
+    AppPrismModel.cpp
+    RPThruster.cpp
+    controllers/T6RollingControllerPrism.cpp
+) 
+

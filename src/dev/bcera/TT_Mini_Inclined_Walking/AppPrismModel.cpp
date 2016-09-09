@@ -51,24 +51,24 @@
  */
 int main(int argc, char** argv)
 {
-  double sf = 30; //Scaling Factor - match with model and controller files
+  double sf = 28; //Scaling Factor - match with model and controller files
    
   // First create the ground and world. Specify ground rotation in radians
   const double yaw = 0.0;
-  const double pitch = 0.0;
+  const double pitch = -0*M_PI/180;//0.2;
   const double roll = 0.0;
 
   
-  //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+  const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
-  //tgBoxGround* ground = new tgBoxGround(groundConfig);
+  tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-  
+  /*
   // Import Ground
   // Set ground parameters
   btVector3 orientation = btVector3(yaw, pitch, roll);
   const double friction = 0.5;
-  const double restitution = 0.0;
+  const double restitution = 0.;
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
   const double margin = 0.05;
   const double offset = 0.5;
@@ -98,9 +98,9 @@ int main(int argc, char** argv)
     std::cout << "Input file opened successfully" << std::endl;
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
-  
+  */
 
-  double gravity = 1.618*sf;
+  double gravity = 9.81*sf;
   const tgWorld::Config config(gravity); // gravity, cm/sec^2
   tgWorld world(config, ground);
 
@@ -117,13 +117,20 @@ int main(int argc, char** argv)
   // simulation
   PrismModel* const myModel = new PrismModel();
 
-  //Create Active Thruster
-  RPThruster* const thrust_control = new RPThruster();
-  myModel->attach(thrust_control);
+  // Define path for controller
+  int *ptr;
+  //int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
+  int path[] = {10, 8, 5, 0, 2, 15};
+  int pathSize = sizeof(path)/sizeof(int);
+  ptr = path;
 
-  const T6RollingController::Config controllerConfig(gravity, "face", 0);
+  //Create Active Thruster
+  //RPThruster* const thrust_control = new RPThruster();
+  //myModel->attach(thrust_control);
+
+  const T6RollingController::Config controllerConfig(gravity, "path", ptr, pathSize);
   T6RollingController* const rollingController = new T6RollingController(controllerConfig);
-  myModel->attach(rollingController);
+  //myModel->attach(rollingController);
   
     
   // Add the model to the world
