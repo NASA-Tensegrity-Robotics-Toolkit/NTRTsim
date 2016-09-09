@@ -285,15 +285,19 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	actuationPolicy.push_back(node18AP);
 	actuationPolicy.push_back(node19AP);
 
-	std::string filename = "InclineRollingData.txt";
-	// Create filestream for data log and open it
-	data_out.open(filename.c_str(), std::fstream::out);
-	if (!data_out.is_open()) {
-		std::cout << "Failed to open output file" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	else {
-		data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+	doLog = false;
+
+	if (doLog) {
+		std::string filename = "13InclineRollingDataStiff.txt";
+		// Create filestream for data log and open it
+		data_out.open(filename.c_str(), std::fstream::out);
+		if (!data_out.is_open()) {
+			std::cout << "Failed to open output file" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		else {
+			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+		}
 	}
 }
 
@@ -377,6 +381,9 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				}
 				else {
 					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+						if (stepIdx == 13) {
+							//exit(EXIT_SUCCESS);
+						}
 						currSurface = contactSurfaceDetection();
 						runPathGen = true;
 						//std::cout << pathIdx << std::endl;
@@ -389,6 +396,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 							//std::cout << currSurface << ", " << pathIdx << ", " << *(c_path+pathIdx) << std::endl;
 							path = findPath(A, currSurface, *(c_path+pathIdx));
 							pathIdx++;
+							stepIdx++;
 							utility::printVector(path);
 						}
 						runPathGen = true;
@@ -407,11 +415,12 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	}
 	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
 	
-	btVector3 payload_vel = payloadBody->getLinearVelocity();
-    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
-    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
-    data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
-	
+	if (doLog) {
+		btVector3 payload_vel = payloadBody->getLinearVelocity();
+	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+	    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
+	    data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	}
 }
 
 bool T6RollingController::checkOnGround()

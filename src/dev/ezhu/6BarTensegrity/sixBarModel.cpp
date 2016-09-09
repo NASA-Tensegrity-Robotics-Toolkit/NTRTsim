@@ -61,7 +61,7 @@ namespace
    			// SuperBall parameters
    			688/pow(sf,3),    // density (kg / length^3)
 	        0.031*sf,     // radius (length)
-	        1615.0,   // stiffness (kg / sec^2) was 1500
+	        1615.0*2,   // stiffness (kg / sec^2) was 1500
 	        200.0,    // damping (kg / sec)
 	        1.684*sf,     // rodLength (length)
 	        0.99,      // friction (unitless)
@@ -227,7 +227,7 @@ void sixBarModel::setup(tgWorld& world)
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
-	tgBasicActuator::Config staticCableConfig(config.stiffness, config.damping, config.pretension,
+	tgBasicActuator::Config staticCableConfig(config.stiffness, config.damping, config.pretension*2,
 		config.hist, config.maxTension, config.targetVelocity);
 
 	// Create a structure that will hold the details of this model

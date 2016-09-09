@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
-    const double pitch = 13*PI/180;
+    const double pitch =10*PI/180;
     const double roll = 0.0;
 
     // [0, 0.1, 0] rad works

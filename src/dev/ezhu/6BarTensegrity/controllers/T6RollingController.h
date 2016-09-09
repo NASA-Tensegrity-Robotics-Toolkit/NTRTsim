@@ -278,6 +278,8 @@ private:
 	bool drGoalReached = false;
 	bool isOnGround;
 	int pathIdx = 1;
+	int stepIdx = 0;
+	bool doLog;
 
 	// Direction to travel
 	btVector3 travelDir;
