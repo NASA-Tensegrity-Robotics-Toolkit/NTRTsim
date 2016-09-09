@@ -28,7 +28,7 @@
 // This application
 #include "TensegrityModel.h"
 // This library
-//#include "core/tgBasicActuator.h"
+#include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 
@@ -50,22 +50,36 @@ void TensegrityModelController::onSetup(TensegrityModel& subject)
 {
 	std::cout << "Setting up the tensegrity model controller" << std::endl;
 	//Tags from entire structure
-        const tgTags AllTags = subject.getTags(); 
+        //const tgTags allTags = subject.getTags(); 
+	std::vector<tgBasicActuator*> cablesWithTagsArray = subject.find<tgBasicActuator>("HB t2");
 	//Get array of strings
-	const std::deque<std::string>& AllTagStringsArray = AllTags.getTags();
+	//const std::deque<std::string>& allTagStringsArray = allTags.getTags();
  	//Iterate through array and output strings to command line
-	for (std::size_t i = 0; i < AllTagStringsArray.size(); i ++) 
+	for (std::size_t i = 0; i < cablesWithTagsArray.size(); i ++) 
 	{	
-		std::cout << AllTagStringsArray[i] << std::endl;
+		std::cout << cablesWithTagsArray[i]->getTags() << std::endl;
 	}   
    	std::cout << "Finished outputting tags" << std::endl;    
 	//Outputting entire model
-	std::cout << "Contents of model: " << std::endl;
-	std::cout << subject << std::endl;
+	//std::cout << "Contents of model: " << std::endl;
+	//std::cout << subject << std::endl;
 }
 
 void TensegrityModelController::onStep(TensegrityModel& subject, double dt)
 {
+	std::vector<tgBasicActuator*> cablesWithTagsArray = subject.find<tgBasicActuator>("HB");
+	//Get array of strings
+	//const std::deque<std::string>& allTagStringsArray = allTags.getTags();
+ 	//Iterate through array and output strings to command line
+	for (std::size_t i = 0; i < cablesWithTagsArray.size(); i ++) 
+	{	
+		double lengthToSet = cablesWithTagsArray[i]->getRestLength();
+		lengthToSet = lengthToSet - dt*10;
+		std::cout << lengthToSet << std::endl;
+		cablesWithTagsArray[i]->setControlInput(lengthToSet, dt); 
+		//std::cout << cablesWithTagsArray[i]->getTags() << std::endl;
+	}   
+   	//std::cout << "Finished outputting tags" << std::endl;    
 }
 	
  
