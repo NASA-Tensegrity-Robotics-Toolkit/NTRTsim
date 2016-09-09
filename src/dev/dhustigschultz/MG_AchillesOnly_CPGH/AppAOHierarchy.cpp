@@ -17,20 +17,20 @@
 */
 
 /**
- * @file AppQuadControlSpiral.cpp
- * @brief Using Brian's existing spine controller for a quadruped, using passive model with simpler actuation
- * @author Brandon Gigous, Dawn Hustig-Schultz, Brian Mirletz
- * @date August 2016
+ * @file AppAOHierarchy.cpp
+ * @brief Implementing Multiple layers of CPGs
+ * @author Dawn Hustig-Schultz, Brandon Gigous
+ * @date Aug 2016
  * @version 1.0.0
  * $Id$
  */
 
-#include "AppQuadSimpleActuation.h"
+#include "AppAOHierarchy.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
 #include "helpers/FileHelpers.h"
 #include <json/json.h>
 
-AppQuadSimpleActuation::AppQuadSimpleActuation(int argc, char** argv)
+AppAOHierarchy::AppAOHierarchy(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -46,7 +46,7 @@ AppQuadSimpleActuation::AppQuadSimpleActuation(int argc, char** argv)
     nTypes = 3;
 
     startX = 0;
-    startY = 40; //May need adjustment
+    startY = 20; //May need adjustment
     startZ = 0;
     startAngle = 0;
     
@@ -56,7 +56,7 @@ AppQuadSimpleActuation::AppQuadSimpleActuation(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppQuadSimpleActuation::setup()
+bool AppAOHierarchy::setup()
 {
     // First create the world
     world = createWorld();
@@ -80,19 +80,18 @@ bool AppQuadSimpleActuation::setup()
     const int segments = 7;
     const int hips = 4;
     const int legs = 4;
-    const int feet = 4; 
 
-    BigPuppySymmetricSpiral2* myModel = new BigPuppySymmetricSpiral2(segments, hips, legs, feet);
+    MountainGoatAchilles* myModel = new MountainGoatAchilles(segments, hips, legs);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-		Json::Value root;
-		Json::Reader reader;
 
-		std::string resourcePath = "bgigous/AppQuadSimpleActuation/";
-		std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
-		std::string controlFilename = controlFilePath + suffix;
+	Json::Value root;
+	Json::Reader reader;
+
+	std::string controlFilePath = FileHelpers::getResourcePath(lowerPath);
+	std::string controlFilename = controlFilePath + suffix;
 
         bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
         if ( !parsingSuccessful )
@@ -111,45 +110,55 @@ bool AppQuadSimpleActuation::setup()
         if (impedenceVals[0].isArray())
         {
             impedenceVals = impedenceVals[0];
-		}
+	      }
 
-		const double impedanceMax = 2000.0;
-
-        const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 16; //This may be ok, but confirm. 
+	      const double impedanceMax = 2000.0;
+        const int segmentSpan = 3; 
+        const int numMuscles = 2; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
-        const double lowPhase = -1*M_PI;
+        const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
         const double highAmplitude = 300.0;
-        //const double kt = 0.0; //May need to retune kt, kp, and kv
-        //const double kp = 2000.0;
-        //const double kv = 200.0;
-		int j = 0;
-		const double kt = impedanceMax * (impedenceVals.get(j, 0.0)).asDouble();
+
+	      int j = 0;
+	      const double kt = impedanceMax * (impedenceVals.get(j, 0.0)).asDouble();
         const double kp = impedanceMax * (impedenceVals.get(1, 0.0)).asDouble();
-		const double kv = impedanceMax * (impedenceVals.get(2, 0.0)).asDouble();
-        const bool def = false;
+	      const double kv = impedanceMax * (impedenceVals.get(2, 0.0)).asDouble();
+        //const double kt = 0.0; //May need to retune kt, kp, and kv
+        //const double kp = 1000.0;
+        //const double kv = 200.0;
+        const bool def = true;
             
         // Overridden by def being true
         const double cl = 10.0;
         const double lf = 0.0;
-        const double hf = 1.5;
+        const double hf = 30.0;
         
         // Feedback parameters... may need to retune
-        const double ffMin = 0.0;
-        const double ffMax = 1;
+        const double ffMin = 0.1;
+        const double ffMax = 10.0;
         const double afMin = 0.0;
-        const double afMax = 200; //200
-        const double pfMin = -0.5;//-0.5;
-        const double pfMax = 6.28; //6.28;
+        const double afMax = 200.0;
+        const double pfMin = -0.5;
+        const double pfMax =  6.28;
 
-	const double maxH = 300.0;
-	const double minH = 1.0;
+	const double maxH = 30.0;
+	const double minH = 7.0;
 
-        JSONQuadFeedbackControl::Config control_config(segmentSpan, 
+	const double numHipMuscles = 6; 
+	const double numLegMuscles = 6; 
+        //Including the achilles tendon 
+        const double numAchillesMuscles = 2;
+
+	// For the higher level of CPGs
+	const double numHighCPGs = 5;
+	const double hf2 = 30.0;	 
+	const double ffMax2 = 10.0;
+
+        JSONAOHierarchyControl::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -173,10 +182,12 @@ bool AppQuadSimpleActuation::setup()
                                                     pfMin,
                                                     pfMax,
 						    maxH,
-						    minH);
+						    minH,
+						    hf2,
+						    ffMax2);
         /// @todo fix memory leak that occurs here
        myControl =
-        new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
+        new JSONAOHierarchyControl(control_config, suffix, lowerPath); //JSONAOHierarchyControl * const 
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -200,7 +211,7 @@ bool AppQuadSimpleActuation::setup()
     return bSetup;
 }
 
-void AppQuadSimpleActuation::handleOptions(int argc, char **argv)
+void AppAOHierarchy::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -249,7 +260,7 @@ void AppQuadSimpleActuation::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppQuadSimpleActuation::getHillyConfig()
+const tgHillyGround::Config AppAOHierarchy::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -269,7 +280,7 @@ const tgHillyGround::Config AppQuadSimpleActuation::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppQuadSimpleActuation::getBoxConfig()
+const tgBoxGround::Config AppAOHierarchy::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -286,14 +297,14 @@ const tgBoxGround::Config AppQuadSimpleActuation::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppQuadSimpleActuation::getBlocks()
+tgModel* AppAOHierarchy::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppQuadSimpleActuation::createWorld()
+tgWorld* AppAOHierarchy::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -315,17 +326,17 @@ tgWorld* AppQuadSimpleActuation::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppQuadSimpleActuation::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppAOHierarchy::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppQuadSimpleActuation::createView(tgWorld *world)
+tgSimView *AppAOHierarchy::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppQuadSimpleActuation::run()
+bool AppAOHierarchy::run()
 {
     if (!bSetup)
     {
@@ -347,12 +358,13 @@ bool AppQuadSimpleActuation::run()
    delete simulation;
    delete view;
    delete world;
+   // Trying to fix the memory leak in the comments above:
    delete myControl;
     
-    return true;
+   return true;
 }
 
-void AppQuadSimpleActuation::simulate(tgSimulation *simulation)
+void AppAOHierarchy::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -408,8 +420,8 @@ void AppQuadSimpleActuation::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppQuadSimpleActuation" << std::endl;
-    AppQuadSimpleActuation app (argc, argv);
+    std::cout << "AppAOHierarchy" << std::endl;
+    AppAOHierarchy app (argc, argv);
 
     if (app.setup())
         app.run();

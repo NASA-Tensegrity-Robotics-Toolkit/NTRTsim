@@ -17,18 +17,18 @@
  */
 
  /**
- * @file MountainGoat.cpp
+ * @file MountainGoatFM0.cpp
  * @brief Implementing Mountain Goat 
- * Trying to stiffen up leg actuators more, to prevent falling.
+ * Seeing what will happen if number of actuators is reduced, and placement of some changed.
  * @author Dawn Hustig-Schultz
- * @date April 2016
+ * @date Sept. 2016
  * @version 1.1.0
  * $Id$
  */
 
 
 //This application
-#include "MountainGoat.h"
+#include "MountainGoatFM0.h"
 
 // This library
 #include "core/tgModel.h"
@@ -56,18 +56,18 @@
 //#define USE_KINEMATIC
 //#define PASSIVE_STRUCTURE
 
-MountainGoat::MountainGoat(int segments, int hips, int legs) :
+MountainGoatFM0::MountainGoatFM0(int segments, int hips, int legs) :
 BaseQuadModelLearning(segments, hips),
 m_legs(legs)
 {
     m_subStructures = segments + hips + legs;
 }
 
-MountainGoat::~MountainGoat()
+MountainGoatFM0::~MountainGoatFM0()
 {
 }
 
-void MountainGoat::addNodesLeg(tgStructure& s, double r){ 
+void MountainGoatFM0::addNodesLeg(tgStructure& s, double r){ 
     s.addNode(0,0,0); //0: Bottom Center of lower leg segment
     s.addNode(0,r,0);  //1: Center of lower leg segment
     s.addNode(r,r,0); //2: Right of lower leg segment
@@ -82,7 +82,7 @@ void MountainGoat::addNodesLeg(tgStructure& s, double r){
     //s.addNode(-r/2,-r/2,0); //9 
 }
 
-void MountainGoat::addRodsLeg(tgStructure& s){
+void MountainGoatFM0::addRodsLeg(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(1,2,"rod");
     s.addPair(1,3,"rod");
@@ -96,20 +96,20 @@ void MountainGoat::addRodsLeg(tgStructure& s){
     //s.addPair(5,9,"rod");
 }
 
-void MountainGoat::addNodesHip(tgStructure& s, double r){
+void MountainGoatFM0::addNodesHip(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(0,r,r); //Node 1 
     s.addNode(0,-r,-r); //Node 2
     s.addNode(0,-r,r); //Node 3
 }
 
-void MountainGoat::addRodsHip(tgStructure& s){
+void MountainGoatFM0::addRodsHip(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
 }
 
-void MountainGoat::addNodesVertebra(tgStructure& s, double r){
+void MountainGoatFM0::addNodesVertebra(tgStructure& s, double r){
     s.addNode(0,0,0); //Node 0 
     s.addNode(r,0,r); //Node 1 
     s.addNode(r,0,-r); //Node 2
@@ -117,14 +117,14 @@ void MountainGoat::addNodesVertebra(tgStructure& s, double r){
     s.addNode(-r,0,r); //Node 4
 }
 
-void MountainGoat::addRodsVertebra(tgStructure& s){
+void MountainGoatFM0::addRodsVertebra(tgStructure& s){
     s.addPair(0,1,"rod");
     s.addPair(0,2,"rod");
     s.addPair(0,3,"rod");
     s.addPair(0,4,"rod");
 }
 
-void MountainGoat::addSegments(tgStructure& goat, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, double r){ 
+void MountainGoatFM0::addSegments(tgStructure& goat, tgStructure& vertebra, tgStructure& hip, tgStructure& leg, double r){ 
     const double offsetDist = r+1; 
     const double offsetDist2 = offsetDist*6; 
     const double offsetDist3 = offsetDist2+2;
@@ -239,7 +239,7 @@ void MountainGoat::addSegments(tgStructure& goat, tgStructure& vertebra, tgStruc
 
 }
 
-void MountainGoat::addMuscles(tgStructure& goat){ 
+void MountainGoatFM0::addMuscles(tgStructure& goat){ 
         //Time to add the muscles to the structure. 
 	//A note about tags: if want to identify a muscle by multiple words, the multiple words will be pulled out in any order,
 	//not the order in which they are written. So, put underscores, use camel case, or use unique, individual words to pull out muscles! 
@@ -277,7 +277,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
                 goat.addPair(n0[2], n1[4], tgString("spine all main rear lower right muscleAct2 seg", i-2) + tgString(" seg", i-1)); 
             }
         }
-        if(i < 7){//Was 6
+        if(i < m_segments){//Was 6
             if(i % 2 == 0){
                 goat.addPair(n0[1], n2[4], tgString("spine2 bottom muscleAct2 seg", i-2) + tgString(" seg", i-1));
                 goat.addPair(n0[2], n2[3], tgString("spine2 top muscleAct1 seg", i-2) + tgString(" seg", i-1));
@@ -288,7 +288,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
 
             }
         }
-        if(i > 0 && i < 7){
+        if(i > 0 && i < m_segments){
             if(i % 2 == 0){//rear
                 goat.addPair(n1[1], n2[3], tgString("spine all main rear upper left muscleAct1 seg", i-1) + tgString(" seg", i));
                 goat.addPair(n1[1], n2[4], tgString("spine all main rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
@@ -297,19 +297,20 @@ void MountainGoat::addMuscles(tgStructure& goat){
             }
             else{//front
 
-                goat.addPair(n1[1], n2[3], tgString("spine all main front lower right muscleAct2 seg", i-1) + tgString(" seg", i));
-                goat.addPair(n1[1], n2[4], tgString("spine all main front lower left muscleAct2 seg", i-1) + tgString(" seg", i));
+                goat.addPair(n1[1], n2[3], tgString("spine all main front lower right muscleAct1 seg", i-1) + tgString(" seg", i));
+                goat.addPair(n1[1], n2[4], tgString("spine all main front lower left muscleAct1 seg", i-1) + tgString(" seg", i));
                 goat.addPair(n1[2], n2[3], tgString("spine all main front upper right muscleAct1 seg", i-1) + tgString(" seg", i));
                 goat.addPair(n1[2], n2[4], tgString("spine all main front upper left muscleAct1 seg", i-1) + tgString(" seg", i));
             }
         }
-	if (i >= 2 && i < 7){
-	    goat.addPair(n1[3], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    goat.addPair(n1[4], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    goat.addPair(n1[3], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
-	    goat.addPair(n1[4], n2[4], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
+	if (i >= 2 && i < m_segments){
+	    goat.addPair(n0[4], n2[3], tgString("spine all vertical muscleAct1 seg", i-1) + tgString(" seg", i));
+	    goat.addPair(n0[2], n2[1], tgString("spine all vertical muscleAct1 seg", i-1) + tgString(" seg", i));
+
+	    goat.addPair(n0[3], n2[4], tgString("spine all vertical muscleAct1 seg", i-1) + tgString(" seg", i));
+	    goat.addPair(n0[1], n2[2], tgString("spine all vertical muscleAct1 seg", i-1) + tgString(" seg", i));	    
 	}
-        if(i == 6){
+        if(i == m_segments - 1){
             //rear
             goat.addPair(n1[1], n2[2], tgString("spine all rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
             goat.addPair(n1[2], n2[2], tgString("spine all rear lower right muscleAct2 seg", i-1) + tgString(" seg", i));
@@ -475,7 +476,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
 
 }
 
-void MountainGoat::setup(tgWorld& world)
+void MountainGoatFM0::setup(tgWorld& world)
 {
     //Rod and Muscle configuration. 
     const double density = 4.2/300.0; //Note: this needs to be high enough or things fly apart...
@@ -489,7 +490,7 @@ void MountainGoat::setup(tgWorld& world)
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
 
     const double stiffness = 1000.0;
-    const double stiffnessPassive = 4000.0; //4000
+    const double stiffnessPassive = 5000.0; //4000
     const double stiffnessPassive2 = 4000.0;
     const double stiffnessPassive3 = 10000.0;
     const double damping = .01*stiffness;
@@ -501,7 +502,7 @@ void MountainGoat::setup(tgWorld& world)
     const double passivePretension = 1000; 
     const double passivePretension2 = 3500; 
     const double passivePretension3 = 3500; 
-    const double passivePretension4 = 4000.0;
+    const double passivePretension4 = 5000.0;
 
 #ifdef USE_KINEMATIC
 
@@ -639,7 +640,7 @@ void MountainGoat::setup(tgWorld& world)
     children.clear();
 }
 
-void MountainGoat::step(double dt)
+void MountainGoatFM0::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -653,7 +654,7 @@ void MountainGoat::step(double dt)
     }
 }
 
-void MountainGoat::teardown()
+void MountainGoatFM0::teardown()
 {
     BaseQuadModelLearning::teardown();
 }

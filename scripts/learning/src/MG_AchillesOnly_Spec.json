@@ -2,24 +2,24 @@
     "filePrefix"   : "monteOut",
     "fileSuffix"   : ".json",
     "resourcePath" : "../../../resources/src/",
-    "lowerPath"    : "bgigous/AppQuadSimpleActuation/",
-    "executable" : "./../../../build/dev/bgigous/MG_SecondAttempt/AppQuadSimpleActuation",
+    "lowerPath"    : "dhustigschultz/AppMGAO_Test/",
+    "executable" : "./../../../build/dev/dhustigschultz/MG_AchillesOnly_CPGH/AppAOHierarchy",
     "terrain" : [[[0, 0, 0, 0.0, 60000]]],
     "learningParams": 
     {
         "trialLength" : 60000,
-        "numTrials" : 5000,
+        "numTrials" : 50,
         "numGenerations" : 1,
         "deterministic": 0,
-        "nodeVals" :
+        "achillesNodeVals" :
         {
             "learning" : true,
             "startingControllers" : 0,
             "monteCarlo" : true,
             "numberOfStates" : 0,
             "numberOfOutputs" : 5,
-            "numberOfInstances" : 8,
-            "populationSize" : 5000,
+            "numberOfInstances" : 1,
+            "populationSize" : 50,
             "useAverage" : true,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
@@ -29,21 +29,21 @@
             "paramMin": 0.0,
             "childMutationChance" : 0.9
         },
-        "edgeVals" :
+        "achillesEdgeVals" :
         {
             "learning" : true,
             "startingControllers" : 0,
             "monteCarlo" : true,
             "numberOfStates" : 0,
             "numberOfOutputs" : 2,
-            "numberOfInstances" : 392,
-            "populationSize" : 5000,
+            "numberOfInstances" : 7,
+            "populationSize" : 50,
             "useAverage" : true,
             "numberToMutate" : 2,
             "numberOfChildren" : 1,
             "mutationChance" : 0.5,
             "mutationDev" : 0.03,
-            "paramMax" : 0.5,
+            "paramMax" : 1.0,
             "paramMin": 0.0,
             "childMutationChance" : 0.9
         },
@@ -56,7 +56,7 @@
             "numberOfOutputs" : 3,
             "numberHidden" : 4,
             "numberOfInstances" : 1,
-            "populationSize" : 5000,
+            "populationSize" : 50,
             "useAverage" : true,
             "numberToMutate" : 15,
             "numberOfChildren" : 5,
@@ -66,51 +66,33 @@
             "paramMin": -1.0,
             "childMutationChance" : 0.7
         },
-		"impedenceVals" :
-		{
-			"learning" : true,
-            "startingControllers" : 0,
-            "monteCarlo" : true,
-            "numberOfStates" : 0,
-            "numberOfOutputs" : 3,
-            "numberOfInstances" : 1,
-            "populationSize" : 5000,
-            "useAverage" : true,
-            "numberToMutate" : 15,
-            "numberOfChildren" : 5,
-            "mutationChance" : 0.5,
-            "mutationDev" : 0.03,
-            "paramMax" : 1.0,
-            "paramMin": 0,
-            "childMutationChance" : 0.7
-		},
-		"PropVals" :
-		{
-			"learning" : true,
+        "propVals" :
+        {
+            "learning" : true,
             "startingControllers" : 0,
             "monteCarlo" : true,
             "numberOfStates" : 0,
             "numberOfOutputs" : 1,
             "numberOfInstances" : 1,
-            "populationSize" : 5000,
+            "populationSize" : 50, 
             "useAverage" : true,
             "numberToMutate" : 15,
             "numberOfChildren" : 5,
             "mutationChance" : 0.5,
             "mutationDev" : 0.03,
-            "paramMax" : 50000.0,
-            "paramMin": 0,
-            "childMutationChance" : 0.7
-		},
-		"DerVals" :
-		{
-			"learning" : true,
+            "paramMax" : 150000.0,
+            "paramMin": 20000.0,
+            "childMutationChance" : 0.9 
+        },
+        "derVals" :
+        {
+            "learning" : true,
             "startingControllers" : 0,
             "monteCarlo" : true,
             "numberOfStates" : 0,
             "numberOfOutputs" : 1,
             "numberOfInstances" : 1,
-            "populationSize" : 5000,
+            "populationSize" : 50,
             "useAverage" : true,
             "numberToMutate" : 15,
             "numberOfChildren" : 5,
@@ -119,6 +101,24 @@
             "paramMax" : 25.0,
             "paramMin": 0,
             "childMutationChance" : 0.7
-		}
+        },
+        "impedenceVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 3,
+            "numberOfInstances" : 1,
+            "populationSize" : 50,
+            "useAverage" : true,
+            "numberToMutate" : 15,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0,
+            "childMutationChance" : 0.7
+        }
     }
 }

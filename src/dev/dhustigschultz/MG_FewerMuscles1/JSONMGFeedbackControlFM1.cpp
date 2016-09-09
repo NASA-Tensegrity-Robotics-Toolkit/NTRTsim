@@ -17,18 +17,19 @@
 */
 
 /**
- * @file JSONFeedbackControl.cpp
- * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz
+ * @file JSONMGFeedbackControlFM1.cpp
+ * @brief A controller for the template class BaseQuadModelLearning,
+ * modified for use on a quadruped
+ * @author Brian Mirletz, Dawn Hustig-Schultz
  * @version 1.1.0
  * $Id$
  */
 
-#include "JSONQuadFeedbackControl.h"
+#include "JSONMGFeedbackControlFM1.h"
 
 
 // Should include tgString, but compiler complains since its been
-// included from BaseSpineModelLearning. Perhaps we should move things
+// included from BaseQuadModelLearning. Perhaps we should move things
 // to a cpp over there
 #include "core/tgSpringCableActuator.h"
 #include "core/tgBasicActuator.h"
@@ -36,7 +37,7 @@
 #include "examples/learningSpines/tgCPGActuatorControl.h"
 #include "dev/CPG_feedback/tgCPGCableControl.h"
 
-#include "examples/learningSpines/BaseSpineModelLearning.h"
+#include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
 #include "helpers/FileHelpers.h"
 
 #include "learning/AnnealEvolution/AnnealEvolution.h"
@@ -54,11 +55,11 @@
 #include <vector>
 
 //#define LOGGING
-#define USE_KINEMATIC
+//#define USE_KINEMATIC
 
 using namespace std;
 
-JSONQuadFeedbackControl::Config::Config(int ss,
+JSONMGFeedbackControlFM1::Config::Config(int ss,
                                         int tm,
                                         int om,
                                         int param,
@@ -83,7 +84,7 @@ JSONQuadFeedbackControl::Config::Config(int ss,
                                         double pfMax,
 					double maxH,
 					double minH) :
-JSONCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
+JSONQuadCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
 freqFeedbackMax(ffMax),
@@ -101,22 +102,22 @@ minHeight(minH)
  * attached for the lifecycle of the learning runs. I.E. that the setup
  * and teardown functions are used for tgModel
  */
-JSONQuadFeedbackControl::JSONQuadFeedbackControl(JSONQuadFeedbackControl::Config config,	
+JSONMGFeedbackControlFM1::JSONMGFeedbackControlFM1(JSONMGFeedbackControlFM1::Config config,	
                                                 std::string args,
                                                 std::string resourcePath) :
-JSONCPGControl(config, args, resourcePath),
+JSONQuadCPGControl(config, args, resourcePath),
 m_config(config)
 {
     // Path and filename handled by base class
     
 }
 
-JSONQuadFeedbackControl::~JSONQuadFeedbackControl()
+JSONMGFeedbackControlFM1::~JSONMGFeedbackControlFM1()
 {
     delete nn;
 }
 
-void JSONQuadFeedbackControl::onSetup(BaseSpineModelLearning& subject)
+void JSONMGFeedbackControlFM1::onSetup(BaseQuadModelLearning& subject)
 {
 	m_pCPGSys = new CPGEquationsFB(100);
 
@@ -174,36 +175,14 @@ void JSONQuadFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     std::cout << *m_pCPGSys << std::endl;
 #endif    
     m_updateTime = 0.0;
+    m_totalTime = 0.0; //For metrics. 
     bogus = false;
-    
-#if(1)
-    Json::Value PVal = root.get("PropVals", "UTF-8");
-    Json::Value DVal = root.get("DerVals", "UTF-8");
-
-	cout << PVal << endl;
-    
-	// Keep drilling if necessary
-    PVal = PVal.get("params", "UTF-8");
-    DVal = DVal.get("params", "UTF-8");
-
-	if (PVal[0].isArray())
-	{
-		PVal = PVal[0];
-	}
-	if (DVal[0].isArray())
-	{
-		DVal = DVal[0];
-	}
-    
-	int j = 0;
-	P = (PVal.get(j, 0.0)).asDouble();
-	D = (DVal.get(j, 0.0)).asDouble();
-#endif
 }
 
-void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
+void JSONMGFeedbackControlFM1::onStep(BaseQuadModelLearning& subject, double dt)
 {
     m_updateTime += dt;
+    m_totalTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
 #if (1)
@@ -233,19 +212,38 @@ void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         m_updateTime = 0;
     }
     
-	double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
-	double currentHeightTail = subject.getSegmentCOM(6)[1];
-	/// Max and min heights added to config
-	if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight 
-    || currentHeightTail > m_config.maxHeight || currentHeightTail < m_config.minHeight)
+    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+    double currentHeightRear =  subject.getSegmentCOM(6)[1];
+    
+    // Max and min heights added to config
+    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight || currentHeightRear > m_config.maxHeight || currentHeightRear < m_config.minHeight)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
 		throw std::runtime_error("Height out of range");
-	}
+    }
+
+    //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
+    if(0){
+	    static int count = 0;
+	    if(count > 100) {
+		std::cout << m_totalTime << std::endl;
+
+		//Getting the center of mass of the entire structure:
+		std::vector<double> newConditions = subject.getSegmentCOM(m_config.segmentNumber);
+
+		std::cout  << "COM: " << newConditions[0] << " " << newConditions[1] << " " << newConditions[2] << " "; 
+	    	std::cout << std::endl;
+
+		count = 0;
+	    }
+	    else {
+		count++;
+	    }
+    }
 }
 
-void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
+void JSONMGFeedbackControlFM1::onTeardown(BaseQuadModelLearning& subject)
 {
     scores.clear();
     // @todo - check to make sure we ran for the right amount of time
@@ -273,7 +271,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     /// @todo - return length scale as a parameter
     double totalEnergySpent=0;
     
-    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
+    std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spiral");
     
     for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
@@ -313,7 +311,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     
     Json::Value subScores;
     subScores["distance"] = scores[0];
-    subScores["energy"] = totalEnergySpent;
+    subScores["energy"] = scores[1];
     
     prevScores.append(subScores);
     root["scores"] = prevScores;
@@ -333,17 +331,17 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     m_spineControllers.clear();    
 }
 
-void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
+void JSONMGFeedbackControlFM1::setupCPGs(BaseQuadModelLearning& subject, array_2D nodeActions, array_4D edgeActions)
 {
-    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("leg_to ");
+	    
+    std::vector <tgSpringCableActuator*> spineMuscles = subject.find<tgSpringCableActuator> ("spiral");
     
     CPGEquationsFB& m_CPGFBSys = *(tgCast::cast<CPGEquations, CPGEquationsFB>(m_pCPGSys));
     
     for (std::size_t i = 0; i < spineMuscles.size(); i++)
     {
 
-        tgPIDController::Config config(P, 0.0, D, true); // Non backdrivable
-        //tgPIDController::Config config(20000.0, 0.0, 10.0, true); // Non backdrivable
+        tgPIDController::Config config(20000.0, 0.0, 5.0, true); // Non backdrivable
         tgCPGCableControl* pStringControl = new tgCPGCableControl(config);
 
         spineMuscles[i]->attach(pStringControl);
@@ -377,7 +375,7 @@ void JSONQuadFeedbackControl::setupCPGs(BaseSpineModelLearning& subject, array_2
 	
 }
 
-array_2D JSONQuadFeedbackControl::scaleNodeActions (Json::Value actions)
+array_2D JSONMGFeedbackControlFM1::scaleNodeActions (Json::Value actions)
 {
     std::size_t numControllers = actions.size();
     std::size_t numActions = actions[0].size();
@@ -417,12 +415,12 @@ array_2D JSONQuadFeedbackControl::scaleNodeActions (Json::Value actions)
     return nodeActions;
 }
 
-std::vector<double> JSONQuadFeedbackControl::getFeedback(BaseSpineModelLearning& subject)
+std::vector<double> JSONMGFeedbackControlFM1::getFeedback(BaseQuadModelLearning& subject)
 {
     // Placeholder
     std::vector<double> feedback;
     
-    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> ("leg_to ");
+    const std::vector<tgSpringCableActuator*>& spineCables = subject.find<tgSpringCableActuator> ("spiral");
     
     double *inputs = new double[m_config.numStates];
     
@@ -457,7 +455,7 @@ std::vector<double> JSONQuadFeedbackControl::getFeedback(BaseSpineModelLearning&
     return feedback;
 }
 
-std::vector<double> JSONQuadFeedbackControl::getCableState(const tgSpringCableActuator& cable)
+std::vector<double> JSONMGFeedbackControlFM1::getCableState(const tgSpringCableActuator& cable)
 {
 	// For each string, scale value from -1 to 1 based on initial length or max tension of motor
     
@@ -473,7 +471,7 @@ std::vector<double> JSONQuadFeedbackControl::getCableState(const tgSpringCableAc
 	return state;
 }
 
-std::vector<double> JSONQuadFeedbackControl::transformFeedbackActions(std::vector< std::vector<double> >& actions)
+std::vector<double> JSONMGFeedbackControlFM1::transformFeedbackActions(std::vector< std::vector<double> >& actions)
 {
 	// Placeholder
 	std::vector<double> feedback;
@@ -496,4 +494,3 @@ std::vector<double> JSONQuadFeedbackControl::transformFeedbackActions(std::vecto
     
 	return feedback;
 }
-

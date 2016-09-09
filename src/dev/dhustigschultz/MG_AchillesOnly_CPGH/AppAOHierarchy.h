@@ -16,21 +16,21 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef APP_QUAD_SIMPLE_ACTUATION_H
-#define APP_QUAD_SIMPLE_ACTUATION_H
+#ifndef APP_AO_HIERARCHY_H
+#define APP_AO_HIERARCHY_H
 
 /**
- * @file AppQuadSimpleActuation.cpp
+ * @file AppAOHierarchy.h
  * @brief Contains the definition function main() for the Multiple terrains app, used here for control of a quadruped.
- * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz, Brandon Gigous
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
  * $Id$
  */
 
 //robot
-#include "BigPuppySymmetricSpiral2.h"
+#include "dev/dhustigschultz/MountainGoatAchilles/MountainGoatAchilles.h"
 
 // controller 
-#include "JSONQuadFeedbackControl.h"
+#include "JSONAOHierarchyControl.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"
@@ -53,10 +53,10 @@
 
 namespace po = boost::program_options;
 
-class AppQuadSimpleActuation
+class AppAOHierarchy
 {
 public:
-    AppQuadSimpleActuation(int argc, char** argv);
+    AppAOHierarchy(int argc, char** argv);
 
     /** Setup the simulation */
     bool setup();
@@ -90,7 +90,7 @@ private:
     tgWorld* world;
     tgSimView* view;
     tgSimulation* simulation;
-	JSONQuadFeedbackControl * myControl;
+    JSONAOHierarchyControl * myControl;
 
     bool use_graphics;
     bool add_controller;
@@ -116,5 +116,5 @@ private:
     bool bSetup;
 };
 
-#endif  // APP_QUAD_SIMPLE_ACTUATION
+#endif  // APP_ACHILLES_HIERARCHY_H
 

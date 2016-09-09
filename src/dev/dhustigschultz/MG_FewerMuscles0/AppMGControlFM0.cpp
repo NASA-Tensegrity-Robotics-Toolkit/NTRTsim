@@ -17,20 +17,18 @@
 */
 
 /**
- * @file AppQuadControlSpiral.cpp
- * @brief Using Brian's existing spine controller for a quadruped, using passive model with simpler actuation
- * @author Brandon Gigous, Dawn Hustig-Schultz, Brian Mirletz
- * @date August 2016
+ * @file AppMGControlFM0.cpp
+ * @brief Using Brian's existing spine controller for a quadruped. 
+ * @author Dawn Hustig-Schultz, Brian Mirletz
+ * @date August 2015
  * @version 1.0.0
  * $Id$
  */
 
-#include "AppQuadSimpleActuation.h"
+#include "AppMGControlFM0.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
-#include "helpers/FileHelpers.h"
-#include <json/json.h>
 
-AppQuadSimpleActuation::AppQuadSimpleActuation(int argc, char** argv)
+AppMGControlFM0::AppMGControlFM0(int argc, char** argv)
 {
     bSetup = false;
     use_graphics = false;
@@ -56,7 +54,7 @@ AppQuadSimpleActuation::AppQuadSimpleActuation(int argc, char** argv)
     handleOptions(argc, argv);
 }
 
-bool AppQuadSimpleActuation::setup()
+bool AppMGControlFM0::setup()
 {
     // First create the world
     world = createWorld();
@@ -82,74 +80,42 @@ bool AppQuadSimpleActuation::setup()
     const int legs = 4;
     const int feet = 4; 
 
-    BigPuppySymmetricSpiral2* myModel = new BigPuppySymmetricSpiral2(segments, hips, legs, feet);
+    MountainGoatFM0* myModel = new MountainGoatFM0(segments, hips, legs);
 
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-		Json::Value root;
-		Json::Reader reader;
-
-		std::string resourcePath = "bgigous/AppQuadSimpleActuation/";
-		std::string controlFilePath = FileHelpers::getResourcePath(resourcePath);
-		std::string controlFilename = controlFilePath + suffix;
-
-        bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
-        if ( !parsingSuccessful )
-        {
-            // report to the user the failure and their locations in the document.
-            std::cout << "Failed to parse configuration\n"
-                << reader.getFormattedErrorMessages();
-            throw std::invalid_argument("Bad filename for JSON, check that resource path exists");
-        }
-        // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
-        // such member.
-        Json::Value impedenceVals = root.get("impedenceVals", "UTF-8");
-        impedenceVals = impedenceVals.get("params", "UTF-8");
-        
-        // Keep drilling if necessary
-        if (impedenceVals[0].isArray())
-        {
-            impedenceVals = impedenceVals[0];
-		}
-
-		const double impedanceMax = 2000.0;
-
-        const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 16; //This may be ok, but confirm. 
+        const int segmentSpan = 3; 
+        const int numMuscles = 8; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
-        const double lowPhase = -1*M_PI;
+        const double lowPhase = -1 * M_PI;
         const double highPhase = M_PI;
         const double lowAmplitude = 0.0;
         const double highAmplitude = 300.0;
-        //const double kt = 0.0; //May need to retune kt, kp, and kv
-        //const double kp = 2000.0;
-        //const double kv = 200.0;
-		int j = 0;
-		const double kt = impedanceMax * (impedenceVals.get(j, 0.0)).asDouble();
-        const double kp = impedanceMax * (impedenceVals.get(1, 0.0)).asDouble();
-		const double kv = impedanceMax * (impedenceVals.get(2, 0.0)).asDouble();
-        const bool def = false;
+        const double kt = 0.0; //May need to retune kt, kp, and kv
+        const double kp = 1000.0;
+        const double kv = 200.0;
+        const bool def = true;
             
         // Overridden by def being true
         const double cl = 10.0;
         const double lf = 0.0;
-        const double hf = 1.5;
+        const double hf = 30.0;
         
         // Feedback parameters... may need to retune
-        const double ffMin = 0.0;
-        const double ffMax = 1;
+        const double ffMin = -0.5;
+        const double ffMax = 10.0;
         const double afMin = 0.0;
-        const double afMax = 200; //200
-        const double pfMin = -0.5;//-0.5;
-        const double pfMax = 6.28; //6.28;
+        const double afMax = 200.0;
+        const double pfMin = -0.5;
+        const double pfMax =  6.28;
 
-	const double maxH = 300.0;
-	const double minH = 1.0;
+	const double maxH = 60.0;
+	const double minH = 7.0;
 
-        JSONQuadFeedbackControl::Config control_config(segmentSpan, 
+        JSONMGFeedbackControlFM0::Config control_config(segmentSpan, 
                                                     numMuscles,
                                                     numMuscles,
                                                     numParams, 
@@ -176,7 +142,7 @@ bool AppQuadSimpleActuation::setup()
 						    minH);
         /// @todo fix memory leak that occurs here
        myControl =
-        new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
+        new JSONMGFeedbackControlFM0(control_config, suffix, lowerPath);
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -200,7 +166,7 @@ bool AppQuadSimpleActuation::setup()
     return bSetup;
 }
 
-void AppQuadSimpleActuation::handleOptions(int argc, char **argv)
+void AppMGControlFM0::handleOptions(int argc, char **argv)
 {
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -249,7 +215,7 @@ void AppQuadSimpleActuation::handleOptions(int argc, char **argv)
     }
 }
 
-const tgHillyGround::Config AppQuadSimpleActuation::getHillyConfig()
+const tgHillyGround::Config AppMGControlFM0::getHillyConfig()
 {
     btVector3 eulerAngles = btVector3(0.0, 0.0, 0.0);
     btScalar friction = 0.5;
@@ -269,7 +235,7 @@ const tgHillyGround::Config AppQuadSimpleActuation::getHillyConfig()
     return hillGroundConfig;
 }
 
-const tgBoxGround::Config AppQuadSimpleActuation::getBoxConfig()
+const tgBoxGround::Config AppMGControlFM0::getBoxConfig()
 {
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -286,14 +252,14 @@ const tgBoxGround::Config AppQuadSimpleActuation::getBoxConfig()
     return groundConfig;
 }
 
-tgModel* AppQuadSimpleActuation::getBlocks()
+tgModel* AppMGControlFM0::getBlocks()
 {
     // Room to add a config
     tgBlockField* myObstacle = new tgBlockField();
     return myObstacle;
 }
 
-tgWorld* AppQuadSimpleActuation::createWorld()
+tgWorld* AppMGControlFM0::createWorld()
 {
     const tgWorld::Config config(
         981 // gravity, cm/sec^2
@@ -315,17 +281,17 @@ tgWorld* AppQuadSimpleActuation::createWorld()
     return new tgWorld(config, ground);
 }
 
-tgSimViewGraphics *AppQuadSimpleActuation::createGraphicsView(tgWorld *world)
+tgSimViewGraphics *AppMGControlFM0::createGraphicsView(tgWorld *world)
 {
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics);
 }
 
-tgSimView *AppQuadSimpleActuation::createView(tgWorld *world)
+tgSimView *AppMGControlFM0::createView(tgWorld *world)
 {
     return new tgSimView(*world, timestep_physics, timestep_graphics);
 }
 
-bool AppQuadSimpleActuation::run()
+bool AppMGControlFM0::run()
 {
     if (!bSetup)
     {
@@ -343,16 +309,16 @@ bool AppQuadSimpleActuation::run()
         simulate(simulation);
     }
     
-    ///@todo consider app.cleanup()
-   delete simulation;
-   delete view;
-   delete world;
-   delete myControl;
+    //@todo consider app.cleanup()
+    delete simulation;
+    delete view;
+    delete world;
+    delete myControl;
     
     return true;
 }
 
-void AppQuadSimpleActuation::simulate(tgSimulation *simulation)
+void AppMGControlFM0::simulate(tgSimulation *simulation)
 {
     for (int i=0; i<nEpisodes; i++) {
         fprintf(stderr,"Episode %d\n", i);
@@ -408,8 +374,8 @@ void AppQuadSimpleActuation::simulate(tgSimulation *simulation)
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppQuadSimpleActuation" << std::endl;
-    AppQuadSimpleActuation app (argc, argv);
+    std::cout << "AppMGControlFM0" << std::endl;
+    AppMGControlFM0 app (argc, argv);
 
     if (app.setup())
         app.run();

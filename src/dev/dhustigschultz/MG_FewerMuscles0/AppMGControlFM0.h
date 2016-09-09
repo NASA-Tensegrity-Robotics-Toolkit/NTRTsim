@@ -16,21 +16,21 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef APP_QUAD_SIMPLE_ACTUATION_H
-#define APP_QUAD_SIMPLE_ACTUATION_H
+#ifndef APP_MG_CONTROL_FM0_H
+#define APP_MG_CONTROL_FM0_H
 
 /**
- * @file AppQuadSimpleActuation.cpp
+ * @file AppMGControlFM0.cpp
  * @brief Contains the definition function main() for the Multiple terrains app, used here for control of a quadruped.
- * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz, Brandon Gigous
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
  * $Id$
  */
 
 //robot
-#include "BigPuppySymmetricSpiral2.h"
+#include "dev/dhustigschultz/MountainGoatFM0/MountainGoatFM0.h"
 
 // controller 
-#include "JSONQuadFeedbackControl.h"
+#include "JSONMGFeedbackControlFM0.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"
@@ -53,10 +53,10 @@
 
 namespace po = boost::program_options;
 
-class AppQuadSimpleActuation
+class AppMGControlFM0
 {
 public:
-    AppQuadSimpleActuation(int argc, char** argv);
+   AppMGControlFM0(int argc, char** argv);
 
     /** Setup the simulation */
     bool setup();
@@ -90,7 +90,7 @@ private:
     tgWorld* world;
     tgSimView* view;
     tgSimulation* simulation;
-	JSONQuadFeedbackControl * myControl;
+    JSONMGFeedbackControlFM0* myControl;
 
     bool use_graphics;
     bool add_controller;
@@ -116,5 +116,5 @@ private:
     bool bSetup;
 };
 
-#endif  // APP_QUAD_SIMPLE_ACTUATION
+#endif  // APP_QUAD_CONTROL_H
 
