@@ -17,16 +17,16 @@
  */
 
 /**
- * @file TensegrityModelController.cpp
- * @brief Implementation of TensegrityModelController.
+ * @file HorizontalSpineController.cpp
+ * @brief Implementation of HorizontalSpineController.
  * @author Drew Sabelhaus, Lara Janse van Vuuren
  * $Id$
  */
 
 // This module
-#include "TensegrityModelController.h"
+#include "HorizontalSpineController.h"
 // This application
-#include "TensegrityModel.h"
+#include "yamlbuilder/TensegrityModel.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
@@ -41,12 +41,12 @@
 #include "helpers/FileHelpers.h"
 
 //Constructor does nothing at the moment
-TensegrityModelController::TensegrityModelController()
+HorizontalSpineController::HorizontalSpineController()
 {
 }
 
 //Debugging output interaction with yaml
-void TensegrityModelController::onSetup(TensegrityModel& subject)
+void HorizontalSpineController::onSetup(TensegrityModel& subject)
 {
 	std::cout << "Setting up the tensegrity model controller" << std::endl;
 	//Tags from entire structure
@@ -65,7 +65,7 @@ void TensegrityModelController::onSetup(TensegrityModel& subject)
 	//std::cout << subject << std::endl;
 }
 
-void TensegrityModelController::onStep(TensegrityModel& subject, double dt)
+void HorizontalSpineController::onStep(TensegrityModel& subject, double dt)
 {
 	std::vector<tgBasicActuator*> cablesWithTagsArray = subject.find<tgBasicActuator>("HB");
 	//Get array of strings
@@ -75,7 +75,7 @@ void TensegrityModelController::onStep(TensegrityModel& subject, double dt)
 	{	
 		double lengthToSet = cablesWithTagsArray[i]->getRestLength();
 		lengthToSet = lengthToSet - dt*10;
-		std::cout << lengthToSet << std::endl;
+		//std::cout << lengthToSet << std::endl;
 		cablesWithTagsArray[i]->setControlInput(lengthToSet, dt); 
 		//std::cout << cablesWithTagsArray[i]->getTags() << std::endl;
 	}   

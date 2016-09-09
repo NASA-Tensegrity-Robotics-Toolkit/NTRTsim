@@ -25,8 +25,9 @@
  */
 
 // This application
-#include "../../../yamlbuilder/TensegrityModel.h"
-#include "../../../yamlbuilder/TensegrityModelController.h"
+//#include "../../../yamlbuilder/TensegrityModel.h"
+#include "yamlbuilder/TensegrityModel.h"
+#include "HorizontalSpineController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -78,7 +79,15 @@ int main(int argc, char** argv)
     // second argument.
     TensegrityModel* const myModel = new TensegrityModel(argv[1],false);
 
-    TensegrityModelController* const controller = new TensegrityModelController();
+    // Attach a controller to the model, if desired.
+    // This is a controller that interacts with a generic TensegrityModel as
+    // built by the TensegrityModel file, BUT it only actually works
+    // with the specific HorizontalSpine YAML file.
+    // @TODO: should this throw an error when attached to a model that
+    // wasn't built with the HorizontalSpine YAML file?
+    HorizontalSpineController* const controller = new HorizontalSpineController();
+    // Attach the controller to the model. Must happen before running the
+    // simulation.
     myModel->attach(controller);
 
     // Add the model to the world

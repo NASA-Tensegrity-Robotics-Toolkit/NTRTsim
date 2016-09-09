@@ -14,7 +14,8 @@ link_libraries(core
 #     TensegrityModel.cpp)
 
 add_executable(AppHorizontalSpine
-#    TensegrityModel.cpp
-    AppHorizontalSpine.cpp)
+  HorizontalSpineController.cpp
+  AppHorizontalSpine.cpp
+)
 
 

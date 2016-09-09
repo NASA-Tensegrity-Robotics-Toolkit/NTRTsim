@@ -174,7 +174,8 @@ int main(int argc, char** argv)
 							 timeBetweenSamples);
 
     // Attach the sensor to the force plate
-    forcePlate->attach(forceSensor);
+    //UNCOMMENT the following line to get log output.
+    //forcePlate->attach(forceSensor);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlate);

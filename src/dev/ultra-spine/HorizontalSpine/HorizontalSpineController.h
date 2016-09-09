@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TENSEGRITY_MODEL_CONTROLLER_H
-#define TENSEGRITY_MODEL_CONTROLLER_H
+#ifndef HORIZONTAL_SPINE_CONTROLLER_H
+#define HORIZONTAL_SPINE_CONTROLLER_H
 
 /**
- * @file TensegrityModelController.h
- * @brief Contains the definition of class TensegrityModelController.
+ * @file HorizontalSpineController.h
+ * @brief Contains the definition of class HorizontalSpineController.
  * @author Drew Sabelhaus, Lara Janse van Vuuren
  * $Id$
  */
@@ -38,29 +38,27 @@
 class TensegrityModel;
 
 /**
- * A controller to apply uniform rest length offset to all cables in a
- * TensegrityModel. Does a one-time adjust of all cable rest lengths, thereby
- * tightening up the structure and keeping it held together without
- * further control input.
+ * A controller to apply the length change in the cables of the HorizontalSpine
+ * model. This is used for the ICRA 2016 ULTRA Spine paper results.
  */
-class TensegrityModelController : public tgObserver<TensegrityModel>, public tgSubject<TensegrityModelController>
+class HorizontalSpineController : public tgObserver<TensegrityModel>, public tgSubject<HorizontalSpineController>
 {
 public:
 	
   /**
-   * Construct a TensegrityRestLengthController.
+   * Construct a HorizontalSpineController.
    * @param[in] restLengthDiff, the amount of cable retraction to enact.
    * This length will be subtracted from the geometric length of
    * each cable in the structure.
    */
   
   // Note that currently this is calibrated for decimeters.
-  TensegrityModelController();
+  HorizontalSpineController();
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~TensegrityModelController() { }
+  virtual ~HorizontalSpineController() { }
 
   /**
    * Apply the controller. On setup, adjust the cable
@@ -93,4 +91,4 @@ private:
 
 };
 
-#endif // Tensegrity_MODEL_CONTROLLER_H
+#endif // HORIZONTAL_SPINE_CONTROLLER_H
