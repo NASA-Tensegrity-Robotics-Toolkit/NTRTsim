@@ -1,0 +1,8 @@
+# This model is just the TetrahedralSpineKinematic, but lifted
+# a few meters up in the air so that it drops downward (e.g., onto
+# a ForcePlateModel.)
+substructures:
+  TetSpine:
+    path: ./TetrahedralSpineKinematic.yaml
+    translation: [22, 20, -22]
+    scale: 0.5

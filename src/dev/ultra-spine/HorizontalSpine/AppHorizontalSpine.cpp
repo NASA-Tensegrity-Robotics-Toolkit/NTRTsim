@@ -25,7 +25,6 @@
  */
 
 // This application
-//#include "../../../yamlbuilder/TensegrityModel.h"
 #include "yamlbuilder/TensegrityModel.h"
 #include "HorizontalSpineController.h"
 // This library
@@ -34,10 +33,13 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+#include "sensors/forceplate/ForcePlateModel.h"
+#include "sensors/forceplate/ForcePlateSensor.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
+#include <string>
 
 /**
  * The entry point.
@@ -73,6 +75,143 @@ int main(int argc, char** argv)
 
     // create the simulation
     tgSimulation simulation(view);
+
+    // Create the force plate by passing in its config struct.
+    // There is no need to create another model file here, since the
+    // force plate is already a model.
+    //
+    // Here is the definition of the config struct for ForcePlateModel.
+    // See sensors/forceplate/ForcePlateModel.h for more information about
+    // each of these parameters.
+    
+    /**
+     * Config( double length = 5.0,
+     *	    double width = 5.0,
+     *	    double height = 2.0,
+     *	    double thickness = 0.1,
+     *	    double platethickness = 1.0,
+     *	    double wallGap = 0.4, // Used to be 0.2
+     *	    double bottomGap = 0.5,
+     *	    double massPlate = 10.0, // Worked with > 10?
+     *	    double massHousing = 0.0,
+     *	    double lateralStiffness = 500.0,
+     *	    double verticalStiffness = 1000.0,
+     *	    double lateralDamping = 50.0,
+     *	    double verticalDamping = 100.0,
+     *	    double lateralRestLength = 0.2,
+     *	    double verticalRestLength = 0.5,
+     *	    double springAnchorOffset = 0.2); // Used to be 0.1
+     */
+
+    // NOTE that the elements in the struct itself have DIFFERENT names,
+    // the shorter ones, that are described in ForcePlateModel.h.
+    // The variable names above are "dummy" names used to pass values in,
+    // not hold the values inside the struct itself.
+
+    // We do not need to pass in every one of these parameters,
+    // just the ones we want to change from the defaults.
+    double length = 15.0;
+    double width = 15.0;
+    double lateralStiffness = 1500.0;
+    double verticalStiffness = 3000.0;
+    // NOTE that as with the other actuators, the Unidirectional Compression Spring
+    // Actuator inside the ForcePlateModel does not work well when the damping
+    // constant is greater than 1/10 the spring constant.
+    // For very high stiffnesses, damping must be even less, closer to 1/30.
+    // If damping is too large, the plate will explode downward to -infinity.
+    double lateralDamping = 50.0;
+    double verticalDamping = 100.0;
+    
+    ForcePlateModel::Config forcePlateConfig(length, width);
+    // One way to change the parameters inside a struct is to do so
+    // after the struct has been created. This is useful when you want
+    // to change a value that's further down in the list of parameters
+    // for the struct's constructor, but do not want to change the defaults
+    // in between. For example:
+    forcePlateConfig.latK = lateralStiffness;
+    forcePlateConfig.vertK = verticalStiffness;
+    forcePlateConfig.latD = lateralDamping;
+    forcePlateConfig.vertD = verticalDamping;
+    
+    // This line determines the location of the force plate's base.
+    // Note that placing it at (0,0,0) might create it below the plane of the
+    // world, so something like (0, 2, 0) or (0, 3, 0) might be more appropriate.
+    // For this ICRA 2017 paper, we need four identical force plates at different
+    // locations.
+    btVector3 forcePlateLocationRearLeft =   btVector3( 18,  3, 0);
+    btVector3 forcePlateLocationRearRight =  btVector3( 18,  3, 16);
+    btVector3 forcePlateLocationFrontLeft =  btVector3( -15, 3, 0);
+    btVector3 forcePlateLocationFrontRight = btVector3( -15, 3, 16); 
+    // The force plate takes a boolean that turns debugging information on or off.
+    // This is optional: the constructor defaults to "off"/"false".
+    bool forcePlateDebugging = true;
+    // We can also tag the force plate with an arbitrary string.
+    // This will be recorded to the correct place in a log file if a sensor is
+    // attached to this force plate.
+    //tgTags tags = tgTags("FP1");
+
+    // TEMPORARILY: use a string instead. Not sure why tags didn't work.
+    std::string labelRearLeft = "FP_RearLeft";
+    std::string labelRearRight = "FP_RearRight";
+    std::string labelFrontRight = "FP_FrontRight";
+    std::string labelFrontLeft = "FP_FrontLeft";
+    
+    // Create the force plate models.
+    // Note that in order to call the 'attach' method below, to attach the sensor,
+    // this pointer has to be a ForcePlateModel pointer not just a tgModel pointer.
+    // That's because the attach method is inherited from tgSubject.
+
+    // Create one for each foot:
+    ForcePlateModel* forcePlateRearLeft = new ForcePlateModel(forcePlateConfig,
+						      forcePlateLocationRearLeft,
+						      forcePlateDebugging,
+						      labelRearLeft);
+    ForcePlateModel* forcePlateFrontLeft = new ForcePlateModel(forcePlateConfig,
+						      forcePlateLocationFrontLeft,
+						      forcePlateDebugging,
+						      labelFrontLeft);
+    ForcePlateModel* forcePlateRearRight = new ForcePlateModel(forcePlateConfig,
+						      forcePlateLocationRearRight,
+						      forcePlateDebugging,
+						      labelRearRight);
+    ForcePlateModel* forcePlateFrontRight = new ForcePlateModel(forcePlateConfig,
+						      forcePlateLocationFrontRight,
+						      forcePlateDebugging,
+						      labelFrontRight);
+
+
+    //DEBUGGING
+    //std::cout << "In the App, this force plate model has label: "
+    //	      << forcePlate->getLabel() << std::endl;
+    
+    // Optionally, add a sensor for the force plate.
+    // The ForcePlateSensor class takes:
+    // a path to the directory where the log file should be stored. NOTE that
+    //    this needs to end in a forward slash / or else the file will be wrong!
+    // the time between samples to record
+
+    // This is the path to the resources/src/forcePlate/forcePlateDemo/logs folder
+    // relative to the compiled executable for this demo application.
+    // Change it according to the file structure on your own computer, or also if
+    // you use the force plate in another file.
+    std::string forcePlateLogPath = "../../../../resources/src/forcePlate/forcePlateDemo/logs/";
+    // A reasonable time between samples is 0.01 seconds.
+    double timeBetweenSamples = 0.01;
+
+    // Create the sensor
+    ForcePlateSensor* forceSensor = new ForcePlateSensor(forcePlateLogPath,
+							 timeBetweenSamples);
+
+    // Attach the sensor to the force plate
+    //UNCOMMENT the following line to get log output.
+    //forcePlateRearLeft->attach(forceSensor);
+    //forcePlateRearRight->attach(forceSensor);
+
+    // Add our force plate model to the simulation
+    simulation.addModel(forcePlateRearLeft);
+    simulation.addModel(forcePlateFrontLeft);
+    simulation.addModel(forcePlateRearRight);
+    simulation.addModel(forcePlateFrontRight);
 
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the

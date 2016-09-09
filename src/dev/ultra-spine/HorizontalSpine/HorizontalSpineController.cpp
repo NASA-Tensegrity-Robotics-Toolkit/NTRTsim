@@ -76,7 +76,7 @@ void HorizontalSpineController::onStep(TensegrityModel& subject, double dt)
 		double lengthToSet = cablesWithTagsArray[i]->getRestLength();
 		lengthToSet = lengthToSet - dt*10;
 		//std::cout << lengthToSet << std::endl;
-		cablesWithTagsArray[i]->setControlInput(lengthToSet, dt); 
+		//cablesWithTagsArray[i]->setControlInput(lengthToSet, dt); 
 		//std::cout << cablesWithTagsArray[i]->getTags() << std::endl;
 	}   
    	//std::cout << "Finished outputting tags" << std::endl;    
