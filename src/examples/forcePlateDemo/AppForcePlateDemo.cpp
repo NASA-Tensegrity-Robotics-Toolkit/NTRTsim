@@ -170,8 +170,9 @@ int main(int argc, char** argv)
     double timeBetweenSamples = 0.01;
 
     // Create the sensor
-    ForcePlateSensor* forceSensor = new ForcePlateSensor(forcePlateLogPath,
-							 timeBetweenSamples);
+    ForcePlateSensor* forceSensor =
+      new ForcePlateSensor(forcePlateLogPath, forcePlate->getLabel(),
+			   timeBetweenSamples);
 
     // Attach the sensor to the force plate
     //UNCOMMENT the following line to get log output.

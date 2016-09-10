@@ -112,14 +112,14 @@ int main(int argc, char** argv)
     // just the ones we want to change from the defaults.
     double length = 15.0;
     double width = 15.0;
-    double lateralStiffness = 1500.0;
-    double verticalStiffness = 3000.0;
+    double lateralStiffness = 1000.0;
+    double verticalStiffness = 2000.0;
     // NOTE that as with the other actuators, the Unidirectional Compression Spring
     // Actuator inside the ForcePlateModel does not work well when the damping
     // constant is greater than 1/10 the spring constant.
     // For very high stiffnesses, damping must be even less, closer to 1/30.
     // If damping is too large, the plate will explode downward to -infinity.
-    double lateralDamping = 50.0;
+    double lateralDamping = 100.0;
     double verticalDamping = 100.0;
     
     ForcePlateModel::Config forcePlateConfig(length, width);
@@ -153,8 +153,8 @@ int main(int argc, char** argv)
     // TEMPORARILY: use a string instead. Not sure why tags didn't work.
     std::string labelRearLeft = "FP_RearLeft";
     std::string labelRearRight = "FP_RearRight";
-    std::string labelFrontRight = "FP_FrontRight";
     std::string labelFrontLeft = "FP_FrontLeft";
+    std::string labelFrontRight = "FP_FrontRight";
     
     // Create the force plate models.
     // Note that in order to call the 'attach' method below, to attach the sensor,
@@ -166,14 +166,14 @@ int main(int argc, char** argv)
 						      forcePlateLocationRearLeft,
 						      forcePlateDebugging,
 						      labelRearLeft);
-    ForcePlateModel* forcePlateFrontLeft = new ForcePlateModel(forcePlateConfig,
-						      forcePlateLocationFrontLeft,
-						      forcePlateDebugging,
-						      labelFrontLeft);
     ForcePlateModel* forcePlateRearRight = new ForcePlateModel(forcePlateConfig,
 						      forcePlateLocationRearRight,
 						      forcePlateDebugging,
 						      labelRearRight);
+    ForcePlateModel* forcePlateFrontLeft = new ForcePlateModel(forcePlateConfig,
+						      forcePlateLocationFrontLeft,
+						      forcePlateDebugging,
+						      labelFrontLeft);
     ForcePlateModel* forcePlateFrontRight = new ForcePlateModel(forcePlateConfig,
 						      forcePlateLocationFrontRight,
 						      forcePlateDebugging,
@@ -198,14 +198,30 @@ int main(int argc, char** argv)
     // A reasonable time between samples is 0.01 seconds.
     double timeBetweenSamples = 0.01;
 
-    // Create the sensor
-    ForcePlateSensor* forceSensor = new ForcePlateSensor(forcePlateLogPath,
-							 timeBetweenSamples);
-
+    // Create the sensors
+    // Rear Left
+    ForcePlateSensor* forceSensorRearLeft =
+      new ForcePlateSensor(forcePlateLogPath, forcePlateRearLeft->getLabel(),
+			   timeBetweenSamples);
+    // Rear Right
+    ForcePlateSensor* forceSensorRearRight =
+      new ForcePlateSensor(forcePlateLogPath, forcePlateRearRight->getLabel(),
+			   timeBetweenSamples);
+    // Front Left
+    ForcePlateSensor* forceSensorFrontLeft =
+      new ForcePlateSensor(forcePlateLogPath, forcePlateFrontLeft->getLabel(),
+			   timeBetweenSamples);
+    // Front Right
+    ForcePlateSensor* forceSensorFrontRight =
+      new ForcePlateSensor(forcePlateLogPath, forcePlateFrontRight->getLabel(),
+			   timeBetweenSamples);
+    
     // Attach the sensor to the force plate
-    //UNCOMMENT the following line to get log output.
-    //forcePlateRearLeft->attach(forceSensor);
-    //forcePlateRearRight->attach(forceSensor);
+    //UNCOMMENT the following line(s) to get log output.
+    forcePlateRearLeft->attach(forceSensorRearLeft);
+    forcePlateRearRight->attach(forceSensorRearRight);
+    forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);
@@ -224,7 +240,16 @@ int main(int argc, char** argv)
     // with the specific HorizontalSpine YAML file.
     // @TODO: should this throw an error when attached to a model that
     // wasn't built with the HorizontalSpine YAML file?
-    HorizontalSpineController* const controller = new HorizontalSpineController();
+
+    // Parameters for the Horizontal Spine Controller are specified in that .h file,
+    // repeated here:
+    double startTime = 5.0;
+    double minLength = 0.75;
+    double rate = 0.1;
+    std::string tagsToControl = "HB HF";
+    // Call the constructor for the controller
+    HorizontalSpineController* const controller =
+      new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);

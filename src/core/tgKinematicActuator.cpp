@@ -41,26 +41,26 @@
 using namespace std;
 
 tgKinematicActuator::Config::Config(double s,
-									double d,
-									double p,
-									double rad,
-									double moFric,
-									double moInert,
-									bool back,
-									bool h,
-									double mf,
-									double tVel,
-									double mnAL,
-									double mnRL,
-									double rot) :
-tgSpringCableActuator::Config::Config(s, d, p, h,
-							   mf, tVel, mnAL, mnRL, rot),
-radius(rad),
-motorFriction(moFric),
-motorInertia(moInert),
-backdrivable(back),
-maxOmega(tVel / rad),
-maxTorque(mf / rad)
+				    double d,
+				    double p,
+				    double rad,
+				    double moFric,
+				    double moInert,
+				    bool back,
+				    bool h,
+				    double mf,
+				    double tVel,
+				    double mnAL,
+				    double mnRL,
+				    double rot) :
+  tgSpringCableActuator::Config::Config(s, d, p, h,
+					mf, tVel, mnAL, mnRL, rot),
+  radius(rad),
+  motorFriction(moFric),
+  motorInertia(moInert),
+  backdrivable(back),
+  maxOmega(tVel / rad),
+  maxTorque(mf / rad)
 {
 	if (rad <= 0.0)
     {

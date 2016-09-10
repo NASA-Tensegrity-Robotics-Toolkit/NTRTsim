@@ -26,16 +26,19 @@
  * $Id$
  */
 
-// This library
+// The NTRT core library
 #include "core/tgObserver.h"
 #include "core/tgSubject.h"
+#include "core/tgTags.h"
 
-// the data collection class
-//#include "sensors/tgDataObserver.h"
+// The C++ standard library
 #include <string>
+#include <vector>
+#include <map>
 
 // Forward declarations
 class TensegrityModel;
+class tgBasicActuator;
 
 /**
  * A controller to apply the length change in the cables of the HorizontalSpine
@@ -47,13 +50,20 @@ public:
 	
   /**
    * Construct a HorizontalSpineController.
-   * @param[in] restLengthDiff, the amount of cable retraction to enact.
-   * This length will be subtracted from the geometric length of
-   * each cable in the structure.
+   * @param[in] startTime, a double that determines when the controller
+   * begins its motion, how many seconds after the simulation starts.
+   * @param[in] minLength, a double that is the percent of the initial length
+   * that this controller will reduce down to. E.g., if minLength = 0.25, 
+   * controller will act until the rest length of the cables is 25% of initial.
+   * @param[in] rate, the rate at which the rest length of the cables will be
+   * changed. Expressed in meters/sec.
+   * @param[in] tagsToControl, a string, which is a space-separated a list of the 
+   * tags of all the
+   * cables upon which to act. All the cables which have a tag in this list of tags
+   * will be acted upon by this controller.
    */
-  
-  // Note that currently this is calibrated for decimeters.
-  HorizontalSpineController();
+  HorizontalSpineController(double startTime, double minLength, double rate,
+			    std::string tagsToControl);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -79,15 +89,31 @@ public:
 private:
 	
   /**
-   * The rest length adjustment to make to the cables. Set
-   * in the constructor.
+   * The private variables for each of the values passed in to the constructor.
    */
-    
- 
+  double m_startTime;
+  double m_minLength;
+  double m_rate;
+  std::string m_tagsToControl;
 
-  // For data logging. TO-DO: implement this fully.
-  //tgDataObserver m_dataObserver;
-  //double m_updateTime;
+  /**
+   * Need an accumulator variable to determine when to start the controller.
+   */
+  double m_timePassed;
+
+  /**
+   * The start length of each of the cables must be recorded.
+   * This map takes a string (the space-separated list of all the tags for
+   * an individual cable) and outputs a double (the rest length at time t=0.)
+   */
+  typedef std::map<tgTags, double> InitialRestLengths;
+  InitialRestLengths initialRL;
+
+  /**
+   * A list of all the actuators to control. This is populated in onSetup
+   * by using m_tagsToControl.
+   */
+  std::vector<tgBasicActuator*> cablesWithTags;
 
 };
 

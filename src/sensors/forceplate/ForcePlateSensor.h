@@ -57,12 +57,15 @@ public:
    * log file will be created when this class is constructed and run.
    * Note that the simulation will crash if the directory of this directory
    * does not exist.
+   * @param[in] label, the label assigned to this ForcePlateModel. This is used
+   * to differentiate between log files if mulitple force plates and sensors are
+   * present in the same App.
    * @param[in] timeBetweenSamples, the length of time in between readings of the
    * force from this force plate. If set very small, then a massive large log file
    * will result, and you may encounter trouble reading that file into e.g. MATLAB.
    */
   
-  ForcePlateSensor(std::string path, double timeBetweenSamples);
+  ForcePlateSensor(std::string path, std::string label, double timeBetweenSamples);
     
   /**
    * Nothing to delete, destructor must be virtual

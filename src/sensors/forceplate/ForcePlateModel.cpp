@@ -870,7 +870,11 @@ double ForcePlateModel::getPlateGravitationalForce() const
   // The total force of the plate is F = -mg
   //return -m_config.mP * worldGravity;
   // @TODO: CALIBRATION!
-  return -m_config.mP * 9.81;
+  //return -m_config.mP * 9.81;
+  // on 2016-09-09, for force plates in AppHorizontalSpine,
+  // calibration is 7.357 N * 5.
+  return - 12.26 * 5;
+  //return 0;
 }
 double ForcePlateModel::getFx() const
 {

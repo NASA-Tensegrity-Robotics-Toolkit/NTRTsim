@@ -41,10 +41,10 @@
  * The constructor here assigns the two private variables, and
  * calls the constructor for the data observer.
  */
-ForcePlateSensor::ForcePlateSensor(std::string path, double timeBetweenSamples):
+ForcePlateSensor::ForcePlateSensor(std::string path, std::string label, double timeBetweenSamples):
   m_timeBetweenSamples(timeBetweenSamples),
   m_updateTime(0.0),
-  m_dataObserver(path + "ForcePlateSensor_")
+  m_dataObserver(path + "ForcePlateSensor_" + label + "_")
 {
   // @TODO: check if path is valid??
 }
