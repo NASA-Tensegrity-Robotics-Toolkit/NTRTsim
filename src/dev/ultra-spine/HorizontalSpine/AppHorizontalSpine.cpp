@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.001; // seconds
+    const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -245,9 +245,16 @@ int main(int argc, char** argv)
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
     double startTime = 5.0;
-    double minLength = 0.75;
-    double rate = 0.1;
-    std::vector<std::string> tagsToControl = {"HB", "HF"};
+    double minLength = 0.8;
+    double rate = 0.25;
+    std::vector<std::string> tagsToControl;
+    // HF is the right horizontal set
+    // HL is the bottom horizontal set maybe?
+    // HB is the left horizontal set
+    // HR is the bottom horizontal set.
+    // BUT, something is wrong here. Probably Bullet's numerical problems.
+    tagsToControl.push_back("HR");
+    tagsToControl.push_back("HB");
     // Call the constructor for the controller
     HorizontalSpineController* const controller =
       new HorizontalSpineController(startTime, minLength, rate, tagsToControl);

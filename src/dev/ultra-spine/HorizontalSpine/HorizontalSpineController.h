@@ -94,7 +94,7 @@ protected:
    * @param[in] tag, a string of the tag for which to search in the list of 
    * actuators in this model.
    */
-  void initializeActuators(std::string tag);
+  void initializeActuators(TensegrityModel& subject, std::string tag);
     
 private:
 	

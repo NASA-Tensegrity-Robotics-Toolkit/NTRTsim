@@ -78,33 +78,48 @@ HorizontalSpineController::HorizontalSpineController(double startTime,
  * specific actuators in the cablesWithTags array, as well as store the initial
  * rest lengths in the initialRL map.
  */
-void HorisontalSpineController::initializeActuators(std::string tag) {
+void HorizontalSpineController::initializeActuators(TensegrityModel& subject,
+						    std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
-
-}
-
-//Debugging output interaction with yaml
-void HorizontalSpineController::onSetup(TensegrityModel& subject)
-{
-  std::cout << "Setting up the HorizontalSpine controller." << std::endl;
-	    << "Finding cables with tags: " << m_tagsToControl
-	    << std::endl;
-  // Pick out the actuators with the specified tags
-  cablesWithTags = subject.find<tgBasicActuator>(m_tagsToControl);
+  // Pick out the actuators with the specified tag
+  std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
   std::cout << "The following cables were found and will be controlled: "
 	    << std::endl;
   //Iterate through array and output strings to command line
-  for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {	
-    std::cout << cablesWithTags[i]->getTags() << std::endl;
+  for (std::size_t i = 0; i < foundActuators.size(); i ++) {	
+    std::cout << foundActuators[i]->getTags() << std::endl;
     // Also, add the rest length of the actuator at this time
     // to the list of all initial rest lengths.
-    initialRL[cablesWithTags[i]->getTags()] = cablesWithTags[i]->getRestLength();
+    initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
     //DEBUGGING:
     std::cout << "Cable rest length at t=0 is "
-	      << initialRL[cablesWithTags[i]->getTags()] << std::endl;
-  }   
-  std::cout << "Finished outputting tags" << std::endl;    
+	      << initialRL[foundActuators[i]->getTags()] << std::endl;
+  }
+  // Add this list of actuators to the full list. Thanks to:
+  // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
+  cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
+			 foundActuators.end() );
+}
+
+/**
+ * For this controller, the onSetup method initializes the actuators,
+ * which means just store pointers to them and record their rest lengths.
+ * This method calls the helper initializeActuators.
+ */
+void HorizontalSpineController::onSetup(TensegrityModel& subject)
+{
+  std::cout << "Setting up the HorizontalSpine controller." << std::endl;
+  //	    << "Finding cables with tags: " << m_tagsToControl
+  //	    << std::endl;
+  cablesWithTags = {};
+  // For all the strings in the list, call initializeActuators.
+  std::vector<std::string>::iterator it;
+  for( it = m_tagsToControl.begin(); it < m_tagsToControl.end(); it++ ) {
+    // Call the helper for this tag.
+    initializeActuators(subject, *it);
+  }
+  std::cout << "Finished setting up the controller." << std::endl;    
 }
 
 void HorizontalSpineController::onStep(TensegrityModel& subject, double dt)
