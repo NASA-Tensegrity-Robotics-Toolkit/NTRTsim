@@ -48,7 +48,7 @@
 HorizontalSpineController::HorizontalSpineController(double startTime,
 						     double minLength,
 						     double rate,
-						     std::string tagsToControl) :
+						     std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),
   m_rate(rate),
@@ -73,10 +73,21 @@ HorizontalSpineController::HorizontalSpineController(double startTime,
   // @TODO: what checks to make on tags?
 }
 
+/**
+ * The initializeActuators method is call in onSetup to put pointers to 
+ * specific actuators in the cablesWithTags array, as well as store the initial
+ * rest lengths in the initialRL map.
+ */
+void HorisontalSpineController::initializeActuators(std::string tag) {
+  //DEBUGGING
+  std::cout << "Finding cables with the tag: " << tag << std::endl;
+
+}
+
 //Debugging output interaction with yaml
 void HorizontalSpineController::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the HorizontalSpine controller." << std::endl
+  std::cout << "Setting up the HorizontalSpine controller." << std::endl;
 	    << "Finding cables with tags: " << m_tagsToControl
 	    << std::endl;
   // Pick out the actuators with the specified tags

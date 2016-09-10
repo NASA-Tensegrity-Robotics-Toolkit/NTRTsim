@@ -57,13 +57,13 @@ public:
    * controller will act until the rest length of the cables is 25% of initial.
    * @param[in] rate, the rate at which the rest length of the cables will be
    * changed. Expressed in meters/sec.
-   * @param[in] tagsToControl, a string, which is a space-separated a list of the 
+   * @param[in] tagsToControl, a vector (array) of strings, which is a list of the 
    * tags of all the
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
   HorizontalSpineController(double startTime, double minLength, double rate,
-			    std::string tagsToControl);
+			    std::vector<std::string> tagsToControl);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -85,6 +85,16 @@ public:
    * @param[in] dt, current timestep must be positive
    */
   virtual void onStep(TensegrityModel& subject, double dt);
+
+protected:
+
+  /**
+   * A helper function to find and initialize the actuators that this class
+   * will control.
+   * @param[in] tag, a string of the tag for which to search in the list of 
+   * actuators in this model.
+   */
+  void initializeActuators(std::string tag);
     
 private:
 	
@@ -94,7 +104,7 @@ private:
   double m_startTime;
   double m_minLength;
   double m_rate;
-  std::string m_tagsToControl;
+  std::vector<std::string> m_tagsToControl;
 
   /**
    * Need an accumulator variable to determine when to start the controller.

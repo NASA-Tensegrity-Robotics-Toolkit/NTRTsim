@@ -40,6 +40,7 @@
 // The C++ Standard Library
 #include <iostream>
 #include <string>
+#include <vector>
 
 /**
  * The entry point.
@@ -246,7 +247,7 @@ int main(int argc, char** argv)
     double startTime = 5.0;
     double minLength = 0.75;
     double rate = 0.1;
-    std::string tagsToControl = "HB HF";
+    std::vector<std::string> tagsToControl = {"HB", "HF"};
     // Call the constructor for the controller
     HorizontalSpineController* const controller =
       new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
