@@ -680,7 +680,9 @@ void ForcePlateModel::setup(tgWorld& world)
   }
   // Here, apply the 1/2 factor to the width and height.
   // NOTE that tgBoxMoreAnchors also uses tgBox::Config.
-  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, plateDensity);
+  // Parameters here are: w, h, d, f, rf, res
+  tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, plateDensity,
+				0.25, 0.24);
 
 
   // Config for the housing walls: @TO-DO: CHANGE DENSITY.

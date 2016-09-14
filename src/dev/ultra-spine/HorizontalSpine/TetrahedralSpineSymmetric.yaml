@@ -6,7 +6,7 @@
 substructures:
 
   t1/t2/t3/t4/t5/t6:
-    path: ./Tetrahedron.yaml
+    path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
     translation: [0, 30.5, 30]
   hips:
@@ -89,17 +89,20 @@ bond_groups:
 # (was either 1000 or 5000)
 # For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
 # (was 5000)
+# Lowered friction from 1 to 0.5.
 builders: 
   rod:
     class: tgRodInfo
     parameters:
       density: 0.0044
       radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
 
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 187.0
+      stiffness: 1000.0
       damping: 100.0
       pretension: 20.0
       history: 1
@@ -109,7 +112,7 @@ builders:
   HF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 187.0
+      stiffness: 1000.0
       damping: 100.0
       pretension: 20.0
       history: 1
@@ -119,7 +122,7 @@ builders:
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 187.0
+      stiffness: 1000.0
       damping: 100.0
       pretension: 20.0
       history: 1
@@ -129,7 +132,7 @@ builders:
   HL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 187
+      stiffness: 1000.0
       damping: 100.0
       pretension: 20.0
       history: 1

@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 
     // create the view
     const double timestep_physics = 0.0001; // seconds
+    //const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -113,15 +114,20 @@ int main(int argc, char** argv)
     // just the ones we want to change from the defaults.
     double length = 15.0;
     double width = 15.0;
-    double lateralStiffness = 1000.0;
-    double verticalStiffness = 2000.0;
+    //double lateralStiffness = 1000.0;
+    double lateralStiffness = 3000.0;
+    //double verticalStiffness = 2000.0;
+    double verticalStiffness = 3000.0;
     // NOTE that as with the other actuators, the Unidirectional Compression Spring
     // Actuator inside the ForcePlateModel does not work well when the damping
     // constant is greater than 1/10 the spring constant.
     // For very high stiffnesses, damping must be even less, closer to 1/30.
     // If damping is too large, the plate will explode downward to -infinity.
-    double lateralDamping = 100.0;
-    double verticalDamping = 100.0;
+    //double lateralDamping = 100.0;
+    double lateralDamping = 500.0;
+    //double verticalDamping = 100.0;
+    double verticalDamping = 500.0;
+    //double verticalDamping = 200.0;
     
     ForcePlateModel::Config forcePlateConfig(length, width);
     // One way to change the parameters inside a struct is to do so
@@ -139,10 +145,10 @@ int main(int argc, char** argv)
     // world, so something like (0, 2, 0) or (0, 3, 0) might be more appropriate.
     // For this ICRA 2017 paper, we need four identical force plates at different
     // locations.
-    btVector3 forcePlateLocationRearLeft =   btVector3( 18,  3, 0);
-    btVector3 forcePlateLocationRearRight =  btVector3( 18,  3, 16);
-    btVector3 forcePlateLocationFrontLeft =  btVector3( -15, 3, 0);
-    btVector3 forcePlateLocationFrontRight = btVector3( -15, 3, 16); 
+    btVector3 forcePlateLocationRearLeft =   btVector3( 19,  3, 0);
+    btVector3 forcePlateLocationRearRight =  btVector3( 19,  3, 16);
+    btVector3 forcePlateLocationFrontLeft =  btVector3( -18, 3, 0);
+    btVector3 forcePlateLocationFrontRight = btVector3( -18, 3, 16); 
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
     bool forcePlateDebugging = true;
@@ -219,10 +225,10 @@ int main(int argc, char** argv)
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
-    forcePlateRearLeft->attach(forceSensorRearLeft);
-    forcePlateRearRight->attach(forceSensorRearRight);
-    forcePlateFrontLeft->attach(forceSensorFrontLeft);
-    forcePlateFrontRight->attach(forceSensorFrontRight);
+    //forcePlateRearLeft->attach(forceSensorRearLeft);
+    //forcePlateRearRight->attach(forceSensorRearRight);
+    //forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    //forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);
@@ -244,17 +250,18 @@ int main(int argc, char** argv)
 
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
-    double startTime = 5.0;
+    double startTime = 10.0;
     double minLength = 0.8;
     double rate = 0.25;
     std::vector<std::string> tagsToControl;
     // HF is the right horizontal set
     // HL is the bottom horizontal set maybe?
     // HB is the left horizontal set
-    // HR is the bottom horizontal set.
+    // HR is the top horizontal set.
     // BUT, something is wrong here. Probably Bullet's numerical problems.
     tagsToControl.push_back("HR");
-    tagsToControl.push_back("HB");
+    tagsToControl.push_back("HF");
+    //tagsToControl.push_back("HB");
     // Call the constructor for the controller
     HorizontalSpineController* const controller =
       new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
