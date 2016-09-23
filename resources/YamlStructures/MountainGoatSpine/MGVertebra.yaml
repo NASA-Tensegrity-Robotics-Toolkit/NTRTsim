@@ -1,0 +1,13 @@
+nodes:
+  center: [0, 26, 0]
+  back1: [10, 26, 10]
+  back2: [10, 26, -10]
+  front1: [-10, 26, -10]
+  front2: [-10, 26, 10]
+
+pair_groups:
+  rod:
+    - [center, back1]
+    - [center, back2]
+    - [center, front1]
+    - [center, front2]

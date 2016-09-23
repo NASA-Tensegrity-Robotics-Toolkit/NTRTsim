@@ -1,0 +1,9 @@
+# This is the yaml configuration file for the 6 bar tensegrity for drop tests. The file imports the 6BarSphere.yaml as a substructure and then imposes translations and rotations for initial drop height and orientation
+
+substructures:
+  6BarSphere:
+    path: ./6BarSphere.yaml
+    translation: [0, 10, 0]
+    rotation:
+      axis: [1, 1, 0]
+      angle: 50

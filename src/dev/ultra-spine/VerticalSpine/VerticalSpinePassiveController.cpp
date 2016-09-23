@@ -40,16 +40,45 @@
 #include "helpers/FileHelpers.h"
 
 VerticalSpinePassiveController::VerticalSpinePassiveController():
-  m_updateTime(0.0),
-  m_dataObserver("logs/vertspine_1-2-3-4_")
+  m_updateTime(0.01),
+  m_dataObserver("logs/vertspine_passive_")
 {
 }
 
 void VerticalSpinePassiveController::onSetup(VerticalSpineModel& subject){
   m_dataObserver.onSetup(subject);
+  // Since this class only updates the logs every so often (according to
+  // m_updateTime), need to track a counter of time between steps.
+  updateTime = 0.0;
+
+  // Debugging: what does this model look like?
+  //std::cout << "This VerticalSpineModel has the following contents:" << std::endl;
+  //std::cout << subject << std::endl;
 }
 
 void VerticalSpinePassiveController::onStep(VerticalSpineModel& subject, double dt)
 {
-  // do nothing.
+  // first, check if our input arguments are sane
+  if( dt <= 0.0)
+  {
+    throw std::invalid_argument("dt is not positive");
+  }
+  else
+  {
+    // check our update time. This is so that samples are taken only every
+    // certain number of steps, not all the time.
+    updateTime += dt;
+    if( updateTime >= m_updateTime )
+    {
+      // Take a step: call the observers' step function.
+      // TO FIX: why do we have to call the data logger's onStep individually?
+      notifyStep(updateTime);
+      m_dataObserver.onStep(subject, updateTime);
+      // then, reset the counter to zero
+      updateTime = 0.0;
+    }
+  } 
+  // log only.
+  //notifyStep(dt);
+  //m_dataObserver.onStep(subject, dt);
 }

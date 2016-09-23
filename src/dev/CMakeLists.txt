@@ -15,5 +15,8 @@ subdirs(
     jbruce
     dhustigschultz
     eajung
+    ezhu
+    mcdaly
+	bgigous
 )
 

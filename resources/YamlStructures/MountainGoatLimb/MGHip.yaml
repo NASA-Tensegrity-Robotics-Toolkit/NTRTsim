@@ -1,0 +1,11 @@
+nodes:
+  center: [0, 0, 0]
+  outer_bottom: [0, -10, -10]
+  inner_bottom: [0, -10, 10]
+  inner_top: [0, 10, 10]
+
+pair_groups:
+  rod:
+    - [center, outer_bottom]
+    - [center, inner_bottom]
+    - [center, inner_top]

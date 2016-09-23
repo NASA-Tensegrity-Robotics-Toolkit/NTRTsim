@@ -1,0 +1,166 @@
+substructures:
+  t1/t2/t3/t4/t5/t6:
+    path: ./Tetrahedron.yaml
+    offset: [0, 0 , -12]
+    translation: [0, 30.5, 30]
+  hips:
+    path: ../BaseStructures/hips.yaml
+    offset: [0, 0, 0]
+    translation: [-5, 25.5, 30]
+  front:
+    path: ../BaseStructures/front.yaml
+    offset: [0, 0, 0]
+    translation: [-12, 25.5, -40]
+  backlegsleft/backlegsright:
+    path: ../BaseStructures/backlegs.yaml
+    offset: [17, 0, 0]
+    translation: [-10, 0, 55]
+  frontlegsleft/frontlegsright:
+    path: ../BaseStructures/frontlegs.yaml
+    offset: [35, 0, 0]
+    translation: [-17, 0, -30]
+
+bond_groups:
+  HF:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [front, front]
+  HR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, right]      
+  HL: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, left]
+  HB:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [back, back]
+  SFR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, front] 
+  SRL:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [right, left]
+  SBF: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [back, front]
+  SBL: 
+   t1/t2/t3/t4/t5/t6/node_node: 
+      - [back, left]  
+
+  rod: 
+   t1/hips/node_node:
+      - [front, V2]
+      - [front, V3]
+      - [left, V1]
+      - [right, V4]
+      - [front, V6]
+      - [front, V7]
+      - [back, V5]
+      - [back, V8]
+
+   t6/front/node_node: 
+      - [front, V11]
+      - [front, V12]
+      - [back, V5]
+      - [back, V6]
+   
+   hips/backlegsleft/node_node:
+      - [V15, V6]
+      - [V19, V7]
+
+   hips/backlegsright/node_node:
+      - [V16, V6]
+      - [V20, V7]
+ 
+   front/frontlegsleft/node_node:
+      - [V19, V7]
+      - [V15, V6]
+  
+   front/frontlegsright/node_node:  
+      - [V20, V7]
+      - [V18, V6]
+
+builders: 
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  HF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 10.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
