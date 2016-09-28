@@ -68,6 +68,7 @@ public:
 
     std::vector<tgBasicController*> m_controllers; //instantiate vector of controllers
     std::vector<double> rand_lengths; //instantiate vector of random restlengths
+    std::vector<double> start_lengths; //instantiate vector of random restlengths
     std::vector<tgBasicActuator*> actuators;
     
 private:

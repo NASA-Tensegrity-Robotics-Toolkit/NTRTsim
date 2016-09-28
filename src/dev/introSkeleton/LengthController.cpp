@@ -54,6 +54,7 @@ void LengthController::onSetup(threeBarModel& subject)
 
   m_controllers.clear(); //clear vector of controllers
   rand_lengths.clear(); //vector of randomized restlengths
+  start_lengths.clear(); //vector of randomized restlengths
   
   //set seeds
   srand(time(NULL));
@@ -73,6 +74,7 @@ void LengthController::onSetup(threeBarModel& subject)
       m_controllers.push_back(m_lenController);
       //generate random end restlength
       double start_length = actuators[i]->getStartLength();
+      start_lengths.push_back(start_length);
       double rand_max = start_length*0.25; //maximum pos. deviation from start length
       double rand_min = -start_length*0.35; //maximum neg. deviation from start length
       double gen_len = drand48()*(rand_max-rand_min) + rand_min + start_length;
@@ -89,12 +91,26 @@ void LengthController::onStep(threeBarModel& subject, double dt)
     globalTime += dt;
     if(globalTime > 2){ //delay start of cable actuation
       if(toggle==0){ //print once when motors start moving
-	       cout << endl << "Activating Cable Motors (Randomized Lengths) -------------------------------------" << endl;
-	       toggle = 1;
+	cout << endl << "Activating Cable Motors (Randomized Lengths) -------------------------------------" << endl;
+	toggle = 1;
       }
-      for(int i = 0; i<actuators.size(); i++){
-	       m_controllers[i]->control(dt,rand_lengths[i]);
-         actuators[i]->moveMotors(dt);
+      if(toggle==1){
+	toggle = 2;
+	for(int i = 0; i<actuators.size(); i++){
+	  m_controllers[i]->control(dt,rand_lengths[i]);
+	  actuators[i]->moveMotors(dt);
+	  if(actuators[i]->getRestLength()!=rand_lengths[i])
+	    toggle = 1;
+	}	
+      }
+      if(toggle==2){
+	toggle = 1;
+	for(int i = 0; i<actuators.size(); i++){
+	  m_controllers[i]->control(dt,start_lengths[i]);
+	  actuators[i]->moveMotors(dt);
+	  if(actuators[i]->getRestLength()!=start_lengths[i])
+	    toggle = 2;
+	}	
       }
     }
   }
