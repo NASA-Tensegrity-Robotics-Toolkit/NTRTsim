@@ -16,25 +16,35 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef PRISM_MODEL_H
-#define PRISM_MODEL_H
+#ifndef THREE_BAR_MODEL_H
+#define THREE_BAR_MODEL_H
 
 /**
- * @file PrismModel.h
+ * @file 3BarModel.h
  * @brief Defines a 3 strut 9 string tensegrity model
- * @author Brian Mirletz
- * @version 1.1.0
+ * @author Edward Zhu
  * $Id$
  */
 
 // This library
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
+
+// Builder libraries
+#include "core/tgBasicActuator.h"
+#include "core/tgRod.h"
+#include "tgcreator/tgNode.h"
+#include "tgcreator/tgBuildSpec.h"
+#include "tgcreator/tgBasicActuatorInfo.h"
+#include "tgcreator/tgRodInfo.h"
+#include "tgcreator/tgStructure.h"
+#include "tgcreator/tgStructureInfo.h"
+
 // The C++ Standard Library
 #include <vector>
 
 // Forward declarations
-class tgSpringCableActuator;
+class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -45,7 +55,7 @@ class tgWorld;
  * uses the new (to v1.1) ability to define pretension in a
  * tgBasicActuator's constructor
  */
-class PrismModel : public tgSubject<PrismModel>, public tgModel
+class threeBarModel : public tgSubject<threeBarModel>, public tgModel
 {
 public: 
     
@@ -53,13 +63,13 @@ public:
      * The only constructor. Configuration parameters are within the
      * .cpp file in this case, not passed in. 
      */
-    PrismModel();
+    threeBarModel();
     
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~PrismModel();
+    virtual ~threeBarModel();
     
     /**
      * Create the model. Place the rods and strings into the world
@@ -93,10 +103,16 @@ public:
     virtual void onVisit(tgModelVisitor& r);
     
     /**
-     * Return a vector of all muscles for the controllers to work with.
-     * @return A vector of all of the muscles
+     * Return a vector of all actuators for the controllers to work with.
+     * @return A vector of all of the actuators
      */
-    const std::vector<tgSpringCableActuator*>& getAllActuators() const;
+    std::vector<tgBasicActuator*>& getAllActuators();
+
+    /**
+     * Return a vector of all rod bodies for the controllers to work with.
+     * @return A vector of all of the rod rigid bodies
+     */
+    std::vector<tgRod*>& getAllRods();
       
 private:
     
@@ -122,18 +138,24 @@ private:
     static void addRods(tgStructure& s);
     
     /**
-     * A function called during setup that creates muscles (Strings) from
+     * A function called during setup that creates actuators (Strings) from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addMuscles(tgStructure& s);
+    static void addActuators(tgStructure& s);
 
 private:    
     /**
-     * A list of all of the spring cable actuators. Will be empty until most of the way
+     * A list of all of the basic actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
-    std::vector<tgSpringCableActuator*> allActuators;
+    std::vector<tgBasicActuator*> allActuators;
+
+    /**
+     * A list of all of the rods. Will be empty until most of the way
+     * through setup when it is filled using tgModel's find methods
+     */
+    std::vector<tgRod*> allRods;
 };
 
-#endif  // Prism_MODEL_H
+#endif  // THREE_BAR_MODEL_H

@@ -17,15 +17,15 @@
 */
 
 /**
- * @file AppPrismModel.cpp
+ * @file App3Bar.cpp
  * @brief Contains the definition function main() for the Three strut
  * tensegrity prism example application
- * @author Brian Tietz
+ * @author Edward Zhu
  * $Id$
  */
 
 // This application
-#include "3BarModel.h"
+#include "threeBarModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -45,7 +45,7 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppPrismModelTest" << std::endl;
+    std::cout << "App3Bar" << std::endl;
 
     // First create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -55,7 +55,9 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(981); // gravity, cm/sec^2
+    double sf = 10;
+    double gravity = 9.81*sf;
+    const tgWorld::Config config(gravity); // gravity, cm/sec^2
     tgWorld world(config, ground);
 
     // Second create the view
@@ -68,7 +70,7 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    PrismModel* const myModel = new PrismModel();
+    threeBarModel* const myModel = new threeBarModel();
     
     // Add the model to the world
     simulation.addModel(myModel);

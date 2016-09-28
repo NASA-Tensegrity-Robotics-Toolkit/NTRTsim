@@ -9,8 +9,8 @@ link_libraries(tgcreator
                 terrain 
                 tgOpenGLSupport)
 
-add_executable(App3BarModel
-    3BarModel.cpp
-    App3BarModel.cpp
+add_executable(App3Bar
+    threeBarModel.cpp
+    App3Bar.cpp
 ) 
 

@@ -17,21 +17,14 @@
 */
 
 /**
- * @file PrismModel.cpp
- * @brief Contains the definition of the members of the class PrismModel.
+ * @file 3BarModel.cpp
+ * @brief Contains the definition of the members of the class threeBarModel.
  * $Id$
  */
 
 // This module
-#include "3BarModel.h"
-// This library
-#include "core/tgBasicActuator.h"
-#include "core/tgRod.h"
-#include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgBasicActuatorInfo.h"
-#include "tgcreator/tgRodInfo.h"
-#include "tgcreator/tgStructure.h"
-#include "tgcreator/tgStructureInfo.h"
+#include "threeBarModel.h"
+#include "core/tgString.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -63,23 +56,22 @@ namespace
        0.31,     // radius (length)
        1000.0,   // stiffness (mass / sec^2)
        10.0,     // damping (mass / sec)
-       500.0,     // pretension (mass * length / sec^2)
+       400.0,     // pretension (mass * length / sec^2)
        10.0,     // triangle_length (length)
        10.0,     // triangle_height (length)
        20.0,     // prism_height (length)
   };
 } // namespace
 
-PrismModel::PrismModel() :
-tgModel() 
+threeBarModel::threeBarModel() : tgModel() 
 {
 }
 
-PrismModel::~PrismModel()
+threeBarModel::~threeBarModel()
 {
 }
 
-void PrismModel::addNodes(tgStructure& s,
+void threeBarModel::addNodes(tgStructure& s,
                             double edge,
                             double width,
                             double height)
@@ -98,37 +90,41 @@ void PrismModel::addNodes(tgStructure& s,
     s.addNode(0, height, width); // 6
 }
 
-void PrismModel::addRods(tgStructure& s)
+void threeBarModel::addRods(tgStructure& s)
 {
-    s.addPair( 0,  4, "rod");
-    s.addPair( 1,  5, "rod");
-    s.addPair( 2,  3, "rod");
+    s.addPair( 0,  4, tgString("rod num", 0));
+    s.addPair( 1,  5, tgString("rod num", 1));
+    s.addPair( 2,  3, tgString("rod num", 2));
+
+    // s.addPair( 0,  4, "rod");
+    // s.addPair( 1,  5, "rod");
+    // s.addPair( 2,  3, "rod");
 }
 
-void PrismModel::addMuscles(tgStructure& s)
+void threeBarModel::addActuators(tgStructure& s)
 {
     // Bottom Triangle
-    s.addPair(0, 1,  "muscle");
-    s.addPair(1, 2,  "muscle");
-    s.addPair(2, 0,  "muscle");
+    s.addPair(0, 1, tgString("actuator num", 0));
+    s.addPair(1, 2, tgString("actuator num", 1));
+    s.addPair(2, 0, tgString("actuator num", 2));
     
     // Top
-    s.addPair(3, 4, "muscle");
-    s.addPair(4, 5,  "muscle");
-    s.addPair(5, 3,  "muscle");
+    s.addPair(3, 4, tgString("actuator num", 3));
+    s.addPair(4, 5, tgString("actuator num", 4));
+    s.addPair(5, 3, tgString("actuator num", 5));
 
     //Edges
-    s.addPair(0, 3, "muscle");
-    s.addPair(1, 4,  "muscle");
-    s.addPair(2, 5,  "muscle");
+    s.addPair(0, 3, tgString("actuator num", 6));
+    s.addPair(1, 4, tgString("actuator num", 7));
+    s.addPair(2, 5, tgString("actuator num", 8));
 }
 
-void PrismModel::setup(tgWorld& world)
+void threeBarModel::setup(tgWorld& world)
 {
     // Define the configurations of the rods and strings
     // Note that pretension is defined for this string
     const tgRod::Config rodConfig(c.radius, c.density);
-    const tgSpringCableActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension);
+    const tgBasicActuator::Config actuatorConfig(c.stiffness, c.damping, c.pretension);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
@@ -139,8 +135,8 @@ void PrismModel::setup(tgWorld& world)
     // Add rods to the structure
     addRods(s);
     
-    // Add muscles to the structure
-    addMuscles(s);
+    // Add actuators to the structure
+    addActuators(s);
     
     // Move the structure so it doesn't start in the ground
     s.move(btVector3(0, 10, 0));
@@ -148,7 +144,7 @@ void PrismModel::setup(tgWorld& world)
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
-    spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
+    spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
     
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -156,10 +152,18 @@ void PrismModel::setup(tgWorld& world)
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
 
-    // We could now use tgCast::filter or similar to pull out the
-    // models (e.g. muscles) that we want to control. 
-    allActuators = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
-    
+    // Get the rod rigid bodies for controller
+    std::vector<tgRod*> rods = threeBarModel::find<tgRod>("rod");
+    for (int i = 0; i < rods.size(); i++) {
+        allRods.push_back(threeBarModel::find<tgRod>(tgString("rod num", i))[0]);    
+    }
+        
+    // Get the actuators for controller
+    std::vector<tgBasicActuator*> actuators = threeBarModel::find<tgBasicActuator>("actuator");
+    for (int i = 0; i < rods.size(); i++) {
+        allActuators.push_back(threeBarModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);    
+    }
+
     // Notify controllers that setup has finished.
     notifySetup();
     
@@ -167,7 +171,7 @@ void PrismModel::setup(tgWorld& world)
     tgModel::setup(world);
 }
 
-void PrismModel::step(double dt)
+void threeBarModel::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -182,18 +186,23 @@ void PrismModel::step(double dt)
     }
 }
 
-void PrismModel::onVisit(tgModelVisitor& r)
+void threeBarModel::onVisit(tgModelVisitor& r)
 {
     // Example: m_rod->getRigidBody()->dosomething()...
     tgModel::onVisit(r);
 }
 
-const std::vector<tgSpringCableActuator*>& PrismModel::getAllActuators() const
+std::vector<tgBasicActuator*>& threeBarModel::getAllActuators()
 {
     return allActuators;
 }
+
+std::vector<tgRod*>& threeBarModel::getAllRods()
+{
+    return allRods;
+}
     
-void PrismModel::teardown()
+void threeBarModel::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
