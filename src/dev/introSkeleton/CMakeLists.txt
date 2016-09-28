@@ -11,6 +11,7 @@ link_libraries(tgcreator
 
 add_executable(App3Bar
     threeBarModel.cpp
+    LengthController.cpp
     App3Bar.cpp
 ) 
 

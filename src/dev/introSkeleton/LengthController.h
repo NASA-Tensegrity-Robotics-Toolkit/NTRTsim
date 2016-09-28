@@ -20,27 +20,26 @@
 #define LENGTH_CONTROLLER_H
 
 /**
- * @file RPTensionController.h
- * @brief Contains the definition of class RPTensionController.
- * @author Brian Tietz
- * @version 1.0.0
+ * @file LengthController.h
+ * @brief Contains the definition of class LengthController.
+ * @author Brian Cera
  * $Id$
  */
+
+#include "threeBarModel.h"
 
 // This library
 #include "core/tgObserver.h"
 #include "controllers/tgBasicController.h"
- #include "core/tgBasicActuator.h"
+#include "core/tgBasicActuator.h"
 
 // The C++ Standard Library
 #include <vector>
 
 // Forward declarations
-class TensegrityModel;
+class threeBarModel;
 
-#include "core/abstractMarker.h" //needed in order to fetch node positions
-
-class LengthController : public tgObserver<TensegrityModel>
+class LengthController : public tgObserver<threeBarModel>
 {
 public:
 	
@@ -56,7 +55,7 @@ public:
      */
     virtual ~LengthController();
     
-    virtual void onSetup(TensegrityModel& subject);
+    virtual void onSetup(threeBarModel& subject);
     
     /**
      * Apply the length controller. Called by notifyStep(dt) of its
@@ -65,20 +64,16 @@ public:
      * have a list of allMuscles populated
      * @param[in] dt, current timestep must be positive
      */
-    virtual void onStep(TensegrityModel& subject, double dt);
+    virtual void onStep(threeBarModel& subject, double dt);
 
     std::vector<tgBasicController*> m_controllers; //instantiate vector of controllers
     std::vector<double> rand_lengths; //instantiate vector of random restlengths
-    const std::vector<tgBasicActuator*> actuators
+    std::vector<tgBasicActuator*> actuators;
     
 private:
 	
-	/**
-	 * The tension setpoint that will be passed to the muscles. Set
-	 * in the constructor
-	 */
     const double m_length;
-    double globalTime;
+    double globalTime = 0;
     int toggle;
 
 };

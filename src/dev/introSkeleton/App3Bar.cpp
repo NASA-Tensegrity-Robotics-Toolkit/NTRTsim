@@ -26,6 +26,7 @@
 
 // This application
 #include "threeBarModel.h"
+#include "LengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -72,6 +73,12 @@ int main(int argc, char** argv)
     // simulation
     threeBarModel* const myModel = new threeBarModel();
     
+    // Create the controller
+    LengthController* const lengthController = new LengthController();
+
+    // Attach controller to the model
+    myModel->attach(lengthController);
+
     // Add the model to the world
     simulation.addModel(myModel);
     

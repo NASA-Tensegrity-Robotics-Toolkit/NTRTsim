@@ -17,27 +17,22 @@
  */
 
 /**
- * @file RPTensionController.cpp
- * @brief Implementation of six strut tensegrity.
- * @author Brian Tietz
- * @version 1.0.0
+ * @file LengthController.cpp
+ * @brief Implementation of class LengthController
+ * @author Brian Cera
  * $Id$
  */
 
-#include <iostream>
-#include <fstream>
-#include <string>
 // This module
 #include "LengthController.h"
-// This application
-#include "3BarModel.h"
-// This library
-#include "core/tgBasicActuator.h"
-#include "core/tgCast.h"
+
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
 #include <time.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -54,7 +49,7 @@ LengthController::~LengthController()
 {
 }	
 
-void LengthController::onSetup(3BarModel& subject)
+void LengthController::onSetup(threeBarModel& subject)
 {
 
   m_controllers.clear(); //clear vector of controllers
@@ -82,24 +77,24 @@ void LengthController::onSetup(3BarModel& subject)
       double rand_min = -start_length*0.35; //maximum neg. deviation from start length
       double gen_len = drand48()*(rand_max-rand_min) + rand_min + start_length;
       rand_lengths.push_back(gen_len);
-
-      m_controllers[i]->control(dt,rand_lengths[p]);
     }
 }
 
-void LengthController::onStep(TensegrityModel& subject, double dt)
+void LengthController::onStep(threeBarModel& subject, double dt)
 {
   if (dt <= 0.0) {
     throw std::invalid_argument("dt is not positive");
   }
   else {
+    globalTime += dt;
     if(globalTime > 2){ //delay start of cable actuation
       if(toggle==0){ //print once when motors start moving
-	cout << endl << "Activating Cable Motors (Randomized Lengths) -------------------------------------" << endl;
-	toggle = 1;
+	       cout << endl << "Activating Cable Motors (Randomized Lengths) -------------------------------------" << endl;
+	       toggle = 1;
       }
       for(int i = 0; i<actuators.size(); i++){
-	actuators[i]->moveMotors(dt);
+	       m_controllers[i]->control(dt,rand_lengths[i]);
+         actuators[i]->moveMotors(dt);
       }
     }
   }
