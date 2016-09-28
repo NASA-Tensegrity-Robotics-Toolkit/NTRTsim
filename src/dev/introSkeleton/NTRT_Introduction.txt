@@ -1,0 +1,39 @@
+Welcome to the NASA Tensegrity Robotics Toolkit Introduction Seminar!
+
+This text file accompanies the seminar held on Wednesday Sept. 28th 2016 of NTRTsim, as given in the Berkeley Emergent Space Tensegrities Lab.
+
+This seminar is designed to give new NTRT users a basic idea of how the simulator works, and how to build/run applications. For more information about any specific C++ classes, see the Doxygen documentation (http://ntrt.perryb.ca/doxygen/), and for more information about the YAML functionality, see the tutorials (http://ntrtsim.readthedocs.io/en/latest/index.html).
+
+- Drew Sabelhaus, Ed Zhu, Brian Cera (apsabelhaus, edward.zhu, brianmcera @berkeley.edu)
+----------------------------------
+
+Outline: 
+
+(i) Preliminary: Navigating the Linux Command Line
+    - cd, ls, pwd, running executables, terminal colors
+
+1. Switch to the NTRT_Intro branch, open this file.
+   - (what 'skeleton' means, for this seminar.)
+   - "FILL_IN"
+2. Basic Usage (build, run example.)
+3. Documentation location, keyboard commands
+4. 4 Components of your program in NTRTsim:
+   - App
+   - Model
+   - Controller (optional)
+   - Other supporting files (such as CMakeLists)
+
+5. Apps, Models, Controllers for NTRTsim v1.0 - Creating Models in C++
+5.1 Run App3bar. What happens?
+5.2. Fill in a line in threeBarModel.cpp
+     - The actuator should connect nodes 5 and 3, and be labelled actuator num 5
+5.3 Build, run App3bar. Looks better!
+5.4 Fill in a line in App3bar.cpp.
+    - The name of the controller "class" is LengthController
+5.5 Build, run App3bar. Wait, we expected the structure to move? What's wrong?
+5.6 Type this line into App3bar.cpp:
+    myModel->attach(myController);
+5.7 Build, run App3bar. Hooray, the structure finally moves!
+
+6. Apps, Models, Controllers for NTRTsim using YAML
+

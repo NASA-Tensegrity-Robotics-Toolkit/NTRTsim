@@ -74,10 +74,11 @@ int main(int argc, char** argv)
     threeBarModel* const myModel = new threeBarModel();
     
     // Create the controller
-    LengthController* const lengthController = new LengthController();
+    // FILL IN 5.4 HERE
+    // FILL_IN* const myController = new FILL_IN();
 
     // Attach controller to the model
-    myModel->attach(lengthController);
+    // FILL IN 5.6 HERE
 
     // Add the model to the world
     simulation.addModel(myModel);

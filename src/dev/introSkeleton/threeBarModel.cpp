@@ -58,7 +58,7 @@ namespace
        0.2,     // density (mass / length^3)
        0.31,     // radius (length)
        1000.0,   // stiffness (mass / sec^2)
-       10.0,     // damping (mass / sec)
+       50.0,     // damping (mass / sec)
        400.0,     // pretension (mass * length / sec^2)
        10.0,     // triangle_length (length)
        10.0,     // triangle_height (length)
@@ -117,7 +117,8 @@ void threeBarModel::addActuators(tgStructure& s)
     // Top
     s.addPair(3, 4, tgString("actuator num", 3));
     s.addPair(4, 5, tgString("actuator num", 4));
-    s.addPair(5, 3, tgString("actuator num", 5));
+    // FILL IN LINE 5.2 HERE
+    //s.addPair(FILL_IN, FILL_IN, tgString("actuator num", FILL_IN));
 
     //Edges
     s.addPair(0, 3, tgString("actuator num", 6));
