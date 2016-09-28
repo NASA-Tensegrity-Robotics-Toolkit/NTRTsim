@@ -19,5 +19,6 @@ subdirs(
     ezhu
     mcdaly
 	bgigous
+    introSkeleton
 )
 
