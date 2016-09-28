@@ -17,10 +17,10 @@
 */
 
 /**
- * @file App3Bar.cpp
+ * @file App3BarTraditional.cpp
  * @brief Contains the definition function main() for the Three strut
- * tensegrity prism example application
- * @author Edward Zhu
+ * tensegrity prism example application (using traditional NTRT system).
+ * @author Edward Zhu, Drew Sabelhaus
  * $Id$
  */
 

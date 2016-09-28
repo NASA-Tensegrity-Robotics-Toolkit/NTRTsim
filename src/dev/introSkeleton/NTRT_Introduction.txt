@@ -23,7 +23,7 @@ Outline:
    - Controller (optional)
    - Other supporting files (such as CMakeLists)
 
-5. Apps, Models, Controllers for NTRTsim v1.0 - Creating Models in C++
+5. Apps, Models, Controllers for NTRTsim v1.0 (Traditional) - Creating Models in C++
 5.1 Run App3bar. What happens?
 5.2. Fill in a line in threeBarModel.cpp
      - The actuator should connect nodes 5 and 3, and be labelled actuator num 5
