@@ -67,9 +67,9 @@ public:
      */
     virtual void onStep(TensegrityModel& subject, double dt);
 
-    std::vector<tgBasicController*> m_controllers;
-    std::vector<double> rand_lengths;
-    std::vector<tgSpringCableActuator*> actuators;
+    std::vector<tgBasicController*> m_controllers; //instantiate vector of controllers
+    std::vector<double> rand_lengths; //instantiate vector of random restlengths
+    const std::vector<tgBasicActuator*> actuators
     
 private:
 	

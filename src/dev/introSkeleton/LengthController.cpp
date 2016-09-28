@@ -54,11 +54,37 @@ LengthController::~LengthController()
 {
 }	
 
-void LengthController::onSetup(TensegrityModel& subject)
+void LengthController::onSetup(3BarModel& subject)
 {
 
-  actuators = subject.getAllActuators();
+  m_controllers.clear(); //clear vector of controllers
+  rand_lengths.clear(); //vector of randomized restlengths
   
+  //set seeds
+  srand(time(NULL));
+  srand48(time(NULL));
+  
+  //get all of the tensegrity structure's cables
+  actuators = subject.getAllActuators();
+
+  //Attach a tgBasicController to each actuator
+  for (size_t i = 0; i < actuators.size(); ++i)
+    {
+      tgBasicActuator * const pActuator = actuators[i];
+      assert(pActuator != NULL);
+      //instantiate controllers for each cable
+      tgBasicController* m_lenController = new tgBasicController(pActuator, m_length);
+      //add controller to vector
+      m_controllers.push_back(m_lenController);
+      //generate random end restlength
+      double start_length = actuators[i]->getStartLength();
+      double rand_max = start_length*0.25; //maximum pos. deviation from start length
+      double rand_min = -start_length*0.35; //maximum neg. deviation from start length
+      double gen_len = drand48()*(rand_max-rand_min) + rand_min + start_length;
+      rand_lengths.push_back(gen_len);
+
+      m_controllers[i]->control(dt,rand_lengths[p]);
+    }
 }
 
 void LengthController::onStep(TensegrityModel& subject, double dt)
@@ -67,11 +93,15 @@ void LengthController::onStep(TensegrityModel& subject, double dt)
     throw std::invalid_argument("dt is not positive");
   }
   else {
-    for (int k = 0; k < (actuators.size()-1); k++) {
-      tgSpringCableActuator* const actuator = actuators[k];
-      assert(pMuscleA != NULL);
+    if(globalTime > 2){ //delay start of cable actuation
+      if(toggle==0){ //print once when motors start moving
+	cout << endl << "Activating Cable Motors (Randomized Lengths) -------------------------------------" << endl;
+	toggle = 1;
+      }
+      for(int i = 0; i<actuators.size(); i++){
+	actuators[i]->moveMotors(dt);
+      }
     }
-    std::cout << actuators[actuators.size()-1] -> getTension() << std::endl;
   }
 }
 
