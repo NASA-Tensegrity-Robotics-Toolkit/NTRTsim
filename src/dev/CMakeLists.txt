@@ -19,7 +19,6 @@ subdirs(
     ezhu
     mcdaly
     bgigous
-    introSkeleton
     # FILL IN FOR 4.1
 )
 

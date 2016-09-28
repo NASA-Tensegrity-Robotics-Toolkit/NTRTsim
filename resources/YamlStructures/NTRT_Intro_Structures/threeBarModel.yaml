@@ -23,7 +23,8 @@ pair_groups:
     - [top1, top3]
 
   vertical_string:
-    - [bottom1, top1]
+    # FILL IN FOR PART 6.4
+    #- [FILL_IN, FILL_IN]
     - [bottom2, top2]
     - [bottom3, top3]
 
@@ -38,10 +39,12 @@ builders:
     parameters:
       stiffness: 1000
       damping: 10
-      pretension: 3000
+      pretension: 1000
+      max_tension: 70000.0
   vertical_string:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1000
       damping: 10
-      pretension: 1000
+      pretension: 300
+      max_tension: 70000.0
