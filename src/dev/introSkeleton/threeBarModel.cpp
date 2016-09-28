@@ -49,7 +49,10 @@ namespace
         double pretension;
         double triangle_length;
         double triangle_height;
-        double prism_height;  
+        double prism_height;
+        bool hist;
+        double maxTension;
+        double targetVelocity;
     } c =
    {
        0.2,     // density (mass / length^3)
@@ -60,6 +63,9 @@ namespace
        10.0,     // triangle_length (length)
        10.0,     // triangle_height (length)
        20.0,     // prism_height (length)
+       0,           // history logging (boolean)
+       10000,       // max tension
+       1,         // target actuator velocity
   };
 } // namespace
 
@@ -124,7 +130,8 @@ void threeBarModel::setup(tgWorld& world)
     // Define the configurations of the rods and strings
     // Note that pretension is defined for this string
     const tgRod::Config rodConfig(c.radius, c.density);
-    const tgBasicActuator::Config actuatorConfig(c.stiffness, c.damping, c.pretension);
+    const tgBasicActuator::Config actuatorConfig(c.stiffness, c.damping, c.pretension,
+        c.hist, c.maxTension, c.targetVelocity);
     
     // Create a structure that will hold the details of this model
     tgStructure s;
