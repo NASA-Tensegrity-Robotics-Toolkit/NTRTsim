@@ -7,11 +7,18 @@ link_libraries(tgcreator
                 sensors
                 core    
                 terrain 
-                tgOpenGLSupport)
+                tgOpenGLSupport
+		yaml-cpp
+		TensegrityModel)
 
-add_executable(App3Bar
+add_executable(App3BarTraditional
     threeBarModel.cpp
     LengthController.cpp
-    App3Bar.cpp
+    App3BarTraditional.cpp
 ) 
 
+# UN-COMMENT these lines for 6.1
+#add_executable(App3BarYAML
+#    LengthControllerYAML.cpp
+#    App3BarYAML.cpp
+#) 
