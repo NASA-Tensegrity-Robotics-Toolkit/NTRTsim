@@ -34,6 +34,7 @@
 // Builder libraries
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
+#include "core/tgString.h"
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"

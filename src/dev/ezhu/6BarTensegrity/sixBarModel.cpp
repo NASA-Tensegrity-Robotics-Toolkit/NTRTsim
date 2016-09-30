@@ -259,11 +259,17 @@ void sixBarModel::setup(tgWorld& world)
 	structureInfo.buildInto(*this, world);
 
 	// Get the rod rigid bodies for controller
-	allRods = sixBarModel::find<tgRod>("rod");
+	std::vector<tgRod*> rods = sixBarModel::find<tgRod>("rod");
+	for (int i = 0; i < rods.size(); i++) {
+		allRods.push_back(sixBarModel::find<tgRod>(tgString("rod num", i))[0]);
+	}
 
 	// Get the actuators for controller
-	allActuators = sixBarModel::find<tgBasicActuator>("actuator");
-
+	std::vector<tgBasicActuator*> actuators = sixBarModel::find<tgBasicActuator>("actuator");
+	for (int i = 0; i < actuators.size(); i++) {
+		allActuators.push_back(sixBarModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
+	}
+	
 	// Get the payload for controller
 	payload = sixBarModel::find<tgRod>("payload");
 
@@ -358,12 +364,12 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 
 void sixBarModel::addSixBarRods(tgStructure& s)
 {
-	s.addPair(0, 1, "rod"); // 0
-	s.addPair(3, 2, "rod"); // 1
-	s.addPair(4, 5, "rod"); // 2
-	s.addPair(7, 6, "rod"); // 3
-	s.addPair(8, 11, "rod"); // 4
-	s.addPair(9, 10, "rod"); // 5
+	s.addPair(0, 1,  tgString("rod num", 0)); // 0
+	s.addPair(3, 2,  tgString("rod num", 1)); // 1
+	s.addPair(4, 5,  tgString("rod num", 2)); // 2
+	s.addPair(7, 6,  tgString("rod num", 3)); // 3
+	s.addPair(8, 11, tgString("rod num", 4)); // 4
+	s.addPair(9, 10, tgString("rod num", 5)); // 5
 }
 
 /*
@@ -397,37 +403,37 @@ void sixBarModel::addSixBarRods(tgStructure& s)
 
 void sixBarModel::addSixBarActuators(tgStructure& s)
 {
-	s.addPair(0, 4, "actuator"); // 0
-	s.addPair(0, 5, "actuator"); // 1
-	s.addPair(0, 8, "actuator"); // 2
-	s.addPair(0, 9, "actuator"); // 3
+	s.addPair(0, 4,  tgString("actuator num", 0)); // 0
+	s.addPair(0, 5,  tgString("actuator num", 1)); // 1
+	s.addPair(0, 8,  tgString("actuator num", 2)); // 2
+	s.addPair(0, 9,  tgString("actuator num", 3)); // 3
 
-	s.addPair(1, 6, "actuator"); // 4
-	s.addPair(1, 7, "actuator"); // 5
-	s.addPair(1, 8, "actuator"); // 6
-	s.addPair(1, 9, "actuator"); // 7
+	s.addPair(1, 6,  tgString("actuator num", 4)); // 4
+	s.addPair(1, 7,  tgString("actuator num", 5)); // 5
+	s.addPair(1, 8,  tgString("actuator num", 6)); // 6
+	s.addPair(1, 9,  tgString("actuator num", 7)); // 7
 
-	s.addPair(2, 6, "actuator"); // 8
-	s.addPair(2, 7, "actuator"); // 9
-	s.addPair(2, 10, "actuator"); // 10
-	s.addPair(2, 11, "actuator"); // 11
+	s.addPair(2, 6,  tgString("actuator num", 8)); // 8
+	s.addPair(2, 7,  tgString("actuator num", 9)); // 9
+	s.addPair(2, 10, tgString("actuator num", 10)); // 10
+	s.addPair(2, 11, tgString("actuator num", 11)); // 11
 
-	s.addPair(3, 4, "actuator"); // 12
-	s.addPair(3, 5, "actuator"); // 13
-	s.addPair(3, 10, "actuator"); // 14
-	s.addPair(3, 11, "actuator"); // 15
+	s.addPair(3, 4,  tgString("actuator num", 12)); // 12
+	s.addPair(3, 5,  tgString("actuator num", 13)); // 13
+	s.addPair(3, 10, tgString("actuator num", 14)); // 14
+	s.addPair(3, 11, tgString("actuator num", 15)); // 15
 
-	s.addPair(4, 8, "actuator"); // 16
-	s.addPair(4, 11, "actuator"); // 17
+	s.addPair(4, 8,  tgString("actuator num", 16)); // 16
+	s.addPair(4, 11, tgString("actuator num", 17)); // 17
 
-	s.addPair(5, 9, "actuator"); // 18
-	s.addPair(5, 10, "actuator"); // 19
+	s.addPair(5, 9,  tgString("actuator num", 18)); // 18
+	s.addPair(5, 10, tgString("actuator num", 19)); // 19
 
-	s.addPair(6, 9, "actuator"); // 20
-	s.addPair(6, 10, "actuator"); // 21
+	s.addPair(6, 9,  tgString("actuator num", 20)); // 20
+	s.addPair(6, 10, tgString("actuator num", 21)); // 21
 
-	s.addPair(7, 8, "actuator"); // 22
-	s.addPair(7, 11, "actuator"); // 23
+	s.addPair(7, 8,  tgString("actuator num", 22)); // 22
+	s.addPair(7, 11, tgString("actuator num", 23)); // 23
 }
 
 void sixBarModel::addPayloadNodes(tgStructure& s)
@@ -439,18 +445,18 @@ void sixBarModel::addPayloadNodes(tgStructure& s)
 
 void sixBarModel::addPayloadRods(tgStructure& s)
 {
-	s.addPair(12, 13, "payload");
+	s.addPair(12, 13, tgString("payload num", 0));
 }
 
 void sixBarModel::addPayloadStrings(tgStructure& s)
 {
-	s.addPair(0, 12, "cable");
-	s.addPair(4, 12, "cable");
-	s.addPair(8, 12, "cable");
+	s.addPair(0, 12,  tgString("cable num", 0));
+	s.addPair(4, 12,  tgString("cable num", 1));
+	s.addPair(8, 12,  tgString("cable num", 2));
 
-	s.addPair(6, 13, "cable");
-	s.addPair(10, 13, "cable");
-	s.addPair(2, 13, "cable");
+	s.addPair(6, 13,  tgString("cable num", 3));
+	s.addPair(10, 13, tgString("cable num", 4));
+	s.addPair(2, 13,  tgString("cable num", 5));
 }
 
 void sixBarModel::rotateToFace(tgStructure& s, int face)
