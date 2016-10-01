@@ -131,7 +131,7 @@ public:
 	 * @param[in] travelDir - Direction to travel in
 	 * @return The number of the face which is in alignment with the direction of travel
 	 */
-	int headingSurfaceDetection(btVector3& travelDir);
+	int headingSurfaceDetection(btVector3& travelDirection, int currFace);
 
 	/**
 	 * Find the shortest path using Dijkstra to get from the start node to the end node
@@ -159,6 +159,14 @@ public:
 	 * @return A boolean indicating whether or not the face is a closed triangle
 	 */
 	bool isClosedFace(int desFace);
+
+	/**
+	 * Function for determining whether or not two closed faces are adjacent
+	 * @param[in] currFace - Current face
+	 * @param[in] desFace - Face to check
+	 * @return A boolean indicating whether or not the two closed faces are adjacent
+	 */
+	bool isAdjacentFace(int currFace, int desFace);
 
 	/**
 	 * Function for setting all actuators in a vector to a certain length
@@ -224,6 +232,17 @@ private:
 
 	// Vector holding row information of adjacency matrix
 	std::vector< std::vector<int> > A;
+
+	std::vector<int> node0AdjClose;
+	std::vector<int> node2AdjClose;
+	std::vector<int> node5AdjClose;
+	std::vector<int> node7AdjClose;
+	std::vector<int> node8AdjClose;
+	std::vector<int> node10AdjClose;
+	std::vector<int> node13AdjClose;
+	std::vector<int> node15AdjClose;
+
+	std::vector< std::vector<int> > AClose;
 
 	// Debugging counter
 	int counter = 0;

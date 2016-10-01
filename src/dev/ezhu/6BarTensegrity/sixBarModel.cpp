@@ -222,8 +222,8 @@ void sixBarModel::setup(tgWorld& world)
 		config.rollFriction, config.restitution);
 	const tgRod::Config PayloadRodConfig(config.radius*4, config.density/16, config.friction,
 		config.rollFriction, config.restitution);
-	//const tgRod::Config motorConfig(config.radius*2, config.density, config.friction,
-	//	config.rollFriction, config.restitution);
+	const tgRod::Config motorConfig(config.radius*2, config.density, config.friction,
+		config.rollFriction, config.restitution);
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
@@ -232,6 +232,9 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Create a structure that will hold the details of this model
 	tgStructure s;
+
+	// Boolean for determining which model to create
+	motorModel = true;
 
 	// Add in the tensegrity structure
 	addSixBar(s);
@@ -252,7 +255,7 @@ void sixBarModel::setup(tgWorld& world)
 	spec.addBuilder("payload", new tgRodInfo(PayloadRodConfig));
 	spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
 	spec.addBuilder("cable", new tgBasicActuatorInfo(staticCableConfig));
-	//spec.addBuilder("motor", new tgRodInfo(motorConfig));
+	spec.addBuilder("motor", new tgRodInfo(motorConfig));
 
 	// Create the structureInfo
 	tgStructureInfo structureInfo(s, spec);
@@ -344,62 +347,57 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	s.addNode(config.rodLength/2, rodSpace/2, 0); // 10
 	s.addNode(config.rodLength/2, -rodSpace/2, 0); // 11
 
-	/*
-	s.addNode(-rodSpace/2, 0, config.motorLength/2); // 12
-	s.addNode(-rodSpace/2, 0, -config.motorLength/2); // 13
-	s.addNode(rodSpace/2, 0, -config.motorLength/2); //14
-	s.addNode(rodSpace/2, 0, config.motorLength/2); //15
 
-	s.addNode(0, -config.motorLength/2, rodSpace/2); // 16
-	s.addNode(0, config.motorLength/2, rodSpace/2); // 17
-	s.addNode(0, config.motorLength/2, -rodSpace/2); // 18
-	s.addNode(0, -config.motorLength/2, -rodSpace/2); // 19
+	// s.addNode(-rodSpace/2, 0, config.motorLength/2); // 12
+	// s.addNode(-rodSpace/2, 0, -config.motorLength/2); // 13
+	// s.addNode(rodSpace/2, 0, -config.motorLength/2); //14
+	// s.addNode(rodSpace/2, 0, config.motorLength/2); //15
 
-	s.addNode(-config.motorLength/2, -rodSpace/2, 0); // 20
-	s.addNode(-config.motorLength/2, rodSpace/2, 0); // 21
-	s.addNode(config.motorLength/2, rodSpace/2, 0); // 22
-	s.addNode(config.motorLength/2, -rodSpace/2, 0); // 23
-	*/
+	// s.addNode(0, -config.motorLength/2, rodSpace/2); // 16
+	// s.addNode(0, config.motorLength/2, rodSpace/2); // 17
+	// s.addNode(0, config.motorLength/2, -rodSpace/2); // 18
+	// s.addNode(0, -config.motorLength/2, -rodSpace/2); // 19
+
+	// s.addNode(-config.motorLength/2, -rodSpace/2, 0); // 20
+	// s.addNode(-config.motorLength/2, rodSpace/2, 0); // 21
+	// s.addNode(config.motorLength/2, rodSpace/2, 0); // 22
+	// s.addNode(config.motorLength/2, -rodSpace/2, 0); // 23
+
 }
 
 void sixBarModel::addSixBarRods(tgStructure& s)
 {
-	s.addPair(0, 1,  tgString("rod num", 0)); // 0
-	s.addPair(3, 2,  tgString("rod num", 1)); // 1
-	s.addPair(4, 5,  tgString("rod num", 2)); // 2
-	s.addPair(7, 6,  tgString("rod num", 3)); // 3
-	s.addPair(8, 11, tgString("rod num", 4)); // 4
-	s.addPair(9, 10, tgString("rod num", 5)); // 5
+		// s.addPair(0, 12,  tgString("rod num", 0));
+		// s.addPair(12, 13, tgString("motor num", 0));
+		// s.addPair(13, 1,  tgString("rod num", 1));
+
+		// s.addPair(3, 15,  tgString("rod num", 2));
+		// s.addPair(15, 14, tgString("motor num", 1));
+		// s.addPair(14, 2,  tgString("rod num", 3));
+
+		// s.addPair(4, 16,  tgString("rod num", 4));
+		// s.addPair(16, 17, tgString("motor num", 2));
+		// s.addPair(17, 5,  tgString("rod num", 5));
+
+		// s.addPair(7, 19,  tgString("rod num", 6));
+		// s.addPair(19, 18, tgString("motor num", 3));
+		// s.addPair(18, 6,  tgString("rod num", 7));
+
+		// s.addPair(8, 20,  tgString("rod num", 8));
+		// s.addPair(20, 23, tgString("motor num", 4));
+		// s.addPair(23, 11, tgString("rod num", 9));
+
+		// s.addPair(9, 21,  tgString("rod num", 10));
+		// s.addPair(21, 22, tgString("motor num", 5));
+		// s.addPair(22, 10, tgString("rod num", 11));
+
+		s.addPair(0, 1,  tgString("rod num", 0)); // 0
+		s.addPair(3, 2,  tgString("rod num", 1)); // 1
+		s.addPair(4, 5,  tgString("rod num", 2)); // 2
+		s.addPair(7, 6,  tgString("rod num", 3)); // 3
+		s.addPair(8, 11, tgString("rod num", 4)); // 4
+		s.addPair(9, 10, tgString("rod num", 5)); // 5
 }
-
-/*
-void sixBarModel::addSixBarRods(tgStructure& s)
-{
-	s.addPair(0, 12, "rod");
-	s.addPair(12, 13, "motor");
-	s.addPair(13, 1, "rod");
-
-	s.addPair(3, 15, "rod");
-	s.addPair(15, 14, "motor");
-	s.addPair(14, 2, "rod");
-
-	s.addPair(4, 16, "rod");
-	s.addPair(16, 17, "motor");
-	s.addPair(17, 5, "rod");
-
-	s.addPair(7, 19, "rod");
-	s.addPair(19, 18, "motor");
-	s.addPair(18, 6, "rod");
-
-	s.addPair(8, 20, "rod");
-	s.addPair(20, 23, "motor");
-	s.addPair(23, 11, "rod");
-
-	s.addPair(9, 21, "rod");
-	s.addPair(21, 22, "motor");
-	s.addPair(22, 10, "rod");
-}
-*/
 
 void sixBarModel::addSixBarActuators(tgStructure& s)
 {
@@ -439,17 +437,27 @@ void sixBarModel::addSixBarActuators(tgStructure& s)
 void sixBarModel::addPayloadNodes(tgStructure& s)
 {
 	double payloadLength = 3;
-	s.addNode(0, payloadLength/2, 0); // 12
-	s.addNode(0, -payloadLength/2, 0); //13
+	s.addNode(0, payloadLength/2, 0); // 12 or 24
+	s.addNode(0, -payloadLength/2, 0); //13 0r 25
 }
 
 void sixBarModel::addPayloadRods(tgStructure& s)
 {
+	// s.addPair(24, 25, tgString("payload num", 0));
+
 	s.addPair(12, 13, tgString("payload num", 0));
 }
 
 void sixBarModel::addPayloadStrings(tgStructure& s)
 {
+	// s.addPair(0, 24,  tgString("cable num", 0));
+	// s.addPair(4, 24,  tgString("cable num", 1));
+	// s.addPair(8, 24,  tgString("cable num", 2));
+
+	// s.addPair(6, 25,  tgString("cable num", 3));
+	// s.addPair(10, 25, tgString("cable num", 4));
+	// s.addPair(2, 25,  tgString("cable num", 5));
+
 	s.addPair(0, 12,  tgString("cable num", 0));
 	s.addPair(4, 12,  tgString("cable num", 1));
 	s.addPair(8, 12,  tgString("cable num", 2));

@@ -108,7 +108,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 			<< c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
 		controller_mode = 2;
 	}
-	else {
+	else if (c_mode.compare("path") == 0) {
 		std::cout << "onSetup: Path size is " << c_path_size << " elements" << std::endl;
 		std::cout << "onSetup: Path: [";
 		for (int i = 0; i < c_path_size-1; i++) {
@@ -116,6 +116,10 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		}
 		std::cout << *(c_path+c_path_size-1) << "]" << std::endl;
 		controller_mode = 3;
+	}
+	else {
+		std::cout << "onSetup: Controller mode not recognized, exiting..." << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	// Retrieve rods from model
@@ -199,6 +203,25 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		std::cout << "onSetup: Adjacency matrix not square, exiting..." << std::endl;
 		//exit(EXIT_FAILURE);
 	}
+
+	// Create matrix of adjacent closed faces
+	node0AdjClose  = boost::assign::list_of(2)(5)(13);
+	node2AdjClose  = boost::assign::list_of(0)(7)(15);
+	node5AdjClose  = boost::assign::list_of(0)(8)(7);
+	node7AdjClose  = boost::assign::list_of(2)(5)(10);
+	node8AdjClose  = boost::assign::list_of(5)(10)(13);
+	node10AdjClose  = boost::assign::list_of(7)(8)(15);
+	node13AdjClose  = boost::assign::list_of(0)(8)(15);
+	node15AdjClose  = boost::assign::list_of(2)(10)(13);
+
+	AClose.push_back(node0AdjClose);
+	AClose.push_back(node2AdjClose);
+	AClose.push_back(node5AdjClose);
+	AClose.push_back(node7AdjClose);
+	AClose.push_back(node8AdjClose);
+	AClose.push_back(node10AdjClose);
+	AClose.push_back(node13AdjClose);
+	AClose.push_back(node15AdjClose);
 
 	// Set up controllers for the cables
 	m_controllers.clear();
@@ -353,20 +376,30 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					resetCounter = 0;
 				}
 				else {
-					if (isOnGround && !drGoalReached) {
-						currPos = rodBodies[2]->getCenterOfMassPosition();
+					if (isOnGround && stepFin && !resetFlag) {
+						currSurface = contactSurfaceDetection();
+						currPos = payloadBody->getCenterOfMassPosition();
+						currPos.setY(0);
 						if (abs(currPos.x()-c_dr_goal.x())<5 && abs(currPos.z()-c_dr_goal.z())<5) {
 							std::cout << "onStep: Goal reached" << std::endl;
 							drGoalReached = true;
 						}
-						if (!reorient) {
-							travelDir = c_dr_goal - currPos;
+						if (!runPathGen && !drGoalReached) {
+							travelDir = (c_dr_goal - currPos).normalize();
 							std::cout << "onStep: Current position: " << currPos << std::endl;
+							std::cout << "onStep: Desired position: " << c_dr_goal << std::endl;
 							std::cout << "onStep: Travel direction: " << travelDir << std::endl;
-							reorient = true;
+							goalSurface = headingSurfaceDetection(travelDir, currSurface);
+							path = findPath(A, currSurface, goalSurface);
+							utility::printVector(path);
+							runPathGen = true;
 						}
-						goalSurface = headingSurfaceDetection(travelDir);
-
+						if (currSurface == goalSurface && !drGoalReached) {
+							runPathGen = false;
+						}
+					}
+					if (currSurface >= 0 && !drGoalReached) {
+						stepFin = stepToFace(currSurface, path[1], dt);
 					}
 				}
 				break;
@@ -388,7 +421,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 						runPathGen = true;
 						//std::cout << pathIdx << std::endl;
 						if (pathIdx == c_path_size) {
-							pathIdx = 1;
+							pathIdx = 0;
 							//goalReached = true;
 							//std::cout << "onStep: Destination reached" << std::endl;
 						}
@@ -461,27 +494,29 @@ int T6RollingController::contactSurfaceDetection()
 		std::cout << "contactSurfaceDetection: No surface found" << std::endl;
 	}
 
-	std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
+	// std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
 
 	return currSurface;
 }
 
-int T6RollingController::headingSurfaceDetection(btVector3& travelDir)
+int T6RollingController::headingSurfaceDetection(btVector3& travelDirection, int currFace)
 {
 	// Initialize variables
 	double dotProd;
 	double maxDotProd = 0;
 	int goalSurface = -1;
 
-	// Find the dot product between the gravity vector and each face
+	// Find the dot product between the heading vector and each face
 	// As all normal vectors point away from the center of the robot,
 	// The larger dot product indicates better alignment
 	for (size_t i = 0; i < normVects.size(); i++) {
-		dotProd = travelDir.dot(normVects[i]);
-		//std::cout << dotProd << std::endl;
-		if (dotProd > maxDotProd) {
-			maxDotProd = dotProd;
-			goalSurface = i;
+		if (isAdjacentFace(currFace, i)) {
+			dotProd = travelDirection.dot(normVects[i]);
+			//std::cout << dotProd << std::endl;
+			if (dotProd > maxDotProd) {
+				maxDotProd = dotProd;
+				goalSurface = i;
+			}
 		}
 	}
 
@@ -645,10 +680,10 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 			if (currFace != path[2]) {
 				m_controllers[cableToActuate]->control(dt, controlLength);
 				actuators[cableToActuate]->moveMotors(dt);
-				std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
+				// std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
 				stepFinished = false;
 				resetCounter++;
-				if (resetCounter > 3000) resetFlag = true;
+				if (resetCounter > 3.0/dt) resetFlag = true;
 			}
 			// If it has, return all cables to rest length
 			else resetFlag = true;
@@ -668,10 +703,10 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 			if (!isClosedFace(currFace)) {
 				m_controllers[cableToActuate]->control(dt, controlLength);
 				actuators[cableToActuate]->moveMotors(dt);
-				std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
+				// std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
 				stepFinished = false;
 				resetCounter++;
-				if (resetCounter > 3000) resetFlag = true;
+				if (resetCounter > 3.0/dt) resetFlag = true;
 			}
 			// If it has, return all cables to rest length
 			else resetFlag = true;
@@ -700,6 +735,17 @@ bool T6RollingController::isClosedFace(int desFace)
 	return isClosedFace;
 }
 
+bool T6RollingController::isAdjacentFace(int currFace, int desFace)
+{
+	bool isAdjacentFace = false;
+
+	if (find(AClose[currFace].begin(), AClose[currFace].end(), desFace) != AClose[currFace].end()) {
+		isAdjacentFace = true;
+	}
+
+	return isAdjacentFace;
+}
+
 bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& controllers, 
 										  std::vector<tgBasicActuator*>& actuators, 
 										  double setLength, double dt)
@@ -715,6 +761,6 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 			returnFin = false;
 		}
 	}
-	std::cout << "Resetting Cable Lengths " << std::endl;
+	// std::cout << "Resetting Cable Lengths " << std::endl;
 	return returnFin;
 }

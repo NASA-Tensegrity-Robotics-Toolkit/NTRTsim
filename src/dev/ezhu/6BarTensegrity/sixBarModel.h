@@ -270,6 +270,8 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 		btVector3 face17Norm;
 		btVector3 face18Norm;
 		btVector3 face19Norm;
+
+		bool motorModel;
 };
 
 #endif

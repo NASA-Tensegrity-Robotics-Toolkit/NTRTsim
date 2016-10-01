@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
-    const double pitch =10*PI/180;
+    const double pitch =0.0*PI/180;
     const double roll = 0.0;
 
     // [0, 0.1, 0] rad works
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.001; // seconds
+    const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -134,21 +134,20 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel();
 
     // Define path for controller
-    int *ptr;
+    int *pathPtr;
     int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
     int pathSize = sizeof(path)/sizeof(int);
-    ptr = path;
+    pathPtr = path;
 
     // Configure the controlller
-    //const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(10, 0, 10));
-    const T6RollingController::Config controllerConfig(gravity, "path", ptr, pathSize);
+    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, 50));
+    //const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
     T6RollingController* const rollingController = new T6RollingController(controllerConfig);
     
     // Attach controller to the model
-    //myModel->attach(tension_sensor);
     myModel->attach(rollingController);
 
     // Add the model to the world
