@@ -114,6 +114,13 @@ public:
 	btVector3 getRobotGravity();
 
 	/**
+	 * Calculate the direction vector in the robot frame
+	 * @param[in] dirVectWorld - The direction in world frame to be found in robot frame
+	 * @return The direction in the robot frame
+	 */
+	btVector3 getRobotDir(btVector3 dirVectWorld);
+
+	/**
 	 * Check to see if the robot is in contact with the ground
 	 * @return A boolean indicating whether or not the robot is on the ground
 	 */

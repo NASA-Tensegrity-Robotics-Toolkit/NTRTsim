@@ -140,8 +140,8 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, 50));
-    //const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
+    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, -50));
+    // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

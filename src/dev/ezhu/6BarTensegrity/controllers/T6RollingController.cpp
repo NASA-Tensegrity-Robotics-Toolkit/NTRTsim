@@ -380,7 +380,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 						currSurface = contactSurfaceDetection();
 						currPos = payloadBody->getCenterOfMassPosition();
 						currPos.setY(0);
-						if (abs(currPos.x()-c_dr_goal.x())<5 && abs(currPos.z()-c_dr_goal.z())<5) {
+						if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<10) {
 							std::cout << "onStep: Goal reached" << std::endl;
 							drGoalReached = true;
 						}
@@ -394,7 +394,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 							utility::printVector(path);
 							runPathGen = true;
 						}
-						if (currSurface == goalSurface && !drGoalReached) {
+						if (!drGoalReached) {
 							runPathGen = false;
 						}
 					}
@@ -460,9 +460,13 @@ bool T6RollingController::checkOnGround()
 {
 	bool onGround = false;
 	
-	btVector3 rodVel = rodBodies[2]->getLinearVelocity();
-	double rodSpeed = rodVel.norm();
-	if (abs(rodSpeed) < 0.001) onGround = true;
+	// btVector3 rodVel = rodBodies[2]->getLinearVelocity();
+	// double rodSpeed = rodVel.norm();
+	// if (abs(rodSpeed) < 0.001) onGround = true;
+
+	btVector3 payloadVel = payloadBody->getLinearVelocity();
+	double payloadSpeed = payloadVel.norm();
+	if (abs(payloadSpeed) < 0.001) onGround = true;
 
 	return onGround;
 }
@@ -499,19 +503,23 @@ int T6RollingController::contactSurfaceDetection()
 	return currSurface;
 }
 
-int T6RollingController::headingSurfaceDetection(btVector3& travelDirection, int currFace)
+int T6RollingController::headingSurfaceDetection(btVector3& travelDirWorld, int currFace)
 {
 	// Initialize variables
 	double dotProd;
 	double maxDotProd = 0;
 	int goalSurface = -1;
 
+	// Get the direction vector in robot frame
+	btVector3 travelDirRobot = getRobotDir(travelDirWorld);
+
 	// Find the dot product between the heading vector and each face
 	// As all normal vectors point away from the center of the robot,
 	// The larger dot product indicates better alignment
 	for (size_t i = 0; i < normVects.size(); i++) {
-		if (isAdjacentFace(currFace, i)) {
-			dotProd = travelDirection.dot(normVects[i]);
+		// if (isAdjacentFace(currFace, i)) {
+		if (isClosedFace(i)) {
+			dotProd = travelDirRobot.dot(normVects[i]);
 			//std::cout << dotProd << std::endl;
 			if (dotProd > maxDotProd) {
 				maxDotProd = dotProd;
@@ -541,6 +549,19 @@ btVector3 T6RollingController::getRobotGravity()
 	btVector3 gravVectRobot = worldToRobot * gravVectWorld;
 	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
 	return gravVectRobot;
+}
+
+btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld) 
+{
+	btTransform worldTrans = rodBodies[2]->getWorldTransform();
+	btMatrix3x3 robotToWorld = worldTrans.getBasis();
+	// The basis of getWorldTransform() returns the rotation matrix from robot frame
+	// to world frame. Invert this matrix to go from world to robot frame
+	btMatrix3x3 worldToRobot = robotToWorld.inverse();
+	// Transform the gravity vector from world frame to robot frame
+	btVector3 dirVectRobot = (worldToRobot * dirVectWorld).normalize();
+	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
+	return dirVectRobot;
 }
 
 std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 
