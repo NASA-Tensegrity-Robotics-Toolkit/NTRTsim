@@ -5,4 +5,5 @@ subdirs(
     WorldImportTest
     STLParser
     payload_thruster
+    DropComparison
     ) 
