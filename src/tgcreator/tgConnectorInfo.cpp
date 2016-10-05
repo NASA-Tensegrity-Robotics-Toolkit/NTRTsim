@@ -85,24 +85,75 @@ tgRigidInfo* tgConnectorInfo::chooseRigid(std::set<tgRigidInfo*> rigids, const b
     
     tgRigidInfo* chosenRigid;
     if (candidateRigids.size() == 1) {
-        // Choose the first element since there's only one
-        chosenRigid = *(candidateRigids.begin());  
-    } else {
-        // find the best candidate (if more than one rigid, use the rigid whose center of mass is closest to v. This seems like a reasonable approach...)
-        chosenRigid = findClosestCenterOfMass(candidateRigids, v);
+      // Choose the first element since there's only one
+      chosenRigid = *(candidateRigids.begin());  
+    }
+    else if (candidateRigids.size() > 1 ){
+      // find the best candidate (if more than one rigid, use the rigid whose center of mass is closest to v. This seems like a reasonable approach...)
+      // Note that this isn't well-defined behavior. The situation in which this
+      // would happen is if two rigids met at a point, and a connector was made
+      // between that point and somewhere else. Since the auto-compounder will
+      // combine those shapes automatically, it shouldn't technically matter
+      // which of those shapes the connector is attached to, but for other
+      // applications (such as placing tonnectors on the surfaces of rigid bodies
+      // instead of just at the nods in tgPair), it would be better to prioritize
+      // points inside the pair than just whatever is closest to the center of mass.
+      // Otherwise this may break in the situation where one rigid body is created
+      // next to another, and the connector is supposed to be from one body at a
+      // node, but ends up getting connected at the surface of the other rigid body.
+      //DEBUGGING:
+      if( 0 ) {
+	std::cout << std::endl << "WARNING: A connector is being created that has more than one potential connecting point. This behavior is not well defined. If your model does not behave as you expect, try moving these multiple rigid bodies apart by some distance, and having the connector attach to only one node." << std::endl
+		  << std::endl;
+      }
+      chosenRigid = findClosestCenterOfMass(candidateRigids, v);
+    }
+    else if (candidateRigids.size() == 0) {
+      //DEBUGGING:
+      std::cout << std::endl << "WARNING: A connector is being created without a connecting point on one end. This WILL cause the simulator to crash when its pointer to a tgRigidInfo is called, since no rigid body can be associated with this point, and so no tgRigidBody can be created." << std::endl << std::endl;
     }
 
     return chosenRigid;
 };
 
 btRigidBody* tgConnectorInfo::getToRigidBody() {
-    return getToRigidInfo()->getRigidInfoGroup()->getRigidBody();
-    //return m_toRigidBody;
+  // Check if the tgRigidInfo is set, if not, throw an exception.
+  if( getToRigidInfo() == NULL ){
+    std::cout << std::endl << "Error in tgConnectorInfo::getToRigidBody. "
+	      << "The toRigidInfo for tgConnector with pair "
+	      << getFrom() << ", " << getTo() << " has not been assigned yet, "
+	      << "but its getToRigidBody method is being called." << std::endl;
+    throw std::runtime_error("getToRigidInfo == NULL, cannot return rigid body.");
+  }
+  if( getToRigidInfo()->getRigidInfoGroup() == NULL ){
+    std::cout << std::endl << "Error in tgConnectorInfo::getToRigidBody. "
+	      << "The toRigidInfo for tgConnector with pair "
+	      << getFrom() << ", " << getTo() << " has been assigned, but does "
+	      << "not have a rigidInfoGroup from which to get a rigid body. "
+	      << std::endl;
+    throw std::runtime_error("getToRigidInfo()->getRigidInfoGroup() == NULL, cannot return rigid body.");
+  }
+  return getToRigidInfo()->getRigidInfoGroup()->getRigidBody();
 };
 
 btRigidBody* tgConnectorInfo::getFromRigidBody() {
-    //return m_fromRigidBody;
-    return getFromRigidInfo()->getRigidInfoGroup()->getRigidBody();
+  // Check if the tgRigidInfo is set, if not, throw an exception.
+  if( getFromRigidInfo() == NULL ){
+    std::cout << std::endl << "Error in tgConnectorInfo::getFromRigidBody. "
+	      << "The fromRigidInfo for tgConnector with pair "
+	      << getFrom() << ", " << getTo() << " has not been assigned yet, "
+	      << "but its getFromRigidBody method is being called." << std::endl;
+    throw std::runtime_error("getFromRigidInfo == NULL, cannot return rigid body.");
+  }
+  if( getFromRigidInfo()->getRigidInfoGroup() == NULL ){
+    std::cout << std::endl << "Error in tgConnectorInfo::getFromRigidBody. "
+	      << "The fromRigidInfo for tgConnector with pair "
+	      << getFrom() << ", " << getTo() << " has been assigned, but does "
+	      << "not have a rigidInfoGroup from which to get a rigid body. "
+	      << std::endl;
+    throw std::runtime_error("getFromRigidInfo()->getRigidInfoGroup() == NULL, cannot return rigid body.");
+  }
+  return getFromRigidInfo()->getRigidInfoGroup()->getRigidBody();
 };
 
 
