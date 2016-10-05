@@ -336,7 +336,7 @@ void SBModel::setup(tgWorld& world)
 
     rotateToFace(s, 2);
 
-    btVector3 offset (0, 10, 0);
+    btVector3 offset (0, 20, 0);
     s.move(offset);
 
     // Create the build spec that uses tags to turn the structure into a real model
@@ -369,6 +369,18 @@ void SBModel::setup(tgWorld& world)
         allActuators.push_back(SBModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
     }
 
+    // btRigidBody* capsuleBody0 = allCapsules[0]->getPRigidBody();
+    // abstractMarker NODE0  = abstractMarker(capsuleBody0,btVector3(0,-config.capsule_length,0),btVector3(0,0,1),0); // body, position, color, node number
+    // this->addMarker(NODE0);
+
+    // btRigidBody* capsuleBody10 = allCapsules[10]->getPRigidBody();
+    // abstractMarker NODE9  = abstractMarker(capsuleBody10,btVector3(0,-config.capsule_length,0),btVector3(0,1,0),1); // body, position, color, node number
+    // this->addMarker(NODE9);
+
+    // btRigidBody* capsuleBody5 = allCapsules[5]->getPRigidBody();
+    // abstractMarker NODE5  = abstractMarker(capsuleBody5,btVector3(0,-config.capsule_length,0),btVector3(1,0,0),2); // body, position, color, node number
+    // this->addMarker(NODE5);
+    
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
 

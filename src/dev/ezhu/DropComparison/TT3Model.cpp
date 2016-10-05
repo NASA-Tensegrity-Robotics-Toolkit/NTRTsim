@@ -80,20 +80,37 @@ namespace
         double targetVelocity;
     } config =
         {
+         // 688/pow(sf,3),     // density of rod (kg / length^3)
+         // 751/pow(sf,3),     // density of capsule (kg/ length^3)
+         // 0.0127/2*sf,       // radius (length) ** rod diameter / 2 **
+         // 0.056/2*sf,        // radius (length) ** capsule diameter / 2 **
+         // 200.0,             // stiffness (kg / sec^2) was 1500
+         // 20.0,              // damping (kg / sec)
+         // 0.66*sf,           // rod_length (length)
+         // 0.325*sf,          // rod_space (length)
+         // 0.19*sf,           // capsule_length (length)
+         // 0.99,              // friction (unitless)
+         // 0.01,              // rollFriction (unitless)
+         // 0.0,               // restitution (?)
+         // 17.5*sf,           // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
+         // 0,			        // History logging (boolean)
+         // 10000*sf,          // maxTens
+         // 0.25*sf,           // targetVelocity   
+
          688/pow(sf,3),     // density of rod (kg / length^3)
          751/pow(sf,3),     // density of capsule (kg/ length^3)
-         0.0127/2*sf,       // radius (length) ** rod diameter / 2 **
-         0.056/2*sf,        // radius (length) ** capsule diameter / 2 **
-         200.0,             // stiffness (kg / sec^2) was 1500
+         0.031*sf,       // radius (length) ** rod diameter / 2 **
+         0.08*sf, //0.137*sf,        // radius (length) ** capsule diameter / 2 **
+         1615.0,             // stiffness (kg / sec^2) was 1500
          20.0,              // damping (kg / sec)
-         0.66*sf,           // rod_length (length)
+         1.7*sf,            // rod_length (length)
          0.325*sf,          // rod_space (length)
-         0.19*sf,           // capsule_length (length)
+         0.48*sf,           // capsule_length (length)
          0.99,              // friction (unitless)
          0.01,              // rollFriction (unitless)
          0.0,               // restitution (?)
-         17.5*sf,           // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
-         0,			        // History logging (boolean)
+         300.0*sf,           // pretension -> scaled to 85.0 which is 10 times the actual scaling because gravity is 10 times higher
+         0,                 // History logging (boolean)
          10000*sf,          // maxTens
          0.25*sf,           // targetVelocity   
         };
@@ -336,7 +353,7 @@ void TT3Model::setup(tgWorld& world)
 
     rotateToFace(s, 2);
 
-    btVector3 offset (0, 10, 0);
+    btVector3 offset (0, 20, 0);
     s.move(offset);
 
     // Create the build spec that uses tags to turn the structure into a real model

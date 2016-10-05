@@ -29,11 +29,14 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "core/tgRod.h"
 #include "controllers/tgTensionController.h"
-#include "learning/Adapters/AnnealAdapter.h"
 #include "core/tgBasicActuator.h"
 // The C++ Standard Library
 #include <vector>
+#include <string>
+#include <fstream>
+#include <ostream>
 //Bullet Physics
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
@@ -51,7 +54,7 @@ class TT3TensionController : public tgObserver<TT3Model>
 {
 public:
 	
-    TT3TensionController(const double tension, double timestep, btVector3 goalTrajectory);
+    TT3TensionController();
     /**
      * Nothing to delete, destructor must be virtual
      */
@@ -71,22 +74,15 @@ public:
     
 private:
 	
-	/**
-	 * The tension setpoint that will be passed to the muscles. Set
-	 * in the constructor
-	 */
-    //const double m_tension;
-    double m_totalTime;
-    double m_initialLengths;
-    btVector3 initPos;
-    btVector3 trajectory;
-    //btVector3 goal;
+	btRigidBody* capsuleBody;
 
     std::vector<tgTensionController*> m_controllers;
 
-    btVector3 endEffectorCOM(TT3Model& subject);
-    
+    bool doLog = false;
 
+    std::ofstream data_out;
+    double simTime = 0;
+    
 };
 
 #endif // TT3_TENSION_CONTROLLER_H

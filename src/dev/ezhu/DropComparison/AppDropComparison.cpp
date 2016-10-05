@@ -84,11 +84,9 @@ int main(int argc, char** argv)
     SBModel* const myModel = new SBModel();
 
     // Fifth, select the controller to use, and attach it to the model.
-    // For example, you could run the following to use the TT3TensionController:
-    // btVector3 goalTrajectory = btVector3(0,0,0);
-    //TT3TensionController* const pTC = new TT3TensionController(10000, timestep_physics, goalTrajectory);
-    //SBTensionController* const pTC = new SBTensionController(10000, timestep_physics, goalTrajectory);
-    //myModel->attach(pTC);
+    //TT3TensionController* const pTC = new TT3TensionController();
+    SBTensionController* const pTC = new SBTensionController();
+    myModel->attach(pTC);
     
     // Finally, add out model to the simulation
     simulation.addModel(myModel);

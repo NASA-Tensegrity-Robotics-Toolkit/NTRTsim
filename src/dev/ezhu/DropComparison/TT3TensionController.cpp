@@ -28,25 +28,16 @@
 #include "TT3TensionController.h"
 // This application
 #include "TT3Model.h"
-// This library
-#include "core/tgBasicActuator.h"
-#include "controllers/tgTensionController.h"
-// The Bullet Physics library
-#include "LinearMath/btScalar.h"
-#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <cassert>
 #include <math.h>
-#include <vector>
 #include <stdexcept>
 
 using namespace std;
 
-TT3TensionController::TT3TensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
-		m_initialLengths(initialLength),
-		m_totalTime(0.0)
+TT3TensionController::TT3TensionController()
 {
-  this->initPos = btVector3(0,0,0);
+
 }
 
 TT3TensionController::~TT3TensionController()
@@ -61,10 +52,24 @@ TT3TensionController::~TT3TensionController()
 
 void TT3TensionController::onSetup(TT3Model& subject)
 {
+	doLog = true;
 
-   this->initPos=endEffectorCOM(subject);
-   this->m_totalTime = 0.0;
+	if (doLog) {
+		std::string filename = "SUPERball_drop_data.txt";
+		// Create filestream for data log and open it
+		data_out.open(filename.c_str(), std::fstream::out);
+		if (!data_out.is_open()) {
+			std::cout << "Failed to open output file" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		else {
+			data_out << "SimTime, XPos, YPos, ZPos, XVel, YVel, ZVel" << std::endl << std::endl;
+		}
+	}
 
+	std::vector<tgRod*> capsules = subject.getAllCapsules();
+	tgRod* capsuleRod = capsules[0];
+	capsuleBody = capsuleRod->getPRigidBody();
 }
 
 void TT3TensionController::onStep(TT3Model& subject, double dt)
@@ -73,19 +78,16 @@ void TT3TensionController::onStep(TT3Model& subject, double dt)
     {
         throw std::invalid_argument("dt is not positive");
     }
+    else {
+    	simTime += dt;
+    }
 
-    m_totalTime += dt;
-  
-    btVector3 ee = endEffectorCOM(subject);
-    std::cout << m_totalTime << " " << ee.getX() << " " << ee.getY() << " " << ee.getZ() << std::endl;
-
-
+    if (doLog) {
+    	btVector3 capsule_pos = capsuleBody->getCenterOfMassPosition();
+    	btVector3 capsule_vel = capsuleBody->getLinearVelocity();
+    	data_out << simTime << ", " << capsule_pos.x() << ", " 
+    		<< capsule_pos.y() << ", " << capsule_pos.z() << ", " 
+    		<< capsule_vel.x() << ", " << capsule_vel.y() << ", " 
+    		<< capsule_vel.z() << std::endl;
+    }
 }
-
-btVector3 TT3TensionController::endEffectorCOM(TT3Model& subject) {
-	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
-	assert(!endEffector.empty());
-	return endEffector[0]->centerOfMass();
-}
-
-

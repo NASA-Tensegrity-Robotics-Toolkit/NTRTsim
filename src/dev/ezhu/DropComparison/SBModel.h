@@ -29,6 +29,7 @@
 #include "core/tgModel.h"
 #include "core/tgSubject.h"
 #include "core/tgRod.h"
+#include "core/abstractMarker.h"
 // The C++ Standard Library
 #include <vector>
 
