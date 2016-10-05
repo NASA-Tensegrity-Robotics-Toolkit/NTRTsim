@@ -17,17 +17,17 @@
 */
 
 /**
- * @file Appv3Ball.cpp
- * @brief Contains the definition function main() for the v3Ball 
+ * @file AppDropComparison.cpp
+ * @brief Contains the definition function main() for the DropComparison 
  * application.
  * $Id$
  */
 
 // This application
-#include "v3Model.h"
-#include "v4Model.h"
-#include "v3TensionController.h"
-#include "v4TensionController.h"
+#include "TT3Model.h"
+#include "SBModel.h"
+#include "TT3TensionController.h"
+#include "SBTensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -48,7 +48,7 @@
  */
 int main(int argc, char** argv)
 {
-    //std::cout << "Appv3BallNew" << std::endl;
+    //std::cout << "AppDropComparison" << std::endl;
 
     // First create the ground and world
     
@@ -61,7 +61,10 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
+    double sf = 10;
+    double gravity = 9.81*sf;
+
+    const tgWorld::Config config(gravity); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've
         // scaled the world length scale to decimeters not cm.
 
@@ -77,20 +80,18 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    v3Model* const myModel = new v3Model();
-    // v4Model* const myModel = new v4Model();
+    // TT3Model* const myModel = new TT3Model();
+    SBModel* const myModel = new SBModel();
 
     // Fifth, select the controller to use, and attach it to the model.
-    // For example, you could run the following to use the v3TensionController:
-    btVector3 goalTrajectory = btVector3(0,0,0);
-    //v3TensionController* const pTC = new v3TensionController(10000, timestep_physics, goalTrajectory);
-    //v4TensionController* const pTC = new v4TensionController(10000, timestep_physics, goalTrajectory);
+    // For example, you could run the following to use the TT3TensionController:
+    // btVector3 goalTrajectory = btVector3(0,0,0);
+    //TT3TensionController* const pTC = new TT3TensionController(10000, timestep_physics, goalTrajectory);
+    //SBTensionController* const pTC = new SBTensionController(10000, timestep_physics, goalTrajectory);
     //myModel->attach(pTC);
-    //hisModel->attach(pTC);
-    // Finally, add out model to the simulation
-    //simulation.addModel(hisModel);
-    simulation.addModel(myModel);
     
+    // Finally, add out model to the simulation
+    simulation.addModel(myModel);
     
     // Run until the user stops
     simulation.run();

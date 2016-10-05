@@ -17,17 +17,17 @@
 */
 
 /**
- * @file v4TensionController.cpp
- * @brief Implementation of six strut tensegrity based from Berkeley's v4 Ball.
+ * @file TT3TensionController.cpp
+ * @brief Implementation of six strut tensegrity based from Berkeley's TT3 Ball.
  * @author Erik Jung
  * @version 1.1.0
  * $Id$
  */
 
 // This module
-#include "v4TensionController.h"
+#include "TT3TensionController.h"
 // This application
-#include "v4Model.h"
+#include "TT3Model.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "controllers/tgTensionController.h"
@@ -42,14 +42,14 @@
 
 using namespace std;
 
-v4TensionController::v4TensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
+TT3TensionController::TT3TensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
 		m_initialLengths(initialLength),
 		m_totalTime(0.0)
 {
   this->initPos = btVector3(0,0,0);
 }
 
-v4TensionController::~v4TensionController()
+TT3TensionController::~TT3TensionController()
 {
 	std::size_t n = m_controllers.size();
 	for(std::size_t i = 0; i < n; i++)
@@ -59,7 +59,7 @@ v4TensionController::~v4TensionController()
 	m_controllers.clear();
 }
 
-void v4TensionController::onSetup(v4Model& subject)
+void TT3TensionController::onSetup(TT3Model& subject)
 {
 
    this->initPos=endEffectorCOM(subject);
@@ -67,7 +67,7 @@ void v4TensionController::onSetup(v4Model& subject)
 
 }
 
-void v4TensionController::onStep(v4Model& subject, double dt)
+void TT3TensionController::onStep(TT3Model& subject, double dt)
 {
 	if (dt <= 0.0)
     {
@@ -82,7 +82,7 @@ void v4TensionController::onStep(v4Model& subject, double dt)
 
 }
 
-btVector3 v4TensionController::endEffectorCOM(v4Model& subject) {
+btVector3 TT3TensionController::endEffectorCOM(TT3Model& subject) {
 	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
 	assert(!endEffector.empty());
 	return endEffector[0]->centerOfMass();

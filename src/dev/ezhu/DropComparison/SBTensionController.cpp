@@ -17,17 +17,17 @@
 */
 
 /**
- * @file v3TensionController.cpp
- * @brief Implementation of six strut tensegrity based from Berkeley's v3 Ball.
+ * @file SBTensionController.cpp
+ * @brief Implementation of six strut tensegrity based from Berkeley's SB Ball.
  * @author Erik Jung
  * @version 1.1.0
  * $Id$
  */
 
 // This module
-#include "v3TensionController.h"
+#include "SBTensionController.h"
 // This application
-#include "v3Model.h"
+#include "SBModel.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "controllers/tgTensionController.h"
@@ -42,14 +42,14 @@
 
 using namespace std;
 
-v3TensionController::v3TensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
+SBTensionController::SBTensionController(const double initialLength, double timestep, btVector3 goalTrajectory) :
 		m_initialLengths(initialLength),
 		m_totalTime(0.0)
 {
   this->initPos = btVector3(0,0,0);
 }
 
-v3TensionController::~v3TensionController()
+SBTensionController::~SBTensionController()
 {
 	std::size_t n = m_controllers.size();
 	for(std::size_t i = 0; i < n; i++)
@@ -59,7 +59,7 @@ v3TensionController::~v3TensionController()
 	m_controllers.clear();
 }
 
-void v3TensionController::onSetup(v3Model& subject)
+void SBTensionController::onSetup(SBModel& subject)
 {
 
    this->initPos=endEffectorCOM(subject);
@@ -67,7 +67,7 @@ void v3TensionController::onSetup(v3Model& subject)
 
 }
 
-void v3TensionController::onStep(v3Model& subject, double dt)
+void SBTensionController::onStep(SBModel& subject, double dt)
 {
 	if (dt <= 0.0)
     {
@@ -82,7 +82,7 @@ void v3TensionController::onStep(v3Model& subject, double dt)
 
 }
 
-btVector3 v3TensionController::endEffectorCOM(v3Model& subject) {
+btVector3 SBTensionController::endEffectorCOM(SBModel& subject) {
 	const std::vector<tgRod*> endEffector = subject.find<tgRod>("endeffector");
 	assert(!endEffector.empty());
 	return endEffector[0]->centerOfMass();

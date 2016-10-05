@@ -1,9 +1,9 @@
 link_libraries(tgcreator controllers core)
 
 add_executable(AppDropComparison
-    v3Model.cpp
-    v4Model.cpp
+    TT3Model.cpp
+    SBModel.cpp
     AppDropComparison.cpp
-    v3TensionController.cpp
-    v4TensionController.cpp
+    TT3TensionController.cpp
+    SBTensionController.cpp
 ) 

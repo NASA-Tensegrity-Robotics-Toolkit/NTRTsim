@@ -16,12 +16,12 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef v3_TENSION_CONTROLLER_H
-#define v3_TENSION_CONTROLLER_H
+#ifndef SB_TENSION_CONTROLLER_H
+#define SB_TENSION_CONTROLLER_H
 
 /**
- * @file v6TensionController.h
- * @brief Contains the definition of class v3TensionController.
+ * @file SBTensionController.h
+ * @brief Contains the definition of class SBTensionController.
  * @author Erik Jung
  * @version 1.0.0
  * $Id$
@@ -41,33 +41,33 @@
 using namespace std;
 
 // Forward declarations
-class v3Model;
+class SBModel;
 
 /**
- * A controller to apply uniform tension to a v3Model. Iterates through
+ * A controller to apply uniform tension to a SBModel. Iterates through
  * all tgLinearString members and calls tensionMinLengthController
  */
-class v3TensionController : public tgObserver<v3Model>
+class SBTensionController : public tgObserver<SBModel>
 {
 public:
 	
-    v3TensionController(const double tension, double timestep, btVector3 goalTrajectory);
+    SBTensionController(const double tension, double timestep, btVector3 goalTrajectory);
     /**
      * Nothing to delete, destructor must be virtual
      */
-    virtual ~v3TensionController();
+    virtual ~SBTensionController();
     
-    virtual void onSetup(v3Model& subject);
+    virtual void onSetup(SBModel& subject);
     
     /**
      * Apply the tension controller. Called my notifyStep(dt) of its
      * subject. The tgLinearStrings will update using
      * their tensionMinLengthController each step
-     * @param[in] subject - the v3Model that is being controlled. Must
+     * @param[in] subject - the SBModel that is being controlled. Must
      * have a list of allMuscles populated
      * @param[in] dt, current timestep must be positive
      */
-    virtual void onStep(v3Model& subject, double dt);
+    virtual void onStep(SBModel& subject, double dt);
     
 private:
 	
@@ -84,9 +84,9 @@ private:
 
     std::vector<tgTensionController*> m_controllers;
 
-    btVector3 endEffectorCOM(v3Model& subject);
+    btVector3 endEffectorCOM(SBModel& subject);
     
 
 };
 
-#endif // v3_TENSION_CONTROLLER_H
+#endif // SB_TENSION_CONTROLLER_H

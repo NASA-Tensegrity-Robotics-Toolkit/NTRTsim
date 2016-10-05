@@ -107,25 +107,25 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	     * Return a vector of all muscles for the controllers to work with.
 	     * @return A vector of all of the muscles
 	     */
-	    std::vector<tgBasicActuator*>& getAllActuators();
+	    const std::vector<tgBasicActuator*>& getAllActuators() const;
 
 	    /**
 	     * Return a vector of all rod bodies for the controllers to work with.
 	     * @return A vector of all of the rod rigid bodies
 	     */
-	    std::vector<tgRod*>& getAllRods();
+	    const std::vector<tgRod*>& getAllRods() const;
 
 	    /**
 	     * Return a vector of the payload body for the controllers to work with.
 	     * @return A vector of the payload rigid body
 	     */
-	    std::vector<tgRod*>& getPayload();
+	    const std::vector<tgRod*>& getPayload() const;
 
 	    /**
 	     * Return a vector of all normal vectors for the controllers to work with.
 	     * @return A vector of all of the normal vectors
 	     */
-	    std::vector<btVector3>& getNormVects();
+	    const std::vector<btVector3>& getNormVects() const;
 
 	    /**
 	     * A function called during setup that rotates the structure

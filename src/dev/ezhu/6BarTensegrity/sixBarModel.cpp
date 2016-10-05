@@ -233,9 +233,6 @@ void sixBarModel::setup(tgWorld& world)
 	// Create a structure that will hold the details of this model
 	tgStructure s;
 
-	// Boolean for determining which model to create
-	motorModel = true;
-
 	// Add in the tensegrity structure
 	addSixBar(s);
 
@@ -285,8 +282,13 @@ void sixBarModel::setup(tgWorld& world)
 
 void sixBarModel::step(double dt)
 {
+	if (dt <= 0.0) {
+		throw std::invalid_argument("dt is not positive");
+	}
+	else {
 	notifyStep(dt);
 	tgModel::step(dt);
+	}
 }
 
 void sixBarModel::onVisit(tgModelVisitor& r)
@@ -294,22 +296,22 @@ void sixBarModel::onVisit(tgModelVisitor& r)
 	tgModel::onVisit(r);
 }
 
-std::vector<tgBasicActuator*>& sixBarModel::getAllActuators()
+const std::vector<tgBasicActuator*>& sixBarModel::getAllActuators() const
 {
 	return allActuators;
 }
 
-std::vector<tgRod*>& sixBarModel::getAllRods()
+const std::vector<tgRod*>& sixBarModel::getAllRods() const 
 {
 	return allRods;
 }
 
-std::vector<tgRod*>& sixBarModel::getPayload()
+const std::vector<tgRod*>& sixBarModel::getPayload() const 
 {
 	return payload;
 }
 
-std::vector<btVector3>& sixBarModel::getNormVects()
+const std::vector<btVector3>& sixBarModel::getNormVects() const 
 {
 	return normalVectors;
 }
@@ -367,36 +369,36 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 
 void sixBarModel::addSixBarRods(tgStructure& s)
 {
-		// s.addPair(0, 12,  tgString("rod num", 0));
-		// s.addPair(12, 13, tgString("motor num", 0));
-		// s.addPair(13, 1,  tgString("rod num", 1));
+	// s.addPair(0, 12,  tgString("rod num", 0));
+	// s.addPair(12, 13, tgString("motor num", 0));
+	// s.addPair(13, 1,  tgString("rod num", 1));
 
-		// s.addPair(3, 15,  tgString("rod num", 2));
-		// s.addPair(15, 14, tgString("motor num", 1));
-		// s.addPair(14, 2,  tgString("rod num", 3));
+	// s.addPair(3, 15,  tgString("rod num", 2));
+	// s.addPair(15, 14, tgString("motor num", 1));
+	// s.addPair(14, 2,  tgString("rod num", 3));
 
-		// s.addPair(4, 16,  tgString("rod num", 4));
-		// s.addPair(16, 17, tgString("motor num", 2));
-		// s.addPair(17, 5,  tgString("rod num", 5));
+	// s.addPair(4, 16,  tgString("rod num", 4));
+	// s.addPair(16, 17, tgString("motor num", 2));
+	// s.addPair(17, 5,  tgString("rod num", 5));
 
-		// s.addPair(7, 19,  tgString("rod num", 6));
-		// s.addPair(19, 18, tgString("motor num", 3));
-		// s.addPair(18, 6,  tgString("rod num", 7));
+	// s.addPair(7, 19,  tgString("rod num", 6));
+	// s.addPair(19, 18, tgString("motor num", 3));
+	// s.addPair(18, 6,  tgString("rod num", 7));
 
-		// s.addPair(8, 20,  tgString("rod num", 8));
-		// s.addPair(20, 23, tgString("motor num", 4));
-		// s.addPair(23, 11, tgString("rod num", 9));
+	// s.addPair(8, 20,  tgString("rod num", 8));
+	// s.addPair(20, 23, tgString("motor num", 4));
+	// s.addPair(23, 11, tgString("rod num", 9));
 
-		// s.addPair(9, 21,  tgString("rod num", 10));
-		// s.addPair(21, 22, tgString("motor num", 5));
-		// s.addPair(22, 10, tgString("rod num", 11));
+	// s.addPair(9, 21,  tgString("rod num", 10));
+	// s.addPair(21, 22, tgString("motor num", 5));
+	// s.addPair(22, 10, tgString("rod num", 11));
 
-		s.addPair(0, 1,  tgString("rod num", 0)); // 0
-		s.addPair(3, 2,  tgString("rod num", 1)); // 1
-		s.addPair(4, 5,  tgString("rod num", 2)); // 2
-		s.addPair(7, 6,  tgString("rod num", 3)); // 3
-		s.addPair(8, 11, tgString("rod num", 4)); // 4
-		s.addPair(9, 10, tgString("rod num", 5)); // 5
+	s.addPair(0, 1,  tgString("rod num", 0)); // 0
+	s.addPair(3, 2,  tgString("rod num", 1)); // 1
+	s.addPair(4, 5,  tgString("rod num", 2)); // 2
+	s.addPair(7, 6,  tgString("rod num", 3)); // 3
+	s.addPair(8, 11, tgString("rod num", 4)); // 4
+	s.addPair(9, 10, tgString("rod num", 5)); // 5
 }
 
 void sixBarModel::addSixBarActuators(tgStructure& s)
