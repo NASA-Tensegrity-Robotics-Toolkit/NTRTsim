@@ -51,7 +51,7 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, in
 
   if (m_mode.compare("face") != 0) {
     std::cout << "Config: invalid arguments" << std::endl;
-    std::cout << "Usage: first arg is a string for mode ('face' or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+    std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
     std::cout << "Exiting..." << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -63,7 +63,19 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, bt
   assert(m_gravity >= 0);
   if (mode.compare("dr") != 0) {
     std::cout << "Config: invalid arguments" << std::endl;
-    std::cout << "Usage: first arg is a string for mode ('face' or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+    std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+    std::cout << "Exiting..." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+T6RollingController::Config::Config (double gravity, const std::string& mode, int *path, int pathSize) :
+  m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize)
+{
+  assert(m_gravity >= 0);
+  if (mode.compare("path") != 0) {
+    std::cout << "Config: invalid arguments" << std::endl;
+    std::cout << "Usage: first arg is a string for mode ('face', 'path', or 'dr'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
     std::cout << "Exiting..." << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -96,10 +108,19 @@ void T6RollingController::onSetup(PrismModel& subject)
       exit(EXIT_FAILURE);
     }
   }
-  else {
-    std::cout << "onSetup: Dead reckoning direction: [" << c_dr_goal.x() << ", " 
+  else if (c_mode.compare("dr") == 0) {
+    std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", " 
 	      << c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
     controller_mode = 2;
+  }
+  else {
+    std::cout << "onSetup: Path size is " << c_path_size << " elements" << std::endl;
+    std::cout << "onSetup: Path: [";
+    for (int i = 0; i < c_path_size-1; i++) {
+      std::cout << *(c_path+i) << ", ";
+    }
+    std::cout << *(c_path+c_path_size-1) << "]" << std::endl;
+    controller_mode = 3;
   }
 
   // Retrieve rods from model
@@ -237,7 +258,6 @@ void T6RollingController::onSetup(PrismModel& subject)
   // Set up controllers for the cables
   m_controllers.clear();
   actuators = subject.getAllActuators();	
-  restLength = actuators[0]->getRestLength();
   //std::cout << "onSetup: Number of actuators: " << actuators.size() << std::endl;
   for (size_t i = 0; i < actuators.size(); i++) {
     tgBasicActuator* const pActuator = actuators[i];
@@ -246,6 +266,10 @@ void T6RollingController::onSetup(PrismModel& subject)
     m_controllers.push_back(m_lenController);
     //std::cout << "onSetup: Cable " << i << ": " << pActuator->getCurrentLength() << std::endl;
   }
+
+  // Find the rest length and start length of the cables
+  restLength = actuators[0]->getRestLength();
+  startLength = actuators[0]->getStartLength();
 
   // Actuation policy table (With policy for open faces)
   // 		 	   Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19   // rows:
@@ -308,27 +332,27 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	{
 	  
 	  if(resetFlag==true){
-	    resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
-	    resetFlag = !resetFlag;
+	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	    //resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
+	    //resetFlag = !resetFlag;
 	    resetCounter = 0;
 	  }
 	  else{
-	    if (isOnGround == true && runPathGen == false && stepFin == true && resetFlag == false) {
+	    if (isOnGround && !runPathGen && stepFin && !resetFlag) {
 	      currSurface = contactSurfaceDetection();
-	      std::cout << "1st Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	      runPathGen = true;
 	      if (currSurface == c_face_goal) {
 		std::cout << "onStep: Destination face reached" << std::endl;
 		goalReached = true;
 		//if(completeReset){
-		  subject.changeRobotState(2);
-		  isOnGround = true;
-		  runPathGen = false;
-		  stepFin = true;
-		  resetFlag = false;
-		  goalReached = false;
-		  std::cout << "Switching to Thrust Control" << std::endl;
-		  //}
+		subject.changeRobotState(2);
+		isOnGround = true;
+		runPathGen = false;
+		stepFin = true;
+		resetFlag = false;
+		goalReached = false;
+		std::cout << "Switching to Thrust Control" << std::endl;
+		//}
 	      }
 	      if (currSurface >= 0 && goalReached == false) {
 		path = findPath(A, currSurface, c_face_goal);
@@ -337,14 +361,12 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	      }
 	    }
 	    else if (isOnGround == false && runPathGen == true) {
-	      std::cout << "2nd Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	      runPathGen = false;
 	    }
 	    if (currSurface >= 0 && goalReached == false) {
-	      std::cout << "3rd Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	      stepFin = stepToFace(currSurface, path[1], dt);
 	      replanCounter++;
-	      if(replanCounter > 3000){
+	      if(replanCounter > 3/dt){
 		runPathGen = false;
 		stepFin = true;
 		resetFlag = true;
@@ -352,8 +374,6 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 		
 	      
 	    }
-	    else
-	      std::cout << "4th Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	  }
 
 
@@ -361,37 +381,37 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	    if(goalReached == true)
 	    setAllActuators(m_controllers, actuators, restLength, dt);
 	  
-	  if (isOnGround == true && runPathGen == false && stepFin == true && resetFlag == false) {
+	    if (isOnGround == true && runPathGen == false && stepFin == true && resetFlag == false) {
 	    currSurface = contactSurfaceDetection();
 	    speedCounter = 0;
 	    std::cout << "1st Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	    if (currSurface == c_face_goal) {
-	      std::cout << "onStep: Destination face reached" << std::endl;
-	      goalReached = true;
-	      bool completeReset = false;
-	      completeReset = setAllActuators(m_controllers, actuators, restLength, dt);
-	      if(completeReset){
-		subject.changeRobotState(2);
-		std::cout << "Switching to Thrust Control" << std::endl;
-	      }
+	    std::cout << "onStep: Destination face reached" << std::endl;
+	    goalReached = true;
+	    bool completeReset = false;
+	    completeReset = setAllActuators(m_controllers, actuators, restLength, dt);
+	    if(completeReset){
+	    subject.changeRobotState(2);
+	    std::cout << "Switching to Thrust Control" << std::endl;
+	    }
 	    }
 	    if (currSurface >= 0 && goalReached == false) {
-	      path = findPath(A, currSurface, c_face_goal);
-	      utility::printVector(path);
+	    path = findPath(A, currSurface, c_face_goal);
+	    utility::printVector(path);
 	    }
 	    runPathGen = true;
-	  }
-	  else if (isOnGround == false && runPathGen == true) {
+	    }
+	    else if (isOnGround == false && runPathGen == true) {
 	    std::cout << "2nd Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	    runPathGen = false;
-	  }
-	  if (currSurface >= 0 && goalReached == false) {
+	    }
+	    if (currSurface >= 0 && goalReached == false) {
 	    std::cout << "3rd Check~~~~~~~~~~~~~~~~~~" << std::endl;
 	    stepFin = stepToFace(currSurface, path[1], dt);
-	  }
-	  else
+	    }
+	    else
 	    std::cout << "4th Check~~~~~~~~~~~~~~~~~~" << std::endl;
-*/
+	  */
 
 	
 
@@ -402,15 +422,76 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	    actuators[cable]->moveMotors(dt);
 	  */
 	  
-	    std::cout << "Robot Ready: " << robotReady << ", isOnGround: " << isOnGround << ", Run Path Gen: " << runPathGen << ", stepFin: " << stepFin << std::endl;
-	    std::cout << "RestLength: " << restLength << std::endl;
-	    std::cout << "Current RL: " << actuators[0]->getRestLength() << std::endl;
+	  std::cout << "Robot Ready: " << robotReady << ", isOnGround: " << isOnGround << ", Run Path Gen: " << runPathGen << ", stepFin: " << stepFin << std::endl;
+	  std::cout << "RestLength: " << restLength << std::endl;
+	  std::cout << "Current RL: " << actuators[0]->getRestLength() << std::endl;
 	  
 	  break;
 	}
       case 2:
 	{
 	  // Code for dead reckoning mode
+	  if (resetFlag) {
+	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	    resetCounter = 0;
+	  }
+	  else {
+	    if (isOnGround && !drGoalReached) {
+	      currPos = rodBodies[2]->getCenterOfMassPosition();
+	      if (abs(currPos.x()-c_dr_goal.x())<5 && abs(currPos.z()-c_dr_goal.z())<5) {
+		std::cout << "onStep: Goal reached" << std::endl;
+		drGoalReached = true;
+	      }
+	      if (!reorient) {
+		travelDir = c_dr_goal - currPos;
+		std::cout << "onStep: Current position: " << currPos << std::endl;
+		std::cout << "onStep: Travel direction: " << travelDir << std::endl;
+		reorient = true;
+	      }
+	      goalSurface = headingSurfaceDetection(travelDir);
+
+	    }
+	  }
+	  break;
+	}
+      case 3:
+	{
+	  // Code for path mode
+	  if (resetFlag) {
+	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	    currentFace = contactSurfaceDetection();
+	    resetCounter = 0;
+	  }
+	  else {
+	    if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+	      if (stepIdx == 13) {
+		//exit(EXIT_SUCCESS);
+	      }
+	      currSurface = contactSurfaceDetection();
+	      runPathGen = true;
+	      //std::cout << pathIdx << std::endl;
+	      if (pathIdx == c_path_size) {
+		pathIdx = 1;
+		//goalReached = true;
+		//std::cout << "onStep: Destination reached" << std::endl;
+	      }
+	      if (currSurface >= 0 && !goalReached) {
+		//std::cout << currSurface << ", " << pathIdx << ", " << *(c_path+pathIdx) << std::endl;
+		path = findPath(A, currSurface, *(c_path+pathIdx));
+		pathIdx++;
+		stepIdx++;
+		utility::printVector(path);
+	      }
+	      runPathGen = true;
+	    }
+	    else if (!isOnGround && runPathGen) {
+	      runPathGen = false;
+	    }
+
+	    if (currSurface >= 0 && !goalReached) {
+	      stepFin = stepToFace(currSurface, path[1], dt);
+	    }
+	  }
 	  break;
 	}
       }
@@ -461,6 +542,35 @@ int T6RollingController::contactSurfaceDetection()
   std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
 
   return currSurface;
+}
+
+int T6RollingController::headingSurfaceDetection(btVector3& travelDir)
+{
+  // Initialize variables
+  double dotProd;
+  double maxDotProd = 0;
+  int goalSurface = -1;
+
+  // Find the dot product between the gravity vector and each face
+  // As all normal vectors point away from the center of the robot,
+  // The larger dot product indicates better alignment
+  for (size_t i = 0; i < normVects.size(); i++) {
+    dotProd = travelDir.dot(normVects[i]);
+    //std::cout << dotProd << std::endl;
+    if (dotProd > maxDotProd) {
+      maxDotProd = dotProd;
+      goalSurface = i;
+    }
+  }
+
+  // Catch all error state
+  if (goalSurface == -1) {
+    std::cout << "headingSurfaceDetection: No surface found" << std::endl;
+  }
+
+  std::cout << "headingSurfaceDetection: Goal surface: " << goalSurface << std::endl;
+
+  return goalSurface;
 }
 
 btVector3 T6RollingController::getRobotGravity() 
@@ -593,69 +703,12 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 }
 
 bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
-{/*
-   bool stepFinished;
-   int cableToActuate = actuationPolicy[startFace][endFace];
-   int currFace = contactSurfaceDetection();
-   std::cout << "Counter: " << counter << std::endl;
-   if (cableToActuate >= 0) {
-   if (counter > 5000) {
-   std::cout << "check" << std::endl;
-   bool isFinished = true;
-   for(int i=0;i<actuators.size();i++){
-   m_controllers[i]->control(dt, restLength);
-   actuators[i]->moveMotors(dt);
-   if(abs(actuators[i]->getRestLength()-restLength) > 0.1)
-   isFinished = false;
-   }
-   std::cout << "stepToFace: Returning to rest length..." << std::endl;
-   stepFinished = false;
-   //std::cout << actuators[cableToActuate]->getCurrentLength() << ", " << restLength << std::endl;
-   if (isFinished) {
-   std::cout << "stepToFace: Step finished" << std::endl;
-   stepFinished = true;
-   counter = 0;
-   }
-   }
-	  
-   else if (currFace != path[2]) {
-   counter = counter + 1;
-   m_controllers[cableToActuate]->control(dt, 0.5);
-   std::cout << "stepToFace: Stepping..." << std::endl;
-   stepFinished = false;
-   actuators[cableToActuate]->moveMotors(dt);
-   }
-   else if (currFace == path[2]) {
-   for(int i=0;i<actuators.size();i++){
-   m_controllers[i]->control(dt, restLength);
-   actuators[i]->moveMotors(dt);
-   }
-   std::cout << "stepToFace: Returning to rest length..." << std::endl;
-   stepFinished = true;
-   //std::cout << actuators[cableToActuate]->getCurrentLength() << ", " << restLength << std::endl;
-   if (actuators[cableToActuate]->getRestLength()-restLength > 0.1) {
-   std::cout << "stepToFace: Step Not finished" << std::endl;
-   stepFinished = false;
-   counter = 0;
-   }
-   }
-	  
-   }
-   else {
-   std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-   exit(EXIT_FAILURE);
-   }
-   return stepFinished;
- */
-  // Initialize flags
-
-  
+{
+  // Initialize flags 
   bool stepFinished = true;
-  //bool isOnPath = false;
+  bool isOnPath = false;
   // Length for cables to retract to
   double controlLength = 0.1*sf;
-  // Find current face
-  //int currFace = contactSurfaceDetection();
 
   //if (isOnPath) {
   // Get which cable to actuate from actuation policy table
@@ -673,23 +726,15 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 	std::cout << "Closed - stepToFace: Stepping..." << std::endl;
 	stepFinished = false;
 	resetCounter++;
-	if(resetCounter>3000)
+	if(resetCounter>3/dt)
 	  resetFlag = true;
       }
       // If it has, return all cables to rest length
       else {
 	resetFlag = true;
-	//std::cout << "stepToFace: Returning to rest length..." << std::endl;
-	//stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
       }
     }
     // Triggers if element called from actuation policy table is -1
-    /*
-    if(resetFlag == true){
-      resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
-      resetFlag = !resetFlag;
-    }
-    */
     else {
       std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
       //exit(EXIT_FAILURE);
@@ -706,22 +751,15 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
 	std::cout << "Open - stepToFace: Stepping to closed face" << std::endl;
 	stepFinished = false;
 	resetCounter++;
-	if(resetCounter>3000)
+	if(resetCounter>3000/dt)
 	  resetFlag = true;
       }
       // If it has, return all cables to rest length
       else {
 	resetFlag = true;
 	std::cout << "stepToFace: Returning to rest length..." << std::endl;
-	//stepFinished = setAllActuators(m_controllers, actuators, restLength, dt);
       }
     }
-    /*
-    if(resetFlag == true){
-      resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
-      resetFlag = !resetFlag;
-    }
-    */
     // Triggers if element called from actuation policy table is -1
     else {
       std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;

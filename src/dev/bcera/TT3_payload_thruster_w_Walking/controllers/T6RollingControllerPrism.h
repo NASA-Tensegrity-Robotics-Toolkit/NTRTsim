@@ -121,6 +121,13 @@ public:
 	int contactSurfaceDetection();
 
 	/**
+	 * Detect which surface of the robot is in alignment with the direction of travel
+	 * @param[in] travelDir - Direction to travel in
+	 * @return The number of the face which is in alignment with the direction of travel
+	 */
+	int headingSurfaceDetection(btVector3& travelDir);
+	
+	/**
 	 * Find the shortest path using Dijkstra to get from the start node to the end node
 	 * @param[in] adjMat - The adjacency matrix of the robot where each face is representated as a node
 	 * @param[in] startNode - The starting node
@@ -138,7 +145,6 @@ public:
 						 double setLength, double dt);
 
 	int resetCounter = 0;
-
 	bool resetFlag = false;
 
 private:
@@ -186,13 +192,9 @@ private:
 	// Vector holding row information of adjacency matrix
 	std::vector< std::vector<int> > A;
 
-	bool runPathGen = false;
 
 	// Debugging counter
 	double replanCounter = 0;
-
-	// Ready flag
-	bool robotReady = false;
 
 	// Vectors to hold actuators and rods
 	std::vector<tgBasicActuator*> actuators;
@@ -232,10 +234,22 @@ private:
 
 	// Hold current surface from contact surface detection
 	int currSurface = -1;
+	int goalSurface = -1;
 
+	//Initialize Flags
+	bool runPathGen = false;	
+	bool robotReady = false;
 	bool stepFin = true;
-
 	bool goalReached = false;
+	bool reorient = false;
+	bool drGoalReached = false;
+	bool isOnGround;
+	int pathIdx = 1;
+	int stepIdx = 0;
+	
+	// Direction to travel
+	btVector3 travelDir;
+	btVector3 currPos;
 };
 
 #endif
