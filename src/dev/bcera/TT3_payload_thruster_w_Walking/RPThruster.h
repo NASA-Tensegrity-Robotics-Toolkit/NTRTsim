@@ -49,11 +49,12 @@ public:
 	
   /**
    * Construct a RPThruster.
-   * @param[in] thrust, specifies magnitude of thrust to be applied.
+   * @param[in] activate - case number for robot state for which this controller is active.
+   * @param[in] transfer - case number for robot state which this controller leads to when finished
    */
   
   // Note that currently this is calibrated for decimeters.
-  RPThruster(const int thrust = 0);
+  RPThruster(int activate, int transfer, int transfer2, btVector3 targetLocation);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -78,11 +79,6 @@ public:
   double generateGaussianNoise(double mu, double sigma);
   
 private:
-	
-  /**
-   * The thrust to be applied. Set in the constructor.
-   */
-  const int m_thrust;
 
   int jetnumber;
   
@@ -99,6 +95,10 @@ private:
   btVector3 goalVector;
   btScalar robotSpeed = 0;
 
+  int activate_flag;
+  int transfer_flag;
+  int transfer_flag_2;
+  
   std::ofstream sim_out;
 
   //btRigidBody* tankRigidBody;

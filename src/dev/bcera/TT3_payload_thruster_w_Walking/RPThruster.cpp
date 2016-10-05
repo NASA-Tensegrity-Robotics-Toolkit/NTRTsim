@@ -56,10 +56,10 @@ namespace
   double initiateThrustTime = 1; // wait time until thrust initiation
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
-  double thrustPeriod = 3.5; // duration of thrust on
+  double thrustPeriod = 2.5; // duration of thrust on
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
-  const btVector3 targetLocation = btVector3(70*sf, 0, -70*sf); // target is located 1000m away in +X direction	
+  btVector3 targetLocation = btVector3(70*sf, 0, -70*sf); // target is located 1000m away in +X direction	
   bool doneHopping = false; // end hopping when this is true
   int numberOfHops = 0; // count the number of hops the robot made in this simulation	
   std::ofstream simlog; // log file for thruster related variables
@@ -85,9 +85,12 @@ namespace
   btRigidBody* thrusterRigidBody; // payload body
 }
 
-RPThruster::RPThruster(const int thrust) :
-  m_thrust(thrust) 
+RPThruster::RPThruster(int activate, int transfer, int transfer_2, btVector3 destination) 
 {
+  activate_flag = activate;
+  transfer_flag = transfer;
+  transfer_flag_2 = transfer_2;
+  targetLocation = destination;
   if (thrust < 0)
     {
       throw std::invalid_argument("Negative thrust not allowed!");
@@ -147,6 +150,7 @@ void RPThruster::onSetup(PrismModel& subject)
 
 void RPThruster::onStep(PrismModel& subject, double dt)
 {
+  std::cout << "Thruster Controller Active" << std::endl;
   //Stop gimbal motion when thruster controller is inactive
   subject.altitudeHinge->enableAngularMotor(true,0,1);
   subject.yawHinge->enableAngularMotor(true,0,1);
@@ -154,7 +158,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
     {
       throw std::invalid_argument("dt is not positive");
     }
-  else if(subject.robotState==2)
+  else if(subject.robotState==activate_flag)
     {
       //Thruster Orientation=============================================================================================
 
@@ -170,7 +174,11 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    positionAcquired = true;
 	  }
 	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<0.1){
-	    subject.changeRobotState(1);
+	    btVector3 diff = tankRigidBody->getCenterOfMassPosition() - targetLocation;
+	    if(diff.norm() < 1000)
+	      subject.changeRobotState(transfer_flag);
+	    else
+	      subject.changeRobotState(transfer_flag_2);
 	    worldTime = -dt; //dt added at end of onStep
 	    timePassed = -dt;	
 	    shootTime = -dt;

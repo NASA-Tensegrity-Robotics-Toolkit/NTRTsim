@@ -40,6 +40,7 @@
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+#include "core/tgString.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 #include "core/tgWorldBulletPhysicsImpl.h"

@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
-*/
+ */
 
 #ifndef T6_ROLLING_CONTROLLER_PRISM_H
 #define T6_ROLLING_CONTROLLER_PRISM_H
@@ -52,204 +52,246 @@ class PrismModel;
 
 class T6RollingController : public tgObserver<PrismModel>
 {
-public:
-	/**
-	  * Configuration structure for setting the mode and goal of the rolling
-	  * controller
-	  */
-	struct Config
-	{
-	public:
-		// Overloaded Config function for two controller modes
-		Config (double gravity, const std::string& mode, int face_goal);
-		Config (double gravity, const std::string& mode, btVector3 dr_goal);
+ public:
+  /**
+   * Configuration structure for setting the mode and goal of the rolling
+   * controller
+   */
+  struct Config
+  {
+  public:
+    // Overloaded Config function for two controller modes
+    Config (double gravity, const std::string& mode, int face_goal, int activate_flag, int transfer_flag);
+    Config (double gravity, const std::string& mode, btVector3 dr_goal, int activate_flag, int transfer_flag);
+    Config (double gravity, const std::string& mode, int *path, int pathSize, int activate_flag, int transfer_flag);
 
-		double m_gravity;
+    double m_gravity;
 
-		// Use "face" for rolling to a goal triangle, use "dr" for dead reckoning
-		std::string m_mode;
+    // Use "face" for rolling to a goal triangle, use "dr" for dead reckoning
+    std::string m_mode;
 
-		// Goal face to roll to, must be between 0 and 7 for the 8 closed triangles
-		int m_face_goal;
+    // Goal face to roll to, must be between 0 and 7 for the 8 closed triangles
+    int m_face_goal;
 
-		// Goal direction to roll towards, specified as an [x,y,z] vector, height (y)
-		// is ignored
-		btVector3 m_dr_goal;
-	};
+    // Goal direction to roll towards, specified as an [x,y,z] vector, height (y)
+    // is ignored
+    btVector3 m_dr_goal;
 
-	/**
-	 * Constructor, allows a user to specify their own config
-	 */
-	T6RollingController(const T6RollingController::Config& config);
+    int *m_path;
+    int m_path_size;
 
-	/**
-	 * Destructor
-	 */
-	virtual ~T6RollingController();
+    //case switches
+    int m_activate_flag;
+    int m_transfer_flag;
+  };
 
-	/**
-	 * Select controller mode based on configuration. Define the normal vectors for 
-	 * all icosahedron faces as well as the adjacency matrix.
-	 * @param[in] subject - the model that the controller attaches to
-	 */
-	virtual void onSetup(PrismModel& subject);
+  /**
+   * Constructor, allows a user to specify their own config
+   */
+  T6RollingController(const T6RollingController::Config& config);
 
-	/**
-	 * Run the controller.
-	 * @param[in] subject - the model that the controller attaches to
-	 * @param[in] dt - the physics time step from the app file
-	 */
-	virtual void onStep(PrismModel& subject, double dt);
+  /**
+   * Destructor
+   */
+  virtual ~T6RollingController();
 
-	/**
-	 * Calculate the gravity vector in the robot frame
-	 * @return The direction of gravity in the robot frame
-	 */
-	btVector3 getRobotGravity();
+  /**
+   * Select controller mode based on configuration. Define the normal vectors for 
+   * all icosahedron faces as well as the adjacency matrix.
+   * @param[in] subject - the model that the controller attaches to
+   */
+  virtual void onSetup(PrismModel& subject);
 
-	/**
-	 * Check to see if the robot is in contact with the ground
-	 * @return A boolean indicating whether or not the robot is on the ground
-	 */
-	bool checkOnGround();
+  /**
+   * Run the controller.
+   * @param[in] subject - the model that the controller attaches to
+   * @param[in] dt - the physics time step from the app file
+   */
+  virtual void onStep(PrismModel& subject, double dt);
 
-	/**
-	 * Detect which surface of the robot is in contact with the ground
-	 * ToDo: test and improve for any arbitrary ground orientation
-	 * @return The number of the face which is in contact with the ground
-	 */
-	int contactSurfaceDetection();
+  /**
+   * Calculate the gravity vector in the robot frame
+   * @return The direction of gravity in the robot frame
+   */
+  btVector3 getRobotGravity();
 
-	/**
-	 * Detect which surface of the robot is in alignment with the direction of travel
-	 * @param[in] travelDir - Direction to travel in
-	 * @return The number of the face which is in alignment with the direction of travel
-	 */
-	int headingSurfaceDetection(btVector3& travelDir);
+  /**
+   * Calculate the direction vector in the robot frame
+   * @param[in] dirVectWorld - The direction in world frame to be found in robot frame
+   * @return The direction in the robot frame
+   */
+  btVector3 getRobotDir(btVector3 dirVectWorld);
 	
-	/**
-	 * Find the shortest path using Dijkstra to get from the start node to the end node
-	 * @param[in] adjMat - The adjacency matrix of the robot where each face is representated as a node
-	 * @param[in] startNode - The starting node
-	 * @param[in] endNode - The destination node
-	 * @return A vector containing the sequence of steps to get from the start node to end node
-	 */
-	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode);
+  /**
+   * Check to see if the robot is in contact with the ground
+   * @return A boolean indicating whether or not the robot is on the ground
+   */
+  bool checkOnGround();
 
-	bool stepToFace(int currFace, int desFace, double dt);
+  /**
+   * Detect which surface of the robot is in contact with the ground
+   * ToDo: test and improve for any arbitrary ground orientation
+   * @return The number of the face which is in contact with the ground
+   */
+  int contactSurfaceDetection();
 
-	bool isClosedFace(int desFace);
-
-	bool setAllActuators(std::vector<tgBasicController*>& controllers, 
-						 std::vector<tgBasicActuator*>& actuators, 
-						 double setLength, double dt);
-
-	int resetCounter = 0;
-	bool resetFlag = false;
-
-private:
-	// Store the configuration data for use later
-	Config m_config;
-	std::string c_mode;
-	int c_face_goal;
-	btVector3 c_dr_goal;
-	int controller_mode;
-
-	// Vector of rigid body objects
-	std::vector<btRigidBody*> rodBodies;
-
-	// A vector to hold all normal vectors
-	std::vector<btVector3> normVects;
-
-	// Gravity vectors
-	btVector3 gravVectWorld;
-
-	// Vector to hold path found using Dijkstra's
-	std::vector<int> path;
-
-	// Rows of adjacency matrix
-	std::vector<int> node0Adj;
-	std::vector<int> node1Adj;
-	std::vector<int> node2Adj;
-	std::vector<int> node3Adj;
-	std::vector<int> node4Adj;
-	std::vector<int> node5Adj;
-	std::vector<int> node6Adj;
-	std::vector<int> node7Adj;
-	std::vector<int> node8Adj;
-	std::vector<int> node9Adj;
-	std::vector<int> node10Adj;
-	std::vector<int> node11Adj;
-	std::vector<int> node12Adj;
-	std::vector<int> node13Adj;
-	std::vector<int> node14Adj;
-	std::vector<int> node15Adj;
-	std::vector<int> node16Adj;
-	std::vector<int> node17Adj;
-	std::vector<int> node18Adj;
-	std::vector<int> node19Adj;
-
-	// Vector holding row information of adjacency matrix
-	std::vector< std::vector<int> > A;
-
-
-	// Debugging counter
-	double replanCounter = 0;
-
-	// Vectors to hold actuators and rods
-	std::vector<tgBasicActuator*> actuators;
-	std::vector<tgRod*> rods;
-	std::vector<btRigidBody*> tank;
-
-	// Vector to hold controllers for the cables
-	std::vector<tgBasicController*> m_controllers;
+  /**
+   * Detect which surface of the robot is in alignment with the direction of travel
+   * @param[in] travelDir - Direction to travel in
+   * @return The number of the face which is in alignment with the direction of travel
+   */
+  int headingSurfaceDetection(btVector3& travelDirection, int currFace);
 	
-	// Rest length of cables
-	double restLength;
+  /**
+   * Find the shortest path using Dijkstra to get from the start node to the end node
+   * @param[in] adjMat - The adjacency matrix of the robot where each face is representated as a node
+   * @param[in] startNode - The starting node
+   * @param[in] endNode - The destination node
+   * @return A vector containing the sequence of steps to get from the start node to end node
+   */
+  std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode);
 
-	// Rows of actuation policy matrix
-	std::vector<int> node0AP;
-	std::vector<int> node1AP;
-	std::vector<int> node2AP;
-	std::vector<int> node3AP;
-	std::vector<int> node4AP;
-	std::vector<int> node5AP;
-	std::vector<int> node6AP;
-	std::vector<int> node7AP;
-	std::vector<int> node8AP;
-	std::vector<int> node9AP;
-	std::vector<int> node10AP;
-	std::vector<int> node11AP;
-	std::vector<int> node12AP;
-	std::vector<int> node13AP;
-	std::vector<int> node14AP;
-	std::vector<int> node15AP;
-	std::vector<int> node16AP;
-	std::vector<int> node17AP;
-	std::vector<int> node18AP;
-	std::vector<int> node19AP;
+  /**
+   * Perform actuation to move robot to desired face
+   * @param[in] currFace - The face that the robot is on when this function is called
+   * @param[in] desFace - Desired face to travel to
+   * @param[in] dt - Time step
+   * @return A boolean indicating whether or not the step has been completed
+   */
+  bool stepToFace(int currFace, int desFace, double dt);
 
-	// Actuation policy table
-	std::vector< std::vector<int> > actuationPolicy;
+  /**
+   * Function for determining whether or not a certain face is a closed triangle on the
+   * robot
+   * @param[in] desFace - Face to check
+   * @return A boolean indicating whether or not the face is a closed triangle
+   */
+  bool isClosedFace(int desFace);
 
-	// Hold current surface from contact surface detection
-	int currSurface = -1;
-	int goalSurface = -1;
+  /**
+   * Function for determining whether or not two closed faces are adjacent
+   * @param[in] currFace - Current face
+   * @param[in] desFace - Face to check
+   * @return A boolean indicating whether or not the two closed faces are adjacent
+   */
+  bool isAdjacentFace(int currFace, int desFace);
 
-	//Initialize Flags
-	bool runPathGen = false;	
-	bool robotReady = false;
-	bool stepFin = true;
-	bool goalReached = false;
-	bool reorient = false;
-	bool drGoalReached = false;
-	bool isOnGround;
-	int pathIdx = 1;
-	int stepIdx = 0;
+  bool setAllActuators(std::vector<tgBasicController*>& controllers, 
+		       std::vector<tgBasicActuator*>& actuators, 
+		       double setLength, double dt);
+
+  int resetCounter = 0;
+  bool resetFlag = false;
+
+ private:
+  // Store the configuration data for use later
+  Config m_config;
+  std::string c_mode;
+  int c_face_goal;
+  btVector3 c_dr_goal;
+  int *c_path;
+  int c_path_size;
+  int controller_mode;
+  int c_activate_flag;
+  int c_transfer_flag;
+
+  // Vector of rigid body objects
+  std::vector<btRigidBody*> rodBodies;
+
+  // A vector to hold all normal vectors
+  std::vector<btVector3> normVects;
+
+  // Gravity vectors
+  btVector3 gravVectWorld;
+
+  // Vector to hold path found using Dijkstra's
+  std::vector<int> path;
+
+  // Rows of adjacency matrix
+  std::vector<int> node0Adj;
+  std::vector<int> node1Adj;
+  std::vector<int> node2Adj;
+  std::vector<int> node3Adj;
+  std::vector<int> node4Adj;
+  std::vector<int> node5Adj;
+  std::vector<int> node6Adj;
+  std::vector<int> node7Adj;
+  std::vector<int> node8Adj;
+  std::vector<int> node9Adj;
+  std::vector<int> node10Adj;
+  std::vector<int> node11Adj;
+  std::vector<int> node12Adj;
+  std::vector<int> node13Adj;
+  std::vector<int> node14Adj;
+  std::vector<int> node15Adj;
+  std::vector<int> node16Adj;
+  std::vector<int> node17Adj;
+  std::vector<int> node18Adj;
+  std::vector<int> node19Adj;
+
+  // Vector holding row information of adjacency matrix
+  std::vector< std::vector<int> > A;
+
+
+  // Debugging counter
+  double replanCounter = 0;
+
+  // Vectors to hold actuators and rods
+  std::vector<tgBasicActuator*> actuators;
+  std::vector<tgRod*> rods;
+  std::vector<btRigidBody*> tank;
+
+  // Vector to hold controllers for the cables
+  std::vector<tgBasicController*> m_controllers;
 	
-	// Direction to travel
-	btVector3 travelDir;
-	btVector3 currPos;
+  // Rest length and start length of cables
+  double restLength;
+  double startLength;
+
+  // Rows of actuation policy matrix
+  std::vector<int> node0AP;
+  std::vector<int> node1AP;
+  std::vector<int> node2AP;
+  std::vector<int> node3AP;
+  std::vector<int> node4AP;
+  std::vector<int> node5AP;
+  std::vector<int> node6AP;
+  std::vector<int> node7AP;
+  std::vector<int> node8AP;
+  std::vector<int> node9AP;
+  std::vector<int> node10AP;
+  std::vector<int> node11AP;
+  std::vector<int> node12AP;
+  std::vector<int> node13AP;
+  std::vector<int> node14AP;
+  std::vector<int> node15AP;
+  std::vector<int> node16AP;
+  std::vector<int> node17AP;
+  std::vector<int> node18AP;
+  std::vector<int> node19AP;
+
+  // Actuation policy table
+  std::vector< std::vector<int> > actuationPolicy;
+
+  // Hold current surface from contact surface detection
+  int currSurface = -1;
+  int goalSurface = -1;
+
+  //Initialize Flags
+  bool runPathGen = false;	
+  bool robotReady = false;
+  bool stepFin = true;
+  bool goalReached = false;
+  bool reorient = false;
+  bool drGoalReached = false;
+  bool isOnGround;
+  int pathIdx = 1;
+  int stepIdx = 0;
+	
+  // Direction to travel
+  btVector3 travelDir;
+  btVector3 currPos;
+
 };
 
 #endif

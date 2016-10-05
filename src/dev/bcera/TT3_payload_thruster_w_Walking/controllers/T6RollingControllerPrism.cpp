@@ -43,8 +43,8 @@ namespace{
   double worldTime = 0;
 }
 
-T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal) : 
-  m_gravity(gravity), m_mode(mode), m_face_goal(face_goal)
+T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, int activate_flag, int transfer_flag) : 
+  m_gravity(gravity), m_mode(mode), m_face_goal(face_goal), m_activate_flag(activate_flag), m_transfer_flag(transfer_flag)
 {
   assert(m_gravity >= 0);
   assert((m_face_goal >= 0) && (m_face_goal <= 19));
@@ -57,8 +57,8 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, in
   }
 }
 
-T6RollingController::Config::Config (double gravity, const std::string& mode, btVector3 dr_goal) :
-  m_gravity(gravity), m_mode(mode), m_dr_goal(dr_goal)
+T6RollingController::Config::Config (double gravity, const std::string& mode, btVector3 dr_goal, int activate_flag, int transfer_flag) :
+  m_gravity(gravity), m_mode(mode), m_dr_goal(dr_goal), m_activate_flag(activate_flag), m_transfer_flag(transfer_flag)
 {
   assert(m_gravity >= 0);
   if (mode.compare("dr") != 0) {
@@ -69,8 +69,8 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, bt
   }
 }
 
-T6RollingController::Config::Config (double gravity, const std::string& mode, int *path, int pathSize) :
-  m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize)
+T6RollingController::Config::Config (double gravity, const std::string& mode, int *path, int pathSize, int activate_flag, int transfer_flag) :
+  m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize), m_activate_flag(activate_flag), m_transfer_flag(transfer_flag)
 {
   assert(m_gravity >= 0);
   if (mode.compare("path") != 0) {
@@ -86,6 +86,8 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
   c_mode = config.m_mode;
   c_face_goal = config.m_face_goal;
   c_dr_goal = config.m_dr_goal;
+  c_activate_flag = config.m_activate_flag;
+  c_transfer_flag = config.m_transfer_flag;
 
   gravVectWorld.setX(0.0);
   gravVectWorld.setY(-config.m_gravity);
@@ -272,27 +274,27 @@ void T6RollingController::onSetup(PrismModel& subject)
   startLength = actuators[0]->getStartLength();
 
   // Actuation policy table (With policy for open faces)
-  // 		 	   Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19   // rows:
+  // 						 Columns:  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  // rows:
   node0AP  = boost::assign::list_of(-1)( 0)(-1)(-1)(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 2)(-1)(-1)(-1); // 0
-  node1AP  = boost::assign::list_of( 0)(-1)( 1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
+  node1AP  = boost::assign::list_of( 2)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 1
   node2AP  = boost::assign::list_of(-1)( 1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 3)(-1)(-1); // 2
-  node3AP  = boost::assign::list_of(-1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
-  node4AP  = boost::assign::list_of(16)(-1)(-1)(-1)(-1)(17)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
+  node3AP  = boost::assign::list_of(-1)(-1)( 1)(-1)(-1)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 3
+  node4AP  = boost::assign::list_of( 0)(-1)(-1)(-1)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 4
   node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
-  node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(12)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
+  node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)( 9)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
   node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
   node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
-  node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)( 8)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
+  node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(11)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
   node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
-  node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(21)(-1)(-1)(-1)(-1)(20)(-1)(-1)(-1)(-1); // 11
-  node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(23)(-1)(-1)(-1)(-1)(22)(-1)(-1)(-1)(-1)(-1)(-1); // 12
+  node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(-1)(-1)(-1)( 4)(-1)(-1)(-1)(-1); // 11
+  node12AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(-1)(-1)( 5)(-1)(-1)(-1)(-1)(-1)(-1); // 12
   node13AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)( 5)(-1)( 6)(-1)(-1)(-1); // 13
-  node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 5)(-1)( 4)(-1)(-1)(-1)(-1); // 14
+  node14AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 6)(-1)( 7)(-1)(-1)(-1)(-1); // 14
   node15AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)( 4)(-1)(-1)( 7)(-1)(-1); // 15
-  node16AP = boost::assign::list_of( 2)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 6)(-1)(-1)(-1)(-1)(-1)(-1); // 16
-  node17AP = boost::assign::list_of(-1)(-1)( 3)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 7)(-1)(-1)(-1)(-1); // 17
-  node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
-  node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)(-1)(11)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
+  node16AP = boost::assign::list_of(16)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(22)(-1)(-1)(-1)(-1)(-1)(-1); // 16
+  node17AP = boost::assign::list_of(-1)(-1)(18)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(20)(-1)(-1)(-1)(-1); // 17
+  node18AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(19)(-1)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 18
+  node19AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(17)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 19
 
   actuationPolicy.push_back(node0AP);
   actuationPolicy.push_back(node1AP);
@@ -318,19 +320,21 @@ void T6RollingController::onSetup(PrismModel& subject)
 
 void T6RollingController::onStep(PrismModel& subject, double dt)
 {
+  std::cout << std::endl;
   std::cout << "OverallTime: " << worldTime << std::endl;
+  std::cout << "RobotState: " << subject.robotState << std::endl;
   worldTime += dt;
   if (dt <= 0.0) {
     throw std::invalid_argument("onStep: dt is not positive");
   }
-  else if(subject.robotState==1){
-    // Code for face mode
+  else if(subject.robotState==c_activate_flag){
     bool isOnGround = checkOnGround();
     if (robotReady == true) {
       switch (controller_mode) {
       case 1:
 	{
-	  
+	  // Code for face mode
+	  std::cout << "Reorienting " << std::endl;
 	  if(resetFlag==true){
 	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
 	    //resetFlag = setAllActuators(m_controllers, actuators, restLength, dt);
@@ -345,7 +349,7 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 		std::cout << "onStep: Destination face reached" << std::endl;
 		goalReached = true;
 		//if(completeReset){
-		subject.changeRobotState(2);
+		subject.changeRobotState(c_transfer_flag);
 		isOnGround = true;
 		runPathGen = false;
 		stepFin = true;
@@ -431,27 +435,40 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
       case 2:
 	{
 	  // Code for dead reckoning mode
+	  std::cout << "Dead Reckoning ~ " << worldTime << std::endl;
+	  currSurface = contactSurfaceDetection();
 	  if (resetFlag) {
 	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
 	    resetCounter = 0;
 	  }
 	  else {
-	    if (isOnGround && !drGoalReached) {
-	      currPos = rodBodies[2]->getCenterOfMassPosition();
-	      if (abs(currPos.x()-c_dr_goal.x())<5 && abs(currPos.z()-c_dr_goal.z())<5) {
+	    if (isOnGround && stepFin && !resetFlag) {
+	      currPos = tank[0]->getCenterOfMassPosition();
+	      currPos.setY(0);
+	      if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<10) {
 		std::cout << "onStep: Goal reached" << std::endl;
 		drGoalReached = true;
 	      }
-	      if (!reorient) {
-		travelDir = c_dr_goal - currPos;
+	      if (!runPathGen && !drGoalReached) {
+		travelDir = (c_dr_goal - currPos).normalize();
 		std::cout << "onStep: Current position: " << currPos << std::endl;
+		std::cout << "onStep: Desired position: " << c_dr_goal << std::endl;
 		std::cout << "onStep: Travel direction: " << travelDir << std::endl;
-		reorient = true;
+		currSurface = contactSurfaceDetection();
+		goalSurface = headingSurfaceDetection(travelDir, currSurface);
+		path = findPath(A, currSurface, goalSurface);
+		utility::printVector(path);
+		runPathGen = true;
 	      }
-	      goalSurface = headingSurfaceDetection(travelDir);
-
+	      if (!drGoalReached) {
+		runPathGen = false;
+	      }
+	    }
+	    if (currSurface >= 0 && !drGoalReached) {
+	      stepFin = stepToFace(currSurface, path[1], dt);
 	    }
 	  }
+	  std::cout << "onStep: Current position: " << currPos << std::endl;
 	  break;
 	}
       case 3:
@@ -459,7 +476,6 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	  // Code for path mode
 	  if (resetFlag) {
 	    resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
-	    currentFace = contactSurfaceDetection();
 	    resetCounter = 0;
 	  }
 	  else {
@@ -544,22 +560,28 @@ int T6RollingController::contactSurfaceDetection()
   return currSurface;
 }
 
-int T6RollingController::headingSurfaceDetection(btVector3& travelDir)
+int T6RollingController::headingSurfaceDetection(btVector3& travelDirWorld, int currFace)
 {
   // Initialize variables
   double dotProd;
   double maxDotProd = 0;
   int goalSurface = -1;
 
-  // Find the dot product between the gravity vector and each face
+  // Get the direction vector in robot frame
+  btVector3 travelDirRobot = getRobotDir(travelDirWorld);
+
+  // Find the dot product between the heading vector and each face
   // As all normal vectors point away from the center of the robot,
   // The larger dot product indicates better alignment
   for (size_t i = 0; i < normVects.size(); i++) {
-    dotProd = travelDir.dot(normVects[i]);
-    //std::cout << dotProd << std::endl;
-    if (dotProd > maxDotProd) {
-      maxDotProd = dotProd;
-      goalSurface = i;
+    // if (isAdjacentFace(currFace, i)) {
+    if (isClosedFace(i)) {
+      dotProd = travelDirRobot.dot(normVects[i]);
+      //std::cout << dotProd << std::endl;
+      if (dotProd > maxDotProd) {
+	maxDotProd = dotProd;
+	goalSurface = i;
+      }
     }
   }
 
@@ -576,6 +598,7 @@ int T6RollingController::headingSurfaceDetection(btVector3& travelDir)
 btVector3 T6RollingController::getRobotGravity() 
 {
   btTransform worldTrans = tank[0]->getWorldTransform();
+  //btTransform worldTrans = rodBodies[2]->getWorldTransform();
   btMatrix3x3 robotToWorld = worldTrans.getBasis();
   //std::cout << robotToWorld.getRow(0) << std::endl;
   //std::cout << robotToWorld.getRow(1) << std::endl;
@@ -587,6 +610,20 @@ btVector3 T6RollingController::getRobotGravity()
   btVector3 gravVectRobot = worldToRobot * gravVectWorld;
   //std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
   return gravVectRobot;
+}
+
+btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld) 
+{
+  btTransform worldTrans = tank[0]->getWorldTransform();
+  //btTransform worldTrans = rodBodies[2]->getWorldTransform();
+  btMatrix3x3 robotToWorld = worldTrans.getBasis();
+  // The basis of getWorldTransform() returns the rotation matrix from robot frame
+  // to world frame. Invert this matrix to go from world to robot frame
+  btMatrix3x3 worldToRobot = robotToWorld.inverse();
+  // Transform the gravity vector from world frame to robot frame
+  btVector3 dirVectRobot = (worldToRobot * dirVectWorld).normalize();
+  //std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
+  return dirVectRobot;
 }
 
 std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 
@@ -713,6 +750,7 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
   //if (isOnPath) {
   // Get which cable to actuate from actuation policy table
   int cableToActuate = actuationPolicy[startFace][endFace];
+  std::cout << "Start: " << startFace << ", End: " << endFace << std::endl;
   // Perform actuation from one closed face to another
   if (isClosedFace(startFace)) {
     if (cableToActuate >= 0) {

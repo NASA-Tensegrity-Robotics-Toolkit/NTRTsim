@@ -346,9 +346,19 @@ void PrismModel::setup(tgWorld& world)
   // Create your structureInfo
   tgStructureInfo structureInfo(s, spec);
   structureInfo.buildInto(*this, world);
+  
+  // Get the rod rigid bodies for controller
+  std::vector<tgRod*> rods = PrismModel::find<tgRod>("rod");
+  for (int i = 0; i < rods.size(); i++) {
+    allRods.push_back(PrismModel::find<tgRod>(tgString("rod num", i))[0]);
+  }
 
-  // Get actuators
-  allActuators = getAllActuators();
+  // Get the actuators for controller
+  std::vector<tgBasicActuator*> actuators = PrismModel::find<tgBasicActuator>("muscle");
+  for (int i = 0; i < actuators.size(); i++) {
+    allActuators.push_back(PrismModel::find<tgBasicActuator>(tgString("muscle num", i))[0]);
+  }
+  
   
   //Get linking rods
   std::vector<tgRod *> linkingRods = find<tgRod>("link");
@@ -443,9 +453,9 @@ void PrismModel::onVisit(tgModelVisitor& r)
   tgModel::onVisit(r);
 }
 
-std::vector<tgBasicActuator*>& PrismModel::getAllActuators() 
+std::vector<tgBasicActuator*>& PrismModel::getAllActuators()
 {
-  return allActuators;
+	return allActuators;
 }
 
 std::vector<tgRod*>& PrismModel::getAllRods()
@@ -635,12 +645,13 @@ void PrismModel::addRods(tgStructure& s, int offset)
   s.addPair( 8+offset,  9+offset, "rod");
   s.addPair( 10+offset, 11+offset, "rod");
   */
-  s.addPair(0+offset, 1+offset, "rod"); // 0
-  s.addPair(3+offset, 2+offset, "rod"); // 1
-  s.addPair(4+offset, 5+offset, "rod"); // 2
-  s.addPair(7+offset, 6+offset, "rod"); // 3
-  s.addPair(8+offset, 11+offset, "rod"); // 4
-  s.addPair(9+offset, 10+offset, "rod"); // 5
+  
+  s.addPair( 0+offset,  1+offset, tgString("rod num", 0));
+  s.addPair( 3+offset,  2+offset, tgString("rod num", 1));
+  s.addPair( 4+offset,  5+offset, tgString("rod num", 2));
+  s.addPair( 7+offset,  6+offset, tgString("rod num", 3));
+  s.addPair( 8+offset,  11+offset, tgString("rod num", 4));
+  s.addPair( 9+offset, 10+offset, tgString("rod num", 5));
   
 }
 
@@ -673,39 +684,72 @@ void PrismModel::addActuators(tgStructure& s, int offset)
   s.addPair( 7+offset, 10+offset, "muscle");	//22
   s.addPair( 7+offset, 11+offset, "muscle");    //23
   */
+  
+  s.addPair(0+offset, 4+offset, tgString("muscle num", 0));
+  s.addPair(0+offset, 5+offset, tgString("muscle num", 1));
+  s.addPair(0+offset, 8+offset, tgString("muscle num", 2));
+  s.addPair(0+offset, 9+offset, tgString("muscle num", 3));
 
-  s.addPair(0+offset, 4+offset, "muscle"); // 0
-  s.addPair(0+offset, 5+offset, "muscle"); // 1
-  s.addPair(0+offset, 8+offset, "muscle"); // 2
-  s.addPair(0+offset, 9+offset, "muscle"); // 3
+  s.addPair(1+offset, 6+offset, tgString("muscle num", 4));
+  s.addPair(1+offset, 7+offset, tgString("muscle num", 5));
+  s.addPair(1+offset, 8+offset, tgString("muscle num", 6));
+  s.addPair(1+offset, 9+offset, tgString("muscle num", 7));
 
-  s.addPair(1+offset, 6+offset, "muscle"); // 4
-  s.addPair(1+offset, 7+offset, "muscle"); // 5
-  s.addPair(1+offset, 8+offset, "muscle"); // 6
-  s.addPair(1+offset, 9+offset, "muscle"); // 7
+  s.addPair(2+offset, 6+offset, tgString("muscle num", 8));
+  s.addPair(2+offset, 7+offset, tgString("muscle num", 9));
+  s.addPair(2+offset, 10+offset, tgString("muscle num", 10));
+  s.addPair(2+offset, 11+offset, tgString("muscle num", 11));
 
-  s.addPair(2+offset, 6+offset, "muscle"); // 8
-  s.addPair(2+offset, 7+offset, "muscle"); // 9
-  s.addPair(2+offset, 10+offset, "muscle"); // 10
-  s.addPair(2+offset, 11+offset, "muscle"); // 11
+  s.addPair(3+offset, 4+offset, tgString("muscle num", 12));
+  s.addPair(3+offset, 5+offset, tgString("muscle num", 13));
+  s.addPair(3+offset, 10+offset, tgString("muscle num", 14));
+  s.addPair(3+offset, 11+offset, tgString("muscle num", 15));
 
-  s.addPair(3+offset, 4+offset, "muscle"); // 12
-  s.addPair(3+offset, 5+offset, "muscle"); // 13
-  s.addPair(3+offset, 10+offset, "muscle"); // 14
-  s.addPair(3+offset, 11+offset, "muscle"); // 15
+  s.addPair(4+offset, 8+offset, tgString("muscle num", 16));
+  s.addPair(4+offset, 11+offset, tgString("muscle num", 17));
 
-  s.addPair(4+offset, 8+offset, "muscle"); // 16
-  s.addPair(4+offset, 11+offset, "muscle"); // 17
+  s.addPair(5+offset, 9+offset, tgString("muscle num", 18));
+  s.addPair(5+offset, 10+offset, tgString("muscle num", 19));
 
-  s.addPair(5+offset, 9+offset, "muscle"); // 18
-  s.addPair(5+offset, 10+offset, "muscle"); // 19
+  s.addPair(6+offset, 9+offset, tgString("muscle num", 20));
+  s.addPair(6+offset, 10+offset, tgString("muscle num", 21));
 
-  s.addPair(6+offset, 9+offset, "muscle"); // 20
-  s.addPair(6+offset, 10+offset, "muscle"); // 21
+  s.addPair(7+offset, 8+offset, tgString("muscle num", 22));
+  s.addPair(7+offset, 11+offset, tgString("muscle num", 23));
+  
+  /*
+  s.addPair(0+offset, 4+offset, "muscle");
+  s.addPair(0+offset, 5+offset, "muscle");
+  s.addPair(0+offset, 8+offset, "muscle");
+  s.addPair(0+offset, 9+offset, "muscle");
 
-  s.addPair(7+offset, 8+offset, "muscle"); // 22
-  s.addPair(7+offset, 11+offset, "muscle"); // 23
+  s.addPair(1+offset, 6+offset, "muscle");
+  s.addPair(1+offset, 7+offset, "muscle");
+  s.addPair(1+offset, 8+offset, "muscle");
+  s.addPair(1+offset, 9+offset, "muscle");
 
+  s.addPair(2+offset, 6+offset, "muscle");
+  s.addPair(2+offset, 7+offset, "muscle");
+  s.addPair(2+offset, 10+offset, "muscle");
+  s.addPair(2+offset, 11+offset, "muscle");
+
+  s.addPair(3+offset, 4+offset, "muscle");
+  s.addPair(3+offset, 5+offset, "muscle");
+  s.addPair(3+offset, 10+offset, "muscle");
+  s.addPair(3+offset, 11+offset, "muscle");
+
+  s.addPair(4+offset, 8+offset, "muscle");
+  s.addPair(4+offset, 11+offset, "muscle");
+
+  s.addPair(5+offset, 9+offset, "muscle");
+  s.addPair(5+offset, 10+offset, "muscle");
+
+  s.addPair(6+offset, 9+offset, "muscle");
+  s.addPair(6+offset, 10+offset, "muscle");
+
+  s.addPair(7+offset, 8+offset, "muscle");
+  s.addPair(7+offset, 11+offset, "muscle");
+  */
 }
 
 btQuaternion PrismModel::rotateToFace(tgStructure& s, int face)

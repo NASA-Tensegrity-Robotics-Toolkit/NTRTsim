@@ -117,13 +117,21 @@ int main(int argc, char** argv)
   // simulation
   PrismModel* const myModel = new PrismModel();
 
+  //Define target destination
+  btVector3 target = btVector3(4000, 0, -4000);
+    
   //Create Active Thruster
-  RPThruster* const thrust_control = new RPThruster();
+  RPThruster* const thrust_control = new RPThruster(2,3,1,target);
   myModel->attach(thrust_control);
 
-  const T6RollingController::Config controllerConfig(gravity, "face", 0);
-  T6RollingController* const rollingController = new T6RollingController(controllerConfig);
-  myModel->attach(rollingController);
+  //Robot Starts in State 1 -> 2 -> 3 -> 1
+  const T6RollingController::Config controllerConfig1(gravity, "face", 0, 1, 2);
+  const T6RollingController::Config controllerConfig2(gravity, "dr", target, 3, 1);
+
+  T6RollingController* const rollingController1 = new T6RollingController(controllerConfig1);
+  myModel->attach(rollingController1);
+  T6RollingController* const rollingController2 = new T6RollingController(controllerConfig2);
+  myModel->attach(rollingController2);
   
     
   // Add the model to the world
