@@ -35,6 +35,7 @@
 #include <cstddef>
 
 #include <fstream>
+#include <vector>
 
 #include "BulletCollision/CollisionShapes/btTriangleMesh.h"
 
@@ -64,7 +65,8 @@ class tgImportGround : public tgBulletGround
                        //double triangleSize = 5.0,
                        //double waveHeight = 5.0,
                        double offset = 0.5,
-                       double scalingFactor = 10);
+                       double scalingFactor = 10,
+                       bool interp = false);
 
                 /** Euler angles are specified as yaw pitch and roll */
                 btVector3 m_eulerAngles;
@@ -101,6 +103,9 @@ class tgImportGround : public tgBulletGround
 
                 /** Scaling factor for the triangle mesh */
                 double m_scalingFactor;
+
+                /** Boolean for whether or not to interpolate for finer mesh */
+                bool m_interpolation;
         };
 
         /**
@@ -132,7 +137,7 @@ class tgImportGround : public tgBulletGround
         /**
          * Returns the collision shape that forms the imported ground from filestream
          */
-        btCollisionShape* importCollisionShape_alt(std::fstream& file, double scalingFactor);
+        btCollisionShape* importCollisionShape_alt(std::fstream& file, double scalingFactor, bool interp);
 
     private:  
         /** Store the configuration data for use later */
@@ -148,7 +153,7 @@ class tgImportGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the information read from the filestream
                             To be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleMesh* createMesh_alt(std::fstream& file, double scalingFactor);
+        btTriangleMesh* createMesh_alt(std::fstream& file, double scalingFactor, bool interp);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
@@ -160,6 +165,10 @@ class tgImportGround : public tgBulletGround
          */
         btCollisionShape* createShape_alt(btTriangleMesh* pMesh);
 
+        /** Pre-condition: A vector of the verticies of a single triangle
+         */
+        void interpolateTriangles(std::vector<btVector3> verticies, btTriangleMesh* pMesh);
+        
         /**
          * @param[out] A flattened array of vertices in the mesh
          */

@@ -47,7 +47,8 @@ tgImportGround::Config::Config(btVector3 eulerAngles,
         btVector3 origin,
         double margin,
         double offset,
-        double scalingFactor) :
+        double scalingFactor,
+        bool interp) :
     m_eulerAngles(eulerAngles),
     m_friction(friction),
     m_restitution(restitution),
@@ -55,7 +56,8 @@ tgImportGround::Config::Config(btVector3 eulerAngles,
     m_origin(origin),
     m_margin(margin),
     m_offset(offset),
-    m_scalingFactor(scalingFactor)
+    m_scalingFactor(scalingFactor),
+    m_interpolation(interp)
 {
     assert((m_friction >= 0.0) && (m_friction <= 1.0));
     assert((m_restitution >= 0.0) && (m_restitution <= 1.0));
@@ -69,13 +71,13 @@ tgImportGround::tgImportGround(std::fstream& file) :
     m_config(Config())
 {
     // @todo make constructor aux to avoid repeated code
-    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation);
 }
 
 tgImportGround::tgImportGround(const tgImportGround::Config& config, std::fstream& file) :
     m_config(config)
 {
-    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation);
 }
 
 tgImportGround::~tgImportGround()
@@ -154,11 +156,11 @@ btCollisionShape* tgImportGround::importCollisionShape() {
 }
 */
 
-btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file, double scalingFactor) {
+btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file, double scalingFactor, bool interp) {
     btCollisionShape * pShape = 0;
 
     // Create the mesh object
-    m_pMesh = createMesh_alt(file, scalingFactor);
+    m_pMesh = createMesh_alt(file, scalingFactor, interp);
 
     // Create the shape object
     pShape = createShape_alt(m_pMesh);
@@ -186,7 +188,7 @@ btTriangleIndexVertexArray *tgImportGround::createMesh(std::size_t triangleCount
 }
 */
 
-btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalingFactor) {
+btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalingFactor, bool interp) {
     // Lines are input in the following format: [x1,y1,z1] [x2,y2,z2] [x3,y3,z3]
 
     btVector3 v0, v1, v2;
@@ -200,6 +202,8 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
 
     while (file.good()) {
     //for (int line = 0; line < 200; line++) {
+
+        std::vector<btVector3> verticies; 
 
         std::string line_in;
         std::getline(file, line_in);
@@ -244,21 +248,27 @@ btTriangleMesh *tgImportGround::createMesh_alt(std::fstream& file, double scalin
             switch (i) {
                 case 0:
                     v0.setValue(x, y, z);
+                    verticies.push_back(v0);
                     break;
                 case 1:
                     v1.setValue(x, y, z);
+                    verticies.push_back(v1);
                     break;
                 case 2:
                     v2.setValue(x, y, z);
+                    verticies.push_back(v2);
                     break;
             }
         }
-    
-    pMesh -> addTriangle(v0, v1, v2);
-
+        if (interp) {
+            interpolateTriangles(verticies, pMesh);
+        }
+        else {
+            pMesh -> addTriangle(v0, v1, v2);   
+        }
     }
 
-    std::cout << "Max X coordinate: " << max_X << ", Max Y coordinate: " << max_Y << ", Max Z coordinate: " << max_Z << std::endl;
+    // std::cout << "Max X coordinate: " << max_X << ", Max Y coordinate: " << max_Y << ", Max Z coordinate: " << max_Z << std::endl;
     
     /*
     // Test triangle
@@ -281,10 +291,26 @@ btCollisionShape *tgImportGround::createShape(btTriangleIndexVertexArray *pMesh)
 }
 */
 
-btCollisionShape *tgImportGround::createShape_alt(btTriangleMesh *pMesh) {
+btCollisionShape* tgImportGround::createShape_alt(btTriangleMesh *pMesh) {
     btCollisionShape *const pShape =
         new btBvhTriangleMeshShape(pMesh, true);
     return pShape;
+}
+
+void tgImportGround::interpolateTriangles(std::vector<btVector3> verticies, btTriangleMesh* pMesh) {
+    // Unpack verticies vector
+    btVector3 v0 = verticies[0];
+    btVector3 v1 = verticies[1];
+    btVector3 v2 = verticies[2];
+    // Find mid points
+    btVector3 v01 = v0+(v1-v0)/2;
+    btVector3 v02 = v0+(v2-v0)/2;
+    btVector3 v12 = v1+(v2-v1)/2;
+
+    pMesh -> addTriangle(v0, v01, v02);
+    pMesh -> addTriangle(v1, v01, v12);
+    pMesh -> addTriangle(v2, v12, v02);
+    pMesh -> addTriangle(v01, v02, v12);
 }
 
 /*

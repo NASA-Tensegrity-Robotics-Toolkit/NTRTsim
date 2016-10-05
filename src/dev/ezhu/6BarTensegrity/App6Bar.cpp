@@ -71,49 +71,50 @@ int main(int argc, char** argv)
     // Import Ground
     // ---------------------------------------------------------------------------------
     // Set ground parameters
-    // btVector3 orientation = btVector3(yaw, pitch, roll);
-    // const double friction = 0.5;
-    // const double restitution = 0.0;
-    // btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    // const double margin = 0.05;
-    // const double offset = 0.5;
-    // const double scalingFactor = 1;
+    btVector3 orientation = btVector3(yaw, pitch, roll);
+    const double friction = 0.5;
+    const double restitution = 0.0;
+    btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    const double margin = 0.05;
+    const double offset = 0.5;
+    const double scalingFactor = 10;
+    const bool interp = false;
 
-    // // Configure ground characteristics
-    // const tgImportGround::Config groundConfig(orientation, friction, restitution,
-    //     origin, margin, offset, scalingFactor);
+    // Configure ground characteristics
+    const tgImportGround::Config groundConfig(orientation, friction, restitution,
+        origin, margin, offset, scalingFactor, interp);
 
-    // // Get filename from argv
-    // // std::string filename_in = argv[1];
-    // std::string filename_in = "./LunarScape_mission.txt";
+    // Get filename from argv
+    // std::string filename_in = argv[1];
+    std::string filename_in = "./LunarScape_mission.txt";
 
-    // // Check filename
-    // if (filename_in.find(".txt") == std::string::npos) {
-    //     std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
-    //     exit(EXIT_FAILURE);
-    // }
+    // Check filename
+    if (filename_in.find(".txt") == std::string::npos) {
+        std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
-    // //Create filestream
-    // std::fstream file_in;
+    //Create filestream 
+    std::fstream file_in; 
 
-    // // Open filestream
-    // file_in.open(filename_in.c_str(), std::fstream::in);
+    // Open filestream
+    file_in.open(filename_in.c_str(), std::fstream::in);
 
-    // // Check if input file opened successfully
-    // if (!file_in.is_open()) {
-    //     std::cout << "Failed to open input file" << std::endl;
-    //     exit(EXIT_FAILURE);
-    // }
-    // else {
-    //     std::cout << "Input file opened successfully" << std::endl;
-    // }
-    // tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+    // Check if input file opened successfully
+    if (!file_in.is_open()) {
+        std::cout << "Failed to open input file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else {
+        std::cout << "Input file opened successfully" << std::endl;
+    }
+    tgImportGround* ground = new tgImportGround(groundConfig, file_in);
     // ---------------------------------------------------------------------------------
 
     // Box ground
     // ---------------------------------------------------------------------------------
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // tgBoxGround* ground = new tgBoxGround(groundConfig);
     // ---------------------------------------------------------------------------------
 
     double sf = 10;
