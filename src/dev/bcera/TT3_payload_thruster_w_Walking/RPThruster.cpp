@@ -19,7 +19,7 @@
 /**
  * @file T6Thruster.cpp
  * @brief Implementation of thruster actuation of T6Model.
- * @author Kyunam Kim
+ * @author Brian Cera
  * @version 1.0.0
  * $Id$
  */
@@ -57,6 +57,7 @@ namespace
   double reorientTime = initiateThrustTime + 0;
   bool isReoriented = false;
   double thrustPeriod = 2.5; // duration of thrust on
+  double distanceThreshold = 200;
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
   btVector3 targetLocation = btVector3(70*sf, 0, -70*sf); // target is located 1000m away in +X direction	
@@ -176,11 +177,14 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<0.1){
 	    btVector3 diff = tankRigidBody->getCenterOfMassPosition() - targetLocation;
 	    diff.setY(0);
-	    if(diff.norm() < 1000)
+	    thrustPeriod = diff.norm()/1500; //linear scale + constant reorient period
+	    thrustPeriod = std::min(thrustPeriod,3.5);
+	    thrustPeriod = std::max(thrustPeriod,0.75);
+	    if(diff.norm() < distanceThreshold)
 	      subject.changeRobotState(transfer_flag);
 	    else
 	      subject.changeRobotState(transfer_flag_2);
-	    worldTime = -dt; //dt added at end of onStep
+	    worldTime = -dt; // negate dt added at end of onStep
 	    timePassed = -dt;	
 	    shootTime = -dt;
 	    positionAcquired = false;
@@ -197,7 +201,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    //std::cout << "Finished - Exiting Simulation" << std::endl;
 	    //exit(EXIT_SUCCESS);
 	  }
-  if(worldTime > reorientTime && !isReoriented){
+	  if(worldTime > reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
 	    double finalGoalAltitude = -10;
 	    double finalGoalYaw = 45;
@@ -217,16 +221,16 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	      AltSet = true;
 	    }
 	    /*
-	    if(abs(finalGoalYaw - goalYaw) > inc){
+	      if(abs(finalGoalYaw - goalYaw) > inc){
 	      if(finalGoalYaw-goalYaw < 0)
-		goalYaw -= inc;
+	      goalYaw -= inc;
 	      if(finalGoalYaw-goalYaw > 0)
-		goalYaw += inc;
-	    }
-	    else{	           
+	      goalYaw += inc;
+	      }
+	      else{	           
 	      goalYaw += (finalGoalYaw-goalYaw);
 	      YawSet = true;
-	    }
+	      }
 	    */
 	    //goalAltitude = finalGoalAltitude;
 	    goalYaw = finalGoalYaw;
@@ -273,9 +277,9 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  count++;
 	  unit_tank = btVector3(0,0,0);
 	  for(int i=0;i<numTankOrientations;i++){
-	    unit_tank.setX(unit_tank.getX() + tankOrientations[i].getX());
-	    unit_tank.setY(unit_tank.getY() + tankOrientations[i].getY());
-	    unit_tank.setZ(unit_tank.getZ() + tankOrientations[i].getZ());
+	  unit_tank.setX(unit_tank.getX() + tankOrientations[i].getX());
+	  unit_tank.setY(unit_tank.getY() + tankOrientations[i].getY());
+	  unit_tank.setZ(unit_tank.getZ() + tankOrientations[i].getZ());
 	  }
 	  unit_tank.setX(unit_tank.getX()/numTankOrientations);
 	  unit_tank.setY(unit_tank.getY()/numTankOrientations);
@@ -298,15 +302,15 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Set PID Controller Here
 	  //NO-ROBOT CONSTANTS
 	  /*
-	  double Kp = 0.005;//0.001;
-	  double Kd = 5;//1*(.001/dt);
-	  double Ki = 5e-7*(dt/.001);
+	    double Kp = 0.005;//0.001;
+	    double Kd = 5;//1*(.001/dt);
+	    double Ki = 5e-7*(dt/.001);
 	  */
 	  //WITH-ROBOT CONSTANTS
 	  /*
-	  double Kp = .08;
-	  double Kd = 275;//5*(.001/dt);
-	  double Ki = 1e-5;//1e-7*(dt/.001);
+	    double Kp = .08;
+	    double Kd = 275;//5*(.001/dt);
+	    double Ki = 1e-5;//1e-7*(dt/.001);
 	  */
 	  
 	  btVector3 PayloadYAxis = -btVector3(world_rot_mat[0][1],world_rot_mat[1][1],world_rot_mat[2][1]);
@@ -333,7 +337,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //PID Controller
 	  error_sum += angle_error;
 	  if(angle_error<5*M_PI/180)
-	    error_sum = 0;
+	  error_sum = 0;
 	  sol_vector.setY(0);
 	  sol_vector = sol_vector.normalized(); //unit directional vector on the X-Z plane
 	  double scalingFactor = (Kp*angle_error + Kd*d_angle_error*dt + Ki*error_sum);
@@ -367,7 +371,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  std::cout << "Gimbal Change Speed: " << Gimbal_Speed*180/M_PI << std::endl;
 	  //Generate noise for solution vector here (i.e. noisy orientation sensors for payload)
 	  /*
-	  if(includeNoise){
+	    if(includeNoise){
 	    btTransform noiseRotation;
 	    btQuaternion rotation;
 	    btVector3 noiseAxis;
@@ -379,7 +383,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    noiseRotation.setRotation(rotation);
 	    std::cout << "Sensor Noise Error Introduced: " << rotation.getAngle()*180/M_PI << std::endl;
 	    sol_vector = noiseRotation*sol_vector;
-	  }
+	    }
 	  */
 	  std::cout << "Thruster Goal Vector: " << sol_vector << std::endl;
 	  
@@ -587,37 +591,37 @@ void RPThruster::onStep(PrismModel& subject, double dt)
     }
 }
   
-  double RPThruster::generateGaussianNoise(double mu, double sigma)
-  {
-    /**
-     * (From Wikipedia)
-     * The standard Box-Muller transform generates 
-     * values from the standard normal distribution 
-     * (i.e. standard normal deviates) with mean 0 and standard deviation 1. 
-     * The implementation below in standard C++ generates values 
-     * from any normal distribution with mean \mu and variance \sigma^2. 
-     * If Z is a standard normal deviate, then X = Z\sigma + \mu will 
-     * have a normal distribution with mean \mu and standard deviation \sigma. 
-     */ 
-    const double epsilon = std::numeric_limits<double>::min();
-    const double two_pi = 2*M_PI;
+double RPThruster::generateGaussianNoise(double mu, double sigma)
+{
+  /**
+   * (From Wikipedia)
+   * The standard Box-Muller transform generates 
+   * values from the standard normal distribution 
+   * (i.e. standard normal deviates) with mean 0 and standard deviation 1. 
+   * The implementation below in standard C++ generates values 
+   * from any normal distribution with mean \mu and variance \sigma^2. 
+   * If Z is a standard normal deviate, then X = Z\sigma + \mu will 
+   * have a normal distribution with mean \mu and standard deviation \sigma. 
+   */ 
+  const double epsilon = std::numeric_limits<double>::min();
+  const double two_pi = 2*M_PI;
 
-    static double z0, z1;
-    static bool generate;
-    generate = !generate;
+  static double z0, z1;
+  static bool generate;
+  generate = !generate;
 
-    if (!generate)
-      return z1 * sigma + mu;
+  if (!generate)
+    return z1 * sigma + mu;
 
-    double u1, u2;
-    do
-      {
-	u1 = rand() * (1.0 / RAND_MAX);
-	u2 = rand() * (1.0 / RAND_MAX);
-      }
-    while ( u1 <= epsilon );
+  double u1, u2;
+  do
+    {
+      u1 = rand() * (1.0 / RAND_MAX);
+      u2 = rand() * (1.0 / RAND_MAX);
+    }
+  while ( u1 <= epsilon );
 
-    z0 = sqrt(-2.0 * log(u1)) * cos(two_pi * u2);
-    z1 = sqrt(-2.0 * log(u1)) * sin(two_pi * u2);
-    return z0 * sigma + mu;
-  }
+  z0 = sqrt(-2.0 * log(u1)) * cos(two_pi * u2);
+  z1 = sqrt(-2.0 * log(u1)) * sin(two_pi * u2);
+  return z0 * sigma + mu;
+}

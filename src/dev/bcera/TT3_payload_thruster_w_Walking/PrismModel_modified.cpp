@@ -220,8 +220,8 @@ void PrismModel::setup(tgWorld& world)
   //TT3 Parameters
   double tankRadius = 0.05*sf;
   double internalRadius = 0.025*sf;//0.05*sf;
-  double externalRadius = 0.04*sf;//0.03*sf;//0.055*sf; 
-  double tankToOuterRing = 0.05*sf;
+  double externalRadius = 0.035*sf;//0.03*sf;//0.055*sf; 
+  double tankToOuterRing = 0.03*sf;
   double payloadLength = 0.05*sf;
   /*
   //Superball Parameters
@@ -249,7 +249,7 @@ void PrismModel::setup(tgWorld& world)
   //const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
   //				   c.rollFriction, c.restitution);
   //thicken gimbal to prevent clipping
-  const tgRod::Config gimbalConfig(0.1, c.density/5, c.friction, 
+  const tgRod::Config gimbalConfig(0.05, c.density*0.2, c.friction, 
 				   c.rollFriction, c.restitution);
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
@@ -260,8 +260,8 @@ void PrismModel::setup(tgWorld& world)
   // Create a structure that will hold the details of this model
   tgStructure s;
   
-  int nPtsExtRing = 48;  //Must be divisible by four
-  int nPtsIntRing = 48;  //Must be divisible by four
+  int nPtsExtRing = 48*4;  //Must be divisible by four
+  int nPtsIntRing = 48*4;  //Must be divisible by four
 
   //Incremented by reference assignment in each call below
   int globalOffset = 0;
@@ -333,7 +333,7 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
   //rotateToFace(s, 15);
-  s.move(btVector3(100, 700, -100));
+  s.move(btVector3(100, 350, -100));
   //s.move(btVector3(100, 1800, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model
@@ -381,7 +381,7 @@ void PrismModel::setup(tgWorld& world)
   btRigidBody* rigidbody3 = rod3->getPRigidBody();
   btRigidBody* rigidbody4 = rod4->getPRigidBody();
   //Important to set pivot location relative to orientation (i.e. flipping structure required neg. sign in from of pivot position)vvvvv
-  yawHinge = new btHingeConstraint(*rigidbody4,*rigidbody3,btVector3(0,0,0),btVector3(0,(-externalRadius-tankToOuterRing-tankToOuterRing/2.2),0),btVector3(0,-1,0),btVector3(0,-1,0),false);
+  yawHinge = new btHingeConstraint(*rigidbody4,*rigidbody3,btVector3(0,0.5,0),btVector3(0,(-externalRadius-tankToOuterRing-tankToOuterRing/2.2),0),btVector3(0,-1,0),btVector3(0,-1,0),false);
 
   //Add the hinge constraints
   this->btWorld->addConstraint(altitudeHinge); //Inner

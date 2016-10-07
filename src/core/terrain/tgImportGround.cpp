@@ -298,19 +298,69 @@ btCollisionShape* tgImportGround::createShape_alt(btTriangleMesh *pMesh) {
 }
 
 void tgImportGround::interpolateTriangles(std::vector<btVector3> verticies, btTriangleMesh* pMesh) {
+    
+    int numInterp = 3;
+
     // Unpack verticies vector
     btVector3 v0 = verticies[0];
     btVector3 v1 = verticies[1];
     btVector3 v2 = verticies[2];
-    // Find mid points
-    btVector3 v01 = v0+(v1-v0)/2;
-    btVector3 v02 = v0+(v2-v0)/2;
-    btVector3 v12 = v1+(v2-v1)/2;
 
-    pMesh -> addTriangle(v0, v01, v02);
-    pMesh -> addTriangle(v1, v01, v12);
-    pMesh -> addTriangle(v2, v12, v02);
-    pMesh -> addTriangle(v01, v02, v12);
+    switch (numInterp) {
+        // Create 4 triangles from 1
+        case 1: {
+            // Find mid points
+            btVector3 v01 = v0+(v1-v0)/2.0;
+            btVector3 v02 = v0+(v2-v0)/2.0;
+            btVector3 v12 = v1+(v2-v1)/2.0;
+
+            pMesh -> addTriangle(v0, v01, v02);
+            pMesh -> addTriangle(v1, v01, v12);
+            pMesh -> addTriangle(v2, v12, v02);
+            pMesh -> addTriangle(v01, v02, v12);
+
+            break;
+        }
+        // Create 16 triangels from 1
+        case 3: {
+            btVector3 v01a = v0+(v1-v0)*1.0/4.0;
+            btVector3 v01b = v0+(v1-v0)*2.0/4.0;
+            btVector3 v01c = v0+(v1-v0)*3.0/4.0;
+
+            btVector3 v02a = v0+(v2-v0)*1.0/4.0;
+            btVector3 v02b = v0+(v2-v0)*2.0/4.0;
+            btVector3 v02c = v0+(v2-v0)*3.0/4.0;
+
+            btVector3 v12a = v1+(v2-v1)*1.0/4.0;
+            btVector3 v12b = v1+(v2-v1)*2.0/4.0;
+            btVector3 v12c = v1+(v2-v1)*3.0/4.0;
+
+            btVector3 via = v02b+(v12b-v02b)/2.0;
+            btVector3 vib = v01b+(v02b-v01b)/2.0;
+            btVector3 vic = v12b+(v01b-v12b)/2.0;
+
+            pMesh -> addTriangle(v0, v01a, v02a);
+            pMesh -> addTriangle(v01a, vib, v02a);
+            pMesh -> addTriangle(v01a, v01b, vib);
+            pMesh -> addTriangle(v01b, vic, vib);
+            pMesh -> addTriangle(v01b, v01c, vic);
+            pMesh -> addTriangle(v01c, v12a, vic);
+            pMesh -> addTriangle(v01c, v1, v12a);
+            pMesh -> addTriangle(v02a, vib, v02b);
+            pMesh -> addTriangle(vib, via, v02b);
+            pMesh -> addTriangle(vib, vic, via);
+            pMesh -> addTriangle(vic, v12b, via);
+            pMesh -> addTriangle(vic, v12a, v12b);
+            pMesh -> addTriangle(v02b, via, v02c);
+            pMesh -> addTriangle(via, v12c, v02c);
+            pMesh -> addTriangle(via, v12b, v12c);
+            pMesh -> addTriangle(v02c, v12c, v2);
+
+            break;
+        }
+    }
+    
+    
 }
 
 /*

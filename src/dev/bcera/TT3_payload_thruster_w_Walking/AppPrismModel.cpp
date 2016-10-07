@@ -58,21 +58,22 @@ int main(int argc, char** argv)
   const double pitch = 0.0;
   const double roll = 0.0;
 
-  
-  //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+  /*
+  const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
-  //tgBoxGround* ground = new tgBoxGround(groundConfig);
-
+  tgBoxGround* ground = new tgBoxGround(groundConfig);
+  */
   
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Import Ground
   // Set ground parameters
   btVector3 orientation = btVector3(yaw, pitch, roll);
-  const double friction = 0.5;
+  const double friction = 0.99;
   const double restitution = 0.0;
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
   const double margin = 0.05;
   const double offset = 0.5;
-  const double scalingFactor = 100;
+  const double scalingFactor = 50;//100;
   bool Interp = false;
   // Configure ground characteristics
   const tgImportGround::Config groundConfig(orientation, friction, restitution,
@@ -99,6 +100,7 @@ int main(int argc, char** argv)
     std::cout << "Input file opened successfully" << std::endl;
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
 
   double gravity = 1.618*sf;
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
   PrismModel* const myModel = new PrismModel();
 
   //Define target destination
-  btVector3 target = btVector3(4000, 0, -4000);
+  btVector3 target = btVector3(2000, 0, -2000);
     
   //Create Active Thruster
   RPThruster* const thrust_control = new RPThruster(2,3,1,target);
