@@ -22,6 +22,7 @@ add_executable(App_TT3_Payload_Thruster
     PrismModel_modified.cpp
     AppPrismModel.cpp
     RPThruster.cpp
+    Marker.cpp
     controllers/T6RollingControllerPrism.cpp
 ) 
 

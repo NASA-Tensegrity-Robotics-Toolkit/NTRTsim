@@ -98,7 +98,7 @@ PrismModel::PrismModel() :
   this->thrusterTransform = NULL;
   this->gDebugDraw = new GLDebugDrawer();
 
-  rodDist = (-c.rod_length + sqrt(pow(c.rod_length,2)+4*pow(c.rod_length,2)))/2;
+  rodDist = (-c.rod_length + sqrt(pow(c.rod_length,2)+4*pow(c.rod_length,2)))/2; 
 
   // Nodes in the x-z plane
   node0 = btVector3(-rodDist/2, 0, c.rod_length/2); // 0
@@ -249,7 +249,7 @@ void PrismModel::setup(tgWorld& world)
   //const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
   //				   c.rollFriction, c.restitution);
   //thicken gimbal to prevent clipping
-  const tgRod::Config gimbalConfig(0.05, c.density*0.2, c.friction, 
+  const tgRod::Config gimbalConfig(0.1, c.density*0.2, c.friction, 
 				   c.rollFriction, c.restitution);
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);

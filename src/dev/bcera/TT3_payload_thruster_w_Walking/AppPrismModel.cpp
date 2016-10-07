@@ -26,6 +26,7 @@
 
 // This application
 #include "PrismModel.h"
+#include "Marker.h"
 #include "RPThruster.h"
 #include "controllers/T6RollingControllerPrism.h"
 // This library
@@ -116,13 +117,16 @@ int main(int argc, char** argv)
   // Third create the simulation
   tgSimulation simulation(view);
 
-  // Fourth create the models with their controllers and add the models to the
-  // simulation
-  PrismModel* const myModel = new PrismModel();
-
   //Define target destination
   //btVector3 target = btVector3(2000, 0, -2000);
   btVector3 target = btVector3(1000, 0, -2000);
+  
+  // Fourth create the models with their controllers and add the models to the
+  // simulation
+  PrismModel* const myModel = new PrismModel();
+  btVector3 marker_target = target;
+  marker_target.setY(400);
+  MarkerModel* const marker = new MarkerModel(marker_target);
     
   //Create Active Thruster
   RPThruster* const thrust_control = new RPThruster(2,3,1,target);
@@ -139,6 +143,7 @@ int main(int argc, char** argv)
   
     
   // Add the model to the world
+  simulation.addModel(marker);
   simulation.addModel(myModel);
     
   simulation.run(100000);

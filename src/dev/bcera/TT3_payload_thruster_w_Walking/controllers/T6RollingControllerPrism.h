@@ -158,7 +158,7 @@ class T6RollingController : public tgObserver<PrismModel>
    * @param[in] dt - Time step
    * @return A boolean indicating whether or not the step has been completed
    */
-  bool stepToFace(int currFace, int desFace, double dt);
+  bool stepToFace(double dt);
 
   /**
    * Function for determining whether or not a certain face is a closed triangle on the
