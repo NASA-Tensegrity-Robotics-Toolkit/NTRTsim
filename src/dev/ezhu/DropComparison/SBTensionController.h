@@ -74,11 +74,6 @@ public:
     
 private:
 
-    double m_totalTime;
-    double m_initialLengths;
-    btVector3 initPos;
-    btVector3 trajectory;
-
     btRigidBody* capsuleBody;
 
     std::vector<tgTensionController*> m_controllers;

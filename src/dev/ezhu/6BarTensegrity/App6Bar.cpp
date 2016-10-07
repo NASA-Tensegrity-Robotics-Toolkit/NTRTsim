@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     const double margin = 0.05;
     const double offset = 0.5;
     const double scalingFactor = 10;
-    const bool interp = false;
+    const bool interp = true;
 
     // Configure ground characteristics
     const tgImportGround::Config groundConfig(orientation, friction, restitution,
