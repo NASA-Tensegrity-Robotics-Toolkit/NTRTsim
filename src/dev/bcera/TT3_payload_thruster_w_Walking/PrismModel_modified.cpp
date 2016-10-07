@@ -220,7 +220,7 @@ void PrismModel::setup(tgWorld& world)
   //TT3 Parameters
   double tankRadius = 0.05*sf;
   double internalRadius = 0.025*sf;//0.05*sf;
-  double externalRadius = 0.03*sf;//0.055*sf; 
+  double externalRadius = 0.04*sf;//0.03*sf;//0.055*sf; 
   double tankToOuterRing = 0.05*sf;
   double payloadLength = 0.05*sf;
   /*
@@ -241,13 +241,16 @@ void PrismModel::setup(tgWorld& world)
   
   //const tgRod::Config tankConfig(tankRadius, 2/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
   //				 c.rollFriction, c.restitution);
-  const tgRod::Config linkConfig(c.radius/2.0, 0.0, c.friction, 
+  const tgRod::Config linkConfig(c.radius/1, 0.0, c.friction, 
 				 c.rollFriction, c.restitution);
   const tgRod::Config thrusterConfig(0.2, c.density/5, c.friction, 
 				     c.rollFriction, c.restitution);
-  const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
+  //original
+  //const tgRod::Config gimbalConfig(0.05, c.density/5, c.friction, 
+  //				   c.rollFriction, c.restitution);
+  //thicken gimbal to prevent clipping
+  const tgRod::Config gimbalConfig(0.1, c.density/5, c.friction, 
 				   c.rollFriction, c.restitution);
-
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
   tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 

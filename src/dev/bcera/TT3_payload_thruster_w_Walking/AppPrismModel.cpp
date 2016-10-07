@@ -73,9 +73,10 @@ int main(int argc, char** argv)
   const double margin = 0.05;
   const double offset = 0.5;
   const double scalingFactor = 100;
+  bool Interp = false;
   // Configure ground characteristics
   const tgImportGround::Config groundConfig(orientation, friction, restitution,
-					    origin, margin, offset, scalingFactor);
+					    origin, margin, offset, scalingFactor,Interp);
   // Get filename from argv
   //std::string filename_in = argv[1];
   std::string filename_in = "./lunarscape_mission.txt";

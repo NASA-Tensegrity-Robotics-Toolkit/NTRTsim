@@ -745,7 +745,7 @@ bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
   bool stepFinished = true;
   bool isOnPath = false;
   // Length for cables to retract to
-  double controlLength = 0.1*sf;
+  double controlLength = 0.0*sf;
 
   //if (isOnPath) {
   // Get which cable to actuate from actuation policy table

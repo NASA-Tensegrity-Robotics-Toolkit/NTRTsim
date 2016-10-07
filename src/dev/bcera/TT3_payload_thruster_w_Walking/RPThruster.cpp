@@ -175,6 +175,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  }
 	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<0.1){
 	    btVector3 diff = tankRigidBody->getCenterOfMassPosition() - targetLocation;
+	    diff.setY(0);
 	    if(diff.norm() < 1000)
 	      subject.changeRobotState(transfer_flag);
 	    else
