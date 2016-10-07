@@ -121,7 +121,8 @@ int main(int argc, char** argv)
   PrismModel* const myModel = new PrismModel();
 
   //Define target destination
-  btVector3 target = btVector3(2000, 0, -2000);
+  //btVector3 target = btVector3(2000, 0, -2000);
+  btVector3 target = btVector3(1000, 0, -2000);
     
   //Create Active Thruster
   RPThruster* const thrust_control = new RPThruster(2,3,1,target);
