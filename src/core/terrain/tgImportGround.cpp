@@ -264,7 +264,13 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
             interpolateTriangles(verticies, pMesh);
         }
         else {
-            pMesh -> addTriangle(v0, v1, v2);   
+            pMesh -> addTriangle(v0, v1, v2);
+
+            v0.setY(v0.y()-0.5);
+            v1.setY(v1.y()-0.5);
+            v2.setY(v2.y()-0.5);
+
+            pMesh -> addTriangle(v0, v1, v2);
         }
     }
 
