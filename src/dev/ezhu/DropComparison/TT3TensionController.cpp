@@ -55,7 +55,7 @@ void TT3TensionController::onSetup(TT3Model& subject)
 	doLog = true;
 
 	if (doLog) {
-		std::string filename = "SUPERball_drop_data.txt";
+		std::string filename = "TT3_drop_data.txt";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -80,6 +80,7 @@ void TT3TensionController::onStep(TT3Model& subject, double dt)
     }
     else {
     	simTime += dt;
+    	std::cout << "Sim time: " << simTime << std::endl;
     }
 
     if (doLog) {

@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     SBModel* const myModel = new SBModel();
 
     // Fifth, select the controller to use, and attach it to the model.
-    //TT3TensionController* const pTC = new TT3TensionController();
+    // TT3TensionController* const pTC = new TT3TensionController();
     SBTensionController* const pTC = new SBTensionController();
     myModel->attach(pTC);
     
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
     
     // Run until the user stops
-    simulation.run();
+    simulation.run(4000);
 
     //Teardown is handled by delete, so that should be automatic
     return 0;

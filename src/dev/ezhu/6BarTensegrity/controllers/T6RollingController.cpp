@@ -753,8 +753,6 @@ bool T6RollingController::stepToFace(double dt)
 	}
 	else stepFinished = true;
 
-	
-	
 	return stepFinished;
 }
 

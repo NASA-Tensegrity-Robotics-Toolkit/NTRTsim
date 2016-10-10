@@ -100,7 +100,7 @@ namespace
          688/pow(sf,3),     // density of rod (kg / length^3)
          751/pow(sf,3),     // density of capsule (kg/ length^3)
          0.031*sf,       // radius (length) ** rod diameter / 2 **
-         0.08*sf, //0.137*sf,        // radius (length) ** capsule diameter / 2 **
+         0.057*sf, //0.137*sf,        // radius (length) ** capsule diameter / 2 **
          1615.0,             // stiffness (kg / sec^2) was 1500
          20.0,              // damping (kg / sec)
          1.7*sf,            // rod_length (length)

@@ -80,6 +80,7 @@ void SBTensionController::onStep(SBModel& subject, double dt)
     }
     else {
     	simTime += dt;
+    	std::cout << "Sim time: " << simTime << std::endl;
     }
 
     if (doLog) {
