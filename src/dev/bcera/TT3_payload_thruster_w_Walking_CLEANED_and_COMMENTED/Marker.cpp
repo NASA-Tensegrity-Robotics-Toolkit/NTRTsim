@@ -39,64 +39,35 @@ namespace
    * All parameters must be positive.
    */
 
-  double sf = 30; //scaling factor. Match with App file and Controller file
+  double sf = 30; //scaling factor. Match with all models, app file and controller files
   btVector3 position;
   
   const struct Config
   {
     double density;
     double radius;
-    double stiffness;
-    double damping;
     double rod_length; 
     double friction;
     double rollFriction;
     double restitution;
-    double pretension;
-    bool   hist;
-    double maxTens;
-    double targetVelocity;
+   
   } c =
     {
       
-      //TT3 Parameters
+      //Parameters
       100,    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
       0.10*sf,          // radius (length)
-      300.0,           // stiffness (kg / sec^2) was 1500
-      20.0,            // damping (kg / sec)
       0.66*sf,         // rod_length (length)
       0.99,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
-      17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,                // History logging (boolean)
-      10000*sf,         // maxTens (kg-m/s^2)
-      0.25*sf,          // targetVelocity (m/s)
-      
-      /*
-      //Superball Parameters
-      688/pow(sf,3),    // density (kg / length^3)
-      .031*sf,          // radius (length)
-      3500.0,           // stiffness (kg / sec^2) was 1500
-      200.0,            // damping (kg / sec)
-      1.615*sf,         // rod_length (length)
-      0.99,             // friction (unitless)
-      0.01,             // rollFriction (unitless)
-      0.0,              // restitution (?)
-      300.0*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,                // History logging (boolean)
-      10000*sf,         // maxTens (kg-m/s^2)
-      0.5*sf,          // targetVelocity (m/s) 
-      */
     };
 } // namespace
 
 MarkerModel::MarkerModel(btVector3 Location) :
   tgModel() 
 {
-  position = Location;
-  //this->gDebugDraw = new GLDebugDrawer();
-  
+  position = Location;  
 }
 
 MarkerModel::~MarkerModel()
@@ -106,12 +77,6 @@ MarkerModel::~MarkerModel()
 
 void MarkerModel::setup(tgWorld& world)
 {
-
-  //Get the dynamics world
-  //tgWorldImpl& impl = world.implementation();
-  //tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
-  //this->btWorld = &bulletWorld.dynamicsWorld();
-
   // Create a structure that will hold the details of this model
   tgStructure s;
 
@@ -123,9 +88,7 @@ void MarkerModel::setup(tgWorld& world)
   s.addNode(0, 0.2*sf, 0); // 1
   s.addPair( 0,  1,"rod");
   
-  //rotateToFace(s, 15);
   s.move(position);
-  //s.move(btVector3(100, 1800, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -134,12 +97,7 @@ void MarkerModel::setup(tgWorld& world)
   // Create your structureInfo
   tgStructureInfo structureInfo(s, spec);
   structureInfo.buildInto(*this, world);
-  
 
-
-  
-  
-  
   // Notify controllers that setup has finished.
   notifySetup();
     

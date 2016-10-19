@@ -20,7 +20,7 @@
  * @file AppPrismModel.cpp
  * @brief Contains the definition function main() for the Three strut
  * tensegrity prism example application
- * @author Brian Tietz
+ * @author Brian Cera
  * $Id$
  */
 
@@ -50,6 +50,7 @@
  * @param[in] argv argv[0] is the executable name
  * @return 0
  */
+
 int main(int argc, char** argv)
 {
   double sf = 30; //Scaling Factor - match with model and controller files
@@ -59,14 +60,17 @@ int main(int argc, char** argv)
   const double pitch = 0.0;
   const double roll = 0.0;
 
+  //Option 1: Uncomment to implement flat ground environment (must comment out STL importer below)
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /*
   const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
   */
-  
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // Import Ground
+
+  //Option 2: Uncomment below to import parsed STL file (must comment out flat ground above)
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Set ground parameters
   btVector3 orientation = btVector3(yaw, pitch, roll);
   const double friction = 0.99;
@@ -76,18 +80,20 @@ int main(int argc, char** argv)
   const double offset = 0.5;
   const double scalingFactor = 20;//100;
   bool Interp = false;
-  // Configure ground characteristics
+  
+  // Configure ground characteristics for simulation
   const tgImportGround::Config groundConfig(orientation, friction, restitution,
 					    origin, margin, offset, scalingFactor,Interp);
+  
   // Get filename from argv
-  //std::string filename_in = argv[1];
   std::string filename_in = "./lunarscape_mission.txt";
-  //std::string filename_in = "./LunarScape_crater2Ex.txt";
+  
   // Check filename
   if (filename_in.find(".txt") == std::string::npos) {
     std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
     exit(EXIT_FAILURE);
   }
+  
   //Create filestream
   std::fstream file_in;
   // Open filestream
@@ -102,51 +108,50 @@ int main(int argc, char** argv)
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-
-  double gravity = 1.618*sf;
-  const tgWorld::Config config(gravity); // gravity, cm/sec^2
+ 
+  double gravity = 1.618*sf; //moon gravity
+  const tgWorld::Config config(gravity); 
   tgWorld world(config, ground);
 
-  // Second create the view
+  //Second create the view
   const double timestep_physics = 0.001; // seconds
   const double timestep_graphics = 1.f/60.f; // seconds
-  tgSimViewGraphics view(world, timestep_physics, timestep_graphics); //turn on graphics
-  //tgSimView view(world, timestep_physics, timestep_graphics); // turn off graphics for faster data logging
+  tgSimViewGraphics view(world, timestep_physics, timestep_graphics); //turn on graphics (option 1)
+  //tgSimView view(world, timestep_physics, timestep_graphics); // uncomment to turn off graphics for faster data logging (option 2)
 
-  // Third create the simulation
+  //Third create the simulation
   tgSimulation simulation(view);
 
   //Define target destination
-  //btVector3 target = btVector3(2000, 0, -2000);
   btVector3 target = btVector3(1000, 0, -2000);
   
-  // Fourth create the models with their controllers and add the models to the
-  // simulation
+  //Fourth create the model with its controllers and add the models to the simulation 
   PrismModel* const myModel = new PrismModel();
+
+  //Place a model to signify target location
   btVector3 marker_target = target;
   marker_target.setY(100);
   MarkerModel* const marker = new MarkerModel(marker_target);
     
   //Create Active Thruster
-  RPThruster* const thrust_control = new RPThruster(2,3,1,target);
+  RPThruster* const thrust_control = new RPThruster(2,3,1,target); //robotstate=2 activates thruster controller, goes to state 3 if robot is within distance threshold, else state 1
   myModel->attach(thrust_control);
 
-  //Robot Starts in State 1 -> 2 -> 3 -> 1
-  const T6RollingController::Config controllerConfig1(gravity, "face", 0, 1, 2);
-  const T6RollingController::Config controllerConfig2(gravity, "dr", target, 3, 1);
+  //Robot Starts in State 1
+  const T6RollingController::Config controllerConfig1(gravity, "face", 0, 1, 2); //reorientation controller is state 1 -> state 2 thrust control
+  const T6RollingController::Config controllerConfig2(gravity, "dr", target, 3, 1); //dead reckoning is state 3 -> state 1 reorientation
 
+  //Attach both rolling controllers (dead reckoning and reorientation rolling)
   T6RollingController* const rollingController1 = new T6RollingController(controllerConfig1);
   myModel->attach(rollingController1);
   T6RollingController* const rollingController2 = new T6RollingController(controllerConfig2);
   myModel->attach(rollingController2);
-  
     
-  // Add the model to the world
+  // Add the models to the world
   simulation.addModel(marker);
   simulation.addModel(myModel);
     
-  simulation.run(100000);
+  simulation.run(100000); //if graphics is turned off, will only run for N timesteps; simulation.run(N)
 
   //Teardown is handled by delete, so that should be automatic
   return 0;
