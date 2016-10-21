@@ -32,6 +32,7 @@
 #include "core/tgRod.h"
 #include "controllers/tgTensionController.h"
 #include "core/tgBasicActuator.h"
+#include "core/abstractMarker.h"
 // The C++ Standard Library
 #include <vector>
 #include <string>
@@ -83,6 +84,7 @@ private:
     std::ofstream data_out;
     double simTime = 0;
     
+    abstractMarker marker;
 };
 
 #endif // SB_TENSION_CONTROLLER_H

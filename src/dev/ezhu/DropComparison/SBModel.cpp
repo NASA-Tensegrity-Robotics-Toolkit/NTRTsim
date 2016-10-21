@@ -369,17 +369,9 @@ void SBModel::setup(tgWorld& world)
         allActuators.push_back(SBModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
     }
 
-    // btRigidBody* capsuleBody0 = allCapsules[0]->getPRigidBody();
-    // abstractMarker NODE0  = abstractMarker(capsuleBody0,btVector3(0,-config.capsule_length,0),btVector3(0,0,1),0); // body, position, color, node number
-    // this->addMarker(NODE0);
-
-    // btRigidBody* capsuleBody10 = allCapsules[10]->getPRigidBody();
-    // abstractMarker NODE9  = abstractMarker(capsuleBody10,btVector3(0,-config.capsule_length,0),btVector3(0,1,0),1); // body, position, color, node number
-    // this->addMarker(NODE9);
-
-    // btRigidBody* capsuleBody5 = allCapsules[5]->getPRigidBody();
-    // abstractMarker NODE5  = abstractMarker(capsuleBody5,btVector3(0,-config.capsule_length,0),btVector3(1,0,0),2); // body, position, color, node number
-    // this->addMarker(NODE5);
+    btRigidBody* rodBody0 = allRods[0]->getPRigidBody();
+    NODE0  = abstractMarker(rodBody0,btVector3(config.rod_length/2/sqrt(2),-config.rod_length/2/sqrt(2)+1,config.capsule_length/2),btVector3(0,0,1),1); // body, position, color, node number
+    this->addMarker(NODE0);
     
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
@@ -421,6 +413,11 @@ const std::vector<tgRod*>& SBModel::getAllRods() const
 const std::vector<tgRod*>& SBModel::getAllCapsules() const 
 {
     return allCapsules;
+}
+
+const abstractMarker& SBModel::getAllMarkers() const
+{
+    return NODE0;
 }
 
 void SBModel::teardown()

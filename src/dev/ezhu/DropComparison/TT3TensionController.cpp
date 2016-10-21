@@ -52,7 +52,7 @@ TT3TensionController::~TT3TensionController()
 
 void TT3TensionController::onSetup(TT3Model& subject)
 {
-	doLog = true;
+	doLog = false;
 
 	if (doLog) {
 		std::string filename = "TT3_drop_data.txt";
