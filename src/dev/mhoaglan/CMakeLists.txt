@@ -1,9 +1,6 @@
-Project(ezhu)
+Project(mhoaglan)
 
 subdirs(
-    6BarTensegrity
-    WorldImportTest
-    STLParser
-    payload_thruster
+    12BarTensegrity
     DropComparison
     ) 

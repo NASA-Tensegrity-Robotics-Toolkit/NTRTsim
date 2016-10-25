@@ -9,6 +9,7 @@ subdirs(
     atil
     steve
     kmorse
+    mhoaglan
     apsabelhaus
     ultra-spine
     muscleNP

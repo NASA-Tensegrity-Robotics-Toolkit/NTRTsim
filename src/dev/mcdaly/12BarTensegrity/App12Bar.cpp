@@ -69,7 +69,8 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
-    RPLengthController* const tension_sensor = new RPLengthController();
+    //Commented out these lines -marshall
+     RPLengthController* const tension_sensor = new RPLengthController();
     myModel -> attach(tension_sensor);
 
     // Add the model to the world

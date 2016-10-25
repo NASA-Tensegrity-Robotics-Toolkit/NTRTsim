@@ -1,0 +1,8 @@
+substructures:
+  12BarCube:
+    path: ./12BarCube.yaml
+    translation: [0, 50, 0] #originally 25
+    rotation:
+      axis: [1, 1, 0]
+      angle: 0
+    scale: 2
