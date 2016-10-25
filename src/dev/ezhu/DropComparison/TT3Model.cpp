@@ -157,47 +157,54 @@ void TT3Model::addNodes(tgStructure& s)
     s.addNode(config.rod_length/2, -rodSpace/2, 0); // 11
 
 
-    s.addNode(-rodSpace/2, 0, config.capsule_length/2); // 12
-    s.addNode(-rodSpace/2, 0, -config.capsule_length/2); // 13
-    s.addNode(rodSpace/2, 0, -config.capsule_length/2); //14
-    s.addNode(rodSpace/2, 0, config.capsule_length/2); //15
+    // s.addNode(-rodSpace/2, 0, config.capsule_length/2); // 12
+    // s.addNode(-rodSpace/2, 0, -config.capsule_length/2); // 13
+    // s.addNode(rodSpace/2, 0, -config.capsule_length/2); //14
+    // s.addNode(rodSpace/2, 0, config.capsule_length/2); //15
 
-    s.addNode(0, -config.capsule_length/2, rodSpace/2); // 16
-    s.addNode(0, config.capsule_length/2, rodSpace/2); // 17
-    s.addNode(0, config.capsule_length/2, -rodSpace/2); // 18
-    s.addNode(0, -config.capsule_length/2, -rodSpace/2); // 19
+    // s.addNode(0, -config.capsule_length/2, rodSpace/2); // 16
+    // s.addNode(0, config.capsule_length/2, rodSpace/2); // 17
+    // s.addNode(0, config.capsule_length/2, -rodSpace/2); // 18
+    // s.addNode(0, -config.capsule_length/2, -rodSpace/2); // 19
 
-    s.addNode(-config.capsule_length/2, -rodSpace/2, 0); // 20
-    s.addNode(-config.capsule_length/2, rodSpace/2, 0); // 21
-    s.addNode(config.capsule_length/2, rodSpace/2, 0); // 22
-    s.addNode(config.capsule_length/2, -rodSpace/2, 0); // 23
+    // s.addNode(-config.capsule_length/2, -rodSpace/2, 0); // 20
+    // s.addNode(-config.capsule_length/2, rodSpace/2, 0); // 21
+    // s.addNode(config.capsule_length/2, rodSpace/2, 0); // 22
+    // s.addNode(config.capsule_length/2, -rodSpace/2, 0); // 23
 }
 
 void TT3Model::addRods(tgStructure& s)
 {
-    s.addPair(0, 12,  tgString("rod num", 0));
-    s.addPair(12, 13, tgString("capsule num", 0));
-    s.addPair(13, 1,  tgString("rod num", 1));
+    s.addPair(0, 1, tgString("rod num", 0));
+    s.addPair(3, 2, tgString("rod num", 1));
+    s.addPair(4, 5, tgString("rod num", 2));
+    s.addPair(7, 6, tgString("rod num", 3));
+    s.addPair(8, 11, tgString("rod num", 4));
+    s.addPair(9, 10, tgString("rod num", 5));
+    
+    // s.addPair(0, 12,  tgString("rod num", 0));
+    // s.addPair(12, 13, tgString("capsule num", 0));
+    // s.addPair(13, 1,  tgString("rod num", 1));
 
-    s.addPair(3, 15,  tgString("rod num", 2));
-    s.addPair(15, 14, tgString("capsule num", 1));
-    s.addPair(14, 2,  tgString("rod num", 3));
+    // s.addPair(3, 15,  tgString("rod num", 2));
+    // s.addPair(15, 14, tgString("capsule num", 1));
+    // s.addPair(14, 2,  tgString("rod num", 3));
 
-    s.addPair(4, 16,  tgString("rod num", 4));
-    s.addPair(16, 17, tgString("capsule num", 2));
-    s.addPair(17, 5,  tgString("rod num", 5));
+    // s.addPair(4, 16,  tgString("rod num", 4));
+    // s.addPair(16, 17, tgString("capsule num", 2));
+    // s.addPair(17, 5,  tgString("rod num", 5));
 
-    s.addPair(7, 19,  tgString("rod num", 6));
-    s.addPair(19, 18, tgString("capsule num", 3));
-    s.addPair(18, 6,  tgString("rod num", 7));
+    // s.addPair(7, 19,  tgString("rod num", 6));
+    // s.addPair(19, 18, tgString("capsule num", 3));
+    // s.addPair(18, 6,  tgString("rod num", 7));
 
-    s.addPair(8, 20,  tgString("rod num", 8));
-    s.addPair(20, 23, tgString("capsule num", 4));
-    s.addPair(23, 11, tgString("rod num", 9));
+    // s.addPair(8, 20,  tgString("rod num", 8));
+    // s.addPair(20, 23, tgString("capsule num", 4));
+    // s.addPair(23, 11, tgString("rod num", 9));
 
-    s.addPair(9, 21,  tgString("rod num", 10));
-    s.addPair(21, 22, tgString("capsule num", 5));
-    s.addPair(22, 10, tgString("rod num", 11));
+    // s.addPair(9, 21,  tgString("rod num", 10));
+    // s.addPair(21, 22, tgString("capsule num", 5));
+    // s.addPair(22, 10, tgString("rod num", 11));
 }
 
 void TT3Model::addActuators(tgStructure& s)
@@ -340,8 +347,8 @@ void TT3Model::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(config.radius, config.density, config.friction, 
 				config.rollFriction, config.restitution);
-    const tgRod::Config capsuleConfig(config.radius_capsule, config.density_capsule, config.friction, 
-				config.rollFriction, config.restitution);
+    // const tgRod::Config capsuleConfig(config.radius_capsule, config.density_capsule, config.friction, 
+				// config.rollFriction, config.restitution);
   
     tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension, config.hist, 
 					    config.maxTens, config.targetVelocity);
@@ -360,7 +367,7 @@ void TT3Model::setup(tgWorld& world)
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
-    spec.addBuilder("capsule", new tgRodInfo(capsuleConfig));
+    // spec.addBuilder("capsule", new tgRodInfo(capsuleConfig));
 
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
@@ -375,10 +382,10 @@ void TT3Model::setup(tgWorld& world)
     }
 
     // Get the capsule rigid bodies for controller
-    std::vector<tgRod*> capsules = TT3Model::find<tgRod>("capsule");
-    for (int i = 0; i < capsules.size(); i++) {
-        allCapsules.push_back(TT3Model::find<tgRod>(tgString("capsule num", i))[0]);
-    }
+    // std::vector<tgRod*> capsules = TT3Model::find<tgRod>("capsule");
+    // for (int i = 0; i < capsules.size(); i++) {
+    //     allCapsules.push_back(TT3Model::find<tgRod>(tgString("capsule num", i))[0]);
+    // }
 
     // Get the actuators for controller
     std::vector<tgBasicActuator*> actuators = TT3Model::find<tgBasicActuator>("actuator");

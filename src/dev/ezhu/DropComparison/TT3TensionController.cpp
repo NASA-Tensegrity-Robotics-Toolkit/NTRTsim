@@ -55,7 +55,7 @@ void TT3TensionController::onSetup(TT3Model& subject)
 	doLog = true;
 
 	if (doLog) {
-		std::string filename = "SUPERball_drop_data.txt";
+		std::string filename = "TT3_drop_data.txt";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -63,13 +63,29 @@ void TT3TensionController::onSetup(TT3Model& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, XPos, YPos, ZPos, XVel, YVel, ZVel" << std::endl << std::endl;
+			data_out << "SimTime, " <<
+			"R0XPos, R0YPos, R0ZPos, R0Ang, R0AxX, R0AxY, R0AxZ, " <<
+			"R1XPos, R1YPos, R1ZPos, R1Ang, R1AxX, R1AxY, R1AxZ, " <<
+			"R2XPos, R2YPos, R2ZPos, R2Ang, R2AxX, R2AxY, R2AxZ, " <<
+			"R3XPos, R3YPos, R3ZPos, R3Ang, R3AxX, R3AxY, R3AxZ, " <<
+			"R4XPos, R4YPos, R4ZPos, R4Ang, R4AxX, R4AxY, R4AxZ, " <<
+			"R5XPos, R5YPos, R5ZPos, R5Ang, R5AxX, R5AxY, R5AxZ" << std::endl << std::endl;
 		}
 	}
 
-	std::vector<tgRod*> capsules = subject.getAllCapsules();
-	tgRod* capsuleRod = capsules[0];
-	capsuleBody = capsuleRod->getPRigidBody();
+	std::vector<tgRod*> rods = subject.getAllRods();
+	tgRod* Rod0 = rods[0];
+	rodBody0 = Rod0->getPRigidBody();
+	tgRod* Rod1 = rods[1];
+	rodBody1 = Rod1->getPRigidBody();
+	tgRod* Rod2 = rods[2];
+	rodBody2 = Rod2->getPRigidBody();
+	tgRod* Rod3 = rods[3];
+	rodBody3 = Rod3->getPRigidBody();
+	tgRod* Rod4 = rods[4];
+	rodBody4 = Rod4->getPRigidBody();
+	tgRod* Rod5 = rods[5];
+	rodBody5 = Rod5->getPRigidBody();
 }
 
 void TT3TensionController::onStep(TT3Model& subject, double dt)
@@ -83,11 +99,50 @@ void TT3TensionController::onStep(TT3Model& subject, double dt)
     }
 
     if (doLog) {
-    	btVector3 capsule_pos = capsuleBody->getCenterOfMassPosition();
-    	btVector3 capsule_vel = capsuleBody->getLinearVelocity();
-    	data_out << simTime << ", " << capsule_pos.x() << ", " 
-    		<< capsule_pos.y() << ", " << capsule_pos.z() << ", " 
-    		<< capsule_vel.x() << ", " << capsule_vel.y() << ", " 
-    		<< capsule_vel.z() << std::endl;
+    	btVector3 rod_pos0 = rodBody0->getCenterOfMassPosition();
+    	btVector3 rod_pos1 = rodBody1->getCenterOfMassPosition();
+    	btVector3 rod_pos2 = rodBody2->getCenterOfMassPosition();
+    	btVector3 rod_pos3 = rodBody3->getCenterOfMassPosition();
+    	btVector3 rod_pos4 = rodBody4->getCenterOfMassPosition();
+    	btVector3 rod_pos5 = rodBody5->getCenterOfMassPosition();
+
+    	btQuaternion rod0Quat = rodBody0->getOrientation();
+    	btScalar rod0Angle = rod0Quat.getAngle();
+    	btVector3 rod0Axis = rod0Quat.getAxis();
+    	btQuaternion rod1Quat = rodBody1->getOrientation();
+    	btScalar rod1Angle = rod0Quat.getAngle();
+    	btVector3 rod1Axis = rod0Quat.getAxis();
+    	btQuaternion rod2Quat = rodBody2->getOrientation();
+    	btScalar rod2Angle = rod0Quat.getAngle();
+    	btVector3 rod2Axis = rod0Quat.getAxis();
+    	btQuaternion rod3Quat = rodBody3->getOrientation();
+    	btScalar rod3Angle = rod0Quat.getAngle();
+    	btVector3 rod3Axis = rod0Quat.getAxis();
+    	btQuaternion rod4Quat = rodBody4->getOrientation();
+    	btScalar rod4Angle = rod0Quat.getAngle();
+    	btVector3 rod4Axis = rod0Quat.getAxis();
+    	btQuaternion rod5Quat = rodBody5->getOrientation();
+    	btScalar rod5Angle = rod0Quat.getAngle();
+    	btVector3 rod5Axis = rod0Quat.getAxis();
+
+    	// std::cout << rod0Angle << " (" << rod0Axis.x() << ","
+    		 // << rod0Axis.y() << "," << rod0Axis.z() << ")" << std::endl;
+    	// btVector3 capsule_vel = capsuleBody->getLinearVelocity();
+    	
+    	// Record state info for simulation playback
+    	data_out << simTime << ", "  
+    		<< rod_pos0.x() << ", " << rod_pos0.y() << ", " << rod_pos0.z() << ", " << rod0Angle << ", "
+    		<< rod0Axis.x() << ", " << rod0Axis.y() << ", " << rod0Axis.z() << ", "
+    		<< rod_pos1.x() << ", " << rod_pos1.y() << ", " << rod_pos1.z() << ", " << rod1Angle << ", "
+    		<< rod1Axis.x() << ", " << rod1Axis.y() << ", " << rod1Axis.z() << ", "
+    		<< rod_pos2.x() << ", " << rod_pos2.y() << ", " << rod_pos2.z() << ", " << rod2Angle << ", "
+    		<< rod2Axis.x() << ", " << rod2Axis.y() << ", " << rod2Axis.z() << ", "
+    		<< rod_pos3.x() << ", " << rod_pos3.y() << ", " << rod_pos3.z() << ", " << rod3Angle << ", "
+    		<< rod3Axis.x() << ", " << rod3Axis.y() << ", " << rod3Axis.z() << ", "
+    		<< rod_pos4.x() << ", " << rod_pos4.y() << ", " << rod_pos4.z() << ", " << rod4Angle << ", "
+    		<< rod4Axis.x() << ", " << rod4Axis.y() << ", " << rod4Axis.z() << ", "
+    		<< rod_pos5.x() << ", " << rod_pos5.y() << ", " << rod_pos5.z() << ", " << rod5Angle << ", "
+    		<< rod5Axis.x() << ", " << rod5Axis.y() << ", " << rod5Axis.z()
+    		<< std::endl;
     }
 }

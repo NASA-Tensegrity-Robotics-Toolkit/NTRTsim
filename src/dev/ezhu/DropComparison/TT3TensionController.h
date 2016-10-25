@@ -40,6 +40,7 @@
 //Bullet Physics
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
  //namespace std for vectors 
 using namespace std;
 
@@ -74,7 +75,12 @@ public:
     
 private:
 	
-	btRigidBody* capsuleBody;
+	btRigidBody* rodBody0;
+    btRigidBody* rodBody1;
+    btRigidBody* rodBody2;
+    btRigidBody* rodBody3;
+    btRigidBody* rodBody4;
+    btRigidBody* rodBody5;
 
     std::vector<tgTensionController*> m_controllers;
 
