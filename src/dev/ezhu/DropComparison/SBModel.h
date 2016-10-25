@@ -109,6 +109,12 @@ public:
     const std::vector<tgRod*>& getAllCapsules() const;
 
     /**
+     * Return a vector of all capsule bodies for the controllers to work with.
+     * @return A vector of all of the capsule rigid bodies
+     */
+    const abstractMarker& getAllMarkers() const;
+
+    /**
          * A function called during setup that rotates the structure
          * to a face
          * @param[in] s A tgStructure that we're building into
@@ -226,6 +232,8 @@ private:
     btVector3 face17Norm;
     btVector3 face18Norm;
     btVector3 face19Norm;
+
+    abstractMarker NODE0;
 };
 
 #endif  // SB_MODEL_H

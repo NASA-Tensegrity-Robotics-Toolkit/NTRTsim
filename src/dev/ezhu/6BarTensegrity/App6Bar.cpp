@@ -62,6 +62,8 @@ int main(int argc, char** argv)
     const double pitch =0.0*PI/180;
     const double roll = 0.0;
 
+    double sf = 10;
+
     // [0, 0.1, 0] rad works
     // [0, 0.15, 0] rad works
     // [0, 0.2, 0] rad works
@@ -78,11 +80,13 @@ int main(int argc, char** argv)
     const double margin = 0.05;
     const double offset = 0.5;
     const double scalingFactor = 10;
-    const bool interp = true;
+    // const double scalingFactor = sf*1000;
+    const int interp = 1;
+    const bool twoLayer = true;
 
     // Configure ground characteristics
     const tgImportGround::Config groundConfig(orientation, friction, restitution,
-        origin, margin, offset, scalingFactor, interp);
+        origin, margin, offset, scalingFactor, interp, twoLayer);
 
     // Get filename from argv
     // std::string filename_in = argv[1];
@@ -117,7 +121,7 @@ int main(int argc, char** argv)
     // tgBoxGround* ground = new tgBoxGround(groundConfig);
     // ---------------------------------------------------------------------------------
 
-    double sf = 10;
+    
     double gravity = 9.81*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);

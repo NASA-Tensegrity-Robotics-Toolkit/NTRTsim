@@ -362,7 +362,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					}
 
 					if (currSurface >= 0 && !goalReached) {
-						stepFin = stepToFace(currSurface, path[1], dt);
+						stepFin = stepToFace(dt);
 					}
 				}
 				//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
@@ -399,7 +399,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 						}
 					}
 					if (currSurface >= 0 && !drGoalReached) {
-						stepFin = stepToFace(currSurface, path[1], dt);
+						stepFin = stepToFace(dt);
 					}
 				}
 				break;
@@ -439,7 +439,8 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					}
 
 					if (currSurface >= 0 && !goalReached) {
-						stepFin = stepToFace(currSurface, path[1], dt);
+						// stepFin = stepToFace(currSurface, path[1], dt);
+						stepFin = stepToFace(dt);
 					}
 				}
 				break;
@@ -676,68 +677,82 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 	return pathVect;
 }
 
-bool T6RollingController::stepToFace(int startFace, int endFace, double dt)
+bool T6RollingController::stepToFace(double dt)
 {
 	// Initialize flags
-	bool stepFinished = true;
+	bool stepFinished = false;
 	bool isOnPath = false;
 	// Length for cables to retract to
 	//double controlLength = 0.2;
 	double controlLength = restLength * 0;
 	
+	int cableToActuate = -1;
 	// Get which cable to actuate from actuation policy table
-	int cableToActuate = actuationPolicy[startFace][endFace];
-	actuatedCable = cableToActuate;
+	if (path.size() > 1) {
+		cableToActuate = actuationPolicy[path[0]][path[1]];
+		actuatedCable = cableToActuate;
 
-	// Perform actuation from one closed face to another
-	if (isClosedFace(startFace)) {
-		if (cableToActuate >= 0) {
-			// Find current face
-			int currFace = contactSurfaceDetection();
-			currentFace = currFace;
-			// path[0] is current face, path[1] is the adjacent open face, 
-			// path[2] is the next closed face
-			// Check if the robot has reached the next closed face
-			if (currFace != path[2]) {
-				m_controllers[cableToActuate]->control(dt, controlLength);
-				actuators[cableToActuate]->moveMotors(dt);
-				// std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
-				stepFinished = false;
-				resetCounter++;
-				if (resetCounter > 3.0/dt) resetFlag = true;
+		// Find current face
+		int currFace = contactSurfaceDetection();
+		currentFace = currFace;
+
+		// Perform actuation from one closed face to another
+		if (isClosedFace(path[0])) {
+			if (cableToActuate >= 0) {
+				// path[0] is current face, path[1] is the adjacent open face, 
+				// path[2] is the next closed face
+				// Check if the robot has reached the next closed face
+				if (currFace != path[2]) {
+					m_controllers[cableToActuate]->control(dt, controlLength);
+					actuators[cableToActuate]->moveMotors(dt);
+					// std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
+					resetCounter++;
+					if (resetCounter > 3.0/dt) resetFlag = true;
+				}
+				// If it has, return all cables to rest length
+				else {
+					resetFlag = true;
+					path.erase(path.begin(),path.begin()+2);
+					utility::printVector(path);
+					if (path.size() == 1) {
+						stepFinished = true;
+					}
+				}
 			}
-			// If it has, return all cables to rest length
-			else resetFlag = true;
+			// Triggers if element called from actuation policy table is -1
+			else {
+				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+				//exit(EXIT_FAILURE);
+			}
 		}
-		// Triggers if element called from actuation policy table is -1
+		// Perfom actuation to get from an open face to a closed face
 		else {
-			std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-			//exit(EXIT_FAILURE);
+			if (cableToActuate >= 0) {
+				// Check to see if robot has reached a closed face
+				if (!isClosedFace(currFace)) {
+					m_controllers[cableToActuate]->control(dt, controlLength);
+					actuators[cableToActuate]->moveMotors(dt);
+					// std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
+					resetCounter++;
+					if (resetCounter > 3.0/dt) resetFlag = true;
+				}
+				// If it has, return all cables to rest length
+				else {
+					resetFlag = true;
+					path.erase(path.begin());
+					utility::printVector(path);
+					stepFinished = true;
+				}
+			}
+			// Triggers if element called from actuation policy table is -1
+			else {
+				std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
+				//exit(EXIT_FAILURE);
+			}
 		}
 	}
-	// Perfom actuation to get from an open face to a closed face
-	else {
-		if (cableToActuate >= 0) {
-			// Find current face
-			int currFace = contactSurfaceDetection();
-			// Check to see if robot has reached a closed face
-			if (!isClosedFace(currFace)) {
-				m_controllers[cableToActuate]->control(dt, controlLength);
-				actuators[cableToActuate]->moveMotors(dt);
-				// std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
-				stepFinished = false;
-				resetCounter++;
-				if (resetCounter > 3.0/dt) resetFlag = true;
-			}
-			// If it has, return all cables to rest length
-			else resetFlag = true;
-		}
-		// Triggers if element called from actuation policy table is -1
-		else {
-			std::cout << "stepToFace: No actuation scheme available, exiting..." << std::endl;
-			//exit(EXIT_FAILURE);
-		}
-	}
+	else stepFinished = true;
+
 	return stepFinished;
 }
 

@@ -32,6 +32,7 @@
 #include <cassert>
 #include <math.h>
 #include <stdexcept>
+#include "utility.hpp"
 
 using namespace std;
 
@@ -63,13 +64,15 @@ void SBTensionController::onSetup(SBModel& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, XPos, YPos, ZPos, XVel, YVel, ZVel" << std::endl << std::endl;
+			data_out << "SimTime, XPos, YPos, ZPos" << std::endl << std::endl;
 		}
 	}
 
 	std::vector<tgRod*> capsules = subject.getAllCapsules();
 	tgRod* capsuleRod = capsules[0];
 	capsuleBody = capsuleRod->getPRigidBody();
+
+	marker = subject.getAllMarkers();
 }
 
 void SBTensionController::onStep(SBModel& subject, double dt)
@@ -80,14 +83,19 @@ void SBTensionController::onStep(SBModel& subject, double dt)
     }
     else {
     	simTime += dt;
+    	std::cout << "Sim time: " << simTime << std::endl;
     }
 
     if (doLog) {
-    	btVector3 capsule_pos = capsuleBody->getCenterOfMassPosition();
-    	btVector3 capsule_vel = capsuleBody->getLinearVelocity();
+    	btVector3 capsule_pos = marker.getWorldPosition();
     	data_out << simTime << ", " << capsule_pos.x() << ", " 
-    		<< capsule_pos.y() << ", " << capsule_pos.z() << ", " 
-    		<< capsule_vel.x() << ", " << capsule_vel.y() << ", " 
-    		<< capsule_vel.z() << std::endl;
+    		<< capsule_pos.y() << ", " << capsule_pos.z() << std::endl;
+
+    	// btVector3 capsule_pos = capsuleBody->getCenterOfMassPosition();
+    	// btVector3 capsule_vel = capsuleBody->getLinearVelocity();
+    	// data_out << simTime << ", " << capsule_pos.x() << ", " 
+    	// 	<< capsule_pos.y() << ", " << capsule_pos.z() << ", " 
+    	// 	<< capsule_vel.x() << ", " << capsule_vel.y() << ", " 
+    	// 	<< capsule_vel.z() << std::endl;
     }
 }

@@ -152,12 +152,10 @@ public:
 
 	/**
 	 * Perform actuation to move robot to desired face
-	 * @param[in] currFace - The face that the robot is on when this function is called
-	 * @param[in] desFace - Desired face to travel to
 	 * @param[in] dt - Time step
 	 * @return A boolean indicating whether or not the step has been completed
 	 */
-	bool stepToFace(int currFace, int desFace, double dt);
+	bool stepToFace(double dt);
 
 	/**
 	 * Function for determining whether or not a certain face is a closed triangle on the
