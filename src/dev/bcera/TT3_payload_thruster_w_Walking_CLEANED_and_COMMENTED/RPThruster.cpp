@@ -56,7 +56,7 @@ namespace
   double initiateThrustTime = 1; // wait time until thrust initiation
   double reorientTime = 0; //how much time after thrust is initiated to wait before reorienting attitude goal vector
   bool isReoriented = false;
-  double thrustPeriod = 2.5; // duration of thrust on
+  double thrustPeriod = 6.5; // duration of thrust on
   double distanceThreshold = 200; //Arbitrary distance to activate dead reckoning
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
@@ -101,7 +101,7 @@ void RPThruster::onSetup(PrismModel& subject)
 {
   //Define tank and thruster rigid bodies for later use
   tankRigidBody = subject.TankBodies[0];
-  thrusterRigidBody = subject.ThrusterBodies[0]; 
+  thrusterRigidBody = subject.ThrusterBodies[0];
 
   //tankOrientations.resize(numTankOrientations);
 
@@ -120,8 +120,6 @@ void RPThruster::onSetup(PrismModel& subject)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   std::cout << "------------------ On Setup -------------------" << std::endl;
-    
-  if ( doLog ) { simlog.open("./log/rotation.csv"); }
 
   srand((unsigned)time(NULL));
 
@@ -138,7 +136,7 @@ void RPThruster::onSetup(PrismModel& subject)
 
   //If logging, start CSV with header line
   if(doLog){
-    sim_out.open("Payload Thruster Control 6s Thrust - Run 3.txt",std::ios::app);
+    sim_out.open("Payload Thruster Control 6s Thrust - Run 3.txt");
     sim_out << "Label-Goal Altitude, GoalAltitude, Label-GoalYaw, GoalYaw, Label-SimTime, SimTime, Label-GimbalPitch, GimbalPitch, Label-GimbalYaw, GimbalYaw, Label-TankPitch, TankPitch, Label-TankYaw, TankYaw, Label-TankPos, TankPosX, TankPosY, TankPosZ, Label-TankVelPitch, TankVelPitch, Label-TankVelYaw, TankVelYaw, Label-Alpha, Alpha, Label-Beta, Beta, Label-Error, Error, Label-d_error, d_Error" << std::endl;
     sim_out << std::endl;
   }
@@ -146,9 +144,7 @@ void RPThruster::onSetup(PrismModel& subject)
 
 
 void RPThruster::onStep(PrismModel& subject, double dt)
-{
-  std::cout << "Thruster Controller Active" << std::endl;
-  
+{  
   //Stop gimbal motion when thruster controller is inactive
   subject.altitudeHinge->enableAngularMotor(true,0,1);
   subject.yawHinge->enableAngularMotor(true,0,1);
@@ -162,22 +158,23 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	}
       else
 	{
+	  std::cout << "Thruster Controller Active" << std::endl;
 	  //check once when thrust control starts, to calculate heading direction
 	  if(positionAcquired==false){
 	    launchPosition = tankRigidBody->getCenterOfMassPosition();
 	    positionAcquired = true; //prevent block from being called until needed
 	  }
 	  //check if robot has landed and stopped rolling
-	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<0.1){
+	  if((worldTime > (initiateThrustTime + thrustPeriod)) && robotSpeed<1){
 	    //compare distance to target location
 	    btVector3 diff = tankRigidBody->getCenterOfMassPosition() - targetLocation;
 	    diff.setY(0);
 
 	    //Set thrust activation period to be proportional to distance to target
 	    thrustPeriod = diff.norm()/1200; //linear scale + constant reorient period
-	    thrustPeriod = std::min(thrustPeriod,3.5);
-	    thrustPeriod = std::max(thrustPeriod,0.85);
-
+	    thrustPeriod = std::min(thrustPeriod,6.5);
+	    thrustPeriod = std::max(thrustPeriod,1.25);
+	    
 	    //if distance is greater than the threshold, switch to reorientation for another hop, else switch to dead reckoning
 	    if(diff.norm() < distanceThreshold)
 	      subject.changeRobotState(transfer_flag);
@@ -205,13 +202,13 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  if(worldTime > initiateThrustTime+reorientTime && !isReoriented){
 	    std::cout << "Reoriented Thrust" << std::endl;
 	    
-	    double finalGoalAltitude = -10; //set arbitrarily based on tested results
+	    double finalGoalAltitude = -30; //set arbitrarily based on tested results
 	    double finalGoalYaw;
 	    
 	    //Calculate Yaw Based on Target
 	    finalGoalYaw = atan2(targetLocation.getX()-launchPosition.getX(),targetLocation.getZ()-launchPosition.getZ())*180/M_PI;
 	    
-	    double inc = 50*dt; //50 degrees of change per second
+	    double inc = 30*dt;//50*dt; //50 degrees of change per second
 
 	    //flags for if either angle has reached final goal angle
 	    bool AltSet = false;
@@ -262,6 +259,9 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  }
 
 	  //Real-time printouts to terminal
+	  std::cout << "Num of Markers: " << markers.size() << std::endl;
+	  for(int p=0;p<markers.size();p++)
+	    std::cout << markers[p].getWorldPosition() << std::endl;
 	  std::cout << "Simulation Time: " << worldTime << std::endl;
 	  std::cout << "Goal Altitude: " << goalAltitude << "; Goal Yaw: " << goalYaw << std::endl;
 	  double altitudeAngle = subject.altitudeHinge->getHingeAngle()*180.0/M_PI;
@@ -304,7 +304,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //More logistic printouts during run-time
 	  std::cout << "Tank Heading|| Altitude: " << acos(unit_tank.y())*180/M_PI-90 << ", Yaw:  " << atan2(unit_tank.x(),-unit_tank.z())*180/M_PI+90 << std::endl;
 	  btVector3 tank_pos = tankRigidBody->getCenterOfMassPosition();
-	  std::cout << "Tank Position: " << tank_pos << std::endl;
+	  std::cout << "Tank Position: " << tank_pos/sf << std::endl;
 	  btVector3 tank_lin_vel = tankRigidBody->getLinearVelocity();
 	  std::cout << "Tank Velocity Magnitude: " << tank_lin_vel.length() << std::endl;
 	  robotSpeed = tank_lin_vel.length();
@@ -368,6 +368,9 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 
 	  //print final goal vector
 	  std::cout << "Thruster Goal Vector: " << sol_vector << std::endl;
+
+	  //print Thrust Period
+	  std::cout << "Thrust Period: " << thrustPeriod << std::endl;
 	  
 	  //Calculate Gimbal Inputs
 	  double beta = asin(-sol_vector.getY());
@@ -433,7 +436,8 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Thruster Force Vector===========================================================================================
 	  std::cout << "Thrust: " << thrust << std::endl;
 	  double gimbalAngleTol = 200; //capability to make thrust inactive if error is too large, in this case, for 200, thrust is always on since 200 error is an unreachable error
-	  if ( shootTime > initiateThrustTime && shootTime <= (initiateThrustTime + thrustPeriod) && abs(deltaAltitude)<gimbalAngleTol && abs(deltaYaw)<gimbalAngleTol)
+	  //if ( shootTime > initiateThrustTime && shootTime <= (initiateThrustTime + thrustPeriod) && abs(deltaAltitude)<gimbalAngleTol && abs(deltaYaw)<gimbalAngleTol)
+	    if ( shootTime > initiateThrustTime && shootTime <= (initiateThrustTime + thrustPeriod))
 	    {
 	      std::cout << "Thruster Active~" << std::endl;
 	      for(int k=0; k<force.size(); k++)
@@ -451,9 +455,13 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //thrust inactive
 	  else
 	    {
+	      std::cout << "Thruster Inactive###" << std::endl;
 	      for(int k=0; k<force.size(); k++)
 		{
 		  force[k] = 0*force[k];
+		  //Stop gimbal motion when thruster is inactive
+		  subject.altitudeHinge->enableAngularMotor(true,0,1);
+		  subject.yawHinge->enableAngularMotor(true,0,1);
 		}			
 	    }
 	  std::cout << std::endl;
@@ -463,12 +471,6 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  for(int m=0; m<force.size(); m++){
 	    thrusterRigidBody->applyForce(force[m], pos);
 	  }
-
-	  //check if robot flew outside of the world
-	  if (thrusterRigidBody->getCenterOfMassPosition()[1] < -10*sf)
-	    {
-	      std::cout << "Robot fell outside of the world!" << std::endl;
-	    }
 
 	  //printout to CSV file if logging boolean is true
 	  std::cout << fmod(worldTime,0.1) << std::endl;

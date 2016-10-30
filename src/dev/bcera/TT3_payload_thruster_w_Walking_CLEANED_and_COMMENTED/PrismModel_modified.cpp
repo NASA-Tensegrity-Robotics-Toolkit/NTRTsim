@@ -33,6 +33,7 @@ namespace
    */
 
   double sf = 30; //scaling factor. Match with App file and Controller file
+  bool marker_log = true;
   
   const struct Config
   {
@@ -53,10 +54,10 @@ namespace
       //Option 1: TT3 Parameters
       2990/pow(sf,3),    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
       .0127/2*sf,          // radius (length)
-      300.0,           // stiffness (kg / sec^2) was 1500
+      500.0,//300.0,           // stiffness (kg / sec^2) was 1500
       20.0,            // damping (kg / sec)
       0.66*sf,         // rod_length (length)
-      0.99,             // friction (unitless)
+      1.0,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
@@ -296,7 +297,18 @@ void PrismModel::setup(tgWorld& world)
   //move robot above ground 
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
-  s.move(btVector3(100, 150, -100));
+  //s.move(btVector3(10*sf,  -225*sf, -10*sf));
+  
+  //scaled 1000/63
+  s.move(btVector3(10*sf, -90*sf, -10*sf));
+
+  s.move(btVector3(10*sf, -42*sf, -900*sf));
+
+  //scaled 1000/50
+
+  //s.move(btVector3(20*sf*63/62.5, -132*sf*63/62.5, -910*sf*63/62.5));
+
+  
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -316,6 +328,12 @@ void PrismModel::setup(tgWorld& world)
   std::vector<tgRod*> rods = PrismModel::find<tgRod>("rod");
   for (int i = 0; i < rods.size(); i++) {
     allRods.push_back(PrismModel::find<tgRod>(tgString("rod num", i))[0]);
+  }
+
+  //set larger margin for collision detection
+  btScalar marg = 0.25;
+  for (int i = 0; i < rods.size(); i++) {
+    allRods[i]->getPRigidBody()->getCollisionShape()->setMargin(marg);
   }
 
   // Get the actuators for controller
@@ -390,6 +408,30 @@ void PrismModel::setup(tgWorld& world)
   
   // Get the actuators for controller
   allActuators = PrismModel::find<tgBasicActuator>("muscle");
+
+  //Grab all the markers on the model
+  if(marker_log){
+    for(int p=0;p<allRods.size();p++){
+      btRigidBody* rod_temp = allRods[p]->getPRigidBody();
+      abstractMarker LOG_NODE_1 = abstractMarker(rod_temp,btVector3(0,c.rod_length/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
+      abstractMarker LOG_NODE_2 = abstractMarker(rod_temp,btVector3(0,-c.rod_length/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
+      this->addMarker(LOG_NODE_1);
+      this->addMarker(LOG_NODE_2);
+      markers.push_back(LOG_NODE_1);
+      markers.push_back(LOG_NODE_2);
+    }
+
+    abstractMarker LOG_NODE_1 = abstractMarker(tankRigidBody,btVector3(0,payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
+    abstractMarker LOG_NODE_2 = abstractMarker(tankRigidBody,btVector3(0,-payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
+    this->addMarker(LOG_NODE_1);
+    this->addMarker(LOG_NODE_2);
+    markers.push_back(LOG_NODE_1);
+    markers.push_back(LOG_NODE_2);
+      
+    //Open log file
+    sim_out.open("Marker Node Positions");
+  }
+      
   
   // Notify controllers that setup has finished.
   notifySetup();
@@ -403,6 +445,22 @@ void PrismModel::setup(tgWorld& world)
 void PrismModel::step(double dt)
 {        
   notifyStep(dt);
+
+  if(marker_log){
+    std::cout << "Marker Logging~~~" << markers.size() << std::endl;
+    for(int i=0;i<markers.size();i++){
+      std::cout << "Node_pos" << i << ", "; 
+      std::cout << markers[i].getWorldPosition().x() << ", ";
+      std::cout << markers[i].getWorldPosition().y() << ", ";
+      std::cout << markers[i].getWorldPosition().z() << ", ";
+    }
+    double yaw, pitch,roll;
+    for(int i=0;i<allRods.size();i++){
+      allRods[i]->getPRigidBody()->getCenterOfMassTransform().getBasis().getEulerYPR(yaw,pitch,roll);
+      std::cout << "YPR" << i << ", " << yaw << ", " << pitch << ", " << roll << ", ";    
+    }
+    std::cout << std::endl;
+  }
   tgModel::step(dt);  // Step any children
 }
 
