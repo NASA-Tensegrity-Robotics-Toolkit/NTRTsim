@@ -82,6 +82,25 @@ private:
     btRigidBody* rodBody4;
     btRigidBody* rodBody5;
 
+    btScalar yaw0;
+    btScalar pitch0;
+    btScalar roll0;
+    btScalar yaw1;
+    btScalar pitch1;
+    btScalar roll1;
+    btScalar yaw2;
+    btScalar pitch2;
+    btScalar roll2;
+    btScalar yaw3;
+    btScalar pitch3;
+    btScalar roll3;
+    btScalar yaw4;
+    btScalar pitch4;
+    btScalar roll4;
+    btScalar yaw5;
+    btScalar pitch5;
+    btScalar roll5;
+
     std::vector<tgTensionController*> m_controllers;
 
     bool doLog = false;

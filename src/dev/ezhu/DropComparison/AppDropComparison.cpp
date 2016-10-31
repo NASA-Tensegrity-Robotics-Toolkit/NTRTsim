@@ -84,13 +84,9 @@ int main(int argc, char** argv)
     // SBModel* const myModel = new SBModel();
 
     // Fifth, select the controller to use, and attach it to the model.
-<<<<<<< HEAD
     TT3TensionController* const pTC = new TT3TensionController();
     // SBTensionController* const pTC = new SBTensionController();
-=======
-    // TT3TensionController* const pTC = new TT3TensionController();
-    SBTensionController* const pTC = new SBTensionController();
->>>>>>> 792f371dffc2e0daad76dcff67df092d4fd8262e
+
     myModel->attach(pTC);
     
     // Finally, add out model to the simulation

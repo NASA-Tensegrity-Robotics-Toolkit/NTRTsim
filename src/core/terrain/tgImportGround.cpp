@@ -271,12 +271,12 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
         if (v0.x() > xBound*scalingFactor || v0.y() <= 0 || v0.z() < -zBound*scalingFactor || 
             v1.x() > xBound*scalingFactor || v1.y() <= 0 || v1.z() < -zBound*scalingFactor || 
             v2.x() > xBound*scalingFactor || v2.y() <= 0 || v2.z() < -zBound*scalingFactor) {
-            continue;
+            // continue;
         }
         
-        v0.setY(v0.y()-min_Y);
-        v1.setY(v1.y()-min_Y);
-        v2.setY(v2.y()-min_Y);
+        // v0.setY(v0.y()-max_Y);
+        // v1.setY(v1.y()-max_Y);
+        // v2.setY(v2.y()-max_Y);
 
         // v0.setY(v0.y()-155000);
         // v1.setY(v1.y()-155000);

@@ -653,7 +653,7 @@ std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& 
 				else {
 					int tentativeDistance = distances[currNode] + weights[neigh_idx];
 					if (tentativeDistance < distances[neighbors[neigh_idx]]) {
-						distances[neighbors[neigh_idx]] = tentativeDistance
+						distances[neighbors[neigh_idx]] = tentativeDistance;
 						prev[neighbors[neigh_idx]] = currNode;
 					}
 				}

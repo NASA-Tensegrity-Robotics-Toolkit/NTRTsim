@@ -81,8 +81,8 @@ int main(int argc, char** argv)
     const double offset = 0.5;
     const double scalingFactor = 10;
     // const double scalingFactor = sf*1000;
-    const int interp = 1;
-    const bool twoLayer = true;
+    const int interp = 0;
+    const bool twoLayer = false;
 
     // Configure ground characteristics
     const tgImportGround::Config groundConfig(orientation, friction, restitution,

@@ -21,3 +21,6 @@ add_executable(AppSTLParser
 
 add_executable(AppElevationGrabber
 	AppElevationGrabber.cpp)
+
+add_executable(AppElevationMap
+	AppElevationMap.cpp)
