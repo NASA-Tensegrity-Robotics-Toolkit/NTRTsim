@@ -31,6 +31,7 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include "LinearMath/btVector3.h"
 
 using namespace std;
 
@@ -86,9 +87,11 @@ int main(int argc, char* argv[]) {
 			file_out << "XAvg, YAvg, ZAvg" << endl;
 		}
 
+		int margin = 30;
+
 		while (file_in.good()) {
 			
-			vector<double> v0, v1, v2;
+			btVector3 v0, v1, v2;
 
 			string line_in;
 
@@ -129,31 +132,29 @@ int main(int argc, char* argv[]) {
 
 				switch (i) {
                 case 0:
-                    v0.push_back(x);
-                    v0.push_back(y);
-                    v0.push_back(z);
+                    v0.setValue(x, y, z);
                     break;
                 case 1:
-                    v1.push_back(x);
-                    v1.push_back(y);
-                    v1.push_back(z);
+                    v1.setValue(x, y, z);
                     break;
                 case 2:
-                    v2.push_back(x);
-                    v2.push_back(y);
-                    v2.push_back(z);
+                    v2.setValue(x, y, z);
                     break;
             	}
 			}
 
-			if (v0[1] <= 0 || v1[1] <= 0 || v2[1] <= 0) {
+			if (v0.y() <= 0 || v1.y() <= 0 || v2.y() <= 0) {
 				validTriangle = false;
 			}
 
 			if (validTriangle) {
-				double x_avg = (v0[0] + v1[0] + v2[0]) / 3;
-				double y_avg = (v0[1] + v1[1] + v2[1]) / 3;
-				double z_avg = (v0[2] + v1[2] + v2[2]) / 3;
+				btVector3 normVect = (v1-v0).cross(v2-v0).normalize();
+				if (normVect.y() < 0) {
+					normVect = -normVect;
+				}
+				double x_avg = (v0.x() + v1.x() + v2.x()) / 3 + margin*normVect.x();
+				double y_avg = (v0.y() + v1.y() + v2.y()) / 3 + margin*normVect.y();
+				double z_avg = (v0.z() + v1.z() + v2.z()) / 3 + margin*normVect.z();
 				cout << x_avg << ", " << y_avg << ", " << z_avg << endl;
 				file_out << x_avg << ", " << y_avg << ", " << z_avg << endl;
 			}
