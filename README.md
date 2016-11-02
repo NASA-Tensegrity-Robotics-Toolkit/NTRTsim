@@ -1,18 +1,28 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
-PLEASE NOTE: This branch provides an introduction to NTRT. Please DO NOT push any solutions or modifications to this branch. If you have suggestions, please raise an issue on GitHub, and create a pull request.
+PLEASE NOTE: This branch provides an introduction to NTRT. 
+---------
+Please DO NOT push any solutions or modifications to this branch. If you have suggestions, please raise an issue on GitHub, and create a pull request.
 
 Video at: https://www.youtube.com/watch?v=jyP5h_t73xw
 
 A brief outline of the video:
+---------
 1:00 Navigating Terminal
+
 15:30 Navigating Simulation
+
 31:50 Adding nodes with (x,y,z) (Section 5)
+
 33:30 Connecting Nodes
+
 34:40 Compiling code
+
 37:00 Adding and connecting Controller to model (starts at Section 5.4)
+
 44:00 YAML (Section 6)
+
 52:22 adding and attaching nodes with [x,y,z] and adding controller
 
 3/19/15 - Warning: OS X Setup/Build Failures
