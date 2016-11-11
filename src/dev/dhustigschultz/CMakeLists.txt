@@ -49,5 +49,21 @@ subdirs(
 
     MountainGoatNL2
 
-)
+    MountainGoatNL
+    MountainGoat_HandTuned
+    MountainGoat_Anchored
+    MountainGoat_SelectMuscles
 
+    MGSingleLeg
+
+    MountainGoatFM4
+    MG_FewerMuscles4
+
+    MG_SM_CPGHierarchy
+    MG_NL_CPGHierarchy
+    MG_CPGSingleLeg
+    MG_SingleLeg_HT
+
+    HexagonalSpine    
+    BigPuppy_SSM_Terrain
+)
