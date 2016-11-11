@@ -28,7 +28,7 @@
 //This module
 #include "MGSingleLegController.h"
 //This application
-#include "dev/dhustigschultz/MountainGoat2/MountainGoat2.h"
+#include "dev/dhustigschultz/MGSingleLeg/MGSingleLeg.h"
 
 //This library
 #include "core/tgSpringCableActuator.h"
