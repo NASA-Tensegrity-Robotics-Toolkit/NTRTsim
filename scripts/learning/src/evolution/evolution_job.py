@@ -69,4 +69,3 @@ class EvolutionJob(NTRTJob):
             fin.close()
         except IOError:
             self.obj = {}
-

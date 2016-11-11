@@ -65,7 +65,7 @@ class EvolutionJobMaster(NTRTJobMaster):
                 fout.write("," + str(x))
 
 
-    def __getNewParams(self, paramName):
+    def __getNewParams(self, paramName): # def __getNewParams(self, paramName, i):
         """
         Generate a new set of paramters based on learning method and config file
         Returns a dictionary paramName : values
@@ -94,7 +94,7 @@ class EvolutionJobMaster(NTRTJobMaster):
             newParams = { 'numActions' : params['numberOfOutputs'],
                          'numStates' : params['numberOfStates'],
                          'numHidden' : params['numberHidden'],
-                         'neuralFilename' : "logs/bestParameters-test_fb-"+ newController['paramID'] +".nnw"}
+                         'neuralFilename' : "logs/bestParameters-test_fb-"+ newController['paramID'] +".nnw"} # neuralFilename' : "logs/bestParameters-test_fb-"+ str(i) +".nnw"}
 
             neuralParams = []
 
@@ -285,7 +285,7 @@ class EvolutionJobMaster(NTRTJobMaster):
                 if (i < 0):
                     raise NTRTMasterError("Number of controllers greater than population size!")
 
-                controller = self.__getNewParams(paramName)
+                controller = self.__getNewParams(paramName) # controller = self.__getNewParams(paramName,i)
                 nextGeneration.__setitem__(controller['paramID'], controller)
                 self.paramID += 1
 
@@ -438,7 +438,7 @@ class EvolutionJobMaster(NTRTJobMaster):
 
             if (params['numberOfStates'] > 0):
                 for c in nextGeneration.itervalues():
-                    c['params']['neuralFilename'] = "logs/bestParameters-test_fb-"+ c['paramID'] +".nnw"
+                    c['params']['neuralFilename'] = "logs/bestParameters-test_fb-"+ c['paramID'] +".nnw"  
                     self.__writeToNNW(c['params']['neuralParams'], self.path + c['params']['neuralFilename'])
 
         return nextGeneration
@@ -524,9 +524,17 @@ class EvolutionJobMaster(NTRTJobMaster):
         scoreDump = open('scoreDump.txt', 'w')
         scoreDump.close()
         for n in range(numGenerations):
+            mc = []
             # Create the generation'
             for p in self.prefixes:
                 self.currentGeneration[p] = self.generationGenerator(self.currentGeneration[p], p + 'Vals')
+                # Looking to see if at least one of the 'Vals' is monteCarlo
+                mc.append(self.jConf["learningParams"][p+'Vals']['monteCarlo'])
+
+            # Check to see if at least one of the -Vals structs has monteCarlo set to 'true':
+            monteCarlo = 0
+            for x in range (0, len(mc)):
+                monteCarlo = monteCarlo | mc[x]
 
             # Iterate over the generation (change range..)
             if n > 0:
@@ -555,7 +563,7 @@ class EvolutionJobMaster(NTRTJobMaster):
 
             # Run the jobs
             conSched = ConcurrentScheduler(jobList, self.numProcesses)
-            completedJobs = conSched.processJobs()
+            completedJobs = conSched.processJobs(monteCarlo, self.jConf['best2N'])
 
             # Read scores from files, write to logs
             totalScore = 0
