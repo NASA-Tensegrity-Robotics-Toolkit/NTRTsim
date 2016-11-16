@@ -3,6 +3,7 @@ import time
 import psutil
 import os
 import json
+from operator import itemgetter
 
 class ConcurrentScheduler:
 
@@ -18,6 +19,7 @@ class ConcurrentScheduler:
         self.jobsTop2N = [] # To store only the top 2n jobs completed, in the case of Monte Carlo
         self.jobsRemaining = [] # To store return value, as there are now two different things being returned between MC and evolution
         self.top2n = [] # To store info on the best 2n controllers
+        self.sortedTop2n = [] # To store the sorted list of the best 2n controllers
         self.mcScores = [] # To store distance and controller number for all trials
         logging.info("Concurrent Scheduler instantiated. Contains %d jobs. Number of concurrent processes: %d." % (len(self.jobsUnprocessed), self.numProcesses))
 
@@ -46,12 +48,15 @@ class ConcurrentScheduler:
                 logging.info("All jobs processed. Breaking out of job loop.")
                 if(mc):
 
+                    # Sort the top 2n scores, from longest distance traveled to shortest:
+                    self.sortedTop2n = sorted(self.top2n, key=itemgetter('distance'), reverse=True)
+
                     # Dump the top 2n scores into a .txt file when the simulation is complete
                     # May need to move this to check_processes() (under 'if minDist < distance) 
                     # if going to run infinitely many trials until 5 days done, and simulation may abort early.
                     # But for now, it's done here
                     top2nDump = open('top2nDump.txt', 'a')
-                    top2nDump.write(json.dumps(self.top2n))
+                    top2nDump.write(json.dumps(self.sortedTop2n))
                     top2nDump.write('\n')
                     top2nDump.close()
 
