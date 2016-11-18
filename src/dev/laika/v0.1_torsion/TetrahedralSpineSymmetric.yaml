@@ -1,0 +1,179 @@
+# YAML file for the Horizontal Spine with kinematic actuators.
+# Used for the 2017 ULTRA Spine ICRA paper.
+
+# This spine has multiple substructures,
+# including the spine itself (t1-t6) and the supporting pieces.
+substructures:
+
+  t1/t2/t3/t4/t5/t6:
+    path: ./TetrahedronSymmetric.yaml
+    offset: [-12, 0 , 0]
+    translation: [0, 30.5, 30]
+  hips:
+    path: ./hips.yaml
+    offset: [0, 0, 0]
+    translation: [0, 35.5, 25]
+  front:
+    path: ./front.yaml
+    offset: [0, 0, 0]
+    translation: [-68, 35.5, 17]
+  backlegsleft/backlegsright:
+    path: ./backlegs.yaml
+    offset: [0, 0, 17]
+    translation: [20, 10, 20]
+  frontlegsleft/frontlegsright:
+    path: ./frontlegs.yaml
+    offset: [0, 0, 30]
+    translation: [-57, 10, 15]
+
+bond_groups:
+  HF:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [front, front]
+  HR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, right]      
+  HL: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, left]
+  HB:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [back, back]
+  SFR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, back] 
+  SRL:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [right, front]
+  SBF: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, front]
+  SBL: 
+   t1/t2/t3/t4/t5/t6/node_node: 
+      - [left, back]  
+
+  rod: 
+   t1/hips/node_node:
+      - [right, V2]
+      - [right, V3]
+      - [left, V1]
+      - [left, V4]
+      - [right, V7]
+      - [right, V8]
+
+   t6/front/node_node: 
+      - [left, V11]
+      - [left, V12]
+      - [right, V3]
+      - [right, V2]
+   
+   hips/backlegsleft/node_node:
+      - [V15, V6]
+      - [V19, V7]
+
+   hips/backlegsright/node_node:
+      - [V16, V6]
+      - [V20, V7]
+ 
+   front/frontlegsleft/node_node:
+      - [V16, V6]
+
+   front/frontlegsright/node_node:  
+      - [V17, V6]
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+builders: 
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.0044
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0

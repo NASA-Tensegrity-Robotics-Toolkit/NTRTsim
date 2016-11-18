@@ -18,6 +18,8 @@ subdirs(
     eajung
     ezhu
     mcdaly
-	bgigous
+    bgigous
+    laika
+    
 )
 
