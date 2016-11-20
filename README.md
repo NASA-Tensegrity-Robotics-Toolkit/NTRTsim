@@ -57,6 +57,11 @@ http://ntrtsim.readthedocs.org/en/latest/index.html
 
 The source for that site is located under doc.
 
+Additionally, some of our developers have recorded an introductory seminar
+for NTRT, available at https://www.youtube.com/watch?v=jyP5h_t73xw.
+To follow that video, please first compile and install NTRT (see 'INSTALL'
+in this directory).
+
 Build Status
 ---------
 
