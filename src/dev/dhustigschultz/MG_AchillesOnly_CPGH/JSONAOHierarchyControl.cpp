@@ -35,7 +35,7 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
-#include "dev/CPG_feedback/tgCPGCableControl.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
 
 #include "dev/dhustigschultz/BigPuppy_SpineOnly_Stats/BaseQuadModelLearning.h"
 #include "helpers/FileHelpers.h"
@@ -43,8 +43,8 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "dev/CPG_feedback/CPGEquationsFB.h"
-#include "dev/CPG_feedback/CPGNodeFB.h"
+#include "util/CPGEquationsFB.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
 
 #include "neuralNet/Neural Network v2/neuralNetwork.h"
 

@@ -40,7 +40,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "dev/btietz/hardwareSineWaves/tgSineStringControl.h"
+#include "examples/IROS_2015/hardwareSineWaves/tgSineStringControl.h"
 
 using namespace std;
 
