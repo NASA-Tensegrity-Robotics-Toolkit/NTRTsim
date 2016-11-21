@@ -12,7 +12,6 @@ subdirs(
     handTunedSineWaves
     muscleNPTests
     tetraCollisions
-    muscleNPEnergy
     muscleNPHills
     TCContact
     ShortOC_CPG 
