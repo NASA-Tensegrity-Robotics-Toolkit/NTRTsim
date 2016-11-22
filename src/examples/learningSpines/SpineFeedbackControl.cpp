@@ -43,8 +43,8 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "CPGEquationsFB.h"
-#include "CPGNodeFB.h"
+#include "util/CPGEquationsFB.h"
+#include "util/CPGNodeFB.h"
 
 //#define LOGGING
 #define USE_KINEMATIC

@@ -8,8 +8,6 @@ link_libraries(boost_program_options
                AnnealEvolution
                tgOpenGLSupport
                obstacles
-               KinematicString
-               CPG_feedback
                sensors
                controllers
 	       BigPuppySymmetricSpiralMetrics
@@ -24,4 +22,4 @@ add_executable(AppQuadControlMetrics
 	       JSONMetricsFeedbackControl.cpp)
 
 target_link_libraries(AppQuadControlMetrics ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles BigPuppySymmetricSpiralMetrics)
-target_link_libraries(JSONMetricsFeedbackControl ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles BigPuppySymmetricSpiralMetrics KinematicString)
+target_link_libraries(JSONMetricsFeedbackControl ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles BigPuppySymmetricSpiralMetrics)

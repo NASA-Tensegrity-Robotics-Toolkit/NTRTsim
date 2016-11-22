@@ -39,6 +39,6 @@ subdirs(
  MuscleNP
  SpineTests
  TimestepIndependence
- # HillTest // * Test has been disabled. See BuildBot build 335 for the error details. See issue #163 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/163 -- Perry
+ #HillTest // * Test has been disabled. See BuildBot build 335 for the error details. See issue #163 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/163 -- Perry
  
  )

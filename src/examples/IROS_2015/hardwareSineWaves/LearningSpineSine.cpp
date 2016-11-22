@@ -51,9 +51,10 @@ using namespace std;
  */
 LearningSpineSine::LearningSpineSine(BaseSpineCPGControl::Config config,
 												std::string args,
+                                                std::string resourcePath,
                                                 std::string ec,
                                                 std::string nc) :
-BaseSpineCPGControl(config, args)
+BaseSpineCPGControl(config, args, resourcePath)
 
 {    
 }
@@ -126,11 +127,11 @@ void LearningSpineSine::onTeardown(BaseSpineModelLearning& subject)
     
     vector<tgSpringCableActuator* > tmpSCAs = subject.getAllMuscles();
     vector<tgBasicActuator* > tmpStrings = tgCast::filter<tgSpringCableActuator, tgBasicActuator>(tmpSCAs);
-    for(int i=0; i<tmpStrings.size(); i++)
+    for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
-        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        for(std::size_t j=1; j<stringHist.tensionHistory.size(); j++)
         {
             const double previousTension = stringHist.tensionHistory[j-1];
             const double previousLength = stringHist.restLengths[j-1];

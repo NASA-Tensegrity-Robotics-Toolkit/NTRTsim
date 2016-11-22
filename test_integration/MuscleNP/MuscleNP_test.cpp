@@ -23,7 +23,7 @@
 */
 
 // This application
-#include "dev/btietz/muscleNPEnergy/MuscleNPCons.h"
+#include "examples/contactCables/ContactCableDemo.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -91,7 +91,7 @@ namespace {
 
 				// Fourth create the models with their controllers and add the models to the
 				// simulation
-				MuscleNPCons* myModel = new MuscleNPCons();
+				ContactCableDemo* myModel = new ContactCableDemo();
 
 				simulation.addModel(myModel);
 				

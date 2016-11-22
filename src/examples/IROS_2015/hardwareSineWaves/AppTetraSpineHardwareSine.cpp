@@ -26,8 +26,8 @@
  */
 
 // This application
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel_hf.h"
+#include "examples/IROS_2015/TetraSpineStatic/TetraSpineStaticModel.h"
+#include "examples/IROS_2015/TetraSpineStatic/TetraSpineStaticModel_hf.h"
 #include "LearningSpineSine.h"
 // This library
 #include "core/tgModel.h"
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     
     
     LearningSpineSine* const myControl =
-      new LearningSpineSine(control_config, suffix);
+      new LearningSpineSine(control_config, suffix, "ICRA2015/learning/");
     myModel->attach(myControl);
     /*
     tgCPGLogger* const myLogger = 

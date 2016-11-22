@@ -4,14 +4,15 @@ link_libraries(controllers
 				tgcreator
                 util
                 sensors
-                learningSpines
                 controllers
                 core    
                 terrain 
                 tgOpenGLSupport)
 
+add_library(TimestepTest SHARED
+			tsTestRig.cpp)
 
-add_executable(AppPIDTest
-				pidTestRig.cpp
-				AppPIDTest.cpp
-				)
+add_executable(AppTSTest
+    tsTestRig.cpp
+    AppTimestepTest.cpp
+) 

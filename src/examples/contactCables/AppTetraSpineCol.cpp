@@ -28,7 +28,7 @@
 // This application
 #include "TetraSpineCollisions.h"
 #include "colSpineSine.h"
-#include "Wall.h"
+
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"
@@ -37,6 +37,7 @@
 #include "core/tgWorld.h"
 #include "core/terrain/tgHillyGround.h"
 #include "examples/learningSpines/tgCPGLogger.h"
+#include "models/obstacles/tgWall.h"
 // obstacles
 #include "models/obstacles/tgBlockField.h"
 // The C++ Standard Library

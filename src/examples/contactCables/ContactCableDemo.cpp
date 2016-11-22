@@ -16,7 +16,7 @@
 * governing permissions and limitations under the License.
 */
 
-#include "MuscleNPCons.h"
+#include "ContactCableDemo.h"
 #include "core/tgModelVisitor.h"
 #include "core/tgBulletUtil.h"
 #include "core/tgWorld.h"
@@ -38,15 +38,15 @@
 // The Bullet Physics Library
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
-MuscleNPCons::MuscleNPCons()
+ContactCableDemo::ContactCableDemo()
 {
 }
 
-MuscleNPCons::~MuscleNPCons()
+ContactCableDemo::~ContactCableDemo()
 {
 }
 
-void MuscleNPCons::setup(tgWorld& world)
+void ContactCableDemo::setup(tgWorld& world)
 {
 
 
@@ -122,12 +122,12 @@ void MuscleNPCons::setup(tgWorld& world)
 	tgModel::setup(world);
 }
 
-void MuscleNPCons::teardown()
+void ContactCableDemo::teardown()
 {
 	tgModel::teardown();
 }
 
-void MuscleNPCons::step(double dt)
+void ContactCableDemo::step(double dt)
 {
 	totalTime += dt;
 	
@@ -175,13 +175,13 @@ void MuscleNPCons::step(double dt)
 * Call tgModelVisitor::render() on self and all descendants.
 * @param[in,out] r a reference to a tgModelVisitor
 */
-void MuscleNPCons::onVisit(const tgModelVisitor& r) const
+void ContactCableDemo::onVisit(const tgModelVisitor& r) const
 {
 	r.render(*this);
 	tgModel::onVisit(r);
 }
 
-double MuscleNPCons::getEnergy() const
+double ContactCableDemo::getEnergy() const
 {
 	double energy = 0;
 	btScalar mass = 0;
@@ -197,7 +197,7 @@ double MuscleNPCons::getEnergy() const
 	return energy;
 }
 
-btVector3 MuscleNPCons::getMomentum() const
+btVector3 ContactCableDemo::getMomentum() const
 {
 	btVector3 vCom(0, 0, 0);
 	btScalar mass = 0;
@@ -214,7 +214,7 @@ btVector3 MuscleNPCons::getMomentum() const
 	return vCom;
 }
 
-btVector3 MuscleNPCons::getVelocityOfBody(int body_num) const
+btVector3 ContactCableDemo::getVelocityOfBody(int body_num) const
 {
 	assert(body_num < allRods.size() && body_num >= 0);
 	tgBaseRigid* ri = allRods[body_num];

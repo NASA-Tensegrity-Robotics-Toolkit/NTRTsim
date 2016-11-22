@@ -25,10 +25,3 @@ add_executable(AppTetraSpineHardwareSine
 	LearningSpineSine.cpp
 	AppTetraSpineHardwareSine.cpp
 )
-
-file(COPY nodeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY edgeConfig.ini DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-
-add_custom_command(TARGET AppTetraSpineHardwareSine POST_BUILD
-					COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/logs)

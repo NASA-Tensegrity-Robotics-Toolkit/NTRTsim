@@ -22,8 +22,6 @@
 /**
  * @file Wall.h
  * @brief Contains the definition of class Wall.
- * Specifically, a crater is defined as a series of boxes which
- * form a barrier. It is designed to test escape algorithms for tensegrities
  * $Id$
  */
 

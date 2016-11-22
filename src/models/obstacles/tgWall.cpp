@@ -23,7 +23,7 @@
  */
 
 // This module
-#include "Wall.h"
+#include "tgWall.h"
 // This library
 #include "core/tgBox.h"
 #include "tgcreator/tgBuildSpec.h"
