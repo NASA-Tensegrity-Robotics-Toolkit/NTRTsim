@@ -48,6 +48,7 @@ subdirs(
     MG_FewerMuscles0
 
     MountainGoatNL2
+    MGNL2_AchillesOnly
 
     MountainGoatNL
     MountainGoat_HandTuned

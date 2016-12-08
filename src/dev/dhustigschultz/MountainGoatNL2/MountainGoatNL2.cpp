@@ -89,14 +89,17 @@ void MountainGoatNL2::addRodsLeg(tgStructure& s){
     s.addPair(4,6,"rod");
     s.addPair(3,6,"rod");
     s.addPair(7,0,"rod");
+
+    //s.addPair(7,5,"rod");
+    //s.addPair(7,6,"rod");
 }
 
 void MountainGoatNL2::addNodesHip(tgStructure& s, double r){
-    s.addNode(0,-r/2,0); //Node 0 
-    s.addNode(0,r,r); //Node 1 
-    s.addNode(0,-r,-r/2); //Node 2
-    s.addNode(0,-r,r/2); //Node 3
-    s.addNode(0,r/2,0); //Node4
+    s.addNode(0,-r/2,0); //Node 0: Lower center
+    s.addNode(0,r,r); //Node 1: Body attachment
+    s.addNode(0,-r,-r/2); //Node 2: Bottom Inner
+    s.addNode(0,-r,r/2); //Node 3: Bottom Outer
+    s.addNode(0,r/2,0); //Node4: Upper center
 }
 
 void MountainGoatNL2::addRodsHip(tgStructure& s){
@@ -403,9 +406,9 @@ void MountainGoatNL2::addMuscles(tgStructure& goat){
     //Leg/hip connections:
 
     //Left front leg/shoulder
-    goat.addPair(n11[1], n7[0], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[2], n7[0], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[0], n7[0], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[1], n7[0], tgString("all left_foreleg left_front_achilles_tendon only muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[2], n7[0], tgString("all left_foreleg left_front_achilles_tendon only muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[0], n7[0], tgString("all left_foreleg left_front_achilles_tendon only muscle seg", 11) + tgString(" seg", 7));
 
     goat.addPair(n11[1], n7[2], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
     goat.addPair(n11[1], n7[3], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
@@ -415,59 +418,79 @@ void MountainGoatNL2::addMuscles(tgStructure& goat){
     goat.addPair(n11[0], n7[2], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
     goat.addPair(n11[0], n7[3], tgString("all left_foreleg muscle seg", 11) + tgString(" seg", 7));
 
-    goat.addPair(n11[5], n7[2], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n11[6], n7[3], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[5], n7[2], tgString("all left_foreleg left_front_achilles_tendon only muscle3 seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[6], n7[3], tgString("all left_foreleg left_front_achilles_tendon only muscle3 seg", 11) + tgString(" seg", 7));
+
+    //Left front Achilles pair:
+    goat.addPair(n11[3], n7[4], tgString("all left_foreleg left_front_achilles_tendon only muscle3 seg", 11) + tgString(" seg", 7));
+    goat.addPair(n11[4], n7[4], tgString("all left_foreleg left_front_achilles_tendon only muscle3 seg", 11) + tgString(" seg", 7));
+
 
 
     //Right front leg/shoulder
-    goat.addPair(n13[1], n9[0], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[2], n9[0], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[0], n9[0], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n13[1], n9[0], tgString("all right_foreleg right_front_achilles_tendon only muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[2], n9[0], tgString("all right_foreleg right_front_achilles_tendon only muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[0], n9[0], tgString("all right_foreleg right_front_achilles_tendon only muscle seg", 13) + tgString(" seg", 9));
 
-    goat.addPair(n13[1], n9[2], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[1], n9[3], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[2], n9[2], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[2], n9[3], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n13[1], n9[2], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[1], n9[3], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[2], n9[2], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[2], n9[3], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
 
-    goat.addPair(n13[0], n9[2], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[0], n9[3], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n13[0], n9[2], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[0], n9[3], tgString("all right_foreleg muscle seg", 13) + tgString(" seg", 9));
 
-    goat.addPair(n13[6], n9[2], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n13[5], n9[3], tgString("all right_foreleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n13[6], n9[2], tgString("all right_foreleg right_front_achilles_tendon only muscle3 seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[5], n9[3], tgString("all right_foreleg right_front_achilles_tendon only muscle3 seg", 13) + tgString(" seg", 9));
+
+    //Right front Achilles pair:
+    goat.addPair(n13[3], n9[4], tgString("all right_foreleg right_front_achilles_tendon only muscle3 seg", 13) + tgString(" seg", 9));
+    goat.addPair(n13[4], n9[4], tgString("all right_foreleg right_front_achilles_tendon only muscle3 seg", 13) + tgString(" seg", 9));
+
 
     //Left rear leg/hip
 
-    goat.addPair(n12[1], n8[0], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[2], n8[0], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[0], n8[0], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n12[1], n8[0], tgString("all left_hindleg left_rear_achilles_tendon only muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[2], n8[0], tgString("all left_hindleg left_rear_achilles_tendon only muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[0], n8[0], tgString("all left_hindleg left_rear_achilles_tendon only muscle seg", 12) + tgString(" seg", 8));
 
-    goat.addPair(n12[1], n8[2], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[1], n8[3], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[2], n8[2], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[2], n8[3], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n12[1], n8[2], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[1], n8[3], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[2], n8[2], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[2], n8[3], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
 
-    goat.addPair(n12[0], n8[2], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[0], n8[3], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n12[0], n8[2], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[0], n8[3], tgString("all left_hindleg muscle seg", 12) + tgString(" seg", 8));
 
-    goat.addPair(n12[5], n8[2], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n12[6], n8[3], tgString("all left_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n12[5], n8[2], tgString("all left_hindleg left_rear_achilles_tendon only muscle3 seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[6], n8[3], tgString("all left_hindleg left_rear_achilles_tendon only muscle3 seg", 12) + tgString(" seg", 8));
+
+    //Left hind Achilles pair:
+    goat.addPair(n12[3], n8[4], tgString("all left_hindleg left_rear_achilles_tendon only muscle3 seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[4], n8[4], tgString("all left_hindleg left_rear_achilles_tendon only muscle3 seg", 12) + tgString(" seg", 8));
+
 
     //Right rear leg/hip
 
-    goat.addPair(n14[1], n10[0], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[2], n10[0], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[0], n10[0], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n14[1], n10[0], tgString("all right_hindleg right_rear_achilles_tendon only muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[2], n10[0], tgString("all right_hindleg right_rear_achilles_tendon only muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[0], n10[0], tgString("all right_hindleg right_rear_achilles_tendon only muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[1], n10[2], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[1], n10[3], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[2], n10[2], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[2], n10[3], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n14[1], n10[2], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[1], n10[3], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[2], n10[2], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[2], n10[3], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[0], n10[2], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[0], n10[3], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n14[0], n10[2], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[0], n10[3], tgString("all right_hindleg muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[6], n10[2], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
-    goat.addPair(n14[5], n10[3], tgString("all right_hindleg muscle seg", 11) + tgString(" seg", 7));
+    goat.addPair(n14[6], n10[2], tgString("all right_hindleg right_rear_achilles_tendon only muscle3 seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[5], n10[3], tgString("all right_hindleg right_rear_achilles_tendon only muscle3 seg", 14) + tgString(" seg", 10));
+
+    //Right hind Achilles pair:
+    goat.addPair(n14[3], n10[4], tgString("all right_hindleg right_rear_achilles_tendon only muscle3 seg", 14) + tgString(" seg", 10));
+    goat.addPair(n14[4], n10[4], tgString("all right_hindleg right_rear_achilles_tendon only muscle3 seg", 14) + tgString(" seg", 10));
+
 
 }
 
@@ -496,8 +519,8 @@ void MountainGoatNL2::setup(tgWorld& world)
 
     const double passivePretension = 1000; 
     const double passivePretension2 = 3500; 
-    const double passivePretension3 = 3500; 
-    const double passivePretension4 = 4000.0;
+    const double passivePretension3 = 5000; //was 3500
+    const double passivePretension4 = 4000.0; //was 4000
 
 #ifdef USE_KINEMATIC
 
@@ -542,13 +565,13 @@ void MountainGoatNL2::setup(tgWorld& world)
         tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
 	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3);
 
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history);
 	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3, history);
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3, history);
     #endif
 
 #endif
@@ -575,7 +598,7 @@ void MountainGoatNL2::setup(tgWorld& world)
 
     addSegments(goat,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 
-    goat.move(btVector3(0.0,-yOffset_foot+7,0.0));
+    goat.move(btVector3(0.0,-yOffset_foot+3,0.0)); //Was +7
 
     addMuscles(goat); //,m_segments,m_hips,m_legs,m_feet
 

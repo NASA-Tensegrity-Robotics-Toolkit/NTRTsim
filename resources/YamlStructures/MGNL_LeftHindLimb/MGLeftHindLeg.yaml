@@ -1,0 +1,29 @@
+substructures:
+  hip:
+    path: MGLeftHindHip.yaml
+    translation: [0, 26, -11]
+  hoof:
+    path: MGLeftHindHoof.yaml
+    translation: [2.5, 11, -11]
+    rotation:
+      axis: [0, 1, 0]
+      angle: 90
+
+bond_groups:
+  string:
+      hip/hoof/node_node:
+        - [inner_bottom, hoof_inner_top]
+        - [inner_bottom, hoof_outer_top]
+        - [outer_bottom, hoof_inner_top]
+        - [outer_bottom, hoof_outer_top]
+        - [inner_bottom, hoof_center1]
+        - [outer_bottom, hoof_center1]
+        - [center2, hoof_inner_top]
+        - [center2, hoof_outer_top]
+        - [inner_bottom, hoof_back_bottom]
+        - [outer_bottom, hoof_front_bottom]
+        - [center2, hoof_center1]
+        - [center1, hoof_inner_top]
+        - [center1, hoof_outer_top]
+        - [center1, hoof_inner_bottom]
+        - [center1, hoof_outer_bottom]

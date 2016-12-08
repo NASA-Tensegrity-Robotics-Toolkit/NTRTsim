@@ -1,0 +1,21 @@
+nodes:
+  hoof_center1: [0, 5, -5]
+  hoof_center2: [0, -5, 0]
+  hoof_inner_top: [0, 10, 2.5]
+  hoof_outer_top: [0, 10, -7.5]
+  hoof_inner_bottom: [0, -10, 7]
+  hoof_outer_bottom: [0, -10, -7]
+  hoof_front_bottom: [5, -10, 0]
+  hoof_back_bottom: [-5, -10, 0]
+
+pair_groups:
+  rod:
+    - [hoof_center1, hoof_outer_top]
+    - [hoof_center1, hoof_inner_top]
+    - [hoof_center2, hoof_outer_bottom]
+    - [hoof_center2, hoof_inner_bottom]
+    - [hoof_outer_bottom, hoof_front_bottom]
+    - [hoof_inner_bottom, hoof_front_bottom]
+    - [hoof_outer_bottom, hoof_back_bottom]
+    - [hoof_inner_bottom, hoof_back_bottom]
+    - [hoof_center1, hoof_center2]

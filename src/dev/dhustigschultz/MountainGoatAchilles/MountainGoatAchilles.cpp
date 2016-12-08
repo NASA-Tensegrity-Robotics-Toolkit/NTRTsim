@@ -99,7 +99,7 @@ void MountainGoatAchilles::addRodsLeg(tgStructure& s){
     s.addPair(0,7,"rod2");
     s.addPair(0,8,"rod2");
     s.addPair(0,9,"rod2");
-    
+   
 }
 
 void MountainGoatAchilles::addNodesHip(tgStructure& s, double r){
@@ -536,7 +536,7 @@ void MountainGoatAchilles::setup(tgWorld& world)
 
     const double passivePretension = 1000; 
     const double passivePretension2 = 3500; 
-    const double passivePretension3 = 3500; 
+    const double passivePretension3 = 5000; //was 3500
     const double passivePretension4 = 5000.0;
 
 #ifdef USE_KINEMATIC
@@ -582,13 +582,13 @@ void MountainGoatAchilles::setup(tgWorld& world)
         tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
 	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3);
 
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
 	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history, maxTens, 2*maxSpeed);
 	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history, maxTens, 2*maxSpeed); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3, history, maxTens2, 2*maxSpeed2);
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3, history, maxTens2, 2*maxSpeed2);
     #endif
 
 #endif
