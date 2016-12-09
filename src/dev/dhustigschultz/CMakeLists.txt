@@ -47,6 +47,9 @@ subdirs(
     MG_FewerMuscles1
     MG_FewerMuscles0
 
+    MountainGoatAchilles2
+    MG_AchillesOnly2
+
     MountainGoatNL2
     MGNL2_AchillesOnly
 
