@@ -50,8 +50,17 @@ subdirs(
     MountainGoatAchilles2
     MG_AchillesOnly2
 
+    MountainGoatAchillesSpirals
+    MG_AchillesAndSpirals
+
+    MountainGoatAchillesSpirals2
+    MG_AchillesAndSpirals2
+
     MountainGoatNL2
     MGNL2_AchillesOnly
+
+    MountainGoatNL2Spirals
+    MGNL2_AchillesAndSpirals
 
     MountainGoatNL
     MountainGoat_HandTuned
