@@ -106,19 +106,17 @@ void tgModel::step(double dt)
 
 void tgModel::onVisit(const tgModelVisitor& r) const
 {
-        r.render(*this);
+  r.render(*this);
 
-        // Call onRender for all children (if we have any)
-    const size_t n = m_children.size();
-        for (std::size_t i = 0; i < n; i++)
-        {
-        tgModel * const pChild = m_children[i];
-        assert(pChild != NULL);
-            pChild->onVisit(r);
-        }
-
-        // Postcondition
-        assert(invariant());
+  // Call onRender for all children (if we have any)
+  const size_t n = m_children.size();
+  for (std::size_t i = 0; i < n; i++) {
+    tgModel * const pChild = m_children[i];
+    assert(pChild != NULL);
+    pChild->onVisit(r);
+  }
+  // Postcondition
+  assert(invariant());
 }
 
 void tgModel::addChild(tgModel* pChild)
