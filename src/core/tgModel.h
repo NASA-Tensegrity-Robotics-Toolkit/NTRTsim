@@ -43,6 +43,8 @@ class abstractMarker;
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
  * The Composite design pattern is used for the sub-models.
+ * Note that this is a sense-able object, meaning that pointers to tgModels
+ * can be passed around in the sensing infrastructure.
  */
 class tgModel : public tgTaggable, public tgSenseable
 {

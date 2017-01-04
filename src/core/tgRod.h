@@ -102,13 +102,12 @@ public:
     double length() const { return m_length; }
 
     /**
-     * This class inherits from tgModel, which is a tgSenseable.
-     * So, in order to get data from a tgRod, we must re-implement
-     * the following two methods.
-     * Declared virtual here just in case some class inherits from tgRod.
+     * for tgSenseable, need to define this method.
+     * It's real simple, should just return "rod".
+     * This abstracts away some of what would be hard-coded into
+     * a sensor later.
      */
-    virtual std::string getDataHeading();
-    virtual std::string getData();
+    virtual std::string getLabelForSensor();
 
 private:
 

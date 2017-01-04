@@ -28,55 +28,29 @@
 
 // From the C++ standard library:
 #include <iostream> //for strings
-#include <assert.h> //for assertions
-
-//#include <sstream>
-//#include <vector>
-//#include <set>
-
-//#include <cstdio>
-//#include <stdlib.h> //atoi
-//#include <algorithm>
+//#include <assert.h> //for assertions
 
 /**
- * This class defines methods for use with sensors.
- * If an object (really, mostly just tgModel and its descendants) can be sensed,
- * inherit from this class and re-define ALL the methods.
- * Note that we make everything pure virtual here to force re-definition.
- * Sensing data from objects occurs in two places in the NTRTsim workflow.
- * First, when setting up the simulation, a heading for the data is given.
- * This describes the data that will be returned, in a comma-separated-value form.
- * Second, when the simulation is running, the data itself can be taken.
- * Note that it's up to the caller (e.g., a tgDataLogger2) to match up the headings
- * with the data.
+ * This class is used to abstract away the class of pointers
+ * that can be passed around in the tgSensors infrastructure.
+ * For now, it's really only tgModel that will inherit from it.
  */
 class tgSenseable
 {
-public:
-
-  // Constructor does nothing, since this class
-  // contains no data.
-  tgSenseable() {}
-
-  // Similarly, destructor does nothing.
-  ~tgSenseable() {}
-
   /**
-   * Create a descriptive heading for all the data that this class can return.
-   * This will be a CSV string, with the number of columns the same as the
-   * number of columns output by the getData function below.
+   * Ideally, this class would have no member functions.
+   * However, since C++ requires at least one virtual member function
+   * for polymorphism, we have one here.
+   * This function returns a label to pre-pend to the header
+   * of any data coming from this object.
+   * For example, for a tgRod, this method should return "rod"
+   * or something like that.
+   * Include a generic output here that really should be redefined later.
    */
-  virtual std::string getDataHeading() = 0;
-
-  /**
-   * Return the data from this class itself.
-   * Note that this MUST be the same number of CSV columns as is returned by
-   * the getDataHeading function.
-   */
-  virtual std::string getData() = 0;
-
-  // TO-DO: should any of this be const?
-
+  virtual std::string getLabelForSensor(){
+    return "base_tgSenseable";
+  }
+    
 };
 
 #endif //TG_SENSEABLE_H
