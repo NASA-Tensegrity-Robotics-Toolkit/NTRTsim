@@ -191,6 +191,19 @@ void tgModel::addMarker(abstractMarker a){
     m_markers.push_back(a);
 }
 
+/**
+ * The methods for tgSenseable.
+ * Note again that these are NOT ever supposed to be called,
+ * only the childrens' methods should be called.
+ */
+std::string tgModel::getDataHeading(){
+  return "tgModel_ERR_SHOULD_NOT_BE_CALLED";
+}
+
+std::string tgModel::getData(){
+  return "tgModel_data_ERR_SHOULD_NOT_BE_CALLED";
+}
+
 bool tgModel::invariant() const
 {
   // No child is NULL

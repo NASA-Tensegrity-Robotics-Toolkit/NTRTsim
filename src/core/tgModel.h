@@ -30,6 +30,7 @@
 #include "tgCast.h"
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
+#include "tgSenseable.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
@@ -43,7 +44,7 @@ class abstractMarker;
  * A root-level model is a Tensegrity. It can contain sub-models.
  * The Composite design pattern is used for the sub-models.
  */
-class tgModel : public tgTaggable
+class tgModel : public tgTaggable, public tgSenseable
 {
 public: 
 
@@ -151,6 +152,17 @@ public:
     const std::vector<abstractMarker>& getMarkers() const;
 
     void addMarker(abstractMarker a);
+
+    /**
+     * From tgSenseable: must re-implement the data collecting methods.
+     * However, this function in tgModel should never really be called,
+     * only the child classes' methods should be called.
+     * This is because we're always trying to sense something like 
+     * a tgRod or a tgSpringCableActuator, not a base tgModel.
+     * This is also why the keyword "virtual" is used here.
+     */
+    virtual std::string getDataHeading();
+    virtual std::string getData();
 
 private:
 
