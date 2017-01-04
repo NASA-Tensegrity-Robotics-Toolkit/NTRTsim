@@ -32,6 +32,7 @@
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
+#include <sstream> //for the tgSenseable methods.
 
 tgRod::Config::Config(double r, double d,
                         double f, double rf, double res) :
@@ -86,6 +87,51 @@ void tgRod::teardown()
   
   // Postcondition
   // This does not preserve the invariant
+}
+
+/**
+ * The two methods from tgSenseable.
+ * A tgRod should return its position and orientation.
+ * Also, the previous tgDataObserver recorded the mass of the rod too,
+ * so do that here for consistency. (even though mass doesn't change with time.)
+ */
+std::string tgRod::getSensorDataHeading() {
+  // Create a string stream to which we'll append all the
+  // information.
+  std::stringstream heading;
+  // The heading consists of the tags for this rod, plus
+  // labels for each of the data that will be returned.
+  // Note that the orientation is a btVector3 object of Euler angles,
+  // which I believe are overloaded as strings...
+  // Also, the XYZ positions are of the center of mass.
+  heading << "(rod_" << getTags() << ").X,"
+	  << "(rod_" << getTags() << ").Y,"
+	  << "(rod_" << getTags() << ").Z,"
+	  << "(rod_" << getTags() << ").OrientEuler,"
+	  << "(rod_" << getTags() << ").mass,";
+
+  // Return the string version of this string stream.
+  return heading.str();
+}
+
+/**
+ * The method that collects the actual data from this tgRod.
+ */
+std::string tgRod::getSensorData() {
+  // Pick out the XYZ position of the center of mass of this rod.
+  btVector3 com = centerOfMass();
+  // Note that the 'orientation' method also returns a btVector3.
+  
+  // Similar to the heading, create a string steam
+  // of all the data to be returned.
+  std::stringstream sensordata;
+  sensordata << com[0] << ","
+	     << com[1] << ","
+	     << com[2] << ","
+	     << orientation() << ","
+	     << mass() << ",";
+  // Again, must return a string, not a stringstream.
+  return sensordata.str();
 }
 
 bool tgRod::invariant() const

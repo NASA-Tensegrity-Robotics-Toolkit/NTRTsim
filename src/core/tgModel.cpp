@@ -197,11 +197,11 @@ void tgModel::addMarker(abstractMarker a){
  * only the childrens' methods should be called.
  */
 std::string tgModel::getDataHeading(){
-  return "tgModel_ERR_SHOULD_NOT_BE_CALLED";
+  return "tgModel_BASE_CLASS_NO_DATA";
 }
 
 std::string tgModel::getData(){
-  return "tgModel_data_ERR_SHOULD_NOT_BE_CALLED";
+  return "tgModel_BASE_CLASS_NO_DATA";
 }
 
 bool tgModel::invariant() const
