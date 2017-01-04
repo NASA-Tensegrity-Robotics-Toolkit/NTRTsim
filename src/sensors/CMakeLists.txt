@@ -17,5 +17,4 @@ add_library( ${PROJECT_NAME} SHARED
     forceplate/ForcePlateModel.cpp
     forceplate/ForcePlateSensor.cpp
 )
-#forceplate/ForcePlateModel.cpp
-  
+ 

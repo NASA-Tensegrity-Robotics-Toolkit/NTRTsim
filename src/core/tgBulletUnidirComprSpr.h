@@ -16,13 +16,15 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef SRC_CORE_TG_BULLET_UNIDIRECTIONAL_COMPRESSION_SPRING_H_
-#define SRC_CORE_TG_BULLET_UNIDIRECTIONAL_COMPRESSION_SPRING_H_
+#ifndef SRC_CORE_TG_BULLET_UNIDIR_COMPR_SPR_H_
+#define SRC_CORE_TG_BULLET_UNIDIR_COMPR_SPR_H_
 
 /**
- * @file tgBulletUnidirectionalCompressionSpring.h
- * @brief Definitions of class tgBulletUnidirectionalCompressionSpring
- * @author Drew Sabelhaus, Brian Mirletz, Atil Iscen
+ * @file tgBulletUnidirComprSpr.h
+ * @brief Definitions of class tgBulletUnidirComprSpr,
+ *    a version of tgBulletCompressionSpring that only
+ *    applies a force in one direction ("unidirectional.")
+ * @author Drew Sabelhaus, et al.
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
@@ -53,8 +55,9 @@ class tgBulletSpringCableAnchor;
  * one of the axes: X, Y or Z.
  * So for example, if it's only in Z, one anchor could move around in X or Y
  * and the applied force wouldn't change.
+ * Here, we use "Unidir" to mean "Unidirectional."
  */
-class tgBulletUnidirectionalCompressionSpring : public tgBulletCompressionSpring
+class tgBulletUnidirComprSpr : public tgBulletCompressionSpring
 {
 public: 
     /**
@@ -82,7 +85,7 @@ public:
      * created once, not dynamically, so it's only deleted at the very 
      * end of the application (NOT during any individual setups or teardowns.)
      */
-    tgBulletUnidirectionalCompressionSpring(
+    tgBulletUnidirComprSpr(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,
 	        bool isFreeEndAttached,
                 double coefK,
@@ -94,7 +97,7 @@ public:
      * The virtual destructor. Deletes all of the anchors including 
      * anchor1 and anchor2
      */
-    virtual ~tgBulletUnidirectionalCompressionSpring();
+    virtual ~tgBulletUnidirComprSpr();
 
     /**
      * Updates this object. Calls calculateAndApplyForce(dt)
@@ -123,7 +126,9 @@ public:
     virtual const btVector3 getSpringEndpoint() const;
     
     /**
-     * Returns the force currently in the spring, either compression only / a positive force only (if isFreeEndAttached is false), or potentially either + or - force (if isFreeEndAttached == true).
+     * Returns the force currently in the spring, either compression only 
+     * (e.g., a positive force only if isFreeEndAttached is false), 
+     * or potentially either + or - force (if isFreeEndAttached == true).
      */
     virtual const double getSpringForce() const;
 
@@ -156,4 +161,4 @@ private:
     bool invariant(void) const;
 };
 
-#endif  // SRC_CORE_TG_BULLET_UNIDIRECTIONAL_COMPRESSION_SPRING_H_
+#endif  // SRC_CORE_TG_BULLET_UNIDIR_COMPR_SPR_H_

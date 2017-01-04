@@ -19,7 +19,7 @@
 /**
  * @file tgBoxMoreAnchors.cpp
  * @brief Contains the definitions of members of class tgBoxMoreAnchors
- * @author Drew Sabelhaus, Brian Mirletz, and Ryan Adams
+ * @author Drew Sabelhaus
  * $Id$
  */
 

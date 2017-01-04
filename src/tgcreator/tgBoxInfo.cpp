@@ -19,7 +19,7 @@
 /**
  * @file tgBoxInfo.cpp
  * @brief Implementation of class tgBoxInfo 
- * @author Brian Mirletz and Ryan Adams
+ * @author Brian Mirletz, Ryan Adams, Drew Sabelhaus
  * @date September 2014
  * $Id$
  */

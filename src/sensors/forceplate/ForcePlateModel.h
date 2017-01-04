@@ -38,7 +38,7 @@
 #include "LinearMath/btVector3.h"
 
 // Forward declarations
-class tgUnidirectionalCompressionSpringActuator;
+class tgUnidirComprSprActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -309,13 +309,6 @@ public:
      * to itself 
      */
     virtual void onVisit(tgModelVisitor& v);
-    
-    /**
-     * Return a vector of all muscles for the controllers to work with.
-     * @return A vector of all of the muscles
-     */
-    //const std::vector<tgCompressionSpringActuator*>& getAllActuators() const;
-    //const std::vector<tgBasicActuator*>& getAllActuators() const;
 
     /**
      * Returns the location of the base of this force plate.
@@ -400,10 +393,7 @@ protected:
     tgNode hb_d;
 
     /**
-     * The nodal coordiantes for the bottom part of the housing.
-     * Note that these need to be attached to the sides via a 
-     * very small "support beam" so that they get auto-compounded properly.
-     * See the addSupportBeamPairs() method.
+     * The nodal coordinates for the bottom part of the housing.
      * These are named according to the face they are closest to: the ab or cd face.
      */
     tgNode hb_bot_ab;
@@ -441,11 +431,11 @@ protected:
      * Note that there are no springs in the minus Y direction (only the springs
      * between the bottom of the plate and the housing bed, e.g., in +Y).
      */
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusX;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusX;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusY;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusZ;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusZ;
+    std::vector<tgUnidirComprSprActuator*> springsPlusX;
+    std::vector<tgUnidirComprSprActuator*> springsMinusX;
+    std::vector<tgUnidirComprSprActuator*> springsPlusY;
+    std::vector<tgUnidirComprSprActuator*> springsPlusZ;
+    std::vector<tgUnidirComprSprActuator*> springsMinusZ;
 
     /**
      * The amount of gravity in the world.
@@ -525,13 +515,6 @@ private:
      * Calculates the node positions for the bottom part of the housing structure.
      */
     void calculateBottomHousingNodePositions();
-    
-    /**
-     * A list of all of the muscles. Will be empty until most of the way
-     * through setup
-     */
-    //std::vector<tgCompressionSpringActuator*> allActuators;
-    //std::vector<tgBasicActuator*> allActuators;
 
     // The "invariant" function just checks the integrity of the member
     // variables of this class.

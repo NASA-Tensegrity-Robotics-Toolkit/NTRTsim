@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgBulletUnidirectionalCompressionSpring.cpp
- * @brief Definitions of members of class tgBulletUnidirectionalCompressionSpring
- * @author Drew Sabelhaus, Brian Mirletz, et al.
+ * @file tgBulletUnidirComprSpr.cpp
+ * @brief Definitions of members of class tgBulletUnidirComprSpr
+ * @author Drew Sabelhaus, et al.
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
 
 // This module
-#include "tgBulletUnidirectionalCompressionSpring.h"
+#include "tgBulletUnidirComprSpr.h"
 #include "tgBulletSpringCableAnchor.h"
 #include "tgCast.h"
 // The BulletPhysics library
@@ -38,9 +38,9 @@
  * The main constructor for this class
  * In comparison to the tgSpringCable vs. tgBulletSpringCable class inheritance,
  * there is no need for the tgCast here, since the same type of anchor is used
- * in both tgBulletCompressionSpring and tgBulletUnidirectionalCompressionSpring.
+ * in both tgBulletCompressionSpring and tgBulletUnidirComprSpr.
  */
-tgBulletUnidirectionalCompressionSpring::tgBulletUnidirectionalCompressionSpring(
+tgBulletUnidirComprSpr::tgBulletUnidirComprSpr(
 		const std::vector<tgBulletSpringCableAnchor*>& anchors,
 		bool isFreeEndAttached,
                 double coefK,
@@ -55,8 +55,8 @@ m_direction(direction)
 
     assert(invariant());
 
-#if (0)
-    std::cout << "tgBulletUnidirectionalCompressionSpring constructor, ";
+    #if (0)
+    std::cout << "tgBulletUnidirComprSpr constructor, ";
     std::cout << "direction is: ";
     std::cout << "(" << m_direction->x() << ",";
     std::cout << m_direction->y() << ",";
@@ -80,15 +80,15 @@ m_direction(direction)
 
 // Destructor has to the responsibility of destroying the anchors also,
 // as well as the btVector3 direction.
-tgBulletUnidirectionalCompressionSpring::~tgBulletUnidirectionalCompressionSpring()
+tgBulletUnidirComprSpr::~tgBulletUnidirComprSpr()
 {
     #if (0)
-    std::cout << "Destroying tgBulletUnidirectionalCompressionSpring" << std::endl;
+    std::cout << "Destroying tgBulletUnidirComprSpr..." << std::endl;
     #endif
 }
 
 // The step function is what's called from other places in NTRT.
-void tgBulletUnidirectionalCompressionSpring::step(double dt)
+void tgBulletUnidirComprSpr::step(double dt)
 {
     if (dt <= 0.0)
     {
@@ -107,7 +107,7 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
       std::cout << "Current spring length is " << getCurrentSpringLength()
 		<< std::endl << std::endl;
 
-      /* Previous error message:
+      /* If we wanted the simulator to completely quit instead:
       std::cout << "Error, unidirectional compression spring length "
 		<< "is negative. Length is: " << getCurrentSpringLength()
        		<< std::endl;
@@ -121,7 +121,7 @@ void tgBulletUnidirectionalCompressionSpring::step(double dt)
 /**
  * Dot getCurrentAnchorDistance with m_direction.
  */
-const double tgBulletUnidirectionalCompressionSpring::getCurrentAnchorDistanceAlongDirection() const
+const double tgBulletUnidirComprSpr::getCurrentAnchorDistanceAlongDirection() const
 {
   // btVector3 between the two anchors
   const btVector3 dist =
@@ -138,9 +138,8 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentAnchorDistanceAl
  * this can be either greater or less than m_restLength. If not, then spring
  * can only exist in compression (less than m_restLength).
  * This only calculates the distance in the stated direction.
- * TO-DO: start here on 2016-08-05.
  */
-const double tgBulletUnidirectionalCompressionSpring::getCurrentSpringLength() const
+const double tgBulletUnidirComprSpr::getCurrentSpringLength() const
 {
     // initialize to the default value.
     // if the distance between the two anchors is larger
@@ -172,7 +171,7 @@ const double tgBulletUnidirectionalCompressionSpring::getCurrentSpringLength() c
  * Returns the location of the endpoint of the spring in space. 
  * The renderer uses this to draw lines more easily.
  */
-const btVector3 tgBulletUnidirectionalCompressionSpring::getSpringEndpoint() const
+const btVector3 tgBulletUnidirComprSpr::getSpringEndpoint() const
 {
   // The spring endpoint will always be the sum of the beginning point
   // and the (spring length times the vector in the direction of the spring).
@@ -192,7 +191,7 @@ const btVector3 tgBulletUnidirectionalCompressionSpring::getSpringEndpoint() con
  * Note that this does NOT include the force due to the damper, since that force
  * is only temporary and isn't reallyt "the force in the spring" per se.
  */
-const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
+const double tgBulletUnidirComprSpr::getSpringForce() const
 {
     // Since the getCurrentSpringLength function already includes the check
     // against m_isFreeEndAttached, as well as a projection along m_direction,
@@ -208,7 +207,7 @@ const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
     //DEBUGGING
     if (0) {
       std::cout << "Called getSpringForce "
-		<< "inside tgBulletUnidirectionalCompressionSpring" << std::endl;
+		<< "inside tgBulletUnidirComprSpr" << std::endl;
     }
     
     // A negative delta_X should result in a positive force.
@@ -227,7 +226,7 @@ const double tgBulletUnidirectionalCompressionSpring::getSpringForce() const
  * Called by step, it calculates what force the spring is experiencing,
  * and applies that force to the rigid bodies it connects to.
  */
-void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
+void tgBulletUnidirComprSpr::calculateAndApplyForce(double dt)
 {
 
     // Create variables to hold the results of these computations
@@ -242,6 +241,8 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
     // This spring applies a force only along m_direction.
     // again, it should have been checked that m_direction is a unit vector by now.
     // Direction is a pointer, so must be dereferenced first.
+    // TO-DO: justify the "-" here. This works, not sure exactly why, but probably
+    //    has to do with choice of which anchor to subtract from the other.
     const btVector3 unitVector = - (*getDirection());
 
     // Calculate the damping force for this timestep.
@@ -257,7 +258,7 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
 
     // Debugging
     #if (0)
-      std::cout << "tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce  " << std::endl;
+      std::cout << "tgBulletUnidirComprSpr::calculateAndApplyForce  " << std::endl;
       std::cout << "Length: " << getCurrentSpringLength() << " rl: " << getRestLength() <<std::endl;
       std::cout << "SpringForce: " << magnitude << " DampingForce: " << m_dampingForce <<std::endl;
     #endif
@@ -286,7 +287,7 @@ void tgBulletUnidirectionalCompressionSpring::calculateAndApplyForce(double dt)
     this->anchor2->attachedBody->applyImpulse(-force*dt,point2);
 }
 
-bool tgBulletUnidirectionalCompressionSpring::invariant(void) const
+bool tgBulletUnidirComprSpr::invariant(void) const
 {
   // Instead of checking for less than zero length, just output a warning.
   // @TODO: find some way of dealing with Bullet's less-than-zero-length between

@@ -19,7 +19,7 @@
 /**
  * @file tgCompressionSpringActuatorInfo.cpp
  * @brief Implementation of class tgCompressionSpringActuatorInfo
- * @author Drew Sabelhaus, Ryan Adams
+ * @author Drew Sabelhaus, et al.
  * @date August 2016
  * $Id$
  */
@@ -109,32 +109,28 @@ tgBulletCompressionSpring* tgCompressionSpringActuatorInfo::createTgBulletCompre
       to = getTo();
     }    
 
-    /*
-    // get the two rigid bodies that correspond to the locations that this compression spring
-    // will be attached between.
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo());
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom());
-    */
-
-    // Note that even though this object is definitely not a SpringCable, and does not inherit from
-    // that class at all, it's still more useful to re-use the spring cable version of anchor.
-    // no need to re-create the exact same object, just to name it differently.
-    // This should work, since tgBulletSpringCableAnchor actually has no tie-ins to either
-    // tgBulletSpringCable or tgSpringCable.
+    // Note that even though this object is definitely not a SpringCable,
+    // and does not inherit from that class at all, it's still more useful
+    // to re-use the spring cable version of anchor.
+    // No need to re-create the exact same object, just to name it differently.
+    // This should work, since tgBulletSpringCableAnchor actually has
+    // no tie-ins to either tgBulletSpringCable or tgSpringCable.
     std::vector<tgBulletSpringCableAnchor*> anchorList;
 
     // add the anchors from these two rigid bodies to the list of anchors that
     // will reside within the tgBulletCompressionSpring.
-    tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
+    tgBulletSpringCableAnchor* anchor1 =
+      new tgBulletSpringCableAnchor(fromBody, from);
     anchorList.push_back(anchor1);
 	
-    tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
+    tgBulletSpringCableAnchor* anchor2 =
+      new tgBulletSpringCableAnchor(toBody, to);
     anchorList.push_back(anchor2);
 
     // call the constructor for tgBulletCompressionSpring.
-    // Unlike the spring-cable, it makes more sense to state the rest length of a compression
-    // spring. That way, it's easy to only apply a force if the total distance between the two
-    // anchors is less than restLength.
+    // Unlike the spring-cable, it makes more sense to state the rest
+    // length of a compression spring. That way, it's easy to only apply
+    // a force if the total distance between the two anchors is less than restLength.
     return new tgBulletCompressionSpring(anchorList, m_config.isFreeEndAttached,
 		       m_config.stiffness, m_config.damping, m_config.restLength);
 }

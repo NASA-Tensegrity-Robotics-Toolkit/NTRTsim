@@ -27,7 +27,7 @@
 // This module
 #include "ForcePlateModel.h"
 // This library
-#include "core/tgUnidirectionalCompressionSpringActuator.h"
+#include "core/tgUnidirComprSprActuator.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgBox.h"
 #include "core/tgBoxMoreAnchors.h"
@@ -37,7 +37,7 @@
 #include "core/tgWorld.h"
 // Files in tgcreator used to build parts of the box
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgUnidirComprSprActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgBoxMoreAnchorsInfo.h"
@@ -650,11 +650,6 @@ void ForcePlateModel::setup(tgWorld& world)
 
   // Move the structure to the location passed in to the constructor.
   s.move(m_location);
-
-  //DEBUGGING
-  // Move the plate up a bit more.
-  //s.move( btVector3(0, 2, 0) );
-
   
   // Create the config structs for the various different boxes and springs.
 
@@ -684,8 +679,11 @@ void ForcePlateModel::setup(tgWorld& world)
   tgBox::Config plateBoxConfig( plateWidth/2, plateHeight/2, plateDensity,
 				0.25, 0.24);
 
-
-  // Config for the housing walls: @TO-DO: CHANGE DENSITY.
+  // Config for the housing walls:
+  // @TO-DO: CHANGE DENSITY. Right now, since this class only supports
+  //    a mass of 0 for the outer housing, the density doesn't matter.
+  //    But, with a possibly-moving force plate in the future, this density
+  //    will have to be corrected by the factor of 1/2 for the half-extents too.
   // Halve the width and height here also.
   tgBox::Config housingWallConfigZ( m_config.t/2, m_config.h/2, 0.0);
   tgBox::Config housingWallConfigX( m_config.h/2, m_config.t/2, 0.0);
@@ -714,22 +712,22 @@ void ForcePlateModel::setup(tgWorld& world)
   // there will need to be four configs here.
   // They are named by face: AB, BC, CD, DA.
   // The springs along X:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(1, 0, 0));
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigAD(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(-1, 0, 0));
   // The springs along Z:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigAB(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(0, 0, -1));
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigCD(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(0, 0, 1));
   
   // The vertical springs can all share the same config:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     verticalSpringConfig(true, m_config.vertK, m_config.vertD, m_config.vertRL,
 			 false, false, new btVector3(0, 1, 0));
   
@@ -738,7 +736,6 @@ void ForcePlateModel::setup(tgWorld& world)
 
   // Add the configs for the boxes
   spec.addBuilder("plateBox", new tgBoxMoreAnchorsInfo(plateBoxConfig));
-  //spec.addBuilder("plateBox", new tgBoxInfo(testConfig));
   spec.addBuilder("housingWallZ", new tgBoxMoreAnchorsInfo(housingWallConfigZ));
   spec.addBuilder("housingWallX", new tgBoxMoreAnchorsInfo(housingWallConfigX));
   spec.addBuilder("housingBottom", new tgBoxMoreAnchorsInfo(housingBottomConfig));
@@ -748,15 +745,15 @@ void ForcePlateModel::setup(tgWorld& world)
 
   // Add the configs for the springs:
   spec.addBuilder("lateralSpringBC",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigBC));
   spec.addBuilder("lateralSpringAD",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAD));
+  		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigAD));
   spec.addBuilder("lateralSpringAB",
-		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAB));
+		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigAB));
   spec.addBuilder("lateralSpringCD",
-		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigCD));
+		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigCD));
   spec.addBuilder("verticalSpring",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
+  		  new tgUnidirComprSprActuatorInfo(verticalSpringConfig));
 
   //DEBUGGING
   if( m_debugging){
@@ -856,11 +853,11 @@ void ForcePlateModel::assignSpringPointers()
   // +y are verticalSpring
   // +z are lateralSpringCD
   // -z are lateralSpringAB
-  springsPlusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringBC");
-  springsMinusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAD");
-  springsPlusY = find<tgUnidirectionalCompressionSpringActuator>("verticalSpring");
-  springsPlusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringCD");
-  springsMinusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAB");
+  springsPlusX = find<tgUnidirComprSprActuator>("lateralSpringBC");
+  springsMinusX = find<tgUnidirComprSprActuator>("lateralSpringAD");
+  springsPlusY = find<tgUnidirComprSprActuator>("verticalSpring");
+  springsPlusZ = find<tgUnidirComprSprActuator>("lateralSpringCD");
+  springsMinusZ = find<tgUnidirComprSprActuator>("lateralSpringAB");
 }
 
 /**
@@ -871,7 +868,9 @@ double ForcePlateModel::getPlateGravitationalForce() const
 {
   // The total force of the plate is F = -mg
   //return -m_config.mP * worldGravity;
-  // @TODO: CALIBRATION!
+  // @TODO: CALIBRATION! This is off by some factor, and Drew is not sure
+  // if that's an artifact of the simulation, or because the math is somehow
+  // incorrect somewhere. TEST THIS.
   //return -m_config.mP * 9.81;
   // on 2016-09-09, for force plates in AppHorizontalSpine,
   // calibration is 7.357 N * 5.
@@ -884,7 +883,7 @@ double ForcePlateModel::getFx() const
   double Fx = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator, for the +X direction
   for( it = springsPlusX.begin(); it < springsPlusX.end(); it++ ) {
     Fx += (*it)->getActuatorSpringForce();
@@ -903,7 +902,7 @@ double ForcePlateModel::getFy() const
   double Fy = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator
   for( it = springsPlusY.begin(); it < springsPlusY.end(); it++ ) {
     //DEBUGGING
@@ -926,7 +925,7 @@ double ForcePlateModel::getFz() const
   double Fz = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator, for the +X direction
   for( it = springsPlusZ.begin(); it < springsPlusZ.end(); it++ ) {
     Fz += (*it)->getActuatorSpringForce();

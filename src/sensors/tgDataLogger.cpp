@@ -107,8 +107,15 @@ void tgDataLogger::render(const ForcePlateModel& forcePlate) const
 
 void tgDataLogger::render(const tgModel& model) const
 {
-  // PLEASE EXCUSE THIS HACK. NOT SURE WHY THE RENDER FUNCTION FOR
-  // FORCEPLATEMODEL IS NOT BEING CALLED DIRECTLY.
+  // THE FOLLOWING IS A HACK TO RENDER A FORCE PLATE MODEL.
+  // When tgDataLogger is updated, be sure to do the following:
+  // 1) Have this rendering somehow be provided by the class itself,
+  //    not hard-coded in this file.
+  // 2) Make that function a virtual function, so that the appropriate
+  //    method is called from a sub-class instead of tgModel (since a tgModel
+  //    is passed in, it will have to declare whatever function we create.)
+  //    See for example:
+  //       https://www.tutorialspoint.com/cplusplus/cpp_polymorphism.htm
   // @TODO FIX THIS!!!!!
   if( 1 ) {
     // Detect if the model being passed in is a ForcePlateModel.

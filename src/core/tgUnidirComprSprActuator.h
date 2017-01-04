@@ -16,16 +16,16 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef SRC_CORE_TG_UNIDIRECTIONAL_COMPRESSION_SPRING_ACTUATOR_H
-#define SRC_CORE_TG_UNIDIRECTIONAL_COMPRESSION_SPRING_ACTUATOR_H
+#ifndef SRC_CORE_TG_UNIDIR_COMPR_SPR_ACTUATOR_H
+#define SRC_CORE_TG_UNIDIR_COMPR_SPR_ACTUATOR_H
 
 /**
- * @file tgUnidirectionalCompressionSpringActuator.h
- * @brief Contains the definition of class tgUnidirectionalCompressionSpringActuator.
+ * @file tgUnidirComprSprActuator.h
+ * @brief Contains the definition of class tgUnidirComprSprActuator.
  * This class assumes a linear spring, F = k \delta x - bV, where the spring begins to
  * apply a force when the length between anchors goes down past restLength.
- * Uses a tgBulletUnidirectionalCompressionSpring to calculate and apply forces.
- * @author Drew Sabelhaus, Brian Mirletz
+ * Uses a tgBulletUnidirComprSpr to calculate and apply forces.
+ * @author Drew Sabelhaus
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
@@ -45,7 +45,7 @@
 #include <deque>
 
 // Forward declarations
-class tgBulletUnidirectionalCompressionSpring;
+class tgBulletUnidirComprSpr;
 class tgModelVisitor;
 class tgWorld;
 
@@ -53,7 +53,7 @@ class tgWorld;
  * This class is what should be used to create a compression spring in NTRT.
  * As of 2016-08-02, it does not actuate, though, but is named 'actuator'
  * in the hopes that this functionality will be added.
- * Since it uses a tgBulletUnidirectionalCompressionSpring, the force applied
+ * Since it uses a tgBulletUnidirComprSpr, the force applied
  * is only along one direction, not the full 3D vector of distance between nodes.
  * E.g., if direction is (0, 1, 0), then the applied force is always in the vertical
  * direction, and is proportional to only the vertical distance between nodes.
@@ -61,7 +61,7 @@ class tgWorld;
 
 // This class needs to be a child model of a tgModel, but that's
 // taken care of by inheriting from tgCompressionSpringActuator
-class tgUnidirectionalCompressionSpringActuator : public tgCompressionSpringActuator
+class tgUnidirComprSprActuator : public tgCompressionSpringActuator
 {
 public: 
 
@@ -69,6 +69,10 @@ public:
    * The config struct.
    * As of 2016-08-02, since this compression spring is unactuated, the
    * config struct only needs a small number of the parameters in tgSpringCableActuator.
+   * Note that this is NOT re-declaring the config struct from
+   * tgCompressionSpringActuator. Instead, it is extending that struct,
+   * since structs can be inherited like classes in C++.
+   * It's extended here because of the inclusion of the 'dir' variable.
    */
   struct Config : public tgCompressionSpringActuator::Config
   {
@@ -91,7 +95,7 @@ public:
     /**
      * List of the new parameters.
      * See tgBulletCompressionSpringActuator for info about the others.
-     * All are passed in to tgBulletUnidirectionalCompressionSpring.
+     * All are passed in to tgBulletUnidirComprSpr.
      */
 
     /**
@@ -108,22 +112,22 @@ public:
   /**
    * THE MAIN CONSTRUCTOR FOR THIS CLASS.
    * Constructor using tags. Typically called in 
-   * tgUnidirectionalCompressionSpringActuatorInfo.cpp .
-   * @param[in] compressionSpring, the tgBulletUnidirectionalCompressionSpring 
+   * tgUnidirComprSprActuatorInfo.cpp .
+   * @param[in] compressionSpring, the tgBulletUnidirComprSpr 
    * object that this controls and logs.
-   * Set up in tgUnidirectionalCompressionSpringActuatorInfo.cpp
+   * Set up in tgUnidirComprSprActuatorInfo.cpp
    * @param[in] tags as passed through tgStructure and tgStructureInfo
    * @param[in] config Holds member variables defined here.
    */    
-  tgUnidirectionalCompressionSpringActuator(
-	 tgBulletUnidirectionalCompressionSpring* compressionSpring,
+  tgUnidirComprSprActuator(
+	 tgBulletUnidirComprSpr* compressionSpring,
          const tgTags& tags,
-         tgUnidirectionalCompressionSpringActuator::Config& config);
+         tgUnidirComprSprActuator::Config& config);
     
   /**
    * Destructor does nothing.
    */
-  virtual ~tgUnidirectionalCompressionSpringActuator();
+  virtual ~tgUnidirComprSprActuator();
     
   /**
    * Notifies observers of setup, calls setup on children
@@ -153,7 +157,10 @@ public:
   virtual void onVisit(const tgModelVisitor& r) const;
     
   /**
-   * Functions for interfacing with tgBulletUnidirectionalCompressionSpring
+   * Functions for interfacing with tgBulletUnidirComprSpr
+   * Like with tgCompressionSpringActuator, if this class was to ever
+   * really become an actuator, the following helper methods would
+   * probably be useful.
    */
 
   /**
@@ -182,7 +189,7 @@ public:
    * This is equivalent to "tension" in a sense, but since this is a 
    * compression spring, it's better termed "spring force."
    * Used in places like ForcePlateModel to pass through information
-   * about the underlying tgBulletUnidirectionalCompressionSpring.
+   * about the underlying tgBulletUnidirComprSpr.
    */
   //virtual const double getSpringForce() const;
 
@@ -190,11 +197,11 @@ public:
 protected:
 
     /**
-     * A copy of the configuration POD supplied at constuction.
+     * A copy of the configuration struct supplied at constuction.
      * This is not const.
      * Override the base config to get the extra parameters.
      */
-    tgUnidirectionalCompressionSpringActuator::Config m_config;
+    tgUnidirComprSprActuator::Config m_config;
 
 private:
 

@@ -17,15 +17,15 @@
 */
 
 /**
- * @file tgUnidirectionalCompressionSpringActuatorInfo.cpp
- * @brief Implementation of class tgUnidirectionalCompressionSpringActuatorInfo
- * @author Drew Sabelhaus, Ryan Adams
+ * @file tgUnidirComprSprActuatorInfo.cpp
+ * @brief Implementation of class tgUnidirComprSprActuatorInfo
+ * @author Drew Sabelhaus, et al.
  * @date August 2016
  * $Id$
  */
 
 // This class
-#include "tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgUnidirComprSprActuatorInfo.h"
 
 // Other classes from core (are these included from the superclass?...)
 //#include "core/tgBulletCompressionSpring.h"
@@ -33,16 +33,16 @@
 #include "core/tgCast.h"
 
 // Include the new type of spring
-#include "core/tgBulletUnidirectionalCompressionSpring.h"
+#include "core/tgBulletUnidirComprSpr.h"
 
 /**
  * Constructor auxiliary method, does some debugging and error checking.
  */
-void tgUnidirectionalCompressionSpringActuatorInfo::constructorAux()
+void tgUnidirComprSprActuatorInfo::constructorAux()
 {
     // Debugging
     #if (0)
-    std::cout << "tgUnidirectionalCompressionSpringActuatorInfo constructor. Direction is:" << std::endl;
+    std::cout << "tgUnidirComprSprActuatorInfo constructor. Direction is:" << std::endl;
     std::cout << "(" << m_config.direction->x() << ",";
     std::cout << m_config.direction->y() << ",";
     std::cout << m_config.direction->z() << ")" << std::endl;
@@ -51,10 +51,10 @@ void tgUnidirectionalCompressionSpringActuatorInfo::constructorAux()
 
 /**
  * Constructors.
- * All must call the constructor for tgCompressionSpringActuator.
+ * All must call the constructor for tgCompressionSpringActuatorInfo.
  */
 
-tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config) : 
+tgUnidirComprSprActuatorInfo::tgUnidirComprSprActuatorInfo(const tgUnidirComprSprActuator::Config& config) : 
 m_config(config),
 tgCompressionSpringActuatorInfo(config)
 {
@@ -62,7 +62,7 @@ tgCompressionSpringActuatorInfo(config)
   constructorAux();
 }
 
-tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config, tgTags tags) : 
+tgUnidirComprSprActuatorInfo::tgUnidirComprSprActuatorInfo(const tgUnidirComprSprActuator::Config& config, tgTags tags) : 
 m_config(config),
 tgCompressionSpringActuatorInfo(config, tags)
 {
@@ -70,7 +70,7 @@ tgCompressionSpringActuatorInfo(config, tags)
   constructorAux();
 }
 
-tgUnidirectionalCompressionSpringActuatorInfo::tgUnidirectionalCompressionSpringActuatorInfo(const tgUnidirectionalCompressionSpringActuator::Config& config, const tgPair& pair) :
+tgUnidirComprSprActuatorInfo::tgUnidirComprSprActuatorInfo(const tgUnidirComprSprActuator::Config& config, const tgPair& pair) :
 m_config(config),
 tgCompressionSpringActuatorInfo(config, pair)
 {
@@ -78,38 +78,38 @@ tgCompressionSpringActuatorInfo(config, pair)
   constructorAux();
 }
 
-tgConnectorInfo* tgUnidirectionalCompressionSpringActuatorInfo::createConnectorInfo(const tgPair& pair)
+tgConnectorInfo* tgUnidirComprSprActuatorInfo::createConnectorInfo(const tgPair& pair)
 {
-    return new tgUnidirectionalCompressionSpringActuatorInfo(m_config, pair);
+    return new tgUnidirComprSprActuatorInfo(m_config, pair);
 }
 
-void tgUnidirectionalCompressionSpringActuatorInfo::initConnector(tgWorld& world)
+void tgUnidirComprSprActuatorInfo::initConnector(tgWorld& world)
 {
-    // Note: tgBulletUnidirectionalCompressionSpring holds pointers to things
+    // Note: tgBulletUnidirComprSpr holds pointers to things
     // in the world, but it doesn't actually have any in-world representation.
     // Remember that m_bulletCompressionSpring is held in the superclass.
-    m_bulletCompressionSpring = createTgBulletUnidirectionalCompressionSpring();
+    m_bulletCompressionSpring = createTgBulletUnidirComprSpr();
 }
 
-tgModel* tgUnidirectionalCompressionSpringActuatorInfo::createModel(tgWorld& world)
+tgModel* tgUnidirComprSprActuatorInfo::createModel(tgWorld& world)
 {
     // Don't have to do anything in the world for a tgBulletCompressionSpring...
     // @todo: set the name based on joined tags, or remove name from the model...
-    //std::cout << "tgUnidirectionalCompressionSpringActuatorInfo::createModel" << std::endl;
+    //std::cout << "tgUnidirComprSprActuatorInfo::createModel" << std::endl;
     
     // ensure connector has been initialized
     assert(m_bulletCompressionSpring);
 
     // Here, we have to cast the compression spring to the type that's used in this
     // class. Casting from the superclass (tgBulletCompressionSpring) to the
-    // subclass tgBulletUnidirectionalCompressionSpring.
+    // subclass tgBulletUnidirComprSpr.
     // Rememeber that m_bulletCompressionSpring is a pointer to
     // a bulletCompressionSpring.
-    return new tgUnidirectionalCompressionSpringActuator(
-	 tgCast::cast<tgBulletCompressionSpring, tgBulletUnidirectionalCompressionSpring>(m_bulletCompressionSpring), getTags(), m_config);
+    return new tgUnidirComprSprActuator(
+	 tgCast::cast<tgBulletCompressionSpring, tgBulletUnidirComprSpr>(m_bulletCompressionSpring), getTags(), m_config);
 }
 
-tgBulletUnidirectionalCompressionSpring* tgUnidirectionalCompressionSpringActuatorInfo::createTgBulletUnidirectionalCompressionSpring()
+tgBulletUnidirComprSpr* tgUnidirComprSprActuatorInfo::createTgBulletUnidirComprSpr()
 {
     // @TO-DO: make this more object-oriented. Currently, there is code re-use
     // between this method and the create compression spring method in
@@ -144,26 +144,29 @@ tgBulletUnidirectionalCompressionSpring* tgUnidirectionalCompressionSpringActuat
       to = getTo();
     }    
 
-    // Note that even though this object is definitely not a SpringCable, and does not inherit from
-    // that class at all, it's still more useful to re-use the spring cable version of anchor.
-    // no need to re-create the exact same object, just to name it differently.
-    // This should work, since tgBulletSpringCableAnchor actually has no tie-ins to either
-    // tgBulletSpringCable or tgSpringCable.
+    // Note that even though this object is definitely not a SpringCable,
+    // and does not inherit from that class at all, it's still more useful
+    // to re-use the spring cable version of anchor.
+    // No need to re-create the exact same object, just to name it differently.
+    // This should work, since tgBulletSpringCableAnchor actually has
+    // no tie-ins to either tgBulletSpringCable or tgSpringCable.
     std::vector<tgBulletSpringCableAnchor*> anchorList;
 
     // add the anchors from these two rigid bodies to the list of anchors that
     // will reside within the tgBulletCompressionSpring.
-    tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
+    tgBulletSpringCableAnchor* anchor1 =
+      new tgBulletSpringCableAnchor(fromBody, from);
     anchorList.push_back(anchor1);
 	
-    tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
+    tgBulletSpringCableAnchor* anchor2 =
+      new tgBulletSpringCableAnchor(toBody, to);
     anchorList.push_back(anchor2);
 
-    // call the constructor for tgBulletUnidirectionalCompressionSpring.
-    // Unlike the spring-cable, it makes more sense to state the rest length of a compression
-    // spring. That way, it's easy to only apply a force if the total distance between the two
-    // anchors is less than restLength.
-    return new tgBulletUnidirectionalCompressionSpring(anchorList,
+    // call the constructor for tgBulletUnidirComprSpr.
+    // Unlike the spring-cable, it makes more sense to state the rest length
+    // of a compression spring. That way, it's easy to only apply a force
+    // if the total distance between the two anchors is less than restLength.
+    return new tgBulletUnidirComprSpr(anchorList,
 		  m_config.isFreeEndAttached, m_config.stiffness, m_config.damping,
 		  m_config.restLength, m_config.direction);
 }
