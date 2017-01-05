@@ -127,7 +127,7 @@ double tgBoxInfo::getMass() const
   const double width = m_config.width;
   const double height = m_config.height;
   const double density = m_config.density;
-  const double volume =  length * (width/2) * (height/2);
+  const double volume =  length * (width*2) * (height*2);
   return volume * density;
 }
 
