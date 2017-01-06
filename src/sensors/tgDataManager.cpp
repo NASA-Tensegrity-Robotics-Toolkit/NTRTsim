@@ -41,7 +41,7 @@
 tgDataManager::tgDataManager()
 {
   //DEBUGGING
-  std::cout << "tgDataManager constructor." << std::endl;
+  //std::cout << "tgDataManager constructor." << std::endl;
   // Postcondition
   assert(invariant());
 }
@@ -55,7 +55,7 @@ tgDataManager::tgDataManager()
 tgDataManager::~tgDataManager()
 {
   //DEBUGGING
-  std::cout << "tgDataManager destructor." << std::endl;
+  //std::cout << "tgDataManager destructor." << std::endl;
   
   // First, delete everything in m_sensors.
   const size_t n_Sens = m_sensors.size();
@@ -83,7 +83,7 @@ tgDataManager::~tgDataManager()
 void tgDataManager::setup()
 {
   //DEBUGGING
-  std::cout << "tgDataManager setup." << std::endl;
+  //std::cout << "tgDataManager setup." << std::endl;
   // TO-DO: Should we create the sensors here in the setup method of the base?
   // What's the best way to maximize code re-use?
   // Postcondition
@@ -100,7 +100,7 @@ void tgDataManager::setup()
 void tgDataManager::teardown()
 {
   //DEBUGGING
-  std::cout << "tgDataManager teardown." << std::endl;
+  //std::cout << "tgDataManager teardown." << std::endl;
   
   // First, delete the sensors.
   // Note that it's good practice to set deleted pointers to NULL here.
@@ -117,6 +117,16 @@ void tgDataManager::teardown()
   // Next, delete the sensor infos.
   // TO-DO: implement this.
 
+  // Clear the list of senseable objects.
+  // Since tgDataManagers don't ever change these objects,
+  // leave it to other classes to create and delete them.
+  // Just get rid of the pointers here.
+  // TO-DO: maybe we don't want to do this? Will this make it so no logs
+  // are created upon reset???
+  // TO-DO: could this segfault? Will the pointers in m_senseables be changed
+  // during reset at all?
+  //m_senseables.clear();
+
   // Postcondition
   assert(invariant());
   assert(m_sensors.empty());
@@ -129,7 +139,7 @@ void tgDataManager::teardown()
 void tgDataManager::step(double dt) 
 {
   //DEBUGGING
-  std::cout << "tgDataManager step." << std::endl;
+  //std::cout << "tgDataManager step." << std::endl;
   if (dt <= 0.0)
   {
     throw std::invalid_argument("dt is not positive");
@@ -170,13 +180,14 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
  * It takes in a pointer to a sense-able object and pushes it to the
  * current list of tgSenseables.
  */
-/*
-void tgDataManager::addSenseable(tgSensable* pSenseable)
+void tgDataManager::addSenseable(tgSenseable* pSenseable)
 {
+  //DEBUGGING
+  std::cout << "tgDataManager addSenseable." << std::endl;
   // Precondition
   if (pSenseable == NULL)
   {
-    throw std::invalid_argument("pSenseable is NULL inside tgDataManager::addSensable");
+    throw std::invalid_argument("pSenseable is NULL inside tgDataManager::addSenseable");
   } 
 
   m_senseables.push_back(pSenseable);
@@ -185,7 +196,7 @@ void tgDataManager::addSenseable(tgSensable* pSenseable)
   assert(invariant());
   assert(!m_senseables.empty());
 }
-*/
+
 
 /**
  * The toString method for data managers should include a list of the number

@@ -34,6 +34,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
+#include <vector> // for managing descendants of tgSenseables.
 
 /**
  * The constructor for this class only assigns the filename prefix.
@@ -77,6 +78,28 @@ void tgDataLogger2::setup()
   tgDataManager::setup();
   //DEBUGGING
   std::cout << "tgDataLogger2 setup." << std::endl;
+
+  // First, check that we're getting the tgSenseables that we want.
+  // Each of the elements in m_senseables may have descendants.
+  // Note that we do NOT check for duplicates, unlike the descendants management
+  // in tgModel.
+  std::vector< std::vector<tgSenseable*> > descendants;
+  //DEBUGGING
+  std::cout << "There are the following senseables that were directly attached to this tgDataLogger2: " << std::endl;
+  for (size_t i=0; i < m_senseables.size(); i++) {
+    std::cout << m_senseables[i]->getLabelForSensor() << std::endl;
+    descendants.push_back( m_senseables[i]->getSenseableDescendants());
+  }
+  std::cout << "The descendants of each of these sense-ables are: " << std::endl;
+  for (size_t i=0; i< descendants.size(); i++) {
+    std::cout << "Senseable number: " << i << " has "
+	      << descendants[i].size() << " descendants, and they are: "
+	      << std::endl;
+    for (size_t j=0; j < descendants[i].size(); j++) {
+      std::cout << descendants[i][j]->getLabelForSensor() << std::endl;
+    }
+  }
+  
   // TO-DO: setup everything!
   
   // Postcondition

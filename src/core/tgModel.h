@@ -156,15 +156,17 @@ public:
     void addMarker(abstractMarker a);
 
     /**
-     * From tgSenseable: must re-implement the data collecting methods.
-     * However, this function in tgModel should never really be called,
-     * only the child classes' methods should be called.
-     * This is because we're always trying to sense something like 
-     * a tgRod or a tgSpringCableActuator, not a base tgModel.
+     * From tgSenseable: give a label of this type of senseable object.
+     * Note that child classes (e.g. rods) re-define this.
      * This is also why the keyword "virtual" is used here.
      */
-    virtual std::string getDataHeading();
-    virtual std::string getData();
+    virtual std::string getLabelForSensor();
+
+    /**
+     * From tgSenseable: need to return all the children of this class.
+     * Since tgModels are tgSenseables, just return getDescendants().
+     */
+    virtual std::vector<tgSenseable*> getSenseableDescendants() const;
 
 private:
 

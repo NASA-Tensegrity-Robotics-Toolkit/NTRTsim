@@ -18,6 +18,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgUnidirComprSprActuator.cpp
     tgWorld.cpp
     tgSimulation.cpp
+    tgSenseable.cpp
     tgBulletRenderer.cpp
     tgSimView.cpp
     tgSimViewGraphics.cpp

@@ -86,6 +86,8 @@ int main(int argc, char** argv)
     std::string log_filename = "~/NTRTsim_logs/AppTgBoxAnchorDebugDemo";
     // First, create the data manager
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename);
+    // Then, add the model to the data logger
+    myDataLogger->addSenseable(myModel);
     // Next, attach it to the simulation
     simulation.addDataManager(myDataLogger);
     // and everything else should happen automatically.

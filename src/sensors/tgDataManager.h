@@ -30,7 +30,7 @@
 //#include "tgCast.h"
 //#include "tgTaggable.h"
 //#include "tgTagSearch.h"
-//#include "core/tgSenseable.h"
+#include "core/tgSenseable.h" //not sure why this needs to be included vs. just declared...
 // The C++ Standard Library
 #include <string>
 #include <sstream>
@@ -40,7 +40,7 @@
 // Forward declarations
 //class tgWorld;
 class tgSensor;
-class tgSenseable;
+//class tgSenseable;
 //class tgSensorInfo;
 
 /**
@@ -90,7 +90,7 @@ public:
      * These objects will be checked via the sensor infos, and sensors will
      * be assigned to them if appropriate.
      */
-    //virtual void addSenseable(tgSenseable* pSenseable);
+    virtual void addSenseable(tgSenseable* pSenseable);
 
     /**
      * Add a sensor info object to the current list of sensor infos.
@@ -128,7 +128,7 @@ protected:
      * A data manager will also have a list of tgSenseable objects 
      * (really, just tgModels most of the time) that it will collect data from.
      */
-    //std::vector<tgSenseable*> m_senseables;
+    std::vector<tgSenseable*> m_senseables;
 
 };
 

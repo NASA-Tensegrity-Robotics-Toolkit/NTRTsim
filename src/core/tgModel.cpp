@@ -183,6 +183,26 @@ std::vector<tgModel*> tgModel::getDescendants() const
   return result;
 }
 
+/**
+ * For tgSenseable: just return the results of getDescendants here.
+ * This should be OK, since a vector of tgModel* is also a vector of
+ * tgSenseable*.
+ */
+std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
+{
+  //return getDescendants();
+  //DEBUGGING: test if this is a type issue...
+  //return std::vector<tgSenseable*>();
+  // Seems to work. So, how about we make a new list, populate it
+  // with tgModels, and return that.
+  std::vector<tgModel*> myDescendants = getDescendants();
+  std::vector<tgSenseable*> mySenseableDescendants;
+  for (size_t i=0; i < myDescendants.size(); i++) {
+    mySenseableDescendants.push_back(myDescendants[i]);
+  }
+  return mySenseableDescendants;
+}
+
 const std::vector<abstractMarker>& tgModel::getMarkers() const {
     return m_markers;
 }
@@ -192,16 +212,10 @@ void tgModel::addMarker(abstractMarker a){
 }
 
 /**
- * The methods for tgSenseable.
- * Note again that these are NOT ever supposed to be called,
- * only the childrens' methods should be called.
+ * For tgSenseable.
  */
-std::string tgModel::getDataHeading(){
-  return "tgModel_BASE_CLASS_NO_DATA";
-}
-
-std::string tgModel::getData(){
-  return "tgModel_BASE_CLASS_NO_DATA";
+std::string tgModel::getLabelForSensor(){
+  return "tgModel";
 }
 
 bool tgModel::invariant() const

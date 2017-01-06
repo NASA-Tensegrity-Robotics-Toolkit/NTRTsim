@@ -99,6 +99,7 @@ std::string tgRod::getLabelForSensor(){
   return "rod";
 }
 
+
 bool tgRod::invariant() const
 {
   return

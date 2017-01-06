@@ -28,7 +28,7 @@
 
 // From the C++ standard library:
 #include <iostream> //for strings
-//#include <assert.h> //for assertions
+#include <vector> //for lists of descendants
 
 /**
  * This class is used to abstract away the class of pointers
@@ -37,6 +37,8 @@
  */
 class tgSenseable
 {
+ public:
+  
   /**
    * Ideally, this class would have no member functions.
    * However, since C++ requires at least one virtual member function
@@ -47,9 +49,15 @@ class tgSenseable
    * or something like that.
    * Include a generic output here that really should be redefined later.
    */
-  virtual std::string getLabelForSensor(){
-    return "base_tgSenseable";
-  }
+  virtual std::string getLabelForSensor();
+
+  /**
+   * In order to create sensors for a whole hierarchy of senseable objects,
+   * sense-able objects need to have references to thei children.
+   * This will be used in a tgDataManager's setup and step functions.
+   * For now, this 'should' be handled by tgModel's getDescendants function.
+   */
+  virtual std::vector<tgSenseable*> getSenseableDescendants() const;
     
 };
 
