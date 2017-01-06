@@ -30,7 +30,7 @@
 //#include "tgCast.h"
 //#include "tgTaggable.h"
 //#include "tgTagSearch.h"
-//#include "tgSenseable.h"
+//#include "core/tgSenseable.h"
 // The C++ Standard Library
 #include <string>
 #include <sstream>
@@ -40,6 +40,7 @@
 // Forward declarations
 //class tgWorld;
 class tgSensor;
+class tgSenseable;
 //class tgSensorInfo;
 
 /**
@@ -85,6 +86,13 @@ public:
     virtual void step(double dt);
 
     /**
+     * Add a tgSenseable object to this data manager.
+     * These objects will be checked via the sensor infos, and sensors will
+     * be assigned to them if appropriate.
+     */
+    //virtual void addSenseable(tgSenseable* pSenseable);
+
+    /**
      * Add a sensor info object to the current list of sensor infos.
      * @param[in] pSensorInfo a pointer to a tgSensorInfo.
      */
@@ -115,6 +123,12 @@ protected:
      * These are used to create the sensors
      */
     //std::vector<tgSensorInfo*> m_sensorInfos;
+
+    /**
+     * A data manager will also have a list of tgSenseable objects 
+     * (really, just tgModels most of the time) that it will collect data from.
+     */
+    //std::vector<tgSenseable*> m_senseables;
 
 };
 

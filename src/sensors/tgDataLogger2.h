@@ -82,10 +82,28 @@ class tgDataLogger2 : public tgDataManager
  protected:
 
   /**
-   * Store the full name of the file for writing data, as well as 
+   * Store the full name of the file for writing data.
+   * note that this is NOT what is passed into the constructor:
+   * that string is modified to create m_fileName.
    */
+  std::string m_fileName;
+
+  /**
+   * In order to have the filename for the log file be created in
+   * the setup function, instead of in the constructor, we need to hold
+   * the filename prefix too. This allows for running setup and teardown
+   * and having different log files - e.g., when the space bar is pressed,
+   * a new log file will be opened.
+   */
+  std::string m_fileNamePrefix;
+
+  /**
+   * Keep track of the total time that the simulation has run.
+   * This is for adding a timestamp into the log file.
+   */
+  double m_totalTime;
   
-}
+};
 
 
 #endif // TG_DATA_LOGGER2_H

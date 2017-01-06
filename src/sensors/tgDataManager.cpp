@@ -27,9 +27,11 @@
 #include "tgDataManager.h"
 // This application
 #include "tgSensor.h"
+#include "core/tgSenseable.h"
 //#include "tgSensorInfo.h"
 // The C++ Standard Library
 //#include <stdio.h> // for sprintf
+#include <iostream>
 #include <stdexcept>
 #include <cassert>
 
@@ -38,6 +40,8 @@
  */
 tgDataManager::tgDataManager()
 {
+  //DEBUGGING
+  std::cout << "tgDataManager constructor." << std::endl;
   // Postcondition
   assert(invariant());
 }
@@ -50,6 +54,9 @@ tgDataManager::tgDataManager()
  */
 tgDataManager::~tgDataManager()
 {
+  //DEBUGGING
+  std::cout << "tgDataManager destructor." << std::endl;
+  
   // First, delete everything in m_sensors.
   const size_t n_Sens = m_sensors.size();
   for (size_t i = 0; i < n_Sens; ++i)
@@ -63,6 +70,10 @@ tgDataManager::~tgDataManager()
   }
   // Next, delete the sensor infos.
   // TO-DO: fill in.
+
+  // Note that the creation and deletion of the senseable objects, e.g.
+  // the tgModels, is handled externally.
+  // tgDataManagers should NOT destroy the objects they are sensing.
 }
 
 /**
@@ -71,6 +82,8 @@ tgDataManager::~tgDataManager()
  */
 void tgDataManager::setup()
 {
+  //DEBUGGING
+  std::cout << "tgDataManager setup." << std::endl;
   // TO-DO: Should we create the sensors here in the setup method of the base?
   // What's the best way to maximize code re-use?
   // Postcondition
@@ -79,13 +92,16 @@ void tgDataManager::setup()
 
 /**
  * The teardown method has to remove all the sensors and sensor infos.
- * Note that this method will likely be re-defined by subclasses,
- * in order to manage (for example) log files: close them out, for example.
+ * Note that this method could be redefined by subclasses, for example to 
+ * do some final step with a mesage-passing algorithm before the simulation ends.
  * TO-DO: what's a good way to capture the deletion of sensors and sensorInfos
  * that doesn't require subclasses to copy-and-paste from this teardown method?
  */
 void tgDataManager::teardown()
 {
+  //DEBUGGING
+  std::cout << "tgDataManager teardown." << std::endl;
+  
   // First, delete the sensors.
   // Note that it's good practice to set deleted pointers to NULL here.
   for (std::size_t i = 0; i < m_sensors.size(); i++)
@@ -112,6 +128,8 @@ void tgDataManager::teardown()
  */
 void tgDataManager::step(double dt) 
 {
+  //DEBUGGING
+  std::cout << "tgDataManager step." << std::endl;
   if (dt <= 0.0)
   {
     throw std::invalid_argument("dt is not positive");
@@ -139,11 +157,33 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
     throw std::invalid_argument("pSensorInfo is NULL inside tgDataManager::addSensorInfo");
   } 
 
-  m_sensorInfos.push_back(pChild);
+  m_sensorInfos.push_back(pSensorInfo);
 
   // Postcondition
   assert(invariant());
   assert(!m_sensorInfos.empty());
+}
+*/
+
+/**
+ * This method adds sense-able objects to this data manager.
+ * It takes in a pointer to a sense-able object and pushes it to the
+ * current list of tgSenseables.
+ */
+/*
+void tgDataManager::addSenseable(tgSensable* pSenseable)
+{
+  // Precondition
+  if (pSenseable == NULL)
+  {
+    throw std::invalid_argument("pSenseable is NULL inside tgDataManager::addSensable");
+  } 
+
+  m_senseables.push_back(pSenseable);
+
+  // Postcondition
+  assert(invariant());
+  assert(!m_senseables.empty());
 }
 */
 
