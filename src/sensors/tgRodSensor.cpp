@@ -47,6 +47,8 @@
  */
 tgRodSensor::tgRodSensor(tgRod* pRod) : tgSensor(pRod)
 {
+  // Note that this pointer may be 0 (equivalent to NULL) if the cast in
+  // the calling function from tgSenseable to tgRod fails.
   if (pRod == NULL) {
     throw std::invalid_argument("Pointer to pRod is NULL inside tgRodSensor.");
   }

@@ -34,6 +34,7 @@
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 #include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -88,6 +89,11 @@ int main(int argc, char** argv)
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename);
     // Then, add the model to the data logger
     myDataLogger->addSenseable(myModel);
+    // Create sensor infos for all the types of sensors that the data logger
+    // will create.
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    // Attach the sensor infos to the data logger
+    myDataLogger->addSensorInfo(myRodSensorInfo);
     // Next, attach it to the simulation
     simulation.addDataManager(myDataLogger);
     // and everything else should happen automatically.

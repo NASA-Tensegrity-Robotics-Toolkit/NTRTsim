@@ -73,8 +73,7 @@ tgDataLogger2::~tgDataLogger2()
  */
 void tgDataLogger2::setup()
 {
-  // Although the parent class doesn't do much in setup at the moment,
-  // call it here anyway, in case that changes!
+  // Call the parent's setup method, which creates the sensors.
   tgDataManager::setup();
   //DEBUGGING
   std::cout << "tgDataLogger2 setup." << std::endl;
@@ -99,8 +98,13 @@ void tgDataLogger2::setup()
       std::cout << descendants[i][j]->getLabelForSensor() << std::endl;
     }
   }
-  
-  // TO-DO: setup everything!
+
+  // Check how many sensor infos are attached.
+  //DEBUGGING
+  std::cout << "There are " << m_sensorInfos.size() << " sensor infos attached."
+	    << std::endl;
+  std::cout << "There are " << m_sensors.size() << " sensors attached."
+	    << std::endl;
   
   // Postcondition
   assert(invariant());

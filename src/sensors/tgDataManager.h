@@ -41,7 +41,7 @@
 //class tgWorld;
 class tgSensor;
 //class tgSenseable;
-//class tgSensorInfo;
+class tgSensorInfo;
 
 /**
  * Abstract class for objects that will manage data within NTRTsim.
@@ -96,7 +96,7 @@ public:
      * Add a sensor info object to the current list of sensor infos.
      * @param[in] pSensorInfo a pointer to a tgSensorInfo.
      */
-    //virtual void addSensorInfo(tgSensorInfo* pSensorInfo);
+    virtual void addSensorInfo(tgSensorInfo* pSensorInfo);
 	
     /**
      * Returns some basic information about this tgDataManager,
@@ -105,6 +105,14 @@ public:
      * @return informative string about this data manager
      */
     virtual std::string toString() const;
+
+ private:
+
+    /**
+     * A helper function for setup. Since there will be a loop over
+     * the sensor infos, this function abstracts it away.
+     */
+    void addSensorsIfAppropriate(tgSenseable* pSenseable);
 
 protected:
 
@@ -122,7 +130,7 @@ protected:
      * have been passed in to it.
      * These are used to create the sensors
      */
-    //std::vector<tgSensorInfo*> m_sensorInfos;
+    std::vector<tgSensorInfo*> m_sensorInfos;
 
     /**
      * A data manager will also have a list of tgSenseable objects 

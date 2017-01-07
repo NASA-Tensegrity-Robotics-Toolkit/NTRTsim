@@ -13,4 +13,6 @@ add_library( ${PROJECT_NAME} SHARED
     tgDataLogger2.cpp
     tgSensor.cpp
     tgRodSensor.cpp
+    tgSensorInfo.cpp
+    tgRodSensorInfo.cpp
 )

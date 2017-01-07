@@ -17,44 +17,30 @@
 */
 
 /**
- * @file tgSensor.cpp
- * @brief An implementation of some parts of the tgSensor abstract class.
+ * @file tgSensorInfo.cpp
+ * @brief An implementation of some parts of the tgSensorInfo abstract class.
  * @author Drew Sabelhaus
- * @date January 4, 2017
+ * @date January 6, 2017
  * $Id$
  */
 
 // Includes from NTRT:
-#include "tgSensor.h"
+#include "tgSensorInfo.h"
 #include "core/tgSenseable.h"
 
 // Includes from the c++ standard library:
-//#include <iostream>
-//#include <sstream>  
-//#include <time.h>
-#include <stdexcept>
+// ...
 
 /**
- * This cpp file only implements the constructor for tgSensor.
- * Note that tgSensor is an abstract class with two pure virtual member
- * functions, so you cannot instantiate a tgSensor.
- * However, a constructor is provided here for ease of managing pointers
- * in child classes.
- * The shorthand syntax for variable assignment is used here.
- * "m_pSens" stands for "my pointer to a tgSenseable object."
+ * Empty constructor.
  */
-tgSensor::tgSensor(tgSenseable* pSens) : m_pSens(pSens)
+tgSensorInfo::tgSensorInfo()
 {
-  if (pSens == NULL) {
-    throw std::invalid_argument("Pointer to pSenseable is NULL inside tgSensor.");
-  }
 }
 
 /** A class with virtual member functions must have a virtual destructor. */
-tgSensor::~tgSensor()
+tgSensorInfo::~tgSensorInfo()
 {
-  // Note that we should NOT be deleting the m_pSens, since that's
-  // likely a tgModel, which is handled by other classes.
 }
 
 //end.

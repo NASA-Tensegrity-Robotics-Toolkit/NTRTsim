@@ -28,7 +28,7 @@
 // This application
 #include "tgSensor.h"
 #include "core/tgSenseable.h"
-//#include "tgSensorInfo.h"
+#include "tgSensorInfo.h"
 // The C++ Standard Library
 //#include <stdio.h> // for sprintf
 #include <iostream>
@@ -67,9 +67,22 @@ tgDataManager::~tgDataManager()
     // It is safe to delete NULL, but this is an invariant
     // assert(pChild != NULL); 
     delete pSensor;
+    // Null out the deleted pointer.
+    m_sensors[i] = NULL;
   }
   // Next, delete the sensor infos.
-  // TO-DO: fill in.
+  const size_t n_SensInf = m_sensorInfos.size();
+  for (size_t i = 0; i < n_SensInf; ++i)
+  {
+    // Pick out one sensorInfo from the list:
+    tgSensorInfo* const pSensorInfo = m_sensorInfos[i];
+    // TO-DO: check if we need this assert...
+    // It is safe to delete NULL, but this is an invariant
+    // assert(pChild != NULL); 
+    delete pSensorInfo;
+    //Null out the deleted pointer.
+    m_sensorInfos[i] = NULL;
+  }
 
   // Note that the creation and deletion of the senseable objects, e.g.
   // the tgModels, is handled externally.
@@ -77,15 +90,44 @@ tgDataManager::~tgDataManager()
 }
 
 /**
- * In child classes, setup will probably do something interesting.
- * In the base class, nothing is being created.
+ * Helper for setup.
+ * This function abstracts away the loop over the sensor infos list.
+ */
+void tgDataManager::addSensorsIfAppropriate(tgSenseable* pSenseable)
+{
+  // Loop over all tgSensorInfos in the list.
+  for (size_t i=0; i < m_sensorInfos.size(); i++){
+    // If this particular sensor info is appropriate for the pSenseable,
+    if( m_sensorInfos[i]->isThisMySenseable(pSenseable) ) {
+      // Create a sensor and push it back to our list of sensors.
+      m_sensors.push_back( m_sensorInfos[i]->createSensor(pSenseable));
+    }
+  }
+}
+
+/**
+ * Create the sensors!
+ * Note that it is up to the child classes to do any other type of setup besides
+ * sensor creation. For example, a data logger will have to first call this parent
+ * function, then ask for the sensor heading from each sensor, then... etc.
  */
 void tgDataManager::setup()
 {
-  //DEBUGGING
-  //std::cout << "tgDataManager setup." << std::endl;
-  // TO-DO: Should we create the sensors here in the setup method of the base?
-  // What's the best way to maximize code re-use?
+  // Iterate over all sensables and their descendants, adding sensors
+  // if appropriate.
+  for (size_t j=0; j < m_senseables.size(); j++){
+    // For each senseable object, create sensors for it and its descendants.
+    // First, the senseable itself:
+    addSensorsIfAppropriate(m_senseables[j]);
+    // Then, for all its descendants:
+    std::vector<tgSenseable*> descendants =
+      m_senseables[j]->getSenseableDescendants();
+    // Loop through.
+    for (size_t k=0; k < descendants.size(); k++) {
+      addSensorsIfAppropriate(descendants[k]);
+    }
+  }
+  
   // Postcondition
   assert(invariant());
 }
@@ -109,6 +151,7 @@ void tgDataManager::teardown()
     // Note that sensors don't have any teardown method.
     // The delete method will call their destructors.
     delete m_sensors[i];
+    m_sensors[i] = NULL;
   }
   // Clear the list so that the destructor for this class doesn't have to
   // do anything.
@@ -116,6 +159,8 @@ void tgDataManager::teardown()
 
   // Next, delete the sensor infos.
   // TO-DO: implement this.
+  // TO-DO: should we actually be deleting these? Or would that make it so no
+  // sensors would be created after a reset???
 
   // Clear the list of senseable objects.
   // Since tgDataManagers don't ever change these objects,
@@ -158,9 +203,15 @@ void tgDataManager::step(double dt)
  * It takes in a pointer to a sensor info and pushes it to the
  * current list of sensor infos.
  */
-/*
 void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
 {
+  // TO-DO:
+  // Check if a type of pSensorInfo is already in the list.
+  // Otherwise, duplicate sensors will be created: e.g., if two tgRodSensorInfos
+  // are in m_sensorInfos, then multiple tgRodSensors will be created for
+  // each tgRod.
+  //DEBUGGING
+  std::cout << "tgDataManager addSensorInfo." << std::endl;
   // Precondition
   if (pSensorInfo == NULL)
   {
@@ -173,7 +224,6 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
   assert(invariant());
   assert(!m_sensorInfos.empty());
 }
-*/
 
 /**
  * This method adds sense-able objects to this data manager.
