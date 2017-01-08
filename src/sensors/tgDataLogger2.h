@@ -28,6 +28,8 @@
 
 // Includes from NTRTsim
 #include "tgDataManager.h"
+// Includes from the C++ standard library
+#include <fstream> // for writing to a file
 
 /**
  * tgDataLogger2 is a tgDataManager. It records data from sensors and outputs
@@ -42,6 +44,12 @@ class tgDataLogger2 : public tgDataManager
    * of the log file to create.
    */
   tgDataLogger2(std::string fileNamePrefix);
+
+  /**
+   * Since folks will probably forget that a file name is needed,
+   * create a constructor with no arguments, and have it complain at them!
+   */
+  tgDataLogger2();
 
   /**
    * The base class handles destruction of the sensors and sensorInfos,
@@ -96,6 +104,11 @@ class tgDataLogger2 : public tgDataManager
    * a new log file will be opened.
    */
   std::string m_fileNamePrefix;
+
+  /**
+   * A file stream, based on m_fileName.
+   */
+  std::ofstream tgOutput;
 
   /**
    * Keep track of the total time that the simulation has run.

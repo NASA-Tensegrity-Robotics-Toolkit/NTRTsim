@@ -35,6 +35,9 @@
 #include <cassert>
 #include <iostream>
 #include <vector> // for managing descendants of tgSenseables.
+#include <time.h> // for the file name of the log file
+#include <sstream> // for converting a size_t to a string.
+#include <cstdlib> // for getenv, converting ~ to $HOME.
 
 /**
  * The constructor for this class only assigns the filename prefix.
@@ -48,9 +51,46 @@ tgDataLogger2::tgDataLogger2(std::string fileNamePrefix) :
   m_fileNamePrefix(fileNamePrefix)
 {
   //DEBUGGING
-  std::cout << "tgDataLogger2 constructor." << std::endl;
+  //std::cout << "tgDataLogger2 constructor." << std::endl;
   // Postcondition
+  // A quick check on the passed-in string: it must not be the empty
+  // string. Must be a correct linux path.
+  // TO-DO: a better check on this.
+  if (m_fileNamePrefix == "") {
+    throw std::invalid_argument("File name cannot be the empty string. Please pass in a path to a file that can be opened.");
+  }
+
+  // Additionally: we want to be able to expand the "~" string in fileNamePrefix
+  // to be the full home directory of the current user.
+  // It's a real pain to have to specify the complete directory structure
+  // for these log file names.
+  // Check if the first character of the string is a tilde:
+  if (m_fileNamePrefix.at(0) == '~') {
+    //DEBUGGING
+    //std::cout << "Automatically converting a tilde ~ to your home directory, as part of the tgDataLogger2 file name..." << std::endl;
+    // Get the $HOME environment variable
+    std::string home = std::getenv("HOME");
+    //DEBUGGING
+    //std::cout << "$HOME is: " << home << std::endl;
+    // Remove the tilde (the first element) from the string
+    m_fileNamePrefix.erase(0,1);
+    // Concatenate the home directory.
+    m_fileNamePrefix = home + m_fileNamePrefix;
+  }
+    
   assert(invariant());
+}
+
+/**
+ * The "BAD" constructor. 
+ * Since people who use NTRT are apt to be new to C++, the errors that they'd get
+ * when trying to create a tgDataLogger2 may be confusing. So, this constructor
+ * lets the simulator compile, but then complains when it's called.
+ * DO NOT USE THIS ONE: use the one with the string passed in!
+ */
+tgDataLogger2::tgDataLogger2()
+{
+  throw std::invalid_argument("Cannot create a tgDataLogger2 without a path to the log file! Please use the constructor that takes a string.");
 }
 
 /**
@@ -61,7 +101,8 @@ tgDataLogger2::tgDataLogger2(std::string fileNamePrefix) :
 tgDataLogger2::~tgDataLogger2()
 {
   //DEBUGGING
-  std::cout << "tgDataLogger2 destructor." << std::endl;
+  //std::cout << "tgDataLogger2 destructor." << std::endl;
+  // TO-DO: should we double-check and close the tgOutput filestream here too?
 }
 
 /**
@@ -75,36 +116,58 @@ void tgDataLogger2::setup()
 {
   // Call the parent's setup method, which creates the sensors.
   tgDataManager::setup();
-  //DEBUGGING
-  std::cout << "tgDataLogger2 setup." << std::endl;
+  // Now, m_sensors should be populated! This is (2) above.
 
-  // First, check that we're getting the tgSenseables that we want.
-  // Each of the elements in m_senseables may have descendants.
-  // Note that we do NOT check for duplicates, unlike the descendants management
-  // in tgModel.
-  std::vector< std::vector<tgSenseable*> > descendants;
-  //DEBUGGING
-  std::cout << "There are the following senseables that were directly attached to this tgDataLogger2: " << std::endl;
-  for (size_t i=0; i < m_senseables.size(); i++) {
-    std::cout << m_senseables[i]->getLabelForSensor() << std::endl;
-    descendants.push_back( m_senseables[i]->getSenseableDescendants());
-  }
-  std::cout << "The descendants of each of these sense-ables are: " << std::endl;
-  for (size_t i=0; i< descendants.size(); i++) {
-    std::cout << "Senseable number: " << i << " has "
-	      << descendants[i].size() << " descendants, and they are: "
-	      << std::endl;
-    for (size_t j=0; j < descendants[i].size(); j++) {
-      std::cout << descendants[i][j]->getLabelForSensor() << std::endl;
-    }
+  // (1) Create the full filename of the log file.
+  // Credit to Brian Tietz Mirletz, via the original tgDataObserver.
+  // Adapted from: http://www.cplusplus.com/reference/clibrary/ctime/localtime/
+  // Also http://www.cplusplus.com/forum/unices/2259/
+  time_t rawtime;
+  tm* currentTime;
+  int fileTimeSize = 64;
+  char fileTime [fileTimeSize];
+  
+  time (&rawtime);
+  currentTime = localtime(&rawtime);
+  strftime(fileTime, fileTimeSize, "%m%d%Y_%H%M%S", currentTime);
+  // Result: fileTime is a string with the time information.
+  m_fileName = m_fileNamePrefix + "_" + fileTime + ".txt";
+
+  // DEBUGGING output:
+  std::cout << "tgDataLogger2 will be saving data to the file: " << std::endl
+	    << m_fileName << std::endl;
+
+  // Attempt to open the log file
+  tgOutput.open(m_fileName.c_str());
+  if (!tgOutput.is_open()) {
+    throw std::runtime_error("Log file could not be opened. Usually, this is because the directory you specified does not exist. Check for spelling errors.");
   }
 
-  // Check how many sensor infos are attached.
-  //DEBUGGING
-  std::cout << "There are " << m_sensorInfos.size() << " sensor infos attached."
-	    << std::endl;
-  std::cout << "There are " << m_sensors.size() << " sensors attached."
-	    << std::endl;
+  // Output a first line of the header.
+  tgOutput << "tgDataLogger2 started logging at time " << fileTime << ", with "
+	   << m_sensors.size() << " sensors on " << m_senseables.size()
+	   << " senseable objects." << std::endl;
+
+  // The first column of data will be "time", the m_totalTime since beginning
+  // of the simulation.
+  tgOutput << "time,";
+
+  // Iterate. For each sensor, output its header.
+  // The prefix here is the sensor number, which we choose to be the index in
+  // the vector of sensors. NOTE that this means the sensors vector CANNOT
+  // BE CHANGED, otherwise the data will not be aligned properly.
+  for (std::size_t i=0; i < m_sensors.size(); i++) {
+    // First, convert i to a string.
+    std::stringstream iAsString;
+    iAsString << i;
+    // Append header for sensor i.
+    tgOutput << m_sensors[i]->getSensorDataHeading( iAsString.str() );
+  }
+  // End with a new line.
+  tgOutput << std::endl;
+
+  // Done! Close the output for now, will be re-opened during step.
+  tgOutput.close();
   
   // Postcondition
   assert(invariant());
@@ -118,7 +181,9 @@ void tgDataLogger2::teardown()
   // Call the parent's teardown method! This is important!
   tgDataManager::teardown();
   //DEBUGGING
-  std::cout << "tgDataLogger2 teardown." << std::endl;
+  //std::cout << "tgDataLogger2 teardown." << std::endl;
+  // Close the log file.
+  tgOutput.close();
   // Postcondition
   assert(invariant());
 }
@@ -140,8 +205,20 @@ void tgDataLogger2::step(double dt)
   else
   {
     //DEBUGGING
-    //std::cout << "tgDataLogger2 step." << std::endl;
-    // TO-DO: collect the data.
+    //std::cout << "tgDataLogger2 step:" << std::endl;
+    // Open the log file for writing, appending and not overwriting.
+    tgOutput.open(m_fileName.c_str(), std::ios::app);
+    // For the timestamp: first, add dt to the total time
+    m_totalTime += dt;
+    // Then output the time.
+    tgOutput << m_totalTime << ",";
+    // Collect the data and output it to the file!
+    for (size_t i=0; i < m_sensors.size(); i++) {
+      tgOutput << m_sensors[i]->getSensorData();
+    }
+    tgOutput << std::endl;
+    // Close the output, to be re-opened next step.
+    tgOutput.close();
   }
 
   // Postcondition
@@ -156,19 +233,9 @@ std::string tgDataLogger2::toString() const
 {
   std::string p = "  ";  
   std::ostringstream os;
-  // Note that we're using sprintf here to convert an int to a string.
-  // TO-DO: fix this!
-  os << "tgDataLogger2" << std::endl;
-    //   << " with " << sprintf("%d",m_sensors.size()) << " sensors."<< std::endl;
+  os << tgDataManager::toString()
+     << "This tgDataManager is a tgDataLogger2. " << std::endl;
 
-  /*
-    os << prefix << p << "Children:" << std::endl;
-  for(std::size_t i = 0; i < m_children.size(); i++) {
-    os << m_children[i]->toString(prefix + p) << std::endl;
-  }
-  os << prefix << p << "Tags: [" << getTags() << "]" << std::endl;
-  os << prefix << ")";
-  */
   return os.str();
 }
 

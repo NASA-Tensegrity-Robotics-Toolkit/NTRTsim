@@ -70,8 +70,18 @@ public:
    * Create a descriptive heading for all the data that this class can return.
    * This will be a CSV string, with the number of columns the same as the
    * number of columns output by the getData function below.
+   * @param[in] prefix a string to pre-pend to all columns of the 
+   * sensor data heading.
+   * @return a string with the heading. A heading should have the following:
+   * (a) a series of comma-separated values in a row, (b) each "column" of
+   * the CSV is prepended with "prefix" and then a "_", (c) then has
+   * the type of sensor, then an open parenthesis "(" and the tags
+   * of the specific tgSenseable object, then a ")." and a label for the 
+   * specific field that will be output in that row.
+   * For example, if sensor 4 (the prefix) will be sensing a rod 
+   * with tags "t4 t5", its label for the X position might be "4_rod(t4 t5).X"
    */
-  virtual std::string getSensorDataHeading() = 0;
+  virtual std::string getSensorDataHeading(std::string prefix = "") = 0;
 
   /**
    * Return the data from this class itself.

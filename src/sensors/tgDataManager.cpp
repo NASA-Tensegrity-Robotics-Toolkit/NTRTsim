@@ -211,7 +211,7 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
   // are in m_sensorInfos, then multiple tgRodSensors will be created for
   // each tgRod.
   //DEBUGGING
-  std::cout << "tgDataManager addSensorInfo." << std::endl;
+  //std::cout << "tgDataManager addSensorInfo." << std::endl;
   // Precondition
   if (pSensorInfo == NULL)
   {
@@ -233,7 +233,7 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
 void tgDataManager::addSenseable(tgSenseable* pSenseable)
 {
   //DEBUGGING
-  std::cout << "tgDataManager addSenseable." << std::endl;
+  //std::cout << "tgDataManager addSenseable." << std::endl;
   // Precondition
   if (pSenseable == NULL)
   {
@@ -258,8 +258,10 @@ std::string tgDataManager::toString() const
   std::ostringstream os;
   // Note that we're using sprintf here to convert an int to a string.
   // TO-DO: fix this!
-  os << "tgDataManager" << std::endl;
-    //   << " with " << sprintf("%d",m_sensors.size()) << " sensors."<< std::endl;
+  os << "tgDataManager"
+     << " with " << m_sensors.size() << " sensors, " << m_sensorInfos.size()
+     << " sensorInfos, and " << m_senseables.size() << " senseable objects."
+     << std::endl;
 
   /*
     os << prefix << p << "Children:" << std::endl;

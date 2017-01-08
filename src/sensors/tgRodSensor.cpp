@@ -69,7 +69,7 @@ tgRodSensor::~tgRodSensor()
  * Also, the previous tgDataObserver recorded the mass of the rod too,
  * so do that here for consistency. (even though mass doesn't change with time.)
  */
-std::string tgRodSensor::getSensorDataHeading() {
+std::string tgRodSensor::getSensorDataHeading(std::string prefix) {
   // Note that this class has access to the parent's pointer, m_pSens.
   // Let's cast that to a pointer to a tgRod right now.
   // Here, "m_pRod" stands for "my pointer to a tgRod."
@@ -84,20 +84,36 @@ std::string tgRodSensor::getSensorDataHeading() {
   // Pull out the tags for this rod, so we only have to call the accessor once.
   //std::deque<std::string> m_tags = m_pRod->getTags();
   tgTags m_tags = m_pRod->getTags();
-  
-  // The heading consists of the tags for this rod, plus
-  // labels for each of the data that will be returned.
+
+  // Copied from tgSensor.h:
+  /**
+   * A sensor heading should have:
+   * (a) a series of comma-separated values in a row, (b) each "column" of
+   * the CSV is prepended with "prefix" and then a "_", (c) then has
+   * the type of sensor, then an open parenthesis "(" and the tags
+   * of the specific tgSenseable object, then a ")." and a label for the 
+   * specific field that will be output in that row.
+   * For example, if sensor 4 (the prefix) will be sensing a rod 
+   * with tags "t4 t5", its label for the X position might be "4_rod(t4 t5).X"
+   */
+
+  // The string 'prefix' will be added to each column. Usually, this would
+  // be for something like a numbering system that a data manager would
+  // implement.
+  // Needs an underscore to separate it from the rest of the heading.
+  prefix = prefix + "_rod(";
+
   // Note that the orientation is a btVector3 object of Euler angles,
   // which I believe are overloaded as strings...
   // Also, the XYZ positions are of the center of mass.
   // TO-DO: check which euler angles are which!!!
-  heading << "(rod_" << m_tags << ").X,"
-	  << "(rod_" << m_tags << ").Y,"
-	  << "(rod_" << m_tags << ").Z,"
-	  << "(rod_" << m_tags << ").Euler1,"
-	  << "(rod_" << m_tags << ").Euler2,"
-	  << "(rod_" << m_tags << ").Euler3,"
-	  << "(rod_" << m_tags << ").mass,";
+  heading << prefix << m_tags << ").X,"
+	  << prefix << m_tags << ").Y,"
+	  << prefix << m_tags << ").Z,"
+	  << prefix << m_tags << ").Euler1,"
+	  << prefix << m_tags << ").Euler2,"
+	  << prefix << m_tags << ").Euler3,"
+	  << prefix << m_tags << ").mass,";
 
   // Return the string version of this string stream.
   return heading.str();

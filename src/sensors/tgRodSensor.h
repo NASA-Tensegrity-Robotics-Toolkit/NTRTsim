@@ -53,7 +53,7 @@ public:
   /**
    * Similarly, this class will implement the two data colleciton methods.
    */
-  virtual std::string getSensorDataHeading();
+  virtual std::string getSensorDataHeading(std::string prefix);
   virtual std::string getSensorData();
 
 };
