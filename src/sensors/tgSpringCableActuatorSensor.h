@@ -17,39 +17,39 @@
 */
 
 /**
- * @file tgRodSensor.h
- * @brief Constains definition of concrete class tgRodSensor.
+ * @file tgSpringCableActuatorSensor.h
+ * @brief Constains definition of concrete class tgSpringCableActuatorSensor.
  * @author Drew Sabelhaus
  * $Id$
  */
 
-#ifndef TG_ROD_SENSOR_H
-#define TG_ROD_SENSOR_H
+#ifndef TG_SPRING_CABLE_ACTUATOR_SENSOR_H
+#define TG_SPRING_CABLE_ACTUATOR_SENSOR_H
 
 // Includes from the sensors directory:
 #include "tgSensor.h"
 // Includes from the NTRT core directory:
-#include "core/tgRod.h"
+#include "core/tgSpringCableActuator.h"
 
 /**
- * This class extends tgSensor to sense a tgRod.
+ * This class extends tgSensor to sense a tgSpringCableActuator.
  * Its functionality is similar to what was hard-coded in earlier work
  * on tgDataLogger/Observer.
  */
-class tgRodSensor : public tgSensor
+class tgSpringCableActuatorSensor : public tgSensor
 {
 public:
 
   /**
-   * The constructor for tgRodSensor, will be same as tgSensor, but now
-   * with a more specific pointer. This should work, since tgRod
-   * is a tgSenseable.
-   * @param[in] pRod a pointer to a tgRod that this sensor will attach itself to.
+   * The constructor for tgSpringCableActuatorSensor, 
+   * will be same as tgSensor, but now with a more specific pointer.
+   * @param[in] pSCA a pointer to a tgSpringCableActuator that 
+   * this sensor will attach itself to.
    */
-  tgRodSensor(tgRod* pRod);
+  tgSpringCableActuatorSensor(tgSpringCableActuator* pSCA);
 
   // Classes with virtual member functions must also have virtual destructors.
-  virtual ~tgRodSensor();
+  virtual ~tgSpringCableActuatorSensor();
 
   /**
    * Similarly, this class will implement the two data colleciton methods.
@@ -59,4 +59,4 @@ public:
 
 };
 
-#endif //TG_ROD_SENSOR_H
+#endif //TG_SPRING_CABLE_ACTUATOR_SENSOR_H

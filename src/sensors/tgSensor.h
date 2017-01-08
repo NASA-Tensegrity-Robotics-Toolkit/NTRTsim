@@ -32,6 +32,7 @@ class tgSenseable;
 
 // From the C++ standard library:
 #include <iostream> //for strings
+#include <vector> // for returning lists of strings
 
 /**
  * This class defines methods for use with sensors.
@@ -40,7 +41,7 @@ class tgSenseable;
  * Note that we make everything pure virtual here to force re-definition.
  * Sensing data from objects occurs in two places in the NTRTsim workflow.
  * First, when setting up the simulation, a heading for the data is given.
- * This describes the data that will be returned, in a comma-separated-value form.
+ * This describes the data that will be returned.
  * Second, when the simulation is running, the data itself can be taken.
  * Note that it's up to the caller (e.g., a tgDataLogger2) to match up the headings
  * with the data.
@@ -67,27 +68,26 @@ public:
 
   /**
    * Create a descriptive heading for all the data that this class can return.
-   * This will be a CSV string, with the number of columns the same as the
-   * number of columns output by the getData function below.
-   * @param[in] prefix a string to pre-pend to all columns of the 
-   * sensor data heading.
-   * @return a string with the heading. A heading should have the following:
-   * (a) a series of comma-separated values in a row, (b) each "column" of
-   * the CSV is prepended with "prefix" and then a "_", (c) then has
-   * the type of sensor, then an open parenthesis "(" and the tags
+   * This will be a vector of strings, with each string being a heading.
+   * Headings should have the following form:
+   * The type of sensor, then an open parenthesis "(" and the tags
    * of the specific tgSenseable object, then a ")." and a label for the 
    * specific field that will be output in that row.
-   * For example, if sensor 4 (the prefix) will be sensing a rod 
-   * with tags "t4 t5", its label for the X position might be "4_rod(t4 t5).X"
+   * For example, if sensor will be sensing a rod 
+   * with tags "t4 t5", its label for the X position might be "rod(t4 t5).X"
+   * @return a list of strings, each being a descriptive heading for a
+   * specific piece of data that will be returned.
    */
-  virtual std::string getSensorDataHeading(std::string prefix = "") = 0;
+  virtual std::vector<std::string> getSensorDataHeadings() = 0;
 
   /**
    * Return the data from this class itself.
-   * Note that this MUST be the same number of CSV columns as is returned by
+   * Note that this MUST have the same number of elements as is returned by
    * the getDataHeading function.
+   * @return a list of strings, each being a piece of sensor data,
+   * in the same order as the headings.
    */
-  virtual std::string getSensorData() = 0;
+  virtual std::vector<std::string> getSensorData() = 0;
 
   // TO-DO: should any of this be const?
 
@@ -103,4 +103,4 @@ protected:
 
 };
 
-#endif //TG_SENSEABLE_H
+#endif //TG_SENSOR_H

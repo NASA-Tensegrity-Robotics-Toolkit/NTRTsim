@@ -37,6 +37,7 @@
 #include <sstream>  
 #include <stdexcept>
 #include <cassert>
+#include <string> // for std::to_string(float)
 
 // Includes from Bullet Physics:
 #include "LinearMath/btVector3.h"
@@ -69,7 +70,7 @@ tgRodSensor::~tgRodSensor()
  * Also, the previous tgDataObserver recorded the mass of the rod too,
  * so do that here for consistency. (even though mass doesn't change with time.)
  */
-std::string tgRodSensor::getSensorDataHeading(std::string prefix) {
+std::vector<std::string> tgRodSensor::getSensorDataHeadings() {
   // Note that this class has access to the parent's pointer, m_pSens.
   // Let's cast that to a pointer to a tgRod right now.
   // Here, "m_pRod" stands for "my pointer to a tgRod."
@@ -77,52 +78,47 @@ std::string tgRodSensor::getSensorDataHeading(std::string prefix) {
   // Check: if the cast failed, this will return 0.
   // In that case, this tgRodSensor does not point to a tgRod!!!
   assert( m_pRod != 0);
+
+  // The list to which we'll append all the sensor headings:
+  std::vector<std::string> headings;
   
-  // Create a string stream to which we'll append all the
-  // information.
-  std::stringstream heading;
   // Pull out the tags for this rod, so we only have to call the accessor once.
-  //std::deque<std::string> m_tags = m_pRod->getTags();
   tgTags m_tags = m_pRod->getTags();
 
   // Copied from tgSensor.h:
   /**
-   * A sensor heading should have:
-   * (a) a series of comma-separated values in a row, (b) each "column" of
-   * the CSV is prepended with "prefix" and then a "_", (c) then has
-   * the type of sensor, then an open parenthesis "(" and the tags
+   * Headings should have the following form:
+   * The type of sensor, then an open parenthesis "(" and the tags
    * of the specific tgSenseable object, then a ")." and a label for the 
    * specific field that will be output in that row.
-   * For example, if sensor 4 (the prefix) will be sensing a rod 
-   * with tags "t4 t5", its label for the X position might be "4_rod(t4 t5).X"
+   * For example, if sensor will be sensing a rod 
+   * with tags "t4 t5", its label for the X position might be "rod(t4 t5).X"
    */
 
-  // The string 'prefix' will be added to each column. Usually, this would
-  // be for something like a numbering system that a data manager would
-  // implement.
-  // Needs an underscore to separate it from the rest of the heading.
-  prefix = prefix + "_rod(";
+  // The string 'prefix' will be added to each heading.
+  std::string prefix = "rod(";
 
   // Note that the orientation is a btVector3 object of Euler angles,
   // which I believe are overloaded as strings...
   // Also, the XYZ positions are of the center of mass.
   // TO-DO: check which euler angles are which!!!
-  heading << prefix << m_tags << ").X,"
-	  << prefix << m_tags << ").Y,"
-	  << prefix << m_tags << ").Z,"
-	  << prefix << m_tags << ").Euler1,"
-	  << prefix << m_tags << ").Euler2,"
-	  << prefix << m_tags << ").Euler3,"
-	  << prefix << m_tags << ").mass,";
+  
+  headings.push_back( prefix + m_tags + ").X" );
+  headings.push_back( prefix + m_tags + ").Y" );
+  headings.push_back( prefix + m_tags + ").Z" );
+  headings.push_back( prefix + m_tags + ").Euler1" );
+  headings.push_back( prefix + m_tags + ").Euler2" );
+  headings.push_back( prefix + m_tags + ").Euler3" );
+  headings.push_back( prefix + m_tags + ").mass" );
 
   // Return the string version of this string stream.
-  return heading.str();
+  return headings;
 }
 
 /**
  * The method that collects the actual data from this tgRod.
  */
-std::string tgRodSensor::getSensorData() {
+std::vector<std::string> tgRodSensor::getSensorData() {
   // Similar to getSensorDataHeading, cast the a pointer to a tgRod right now.
   tgRod* m_pRod = tgCast::cast<tgSenseable, tgRod>(m_pSens);
   // Check: if the cast failed, this will return 0.
@@ -132,19 +128,59 @@ std::string tgRodSensor::getSensorData() {
   btVector3 com = m_pRod->centerOfMass();
   btVector3 orient = m_pRod->orientation();
   // Note that the 'orientation' method also returns a btVector3.
+
+  // The list of sensor data that will be returned:
+  std::vector<std::string> sensordata;
+
+  /**
+   * The original version of this section of code, which 
+   * output one string, looked like:
+   * std::stringstream sensordata;
+   * sensordata << com[0] << ","
+   *	     << com[1] << ","
+   *	     << com[2] << ","
+   *	     << orient[0] << ","
+   *	     << orient[1] << ","
+   *	     << orient[2] << ","
+   *	     << m_pRod->mass() << ",";
+   */
   
-  // Similar to the heading, create a string steam
-  // of all the data to be returned.
-  std::stringstream sensordata;
-  sensordata << com[0] << ","
-	     << com[1] << ","
-	     << com[2] << ","
-	     << orient[0] << ","
-	     << orient[1] << ","
-	     << orient[2] << ","
-	     << m_pRod->mass() << ",";
-  // Again, must return a string, not a stringstream.
-  return sensordata.str();
+  // The floats (btScalars?) need to be converted to strings
+  // via a stringstream.
+  std::stringstream ss;
+
+  // com[0]
+  ss << com[0];
+  sensordata.push_back( ss.str() );
+  // Reset the stream.
+  ss.str("");
+  
+  // com[1]
+  ss << com[1];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // com[2]
+  ss << com[2];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // orient[0]
+  ss << orient[0];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // orient[1]
+  ss << orient[1];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // orient[2]
+  ss << orient[2];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // mass
+  ss << m_pRod->mass();
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  
+  return sensordata;
 }
 
 //end.

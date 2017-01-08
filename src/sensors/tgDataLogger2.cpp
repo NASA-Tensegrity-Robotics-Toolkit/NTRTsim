@@ -142,15 +142,18 @@ void tgDataLogger2::setup()
   tgOutput << "time,";
 
   // Iterate. For each sensor, output its header.
-  // The prefix here is the sensor number, which we choose to be the index in
+  // Prepend each label with the sensor number, which we choose to be the index in
   // the vector of sensors. NOTE that this means the sensors vector CANNOT
   // BE CHANGED, otherwise the data will not be aligned properly.
   for (std::size_t i=0; i < m_sensors.size(); i++) {
-    // First, convert i to a string.
-    std::stringstream iAsString;
-    iAsString << i;
-    // Append header for sensor i.
-    tgOutput << m_sensors[i]->getSensorDataHeading( iAsString.str() );
+    // Get the vector of sensor data headings from this sensor
+    std::vector<std::string> headings = m_sensors[i]->getSensorDataHeadings();
+    // Iterate and output each heading
+    for (std::size_t j=0; j < headings.size(); j++) {
+      // Prepend with the sensor number and an underscore.
+      // Also, end with a comma, since this is a comma-separated-value log file.
+      tgOutput << i << "_" << headings[j] << ",";
+    }
   }
   // End with a new line.
   tgOutput << std::endl;
@@ -197,7 +200,13 @@ void tgDataLogger2::step(double dt)
     tgOutput << m_totalTime << ",";
     // Collect the data and output it to the file!
     for (size_t i=0; i < m_sensors.size(); i++) {
-      tgOutput << m_sensors[i]->getSensorData();
+      // Get the vector of sensor data from this sensor
+      std::vector<std::string> sensordata = m_sensors[i]->getSensorData();
+      // Iterate and output each data sample
+      for (std::size_t j=0; j < sensordata.size(); j++) {
+	// Include a comma, since this is a comma-separated-value log file.
+	tgOutput << sensordata[j] << ",";
+      }
     }
     tgOutput << std::endl;
     // Close the output, to be re-opened next step.
