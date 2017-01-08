@@ -27,9 +27,6 @@
  */
 
 // This application
-//#include "tgCast.h"
-//#include "tgTaggable.h"
-//#include "tgTagSearch.h"
 #include "core/tgSenseable.h" //not sure why this needs to be included vs. just declared...
 // The C++ Standard Library
 #include <string>
@@ -38,9 +35,7 @@
 #include <vector>
 
 // Forward declarations
-//class tgWorld;
 class tgSensor;
-//class tgSenseable;
 class tgSensorInfo;
 
 /**
@@ -89,6 +84,8 @@ public:
      * Add a tgSenseable object to this data manager.
      * These objects will be checked via the sensor infos, and sensors will
      * be assigned to them if appropriate.
+     * @param[in] pSenseable a pointer to a tgSenseable object that will be
+     * added to this data manager's list of senseable objects.
      */
     virtual void addSenseable(tgSenseable* pSenseable);
 
@@ -111,12 +108,13 @@ public:
     /**
      * A helper function for setup. Since there will be a loop over
      * the sensor infos, this function abstracts it away.
+     * @param[in] pSenseable a pointer to one of this object's senseables.
      */
     void addSensorsIfAppropriate(tgSenseable* pSenseable);
 
 protected:
 
-    /** Integrity predicate. */
+    // Integrity predicate.
     bool invariant() const;
 
     /**

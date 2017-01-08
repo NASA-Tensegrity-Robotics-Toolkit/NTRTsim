@@ -42,6 +42,8 @@ class tgDataLogger2 : public tgDataManager
   /**
    * The constructor for tgDataLogger2 takes in a string that specifies the location
    * of the log file to create.
+   * @param[in] fileNamePrefix a string that specifies the path to the log file that 
+   * will be written. The current time will be appended to this prefix.
    */
   tgDataLogger2(std::string fileNamePrefix);
 
@@ -76,6 +78,7 @@ class tgDataLogger2 : public tgDataManager
    * The step function for tgDataLogger2 will open the log file for output,
    * write a line of sensor data, then close the log file.
    * Declared virtual here just in case any classes inherit from this.
+   * @param[in] dt a double, the amount of time since the last step. 
    */
   virtual void step(double dt);
 

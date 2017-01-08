@@ -22,7 +22,7 @@
 /**
  * @file tgModel.h
  * @brief Contains the definition of class tgModel.
- * @author Ryan Adams
+ * @author Ryan Adams, Drew Sabelhaus
  * $Id$
  */
 
@@ -156,15 +156,10 @@ public:
     void addMarker(abstractMarker a);
 
     /**
-     * From tgSenseable: give a label of this type of senseable object.
-     * Note that child classes (e.g. rods) re-define this.
-     * This is also why the keyword "virtual" is used here.
-     */
-    virtual std::string getLabelForSensor();
-
-    /**
      * From tgSenseable: need to return all the children of this class.
      * Since tgModels are tgSenseables, just return getDescendants().
+     * @return a vector of tgModels, with pointers changed into pointers
+     * for tgSenseables.
      */
     virtual std::vector<tgSenseable*> getSenseableDescendants() const;
 

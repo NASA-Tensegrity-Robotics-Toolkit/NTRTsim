@@ -32,7 +32,6 @@ class tgSenseable;
 
 // From the C++ standard library:
 #include <iostream> //for strings
-//#include <assert.h> //for assertions
 
 /**
  * This class defines methods for use with sensors.

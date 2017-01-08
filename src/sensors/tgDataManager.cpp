@@ -40,8 +40,6 @@
  */
 tgDataManager::tgDataManager()
 {
-  //DEBUGGING
-  //std::cout << "tgDataManager constructor." << std::endl;
   // Postcondition
   assert(invariant());
 }
@@ -49,8 +47,8 @@ tgDataManager::tgDataManager()
 /**
  * In the destructor, we must be sure to delete everything in both the 
  * m_sensors and m_sensorInfos lists.
- * Ideally, this should be handled by teardown, so this is really a
- * double-check for memory leaks more than anything else.
+ * Teardown only deletes sensors, not sensor infos, so this is a double-check
+ * for sensors and the only real delete for sensor infos.
  */
 tgDataManager::~tgDataManager()
 {
@@ -77,7 +75,6 @@ tgDataManager::~tgDataManager()
     // Pick out one sensorInfo from the list:
     tgSensorInfo* const pSensorInfo = m_sensorInfos[i];
     // TO-DO: check if we need this assert...
-    // It is safe to delete NULL, but this is an invariant
     // assert(pChild != NULL); 
     delete pSensorInfo;
     //Null out the deleted pointer.
@@ -140,10 +137,7 @@ void tgDataManager::setup()
  * that doesn't require subclasses to copy-and-paste from this teardown method?
  */
 void tgDataManager::teardown()
-{
-  //DEBUGGING
-  //std::cout << "tgDataManager teardown." << std::endl;
-  
+{  
   // First, delete the sensors.
   // Note that it's good practice to set deleted pointers to NULL here.
   for (std::size_t i = 0; i < m_sensors.size(); i++)
@@ -157,20 +151,10 @@ void tgDataManager::teardown()
   // do anything.
   m_sensors.clear();
 
-  // Next, delete the sensor infos.
-  // TO-DO: implement this.
-  // TO-DO: should we actually be deleting these? Or would that make it so no
-  // sensors would be created after a reset???
-
-  // Clear the list of senseable objects.
-  // Since tgDataManagers don't ever change these objects,
-  // leave it to other classes to create and delete them.
-  // Just get rid of the pointers here.
-  // TO-DO: maybe we don't want to do this? Will this make it so no logs
-  // are created upon reset???
-  // TO-DO: could this segfault? Will the pointers in m_senseables be changed
-  // during reset at all?
-  //m_senseables.clear();
+  // Don't touch the list of senseable objects.
+  // These tgModels are not re-created when teardown is called (I think?),
+  // so the pointers should remain the same between calls to reset.
+  // TO-DO: confirm that it's OK to not remove the list of m_senseables.
 
   // Postcondition
   assert(invariant());
@@ -183,8 +167,6 @@ void tgDataManager::teardown()
  */
 void tgDataManager::step(double dt) 
 {
-  //DEBUGGING
-  //std::cout << "tgDataManager step." << std::endl;
   if (dt <= 0.0)
   {
     throw std::invalid_argument("dt is not positive");
@@ -210,8 +192,7 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
   // Otherwise, duplicate sensors will be created: e.g., if two tgRodSensorInfos
   // are in m_sensorInfos, then multiple tgRodSensors will be created for
   // each tgRod.
-  //DEBUGGING
-  //std::cout << "tgDataManager addSensorInfo." << std::endl;
+
   // Precondition
   if (pSensorInfo == NULL)
   {
@@ -232,14 +213,14 @@ void tgDataManager::addSensorInfo(tgSensorInfo* pSensorInfo)
  */
 void tgDataManager::addSenseable(tgSenseable* pSenseable)
 {
-  //DEBUGGING
-  //std::cout << "tgDataManager addSenseable." << std::endl;
   // Precondition
   if (pSenseable == NULL)
   {
     throw std::invalid_argument("pSenseable is NULL inside tgDataManager::addSenseable");
   } 
 
+  // TO-DO: should we check to see if this senseable object is already
+  // in the m_senseables list???
   m_senseables.push_back(pSenseable);
 
   // Postcondition
@@ -254,23 +235,12 @@ void tgDataManager::addSenseable(tgSenseable* pSenseable)
  */
 std::string tgDataManager::toString() const
 {
-  std::string p = "  ";  
   std::ostringstream os;
-  // Note that we're using sprintf here to convert an int to a string.
-  // TO-DO: fix this!
   os << "tgDataManager"
      << " with " << m_sensors.size() << " sensors, " << m_sensorInfos.size()
      << " sensorInfos, and " << m_senseables.size() << " senseable objects."
      << std::endl;
 
-  /*
-    os << prefix << p << "Children:" << std::endl;
-  for(std::size_t i = 0; i < m_children.size(); i++) {
-    os << m_children[i]->toString(prefix + p) << std::endl;
-  }
-  os << prefix << p << "Tags: [" << getTags() << "]" << std::endl;
-  os << prefix << ")";
-  */
   return os.str();
 }
 

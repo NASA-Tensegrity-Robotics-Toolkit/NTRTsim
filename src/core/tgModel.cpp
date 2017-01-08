@@ -190,11 +190,8 @@ std::vector<tgModel*> tgModel::getDescendants() const
  */
 std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
 {
-  //return getDescendants();
-  //DEBUGGING: test if this is a type issue...
-  //return std::vector<tgSenseable*>();
-  // Seems to work. So, how about we make a new list, populate it
-  // with tgModels, and return that.
+  // TO-DO: why can't we just return the results of getDescendants?
+  // There seems to be some polymorphism issue here...
   std::vector<tgModel*> myDescendants = getDescendants();
   std::vector<tgSenseable*> mySenseableDescendants;
   for (size_t i=0; i < myDescendants.size(); i++) {
@@ -209,13 +206,6 @@ const std::vector<abstractMarker>& tgModel::getMarkers() const {
 
 void tgModel::addMarker(abstractMarker a){
     m_markers.push_back(a);
-}
-
-/**
- * For tgSenseable.
- */
-std::string tgModel::getLabelForSensor(){
-  return "tgModel";
 }
 
 bool tgModel::invariant() const

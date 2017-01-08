@@ -30,7 +30,7 @@
 // This module
 #include "tgSensorInfo.h"
 // Other includes from NTRTsim
-//#include "core/tgRod.h"
+// ...
 // Other includes from the C++ standard library
 // ...
 
@@ -61,12 +61,18 @@ class tgRodSensorInfo : public tgSensorInfo
   /**
    * From tgSensorInfo, need to implement a check to see if a particular
    * tgSenseable is a tgRod.
+   * @param[in] pSenseable a pointer to a tgSenseable object, that this sensor info
+   * may or may not be able to create a sensor for.
+   * @return true if pSenseable is able to be sensed by the type of sensor that
+   * this sensor info creates.
    */
   virtual bool isThisMySenseable(tgSenseable* pSenseable);
 
   /**
    * Similarly, create a sensor if appropriate.
    * See tgSensorInfo for more... info.
+   * @param[in] pSenseable pointer to a senseable object. Sensor will be created
+   * for this pSenseable.
    */
   virtual tgSensor* createSensor(tgSenseable* pSenseable);
 

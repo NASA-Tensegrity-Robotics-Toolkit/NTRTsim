@@ -24,13 +24,10 @@
  */
 
 // This module
-//#include "tgDataManager.h"
 #include "tgDataLogger2.h"
 // This application
 #include "tgSensor.h"
-//#include "tgSensorInfo.h"
 // The C++ Standard Library
-//#include <stdio.h> // for sprintf
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
@@ -50,9 +47,6 @@ tgDataLogger2::tgDataLogger2(std::string fileNamePrefix) :
   tgDataManager(),
   m_fileNamePrefix(fileNamePrefix)
 {
-  //DEBUGGING
-  //std::cout << "tgDataLogger2 constructor." << std::endl;
-  // Postcondition
   // A quick check on the passed-in string: it must not be the empty
   // string. Must be a correct linux path.
   // TO-DO: a better check on this.
@@ -66,18 +60,15 @@ tgDataLogger2::tgDataLogger2(std::string fileNamePrefix) :
   // for these log file names.
   // Check if the first character of the string is a tilde:
   if (m_fileNamePrefix.at(0) == '~') {
-    //DEBUGGING
-    //std::cout << "Automatically converting a tilde ~ to your home directory, as part of the tgDataLogger2 file name..." << std::endl;
     // Get the $HOME environment variable
     std::string home = std::getenv("HOME");
-    //DEBUGGING
-    //std::cout << "$HOME is: " << home << std::endl;
     // Remove the tilde (the first element) from the string
     m_fileNamePrefix.erase(0,1);
     // Concatenate the home directory.
     m_fileNamePrefix = home + m_fileNamePrefix;
   }
-    
+  
+  // Postcondition  
   assert(invariant());
 }
 
@@ -100,8 +91,6 @@ tgDataLogger2::tgDataLogger2()
  */
 tgDataLogger2::~tgDataLogger2()
 {
-  //DEBUGGING
-  //std::cout << "tgDataLogger2 destructor." << std::endl;
   // TO-DO: should we double-check and close the tgOutput filestream here too?
 }
 
@@ -180,8 +169,6 @@ void tgDataLogger2::teardown()
 {
   // Call the parent's teardown method! This is important!
   tgDataManager::teardown();
-  //DEBUGGING
-  //std::cout << "tgDataLogger2 teardown." << std::endl;
   // Close the log file.
   tgOutput.close();
   // Postcondition
@@ -196,16 +183,12 @@ void tgDataLogger2::teardown()
  */
 void tgDataLogger2::step(double dt) 
 {
-  //DEBUGGING
-  //std::cout << "tgDataLogger2 step." << std::endl;
   if (dt <= 0.0)
   {
     throw std::invalid_argument("dt is not positive");
   }
   else
   {
-    //DEBUGGING
-    //std::cout << "tgDataLogger2 step:" << std::endl;
     // Open the log file for writing, appending and not overwriting.
     tgOutput.open(m_fileName.c_str(), std::ios::app);
     // For the timestamp: first, add dt to the total time

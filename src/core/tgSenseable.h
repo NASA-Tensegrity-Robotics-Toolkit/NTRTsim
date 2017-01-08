@@ -38,18 +38,6 @@
 class tgSenseable
 {
  public:
-  
-  /**
-   * Ideally, this class would have no member functions.
-   * However, since C++ requires at least one virtual member function
-   * for polymorphism, we have one here.
-   * This function returns a label to pre-pend to the header
-   * of any data coming from this object.
-   * For example, for a tgRod, this method should return "rod"
-   * or something like that.
-   * Include a generic output here that really should be redefined later.
-   */
-  virtual std::string getLabelForSensor();
 
   /**
    * In order to create sensors for a whole hierarchy of senseable objects,

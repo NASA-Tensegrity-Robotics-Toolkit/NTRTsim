@@ -29,9 +29,6 @@
 #include "core/tgSenseable.h"
 
 // Includes from the c++ standard library:
-//#include <iostream>
-//#include <sstream>  
-//#include <time.h>
 #include <stdexcept>
 
 /**

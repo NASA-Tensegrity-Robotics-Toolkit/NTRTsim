@@ -27,10 +27,13 @@
  * $Id$
  */
 
+// Includes:
 // The C++ Standard Library
+#include <iostream> // for the to-string overloaded method
 // This library
-//
-//Bullet Physics
+// ...
+// Bullet Physics
+// ...
 
 // Forward references
 class tgSenseable;
@@ -80,13 +83,11 @@ public:
  * @return os
  * @todo Inlining this does no good; stream operations are slow.
  */
-/*
 inline std::ostream&
 operator<<(std::ostream& os, const tgSensorInfo& obj)
 {
     os << "tgSensorInfo";
     return os;
 }
-*/
 
 #endif // TG_SENSOR_INFO_H

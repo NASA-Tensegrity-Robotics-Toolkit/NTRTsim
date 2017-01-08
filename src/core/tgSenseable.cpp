@@ -27,17 +27,8 @@
 #include "tgSenseable.h"
 
 // From the C++ standard library:
-//#include <iostream> //for strings
-//#include <vector> //for lists of descendants
-//#include <assert.h> //for assertions
+// ...
 
-
-/**
- * This function shouldn't ever be called, so output something generic.
- */
-std::string tgSenseable::getLabelForSensor(){
-  return "base_tgSenseable";
-}
 
 /**
  * Return an empty vector of descendants.

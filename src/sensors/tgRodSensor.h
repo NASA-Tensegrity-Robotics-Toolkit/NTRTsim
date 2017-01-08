@@ -44,6 +44,7 @@ public:
    * The constructor for tgRodSensor, will be same as tgSensor, but now
    * with a more specific pointer. This should work, since tgRod
    * is a tgSenseable.
+   * @param[in] pRod a pointer to a tgRod that this sensor will attach itself to.
    */
   tgRodSensor(tgRod* pRod);
 
