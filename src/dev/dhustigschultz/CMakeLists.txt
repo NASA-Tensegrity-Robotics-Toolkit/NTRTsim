@@ -37,7 +37,17 @@ subdirs(
     BigPuppy_SymmetricSpiral_Metrics
 
     MountainGoat
+    MountainGoatFM0
     MG_Controller
     MG_CPGHierarchy
 
+    MountainGoatAchilles
+    MG_Achilles_CPGHierarchy
+    MG_AchillesOnly_CPGH
+    MG_FewerMuscles1
+    MG_FewerMuscles0
+
+    MountainGoatNL2
+
 )
+

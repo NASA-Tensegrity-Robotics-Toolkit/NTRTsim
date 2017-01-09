@@ -22,7 +22,7 @@
 /**
  * @file tgBoxMoreAnchors.h
  * @brief Create a box shape. This class supports more than two anchor points.
- * @author Drew Sabelhaus, Brian Mirletz, and Ryan Adams
+ * @author Drew Sabelhaus
  * $Id$
  */
 
@@ -32,9 +32,6 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <vector>
-
-// Forward declarations
-//class btRigidBody;
 
 /**
  * This class is a child of tgBox, with nothing changed.

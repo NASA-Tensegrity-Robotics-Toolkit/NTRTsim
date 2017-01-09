@@ -19,7 +19,7 @@
 /**
  * @file tgSimulation.cpp
  * @brief Contains the definitions of members of class tgSimulation
- * @author Ryan Adams, Brian Mirletz
+ * @author Ryan Adams, Brian Mirletz, Drew Sabelhaus
  * $Id$
  */
 
@@ -30,6 +30,7 @@
 #include "tgSimView.h"
 #include "tgSimViewGraphics.h"
 #include "tgWorld.h"
+#include "sensors/tgDataManager.h" //for loggers etc.
 // The Bullet Physics Library
 #include "LinearMath/btQuickprof.h"
 
@@ -54,6 +55,10 @@ tgSimulation::~tgSimulation()
     for (std::size_t i = 0; i < m_models.size(); i++)
     {
         delete m_models[i];
+    }
+    // Delete the tgDataManagers here too.
+    for (std::size_t i=0; i < m_dataManagers.size(); i++) {
+      delete m_dataManagers[i];
     }
 }
 
@@ -95,6 +100,24 @@ void tgSimulation::addObstacle(tgModel* pObstacle)
     assert(!m_obstacles.empty());
 }
 
+// Similar to models and obstacles, add a data manager.
+void tgSimulation::addDataManager(tgDataManager* pDataManager)
+{
+  // Precondition
+  if( pDataManager == NULL){
+    throw std::invalid_argument("NULL pointer to data manager, in tgSimulation.");
+  }
+  else {
+    // TO-DO: do data managers need knowledge of the world?
+    //pDataManager->setup(m_view.world());
+    pDataManager->setup();
+    m_dataManagers.push_back(pDataManager);
+  }
+  // Postcondition
+  assert(invariant());
+  assert(!m_dataManagers.empty());
+}
+
 void tgSimulation::onVisit(const tgModelVisitor& r) const
 {
 #ifndef BT_NO_PROFILE 
@@ -121,6 +144,14 @@ void tgSimulation::reset()
         
         m_models[i]->setup(m_view.world());
     }
+    // Also, need to set up the data managers again.
+    // Note that this MUST occur after calling setup on the models,
+    // otherwise the data manager will not create any sensors
+    // (since there are no tgRods, etc., inside the tgModel yet!)
+    for (std::size_t i = 0; i < m_dataManagers.size(); i++) {
+      // As in addDataManager: do the data managers need knowledge of the world?
+      m_dataManagers[i]->setup();
+    }
     
     // Don't need to set up obstacles since they will be added after this
 }
@@ -138,6 +169,14 @@ void tgSimulation::reset(tgGround* newGround)
     {
         
         m_models[i]->setup(m_view.world());
+    }
+    // Also, need to set up the data managers again.
+    // Note that this MUST occur after calling setup on the models,
+    // otherwise the data manager will not create any sensors
+    // (since there are no tgRods, etc., inside the tgModel yet!)
+    for (std::size_t i = 0; i < m_dataManagers.size(); i++) {
+      // As in addDataManager: do the data managers need knowledge of the world?
+      m_dataManagers[i]->setup();
     }
     
     // Don't need to set up obstacles since they were just added
@@ -177,6 +216,11 @@ void tgSimulation::step(double dt) const
         {
             m_obstacles[i]->step(dt);
         }
+
+	// Step the data managers
+	for (std::size_t i = 0; i < m_dataManagers.size(); i++) {
+	  m_dataManagers[i]->step(dt);
+	}
     }
 }
   
@@ -202,8 +246,16 @@ void tgSimulation::teardown()
         delete pModel;
         m_obstacles.pop_back();
     }
-    
     assert(m_obstacles.empty());
+
+    // Similar to the models and obstacles, tear down the data managers.
+    const size_t num_DM = m_dataManagers.size(); //why not in the loop gaurd?...
+    for (std::size_t i = 0; i < num_DM; i++) {
+      tgDataManager* const pDataManager = m_dataManagers[i];
+      assert(pDataManager != NULL);
+      // perform the actual teardown
+      pDataManager->teardown();
+    }
     
     // Reset the world after the models - models need world info for
     // their onTeardown() functions

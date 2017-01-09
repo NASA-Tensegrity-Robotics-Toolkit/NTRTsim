@@ -8,16 +8,17 @@ add_library( ${PROJECT_NAME} SHARED
     tgBulletSpringCable.cpp
     tgBulletContactSpringCable.cpp
     tgBulletCompressionSpring.cpp
-    tgBulletUnidirectionalCompressionSpring.cpp
+    tgBulletUnidirComprSpr.cpp
     
     tgModel.cpp
     tgSpringCableActuator.cpp
     tgBasicActuator.cpp
     tgKinematicActuator.cpp
     tgCompressionSpringActuator.cpp
-    tgUnidirectionalCompressionSpringActuator.cpp
+    tgUnidirComprSprActuator.cpp
     tgWorld.cpp
     tgSimulation.cpp
+    tgSenseable.cpp
     tgBulletRenderer.cpp
     tgSimView.cpp
     tgSimViewGraphics.cpp

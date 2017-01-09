@@ -25,7 +25,7 @@
  * This class assumes a linear spring, F = k \delta x - bV, where the spring begins to
  * apply a force when the length between anchors goes down past restLength.
  * Uses a tgBulletCompressionSpring to calculate and apply forces.
- * @author Drew Sabelhaus, Brian Mirletz
+ * @author Drew Sabelhaus
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
@@ -46,7 +46,7 @@ class tgWorld;
 /**
  * This class is what should be used to create a compression spring in NTRT.
  * As of 2016-08-02, it does not actuate, though, but is named 'actuator'
- * in the hopes that this functionality will be added.
+ * in the hopes that this functionality will be added eventually.
  */
 
 // This class needs to be a child model of a tgModel.
@@ -111,29 +111,29 @@ public:
      */
     double restLength;
 
-          /**
-       * Control the automatic re-locating of cable anchor points.
-       * 
-       * When true, the default behavior, the specified attachment point
-       * of a cable is moved from the actual node location (for example, at the
-       * center of the circle at the end of a rod) to a location at the edge
-       * of the rigid body it's attached to (for example, on the edge of the
-       * circle at the end of a rod.) 
-       * 
-       * If unsure, leave default, because when set to 'false', the cable will
-       * likely clip through the rod.
-       * Disabling automatic movement of anchor points is most useful for
-       * structures that need very particular cable placement.
-       * Here, cable attachment point "A" corresponds to the first of the two
-       * anchors of the spring-cable, or the "From" point in the tgcreator files.
-       * The "B" point corresponds to the second anchor location, or the "To" point
-       * in the tgcreator files.
-       * 
-       * These parameters are used in the createTgBulletSpringCable method inside
-       * the tgBasicActuatorInfo class.
-       */
-      bool moveCablePointAToEdge;
-      bool moveCablePointBToEdge;
+    /**
+     * Control the automatic re-locating of cable anchor points.
+     * 
+     * When true, the default behavior, the specified attachment point
+     * of a cable is moved from the actual node location (for example, at the
+     * center of the circle at the end of a rod) to a location at the edge
+     * of the rigid body it's attached to (for example, on the edge of the
+     * circle at the end of a rod.) 
+     * 
+     * If unsure, leave default, because when set to 'false', the cable will
+     * likely clip through the rod.
+     * Disabling automatic movement of anchor points is most useful for
+     * structures that need very particular cable placement.
+     * Here, cable attachment point "A" corresponds to the first of the two
+     * anchors of the spring-cable, or the "From" point in the tgcreator files.
+     * The "B" point corresponds to the second anchor location, or the "To" point
+     * in the tgcreator files.
+     * 
+     * These parameters are used in the createTgBulletSpringCable method inside
+     * the tgBasicActuatorInfo class.
+     */
+    bool moveCablePointAToEdge;
+    bool moveCablePointBToEdge;
 
   };
   
@@ -182,7 +182,10 @@ public:
   virtual void onVisit(const tgModelVisitor& r) const;
     
   /**
-   * Functions for interfacing with tgBulletCompressionSpring
+   * Functions for interfacing with tgBulletCompressionSpring.
+   * NOTE that some of these are not implemented at the moment.
+   * If this class was to really become an actuator, these helper 
+   * functions would probably be needed.
    */
 
   /**
@@ -251,11 +254,6 @@ protected:
      * This is not const.
      */
     Config m_config;
-
-    // things that were not copied in from tgSpringCableActuator.h:
-    //m_restLength
-    //m_startLength
-    //m_prevVelocity
 
 private:
 

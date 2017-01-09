@@ -331,6 +331,24 @@ inline tgTags operator+(tgTags lhs, const tgTags& rhs)
   return lhs;
 }
 
+// Overload the + operator for strings too. tgTags should be able to be added
+// to strings, with a string as the return result.
+inline std::string operator+(tgTags tags, std::string str)
+{
+  // Use the stringstream overloaded operator.
+  std::stringstream os;
+  os << tags << str;
+  return os.str();
+}
+// Similarly, have a + function with the operands flipped.
+inline std::string operator+(std::string str, tgTags tags)
+{
+  // Use the stringstream overloaded operator.
+  std::stringstream os;
+  os << str << tags;
+  return os.str();
+}
+
 /**
  * Represent tags as a YAML list
  * Note: this function has no dependencies on external libraries

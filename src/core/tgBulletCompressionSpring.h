@@ -22,7 +22,7 @@
 /**
  * @file tgBulletCompressionSpring.h
  * @brief Definitions of class tgBulletCompressionSpring
- * @author Drew Sabelhaus, Brian Mirletz, Atil Iscen
+ * @author Drew Sabelhaus, et al.
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
@@ -166,18 +166,6 @@ public:
      * @todo figure out how to cast and pass by reference
      */
     virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const;
-
-    /**
-     * Return the tgBulletSpringCableAnchors individually.
-     * This is used in child classes to be sure that the anchors being
-     * accessed are the anchors stored in this class, and NOT in some other
-     * child class.
-     */
-    /*
-    virtual const tgBulletSpringCableAnchor* getAnchor1() const;
-    virtual const tgBulletSpringCableAnchor* getAnchor2() const;
-    */
-    
     
 protected:
     

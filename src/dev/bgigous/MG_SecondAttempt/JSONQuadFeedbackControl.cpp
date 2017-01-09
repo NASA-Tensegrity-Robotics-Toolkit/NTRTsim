@@ -34,7 +34,7 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
-#include "dev/CPG_feedback/tgCPGCableControl.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
 
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 #include "helpers/FileHelpers.h"
@@ -42,8 +42,8 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Configuration/configuration.h"
 
-#include "dev/CPG_feedback/CPGEquationsFB.h"
-#include "dev/CPG_feedback/CPGNodeFB.h"
+#include "util/CPGEquationsFB.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
 
 #include "neuralNet/Neural Network v2/neuralNetwork.h"
 
@@ -233,10 +233,11 @@ void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
         m_updateTime = 0;
     }
     
-    double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
-    
-    /// Max and min heights added to config
-    if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight)
+	double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
+	double currentHeightTail = subject.getSegmentCOM(6)[1];
+	/// Max and min heights added to config
+	if (currentHeight > m_config.maxHeight || currentHeight < m_config.minHeight 
+    || currentHeightTail > m_config.maxHeight || currentHeightTail < m_config.minHeight)
     {
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;

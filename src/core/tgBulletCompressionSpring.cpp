@@ -19,7 +19,7 @@
 /**
  * @file tgBulletCompressionSpring.cpp
  * @brief Definitions of members of class tgBulletCompressionSpring
- * @author Drew Sabelhaus, Brian Mirletz, et al.
+ * @author Drew Sabelhaus, et al.
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
@@ -126,7 +126,7 @@ void tgBulletCompressionSpring::step(double dt)
     // TO-DO: find a way to apply a hard stop here instead.
     if( getCurrentSpringLength() <= 0.0)
     {
-      throw std::runtime_error("Compression spring has negative length, simulation stopping. Increase your stiffness coefficient.");
+      throw std::runtime_error("Compression spring has negative length, simulation stopping. Increase your stiffness coefficient. TO-DO: implement a 'hard stop' inside the step method of tgBulletCompressionSpring instead of crashing the simulator.");
     }
     
     assert(invariant());
@@ -246,44 +246,6 @@ const double tgBulletCompressionSpring::getSpringForce() const
  */
 void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
 {
-  /*
-    // Apply a force only if the spring is loaded.
-    if( getCurrentAnchorDistance() < m_restLength)
-    {
-        // Create variables to hold the results of these computations
-        btVector3 force(0.0, 0.0, 0.0);
-        double magnitude = 0.0;
-      
-        // Calculate the distance between the anchors
-        // Here, 'stretch' is the delta_x in F = - k delta_x - b V.
-        const btVector3 dist =
-	  anchor2->getWorldPosition() - anchor1->getWorldPosition();
-	const double currLength = dist.length();
-	const double stretch = currLength - m_restLength;
-    
-	// The unit vector of the direction of the force will be needed later
-	// In order to have a positive force move the two rigid bodies away
-	// from each other, this unit vector must be in the opposite direction
-	// of this calculation. Otherwise, a positive force brings them closer
-	// together. Needs a minus.
-	const btVector3 unitVector = - dist / currLength;
-	
-	// The magnitude of the force due to the spring is simple to calculate:
-	// A negative delta_X should result in a positive force.
-	magnitude =  - m_coefK * stretch;
-
-	// The magnitude of the force due to damping is a bit more complicated.
-	// Take an approximated derivative to estimate the velocity of the
-	// tip of the compression spring:
-	const double deltaStretch = currLength - m_prevLength;
-	m_velocity = deltaStretch / dt;
-
-	// The damping force for this timestep
-	// Like with spring force, a positive velocity should result in a
-	// force acting against the movement of the tip of the spring.
-	m_dampingForce = - m_coefD * m_velocity;
-  */
-
     // Create variables to hold the results of these computations
     btVector3 force(0.0, 0.0, 0.0);
     // the following ONLY includes forces due to K, not due to damping.
@@ -296,6 +258,7 @@ void tgBulletCompressionSpring::calculateAndApplyForce(double dt)
     // Calculate the damping force for this timestep.
     // Take an approximated derivative to estimate the velocity of the
     // tip of the compression spring:
+    // TO-DO: MAKE THIS A BETTER APPROXIMATION TO THE DERIVATIVE!!
     const double changeInDeltaX = currLength - m_prevLength;
     m_velocity = changeInDeltaX / dt;
 
@@ -335,22 +298,7 @@ const std::vector<const tgSpringCableAnchor*>tgBulletCompressionSpring::getAncho
     return tgCast::constFilter<tgBulletSpringCableAnchor, const tgSpringCableAnchor>(m_anchors);
 }
 
-// return each of the (two) anchors individually.
-/*
-const tgBulletSpringCableAnchor* tgBulletCompressionSpring::getAnchor1()
-{
-  // make sure this pointer is not null
-  assert(invariant());
-  return anchor1;
-}
-const tgBulletSpringCableAnchor* tgBulletCompressionSpring::getAnchor2()
-{
-  // make sure this pointer is not null
-  assert(invariant());
-  return anchor2;
-}
-*/
-
+// The invariant, for checking that everything is OK.
 bool tgBulletCompressionSpring::invariant(void) const
 {
     return (m_coefK > 0.0 &&

@@ -33,6 +33,9 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -80,6 +83,26 @@ int main(int argc, char** argv)
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
+
+    // For the sensors:
+    // A string prefix for the filename
+    std::string log_filename = "~/NTRTsim_logs/AppTgBoxAnchorDebugDemo";
+    // First, create the data manager
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename);
+    //std::cout << myDataLogger->toString() << std::endl;
+    // Then, add the model to the data logger
+    myDataLogger->addSenseable(myModel);
+    // Create sensor infos for all the types of sensors that the data logger
+    // will create.
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo =
+      new tgSpringCableActuatorSensorInfo();
+    // Attach the sensor infos to the data logger
+    myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
+    // Next, attach it to the simulation
+    simulation.addDataManager(myDataLogger);
+    // and everything else should happen automatically.
     
     // Run until the user stops
     simulation.run();

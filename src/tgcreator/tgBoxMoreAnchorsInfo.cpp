@@ -19,7 +19,7 @@
 /**
  * @file tgBoxMoreAnchorsInfo.cpp
  * @brief Implementation of class tgBoxMoreAnchorsInfo 
- * @author Drew Sabelhaus, Brian Mirletz, and Ryan Adams
+ * @author Drew Sabelhaus
  * @date September 2016
  * $Id$
  */
@@ -99,6 +99,12 @@ std::set<tgRigidInfo*> tgBoxMoreAnchorsInfo::getLeafRigids()
 
 /**
  * Returns a string: "x", "y", or "z".
+ * TO-DO: FIX THIS! This method shouldn't be needed. But, at the moment,
+ * it's used as a fix to the arbitrary orientation assignment of tgBox.
+ * A better solution is to have tgBox specify an orientation (ex., maybe
+ * a unit vector in the "width" direction so that a set of axes can be 
+ * applied to the box.) This will require changing tgBox in major ways,
+ * though.
  */
 std::string tgBoxMoreAnchorsInfo::getBoxOrientation() const {
   // The return value will be a string:
@@ -109,6 +115,9 @@ std::string tgBoxMoreAnchorsInfo::getBoxOrientation() const {
   //DEBUGGING:
   //std::cout << "Inside tgBoxMoreAnchorsInfo::getBoxOrientation, lengthVector is "
   //	    << lengthVector << "." << std::endl;
+
+  // For now, check to be sure the box is orthogonal to the axes of the world.
+  // This class does not currently support boxes at an angle.
   // Only one of the dimensions in lengthVector should be nonzero.
   if( lengthVector.dot( btVector3(1, 0, 0)) != 0.0 ) {
     // There is a nonzero in x.
@@ -150,15 +159,16 @@ std::string tgBoxMoreAnchorsInfo::getBoxOrientation() const {
 /**
  * The following three functions return the half extents of the box, 
  * depending on its orientation.
- * These are hard-coded by trial and error, and LIKELY CONTAIN BUGS.
+ * These are hard-coded by trial and error, and CHANGE ARBITRARILY.
  * Also, note that since NTRT assumes that length is the full length
  * of the box (unlike width and height, which are half-extents),
  * length has to be halved here.
+ * TO-DO: we shouldn't need these functions if tgBox is changed to 
+ * incorporate orientation explicitly.
  */
 btVector3 tgBoxMoreAnchorsInfo::getHalfExtentsOrientedX() const {
   // Length is in X, Width is in Y, Height is in Z.
   // Used to be: width in z, height in y.
-  // @TODO: TEST THIS ONE
   //DEBUGGING
   //std::cout << "Length is in x direction, so width will be in y, "
   //	    << "and height will be in z. " << std::endl;
