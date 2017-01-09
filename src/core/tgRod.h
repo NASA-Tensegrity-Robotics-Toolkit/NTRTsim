@@ -101,14 +101,6 @@ public:
      */
     double length() const { return m_length; }
 
-    /**
-     * for tgSenseable, need to define this method.
-     * It's real simple, should just return "rod".
-     * This abstracts away some of what would be hard-coded into
-     * a sensor later.
-     */
-    virtual std::string getLabelForSensor();
-
 private:
 
     /** Integrity predicate. */

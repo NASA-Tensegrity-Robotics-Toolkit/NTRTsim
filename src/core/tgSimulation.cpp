@@ -19,7 +19,7 @@
 /**
  * @file tgSimulation.cpp
  * @brief Contains the definitions of members of class tgSimulation
- * @author Ryan Adams, Brian Mirletz
+ * @author Ryan Adams, Brian Mirletz, Drew Sabelhaus
  * $Id$
  */
 
@@ -131,14 +131,6 @@ void tgSimulation::onVisit(const tgModelVisitor& r) const
         for (std::size_t i = 0; i < m_obstacles.size(); i++) {
             m_obstacles[i]->onVisit(r);
         }
-	// Since data managers are not tgSubject(s), and are not visited,
-	// do we need something about data managers here at all????
-	//// For data managers now too:
-	//for (std::size_t i = 0; i < m_dataManagers.size(); i++) {
-	//  // Note that the data managers will have all the information
-	//  // they need already, no visitor to pass in.
-	//  m_dataManagers[i]->onVisit();
-	//}
 }
 
 void tgSimulation::reset()

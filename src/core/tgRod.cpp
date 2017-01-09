@@ -90,16 +90,6 @@ void tgRod::teardown()
   // This does not preserve the invariant
 }
 
-/**
- * For tgSenseable, define this method that returns some string
- * to pre-pend to a header for data collection.
- * Should be simple and short, identifying what type of object is being sensed.
- */
-std::string tgRod::getLabelForSensor(){
-  return "rod";
-}
-
-
 bool tgRod::invariant() const
 {
   return
