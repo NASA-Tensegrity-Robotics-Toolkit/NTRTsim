@@ -201,7 +201,7 @@ int main(int argc, char** argv)
     // relative to the compiled executable for this demo application.
     // Change it according to the file structure on your own computer, or also if
     // you use the force plate in another file.
-    std::string forcePlateLogPath = "../../../../resources/src/forcePlate/forcePlateDemo/logs/";
+    std::string forcePlateLogPath = "../../../../resources/src/forcePlate/AppHorizontalSpine/logs/";
     // A reasonable time between samples is 0.01 seconds.
     double timeBetweenSamples = 0.01;
 
@@ -225,10 +225,10 @@ int main(int argc, char** argv)
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
-    //forcePlateRearLeft->attach(forceSensorRearLeft);
-    //forcePlateRearRight->attach(forceSensorRearRight);
-    //forcePlateFrontLeft->attach(forceSensorFrontLeft);
-    //forcePlateFrontRight->attach(forceSensorFrontRight);
+    forcePlateRearLeft->attach(forceSensorRearLeft);
+    forcePlateRearRight->attach(forceSensorRearRight);
+    forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);

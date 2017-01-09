@@ -7,7 +7,8 @@ subdirs(
 
 link_directories(${LIB_DIR})
 
-link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
+#link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
+link_libraries(util core tgOpenGLSupport)
 
 add_library( ${PROJECT_NAME} SHARED
   # Older software
