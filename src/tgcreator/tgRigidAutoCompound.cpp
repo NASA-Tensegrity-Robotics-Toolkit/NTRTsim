@@ -19,16 +19,20 @@
 /**
  * @file tgRigidAutoCompound.cpp
  * @brief Definition of class tgRigidAutoCompound
- * @author Ryan Adams
+ * @author Ryan Adams, Drew Sabelhaus
  * @date March 2014
  * $Id$
  */
 
+// This module
 #include "tgRigidAutoCompound.h"
-
+// Bullet Physics
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "tgCompoundRigidInfo.h"
+// The C++ standard library
 #include <map>
+#include <cstdlib> // for random number generator
+#include <sstream> // for string streams, tags.
 
 // Debugging
 #include <iostream>
@@ -138,8 +142,13 @@ void tgRigidAutoCompound::createCompounds() {
 
 tgRigidInfo* tgRigidAutoCompound::createCompound(std::deque<tgRigidInfo*> rigids) {
     tgCompoundRigidInfo* c = new tgCompoundRigidInfo();
+    // Add an additional tag to this compound rigid info.
+    // This is of the form "compound_3qhA8L" for example.
+    std::stringstream newtag;
+    newtag << "compound_" << random_tag_hash();
     for(int i = 0; i < rigids.size(); i++) {
-        c->addRigid(*rigids[i]);
+      rigids[i]->addTags(newtag.str());
+      c->addRigid(*rigids[i]);
     }
     return (tgRigidInfo*)c;
 }
@@ -152,3 +161,33 @@ bool tgRigidAutoCompound::rigidBelongsIn(tgRigidInfo* rigid, std::deque<tgRigidI
     }
     return false;
 };
+
+std::string tgRigidAutoCompound::random_tag_hash() {
+  /**
+   * Many thanks to StackOverflow users Ates Goral and Mehrdad Afshari
+   * http://stackoverflow.com/questions/440133/how-do-i-create-a-random-alpha-numeric-string-in-c
+   *
+   * This function should generate a random string. Not sure about
+   * the probability distribution, though.
+   */
+  // Create the string (character array) to put the random characters into
+  size_t length = 6;
+  char s[length];
+
+  // A constant variable for the chracters that will be chosen from
+  static const char alphanum[] =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+
+  // Insert a random one of these characters into the array
+  for (int i = 0; i < length; ++i) {
+    s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+  }
+
+  // set the string termination character
+  s[length] = 0;
+
+  // Returning a character array is the same as returning a string.
+  return s;
+}
