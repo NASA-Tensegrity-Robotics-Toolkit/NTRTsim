@@ -101,7 +101,7 @@ bool tgCompoundRigidSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
       std::stringstream tagstream;
       tagstream << descendants[i]->getTags();
       std::string tags = tagstream.str();
-      std::cout << "Tags are: " << tags << std::endl;
+      //std::cout << "Tags are: " << tags << std::endl;
       // (b) use a regular expression to pick out any compound tags
       boost::smatch matches;
       bool anymatches = boost::regex_search(tags, matches, compound_regex);
@@ -113,16 +113,35 @@ bool tgCompoundRigidSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 	// Note that there should be AT MOST one match.
 	// No rigid body should ever be part of more than one compound: if
 	// it was part of two compounds, those compounds would be the same!!
-	if (matches.size() > 1 ){
+	// TO-DO: write some verifying code (maybe in tgRigidAutoCompounder)
+	// to enforce this.
+	if (matches.size() >= 2 ){
 	  throw std::runtime_error("A tgModel has more than one compound tag in its tag list, inside tgCompoundRigidSensorInfo. This is impossible, and something is very wrong.");
 	}
 	//std::cout << "Found a compound! Original tags were: "
 	//	  << tags << " and regex match is: " << matches.str(0) << std::endl;
+
+	// Now, add to the index of counts for this tag.
+	compounds[matches.str(0)] += 1;
       }
     }
     // Finally, count the number of descendants for each compound.
     // If there are at least two, return true.
-    // TO-DO: implement this.
+    // Iterate over the map:
+    std::map<std::string, int>::iterator it;
+    for( it = compounds.begin(); it != compounds.end(); ++it){
+      // The 'second' field of this iterator is the value.
+      // We need at least two rigids in order to have a proper compound.
+      if( (it->second) >= 2 ) {
+	return 1;
+      }
+      else if( (it->second) == 1) {
+	// It should never happen that there is only one object with a
+	// compound tag...
+	throw std::runtime_error("There is only one object with a compound tag. That's not possible, compound tgModels should be at least two objects. Exiting.");
+      }
+    }
+    // If there were no compound tags,
     return 0;
   }
 }
@@ -141,5 +160,6 @@ tgSensor* tgCompoundRigidSensorInfo::createSensor(tgSenseable* pSenseable)
   // Note that we cast the pointer here, knowing that it will succeed.
   //return new tgCompoundRigidSensor( tgCast::cast<tgSenseable, tgRod>(pSenseable) );
   // DEBUGGING: make this compile so the above code can be run.
+  std::cout << "Returning a null pointer for tgCompRigSens.createSensor." << std::endl;
   return NULL;
 }

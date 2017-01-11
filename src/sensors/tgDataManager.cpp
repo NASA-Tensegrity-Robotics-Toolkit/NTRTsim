@@ -96,8 +96,12 @@ void tgDataManager::addSensorsIfAppropriate(tgSenseable* pSenseable)
   for (size_t i=0; i < m_sensorInfos.size(); i++){
     // If this particular sensor info is appropriate for the pSenseable,
     if( m_sensorInfos[i]->isThisMySenseable(pSenseable) ) {
-      // Create a sensor and push it back to our list of sensors.
-      m_sensors.push_back( m_sensorInfos[i]->createSensor(pSenseable));
+      // Create a sensor:
+      tgSensor* pNewSensor = m_sensorInfos[i]->createSensor(pSenseable);
+      // and if it's not NULL, push it back to our list of sensors.
+      if( pNewSensor != NULL) {
+	m_sensors.push_back(pNewSensor);
+      }
     }
   }
 }
@@ -249,6 +253,7 @@ bool tgDataManager::invariant() const
 {
   // TO-DO:
   // m_sensors and m_sensorInfos are sane, check somehow...?
+  // For example, check if any of the pointers in m_sensors are NULL.
   return true;
 }
 
