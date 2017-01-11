@@ -26,8 +26,9 @@
 // This module
 #include "tgCompoundRigidSensorInfo.h"
 // Other includes from NTRTsim
-//#include "tgCompoundRigidSensor.h"
+#include "tgCompoundRigidSensor.h"
 #include "core/tgModel.h"
+#include "core/tgBaseRigid.h" // for checking descendants via casting.
 #include "core/tgSenseable.h"
 #include "core/tgCast.h"
 // Other includes from the C++ standard library
@@ -93,15 +94,12 @@ bool tgCompoundRigidSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
     boost::regex compound_regex("compound_\\w{6}");
     
     // Iterate through the descendants
-    //DEBUGGING
-    // std::cout << "Descendants has size: " << descendants.size() << std::endl;
     for (size_t i=0; i < descendants.size(); i++){
-      // If this descendant has a compound tag...
+      // Check if this descendant has a compound tag...
       // (a) get the tags in string form
       std::stringstream tagstream;
       tagstream << descendants[i]->getTags();
       std::string tags = tagstream.str();
-      //std::cout << "Tags are: " << tags << std::endl;
       // (b) use a regular expression to pick out any compound tags
       boost::smatch matches;
       bool anymatches = boost::regex_search(tags, matches, compound_regex);
@@ -118,10 +116,14 @@ bool tgCompoundRigidSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 	if (matches.size() >= 2 ){
 	  throw std::runtime_error("A tgModel has more than one compound tag in its tag list, inside tgCompoundRigidSensorInfo. This is impossible, and something is very wrong.");
 	}
-	//std::cout << "Found a compound! Original tags were: "
-	//	  << tags << " and regex match is: " << matches.str(0) << std::endl;
-
-	// Now, add to the index of counts for this tag.
+	// Confirm that the specific descendant is actually a rigid body.
+	// It's possible that some not-rigid-bodies could have erroneous tags...
+	tgBaseRigid* pBaseRigid =
+	  tgCast::cast<tgSenseable, tgBaseRigid>(descendants[i]);
+	if (pBaseRigid == 0 ) {
+	  throw std::runtime_error("A tgModel that is NOT a rigid body has a compound tag attached to it. Only rigid bodies should have compound tags.");
+	}
+	// Finally, if everything is good, add to the index of counts for this tag.
 	compounds[matches.str(0)] += 1;
       }
     }
@@ -152,14 +154,22 @@ bool tgCompoundRigidSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 tgSensor* tgCompoundRigidSensorInfo::createSensor(tgSenseable* pSenseable)
 {
   //CHECK: the caller SHOULD HAVE made sure that pSenseable
-  // was a tgRod pointer. If not, complain!!
+  // satisfied the conditions of sensor creation.
   if (!isThisMySenseable(pSenseable)) {
     throw std::invalid_argument("pSenseable is NOT a valid tgModel or does not have compound rigid bodies, inside tgCompoundRigidSensorInfo.");
   }
+  /**
+   * (1) Get the compound tags from within this tgModel.
+   * (2) Remove any compound tags that are in blacklist.
+   * (3) If the result is non-empty, create a tgCompoundRigidSensor with
+   *     the resulting tags.
+   * (4) Blacklist the tags that were just now passed in to the sensor 
+   *     constructor.
+   */
+
+  // TO-DO: make a helper function that gets the compound tags from pSenseable
+  
   // Then, if the program hasn't quit, make the sensor.
   // Note that we cast the pointer here, knowing that it will succeed.
-  //return new tgCompoundRigidSensor( tgCast::cast<tgSenseable, tgRod>(pSenseable) );
-  // DEBUGGING: make this compile so the above code can be run.
-  std::cout << "Returning a null pointer for tgCompRigSens.createSensor." << std::endl;
-  return NULL;
+  //return new tgCompoundRigidSensor( tgCast::cast<tgSenseable, tgModel>(pSenseable) );
 }
