@@ -36,7 +36,7 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     add_blocks = false;
     add_hills = false;
     all_terrain = false;
-    timestep_physics = 1.0f/1000.0f;
+    timestep_physics = 1.0f/1000.0f; 
     timestep_graphics = 1.0f/60.0f;
     nEpisodes = 1;
     nSteps = 60000;
@@ -133,7 +133,7 @@ bool AppMixedLearning::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONMixedLearningControl* const myControl =
+        myControl =
         new JSONMixedLearningControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -305,6 +305,8 @@ bool AppMixedLearning::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
     
     return true;
 }

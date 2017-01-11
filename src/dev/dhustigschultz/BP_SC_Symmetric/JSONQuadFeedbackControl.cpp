@@ -18,8 +18,9 @@
 
 /**
  * @file JSONFeedbackControl.cpp
- * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz
+ * @brief A controller for the template class BaseSpineModelLearning,
+ * modified for use on a quadruped
+ * @author Brian Mirletz, Dawn Hustig-Schultz
  * @version 1.1.0
  * $Id$
  */
@@ -54,7 +55,7 @@
 #include <vector>
 
 //#define LOGGING
-#define USE_KINEMATIC
+//#define USE_KINEMATIC
 
 using namespace std;
 
@@ -174,12 +175,14 @@ void JSONQuadFeedbackControl::onSetup(BaseSpineModelLearning& subject)
     std::cout << *m_pCPGSys << std::endl;
 #endif    
     m_updateTime = 0.0;
+    m_totalTime = 0.0; //For metrics. 
     bogus = false;
 }
 
 void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
 {
     m_updateTime += dt;
+    m_totalTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
 #if (1)
@@ -217,7 +220,26 @@ void JSONQuadFeedbackControl::onStep(BaseSpineModelLearning& subject, double dt)
 		/// @todo if bogus, stop trial (reset simulation)
 		bogus = true;
 		throw std::runtime_error("Height out of range");
-	}
+    }
+
+    //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
+    if(1){
+	    static int count = 0;
+	    if(count > 100) {
+		//std::cout << m_totalTime << std::endl;
+
+		//Getting the center of mass of the entire structure:
+		std::vector<double> newConditions = subject.getSegmentCOM(m_config.segmentNumber);
+
+		std::cout << newConditions[0] << "," << newConditions[1] << "," << newConditions[2] << ","; 
+	    	std::cout << std::endl;
+
+		count = 0;
+	    }
+	    else {
+		count++;
+	    }
+    }
 }
 
 void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
@@ -288,7 +310,7 @@ void JSONQuadFeedbackControl::onTeardown(BaseSpineModelLearning& subject)
     
     Json::Value subScores;
     subScores["distance"] = scores[0];
-    subScores["energy"] = totalEnergySpent;
+    subScores["energy"] = scores[1];
     
     prevScores.append(subScores);
     root["scores"] = prevScores;
@@ -427,6 +449,8 @@ std::vector<double> JSONQuadFeedbackControl::getFeedback(BaseSpineModelLearning&
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
+    //Reducing memory leak here:
+    delete[] inputs;
     
     
     return feedback;
@@ -471,4 +495,3 @@ std::vector<double> JSONQuadFeedbackControl::transformFeedbackActions(std::vecto
     
 	return feedback;
 }
-

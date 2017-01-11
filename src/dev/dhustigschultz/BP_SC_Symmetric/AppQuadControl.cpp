@@ -85,8 +85,8 @@ bool AppQuadControl::setup()
     // Fifth create the controllers, attach to model
     if (add_controller)
     {
-        const int segmentSpan = 3; //Not sure what this will be for mine!
-        const int numMuscles = 8; //This may be ok, but confirm. 
+        const int segmentSpan = 3; 
+        const int numMuscles = 8; 
         const int numParams = 2;
         const int segNumber = 0; // For learning results
         const double controlTime = .01;
@@ -141,7 +141,7 @@ bool AppQuadControl::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONQuadFeedbackControl* const myControl =
+        myControl =
         new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -313,7 +313,8 @@ bool AppQuadControl::run()
    delete simulation;
    delete view;
    delete world;
-    
+   //Added to fix memory leak:
+   delete myControl;
     return true;
 }
 

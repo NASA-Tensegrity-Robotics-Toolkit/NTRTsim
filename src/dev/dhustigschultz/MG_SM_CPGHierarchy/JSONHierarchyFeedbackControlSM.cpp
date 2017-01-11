@@ -1234,6 +1234,8 @@ std::vector<double> JSONHierarchyFeedbackControlSM::getFeedback(BaseQuadModelLea
 		
 	feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
+    //Reducing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

@@ -90,6 +90,7 @@ private:
     tgWorld* world;
     tgSimView* view;
     tgSimulation* simulation;
+    JSONMGFeedbackControl* myControl;
 
     bool use_graphics;
     bool add_controller;

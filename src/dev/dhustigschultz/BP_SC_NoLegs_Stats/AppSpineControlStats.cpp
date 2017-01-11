@@ -139,7 +139,7 @@ bool AppSpineControlStats::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONStatsFeedbackControl* const myControl =
+        myControl =
         new JSONStatsFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -311,6 +311,8 @@ bool AppSpineControlStats::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
     
     return true;
 }

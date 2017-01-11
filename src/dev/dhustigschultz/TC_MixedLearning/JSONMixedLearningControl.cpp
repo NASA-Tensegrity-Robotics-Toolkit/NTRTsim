@@ -20,6 +20,7 @@
  * @file JSONMixedLearningControl.cpp
  * @brief A controller for the template class BaseSpineModelLearning
  * @author Brian Mirletz, Dawn Hustig-Schultz
+ * @date Sept. 2015
  * @version 1.0.0
  * $Id$
  */
@@ -54,7 +55,6 @@
 #include <vector>
 
 //#define LOGGING
-#define USE_KINEMATIC
 
 using namespace std;
 
@@ -118,7 +118,8 @@ JSONMixedLearningControl::~JSONMixedLearningControl()
 
 void JSONMixedLearningControl::onSetup(BaseSpineModelLearning& subject)
 {
-	m_pCPGSys = new CPGEquationsFB(200);
+    m_totalTime = 0;
+    m_pCPGSys = new CPGEquationsFB(200);
 
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -186,6 +187,7 @@ void JSONMixedLearningControl::onSetup(BaseSpineModelLearning& subject)
 void JSONMixedLearningControl::onStep(BaseSpineModelLearning& subject, double dt)
 {
     m_updateTime += dt;
+    m_totalTime += dt;
     if (m_updateTime >= m_config.controlTime)
     {
 #if (1)
@@ -213,6 +215,7 @@ void JSONMixedLearningControl::onStep(BaseSpineModelLearning& subject, double dt
 #endif
 		notifyStep(m_updateTime);
         m_updateTime = 0;
+        //std::cout << m_totalTime << " " << currentHeight<< std::endl;
     }
     
     double currentHeight = subject.getSegmentCOM(m_config.segmentNumber)[1];
@@ -255,11 +258,17 @@ void JSONMixedLearningControl::onTeardown(BaseSpineModelLearning& subject)
     double totalEnergySpent=0;
     
     std::vector<tgSpringCableActuator* > tmpStrings = subject.getAllMuscles();
-    
+
     for(std::size_t i=0; i<tmpStrings.size(); i++)
     {
         tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
         
+        std::size_t histSize = stringHist.tensionHistory.size();
+        
+        double dt = m_totalTime / (double)histSize;
+        
+    #if (1)
+    
         for(std::size_t j=1; j<stringHist.tensionHistory.size(); j++)
         {
             const double previousTension = stringHist.tensionHistory[j-1];
@@ -272,11 +281,23 @@ void JSONMixedLearningControl::onTeardown(BaseSpineModelLearning& subject)
             const double workDone = previousTension * motorSpeed;
             totalEnergySpent += workDone;
         }
+        
+    #else
+        for(std::size_t j=0; j < histSize; j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j];
+            double motorSpeed = stringHist.lastVelocities[j];
+            // Integrating power over time
+            const double workDone = previousTension * motorSpeed * dt;
+            totalEnergySpent += workDone;
+        }
+    #endif
     }
     
     scores.push_back(totalEnergySpent);
     
     std::cout << "Dist travelled " << scores[0] << std::endl;
+    std::cout << "Total energy spent " << scores[1] << std::endl;
     
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
@@ -294,7 +315,7 @@ void JSONMixedLearningControl::onTeardown(BaseSpineModelLearning& subject)
     
     Json::Value subScores;
     subScores["distance"] = scores[0];
-    subScores["energy"] = totalEnergySpent;
+    subScores["energy"] = scores[1];
     
     prevScores.append(subScores);
     root["scores"] = prevScores;
@@ -517,7 +538,8 @@ std::vector<double> JSONMixedLearningControl::getFeedback(BaseSpineModelLearning
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
-    
+    //Fixing memory leak here:
+    delete[] inputs;    
     
     return feedback;
 }

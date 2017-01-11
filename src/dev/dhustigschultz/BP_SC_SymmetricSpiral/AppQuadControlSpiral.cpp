@@ -141,7 +141,7 @@ bool AppQuadControlSpiral::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONQuadFeedbackControl* const myControl =
+        myControl =
         new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -313,6 +313,8 @@ bool AppQuadControlSpiral::run()
    delete simulation;
    delete view;
    delete world;
+   //Added to fix memory leak:
+   delete myControl;
     
     return true;
 }

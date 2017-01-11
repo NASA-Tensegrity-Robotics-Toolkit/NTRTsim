@@ -92,6 +92,7 @@ private:
     tgWorld* world;
     tgSimView* view;
     tgSimulation* simulation;
+    JSONMixedLearningControl* myControl;
 
     bool use_graphics;
     bool add_controller;

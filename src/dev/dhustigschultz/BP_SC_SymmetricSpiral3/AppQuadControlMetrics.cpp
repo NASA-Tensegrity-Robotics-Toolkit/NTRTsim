@@ -140,7 +140,7 @@ bool AppQuadControlMetrics::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONMetricsFeedbackControl* const myControl =
+        myControl =
         new JSONMetricsFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -312,6 +312,8 @@ bool AppQuadControlMetrics::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
     
     return true;
 }

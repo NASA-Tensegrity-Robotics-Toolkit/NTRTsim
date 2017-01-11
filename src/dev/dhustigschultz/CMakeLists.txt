@@ -72,6 +72,10 @@ subdirs(
     MountainGoatFM4
     MG_FewerMuscles4
 
+    MountainGoatFM5
+    MountainGoatFM6
+    MountainGoatFM7
+
     MG_SM_CPGHierarchy
     MG_NL_CPGHierarchy
     MG_CPGSingleLeg

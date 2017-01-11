@@ -141,7 +141,7 @@ bool AppQuadControlDoxieNF::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONQuadFeedbackControl* const myControl =
+        myControl =
         new JSONQuadFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -313,6 +313,8 @@ bool AppQuadControlDoxieNF::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
     
     return true;
 }

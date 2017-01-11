@@ -148,7 +148,7 @@ bool AppQuadControlSegments::setup()
 						    numLegMuscles,
 						    numLegMuscles);
         /// @todo fix memory leak that occurs here
-       JSONSegmentsFeedbackControl* const myControl =
+        myControl =
         new JSONSegmentsFeedbackControl(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -320,7 +320,9 @@ bool AppQuadControlSegments::run()
    delete simulation;
    delete view;
    delete world;
-    
+   //fixing memory leak by deleting myControl:
+   delete myControl;    
+
     return true;
 }
 

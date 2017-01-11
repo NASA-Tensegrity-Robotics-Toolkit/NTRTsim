@@ -156,7 +156,7 @@ bool AppQuadControlHierarchySM::setup()
 						    hf2,
 						    ffMax2);
         /// @todo fix memory leak that occurs here
-       JSONHierarchyFeedbackControlSM * const myControl =
+        myControl =
         new JSONHierarchyFeedbackControlSM(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -328,6 +328,8 @@ bool AppQuadControlHierarchySM::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
     
    return true;
 }

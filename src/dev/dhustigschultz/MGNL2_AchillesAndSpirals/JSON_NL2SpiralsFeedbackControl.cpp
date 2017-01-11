@@ -837,6 +837,8 @@ std::vector<double> JSON_NL2SpiralsFeedbackControl::getFeedback(BaseQuadModelLea
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
+    //Fixing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

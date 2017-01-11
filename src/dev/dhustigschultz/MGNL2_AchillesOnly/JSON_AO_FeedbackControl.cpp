@@ -787,6 +787,8 @@ std::vector<double> JSON_AO_FeedbackControl::getFeedback(BaseQuadModelLearning& 
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
+    //Reducing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

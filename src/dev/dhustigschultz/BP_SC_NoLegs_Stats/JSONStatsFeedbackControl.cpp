@@ -259,14 +259,21 @@ void JSONStatsFeedbackControl::onStep(BaseQuadModelLearning& subject, double dt)
 		std::cout  << "COM: " << structureCOM[0] << " " << structureCOM[1] << " " << structureCOM[2] << " "; 
 	    	std::cout << std::endl;
 		//Clear the metrics vector for ease of adding tensions. 
-		metrics.clear();
+		//metrics.clear();
 
 		std::vector<tgSpringCableActuator* > tmpStrings = subject.find<tgSpringCableActuator> ("spine ");
 
 		for(std::size_t i=0; i<tmpStrings.size(); i++)
 		{
-		    std::cout << "Muscle " << i << ": " << tmpStrings[i]->getTension() << std::endl;
+		    std::cout << "Muscle Tension " << i << ": " << tmpStrings[i]->getTension() << std::endl;
 		}
+		std::cout << std::endl;
+		
+		for(std::size_t i=0; i<tmpStrings.size(); i++)
+		{
+		    std::cout << "Muscle Length " << i << ": " << tmpStrings[i]->getCurrentLength() << std::endl;
+		}
+		std::cout << std::endl;
 
 		count = 0;
 	    }
@@ -501,7 +508,8 @@ std::vector<double> JSONStatsFeedbackControl::getFeedback(BaseQuadModelLearning&
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
-    
+    //Fixing memory leak here:
+    delete[] inputs;    
     
     return feedback;
 }

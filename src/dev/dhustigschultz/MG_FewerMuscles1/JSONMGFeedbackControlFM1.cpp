@@ -224,15 +224,15 @@ void JSONMGFeedbackControlFM1::onStep(BaseQuadModelLearning& subject, double dt)
     }
 
     //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
-    if(0){
+    if(1){
 	    static int count = 0;
 	    if(count > 100) {
-		std::cout << m_totalTime << std::endl;
+		//std::cout << m_totalTime << std::endl;
 
 		//Getting the center of mass of the entire structure:
 		std::vector<double> newConditions = subject.getSegmentCOM(m_config.segmentNumber);
 
-		std::cout  << "COM: " << newConditions[0] << " " << newConditions[1] << " " << newConditions[2] << " "; 
+		std::cout  <<newConditions[0] << "," << newConditions[1] << "," << newConditions[2] << ","; 
 	    	std::cout << std::endl;
 
 		count = 0;
@@ -450,7 +450,8 @@ std::vector<double> JSONMGFeedbackControlFM1::getFeedback(BaseQuadModelLearning&
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
-    
+    //Reducing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

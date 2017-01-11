@@ -135,7 +135,7 @@ m_config(config)
 
 JSONAOHierarchyControl::~JSONAOHierarchyControl()
 {
-    //delete nn;
+    delete nn;
 }
 
 void JSONAOHierarchyControl::onSetup(BaseQuadModelLearning& subject)
@@ -315,6 +315,24 @@ void JSONAOHierarchyControl::onStep(BaseQuadModelLearning& subject, double dt)
 		throw std::runtime_error("Height out of range");
     }
 
+    //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
+    if(1){
+	    static int count = 0;
+	    if(count > 100) {
+
+		//Getting the center of mass of the entire structure:
+		std::vector<double> newConditions = subject.getSegmentCOM(m_config.segmentNumber);
+
+		std::cout  <<newConditions[0] << "," << newConditions[1] << "," << newConditions[2] << ","; 
+	    	std::cout << std::endl;
+
+		count = 0;
+	    }
+	    else {
+		count++;
+	    }
+    }
+
 }
 
 void JSONAOHierarchyControl::onTeardown(BaseQuadModelLearning& subject)
@@ -444,7 +462,7 @@ void JSONAOHierarchyControl::onTeardown(BaseQuadModelLearning& subject)
     m_rightRearAchillesControllers.clear();  
 
     // Trying to delete here instead, to fix the leak
-    delete nn;
+    //delete nn; //Look at neuralNetwork code, to see what the object consists of, to determine HOW to correctly delete this!
 
 }
 
@@ -769,6 +787,8 @@ std::vector<double> JSONAOHierarchyControl::getFeedback(BaseQuadModelLearning& s
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
+    //Reducing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

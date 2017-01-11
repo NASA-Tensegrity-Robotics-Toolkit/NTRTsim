@@ -17,15 +17,17 @@
 */
 
 /**
- * @file AppTerrainJSON.cpp
- * @brief Contains the definition of functions for multi-terrain app
- * @author Brian Mirletz, Alexander Xydes
- * @copyright Copyright (C) 2014 NASA Ames Research Center
+ * @file AppMixedLearning.cpp
+ * @brief Contains the definition of functions for multi-terrain app, 
+ * used in this instance for separate learning of parameters for the first and last segments of a Tetrahedral Complex spine. 
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
+ * @copyright Copyright (C) 2015 NASA Ames Research Center
  * $Id$
  */
 
 #include "AppMixedLearning.h"
 #include "dev/btietz/JSONTests/tgCPGJSONLogger.h"
+#include "tgcreator/tgUtil.h"
 
 AppMixedLearning::AppMixedLearning(int argc, char** argv)
 {
@@ -51,6 +53,8 @@ AppMixedLearning::AppMixedLearning(int argc, char** argv)
     lowerPath = "default";
 
     handleOptions(argc, argv);
+
+    //tgUtil::seedRandom();
 }
 
 bool AppMixedLearning::setup()
@@ -132,8 +136,8 @@ bool AppMixedLearning::setup()
 						    maxH,
 						    minH);
         /// @todo fix memory leak that occurs here
-       JSONMixedLearningControl* const myControl =
-        new JSONMixedLearningControl(control_config, suffix, lowerPath); //"dhustigschultz/AppMixedLearning/"
+        myControl =
+        new JSONMixedLearningControl(control_config, suffix, lowerPath); 
 
 #if (0)        
             tgCPGJSONLogger* const myLogger = 
@@ -304,6 +308,9 @@ bool AppMixedLearning::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
+
     
     return true;
 }

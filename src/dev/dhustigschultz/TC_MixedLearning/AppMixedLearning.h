@@ -21,8 +21,9 @@
 
 /**
  * @file AppMixedLearning.cpp
- * @brief Contains the definition function main() for the Multiple terrains app
- * @author Brian Mirletz, Alexander Xydes
+ * @brief Contains the definition function main() for the Multiple terrains app, 
+ * used in this instance for separate learning of parameters for the first and last segments of a spine. 
+ * @author Brian Mirletz, Alexander Xydes, Dawn Hustig-Schultz
  * $Id$
  */
 
@@ -90,6 +91,7 @@ private:
     tgWorld* world;
     tgSimView* view;
     tgSimulation* simulation;
+    JSONMixedLearningControl* myControl;
 
     bool use_graphics;
     bool add_controller;

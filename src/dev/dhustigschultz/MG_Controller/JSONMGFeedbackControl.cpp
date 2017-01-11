@@ -583,7 +583,8 @@ std::vector<double> JSONMGFeedbackControl::getFeedback(BaseQuadModelLearning& su
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
-    
+    //Fixing memory leak here:
+    delete[] inputs;    
     
     return feedback;
 }

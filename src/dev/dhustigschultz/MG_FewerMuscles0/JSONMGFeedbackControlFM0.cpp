@@ -450,7 +450,8 @@ std::vector<double> JSONMGFeedbackControlFM0::getFeedback(BaseQuadModelLearning&
         
         feedback.insert(feedback.end(), cableFeedback.begin(), cableFeedback.end());
     }
-    
+    //Reducing memory leak here:
+    delete[] inputs;
     
     return feedback;
 }

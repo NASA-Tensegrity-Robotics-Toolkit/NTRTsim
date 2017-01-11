@@ -156,7 +156,7 @@ bool AppMGHierarchyNL::setup()
 						    hf2,
 						    ffMax2);
         /// @todo fix memory leak that occurs here
-       JSONHierarchyControlNL * const myControl =
+        myControl =
         new JSONHierarchyControlNL(control_config, suffix, lowerPath);
 
 #if (0)        
@@ -344,6 +344,9 @@ bool AppMGHierarchyNL::run()
    delete simulation;
    delete view;
    delete world;
+   //fixing memory leak by deleting myControl:
+   delete myControl;
+
     
    return true;
 }
