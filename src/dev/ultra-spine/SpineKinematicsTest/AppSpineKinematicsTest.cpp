@@ -36,6 +36,7 @@
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -129,12 +130,14 @@ int main(int argc, char** argv)
     myDataLogger->addSenseable(myModel);
     // Create sensor infos for all the types of sensors that the data logger
     // will create.
-    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
-    tgSpringCableActuatorSensorInfo* mySCASensorInfo =
-      new tgSpringCableActuatorSensorInfo();
+    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    //tgSpringCableActuatorSensorInfo* mySCASensorInfo =
+    //  new tgSpringCableActuatorSensorInfo();
+    tgCompoundRigidSensorInfo* myCRSensorInfo = new tgCompoundRigidSensorInfo();
     // Attach the sensor infos to the data logger
-    myDataLogger->addSensorInfo(myRodSensorInfo);
-    myDataLogger->addSensorInfo(mySCASensorInfo);
+    //myDataLogger->addSensorInfo(myRodSensorInfo);
+    //myDataLogger->addSensorInfo(mySCASensorInfo);
+    myDataLogger->addSensorInfo(myCRSensorInfo);
     // Next, attach it to the simulation
     simulation.addDataManager(myDataLogger);
 

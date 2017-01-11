@@ -7,8 +7,9 @@ subdirs(
 
 link_directories(${LIB_DIR})
 
-#link_libraries(${PROJECT_NAME} util core tgOpenGLSupport)
-link_libraries(util core tgOpenGLSupport)
+# Note that we need to compile in support for boost's regex library
+# for use in tgCompoundRigidSensor and its info class.
+link_libraries(util core tgOpenGLSupport boost_regex)
 
 add_library( ${PROJECT_NAME} SHARED
   # Older software
@@ -26,11 +27,13 @@ add_library( ${PROJECT_NAME} SHARED
   tgSensorInfo.cpp
   tgRodSensorInfo.cpp
   tgSpringCableActuatorSensorInfo.cpp
+  tgCompoundRigidSensorInfo.cpp
 
   # The ForcePlateModel and sensor are also needed here,
   # since the data logger needs to know how to render a force plate.
   forceplate/ForcePlateModel.cpp
   forceplate/ForcePlateSensor.cpp
 )
+
 
   
