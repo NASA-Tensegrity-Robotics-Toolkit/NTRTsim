@@ -34,11 +34,15 @@
 // Other includes from the C++ standard library
 #include <vector>
 #include <string>
+#include <map> // for the helper function
+// Includes from Boost
+//#include <boost/regex.hpp>
 
 // Forward references
 class tgSenseable;
 //class tgCompoundRigidSensor; // since createSensor returns only a tgSensor.
 class tgSensor;
+class tgModel; // this class only works on tgModels, since tgSenseables don't have tags.
 
 /**
  * tgCompoundRigidSensorInfo is a sensor info class that creates sensors for
@@ -46,6 +50,9 @@ class tgSensor;
  * (1) is a tgModel with at least two descendants
  * (2) at least two of the descendants, both of which can be cast to tgBaseRigids,
  *     have matching "compound_XXXXXX" tags
+ * See the implementation of these functions for more details about how many sensors
+ * are created. If used properly (e.g. this is the only tgCompoundRigidSensorInfo in the
+ * application), there should not be any redundant sensors created.
  */
 class tgCompoundRigidSensorInfo : public tgSensorInfo
 {
@@ -64,68 +71,40 @@ class tgCompoundRigidSensorInfo : public tgSensorInfo
   /**
    * From tgSensorInfo, need to implement a check to see if a particular
    * tgSenseable fits the criteria for making a compound rigid body sensor.
+   * This returns true iff the passed-in model has at least one compound, and that
+   * compound is not in the blacklist.
    * @param[in] pSenseable a pointer to a tgSenseable object, that this sensor info
    * may or may not be able to create a sensor for.
    * @return true if pSenseable is able to be sensed by the type of sensor that
    * this sensor info creates.
-   *
-   * Problem: how to make it so that EXACTLY ONE tgCompoundRigidSensor is made
-   * per single compound rigid body?
-   * This is complicated by the fact that tgModels can have other tgModels.
-   * Take the spine in YAML example. The root tgModel has four other tgModels in it,
-   * each of which contain four rods. Each of these four rods are compounds.
-   *      (note that no compounds exist cross-tgModel or up/down the heirarchy.)
-   *
-   * Solution: state machine inside tgCompoundRigidSensor.
-   * (1) When isThisMySenseable, if no root tgModel exists, declare the passed-in
-   * as root.
-   * (2) If the passed-in tgModel 
-   *      (a) has a compound in it, and 
-   *      (b) doesn't have any child container tgModels - e.g., only has rods and rigids and whatnot, 
-   * ...then:
-   *      (c) record the hash of the compounds that will be created
-   *      (d) return true
-   *
-   * Then, when createSensor is called:
-   * (1) again, check somehow that this is the leaf-iest tgModel
-   * (2) create whatever sensors can be created under this leaf model
-   *     ...note that this will return a sensor to POTENTIALLY MULTIPLE 
-   *        compound rigid bodies, if for example multiple compounds exist
-   *        within the same level of a tgModel (see, for ex., VertSpineModel.)
-   *
-   * Need to handle the case where there is a tgModel with one or more compounds
-   * in it, but it also has a child tgModel with one or more compounds in it.
-   * So, for example, we can't just say "Iff a leaf tgModel, then make the sensor",
-   * since there could be a case when the model has a sensor for its compound
-   * but its children should supply the sensor(s) for their compounds.
-   *      THIS REQUIRES THE PASSING-IN OF COMPOUND TAGS TO THE SENSOR CONSTRUCTOR.
-   *      Otherwise, in this case, how would the sensor know what parts to sense?
-   *      If it was to sense "everything", then it would sense the parent's compound
-   *      as well as the child's, but there will also be another sensor made for the
-   *      child tgModel that senses its compound(s).
-   *
-   * Need to find a way to keep consistency between calls to isThisMySenseable and
-   * createSensor.
-   *
-   * Also, is this too complicated????
-   * Should we just keep a list of what compounds have been sensed, and be greedy
-   * with allocating sensors to tgModels?
-   * For example, we say "as soon as we see a certain compound, make a sensor for it,
-   * then add it to a blacklist."
-   * That might be easiest, although it's probably not what the message-passing
-   * people would want.
    */
   virtual bool isThisMySenseable(tgSenseable* pSenseable);
 
   /**
    * Similarly, create a sensor if appropriate.
-   * See tgSensorInfo for more... info.
+   * This class can make zero or more sensors via this method.
+   * An empty list will be returned if there are no available compounds in 
+   * the passed-in model that are not in the blacklist.
+   * Otherwise, it will create an individual sensor for every compound that is
+   * not in the blacklist.
    * @param[in] pSenseable pointer to a senseable object. Sensor will be created
    * for this pSenseable.
+   * @return zero or more new sensors.
    */
-  virtual tgSensor* createSensor(tgSenseable* pSenseable);
+  virtual std::vector<tgSensor*> createSensorsIfAppropriate(tgSenseable* pSenseable);
 
  private:
+
+  /**
+   * A helper function that extracts any compound tags from a tgModel object.
+   * This is used in multiple places in this class.
+   * @param[in] pModel a pointer to a tgModel, which may or may not have any compound
+   *    objects or compound tags.
+   * @return a map of the compound tags in the model, and the count of how many
+   *    descendants have those tags. Counting the number of tags doesn't take much
+   *    overhead, and is very useful for some purposes (e.g. in checking isThisMySenseable.)
+   */
+  std::map<std::string, int> getCompoundTags(tgModel* pModel);
 
   /**
    * Keep track of which compounds have already been accounted for
@@ -137,6 +116,11 @@ class tgCompoundRigidSensorInfo : public tgSensorInfo
    */
   std::vector<std::string> blacklist;
 
+  /**
+   * a helper that encapsulates the call to std::find in the blacklist.
+   */
+  bool isBlacklisted(std::string tag);
+  
 };
 
 #endif // TG_COMPOUND_RIGID_SENSOR_INFO_H

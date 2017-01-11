@@ -90,17 +90,23 @@ tgDataManager::~tgDataManager()
  * Helper for setup.
  * This function abstracts away the loop over the sensor infos list.
  */
-void tgDataManager::addSensorsIfAppropriate(tgSenseable* pSenseable)
+void tgDataManager::addSensorsHelper(tgSenseable* pSenseable)
 {
   // Loop over all tgSensorInfos in the list.
   for (size_t i=0; i < m_sensorInfos.size(); i++){
     // If this particular sensor info is appropriate for the pSenseable,
     if( m_sensorInfos[i]->isThisMySenseable(pSenseable) ) {
-      // Create a sensor:
-      tgSensor* pNewSensor = m_sensorInfos[i]->createSensor(pSenseable);
-      // and if it's not NULL, push it back to our list of sensors.
-      if( pNewSensor != NULL) {
-	m_sensors.push_back(pNewSensor);
+      // Possibly create sensors (usually, this returns a list of size 1.
+      std::vector<tgSensor*> newSensors =
+	m_sensorInfos[i]->createSensorsIfAppropriate(pSenseable);
+      // Add everything in the list to m_sensors.
+      // If an empty list has been returned, no sensors will be added.
+      // Also, need to check if any of the pointers are NULL.
+      for( size_t i=0; i < newSensors.size(); i++ ){
+	// If this sensor pointer is not null...
+	if( newSensors[i] != NULL) {
+	  m_sensors.push_back(newSensors[i]);
+	}
       }
     }
   }
@@ -119,13 +125,13 @@ void tgDataManager::setup()
   for (size_t j=0; j < m_senseables.size(); j++){
     // For each senseable object, create sensors for it and its descendants.
     // First, the senseable itself:
-    addSensorsIfAppropriate(m_senseables[j]);
+    addSensorsHelper(m_senseables[j]);
     // Then, for all its descendants:
     std::vector<tgSenseable*> descendants =
       m_senseables[j]->getSenseableDescendants();
     // Loop through.
     for (size_t k=0; k < descendants.size(); k++) {
-      addSensorsIfAppropriate(descendants[k]);
+      addSensorsHelper(descendants[k]);
     }
   }
   

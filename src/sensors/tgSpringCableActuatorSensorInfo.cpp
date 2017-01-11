@@ -65,16 +65,19 @@ bool tgSpringCableActuatorSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 }
 
 /**
- * Create a rod sensor for a tgSpringCableActuator.
+ * Create a sensor for a tgSpringCableActuator. Returns a list of size 1.
  */
-tgSensor* tgSpringCableActuatorSensorInfo::createSensor(tgSenseable* pSenseable)
+std::vector<tgSensor*> tgSpringCableActuatorSensorInfo::createSensorsIfAppropriate(tgSenseable* pSenseable)
 {
   //CHECK: the caller SHOULD HAVE made sure that pSenseable
   // was a tgSpringCableActuator pointer. If not, complain!!
   if (!isThisMySenseable(pSenseable)) {
     throw std::invalid_argument("pSenseable is NOT a tgSpringCableActuator, inside tgSpringCableActuatorSensorInfo.");
   }
+  // Create the list we'll return
+  std::vector<tgSensor*> newSensors;
   // Then, if the program hasn't quit, make the sensor.
   // Note that we cast the pointer here, knowing that it will succeed.
-  return new tgSpringCableActuatorSensor( tgCast::cast<tgSenseable, tgSpringCableActuator>(pSenseable) );
+  newSensors.push_back( new tgSpringCableActuatorSensor( tgCast::cast<tgSenseable, tgSpringCableActuator>(pSenseable) ));
+  return newSensors;
 }

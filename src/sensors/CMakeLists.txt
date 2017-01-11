@@ -23,6 +23,7 @@ add_library( ${PROJECT_NAME} SHARED
   tgSensor.cpp
   tgRodSensor.cpp
   tgSpringCableActuatorSensor.cpp
+  tgCompoundRigidSensor.cpp
   
   tgSensorInfo.cpp
   tgRodSensorInfo.cpp

@@ -110,7 +110,7 @@ public:
      * the sensor infos, this function abstracts it away.
      * @param[in] pSenseable a pointer to one of this object's senseables.
      */
-    void addSensorsIfAppropriate(tgSenseable* pSenseable);
+    void addSensorsHelper(tgSenseable* pSenseable);
 
 protected:
 

@@ -73,8 +73,14 @@ class tgSpringCableActuatorSensorInfo : public tgSensorInfo
    * See tgSensorInfo for more... info.
    * @param[in] pSenseable pointer to a senseable object. Sensor will be created
    * for this pSenseable.
+   * @return a list of pointers to tgSpringCableActuatorSensors. 
+   * Note that this should ALWAYS have size 1. Don't create sensors for 
+   * elements that just have rods as descendants, only create sensors for 
+   * an actual spring-cable actuator. (This eliminates redundant sensor creation.)
+   * @throws invalid_argument if pSenseable is not a tgSpringCableActuator. 
+   * This enforces the caller to check isThisMySenseable before creating sensors.
    */
-  virtual tgSensor* createSensor(tgSenseable* pSenseable);
+  virtual std::vector<tgSensor*> createSensorsIfAppropriate(tgSenseable* pSenseable);
 
 };
 
