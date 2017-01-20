@@ -37,7 +37,8 @@ link_directories(${ENV_LIB_DIR} ${OPENGL_LIB} ${OPENGL_FG_LIB})
 subdirs(
  ICRA2015Tests
  MuscleNP
- SpineTests
+ # SpineTests * Test has been disabled. See BuildBot build 494 for the error details. See issue #200 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/200 -- Perry
+ 
  TimestepIndependence
  #HillTest // * Test has been disabled. See BuildBot build 335 for the error details. See issue #163 (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/163 -- Perry
  
