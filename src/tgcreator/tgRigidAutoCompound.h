@@ -19,8 +19,8 @@
 /**
  * @file tgRigidAutoCompound.h
  * @brief Definition of class tgRigidAutoCompound
- * @author Ryan Adams
- * @date March 2014
+ * @author Ryan Adams and Drew Sabelhaus
+ * @date January 2017, March 2014
  * $Id$
  */
 

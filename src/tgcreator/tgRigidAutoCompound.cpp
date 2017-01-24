@@ -33,6 +33,9 @@
 #include <map>
 #include <cstdlib> // for random number generator
 #include <sstream> // for string streams, tags.
+// Boost
+#include <boost/random/random_device.hpp> // used for the random compound tag hash
+#include <boost/random/uniform_int_distribution.hpp> // used for the random compound tag hash
 
 // Debugging
 #include <iostream>
@@ -165,24 +168,35 @@ bool tgRigidAutoCompound::rigidBelongsIn(tgRigidInfo* rigid, std::deque<tgRigidI
 std::string tgRigidAutoCompound::random_tag_hash() {
   /**
    * Many thanks to StackOverflow users Ates Goral and Mehrdad Afshari
+   * for a framework for this function.
    * http://stackoverflow.com/questions/440133/how-do-i-create-a-random-alpha-numeric-string-in-c
    *
-   * This function should generate a random string. Not sure about
-   * the probability distribution, though.
+   * This function should generate a random string with a uniform distribution
+   * over the characters in the 'alphanum' char array below.
    */
   // Create the string (character array) to put the random characters into
   size_t length = 6;
   char s[length];
 
+  // The random number generator to pick characters out of the array
+  boost::random::random_device rng;
+
   // A constant variable for the chracters that will be chosen from
   static const char alphanum[] =
     "0123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "0123456789"
     "abcdefghijklmnopqrstuvwxyz";
 
+  // A uniform distribution over the indices into the character array
+  boost::random::uniform_int_distribution<> alphanum_dist(0, sizeof(alphanum) - 1);
+
   // Insert a random one of these characters into the array
+  // Thanks to the Boost library random number generator tutorial,
+  // http://www.boost.org/doc/libs/1_62_0/doc/html/boost_random/tutorial.html
   for (int i = 0; i < length; ++i) {
-    s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    //s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    s[i] = alphanum[ alphanum_dist(rng) ];
   }
 
   // set the string termination character
