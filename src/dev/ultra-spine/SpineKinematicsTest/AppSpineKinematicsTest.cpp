@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
-    double startTime = 10.0;
+    double startTime = 3.0;
     double minLength = 0.8;
     double rate = 0.25;
     std::vector<std::string> tagsToControl;
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
     // A string prefix for the filename
     std::string log_filename = "~/NTRTsim_logs/AppSpineKinematicsTest";
     // The time interval between sensor readings:
-    double timeInterval = 0.01;
+    double timeInterval = 0.2;
     // First, create the data manager
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, timeInterval);
     //std::cout << myDataLogger->toString() << std::endl;
