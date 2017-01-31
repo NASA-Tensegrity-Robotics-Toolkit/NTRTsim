@@ -95,11 +95,10 @@ int main(int argc, char** argv)
     tagsToControl.push_back("horizontal_string");
     
     // Create the controller
-    // FILL IN 6.6 HERE
-    // FILL_IN* const myController = new FILL_IN(startTime, minLength, rate, tagsToControl);
+    LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
     
     // Attach the controller to the model
-    // FILL IN 6.7 HERE
+    myModel->attach(myController);
 
     // Add the model to the world
     simulation.addModel(myModel);

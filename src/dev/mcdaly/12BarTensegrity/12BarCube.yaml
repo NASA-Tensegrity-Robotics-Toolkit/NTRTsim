@@ -39,7 +39,7 @@ pair_groups:
     - [n20, n21]
     - [n22, n23]
 
-  string:
+  cable:
     - [n0, n2]
     - [n0, n14]
     - [n0, n11]
@@ -72,6 +72,8 @@ pair_groups:
     - [n18, n21]
     - [n21, n5]
     - [n21, n15]
+    
+  cablesToMove:
     - [n18, n9]
     - [n9, n20]
     - [n20, n13]
@@ -87,7 +89,7 @@ builders:
       roll_friction: 0.01
       restitution: 0.0
 
-  string:
+  cable:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 800.0
