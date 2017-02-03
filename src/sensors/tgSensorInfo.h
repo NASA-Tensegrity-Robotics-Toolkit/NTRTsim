@@ -30,6 +30,7 @@
 // Includes:
 // The C++ Standard Library
 #include <iostream> // for the to-string overloaded method
+#include <vector> // for returning lists of sensors
 // This library
 // ...
 // Bullet Physics
@@ -43,6 +44,9 @@ class tgSensor;
  * tgSensorInfo is an abstract class that contains methods for creating sensors.
  * This is how a tgDataManager will create sensors for specific tgSenseable objects
  * (e.g., how a tgDataLogger2 will create sensors for specific tgModels.)
+ * Note that an individual tgSensorInfo may return multiple sensors upon a single
+ * call to createSensorsIfAppropriate - this would be the case for e.g. tgCompoundRigidSensor,
+ * but in most cases (e.g. rods and spring-cables) only one sensor is returned.
  */ 
 class tgSensorInfo
 {
@@ -58,7 +62,7 @@ public:
 
   /**
    * First, a tgSensorInfo should be able to determine if
-   * it can create a sensor for a specific tgSenseable object.
+   * it can create at least one sensor for a specific tgSenseable object.
    * This is the first step in creating sensors, first check then create.
    * @param[in] pSenseable a pointer to a senseable object (usually a tgModel), which either can or cannot be sensed by whatever particular sensor would be created by this tgSensorInfo.
    * @return if it's possible for this sensor info to create a sensor for the given tgSenseable object.
@@ -66,12 +70,22 @@ public:
   virtual bool isThisMySenseable(tgSenseable* pSenseable) = 0;
 
   /**
-   * Next, this class needs to be able to actually create a sensor.
-   * TO-DO: should this method also include a check to isThisMySenseable?
+   * Next, this class needs to be able to actually create one or more sensors.
    * @param[in] pSenseable a pointer to the tgSenseable object that is to be sensed.
-   * @return a pointer to the new tgSensor that was created. This tgSensor will have a reference to the particular pSenseable that's passed in.
+   * @return a vector of pointers to any sensors that were created. This list can have zero elements,
+   * for example in the case that all possible sensors have already been created for an object.
+   * Note that it's up to the subclasses to make sure that redundant sensors are not created.
+   * One way to do this, for example, is to only create sensors for the "leaf" descendants.
+   * That would be how (for example) tgRodSensorInfo works: by only creating sensors for
+   * tgSenseables that can be cast to tgRods, we can be sure that only one sensors is made per rod,
+   * since any individual rod will only be passed in ONCE to this function.
+   * However, for more complicated situations, like tgCompoundRigidSensor, a subclass would need
+   * to keep track of e.g. which compound rigids have been assigned a sensor, so as to not
+   * create multiple for the same compound rigid.
+   * In short, return the least number of sensors possible, and if dealing directly with children
+   * of tgModel, then don't create any sensors for the tgModel itself, just its children.
    */
-  virtual tgSensor* createSensor(tgSenseable* pSenseable) = 0;
+  virtual std::vector<tgSensor*> createSensorsIfAppropriate(tgSenseable* pSenseable) = 0;
 
 };
 

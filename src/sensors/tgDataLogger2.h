@@ -41,11 +41,14 @@ class tgDataLogger2 : public tgDataManager
 
   /**
    * The constructor for tgDataLogger2 takes in a string that specifies the location
-   * of the log file to create.
+   * of the log file to create, as well as an optional variable that controls
+   * frequency of sensor readings.
    * @param[in] fileNamePrefix a string that specifies the path to the log file that 
    * will be written. The current time will be appended to this prefix.
+   * @param[in] timeInterval the time interval for querying sensors. Note that an updateTime
+   * of 0 means that sensors will be queried at each call of step().
    */
-  tgDataLogger2(std::string fileNamePrefix);
+  tgDataLogger2(std::string fileNamePrefix, double timeInterval = 0.0);
 
   /**
    * Since folks will probably forget that a file name is needed,
@@ -118,6 +121,19 @@ class tgDataLogger2 : public tgDataManager
    * This is for adding a timestamp into the log file.
    */
   double m_totalTime;
+
+  /**
+   * The time interval for sensor readings. Taking sensor data at each call 
+   * of step() can result in very very large files, so this parameter allows querying
+   * at a slower interval.
+   */
+  double m_timeInterval;
+
+  /**
+   * A variable to keep track of time between sensor readings. This is used to 
+   * check m_timeInterval.
+   */
+  double m_updateTime;
   
 };
 

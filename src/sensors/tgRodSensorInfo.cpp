@@ -62,16 +62,19 @@ bool tgRodSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 }
 
 /**
- * Create a rod sensor for a tgRod.
+ * Create a rod sensor for a tgRod. Returns a list of size 1.
  */
-tgSensor* tgRodSensorInfo::createSensor(tgSenseable* pSenseable)
+std::vector<tgSensor*> tgRodSensorInfo::createSensorsIfAppropriate(tgSenseable* pSenseable)
 {
   //CHECK: the caller SHOULD HAVE made sure that pSenseable
   // was a tgRod pointer. If not, complain!!
   if (!isThisMySenseable(pSenseable)) {
     throw std::invalid_argument("pSenseable is NOT a tgRod, inside tgRodSensorInfo.");
   }
+  // Create the list we'll return
+  std::vector<tgSensor*> newSensors;
   // Then, if the program hasn't quit, make the sensor.
   // Note that we cast the pointer here, knowing that it will succeed.
-  return new tgRodSensor( tgCast::cast<tgSenseable, tgRod>(pSenseable) );
+  newSensors.push_back( new tgRodSensor( tgCast::cast<tgSenseable, tgRod>(pSenseable) ));
+  return newSensors;
 }

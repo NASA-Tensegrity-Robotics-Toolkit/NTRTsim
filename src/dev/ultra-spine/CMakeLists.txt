@@ -4,4 +4,5 @@ subdirs(
     VerticalSpine
     VerticalSpine_CableCollision
     HorizontalSpine
+    SpineKinematicsTest
 ) 

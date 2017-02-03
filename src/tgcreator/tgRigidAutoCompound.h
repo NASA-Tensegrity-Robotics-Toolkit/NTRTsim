@@ -19,17 +19,20 @@
 /**
  * @file tgRigidAutoCompound.h
  * @brief Definition of class tgRigidAutoCompound
- * @author Ryan Adams
- * @date March 2014
+ * @author Ryan Adams and Drew Sabelhaus
+ * @date January 2017, March 2014
  * $Id$
  */
 
 #ifndef TG_RIGID_AUTO_COMPOUND_H
 #define TG_RIGID_AUTO_COMPOUND_H
 
+// From the C++ standard library
 #include <vector>
 #include <deque>
+#include <iostream> //for strings
 
+// Forward declarations for Bullet Physics
 class tgRigidInfo;
 class btCollisionObject;
 class btRigidBody;
@@ -68,12 +71,26 @@ protected:
     // Find all rigids that should be in a group with the given rigid
     // @todo: This may contain an off-by-one error (the last rigid may not be grouped properly...)
     std::deque<tgRigidInfo*> findGroup(tgRigidInfo* rigid, std::deque<tgRigidInfo*>& ungrouped);
-        
+
+    /**
+     * Creates tgCompoundRigidInfos for compounded bodies.
+     * Also, adds tags to each of the consitutent tgRigidInfos 
+     * that designate what compound each of the models will belong to.
+     * These tags are in the form "compound_h8A0k2", where the second part
+     * is a random 6-digit alphanumeric hash via random_tag_hash().
+     */
     void createCompounds();
     
     tgRigidInfo* createCompound(std::deque<tgRigidInfo*> rigids);
     
     bool rigidBelongsIn(tgRigidInfo* rigid, std::deque<tgRigidInfo*> group);
+
+    /**
+     * For adding tags to compounded rigid bodies.
+     * This function generates a 6-digit alphanumeric hash.
+     * @return a 6-character string of random alphanumberic characters.
+     */
+    std::string random_tag_hash();
     
     // Doesn't look like we own these
     std::deque<tgRigidInfo*> m_rigids;
