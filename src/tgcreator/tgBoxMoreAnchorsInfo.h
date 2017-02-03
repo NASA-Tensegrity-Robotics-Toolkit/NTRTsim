@@ -48,7 +48,7 @@ class btVector3;
  * point. It also has length, width and density.
  * This 'info' class will also detect and add nodes that are along the outside
  * edge of the box (as of 2016-08-31, actually adds nodes on or INSIDE the box,
- * which is not the behavior we want, but is good enough for the ForcePlateModel.)
+ * which is not the behavior we want, but is good enough for the ForcePlateModel
  *
  * NOTE THAT THIS CLASS DOES NOT WORK WELL AT THE MOMENT. 
  *     A discussion on the limitations of NTRT's creation of boxes

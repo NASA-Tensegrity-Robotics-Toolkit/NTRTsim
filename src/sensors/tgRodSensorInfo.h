@@ -73,8 +73,14 @@ class tgRodSensorInfo : public tgSensorInfo
    * See tgSensorInfo for more... info.
    * @param[in] pSenseable pointer to a senseable object. Sensor will be created
    * for this pSenseable.
+   * @return a list of pointers to tgRodSensors. Note that this should ALWAYS
+   * have size 1.
+   * Don't create sensors for elements that just have rods as descendants, only create
+   * sensors for an actual tgRod. (This eliminates redundant sensor creation.)
+   * @throws invalid_argument if pSenseable is not a tgRod. This enforces the caller to
+   * check isThisMySenseable before creating sensors. Play nice!
    */
-  virtual tgSensor* createSensor(tgSenseable* pSenseable);
+  virtual std::vector<tgSensor*> createSensorsIfAppropriate(tgSenseable* pSenseable);
 
 };
 

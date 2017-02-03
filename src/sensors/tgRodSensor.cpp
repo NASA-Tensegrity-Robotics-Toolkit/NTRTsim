@@ -111,7 +111,7 @@ std::vector<std::string> tgRodSensor::getSensorDataHeadings() {
   headings.push_back( prefix + m_tags + ").Euler3" );
   headings.push_back( prefix + m_tags + ").mass" );
 
-  // Return the string version of this string stream.
+  // Return the resulting vector.
   return headings;
 }
 

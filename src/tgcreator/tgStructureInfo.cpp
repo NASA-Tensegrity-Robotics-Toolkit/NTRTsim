@@ -204,23 +204,8 @@ tgConnectorInfo* tgStructureInfo::initConnectorInfo(const T& connectorCandidate,
 
 void tgStructureInfo::autoCompoundRigids()
 {
-  //DEBUGGING
-  /*
-    std::cout << "tgStructureInfo autoCompoundRigids getAllRigids: " << std::endl;
-    std::vector<tgRigidInfo*> allRigids = getAllRigids();
-    for(int i = 0; i < allRigids.size(); i++) {
-        std::cout << *(allRigids[i]) << std::endl;
-    }
-  */
   tgRigidAutoCompound c(getAllRigids());
   m_compounded = c.execute();
-  //DEBUGGING
-  /*
-    std::cout << "tgStructureInfo autoCompoundRigids m_compounded: " << std::endl;
-    for(int i = 0; i < m_compounded.size(); i++) {
-        std::cout << *(m_compounded[i]) << std::endl;
-  }
-  */
 }
 
 void tgStructureInfo::chooseConnectorRigids()

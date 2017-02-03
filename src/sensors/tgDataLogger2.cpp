@@ -43,15 +43,20 @@
  * appending to the same one.)
  * Call the constructor of the parent class anyway, though it does nothing.
  */
-tgDataLogger2::tgDataLogger2(std::string fileNamePrefix) :
+tgDataLogger2::tgDataLogger2(std::string fileNamePrefix, double timeInterval) :
   tgDataManager(),
-  m_fileNamePrefix(fileNamePrefix)
+  m_fileNamePrefix(fileNamePrefix),
+  m_timeInterval(timeInterval)
 {
   // A quick check on the passed-in string: it must not be the empty
   // string. Must be a correct linux path.
   // TO-DO: a better check on this.
   if (m_fileNamePrefix == "") {
     throw std::invalid_argument("File name cannot be the empty string. Please pass in a path to a file that can be opened.");
+  }
+  // Check: a negative time interval doesn't make sense.
+  if (m_timeInterval < 0.0 ) {
+    throw std::invalid_argument("Time interval must be nonnegative. Negative time intervals do not make sense.");
   }
 
   // Additionally: we want to be able to expand the "~" string in fileNamePrefix
@@ -160,6 +165,10 @@ void tgDataLogger2::setup()
 
   // Done! Close the output for now, will be re-opened during step.
   tgOutput.close();
+
+  // Initialize/reset the values of the time variables.
+  m_totalTime = 0.0;
+  m_updateTime = 0.0;
   
   // Postcondition
   assert(invariant());
@@ -192,25 +201,32 @@ void tgDataLogger2::step(double dt)
   }
   else
   {
-    // Open the log file for writing, appending and not overwriting.
-    tgOutput.open(m_fileName.c_str(), std::ios::app);
     // For the timestamp: first, add dt to the total time
     m_totalTime += dt;
-    // Then output the time.
-    tgOutput << m_totalTime << ",";
-    // Collect the data and output it to the file!
-    for (size_t i=0; i < m_sensors.size(); i++) {
-      // Get the vector of sensor data from this sensor
-      std::vector<std::string> sensordata = m_sensors[i]->getSensorData();
-      // Iterate and output each data sample
-      for (std::size_t j=0; j < sensordata.size(); j++) {
-	// Include a comma, since this is a comma-separated-value log file.
-	tgOutput << sensordata[j] << ",";
+    // also, add to the current time between sensor readings.
+    m_updateTime += dt;
+    // Then, if enough time has elapsed between the previous sensor reading,
+    if (m_updateTime >= m_timeInterval) {
+      // Open the log file for writing, appending and not overwriting.
+      tgOutput.open(m_fileName.c_str(), std::ios::app);
+      // Then output the time.
+      tgOutput << m_totalTime << ",";
+      // Collect the data and output it to the file!
+      for (size_t i=0; i < m_sensors.size(); i++) {
+	// Get the vector of sensor data from this sensor
+	std::vector<std::string> sensordata = m_sensors[i]->getSensorData();
+	// Iterate and output each data sample
+	for (std::size_t j=0; j < sensordata.size(); j++) {
+	  // Include a comma, since this is a comma-separated-value log file.
+	  tgOutput << sensordata[j] << ",";
+	}
       }
+      tgOutput << std::endl;
+      // Close the output, to be re-opened next step.
+      tgOutput.close();
+      // Now that the sensors have been read, reset the counter.
+      m_updateTime = 0.0;
     }
-    tgOutput << std::endl;
-    // Close the output, to be re-opened next step.
-    tgOutput.close();
   }
 
   // Postcondition
