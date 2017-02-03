@@ -1,28 +1,4 @@
 nodes:
- # center: [0, 10, 0]
- # front: [10, 20, 10]
- # right: [10, 0, -10]
- # back: [-10, 20, -10]
- # left: [-10, 0,10]
-
- # center: [0, 10, 0]
- # front: [10, 10, 20]
- # right: [10, -10, 0]
- # back: [-10, -10, 20] 
- # left: [-10, -10, 0]
-
- # center: [0, 10, 0]
- # front: [20, 10, 10]      
- # right: [0, 10, -10]
- # back: [20, -10, -10] 
- # left: [0, -10, 10]
-
-# Below was used for the Top-right test in NTRTsim for ICRA2017 paper
-#  center: [0, 10, 0]
-#  front: [20, 10, 10]
-#  right: [-10, 20, 0]
-#  back: [10, 10, -20] 
-#  left: [-10, -10, 0]
 
 # Below is a symmetric version of this tetrahedron:
   center: [0, 10, 0]
@@ -30,13 +6,6 @@ nodes:
   right: [-10, 20, 0]
   back: [10, 10, -10] 
   left: [-10, 0, 0]
-
-# Below is a symmetric version of the tetrahedron, but a bit larger:
-#  center: [0, 10, 0]
-#  front: [10, 10, 15]
-#  right: [-10, 25, 0]
-#  back: [10, 10, -15] 
-#  left: [-10, -5, 0]
 
 pair_groups:
   rod:

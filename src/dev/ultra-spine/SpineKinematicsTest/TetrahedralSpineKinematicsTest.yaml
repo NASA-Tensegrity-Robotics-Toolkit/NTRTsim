@@ -72,7 +72,7 @@ builders:
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 70000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   HF:
@@ -82,7 +82,7 @@ builders:
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 70000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   HB:
@@ -92,7 +92,7 @@ builders:
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 70000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   HL:
@@ -102,7 +102,7 @@ builders:
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 70000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   SFR:
@@ -112,7 +112,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 200.0
       target_velocity: 12.0
   SRL:
     class: tgBasicActuatorInfo
@@ -121,7 +121,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   SBF:
@@ -131,7 +131,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 200.0
       target_velocity: 12.0
 
   SBL:
@@ -141,5 +141,5 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 200.0
       target_velocity: 12.0

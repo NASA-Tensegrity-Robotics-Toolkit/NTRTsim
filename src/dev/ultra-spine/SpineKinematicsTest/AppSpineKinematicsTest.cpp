@@ -131,12 +131,12 @@ int main(int argc, char** argv)
     // Create sensor infos for all the types of sensors that the data logger
     // will create.
     //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
-    //tgSpringCableActuatorSensorInfo* mySCASensorInfo =
-    //  new tgSpringCableActuatorSensorInfo();
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo =
+      new tgSpringCableActuatorSensorInfo();
     tgCompoundRigidSensorInfo* myCRSensorInfo = new tgCompoundRigidSensorInfo();
     // Attach the sensor infos to the data logger
     //myDataLogger->addSensorInfo(myRodSensorInfo);
-    //myDataLogger->addSensorInfo(mySCASensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
     myDataLogger->addSensorInfo(myCRSensorInfo);
     // Next, attach it to the simulation
     simulation.addDataManager(myDataLogger);
