@@ -87,7 +87,7 @@ Note, however, that if you write the log files somewhere outside the NTRT github
 (It is a *good idea* to not sync your logs, since it will take up space on other people's computers.)
 
 The structure of a tgDataLogger2 data file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 The tgDataLogger2 log file names are ended with a timestamp.
 This timestamp is when you ran your application.
@@ -151,12 +151,48 @@ The tgSpringCableActuatorSensor class outputs the following sensor data:
 3. The tension in the cable. This is like F in F = -k*(x - x0).      
 
 Using tgDataLogger2 with YAML models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Copy yamlbuilder/BuildTensegrityModel.cpp to a new folder, and add the code from the section above.
-Here's a sample App file from (INSERT HORIZONTAL SPINE EXAMPLE)
+For an example of how this is done, refer to the AppSpineKinematicsTest application, under src/dev/ultra-spine/SpineKinematicsTest/AppSpineKinematicsTest.cpp.
+This file is a copy of BuildTensegrityModel that contains a controller and a tgDataLogger2.
 
 Note that since tgBasicActuator is a tgSpringCableActuator, the tgSpringCableActuatorSensor and its Info class will work fine with the tgBasicActuators created by the YAML builder.
+
+Using tgCompoundRigidSensor
+-----------------------------------------
+
+Also new in the tgDataLogger2 infrastructure is a sensor that logs information about compound rigid bodies.
+Called tgCompoundRigidSensor, it detects tgModels that have been compounded together, using a specific tag that's appended to each model in a compound (see src/tgcreator/tgRigidAutoCompound for more information about this tag hash).
+This sensor outputs the position and orientation of a compound rigid body.
+
+The position of a compound is defined as the average of the centers of mass of each of its constituent models.
+Note that this is NOT necessarily the center of mass of the compound itself: for example, if the compound structure contains models of different sizes, the average of the centers-of-mass will not take the different masses into account.
+See issue #202 for more information. https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/202
+
+As of 2017-02-03, the orientation of a compound rigid body is not implemented yet. Currently, an empty string is placed in each of the 'orientation' columns. See issue #203 for more information. https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/203
+
+The output of a tgCompoundRigidSensor looks like: ::
+
+  0_compound(compound_4cBWDx).X,0_compound(compound_4cBWDx).Y,0_compound(compound_4cBWDx).Z,0_compound(compound_4cBWDx).Euler1,0_compound(compound_4cBWDx).Euler2,0_compound(compound_4cBWDx).Euler3,0_compound(compound_4cBWDx).mass,
+  -35.9804,15,2.13853e-16,,,,0.195487,
+
+The 'mass' parameter is a sum of all the masses of the models in the compound rigid body.
+  
+Like the rods and cables, the word "compound" is pre-pended to each column.
+Currently, the only tag that's written between the parentheses in the heading is the tag that identifies all the models in the rigid compound.
+This is always the word "compound" with an underscore, then a 6-digit alphanumeric hash that's randomly created for each compound.
+This hash will (should!) change with each run of the simulator, so your log files will have different headings each time you run it.
+This is necessary for consistency between simulations of the same type of compound (e.g. a spine vertebra with a specific size) in possibly multiple positions in the same App, or in similar uses between different Apps.
+
+Note also that these compounds are not ordered in any manner.
+It will be up to you to figure out which compound corresponds with which of your physical objects in the simulation.
+For example, the AppSpineKinematicsTest application logs vertebrae in some weird order, like 2-1-3-4-6-5.
+We suggest you look at the compound's position at t=0 and compare that to what you program in your YAML file or model .cpp file.
+
+A suggested fix, if someone wants to implement it, would be to have the sensor output the union of all tags of its constituent models.
+See issue #204. https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/204
+
 
 Advanced Uses of tgDataManager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
