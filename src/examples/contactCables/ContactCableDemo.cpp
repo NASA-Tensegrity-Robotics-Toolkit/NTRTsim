@@ -58,26 +58,22 @@ void ContactCableDemo::setup(tgWorld& world)
 	
 	tgStructure s;
 	
-	s.addNode(-2, 2, 0);
-	s.addNode(0, 2, 0);
-	s.addNode(0, 2, 0);
-	s.addNode(0, 4, 0);
-	s.addNode(0, 12, 0);
-	s.addNode(0, 14, 0);
+	s.addNode(0, 2, 0); // 0
+	s.addNode(0, 4, 0); // 1
+	s.addNode(0, 12, 0); // 2
+	s.addNode(0, 14, 0); // 3
 	
 	
-	// Free rod to which we will apply motion
-	s.addNode(-1, 6, 5);
-	s.addNode(1, 6, 5);
+	// Static rod that the others will run into
+	s.addNode(-1, 8, 5); // 4
+	s.addNode(1, 8, 5); // 5
 
-	//s.addPair(0, 1, "rod");
+	s.addPair(0, 1, "rod");
 	s.addPair(2, 3, "box");
-	s.addPair(4, 5, "box");
 	
-	s.addPair(6, 7, "rod");
+	s.addPair(4, 5, "rod");
 
-	//s.addPair(1, 2, "muscle");
-	s.addPair(3, 4, "muscle");
+	s.addPair(1, 2, "muscle");
 	s.move(btVector3(0, 0, 0));
 
 
@@ -109,7 +105,7 @@ void ContactCableDemo::setup(tgWorld& world)
 	btRigidBody* body2 = allRods[1]->getPRigidBody();
 	
 	// Apply initial impulse
-	btVector3 impulse(0.5, 0.0, 0.5);
+	btVector3 impulse(0.4, 0.0, 0.4);
 	body->applyCentralImpulse(impulse);
 	body2->applyCentralImpulse(impulse);
 	
