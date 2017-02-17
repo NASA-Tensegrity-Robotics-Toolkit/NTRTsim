@@ -1,28 +1,28 @@
-nodes:
-  n0: [-1.85, 0, -.43]
-  n1: [-0.76, -3.69, 0.65]
-  n2: [-1.85, 0, -1.96]
-  n3: [1.85, -1.08, -3.04]
-  n4: [-0.76, 0, -3.04]
-  n5: [-1.85, -3.69, -1.96]
-  n6: [0.76, 0, -3.04]
-  n7: [1.85, -1.08, 0.65] 
-  n8: [1.85, 0, -1.96]
-  n9: [0.76, -3.69, -3.04]
-  n10: [1.85, 0, -.43]
-  n11: [-1.85, -1.08, 0.65]
-  n12: [0.76, 0, 0.65]
-  n13: [1.85, -3.69, -.43] 
-  n14: [-.76, 0, 0.65]
-  n15: [-1.85, -1.08, -3.04]
-  n16: [-1.85, -3.69, -0.43]
-  n17: [1.85, -2.61, 0.65] 
-  n18: [-0.76, -3.69, -3.04]
-  n19: [-1.85, -2.61, 0.65]
-  n20: [1.85, -3.69, -1.96]
-  n21: [-1.85, -2.61, -3.04]
-  n22: [0.76, -3.69, 0.65] 
-  n23: [1.85, -2.61, -3.04]
+nodes: #nodal coordinates for rods of length 4.5 dm
+  n0: [-2.121,2.121,1.061]
+  n1: [-1.061,-2.121,2.121]
+  n2: [-2.121,2.121,-1.061]
+  n3: [2.121,1.061,-2.121]
+  n4: [-1.061,2.121,-2.121]
+  n5: [-2.121,-2.121,-1.061]
+  n6: [1.061,2.121,-2.121]
+  n7: [2.121,1.061,2.121]
+  n8: [2.121,2.121,-1.061]
+  n9: [1.061,-2.121,-2.121]
+  n10: [2.121,2.121,1.061]
+  n11: [-2.121,1.061,2.121]
+  n12: [1.061,2.121,2.121]
+  n13: [2.121,-2.121,1.061]
+  n14: [-1.061,2.121,2.121]
+  n15: [-2.121,1.061,-2.121]
+  n16: [-2.121,-2.121,1.061]
+  n17: [2.121,-1.061,2.121]
+  n18: [-1.061,-2.121,-2.121]
+  n19: [-2.121,-1.061,2.121]
+  n20: [2.121,-2.121,-1.061]
+  n21: [-2.121,-1.061,-2.121]
+  n22: [1.061,-2.121,2.121]
+  n23: [2.121,-1.061,2.121]
 
 pair_groups:
   rod:
@@ -83,18 +83,18 @@ builders:
   rod:
     class: tgRodInfo
     parameters: 
-      density: 0.688
-      radius: 0.21
-      friction: 0.99
-      roll_friction: 0.01
-      restitution: 0.0
+      density: 2.7 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
+      radius: 0.095 #dm #outer radius is 9.5 mm
+      friction: 0.7 #estimated value
+      roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
+      restitution: 0.0 #does this have to be zero?
 
   cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 800.0
-      damping: 60.0
-      pretension: 400.0
-      history: 0
-      max_tension: 3000
-      target_velocity: 10
+      stiffness: 1560.0 #kg/s^2 (N/m) #value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      damping: 200.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      history: 0 #what is this?
+      max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
+      target_velocity: 10 #dm/s #what is this?
