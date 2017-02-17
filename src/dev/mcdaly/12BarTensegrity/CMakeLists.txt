@@ -1,23 +1,25 @@
-sublink_directories(${LIB_DIR})
+#sublink_directories(${LIB_DIR})
 
-link_libraries(core
-               tgcreator
-               controllers
-               util
-               sensors
-               terrain
-               tgOpenGLSupport
-               yaml-cpp
-	       Adapters
-	       TensegrityModel)
+link_directories(${LIB_DIR})
+
+message(STATUS "LIB_DIR: " ${LIB_DIR})
+
+link_libraries(tgcreator
+                util
+                sensors
+                core    
+                terrain 
+                tgOpenGLSupport
+    yaml-cpp
+    TensegrityModel)
 
 # add_library(TensegrityModel
-#     TensegrityModel.cpp)
+#    TensegrityModel.cpp)
 
 add_executable(App12Bar
 #    TensegrityModel.cpp
-    App12Bar.cpp
-    RPLengthController.h
-    RPLengthController_rand.cpp)
+    App12Bar.cpp)
+#    RPLengthController.h
+#    RPLengthController_rand.cpp)
 
 

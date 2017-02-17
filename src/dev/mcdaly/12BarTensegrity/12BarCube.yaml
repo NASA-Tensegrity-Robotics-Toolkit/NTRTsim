@@ -22,7 +22,7 @@ nodes: #nodal coordinates for rods of length 4.5 dm
   n20: [2.121,-2.121,-1.061]
   n21: [-2.121,-1.061,-2.121]
   n22: [1.061,-2.121,2.121]
-  n23: [2.121,-1.061,2.121]
+  n23: [2.121,-1.061,-2.121]
 
 pair_groups:
   rod:
@@ -72,8 +72,6 @@ pair_groups:
     - [n18, n21]
     - [n21, n5]
     - [n21, n15]
-    
-  cablesToMove:
     - [n18, n9]
     - [n9, n20]
     - [n20, n13]
@@ -84,7 +82,7 @@ builders:
     class: tgRodInfo
     parameters: 
       density: 2.7 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
-      radius: 0.095 #dm #outer radius is 9.5 mm
+      radius: 0.0475 #dm #outer diameter is 9.5 mm
       friction: 0.7 #estimated value
       roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
       restitution: 0.0 #does this have to be zero?
@@ -92,9 +90,9 @@ builders:
   cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1560.0 #kg/s^2 (N/m) #value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      damping: 200.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      stiffness: 1000.0 #1560.0 #kg/s^2 (N/m) #value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      damping: 20.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 300.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       history: 0 #what is this?
       max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
-      target_velocity: 10 #dm/s #what is this?
+      target_velocity: 0 #dm/s #what is this?

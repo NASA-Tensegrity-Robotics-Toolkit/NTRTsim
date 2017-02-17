@@ -25,8 +25,8 @@
  */
 
 // This application
-#include "../../../yamlbuilder/TensegrityModel.h"
-#include "RPLengthController.h"
+#include "yamlbuilder/TensegrityModel.h"
+//#include "LengthControllerYAML.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -37,6 +37,8 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
+#include <string>
+#include <vector>
 
 /**
  * The entry point.
@@ -47,6 +49,13 @@
  */
 int main(int argc, char** argv)
 {
+    // For this YAML parser app, need to check that an argument path was
+    // passed in.
+    if (argv[1] == NULL)
+    {
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+    }
+
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -55,11 +64,11 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(98.1); // gravity, dm/sec^2
+    const tgWorld::Config config(98.1); // gravity, dm/s^2
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.001; // seconds
+    const double timestep_physics = 0.0001; // seconds // can try 0.0001
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -67,10 +76,10 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    TensegrityModel* const myModel = new TensegrityModel(argv[1],false); // second argument not necessary
 
-    RPLengthController* const tension_sensor = new RPLengthController();
-    myModel -> attach(tension_sensor);
+    // RPLengthController* const tension_sensor = new RPLengthController();
+    // myModel -> attach(tension_sensor);
 
     // Add the model to the world
     simulation.addModel(myModel);
