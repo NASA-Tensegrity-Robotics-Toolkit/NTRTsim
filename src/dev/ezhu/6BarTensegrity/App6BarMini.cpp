@@ -17,8 +17,8 @@
 */
 
 /**
- * @file App6Bar.cpp
- * @brief Contains the definition function main() for App6Bar
+ * @file App6BarMini.cpp
+ * @brief Contains the definition function main() for App6BarMini
  * which builds a 6 bar tensegrity structure defined in YAML or through tgCreator
  * @author Edward Zhu
  * $Id$
@@ -44,7 +44,7 @@
 #include <string>
 #include <math.h>
 // Controller
-#include "controllers/T6RollingController.h"
+#include "controllers/T6MiniRollingController.h"
 
 #define PI 3.14159
 
@@ -148,12 +148,12 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, -50));
+    const T6MiniRollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, -50));
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
-    T6RollingController* const rollingController = new T6RollingController(controllerConfig);
+    T6MiniRollingController* const rollingController = new T6MiniRollingController(controllerConfig);
     
     // Attach controller to the model
     myModel->attach(rollingController);
