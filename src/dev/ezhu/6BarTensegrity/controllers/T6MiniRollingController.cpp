@@ -92,7 +92,7 @@ T6MiniRollingController::~T6MiniRollingController()
 	m_controllers.clear();
 }
 
-void T6MiniRollingController::onSetup(sixBarModel& subject)
+void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 {
 	std::cout << "onSetup: " << c_mode << " mode chosen" << std::endl;
 	if (c_mode.compare("face") == 0) {
@@ -327,7 +327,7 @@ void T6MiniRollingController::onSetup(sixBarModel& subject)
 	}
 }
 
-void T6MiniRollingController::onStep(sixBarModel& subject, double dt)
+void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 {
 	if (dt <= 0.0) {
 		throw std::invalid_argument("onStep: dt is not positive");
@@ -339,15 +339,35 @@ void T6MiniRollingController::onStep(sixBarModel& subject, double dt)
 
 	if (robotReady && worldTime > 5) {
 		if (moveComplete && isOnGround) {
-			bool validInput = true;
 			std::cout << "Robot ready, waiting for user input..." << std::endl;
 			std::cin >> actuatorNum;
-			std::cout << "Actuator " << actuatorNum << " selected, moving..." << std::endl;
-			if (actuatorNum < 0 || actuatorNum > 5) {
-				std::cout << "Invalid actuator selection, please input a number 0 - 5" << std::endl;
-				validInput = false;
+			std::cout << "Actuator " << actuatorNum << " selected" << std::endl;
+			if (actuatorNum < 1 || actuatorNum > 6) {
+				std::cout << "Invalid actuator selection, please input a number 1 - 6" << std::endl;
+				moveComplete = true;
 			}
-			if (validInput) {
+			else {
+				// Mapping between the 6 mini actuators and the cables in the 6 bar numbering scheme
+				switch (actuatorNum) {
+					case 1:
+					actuatorNum = 16;
+					break;
+					case 2:
+					actuatorNum = 12; //12
+					break;
+					case 3:
+					actuatorNum = 14; //14
+					break;
+					case 4:
+					actuatorNum = 21;
+					break;
+					case 5:
+					actuatorNum = 4; //4
+					break;
+					case 6:
+					actuatorNum = 6; //6
+					break;
+				}
 				moveComplete = false;
 			}
 		}

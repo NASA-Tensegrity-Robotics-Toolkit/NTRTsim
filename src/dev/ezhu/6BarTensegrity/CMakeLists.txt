@@ -21,17 +21,16 @@ link_libraries(core
 
 add_executable(App6Bar
 #    TensegrityModel.cpp
-#    controllers/tensionSensor.cpp
     controllers/T6RollingController.cpp
-    sixBarModel.cpp
+    models/sixBarModel.cpp
     App6Bar.cpp)
 
 #add_executable(AppUphillRolling
 #    controllers/T6RollingControllerPrism.cpp
-#    PrismModel_mini.cpp
+#    models/PrismModel_mini.cpp
 #    AppPrismModel.cpp)
 
 add_executable(App6Mini
     controllers/T6MiniRollingController.cpp
-    sixBarModel.cpp
+    models/sixBarMiniModel.cpp
     App6BarMini.cpp)

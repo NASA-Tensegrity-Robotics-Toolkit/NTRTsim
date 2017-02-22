@@ -25,7 +25,7 @@
  */
 
 // This application
-#include "PrismModel.h"
+#include "models/PrismModel.h"
 //#include "RPThruster.h"
 #include "controllers/T6RollingControllerPrism.h"
 // This library

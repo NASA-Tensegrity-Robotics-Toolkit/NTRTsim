@@ -33,7 +33,7 @@
 #include "controllers/tgBasicController.h"
 
 // The Model
-#include "../sixBarModel.h"
+#include "../models/sixBarModel.h"
 
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"

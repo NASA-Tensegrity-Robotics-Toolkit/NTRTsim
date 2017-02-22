@@ -28,7 +28,7 @@
 // For yaml model builder
 //#include "../../../yamlbuilder/TensegrityModel.h"
 // For tgCreator
-#include "sixBarModel.h"
+#include "models/sixBarMiniModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgImportGround.h"
@@ -46,7 +46,7 @@
 // Controller
 #include "controllers/T6MiniRollingController.h"
 
-#define PI 3.14159
+// #define PI 3.14159
 
 /**
  * The entry point.
@@ -59,8 +59,8 @@ int main(int argc, char** argv)
 {
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
-    const double pitch =0.0*PI/180;
-    const double roll = 0.0;
+    const double pitch =-25.0*M_PI/180;
+    const double roll = 0.0*M_PI/180;
 
     double sf = 10;
 
@@ -117,7 +117,8 @@ int main(int argc, char** argv)
 
     // Box ground
     // ---------------------------------------------------------------------------------
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    double frictionCoeff = 1;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll), frictionCoeff);
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     // ---------------------------------------------------------------------------------
 
@@ -139,7 +140,7 @@ int main(int argc, char** argv)
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
     // Use tgCreator
-    sixBarModel* const myModel = new sixBarModel();
+    sixBarMiniModel* const myModel = new sixBarMiniModel();
 
     // Define path for controller
     int *pathPtr;

@@ -17,19 +17,19 @@
 */
 
 /**
- * @file sixBarModel.cpp
- * @brief Contains the definition of the members of the class sixBarModel.
+ * @file sixBarMiniModel.cpp
+ * @brief Contains the definition of the members of the class sixBarMiniModel.
  * $Id$
  */
 
 // This Module
-#include "sixBarModel.h"
+#include "sixBarMiniModel.h"
 // C++ Standard Libraries
 #include <math.h>
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // Utility Library
-#include "utility.hpp"
+#include "../utility.hpp"
 
 namespace 
 {
@@ -91,30 +91,30 @@ namespace
    		};
 }
 
-sixBarModel::sixBarModel() : tgModel() 
+sixBarMiniModel::sixBarMiniModel() : tgModel() 
 {
 
 }
 
-sixBarModel::~sixBarModel()
+sixBarMiniModel::~sixBarMiniModel()
 {
 }
 
-void sixBarModel::addSixBar(tgStructure& s)
+void sixBarMiniModel::addSixBar(tgStructure& s)
 {
 	addSixBarNodes(s);
 	addSixBarRods(s);
 	addSixBarActuators(s);
 }
 
-void sixBarModel::addPayload(tgStructure& s)
+void sixBarMiniModel::addPayload(tgStructure& s)
 {
 	addPayloadNodes(s);
 	addPayloadRods(s);
 	addPayloadStrings(s);
 }
 
-void sixBarModel::setup(tgWorld& world)
+void sixBarMiniModel::setup(tgWorld& world)
 {
 	// Calculate the space between two parallel rods based on the rod length from Config
 	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
@@ -240,8 +240,9 @@ void sixBarModel::setup(tgWorld& world)
 	addPayload(s);
 
 	// Move the structure
-	rotateToFace(s, 2);
-	s.move(btVector3(50, 10, -50)); 
+	rotateToFace(s, 0);
+	rotateYaw(s, -45*M_PI/180);
+	s.move(btVector3(0, 10, 0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));
@@ -260,19 +261,19 @@ void sixBarModel::setup(tgWorld& world)
 	structureInfo.buildInto(*this, world);
 
 	// Get the rod rigid bodies for controller
-	std::vector<tgRod*> rods = sixBarModel::find<tgRod>("rod");
+	std::vector<tgRod*> rods = sixBarMiniModel::find<tgRod>("rod");
 	for (int i = 0; i < rods.size(); i++) {
-		allRods.push_back(sixBarModel::find<tgRod>(tgString("rod num", i))[0]);
+		allRods.push_back(sixBarMiniModel::find<tgRod>(tgString("rod num", i))[0]);
 	}
 
 	// Get the actuators for controller
-	std::vector<tgBasicActuator*> actuators = sixBarModel::find<tgBasicActuator>("actuator");
+	std::vector<tgBasicActuator*> actuators = sixBarMiniModel::find<tgBasicActuator>("actuator");
 	for (int i = 0; i < actuators.size(); i++) {
-		allActuators.push_back(sixBarModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
+		allActuators.push_back(sixBarMiniModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
 	}
 	
 	// Get the payload for controller
-	payload = sixBarModel::find<tgRod>("payload");
+	payload = sixBarMiniModel::find<tgRod>("payload");
 
 	// Notify controllers that setup has finished
 	notifySetup();
@@ -281,7 +282,7 @@ void sixBarModel::setup(tgWorld& world)
 	tgModel::setup(world);
 }
 
-void sixBarModel::step(double dt)
+void sixBarMiniModel::step(double dt)
 {
 	if (dt <= 0.0) {
 		throw std::invalid_argument("dt is not positive");
@@ -292,38 +293,38 @@ void sixBarModel::step(double dt)
 	}
 }
 
-void sixBarModel::onVisit(tgModelVisitor& r)
+void sixBarMiniModel::onVisit(tgModelVisitor& r)
 {
 	tgModel::onVisit(r);
 }
 
-const std::vector<tgBasicActuator*>& sixBarModel::getAllActuators() const
+const std::vector<tgBasicActuator*>& sixBarMiniModel::getAllActuators() const
 {
 	return allActuators;
 }
 
-const std::vector<tgRod*>& sixBarModel::getAllRods() const 
+const std::vector<tgRod*>& sixBarMiniModel::getAllRods() const 
 {
 	return allRods;
 }
 
-const std::vector<tgRod*>& sixBarModel::getPayload() const 
+const std::vector<tgRod*>& sixBarMiniModel::getPayload() const 
 {
 	return payload;
 }
 
-const std::vector<btVector3>& sixBarModel::getNormVects() const 
+const std::vector<btVector3>& sixBarMiniModel::getNormVects() const 
 {
 	return normalVectors;
 }
 
-void sixBarModel::teardown()
+void sixBarMiniModel::teardown()
 {
 	notifyTeardown();
 	tgModel::teardown();
 }
 
-void sixBarModel::addSixBarNodes(tgStructure& s)
+void sixBarMiniModel::addSixBarNodes(tgStructure& s)
 {
 	/* Starting configuration where the rods are parallel to the principle directions
 	 * and the origin is at the center of the tensegrity
@@ -368,7 +369,7 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 
 }
 
-void sixBarModel::addSixBarRods(tgStructure& s)
+void sixBarMiniModel::addSixBarRods(tgStructure& s)
 {
 	// s.addPair(0, 12,  tgString("rod num", 0));
 	// s.addPair(12, 13, tgString("motor num", 0));
@@ -402,7 +403,7 @@ void sixBarModel::addSixBarRods(tgStructure& s)
 	s.addPair(9, 10, tgString("rod num", 5)); // 5
 }
 
-void sixBarModel::addSixBarActuators(tgStructure& s)
+void sixBarMiniModel::addSixBarActuators(tgStructure& s)
 {
 	s.addPair(0, 4,  tgString("actuator num", 0)); // 0
 	s.addPair(0, 5,  tgString("actuator num", 1)); // 1
@@ -435,23 +436,30 @@ void sixBarModel::addSixBarActuators(tgStructure& s)
 
 	s.addPair(7, 8,  tgString("actuator num", 22)); // 22
 	s.addPair(7, 11, tgString("actuator num", 23)); // 23
+
+	// s.addPair(4, 8, tgString("actuator num", 0)); // 0
+	// s.addPair(8, 1, tgString("actuator num", 1)); // 1
+	// s.addPair(1, 6, tgString("actuator num", 2)); // 2
+	// s.addPair(6, 10, tgString("actuator num", 3)); // 3
+	// s.addPair(10, 3, tgString("actuator num", 4)); // 4
+	// s.addPair(3, 4, tgString("actuator num", 5)); // 5
 }
 
-void sixBarModel::addPayloadNodes(tgStructure& s)
+void sixBarMiniModel::addPayloadNodes(tgStructure& s)
 {
 	double payloadLength = 3;
 	s.addNode(0, payloadLength/2, 0); // 12 or 24
 	s.addNode(0, -payloadLength/2, 0); //13 0r 25
 }
 
-void sixBarModel::addPayloadRods(tgStructure& s)
+void sixBarMiniModel::addPayloadRods(tgStructure& s)
 {
 	// s.addPair(24, 25, tgString("payload num", 0));
 
 	s.addPair(12, 13, tgString("payload num", 0));
 }
 
-void sixBarModel::addPayloadStrings(tgStructure& s)
+void sixBarMiniModel::addPayloadStrings(tgStructure& s)
 {
 	// s.addPair(0, 24,  tgString("cable num", 0));
 	// s.addPair(4, 24,  tgString("cable num", 1));
@@ -470,7 +478,7 @@ void sixBarModel::addPayloadStrings(tgStructure& s)
 	s.addPair(2, 13,  tgString("cable num", 5));
 }
 
-void sixBarModel::rotateToFace(tgStructure& s, int face)
+void sixBarMiniModel::rotateToFace(tgStructure& s, int face)
 {
 	btVector3 faceNorm = normalVectors[face];
 	btVector3 goalDir = btVector3(0, -1, 0);
@@ -479,4 +487,9 @@ void sixBarModel::rotateToFace(tgStructure& s, int face)
 	btVector3 crossProd = faceNorm.cross(goalDir);
 
 	s.addRotation(btVector3(0,0,0), crossProd, theta);
+}
+
+void sixBarMiniModel::rotateYaw(tgStructure& s, double psi)
+{
+	s.addRotation(btVector3(0,0,0), btVector3(0,1,0), psi);
 }

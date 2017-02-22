@@ -16,8 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef T6_ROLLING_CONTROLLER_H
-#define T6_ROLLING_CONTROLLER_H
+#ifndef T6_MINI_ROLLING_CONTROLLER_H
+#define T6_MINI_ROLLING_CONTROLLER_H
 
 /**
  * @file T6MiniRollingController.h
@@ -33,7 +33,7 @@
 #include "controllers/tgBasicController.h"
 
 // The Model
-#include "../sixBarModel.h"
+#include "../models/sixBarMiniModel.h"
 
 // The Bullet Physics Library
 #include "LinearMath/btVector3.h"
@@ -45,14 +45,14 @@
 #include <ostream>
 
 // Forward declarations
-class sixBarModel;
+class sixBarMiniModel;
 
 /**
  * A controller which allows for rolling to a goal triangle or rolling with
  * dead reckoning
  */
 
-class T6MiniRollingController : public tgObserver<sixBarModel>
+class T6MiniRollingController : public tgObserver<sixBarMiniModel>
 {
 public:
 	/**
@@ -98,14 +98,14 @@ public:
 	 * all icosahedron faces as well as the adjacency matrix.
 	 * @param[in] subject - the model that the controller attaches to
 	 */
-	virtual void onSetup(sixBarModel& subject);
+	virtual void onSetup(sixBarMiniModel& subject);
 
 	/**
 	 * Run the controller.
 	 * @param[in] subject - the model that the controller attaches to
 	 * @param[in] dt - the physics time step from the app file
 	 */
-	virtual void onStep(sixBarModel& subject, double dt);
+	virtual void onStep(sixBarMiniModel& subject, double dt);
 
 	/**
 	 * Calculate the gravity vector in the robot frame

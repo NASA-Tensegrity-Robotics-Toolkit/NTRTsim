@@ -28,7 +28,7 @@
 // For yaml model builder
 //#include "../../../yamlbuilder/TensegrityModel.h"
 // For tgCreator
-#include "sixBarModel.h"
+#include "models/sixBarModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgImportGround.h"
