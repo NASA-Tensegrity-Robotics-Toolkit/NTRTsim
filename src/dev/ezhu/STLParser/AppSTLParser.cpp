@@ -50,13 +50,13 @@ int main(int argc, char* argv[]) {
 		//string  out_path = "/home/edward/NTRTsim/src/dev/ezhu/STLParser/";
 		
 		// Check for valid file extension
-		if (filename_in.find(".stl") == string::npos) {
-			cout << "Incorrect filetype, application for ASCII STL files only" << endl;
-			exit(EXIT_FAILURE);
-		}
-		else {
-			cout << "File to parse: " << filename_in << endl;
-		}
+		// if ((filename_in.find(".stl") == string::npos) || (filename_in.find(".STL") == string::npos)){
+		// 	cout << "Incorrect filetype, application for ASCII STL files only" << endl;
+		// 	exit(EXIT_FAILURE);
+		// }
+		// else {
+		// 	cout << "File to parse: " << filename_in << endl;
+		// }
 		
 		// Create filestream objects
 		fstream file_in;
@@ -139,6 +139,9 @@ int main(int argc, char* argv[]) {
 							//cout << element << endl;
 						}
 						size_t found_E = element.find_first_of("E");
+						if (found_E == string::npos) {
+							found_E = element.find_first_of("e");
+						}
 						string coeff = element.substr(0, found_E);
 						string exp = element.substr(found_E + 1, element.size() - found_E);
 						//cout << coeff << " " << exp << endl;

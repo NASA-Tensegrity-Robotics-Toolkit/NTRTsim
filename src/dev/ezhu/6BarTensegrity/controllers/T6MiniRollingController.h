@@ -299,13 +299,17 @@ private:
 
 	// Actuation policy table
 	std::vector< std::vector<int> > actuationPolicy;
+	std::vector<int> sequence;
+	int sequenceIdx = 0;
 
 	// Hold current surface from contact surface detection
 	int currSurface = -1;
 	int goalSurface = -1;
 
-	int actuatorNum;
+	int actuatorNum = 1;
 	std::vector<bool> actuatorStatus;
+	double timer = 0;
+	int cableNum;
 
 	// Initialize flags
 	bool moveComplete = true;

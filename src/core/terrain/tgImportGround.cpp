@@ -49,7 +49,8 @@ tgImportGround::Config::Config(btVector3 eulerAngles,
         double offset,
         double scalingFactor,
         int interp,
-        bool twoLayer) :
+        bool twoLayer,
+        bool flipZY) :
     m_eulerAngles(eulerAngles),
     m_friction(friction),
     m_restitution(restitution),
@@ -59,7 +60,8 @@ tgImportGround::Config::Config(btVector3 eulerAngles,
     m_offset(offset),
     m_scalingFactor(scalingFactor),
     m_interpolation(interp),
-    m_twoLayer(twoLayer)
+    m_twoLayer(twoLayer),
+    m_flipZY(flipZY)
 {
     assert((m_friction >= 0.0) && (m_friction <= 1.0));
     assert((m_restitution >= 0.0) && (m_restitution <= 1.0));
@@ -73,13 +75,13 @@ tgImportGround::tgImportGround(std::fstream& file) :
     m_config(Config())
 {
     // @todo make constructor aux to avoid repeated code
-    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation, m_config.m_twoLayer);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation, m_config.m_twoLayer, m_config.m_flipZY);
 }
 
 tgImportGround::tgImportGround(const tgImportGround::Config& config, std::fstream& file) :
     m_config(config)
 {
-    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation, m_config.m_twoLayer);
+    pGroundShape = importCollisionShape_alt(file, m_config.m_scalingFactor, m_config.m_interpolation, m_config.m_twoLayer, m_config.m_flipZY);
 }
 
 tgImportGround::~tgImportGround()
@@ -158,11 +160,11 @@ btCollisionShape* tgImportGround::importCollisionShape() {
 }
 */
 
-btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer) {
+btCollisionShape* tgImportGround::importCollisionShape_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer, bool flipZY) {
     btCollisionShape * pShape = 0;
 
     // Create the mesh object
-    m_pMesh = createMesh_alt(file, scalingFactor, interp, twoLayer);
+    m_pMesh = createMesh_alt(file, scalingFactor, interp, twoLayer, flipZY);
 
     // Create the shape object
     pShape = createShape_alt(m_pMesh);
@@ -190,7 +192,7 @@ btTriangleIndexVertexArray *tgImportGround::createMesh(std::size_t triangleCount
 }
 */
 
-btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer) {
+btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer, bool flipZY) {
     // Lines are input in the following format: [x1,y1,z1] [x2,y2,z2] [x3,y3,z3]
 
     btVector3 v0, v1, v2;
@@ -233,10 +235,12 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
             z = atof(z_str.c_str()) * scalingFactor;
 
             // Swap y and z values to match NTRT coordinate convention (y is height)
-            double temp = y;
-            y = z;
-            z = -temp;
-
+            if (flipZY) {
+                double temp = y;
+                y = z;
+                z = -temp;
+            }
+            
             if (abs(x) > abs(max_X)) max_X = x;
             if (abs(y) > abs(max_Y)) max_Y = y;
             if (abs(z) > abs(max_Z)) max_Z = z;

@@ -241,8 +241,8 @@ void sixBarMiniModel::setup(tgWorld& world)
 
 	// Move the structure
 	rotateToFace(s, 0);
-	rotateYaw(s, -45*M_PI/180);
-	s.move(btVector3(0, 10, 0)); 
+	rotateYaw(s, 60*M_PI/180);
+	s.move(btVector3(10, 20, 50)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));

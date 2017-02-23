@@ -67,7 +67,8 @@ class tgImportGround : public tgBulletGround
                        double offset = 0.5,
                        double scalingFactor = 10,
                        int interp = 0,
-                       bool twoLayer = false);
+                       bool twoLayer = false,
+                       bool flipZY = true);
 
                 /** Euler angles are specified as yaw pitch and roll */
                 btVector3 m_eulerAngles;
@@ -110,6 +111,8 @@ class tgImportGround : public tgBulletGround
 
                 /** Boolean for turning on the double layered terrain to help with clipping */
                 bool m_twoLayer;
+
+                bool m_flipZY;
         };
 
         /**
@@ -141,7 +144,7 @@ class tgImportGround : public tgBulletGround
         /**
          * Returns the collision shape that forms the imported ground from filestream
          */
-        btCollisionShape* importCollisionShape_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer);
+        btCollisionShape* importCollisionShape_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer, bool flipZY);
 
     private:  
         /** Store the configuration data for use later */
@@ -157,7 +160,7 @@ class tgImportGround : public tgBulletGround
          *  Post-condition: Returns a mesh, as configured by the information read from the filestream
                             To be used as a template for a btBvhTriangleMeshShape
          */
-        btTriangleMesh* createMesh_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer);
+        btTriangleMesh* createMesh_alt(std::fstream& file, double scalingFactor, int interp, bool twoLayer, bool flipZY);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
          *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
