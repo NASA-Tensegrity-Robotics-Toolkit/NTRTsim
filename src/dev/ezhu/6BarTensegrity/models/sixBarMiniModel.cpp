@@ -64,7 +64,7 @@ namespace
 	        1615.0*2,   // stiffness (kg / sec^2) was 1500
 	        200.0,    // damping (kg / sec)
 	        1.684*sf,     // rodLength (length)
-	        0.99,      // friction (unitless)
+	        1.25,      // friction (unitless)
 	        0.01,     // rollFriction (unitless)
 	        0.0,      // restitution (?)
 	        300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller

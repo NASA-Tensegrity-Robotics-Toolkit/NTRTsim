@@ -313,10 +313,10 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 
 	sequence = boost::assign::list_of(2)(1)(3)(2)(4)(3)(5)(4)(6)(5)(1)(6);
 
-	doLog = false;
+	doLog = true;
 
 	if (doLog) {
-		std::string filename = "13InclineRollingDataStiff.txt";
+		std::string filename = "22InclineRollingData_2cable_UPFRICTION.txt";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -324,7 +324,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+			data_out << "SimTime, ActuatedCable, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
 		}
 	}
 }
@@ -403,7 +403,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 		btVector3 payload_vel = payloadBody->getLinearVelocity();
 	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
 	    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
-	    data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	    data_out << worldTime << ", " <<cableNum << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
 	}
 }
 
