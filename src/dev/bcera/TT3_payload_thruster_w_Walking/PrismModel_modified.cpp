@@ -330,7 +330,7 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
   //rotateToFace(s, 15);
-  s.move(btVector3(100, 700, -100));
+  //s.move(btVector3(100, 700, -100));
   //s.move(btVector3(100, 1800, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model

@@ -59,11 +59,11 @@ int main(int argc, char** argv)
   const double roll = 0.0;
 
   
-  //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+  const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
-  //tgBoxGround* ground = new tgBoxGround(groundConfig);
+  tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-  
+  /*
   // Import Ground
   // Set ground parameters
   btVector3 orientation = btVector3(yaw, pitch, roll);
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     std::cout << "Input file opened successfully" << std::endl;
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
-  
+  */
 
   double gravity = 1.618*sf;
   const tgWorld::Config config(gravity); // gravity, cm/sec^2
