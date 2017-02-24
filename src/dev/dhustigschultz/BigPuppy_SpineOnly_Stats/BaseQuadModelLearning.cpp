@@ -69,6 +69,7 @@ void BaseQuadModelLearning::teardown()
     m_allMuscles.clear();
     m_allSegments.clear();
     m_muscleMap.clear();
+    segmentMasses.clear();
 }
 
 void BaseQuadModelLearning::step(double dt)
@@ -135,15 +136,19 @@ std::vector<double> BaseQuadModelLearning::getCOM(const int n)
     }
     else if (n >= m_subStructures)
     {
-        throw std::range_error(tgString("Segment number > ", m_segments));
+        throw std::range_error(tgString("Segment number > ", m_subStructures));
     }
+
+    //Also clearing here, just in case this function is used multiple times.
+    segmentMasses.clear();
 
     std::vector<double> centerOfMass(3);
     for (size_t i = 0; i < 3; ++i) { centerOfMass[i] = 0; }
     double mass = 0.0;
-    for (std::size_t i = n; i < m_subStructures; i++)
+    for (std::size_t i = 0; i < m_subStructures; i++)
     {  
-        std::vector<double> segmentCOM = getSegmentCOM(i);
+        std::vector<double> segmentCOM = getSegmentCOM(i); 
+        //std::cout << "Size: " << segmentCOM.size() << std::endl;
 	for (std::size_t j = 0; j < 3; j++)
 	{
 	    segmentCOM[j] *= segmentMasses[i];
@@ -154,8 +159,7 @@ std::vector<double> BaseQuadModelLearning::getCOM(const int n)
 	}
 	mass += segmentMasses[i];
     }
-    
-    //assert(n == segmentMasses.size());
+    std::cout << "Total Mass: " << mass << std::endl;
 
     for (std::size_t j = 0; j < 3; j++)
     {
@@ -189,7 +193,7 @@ btVector3 BaseQuadModelLearning::getSegmentCOMVector(const int n)
     }
     else if (n >= m_subStructures)
     {
-        throw std::range_error(tgString("Segment number > ", m_segments));
+        throw std::range_error(tgString("Segment number > ", m_subStructures));
     }
     
     std::vector<tgRod*> p_rods =

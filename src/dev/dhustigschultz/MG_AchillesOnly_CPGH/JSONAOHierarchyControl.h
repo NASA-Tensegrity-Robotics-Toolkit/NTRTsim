@@ -79,17 +79,7 @@ struct Config : public JSONQuadCPGControl::Config
         double pfMin = 0.0,
         double pfMax = 0.0,
 	double maxH = 60.0, //May need to tune this value more
-	double minH = 1.0,   //Perhaps same
-	/*int ohm = 10,
-	int thm = 10,
-  	int olm = 10,
-  	int tlm = 10,
-        int oam = 2,
-        int tam = 2,*/
-        int ohighm = 5,
-        int thighm = 5,
-	double hf2 = 20.0,
-	double ffMax2 = 0.0
+	double minH = 1.0   //Perhaps same
         );
         
         const double freqFeedbackMin;
@@ -107,19 +97,6 @@ struct Config : public JSONQuadCPGControl::Config
         int numStates;
         int numActions;
 
-	// New values of numMuscles, for non-spine segments:
-	/*int ourHipMuscles;
-	int theirHipMuscles;
-  	int ourLegMuscles;
- 	int theirLegMuscles;
-        int ourAchillesMuscles;
-        int theirAchillesMuscles;*/
-        int ourHighMuscles;
-        int theirHighMuscles;
-
-	// These are for the higher level CPGs
-	const double highFreq2;
-        const double freqFeedbackMax2;
     };
 
     JSONAOHierarchyControl(JSONAOHierarchyControl::Config config,	
@@ -140,9 +117,7 @@ protected:
 
     virtual void setupCPGs(BaseQuadModelLearning& subject, array_2D achillesNodeActions, array_4D achillesEdgeActions); 
     
-    virtual array_2D scaleNodeActions (Json::Value actions, double highFreq, double freqFeedbackMax);
-
-    virtual array_4D scaleEdgeActions (Json::Value actions, int segmentSpan, int theirMuscles, int ourMuscles); 
+    virtual array_2D scaleNodeActions (Json::Value actions); 
  
     std::vector<double> getFeedback(BaseQuadModelLearning& subject);
     

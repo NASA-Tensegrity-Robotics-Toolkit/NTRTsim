@@ -84,17 +84,7 @@ JSONAOHierarchyControl::Config::Config(int ss,
                                         double pfMin,
                                         double pfMax,
 					double maxH,
-					double minH,
-					/*int ohm,
-					int thm,
-          				int olm,
-          				int tlm, 
-                                        int oam,
-                                        int tam,*/
-					int ohighm,
-					int thighm,
-					double hf2,
-					double ffMax2) :
+					double minH) :
 JSONQuadCPGControl::Config::Config(ss, tm, om, param, segnum, ct, la, ha,
                                     lp, hp, kt, kp, kv, def, cl, lf, hf),
 freqFeedbackMin(ffMin),
@@ -104,17 +94,7 @@ ampFeedbackMax(afMax),
 phaseFeedbackMin(pfMin),
 phaseFeedbackMax(pfMax),
 maxHeight(maxH),
-minHeight(minH),
-/*ourHipMuscles(ohm),
-theirHipMuscles(thm),
-ourLegMuscles(olm),
-theirLegMuscles(tlm),
-ourAchillesMuscles(oam),
-theirAchillesMuscles(tam),
-ourHighMuscles(ohighm),
-theirHighMuscles(thighm),*/
-highFreq2(hf2),
-freqFeedbackMax2(ffMax2)
+minHeight(minH)
 {
     
 }
@@ -156,32 +136,16 @@ void JSONAOHierarchyControl::onSetup(BaseQuadModelLearning& subject)
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
     // Lower level CPG node and edge params:
-    /*Json::Value spineNodeVals = root.get("spineNodeVals", "UTF-8");
-    Json::Value legNodeVals = root.get("legNodeVals", "UTF-8");
-    Json::Value spineEdgeVals = root.get("spineEdgeVals", "UTF-8");
-    Json::Value hipEdgeVals = root.get("hipEdgeVals", "UTF-8");
-    Json::Value legEdgeVals = root.get("legEdgeVals", "UTF-8");*/
     Json::Value achillesNodeVals = root.get("achillesNodeVals", "UTF-8");
     Json::Value achillesEdgeVals = root.get("achillesEdgeVals", "UTF-8");    
 
     std::cout << achillesNodeVals << std::endl;
     
-    /*spineNodeVals = spineNodeVals.get("params", "UTF-8");
-    legNodeVals = legNodeVals.get("params", "UTF-8");
-    spineEdgeVals = spineEdgeVals.get("params", "UTF-8");
-    hipEdgeVals = hipEdgeVals.get("params", "UTF-8");
-    legEdgeVals = legEdgeVals.get("params", "UTF-8");*/
     achillesNodeVals = achillesNodeVals.get("params", "UTF-8");
     achillesEdgeVals = achillesEdgeVals.get("params", "UTF-8");
     
-    // A painful way of reducing the solution space... had to rewrite scaleEdgeActions() to take in a couple more parameters.
-    //array_4D spineEdgeParams = scaleEdgeActions(spineEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
-    //array_4D hipEdgeParams = scaleEdgeActions(hipEdgeVals,m_config.segmentSpan,m_config.theirHipMuscles,m_config.ourHipMuscles);
-    //array_4D legEdgeParams = scaleEdgeActions(legEdgeVals,m_config.segmentSpan,m_config.theirLegMuscles,m_config.ourLegMuscles);
-    array_4D achillesEdgeParams = scaleEdgeActions(achillesEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
-    //array_2D spineNodeParams = scaleNodeActions(spineNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
-    //array_2D legNodeParams = scaleNodeActions(legNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
-    array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
+    array_4D achillesEdgeParams = scaleEdgeActions(achillesEdgeVals); 
+    array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals); 
 
     // Setup the lower level of CPGs
     setupCPGs(subject, achillesNodeParams, achillesEdgeParams);
@@ -462,7 +426,7 @@ void JSONAOHierarchyControl::onTeardown(BaseQuadModelLearning& subject)
     m_rightRearAchillesControllers.clear();  
 
     // Trying to delete here instead, to fix the leak
-    //delete nn; //Look at neuralNetwork code, to see what the object consists of, to determine HOW to correctly delete this!
+    //delete nn;
 
 }
 
@@ -633,7 +597,7 @@ void JSONAOHierarchyControl::setupCPGs(BaseQuadModelLearning& subject, array_2D 
 
 }
 
-array_2D JSONAOHierarchyControl::scaleNodeActions (Json::Value actions, double highFreq, double freqFeedbackMax)
+array_2D JSONAOHierarchyControl::scaleNodeActions (Json::Value actions)
 {
     std::size_t numControllers = actions.size();
     std::size_t numActions = actions[0].size();
@@ -646,11 +610,11 @@ array_2D JSONAOHierarchyControl::scaleNodeActions (Json::Value actions, double h
     assert(numActions == 5);
     
 	limits[0][0] = m_config.lowFreq;
-	limits[1][0] = highFreq;
+	limits[1][0] = m_config.highFreq;
 	limits[0][1] = m_config.lowAmp;
 	limits[1][1] = m_config.highAmp;
     limits[0][2] = m_config.freqFeedbackMin;
-    limits[1][2] = freqFeedbackMax;
+    limits[1][2] = m_config.freqFeedbackMax;
     limits[0][3] = m_config.ampFeedbackMin;
     limits[1][3] = m_config.ampFeedbackMax;
     limits[0][4] = m_config.phaseFeedbackMin;
@@ -671,85 +635,6 @@ array_2D JSONAOHierarchyControl::scaleNodeActions (Json::Value actions, double h
     }
     
     return nodeActions;
-}
-
-array_4D JSONAOHierarchyControl::scaleEdgeActions  
-                            (Json::Value edgeParam, int segmentSpan, int theirMuscles, int ourMuscles)
-{
-    assert(edgeParam[0].size() == 2);
-    
-    double lowerLimit = m_config.lowPhase;
-    double upperLimit = m_config.highPhase;
-    double range = upperLimit - lowerLimit;
-    
-    array_4D actionList(boost::extents[segmentSpan][theirMuscles][ourMuscles][m_config.params]);
-    
-    /* Horrid while loop to populate upper diagonal of matrix, since
-    * its symmetric and we want to minimze parameters used in learing
-    * note that i==1, j==k will refer to the same muscle
-    * @todo use boost to set up array so storage is only allocated for 
-    * elements that are used
-    */
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    
-    // Quirk of the old learning code. Future examples can move forward
-    Json::Value::iterator edgeIt = edgeParam.end();
-    
-    int count = 0;
-    
-    while (i < segmentSpan)
-    {
-        while(j < theirMuscles)
-        {
-            while(k < ourMuscles)
-            {
-                if (edgeIt == edgeParam.begin())
-                {
-                    std::cout << "ran out before table populated!"
-                    << std::endl;
-                    /// @todo consider adding exception here
-                    break;
-                }
-                else
-                {
-                    if (i == 1 && j == k)
-                    {
-                        // std::cout << "Skipped identical muscle" << std::endl;
-                        //Skip since its the same muscle
-                    }
-                    else
-                    {
-                        edgeIt--;
-                        Json::Value edgeParam = *edgeIt;
-                        assert(edgeParam.size() == 2);
-                        // Weight from 0 to 1
-                        actionList[i][j][k][0] = edgeParam[0].asDouble();
-                        //std::cout << actionList[i][j][k][0] << " ";
-                        // Phase offset from -pi to pi
-                        actionList[i][j][k][1] = edgeParam[1].asDouble() * 
-                                                (range) + lowerLimit;
-                        //std::cout <<  actionList[i][j][k][1] << std::endl;
-                        count++;
-                    }
-                }
-                k++;
-            }
-            j++;
-            k = j;
-            
-        }
-        j = 0;
-        k = 0;
-        i++;
-    }
-    
-    std::cout<< "Params used: " << count << std::endl;
-    
-    assert(edgeParam.begin() == edgeIt);
-    
-    return actionList;
 }
 
 std::vector<double> JSONAOHierarchyControl::getFeedback(BaseQuadModelLearning& subject)

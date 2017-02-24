@@ -70,16 +70,13 @@ bool AppAOHierarchy::setup()
     // Third create the simulation
     simulation = new tgSimulation(*view);
 
-    // Fourth create the models with their controllers and add the models to the
-    // simulation
-    /// @todo add position and angle to configuration
-        //FlemonsSpineModelContact* myModel =
-      //new FlemonsSpineModelContact(nSegments); 
-
     //Parameters for the structure:
     const int segments = 7;
     const int hips = 4;
     const int legs = 4;
+
+    // Fourth create the models with their controllers and add the models to the
+    // simulation
 
     MountainGoatAchilles* myModel = new MountainGoatAchilles(segments, hips, legs);
 
@@ -112,7 +109,7 @@ bool AppAOHierarchy::setup()
             impedenceVals = impedenceVals[0];
 	      }
 
-	      const double impedanceMax = 2000.0;
+	      const double impedanceMax = 5000.0; //Change this to scale the values! maybe do different for each one?
         const int segmentSpan = 3; 
         const int numMuscles = 2; 
         const int numParams = 2;
@@ -145,18 +142,8 @@ bool AppAOHierarchy::setup()
         const double pfMin = -0.5;
         const double pfMax =  6.28;
 
-	const double maxH = 30.0;
+	const double maxH = 60.0;//30.0;
 	const double minH = 7.0;
-
-	const double numHipMuscles = 6; 
-	const double numLegMuscles = 6; 
-        //Including the achilles tendon 
-        const double numAchillesMuscles = 2;
-
-	// For the higher level of CPGs
-	const double numHighCPGs = 5;
-	const double hf2 = 30.0;	 
-	const double ffMax2 = 10.0;
 
         JSONAOHierarchyControl::Config control_config(segmentSpan, 
                                                     numMuscles,
@@ -182,9 +169,7 @@ bool AppAOHierarchy::setup()
                                                     pfMin,
                                                     pfMax,
 						    maxH,
-						    minH,
-						    hf2,
-						    ffMax2);
+						    minH);
         /// @todo fix memory leak that occurs here
        myControl =
         new JSONAOHierarchyControl(control_config, suffix, lowerPath); //JSONAOHierarchyControl * const 

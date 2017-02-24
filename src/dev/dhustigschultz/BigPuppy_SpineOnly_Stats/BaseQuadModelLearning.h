@@ -94,7 +94,7 @@ protected:
 
     std::size_t m_subStructures; 
     
-    const std::size_t m_segments;
+    std::size_t m_segments;
 
     const std::size_t m_hips;
     
