@@ -316,7 +316,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 	doLog = true;
 
 	if (doLog) {
-		std::string filename = "22InclineRollingData_2cable_UPFRICTION.txt";
+		std::string filename = "16InclineRollingData_2cable_UPFRICTION.txt";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
