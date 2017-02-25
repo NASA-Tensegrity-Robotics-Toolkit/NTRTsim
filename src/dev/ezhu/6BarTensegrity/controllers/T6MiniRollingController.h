@@ -66,6 +66,7 @@ public:
 		Config (double gravity, const std::string& mode, int face_goal);
 		Config (double gravity, const std::string& mode, btVector3 dr_goal);
 		Config (double gravity, const std::string& mode, int *path, int pathSize);
+		Config (double gravity, const std::string& mode);
 
 		double m_gravity;
 
@@ -307,12 +308,20 @@ private:
 	int goalSurface = -1;
 
 	int actuatorNum = 1;
+	int actuatorNum1 = 1;
+	int actuatorNum2 = 1;
 	std::vector<bool> actuatorStatus;
 	double timer = 0;
 	int cableNum;
+	int cableNum1;
+	int cableNum2;
+
+	int logCounter = 10;
 
 	// Initialize flags
 	bool moveComplete = true;
+	bool moveComplete1 = true;
+	bool moveComplete2 = true;
 	bool robotReady = false;
 	bool stepFin = true;
 	bool goalReached = false;
@@ -334,6 +343,8 @@ private:
 	int actuatedCable;
 	int currentFace;
 	double percentChange = 0;
+
+	int mode = 1; // 0: nonsequential 1: simultaneous
 };
 
 #endif

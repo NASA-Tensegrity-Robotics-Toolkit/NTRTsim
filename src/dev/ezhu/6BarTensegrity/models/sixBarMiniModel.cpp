@@ -54,40 +54,38 @@ namespace
    		bool hist;
    		double maxTension;
    		double targetVelocity;
-   		double motorLength;
+   		// double motorLength;
    	} config =
    		{
    			
    			// SuperBall parameters
-   			688/pow(sf,3),    // density (kg / length^3)
-	        0.031*sf,     // radius (length)
-	        1615.0*2,   // stiffness (kg / sec^2) was 1500
-	        200.0,    // damping (kg / sec)
-	        1.684*sf,     // rodLength (length)
-	        1.25,      // friction (unitless)
-	        0.01,     // rollFriction (unitless)
-	        0.0,      // restitution (?)
-	        300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
-	        0,         // History logging (boolean)
-	        10000*sf,   // maxTension
-	        0.5*sf,    // targetVelocity
-	        0.3175*sf, // Motor length
+   			// 688/pow(sf,3),    // density (kg / length^3)
+	     //    0.031*sf,     // radius (length)
+	     //    1615.0*2,   // stiffness (kg / sec^2) was 1500
+	     //    200.0,    // damping (kg / sec)
+	     //    1.684*sf,     // rodLength (length)
+	     //    1.25,      // friction (unitless)
+	     //    0.01,     // rollFriction (unitless)
+	     //    0.0,      // restitution (?)
+	     //    300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+	     //    0,         // History logging (boolean)
+	     //    10000*sf,   // maxTension
+	     //    0.5*sf,    // targetVelocity
+	        // 0.3175*sf, // Motor length
 	        
-	        /*
-	        //TT4-Mini parameters
-	        2485/pow(sf,3),
-	        0.0045*sf,
-	        46.173,
-	        200.0,
-	        0.245*sf,
-	        0.99,
-	        0.01,
-	        0.0,
-	        0.7*sf,
-	        0,
-	        10000*sf,
-	        0.3*sf,
-	        */
+	        //TT_MINI Parameters
+			2485/pow(sf,3),    // density (kg / length^3) 
+			0.0045*sf,          // radius (length)
+			300, //300,//47.173,           // stiffness (kg / sec^2) was 1500
+			2,            // damping (kg / sec)
+			0.245*sf,         // rod_length (length) (10 inches for mini)
+			1.5,             // friction (unitless)
+			0.01,             // rollFriction (unitless)
+			0,              // restitution (?)
+			1.65*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
+			0,                // History logging (boolean)
+			100000*sf,         // maxTens (kg-m/s^2)
+			0.1*sf,          // targetVelocity (m/s)
    		};
 }
 
@@ -241,8 +239,10 @@ void sixBarMiniModel::setup(tgWorld& world)
 
 	// Move the structure
 	rotateToFace(s, 0);
-	rotateYaw(s, 60*M_PI/180);
-	s.move(btVector3(10, 20, 50)); 
+	// rotateYaw(s, 60*M_PI/180); // Two cable
+	rotateYaw(s, 45*M_PI/180); // Single cable (and two cable at 26 deg)
+	// s.move(btVector3(17, 13, 50)); 
+	s.move(btVector3(0, 3, 0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));
@@ -447,7 +447,7 @@ void sixBarMiniModel::addSixBarActuators(tgStructure& s)
 
 void sixBarMiniModel::addPayloadNodes(tgStructure& s)
 {
-	double payloadLength = 3;
+	double payloadLength = 0.3;
 	s.addNode(0, payloadLength/2, 0); // 12 or 24
 	s.addNode(0, -payloadLength/2, 0); //13 0r 25
 }

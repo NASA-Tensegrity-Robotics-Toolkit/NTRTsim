@@ -74,6 +74,18 @@ m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize)
 	}
 }
 
+T6MiniRollingController::Config::Config (double gravity, const std::string& mode) :
+m_gravity(gravity), m_mode(mode)
+{
+	assert(m_gravity >= 0);
+	if (mode.compare("mini") != 0) {
+		std::cout << "Config: invalid arguments" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'mini'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Exiting..." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
 T6MiniRollingController::T6MiniRollingController(const T6MiniRollingController::Config& config) : m_config(config)
 {
 	c_mode = config.m_mode;
@@ -116,6 +128,10 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 		}
 		std::cout << *(c_path+c_path_size-1) << "]" << std::endl;
 		controller_mode = 3;
+	}
+	else if (c_mode.compare("mini") == 0) {
+		std::cout << "onSetup: Controlling as mini" << std::endl;
+		controller_mode = 4;
 	}
 	else {
 		std::cout << "onSetup: Controller mode not recognized, exiting..." << std::endl;
@@ -311,12 +327,13 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 	// All cables fully released
 	actuatorStatus = boost::assign::list_of(true)(false)(false)(false)(false)(false);
 
-	sequence = boost::assign::list_of(2)(1)(3)(2)(4)(3)(5)(4)(6)(5)(1)(6);
+	sequence = boost::assign::list_of(2)(1)(3)(2)(4)(3)(5)(4)(6)(5)(1)(6); // Two cable
+	// sequence = boost::assign::list_of(1)(2)(2)(3)(3)(4)(4)(5)(5)(6)(6)(1); // Single cable
 
-	doLog = true;
+	doLog = false;
 
 	if (doLog) {
-		std::string filename = "16InclineRollingData_2cable_UPFRICTION.txt";
+		std::string filename = "0InclineRollingData_2cableSIMUL_UPFRICTION_MINI.txt";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -324,7 +341,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, ActuatedCable, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
 		}
 	}
 }
@@ -338,72 +355,169 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 		worldTime += dt;
 	}
 	isOnGround = checkOnGround();
-
+	
 	if (robotReady && worldTime > 3) {
-		if (moveComplete && isOnGround) {
-			std::cout << "Robot ready, waiting for user input..." << std::endl;
-			actuatorNum = sequence[sequenceIdx];
-			// std::cin >> actuatorNum;
-			std::cout << "Actuator " << actuatorNum << " selected" << std::endl;
-			// if (actuatorNum < 1 || actuatorNum > 6) {
-			// 	std::cout << "Invalid actuator selection, please input a number 1 - 6" << std::endl;
-				// moveComplete = true;
-				// timer = 0;
-			// }
-			// else {
-				// Mapping between the 6 mini actuators and the cables in the 6 bar numbering scheme
-				switch (actuatorNum) {
-					case 1:
-					cableNum = 16;
-					break;
-					case 2:
-					cableNum = 12; //12
-					break;
-					case 3:
-					cableNum = 14; //14
-					break;
-					case 4:
-					cableNum = 21;
-					break;
-					case 5:
-					cableNum = 4; //4
-					break;
-					case 6:
-					cableNum = 6; //6
-					break;
+		if (mode == 0) {
+			if (moveComplete && isOnGround) {
+				std::cout << "Robot ready, waiting for user input..." << std::endl;
+				actuatorNum = sequence[sequenceIdx];
+				// std::cin >> actuatorNum;
+				std::cout << "Actuator " << actuatorNum << " selected" << std::endl;
+				// if (actuatorNum < 1 || actuatorNum > 6) {
+				// 	std::cout << "Invalid actuator selection, please input a number 1 - 6" << std::endl;
+					// moveComplete = true;
+					// timer = 0;
+				// }
+				// else {
+					// Mapping between the 6 mini actuators and the cables in the 6 bar numbering scheme
+					switch (actuatorNum) {
+						case 1:
+						cableNum = 16;
+						break;
+						case 2:
+						cableNum = 12; //12
+						break;
+						case 3:
+						cableNum = 14; //14
+						break;
+						case 4:
+						cableNum = 21;
+						break;
+						case 5:
+						cableNum = 4; //4
+						break;
+						case 6:
+						cableNum = 6; //6
+						break;
+					}
+					moveComplete = false;
+				// }
+			}
+			else if (!moveComplete) {
+				// Fully contract if cable was released
+				if (actuatorStatus[actuatorNum-1] == false) {
+					// std::cout << "Contracting..." << std::endl;
+					moveComplete = setSingleActuator(m_controllers[cableNum], actuators[cableNum], 0.001, dt);
+
 				}
-				moveComplete = false;
-			// }
+				// Fully release if cable was contracted
+				else if (actuatorStatus[actuatorNum-1] == true) {
+					// std::cout << "Realeasing..." << std::endl;
+					moveComplete = setSingleActuator(m_controllers[cableNum], actuators[cableNum], restLength, dt);
+				}
+				moveComplete = moveComplete && (timer >= 2);
+				if (moveComplete) {
+					actuatorStatus[actuatorNum-1] = !actuatorStatus[actuatorNum-1];
+					timer = 0;
+					sequenceIdx = (sequenceIdx+1)%12;
+				}
+			}
 		}
-		else if (!moveComplete) {
-			// Fully contract if cable was released
-			if (actuatorStatus[actuatorNum-1] == false) {
-				// std::cout << "Contracting..." << std::endl;
-				moveComplete = setSingleActuator(m_controllers[cableNum], actuators[cableNum], 0.1, dt);
+		else {
+			if (moveComplete1 && moveComplete2 && isOnGround) {
+				std::cout << "Robot ready, waiting for user input..." << std::endl;
+				actuatorNum1 = sequence[sequenceIdx];
+				actuatorNum2 = sequence[sequenceIdx+1];
+				// std::cin >> actuatorNum;
+				std::cout << "Actuators " << actuatorNum1 << ", " << actuatorNum2 << " selected" << std::endl;
+				// if (actuatorNum < 1 || actuatorNum > 6) {
+				// 	std::cout << "Invalid actuator selection, please input a number 1 - 6" << std::endl;
+					// moveComplete = true;
+					// timer = 0;
+				// }
+				// else {
+					// Mapping between the 6 mini actuators and the cables in the 6 bar numbering scheme
+					switch (actuatorNum1) {
+						case 1:
+						cableNum1 = 16;
+						break;
+						case 2:
+						cableNum1 = 12; //12
+						break;
+						case 3:
+						cableNum1 = 14; //14
+						break;
+						case 4:
+						cableNum1 = 21;
+						break;
+						case 5:
+						cableNum1 = 4; //4
+						break;
+						case 6:
+						cableNum1 = 6; //6
+						break;
+					}
+					switch (actuatorNum2) {
+						case 1:
+						cableNum2 = 16;
+						break;
+						case 2:
+						cableNum2 = 12; //12
+						break;
+						case 3:
+						cableNum2 = 14; //14
+						break;
+						case 4:
+						cableNum2 = 21;
+						break;
+						case 5:
+						cableNum2 = 4; //4
+						break;
+						case 6:
+						cableNum2 = 6; //6
+						break;
+					}
+					moveComplete1 = false;
+					moveComplete2 = false;
+				// }
 			}
-			// Fully release if cable was contracted
-			else if (actuatorStatus[actuatorNum-1] == true) {
-				// std::cout << "Realeasing..." << std::endl;
-				moveComplete = setSingleActuator(m_controllers[cableNum], actuators[cableNum], restLength, dt);
+			else if (!moveComplete1 || !moveComplete2) {
+				// Fully contract if cable was released
+				if (actuatorStatus[actuatorNum1-1] == false) {
+					// std::cout << "Contracting..." << std::endl;
+					moveComplete1 = setSingleActuator(m_controllers[cableNum1], actuators[cableNum1], 0.001, dt);
+
+				}
+				// Fully release if cable was contracted
+				else if (actuatorStatus[actuatorNum1-1] == true) {
+					// std::cout << "Realeasing..." << std::endl;
+					moveComplete1 = setSingleActuator(m_controllers[cableNum1], actuators[cableNum1], restLength, dt);
+				}
+				if (actuatorStatus[actuatorNum2-1] == false) {
+					// std::cout << "Contracting..." << std::endl;
+					moveComplete2 = setSingleActuator(m_controllers[cableNum2], actuators[cableNum2], 0.001, dt);
+
+				}
+				// Fully release if cable was contracted
+				else if (actuatorStatus[actuatorNum2-1] == true) {
+					// std::cout << "Realeasing..." << std::endl;
+					moveComplete2 = setSingleActuator(m_controllers[cableNum2], actuators[cableNum2], restLength, dt);
+				}
+				moveComplete = moveComplete1 && moveComplete2 && (timer >= 2);
+				if (moveComplete) {
+					actuatorStatus[actuatorNum1-1] = !actuatorStatus[actuatorNum1-1];
+					actuatorStatus[actuatorNum2-1] = !actuatorStatus[actuatorNum2-1];
+					timer = 0;
+					sequenceIdx = (sequenceIdx+2)%12;
+				}
 			}
-			moveComplete = moveComplete && (timer >= 3);
-			if (moveComplete) {
-				actuatorStatus[actuatorNum-1] = !actuatorStatus[actuatorNum-1];
-				timer = 0;
-				sequenceIdx = (sequenceIdx+1)%12;
-			}
-			timer += dt;
 		}
+		timer += dt;
 	}
-	else robotReady = setSingleActuator(m_controllers[16], actuators[16], 0.1, dt);
+	else robotReady = setSingleActuator(m_controllers[16], actuators[16], 0.001, dt);
 
 	// std::cout << robotReady << "|" << isOnGround << "|" << moveComplete << std::endl;
 
-	if (doLog) {
+	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();
 	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
-	    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
-	    data_out << worldTime << ", " <<cableNum << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	    percentChange = (actuators[cableNum]->getCurrentLength()-startLength)/startLength;
+	    currSurface = contactSurfaceDetection();
+	    data_out << worldTime << ", " << cableNum << ", " << currSurface << "," << percentChange << "," << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+		logCounter = 0;
+	}
+	if (doLog) {
+		logCounter++;
 	}
 }
 
@@ -757,11 +871,12 @@ bool T6MiniRollingController::setSingleActuator(tgBasicController* controller, t
 	bool actuationComplete = false;
 	controller->control(dt, setLength);
 	actuator->moveMotors(dt);
-	if (actuator->getRestLength()-setLength < 0.01) {
+	// std::cout << actuator->getRestLength() << std::endl;
+	if (actuator->getRestLength()-setLength < 0.0001 && actuator->getRestLength()-setLength > -0.0001) {
 		actuationComplete = true;
 	}
-	if (actuator->getRestLength()-setLength > -0.01) {
-		actuationComplete = true;
-	}
+	// if (actuator->getRestLength()-setLength > -0.00001) {
+	// 	actuationComplete = true;
+	// }
 	return actuationComplete;
 }

@@ -62,8 +62,8 @@ public:
         bool h = false,
         double mf = 1000.0,
         double tVel = 100.0,
-        double mnAL = 0.1,
-        double mnRL = 0.1,
+        double mnAL = 0.001, //0.1,
+        double mnRL = 0.001, //0.1,
         double rot = 0);
       
       /**

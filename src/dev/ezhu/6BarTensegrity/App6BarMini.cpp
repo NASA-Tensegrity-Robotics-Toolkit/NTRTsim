@@ -73,54 +73,54 @@ int main(int argc, char** argv)
     // Import Ground
     // ---------------------------------------------------------------------------------
     // Set ground parameters
-    btVector3 orientation = btVector3(yaw, pitch, roll);
-    const double friction = 1;
-    const double restitution = 0.0;
-    btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    const double margin = 0.05;
-    const double offset = 0.5;
-    const double scalingFactor = 10;
-    // const double scalingFactor = sf*1000;
-    const int interp = 0;
-    const bool twoLayer = false;
-    const bool flipXZ = false;
+    // btVector3 orientation = btVector3(yaw, pitch, roll);
+    // const double friction = 1;
+    // const double restitution = 0.0;
+    // btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    // const double margin = 0.05;
+    // const double offset = 0.5;
+    // const double scalingFactor = 10;
+    // // const double scalingFactor = sf*1000;
+    // const int interp = 0;
+    // const bool twoLayer = false;
+    // const bool flipXZ = false;
 
-    // Configure ground characteristics
-    const tgImportGround::Config groundConfig(orientation, friction, restitution,
-        origin, margin, offset, scalingFactor, interp, twoLayer, flipXZ);
+    // // Configure ground characteristics
+    // const tgImportGround::Config groundConfig(orientation, friction, restitution,
+    //     origin, margin, offset, scalingFactor, interp, twoLayer, flipXZ);
 
-    // Get filename from argv
-    std::string filename_in = argv[1];
-    // std::string filename_in = "../STLParser/rampstls/10degRamp.txt";
+    // // Get filename from argv
+    // std::string filename_in = argv[1];
+    // // std::string filename_in = "../STLParser/rampstls/10degRamp.txt";
 
-    // Check filename
-    if (filename_in.find(".txt") == std::string::npos) {
-        std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    // // Check filename
+    // if (filename_in.find(".txt") == std::string::npos) {
+    //     std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
 
-    //Create filestream 
-    std::fstream file_in; 
+    // //Create filestream 
+    // std::fstream file_in; 
 
-    // Open filestream
-    file_in.open(filename_in.c_str(), std::fstream::in);
+    // // Open filestream
+    // file_in.open(filename_in.c_str(), std::fstream::in);
 
-    // Check if input file opened successfully
-    if (!file_in.is_open()) {
-        std::cout << "Failed to open input file" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    else {
-        std::cout << "Input file opened successfully" << std::endl;
-    }
-    tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+    // // Check if input file opened successfully
+    // if (!file_in.is_open()) {
+    //     std::cout << "Failed to open input file" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
+    // else {
+    //     std::cout << "Input file opened successfully" << std::endl;
+    // }
+    // tgImportGround* ground = new tgImportGround(groundConfig, file_in);
     // ---------------------------------------------------------------------------------
 
     // Box ground
     // ---------------------------------------------------------------------------------
-    // double frictionCoeff = 1;
-    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll), frictionCoeff);
-    // tgBoxGround* ground = new tgBoxGround(groundConfig);
+    double frictionCoeff = 1;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll), frictionCoeff);
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
     // ---------------------------------------------------------------------------------
 
     
@@ -150,8 +150,9 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6MiniRollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, -50));
-    // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
+    const T6MiniRollingController::Config controllerConfig(gravity, "mini");
+    // const T6MiniRollingController::Config controllerConfig(gravity, "dr", btVector3(50, 0, 0));
+    // const T6MiniRollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
