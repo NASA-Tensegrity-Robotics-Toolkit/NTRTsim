@@ -109,14 +109,21 @@ void RotatingVertebraController::onSetup(TensegrityModel& subject)
   hingedRodA = allRods[0];
   hingedRodB = allRods[1];
 
+  std::cout << "Size of allRods: "
+	    << allRods.size() << std::endl;
+
   // Next, create the rotating ("hinge") joint.
   btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
   btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
   // Create the hinge constraint
   // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+  // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
+  //    between two vertebrae should be.
+  // For the rotating joint, need to compensate for the vertical translation,
+  // which could be like +30 to rod 2.
   btHingeConstraint* rotHinge =
-    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-10, 0, 0),
-			  btVector3(0, 0, 0), btVector3(1, 0, 0),
+    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 0, 0),
+			  btVector3(0, 30, 0), btVector3(1, 0, 0),
 			  btVector3(1, 0, 0), false);
   // Add to the world.
   m_world->addConstraint( rotHinge );
@@ -152,11 +159,11 @@ void RotatingVertebraController::onStep(TensegrityModel& subject, double dt)
     }
     // Finally, apply the torque.
     // Note that we apply equal and opposite torques to the two rods.
-    std::cout << "Applying torque: " << worldAlignedTorque << std::endl;
+    //std::cout << "Applying torque: " << worldAlignedTorque << std::endl;
     //std::cout << "Applying torque: " << torqueToApply << std::endl;
     //std::cout << "World alignment is: " << worldAlignmentBasis << std::endl;
-    hingedRodA->getPRigidBody()->applyTorqueImpulse( worldAlignedTorque );
-    hingedRodB->getPRigidBody()->applyTorqueImpulse( -worldAlignedTorque );
+    //hingedRodA->getPRigidBody()->applyTorqueImpulse( worldAlignedTorque );
+    //hingedRodB->getPRigidBody()->applyTorqueImpulse( -worldAlignedTorque );
     //hingedRod->getPRigidBody()->applyTorqueImpulse( torqueToApply );
   }
 }

@@ -36,9 +36,9 @@ builders:
     class: tgBasicActuatorInfo
     #class: tgBasicContactCableInfo
     parameters:
-      stiffness: 100.0
-      damping: 10.0
-      pretension: 2.0
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
       history: 0
       max_tension: 70000.0
       target_velocity: 12.0

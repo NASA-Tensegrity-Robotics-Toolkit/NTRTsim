@@ -1,0 +1,29 @@
+nodes:
+
+# Below is the first half of the "V" for the rotating vertebra.,
+# with the "V" opening up towards the rear of the robot.
+# With rod as the axis for a hinged joint:
+  center: [0, 10, 0]
+  front: [10, 10, 10]
+  back: [10, 10, -10] 
+  rodHingeEnd: [3, 10, 0]
+
+pair_groups:
+  rodBack:
+    - [center, front]
+    - [center, back]
+  rodForHinge:
+    - [center, rodHingeEnd]
+
+# Density used to be 0.014
+builders:
+  rodBack:
+    class: tgRodInfo
+    parameters:
+      density: 0.014 # was 0.014
+      radius: 0.5
+  rodForHinge:
+    class: tgRodInfo
+    parameters:
+      density: 0.0 # was 0.014
+      radius: 4

@@ -1,0 +1,30 @@
+nodes:
+
+# Below is a symmetric version of this tetrahedron,
+# with an extra small node for a "rod" that will serve
+# as the axis for a hinged joint:
+  center: [0, 10, 0]
+  right: [-10, 20, 0] 
+  left: [-10, 0, 0]
+  rodHingeEnd: [-3, 10, 0]
+
+
+pair_groups:
+  rodFront:
+    - [center, right]
+    - [center, left]
+  rodForHinge:
+    - [center, rodHingeEnd]
+
+# Density used to be 0.014
+builders:
+  rodFront:
+    class: tgRodInfo
+    parameters:
+      density: 0.0 # was 0.014
+      radius: 0.5
+  rodForHinge:
+    class: tgRodInfo
+    parameters:
+      density: 0.0 # was 0.014
+      radius: 4
