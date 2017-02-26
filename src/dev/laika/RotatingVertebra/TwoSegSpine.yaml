@@ -1,0 +1,46 @@
+# The TwoSegSpine is a spine with two vertebrae.
+
+# Two Tetrahedron structures.
+substructures:
+  t1/t2:
+    path: ./TetrahedronHinged.yaml
+    offset: [-25, 0, 0] # was -12
+    translation: [0, 20, 0]
+    #translation: [0, 30.5, 30]
+
+# There are 8 cables between two vertebrae in order:
+#bond_groups:
+  #spine_actuator: 
+   #t1/t2/node_node:
+      ## the four horizontal cables
+      #- [front, front]
+      #- [right, right]
+      #- [back, back]
+      #- [left, left]
+      ## the four saddle cables
+      #- [right, back]
+      #- [right, front]
+      #- [left, front]
+      #- [left, back]  
+
+# Only one builder (for the actuators.)
+# The substructure creates the rods.
+#  rod:
+#    class: tgRodInfo
+#    parameters:
+#      density: 0.0
+#      radius: 0.5
+builders: 
+
+  spine_actuator:
+    class: tgBasicActuatorInfo
+    #class: tgBasicContactCableInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 0
+      max_tension: 70000.0
+      target_velocity: 12.0
+      moveCablePointBToEdge: false
+      moveCablePointAToEdge: false
