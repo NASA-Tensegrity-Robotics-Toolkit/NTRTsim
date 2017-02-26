@@ -31,10 +31,10 @@ builders:
   rod:
     class: tgRodInfo
     parameters:
-      density: 0.014
+      density: 0.014 # was 0.014
       radius: 0.5
   rodForHinge:
     class: tgRodInfo
     parameters:
-      density: 0.014
+      density: 0.014 # was 0.014
       radius: 0.5

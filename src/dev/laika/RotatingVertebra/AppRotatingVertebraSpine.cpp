@@ -27,6 +27,7 @@
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 #include "HorizontalSpineController.h"
+#include "RotatingVertebraController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -278,12 +279,38 @@ int main(int argc, char** argv)
     // simulation.
     //myModel->attach(controller);
 
+    // Next, we need to get a reference to the Bullet Physics world.
+    // This is for passing in to the RotatingVertebraController, so it can
+    // create the hinge.
+    // TO-DO: does this reference get destroyed and re-created?? this will break...
+    tgWorld simWorld = simulation.getWorld();
+    tgWorldImpl& impl = world.implementation();
+    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+
+    // Create the controller for the rotating vertebra.
+    double startTimeRot = 0.0;
+    btVector3 startTorqueRot = btVector3(0, 0, 0);
+    double phaseTwoTimeRot = 4.0;
+    btVector3 phaseTwoTorqueRot = btVector3(-1, 0, 0);
+    std::string rodHingeTag = "rodForHinge";
+    RotatingVertebraController* rotController =
+      new RotatingVertebraController( startTimeRot, startTorqueRot,
+				      phaseTwoTimeRot, phaseTwoTorqueRot,
+				      rodHingeTag, btWorld);
+
+    // Add the controller to the YAML model.
+    // TO-DO: can we do this after adding the model to the simulation?
+    // Will the controller's onSetup method still be called?
+    myModel->attach( rotController );
+
     // Add the model to the world
     simulation.addModel(myModel);
     
     // Next, add a constraint manually. This will be for the hinged, rotating
     // vertebra. TO-DO: made it a tgModel instead of doing this
     // from the app file? Super hacky...
+    /*
     std::vector<tgModel*> all_children = myModel->getDescendants();
     // Pick out the tgRods that will be used for the hinge.
     // These should be tagged rodForHinge in the YAML file.
@@ -315,8 +342,10 @@ int main(int argc, char** argv)
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
     // Add the hinge constraint to the world.
     btWorld->addConstraint(rotHinge);
-    
 
+    */
+    
+    // Finally, run the simulation.
     simulation.run();
 
     // teardown is handled by delete

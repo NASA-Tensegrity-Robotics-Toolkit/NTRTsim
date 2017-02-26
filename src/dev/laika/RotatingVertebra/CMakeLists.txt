@@ -15,7 +15,7 @@ link_libraries(core
 #     TensegrityModel.cpp)
 
 add_executable(AppRotatingVertebraSpine
-  #Controller.cpp
+  RotatingVertebraController.cpp
   AppRotatingVertebraSpine.cpp
 )
 
