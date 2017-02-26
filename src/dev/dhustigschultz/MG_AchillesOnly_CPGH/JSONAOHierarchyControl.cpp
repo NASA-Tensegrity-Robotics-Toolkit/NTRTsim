@@ -147,6 +147,30 @@ void JSONAOHierarchyControl::onSetup(BaseQuadModelLearning& subject)
     array_4D achillesEdgeParams = scaleEdgeActions(achillesEdgeVals); 
     array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals); 
 
+#if(1) //These were originally parsed after setupCPGs! That was wrong, because P and D need to be initialized before setupCPGs is called.
+    Json::Value PVal = root.get("propVals", "UTF-8");
+    Json::Value DVal = root.get("derVals", "UTF-8");
+    
+    PVal = PVal.get("params", "UTF-8");
+    DVal = DVal.get("params", "UTF-8");
+
+	if (PVal[0].isArray())
+	{
+		PVal = PVal[0];
+	}
+	if (DVal[0].isArray())
+	{
+		DVal = DVal[0];
+	}
+    
+	int j = 0;
+
+	P = 20000.0;//(PVal.get(j, 0.0)).asDouble();
+	D = 5.0;//(DVal.get(j, 0.0)).asDouble();
+
+
+#endif
+
     // Setup the lower level of CPGs
     setupCPGs(subject, achillesNodeParams, achillesEdgeParams);
 
@@ -207,32 +231,6 @@ void JSONAOHierarchyControl::onSetup(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
-
-    
-#if(1)
-    Json::Value PVal = root.get("propVals", "UTF-8");
-    Json::Value DVal = root.get("derVals", "UTF-8");
-
-	cout << PVal << endl;
-    
-	// Keep drilling if necessary
-    PVal = PVal.get("params", "UTF-8");
-    DVal = DVal.get("params", "UTF-8");
-
-	if (PVal[0].isArray())
-	{
-		PVal = PVal[0];
-	}
-	if (DVal[0].isArray())
-	{
-		DVal = DVal[0];
-	}
-    
-	int j = 0;
-	P = (PVal.get(j, 0.0)).asDouble();
-	D = (DVal.get(j, 0.0)).asDouble();
-#endif
-
 }
 
 void JSONAOHierarchyControl::onStep(BaseQuadModelLearning& subject, double dt)
@@ -281,14 +279,15 @@ void JSONAOHierarchyControl::onStep(BaseQuadModelLearning& subject, double dt)
 
     //every 100 steps, get the COM and tensions of active muscles and store them in the JSON file.
     if(1){
-	    static int count = 0;
-	    if(count > 100) {
+	    static int count = 1; //was count = 0
+	    if(count >= 1) { //was count > 100
 
 		//Getting the center of mass of the entire structure:
 		std::vector<double> newConditions = subject.getSegmentCOM(m_config.segmentNumber);
 
 		std::cout  <<newConditions[0] << "," << newConditions[1] << "," << newConditions[2] << ","; 
-	    	std::cout << std::endl;
+
+		std::cout << std::endl;
 
 		count = 0;
 	    }
