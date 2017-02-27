@@ -1,0 +1,101 @@
+AppAOHierarchy
+Box Ground
+{
+	"avgScore" : 341.02350544072175,
+	"maxScore" : 342.91152662445421,
+	"paramID" : "4885",
+	"params" : 
+	[
+		[
+			0.75605028209675751,
+			0.97946184194561325,
+			0.084296083984543066,
+			0.16147816084014904,
+			0.40331732798317677
+		]
+	],
+	"probability" : 0.027887431168108188,
+	"scores" : 
+	[
+		342.91152662445421,
+		342.91152662445421,
+		340.48180199649863,
+		337.78916651747994
+	]
+}
+Params used: 7
+create NN with 2 4 3
+weight set: 0.480833
+weight set: 0.523259
+weight set: 0.39598
+weight set: -0.480833
+weight set: 0.622254
+weight set: -0.19799
+weight set: 0.523259
+weight set: 0.608112
+weight set: 0
+weight set: -0.39598
+weight set: 0.183848
+weight set: -0.311127
+
+Neuron weights loaded successfuly from '/u/dhustigs/NTRTsim/src/../resources/src/dhustigschultz/AppMGAO_GA/logs/bestParameters-test_fb-5172.nnw'
+11 26 0 
+{
+	"avgScore" : 348.53975085758231,
+	"maxScore" : 348.53975085758231,
+	"paramID" : "5192",
+	"params" : 
+	[
+		[
+			119777.68425590222
+		]
+	],
+	"probability" : 0.028158337078902931,
+	"scores" : 
+	[
+		348.53975085758231
+	]
+}
+SimView::run(60000)
+Dist travelled 336.217
+Box Ground
+ed 337.789
+Box Ground
+
+	[
+		[
+			119777.70997729122
+		]
+	],
+	"probability" : 0.028312159483845502,
+	"scores" : 
+	[
+		332.67983017667041,
+		337.79330051141761,
+		344.1305486596172,
+		342.44836921774225,
+		344.63372458658813,
+		324.76899173624685,
+		342.67934725433372
+	]
+}
+SimView::run(60000)
+Dist travelled 341.887
+Box Ground
+6915592,
+		330.70477027557286,
+		326.17949727712335,
+		326.78961942766591,
+		322.08806177132351,
+		326.17663336915592,
+		326.17663336915592,
+		330.70477027557286,
+		336.36868393648041,
+		335.22441362755808,
+		330.70477027557286,
+		328.43075306700217
+	]
+}
+SimView::run(60000)
+Dist travelled 326.79
+Box Ground
