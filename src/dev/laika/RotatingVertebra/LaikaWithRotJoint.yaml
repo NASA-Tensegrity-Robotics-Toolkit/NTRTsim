@@ -18,6 +18,19 @@ substructures:
   rotJoint:
     path: ./TwoSegSpine.yaml
     translation: [ 0, 0, 0]
+  rear:
+    path: ../BaseStructuresLaika/simpleLaikaRear.yaml
+    # Should be placed a bit back from the end of t1.
+    # also need to move upwards by the diff b/w 20 and the above.
+    translation: [19, 30.5, 0]
+  front:
+    path: ../BaseStructuresLaika/simpleLaikaRear.yaml
+    # Needs to be flipped by 180 to become the "front"
+    #rotation:
+    #  axis: [1, 0, 0]
+    #  angle: 180
+    # Translate to be in front of t6, -11 + -8 + -1
+    translation: [-28, 30.5, 0]
 
 
 bond_groups:
@@ -102,7 +115,12 @@ bond_groups:
    rotJoint/t5/node_node:
      - [leftB, back]
 
-  #rod: 
+  connectorRod:
+    rear/t1/node_node:
+      - [spineattach, center]
+    t6/front/node_node:
+      - [center, spineattach]
+     
 
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
@@ -114,10 +132,10 @@ bond_groups:
 # (was 5000)
 # Lowered friction from 1 to 0.5.
 builders: 
-  rod:
+  connectorRod:
     class: tgRodInfo
     parameters:
-      density: 0.0044 # was 0.0044
+      density: 0.001 # was 0.0044
       radius: 0.25
       friction: 0.5
       roll_friction: 0.5
@@ -125,78 +143,63 @@ builders:
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0 # was 1000
+      stiffness: 5000.0 # was 1000
       damping: 100.0 # was 100
-      pretension: 20.0 # was 20
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
+      pretension: 800.0 # was 20
+      max_tension: 700000.0
 
   HF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 5000.0
       damping: 100.0
-      pretension: 20.0
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
 
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 5000.0
       damping: 100.0
-      pretension: 20.0
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
 
   HL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 5000.0
       damping: 100.0
-      pretension: 20.0
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
 
   SFR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226 # was 1226
+      stiffness: 5000 # was 1226
       damping: 100.0
-      pretension: 0.0
-      history: 1
-      max_tension: 7000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
+
   SRL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226
+      stiffness: 5000
       damping: 100.0
-      pretension: 0.0
-      history: 1
-      max_tension: 7000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
 
   SBF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226.0
+      stiffness: 5000.0
       damping: 100.0
-      pretension: 0.0
-      history: 1
-      max_tension: 7000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
 
   SBL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226.0
+      stiffness: 5000.0
       damping: 100.0
-      pretension: 0.0
-      history: 1
-      max_tension: 7000.0
-      target_velocity: 12.0
+      pretension: 800.0
+      max_tension: 700000.0
