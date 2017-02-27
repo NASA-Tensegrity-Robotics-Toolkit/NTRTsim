@@ -291,8 +291,8 @@ int main(int argc, char** argv)
     // Create the controller for the rotating vertebra.
     double startTimeRot = 0.0;
     btVector3 startTorqueRot = btVector3(0.0, 0, 0);
-    double phaseTwoTimeRot = 8.0;
-    btVector3 phaseTwoTorqueRot = btVector3(0.0, 0, 0); // was 0.1
+    double phaseTwoTimeRot = 15.0;
+    btVector3 phaseTwoTorqueRot = btVector3(0.1, 0, 0); // was 0.1
     std::string rodHingeTag = "rodForHinge";
     RotatingVertebraController* rotController =
       new RotatingVertebraController( startTimeRot, startTorqueRot,

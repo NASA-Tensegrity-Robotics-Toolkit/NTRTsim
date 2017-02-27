@@ -122,7 +122,7 @@ void RotatingVertebraController::onSetup(TensegrityModel& subject)
   // For the rotating joint, need to compensate for the vertical translation,
   // which could be like +30 to rod 2.
   btHingeConstraint* rotHinge =
-    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-10, 0, 0),
+    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-5, 0, 0),
 			  btVector3(0, 0, 0), btVector3(1, 0, 0),
 			  btVector3(1, 0, 0), false);
   // Add to the world.
