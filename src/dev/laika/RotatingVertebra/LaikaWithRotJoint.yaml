@@ -7,13 +7,13 @@ substructures:
 
   t1/t2:
     path: ./TetrahedronSymmetric.yaml
-    offset: [-8, 0 , 0]
-    translation: [16, 40.5, 0] # was 30.5
+    offset: [-6, 0 , 0]
+    translation: [12, 40.5, 0] # was 30.5
     scale: 0.5
   t5/t6:
     path: ./TetrahedronSymmetric.yaml
-    offset: [-8, 0 , 0]
-    translation: [-11, 40.5, 0] # TwoSegSpine gives -3 extra, 2nd vert.
+    offset: [-6, 0 , 0]
+    translation: [-9, 40.5, 0] # TwoSegSpine gives -3 extra, 2nd vert.
     scale: 0.5
   rotJoint:
     path: ./TwoSegSpine.yaml
@@ -22,15 +22,15 @@ substructures:
     path: ../BaseStructuresLaika/simpleLaikaRear.yaml
     # Should be placed a bit back from the end of t1.
     # also need to move upwards by the diff b/w 20 and the above.
-    translation: [19, 30.5, 0]
+    translation: [18, 35.5, 0] # was 13
   front:
     path: ../BaseStructuresLaika/simpleLaikaRear.yaml
     # Needs to be flipped by 180 to become the "front"
     #rotation:
     #  axis: [1, 0, 0]
     #  angle: 180
-    # Translate to be in front of t6, -11 + -8 + -1
-    translation: [-28, 30.5, 0]
+    # Translate to be in front of t6, -9 + -6 + -1
+    translation: [-22, 35.5, 0]
 
 
 bond_groups:
@@ -144,62 +144,55 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0 # was 1000
-      damping: 100.0 # was 100
-      pretension: 800.0 # was 20
-      max_tension: 700000.0
+      damping: 500.0 # was 100
+      pretension: 500.0 # was 20
 
   HF:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 500.0
 
   HB:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 500.0
 
   HL:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 500.0
 
   SFR:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000 # was 1226
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 400.0
 
   SRL:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 400.0
 
   SBF:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 400.0
 
   SBL:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 5000.0
-      damping: 100.0
-      pretension: 800.0
-      max_tension: 700000.0
+      damping: 500.0
+      pretension: 400.0
+
