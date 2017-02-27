@@ -1,0 +1,26 @@
+# Units are currently in cm
+# Hips have a "T" shape.
+
+# Need four nodes: one for the spine attachment location,
+# and three for the "T"
+
+nodes:    
+  spineattach: [0, 0, 0]
+  hipcenter: [5, 0, 0]
+  legattachA: [5, 0, 5]
+  legattachB: [5, 0, -5]
+
+# define the rod for the two new nodes
+pair_groups:
+  hiprod:
+    - [spineattach, hipcenter]
+    - [hipcenter, legattachA]
+    - [hipcenter, legattachB]
+
+builders:
+  hiprod:
+    class: tgRodInfo
+    parameters:
+      density: 0.01
+      radius: 1
+

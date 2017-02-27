@@ -1,0 +1,27 @@
+# Units are currently in cm
+# Simple legs have a shoulder and a foot.
+# Since we can't do spheres, approx the foot.
+
+nodes:    
+  shoulder: [0, 20, 0]
+  ankle: [-1, 1, 0]
+  foot: [0, 0, 0]
+
+pair_groups:
+  legrod:
+    - [shoulder, ankle]
+  anklerod:
+    - [ankle, foot]
+
+builders:
+  legrod:
+    class: tgRodInfo
+    parameters:
+      density: 0.0001
+      radius: 1
+      
+  anklerod:
+    class: tgRodInfo
+    parameters:
+      density: 0.01 # Was 0.014
+      radius: 1

@@ -1,21 +1,19 @@
-# This YAML file represents a single vertebra,
-# made out of two pieces that rotate with respect
-# to each other. Note that it does NOT include the hinge joint
-# as of 2017-02-26, that has to be created in an app or somewhere else.
+# This is the rotating vertebra joint. Contains two spine vertebrae,
+# since the hinge constraint didn't seem to work with half vertebrae.
 
-# The front and back parts of the vertebra:
+# Two Tetrahedron structures.
 substructures:
-  back:
-    path: ./RotVertBack.yaml
-    translation: [7, 20, 0] # only a small translation need, so no collisions.
-  #front:
-  #  path: ./RotVertBackFlipped.yaml
-  #  rotation:
-  #    axis: [1, 0, 0]
-  #    angle: 90
-  #  translation: [-7, 20, 0]
-  front:
-    path: ./RotVertFront.yaml
-    translation: [-10, 20, 0] # only a small translation need, so no collisions.
+  tA:
+    path: ./TetrahedronHingedA.yaml
+    translation: [0, 0, 0]
+    scale: 0.5
+  tB:
+    path: ./TetrahedronHingedB.yaml
+    translation: [-5, 0, 0] # this gets overwritten with the btHingeConstraint.
+    scale: 0.5
 
-# This single vertebra does not have any cables, so that's it.
+#  t1/t2:
+#    path: ./TetrahedronHinged.yaml
+#    offset: [-25, 0, 0] # was -12
+#    translation: [0, 20, 0]
+#    #translation: [0, 30.5, 30]
