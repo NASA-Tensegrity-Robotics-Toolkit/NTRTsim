@@ -165,9 +165,8 @@ void JSONAOHierarchyControl::onSetup(BaseQuadModelLearning& subject)
     
 	int j = 0;
 
-	P = 20000.0;//(PVal.get(j, 0.0)).asDouble();
-	D = 5.0;//(DVal.get(j, 0.0)).asDouble();
-
+	P = 20000.0;//(PVal.get(j, 0.0)).asDouble();// 150000.0;
+	D = 5.0;//(DVal.get(j, 0.0)).asDouble();// 25.0;
 
 #endif
 
