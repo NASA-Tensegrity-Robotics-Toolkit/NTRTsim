@@ -21,8 +21,9 @@
 
 /**
  * @file JSONFeedbackControl.h
- * @brief A controller for the template class BaseSpineModelLearning
- * @author Brian Mirletz
+ * @brief A controller for the template class BaseSpineModelLearning,
+ * modified for use on a quadruped
+ * @author Brian Mirletz, Dawn Hustig-Schultz
  * @version 1.1.0
  * $Id$
  */
@@ -107,6 +108,7 @@ struct Config : public JSONCPGControl::Config
     virtual void onStep(BaseSpineModelLearning& subject, double dt);
     
     virtual void onTeardown(BaseSpineModelLearning& subject);
+
 	
 protected:
 
@@ -126,6 +128,8 @@ protected:
     
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
+
+    double m_totalTime;
     
 };
 

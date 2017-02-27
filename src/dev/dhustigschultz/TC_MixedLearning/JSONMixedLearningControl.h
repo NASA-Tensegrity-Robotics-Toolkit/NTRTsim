@@ -23,6 +23,7 @@
  * @file JSONMixedLearningControl.h
  * @brief A controller for the template class BaseSpineModelLearning
  * @author Brian Mirletz, Dawn Hustig-Schultz
+ * @date Sept. 2015
  * @version 1.0.0
  * $Id$
  */
@@ -129,6 +130,8 @@ protected:
 
     /// @todo generalize this if we need more than one
     neuralNetwork* nn;
+
+    double m_totalTime;
     
 };
 
