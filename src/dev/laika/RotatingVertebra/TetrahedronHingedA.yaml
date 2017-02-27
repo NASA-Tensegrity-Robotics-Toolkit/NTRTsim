@@ -2,22 +2,24 @@ nodes:
 
 # Below is a symmetric version of this tetrahedron,
 # with an extra small node for a "rod" that will serve
-# as the axis for a hinged joint:
-  center: [0, 10, 0]
-  front: [10, 10, 10]
-  right: [-10, 20, 0]
-  back: [10, 10, -10] 
-  left: [-10, 0, 0]
+# as the axis for a hinged joint.
+# Renamed to put "A" so that we can differentiate between the two
+# vertebrae in the rotating joint.
+  centerA: [0, 10, 0]
+  frontA: [10, 10, 10]
+  rightA: [-10, 20, 0]
+  backA: [10, 10, -10] 
+  leftA: [-10, 0, 0]
   rodHingeEnd: [-2, 10, 0]
 
 pair_groups:
   rod:
-    - [center, front]
-    - [center, right]
-    - [center, back]
-    - [center, left]
+    - [centerA, frontA]
+    - [centerA, rightA]
+    - [centerA, backA]
+    - [centerA, leftA]
   rodForHinge:
-    - [center, rodHingeEnd]
+    - [centerA, rodHingeEnd]
 
 # Density used to be 0.014
 builders:

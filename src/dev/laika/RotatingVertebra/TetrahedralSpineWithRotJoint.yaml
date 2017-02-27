@@ -12,10 +12,10 @@ substructures:
   t5/t6:
     path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
-    translation: [-24, 30.5, 30]
+    translation: [-41, 30.5, 30] # TwoSegSpine gives -12 + -5 = -17 extra
   rotJoint:
     path: ./TwoSegSpine.yaml
-    translation: [ 10, 10, 0]
+    translation: [ -24, 30.5, 30]
   hips:
     path: ../BaseStructuresLaika/hips.yaml
     offset: [0, 0, 0]
@@ -39,48 +39,81 @@ bond_groups:
      - [front, front]
    t5/t6/node_node:
      - [front, front]
+   t2/rotJoint/node_node:
+     - [front, frontA]
+   rotJoint/t5/node_node:
+     - [frontA, front]
 
   HR:
    t1/t2/node_node:
      - [right, right]
    t5/t6/node_node:
-     - [right, right]      
+     - [right, right]
+   t2/rotJoint/node_node: # this one causes problems
+     - [right, rightB]
+   rotJoint/t5/node_node:
+     - [rightB, right]
 
   HL: 
    t1/t2/node_node:
      - [left, left]
    t5/t6/node_node:
      - [left, left]
+   t2/rotJoint/node_node: # this one causes problems
+     - [left, leftB]
+   rotJoint/t5/node_node:
+     - [leftB, left]
 
   HB:
    t1/t2/node_node:
      - [back, back]
    t5/t6/node_node: 
      - [back, back]
+   t2/rotJoint/node_node:
+     - [back, backA]
+   rotJoint/t5/node_node:
+     - [backA, back]
 
   SFR:
    t1/t2/node_node:
      - [right, back]
    t5/t6/node_node:
-     - [right, back] 
+     - [right, back]
+   t2/rotJoint/node_node:
+     - [right, backA]
+   rotJoint/t5/node_node:
+     - [rightB, back]
+
 
   SRL:
    t1/t2/node_node:
      - [right, front]
    t5/t6/node_node: 
      - [right, front]
+   t2/rotJoint/node_node:
+     - [right, frontA]
+   rotJoint/t5/node_node:
+     - [rightB, front]
 
   SBF: 
    t1/t2/node_node:
      - [left, front]
    t5/t6/node_node:
      - [left, front]
+   t2/rotJoint/node_node:
+     - [left, frontA]
+   rotJoint/t5/node_node:
+     - [leftB, front]
 
   SBL: 
    t1/t2/node_node:
      - [left, back]
    t5/t6/node_node: 
-      - [left, back]  
+     - [left, back]
+   t2/rotJoint/node_node:
+     - [left, backA]
+   rotJoint/t5/node_node:
+     - [leftB, back]
 
   rod: 
    t1/hips/node_node:
@@ -124,7 +157,7 @@ builders:
   rod:
     class: tgRodInfo
     parameters:
-      density: 0.0044
+      density: 0.0044 # was 0.0044
       radius: 0.25
       friction: 0.5
       roll_friction: 0.5

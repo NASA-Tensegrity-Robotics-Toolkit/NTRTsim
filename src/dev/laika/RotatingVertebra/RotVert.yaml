@@ -8,8 +8,14 @@ substructures:
   back:
     path: ./RotVertBack.yaml
     translation: [7, 20, 0] # only a small translation need, so no collisions.
+  #front:
+  #  path: ./RotVertBackFlipped.yaml
+  #  rotation:
+  #    axis: [1, 0, 0]
+  #    angle: 90
+  #  translation: [-7, 20, 0]
   front:
     path: ./RotVertFront.yaml
-    translation: [-7, 20, 0] # only a small translation need, so no collisions.
+    translation: [-10, 20, 0] # only a small translation need, so no collisions.
 
 # This single vertebra does not have any cables, so that's it.
