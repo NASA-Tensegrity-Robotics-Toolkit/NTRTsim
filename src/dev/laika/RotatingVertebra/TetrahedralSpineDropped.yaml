@@ -7,5 +7,6 @@
 substructures:
   TetSpine:
     path: ./TetrahedralSpineWithRotJoint.yaml
-    translation: [22, -10, -22]
-    scale: 0.5
+    translation: [22, 30, -22]
+    #translation: [0, 0, 0]
+    #scale: 0.5

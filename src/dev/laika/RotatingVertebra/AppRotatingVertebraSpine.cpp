@@ -83,7 +83,106 @@ int main(int argc, char** argv)
     // create the simulation
     tgSimulation simulation(view);
 
-    // Create the force plate by passing in its config struct.
+    // create the models with their controllers and add the models to the simulation
+    // This constructor for TensegrityModel takes the 'debugging' flag as the
+    // second argument.
+    TensegrityModel* const myModel = new TensegrityModel(argv[1],true);
+
+    // Attach a controller to the model, if desired.
+    // This is a controller that interacts with a generic TensegrityModel as
+    // built by the TensegrityModel file, BUT it only actually works
+    // with the specific HorizontalSpine YAML file.
+    // @TODO: should this throw an error when attached to a model that
+    // wasn't built with the HorizontalSpine YAML file?
+
+    // Parameters for the Horizontal Spine Controller are specified in that .h file,
+    // repeated here:
+    double startTime = 10.0;
+    double minLength = 0.8;
+    double rate = 0.25;
+    std::vector<std::string> tagsToControl;
+    // HF is the right horizontal set
+    // HL is the bottom horizontal set maybe?
+    // HB is the left horizontal set
+    // HR is the top horizontal set.
+    // BUT, something is wrong here. Probably Bullet's numerical problems.
+    tagsToControl.push_back("HR");
+    tagsToControl.push_back("HF");
+    //tagsToControl.push_back("HB");
+    // Call the constructor for the controller
+    //HorizontalSpineController* const controller =
+    //  new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
+    // Attach the controller to the model. Must happen before running the
+    // simulation.
+    //myModel->attach(controller);
+
+    // Next, we need to get a reference to the Bullet Physics world.
+    // This is for passing in to the RotatingVertebraController, so it can
+    // create the hinge.
+    // TO-DO: does this reference get destroyed and re-created?? this will break...
+    tgWorld simWorld = simulation.getWorld();
+    tgWorldImpl& impl = world.implementation();
+    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+
+    // Create the controller for the rotating vertebra.
+    double startTimeRot = 0.0;
+    btVector3 startTorqueRot = btVector3(0.0, 0, 0);
+    double phaseTwoTimeRot = 8.0;
+    btVector3 phaseTwoTorqueRot = btVector3(0.0, 0, 0); // was 0.2
+    std::string rodHingeTag = "rodForHinge";
+    RotatingVertebraController* rotController =
+      new RotatingVertebraController( startTimeRot, startTorqueRot,
+				      phaseTwoTimeRot, phaseTwoTorqueRot,
+				      rodHingeTag, btWorld);
+
+    // Add the controller to the YAML model.
+    // TO-DO: can we do this after adding the model to the simulation?
+    // Will the controller's onSetup method still be called?
+    myModel->attach( rotController );
+
+    // Add the model to the world
+    simulation.addModel(myModel);
+    
+    // Next, add a constraint manually. This will be for the hinged, rotating
+    // vertebra. TO-DO: made it a tgModel instead of doing this
+    // from the app file? Super hacky...
+    /*
+    std::vector<tgModel*> all_children = myModel->getDescendants();
+    // Pick out the tgRods that will be used for the hinge.
+    // These should be tagged rodForHinge in the YAML file.
+    std::cout << "Getting all the rods for the hinge..." << std::endl;
+    std::vector<tgRod*> allRodsCast = tgCast::filter<tgModel, tgRod>(all_children);
+    // A different way:
+    std::vector<tgRod*> allRods = myModel->find<tgRod>("rodForHinge");
+    for (size_t i = 0; i < allRods.size(); i++)
+    {
+      std::cout << "Inside App: rod number " << i << ": " << std::endl;
+      std::cout << "tags: " << allRods[i]->getTags() << std::endl;
+      std::cout << allRods[i]->toString() << std::endl;
+    }
+    
+    // Test of the btHingeConstraint.
+    // First, pick out the Bullet rigid bodies of the two rods.
+    btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
+    btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
+        // Create the hinge constraint
+    // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+    btHingeConstraint* rotHinge =
+      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-10, 0, 0),
+			    btVector3(0, 0, 0), btVector3(1, 0, 0),
+			    btVector3(1, 0, 0), false);
+    // Next, we need to get a reference to the Bullet Physics world.
+    tgWorld simWorld = simulation.getWorld();
+    tgWorldImpl& impl = world.implementation();
+    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+    // Add the hinge constraint to the world.
+    btWorld->addConstraint(rotHinge);
+
+    */
+
+        // Create the force plate by passing in its config struct.
     // There is no need to create another model file here, since the
     // force plate is already a model.
     //
@@ -174,7 +273,6 @@ int main(int argc, char** argv)
     // That's because the attach method is inherited from tgSubject.
 
     // Create one for each foot:
-    /*
     ForcePlateModel* forcePlateRearLeft = new ForcePlateModel(forcePlateConfig,
 						      forcePlateLocationRearLeft,
 						      forcePlateDebugging,
@@ -191,7 +289,6 @@ int main(int argc, char** argv)
 						      forcePlateLocationFrontRight,
 						      forcePlateDebugging,
 						      labelFrontRight);
-    */
 
     //DEBUGGING
     //std::cout << "In the App, this force plate model has label: "
@@ -212,7 +309,6 @@ int main(int argc, char** argv)
     double timeBetweenSamples = 0.01;
 
     // Create the sensors
-    /*
     // Rear Left
     ForcePlateSensor* forceSensorRearLeft =
       new ForcePlateSensor(forcePlateLogPath, forcePlateRearLeft->getLabel(),
@@ -229,7 +325,6 @@ int main(int argc, char** argv)
     ForcePlateSensor* forceSensorFrontRight =
       new ForcePlateSensor(forcePlateLogPath, forcePlateFrontRight->getLabel(),
 			   timeBetweenSamples);
-    */
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
@@ -239,111 +334,10 @@ int main(int argc, char** argv)
     //forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
-    /*
     simulation.addModel(forcePlateRearLeft);
     simulation.addModel(forcePlateFrontLeft);
     simulation.addModel(forcePlateRearRight);
     simulation.addModel(forcePlateFrontRight);
-    */
-
-    // create the models with their controllers and add the models to the simulation
-    // This constructor for TensegrityModel takes the 'debugging' flag as the
-    // second argument.
-    TensegrityModel* const myModel = new TensegrityModel(argv[1],true);
-
-    // Attach a controller to the model, if desired.
-    // This is a controller that interacts with a generic TensegrityModel as
-    // built by the TensegrityModel file, BUT it only actually works
-    // with the specific HorizontalSpine YAML file.
-    // @TODO: should this throw an error when attached to a model that
-    // wasn't built with the HorizontalSpine YAML file?
-
-    // Parameters for the Horizontal Spine Controller are specified in that .h file,
-    // repeated here:
-    double startTime = 10.0;
-    double minLength = 0.8;
-    double rate = 0.25;
-    std::vector<std::string> tagsToControl;
-    // HF is the right horizontal set
-    // HL is the bottom horizontal set maybe?
-    // HB is the left horizontal set
-    // HR is the top horizontal set.
-    // BUT, something is wrong here. Probably Bullet's numerical problems.
-    tagsToControl.push_back("HR");
-    tagsToControl.push_back("HF");
-    //tagsToControl.push_back("HB");
-    // Call the constructor for the controller
-    //HorizontalSpineController* const controller =
-    //  new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
-    // Attach the controller to the model. Must happen before running the
-    // simulation.
-    //myModel->attach(controller);
-
-    // Next, we need to get a reference to the Bullet Physics world.
-    // This is for passing in to the RotatingVertebraController, so it can
-    // create the hinge.
-    // TO-DO: does this reference get destroyed and re-created?? this will break...
-    tgWorld simWorld = simulation.getWorld();
-    tgWorldImpl& impl = world.implementation();
-    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
-    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
-
-    // Create the controller for the rotating vertebra.
-    double startTimeRot = 0.0;
-    btVector3 startTorqueRot = btVector3(0.0, 0, 0);
-    double phaseTwoTimeRot = 15.0;
-    btVector3 phaseTwoTorqueRot = btVector3(0.1, 0, 0); // was 0.1
-    std::string rodHingeTag = "rodForHinge";
-    RotatingVertebraController* rotController =
-      new RotatingVertebraController( startTimeRot, startTorqueRot,
-				      phaseTwoTimeRot, phaseTwoTorqueRot,
-				      rodHingeTag, btWorld);
-
-    // Add the controller to the YAML model.
-    // TO-DO: can we do this after adding the model to the simulation?
-    // Will the controller's onSetup method still be called?
-    myModel->attach( rotController );
-
-    // Add the model to the world
-    simulation.addModel(myModel);
-    
-    // Next, add a constraint manually. This will be for the hinged, rotating
-    // vertebra. TO-DO: made it a tgModel instead of doing this
-    // from the app file? Super hacky...
-    /*
-    std::vector<tgModel*> all_children = myModel->getDescendants();
-    // Pick out the tgRods that will be used for the hinge.
-    // These should be tagged rodForHinge in the YAML file.
-    std::cout << "Getting all the rods for the hinge..." << std::endl;
-    std::vector<tgRod*> allRodsCast = tgCast::filter<tgModel, tgRod>(all_children);
-    // A different way:
-    std::vector<tgRod*> allRods = myModel->find<tgRod>("rodForHinge");
-    for (size_t i = 0; i < allRods.size(); i++)
-    {
-      std::cout << "Inside App: rod number " << i << ": " << std::endl;
-      std::cout << "tags: " << allRods[i]->getTags() << std::endl;
-      std::cout << allRods[i]->toString() << std::endl;
-    }
-    
-    // Test of the btHingeConstraint.
-    // First, pick out the Bullet rigid bodies of the two rods.
-    btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
-    btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
-        // Create the hinge constraint
-    // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
-    btHingeConstraint* rotHinge =
-      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-10, 0, 0),
-			    btVector3(0, 0, 0), btVector3(1, 0, 0),
-			    btVector3(1, 0, 0), false);
-    // Next, we need to get a reference to the Bullet Physics world.
-    tgWorld simWorld = simulation.getWorld();
-    tgWorldImpl& impl = world.implementation();
-    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
-    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
-    // Add the hinge constraint to the world.
-    btWorld->addConstraint(rotHinge);
-
-    */
     
     // Finally, run the simulation.
     simulation.run();

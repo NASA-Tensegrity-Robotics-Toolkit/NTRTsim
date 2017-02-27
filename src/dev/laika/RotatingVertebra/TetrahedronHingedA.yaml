@@ -13,7 +13,7 @@ nodes:
   rodHingeEnd: [-2, 10, 0]
 
 pair_groups:
-  rod:
+  rodTetraA:
     - [centerA, frontA]
     - [centerA, rightA]
     - [centerA, backA]
@@ -23,13 +23,13 @@ pair_groups:
 
 # Density used to be 0.014
 builders:
-  rod:
+  rodTetraA:
     class: tgRodInfo
     parameters:
       density: 0.0022 # was 0.014
-      radius: 0.5
+      radius: 0.25
   rodForHinge:
     class: tgRodInfo
     parameters:
-      density: 0.014 # was 0.014
+      density: 0.0 # was 0.014
       radius: 2.0
