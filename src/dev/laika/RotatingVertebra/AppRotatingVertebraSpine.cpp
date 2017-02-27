@@ -95,6 +95,7 @@ int main(int argc, char** argv)
     // @TODO: should this throw an error when attached to a model that
     // wasn't built with the HorizontalSpine YAML file?
 
+    /*
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
     double startTime = 10.0;
@@ -115,6 +116,7 @@ int main(int argc, char** argv)
     // Attach the controller to the model. Must happen before running the
     // simulation.
     //myModel->attach(controller);
+    */
 
     // Next, we need to get a reference to the Bullet Physics world.
     // This is for passing in to the RotatingVertebraController, so it can
