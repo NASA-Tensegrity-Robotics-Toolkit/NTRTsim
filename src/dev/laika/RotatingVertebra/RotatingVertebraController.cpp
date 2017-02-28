@@ -160,7 +160,7 @@ void RotatingVertebraController::onStep(TensegrityModel& subject, double dt)
     }
     // Finally, apply the torque.
     // Note that we apply equal and opposite torques to the two rods.
-    //std::cout << "Applying torque: " << worldAlignedTorque << std::endl;
+    std::cout << "Applying torque: " << worldAlignedTorque << std::endl;
     //std::cout << "Applying torque: " << torqueToApply << std::endl;
     //std::cout << "World alignment is: " << worldAlignmentBasis << std::endl;
     hingedRodA->getPRigidBody()->applyTorqueImpulse( worldAlignedTorque );

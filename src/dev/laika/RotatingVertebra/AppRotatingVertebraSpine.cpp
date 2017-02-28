@@ -126,10 +126,12 @@ int main(int argc, char** argv)
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
 
     // Create the controller for the rotating vertebra.
-    double startTimeRot = 0.0;
-    btVector3 startTorqueRot = btVector3(0.0, 0, 0);
-    double phaseTwoTimeRot = 8.0;
-    btVector3 phaseTwoTorqueRot = btVector3(0.0, 0, 0); // was 0.2
+    //double startTimeRot = 2.0;
+    double startTimeRot = 6.0;
+    btVector3 startTorqueRot = btVector3(0.064, 0, 0);
+    //double phaseTwoTimeRot = 3.5;
+    double phaseTwoTimeRot = 7.5;
+    btVector3 phaseTwoTorqueRot = btVector3(0.056, 0, 0); // was 0.2
     std::string rodHingeTag = "rodForHinge";
     RotatingVertebraController* rotController =
       new RotatingVertebraController( startTimeRot, startTorqueRot,
@@ -328,10 +330,10 @@ int main(int argc, char** argv)
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
-    //forcePlateRearLeft->attach(forceSensorRearLeft);
-    //forcePlateRearRight->attach(forceSensorRearRight);
-    //forcePlateFrontLeft->attach(forceSensorFrontLeft);
-    //forcePlateFrontRight->attach(forceSensorFrontRight);
+    forcePlateRearLeft->attach(forceSensorRearLeft);
+    forcePlateRearRight->attach(forceSensorRearRight);
+    forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);

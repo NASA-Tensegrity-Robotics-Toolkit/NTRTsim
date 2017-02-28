@@ -26,7 +26,7 @@ substructures:
   hips:
     path: ../BaseStructuresLaika/HipsScaled.yaml
     #translation: [22, 45.5, 3]
-    translation: [5, 43, 3]
+    translation: [5, 40, 3]
   front:
     path: ../BaseStructuresLaika/FrontScaled.yaml
     # t6 was at -21 -12 = -33
@@ -37,7 +37,7 @@ substructures:
     #path: ../BaseStructuresLaika/backlegs.yaml
     path: ../BaseStructuresLaika/BackLegsScaled.yaml
     offset: [0, 0, 17]
-    translation: [20, 25, -2]
+    translation: [20, 23, -2]
     #translation: [42, 20, -2]
   frontlegsleft/frontlegsright: 
     #path: ../BaseStructuresLaika/frontlegs.yaml
@@ -223,7 +223,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 70000.0
       target_velocity: 12.0
   SRL:
     class: tgBasicActuatorInfo
@@ -232,7 +232,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 70000.0
       target_velocity: 12.0
 
   SBF:
@@ -242,7 +242,7 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 70000.0
       target_velocity: 12.0
 
   SBL:
@@ -252,5 +252,5 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 7000.0
+      max_tension: 70000.0
       target_velocity: 12.0
