@@ -28,7 +28,6 @@ substructures:
     #translation: [22, 45.5, 3]
     translation: [5, 43, 3]
   front:
-    #path: ../BaseStructuresLaika/front.yaml
     path: ../BaseStructuresLaika/FrontScaled.yaml
     # t6 was at -21 -12 = -33
     # t6 is now at -12 -6 = -18, difference is then -15
@@ -38,15 +37,15 @@ substructures:
     #path: ../BaseStructuresLaika/backlegs.yaml
     path: ../BaseStructuresLaika/BackLegsScaled.yaml
     offset: [0, 0, 17]
+    translation: [20, 25, -2]
     #translation: [42, 20, -2]
-    translation: [25, 18.5, -2]
   frontlegsleft/frontlegsright: 
     #path: ../BaseStructuresLaika/frontlegs.yaml
     path: ../BaseStructuresLaika/FrontLegsScaled.yaml
     #offset: [0, 0, 30]
     offset: [0, 0, 15]
     #translation: [-37, 20, -7]
-    translation: [-18, 20, 0.5]
+    translation: [-18, 23, 0.5]
 
 bond_groups:
   HF:
