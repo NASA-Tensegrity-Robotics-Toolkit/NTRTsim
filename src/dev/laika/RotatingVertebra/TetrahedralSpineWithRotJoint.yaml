@@ -7,39 +7,46 @@
 substructures:
 
   t1/t2:
-    path: ./TetrahedronSymmetric.yaml
-    offset: [-12, 0 , 0]
-    #translation: [0, 40.5, 30] # was 30.5
-    translation: [22, 40.5, 8] # was 30.5
+    path: ./TetrahedronSymmetricScaled.yaml
+    #offset: [-12, 0 , 0]
+    offset: [-6, 0, 0]
+    #translation: [22, 40.5, 8] # was 30.5
+    translation: [10, 40.5, 8]
   t5/t6:
-    path: ./TetrahedronSymmetric.yaml
-    offset: [-12, 0 , 0]
-    #translation: [-43, 40.5, 30] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
-    translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
+    path: ./TetrahedronSymmetricScaled.yaml
+    #offset: [-12, 0 , 0]
+    offset: [-6, 0 , 0]
+    # RotVert gives -4, -6 gap, -2 offset = -12
+    #translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
+    translation: [-12, 40.5, 8]
   rotJoint:
     path: ./RotVert.yaml
-    #translation: [ -24, 40.5, 30]
-    translation: [ -2, 40.5, 8]
+    #translation: [ -2, 40.5, 8]
+    translation: [ -2, 35.5, 8]
   hips:
-    path: ../BaseStructuresLaika/hips.yaml
-    offset: [0, 0, 0]
-    #translation: [0, 45.5, 25]
-    translation: [22, 45.5, 3]
+    path: ../BaseStructuresLaika/HipsScaled.yaml
+    #translation: [22, 45.5, 3]
+    translation: [5, 43, 3]
   front:
-    path: ../BaseStructuresLaika/front.yaml
-    offset: [0, 0, 0]
-    #translation: [-70, 45.5, 17] # was -68
-    translation: [-48, 45.5, -5]
+    #path: ../BaseStructuresLaika/front.yaml
+    path: ../BaseStructuresLaika/FrontScaled.yaml
+    # t6 was at -21 -12 = -33
+    # t6 is now at -12 -6 = -18, difference is then -15
+    #translation: [-48, 45.5, -5]
+    translation: [-28, 38.5, -5]
   backlegsleft/backlegsright:
-    path: ../BaseStructuresLaika/backlegs.yaml
+    #path: ../BaseStructuresLaika/backlegs.yaml
+    path: ../BaseStructuresLaika/BackLegsScaled.yaml
     offset: [0, 0, 17]
-    #translation: [20, 20, 20]
-    translation: [42, 20, -2]
+    #translation: [42, 20, -2]
+    translation: [25, 18.5, -2]
   frontlegsleft/frontlegsright: 
-    path: ../BaseStructuresLaika/frontlegs.yaml
-    offset: [0, 0, 30]
-    #translation: [-59, 20, 15] # was -57
-    translation: [-37, 20, -7]
+    #path: ../BaseStructuresLaika/frontlegs.yaml
+    path: ../BaseStructuresLaika/FrontLegsScaled.yaml
+    #offset: [0, 0, 30]
+    offset: [0, 0, 15]
+    #translation: [-37, 20, -7]
+    translation: [-18, 20, 0.5]
 
 bond_groups:
   HF:
@@ -165,7 +172,7 @@ builders:
   rod:
     class: tgRodInfo
     parameters:
-      density: 0.0044 # was 0.0044
+      density: 0.01 # was 0.0044
       radius: 0.25
       friction: 0.5
       roll_friction: 0.5
