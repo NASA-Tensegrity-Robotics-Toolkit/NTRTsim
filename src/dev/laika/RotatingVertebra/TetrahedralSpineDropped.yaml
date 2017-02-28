@@ -6,8 +6,7 @@
 # Used to be: translation: [22, 20, -22]
 substructures:
   TetSpine:
-    #path: ./TetrahedralSpineWithRotJointScaled.yaml
     path: ./TetrahedralSpineWithRotJoint.yaml
-    #translation: [22, 30, -22]
+    translation: [22, 30, -22]
     #translation: [0, 0, 0]
     #scale: 0.5

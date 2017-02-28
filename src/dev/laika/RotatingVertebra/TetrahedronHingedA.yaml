@@ -32,4 +32,4 @@ builders:
     class: tgRodInfo
     parameters:
       density: 0.0 # was 0.014
-      radius: 1.5
+      radius: 2.0
