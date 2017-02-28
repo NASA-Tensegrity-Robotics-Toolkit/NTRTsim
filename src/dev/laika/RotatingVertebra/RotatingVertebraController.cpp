@@ -123,7 +123,7 @@ void RotatingVertebraController::onSetup(TensegrityModel& subject)
   // which could be like +30 to rod 2.
   // 5 worked, also 10.
   btHingeConstraint* rotHinge =
-    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(7, 0, 0),
+    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(4, 0, 0),
 			  btVector3(0, 0, 0), btVector3(1, 0, 0),
 			  btVector3(1, 0, 0), false);
   // Add to the world.

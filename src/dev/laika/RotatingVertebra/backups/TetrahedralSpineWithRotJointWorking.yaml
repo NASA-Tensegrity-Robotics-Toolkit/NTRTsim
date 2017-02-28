@@ -3,43 +3,35 @@
 
 # This spine has multiple substructures,
 # including the spine itself (t1-t6) and the supporting pieces.
-# Adding translation [22, 0, -22] to remove need for "Dropped".
 substructures:
 
   t1/t2:
     path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
-    #translation: [0, 40.5, 30] # was 30.5
-    translation: [22, 40.5, 8] # was 30.5
+    translation: [0, 40.5, 30] # was 30.5
   t5/t6:
     path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
-    #translation: [-43, 40.5, 30] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
-    translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
+    translation: [-43, 40.5, 30] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
   rotJoint:
     path: ./RotVert.yaml
-    #translation: [ -24, 40.5, 30]
-    translation: [ -2, 40.5, 8]
+    translation: [ -24, 40.5, 30]
   hips:
     path: ../BaseStructuresLaika/hips.yaml
     offset: [0, 0, 0]
-    #translation: [0, 45.5, 25]
-    translation: [22, 45.5, 3]
+    translation: [0, 45.5, 25]
   front:
     path: ../BaseStructuresLaika/front.yaml
     offset: [0, 0, 0]
-    #translation: [-70, 45.5, 17] # was -68
-    translation: [-48, 45.5, -5]
+    translation: [-70, 45.5, 17] # was -68
   backlegsleft/backlegsright:
     path: ../BaseStructuresLaika/backlegs.yaml
     offset: [0, 0, 17]
-    #translation: [20, 20, 20]
-    translation: [42, 20, -2]
+    translation: [20, 20, 20]
   frontlegsleft/frontlegsright: 
     path: ../BaseStructuresLaika/frontlegs.yaml
     offset: [0, 0, 30]
-    #translation: [-59, 20, 15] # was -57
-    translation: [-37, 20, -7]
+    translation: [-59, 20, 15] # was -57
 
 bond_groups:
   HF:
