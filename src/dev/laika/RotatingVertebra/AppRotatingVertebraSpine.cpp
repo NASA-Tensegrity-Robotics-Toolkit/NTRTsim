@@ -26,7 +26,7 @@
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
-//#include "HorizontalSpineController.h"
+#include "HorizontalSpineController.h"
 #include "RotatingVertebraController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
@@ -251,16 +251,10 @@ int main(int argc, char** argv)
     // world, so something like (0, 2, 0) or (0, 3, 0) might be more appropriate.
     // For this ICRA 2017 paper, we need four identical force plates at different
     // locations.
-    /*
     btVector3 forcePlateLocationRearLeft =   btVector3( 19,  3, 0);
     btVector3 forcePlateLocationRearRight =  btVector3( 19,  3, 16);
     btVector3 forcePlateLocationFrontLeft =  btVector3( -18, 3, 0);
     btVector3 forcePlateLocationFrontRight = btVector3( -18, 3, 16); 
-    */
-    btVector3 forcePlateLocationRearLeft =   btVector3( 19,  3, -8);
-    btVector3 forcePlateLocationRearRight =  btVector3( 19,  3, 8);
-    btVector3 forcePlateLocationFrontLeft =  btVector3( -18, 3, -8);
-    btVector3 forcePlateLocationFrontRight = btVector3( -18, 3, 8);
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
     bool forcePlateDebugging = true;
