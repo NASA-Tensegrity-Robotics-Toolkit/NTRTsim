@@ -4,14 +4,14 @@
 # Since we can't do spheres, approx the foot.
 
 nodes:    
-  spineattach: [0, 15, 0]
-  hipcenter: [2, 15, 0]
-  legattachFar: [2, 15, 8]
-  legattachNear: [2, 15, -8]
-  ankleFar: [3, 1, 8]
-  footFar: [2, 0, 8]
-  ankleNear: [3, 1, -8]
-  footNear: [2, 0, -8]
+  spineattach: [0, 20, 0]
+  hipcenter: [5, 20, 0]
+  legattachFar: [5, 20, 10]
+  legattachNear: [5, 20, -10]
+  ankleFar: [6, 1, 10]
+  footFar: [5, 0, 10]
+  ankleNear: [6, 1, -10]
+  footNear: [5, 0, -10]
 
 pair_groups:
   rearRod:

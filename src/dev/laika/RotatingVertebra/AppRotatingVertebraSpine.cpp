@@ -259,8 +259,8 @@ int main(int argc, char** argv)
     */
     btVector3 forcePlateLocationRearLeft =   btVector3( 19,  3, -8);
     btVector3 forcePlateLocationRearRight =  btVector3( 19,  3, 8);
-    btVector3 forcePlateLocationFrontLeft =  btVector3( -15, 3, -8);
-    btVector3 forcePlateLocationFrontRight = btVector3( -15, 3, 8);
+    btVector3 forcePlateLocationFrontLeft =  btVector3( -18, 3, -8);
+    btVector3 forcePlateLocationFrontRight = btVector3( -18, 3, 8);
     // The force plate takes a boolean that turns debugging information on or off.
     // This is optional: the constructor defaults to "off"/"false".
     bool forcePlateDebugging = true;
