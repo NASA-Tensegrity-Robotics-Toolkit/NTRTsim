@@ -344,7 +344,7 @@ private:
 	int currentFace;
 	double percentChange = 0;
 
-	int mode = 1; // 0: nonsequential 1: simultaneous
+	int mode = 0; // 0: nonsequential 1: simultaneous
 };
 
 #endif
