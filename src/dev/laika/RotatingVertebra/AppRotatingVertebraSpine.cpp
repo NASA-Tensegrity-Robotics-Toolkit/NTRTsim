@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
-    double startTime = 10.0;
+    double startTime = 5.0;
     double minLength = 0.8;
     double rate = 0.25;
     std::vector<std::string> tagsToControl;
@@ -107,7 +107,8 @@ int main(int argc, char** argv)
     // HR is the top horizontal set.
     // BUT, something is wrong here. Probably Bullet's numerical problems.
     tagsToControl.push_back("HR");
-    tagsToControl.push_back("HF");
+    tagsToControl.push_back("testnone");
+    //tagsToControl.push_back("HF");
     //tagsToControl.push_back("HB");
     // Call the constructor for the controller
     //HorizontalSpineController* const controller =
@@ -128,10 +129,12 @@ int main(int argc, char** argv)
     // Create the controller for the rotating vertebra.
     //double startTimeRot = 2.0;
     double startTimeRot = 6.0;
-    btVector3 startTorqueRot = btVector3(0.064, 0, 0);
+    //btVector3 startTorqueRot = btVector3(-0.065, 0, 0); // was -0.064
+    btVector3 startTorqueRot = btVector3(0, 0, 0);
     //double phaseTwoTimeRot = 3.5;
     double phaseTwoTimeRot = 7.5;
-    btVector3 phaseTwoTorqueRot = btVector3(0.056, 0, 0); // was 0.2
+    //btVector3 phaseTwoTorqueRot = btVector3(-0.053225, 0, 0); // was -0.054
+    btVector3 phaseTwoTorqueRot = btVector3(0, 0, 0);
     std::string rodHingeTag = "rodForHinge";
     RotatingVertebraController* rotController =
       new RotatingVertebraController( startTimeRot, startTorqueRot,
@@ -223,16 +226,18 @@ int main(int argc, char** argv)
     //double lateralStiffness = 1000.0;
     double lateralStiffness = 3000.0;
     //double verticalStiffness = 2000.0;
-    double verticalStiffness = 3000.0;
+    //double verticalStiffness = 3000.0;
+    double verticalStiffness = 5000.0;
     // NOTE that as with the other actuators, the Unidirectional Compression Spring
     // Actuator inside the ForcePlateModel does not work well when the damping
     // constant is greater than 1/10 the spring constant.
     // For very high stiffnesses, damping must be even less, closer to 1/30.
     // If damping is too large, the plate will explode downward to -infinity.
     //double lateralDamping = 100.0;
-    double lateralDamping = 500.0;
+    double lateralDamping = 50.0;
     //double verticalDamping = 100.0;
-    double verticalDamping = 500.0;
+    //double verticalDamping = 500.0;
+    double verticalDamping = 50.0;
     //double verticalDamping = 200.0;
     
     ForcePlateModel::Config forcePlateConfig(length, width);
@@ -330,10 +335,10 @@ int main(int argc, char** argv)
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
-    forcePlateRearLeft->attach(forceSensorRearLeft);
-    forcePlateRearRight->attach(forceSensorRearRight);
-    forcePlateFrontLeft->attach(forceSensorFrontLeft);
-    forcePlateFrontRight->attach(forceSensorFrontRight);
+    //forcePlateRearLeft->attach(forceSensorRearLeft);
+    //forcePlateRearRight->attach(forceSensorRearRight);
+    //forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    //forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);

@@ -16,6 +16,7 @@ link_libraries(core
 
 add_executable(AppRotatingVertebraSpine
   RotatingVertebraController.cpp
+  HorizontalSpineController.cpp
   AppRotatingVertebraSpine.cpp
 )
 

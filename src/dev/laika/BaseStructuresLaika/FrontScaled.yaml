@@ -2,5 +2,5 @@
 
 substructures:
   frontScaled:
-    path: ./front.yaml
+    path: ./frontHeavier.yaml
     scale: 0.5
