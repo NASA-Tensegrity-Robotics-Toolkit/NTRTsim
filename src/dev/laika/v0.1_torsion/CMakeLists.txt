@@ -16,6 +16,7 @@ link_libraries(core
 
 add_executable(AppLaikaTorsion
   LaikaTorsionController.cpp
+  LaikaReverseTorsionController.cpp
   AppLaikaTorsion.cpp
 )
 
