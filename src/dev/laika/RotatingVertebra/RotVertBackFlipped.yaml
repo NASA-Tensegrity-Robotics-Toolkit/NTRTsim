@@ -1,0 +1,15 @@
+# This YAML file flips the back rotating vertebra.
+
+# The front and back parts of the vertebra:
+substructures:
+  flipped:
+    path: ./RotVertBack.yaml
+    rotation:
+      axis: [0, 0, 1]
+      angle: 180
+
+  #front:
+  #  path: ./RotVertFront.yaml
+  #  translation: [-10, 20, 0] # only a small translation need, so no collisions.
+
+# This single vertebra does not have any cables, so that's it.

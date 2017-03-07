@@ -30,6 +30,7 @@
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
+#include "core/tgRod.h" // for hinge hack
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
@@ -38,6 +39,9 @@
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
+#include "core/tgWorldBulletPhysicsImpl.h" // for hinge hack
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h" // for hinge hack
 // The C++ Standard Library
 #include <iostream>
 
@@ -84,6 +88,35 @@ int main(int argc, char** argv)
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
 
+    // Test: can we play with the underlying bullet physics stuff (e.g. constraints)
+    // from the app file? Super hacky...
+    std::vector<tgModel*> all_children = myModel->getDescendants();
+    // Pick out the tgRods:
+    std::vector<tgRod*> allRods = tgCast::filter<tgModel, tgRod>(all_children);
+        for (size_t i = 0; i < allRods.size(); i++)
+    {
+      std::cout << "Inside App: rod number " << i << ": " << std::endl;
+      std::cout << "tags: " << allRods[i]->getTags() << std::endl;
+      std::cout << allRods[i]->toString() << std::endl;
+    }
+    // Test of the btHingeConstraint.
+    // First, pick out the Bullet rigid bodies of the two rods.
+    btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
+    btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
+        // Create the hinge constraint
+    // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+    btHingeConstraint* rotHinge =
+      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 3, 0),
+			    btVector3(0, 0, 0), btVector3(0, 1, 0),
+			    btVector3(0, 1, 0), false);
+    // Next, we need to get a reference to the Bullet Physics world.
+    //tgWorld simWorld = simulation.getWorld();
+    tgWorldImpl& impl = world.implementation();
+    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+    // Add the hinge constraint to the world.
+    btWorld->addConstraint(rotHinge);
+    
     // For the sensors:
     // A string prefix for the filename
     std::string log_filename = "~/NTRTsim_logs/AppTgBoxAnchorDebugDemo";
@@ -101,7 +134,7 @@ int main(int argc, char** argv)
     myDataLogger->addSensorInfo(myRodSensorInfo);
     myDataLogger->addSensorInfo(mySCASensorInfo);
     // Next, attach it to the simulation
-    simulation.addDataManager(myDataLogger);
+    //simulation.addDataManager(myDataLogger);
     // and everything else should happen automatically.
     
     // Run until the user stops

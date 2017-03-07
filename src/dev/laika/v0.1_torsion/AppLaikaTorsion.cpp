@@ -28,6 +28,7 @@
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 #include "LaikaTorsionController.h"
+#include "LaikaReverseTorsionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"

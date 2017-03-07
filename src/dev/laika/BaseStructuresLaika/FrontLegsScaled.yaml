@@ -1,0 +1,6 @@
+# Units are currently in cm
+
+substructures:
+  frontScaled:
+    path: ./frontlegs.yaml
+    scale: 0.5

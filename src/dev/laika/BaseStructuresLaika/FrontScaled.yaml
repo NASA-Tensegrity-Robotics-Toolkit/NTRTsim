@@ -1,0 +1,6 @@
+# Units are currently in cm
+
+substructures:
+  frontScaled:
+    path: ./frontHeavier.yaml
+    scale: 0.5

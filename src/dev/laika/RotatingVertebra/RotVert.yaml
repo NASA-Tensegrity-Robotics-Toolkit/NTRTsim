@@ -1,0 +1,13 @@
+# The TwoSegSpine is a spine with two vertebrae.
+
+# Two Tetrahedron structures.
+substructures:
+  tA:
+    path: ./TetrahedronHingedA.yaml
+    translation: [0, 0, 0]
+    scale: 0.5
+  tB:
+    path: ./TetrahedronHingedB.yaml
+    translation: [-5, 0, 0]
+    scale: 0.5
+

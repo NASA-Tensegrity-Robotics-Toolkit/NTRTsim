@@ -24,6 +24,7 @@ add_executable(AppHorizontalSpine
 =======
 add_executable(AppLaikaTorsion
   LaikaTorsionController.cpp
+  LaikaReverseTorsionController.cpp
   AppLaikaTorsion.cpp
 >>>>>>> 61317e6b5497519355b8febcf46b750f34a6954a
 )
