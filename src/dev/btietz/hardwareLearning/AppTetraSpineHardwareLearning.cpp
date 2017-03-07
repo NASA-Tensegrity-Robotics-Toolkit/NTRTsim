@@ -26,8 +26,8 @@
  */
 
 // This application
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel.h"
-#include "dev/btietz/TetraSpineStatic/TetraSpineStaticModel_hf.h"
+#include "examples/IROS_2015/TetraSpineStatic/TetraSpineStaticModel.h"
+#include "examples/IROS_2015/TetraSpineStatic/TetraSpineStaticModel_hf.h"
 #include "LearningSpineJSON.h"
 // This library
 #include "core/tgModel.h"

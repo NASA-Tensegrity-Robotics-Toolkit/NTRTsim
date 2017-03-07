@@ -8,7 +8,7 @@ project(forceplate)
 
 # Used to be:
 #link_libraries(tgcreator util core tgOpenGLSupport)
-link_libraries(${LIB_DIR} tgcreator util core tgOpenGLSupport)
+link_libraries(sensors tgcreator util core tgOpenGLSupport)
 
 # The force plate library has only one file: the force plate model.
 #add_library( ${PROJECT_NAME} SHARED

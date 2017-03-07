@@ -28,14 +28,14 @@
 #include "TwoBoxesModel.h"
 // This library
 #include "core/tgCompressionSpringActuator.h"
-#include "core/tgUnidirectionalCompressionSpringActuator.h"
+#include "core/tgUnidirComprSprActuator.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
 #include "core/tgBoxMoreAnchors.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgCompressionSpringActuatorInfo.h"
-#include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgUnidirComprSprActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
@@ -200,7 +200,7 @@ void TwoBoxesModel::setup(tgWorld& world)
     //tgCompressionSpringActuator::Config compressionSpringConfig(c.isFreeEndAttached,
     //				c.stiffness, c.damping, c.springRestLength,
     //				c.moveCablePointAToEdge, c.moveCablePointBToEdge);
-    tgUnidirectionalCompressionSpringActuator::Config compressionSpringConfig(
+    tgUnidirComprSprActuator::Config compressionSpringConfig(
 				c.isFreeEndAttached, c.stiffness, c.damping,
 				c.springRestLength, c.moveCablePointAToEdge,
 				c.moveCablePointBToEdge, c.direction);
@@ -238,8 +238,8 @@ void TwoBoxesModel::setup(tgWorld& world)
     //spec.addBuilder("box", new tgBoxInfo(boxConfig));
     spec.addBuilder("box", new tgBoxMoreAnchorsInfo(boxConfig));
     //spec.addBuilder("compressionSpring", new tgCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("compressionSpring", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
-    //spec.addBuilder("basicActuator", new tgUnidirectionalCompressionSpringActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("compressionSpring", new tgUnidirComprSprActuatorInfo(compressionSpringConfig));
+    //spec.addBuilder("basicActuator", new tgUnidirComprSprActuatorInfo(compressionSpringConfig));
     spec.addBuilder("basicActuator", new tgBasicActuatorInfo(basActConfig));
 
     

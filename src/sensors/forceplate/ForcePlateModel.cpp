@@ -27,7 +27,7 @@
 // This module
 #include "ForcePlateModel.h"
 // This library
-#include "core/tgUnidirectionalCompressionSpringActuator.h"
+#include "core/tgUnidirComprSprActuator.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgBox.h"
 #include "core/tgBoxMoreAnchors.h"
@@ -37,7 +37,7 @@
 #include "core/tgWorld.h"
 // Files in tgcreator used to build parts of the box
 #include "tgcreator/tgBuildSpec.h"
-#include "tgcreator/tgUnidirectionalCompressionSpringActuatorInfo.h"
+#include "tgcreator/tgUnidirComprSprActuatorInfo.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBoxInfo.h"
 #include "tgcreator/tgBoxMoreAnchorsInfo.h"
@@ -714,22 +714,22 @@ void ForcePlateModel::setup(tgWorld& world)
   // there will need to be four configs here.
   // They are named by face: AB, BC, CD, DA.
   // The springs along X:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigBC(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(1, 0, 0));
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigAD(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(-1, 0, 0));
   // The springs along Z:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigAB(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(0, 0, -1));
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     lateralSpringConfigCD(true, m_config.latK, m_config.latD, m_config.latRL,
 			  false, false, new btVector3(0, 0, 1));
   
   // The vertical springs can all share the same config:
-  tgUnidirectionalCompressionSpringActuator::Config
+  tgUnidirComprSprActuator::Config
     verticalSpringConfig(true, m_config.vertK, m_config.vertD, m_config.vertRL,
 			 false, false, new btVector3(0, 1, 0));
   
@@ -748,15 +748,15 @@ void ForcePlateModel::setup(tgWorld& world)
 
   // Add the configs for the springs:
   spec.addBuilder("lateralSpringBC",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigBC));
+  		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigBC));
   spec.addBuilder("lateralSpringAD",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAD));
+  		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigAD));
   spec.addBuilder("lateralSpringAB",
-		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigAB));
+		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigAB));
   spec.addBuilder("lateralSpringCD",
-		  new tgUnidirectionalCompressionSpringActuatorInfo(lateralSpringConfigCD));
+		  new tgUnidirComprSprActuatorInfo(lateralSpringConfigCD));
   spec.addBuilder("verticalSpring",
-  		  new tgUnidirectionalCompressionSpringActuatorInfo(verticalSpringConfig));
+  		  new tgUnidirComprSprActuatorInfo(verticalSpringConfig));
 
   //DEBUGGING
   if( m_debugging){
@@ -856,11 +856,11 @@ void ForcePlateModel::assignSpringPointers()
   // +y are verticalSpring
   // +z are lateralSpringCD
   // -z are lateralSpringAB
-  springsPlusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringBC");
-  springsMinusX = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAD");
-  springsPlusY = find<tgUnidirectionalCompressionSpringActuator>("verticalSpring");
-  springsPlusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringCD");
-  springsMinusZ = find<tgUnidirectionalCompressionSpringActuator>("lateralSpringAB");
+  springsPlusX = find<tgUnidirComprSprActuator>("lateralSpringBC");
+  springsMinusX = find<tgUnidirComprSprActuator>("lateralSpringAD");
+  springsPlusY = find<tgUnidirComprSprActuator>("verticalSpring");
+  springsPlusZ = find<tgUnidirComprSprActuator>("lateralSpringCD");
+  springsMinusZ = find<tgUnidirComprSprActuator>("lateralSpringAB");
 }
 
 /**
@@ -884,7 +884,7 @@ double ForcePlateModel::getFx() const
   double Fx = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator, for the +X direction
   for( it = springsPlusX.begin(); it < springsPlusX.end(); it++ ) {
     Fx += (*it)->getActuatorSpringForce();
@@ -903,7 +903,7 @@ double ForcePlateModel::getFy() const
   double Fy = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator
   for( it = springsPlusY.begin(); it < springsPlusY.end(); it++ ) {
     //DEBUGGING
@@ -926,7 +926,7 @@ double ForcePlateModel::getFz() const
   double Fz = 0.0;
   // Ask each of the springs for their force and add.
   // Use an iterator:
-  std::vector<tgUnidirectionalCompressionSpringActuator*>::const_iterator it;
+  std::vector<tgUnidirComprSprActuator*>::const_iterator it;
   // loop using the iterator, for the +X direction
   for( it = springsPlusZ.begin(); it < springsPlusZ.end(); it++ ) {
     Fz += (*it)->getActuatorSpringForce();

@@ -22,7 +22,7 @@
 /**
  * @file tgBoxMoreAnchorsInfo.h
  * @brief Class that interfaces with Bullet to build the boxes, specifically for boxes that support more than 2 anchor points.
- * @author Drew Sabelhaus, Brian Mirletz, and Ryan Adams
+ * @author Drew Sabelhaus
  * @date September 2016
  * $Id$
  */
@@ -48,7 +48,17 @@ class btVector3;
  * point. It also has length, width and density.
  * This 'info' class will also detect and add nodes that are along the outside
  * edge of the box (as of 2016-08-31, actually adds nodes on or INSIDE the box,
- * which is not the behavior we want, but is good enough for the ForcePlateModel.)
+ * which is not the behavior we want, but is good enough for the ForcePlateModel
+ *
+ * NOTE THAT THIS CLASS DOES NOT WORK WELL AT THE MOMENT. 
+ *     A discussion on the limitations of NTRT's creation of boxes
+ *     is present in tgBoxMoreAnchors.cpp, but briefly: since NTRTsim does not
+ *     specify an orientation for a box, the width and height directions currently
+ *     are chosen ARBITRARILY by the underlying Bullet Physics methods. As a result,
+ *     this class will sometimes break for no reason. That would occur if Bullet
+ *     chooses which parameter is width and which is height in a different way
+ *     than is assumed here. To fix this, we'd want to change how boxes are
+ *     specified, but that means changing tgBox, which may affect other code...
  */ 
 class tgBoxMoreAnchorsInfo : public tgBoxInfo {
 public:
@@ -112,6 +122,7 @@ public:
      * This just makes it so that tgBoxMoreAnchorsInfo does not own the pair.
      * But that's fine. In the implementation of tgBoxMoreAnchorsInfo, we'll just
      * call these functions instead of addressing m_pair directly.
+     * So, these are listed here for your reference, do not re-implement them.
      *const tgBox::Config& getConfig() const { return m_config; }
      *const btVector3& getFrom() const { return m_pair.getFrom(); }
      *const btVector3& getTo() const { return m_pair.getTo(); }

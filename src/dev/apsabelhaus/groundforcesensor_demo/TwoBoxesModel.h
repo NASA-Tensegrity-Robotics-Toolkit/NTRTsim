@@ -35,7 +35,7 @@
 
 // Forward declarations
 class tgCompressionSpringActuator;
-class tgUnidirectionalCompressionSpringActuator;
+class tgUnidirComprSprActuator;
 class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;

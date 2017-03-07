@@ -25,7 +25,7 @@
 #include "controllers/tgPIDController.h"
 #include "core/tgCast.h"
 #include "util/CPGEquations.h"
-#include "dev/CPG_feedback/CPGEquationsFB.h"
+#include "util/CPGEquationsFB.h"
 
 // The C++ Standard Library
 #include <iostream>

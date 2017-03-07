@@ -32,6 +32,8 @@
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+// For sensing (DEBUGGING RIGHT NOW)
+#include "sensors/tgRodSensor.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -220,6 +222,35 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     // models (e.g. muscles) that we want to control. 
     allActuators = tgCast::filter<tgModel, tgBasicActuator> (getDescendants());
 
+    //Debugging: test out the new tgRodSensor on a basic level.
+    // All the descendants from this tgModel, now that they have been built:
+    std::vector<tgModel*> all_children = getDescendants();
+    // Pick out the tgRods:
+    std::vector<tgRod*> allRods = tgCast::filter<tgModel, tgRod>(all_children);
+    // Print out the tgRods
+    std::cout << "tgBoxAnchorDebugDemo tgRods: " << std::endl;
+    for (size_t i = 0; i < allRods.size(); i++)
+    {
+      std::cout << "rod number " << i << ": " << std::endl;
+      std::cout << "tags: " << allRods[i]->getTags() << std::endl;
+      std::cout << allRods[i]->toString() << std::endl;
+    }
+
+    // Now, create some sensors and test them out.
+    for (size_t i = 0; i < allRods.size(); i++)
+    {
+      tgRodSensor* rodsensor_i = new tgRodSensor(allRods[i]);
+      allRodSensors.push_back(rodsensor_i);
+    }
+    /*
+    for (size_t i = 0; i < allRodSensors.size(); i++)
+    {
+      std::cout << allRodSensors[i]->getSensorDataHeading() << std::endl;
+    }
+    */
+    
+    
+    
     // call the onSetup methods of all observed things e.g. controllers
     notifySetup();
 
@@ -232,13 +263,19 @@ void tgBoxAnchorDebugModel::step(double dt)
     // Precondition
     if (dt <= 0.0)
     {
-        throw std::invalid_argument("dt is not positive");
+      throw std::invalid_argument("dt is not positive");
     }
     else
     {
-        // Notify observers (controllers) of the step so that they can take action
-        notifyStep(dt);
-        tgModel::step(dt);  // Step any children
+      //DEBUGGING: try out the new sensors!
+      /*
+      for (size_t i = 0; i < allRodSensors.size(); i++) {
+	std::cout << allRodSensors[i]->getSensorData() << std::endl;
+      }
+      */
+      // Notify observers (controllers) of the step so that they can take action
+      notifyStep(dt);
+      tgModel::step(dt);  // Step any children
     }
 }
 

@@ -1,6 +1,7 @@
 import logging
 import time
 import psutil
+import os
 
 class ConcurrentScheduler:
 
@@ -45,6 +46,9 @@ class ConcurrentScheduler:
             if proc.status() == psutil.STATUS_ZOMBIE:
                 logging.info("Process with ID %d is now a zombie process. Mark it as complete." % activeProc.pid)
                 completed.append(activeProc)
+                # Releasing the processID from each zombie process
+                childPid, status = os.waitpid(activeProc.pid, 0)
+                logging.info("Zombie process ID %d, with exit status %d, has been removed from the process table and can be reused." % (childPid, status))
 
         for completeProc in completed:
             self.jobsProcessing.remove(completeProc)

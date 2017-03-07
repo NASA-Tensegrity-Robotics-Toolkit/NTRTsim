@@ -19,7 +19,7 @@
 /**
  * @file tgCompressionSpringActuator.cpp
  * @brief Contains the definitions of members of class tgCompressionSpringActuator.
- * @author Drew Sabelhaus, Brian Mirletz
+ * @author Drew Sabelhaus
  * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */

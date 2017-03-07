@@ -19,7 +19,7 @@
 /**
  * @file tgCompressionSpringActuatorInfo.h
  * @brief Definition of class tgCompressionSpringActuatorInfo, used to create a tgBulletCompressionSpring
- * @author Drew Sabelhaus, Ryan Adams
+ * @author Drew Sabelhaus, et al.
  * @date August 2016
  * $Id$
  */
@@ -42,25 +42,24 @@
  * the actual compression spring object and also to 
  * reference its config.
  * TO-DO: why not just include tgBulletCompressionSpring.h? */
-
 class tgBulletCompressionSpring;
-//class tgCompressionSpringActuator;
 
+// The compression spring actuator serves as a connector
 class tgCompressionSpringActuatorInfo : public tgConnectorInfo
 {
 public:
 
     /**
-     * Construct a tgCompressionSpringActuatorInfo with just a config. The pair must be filled in 
-     * later, or factory methods can be used to create instances with
-     * pairs.
+     * Construct a tgCompressionSpringActuatorInfo with just a config. 
+     * The pair must be filled in later, or factory methods can 
+     * be used to create instances with pairs.
      */
     tgCompressionSpringActuatorInfo(const tgCompressionSpringActuator::Config& config);
 
     /**
-     * Construct a tgCompressionSpringActuatorInfo with just a config and tags. The pair must 
-     * be filled in later, or factory methods can be used to create instances 
-     * with pairs.
+     * Construct a tgCompressionSpringActuatorInfo with just a config and tags.
+     * The pair must be filled in later, or factory methods can 
+     * be used to create instances with pairs.
      */
     tgCompressionSpringActuatorInfo(const tgCompressionSpringActuator::Config& config, tgTags tags);
 

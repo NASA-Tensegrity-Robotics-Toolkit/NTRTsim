@@ -37,7 +37,7 @@ builders:
     parameters:
       stiffness: 1000.0
       damping: 100.0
-      pretension: 100.0
+      pretension: 10.0
       history: 0
       max_tension: 7000.0
       target_velocity: 12.0

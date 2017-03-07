@@ -76,10 +76,10 @@ void MountainGoat::addNodesLeg(tgStructure& s, double r){
     s.addNode(0,-r/2,0);  //5: Leg segment extension for connections to foot.
 
     //Extra nodes, for supporting rod structures on bottom
-    s.addNode(0,-r/2,-r/2); //6
-    s.addNode(0,-r/2,r/2); //7
-    s.addNode(r/2,-r/2,0); //8
-    s.addNode(-r/2,-r/2,0); //9 
+    //s.addNode(0,-r/2,-r/2); //6
+    //s.addNode(0,-r/2,r/2); //7
+    //s.addNode(r/2,-r/2,0); //8
+    //s.addNode(-r/2,-r/2,0); //9 
 }
 
 void MountainGoat::addRodsLeg(tgStructure& s){
@@ -90,10 +90,10 @@ void MountainGoat::addRodsLeg(tgStructure& s){
     s.addPair(0,5,"rod");
 
     //Extra rods, for support
-    s.addPair(5,6,"rod");
-    s.addPair(5,7,"rod");
-    s.addPair(5,8,"rod");
-    s.addPair(5,9,"rod");
+    //s.addPair(5,6,"rod");
+    //s.addPair(5,7,"rod");
+    //s.addPair(5,8,"rod");
+    //s.addPair(5,9,"rod");
 }
 
 void MountainGoat::addNodesHip(tgStructure& s, double r){
@@ -351,7 +351,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
 
     goat.addPair(n7[3], n1[1], tgString("all left_shoulder hip rear lower muscleAct1 seg", 7) + tgString(" seg", 1));
     goat.addPair(n7[3], n1[4], tgString("all left_shoulder hip front lower muscleAct1 seg", 7) + tgString(" seg", 1));
-    goat.addPair(n7[3], n0[1], tgString("all left_shoulder hip front bottom muscleAct1 seg", 7) + tgString(" seg", 0));
+    goat.addPair(n7[3], n0[1], tgString("all left_shoulder front bottom muscleAct1 seg", 7) + tgString(" seg", 0));
     goat.addPair(n7[3], n2[4], tgString("all left_shoulder hip rear bottom muscleAct1 seg", 7) + tgString(" seg", 2));
 
     //Extra muscles, to move left shoulder forward and back:
@@ -367,7 +367,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
     goat.addPair(n8[3], n5[1], tgString("all left_hip rear lower muscleAct1 seg", 8) + tgString(" seg", 5));
     goat.addPair(n8[3], n5[4], tgString("all left_hip front lower muscleAct1 seg", 8) + tgString(" seg", 5));
     goat.addPair(n8[3], n4[1], tgString("all left_hip front bottom muscleAct1 seg", 8) + tgString(" seg", 4));
-    goat.addPair(n8[3], n6[4], tgString("all left_hip front bottom muscleAct1 seg", 8) + tgString(" seg", 6));
+    goat.addPair(n8[3], n6[4], tgString("all left_hip front bottom muscleAct1 seg", 8) + tgString(" seg", 6)); //all left_hip 
 
     //Extra muscles, to move left hip forward and back:
     goat.addPair(n8[0], n5[1], tgString("all left_hip rear mid muscleAct1 seg", 8) + tgString(" seg", 5)); 
@@ -391,7 +391,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
     //Right hip muscles
     goat.addPair(n10[1], n5[2], tgString("all right_hip rear upper muscleAct1 seg", 10) + tgString(" seg", 5));
     goat.addPair(n10[1], n5[3], tgString("all right_hip front upper muscleAct1 seg", 10) + tgString(" seg", 5));
-    goat.addPair(n10[1], n4[2], tgString("all right_hip front top muscleAct1 seg", 10) + tgString(" seg", 4));
+    goat.addPair(n10[1], n4[2], tgString("all right_hip front top muscleAct1 seg", 10) + tgString(" seg", 4)); //all right_hip 
     goat.addPair(n10[1], n6[3], tgString("all right_hip rear top muscleAct1 seg", 10) + tgString(" seg", 6));
 
     goat.addPair(n10[3], n5[2], tgString("all right_hip rear lower muscleAct1 seg", 10) + tgString(" seg", 5));
@@ -440,7 +440,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
 
     //Left rear leg/hip
     goat.addPair(n12[4], n8[3], tgString("all left_hindleg outer thigh muscle seg", 12) + tgString(" seg", 8)); 
-    goat.addPair(n12[4], n8[2], tgString("all left_hindleg inner thigh muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[4], n8[2], tgString("inner thigh muscle seg", 12) + tgString(" seg", 8));
 
     goat.addPair(n12[4], n3[1],tgString("all left_hindleg rear abdomen connection muscle seg", 12) + tgString(" seg", 3)); 
     goat.addPair(n12[3], n5[1],tgString("all left_hindleg front abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); //Active
@@ -459,9 +459,9 @@ void MountainGoat::addMuscles(tgStructure& goat){
     goat.addPair(n14[4], n10[2], tgString("all right_hindleg inner thigh muscle seg", 14) + tgString(" seg", 10)); 
     goat.addPair(n14[4], n10[3], tgString("all right_hindleg outer thigh muscle seg", 14) + tgString(" seg", 10));
 
-    goat.addPair(n14[4], n3[2], tgString("all right_hindleg rear abdomen connection muscle seg", 14) + tgString(" seg", 3)); 
-    goat.addPair(n14[3], n5[2], tgString("all right_hindleg front abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); //Active
-    goat.addPair(n14[2], n5[3], tgString("all right_hindleg rear abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); //Active
+    goat.addPair(n14[4], n3[2], tgString("all right_hindleg rear abdomen connection muscle seg", 14) + tgString(" seg", 3));  
+    goat.addPair(n14[3], n5[2], tgString("all right_hindleg front abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); 
+    goat.addPair(n14[2], n5[3], tgString("all right_hindleg rear abdomen connection muscle3 seg", 14) + tgString(" seg", 5)); 
 
 
     goat.addPair(n14[3], n10[2], tgString("all right_hindleg inner calf muscle seg", 14) + tgString(" seg", 10));
@@ -471,7 +471,7 @@ void MountainGoat::addMuscles(tgStructure& goat){
     goat.addPair(n14[2], n10[3], tgString("all right_hindleg outer front calf muscle seg", 14) + tgString(" seg", 10));
 
     //Adding muscle to pull rear left leg up:
-    goat.addPair(n14[4], n10[1], tgString("all right_hindleg central thigh muscle3 seg", 14) + tgString(" seg", 10)); //Active
+    goat.addPair(n14[4], n10[1], tgString("all right_hindleg central thigh muscle3 seg", 14) + tgString(" seg", 10)); 
 
 }
 

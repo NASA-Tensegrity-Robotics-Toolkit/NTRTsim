@@ -183,6 +183,23 @@ std::vector<tgModel*> tgModel::getDescendants() const
   return result;
 }
 
+/**
+ * For tgSenseable: just return the results of getDescendants here.
+ * This should be OK, since a vector of tgModel* is also a vector of
+ * tgSenseable*.
+ */
+std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
+{
+  // TO-DO: why can't we just return the results of getDescendants?
+  // There seems to be some polymorphism issue here...
+  std::vector<tgModel*> myDescendants = getDescendants();
+  std::vector<tgSenseable*> mySenseableDescendants;
+  for (size_t i=0; i < myDescendants.size(); i++) {
+    mySenseableDescendants.push_back(myDescendants[i]);
+  }
+  return mySenseableDescendants;
+}
+
 const std::vector<abstractMarker>& tgModel::getMarkers() const {
     return m_markers;
 }

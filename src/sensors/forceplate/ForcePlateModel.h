@@ -38,7 +38,7 @@
 #include "LinearMath/btVector3.h"
 
 // Forward declarations
-class tgUnidirectionalCompressionSpringActuator;
+class tgUnidirComprSprActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
@@ -441,11 +441,11 @@ protected:
      * Note that there are no springs in the minus Y direction (only the springs
      * between the bottom of the plate and the housing bed, e.g., in +Y).
      */
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusX;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusX;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusY;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsPlusZ;
-    std::vector<tgUnidirectionalCompressionSpringActuator*> springsMinusZ;
+    std::vector<tgUnidirComprSprActuator*> springsPlusX;
+    std::vector<tgUnidirComprSprActuator*> springsMinusX;
+    std::vector<tgUnidirComprSprActuator*> springsPlusY;
+    std::vector<tgUnidirComprSprActuator*> springsPlusZ;
+    std::vector<tgUnidirComprSprActuator*> springsMinusZ;
 
     /**
      * The amount of gravity in the world.

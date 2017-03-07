@@ -17,9 +17,12 @@ subdirs(
     yamlbuilder
 )
 
-#add_definitions(
-#    -Wall
-#)
+# To turn off verbose compiling, comment out
+# the -Wall below.
+add_definitions(
+  #-Wall
+  #-std=c++11
+)
 
 # Don't need to edit below this line.
 
