@@ -580,7 +580,7 @@ void MountainGoatFM4::setup(tgWorld& world)
     //Build the goat
     tgStructure goat;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(goat,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 

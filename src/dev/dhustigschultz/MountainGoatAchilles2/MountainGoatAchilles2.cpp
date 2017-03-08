@@ -294,7 +294,7 @@ void MountainGoatAchilles2::addMuscles(tgStructure& goat){
 
             }
         }
-        if(i > 0 && i < 7){
+        if(i > 0 && i < 6){
             if(i % 2 == 0){//rear
                 goat.addPair(n1[1], n2[3], tgString("spine all main rear upper left muscleAct1 seg", i-1) + tgString(" seg", i));
                 goat.addPair(n1[1], n2[4], tgString("spine all main rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
@@ -309,6 +309,14 @@ void MountainGoatAchilles2::addMuscles(tgStructure& goat){
                 goat.addPair(n1[2], n2[4], tgString("spine all main front upper left muscleAct1 seg", i-1) + tgString(" seg", i));
             }
         }
+	else if(i==6){ //Unrolling the loop a bit, so that I can relabel some muscles as part of the spiral
+
+            goat.addPair(n1[1], n2[3], tgString("spine all spiral main rear upper left muscleAct1 seg", i-1) + tgString(" seg", i));
+            goat.addPair(n1[1], n2[4], tgString("spine all spiral main rear lower left muscleAct2 seg", i-1) + tgString(" seg", i));
+            goat.addPair(n1[2], n2[3], tgString("spine all spiral main rear upper right muscleAct1 seg", i-1) + tgString(" seg", i));
+            goat.addPair(n1[2], n2[4], tgString("spine all spiral main rear lower right muscleAct2 seg", i-1) + tgString(" seg", i));
+
+	}
 	if (i >= 2 && i < 7){
 	    goat.addPair(n1[3], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
 	    goat.addPair(n1[4], n2[3], tgString("spine all spiral muscleAct1 seg", i-1) + tgString(" seg", i));
@@ -611,7 +619,7 @@ void MountainGoatAchilles2::setup(tgWorld& world)
     //Build the goat
     tgStructure goat;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(goat,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 

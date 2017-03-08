@@ -11,7 +11,6 @@ subdirs(
     BigPuppy_SymmetricArching
     BigPuppy_SymmetricSpiral1
     BigPuppy_SymmetricSpiral2
-    BigPuppy_SymmetricSpiral_Segments
     BigPuppy_SpineOnly
     BigPuppy_SpineOnly_Stats
     BigPuppy_Anchored_Model
@@ -30,11 +29,6 @@ subdirs(
     BP_SC_DoxieSpirals
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
-
-    BP_SC_SymmetricSpiral_Segments
-
-    BP_SC_SymmetricSpiral3
-    BigPuppy_SymmetricSpiral_Metrics
 
     MountainGoat
     MountainGoatFM0
@@ -72,10 +66,6 @@ subdirs(
     MountainGoatFM4
     MG_FewerMuscles4
 
-    MountainGoatFM5
-    MountainGoatFM6
-    MountainGoatFM7
-
     MG_SM_CPGHierarchy
     MG_NL_CPGHierarchy
     MG_CPGSingleLeg
@@ -83,4 +73,5 @@ subdirs(
 
     HexagonalSpine    
     BigPuppy_SSM_Terrain
+
 )

@@ -635,7 +635,7 @@ void BigPuppySymmetricSpiral1::setup(tgWorld& world)
     //Build the puppy
     tgStructure puppy;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(puppy,vertebra,hip,leg,foot,rod_space); //,m_segments,m_hips,m_legs,m_feet
 

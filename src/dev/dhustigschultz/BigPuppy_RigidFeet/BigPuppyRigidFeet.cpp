@@ -53,7 +53,7 @@
 #include <stdexcept>
 
 //#define USE_KINEMATIC
-#define PASSIVE_STRUCTURE
+//#define PASSIVE_STRUCTURE
 
 BigPuppyRigidFeet::BigPuppyRigidFeet(int segments, int hips, int legs, int feet) :
 BaseSpineModelLearning(segments),
@@ -643,11 +643,11 @@ void BigPuppyRigidFeet::setup(tgWorld& world)
     //Build the puppy
     tgStructure puppy;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(puppy,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 
-    puppy.move(btVector3(0.0,26,0.0));
+    puppy.move(btVector3(0.0,-yOffset_foot,0.0));
 
     addMuscles(puppy); //,m_segments,m_hips,m_legs,m_feet
 

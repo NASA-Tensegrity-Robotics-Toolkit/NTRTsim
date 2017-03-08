@@ -498,18 +498,19 @@ void MountainGoat::setup(tgWorld& world)
 
     const double stiffness = 1000.0;
     const double stiffnessPassive = 4000.0; //4000
-    const double stiffnessPassive2 = 4000.0;
+    const double stiffnessPassive2 = 10000.0;
     const double stiffnessPassive3 = 10000.0;
     const double damping = .01*stiffness;
     const double pretension = 0.0;
     const bool   history = true;
     const double maxTens = 7000.0;
+    const double maxTens2 = 10000.0;
     const double maxSpeed = 12.0;
 
     const double passivePretension = 1000; 
     const double passivePretension2 = 3500; 
     const double passivePretension3 = 3500; 
-    const double passivePretension4 = 4000.0;
+    const double passivePretension4 = 9000.0;
 
 #ifdef USE_KINEMATIC
 
@@ -520,47 +521,47 @@ void MountainGoat::setup(tgWorld& world)
     #ifdef PASSIVE_STRUCTURE
         tgKinematicActuator::Config motorConfig(stiffness, 20, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigStomach(stiffnessPassive2, damping, passivePretension4,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens2, 2*maxSpeed); 
 	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive3, damping, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
     #else
         tgKinematicActuator::Config motorConfigSpine(stiffness, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigStomach(stiffnessPassive2, damping, passivePretension4,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
-	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive, damping, passivePretension3, // Was stiffnessPassive3
+                                            history, maxTens2, 2*maxSpeed); 
+	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive3, damping, passivePretension3, 
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
     #endif
 
 #else
     
     #ifdef PASSIVE_STRUCTURE
-        tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
-	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
-	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+        tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history, maxTens2, 2*maxSpeed); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3, history, maxTens, 2*maxSpeed);
 
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
-	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history);
-	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3, history);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history, maxTens2, 2*maxSpeed); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3, history, maxTens, 2*maxSpeed);
     #endif
 
 #endif
@@ -583,7 +584,7 @@ void MountainGoat::setup(tgWorld& world)
     //Build the goat
     tgStructure goat;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(goat,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 

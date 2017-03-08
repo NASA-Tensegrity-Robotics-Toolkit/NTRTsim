@@ -538,6 +538,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
     const tgRod::Config rodConfig(radius, density, friction, rollFriction, restitution);
 
     const double stiffness = 1000.0;
+    const double stiffnessPassive = 3000.0;
     const double damping = .01*stiffness;
     const double pretension = 0.0; 
     const bool   history = true;
@@ -563,14 +564,14 @@ void BigPuppySymmetric::setup(tgWorld& world)
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
 
-	tgKinematicActuator::Config motorConfigOther(3000, damping*3, passivePretension2,
+	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
 
-	tgKinematicActuator::Config motorConfigFeet(stiffness, damping, passivePretension,
+	tgKinematicActuator::Config motorConfigFeet(stiffnessPassive, damping, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed); 
-	tgKinematicActuator::Config motorConfigLegs(3000, damping*3, passivePretension3,
+	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive, damping, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
                                             history, maxTens, maxSpeed);
     #endif
@@ -581,9 +582,9 @@ void BigPuppySymmetric::setup(tgWorld& world)
         tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
     #else
         tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
-	tgSpringCableActuator::Config muscleConfigOther(3000, damping*3, passivePretension2);
-	tgSpringCableActuator::Config muscleConfigFeet(stiffness, damping, passivePretension); 
-	tgSpringCableActuator::Config muscleConfigLegs(3000, damping*3, passivePretension3);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
+	tgSpringCableActuator::Config muscleConfigFeet(stiffnessPassive, damping, passivePretension); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
     #endif
 
 #endif
@@ -611,7 +612,7 @@ void BigPuppySymmetric::setup(tgWorld& world)
     //Build the puppy
     tgStructure puppy;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(puppy,vertebra,hip,leg,foot,rod_space); //,m_segments,m_hips,m_legs,m_feet
 

@@ -117,6 +117,9 @@ void BigFoot::setup(tgWorld& world)
     foot.addPair(5,6,"muscle");
     foot.addPair(6,7,"muscle");
 
+    foot.move(btVector3(0.0,2.5,0.0));  // The foot gets stuck in the ground if the bottom-most nodes are left at zero, 
+					// have to shift it up in y-direction to get around this.
+
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));

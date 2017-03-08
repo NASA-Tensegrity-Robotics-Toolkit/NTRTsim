@@ -286,6 +286,9 @@ void BigPuppy::addMuscles(tgStructure& puppy, std::size_t segments, std::size_t 
             puppy.addPair(n0[3], n1[3], tgString("spine first upper right muscle seg", i-2) + tgString(" seg", i-1));
             puppy.addPair(n0[3], n1[4], tgString("spine first upper left muscle seg", i-2) + tgString(" seg", i-1));
 
+            puppy.addPair(n0[4], n1[3], tgString("puppy front lower right muscle seg", i-2) + tgString(" seg", i-1));
+            puppy.addPair(n0[4], n1[4], tgString("puppy front lower left muscle seg", i-2) + tgString(" seg", i-1));
+
         }        
 
         //Add muscles to the puppy
@@ -457,8 +460,8 @@ void BigPuppy::addMuscles(tgStructure& puppy, std::size_t segments, std::size_t 
     puppy.addPair(n11[4], n7[3], tgString("left outer thigh muscle seg", 11) + tgString(" seg", 7)); 
     puppy.addPair(n11[4], n7[2], tgString("left inner thigh muscle seg", 11) + tgString(" seg", 7));
 
-    puppy.addPair(n11[4], n3[4],tgString("left rear abdomen muscle seg", 11) + tgString(" seg", 3)); 
-    puppy.addPair(n11[3], n5[1],tgString("left rear abdomen muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n11[4], n3[4],tgString("left front hind abdomen muscle seg", 11) + tgString(" seg", 3)); 
+    puppy.addPair(n11[3], n5[1],tgString("left rear hind abdomen muscle seg", 11) + tgString(" seg", 5)); 
 
     puppy.addPair(n11[3], n7[3], tgString("left outer calf muscle seg", 11) + tgString(" seg", 7));
     puppy.addPair(n11[3], n7[2], tgString("left inner calf muscle seg", 11) + tgString(" seg", 7));
@@ -600,7 +603,7 @@ void BigPuppy::setup(tgWorld& world)
     std::size_t m_hips = 4;
     std::size_t m_legs = 4;
     std::size_t m_feet = 4;
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) -2;
 
     addSegments(puppy,vertebra,hip,leg,foot,rod_space,m_segments,m_hips,m_legs,m_feet); 
 
@@ -629,7 +632,9 @@ void BigPuppy::setup(tgWorld& world)
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
-    allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+    m_allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
+
+    m_allSegments = this->find<tgModel> ("segment");
     
     // Notify controllers that setup has finished.
     notifySetup();
@@ -655,13 +660,109 @@ void BigPuppy::step(double dt)
     }
 }
 
+const std::vector<tgSpringCableActuator*>&
+BigPuppy::getMuscles (const std::string& key) const
+{
+    const MuscleMap::const_iterator it = m_muscleMap.find(key);
+    if (it == m_muscleMap.end())
+    {
+        throw std::invalid_argument("Key '" + key + "' not found in muscle map");
+    }
+    else
+    {
+        return it->second;
+    }
+}
+
 const std::vector<tgSpringCableActuator*>& BigPuppy::getAllMuscles() const
 {
-    return allMuscles;
+    return m_allMuscles;
+}
+
+const std::vector<tgBaseRigid*> BigPuppy::getAllRigids() const
+{
+	if (m_allSegments.size() != m_pSegments)
+    {
+        throw std::runtime_error("Not initialized");
+    }
+	
+	std::vector<tgBaseRigid*> p_rods;
+	
+	for (std::size_t i = 0; i < m_allSegments.size(); i++)
+	{
+		std::vector<tgBaseRigid*> temp = tgCast::filter<tgModel, tgBaseRigid> (m_allSegments[i]->getDescendants());
+        p_rods.insert(p_rods.end(), temp.begin(), temp.end());
+	}
+	
+	return p_rods;
+}
+
+const int BigPuppy::getSegments() const
+{
+    return m_pSegments;
+}
+
+//Figure out whether you need to make this and getSegmentCOMVector local to the spine somehow....
+std::vector<double> BigPuppy::getSegmentCOM(const int n) const
+{
+    
+    btVector3 segmentCenterOfMass = getSegmentCOMVector(n);
+    
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { result[i] = segmentCenterOfMass[i]; }
+    
+    return result;
+}
+
+btVector3 BigPuppy::getSegmentCOMVector(const int n) const
+{
+    if (m_allSegments.size() != m_pSegments)
+    {
+        throw std::runtime_error("Not initialized");
+    }
+    else if (n < 0) 
+    {
+        throw std::range_error("Negative segment number"); 
+    }
+    else if (n >= m_pSegments)
+    {
+        throw std::range_error(tgString("Segment number > ", m_pSegments));
+    }
+    
+    std::vector<tgRod*> p_rods =
+        tgCast::filter<tgModel, tgRod> (m_allSegments[n]->getDescendants());
+    
+    // Ensure our segments are being populated correctly
+    assert(!p_rods.empty());
+
+    btVector3 segmentCenterOfMass(0, 0, 0);
+    double segmentMass = 0.0;
+    for (std::size_t i = 0; i < p_rods.size(); i++)
+    {
+        const tgRod* const pRod = p_rods[i];
+        assert(pRod != NULL);
+        const double rodMass = pRod->mass();
+        //std::cout << "mass " << rodMass;
+        const btVector3 rodCenterOfMass = pRod->centerOfMass();
+        segmentCenterOfMass += rodCenterOfMass * rodMass;
+        segmentMass += rodMass;
+    }
+    
+    // Check to make sure the rods actually had mass
+    assert(segmentMass > 0.0);
+    
+    segmentCenterOfMass /= segmentMass;
+
+    return segmentCenterOfMass;
 }
 
 void BigPuppy::teardown()
 {
     notifyTeardown();
     tgModel::teardown();
+
+    m_allMuscles.clear();
+    m_allSegments.clear();
+    //m_muscleMap.clear();
 }

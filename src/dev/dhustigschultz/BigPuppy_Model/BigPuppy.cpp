@@ -308,7 +308,7 @@ void BigPuppy::setup(tgWorld& world)
         spine.addChild(t); //Add a segment to the spine
     }
 
-    spine.move(btVector3(0.0,21.0,0.0));
+    spine.move(btVector3(0.0,23.0,0.0));
 
 
     std::vector<tgStructure*> children = spine.getChildren();

@@ -464,7 +464,8 @@ void BigPuppyNoFeet::addMuscles(tgStructure& puppy){
     puppy.addPair(n12[4], n8[2], tgString("right inner thigh muscle seg", 11) + tgString(" seg", 7));
 
     puppy.addPair(n12[4], n3[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 3)); 
-    puppy.addPair(n12[3], n5[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
+    puppy.addPair(n12[3], n5[1],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5));
+    puppy.addPair(n12[2], n5[4],tgString("right rear abdomen connection muscle seg", 11) + tgString(" seg", 5)); 
 
     puppy.addPair(n12[3], n8[3], tgString("right outer calf muscle seg", 11) + tgString(" seg", 7));
     puppy.addPair(n12[3], n8[2], tgString("right inner calf muscle seg", 11) + tgString(" seg", 7));
@@ -481,6 +482,7 @@ void BigPuppyNoFeet::addMuscles(tgStructure& puppy){
 
     puppy.addPair(n14[4], n3[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 3)); 
     puppy.addPair(n14[3], n5[2], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
+    puppy.addPair(n14[2], n5[3], tgString("left rear abdomen connection muscle seg", 13) + tgString(" seg", 5)); 
 
     puppy.addPair(n14[3], n10[2], tgString("left inner calf muscle seg", 13) + tgString(" seg", 9));
     puppy.addPair(n14[3], n10[3], tgString("left outer calf muscle seg", 13) + tgString(" seg", 9));
@@ -546,7 +548,7 @@ void BigPuppyNoFeet::setup(tgWorld& world)
     const double maxSpeed = 12.0;
 
     const double passivePretension = 1000; 
-    const double passivePretension2 = 2500;
+    const double passivePretension2 = 3000;
     const double passivePretension3 = 2500;
 
 #ifdef USE_KINEMATIC
@@ -628,11 +630,11 @@ void BigPuppyNoFeet::setup(tgWorld& world)
     //Build the puppy
     tgStructure puppy;
 
-    const double yOffset_foot = -(2*rod_space+6);
+    const double yOffset_foot = -(2*rod_space+6) - 2;
 
     addSegments(puppy,vertebra,hip,leg,rod_space); //,m_segments,m_hips,m_legs,m_feet
 
-    puppy.move(btVector3(0.0,26,0.0));
+    puppy.move(btVector3(0.0,-yOffset_foot,0.0));
 
     addMuscles(puppy); //,m_segments,m_hips,m_legs,m_feet
 

@@ -382,7 +382,7 @@ void BigPuppySpineOnlyStats::setup(tgWorld& world)
 
     addSegments(puppy,vertebra,hip,rod_space); //,m_segments,m_hips,m_legs,m_feet
 
-    puppy.move(btVector3(0.0,12.0,0.0));
+    puppy.move(btVector3(0.0,14.0,0.0));
 
     addMuscles(puppy); //,m_segments,m_hips,m_legs,m_feet
 
