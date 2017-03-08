@@ -43,6 +43,12 @@ class tgStructure;    //Do I need this, or tgStructureInfo?
 class tgStructureInfo;  //Do I need this, or just tgStructure, or both?
 class tgBasicActuator;  
 
+
+class tgSpringCableActuator;
+class tgWorld;
+class tgBaseRigid;
+class btVector3;
+
 class BigPuppy: public tgSubject<BigPuppy>, public tgModel
 {
 public: 
@@ -73,11 +79,38 @@ public:
      */
     virtual void step(double dt);
 
+    virtual const std::vector<tgSpringCableActuator*>& getMuscles(const std::string& key) const;
+
     /**
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles
      */
     const std::vector<tgSpringCableActuator*>& getAllMuscles() const;
+
+    virtual const std::vector<tgBaseRigid*> getAllRigids() const;
+    
+    virtual const int getSegments() const;
+
+    virtual std::vector<double> getSegmentCOM(const int n) const;
+
+    virtual btVector3 getSegmentCOMVector(const int n) const;
+    
+    virtual std::size_t getNumberofMuslces() const
+    {
+        return m_allMuscles.size();
+    }
+
+    typedef std::map<std::string, std::vector<tgSpringCableActuator*> > MuscleMap;
+
+protected: 
+
+    std::vector<tgSpringCableActuator*> m_allMuscles;
+
+    std::vector<tgModel*> m_allSegments;
+
+    std::size_t m_pSegments;
+
+    MuscleMap m_muscleMap;
 
 private:
 
