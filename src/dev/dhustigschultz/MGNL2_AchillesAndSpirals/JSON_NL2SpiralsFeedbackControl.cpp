@@ -142,7 +142,7 @@ void JSON_NL2SpiralsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
 {
     m_pCPGSys = new CPGEquationsFB(500);
 
-    Json::Value root; // will contains the root value after parsing.
+    Json::Value root; // will contain the root value after parsing.
     Json::Reader reader;
 
     bool parsingSuccessful = reader.parse( FileHelpers::getFileString(controlFilename.c_str()), root );
@@ -156,11 +156,6 @@ void JSON_NL2SpiralsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
     // Lower level CPG node and edge params:
-    /*
-    Json::Value legNodeVals = root.get("legNodeVals", "UTF-8");
-
-    Json::Value hipEdgeVals = root.get("hipEdgeVals", "UTF-8");
-    Json::Value legEdgeVals = root.get("legEdgeVals", "UTF-8");*/
     Json::Value achillesNodeVals = root.get("achillesNodeVals", "UTF-8");
     Json::Value achillesEdgeVals = root.get("achillesEdgeVals", "UTF-8");    
 
@@ -168,26 +163,41 @@ void JSON_NL2SpiralsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     Json::Value spiralEdgeVals = root.get("spiralEdgeVals", "UTF-8");
 
     std::cout << achillesNodeVals << std::endl;
-    
-    /*
-    legNodeVals = legNodeVals.get("params", "UTF-8");
-    
-    hipEdgeVals = hipEdgeVals.get("params", "UTF-8");
-    legEdgeVals = legEdgeVals.get("params", "UTF-8");*/
+
     achillesNodeVals = achillesNodeVals.get("params", "UTF-8");
     achillesEdgeVals = achillesEdgeVals.get("params", "UTF-8");
 
     spiralNodeVals = spiralNodeVals.get("params", "UTF-8");
     spiralEdgeVals = spiralEdgeVals.get("params", "UTF-8");
     
-    // A painful way of reducing the solution space... had to rewrite scaleEdgeActions() to take in a couple more parameters.
     array_4D spiralEdgeParams = scaleEdgeActions(spiralEdgeVals,m_config.segmentSpan,m_config.theirSpiralMuscles,m_config.ourSpiralMuscles);
-    //array_4D hipEdgeParams = scaleEdgeActions(hipEdgeVals,m_config.segmentSpan,m_config.theirHipMuscles,m_config.ourHipMuscles);
-    //array_4D legEdgeParams = scaleEdgeActions(legEdgeVals,m_config.segmentSpan,m_config.theirLegMuscles,m_config.ourLegMuscles);
     array_4D achillesEdgeParams = scaleEdgeActions(achillesEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
     array_2D spiralNodeParams = scaleNodeActions(spiralNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
-    //array_2D legNodeParams = scaleNodeActions(legNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
     array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
+
+#if(1)
+    Json::Value PVal = root.get("propVals", "UTF-8");
+    Json::Value DVal = root.get("derVals", "UTF-8");
+
+	cout << PVal << endl;
+    
+	// Keep drilling if necessary
+    PVal = PVal.get("params", "UTF-8");
+    DVal = DVal.get("params", "UTF-8");
+
+	if (PVal[0].isArray())
+	{
+		PVal = PVal[0];
+	}
+	if (DVal[0].isArray())
+	{
+		DVal = DVal[0];
+	}
+    
+	int j = 0;
+	P = (PVal.get(j, 0.0)).asDouble();
+	D = (DVal.get(j, 0.0)).asDouble();
+#endif
 
     // Setup the lower level of CPGs
     setupCPGs(subject, achillesNodeParams, achillesEdgeParams, spiralNodeParams, spiralEdgeParams);
@@ -249,31 +259,6 @@ void JSON_NL2SpiralsFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
-
-    
-#if(1)
-    Json::Value PVal = root.get("propVals", "UTF-8");
-    Json::Value DVal = root.get("derVals", "UTF-8");
-
-	cout << PVal << endl;
-    
-	// Keep drilling if necessary
-    PVal = PVal.get("params", "UTF-8");
-    DVal = DVal.get("params", "UTF-8");
-
-	if (PVal[0].isArray())
-	{
-		PVal = PVal[0];
-	}
-	if (DVal[0].isArray())
-	{
-		DVal = DVal[0];
-	}
-    
-	int j = 0;
-	P = (PVal.get(j, 0.0)).asDouble();
-	D = (DVal.get(j, 0.0)).asDouble();
-#endif
 
 }
 

@@ -189,6 +189,30 @@ void JSONAASFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     //array_2D legNodeParams = scaleNodeActions(legNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
     array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
 
+#if(1)
+    Json::Value PVal = root.get("propVals", "UTF-8");
+    Json::Value DVal = root.get("derVals", "UTF-8");
+
+	cout << PVal << endl;
+    
+	// Keep drilling if necessary
+    PVal = PVal.get("params", "UTF-8");
+    DVal = DVal.get("params", "UTF-8");
+
+	if (PVal[0].isArray())
+	{
+		PVal = PVal[0];
+	}
+	if (DVal[0].isArray())
+	{
+		DVal = DVal[0];
+	}
+    
+	int j = 0;
+	P = (PVal.get(j, 0.0)).asDouble();
+	D = (DVal.get(j, 0.0)).asDouble();
+#endif
+
     // Setup the lower level of CPGs
     setupCPGs(subject, achillesNodeParams, achillesEdgeParams, spiralNodeParams, spiralEdgeParams);
 
@@ -249,31 +273,6 @@ void JSONAASFeedbackControl::onSetup(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
-
-    
-#if(1)
-    Json::Value PVal = root.get("propVals", "UTF-8");
-    Json::Value DVal = root.get("derVals", "UTF-8");
-
-	cout << PVal << endl;
-    
-	// Keep drilling if necessary
-    PVal = PVal.get("params", "UTF-8");
-    DVal = DVal.get("params", "UTF-8");
-
-	if (PVal[0].isArray())
-	{
-		PVal = PVal[0];
-	}
-	if (DVal[0].isArray())
-	{
-		DVal = DVal[0];
-	}
-    
-	int j = 0;
-	P = (PVal.get(j, 0.0)).asDouble();
-	D = (DVal.get(j, 0.0)).asDouble();
-#endif
 
 }
 

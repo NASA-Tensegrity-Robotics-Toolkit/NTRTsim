@@ -156,32 +156,41 @@ void JSON_AO_FeedbackControl::onSetup(BaseQuadModelLearning& subject)
     // Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
     // such member.
     // Lower level CPG node and edge params:
-    /*Json::Value spineNodeVals = root.get("spineNodeVals", "UTF-8");
-    Json::Value legNodeVals = root.get("legNodeVals", "UTF-8");
-    Json::Value spineEdgeVals = root.get("spineEdgeVals", "UTF-8");
-    Json::Value hipEdgeVals = root.get("hipEdgeVals", "UTF-8");
-    Json::Value legEdgeVals = root.get("legEdgeVals", "UTF-8");*/
     Json::Value achillesNodeVals = root.get("achillesNodeVals", "UTF-8");
     Json::Value achillesEdgeVals = root.get("achillesEdgeVals", "UTF-8");    
 
     std::cout << achillesNodeVals << std::endl;
     
-    /*spineNodeVals = spineNodeVals.get("params", "UTF-8");
-    legNodeVals = legNodeVals.get("params", "UTF-8");
-    spineEdgeVals = spineEdgeVals.get("params", "UTF-8");
-    hipEdgeVals = hipEdgeVals.get("params", "UTF-8");
-    legEdgeVals = legEdgeVals.get("params", "UTF-8");*/
     achillesNodeVals = achillesNodeVals.get("params", "UTF-8");
     achillesEdgeVals = achillesEdgeVals.get("params", "UTF-8");
     
-    // A painful way of reducing the solution space... had to rewrite scaleEdgeActions() to take in a couple more parameters.
-    //array_4D spineEdgeParams = scaleEdgeActions(spineEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
-    //array_4D hipEdgeParams = scaleEdgeActions(hipEdgeVals,m_config.segmentSpan,m_config.theirHipMuscles,m_config.ourHipMuscles);
-    //array_4D legEdgeParams = scaleEdgeActions(legEdgeVals,m_config.segmentSpan,m_config.theirLegMuscles,m_config.ourLegMuscles);
     array_4D achillesEdgeParams = scaleEdgeActions(achillesEdgeVals,m_config.segmentSpan,m_config.theirMuscles,m_config.ourMuscles);
-    //array_2D spineNodeParams = scaleNodeActions(spineNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
-    //array_2D legNodeParams = scaleNodeActions(legNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
     array_2D achillesNodeParams = scaleNodeActions(achillesNodeVals, m_config.highFreq, m_config.freqFeedbackMax);
+
+    
+#if(1)
+    Json::Value PVal = root.get("propVals", "UTF-8");
+    Json::Value DVal = root.get("derVals", "UTF-8");
+
+	cout << PVal << endl;
+    
+	// Keep drilling if necessary
+    PVal = PVal.get("params", "UTF-8");
+    DVal = DVal.get("params", "UTF-8");
+
+	if (PVal[0].isArray())
+	{
+		PVal = PVal[0];
+	}
+	if (DVal[0].isArray())
+	{
+		DVal = DVal[0];
+	}
+    
+	int j = 0;
+	P = (PVal.get(j, 0.0)).asDouble();
+	D = (DVal.get(j, 0.0)).asDouble();
+#endif
 
     // Setup the lower level of CPGs
     setupCPGs(subject, achillesNodeParams, achillesEdgeParams);
@@ -243,31 +252,6 @@ void JSON_AO_FeedbackControl::onSetup(BaseQuadModelLearning& subject)
     payloadLog.open(controlFilename.c_str(),ofstream::out);
     
     payloadLog << root << std::endl;
-
-    
-#if(1)
-    Json::Value PVal = root.get("propVals", "UTF-8");
-    Json::Value DVal = root.get("derVals", "UTF-8");
-
-	cout << PVal << endl;
-    
-	// Keep drilling if necessary
-    PVal = PVal.get("params", "UTF-8");
-    DVal = DVal.get("params", "UTF-8");
-
-	if (PVal[0].isArray())
-	{
-		PVal = PVal[0];
-	}
-	if (DVal[0].isArray())
-	{
-		DVal = DVal[0];
-	}
-    
-	int j = 0;
-	P = (PVal.get(j, 0.0)).asDouble();
-	D = (DVal.get(j, 0.0)).asDouble();
-#endif
 
 }
 
