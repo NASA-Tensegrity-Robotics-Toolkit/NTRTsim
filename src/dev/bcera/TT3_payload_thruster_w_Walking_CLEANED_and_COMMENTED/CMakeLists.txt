@@ -18,7 +18,7 @@ link_libraries(tgcreator
 		Adapters
                 tgOpenGLSupport)
 
-add_executable(App_TT3_Payload_Thruster
+add_executable(App_TT3_Payload_Thruster_cleaned
     PrismModel_modified.cpp
     AppPrismModel.cpp
     RPThruster.cpp

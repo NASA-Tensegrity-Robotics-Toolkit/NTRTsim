@@ -32,6 +32,8 @@
 #include "core/tgSubject.h"
 // The C++ Standard Library
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
@@ -127,6 +129,8 @@ public:
     std::vector<btVector3>& getNormVects();
 
     std::vector<btRigidBody*>& getTank();
+
+    std::vector<abstractMarker> markers;
 
     btQuaternion rotateToFace(tgStructure& s, int face);
 
@@ -243,11 +247,13 @@ private:
      * A list of all of the spring cable actuators. Will be empty until most of the way
      * through setup when it is filled using tgModel's find methods
      */
+    
     std::vector<tgBasicActuator*> allActuators;
-
     std::vector<btVector3> normalVectors;
     std::vector<btVector3> normalVectors_rotated;
     std::vector<tgRod*> allRods;
+
+    std::ofstream sim_out;
     
     // Normal vectors of all icosahedron faces
     btVector3 face0Norm;

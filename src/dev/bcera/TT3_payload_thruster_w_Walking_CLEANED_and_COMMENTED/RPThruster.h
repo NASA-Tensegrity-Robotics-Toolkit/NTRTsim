@@ -30,6 +30,7 @@
 
 // This library
 #include "core/tgObserver.h"
+#include "core/abstractMarker.h" 
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -80,14 +81,14 @@ public:
   
 private:
 
-  int jetnumber;
+  int jetnumber; //number of jets for conic thrust representation
   
   double mass;
   
   std::vector<btVector3> force;
-
   std::vector<btVector3> jetDirections;
   std::vector<btVector3> tankOrientations;
+  std::vector<abstractMarker> markers;
 
   double goalAltitude, goalYaw;
   double prev_angle_err;

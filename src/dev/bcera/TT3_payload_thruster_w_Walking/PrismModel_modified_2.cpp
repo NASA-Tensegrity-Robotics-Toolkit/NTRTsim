@@ -330,7 +330,7 @@ void PrismModel::setup(tgWorld& world)
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
   //rotateToFace(s, 15);
-  //s.move(btVector3(100, 700, -100));
+  s.move(btVector3(100, 700, -100));
   //s.move(btVector3(100, 1800, -100));
   
   // Create the build spec that uses tags to turn the structure into a real model
@@ -565,10 +565,8 @@ void PrismModel::addNodes(tgStructure& s, int offset, double tankToOuterRing)
   double theta = asin(r/t)*180/M_PI;
   double m = sqrt(pow(t,2)+pow((2*t*sin(54*M_PI/180)),2)); //tip to tip of reg. icosahedron
   double var = m-t*cos(theta*M_PI/180);
-
   //Values below copied from Icosahderon_w_payload.m, with Y_ntrt = Z_matlab  and Z_ntrt = -Y_matlab
   //Coordinate transformation necessary as NTRT height direction is (0,1,0) Y unit vector
-
   s.addNode(0, -m/2-tankToOuterRing, 0);  // 0
   s.addNode(0, var-m/2-tankToOuterRing, r);  // 1
   s.addNode(0, t*cos(theta*M_PI/180)-m/2-tankToOuterRing, -r);  // 2
@@ -738,15 +736,3 @@ void PrismModel::changeRobotState(int state)
 {
   robotState = state;
 }
-
-
-
-
-
-
-
-
-
-
-
-
