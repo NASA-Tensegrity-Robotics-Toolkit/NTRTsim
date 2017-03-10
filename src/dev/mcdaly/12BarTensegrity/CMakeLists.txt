@@ -10,8 +10,8 @@ link_libraries(tgcreator
                 core    
                 terrain 
                 tgOpenGLSupport
-    yaml-cpp
-    TensegrityModel)
+    		yaml-cpp
+    		TensegrityModel)
 
 # add_library(TensegrityModel
 #    TensegrityModel.cpp)

@@ -16,9 +16,16 @@
  * governing permissions and limitations under the License.
 */
 
+/**
+ * @file BuildTensegrityModel.cpp
+ * @brief Contains the definition function main() for TensegrityModel
+ * which builds a model based on tensegrity structure defined in YAML
+ * @author Simon Kotwicz & Jonah Eisen
+ * $Id$
+ */
+
 // This application
-#include "yamlbuilder/TensegrityModel.h"
-//#include "LengthControllerYAML.h"
+#include "TensegrityModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -29,12 +36,6 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
-#include <string>
-#include <vector>
-// Sensors
-#include "sensors/tgDataLogger2.h"
-#include "sensors/tgRodSensorInfo.h"
-#include "sensors/tgSpringCableActuatorInfo.h"
 
 /**
  * The entry point.
@@ -45,13 +46,6 @@
  */
 int main(int argc, char** argv)
 {
-    // For this YAML parser app, need to check that an argument path was
-    // passed in.
-    if (argv[1] == NULL)
-    {
-      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
-    }
-
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -60,25 +54,26 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(98.1); // gravity, dm/s^2
+    const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
     // Create the view
-    const double timestep_physics = 0.0001; // seconds // can try 0.0001
+    const double timestep_physics = 0.001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Create the simulation
     tgSimulation simulation(view);
 
-    // Create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1],false); // second argument not necessary
+    // Create the models with their controllers and add the models to
+    // the simulation.
+    // This constructor for TensegrityModel takes the "debugging" flag
+    // as its second parameter. Set to true, and the simulation will
+    // output lots of information about the model that's created.
+    TensegrityModel* const myModel = new TensegrityModel(argv[1], false);
 
     // Add the model to the world
     simulation.addModel(myModel);
-
-    // RPLengthController* const tension_sensor = new RPLengthController();
-    // myModel -> attach(tension_sensor);
 
     // Create data logger
     std::string log = "../../../../resources/src/12Bar/logs";
@@ -94,7 +89,6 @@ int main(int argc, char** argv)
     // Add data logger to the world
     simulation.addDataManager(myDataLogger);
 
-    // Run simulation
     simulation.run();
 
     // teardown is handled by delete
