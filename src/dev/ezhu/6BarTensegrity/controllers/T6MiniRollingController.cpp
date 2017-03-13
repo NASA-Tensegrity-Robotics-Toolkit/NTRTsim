@@ -344,6 +344,8 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
 		}
 	}
+
+	markers = subject.getAllMarkers();
 }
 
 void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
@@ -507,6 +509,19 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 	else robotReady = setSingleActuator(m_controllers[16], actuators[16], 0.001, dt);
 
 	// std::cout << robotReady << "|" << isOnGround << "|" << moveComplete << std::endl;
+
+	if (logCounter == 1000) {
+		btVector3 marker0Pos = markers[0].getWorldPosition();
+		btVector3 marker1Pos = markers[1].getWorldPosition();
+		btVector3 marker2Pos = markers[2].getWorldPosition();
+		btVector3 marker3Pos = markers[3].getWorldPosition();
+		btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+
+		std::cout << marker0Pos << "," << marker1Pos << "," << marker2Pos << "," << marker3Pos << "," << payload_pos << std::endl;
+		logCounter = 0;
+	}
+	
+	logCounter++;
 
 	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();

@@ -31,6 +31,7 @@
 #include "core/tgObserver.h"
 #include "core/tgRod.h"
 #include "controllers/tgBasicController.h"
+#include "core/abstractMarker.h"
 
 // The Model
 #include "../models/sixBarMiniModel.h"
@@ -268,6 +269,7 @@ private:
 	std::vector<tgBasicActuator*> actuators;
 	std::vector<tgRod*> rods;
 	std::vector<tgRod*> payload;
+	std::vector<abstractMarker> markers;
 
 	// Vector to hold controllers for the cables
 	std::vector<tgBasicController*> m_controllers;

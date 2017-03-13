@@ -275,6 +275,26 @@ void sixBarMiniModel::setup(tgWorld& world)
 	// Get the payload for controller
 	payload = sixBarMiniModel::find<tgRod>("payload");
 
+	btRigidBody* rodBody0 = allRods[1]->getPRigidBody();
+	btRigidBody* rodBody1 = allRods[3]->getPRigidBody();
+	btRigidBody* rodBody2 = allRods[5]->getPRigidBody();
+	btRigidBody* rodBody3 = allRods[2]->getPRigidBody();
+
+	NODE0 = abstractMarker(rodBody0,btVector3(0,config.rodLength/2,0),btVector3(0,0,1),1);
+	NODE1 = abstractMarker(rodBody1,btVector3(0,config.rodLength/2,0),btVector3(0,1,0),2);
+	NODE2 = abstractMarker(rodBody2,btVector3(0,config.rodLength/2,0),btVector3(1,0,0),3);
+	NODE3 = abstractMarker(rodBody3,btVector3(0,config.rodLength/2,0),btVector3(1,0,1),4);
+
+	allMarkers.push_back(NODE0);
+	allMarkers.push_back(NODE1);
+	allMarkers.push_back(NODE2);
+	allMarkers.push_back(NODE3);
+
+	this->addMarker(NODE0);
+	this->addMarker(NODE1);
+	this->addMarker(NODE2);
+	this->addMarker(NODE3);
+
 	// Notify controllers that setup has finished
 	notifySetup();
 
@@ -316,6 +336,11 @@ const std::vector<tgRod*>& sixBarMiniModel::getPayload() const
 const std::vector<btVector3>& sixBarMiniModel::getNormVects() const 
 {
 	return normalVectors;
+}
+
+const std::vector<abstractMarker>& sixBarMiniModel::getAllMarkers() const
+{
+    return allMarkers;
 }
 
 void sixBarMiniModel::teardown()

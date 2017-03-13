@@ -57,22 +57,37 @@ namespace
    		double motorLength;
    	} config =
    		{
-   			
+   			/*
    			// SuperBall parameters
    			688/pow(sf,3),    // density (kg / length^3)
 	        0.031*sf,     // radius (length)
-	        1615.0*2,   // stiffness (kg / sec^2) was 1500
+	        1615.0,   // stiffness (kg / sec^2) was 1500
 	        200.0,    // damping (kg / sec)
 	        1.684*sf,     // rodLength (length)
 	        0.99,      // friction (unitless)
 	        0.01,     // rollFriction (unitless)
 	        0.0,      // restitution (?)
-	        300.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+	        100.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
 	        0,         // History logging (boolean)
 	        10000*sf,   // maxTension
 	        0.5*sf,    // targetVelocity
 	        0.3175*sf, // Motor length
+	        */
 	        
+	        688/pow(sf,3),    // density (kg / length^3)
+	        0.019*sf,     // radius (length)
+	        400.0,   // stiffness (kg / sec^2) was 1500
+	        20.0,    // damping (kg / sec)
+	        1.684*sf,     // rodLength (length)
+	        0.99,      // friction (unitless)
+	        0.01,     // rollFriction (unitless)
+	        0.0,      // restitution (?)
+	        100.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+	        0,         // History logging (boolean)
+	        10000*sf,   // maxTension
+	        0.5*sf,    // targetVelocity
+	        0.3175*sf, // Motor length
+
 	        /*
 	        //TT4-Mini parameters
 	        2485/pow(sf,3),
@@ -237,11 +252,11 @@ void sixBarModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	addPayload(s);
+	// addPayload(s);
 
 	// Move the structure
 	rotateToFace(s, 2);
-	s.move(btVector3(50, 10, -50)); 
+	s.move(btVector3(0, 50, -0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));

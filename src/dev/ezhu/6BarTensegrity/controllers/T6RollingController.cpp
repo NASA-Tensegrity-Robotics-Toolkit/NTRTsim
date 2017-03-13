@@ -133,10 +133,12 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		rodBodies.push_back(rodBody);
 	}
 
+	/*
 	// Retrive payload body from model
 	payload = subject.getPayload();
 	tgRod* payloadRod = payload[0];
 	payloadBody = payloadRod->getPRigidBody();
+	*/
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
@@ -332,129 +334,129 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	else {
 		worldTime += dt;
 	}
-	isOnGround = checkOnGround();
+	// isOnGround = checkOnGround();
 
-	if (robotReady == true) {
-		switch (controller_mode) {
-		case 1:
-			{
-				// Code for face mode
-				if (resetFlag) {
-					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
-					resetCounter = 0;
-				}
-				else {
-					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
-						currSurface = contactSurfaceDetection();
-						runPathGen = true;
-						if (currSurface == c_face_goal) {
-							goalReached = true;
-							std::cout << "onStep: Destination face reached" << std::endl;
-						}
-						if (currSurface >= 0 && !goalReached) {
-							path = findPath(A, currSurface, c_face_goal);
-							utility::printVector(path);
-						}
-						runPathGen = true;
-					}
-					else if (!isOnGround && runPathGen) {
-						runPathGen = false;
-					}
+	// if (robotReady == true) {
+	// 	switch (controller_mode) {
+	// 	case 1:
+	// 		{
+	// 			// Code for face mode
+	// 			if (resetFlag) {
+	// 				resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	// 				resetCounter = 0;
+	// 			}
+	// 			else {
+	// 				if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+	// 					currSurface = contactSurfaceDetection();
+	// 					runPathGen = true;
+	// 					if (currSurface == c_face_goal) {
+	// 						goalReached = true;
+	// 						std::cout << "onStep: Destination face reached" << std::endl;
+	// 					}
+	// 					if (currSurface >= 0 && !goalReached) {
+	// 						path = findPath(A, currSurface, c_face_goal);
+	// 						utility::printVector(path);
+	// 					}
+	// 					runPathGen = true;
+	// 				}
+	// 				else if (!isOnGround && runPathGen) {
+	// 					runPathGen = false;
+	// 				}
 
-					if (currSurface >= 0 && !goalReached) {
-						stepFin = stepToFace(dt);
-					}
-				}
-				//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
-				break;
-			}
-		case 2:
-			{
-				// Code for dead reckoning mode
-				if (resetFlag) {
-					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
-					resetCounter = 0;
-				}
-				else {
-					if (isOnGround && stepFin && !resetFlag) {
-						currSurface = contactSurfaceDetection();
-						currPos = payloadBody->getCenterOfMassPosition();
-						currPos.setY(0);
-						if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<10) {
-							std::cout << "onStep: Goal reached" << std::endl;
-							drGoalReached = true;
-						}
-						if (!runPathGen && !drGoalReached) {
-							travelDir = (c_dr_goal - currPos).normalize();
-							std::cout << "onStep: Current position: " << currPos << std::endl;
-							std::cout << "onStep: Desired position: " << c_dr_goal << std::endl;
-							std::cout << "onStep: Travel direction: " << travelDir << std::endl;
-							goalSurface = headingSurfaceDetection(travelDir, currSurface);
-							path = findPath(A, currSurface, goalSurface);
-							utility::printVector(path);
-							runPathGen = true;
-						}
-						if (!drGoalReached) {
-							runPathGen = false;
-						}
-					}
-					if (currSurface >= 0 && !drGoalReached) {
-						stepFin = stepToFace(dt);
-					}
-				}
-				break;
-			}
-		case 3:
-			{
-				// Code for path mode
-				if (resetFlag) {
-					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
-					currentFace = contactSurfaceDetection();
-					resetCounter = 0;
-				}
-				else {
-					if (isOnGround && !runPathGen && stepFin && !resetFlag) {
-						if (stepIdx == 13) {
-							//exit(EXIT_SUCCESS);
-						}
-						currSurface = contactSurfaceDetection();
-						runPathGen = true;
-						//std::cout << pathIdx << std::endl;
-						if (pathIdx == c_path_size) {
-							pathIdx = 0;
-							//goalReached = true;
-							//std::cout << "onStep: Destination reached" << std::endl;
-						}
-						if (currSurface >= 0 && !goalReached) {
-							//std::cout << currSurface << ", " << pathIdx << ", " << *(c_path+pathIdx) << std::endl;
-							path = findPath(A, currSurface, *(c_path+pathIdx));
-							pathIdx++;
-							stepIdx++;
-							utility::printVector(path);
-						}
-						runPathGen = true;
-					}
-					else if (!isOnGround && runPathGen) {
-						runPathGen = false;
-					}
+	// 				if (currSurface >= 0 && !goalReached) {
+	// 					stepFin = stepToFace(dt);
+	// 				}
+	// 			}
+	// 			//std::cout << "isOnGround: " << isOnGround << ", runPathGen: " << runPathGen << ", stepFin: " << stepFin << ", goalreached: " << goalReached << std::endl;
+	// 			break;
+	// 		}
+	// 	case 2:
+	// 		{
+	// 			// Code for dead reckoning mode
+	// 			if (resetFlag) {
+	// 				resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	// 				resetCounter = 0;
+	// 			}
+	// 			else {
+	// 				if (isOnGround && stepFin && !resetFlag) {
+	// 					currSurface = contactSurfaceDetection();
+	// 					currPos = payloadBody->getCenterOfMassPosition();
+	// 					currPos.setY(0);
+	// 					if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<10) {
+	// 						std::cout << "onStep: Goal reached" << std::endl;
+	// 						drGoalReached = true;
+	// 					}
+	// 					if (!runPathGen && !drGoalReached) {
+	// 						travelDir = (c_dr_goal - currPos).normalize();
+	// 						std::cout << "onStep: Current position: " << currPos << std::endl;
+	// 						std::cout << "onStep: Desired position: " << c_dr_goal << std::endl;
+	// 						std::cout << "onStep: Travel direction: " << travelDir << std::endl;
+	// 						goalSurface = headingSurfaceDetection(travelDir, currSurface);
+	// 						path = findPath(A, currSurface, goalSurface);
+	// 						utility::printVector(path);
+	// 						runPathGen = true;
+	// 					}
+	// 					if (!drGoalReached) {
+	// 						runPathGen = false;
+	// 					}
+	// 				}
+	// 				if (currSurface >= 0 && !drGoalReached) {
+	// 					stepFin = stepToFace(dt);
+	// 				}
+	// 			}
+	// 			break;
+	// 		}
+	// 	case 3:
+	// 		{
+	// 			// Code for path mode
+	// 			if (resetFlag) {
+	// 				resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
+	// 				currentFace = contactSurfaceDetection();
+	// 				resetCounter = 0;
+	// 			}
+	// 			else {
+	// 				if (isOnGround && !runPathGen && stepFin && !resetFlag) {
+	// 					if (stepIdx == 13) {
+	// 						//exit(EXIT_SUCCESS);
+	// 					}
+	// 					currSurface = contactSurfaceDetection();
+	// 					runPathGen = true;
+	// 					//std::cout << pathIdx << std::endl;
+	// 					if (pathIdx == c_path_size) {
+	// 						pathIdx = 0;
+	// 						//goalReached = true;
+	// 						//std::cout << "onStep: Destination reached" << std::endl;
+	// 					}
+	// 					if (currSurface >= 0 && !goalReached) {
+	// 						//std::cout << currSurface << ", " << pathIdx << ", " << *(c_path+pathIdx) << std::endl;
+	// 						path = findPath(A, currSurface, *(c_path+pathIdx));
+	// 						pathIdx++;
+	// 						stepIdx++;
+	// 						utility::printVector(path);
+	// 					}
+	// 					runPathGen = true;
+	// 				}
+	// 				else if (!isOnGround && runPathGen) {
+	// 					runPathGen = false;
+	// 				}
 
-					if (currSurface >= 0 && !goalReached) {
-						// stepFin = stepToFace(currSurface, path[1], dt);
-						stepFin = stepToFace(dt);
-					}
-				}
-				break;
-			}
-		}
-	}
-	else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
+	// 				if (currSurface >= 0 && !goalReached) {
+	// 					// stepFin = stepToFace(currSurface, path[1], dt);
+	// 					stepFin = stepToFace(dt);
+	// 				}
+	// 			}
+	// 			break;
+	// 		}
+	// 	}
+	// }
+	// else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
 	
-	if (doLog) {
-		btVector3 payload_vel = payloadBody->getLinearVelocity();
-	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
-	    percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
-	    data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
-	}
+	// if (doLog) {
+	// 	btVector3 payload_vel = payloadBody->getLinearVelocity();
+	//     btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+	//     percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
+	//     data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	// }
 }
 
 bool T6RollingController::checkOnGround()

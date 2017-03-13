@@ -122,7 +122,8 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
 
     
-    double gravity = 9.81*sf;
+    // double gravity = 9.81*sf;
+    double gravity = 1.62*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);
 
@@ -148,7 +149,7 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(-50, 0, -50));
+    const T6RollingController::Config controllerConfig(gravity, "face", 2);
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller

@@ -35,6 +35,7 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
@@ -126,6 +127,12 @@ class sixBarMiniModel : public tgSubject<sixBarMiniModel>, public tgModel
 	     * @return A vector of all of the normal vectors
 	     */
 	    const std::vector<btVector3>& getNormVects() const;
+
+	    /**
+	     * Return a vector of all abstract markers for the controllers to work with.
+	     * @return A vector of all of the abstract markers
+	     */
+	    const std::vector<abstractMarker>& getAllMarkers() const;
 
 	    /**
 	     * A function called during setup that rotates the structure
@@ -247,6 +254,7 @@ class sixBarMiniModel : public tgSubject<sixBarMiniModel>, public tgModel
 		std::vector<tgBasicActuator*> allActuators;
 	    std::vector<tgRod*> allRods;
 	    std::vector<tgRod*> payload;
+	    std::vector<abstractMarker> allMarkers;
 
 	    // A vector to hold all normal vectors
 		std::vector<btVector3> normalVectors;
@@ -272,6 +280,11 @@ class sixBarMiniModel : public tgSubject<sixBarMiniModel>, public tgModel
 		btVector3 face17Norm;
 		btVector3 face18Norm;
 		btVector3 face19Norm;
+
+		abstractMarker NODE0;
+		abstractMarker NODE1;
+		abstractMarker NODE2;
+		abstractMarker NODE3;
 
 		bool motorModel;
 };
