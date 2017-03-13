@@ -34,7 +34,7 @@
 // Sensors
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
-#include "sensors/tgSpringCableActuatorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 
 /**
  * The entry point.
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     // myModel -> attach(tension_sensor);
 
     // Create data logger
-    std::string log = "../../../../resources/src/12Bar/logs";
+    std::string log = "../../../../resources/src/12Bar/logs/log";
     tgDataLogger2* myDataLogger = new tgDataLogger2(log);
     myDataLogger->addSenseable(myModel);
 

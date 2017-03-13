@@ -743,6 +743,11 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/core/tgTags.h
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/core/tgWorld.h
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/App12Bar.cpp
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/sensors/tgDataLogger2.h
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/sensors/tgDataManager.h
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/sensors/tgRodSensorInfo.h
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/sensors/tgSensorInfo.h
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/sensors/tgSpringCableActuatorSensorInfo.h
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/tgcreator/tgBuildSpec.h
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/tgcreator/tgNode.h
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: /home/mcdaly/NTRTsim/src/tgcreator/tgNodes.h

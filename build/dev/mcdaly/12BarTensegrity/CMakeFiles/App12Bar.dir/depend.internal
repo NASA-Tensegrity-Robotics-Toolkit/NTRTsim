@@ -744,6 +744,11 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o
  /home/mcdaly/NTRTsim/src/core/tgTags.h
  /home/mcdaly/NTRTsim/src/core/tgWorld.h
  /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/App12Bar.cpp
+ /home/mcdaly/NTRTsim/src/sensors/tgDataLogger2.h
+ /home/mcdaly/NTRTsim/src/sensors/tgDataManager.h
+ /home/mcdaly/NTRTsim/src/sensors/tgRodSensorInfo.h
+ /home/mcdaly/NTRTsim/src/sensors/tgSensorInfo.h
+ /home/mcdaly/NTRTsim/src/sensors/tgSpringCableActuatorSensorInfo.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgBuildSpec.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgNode.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgNodes.h
