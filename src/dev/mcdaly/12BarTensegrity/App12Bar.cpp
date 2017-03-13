@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     // myModel -> attach(tension_sensor);
 
     // Create data logger
-    std::string log = "../../../../resources/src/12Bar/logs/log";
+    std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
     tgDataLogger2* myDataLogger = new tgDataLogger2(log);
     myDataLogger->addSenseable(myModel);
 
