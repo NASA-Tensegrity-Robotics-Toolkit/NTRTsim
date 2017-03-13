@@ -35,6 +35,7 @@
 #include <vector>
 // Includes from Bullet Physics:
 #include "LinearMath/btVector3.h" //for the functions calculating com and orient
+#include "LinearMath/btQuaternion.h" // for the initial orientation variable
 
 /**
  * This class extends tgSensor to sense a compound rigid body.
@@ -103,6 +104,17 @@ public:
    * that are together in its compound.
    */
   std::vector<tgBaseRigid*> m_rigids;
+
+  /**
+   * Store the original orientation of the compound rigid,
+   * for comparison later to get the current orientation.
+   * We do this by selecting the first rigid body from m_rigids.
+   * Also, store the inverse: we'll be using the inverse at each step,
+   * better to calculate it now.
+   * TO-DO: that means we need to make sure that list doesn't change!
+   */
+  btQuaternion origOrientQuat;
+  btQuaternion origOrientQuatInv;
 
 };
 
