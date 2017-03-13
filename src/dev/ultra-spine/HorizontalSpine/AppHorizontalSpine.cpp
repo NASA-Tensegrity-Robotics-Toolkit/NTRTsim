@@ -117,16 +117,16 @@ int main(int argc, char** argv)
     //double lateralStiffness = 1000.0;
     double lateralStiffness = 3000.0;
     //double verticalStiffness = 2000.0;
-    double verticalStiffness = 3000.0;
+    double verticalStiffness = 5000.0;
     // NOTE that as with the other actuators, the Unidirectional Compression Spring
     // Actuator inside the ForcePlateModel does not work well when the damping
     // constant is greater than 1/10 the spring constant.
     // For very high stiffnesses, damping must be even less, closer to 1/30.
     // If damping is too large, the plate will explode downward to -infinity.
     //double lateralDamping = 100.0;
-    double lateralDamping = 500.0;
+    double lateralDamping = 50.0;
     //double verticalDamping = 100.0;
-    double verticalDamping = 500.0;
+    double verticalDamping = 50.0;
     //double verticalDamping = 200.0;
     
     ForcePlateModel::Config forcePlateConfig(length, width);
@@ -225,10 +225,10 @@ int main(int argc, char** argv)
     
     // Attach the sensor to the force plate
     //UNCOMMENT the following line(s) to get log output.
-    forcePlateRearLeft->attach(forceSensorRearLeft);
-    forcePlateRearRight->attach(forceSensorRearRight);
-    forcePlateFrontLeft->attach(forceSensorFrontLeft);
-    forcePlateFrontRight->attach(forceSensorFrontRight);
+    //forcePlateRearLeft->attach(forceSensorRearLeft);
+    //forcePlateRearRight->attach(forceSensorRearRight);
+    //forcePlateFrontLeft->attach(forceSensorFrontLeft);
+    //forcePlateFrontRight->attach(forceSensorFrontRight);
 
     // Add our force plate model to the simulation
     simulation.addModel(forcePlateRearLeft);
@@ -259,9 +259,9 @@ int main(int argc, char** argv)
     // HB is the left horizontal set
     // HR is the top horizontal set.
     // BUT, something is wrong here. Probably Bullet's numerical problems.
-    tagsToControl.push_back("HR");
-    tagsToControl.push_back("HF");
-    //tagsToControl.push_back("HB");
+    //tagsToControl.push_back("HR");
+    //tagsToControl.push_back("HF");
+    tagsToControl.push_back("HB");
     // Call the constructor for the controller
     HorizontalSpineController* const controller =
       new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
