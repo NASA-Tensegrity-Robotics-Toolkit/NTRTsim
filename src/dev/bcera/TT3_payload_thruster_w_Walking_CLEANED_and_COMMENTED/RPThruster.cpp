@@ -56,21 +56,22 @@ namespace
   double initiateThrustTime = 1; // wait time until thrust initiation
   double reorientTime = 0; //how much time after thrust is initiated to wait before reorienting attitude goal vector
   bool isReoriented = false;
-  double thrustPeriod = 6.5; // duration of thrust on
-  double distanceThreshold = 200; //Arbitrary distance to activate dead reckoning
+  double thrustPeriod = 6.75; // duration of thrust on
+  double distanceThreshold = 20*sf; //Arbitrary distance to activate dead reckoning
   bool thrusted = false; // records if this cycle of thrust has happened or not for each hop
   double targetDistance = 10.0; // distance to the target (before scaling)
   btVector3 targetLocation; // target is defined on construction	
   bool doneHopping = false; // end hopping when this is true
   int numberOfHops = 0; // count the number of hops the robot made in this simulation	
   std::ofstream simlog; // log file for thruster related variables
-  bool doLog = false; // choose to log thruster related variables
+  bool doLog = true; // choose to log thruster related variables
   double timePassed = 0.0; // controls logging frequency
-  bool includeNoise = false; //turn on/off Gaussian Noise for thruster orientation
+  bool includeNoise = true; //turn on/off Gaussian Noise for thruster orientation
   double prev_alpha = 0;
   double prev_beta = 0;
   double prev_gimbalYaw = 0;
   double prev_gimbalPitch = 0;
+  double motor_speed = 180; //degrees per second
   btVector3 prev_GimbalHeading = btVector3(0,0,-1);
   int numTankOrientations = 1; //Averaging Filter, currently being unused
   int count = 0;
@@ -136,7 +137,7 @@ void RPThruster::onSetup(PrismModel& subject)
 
   //If logging, start CSV with header line
   if(doLog){
-    sim_out.open("Payload Thruster Control 6s Thrust - Run 3.txt");
+    sim_out.open("Payload Thruster_350stiffness_50percent_innercables.txt");
     sim_out << "Label-Goal Altitude, GoalAltitude, Label-GoalYaw, GoalYaw, Label-SimTime, SimTime, Label-GimbalPitch, GimbalPitch, Label-GimbalYaw, GimbalYaw, Label-TankPitch, TankPitch, Label-TankYaw, TankYaw, Label-TankPos, TankPosX, TankPosY, TankPosZ, Label-TankVelPitch, TankVelPitch, Label-TankVelYaw, TankVelYaw, Label-Alpha, Alpha, Label-Beta, Beta, Label-Error, Error, Label-d_error, d_Error" << std::endl;
     sim_out << std::endl;
   }
@@ -173,7 +174,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    //Set thrust activation period to be proportional to distance to target
 	    thrustPeriod = diff.norm()/1200; //linear scale + constant reorient period
 	    thrustPeriod = std::min(thrustPeriod,6.5);
-	    thrustPeriod = std::max(thrustPeriod,1.25);
+	    thrustPeriod = std::max(thrustPeriod,2.5);
 	    
 	    //if distance is greater than the threshold, switch to reorientation for another hop, else switch to dead reckoning
 	    if(diff.norm() < distanceThreshold)
@@ -332,7 +333,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    noiseAxis.setY(rand());
 	    noiseAxis.setZ(rand());
 	    noiseAxis.normalize();
-	    double noiseAngle = generateGaussianNoise(0,1*M_PI/180*dt);
+	    double noiseAngle = generateGaussianNoise(0,2*M_PI/180*dt);
 	    PayloadYAxis = PayloadYAxis.rotate(noiseAxis,noiseAngle);
 	    std::cout << "Sensor Noise Error Introduced: " << noiseAngle<< std::endl;
 	    //redefine Errors
@@ -389,11 +390,19 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	    alpha += generateGaussianNoise(0,2*M_PI/180);
 	  }
 
+	  /*
+	  //speed limiter
+	  std::cout << "old alpha: " << alpha << std::endl;
+	  alpha = prev_alpha+motor_speed*M_PI/180*dt*((prev_alpha<alpha)-(alpha<prev_alpha));
+	  std::cout << "new alpha: " << alpha << std::endl;
+	  beta = prev_beta+motor_speed*M_PI/180*dt*((prev_beta<beta)-(beta<prev_beta));
+	  */
+
 	  //keep track of past beta to check gimbal speeds
-	  prev_alpha = alpha;
-	  prev_beta = beta;
 	  std::cout << "Alpha: " << alpha*180/M_PI << "; Beta: " << beta*180/M_PI << std::endl;
 	  std::cout << "Alpha Speed: " << (alpha-prev_alpha)*180/M_PI/dt << "; Beta Speed: " << (beta-prev_beta)*180/M_PI/dt << std::endl;
+	  prev_alpha = alpha;
+	  prev_beta = beta;
 
 	  
 	  double tolerance = 1; //Degree
@@ -402,23 +411,23 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 	  //Set altitude
 	  double deltaAltitude = beta*180/M_PI - altitudeAngle;
 	  if (deltaAltitude > tolerance){
-	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,1);
+	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,10*dt);
 	  }
 	  else if (deltaAltitude < -tolerance){
-	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,1);
+	    subject.altitudeHinge->enableAngularMotor(true,deltaAltitude*speed,10*dt);
 	  }
 	  else{
-	    subject.altitudeHinge->enableAngularMotor(true,0.0,10);
+	    subject.altitudeHinge->enableAngularMotor(true,0.0,1);
 	    altitudeInPosition = true;
 	  }
 
 	  //Set yaw
 	  double deltaYaw = alpha*180/M_PI - yawAngle;
 	  if (deltaYaw-speed*dt > tolerance){
-	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,1);
+	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,10*dt);
 	  }
 	  else if (deltaYaw+speed*dt < -tolerance){
-	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,1);
+	    subject.yawHinge->enableAngularMotor(true,deltaYaw*speed,10*dt);
 	  }
 	  else{
 	    subject.yawHinge->enableAngularMotor(true,0.0,1);
@@ -460,8 +469,8 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 		{
 		  force[k] = 0*force[k];
 		  //Stop gimbal motion when thruster is inactive
-		  subject.altitudeHinge->enableAngularMotor(true,0,1);
-		  subject.yawHinge->enableAngularMotor(true,0,1);
+		  //subject.altitudeHinge->enableAngularMotor(true,0,1);
+		  //subject.yawHinge->enableAngularMotor(true,0,1);
 		}			
 	    }
 	  std::cout << std::endl;
@@ -474,7 +483,7 @@ void RPThruster::onStep(PrismModel& subject, double dt)
 
 	  //printout to CSV file if logging boolean is true
 	  std::cout << fmod(worldTime,0.1) << std::endl;
-	  if(doLog && fmod(worldTime,0.01)<0.001){
+	  if(doLog && fmod(worldTime,0.02)<0.001){
 	    std::cout << "PRINTING TO FILE~~~~~"  << std::endl;
 	    sim_out << "Goal Altitude, " << goalAltitude << ", Goal Yaw, " << goalYaw << ", ";
 	    sim_out << "Sim Time, " << worldTime << ", Gimbal Pitch, " << altitudeAngle << ", Gimbal Yaw, " << yawAngle << ", ";

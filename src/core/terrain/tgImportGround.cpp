@@ -226,7 +226,7 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
 
             // Extract y value
             std::string y_str = line_in.substr(found_comma_1 + 1, found_comma_2 - 1 - found_comma_1);
-            y = atof(y_str.c_str()) * scalingFactor;
+            y = atof(y_str.c_str()) *scalingFactor;
 
             // Extrack z value
             std::string z_str = line_in.substr(found_comma_2 + 1, found_right_brac - 1 - found_comma_2);

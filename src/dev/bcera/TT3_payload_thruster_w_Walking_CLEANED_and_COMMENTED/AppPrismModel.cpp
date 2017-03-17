@@ -62,13 +62,13 @@ int main(int argc, char** argv)
 
   //Option 1: Uncomment to implement flat ground environment (must comment out STL importer below)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /*
+  
   const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
-  */
+  
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  /*
   //Option 2: Uncomment below to import parsed STL file (must comment out flat ground above)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Set ground parameters
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   const double friction = 1.0;
   const double restitution = 0.0;
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
-  const double margin = 35;//0.05;
+  const double margin = 30;//0.05;
   const double offset = 0.5;
   const double scalingFactor = sf*1000/63;
   int Interp = 0;
@@ -87,7 +87,8 @@ int main(int argc, char** argv)
 					    origin, margin, offset, scalingFactor,Interp,twoLayer);
   
   // Get filename from argv
-  std::string filename_in = "./LunarScape_mission.txt";
+  //std::string filename_in = "./LunarScape_mission.txt";
+  std::string filename_in = "./LunarMission_Easy.txt";
   
   // Check filename
   if (filename_in.find(".txt") == std::string::npos) {
@@ -109,13 +110,14 @@ int main(int argc, char** argv)
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
+  */ 
+
   double gravity = 1.618*sf; //moon gravity
   const tgWorld::Config config(gravity); 
   tgWorld world(config, ground);
 
   //Second create the view
-  const double timestep_physics = 0.00075; // seconds
+  const double timestep_physics = 0.0005; // seconds
   const double timestep_graphics = 1.f/60.f; // seconds
   tgSimViewGraphics view(world, timestep_physics, timestep_graphics); //turn on graphics (option 1)
   //tgSimView view(world, timestep_physics, timestep_graphics); // uncomment to turn off graphics for faster data logging (option 2)
@@ -127,8 +129,8 @@ int main(int argc, char** argv)
   //btVector3 target = btVector3(1000, 0, -2000);
   //btVector3 target = btVector3(1000*sf, 0, -1000*sf);
   //btVector3 target = btVector3(450*sf, 0, -10*sf);
-  btVector3 target = btVector3(150*sf, 0, -100*sf);
-  //btVector3 target = btVector3(700*sf, 0, -10*sf);
+  //btVector3 target = btVector3(150*sf, 0, -100*sf);
+  btVector3 target = btVector3(800*sf, 0, -190*sf);
   
   //Fourth create the model with its controllers and add the models to the simulation 
   PrismModel* const myModel = new PrismModel();

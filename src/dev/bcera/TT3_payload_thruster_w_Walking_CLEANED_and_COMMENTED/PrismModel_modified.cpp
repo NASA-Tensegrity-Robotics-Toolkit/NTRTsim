@@ -33,7 +33,8 @@ namespace
    */
 
   double sf = 30; //scaling factor. Match with App file and Controller file
-  bool marker_log = true;
+  bool marker_log = false;
+  double sim_time = 0;
   
   const struct Config
   {
@@ -54,7 +55,7 @@ namespace
       //Option 1: TT3 Parameters
       2990/pow(sf,3),    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
       .0127/2*sf,          // radius (length)
-      500.0,//300.0,           // stiffness (kg / sec^2) was 1500
+      350,//500.0,//300.0,           // stiffness (kg / sec^2) was 1500
       20.0,            // damping (kg / sec)
       0.66*sf,         // rod_length (length)
       1.0,             // friction (unitless)
@@ -239,7 +240,7 @@ void PrismModel::setup(tgWorld& world)
 				   c.rollFriction, c.restitution);
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
-  tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 
+  tgBasicActuator::Config tankLinkConfig(c.stiffness*0.50, c.damping, c.pretension*1.5, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
     
@@ -300,14 +301,19 @@ void PrismModel::setup(tgWorld& world)
   //s.move(btVector3(10*sf,  -225*sf, -10*sf));
   
   //scaled 1000/63
-  s.move(btVector3(10*sf, -90*sf, -10*sf));
+  //s.move(btVector3(10*sf, -90*sf, -10*sf));
 
-  s.move(btVector3(10*sf, -42*sf, -900*sf));
+  //s.move(btVector3(10*sf, -42*sf, -900*sf));
 
   //scaled 1000/50
 
   //s.move(btVector3(20*sf*63/62.5, -132*sf*63/62.5, -910*sf*63/62.5));
+  /*
+  //scaled 1000/63
+  s.move(btVector3(10*sf, -90*sf, -10*sf));
 
+  s.move(btVector3(10*sf, -36*sf, -900*sf));
+  */
   
   
   // Create the build spec that uses tags to turn the structure into a real model
@@ -331,7 +337,7 @@ void PrismModel::setup(tgWorld& world)
   }
 
   //set larger margin for collision detection
-  btScalar marg = 0.25;
+  btScalar marg = 0.75;
   for (int i = 0; i < rods.size(); i++) {
     allRods[i]->getPRigidBody()->getCollisionShape()->setMargin(marg);
   }
@@ -429,7 +435,9 @@ void PrismModel::setup(tgWorld& world)
     markers.push_back(LOG_NODE_2);
       
     //Open log file
-    sim_out.open("Marker Node Positions");
+    sim_out.open("Marker Pos and YPR Angles.txt");
+
+    sim_out << "Time, X_0, Y_0, Z_0, X_1, Y_1, Z_1, X_2, Y_2, Z_2, X_3, Y_3, Z_3, X_4, Y_4, Z_4, X_5, Y_5, Z_5, X_6, Y_6, Z_6, X_7, Y_7, Z_7, X_8, Y_8, Z_8, X_9, Y_9, Z_9, X_10, Y_10, Z_10, X_11, Y_11, Z_11, X_12, Y_12, Z_12, X_13, Y_13, Z_13, Y0, P0, R0, Y1, P1, R1, Y2, P2, R2, Y3, P3, R3, Y4, P4, R4, Y5, P5, R5, Y6, P6, R6" << std::endl;  
   }
       
   
@@ -438,29 +446,31 @@ void PrismModel::setup(tgWorld& world)
     
   // Actually setup the children
   tgModel::setup(world);
-
+  
   std::cout << "Model Setup Complete ~~~~~~~~~~~~" << std::endl;
+  
 }
 
 void PrismModel::step(double dt)
 {        
   notifyStep(dt);
-
-  if(marker_log){
-    std::cout << "Marker Logging~~~" << markers.size() << std::endl;
+  
+  if(marker_log && fmod(sim_time,0.02)<=dt){
+    sim_out << sim_time << ", ";
+    //sim_out << "Marker Logging~~~" << markers.size() << std::endl;
     for(int i=0;i<markers.size();i++){
-      std::cout << "Node_pos" << i << ", "; 
-      std::cout << markers[i].getWorldPosition().x() << ", ";
-      std::cout << markers[i].getWorldPosition().y() << ", ";
-      std::cout << markers[i].getWorldPosition().z() << ", ";
+      sim_out << markers[i].getWorldPosition().x() << ", ";
+      sim_out << markers[i].getWorldPosition().y() << ", ";
+      sim_out << markers[i].getWorldPosition().z() << ", ";
     }
     double yaw, pitch,roll;
     for(int i=0;i<allRods.size();i++){
       allRods[i]->getPRigidBody()->getCenterOfMassTransform().getBasis().getEulerYPR(yaw,pitch,roll);
-      std::cout << "YPR" << i << ", " << yaw << ", " << pitch << ", " << roll << ", ";    
+      sim_out << yaw << ", " << pitch << ", " << roll << ", ";    
     }
-    std::cout << std::endl;
+    sim_out << std::endl;
   }
+  sim_time += dt;
   tgModel::step(dt);  // Step any children
 }
 

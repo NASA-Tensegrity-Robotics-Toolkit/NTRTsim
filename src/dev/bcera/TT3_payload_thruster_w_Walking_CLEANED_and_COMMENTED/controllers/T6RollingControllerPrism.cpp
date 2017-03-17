@@ -445,7 +445,7 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
 	    if (isOnGround && stepFin && !resetFlag) {
 	      currPos = tank[0]->getCenterOfMassPosition();
 	      currPos.setY(0);
-	      if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<10) {
+	      if (abs(currPos.x()-c_dr_goal.x())<10 && abs(currPos.z()-c_dr_goal.z())<5*sf) {
 		std::cout << "onStep: Goal reached" << std::endl;
 		drGoalReached = true;
 	      }
