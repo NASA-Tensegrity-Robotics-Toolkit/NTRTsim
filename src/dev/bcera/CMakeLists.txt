@@ -5,11 +5,12 @@ orient
 thruster
 payload_thruster
 payload_thruster_disturbance_rejection
-TT3_payload_thruster_w_Walking
+#TT3_payload_thruster_w_Walking
 TT3_payload_thruster_w_Walking_CLEANED_and_COMMENTED
 V3_V4
 OLD_TT3_payload_thruster
 TT_Mini_Inclined_Walking
+TT3_MPC_Walking
 )
 	
  add_executable(AppWorkspace
