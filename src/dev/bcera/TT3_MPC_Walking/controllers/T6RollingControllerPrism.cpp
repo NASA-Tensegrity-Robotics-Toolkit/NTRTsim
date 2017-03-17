@@ -333,24 +333,69 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   float step1[24] = {0.2630,0.4828,0.4828,0.3840,0.4360,0.3446,0.2630,0.3223,0.4066,0.3502,0.3395,0.4828,0.2630,0.4828,0.4006,0.2630,0.4828,0.4358,0.2630,0.2630,0.4026,0.4051,0.2630,0.4828};
   float step2[24] = {0.3839,0.3787,0.4139,0.3418,0.3319,0.4139,0.3319,0.4044,0.3319,0.4139,0.3542,0.4139,0.3836,0.3975,0.4044,0.3319,0.4139,0.3319,0.3840,0.3789,0.4139,0.4139,0.3319,0.3936};
   float step3[24] = {0.4343,0.4111,0.4228,0.4369,0.2569,0.4889,0.3446,0.3434,0.4889,0.4293,0.2569,0.2569,0.2569,0.2569,0.4889,0.4889,0.3184,0.4180,0.3023,0.3966,0.2569,0.4889,0.4889,0.2569};
+  float step4[24] = {.4145,.4145,.3313,.3313,.3313,.3929,.4145,.4145,.4145,.3313,.3857,.3864,.3814,.3867,.3781,.3973,.3504,.4036,.4044,.3397,.3313,.4145,.4145,.3313};
+  float step5[24] = {.4917,.2541,.4917,.2541,.4917,.2541,.4269,.4917,.3300,.4053,.4075,.2541,.3882,.3261,.4028,.2541,.2541,.4917,.3500,.4365,.3451,.4043,.2541,.4917};
+  float step6[24] = {.4140,.3318,.4140,.3318,.4140,.3318,.3318,.3938,.3538,.4044,.4140,.3815,.3409,.4040,.4140,.3848,.3854,.3783,.4140,.3318,.4140,.3318,.3860,.3992};
+  float step7[24] = {.4191,.3387,.3039,.4958,.2500,.4958,.4223,.2500,.2500,.4958,.4958,.3931,.4409,.3501,.2500,.3000,.4367,.4107,.4958,.2500,.4204,.4958,.2500,.2500};
+  float step8[24] = {.3308,.4150,.3499,.4150,.3902,.3999,.4002,.3308,.3870,.3778,.4150,.3404,.3308,.4150,.3308,.4055,.4150,.4150,.3928,.3308,.3308,.4150,.3803,.3875};
+  float step9[24] = {.4939,.4231,.2519,.2519,.2519,.2519,.4939,.4939,.4262,.4132,.4180,.4473,.2519,.4939,.3342,.3507,.4939,.2519,.2519,.4939,.4248,.3151,.3963,.3010};
+  float step10[24] = {.4149,.3309,.3861,.3838,.3797,.3838,.3773,.3972,.4149,.4149,.3309,.3309,.3309,.3923,.4149,.4149,.4149,.3309,.3309,.4149,.4013,.3826,.3434,.4026};
+  float step11[24] = {.3252,.4070,.4133,.2590,.3913,.3144,.4083,.2590,.4868,.2590,.4868,.2590,.4868,.2590,.4314,.4868,.2590,.4314,.4868,.2590,.4868,.2590,.4402,.3488};
+  float step12[24] = {.3517,.4042,.4146,.6787,.3449,.4027,.4146,.3819,.4146,.3312,.4146,.3312,.4146,.3312,.3312,.3924,.3312,.4146,.3945,.3840,.3773,.3830,.3312,.4146};
   int swap = 1;
   float sequence[24];
   switch(roll_case){
   case 0:
     std::cout << "Case0" << std::endl;
-    std::copy(step1, step1+23, sequence);
+    std::copy(step1, step1+24, sequence);
     break;
   case 1:
     std::cout << "Case1" << std::endl;
-    std::copy(step2, step2+23, sequence);
+    std::copy(step2, step2+24, sequence);
     break;
   case 2:
-    std::cout << "Case1" << std::endl;
-    std::copy(step3, step3+23, sequence);
+    std::cout << "Case2" << std::endl;
+    std::copy(step3, step3+24, sequence);
+    break;
+  case 3:
+    std::cout << "Case3" << std::endl;
+    std::copy(step4, step4+24, sequence);
+    break;
+  case 4:
+    std::cout << "Case4" << std::endl;
+    std::copy(step5, step5+24, sequence);
+    break;
+  case 5:
+    std::cout << "Case5" << std::endl;
+    std::copy(step6, step6+24, sequence);
+    break;
+  case 6:
+    std::cout << "Case6" << std::endl;
+    std::copy(step7, step7+24, sequence);
+    break;
+  case 7:
+    std::cout << "Case7" << std::endl;
+    std::copy(step8, step8+24, sequence);
+    break;
+  case 8:
+    std::cout << "Case8" << std::endl;
+    std::copy(step9, step9+24, sequence);
+    break;
+  case 9:
+    std::cout << "Case9" << std::endl;
+    std::copy(step10, step10+24, sequence);
+    break;
+  case 10:
+    std::cout << "Case10" << std::endl;
+    std::copy(step11, step11+24, sequence);
+    break;
+  case 11:
+    std::cout << "Case11" << std::endl;
+    std::copy(step12, step12+24, sequence);
     break;
   }
   for(int i=0;i<24;i++){
-    m_controllers[i]->control(dt,step1[i]*sf); //scale by scaling factor here
+    m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
     std::cout << "Current Control: " << sequence[i]*sf << ", ";
     std::cout << "Roll Case: " << roll_case << std::endl;
     //std::cout << "Start Length: " << startLength << std::endl;
@@ -362,11 +407,23 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
       swap = 0;
   }
   std::cout << "WorldTime: " << worldTime << std::endl;
-  float time_inc = 3;
-  if(worldTime>0 && worldTime<time_inc) roll_case = 0;
-  if(worldTime>time_inc && worldTime<time_inc*2) roll_case = 1;
-  if(worldTime>time_inc*2 && worldTime<time_inc*3) roll_case = 2;
-  
+  float time_inc = 1.5;
+  if((worldTime-last_step_time)>time_inc){
+    roll_case = (roll_case+1)%12;
+    last_step_time = worldTime;
+  }
+  //if(worldTime>0 && worldTime<time_inc) roll_case = 0;
+  //if(worldTime>time_inc && worldTime<time_inc*2) roll_case = 1;
+  //if(worldTime>time_inc*2 && worldTime<time_inc*3) roll_case = 2;
+  //if(worldTime>time_inc*3 && worldTime<time_inc*4) roll_case = 3;
+  //if(worldTime>time_inc*4 && worldTime<time_inc*5) roll_case = 4;
+  //if(worldTime>time_inc*5 && worldTime<time_inc*6) roll_case = 5;
+  //if(worldTime>time_inc*6 && worldTime<time_inc*7) roll_case = 6;
+  //if(worldTime>time_inc*7 && worldTime<time_inc*8) roll_case = 7;
+  //if(worldTime>time_inc*8 && worldTime<time_inc*9) roll_case = 8;
+  //if(worldTime>time_inc*9 && worldTime<time_inc*10) roll_case = 9;
+  //if(worldTime>time_inc*10 && worldTime<time_inc*11) roll_case = 10;
+  //if(worldTime>time_inc*11 && worldTime<time_inc*12) roll_case = 11;
 
     
 }

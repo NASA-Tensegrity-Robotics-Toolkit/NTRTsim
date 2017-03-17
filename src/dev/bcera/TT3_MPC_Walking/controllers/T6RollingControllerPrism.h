@@ -288,6 +288,7 @@ class T6RollingController : public tgObserver<PrismModel>
   int pathIdx = 1;
   int stepIdx = 0;
   int roll_case = 0;
+  double last_step_time = 0;
 	
   // Direction to travel
   btVector3 travelDir;
