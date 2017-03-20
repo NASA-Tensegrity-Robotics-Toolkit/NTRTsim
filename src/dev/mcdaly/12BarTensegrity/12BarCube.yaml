@@ -92,7 +92,7 @@ builders:
     parameters:
       stiffness: 1560.0 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
       damping: 50.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 200.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       history: 0 #what is this?
       max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
       target_velocity: 0 #dm/s #what is this?
