@@ -32,8 +32,12 @@
 #include "core/tgSubject.h"
 
 // the data collection class
+// TO-DO: this should change to the new tgDataObserver2.
 #include "sensors/tgDataObserver.h"
+
+// C++ standard library
 #include <string>
+#include <vector> // for the lists of inverse kinematics cable lengths
 
 // Forward declarations
 class VSpineDistribControlModel;
@@ -106,6 +110,17 @@ private:
   // For data logging. TO-DO: implement this fully.
   //tgDataObserver m_dataObserver;
   double m_updateTime;
+
+  /**
+   * The list of rest cable lengths, over time, to be read-in in setup.
+   * These are for the inverse kinematics, and are used like a "trajectory"
+   * for a tracking controller
+   * This is a vector of vectors: the first index is the timestep (0 to t-1),
+   * the second index is the cable number (I think 0 to 23?)
+   * The cable lengths are doubles.
+   * TO-DO: CONFIRM THAT THE CONTROL INPUT TAKES REST LENGTHS NOT TENSIONS!
+   */
+  std::vector< std::vector<double> > cable_trajectory;
 
 };
 

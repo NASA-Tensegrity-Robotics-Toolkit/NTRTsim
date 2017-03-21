@@ -36,6 +36,10 @@
 #include <cassert>
 #include <stdexcept>
 #include <vector>
+#include <iostream>
+#include <fstream> // for the input csv file
+#include <stdexcept> // for some error handling
+#include <stdlib.h> // for the atof function
 
 #include "helpers/FileHelpers.h"
 
@@ -69,6 +73,96 @@ VSpineDistribControlBending::VSpineDistribControlBending():
 
 void VSpineDistribControlBending::onSetup(VSpineDistribControlModel& subject){
   //m_dataObserver.onSetup(subject);
+
+  // Set up the list of cable lengths (the trajectory.)
+  // DEBUGGING:
+  std::cout << "Opening and reading the inverse kinematics CSV file..." << std::endl;
+  // First, declare the path to the csv file as a string
+  // (Ankita: I'd recommend moving this to the constructor of this class,
+  // so you're able to pass it in from the App file.)
+  std::string csv_path = "../../../../src/dev/ultra-spine/VSpineDistribControl/matlab_example_csv_output.csv";
+  // Next, open it as an input file stream
+  // This needs to be a c-style string for some reason.
+  std::ifstream csv_file(csv_path.c_str());
+  // If the file wasn't opened, throw an exception.
+  if( !csv_file.is_open() ) {
+    throw std::invalid_argument("Couldn't open the CSV file, check the path.");
+  }
+  // We need to declare some temporary variables to use to store the data
+  //   as it's parsed:
+  std::string temp_row;
+  // We need to keep a boolean variable to check if the arrays have been
+  // initialized yet.
+  bool areInitialized = false;
+  // Now, loop over the lines in the file as they're read in.
+  // Note that the getline function will return 0 when there are no more lines left.
+  while( std::getline(csv_file, temp_row) ) {
+    // Here, temp_row has one row of the data.
+    // Convert the string into a stringstream, for more parsing of the line
+    // into its individual components:
+    std::stringstream temp_row_stream( temp_row );
+    // Loop over it and output all elements (separated by a comma).
+    // Note that the variable temp_row_stream will have value 0 when it's empty.
+    // Also, we need a tracking variable to index into the vector of vectors.
+    int timestep = 0;
+    while( temp_row_stream ) {
+      // Read in the next element from the stream into a specific string:
+      std::string temp_element;
+      std::getline( temp_row_stream, temp_element, ',');
+      // For some reason, the getline function returns an empty string
+      // at the end of a row. If temp_element is empty, break out of the loop here.
+      if( temp_element.empty() ) {
+	break;
+      }
+      // TESTING: just output to the command line.
+      std::cout << "Element from the input csv file: " << temp_element << std::endl;
+      // Finally, append this element to the proper list in cable_trajectory.
+      // The first index into cable_trajectory is timestep.
+      // If this is the first row (e.g., the arrays have not been initialized),
+      // we need to create a new array then append it to the array of arrays:
+      if( !areInitialized ) {
+	// the array for this column:
+	std::vector<double> tempArray;
+	// add the first element of the columnt to the new array:
+	// (the atof function turns a string into a double)
+	tempArray.push_back( atof(temp_element.c_str()) );
+	// add this array to the array of arrays:
+	cable_trajectory.push_back( tempArray );
+      }
+      else {
+	// The arrays already exist, so we can just index into the right place:
+	cable_trajectory[timestep].push_back( atof(temp_element.c_str()) );
+	// increment the counter.
+	// Note that above, we don't need a counter, since no indexing is needed.
+	timestep += 1;
+      }
+    }
+    // Set the flag to true now that a line is read.
+    // We're technically re-setting it every time, but who cares.
+    // If it's true after the first row, it's true after every row.
+    areInitialized = true;
+  }
+  // DEBUGGING:
+  std::cout << "Finished reading in the CSV file." << std::endl;
+  std::cout << "There were " << cable_trajectory.size() << " timesteps and "
+	    << cable_trajectory[0].size() << " rows." << std::endl;
+  // DEBUGGING:
+  // Output the resulting vector of vectors, just to test that it looks right.
+  std::cout << "CSV values are: " << std::endl;
+  // The outer loop is along the LONG dimension (e.g., how many rows there are,
+  // and the inner loop along the timesteps.
+  // So, arbitrarily choose the first column vector, to get the number of rows:
+  for( int i=0; i < cable_trajectory[0].size(); i++ ){
+ 
+    for( int j=0; j < cable_trajectory.size(); i++) {
+      std::cout << cable_trajectory[j][i] << "," ;
+    }
+    // At the end of a row, put a newline.
+    std::cout << std::endl;
+  }
+  // Temporarily: cause the simulation to stop.
+  throw std::runtime_error("Break, in VSpineDistribControlBending::onSetup.");
+  
 }
 
 
