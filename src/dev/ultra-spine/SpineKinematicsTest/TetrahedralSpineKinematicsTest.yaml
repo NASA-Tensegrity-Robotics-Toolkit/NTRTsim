@@ -68,41 +68,37 @@ builders:
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 500.0
+      stiffness: 1500.0 # was 500
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   HF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 500.0
+      stiffness: 1500.0
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 500.0
+      stiffness: 1500.0
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   HL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 500.0
+      stiffness: 1500.0
       damping: 50.0
       pretension: 20.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   SFR:
@@ -112,7 +108,6 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
   SRL:
     class: tgBasicActuatorInfo
@@ -121,7 +116,6 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   SBF:
@@ -131,7 +125,6 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
 
   SBL:
@@ -141,5 +134,4 @@ builders:
       damping: 100.0
       pretension: 0.0
       history: 1
-      max_tension: 200.0
       target_velocity: 12.0
