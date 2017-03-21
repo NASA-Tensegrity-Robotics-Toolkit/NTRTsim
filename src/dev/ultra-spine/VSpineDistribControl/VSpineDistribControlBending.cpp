@@ -81,6 +81,10 @@ void VSpineDistribControlBending::onSetup(VSpineDistribControlModel& subject){
   // (Ankita: I'd recommend moving this to the constructor of this class,
   // so you're able to pass it in from the App file.)
   std::string csv_path = "../../../../src/dev/ultra-spine/VSpineDistribControl/matlab_example_csv_output.csv";
+
+  // ANKITA: everything from here down shouldn't need to be edited,
+  //     unless you'd like to change some of the command line output with cout.
+  
   // Next, open it as an input file stream
   // This needs to be a c-style string for some reason.
   std::ifstream csv_file(csv_path.c_str());
@@ -153,15 +157,20 @@ void VSpineDistribControlBending::onSetup(VSpineDistribControlModel& subject){
   // and the inner loop along the timesteps.
   // So, arbitrarily choose the first column vector, to get the number of rows:
   for( int i=0; i < cable_trajectory[0].size(); i++ ){
- 
-    for( int j=0; j < cable_trajectory.size(); i++) {
-      std::cout << cable_trajectory[j][i] << "," ;
+    for( int j=0; j < cable_trajectory.size(); j++) {
+      // Note the order of indexing here, just because we want to
+      // print out one row.
+      std::cout << cable_trajectory[j][i] << ",";
+      // Ankita, for your work, you should just be able to index into the lists 
+      // like cable_trajectory[timestep][cable_number], and not do this j,i thing.
     }
     // At the end of a row, put a newline.
     std::cout << std::endl;
   }
   // Temporarily: cause the simulation to stop.
-  throw std::runtime_error("Break, in VSpineDistribControlBending::onSetup.");
+  // Ankita, you can uncomment the following line if you want to see the output
+  // above, and not have it cleared away by all the values that the App file outputs.
+  //throw std::runtime_error("Break, in VSpineDistribControlBending::onSetup.");
   
 }
 
