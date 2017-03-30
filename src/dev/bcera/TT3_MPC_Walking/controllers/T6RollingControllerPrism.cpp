@@ -33,15 +33,28 @@
 #include <algorithm>
 #include <math.h>
 // Boost Matrix Library
-//#include "numeric/ublas/matrix.hpp"
+#include "numeric/ublas/matrix.hpp"
+#include <numeric/ublas/assignment.hpp>
+#include <numeric/ublas/operation.hpp>
+//Boost Vector Library
+#include <numeric/ublas/vector.hpp>
 //#include "numeric/ublas/io.hpp" 
 #include "assign/list_of.hpp"
 // Utility Library
 #include "../utility.hpp"
 
+using namespace boost::numeric::ublas;
+
 namespace{
   double sf = 30;
   double worldTime = 0;
+  //Matrices holding input weights and hidden layer weights of Neural Net for CSD
+  matrix<double> IW(5,6);
+  matrix<double> LW(20,5);
+  vector<double> b1(5);
+  vector<double> b2(20);
+  vector<double> xmin(6);
+  vector<double> xmax(6);
 }
 
 T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, int activate_flag, int transfer_flag) : 
@@ -142,58 +155,6 @@ void T6RollingController::onSetup(PrismModel& subject)
   // Retrieve normal vectors from model
   normVects = subject.getNormVects();
 
-  // Find the rest length of the cables
-  //restLength = subject.face0.norm();
-
-  //std::cout << "onSetup: Cable rest length: " << restLength << std::endl;
-
-  /*
-    std::cout << "Face 0: " << face0Norm << std::endl;
-    std::cout << "Face 1: " << face1Norm << std::endl;
-    std::cout << "Face 2: " << face2Norm << std::endl;
-    std::cout << "Face 3: " << face3Norm << std::endl;
-    std::cout << "Face 4: " << face4Norm << std::endl;
-    std::cout << "Face 5: " << face5Norm << std::endl;
-    std::cout << "Face 6: " << face6Norm << std::endl;
-    std::cout << "Face 7: " << face7Norm << std::endl;
-    std::cout << "Face 8: " << face8Norm << std::endl;
-    std::cout << "Face 9: " << face9Norm << std::endl;
-    std::cout << "Face 10: " << face10Norm << std::endl;
-    std::cout << "Face 11: " << face11Norm << std::endl;
-    std::cout << "Face 12: " << face12Norm << std::endl;
-    std::cout << "Face 13: " << face13Norm << std::endl;
-    std::cout << "Face 14: " << face14Norm << std::endl;
-    std::cout << "Face 15: " << face15Norm << std::endl;
-    std::cout << "Face 16: " << face16Norm << std::endl;
-    std::cout << "Face 17: " << face17Norm << std::endl;
-    std::cout << "Face 18: " << face18Norm << std::endl;
-    std::cout << "Face 19: " << face19Norm << std::endl;
-  */
-
-  /*
-  // Create adjacency matrix (with open triangles connected)
-  // 						  Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
-  node0Adj  = boost::assign::list_of(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 0
-  node1Adj  = boost::assign::list_of(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0); // 1
-  node2Adj  = boost::assign::list_of(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 2
-  node3Adj  = boost::assign::list_of(0)(0)(1)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 3
-  node4Adj  = boost::assign::list_of(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 4
-  node5Adj  = boost::assign::list_of(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1); // 5
-  node6Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 6
-  node7Adj  = boost::assign::list_of(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0); // 7
-  node8Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1); // 8
-  node9Adj  = boost::assign::list_of(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0); // 9
-  node10Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0); // 10
-  node11Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(1)(0)(0)(0)(0); // 11
-  node12Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(1)(0)(0)(0)(0)(0)(0); // 12
-  node13Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(1)(0)(0)(0); // 13
-  node14Adj = boost::assign::list_of(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(1)(0)(0)(0)(0); // 14
-  node15Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(1)(0)(0); // 15
-  node16Adj = boost::assign::list_of(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0)(0)(0)(1); // 16
-  node17Adj = boost::assign::list_of(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0); // 17
-  node18Adj = boost::assign::list_of(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(1)(0)(0); // 18
-  node19Adj = boost::assign::list_of(0)(0)(0)(0)(0)(1)(0)(0)(1)(0)(0)(0)(0)(0)(0)(0)(1)(0)(0)(0); // 19
-  */
 
   // Open triangles not connected
   // 			    Columns: 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19  // rows:
@@ -317,13 +278,54 @@ void T6RollingController::onSetup(PrismModel& subject)
   actuationPolicy.push_back(node17AP);
   actuationPolicy.push_back(node18AP);
   actuationPolicy.push_back(node19AP);
+
+  //NN Input Layer Weights
+  IW <<= -1.0839, -6.6742, 0.5020, 3.1374, -7.6381, 0.8438,
+    -0.2434, -0.2833, 2.6288, 3.5690, -5.2973, -6.0553,
+    2.0625, -0.0911, -4.0092, -2.4250, -2.7149, 2.2461,
+    4.6154, 0.6760, -1.4432, 3.0841, -1.2598, 1.2244,
+    4.1456, 2.5755, -1.3991, 0.4580, 1.1665, -6.4988;
+
+  //NN Hidden Layer Weights
+  LW <<= 5.1837, 9.0885, 18.2413, -9.4545, -2.8966,
+    0.3232, 4.9520, 0.0261, -11.3385, 12.1297,
+    -0.8560, 5.5827, -13.2629, -13.2917, 0.1038,
+    0.1052, 16.6282, 1.0384, -6.3818, -21.9200,
+    19.4281, -3.5132, 6.2469, -2.2053, -6.1742,
+    -1.5008, -3.4427, 7.3358, -3.9269, -14.7209,
+    -6.8752, -6.5257, -8.2377, -10.0271, -4.2101,
+    10.0271, -16.5941, -7.8216, -4.7950, -0.0937,
+    -10.8409, -5.7857, 2.6632, -7.3001, 13.3635,
+    -13.5390, -6.0814, 1.4624, 6.9256, -7.6022,
+    -2.8084, -7.8460, -10.2098, 11.3693, 2.7434,
+    -6.9309, 6.0847, -5.5783, 6.4967, 8.4519,
+    -1.3169, -7.6164, 7.3237, 17.8512, 3.7860,
+    -6.2791, 7.1690, 10.3343, 3.6462, 7.1475,
+    10.1791, 5.8937, 8.1198, 8.1822, 5.7124,
+    8.6480, 4.1059, -5.0058, 22.9220, 1.1854,
+    5.4086, -7.0375, 7.4380, -7.2575, 7.9569,
+    2.7611, 1.9095, -14.5947, -0.8900, 14.5451,
+    5.7304, 0.9587, -10.3635, 8.1787, -12.0539,
+    -19.7845, 1.4347, 6.4313, -11.3304, -3.7136;
+
+  //NN Hidden Layer Bias
+  b1 <<= 0.9161, -0.3382, 0.2771, -1.3921, 1.1182;
+
+  //NN Output Layer Bias
+  b2 <<= -4.1912, -0.5331, -1.7284, -3.3501, 0.4975, -0.2921, 1.4950, -1.0537, -0.2524, 3.2582, 2.2640, 3.1393, -0.1171, 2.2229, 1.7639, -1.1248, 1.9382, -3.8833, 6.8564, -3.8161;
+
+  //x-minimum for MAPMINMAX transformation
+  xmin <<= 0.1566, 0.1312, 0.1290, 0.0975, 0.1496, 0.1230;
+
+  xmax <<= 3.0654, 3.0008, 3.0366, 3.0209, 3.0103, 3.0064;
+
 }
 
 void T6RollingController::onStep(PrismModel& subject, double dt)
 {
-  std::cout << std::endl;
-  std::cout << "OverallTime: " << worldTime << std::endl;
-  std::cout << "RobotState: " << subject.robotState << std::endl;
+  //std::cout << std::endl;
+  //std::cout << "OverallTime: " << worldTime << std::endl;
+  //std::cout << "RobotState: " << subject.robotState << std::endl;
   worldTime += dt;
   if (dt <= 0.0) {
     throw std::invalid_argument("onStep: dt is not positive");
@@ -337,8 +339,8 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   float step5[24] = {.4917,.2541,.4917,.2541,.4917,.2541,.4269,.4917,.3300,.4053,.4075,.2541,.3882,.3261,.4028,.2541,.2541,.4917,.3500,.4365,.3451,.4043,.2541,.4917};
   float step6[24] = {.4140,.3318,.4140,.3318,.4140,.3318,.3318,.3938,.3538,.4044,.4140,.3815,.3409,.4040,.4140,.3848,.3854,.3783,.4140,.3318,.4140,.3318,.3860,.3992};
   float step7[24] = {.4191,.3387,.3039,.4958,.2500,.4958,.4223,.2500,.2500,.4958,.4958,.3931,.4409,.3501,.2500,.3000,.4367,.4107,.4958,.2500,.4204,.4958,.2500,.2500};
-  float step8[24] = {.3308,.4150,.3499,.4150,.3902,.3999,.4002,.3308,.3870,.3778,.4150,.3404,.3308,.4150,.3308,.4055,.4150,.4150,.3928,.3308,.3308,.4150,.3803,.3875};
-  float step9[24] = {.4939,.4231,.2519,.2519,.2519,.2519,.4939,.4939,.4262,.4132,.4180,.4473,.2519,.4939,.3342,.3507,.4939,.2519,.2519,.4939,.4248,.3151,.3963,.3010};
+  float step8[24] = {0.3358,.4100,.3549,.4100,.3859,.403,.3955,.3358,.3864,.3798,.4100,.3444,.3358,.4100,.3358,.4028,.4100,.4100,.3978,.3358,.3358,.4100,.3756,.3833};
+  float step9[24] = {.4889,.4281,.2569,.2569,.2569,.2569,.4889,.4889,.4276,.4144,.4221,.4453,.2569,.4889,.3337,.3466,.4889,.2569,.2569,.4889,.4198,.3199,.3982,.2974};
   float step10[24] = {.4149,.3309,.3861,.3838,.3797,.3838,.3773,.3972,.4149,.4149,.3309,.3309,.3309,.3923,.4149,.4149,.4149,.3309,.3309,.4149,.4013,.3826,.3434,.4026};
   float step11[24] = {.3252,.4070,.4133,.2590,.3913,.3144,.4083,.2590,.4868,.2590,.4868,.2590,.4868,.2590,.4314,.4868,.2590,.4314,.4868,.2590,.4868,.2590,.4402,.3488};
   float step12[24] = {.3517,.4042,.4146,.6787,.3449,.4027,.4146,.3819,.4146,.3312,.4146,.3312,.4146,.3312,.3312,.3924,.3312,.4146,.3945,.3840,.3773,.3830,.3312,.4146};
@@ -346,72 +348,99 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   float sequence[24];
   switch(roll_case){
   case 0:
-    std::cout << "Case0" << std::endl;
+    //std::cout << "Case0" << std::endl;
     std::copy(step1, step1+24, sequence);
     break;
   case 1:
-    std::cout << "Case1" << std::endl;
+    //std::cout << "Case1" << std::endl;
     std::copy(step2, step2+24, sequence);
     break;
   case 2:
-    std::cout << "Case2" << std::endl;
+    //std::cout << "Case2" << std::endl;
     std::copy(step3, step3+24, sequence);
     break;
   case 3:
-    std::cout << "Case3" << std::endl;
+    //std::cout << "Case3" << std::endl;
     std::copy(step4, step4+24, sequence);
     break;
   case 4:
-    std::cout << "Case4" << std::endl;
+    //std::cout << "Case4" << std::endl;
     std::copy(step5, step5+24, sequence);
     break;
   case 5:
-    std::cout << "Case5" << std::endl;
+    //std::cout << "Case5" << std::endl;
     std::copy(step6, step6+24, sequence);
     break;
   case 6:
-    std::cout << "Case6" << std::endl;
+    //std::cout << "Case6" << std::endl;
     std::copy(step7, step7+24, sequence);
     break;
   case 7:
-    std::cout << "Case7" << std::endl;
+    //std::cout << "Case7" << std::endl;
     std::copy(step8, step8+24, sequence);
     break;
   case 8:
-    std::cout << "Case8" << std::endl;
+    //std::cout << "Case8" << std::endl;
     std::copy(step9, step9+24, sequence);
     break;
   case 9:
-    std::cout << "Case9" << std::endl;
+    //std::cout << "Case9" << std::endl;
     std::copy(step10, step10+24, sequence);
     break;
   case 10:
-    std::cout << "Case10" << std::endl;
+    //std::cout << "Case10" << std::endl;
     std::copy(step11, step11+24, sequence);
     break;
   case 11:
-    std::cout << "Case11" << std::endl;
+    //std::cout << "Case11" << std::endl;
     std::copy(step12, step12+24, sequence);
     break;
   }
   for(int i=0;i<24;i++){
     m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
-    std::cout << "Current Control: " << sequence[i]*sf << ", ";
-    std::cout << "Roll Case: " << roll_case << std::endl;
+    //std::cout << "Current Control: " << sequence[i]*sf << ", ";
     //std::cout << "Start Length: " << startLength << std::endl;
     //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
     actuators[i]->moveMotors(dt);
-    if(actuators[i]->getRestLength()-sequence[i]*sf > 0.01)
-      swap = 0;
-    if(actuators[i]->getRestLength()-sequence[i]*sf < -0.01)
-      swap = 0;
   }
-  std::cout << "WorldTime: " << worldTime << std::endl;
-  float time_inc = 1.5;
+  //std::cout << "Roll Case: " << roll_case << std::endl;
+  //std::cout << "WorldTime: " << worldTime << std::endl;
+  
+  /*
+  float time_inc;
+  if(roll_case%2==0)
+    time_inc = 1.335;//1.425;
+  else
+    time_inc = 1.3;
   if((worldTime-last_step_time)>time_inc){
     roll_case = (roll_case+1)%12;
     last_step_time = worldTime;
   }
+  */
+  
+  
+
+  if(fmod(worldTime,0.01)<=dt){
+    int currFace = contactSurfaceDetection(currFace);
+    std::cout << "Curr Face: " << currFace << std::endl;
+    int mat_currFace = currFace + 1; //matlab 1-index
+    if(mat_currFace==6) roll_case = 0;
+    if(mat_currFace==20) roll_case = 1;
+    if(mat_currFace==9) roll_case = 2;
+    if(mat_currFace==13) roll_case = 3;
+    if(mat_currFace==14) roll_case = 4;
+    if(mat_currFace==15) roll_case = 5;
+    if(mat_currFace==16) roll_case = 6;
+    if(mat_currFace==18) roll_case = 7;
+    if(mat_currFace==3) roll_case = 8;
+    if(mat_currFace==4) roll_case = 9;
+    if(mat_currFace==8) roll_case = 10;
+    if(mat_currFace==7) roll_case = 11;
+
+    //roll_case = (roll_case+1)%12;
+    std::cout << "Roll Case: " << roll_case << std::endl; 
+  }
+    
   //if(worldTime>0 && worldTime<time_inc) roll_case = 0;
   //if(worldTime>time_inc && worldTime<time_inc*2) roll_case = 1;
   //if(worldTime>time_inc*2 && worldTime<time_inc*3) roll_case = 2;
@@ -440,35 +469,99 @@ bool T6RollingController::checkOnGround()
   return onGround;
 }
 
-int T6RollingController::contactSurfaceDetection()
+int T6RollingController::contactSurfaceDetection(int currFace)
 {
-  // Initialize variables
-  double dotProd;
-  double maxDotProd = 0;
-  int currSurface = -1;
+  // Initialize vector of phi angles (angles between rod directions and +Y axis)
+  vector<double> faceInput(6);
+  //rods
+  for(size_t i=0; i<6; i++){
+    btTransform worldTrans = rodBodies[i]->getWorldTransform();
+    btMatrix3x3 robot2world = worldTrans.getBasis();
+    btVector3 rodDir = robot2world*btVector3(0,1,0);
+    double angle = rodDir.angle(btVector3(0,1,0));
+    //std::cout << angle << std::endl;
+    faceInput(i) = angle;
+  }
+    
+  vector<double> ones(6);
+  ones <<= 1, 1, 1, 1, 1, 1;
+  faceInput = element_div(2*(faceInput-xmin),xmax-xmin)-ones;
+  /*
+  for(size_t i=0; i<faceInput.size() ; i++){
+    std::cout << faceInput(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+  
+  
+  //multiply inputs by input weights
+  vector<double> hiddenLayer(5);
+  axpy_prod(IW,faceInput,hiddenLayer,true); //multiply by weights
+  /*
+  for(size_t i=0; i<hiddenLayer.size() ; i++){
+    std::cout << hiddenLayer(i) << ", ";
+  }
+  */
+  std::cout << std::endl;
+  hiddenLayer += b1; //add bias
+  /*
+  for(size_t i=0; i<hiddenLayer.size() ; i++){
+    std::cout << hiddenLayer(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
 
-  // Get the gravity vector
-  btVector3 robotGravity = getRobotGravity();
+  //tansig function (sigmoid with output mapped [-1,1])
+  for(size_t i=0; i<hiddenLayer.size(); i++){
+    hiddenLayer(i) = 2/(1+exp(-2*hiddenLayer(i)))-1;
+  }
+  /*
+  for(size_t i=0; i<hiddenLayer.size() ; i++){
+    std::cout << hiddenLayer(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
 
-  // Find the dot product between the gravity vector and each face
-  // As all normal vectors point away from the center of the robot,
-  // The larger dot product indicates better alignment
-  for (size_t i = 0; i < normVects.size(); i++) {
-    dotProd = robotGravity.dot(normVects[i]);
-    //std::cout << dotProd << std::endl;
-    if (dotProd > maxDotProd) {
-      maxDotProd = dotProd;
+  //multiply hidden layer outputs by layer1 weights
+  vector<double> outputLayer(20);
+  axpy_prod(LW,hiddenLayer,outputLayer,true); //multiply by weights
+  std::cout << "hidden layer multiplied with weights: " << std::endl;
+  /*
+  for(size_t i=0; i<outputLayer.size() ; i++){
+    std::cout << outputLayer(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+  outputLayer += b2; //add bias
+  /*
+  for(size_t i=0; i<outputLayer.size() ; i++){
+    std::cout << outputLayer(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+
+  //softmax function for output layer
+  double sum = 0;
+  for(size_t i=0; i<outputLayer.size(); i++){
+    outputLayer(i) = exp(outputLayer(i));
+    sum += outputLayer(i);
+  }
+  for(size_t i=0; i<outputLayer.size(); i++){
+    outputLayer(i) = outputLayer(i)/sum;
+    std::cout << outputLayer(i) << ", ";
+  }
+  std::cout << std::endl;
+  int currSurface = currFace;
+  double threshold = 0.3;
+  int otherMax = -1;
+  for(int i=0; i<outputLayer.size(); i++){
+    if((otherMax==-1||outputLayer(i)>outputLayer(otherMax)) && outputLayer(i)>=threshold && i!=currFace){
       currSurface = i;
+      otherMax = i;
     }
   }
-
-  // Catch all error state
-  if (currSurface == -1) {
-    std::cout << "contactSurfaceDetection: No surface found" << std::endl;
-  }
-
-  std::cout << "contactSurfaceDetection: Contact surface: " << currSurface << std::endl;
-
+  std::cout << "Contact Surface: Face " << currSurface+1 << " with Probability " << outputLayer(currSurface) << std::endl;
+  
   return currSurface;
 }
 
@@ -666,7 +759,7 @@ bool T6RollingController::stepToFace(double dt)
 		cableToActuate = actuationPolicy[path[0]][path[1]];
 
 		// Find current face
-		int currFace = contactSurfaceDetection();
+		int currFace = contactSurfaceDetection(0);
 
 		// Perform actuation from one closed face to another
 		if (isClosedFace(path[0])) {

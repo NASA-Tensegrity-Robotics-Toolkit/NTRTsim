@@ -63,7 +63,7 @@ namespace
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
-      0.15*sf,          // targetVelocity (m/s)
+      0.08*sf,//0.15*sf,          // targetVelocity (m/s)
       
       /*
       //Option 2: Superball Parameters
@@ -446,7 +446,7 @@ void PrismModel::step(double dt)
 {        
   notifyStep(dt);
 
-  std::cout << "Tank Position: " << TankBodies[0]->getCenterOfMassPosition() << std::endl;
+  //std::cout << "Tank Position: " << TankBodies[0]->getCenterOfMassPosition() << std::endl;
   if(marker_log){
     std::cout << "Marker Logging~~~" << markers.size() << std::endl;
     for(int i=0;i<markers.size();i++){

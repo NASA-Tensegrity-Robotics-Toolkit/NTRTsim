@@ -42,6 +42,7 @@
 #include <vector>
 #include <string>
 
+
 // Forward declarations
 class PrismModel;
 
@@ -133,7 +134,7 @@ class T6RollingController : public tgObserver<PrismModel>
    * ToDo: test and improve for any arbitrary ground orientation
    * @return The number of the face which is in contact with the ground
    */
-  int contactSurfaceDetection();
+  int contactSurfaceDetection(int currFace);
 
   /**
    * Detect which surface of the robot is in alignment with the direction of travel
@@ -232,7 +233,6 @@ class T6RollingController : public tgObserver<PrismModel>
   // Vector holding row information of adjacency matrix
   std::vector< std::vector<int> > A;
 
-
   // Debugging counter
   double replanCounter = 0;
 
@@ -288,6 +288,7 @@ class T6RollingController : public tgObserver<PrismModel>
   int pathIdx = 1;
   int stepIdx = 0;
   int roll_case = 0;
+  int currFace = 0;
   double last_step_time = 0;
 	
   // Direction to travel
