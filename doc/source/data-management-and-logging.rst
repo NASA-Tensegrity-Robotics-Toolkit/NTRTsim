@@ -36,7 +36,7 @@ First, include the following header files: ::
 
 	#include "sensors/tgDataLogger2.h"
 	#include "sensors/tgRodSensorInfo.h"
-	#include "sensors/tgSpringCableActuatorInfo.h"
+	#include "sensors/tgSpringCableActuatorSensorInfo.h"
 
 Then, **after** you create your tgModel and add it to the simulation, perform the following steps:
 	
