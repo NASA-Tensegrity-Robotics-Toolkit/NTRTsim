@@ -127,14 +127,15 @@ int main(int argc, char** argv)
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
 
     // Create the controller for the rotating vertebra.
-    //double startTimeRot = 2.0;
-    double startTimeRot = 6.0;
-    //btVector3 startTorqueRot = btVector3(-0.065, 0, 0); // was -0.064
-    btVector3 startTorqueRot = btVector3(0, 0, 0);
+    double startTimeRot = 4.0;
+    //double startTimeRot = 6.0;
+    btVector3 startTorqueRot = btVector3(-0.065, 0, 0); // was -0.064
+    //btVector3 startTorqueRot = btVector3(0, 0, 0);
     //double phaseTwoTimeRot = 3.5;
-    double phaseTwoTimeRot = 7.5;
-    //btVector3 phaseTwoTorqueRot = btVector3(-0.053225, 0, 0); // was -0.054
-    btVector3 phaseTwoTorqueRot = btVector3(0, 0, 0);
+    double phaseTwoTimeRot = 5.45;
+    //double phaseTwoTimeRot = 7.5;
+    btVector3 phaseTwoTorqueRot = btVector3(-0.053225, 0, 0); // was -0.054
+    //btVector3 phaseTwoTorqueRot = btVector3(0, 0, 0);
     std::string rodHingeTag = "rodForHinge";
     RotatingVertebraController* rotController =
       new RotatingVertebraController( startTimeRot, startTorqueRot,
