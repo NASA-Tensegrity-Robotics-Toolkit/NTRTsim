@@ -61,6 +61,13 @@ anything.
 
   ** Running the setup script **
 
+  - Ensure that all of the dependencies above are installed before running setup.sh. If
+    you realize after successfully running setup.sh that you were missing a dependency,
+    then install the dependency, nuke your existing NTRT install, and do a fresh build from scratch.
+    There are cases (e.g. freeglut3) where setup can finish even if a dependency is missing, but
+    app builds will continue to fail even after you've installed the missing dependency.
+    See issue 211 for more info (https://github.com/NASA-Tensegrity-Robotics-Toolkit/NTRTsim/issues/211)
+
   - If you want to specify setup options, copy the files in
     conf/default/ to conf/, removing the .default
     (for example conf/default/bullet.conf.default becomes conf/bullet.conf)
