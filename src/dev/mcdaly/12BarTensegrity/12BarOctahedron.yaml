@@ -1,4 +1,6 @@
-nodes: #nodal coordinates for rods of length 4.5 dm
+nodes:
+
+  # rod ends (length of 4.5 dm)
   n0 : [0, 0, 0]
   n1 : [0.54, 0.35, 1.84]
   n2 : [2.32, 0, 1.38]
@@ -24,7 +26,25 @@ nodes: #nodal coordinates for rods of length 4.5 dm
   n22 : [3.65, 4.15, 0]
   n23 : [2.32, 4.5, -1.38]
 
+  # rod centers
+  n24: [-1.47, 0, 1.47]
+  n25: [0, 1.47, -1.47]
+  n26: [-1.47, 0, -1.47]
+  n27: [1.47, 1.47, 0]
+  n28: [1.47, 0, -1.47]
+  n29: [0, 1.47, 1.47]
+  n30: [1.47, 0, 1.47]
+  n31: [-1.47, 1.47, 0]
+  n32: [0, -1.47, 1.47]
+  n33: [-1.47, -1.47, 0]
+  n34: [0, -1.47, -1.47]
+  n35: [1.47, -1.47, 0]
+ 
+  # payload centers
+  n36: [0, -0.4, 0]
+  n37: 
   
+
 pair_groups:
   rod:
     - [n0, n19]
@@ -40,7 +60,7 @@ pair_groups:
     - [n15, n11]
     - [n8, n5]
 
-  string:
+  cable:
     - [n0, n1]
     - [n0, n5]
     - [n0, n7]
@@ -78,22 +98,32 @@ pair_groups:
     - [n21, n22]
     - [n22, n23]
 
+  payload:
+    - [n13, n16]    
+
 builders:
   rod:
     class: tgRodInfo
     parameters: 
-      density: 2.7 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
+      density: 2.70 #2.70 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
       radius: 0.0475 #dm #outer diameter is 9.5 mm
-      friction: 1.0 #estimated value
-      roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
-      restitution: 0.0 #does this have to be zero?
+      #friction: 1.0 #estimated value
+      #roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
+      #restitution: 0.0 #does this have to be zero?
 
   cable:
-    class: tgBasicActuatorInfo
+    class: tgBasicActuatorInfo 
     parameters:
       stiffness: 1560.0 #1560.0 #kg/s^2 (N/m) #value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      damping: 20.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 4000.0 #400.0 #kg-dm/s^2 #need to check estimate using 'Tension Results.xlsx'
-      history: 0 #what is this?
-      max_tension: 100000.0 #kg-dm/s^2
-      target_velocity: 0 #dm/s #what is this?
+      damping: 50.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 400.0 #400.0 #kg-dm/s^2 #need to check estimate using 'Tension Results.xlsx'
+      #history: 0 #what is this?
+      #max_tension: 100000.0 #kg-dm/s^2
+      #target_velocity: 0 #dm/s #what is this?
+
+  payload:
+    class: tgBoxInfo
+    parameters:
+      width: 0.25
+      height: 0.25
+      density: 2.70 #kg/dm^3

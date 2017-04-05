@@ -77,8 +77,8 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
-    // RPLengthController* const tension_sensor = new RPLengthController();
-    // myModel -> attach(tension_sensor);
+    // RPLengthController* const controller = new RPLengthController();
+    // myModel -> attach(controller);
 
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
