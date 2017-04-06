@@ -36,14 +36,15 @@ First, include the following header files: ::
 
 	#include "sensors/tgDataLogger2.h"
 	#include "sensors/tgRodSensorInfo.h"
-	#include "sensors/tgSpringCableActuatorSensorInfo.h"
+	#include "sensors/tgSpringCableActuatorInfo.h"
 
 Then, **after** you create your tgModel and add it to the simulation, perform the following steps:
 	
-#. Create a tgDataLogger2, passing in the name of the log file that you would like to create. ::
+#. Create a tgDataLogger2, passing in the name of the log file that you would like to create. Include a time interval for logging. If you don't include this, you will get a sample at each timestep, and your logfile will be extremely large. A suggested sampling time interval is 0.1 sec. ::
      
      std::string log_filename = "~/path_to_my_logs/example_logfile";
-     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename);
+     double samplingTimeInterval = 0.1;
+     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
 
 #. Add the model to the data logger. If your pointer to your tgModel was myModel, ::
 
