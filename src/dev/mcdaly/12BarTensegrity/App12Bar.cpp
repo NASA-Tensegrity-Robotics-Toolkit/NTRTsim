@@ -92,7 +92,7 @@ int main(int argc, char** argv)
     myDataLogger->addSensorInfo(mySCASensorInfo);
     
     // Add data logger to the world
-    simulation.addDataManager(myDataLogger);
+    //simulation.addDataManager(myDataLogger); // comment/uncomment to record data
 
     // Run simulation
     simulation.run();
