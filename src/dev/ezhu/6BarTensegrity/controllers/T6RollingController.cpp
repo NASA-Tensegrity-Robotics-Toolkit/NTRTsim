@@ -36,8 +36,8 @@
 // Utility Library
 #include "../utility.hpp"
 
-T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal) : 
-m_gravity(gravity), m_mode(mode), m_face_goal(face_goal)
+T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name) : 
+m_gravity(gravity), m_mode(mode), m_face_goal(face_goal), m_log_name(log_name)
 {
 	assert(m_gravity >= 0);
 	assert((m_face_goal >= 0) && (m_face_goal <= 19));
@@ -81,6 +81,7 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_dr_goal = config.m_dr_goal;
 	c_path = config.m_path;
 	c_path_size = config.m_path_size;
+	c_log_name = config.m_log_name;
 
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
@@ -133,12 +134,10 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		rodBodies.push_back(rodBody);
 	}
 
-	/*
 	// Retrive payload body from model
 	payload = subject.getPayload();
 	tgRod* payloadRod = payload[0];
 	payloadBody = payloadRod->getPRigidBody();
-	*/
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
@@ -310,10 +309,11 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	actuationPolicy.push_back(node18AP);
 	actuationPolicy.push_back(node19AP);
 
-	doLog = false;
+	doLog = true;
 
 	if (doLog) {
-		std::string filename = "13InclineRollingDataStiff.txt";
+		// std::string filename = "0P0R_Response.txt";
+		std::string filename = c_log_name;
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -321,9 +321,11 @@ void T6RollingController::onSetup(sixBarModel& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+			data_out << "SimTime, CoM_posX, CoM_posY, CoM_posZ, CoM_velX, CoM_velY, CoM_velZ, onGround, contactCounter" << std::endl << std::endl;
 		}
 	}
+
+	markers = subject.getAllMarkers();
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
@@ -451,12 +453,84 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	// }
 	// else robotReady = setAllActuators(m_controllers, actuators, restLength, dt);
 	
-	// if (doLog) {
-	// 	btVector3 payload_vel = payloadBody->getLinearVelocity();
-	//     btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
-	//     percentChange = (actuators[actuatedCable]->getCurrentLength()-startLength)/startLength;
-	//     data_out << worldTime << ", " << actuatedCable << ", " << currentFace << ", " << percentChange << ", " << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	btVector3 CoM_pos;
+	btVector3 CoM_vel;
+
+	// for (int i = 0; i < rodBodies.size(); i++) {
+	// 	CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
+	// 	CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
 	// }
+
+	CoM_pos = payloadBody->getCenterOfMassPosition();
+	CoM_vel = payloadBody->getLinearVelocity();
+
+	if (worldTime > 5 && worldTime <= 6) {
+		thrusterOn = true;
+	}
+	else {
+		thrusterOn = false;
+	}
+
+	// std::cout << getRobotForce(btVector3(250,250,0)) << std::endl;
+	if (thrusterOn) {
+		payloadBody->applyCentralForce(getRobotForce(btVector3(250,250,0)));
+	}
+ 
+	if (CoM_vel.norm() < 1 && worldTime > 6) {
+		exit(EXIT_SUCCESS);
+	}
+
+	// if (!isOnGround && worldTime > 6) {
+	if (worldTime > 6) {
+		bool tmp = false;
+		for (int i = 0; i < markers.size(); i++) {
+			if (markers[i].getWorldPosition().y() <= 1.56) {
+				tmp = true;
+				break;
+				// contactNode = i;
+			}
+			// std::cout << i << std::endl;
+		}
+		isOnGround = tmp;
+		// if (CoM_pos.y() <= 5) {
+		// 	isOnGround = true;
+		// }
+	}
+	// Data logging ends when the same rod leaves the ground
+	// else if (worldTime > 6) {
+	// 	// std::cout << markers[contactNode].getWorldPosition().y() << std::endl;
+	// 	// if (markers[contactNode].getWorldPosition().y() > 1.56) {
+	// 	// 	isOnGround = false;
+	// 	// 	exit(EXIT_SUCCESS);
+	// 	// }
+
+	// 	for (int i = 0; i < markers.size(); i++) {
+	// 		if (markers[i].getWorldPosition().y() > 1.56) {
+	// 			isOnGround = isOnGround & true;
+	// 		}
+	// 		isOnGround = ~isOnGround;
+	// 	}
+	// 	// if (CoM_pos.y() > 5) {
+	// 	// 	isOnGround = false;
+	// 	// 	// exit(EXIT_SUCCESS);
+	// 	// }
+	// }
+
+	if (isOnGround != lastFlag) {
+		if (isOnGround) {
+			contactCounter += 1;
+		}
+		lastFlag = isOnGround;
+	}
+
+	// std::cout << isOnGround << std::endl;
+
+	// if (doLog && isOnGround) {
+	if (doLog && !thrusterOn && worldTime > 6) {
+	    data_out << worldTime << ", " << CoM_pos.x() << ", " << CoM_pos.y() << ", " << CoM_pos.z() << ", " 
+	    		<< CoM_vel.x() << ", " << CoM_vel.y() << ", " << CoM_vel.z() << ", " 
+	    		<< isOnGround << ", " << contactCounter << std::endl;
+	}
 }
 
 bool T6RollingController::checkOnGround()
@@ -565,6 +639,23 @@ btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld)
 	btVector3 dirVectRobot = (worldToRobot * dirVectWorld).normalize();
 	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
 	return dirVectRobot;
+}
+
+btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld) 
+{
+	btTransform worldTrans = payloadBody->getWorldTransform();
+	btMatrix3x3 robotToWorld = worldTrans.getBasis();
+	// The basis of getWorldTransform() returns the rotation matrix from robot frame
+	// to world frame. Invert this matrix to go from world to robot frame
+	btMatrix3x3 worldToRobot = robotToWorld.inverse();
+	// Transform the gravity vector from world frame to robot frame
+	btVector3 forceVectRobot = worldToRobot * forceVectWorld;
+	//std::cout << "Gravity vector in robot frame: " << gravVectRobot << std::endl;
+	// btTransform rotation;
+	// btQuaternion orientation = payloadBody->getOrientation();
+	// rotation.setRotation(orientation);
+	// btVector3 forceVectRobot = rotation*forceVectWorld;
+	return forceVectRobot;
 }
 
 std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 

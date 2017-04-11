@@ -30,6 +30,7 @@
 // This Library
 #include "core/tgObserver.h"
 #include "core/tgRod.h"
+#include "core/abstractMarker.h"
 #include "controllers/tgBasicController.h"
 
 // The Model
@@ -63,7 +64,7 @@ public:
 	{
 	public:
 		// Overloaded Config function for two controller modes
-		Config (double gravity, const std::string& mode, int face_goal);
+		Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name);
 		Config (double gravity, const std::string& mode, btVector3 dr_goal);
 		Config (double gravity, const std::string& mode, int *path, int pathSize);
 
@@ -71,6 +72,7 @@ public:
 
 		// Use "face" for rolling to a goal triangle, use "dr" for dead reckoning
 		std::string m_mode;
+		std::string m_log_name;
 
 		// Goal face to roll to
 		int m_face_goal;
@@ -119,6 +121,13 @@ public:
 	 * @return The direction in the robot frame
 	 */
 	btVector3 getRobotDir(btVector3 dirVectWorld);
+
+	/**
+	 * Calculate the force vector in the robot frame
+	 * @param[in] forceVectWorld - The force vector in world frame to be found in robot frame
+	 * @return The force vector in the robot frame
+	 */
+	btVector3 getRobotForce(btVector3 forceVectWorld);
 
 	/**
 	 * Check to see if the robot is in contact with the ground
@@ -197,6 +206,7 @@ private:
 	int *c_path;
 	int c_path_size;
 	int controller_mode;
+	std::string c_log_name;
 
 	// Vector of rigid body objects
 	std::vector<btRigidBody*> rodBodies;
@@ -256,6 +266,7 @@ private:
 	std::vector<tgBasicActuator*> actuators;
 	std::vector<tgRod*> rods;
 	std::vector<tgRod*> payload;
+	std::vector<abstractMarker> markers;
 
 	// Vector to hold controllers for the cables
 	std::vector<tgBasicController*> m_controllers;
@@ -300,7 +311,7 @@ private:
 	bool runPathGen = false;
 	bool reorient = false;
 	bool drGoalReached = false;
-	bool isOnGround;
+	bool isOnGround = false;
 	int pathIdx = 1;
 	int stepIdx = 0;
 	bool doLog;
@@ -315,6 +326,13 @@ private:
 	int actuatedCable;
 	int currentFace;
 	double percentChange = 0;
+
+	int contactNode;
+	bool thrusterOn = false;
+
+	bool lastFlag = isOnGround;
+	int contactCounter = 0;
+	std::vector<bool> contactVec;
 };
 
 #endif

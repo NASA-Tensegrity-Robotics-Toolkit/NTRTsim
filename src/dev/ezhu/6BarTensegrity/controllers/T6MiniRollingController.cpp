@@ -345,7 +345,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 		}
 	}
 
-	markers = subject.getAllMarkers();
+	// markers = subject.getAllMarkers();
 }
 
 void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
@@ -407,7 +407,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 					// std::cout << "Realeasing..." << std::endl;
 					moveComplete = setSingleActuator(m_controllers[cableNum], actuators[cableNum], restLength, dt);
 				}
-				moveComplete = moveComplete && (timer >= 2);
+				moveComplete = moveComplete && (timer >= 1.5);
 				if (moveComplete) {
 					actuatorStatus[actuatorNum-1] = !actuatorStatus[actuatorNum-1];
 					timer = 0;
@@ -421,7 +421,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 				actuatorNum1 = sequence[sequenceIdx];
 				actuatorNum2 = sequence[sequenceIdx+1];
 				// std::cin >> actuatorNum;
-				std::cout << "Actuators " << actuatorNum1 << ", " << actuatorNum2 << " selected" << std::endl;
+				// std::cout << "Actuators " << actuatorNum1 << ", " << actuatorNum2 << " selected" << std::endl;
 				// if (actuatorNum < 1 || actuatorNum > 6) {
 				// 	std::cout << "Invalid actuator selection, please input a number 1 - 6" << std::endl;
 					// moveComplete = true;
@@ -495,7 +495,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 					// std::cout << "Realeasing..." << std::endl;
 					moveComplete2 = setSingleActuator(m_controllers[cableNum2], actuators[cableNum2], restLength, dt);
 				}
-				moveComplete = moveComplete1 && moveComplete2 && (timer >= 2);
+				moveComplete = moveComplete1 && moveComplete2 && (timer >= 1.5);
 				if (moveComplete) {
 					actuatorStatus[actuatorNum1-1] = !actuatorStatus[actuatorNum1-1];
 					actuatorStatus[actuatorNum2-1] = !actuatorStatus[actuatorNum2-1];
@@ -510,18 +510,18 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 
 	// std::cout << robotReady << "|" << isOnGround << "|" << moveComplete << std::endl;
 
-	if (logCounter == 1000) {
-		btVector3 marker0Pos = markers[0].getWorldPosition();
-		btVector3 marker1Pos = markers[1].getWorldPosition();
-		btVector3 marker2Pos = markers[2].getWorldPosition();
-		btVector3 marker3Pos = markers[3].getWorldPosition();
-		btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+	// if (logCounter == 1000) {
+	// 	btVector3 marker0Pos = markers[0].getWorldPosition();
+	// 	btVector3 marker1Pos = markers[1].getWorldPosition();
+	// 	btVector3 marker2Pos = markers[2].getWorldPosition();
+	// 	btVector3 marker3Pos = markers[3].getWorldPosition();
+	// 	btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
 
-		std::cout << marker0Pos << "," << marker1Pos << "," << marker2Pos << "," << marker3Pos << "," << payload_pos << std::endl;
-		logCounter = 0;
-	}
+	// 	std::cout << marker0Pos << "," << marker1Pos << "," << marker2Pos << "," << marker3Pos << "," << payload_pos << std::endl;
+	// 	logCounter = 0;
+	// }
 	
-	logCounter++;
+	// logCounter++;
 
 	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();

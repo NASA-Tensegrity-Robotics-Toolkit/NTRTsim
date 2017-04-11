@@ -43,6 +43,7 @@
 #include <fstream>
 #include <string>
 #include <math.h>
+#include <stdlib.h>
 // Controller
 #include "controllers/T6RollingController.h"
 
@@ -115,6 +116,19 @@ int main(int argc, char** argv)
     // tgImportGround* ground = new tgImportGround(groundConfig, file_in);
     // ---------------------------------------------------------------------------------
 
+    // Initial yaw
+    int psi = atoi(argv[1]);
+    // Initial pitch 
+    int theta = atoi(argv[2]);
+    // Initial roll
+    int phi = atoi(argv[3]);
+    
+    // File to write to
+    std::string log_name = argv[4];
+
+    std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
+    std::cout << "Writing to file: " << log_name << std::endl;
+
     // Box ground
     // ---------------------------------------------------------------------------------
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
@@ -126,7 +140,7 @@ int main(int argc, char** argv)
     double gravity = 1.62*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);
-
+  
     // create the view
     const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
@@ -140,7 +154,8 @@ int main(int argc, char** argv)
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
     // Use tgCreator
-    sixBarModel* const myModel = new sixBarModel();
+    // sixBarModel* const myModel = new sixBarModel();
+    sixBarModel* const myModel = new sixBarModel(psi,theta,phi);
 
     // Define path for controller
     int *pathPtr;
@@ -149,7 +164,7 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 2);
+    const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
 
     // Create the controller

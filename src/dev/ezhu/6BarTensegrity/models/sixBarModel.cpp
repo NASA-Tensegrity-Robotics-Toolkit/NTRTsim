@@ -74,15 +74,16 @@ namespace
 	        0.3175*sf, // Motor length
 	        */
 	        
-	        688/pow(sf,3),    // density (kg / length^3)
-	        0.019*sf,     // radius (length)
-	        400.0,   // stiffness (kg / sec^2) was 1500
+	        // TT-3 parameters
+	        2990/pow(sf,3),    // density (kg / length^3)
+	        0.0127/2*sf,     // radius (length)
+	        500.0,   // stiffness (kg / sec^2) was 1500
 	        20.0,    // damping (kg / sec)
-	        1.684*sf,     // rodLength (length)
+	        0.66*sf,     // rodLength (length)
 	        0.99,      // friction (unitless)
 	        0.01,     // rollFriction (unitless)
 	        0.0,      // restitution (?)
-	        100.0*sf,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+	        17.5*sf, //17.5*sf, // pretension
 	        0,         // History logging (boolean)
 	        10000*sf,   // maxTension
 	        0.5*sf,    // targetVelocity
@@ -105,10 +106,16 @@ namespace
 	        */
    		};
 }
+ 
+sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel() 
+{
+	yaw_init = yaw;
+	pitch_init = pitch;
+	roll_init = roll;
+}
 
 sixBarModel::sixBarModel() : tgModel() 
 {
-
 }
 
 sixBarModel::~sixBarModel()
@@ -235,14 +242,14 @@ void sixBarModel::setup(tgWorld& world)
   	// Note that pretension is defined for this string
 	const tgRod::Config sixBarRodConfig(config.radius, config.density, config.friction,
 		config.rollFriction, config.restitution);
-	const tgRod::Config PayloadRodConfig(config.radius*4, config.density/16, config.friction,
+	const tgRod::Config PayloadRodConfig(config.radius*8, 4317/pow(sf,3), config.friction,
 		config.rollFriction, config.restitution);
 	const tgRod::Config motorConfig(config.radius*2, config.density, config.friction,
 		config.rollFriction, config.restitution);
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
-	tgBasicActuator::Config staticCableConfig(config.stiffness, config.damping, config.pretension*2,
+	tgBasicActuator::Config staticCableConfig(config.stiffness*2, config.damping*2, config.pretension*3,
 		config.hist, config.maxTension, config.targetVelocity);
 
 	// Create a structure that will hold the details of this model
@@ -252,11 +259,14 @@ void sixBarModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	// addPayload(s);
+	addPayload(s);
 
 	// Move the structure
 	rotateToFace(s, 2);
-	s.move(btVector3(0, 50, -0)); 
+	rotateYaw(s, yaw_init*M_PI/180);
+	rotatePitch(s, pitch_init*M_PI/180);
+	rotateRoll(s, roll_init*M_PI/180);
+	s.move(btVector3(0, 7, -0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));
@@ -287,7 +297,30 @@ void sixBarModel::setup(tgWorld& world)
 	}
 	
 	// Get the payload for controller
-	payload = sixBarModel::find<tgRod>("payload");
+	payload.push_back(sixBarModel::find<tgRod>("payload")[0]);
+
+	// btRigidBody* rodBody0 = allRods[0]->getPRigidBody();
+	// btRigidBody* rodBody1 = allRods[2]->getPRigidBody();
+	// btRigidBody* rodBody2 = allRods[5]->getPRigidBody();
+
+	// NODE0 = abstractMarker(rodBody0,btVector3(0,-config.rodLength/2,0),btVector3(0,0,1),1);
+	// NODE1 = abstractMarker(rodBody1,btVector3(0,config.rodLength/2,0),btVector3(0,1,0),2);
+	// NODE2 = abstractMarker(rodBody2,btVector3(0,-config.rodLength/2,0),btVector3(1,0,0),3);
+
+	for (int i = 0; i < allRods.size(); i++) {
+		allMarkers.push_back(abstractMarker(allRods[i]->getPRigidBody(),btVector3(0,-config.rodLength/2,0),btVector3(0,0,1),i+1));
+	}
+	for (int i = 0; i < allRods.size(); i++) {
+		allMarkers.push_back(abstractMarker(allRods[i]->getPRigidBody(),btVector3(0,config.rodLength/2,0),btVector3(0,0,1),i+7));
+	}
+
+	// allMarkers.push_back(NODE0);
+	// allMarkers.push_back(NODE1);
+	// allMarkers.push_back(NODE2);
+
+	for (int i = 0; i < allMarkers.size(); i++) {
+		this->addMarker(allMarkers[i]);
+	}
 
 	// Notify controllers that setup has finished
 	notifySetup();
@@ -330,6 +363,11 @@ const std::vector<tgRod*>& sixBarModel::getPayload() const
 const std::vector<btVector3>& sixBarModel::getNormVects() const 
 {
 	return normalVectors;
+}
+
+const std::vector<abstractMarker>& sixBarModel::getAllMarkers() const
+{
+    return allMarkers;
 }
 
 void sixBarModel::teardown()
@@ -454,7 +492,7 @@ void sixBarModel::addSixBarActuators(tgStructure& s)
 
 void sixBarModel::addPayloadNodes(tgStructure& s)
 {
-	double payloadLength = 3;
+	double payloadLength = 0.1*sf;
 	s.addNode(0, payloadLength/2, 0); // 12 or 24
 	s.addNode(0, -payloadLength/2, 0); //13 0r 25
 }
@@ -494,4 +532,19 @@ void sixBarModel::rotateToFace(tgStructure& s, int face)
 	btVector3 crossProd = faceNorm.cross(goalDir);
 
 	s.addRotation(btVector3(0,0,0), crossProd, theta);
+}
+
+void sixBarModel::rotateYaw(tgStructure& s, double psi)
+{
+	s.addRotation(btVector3(0,0,0), btVector3(0,1,0), psi);
+}
+
+void sixBarModel::rotatePitch(tgStructure& s, double theta)
+{
+	s.addRotation(btVector3(0,0,0), btVector3(0,0,1), theta);
+}
+
+void sixBarModel::rotateRoll(tgStructure& s, double phi)
+{
+	s.addRotation(btVector3(0,0,0), btVector3(1,0,0), phi);
 }

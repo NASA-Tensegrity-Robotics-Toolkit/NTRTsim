@@ -35,7 +35,7 @@
 
 // The C++ Standard Library
 #include <stdexcept>
-
+ 
 tgSimulation::tgSimulation(tgSimView& view) :
   m_view(view)
 {

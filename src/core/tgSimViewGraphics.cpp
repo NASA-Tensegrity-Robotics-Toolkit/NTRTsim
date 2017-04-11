@@ -22,7 +22,7 @@
  * @author Brian Mirletz, Ryan Adams
  * $Id$
  */
-
+ 
 // This module
 #include "tgSimViewGraphics.h"
 // This application
@@ -32,7 +32,7 @@
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
-
+ 
 tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
                      double stepSize,
                      double renderRate) : 

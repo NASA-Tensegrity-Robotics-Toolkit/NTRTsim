@@ -35,6 +35,7 @@
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgString.h"
+#include "core/abstractMarker.h"
 #include "tgcreator/tgNode.h"
 #include "tgcreator/tgBuildSpec.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
@@ -64,7 +65,8 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	     * The only constructor. Configuration parameters are within the
 	     * .cpp file in this case, not passed in. 
 	     */
-	    sixBarModel();
+		sixBarModel();
+	    sixBarModel(int yaw, int pitch, int roll);
 	    
 	    /**
 	     * Destructor. Deletes controllers, if any were added during setup.
@@ -128,12 +130,24 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	    const std::vector<btVector3>& getNormVects() const;
 
 	    /**
+	     * Return a vector of all abstract markers for the controllers to work with.
+	     * @return A vector of all of the abstract markers
+	     */
+	    const std::vector<abstractMarker>& getAllMarkers() const;
+
+	    /**
 	     * A function called during setup that rotates the structure
 	     * to a face
 	     * @param[in] s A tgStructure that we're building into
 	     * @param[in] face The face to rotate to
 	     */
 	    void rotateToFace(tgStructure& s, int face);
+
+	    void rotateYaw(tgStructure& s, double psi);
+
+	    void rotatePitch(tgStructure& s, double theta);
+
+	    void rotateRoll(tgStructure& s, double phi);
 
 	    double rodDist;
 
@@ -271,7 +285,16 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 		btVector3 face18Norm;
 		btVector3 face19Norm;
 
+		abstractMarker NODE0;
+		abstractMarker NODE1;
+		abstractMarker NODE2;
+		std::vector<abstractMarker> allMarkers;
+
 		bool motorModel;
+
+		int yaw_init = 0;
+		int pitch_init = 0;
+		int roll_init = 0;
 };
 
 #endif
