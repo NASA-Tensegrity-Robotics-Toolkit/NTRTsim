@@ -24,7 +24,7 @@ pair_groups:
 
   vertical_string:
     # FILL IN FOR PART 6.4
-    #- [FILL_IN, FILL_IN]
+    - [bottom1, top1]
     - [bottom2, top2]
     - [bottom3, top3]
 

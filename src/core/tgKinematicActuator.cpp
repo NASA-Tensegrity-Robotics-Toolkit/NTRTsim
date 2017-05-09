@@ -39,6 +39,7 @@
 #include <stdexcept>
 
 using namespace std;
+double ctrML = 0;
 
 tgKinematicActuator::Config::Config(double s,
 									double d,
@@ -137,6 +138,7 @@ void tgKinematicActuator::step(double dt)
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("tgKinematicActuator::step");
 #endif //BT_NO_PROFILE   	
+    //std::cout << "In function tgKinematicActuator::step" << std::endl;
     if (dt <= 0.0)
     {
         throw std::invalid_argument("dt is not positive.");
@@ -185,17 +187,19 @@ const double tgKinematicActuator::getVelocity() const
 
 void tgKinematicActuator::integrateRestLength(double dt)
 {
-	double tension = getTension();
-	m_appliedTorque = getAppliedTorque(m_desiredTorque);
-	// motorVel will always cause opposite acc, but tension can only
+    double tension = getTension();
+	m_appliedTorque = getAppliedTorque(m_desiredTorque); 
+    // motorVel will always cause opposite acc, but tension can only
 	// cause lengthening (positive Acc)
 	m_motorAcc = (m_appliedTorque - m_config.motorFriction * m_motorVel 
 					+ tension * m_config.radius) / m_config.motorInertia;
-	
+    //ML: should tension sign be changed? (was +)
 	if (!m_config.backdrivable && m_motorAcc * m_appliedTorque <= 0.0)
 	{
 		// Stop undesired lengthing if the motor is not backdrivable
 		m_motorVel = m_motorVel + m_motorAcc * dt > 0.0 ? 0.0 : m_motorVel + m_motorAcc * dt;
+        //if(m_motorVel!=0)
+          //  cout << "m_motorVel: " << m_motorVel << endl; 
 	}
 	else
 	{
@@ -206,8 +210,16 @@ void tgKinematicActuator::integrateRestLength(double dt)
 	m_restLength += m_config.radius * m_motorVel * dt; 
 	
 	/// @todo check min actual length somewhere
-	
-	m_restLength =
+    
+    //ML
+    //if(m_appliedTorque!=0)
+    ctrML+=dt;
+    if(ctrML > 719.952 && ctrML < 720.000)// && (int)(1000*ctrML)%1000==0) 
+        cout << "Cable: " << (int)(1000*ctrML)%24+1 << ", Time: " << ctrML << ", Tension: " << tension << ", RestLength: " << m_restLength << ", Current Length: " << m_springCable->getActualLength() << ", Applied torque: " << m_appliedTorque << ", Motor acceleration: " << m_motorAcc << ", Motor velocity: " << m_motorVel << endl;
+        //cout << "Tension: " << tension << ", Rest Length: " << m_restLength << ", Current Length: " << m_springCable->getActualLength() << endl;
+	//ML
+
+    m_restLength =
 	(m_restLength > m_config.minRestLength) ? m_restLength : m_config.minRestLength;
 
 	m_springCable->setRestLength(m_restLength);
@@ -219,7 +231,12 @@ double tgKinematicActuator::getAppliedTorque(double desiredTorque) const
 						(1.0 - m_config.radius * abs(m_motorVel) / m_config.targetVelocity);
 	
 	maxTorque = maxTorque < 0.0 ? 0.0 : maxTorque;
-	
+    
+    /*double testML = abs(desiredTorque) < maxTorque ? desiredTorque : 
+      desiredTorque / abs(desiredTorque) * maxTorque;
+    //if(testML!=0)
+        //cout << "Max Torque: " << maxTorque << ", Applied Torque:" << testML << endl;
+    return testML;*/	
 	return abs(desiredTorque) < maxTorque ? desiredTorque : 
 		desiredTorque / abs(desiredTorque) * maxTorque;
 }

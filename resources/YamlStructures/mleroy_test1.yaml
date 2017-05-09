@@ -1,0 +1,47 @@
+nodes:
+  rod1a: [-5, 0, 0]
+  rod1b: [-5, 5, 0]
+
+  rod2a: [5, 0, 0]
+  rod2b: [5, 5, 0]
+  
+  rod3a: [0, 0, 8.66]
+  rod3b: [0, 5, 8.66]
+
+#  rod4a: [-10, 0, 0]
+#  rod4b: [-10, 5, 0]
+
+
+pair_groups:
+  rod:
+    - [rod1a, rod2b]
+    - [rod2a, rod3b]
+    - [rod3a, rod1b]
+
+  string:
+    - [rod1a, rod2a]
+    - [rod2a, rod3a]
+    - [rod1a, rod3a]
+
+    - [rod1b, rod2b]
+    - [rod2b, rod3b]
+    - [rod1b, rod3b]
+
+    - [rod1a, rod1b]
+    - [rod2a, rod2b]
+    - [rod3a, rod3b]
+
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5
+
+  string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 20
+      pretension: 1000

@@ -130,6 +130,7 @@ void AnnealEvolution::mutateEveryController()
 {
     for(std::size_t i=0;i<populations.size();i++)
     {
+        std::cout << "Mutating, Temp=" << Temp << std::endl;
         populations.at(i)->mutate(&eng,numberOfElementsToMutate, Temp);
     }
 }
@@ -191,12 +192,14 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
         testsToDo=numberOfTestsBetweenGenerations; //stop when we reach x amount of random tests
     else
         testsToDo=populationSize; //stop when we test each element once
-
+std::cout << "\e[1;35mtestsToDo=" << testsToDo << ", currentTest=" << currentTest << "\e[0m" << std::endl; //ML
     if(currentTest == testsToDo)
     {
         orderAllPopulations();
         mutateEveryController();
-        Temp -= 0.0; // @todo - make this a parameter
+        Temp -= 0.21; // @todo - make this a parameter //ML (was 0.0)
+        Temp = Temp<0?0.0:Temp; //ML
+
 //        cout<<"mutated the populations"<<endl;
         this->scoresOfTheGeneration.clear();
 
@@ -237,8 +240,8 @@ void AnnealEvolution::updateScores(vector <double> multiscore)
         this->scoresOfTheGeneration.push_back(multiscore);
     else
         multiscore.push_back(-1.0);
-    double score=1.0* multiscore[0] - 0.0 * multiscore[1];
-    
+    double score=10.0* multiscore[0] - 1.0 * multiscore[1]; //ML
+    std::cout << "Score is now: " << score << std::endl << std::endl; //ML
     //Record it to the file
     ofstream payloadLog;
     payloadLog.open((resourcePath + "logs/scores.csv").c_str(),ios::app);

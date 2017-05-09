@@ -17,20 +17,20 @@
  */
 
 /**
- * @file AppEscape.cpp
+ * @file AppEscapeML.cpp
  * @brief Contains the definition function main() for the Escape T6
  * application.
  * $Id$
  */
 
 // This application
-#include "EscapeModel.h"
-#include "EscapeController.h"
+#include "EscapeMLModel.h"
+#include "EscapeMLController.h"
 
 // This library
 #include "core/terrain/tgBoxGround.h"
-#include "models/obstacles/tgCraterShallow.h"
-#include "models/obstacles/tgCraterDeep.h"
+#include "Crater.h"
+#include "CraterDeep.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
@@ -58,32 +58,34 @@ void simulate(tgSimulation *simulation);
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppEscapeCrater" << std::endl;
+    std::cout << "AppEscapeML" << std::endl;
 
     // First create the world
     tgWorld *world = createWorld();
 
     // Second create the view
+    #if(1)
     tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
-    //tgSimView       *view = createView(world);         // For running multiple episodes
-
+    #else
+    tgSimView       *view = createView(world);         // For running multiple episodes
+    #endif
+    
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
 
     // Fourth create the models with their controllers and add the models to the simulation
-    EscapeModel* const model = new EscapeModel();
-
+    EscapeMLModel* const model = new EscapeMLModel();
+    
     /* Required for setting up learning file input/output. */
     const std::string suffix((argc > 1) ? argv[1] : "default");
-    
-    
+    //std::cout << suffix << std::endl;
     
     // Fifth create controller and attach it to the model
     double initialLength = 9.0; // decimeters
-    EscapeController* const controller = new EscapeController(initialLength,
-                                                                suffix,
-                                                                "craterEscape/",
-                                                                "Config.ini");
+    EscapeMLController* const controller = new EscapeMLController(initialLength,
+                                                                    suffix,
+                                                                    "EscapeML/",
+                                                                    "Config.ini");
     model->attach(controller);
 
     //Sixth add model (with controller) to simulation
@@ -91,8 +93,8 @@ int main(int argc, char** argv)
 
     //Seventh add crater to simulation
     btVector3 originCrater = btVector3(0,0,0);
-    tgCraterShallow* crater = new tgCraterShallow(originCrater);
-    //tgCraterDeep* crater = new tgCraterDeep(originCrater);
+    Crater* crater = new Crater(originCrater);
+    //CraterDeep* crater = new CraterDeep(originCrater);
     simulation->addModel(crater);
 
     simulate(simulation);
@@ -129,21 +131,21 @@ tgWorld *createWorld() {
 
 /** Use for displaying tensegrities in simulation */
 tgSimViewGraphics *createGraphicsView(tgWorld *world) {
-    const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
+    const double timestep_physics = 0.001; // Seconds
     const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimViewGraphics(*world, timestep_physics, timestep_graphics); 
 }
 
 /** Use for trial episodes of many tensegrities in an experiment */
 tgSimView *createView(tgWorld *world) {
-    const double timestep_physics = 1.0 / 60.0 / 10.0; // Seconds
+    const double timestep_physics = 0.001; // Seconds
     const double timestep_graphics = 1.f /60.f; // Seconds, AKA render rate. Leave at 1/60 for real-time viewing
     return new tgSimView(*world, timestep_physics, timestep_graphics); 
 }
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation) {
-    int nEpisodes = 20; // Number of episodes ("trial runs")
+    int nEpisodes = 3; // Number of episodes ("trial runs")
     int nSteps = 10000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     for (int i=0; i<nEpisodes; i++) {
         simulation->run(nSteps);
