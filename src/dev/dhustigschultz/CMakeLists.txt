@@ -74,4 +74,13 @@ subdirs(
     HexagonalSpine    
     BigPuppy_SSM_Terrain
 
+    MountainGoat_AchillesLong
+    MountainGoat_AchillesShort
+    MountainGoat_AchillesLongAAS
+    MountainGoat_AchillesShortAAS
+
+    MG_AchillesLong_PassiveSpine
+    MG_AchillesShort_PassiveSpine
+    MG_AchillesLong_ActiveSpine
+    MG_AchillesShort_ActiveSpine
 )
