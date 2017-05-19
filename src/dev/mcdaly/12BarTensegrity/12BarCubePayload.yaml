@@ -121,6 +121,7 @@ pair_groups:
 
   rod_payload:
     - [n36, n37]
+    - [n36, n38]
     - [n36, n39]
     - [n36, n40]
     - [n36, n41]
@@ -180,7 +181,7 @@ builders:
     parameters:
       width: 0.4
       height: 0.4
-      density: 0.67 #kg/dm^3 #multiply by 3 to get actual weight
+      density: 0.717 #kg/dm^3
 
   # zero-density rods used to locate nodes on the box
   rod_payload:

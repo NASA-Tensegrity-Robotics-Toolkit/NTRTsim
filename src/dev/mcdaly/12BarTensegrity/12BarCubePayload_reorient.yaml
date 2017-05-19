@@ -1,8 +1,7 @@
 substructures:
   12BarCube:
-    path: ./12BarCube.yaml
-    #translation: [0, 3.7, 0] #dm
-    translation: [0, 10, 0]
+    path: ./12BarCubePayload.yaml
+    translation: [0, 3.7, 0] #dm
     rotation:
       axis: [1, 0, 0]
       angle: 0 #deg

@@ -1,6 +1,6 @@
 substructures:
   12BarCube:
-    path: ./12BarOctahedron.yaml
+    path: ./12BarOctahedronPayload.yaml
     translation: [0, 5, 0] #dm
     rotation:
       axis: [1, 0, 1]
