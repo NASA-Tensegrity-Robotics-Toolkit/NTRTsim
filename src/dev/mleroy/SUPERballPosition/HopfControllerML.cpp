@@ -67,7 +67,7 @@ std::string primerCableFileName = "_cable_hopf_results";
 std::string primerCOMFileName = "_center_mass_results";
 static std::string hopfFileName;
 static std::string speedFileName;
-static std::string cableFileName;
+static std::string cableFileName; 
 static std::string cOMFileName;
 static std::vector<std::string> fileNames;
 

@@ -55,7 +55,7 @@ tgSimViewGraphics *createGraphicsView(tgWorld *world);
 tgSimView *createView(tgWorld *world);
 void simulate(tgSimulation *simulation, HopfControllerML* myController);
 std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsToControl);
-
+ 
 
 /**
  * The entry point.

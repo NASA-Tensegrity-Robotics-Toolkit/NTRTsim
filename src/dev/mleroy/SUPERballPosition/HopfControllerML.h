@@ -243,7 +243,7 @@ private:
   
   /**
    * Handles getting parameters from and returning scores to the evolution object.
-   * Needs to persist throughout a simulation
+   * Needs to persist throughout a simulation 
    */
   AnnealAdapter adapter;
   
