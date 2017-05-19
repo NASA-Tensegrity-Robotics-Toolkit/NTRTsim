@@ -27,13 +27,18 @@
 #include <sstream>
 #include "FileHelpers.h"
 #include "resources.h"
+#include <iostream> //ML
 
 using namespace std;
 
 std::string FileHelpers::getFileString(std::string fileName) {
+    std::cout << "in getFileString, " << fileName.c_str() << std::endl; //ML
     std::ifstream fileInput(fileName.c_str());
+    if(fileInput.is_open())
+    	std::cout << "File open" << std::endl;
     stringstream buffer;
     buffer << fileInput.rdbuf();
+    //std::cout << "it is " << buffer.str() << std::endl; //ML
     return buffer.str();
 }
 

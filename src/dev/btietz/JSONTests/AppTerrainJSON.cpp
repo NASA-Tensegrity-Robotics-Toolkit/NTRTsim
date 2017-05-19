@@ -30,14 +30,14 @@
 AppTerrainJSON::AppTerrainJSON(int argc, char** argv)
 {
     bSetup = false;
-    use_graphics = false;
+    use_graphics = true;
     add_controller = true;
     add_blocks = false;
     add_hills = false;
     all_terrain = false;
     timestep_physics = 1.0f/1000.0f;
     timestep_graphics = 1.0f/60.0f;
-    nEpisodes = 1;
+    nEpisodes = 4;
     nSteps = 60000;
     nSegments = 6;
     nTypes = 3;
@@ -47,7 +47,7 @@ AppTerrainJSON::AppTerrainJSON(int argc, char** argv)
     startZ = 0;
     startAngle = 0;
     
-    suffix = "default";
+    suffix = "tcContact.json";//"default";
 
     handleOptions(argc, argv);
 }

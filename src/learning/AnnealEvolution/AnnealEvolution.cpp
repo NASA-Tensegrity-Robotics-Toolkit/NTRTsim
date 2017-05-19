@@ -153,7 +153,7 @@ void AnnealEvolution::orderAllPopulations()
     }
     aveScore1 /= scoresOfTheGeneration.size();
     aveScore2 /= scoresOfTheGeneration.size();
-
+    std::cout << "\e[1;33mAVESCORES: " << aveScore1 << ", " << aveScore2 << "\e[0m" << std::endl;
 
     for(std::size_t i=0;i<populations.size();i++)
     {
@@ -195,9 +195,10 @@ vector <AnnealEvoMember *> AnnealEvolution::nextSetOfControllers()
 std::cout << "\e[1;35mtestsToDo=" << testsToDo << ", currentTest=" << currentTest << "\e[0m" << std::endl; //ML
     if(currentTest == testsToDo)
     {
+        std::cout << "about to order" << std::endl; //ML
         orderAllPopulations();
         mutateEveryController();
-        Temp -= 0.21; // @todo - make this a parameter //ML (was 0.0)
+        Temp -= 0.0; // @todo - make this a parameter //ML (was 0.0)
         Temp = Temp<0?0.0:Temp; //ML
 
 //        cout<<"mutated the populations"<<endl;

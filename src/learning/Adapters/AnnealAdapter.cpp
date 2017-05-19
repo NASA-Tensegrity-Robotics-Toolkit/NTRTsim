@@ -52,6 +52,7 @@ void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuratio
     this->annealEvo = evo;
     if(isLearning)
     {
+        std::cout << "is learning" << std::endl; //ML
         currentControllers = this->annealEvo->nextSetOfControllers();
     }
     else
@@ -70,7 +71,9 @@ void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuratio
 
 vector<vector<double> > AnnealAdapter::step(double deltaTimeSeconds,vector<double> state)
 {
+    std::cout << "In step function of adapter" << std::endl; //ML
     totalTime+=deltaTimeSeconds;
+    std::cout << "STATE SIZE: " << state.size() << std::endl;
 //  cout<<"NN adapter, state: "<<state[0]<<" "<<state[1]<<" "<<state[2]<<" "<<state[3]<<" "<<state[4]<<" "<<endl;
     vector< vector<double> > actions;
 

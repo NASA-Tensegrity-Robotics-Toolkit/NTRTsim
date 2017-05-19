@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     // passed in.
     if (argv[1] == NULL)
     {
-      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you would like to build.");
     }
 
 /*  
@@ -120,7 +120,6 @@ int main(int argc, char** argv)
 
     // User-defined initial conditions, shouldn't matter much as Hopf oscillator
     // defines a stable limit cycle
-    //int nOscillators = NOSCILLATORS;
     double hopfState[NSTATES] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};//{0.1,-0.1,-0.15,0.15,0.05,-0.05,-0.2,0.2};
     double hopfVel[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     //double hopfAcc[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
@@ -254,19 +253,20 @@ tgSimView *createView(tgWorld *world) {
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation, HopfControllerML* myController) {
-    int nEpisodes = 5;  // Number of episodes ("trial runs")
+    int nEpisodes = 3;  // Number of episodes ("trial runs")
     int nSteps = 30001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
     for (int i=1; i<=nEpisodes; i++)
     {
-        if(i!=1)
-        {
-            myController->resetTimePassed();
-            simulation->reset();
-        }
-
         std::cout << "Running episode " << i << " of " << nEpisodes << std::endl;
         try
         {
+            if(i!=1)
+            {
+                std::cout << "RESET" << std::endl;
+                simulation->reset();
+                myController->resetTimePassed();
+            }
+
             //std::cout << "Starting new run" << std::endl;
             simulation->run(nSteps);
             //std::cout << "End of run" << std::endl;

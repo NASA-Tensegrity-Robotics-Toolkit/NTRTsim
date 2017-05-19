@@ -140,7 +140,7 @@ public:
   virtual void updateHopfState(double dt);
   virtual void hopfOscillator(TensegrityModel& subject, double dt, double m_timePassed, double *hopfState, double *hopfVel, //double *hopfAcc,
                               int firstCable, int lastCable, double initRestLengths, int selectedOscillator, int hopfSelector, double phaseOffset);
-  virtual void compNextHopfState(double dt, int nOscillators);
+  virtual void compNextHopfState(double dt, int selectedOscillator);
   virtual void perturbateHopf(int selectedOscillator);
   virtual std::vector<double> getBallCOM(TensegrityModel& subject);
   virtual void resetTimePassed();
@@ -174,9 +174,6 @@ private:
   /**
    * The private variables for each of the values passed in to the constructor.
    */
-  double m_startTime;
-  double m_minLength;
-  double m_rate;
   std::vector<std::string> m_tagsToControl;
 
   /**
@@ -198,8 +195,6 @@ private:
    */
   std::vector<tgBasicActuator*> cablesWithTags;
   //std::vector<tgKinematicActuator*> cablesWithTags;
-
-  int nOscillators;
 
   double hopfOmega[NOSCILLATORS];
   double hopfMu[NOSCILLATORS];

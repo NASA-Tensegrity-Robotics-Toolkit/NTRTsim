@@ -135,10 +135,7 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
   ctr(ctr),
   initRestLengths(initRestLengths),
   saveToCSV(saveToCSV),
-  /*hopfStateInit(hopfStateInit),
-  hopfVelInit(hopfVelInit),
-  hopfAccInit(hopfAccInit),*/
-  // rest for mll
+  // rest for learning library
   configFilename(configFile),
   evolution(args, configFile, resourcePath),
   learning(false)
@@ -155,12 +152,6 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
     //hopfAccFirst[i]   = hopfAccInit[i];
   }
 
-  //std::cout << args << " " << resourcePath << " " << configFile << std::endl;
-  
-  /*for(int i=0; i<24; i++)
-  {
-    cableInitRestLength[i] = cablesWithTags[i]->getRestLength();
-  }*/
 
   // Setting up the different log files
   hopfFileName  = setupCSVFiles(primerHopfFileName);
@@ -174,7 +165,7 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
   fileNames.push_back(cOMFileName);
 
 
-  // Setting up things for the machine learning library
+  // Setting up things for the learning library
   std::string path;
   if (resourcePath != "")
   {
@@ -187,8 +178,6 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
 
   configData.readFile(path + configFilename);
   learning = configData.getintvalue("learning");
-  //std::cout << path << " " << configFilename << " " << learning << " " << configData.getintvalue("numberOfControllers") << " " << configData.getintvalue("numberOfActions") << std::endl;
-  // @TODO: what checks to make on tags?
 }
 
 
@@ -214,7 +203,7 @@ void HopfControllerML::onTeardown(TensegrityModel& subject)
     scores.push_back(energySpent);
     
     //std::cout << "Tearing down" << std::endl;
-    adapter.endEpisode(scores);
+    //adapter.endEpisode(scores);
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
@@ -269,6 +258,7 @@ double HopfControllerML::totalEnergySpent(TensegrityModel& subject)
  */
 void HopfControllerML::onSetup(TensegrityModel& subject)
 {
+  resetTimePassed();
   for(int i=0; i<NSTATES; i++)
   {
     //std::cout << "Starting Hopf Oscillators again" << std::endl;
@@ -279,57 +269,59 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
   }
 
   initPosition = getBallCOM(subject);
-  //std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
-  //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
+  std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
+  std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
-  adapter.initialize(&evolution,
+  /*adapter.initialize(&evolution,
                       learning,
                       configData);
   
   std::vector<double> state;
+  std::cout << &state << std::endl;
   double dt = 0.0;
-  array_2D params = scaleActions(adapter.step(dt, state));
-  
+  array_2D params = scaleActions(adapter.step(dt, state));*/
+  array_2D params(boost::extents[4][8]);
+    
   // Choose between keeping the learning library or manually setting parameters
-  if(0)
-  {
+  if(1)
+  {    
     std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
-    params[0][0] = 2.00;
-    params[0][1] = 0.2;
-    params[0][2] = -0.5;
-    params[0][3] = -0.11;
-    params[0][4] = -0.12;
-    params[0][5] = -0.13;
-    params[0][6] = -0.14;
-    params[0][7] = -0.15;
+    params[0][0] = 3.83366; //2.00;
+    params[0][1] = 0.951536; //0.2;
+    params[0][2] = -0.326143; //-0.5;
+    params[0][3] = -0.7548; //-0.11;
+    params[0][4] = -0.692846; //-0.12;
+    params[0][5] = -0.301531; //-0.13;
+    params[0][6] = -0.0965834; //-0.14;
+    params[0][7] = -0.0477222;//-0.15;
 
-    params[1][0] = 2.01;
-    params[1][1] = 0.21;
-    params[1][2] = -0.16;
-    params[1][3] = -0.17;
-    params[1][4] = -0.18;
-    params[1][5] = -0.19;
-    params[1][6] = -0.20;
-    params[1][7] = -0.21;
+    params[1][0] = 3.81622; //2.01;
+    params[1][1] = 0.514954; //0.21;
+    params[1][2] = -0.301126; //-0.16;
+    params[1][3] = -0.456894; //-0.17;
+    params[1][4] = -0.288842; //-0.18;
+    params[1][5] = -0.802321; //-0.19;
+    params[1][6] = 0.005425; //-0.20;
+    params[1][7] = -0.012221;//-0.21;
     
-    params[2][0] = 2.02;
-    params[2][1] = 0.22;
-    params[2][2] = -0.22;
-    params[2][3] = -0.23;
-    params[2][4] = -0.24;
-    params[2][5] = -0.25;
-    params[2][6] = -0.26;
-    params[2][7] = -0.27;
+    params[2][0] = 3.66452; //2.02;
+    params[2][1] = 0.910582; //0.22;
+    params[2][2] = -0.211439; //-0.22;
+    params[2][3] = -0.992296; //-0.23;
+    params[2][4] = -0.201521; //-0.24;
+    params[2][5] = -0.135209; //-0.25;
+    params[2][6] = 0.03794; //-0.26;
+    params[2][7] = -0.0895263;//-0.27;
     
-    params[3][0] = 2.03;
-    params[3][1] = 0.23;
-    params[3][2] = -0.28;
-    params[3][3] = -0.29;
-    params[3][4] = -0.30;
-    params[3][5] = -0.31;
-    params[3][6] = -0.32;
-    params[3][7] = -0.33;
+    params[3][0] = 3.4382; //2.03;
+    params[3][1] = 0.931574; //0.23;
+    params[3][2] = -0.948404; //-0.28;
+    params[3][3] = -0.227634; //-0.29;
+    params[3][4] = -0.329029; //-0.30;
+    params[3][5] = -0.906597; //-0.31;
+    params[3][6] = 0.047229; //-0.32;
+    params[3][7] = 0.0110046;//-0.33;
   }
   //for (int i=0; i<NOSCILLATORS; i++)
     //std::cout << "\e[1;31mThe following will be sent to setup: " << i << " " << params[i][0] << " " << params[i][1] << " " << params[i][2] << " " <<params[i][3] << " " << params[i][4] << "\e[0m" << std::endl;
@@ -365,7 +357,6 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
     initializeActuators(subject, *it);
   }
   std::cout << "Finished setting up the controller." << std::endl;
-
   //for(std::size_t i=0; i<=23; i++)
     //std::cout << "Rest length " << i << " " << cablesWithTags[i]->getTags() << " " << cablesWithTags[i]->getHistory().restLengths[0] << std::endl;
 
@@ -481,12 +472,14 @@ void HopfControllerML::initializeActuators(TensegrityModel& subject, std::string
 void HopfControllerML::onStep(TensegrityModel& subject, double dt)
 {
   m_timePassed += dt;
-
-  if(m_timePassed==dt)
+  
+  if(fabs(m_timePassed-25000*dt) < 0.0000001)
   { 
     testSynchHyp();
     std::vector<double> startingCOM = getBallCOM(subject);
-    std::cout << "\e[1;36mStarting position at time " << m_timePassed << " is: " << startingCOM[0] << " " << startingCOM[1] << " " << startingCOM[2] << "\e[0m" << std::endl;
+    std::cout << "\e[1;36mPosition at time " << m_timePassed << " is: " << startingCOM[0] << " " << startingCOM[1] << " " << startingCOM[2] << " (Hopf:" << hopfState[0] << "/" << hopfState[1] << "/" << hopfState[2] << "/" << hopfState[3] << "/" << hopfState[4] << "/" << hopfState[5] << "/" << hopfState[6] << "/" << hopfState[7] << ")\e[0m" << std::endl;
+    //for(int i=0; i<24; i++)
+      //std::cout << cablesWithTags[i]->getTags() << ", rl=" << (cablesWithTags[i]->getRestLength()) << std::endl;  
   }
 
   if(m_timePassed >= 3000*dt && m_timePassed < CONTROLLER_STOP_TIME*dt)
@@ -534,19 +527,13 @@ void HopfControllerML::onStep(TensegrityModel& subject, double dt)
     if(saveToCSV)
     {
       std::vector <double> resultCOM = getBallCOM(subject);
-      //std::cout<<"COM: (" << resultCOM[0] << ", " << resultCOM[1] << ", " << resultCOM[2] << ")" << std::endl;
       exportHopfCSV(m_timePassed, hopfState, fileNames, resultCOM);
     }
     if(m_timePassed>CONTROLLER_STOP_TIME*dt)
     {
-      std::vector <double> resultCOM = getBallCOM(subject);
-      //std::cout << "COM: (" << resultCOM[0] << ", " << resultCOM[1] << ", " << resultCOM[2] << ")" << std::endl;
-      //std::cout << "Omegas: " << hopfOmega[0] << ", " << hopfOmega[1] << ", " << hopfOmega[2] << ", " << hopfOmega[3] << std::endl;
-      //std::cout << "Mus: " << hopfMu[0] << ", " << hopfMu[1] << ", " << hopfMu[2] << ", " << hopfMu[3] << std::endl;
-      //std::cout << "Couplings: " << coupling[0] << ", " << coupling[1] << ", " << coupling[2] << ", " << coupling[3] << std::endl;
       double distance = displacement(subject);
-    
-      std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl;      
+      std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl << std::endl << std::endl;      
+      
       if(saveToCSV)
       {
         saveHistLastLengths();
@@ -560,6 +547,9 @@ void HopfControllerML::onStep(TensegrityModel& subject, double dt)
 }
 
 
+/**
+ * This method checks that the scaled actions will generate a synchronized network of coupled oscillators
+ */
 void HopfControllerML::testSynchHyp()
 {
   double a31 = couplingDown[0];//1.1;
@@ -654,7 +644,6 @@ void HopfControllerML::compNextHopfState(double dt, int selectedOscillator)
   // ATTENTION, SIZE OF COUPLINGARRAY AND COUPLEDSTATE ARRAYS HAS CHANGED WRT BACKUP
   // /!\
 
-  //std::cout << "test1" << std::endl;
   switch(selectedOscillator) //TODO: CHECK COUPLINGS (SEE NOTEBOOK)
   {
     case 0:
@@ -683,11 +672,10 @@ void HopfControllerML::compNextHopfState(double dt, int selectedOscillator)
       couplingArray[1] = 0;
       coupledState[0] = 4;
       coupledState[1] = 6;
-      coupledState[2] = 0;
+      coupledState[2] = 6;
       break;
   }
-  //std::cout << "test2" << std::endl;
-
+  
   //double r = sqrt(hopfState[2*selectedOscillator]*hopfState[2*selectedOscillator] + hopfState[2*selectedOscillator+1]*hopfState[2*selectedOscillator+1]);
 
   hopfVel[2*selectedOscillator]   =   hopfOmega[selectedOscillator] 
@@ -720,10 +708,10 @@ void HopfControllerML::compNextHopfState(double dt, int selectedOscillator)
 void HopfControllerML::perturbateHopf(int selectedOscillator)
 {
   // 6 is an arbitrary number here as we have a 2D oscillator based on position, speed and acceleration
-  srand(time(NULL));
-  double randArray[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
+  //srand(time(NULL));
+  double randArray[4] = {0.0,0.0,0.0,0.0};
 
-  for(int i=0; i<6; i++)
+  for(int i=0; i<4; i++)
   {
     randArray[i] = 0.05*((double)rand()/RAND_MAX);
   }
@@ -774,16 +762,8 @@ void HopfControllerML::hopfOscillator(TensegrityModel& subject, double dt, doubl
       //cablesWithTags[i]->setControlInput((HOPF_AMPLIFIER*bufferVar+1+offsetOdd)*((cablesWithTags[i]->getHistory()).restLengths[0]), dt);
     }
     
-    //std::cout << "control input will be: " << ((cablesWithTags[i]->getHistory()).restLengths[0])*(1+offsetVar+cos(bufferVar+phaseOffset)) << std::endl;
-
-    //cablesWithTags[i]->setControlInput((1+bufferVar*HOPF_AMPLIFIER+offsetVar)*((cablesWithTags[i]->getHistory()).restLengths[0]), dt);
+    //std::cout << "Cable " << cablesWithTags[i]->getTags() << ", control: " << ((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)) << std::endl;
     cablesWithTags[i]->setControlInput(((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)), dt);
-
-    //std::cout << cablesWithTags[i]->getTags() << " " << (cablesWithTags[i]->getHistory()).restLengths[0] << std::endl;
-    /*if(i%2==0)
-      cablesWithTags[i]->setControlInput((HOPF_AMPLIFIER*bufferVar+1+offsetEven)*((cablesWithTags[i]->getHistory()).restLengths[0]), dt);
-    else
-      cablesWithTags[i]->setControlInput((HOPF_AMPLIFIER*bufferVar+1+offsetOdd)*((cablesWithTags[i]->getHistory()).restLengths[0]), dt);*/
   }
 }
 

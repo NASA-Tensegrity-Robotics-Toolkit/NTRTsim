@@ -213,9 +213,9 @@ void tgKinematicActuator::integrateRestLength(double dt)
     
     //ML
     //if(m_appliedTorque!=0)
-    ctrML+=dt;
-    if(ctrML > 719.952 && ctrML < 720.000)// && (int)(1000*ctrML)%1000==0) 
-        cout << "Cable: " << (int)(1000*ctrML)%24+1 << ", Time: " << ctrML << ", Tension: " << tension << ", RestLength: " << m_restLength << ", Current Length: " << m_springCable->getActualLength() << ", Applied torque: " << m_appliedTorque << ", Motor acceleration: " << m_motorAcc << ", Motor velocity: " << m_motorVel << endl;
+    //ctrML+=dt;
+    //if(ctrML > 719.952 && ctrML < 720.000)// && (int)(1000*ctrML)%1000==0) 
+        //cout << "Cable: " << (int)(1000*ctrML)%24+1 << ", Time: " << ctrML << ", Tension: " << tension << ", RestLength: " << m_restLength << ", Current Length: " << m_springCable->getActualLength() << ", Applied torque: " << m_appliedTorque << ", Motor acceleration: " << m_motorAcc << ", Motor velocity: " << m_motorVel << endl;
         //cout << "Tension: " << tension << ", Rest Length: " << m_restLength << ", Current Length: " << m_springCable->getActualLength() << endl;
 	//ML
 

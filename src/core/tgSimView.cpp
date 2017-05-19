@@ -141,6 +141,7 @@ void tgSimView::run(int steps)
     {
             // The tgSimView has been passed to a tgSimulation
         std::cout << "SimView::run("<<steps<<")" << std::endl;
+        std::cout << "stepSize=" << getStepSize() << ", renderRate=" << getRenderRate() << std::endl; 
         // This would normally run forever, but this is just for testing
         m_renderTime = 0;
         double totalTime = 0.0;
@@ -148,6 +149,7 @@ void tgSimView::run(int steps)
             m_pSimulation->step(m_stepSize);    
             m_renderTime += m_stepSize;
             totalTime += m_stepSize;
+            //std::cout << "totalTime=" << totalTime << std::endl;
             
             if (m_renderTime >= m_renderRate) {
                 render();
