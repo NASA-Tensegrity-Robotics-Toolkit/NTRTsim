@@ -1,0 +1,72 @@
+Welcome to the NASA Tensegrity Robotics Toolkit Introduction Seminar!
+
+This text file accompanies the seminar held on Wednesday Sept. 28th 2016 of NTRTsim, as given in the Berkeley Emergent Space Tensegrities Lab.
+
+This seminar is designed to give new NTRT users a basic idea of how the simulator works, and how to build/run applications. For more information about any specific C++ classes, see the Doxygen documentation (http://ntrt.perryb.ca/doxygen/), and for more information about the YAML functionality, see the tutorials (http://ntrtsim.readthedocs.io/en/latest/index.html).
+
+- Drew Sabelhaus, Ed Zhu, Brian Cera (apsabelhaus, edward.zhu, brianmcera @berkeley.edu)
+----------------------------------
+
+Outline: 
+
+(i) Preliminary: Navigating the Linux Command Line
+    - cd, ls, pwd, running executables, terminal colors
+
+1. Preparing your workspace for the seminar
+   - Switch to the NTRT_Intro branch:
+     git checkout NTRT_Intro
+1.1 Copy the folder introSkeleton to introWorkspace
+    cp -R introSkeleton introWorkspace
+1.2 Open this file
+   - (what 'skeleton' means, for this seminar.)
+   - "FILL_IN"
+
+2. Basic Usage (build, run example.)
+3. Documentation location, keyboard commands
+4. The components of your program in NTRTsim:
+   - App
+   - Model
+   - Controller (optional)
+   - Other supporting files (such as CMakeLists)
+4.1 Fill in a line in CMakeLists.txt in src/dev, Should add in:
+    introWorkspace
+
+5. Apps, Models, Controllers for NTRTsim v1.0 (Traditional) - Creating Models in C++
+5.1 Run App3barTraditional. What happens?
+5.2. Fill in a line in threeBarModel.cpp
+     - The actuator should connect nodes 5 and 3, and be labelled actuator num 5
+5.3 Build, run App3barTraditional. Looks better!
+5.4 Fill in a line in App3barTraditional.cpp.
+    - The name of the controller "class" is LengthController
+5.5 Build, run App3barTraditional. Wait, we expected the structure to move? Hmm...
+5.6 Type this line into App3barTraditional.cpp:
+    myModel->attach(myController);
+5.7 Build, run App3barTraditional. Hooray, the structure finally moves!
+
+6. Apps, Models, Controllers for NTRTsim using YAML
+   - Changes between traditional and YAML: No "model", but instead, a YAML file.
+6.1 Un-comment the lines in src/dev/introWorkspace/CMakeLists.txt
+    - these lines will compile the example YAML application
+6.2 Build, run App3barYAML. Why does this not work?
+6.3 run App3BarYAML with one argument, the path to the YAML file to build.
+    - For example, if NTRTsim is in your home folder, you would type:
+    ./App3BarYAML ~/NTRTsim/resources/YamlStructures/NTRT_Intro_Structures/threeBarModel.y
+    - If NTRTsim is under a "repositories" folder in your home, how Drew likes to do it, then you would run the command:
+    ./App3BarYAML ~/repositories/NTRTsim/resources/YamlStructures/NTRT_Intro_Structures/threeBarModel.y
+    - Notice that the structure is missing a cable... let's fix that!
+6.4 Fill in a line in threeBarModel.yaml
+    - One additional vertical_string should be attached from node bottom1 to top1.
+6.5 No need to re-compile! Just run ./App3BarYAML again. Now the cable appears!
+6.6 Fill in a line in App3BarYAML.cpp to create the controller
+    - The name of the controller class is LengthControllerYAML
+6.7 Fill in a line in App3BarYAML to attach the controller to the model
+    myModel->attach(myController);
+6.8 Build, run. The structure stiffens upwards!
+    - Note that we had to recompile at this step, since a .cpp file was changed.
+
+7. Extra features of NTRTsim. (Drew will demonstrate, no need to follow along.)
+7.1 Terrain
+7.2 Markers
+7.3 Data logging (includes ForcePlateModel)
+7.4 Changing dt, scaling gravity
+
