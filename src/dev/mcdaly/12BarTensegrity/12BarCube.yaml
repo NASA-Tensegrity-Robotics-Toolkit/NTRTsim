@@ -79,6 +79,9 @@ pair_groups:
     - [n20, n13]
     - [n16, n5]
 
+  actuated_cable:
+    - [n6, n14]
+
 builders:
   rod:
     class: tgRodInfo
@@ -96,5 +99,15 @@ builders:
       #damping: 50.0 #kg/s (N-s/m) #complete guess for value
       pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
-      #max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
+      max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
+      #target_velocity: 0 #dm/s #what is this?
+
+  actuated_cable:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0 #kg/s^2 (N/m) #make value large to mimic stiff cable
+      #damping: 50.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 0.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      #history: 0 #what is this?
+      max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
       #target_velocity: 0 #dm/s #what is this?

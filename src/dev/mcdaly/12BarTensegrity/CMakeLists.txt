@@ -13,13 +13,9 @@ link_libraries(tgcreator
     		yaml-cpp
     		TensegrityModel)
 
-# add_library(TensegrityModel
-#    TensegrityModel.cpp)
-
 add_executable(App12Bar
-#    TensegrityModel.cpp
-    App12Bar.cpp)
-#    RPLengthController.h
-#    RPLengthController_rand.cpp)
+    LengthControllerYAML.cpp
+    App12Bar.cpp
+) 
 
 

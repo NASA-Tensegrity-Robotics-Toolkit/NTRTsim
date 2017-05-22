@@ -152,6 +152,33 @@ App12Bar.cpp.s:
 	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.s
 .PHONY : App12Bar.cpp.s
 
+LengthControllerYAML.o: LengthControllerYAML.cpp.o
+
+.PHONY : LengthControllerYAML.o
+
+# target to build an object file
+LengthControllerYAML.cpp.o:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
+.PHONY : LengthControllerYAML.cpp.o
+
+LengthControllerYAML.i: LengthControllerYAML.cpp.i
+
+.PHONY : LengthControllerYAML.i
+
+# target to preprocess a source file
+LengthControllerYAML.cpp.i:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.i
+.PHONY : LengthControllerYAML.cpp.i
+
+LengthControllerYAML.s: LengthControllerYAML.cpp.s
+
+.PHONY : LengthControllerYAML.s
+
+# target to generate assembly for a file
+LengthControllerYAML.cpp.s:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.s
+.PHONY : LengthControllerYAML.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -164,6 +191,9 @@ help:
 	@echo "... App12Bar.o"
 	@echo "... App12Bar.i"
 	@echo "... App12Bar.s"
+	@echo "... LengthControllerYAML.o"
+	@echo "... LengthControllerYAML.i"
+	@echo "... LengthControllerYAML.s"
 .PHONY : help
 
 

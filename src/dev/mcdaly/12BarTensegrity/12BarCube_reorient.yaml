@@ -4,6 +4,6 @@ substructures:
     #translation: [0, 3.7, 0] #dm
     translation: [0, 10, 0]
     rotation:
-      axis: [0, 1, 1]
-      angle: 45 #deg
+      axis: [1, 0, 0]
+      angle: 180 #deg
     scale: 1

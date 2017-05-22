@@ -18,7 +18,6 @@
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
-//#include "LengthControllerYAML.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -35,6 +34,8 @@
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
+// Controllers
+#include "LengthControllerYAML.h"
 
 /**
  * The entry point.
@@ -74,11 +75,20 @@ int main(int argc, char** argv)
     // Create the models with their controllers and add the models to the simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1],false); // second argument not necessary
 
-    // Add the model to the world
-    simulation.addModel(myModel);
-
-    // RPLengthController* const controller = new RPLengthController();
-    // myModel -> attach(controller);
+    // Parameters for the LengthControllerYAML are specified in that .h file,
+    // repeated here:
+    double startTime = 2.0;
+    double minLength = 0.1;
+    double rate = 1;
+    std::vector<std::string> tagsToControl;
+    // See the threeBarModel.YAML file to see where "vertical_string" is used.
+    tagsToControl.push_back("actuated_cable");
+    
+    // Create the controller
+    LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
+    
+    // Attach the controller to the model
+    myModel->attach(myController);
 
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
@@ -93,6 +103,9 @@ int main(int argc, char** argv)
     
     // Add data logger to the world
     //simulation.addDataManager(myDataLogger); // comment/uncomment to record data
+
+    // Add the model to the world
+    simulation.addModel(myModel);
 
     // Run simulation
     simulation.run();
