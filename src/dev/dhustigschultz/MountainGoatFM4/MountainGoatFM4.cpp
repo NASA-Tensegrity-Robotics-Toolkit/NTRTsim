@@ -445,7 +445,7 @@ void MountainGoatFM4::addMuscles(tgStructure& goat){
 
     //Left rear leg/hip
     goat.addPair(n12[4], n8[3], tgString("all left_hindleg outer thigh muscle seg", 12) + tgString(" seg", 8)); 
-    goat.addPair(n12[4], n8[2], tgString("inner thigh muscle seg", 12) + tgString(" seg", 8));
+    goat.addPair(n12[4], n8[2], tgString("all left_hindleg inner thigh muscle seg", 12) + tgString(" seg", 8));
 
     goat.addPair(n12[4], n3[1],tgString("all left_hindleg rear abdomen connection muscle seg", 12) + tgString(" seg", 3)); 
     goat.addPair(n12[3], n5[1],tgString("all left_hindleg front abdomen connection muscle3 seg", 12) + tgString(" seg", 5)); //Active
@@ -495,18 +495,19 @@ void MountainGoatFM4::setup(tgWorld& world)
 
     const double stiffness = 1000.0;
     const double stiffnessPassive = 4000.0; //4000
-    const double stiffnessPassive2 = 4000.0;
+    const double stiffnessPassive2 = 10000.0; //Was 4000
     const double stiffnessPassive3 = 10000.0;
     const double damping = .01*stiffness;
     const double pretension = 0.0;
     const bool   history = true;
     const double maxTens = 7000.0;
+    const double maxTens2 = 10000.0;
     const double maxSpeed = 12.0;
 
     const double passivePretension = 1000; 
     const double passivePretension2 = 3500; 
     const double passivePretension3 = 3500; 
-    const double passivePretension4 = 4000.0;
+    const double passivePretension4 = 9000.0; //was 4000
 
 #ifdef USE_KINEMATIC
 
@@ -515,49 +516,51 @@ void MountainGoatFM4::setup(tgWorld& world)
     const double motorInertia = 1.0;
     const bool backDrivable = false;
     #ifdef PASSIVE_STRUCTURE
+	//These all used to have only maxSpeed, instead of 2*maxSpeed:
+	//Both Stomach Configs used to have only maxTens
         tgKinematicActuator::Config motorConfig(stiffness, 20, passivePretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigStomach(stiffnessPassive2, damping, passivePretension4,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens2, 2*maxSpeed); 
 	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive3, damping, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
     #else
         tgKinematicActuator::Config motorConfigSpine(stiffness, damping, pretension,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigOther(stiffnessPassive, damping, passivePretension2,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens, 2*maxSpeed); 
 
 	tgKinematicActuator::Config motorConfigStomach(stiffnessPassive2, damping, passivePretension4,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed); 
+                                            history, maxTens2, 2*maxSpeed); 
 	tgKinematicActuator::Config motorConfigLegs(stiffnessPassive3, damping, passivePretension3,
                                             mRad, motorFriction, motorInertia, backDrivable,
-                                            history, maxTens, maxSpeed);
+                                            history, maxTens, 2*maxSpeed);
     #endif
 
 #else
     
     #ifdef PASSIVE_STRUCTURE
-        tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension);
-	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2);
-	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3);
+        tgSpringCableActuator::Config muscleConfig(2000, 20, passivePretension, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history, maxTens, 2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history, maxTens, 2*maxSpeed); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3, damping, passivePretension3, history, maxTens, 2*maxSpeed); //was stiffnessPassive
 
     #else
-        tgSpringCableActuator::Config muscleConfigSpine(stiffness, damping, pretension, history, maxTens, 2*maxSpeed);
-	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive, damping, passivePretension2, history);
-	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2, damping, passivePretension4, history); 
-	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive, damping, passivePretension3, history);
+        tgSpringCableActuator::Config muscleConfigSpine(stiffness,damping,pretension,history,maxTens,2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigOther(stiffnessPassive,damping,passivePretension2,history,maxTens,2*maxSpeed);
+	tgSpringCableActuator::Config muscleConfigStomach(stiffnessPassive2,damping,passivePretension4,history,maxTens,2*maxSpeed); 
+	tgSpringCableActuator::Config muscleConfigLegs(stiffnessPassive3,damping,passivePretension3,history, maxTens,2*maxSpeed); //was stiffnessPassive
     #endif
 
 #endif
