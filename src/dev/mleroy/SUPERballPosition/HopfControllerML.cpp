@@ -820,9 +820,11 @@ std::vector<double> HopfControllerML::getBallCOM(TensegrityModel& subject)
         assert(rod != NULL);
         const double rodMass = rod->mass();
         const btVector3 rodCenterOfMass = rod->centerOfMass();
+        std::cout << i << ", " << rodCenterOfMass << ", ";
         ballCenterOfMass += rodCenterOfMass * rodMass;
         ballMass += rodMass;
     }
+    std::cout << std::endl;
 
     //assert(ballMass > 0.0);
     ballCenterOfMass /= ballMass;

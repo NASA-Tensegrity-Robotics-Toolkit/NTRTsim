@@ -32,6 +32,7 @@
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
+#include "core/tgSimView.h"
 #include "core/tgWorld.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
@@ -39,6 +40,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+#define USEGRAPHICS 0
 
 /**
  * The entry point.
@@ -55,7 +58,7 @@ int main(int argc, char** argv)
     {
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
     }
-  
+ 
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -68,10 +71,14 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.0001; // seconds
-    //const double timestep_physics = 0.001;
+    //const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    #if(USEGRAPHICS)
+        tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    #else
+        tgSimView view(world, timestep_physics, timestep_graphics);
+    #endif
 
     // create the simulation
     tgSimulation simulation(view);
@@ -89,7 +96,7 @@ int main(int argc, char** argv)
     // repeated here:
     double startTime = 5.0;
     double minLength = 0.7;
-    double rate = 0.5; //0.25
+    double rate = 1.5; //0.25
     std::vector<std::string> tagsToControl;
     // See the threeBarModel.YAML file to see where "vertical_string" is used.
     tagsToControl.push_back("horizontal_string");
@@ -104,8 +111,27 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
-
-    simulation.run();
+    
+    #if(USEGRAPHICS)
+        simulation.run();
+    
+    #else
+    {
+        int nEpisodes = 5;  // Number of episodes ("trial runs")
+        int nSteps = 10001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
+        for (int i=1; i<=nEpisodes; i++)
+        {
+            std::cout << "Running episode " << i << " of " << nEpisodes << std::endl;
+            if(i!=1)
+            {
+                std::cout << "RESET" << std::endl;
+                simulation.reset();
+                myController->resetTimePassed();
+            }
+            simulation.run(nSteps);
+        }
+    }    
+    #endif
 
     // teardown is handled by delete
     return 0;
