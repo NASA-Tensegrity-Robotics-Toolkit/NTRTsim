@@ -122,7 +122,7 @@ private:
   /**
    * Need a boolean for returning the cable
    */
-  bool m_return = 0;
+  bool m_return;
 
   /**
    * The start length of each of the cables must be recorded.

@@ -124,6 +124,9 @@ void LengthControllerWithReturn::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
+  // Initialize flag to return the cable to false
+  m_return = 0;
+  // Output that controller setup is complete
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
