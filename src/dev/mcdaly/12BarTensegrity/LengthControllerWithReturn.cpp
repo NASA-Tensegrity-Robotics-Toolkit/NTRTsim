@@ -17,8 +17,8 @@
  */
 
 /**
- * @file LengthControllerYAML.cpp
- * @brief Implementation of LengthControllerYAML.
+ * @file LengthControllerWithReturn.cpp
+ * @brief Implementation of LengthControllerWithReturn.h
  * @author Drew Sabelhaus and Mallory Daly
  * $Id$
  */
@@ -29,7 +29,7 @@
  */
 
 // This module
-#include "LengthControllerYAML.h"
+#include "LengthControllerWithReturn.h"
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 // This library
@@ -50,7 +50,7 @@
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-LengthControllerYAML::LengthControllerYAML(double startTime,
+LengthControllerWithReturn::LengthControllerWithReturn(double startTime,
 					   double minLength,
 					   double rate,
 					   std::vector<std::string> tagsToControl) :
@@ -83,7 +83,7 @@ LengthControllerYAML::LengthControllerYAML(double startTime,
  * specific actuators in the cablesWithTags array, as well as store the initial
  * rest lengths in the initialRL map.
  */
-void LengthControllerYAML::initializeActuators(TensegrityModel& subject,
+void LengthControllerWithReturn::initializeActuators(TensegrityModel& subject,
 					       std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -112,9 +112,9 @@ void LengthControllerYAML::initializeActuators(TensegrityModel& subject,
  * which means just store pointers to them and record their rest lengths.
  * This method calls the helper initializeActuators.
  */
-void LengthControllerYAML::onSetup(TensegrityModel& subject)
+void LengthControllerWithReturn::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the LengthControllerYAML controller." << std::endl;
+  std::cout << "Setting up the LengthControllerWithReturn controller." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
   //	    << std::endl;
   cablesWithTags = {};
@@ -127,7 +127,7 @@ void LengthControllerYAML::onSetup(TensegrityModel& subject)
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
-void LengthControllerYAML::onStep(TensegrityModel& subject, double dt)
+void LengthControllerWithReturn::onStep(TensegrityModel& subject, double dt)
 {
   // First, increment the accumulator variable.
   m_timePassed += dt;

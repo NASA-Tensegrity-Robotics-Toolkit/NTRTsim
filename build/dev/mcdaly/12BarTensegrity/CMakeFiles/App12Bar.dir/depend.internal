@@ -744,7 +744,7 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o
  /home/mcdaly/NTRTsim/src/core/tgTags.h
  /home/mcdaly/NTRTsim/src/core/tgWorld.h
  /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/App12Bar.cpp
- /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.h
+ /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.h
  /home/mcdaly/NTRTsim/src/sensors/tgDataLogger2.h
  /home/mcdaly/NTRTsim/src/sensors/tgDataManager.h
  /home/mcdaly/NTRTsim/src/sensors/tgRodSensorInfo.h
@@ -759,7 +759,7 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o
  /home/mcdaly/NTRTsim/src/tgcreator/tgStructure.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgUtil.h
  /home/mcdaly/NTRTsim/src/yamlbuilder/TensegrityModel.h
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o
  /home/mcdaly/NTRTsim/src/../env/build/bullet/src/BulletCollision/BroadphaseCollision/btAxisSweep3.h
  /home/mcdaly/NTRTsim/src/../env/build/bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h
  /home/mcdaly/NTRTsim/src/../env/build/bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h
@@ -1488,8 +1488,8 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
  /home/mcdaly/NTRTsim/src/core/tgTaggable.h
  /home/mcdaly/NTRTsim/src/core/tgTaggables.h
  /home/mcdaly/NTRTsim/src/core/tgTags.h
- /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.cpp
- /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.h
+ /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.cpp
+ /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.h
  /home/mcdaly/NTRTsim/src/helpers/FileHelpers.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgBuildSpec.h
  /home/mcdaly/NTRTsim/src/tgcreator/tgNode.h

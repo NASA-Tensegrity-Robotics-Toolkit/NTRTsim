@@ -57,28 +57,28 @@ include dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/progress.make
 # Include the compile flags for this target's objects.
 include dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/flags.make
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/flags.make
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o: /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mcdaly/NTRTsim/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o"
-	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o -c /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.cpp
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/flags.make
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o: /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mcdaly/NTRTsim/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o"
+	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o -c /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.cpp
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.i"
-	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.cpp > CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.i
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.i"
+	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.cpp > CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.i
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.s"
-	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerYAML.cpp -o CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.s
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.s"
+	cd /home/mcdaly/NTRTsim/build/dev/mcdaly/12BarTensegrity && /home/mcdaly/NTRTsim/env/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerWithReturn.cpp -o CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.s
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.requires:
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.requires:
 
-.PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.requires
+.PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.requires
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.provides: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.requires
-	$(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.provides.build
-.PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.provides
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.provides: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.requires
+	$(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.provides.build
+.PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.provides
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.provides.build: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.provides.build: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o
 
 
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/flags.make
@@ -107,13 +107,13 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o.provides.build
 
 # Object files for target App12Bar
 App12Bar_OBJECTS = \
-"CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o" \
+"CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o" \
 "CMakeFiles/App12Bar.dir/App12Bar.cpp.o"
 
 # External object files for target App12Bar
 App12Bar_EXTERNAL_OBJECTS =
 
-dev/mcdaly/12BarTensegrity/App12Bar: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
+dev/mcdaly/12BarTensegrity/App12Bar: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o
 dev/mcdaly/12BarTensegrity/App12Bar: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o
 dev/mcdaly/12BarTensegrity/App12Bar: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make
 dev/mcdaly/12BarTensegrity/App12Bar: /usr/lib/x86_64-linux-gnu/libglut.so
@@ -138,7 +138,7 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build: dev/mcdaly/12BarTenseg
 
 .PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build
 
-dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/requires: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o.requires
+dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/requires: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o.requires
 dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/requires: dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o.requires
 
 .PHONY : dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/requires

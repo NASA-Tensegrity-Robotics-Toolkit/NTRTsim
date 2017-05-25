@@ -20,8 +20,8 @@
 // #define HORIZONTAL_SPINE_CONTROLLER_H
 
 /**
- * @file LengthControllerYAML.h
- * @brief Contains the definition of class LengthControllerYAML
+ * @file LengthControllerWithReturn.h
+ * @brief Contains the definition of class LengthControllerWithReturn
  * @author Drew Sabelhaus and Mallory Daly
  * $Id$
  */
@@ -30,6 +30,9 @@
  * the following inputs: controller start time, minimum cable length desired,
  * retraction rate, and cables to be controlled (based on tags).
  */
+
+#ifndef LENGTHCONTROLLERWITHRETURN_H
+#define LENGTHCONTROLLERWITHRETURN_H
 
 // The NTRT core library
 #include "core/tgObserver.h"
@@ -49,7 +52,7 @@ class tgBasicActuator;
  * A controller to apply the length change in the cables of the 3-bar example
  * model, for the NTRT Introduction Seminar on 2016-09-28 in BEST.
  */
-class LengthControllerYAML : public tgObserver<TensegrityModel>, public tgSubject<LengthControllerYAML>
+class LengthControllerWithReturn : public tgObserver<TensegrityModel>, public tgSubject<LengthControllerWithReturn>
 {
 public:
 	
@@ -67,13 +70,13 @@ public:
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
-  LengthControllerYAML(double startTime, double minLength, double rate,
+  LengthControllerWithReturn(double startTime, double minLength, double rate,
 			    std::vector<std::string> tagsToControl);
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~LengthControllerYAML() { }
+  virtual ~LengthControllerWithReturn() { }
 
   /**
    * Apply the controller. On setup, adjust the cable
@@ -137,4 +140,4 @@ private:
 
 };
 
-// #endif // HORIZONTAL_SPINE_CONTROLLER_H
+#endif

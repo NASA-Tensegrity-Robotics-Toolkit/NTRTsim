@@ -86,17 +86,17 @@ builders:
   rod:
     class: tgRodInfo
     parameters: 
-      density: 2.7 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
+      density: 3.0 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
       radius: 0.0475 #dm #outer diameter is 9.5 mm
-      friction: 1.0 #estimated value
-      roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
+      friction: 1 #estimated value
+      roll_friction: 1 #nearly zero (almost no rolling resistance)
       restitution: 0.0 #does this have to be zero?
 
   cable:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 410.7 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      #damping: 50.0 #kg/s (N-s/m) #complete guess for value
+      damping: 100.0 #kg/s (N-s/m) #complete guess for value
       pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
       max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N

@@ -152,32 +152,32 @@ App12Bar.cpp.s:
 	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.s
 .PHONY : App12Bar.cpp.s
 
-LengthControllerYAML.o: LengthControllerYAML.cpp.o
+LengthControllerWithReturn.o: LengthControllerWithReturn.cpp.o
 
-.PHONY : LengthControllerYAML.o
+.PHONY : LengthControllerWithReturn.o
 
 # target to build an object file
-LengthControllerYAML.cpp.o:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.o
-.PHONY : LengthControllerYAML.cpp.o
+LengthControllerWithReturn.cpp.o:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o
+.PHONY : LengthControllerWithReturn.cpp.o
 
-LengthControllerYAML.i: LengthControllerYAML.cpp.i
+LengthControllerWithReturn.i: LengthControllerWithReturn.cpp.i
 
-.PHONY : LengthControllerYAML.i
+.PHONY : LengthControllerWithReturn.i
 
 # target to preprocess a source file
-LengthControllerYAML.cpp.i:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.i
-.PHONY : LengthControllerYAML.cpp.i
+LengthControllerWithReturn.cpp.i:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.i
+.PHONY : LengthControllerWithReturn.cpp.i
 
-LengthControllerYAML.s: LengthControllerYAML.cpp.s
+LengthControllerWithReturn.s: LengthControllerWithReturn.cpp.s
 
-.PHONY : LengthControllerYAML.s
+.PHONY : LengthControllerWithReturn.s
 
 # target to generate assembly for a file
-LengthControllerYAML.cpp.s:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerYAML.cpp.s
-.PHONY : LengthControllerYAML.cpp.s
+LengthControllerWithReturn.cpp.s:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.s
+.PHONY : LengthControllerWithReturn.cpp.s
 
 # Help Target
 help:
@@ -191,9 +191,9 @@ help:
 	@echo "... App12Bar.o"
 	@echo "... App12Bar.i"
 	@echo "... App12Bar.s"
-	@echo "... LengthControllerYAML.o"
-	@echo "... LengthControllerYAML.i"
-	@echo "... LengthControllerYAML.s"
+	@echo "... LengthControllerWithReturn.o"
+	@echo "... LengthControllerWithReturn.i"
+	@echo "... LengthControllerWithReturn.s"
 .PHONY : help
 
 
