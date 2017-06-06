@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 
     // Parameters for the LengthControllerWithReturn are specified in that .h file,
     // repeated here:
-    double startTime = 0.5;
+    double startTime = 1;
     double minLength = 0.05;
-    double rate = 10;
+    double rate = 2;
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("actuated_cable");
     
