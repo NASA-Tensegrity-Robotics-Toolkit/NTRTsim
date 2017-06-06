@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Create the view
-    const double timestep_physics = 0.00001; // seconds // can try 0.0001
+    const double timestep_physics = 0.0001; // seconds // recommened 0.001
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 
     // Parameters for the LengthControllerWithReturn are specified in that .h file,
     // repeated here:
-    double startTime = 1;
+    double startTime = 2;
     double minLength = 0.05;
-    double rate = 2;
+    double rate = 0.5;
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("actuated_cable");
     

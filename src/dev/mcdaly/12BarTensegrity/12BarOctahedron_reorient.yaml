@@ -3,6 +3,6 @@ substructures:
     path: ./12BarOctahedron.yaml
     translation: [0, 2.1, 0] #dm
     rotation:
-      axis: [0, 0, 1]
+      axis: [1, 0, 0]
       angle: 45 #deg
     scale: 1
