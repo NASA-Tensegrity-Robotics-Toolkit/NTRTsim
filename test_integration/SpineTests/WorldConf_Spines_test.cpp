@@ -25,7 +25,7 @@
 // This application
 #include "examples/learningSpines/TetrahedralComplex/FlemonsSpineModelLearning.h"
 #include "examples/learningSpines/BaseSpineCPGControl.h"
-#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
+#include "examples/learningSpines/KinematicSpineCPGControl.h"
 // This library
 #include "core/tgModel.h"
 #include "core/tgSimView.h"

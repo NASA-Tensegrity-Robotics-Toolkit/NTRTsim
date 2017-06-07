@@ -129,6 +129,15 @@ void tgWorld::step(double dt) const
   }
 }
 
+// Add a function that returns the amount of gravity in the world.
+// This is useful for calculating the forces applied by rigid bodies
+// inside models (e.g., ForcePlateModel.)
+double tgWorld::getWorldGravity() const
+{
+  // return the value from the config.
+  return m_config.gravity;
+}
+
 bool tgWorld::invariant() const
 {
   return m_pImpl != 0;

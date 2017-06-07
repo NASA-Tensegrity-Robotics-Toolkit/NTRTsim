@@ -34,15 +34,15 @@
 #include "core/tgBasicActuator.h"
 #include "controllers/tgImpedanceController.h"
 #include "examples/learningSpines/tgCPGActuatorControl.h"
-#include "dev/CPG_feedback/tgCPGCableControl.h"
-#include "dev/btietz/kinematicString/tgSCASineControl.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
+#include "examples/learningSpines/tgSCASineControl.h"
 
 #include "examples/learningSpines/BaseSpineModelLearning.h"
 #include "dev/btietz/TC_goal/BaseSpineModelGoal.h"
 #include "helpers/FileHelpers.h"
 
-#include "dev/CPG_feedback/CPGEquationsFB.h"
-#include "dev/CPG_feedback/CPGNodeFB.h"
+#include "util/CPGEquationsFB.h"
+#include "examples/learningSpines/tgCPGCableControl.h"
 
 #include "neuralNet/Neural Network v2/neuralNetwork.h"
 

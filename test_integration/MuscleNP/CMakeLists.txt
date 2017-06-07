@@ -10,6 +10,5 @@ target_link_libraries(MuscleNP_test ${ENV_LIB_DIR}/libgtest.a pthread
 												${NTRT_BUILD_DIR}/core/libcore.so 
 												${NTRT_BUILD_DIR}/core/terrain/libterrain.so 
 												${NTRT_BUILD_DIR}/tgcreator/libtgcreator.so
-												${NTRT_BUILD_DIR}/dev/muscleNP/libMuscleNP.so
-												${NTRT_BUILD_DIR}/dev/btietz/muscleNPEnergy/libMuscleNPCons.so
+												${NTRT_BUILD_DIR}/examples/contactCables/libContactCableCons.so
 												 )

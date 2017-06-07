@@ -8,8 +8,6 @@ link_libraries(boost_program_options
                AnnealEvolution
                tgOpenGLSupport
                obstacles
-               KinematicString
-               CPG_feedback
                sensors
                controllers
 	       MountainGoatAchilles
@@ -24,4 +22,4 @@ add_executable(AppAOHierarchy
 	       JSONAOHierarchyControl.cpp)
 
 target_link_libraries(AppAOHierarchy ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles MountainGoatAchilles)
-target_link_libraries(JSONAOHierarchyControl ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles MountainGoatAchilles KinematicString)
+target_link_libraries(JSONAOHierarchyControl ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers boost_program_options obstacles MountainGoatAchilles)

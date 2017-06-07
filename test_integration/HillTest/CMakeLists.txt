@@ -14,8 +14,8 @@ target_link_libraries(TetraSpineHills_test ${ENV_LIB_DIR}/libgtest.a pthread
                                                 ${NTRT_BUILD_DIR}/helpers/libFileHelpers.so 
 												${NTRT_BUILD_DIR}/sensors/libsensors.so 
 												${NTRT_BUILD_DIR}/examples/learningSpines/liblearningSpines.so 
-												${NTRT_BUILD_DIR}/dev/btietz/TetraSpineStatic/libtetraSpineHardware.so
-                                                ${NTRT_BUILD_DIR}/dev/btietz/hardwareSineWaves/libtetraSpineLearningSine.so
+												${NTRT_BUILD_DIR}/examples/IROS_2015/TetraSpineStatic/libtetraSpineHardware.so
+                                                ${NTRT_BUILD_DIR}/examples/IROS_2015/hardwareSineWaves/libtetraSpineLearningSine.so
 												${NTRT_BUILD_DIR}/models/obstacles/libobstacles.so
-												${NTRT_BUILD_DIR}/dev/btietz/tetraCollisions/libtetraCollisions.so)
+												${NTRT_BUILD_DIR}/examples/contactCables/libtetraCollisions.so)
 												

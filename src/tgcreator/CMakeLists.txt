@@ -5,6 +5,7 @@ add_library( ${PROJECT_NAME} SHARED
     tgRigidInfo.cpp
     tgRodInfo.cpp
     tgBoxInfo.cpp
+    tgBoxMoreAnchorsInfo.cpp
     tgSphereInfo.cpp
     tgStructure.cpp
     tgBuildSpec.cpp
@@ -13,6 +14,8 @@ add_library( ${PROJECT_NAME} SHARED
     tgCompoundRigidInfo.cpp
     tgPair.cpp
     tgBasicActuatorInfo.cpp
+    tgCompressionSpringActuatorInfo.cpp
+    tgUnidirComprSprActuatorInfo.cpp
     tgKinematicActuatorInfo.cpp
     tgKinematicContactCableInfo.cpp
     tgBasicContactCableInfo.cpp
@@ -22,4 +25,5 @@ add_library( ${PROJECT_NAME} SHARED
 
 link_directories(${LIB_DIR})
 
-target_link_libraries(${PROJECT_NAME} core tgOpenGLSupport)
+# Needed to add boost's random library for tgRigidAutoCompound's hashing function
+target_link_libraries(${PROJECT_NAME} core tgOpenGLSupport boost_random)

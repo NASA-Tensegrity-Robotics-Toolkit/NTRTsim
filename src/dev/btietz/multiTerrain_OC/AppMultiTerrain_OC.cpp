@@ -30,7 +30,7 @@
 #include "dev/btietz/multiTerrain_OC/OctahedralComplex.h"
 
 // controller 
-#include "dev/CPG_feedback/SpineFeedbackControl.h"
+#include "examples/learningSpines/SpineFeedbackControl.h"
 #include "dev/btietz/TC_goal/SpineGoalControl.h"
 #include "dev/btietz/multiTerrain_OC/OctahedralGoalControl.h"
 

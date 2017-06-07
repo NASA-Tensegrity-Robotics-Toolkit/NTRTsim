@@ -36,6 +36,8 @@ class tgBasicActuator;
 class tgModelVisitor;
 class tgStructure;
 class tgWorld;
+// For debugging sensors
+class tgRodSensor;
 
 /**
  * Class that creates some test structures with tgBasicActuator(s) between them,
@@ -122,11 +124,17 @@ private:
 
 private:
 	
-	/**
+    /**
      * A list of all of the muscles. Will be empty until most of the way
      * through setup
      */
     std::vector<tgBasicActuator*> allActuators;
+
+    /**
+     * For testing out the new sensors: keep a list of tgRodSensors
+     * so they can be called at each timestep.
+     */
+    std::vector<tgRodSensor*> allRodSensors;
 };
 
 #endif  // TGBOX_ANCHOR_DEBUG_MODEL_H

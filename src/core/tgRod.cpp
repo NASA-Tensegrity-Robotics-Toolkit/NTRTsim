@@ -32,6 +32,8 @@
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
+#include <sstream> //for the tgSenseable methods.
+#include <iostream> //for strings.
 
 tgRod::Config::Config(double r, double d,
                         double f, double rf, double res) :

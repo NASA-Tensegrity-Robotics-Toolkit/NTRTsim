@@ -16,6 +16,10 @@ add_library(${PROJECT_NAME} SHARED
 			BaseSpineCPGControl.cpp
             tgCPGActuatorControl.cpp    
             tgCPGLogger.cpp
+            tgSCASineControl.cpp
+            KinematicSpineCPGControl.cpp
+            tgCPGCableControl.cpp
+            SpineFeedbackControl.cpp
             )
 
 subdirs(    OctahedralComplex

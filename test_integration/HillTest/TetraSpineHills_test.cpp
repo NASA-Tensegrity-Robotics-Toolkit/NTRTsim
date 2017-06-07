@@ -23,8 +23,8 @@
 */
 
 // This application
-#include "dev/btietz/tetraCollisions/TetraSpineCollisions.h"
-#include "dev/btietz/tetraCollisions/colSpineSine.h"
+#include "examples/contactCables/TetraSpineCollisions.h"
+#include "examples/contactCables/colSpineSine.h"
 // This library
 #include "core/terrain/tgHillyGround.h"
 #include "core/tgModel.h"

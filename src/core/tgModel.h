@@ -22,7 +22,7 @@
 /**
  * @file tgModel.h
  * @brief Contains the definition of class tgModel.
- * @author Ryan Adams
+ * @author Ryan Adams, Drew Sabelhaus
  * $Id$
  */
 
@@ -30,6 +30,7 @@
 #include "tgCast.h"
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
+#include "tgSenseable.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
@@ -42,8 +43,10 @@ class abstractMarker;
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
  * The Composite design pattern is used for the sub-models.
+ * Note that this is a sense-able object, meaning that pointers to tgModels
+ * can be passed around in the sensing infrastructure.
  */
-class tgModel : public tgTaggable
+class tgModel : public tgTaggable, public tgSenseable
 {
 public: 
 
@@ -151,6 +154,14 @@ public:
     const std::vector<abstractMarker>& getMarkers() const;
 
     void addMarker(abstractMarker a);
+
+    /**
+     * From tgSenseable: need to return all the children of this class.
+     * Since tgModels are tgSenseables, just return getDescendants().
+     * @return a vector of tgModels, with pointers changed into pointers
+     * for tgSenseables.
+     */
+    virtual std::vector<tgSenseable*> getSenseableDescendants() const;
 
 private:
 
