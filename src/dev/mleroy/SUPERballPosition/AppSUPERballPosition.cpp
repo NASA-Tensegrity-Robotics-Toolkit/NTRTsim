@@ -36,6 +36,9 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 
 // Bullet Physics
 #include "LinearMath/btVector3.h"
@@ -47,6 +50,8 @@
 
 #define NOSCILLATORS 4
 #define NSTATES 8
+#define USEGRAPHICS 1
+#define LOGDATA 0
 
 // Function prototypes
 tgBoxGround *createGround();
@@ -98,7 +103,7 @@ int main(int argc, char** argv)
     tgWorld *world = createWorld();
 
     // Second create the view (Choose between with or without graphics)
-    #if(0)
+    #if(USEGRAPHICS)
         tgSimViewGraphics *view = createGraphicsView(world); // For visual experimenting on one tensegrity
     #else
         tgSimView         *view = createView(world);         // For running multiple episodes
@@ -123,14 +128,14 @@ int main(int argc, char** argv)
     double hopfState[NSTATES] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};//{0.1,-0.1,-0.15,0.15,0.05,-0.05,-0.2,0.2};
     double hopfVel[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     //double hopfAcc[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    if(0)
+    #if(0)
     {
-        srand(time(NULL));
+        /*srand(time(NULL));
         for(int i=0; i<NSTATES; i++)
         {
             hopfState[i] = (double)(rand()%1000)/500-1;
             hopfVel[i] = (double)(rand()%1000)/500-1;
-        }
+        }*/
 
         std::cout << "\e[1;38mStates: ";
         for(int i=0; i<NSTATES; i++)
@@ -142,6 +147,7 @@ int main(int argc, char** argv)
             std::cout << hopfVel[i] << ", ";
         std::cout << "\e[0m" << std::endl;   
     }
+    #endif
 
     // Ranges to be examined by the machine learning library
     double hopfOmegaMin = 2.0;
@@ -193,6 +199,29 @@ int main(int argc, char** argv)
     // Add the model to the world
     //simulation.addModel(myModel);
     simulation->addModel(myModel);
+
+    #if(LOGDATA)
+        // Add sensors using the new sensing framework
+        // A string prefix for the filename
+        std::string log_filename = "~/projects/tg_shared/AppSUPERballPosition";
+        // The time interval between sensor readings:
+        double timeInterval = 0.2;
+        // First, create the data manager
+        tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename);
+        //std::cout << myDataLogger->toString() << std::endl;
+        // Then, add the model to the data logger
+        myDataLogger->addSenseable(myModel);
+        // Create sensor infos for all the types of sensors that the data logger
+        // will create.
+        tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+        tgSpringCableActuatorSensorInfo* mySCASensorInfo =
+          new tgSpringCableActuatorSensorInfo();
+        // Attach the sensor infos to the data logger
+        myDataLogger->addSensorInfo(myRodSensorInfo);
+        myDataLogger->addSensorInfo(mySCASensorInfo);
+        // Next, attach it to the simulation
+        simulation->addDataManager(myDataLogger);
+    #endif
 
     //simulation->run();
     simulate(simulation,myController);
