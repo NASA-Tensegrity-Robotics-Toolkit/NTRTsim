@@ -50,15 +50,16 @@
 
 #define NOSCILLATORS 4
 #define NSTATES 8
-#define USEGRAPHICS 1
+#define USEGRAPHICS 0
 #define LOGDATA 0
+#define USEHOPFCTLR 1
 
 // Function prototypes
 tgBoxGround *createGround();
 tgWorld *createWorld();
 tgSimViewGraphics *createGraphicsView(tgWorld *world);
 tgSimView *createView(tgWorld *world);
-//void simulate(tgSimulation *simulation, HopfControllerML* myController);
+void simulate(tgSimulation *simulation, HopfControllerML* myController);
 void simulate(tgSimulation *simulation, LengthControllerYAML* myController);
 std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsToControl);
  
@@ -187,17 +188,18 @@ int main(int argc, char** argv)
                                             hopfOffsetOddMin,  hopfOffsetOddMax);
 
     // Create the controller
-    /*HopfControllerML* const myController = new HopfControllerML(control_config, tagsToControl, timePassed, 
-                                                                ctr, initRestLengths, saveToCSV, 
-                                                                hopfState, hopfVel, //hopfAcc, 
-                                                                suffix, "SUPERballPosition/", "Config.ini");
-    */
-    
-    double startTime = 5.0;
-    double minLength = 0.7;
-    double rate = 1.5; //0.25
-    LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
-    
+    #if(USEHOPFCTLR)
+        HopfControllerML* const myController = new HopfControllerML(control_config, tagsToControl, timePassed, 
+                                                                    ctr, initRestLengths, saveToCSV, 
+                                                                    hopfState, hopfVel, //hopfAcc, 
+                                                                    suffix, "SUPERballPosition/", "Config.ini");
+    #else    
+        double startTime = 5.0;
+        double minLength = 0.7;
+        double rate = 1.5; //0.25
+        LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
+    #endif
+
     // Attach the controller to the model
     // This is a controller that interacts with a generic TensegrityModel as
     // built by the TensegrityModel file.
@@ -288,7 +290,33 @@ tgSimView *createView(tgWorld *world) {
 
 
 /** Run a series of episodes for nSteps each */
-//void simulate(tgSimulation *simulation, HopfControllerML* myController) {
+void simulate(tgSimulation *simulation, HopfControllerML* myController) {
+    int nEpisodes = 50;  // Number of episodes ("trial runs")
+    int nSteps = 30001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
+    for (int i=1; i<=nEpisodes; i++)
+    {
+        std::cout << "Running episode " << i << " of " << nEpisodes << std::endl;
+        try
+        {
+            if(i!=1)
+            {
+                std::cout << "RESET" << std::endl;
+                simulation->reset();
+                myController->resetTimePassed();
+            }
+
+            //std::cout << "Starting new run" << std::endl;
+            simulation->run(nSteps);
+            //std::cout << "End of run" << std::endl;
+        }
+        catch(const std::invalid_argument& msg)
+        {
+            std::cout << "\e[1;31mError occured due to: " << msg.what() << "\e[0m" << std::endl << std::endl;
+        }
+    }
+    simulation->reset(); //so that the last episode may be saved in scores.csv
+}
+
 void simulate(tgSimulation *simulation, LengthControllerYAML* myController) {
     int nEpisodes = 10;  // Number of episodes ("trial runs")
     int nSteps = 30001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)

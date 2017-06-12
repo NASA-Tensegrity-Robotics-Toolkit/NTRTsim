@@ -44,7 +44,7 @@
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 
-#define USEGRAPHICS 1
+#define USEGRAPHICS 0
 #define LOGDATA 0
 
 /**

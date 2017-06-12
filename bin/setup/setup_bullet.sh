@@ -120,6 +120,14 @@ function unpack_bullet()
 # Patch Bullet to include OpenGL Directories
 function patch_bullet()
 {
+    # Also fix double free error in btQuickprof
+    pushd "$BULLET_BUILD_DIR" > /dev/null    
+    patch -p0 < "$SETUP_DIR/patches/determinism_bullet.patch"
+    popd > /dev/null
+    pushd "$BULLET_BUILD_DIR/src/LinearMath" > /dev/null
+    patch < "$SETUP_DIR/patches/btQuickprof.patch"
+    popd > /dev/null
+
     pushd "$BULLET_BUILD_DIR/Demos" > /dev/null
 
     # Copy the files we're going to change
@@ -140,13 +148,6 @@ function patch_bullet()
 
     popd > /dev/null
     
-    # Also fix double free error in btQuickprof
-    
-    pushd "$BULLET_BUILD_DIR/src/LinearMath" > /dev/null
-    
-    patch < "$SETUP_DIR/patches/btQuickprof.patch"
-    
-    popd > /dev/null
 }
 
 # Build the package under the build directory specified in in install.conf

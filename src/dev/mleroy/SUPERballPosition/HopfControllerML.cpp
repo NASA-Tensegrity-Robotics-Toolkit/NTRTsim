@@ -779,7 +779,7 @@ void HopfControllerML::resetTimePassed()
   
   for(int i=0; i<NSTATES; i++)
   {
-    std::cout << "States right before reset: " << hopfState[i] << " " << hopfVel[i] << std::endl;
+    //std::cout << "States right before reset: " << hopfState[i] << " " << hopfVel[i] << std::endl;
     hopfState[i] = 0.0;
     hopfVel[i] = 0.0; 
     /*if(random)
