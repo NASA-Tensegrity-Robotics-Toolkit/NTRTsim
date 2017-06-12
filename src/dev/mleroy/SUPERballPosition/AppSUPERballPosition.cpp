@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     // Attach the controller to the model
     // This is a controller that interacts with a generic TensegrityModel as
     // built by the TensegrityModel file.
-    myModel->attach(myController);
+    //myModel->attach(myController);
 
     // Add the model to the world
     //simulation.addModel(myModel);

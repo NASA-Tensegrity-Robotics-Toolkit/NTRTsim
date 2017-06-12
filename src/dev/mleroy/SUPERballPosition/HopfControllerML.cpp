@@ -269,7 +269,7 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
   }
 
   initPosition = getBallCOM(subject);
-  //std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
+  std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
   //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
@@ -499,8 +499,8 @@ void HopfControllerML::onStep(TensegrityModel& subject, double dt)
       //std::cout << "Test length: " << initialRL.at((tgTags)"SUPERball_string21") << std::endl;
     }*/
     ctr++;
-    //if(ctr == 4500)
-      //std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
+    if(ctr == 4500)
+      std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
     /*for(InitialRestLengths::const_iterator it = initialRL.begin(); it != initialRL.end(); ++it)
     {
       std::cout << it->first << " " << it->second << std::endl;
@@ -779,7 +779,7 @@ void HopfControllerML::resetTimePassed()
   
   for(int i=0; i<NSTATES; i++)
   {
-    //std::cout << "States right before reset: " << hopfState[i] << " " << hopfVel[i] << std::endl;
+    std::cout << "States right before reset: " << hopfState[i] << " " << hopfVel[i] << std::endl;
     hopfState[i] = 0.0;
     hopfVel[i] = 0.0; 
     /*if(random)

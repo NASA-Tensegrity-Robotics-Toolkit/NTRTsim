@@ -1,11 +1,11 @@
 nodes:
-  bottom1: [-5, 0, 0]
-  bottom2: [5, 0, 0]
-  bottom3: [0, 0, 8.66]
+  bottom1: [-5, 1.75, 0]
+  bottom2: [5, 1.75, 0]
+  bottom3: [0, 1.75, 8.66]
 
-  top1: [-5, 5, 0]
-  top2: [5, 5, 0]
-  top3: [0, 5, 8.66]
+  top1: [-5, 6.75, 0]
+  top2: [5, 6.75, 0]
+  top3: [0, 6.75, 8.66]
 
 pair_groups:
   prism_rod:
@@ -39,12 +39,12 @@ builders:
     parameters:
       stiffness: 1000
       damping: 10
-      pretension: 1000
+      pretension: 460
       max_tension: 70000.0
   vertical_string:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1000
       damping: 10
-      pretension: 300
+      pretension: 314.25
       max_tension: 70000.0

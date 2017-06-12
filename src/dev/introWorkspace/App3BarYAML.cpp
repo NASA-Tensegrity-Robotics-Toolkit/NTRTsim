@@ -40,8 +40,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 
-#define USEGRAPHICS 0
+#define USEGRAPHICS 1
+#define LOGDATA 0
 
 /**
  * The entry point.
@@ -112,12 +116,36 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
     
+    #if(LOGDATA)
+        // Add sensors using the new sensing framework
+        // A string prefix for the filename
+        std::string log_filename = "~/projects/tg_shared/App3BarYAML";
+        // The time interval between sensor readings:
+        double timeInterval = 0.2;
+        // First, create the data manager
+        tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename,timeInterval);
+        //std::cout << myDataLogger->toString() << std::endl;
+        // Then, add the model to the data logger
+        myDataLogger->addSenseable(myModel);
+        // Create sensor infos for all the types of sensors that the data logger
+        // will create.
+        tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+        tgSpringCableActuatorSensorInfo* mySCASensorInfo =
+          new tgSpringCableActuatorSensorInfo();
+        // Attach the sensor infos to the data logger
+        myDataLogger->addSensorInfo(myRodSensorInfo);
+        myDataLogger->addSensorInfo(mySCASensorInfo);
+        // Next, attach it to the simulation
+        simulation.addDataManager(myDataLogger);
+    #endif
+
+
     #if(USEGRAPHICS)
         simulation.run();
     
     #else
     {
-        int nEpisodes = 5;  // Number of episodes ("trial runs")
+        int nEpisodes = 25;  // Number of episodes ("trial runs")
         int nSteps = 10001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
         for (int i=1; i<=nEpisodes; i++)
         {
