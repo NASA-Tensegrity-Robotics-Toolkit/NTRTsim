@@ -55,7 +55,7 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletCollision/BroadphaseCollision/btOverlappingPairCache.h"
 
-#define MLCP_SOLVER
+//#define MLCP_SOLVER
 
 #ifdef MLCP_SOLVER
 

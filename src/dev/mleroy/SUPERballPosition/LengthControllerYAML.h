@@ -86,6 +86,9 @@ public:
    */
   virtual void onStep(TensegrityModel& subject, double dt);
 
+  virtual void resetTimePassed();
+  virtual void getBallCOM(TensegrityModel& subject, int color);
+
 protected:
 
   /**

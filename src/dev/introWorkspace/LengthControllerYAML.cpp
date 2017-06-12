@@ -112,7 +112,7 @@ void LengthControllerYAML::initializeActuators(TensegrityModel& subject,
  */
 void LengthControllerYAML::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the LengthControllerYAML controller." << std::endl;
+  //std::cout << "Setting up the LengthControllerYAML controller." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
   //	    << std::endl;
   cablesWithTags = {};
@@ -122,9 +122,9 @@ void LengthControllerYAML::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
-  std::cout << "Finished setting up the controller." << std::endl;
+  //std::cout << "Finished setting up the controller." << std::endl;
   resetTimePassed();
-  getBallCOM(subject,31);    
+  //getBallCOM(subject,31);    
 }
 
 void LengthControllerYAML::onStep(TensegrityModel& subject, double dt)

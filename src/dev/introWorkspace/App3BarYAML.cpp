@@ -145,7 +145,7 @@ int main(int argc, char** argv)
     
     #else
     {
-        int nEpisodes = 25;  // Number of episodes ("trial runs")
+        int nEpisodes = 100;  // Number of episodes ("trial runs")
         int nSteps = 10001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
         for (int i=1; i<=nEpisodes; i++)
         {
