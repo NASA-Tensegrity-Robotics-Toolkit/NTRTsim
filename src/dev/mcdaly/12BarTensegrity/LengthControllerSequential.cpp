@@ -124,8 +124,12 @@ void LengthControllerSequential::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
-  // Initialize flag to return the cable to false
-  m_return = 0;
+  // Initialize flags
+  m_retract = 1;  // Cable is in retract mode (rather than return mode)
+  m_next_cable = 0;  // Move to next cable
+  m_finished = 0;  // Finished retracting and returning all cables
+  // Initialize cable index
+  m_cable_index = 0;
   // Output that controller setup is complete
   std::cout << "Finished setting up the controller." << std::endl;    
 }
@@ -135,14 +139,25 @@ void LengthControllerSequential::onStep(TensegrityModel& subject, double dt)
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, if it's passed the time to start the controller,
-  if(m_timePassed > m_startTime && m_return == 0) {
-    // For each cable, check if its rest length is past the minimum,
-    // otherwise adjust its length according to m_rate and dt.
-    for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {	
-      double currRestLength = cablesWithTags[i]->getRestLength();
+  if(m_timePassed > m_startTime) {
+    
+    if(m_next_cable == 1) {
+      m_next_cable == 0;
+      m_cable_index += 1;
+    }
+
+    if(m_cable_index > cablesWithTags.size()) {
+        m_finished = 1;
+    }
+
+    // Retract mode
+    if(m_retract == 1 && m_finished == 0) {
+      // For current cable, check if its rest length is past the minimum,
+      // otherwise adjust its length according to m_rate and dt.
+      double currRestLength = cablesWithTags[m_cable_index]->getRestLength();
       // Calculate the minimum rest length for this cable.
       // Remember that m_minLength is a percent.
-      double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
+      double minRestLength = initialRL[cablesWithTags[m_cable_index]->getTags()] * m_minLength;
       // If the current rest length is still greater than the minimum,
       if(currRestLength > minRestLength) {
       	// output a progress bar for the controller, to track when control occurs.
@@ -152,20 +167,20 @@ void LengthControllerSequential::onStep(TensegrityModel& subject, double dt)
       	double nextRestLength = currRestLength - m_rate * dt;
       	//DEBUGGING
       	//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
-      	cablesWithTags[i]->setControlInput(nextRestLength,dt);
+      	cablesWithTags[m_cable_index]->setControlInput(nextRestLength,dt);
       }
       else {
         // Cable has been retracted to min length; now return cable to original position
-        m_return = 1;
+        m_retract = 0;
       }
-    }   
-  }
-  else if(m_timePassed > m_startTime && m_return == 1) {
-    for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {  
-      double currRestLength = cablesWithTags[i]->getRestLength();
+    }
+
+    // Return state
+    else if(m_retract == 0 && m_finished == 0) {
+      double currRestLength = cablesWithTags[m_cable_index]->getRestLength();
       //std::cout << "Current rest length: " << currRestLength << std::endl;
       // Keep moving if current rest length is still below original
-      double initialRestLength = initialRL[cablesWithTags[i]->getTags()];
+      double initialRestLength = initialRL[cablesWithTags[m_cable_index]->getTags()];
       //std::cout << "Initial rest length: " << initialRestLength << std::endl;
       if(currRestLength < initialRestLength) {
         // output a progress bar for the controller, to track when control occurs.
@@ -175,9 +190,14 @@ void LengthControllerSequential::onStep(TensegrityModel& subject, double dt)
         double nextRestLength = currRestLength + m_rate * dt;
         //DEBUGGING
         //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
-        cablesWithTags[i]->setControlInput(nextRestLength,dt);
+        cablesWithTags[m_cable_index]->setControlInput(nextRestLength,dt);
       }
-    } 
+      else {
+        // Cable has returned to original position; now flag to move to next cable and enter retract mode
+        m_next_cable = 1;
+        m_retract = 1;
+      }
+    }
   }
 }
 	

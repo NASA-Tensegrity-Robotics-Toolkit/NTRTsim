@@ -31,8 +31,8 @@
  * retraction rate, and cables to be controlled (based on tags).
  */
 
-#ifndef LENGTHCONTROLLERWITHRETURN_H
-#define LENGTHCONTROLLERWITHRETURN_H
+#ifndef LENGTHCONTROLLERSEQUENTIAL_H
+#define LENGTHCONTROLLERSEQUENTIAL_H
 
 // The NTRT core library
 #include "core/tgObserver.h"
@@ -120,9 +120,16 @@ private:
   double m_timePassed;
 
   /**
-   * Need a boolean for returning the cable
+   * Need booleans for flags to retract cable (vs. return), move to next cable, or stop controller
    */
-  bool m_return;
+  bool m_retract;
+  bool m_next_cable;
+  bool m_finished;
+
+  /**
+   * Need integer for current cable index
+   */
+  int m_cable_index;
 
   /**
    * The start length of each of the cables must be recorded.
