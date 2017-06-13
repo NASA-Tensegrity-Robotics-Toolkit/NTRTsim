@@ -80,16 +80,16 @@ pair_groups:
     - [n22, n23]
 
   actuated_cable:
-   - [n5, n7]    
+   - [n2,n8]    
 
 builders:
   rod:
     class: tgRodInfo
     parameters: 
-      density: 2.70 #2.70 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
+      density: 4.16 #2.70 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
       radius: 0.0475 #dm #outer diameter is 9.5 mm
-      friction: 1.0 #estimated value
-      #roll_friction: 0.01 #N or dimensionless? #nearly zero (almost no rolling resistance)
+      friction: 1 #estimated value
+      roll_friction: 1 #N or dimensionless? #nearly zero (almost no rolling resistance)
       #restitution: 0.0 #does this have to be zero?
 
   cable:
@@ -105,9 +105,9 @@ builders:
   actuated_cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 10000.0 #kg/s^2 (N/m) #make value large to mimic stiff cable
+      stiffness: 10000 #kg/s^2 (N/m) #make value large to mimic stiff cable
       #damping: 50.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 0.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      pretension: 0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
       max_tension: 100000 #kg-dm/s^2
       #target_velocity: 0 #dm/s #what is this?      
