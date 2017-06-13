@@ -120,7 +120,7 @@ pair_groups:
     - [n16, n5]
 
   actuation_module:
-    - [n36, n37]  # bar 0
+    - [n36, n37]  # bar 0q
     - [n38, n39]  # bar 4
     - [n40, n41]  # bar 5
     - [n42, n43]  # bar 10
@@ -132,8 +132,8 @@ pair_groups:
     - [n20, n42]
 
   actuated_cable:
-    #- [n1, n20]
     - [n2, n10]
+    - [n6, n14]
 
 
 builders:

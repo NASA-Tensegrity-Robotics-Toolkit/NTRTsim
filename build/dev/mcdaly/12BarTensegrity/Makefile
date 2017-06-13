@@ -152,32 +152,32 @@ App12Bar.cpp.s:
 	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.s
 .PHONY : App12Bar.cpp.s
 
-LengthControllerWithReturn.o: LengthControllerWithReturn.cpp.o
+LengthControllerSequential.o: LengthControllerSequential.cpp.o
 
-.PHONY : LengthControllerWithReturn.o
+.PHONY : LengthControllerSequential.o
 
 # target to build an object file
-LengthControllerWithReturn.cpp.o:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o
-.PHONY : LengthControllerWithReturn.cpp.o
+LengthControllerSequential.cpp.o:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerSequential.cpp.o
+.PHONY : LengthControllerSequential.cpp.o
 
-LengthControllerWithReturn.i: LengthControllerWithReturn.cpp.i
+LengthControllerSequential.i: LengthControllerSequential.cpp.i
 
-.PHONY : LengthControllerWithReturn.i
+.PHONY : LengthControllerSequential.i
 
 # target to preprocess a source file
-LengthControllerWithReturn.cpp.i:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.i
-.PHONY : LengthControllerWithReturn.cpp.i
+LengthControllerSequential.cpp.i:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerSequential.cpp.i
+.PHONY : LengthControllerSequential.cpp.i
 
-LengthControllerWithReturn.s: LengthControllerWithReturn.cpp.s
+LengthControllerSequential.s: LengthControllerSequential.cpp.s
 
-.PHONY : LengthControllerWithReturn.s
+.PHONY : LengthControllerSequential.s
 
 # target to generate assembly for a file
-LengthControllerWithReturn.cpp.s:
-	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.s
-.PHONY : LengthControllerWithReturn.cpp.s
+LengthControllerSequential.cpp.s:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthControllerSequential.cpp.s
+.PHONY : LengthControllerSequential.cpp.s
 
 # Help Target
 help:
@@ -191,9 +191,9 @@ help:
 	@echo "... App12Bar.o"
 	@echo "... App12Bar.i"
 	@echo "... App12Bar.s"
-	@echo "... LengthControllerWithReturn.o"
-	@echo "... LengthControllerWithReturn.i"
-	@echo "... LengthControllerWithReturn.s"
+	@echo "... LengthControllerSequential.o"
+	@echo "... LengthControllerSequential.i"
+	@echo "... LengthControllerSequential.s"
 .PHONY : help
 
 

@@ -14,7 +14,7 @@ link_libraries(tgcreator
     		TensegrityModel)
 
 add_executable(App12Bar
-    LengthControllerWithReturn.cpp
+    LengthControllerSequential.cpp
     App12Bar.cpp
 ) 
 
