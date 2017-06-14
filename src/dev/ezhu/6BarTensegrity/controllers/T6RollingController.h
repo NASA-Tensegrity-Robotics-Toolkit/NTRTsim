@@ -63,10 +63,10 @@ public:
 	struct Config
 	{
 	public:
-		// Overloaded Config function for two controller modes
+		// Overloaded Config function for multiple controller modes
 		Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name);
-		Config (double gravity, const std::string& mode, btVector3 dr_goal);
-		Config (double gravity, const std::string& mode, int *path, int pathSize);
+		Config (double gravity, const std::string& mode, btVector3 dr_goal, const std::string& log_name);
+		Config (double gravity, const std::string& mode, int *path, int pathSize, const std::string& log_name);
 
 		double m_gravity;
 
