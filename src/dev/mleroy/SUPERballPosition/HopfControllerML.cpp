@@ -39,6 +39,7 @@
 #include "learning/AnnealEvolution/AnnealEvolution.h"
 #include "learning/Adapters/AnnealAdapter.h"
 #include "learning/Configuration/configuration.h"
+#include "boost/numeric/odeint.hpp"
 
 //#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
@@ -60,6 +61,8 @@
 #include <map>
 #include <deque>
 
+#define USEBOOSTRK 0
+
 char timebuffer[12];
 std::string primerHopfFileName = "_hopf_results";
 std::string primerSpeedFileName = "_speed_hopf_results";
@@ -74,6 +77,18 @@ static std::vector<std::string> fileNames;
 const double CONTROLLER_STOP_TIME = 30000.0;
 const double HOPF_AMPLIFIER = 0.5;
 const double MATH_PI = 3.14159265359;
+
+state_type x(4);
+size_t steps;
+
+void odeTest(const state_type &x, state_type &dxdt, const double t)
+{
+  dxdt[0]=3.83366-(-0.7548+0.301531)*sin(x[0]-x[1]);
+  dxdt[1]=3.81622+(-0.301126+0.288842)*sin(x[0]-x[1])-(-0.456894+0.802321)*sin(x[1]-x[2]);
+  dxdt[2]=3.66452+(-0.211439+0.201521)*sin(x[1]-x[2])-(-0.992296+0.135209)*sin(x[2]-x[3]);
+  dxdt[3]=3.4382 +(-0.948404+0.329029)*sin(x[2]-x[3]);
+}
+
 
 HopfControllerML::Config::Config(double hOMin, double hOMax, double hMMin, double hMMax, double cUpMin, double cUpMax,
                                  double cDownMin, double cDownMax, double cNeMin, double cNeMax, double cSeMin, double cSeMax,
@@ -140,6 +155,11 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
   evolution(args, configFile, resourcePath),
   learning(false)
 {
+  x[0] = 0.0;
+  x[1] = 0.0;
+  x[2] = 0.0;
+  x[3] = 0.0;
+
   for(int i=0; i<NSTATES; i++)
   {
     //std::cout << "Starting Hopf Oscillators" << std::endl;
@@ -152,7 +172,6 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
     //hopfAccFirst[i]   = hopfAccInit[i];
   }
 
-
   // Setting up the different log files
   hopfFileName  = setupCSVFiles(primerHopfFileName);
   speedFileName = setupCSVFiles(primerSpeedFileName);
@@ -163,7 +182,6 @@ HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<
   fileNames.push_back(speedFileName);
   fileNames.push_back(cableFileName);
   fileNames.push_back(cOMFileName);
-
 
   // Setting up things for the learning library
   std::string path;
@@ -192,62 +210,62 @@ HopfControllerML::~HopfControllerML()
 // is the maximum distance from the origin reached during that subject's episode
 void HopfControllerML::onTeardown(TensegrityModel& subject) 
 {
-    std::cout << "Tearing down" << std::endl;
-    std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
-    
-    double distance = displacement(subject);
-    double energySpent = totalEnergySpent(subject);
+  std::cout << "Tearing down" << std::endl;
+  std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
+  
+  double distance = displacement(subject);
+  double energySpent = totalEnergySpent(subject);
 
-    //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    scores.push_back(distance);
-    scores.push_back(energySpent);
-    
-    //std::cout << "Tearing down" << std::endl;
-    //adapter.endEpisode(scores);
+  //Invariant: For now, scores must be of size 2 (as required by endEpisode())
+  scores.push_back(distance);
+  scores.push_back(energySpent);
+  
+  //std::cout << "Tearing down" << std::endl;
+  //adapter.endEpisode(scores);
 
-    // If any of subject's dynamic objects need to be freed, this is the place to do so
+  // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
 
 
 double HopfControllerML::displacement(TensegrityModel& subject) 
 {
-    std::vector<double> finalPosition = getBallCOM(subject);
+  std::vector<double> finalPosition = getBallCOM(subject);
 
-    // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
-    //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
+  // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
+  //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
-    const double newX = finalPosition[0];
-    const double newZ = finalPosition[2];
-    const double oldX = initPosition[0];
-    const double oldZ = initPosition[2];
+  const double newX = finalPosition[0];
+  const double newZ = finalPosition[2];
+  const double oldX = initPosition[0];
+  const double oldZ = initPosition[2];
 
-    const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + 
-                                      (newZ-oldZ) * (newZ-oldZ));
-    return distanceMoved;
+  const double distanceMoved = sqrt((newX-oldX) * (newX-oldX) + (newZ-oldZ) * (newZ-oldZ));
+  return distanceMoved;
 }
 
 
 double HopfControllerML::totalEnergySpent(TensegrityModel& subject)
 {
-    double totalEnergySpent=0;
+  double totalEnergySpent=0;
 
-    std::vector<tgBasicActuator* > tmpStrings = cablesWithTags;
-    for(size_t i=0; i<tmpStrings.size(); i++) {
-        tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
-
-        for(size_t j=1; j<stringHist.tensionHistory.size(); j++) {
-            const double previousTension = stringHist.tensionHistory[j-1];
-            const double previousLength = stringHist.restLengths[j-1];
-            const double currentLength = stringHist.restLengths[j];
-            //TODO: examine this assumption - free spinning motor may require more power         
-            double motorSpeed = (currentLength-previousLength);
-            //if(motorSpeed > 0) // Vestigial code
-              //  motorSpeed = 0;
-            const double workDone = previousTension * motorSpeed / 1000000; // division added by ML
-            totalEnergySpent += workDone;
-        }
+  std::vector<tgBasicActuator* > tmpStrings = cablesWithTags;
+  for(size_t i=0; i<tmpStrings.size(); i++)
+  {
+    tgSpringCableActuator::SpringCableActuatorHistory stringHist = tmpStrings[i]->getHistory();
+    for(size_t j=1; j<stringHist.tensionHistory.size(); j++)
+    {
+      const double previousTension = stringHist.tensionHistory[j-1];
+      const double previousLength = stringHist.restLengths[j-1];
+      const double currentLength = stringHist.restLengths[j];
+      //TODO: examine this assumption - free spinning motor may require more power         
+      double motorSpeed = (currentLength-previousLength);
+      //if(motorSpeed > 0) // Vestigial code
+        //  motorSpeed = 0;
+      const double workDone = previousTension * motorSpeed / 1000000; // division added by ML
+      totalEnergySpent += workDone;
     }
-    return totalEnergySpent;
+  }
+  return totalEnergySpent;
 }
 
 
@@ -273,9 +291,7 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
   //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
-  /*adapter.initialize(&evolution,
-                      learning,
-                      configData);
+  /*adapter.initialize(&evolution,learning,configData);
   
   std::vector<double> state;
   std::cout << &state << std::endl;
@@ -370,46 +386,45 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
  */
 array_2D HopfControllerML::scaleActions(std::vector< std::vector <double> > actions)
 {
-    std::size_t numControllers = configData.getintvalue("numberOfControllers");
-    std::size_t numActions     = configData.getintvalue("numberOfActions");
-    
-    assert( actions.size()    == numControllers);
-    assert( actions[0].size() == numActions);
-    
-    array_2D actionsUpd(boost::extents[numControllers][numActions]);
-    
-    array_2D limits(boost::extents[2][numActions]);
-    
-    // Check if we need to update limits
-    //assert(numActions == 2);
-    
-    limits[0][0] = m_config.hopfOmegaMin;
-    limits[1][0] = m_config.hopfOmegaMax;
-    limits[0][1] = m_config.hopfMuMin;
-    limits[1][1] = m_config.hopfMuMax;
-    limits[0][2] = m_config.couplingUpMin;
-    limits[1][2] = m_config.couplingUpMax;
-    limits[0][3] = m_config.couplingDownMin;
-    limits[1][3] = m_config.couplingDownMax;
-    limits[0][4] = m_config.couplingNeMin;
-    limits[1][4] = m_config.couplingNeMax;
-    limits[0][5] = m_config.couplingSeMin;
-    limits[1][5] = m_config.couplingSeMax;
-    limits[0][6] = m_config.hopfOffsetEvenMin;
-    limits[1][6] = m_config.hopfOffsetEvenMax;
-    limits[0][7] = m_config.hopfOffsetOddMin;
-    limits[1][7] = m_config.hopfOffsetOddMax;
+  std::size_t numControllers = configData.getintvalue("numberOfControllers");
+  std::size_t numActions     = configData.getintvalue("numberOfActions");
+  
+  assert( actions.size()    == numControllers);
+  assert( actions[0].size() == numActions);
+  
+  array_2D actionsUpd(boost::extents[numControllers][numActions]);
+  
+  array_2D limits(boost::extents[2][numActions]);
+  
+  // Check if we need to update limits
+  //assert(numActions == 2);
+  
+  limits[0][0] = m_config.hopfOmegaMin;
+  limits[1][0] = m_config.hopfOmegaMax;
+  limits[0][1] = m_config.hopfMuMin;
+  limits[1][1] = m_config.hopfMuMax;
+  limits[0][2] = m_config.couplingUpMin;
+  limits[1][2] = m_config.couplingUpMax;
+  limits[0][3] = m_config.couplingDownMin;
+  limits[1][3] = m_config.couplingDownMax;
+  limits[0][4] = m_config.couplingNeMin;
+  limits[1][4] = m_config.couplingNeMax;
+  limits[0][5] = m_config.couplingSeMin;
+  limits[1][5] = m_config.couplingSeMax;
+  limits[0][6] = m_config.hopfOffsetEvenMin;
+  limits[1][6] = m_config.hopfOffsetEvenMax;
+  limits[0][7] = m_config.hopfOffsetOddMin;
+  limits[1][7] = m_config.hopfOffsetOddMax;
 
-    // This one is square
-    for( std::size_t i = 0; i < numControllers; i++)
+  // This one is square
+  for( std::size_t i = 0; i < numControllers; i++)
+  {
+    for( std::size_t j = 0; j < numActions; j++)
     {
-        for( std::size_t j = 0; j < numActions; j++)
-        {
-            actionsUpd[i][j] = ( actions[i][j] *  
-                    (limits[1][j] - limits[0][j])) + limits[0][j];
-        }
+        actionsUpd[i][j] = ( actions[i][j] * (limits[1][j] - limits[0][j])) + limits[0][j];
     }
-    return actionsUpd;
+  }
+  return actionsUpd;
 }
 
 
@@ -430,7 +445,7 @@ void HopfControllerML::setupOscillators(TensegrityModel& subject, array_2D param
     hopfOffsetEven[i] = params[i][6];
     hopfOffsetOdd[i]  = params[i][7];
     //std::cout << i << "\e[1;33m " << hopfOmega[i] << " " << hopfMu[i] << " " << coupling[i] << " " << hopfOffsetEven[i] << " " << hopfOffsetOdd[i] << "\e[0m" << std::endl;
-    }  
+  }  
 }
 
 
@@ -472,7 +487,7 @@ void HopfControllerML::initializeActuators(TensegrityModel& subject, std::string
 void HopfControllerML::onStep(TensegrityModel& subject, double dt)
 {
   m_timePassed += dt;
-  
+
   if(fabs(m_timePassed-25000*dt) < 0.0000001)
   { 
     testSynchHyp();
@@ -484,6 +499,22 @@ void HopfControllerML::onStep(TensegrityModel& subject, double dt)
 
   if(m_timePassed >= 3000*dt && m_timePassed < CONTROLLER_STOP_TIME*dt)
   {
+    steps=boost::numeric::odeint::integrate(odeTest,x,m_timePassed,m_timePassed+dt,dt);
+    /*if((int)(1000*m_timePassed)%1000==0)
+      printf("t=%.3f, x[0]=%.3f, x[1]=%.3f, x[2]=%.3f, x[3]=%.3f\nA1=%.3f (%.3f), A2=%.3f (%.3f), A3=%.3f (%.3f), A4=%.3f (%.3f)\n\n",m_timePassed+dt,x[0],x[1],x[2],x[3],1+0.5*cos(x[0]),1+0.5*cos(hopfState[0]),1+0.5*cos(x[1]),1+0.5*cos(hopfState[2]),1+0.5*cos(x[2]),1+0.5*cos(hopfState[4]),1+0.5*cos(x[3]),1+0.5*cos(hopfState[6]));
+    */
+    if(0)
+    {
+      FILE *pFile;
+      const char* fileName = "/home/tensegribuntu/projects/tg_shared/boostODEtest.csv";
+      pFile = fopen(fileName,"a");
+      if(pFile!=NULL)
+      {
+        fprintf(pFile, "%f,%f,%f,%f\n",x[0],x[1],x[2],x[3]);
+        fclose(pFile);
+      }
+    }
+  
     /*if(ctr==0)
     {
       initRestLengths=cablesWithTags[0]->getRestLength();
@@ -762,6 +793,11 @@ void HopfControllerML::hopfOscillator(TensegrityModel& subject, double dt, doubl
       //cablesWithTags[i]->setControlInput((HOPF_AMPLIFIER*bufferVar+1+offsetOdd)*((cablesWithTags[i]->getHistory()).restLengths[0]), dt);
     }
     
+    #if USEBOOSTRK
+      //std::cout << "RK" << std::endl; 
+      bufferVar = x[selectedOscillator];
+    #endif
+
     //std::cout << "Cable " << cablesWithTags[i]->getTags() << ", control: " << ((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)) << std::endl;
     cablesWithTags[i]->setControlInput(((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)), dt);
   }

@@ -53,6 +53,7 @@ class configuration;
 
 
 typedef boost::multi_array<double, 2> array_2D;
+typedef std::vector<double> state_type;
 
 
 /**
@@ -155,6 +156,8 @@ public:
   virtual void saveHistDamping();
   virtual void saveHistLastVelocities();
   virtual void saveHistTension();
+
+  //virtual void odeTest(const state_type &x, state_type &dxdt, const double t);
   
   
 protected:
