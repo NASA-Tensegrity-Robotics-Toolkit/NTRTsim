@@ -120,10 +120,9 @@ private:
   double m_timePassed;
 
   /**
-   * Need booleans for flags to retract cable (vs. return), move to next cable, or stop controller
+   * Need booleans for flags to retract cable (vs. return) and stop controller
    */
   bool m_retract;
-  bool m_next_cable;
   bool m_finished;
 
   /**

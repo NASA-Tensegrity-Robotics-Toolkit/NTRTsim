@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     // repeated here:
     double startTime = 5;
     double minLength = 0.05;
-    double rate = 0.5;
+    double rate = 1;
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("actuated_cable");
     

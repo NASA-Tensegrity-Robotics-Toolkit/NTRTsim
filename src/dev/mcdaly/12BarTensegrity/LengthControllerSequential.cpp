@@ -126,7 +126,6 @@ void LengthControllerSequential::onSetup(TensegrityModel& subject)
   }
   // Initialize flags
   m_retract = 1;  // Cable is in retract mode (rather than return mode)
-  m_next_cable = 0;  // Move to next cable
   m_finished = 0;  // Finished retracting and returning all cables
   // Initialize cable index
   m_cable_index = 0;
@@ -139,16 +138,7 @@ void LengthControllerSequential::onStep(TensegrityModel& subject, double dt)
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, if it's passed the time to start the controller,
-  if(m_timePassed > m_startTime) {
-    
-    if(m_next_cable == 1) {
-      m_next_cable == 0;
-      m_cable_index += 1;
-    }
-
-    if(m_cable_index > cablesWithTags.size()) {
-        m_finished = 1;
-    }
+  if(m_timePassed > m_startTime) {   
 
     // Retract mode
     if(m_retract == 1 && m_finished == 0) {
@@ -194,8 +184,14 @@ void LengthControllerSequential::onStep(TensegrityModel& subject, double dt)
       }
       else {
         // Cable has returned to original position; now flag to move to next cable and enter retract mode
-        m_next_cable = 1;
-        m_retract = 1;
+        //m_next_cable = 1;
+        if(m_cable_index < cablesWithTags.size()-1) {
+          m_cable_index += 1;
+          m_retract = 1;
+        }
+        else {
+          m_finished = 1;
+        }
       }
     }
   }

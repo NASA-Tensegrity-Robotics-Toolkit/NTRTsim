@@ -81,7 +81,7 @@ pair_groups:
 
   actuated_cable:
     - [n2, n10]
-    - [n6, n14]
+    #- [n6, n14]
 
 builders:
   rod:

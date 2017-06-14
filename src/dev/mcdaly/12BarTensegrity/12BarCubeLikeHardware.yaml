@@ -41,15 +41,23 @@ nodes:
   n35: [1.47, -1.47, 0]
  
   # actuation module locations
-  n36: [-1.673, 0.6932, 1.2669]
-  n37: [-1.2671, -0.6926, 1.6729]
-  n38: [1.6731, 0.6932, -1.2669]
-  n39: [1.2671, -0.6926, -1.6729]
-  n40: [0.6932, 1.6731, 1.2669]
-  n41: [-0.6926, 1.2671, 1.6729]
-  n42: [0.6932, -1.6731, -1.2669]
-  n43: [-0.6926, -1.2671, -1.6729]
-  
+  # n36: [-1.673, 0.6932, 1.2669]
+  # n37: [-1.2671, -0.6926, 1.6729]
+  # n38: [1.6731, 0.6932, -1.2669]
+  # n39: [1.2671, -0.6926, -1.6729]
+  # n40: [0.6932, 1.6731, 1.2669]
+  # n41: [-0.6926, 1.2671, 1.6729]
+  # n42: [0.6932, -1.6731, -1.2669]
+  # n43: [-0.6926, -1.2671, -1.6729]
+  n36: [-1.6054, 0.46224, 1.3346]
+  n37: [-1.3348, -0.46162, 1.6052]
+  n38: [1.6054, 0.46224, -1.3346]
+  n39: [1.3348, -0.46162, -1.6052]
+  n40: [0.46224, 1.6054, 1.3346]
+  n41: [-0.46162, 1.3348, 1.6052]
+  n42: [0.46224, -1.6054, -1.3346]
+  n43: [-0.46162, -1.3348, -1.6052]
+    
 
 pair_groups:
 
@@ -133,7 +141,9 @@ pair_groups:
 
   actuated_cable:
     - [n2, n10]
-    - [n6, n14]
+    - [n0, n5]
+    - [n16, n20]
+    - [n8, n13]
 
 
 builders:
@@ -152,7 +162,7 @@ builders:
   cable_structure:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000 #502.5 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      stiffness: 1500 #502.5 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
       #damping: 50.25 #kg/s (N-s/m) #complete guess for value
       pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
@@ -165,7 +175,7 @@ builders:
     parameters:
       width: 0.2
       height: 0.2
-      density: 1.85 #kg/dm^3
+      density: 5 #11.11 #kg/dm^3
 
   actuation_module_connectors:
     class: tgRodInfo
