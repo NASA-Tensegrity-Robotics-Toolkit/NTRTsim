@@ -195,8 +195,8 @@ int main(int argc, char** argv)
     // Configure the controlller
     // const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize, log_name);
-    // const T6RollingController::Config controllerConfig(gravity, "thrust", btVector3(250,250,0), log_name);
-    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(250,0,250), log_name);
+    const T6RollingController::Config controllerConfig(gravity, "thrust", btVector3(500,500,0), log_name);
+    // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(10,0,0), log_name);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();

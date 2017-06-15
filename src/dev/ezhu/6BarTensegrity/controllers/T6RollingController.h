@@ -207,6 +207,7 @@ private:
 	int c_path_size;
 	int controller_mode;
 	std::string c_log_name;
+	double c_gravity;
 
 	// Vector of rigid body objects
 	std::vector<btRigidBody*> rodBodies;

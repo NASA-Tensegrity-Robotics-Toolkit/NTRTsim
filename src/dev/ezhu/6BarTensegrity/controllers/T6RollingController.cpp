@@ -82,6 +82,7 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_path = config.m_path;
 	c_path_size = config.m_path_size;
 	c_log_name = config.m_log_name;
+	c_gravity = config.m_gravity;
 
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
@@ -462,17 +463,41 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				// Thruster mode
 				btVector3 CoM_pos;
 				btVector3 CoM_vel;
-
-				// for (int i = 0; i < rodBodies.size(); i++) {
-				// 	CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
-				// 	CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
-				// }
-
-				CoM_pos = payloadBody->getCenterOfMassPosition();
-				CoM_vel = payloadBody->getLinearVelocity();
+				btVector3 vel_goal;
+				btVector3 pos_goal;
+				double Tx, Ty, Tz;
+				vel_goal.setX(20);
+				vel_goal.setY(20);
+				vel_goal.setZ(0);
 
 				if (worldTime > 5 && worldTime <= 6) {
 					thrusterOn = true;
+					// pos_goal.setX(c_dr_goal.x()*(worldTime-5));
+					// pos_goal.setY(c_dr_goal.y()*(worldTime-5));
+					// pos_goal.setZ(c_dr_goal.z()*(worldTime-5));
+					pos_goal = c_dr_goal;
+
+					// for (int i = 0; i < rodBodies.size(); i++) {
+					// 	CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
+					// 	CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
+					// }
+
+					CoM_pos = payloadBody->getCenterOfMassPosition();
+					CoM_vel = payloadBody->getLinearVelocity();
+
+					// Find trajectory
+
+					// Gain matrix from LQR
+					// K = [3.162 0 0 1 0 0; 0 3.162 0 0 1 0; 0 0 3.162 0 0 1]
+
+					// Find thrusts
+					Tx = 3.162*(vel_goal.x()-CoM_vel.x())+(pos_goal.x()-CoM_pos.x());
+					Ty = 3.162*(vel_goal.y()-CoM_vel.y())+(pos_goal.y()-CoM_pos.y())+5*c_gravity;
+					Tz = 3.162*(vel_goal.z()-CoM_vel.z())+(pos_goal.z()-CoM_pos.z());
+
+					// std::cout << "x: " << CoM_pos.x() << ", y: " << CoM_pos.y() << ", z: " << CoM_pos.z() 
+					// 			<< " | Vx: " << CoM_vel.x() << ", Vy: " << CoM_vel.y() << ", Vz: " << CoM_vel.z()
+					// 			<< " | Tx: " << Tx << ", Ty: " << Ty << ", Tz: " << Tz << std::endl;
 				}
 				else {
 					thrusterOn = false;
@@ -480,12 +505,13 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				// std::cout << getRobotForce(btVector3(250,250,0)) << std::endl;
 				if (thrusterOn) {
-					payloadBody->applyCentralForce(getRobotForce(c_dr_goal));
+					payloadBody->applyCentralForce(getRobotForce(btVector3(Tx,Ty,Tz)));
+					// payloadBody->applyCentralForce(getRobotForce(c_dr_goal));
 				}
 			 
-				if (CoM_vel.norm() < 1 && worldTime > 6) {
-					exit(EXIT_SUCCESS);
-				}
+				// if (CoM_vel.norm() < 1 && worldTime > 6) {
+				// 	exit(EXIT_SUCCESS);
+				// }
 
 				// if (!isOnGround && worldTime > 6) {
 				if (worldTime > 6) {
