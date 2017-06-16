@@ -87,7 +87,8 @@ int main(int argc, char* argv[]) {
 			file_out << "XAvg, YAvg, ZAvg" << endl;
 		}
 
-		int margin = 30;
+		int margin = 35/30;
+		double yScale = 0.8;
 
 		while (file_in.good()) {
 			
@@ -153,7 +154,7 @@ int main(int argc, char* argv[]) {
 					normVect = -normVect;
 				}
 				double x_avg = (v0.x() + v1.x() + v2.x()) / 3 + margin*normVect.x();
-				double y_avg = (v0.y() + v1.y() + v2.y()) / 3 + margin*normVect.y();
+				double y_avg = (v0.y() + v1.y() + v2.y())*yScale / 3 + margin*normVect.y();
 				double z_avg = (v0.z() + v1.z() + v2.z()) / 3 + margin*normVect.z();
 				cout << x_avg << ", " << y_avg << ", " << z_avg << endl;
 				file_out << x_avg << ", " << y_avg << ", " << z_avg << endl;
