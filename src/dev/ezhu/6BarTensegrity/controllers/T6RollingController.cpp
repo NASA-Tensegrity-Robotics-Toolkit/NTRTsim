@@ -466,9 +466,6 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				btVector3 vel_goal;
 				btVector3 pos_goal;
 				double Tx, Ty, Tz;
-				vel_goal.setX(20);
-				vel_goal.setY(20);
-				vel_goal.setZ(0);
 
 				if (worldTime > 5 && worldTime <= 6) {
 					thrusterOn = true;
@@ -476,6 +473,9 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					// pos_goal.setY(c_dr_goal.y()*(worldTime-5));
 					// pos_goal.setZ(c_dr_goal.z()*(worldTime-5));
 					pos_goal = c_dr_goal;
+					vel_goal.setX(20);
+					vel_goal.setY(20);
+					vel_goal.setZ(0);
 
 					// for (int i = 0; i < rodBodies.size(); i++) {
 					// 	CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
@@ -485,15 +485,13 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					CoM_pos = payloadBody->getCenterOfMassPosition();
 					CoM_vel = payloadBody->getLinearVelocity();
 
-					// Find trajectory
-
 					// Gain matrix from LQR
 					// K = [3.162 0 0 1 0 0; 0 3.162 0 0 1 0; 0 0 3.162 0 0 1]
 
 					// Find thrusts
-					Tx = 3.162*(vel_goal.x()-CoM_vel.x())+(pos_goal.x()-CoM_pos.x());
-					Ty = 3.162*(vel_goal.y()-CoM_vel.y())+(pos_goal.y()-CoM_pos.y())+5*c_gravity;
-					Tz = 3.162*(vel_goal.z()-CoM_vel.z())+(pos_goal.z()-CoM_pos.z());
+					Tx = 3.317*(vel_goal.x()-CoM_vel.x())+1.0*(pos_goal.x()-CoM_pos.x());
+					Ty = 3.317*(vel_goal.y()-CoM_vel.y())+1.0*(pos_goal.y()-CoM_pos.y())+5.0*c_gravity;
+					Tz = 3.892*(vel_goal.z()-CoM_vel.z())+1.414*(pos_goal.z()-CoM_pos.z());
 
 					// std::cout << "x: " << CoM_pos.x() << ", y: " << CoM_pos.y() << ", z: " << CoM_pos.z() 
 					// 			<< " | Vx: " << CoM_vel.x() << ", Vy: " << CoM_vel.y() << ", Vz: " << CoM_vel.z()
@@ -505,8 +503,13 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				// std::cout << getRobotForce(btVector3(250,250,0)) << std::endl;
 				if (thrusterOn) {
-					payloadBody->applyCentralForce(getRobotForce(btVector3(Tx,Ty,Tz)));
-					// payloadBody->applyCentralForce(getRobotForce(c_dr_goal));
+					btVector3 robotForce;
+					// robotForce = getRobotForce(c_dr_goal, payloadBody);
+					robotForce = getRobotForce(btVector3(Tx,Ty,Tz), payloadBody);
+					payloadBody->applyCentralForce(robotForce);
+					// for (int i = 0; i < rodBodies.size(); i++) {
+					// 	rodBodies[i]->applyCentralForce(getRobotForce(c_dr_goal, rodBodies[i]));
+					// }
 				}
 			 
 				// if (CoM_vel.norm() < 1 && worldTime > 6) {
@@ -682,9 +685,9 @@ btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld)
 	return dirVectRobot;
 }
 
-btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld) 
+btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld, btRigidBody* body) 
 {
-	btTransform worldTrans = payloadBody->getWorldTransform();
+	btTransform worldTrans = body->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
 	// The basis of getWorldTransform() returns the rotation matrix from robot frame
 	// to world frame. Invert this matrix to go from world to robot frame

@@ -127,7 +127,7 @@ public:
 	 * @param[in] forceVectWorld - The force vector in world frame to be found in robot frame
 	 * @return The force vector in the robot frame
 	 */
-	btVector3 getRobotForce(btVector3 forceVectWorld);
+	btVector3 getRobotForce(btVector3 forceVectWorld, btRigidBody* body);
 
 	/**
 	 * Check to see if the robot is in contact with the ground
