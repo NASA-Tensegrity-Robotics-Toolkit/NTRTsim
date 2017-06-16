@@ -63,10 +63,10 @@ public:
 	struct Config
 	{
 	public:
-		// Overloaded Config function for two controller modes
+		// Overloaded Config function for multiple controller modes
 		Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name);
-		Config (double gravity, const std::string& mode, btVector3 dr_goal);
-		Config (double gravity, const std::string& mode, int *path, int pathSize);
+		Config (double gravity, const std::string& mode, btVector3 dr_goal, const std::string& log_name);
+		Config (double gravity, const std::string& mode, int *path, int pathSize, const std::string& log_name);
 
 		double m_gravity;
 
@@ -127,7 +127,7 @@ public:
 	 * @param[in] forceVectWorld - The force vector in world frame to be found in robot frame
 	 * @return The force vector in the robot frame
 	 */
-	btVector3 getRobotForce(btVector3 forceVectWorld);
+	btVector3 getRobotForce(btVector3 forceVectWorld, btRigidBody* body);
 
 	/**
 	 * Check to see if the robot is in contact with the ground
@@ -207,6 +207,7 @@ private:
 	int c_path_size;
 	int controller_mode;
 	std::string c_log_name;
+	double c_gravity;
 
 	// Vector of rigid body objects
 	std::vector<btRigidBody*> rodBodies;

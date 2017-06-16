@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 
     // 0.26 rad ~= 15 deg
     
+    // ---------------------------------------------------------------------------------
     // Import Ground
     // ---------------------------------------------------------------------------------
     // Set ground parameters
@@ -114,28 +115,56 @@ int main(int argc, char** argv)
     //     std::cout << "Input file opened successfully" << std::endl;
     // }
     // tgImportGround* ground = new tgImportGround(groundConfig, file_in);
-    // ---------------------------------------------------------------------------------
-
-    // Initial yaw
-    int psi = atoi(argv[1]);
-    // Initial pitch 
-    int theta = atoi(argv[2]);
-    // Initial roll
-    int phi = atoi(argv[3]);
     
-    // File to write to
-    std::string log_name = argv[4];
-
-    std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
-    std::cout << "Writing to file: " << log_name << std::endl;
-
+    // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     tgBoxGround* ground = new tgBoxGround(groundConfig);
-    // ---------------------------------------------------------------------------------
-
     
+    // ---------------------------------------------------------------------------------
+    // Parse input arguments
+    // ---------------------------------------------------------------------------------
+    int psi, theta, phi;
+    std::string log_name;
+
+    if (argc == 2) {
+        psi = 0;
+        theta = 0;
+        phi = 0;
+        log_name = argv[1];
+    }
+    else if (argc == 4) {
+        // Initial yaw
+        psi = atoi(argv[1]);
+        // Initial pitch 
+        theta = atoi(argv[2]);
+        // Initial roll
+        phi = atoi(argv[3]);
+    }
+    else if (argc == 5) {
+        // Initial yaw
+        psi = atoi(argv[1]);
+        // Initial pitch 
+        theta = atoi(argv[2]);
+        // Initial roll
+        phi = atoi(argv[3]);
+        // File to write to
+        log_name = argv[4];
+    }
+    else {
+        psi = 0;
+        theta = 0;
+        phi = 0;
+    }
+    std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
+    if (!log_name.empty()) {
+        std::cout << "Writing to file: " << log_name << std::endl;
+    }
+    else {
+        std::cout << "No log file specified, data will not be logged" << std::endl;
+    }
+
     // double gravity = 9.81*sf;
     double gravity = 1.62*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
@@ -164,8 +193,10 @@ int main(int argc, char** argv)
     pathPtr = path;
 
     // Configure the controlller
-    const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
-    // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize);
+    // const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
+    // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize, log_name);
+    const T6RollingController::Config controllerConfig(gravity, "thrust", btVector3(250,250,0), log_name);
+    // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(10,0,0), log_name);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
