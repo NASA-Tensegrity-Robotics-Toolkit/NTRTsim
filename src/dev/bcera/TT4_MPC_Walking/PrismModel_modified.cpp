@@ -51,12 +51,12 @@ namespace
     double targetVelocity;
   } c =
     {
-      //Option 1: TT3 Parameters
-      2990/pow(sf,3),    // density (kg / length^3) [calculated so 6 rods = 1.5 kg]
-      .0127/2*sf,          // radius (length)
-      550,//300,//500.0,//300.0,           // stiffness (kg / sec^2) was 1500
+      //Option 1: TT4 Parameters
+      888.1/pow(sf,3),    // density (kg / length^3) [calculated so each rod = 0.45 kg]
+      .0254/2*sf,          // radius (length)
+      515,             //stiffness (kg / sec^2) was 1500
       20.0,            // damping (kg / sec)
-      0.66*sf,         // rod_length (length)
+      1.0*sf,         // rod_length (length)
       1.0,             // friction (unitless)
       0.01,             // rollFriction (unitless)
       0.0,              // restitution (?)
@@ -64,22 +64,6 @@ namespace
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
       0.10*sf,//0.15*sf,          // targetVelocity (m/s)
-      
-      /*
-      //Option 2: Superball Parameters
-      688/pow(sf,3),    // density (kg / length^3)
-      .031*sf,          // radius (length)
-      3500.0,           // stiffness (kg / sec^2) was 1500
-      200.0,            // damping (kg / sec)
-      1.615*sf,         // rod_length (length)
-      0.99,             // friction (unitless)
-      0.01,             // rollFriction (unitless)
-      0.0,              // restitution (?)
-      300.0*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
-      0,                // History logging (boolean)
-      10000*sf,         // maxTens (kg-m/s^2)
-      0.5*sf,          // targetVelocity (m/s) 
-      */
     };
 } // namespace
 
@@ -195,13 +179,6 @@ PrismModel::~PrismModel()
 {
 }
 
-void PrismModel::addRobot(tgStructure& s, int& offset, double tankToOuterRing){
-  addNodes(s,offset,tankToOuterRing);
-  addRods(s,offset);
-  addActuators(s,offset);
-  offset += 12;
-}
-
 void PrismModel::setup(tgWorld& world)
 {
 
@@ -216,17 +193,9 @@ void PrismModel::setup(tgWorld& world)
   double externalRadius = 0.035*sf;//0.03*sf;//0.055*sf; 
   double tankToOuterRing = 0.03*sf;
   double payloadLength = 0.05*sf;
-  /*
-  //Option 2: Superball Parameters
-  double tankRadius = 0.1*sf;
-  double internalRadius = 0.06*sf;
-  double externalRadius = 0.1*sf; 
-  double tankToOuterRing = 0.1*sf;
-  double payloadLength = 0.1*sf;
-  */
   
   // Define the configurations of the rods and strings
-  // Note that pretension is defined for this string
+  
   const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
   const tgRod::Config tankConfig(tankRadius, 21645/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
@@ -239,6 +208,8 @@ void PrismModel::setup(tgWorld& world)
 				   c.rollFriction, c.restitution);
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
+
+  // Note that pretension is defined for this string
   tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
@@ -260,7 +231,7 @@ void PrismModel::setup(tgWorld& world)
   addRobot(s,globalOffset,tankToOuterRing+externalRadius);
 
   //rotate robot to sit on a specified face
-  btQuaternion rotation = rotateToFace(s, 5);
+  btQuaternion rotation = rotateToFace(s, 10);
   rotateNormVectors(rotation);
 
   double* COM = returnCOM(s,beforeRobot,12);
@@ -268,7 +239,9 @@ void PrismModel::setup(tgWorld& world)
   std::cout << "COM: " << *COM << " " << *(COM+1) << " " << *(COM+2) << std::endl;
   //*/
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
+  //Payload Constructor Functions /////////////////////////////////////////////////////////////////
+  /*
   //GIMBAL
   int gimbalStart = globalOffset; //Save the node position before adding the gimbal
   addRing(s,externalRadius,nPtsExtRing,globalOffset);
@@ -291,24 +264,15 @@ void PrismModel::setup(tgWorld& world)
   std::cout << "After Thruster: " << globalOffset << std::endl;
   
   //Inner Payload Strings
-  //**If you comment out the robot constructor above, also comment out this string constructor below to avoid segfault error
+  //**If you comment out the robot constructor above, also comment out this string constructor to avoid segfault error
   addStrings(s,baseStartLink,beforeRobot); 
+  */
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
+  
   //move robot above ground 
   s.move(btVector3(0, c.rod_length/1.5, 0));
 
-  //s.move(btVector3(10*sf,  -225*sf, -10*sf));
-  
-  //scaled 1000/63
-  //s.move(btVector3(10*sf, -90*sf, -10*sf));
-
-  //s.move(btVector3(10*sf, -42*sf, -900*sf));
-
-  //scaled 1000/50
-
-  //s.move(btVector3(20*sf*63/62.5, -132*sf*63/62.5, -910*sf*63/62.5));
-
-  
   
   // Create the build spec that uses tags to turn the structure into a real model
   tgBuildSpec spec;
@@ -336,7 +300,7 @@ void PrismModel::setup(tgWorld& world)
     allRods[i]->getPRigidBody()->getCollisionShape()->setMargin(marg);
   }
 
-  // Get the actuators for controller
+  // Get the actuators for any controllers
   std::vector<tgBasicActuator*> actuators = PrismModel::find<tgBasicActuator>("muscle");
   std::vector<tgBasicActuator*> innerCables = PrismModel::find<tgBasicActuator>("string");
   for (int i = 0; i < actuators.size(); i++) {
@@ -347,6 +311,8 @@ void PrismModel::setup(tgWorld& world)
     allCables.push_back(PrismModel::find<tgBasicActuator>(tgString("string num", i))[0]);
   }
 
+  //Comment out below if not using inner-payload
+  /*
   //Get linking rods
   std::vector<tgRod *> linkingRods = find<tgRod>("link");
   std::cout << "[ ] -> There are " << linkingRods.size() << " links" << std::endl;
@@ -389,10 +355,12 @@ void PrismModel::setup(tgWorld& world)
   btVector3 pos = btVector3(0,0,7);
   abstractMarker thrust_dir=abstractMarker(thrusterRigidBody,pos,btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
   //this->addMarker(thrust_dir); //removed marker for now, for videos
+  */
+
   
   // Get the rod rigid bodies for controller
+  int thrusterNode = globalOffset; //un-comment if not using inner-payload
   allRods = PrismModel::find<tgRod>("rod");
-  
   btRigidBody* rodBody = allRods[0]->getPRigidBody();
   abstractMarker NODE0 = abstractMarker(rodBody,btVector3(0,-c.rod_length/2,0),btVector3(1,0,.0),thrusterNode); // body, position, color, node number
   btRigidBody* rodBody0 = allRods[3]->getPRigidBody();
@@ -422,15 +390,17 @@ void PrismModel::setup(tgWorld& world)
       markers.push_back(LOG_NODE_2);
     }
 
+    /*
     abstractMarker LOG_NODE_1 = abstractMarker(tankRigidBody,btVector3(0,payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
     abstractMarker LOG_NODE_2 = abstractMarker(tankRigidBody,btVector3(0,-payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
     this->addMarker(LOG_NODE_1);
     this->addMarker(LOG_NODE_2);
     markers.push_back(LOG_NODE_1);
     markers.push_back(LOG_NODE_2);
+    */
       
     //Open log file
-    sim_out.open("Marker Node Positions");
+    //sim_out.open("Marker Node Positions");
   }
       
   
@@ -472,6 +442,13 @@ void PrismModel::onVisit(tgModelVisitor& r)
   tgModel::onVisit(r);
 }
 
+void PrismModel::addRobot(tgStructure& s, int& offset, double tankToOuterRing){
+  addNodes(s,offset,tankToOuterRing);
+  addRods(s,offset);
+  addActuators(s,offset);
+  offset += 12;
+}
+
 std::vector<tgBasicActuator*>& PrismModel::getAllActuators()
 {
   return allActuators;
@@ -483,10 +460,10 @@ std::vector<tgBasicActuator*>& PrismModel::getAllCables()
 }
 
 /*
-std::vector<abstractMarker> PrismModel::getAllMarkers()
-{
+  std::vector<abstractMarker> PrismModel::getAllMarkers()
+  {
   return markers;
-}
+  }
 */
 
 std::vector<tgRod*>& PrismModel::getAllRods()

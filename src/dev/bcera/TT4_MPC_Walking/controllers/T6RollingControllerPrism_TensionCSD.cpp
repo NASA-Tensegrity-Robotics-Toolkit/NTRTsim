@@ -19,17 +19,15 @@
 /**
  * @file T6RollingControllerPrism.cpp
  * @brief Implementation of the rolling controller.
- * @author Brian Cera adapted from code by Edward Zhu
+ * @author Brian Cera
  * @version 1.0.0
  * $Id$
  */
 
 // This module
 #include "T6RollingControllerPrism.h"
-#include "core/abstractMarker.h" 
 // The C++ Standard Library
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <cassert>
 #include <algorithm>
@@ -51,15 +49,12 @@ namespace{
   double sf = 30;
   double worldTime = 0;
   //Matrices holding input weights and hidden layer weights of Neural Net for CSD
-  matrix<double> IW(5,6);
+  matrix<double> IW(5,30);
   matrix<double> LW(20,5);
   vector<double> b1(5);
   vector<double> b2(20);
-  vector<double> xmin(6);
-  vector<double> xmax(6);
-  matrix<double> RL_mat(20*3,24);
-  matrix<int> F_mat(20,3);
-  
+  vector<double> xmin(30);
+  vector<double> xmax(30);
 }
 
 T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, int activate_flag, int transfer_flag) : 
@@ -286,66 +281,44 @@ void T6RollingController::onSetup(PrismModel& subject)
   actuationPolicy.push_back(node19AP);
 
   //NN Input Layer Weights
-  IW <<= -1.0839, -6.6742, 0.5020, 3.1374, -7.6381, 0.8438,
-    -0.2434, -0.2833, 2.6288, 3.5690, -5.2973, -6.0553,
-    2.0625, -0.0911, -4.0092, -2.4250, -2.7149, 2.2461,
-    4.6154, 0.6760, -1.4432, 3.0841, -1.2598, 1.2244,
-    4.1456, 2.5755, -1.3991, 0.4580, 1.1665, -6.4988;
+  IW <<= -0.0900, -4.3071,  3.0105,  2.2910, -1.4135,  1.7842,  0.9729, -1.0162, -2.3312,  3.9787, -2.3286, -2.2943, 2.0611, -1.8478, -1.1120,  2.2290, -6.2963,  3.4483,  0.0287,  4.0974, -1.5081,  5.0330, -4.5079,  1.6974,  -0.5339, -2.0303, -1.3596,  1.6605, -1.2871,  3.2154,
+    -2.3317,  1.0893,  0.5751,  1.7527,  4.0865, -1.5453, -0.4208,  0.8711,  0.6395, -3.8743,  0.5718, -1.1568,  -0.4362,  0.6756, -1.5242,  1.0454,  2.0725, -1.7961, -1.8978, -0.2933, -0.1167, -1.3715,  2.7237,  0.5327,  -2.3011, -3.6427,  1.1520,  5.5547, -3.0727, -0.9998,
+    2.6823,  0.3441, -1.4455, -1.7607, -3.8532, -2.4197,  2.8178,  5.0709, -6.2473,  0.8890,  3.3928,  2.9802,   4.7824,  0.0173, -4.1874, -2.4252, -2.0753,  0.2767, -4.2299,  0.9031, -1.3604,  2.4131, -2.9775,  1.7007,   2.6190, -0.9269, -0.1171,  0.8053,  0.4182, -3.2389,
+    0.0823, -2.1341,  0.2801,  1.1354,  0.8753,  1.3371, -0.4302, -1.4246,  0.3320,  0.6944, -2.2284, -1.0550,  -0.5689, -2.5760,  0.8560, -0.8985,  0.2122, -0.3942,  2.9002,  3.2656, -0.6282,  0.2193, -3.4972,  1.1520,   4.7782, -2.5257,  1.1299,  0.2408, -0.7663, -2.9942,
+    -1.9252, -1.1108, -1.3321,  0.8915,  1.5137, -0.9483,  0.2245, -1.0994, -0.1608,  1.1123, -0.4677, -0.6490,   1.3063, -1.3451,  1.7572, -1.2268, -0.7281, -0.5935, -0.3906, -1.0843, -1.2404,  1.1357, -0.8697,  1.4066,   1.7468,  4.9277, -4.3195, -5.3445,  3.9627,  0.9176;
 
   //NN Hidden Layer Weights
-  LW <<= 5.1837, 9.0885, 18.2413, -9.4545, -2.8966,
-    0.3232, 4.9520, 0.0261, -11.3385, 12.1297,
-    -0.8560, 5.5827, -13.2629, -13.2917, 0.1038,
-    0.1052, 16.6282, 1.0384, -6.3818, -21.9200,
-    19.4281, -3.5132, 6.2469, -2.2053, -6.1742,
-    -1.5008, -3.4427, 7.3358, -3.9269, -14.7209,
-    -6.8752, -6.5257, -8.2377, -10.0271, -4.2101,
-    10.0271, -16.5941, -7.8216, -4.7950, -0.0937,
-    -10.8409, -5.7857, 2.6632, -7.3001, 13.3635,
-    -13.5390, -6.0814, 1.4624, 6.9256, -7.6022,
-    -2.8084, -7.8460, -10.2098, 11.3693, 2.7434,
-    -6.9309, 6.0847, -5.5783, 6.4967, 8.4519,
-    -1.3169, -7.6164, 7.3237, 17.8512, 3.7860,
-    -6.2791, 7.1690, 10.3343, 3.6462, 7.1475,
-    10.1791, 5.8937, 8.1198, 8.1822, 5.7124,
-    8.6480, 4.1059, -5.0058, 22.9220, 1.1854,
-    5.4086, -7.0375, 7.4380, -7.2575, 7.9569,
-    2.7611, 1.9095, -14.5947, -0.8900, 14.5451,
-    5.7304, 0.9587, -10.3635, 8.1787, -12.0539,
-    -19.7845, 1.4347, 6.4313, -11.3304, -3.7136;
+  LW <<= 6.2652,  9.8036, -2.8482, -1.4381,  5.3480,
+    12.9771, -0.9058, -2.2795, -6.0467,  2.7570,
+    3.6564,  -10.3262, -3.6167, -9.2346,  0.0705,
+    -5.6759,  4.8883, -2.2322, -7.4645,  4.2831,
+    7.6581,  4.3781, -1.7466, -6.7802, -4.8744,
+    7.4293,  2.0889, -6.5826,  3.7108, -5.0694,
+    -4.6443,  1.8263, -5.1715,  6.9626, -5.4681,
+    -4.0533,  4.2306, -3.9364, -5.5318, -5.9624,
+    5.6717,  6.7749,  8.8278,  1.3086,  5.2270,
+    -4.8173,  7.2742,  5.3860,  1.6917, -3.8687,
+    -3.0710,  2.4236,  4.5821,  5.7633,  6.8215,
+    -7.4044, -7.5922, -3.8519,  8.1803, -0.0880,
+    7.7459, -4.9779,  6.8104,  5.3859,  2.1177,
+    -3.3525, -9.6685,  7.2268, 11.2361, -2.8550,
+    -0.9606, -5.9247,  9.6882, -1.7257,  2.1337,
+    -10.4780, -3.5940,  3.2617,  -10.4446,  0.1822,
+    -3.9559,  7.3024, -5.7163,  4.2677,  4.1510,
+    -9.0104, -6.7472, -8.4564, -9.4606, -1.8905,
+    2.0383, -3.3739, -6.5875,  3.0214,  4.5698,
+    4.8374,  4.7222,  5.3176,  3.5085, -4.7419;
 
   //NN Hidden Layer Bias
-  b1 <<= 0.9161, -0.3382, 0.2771, -1.3921, 1.1182;
+  b1 <<= 1.1699, 0.3070, -3.0133, 1.2588, 4.3232;
 
   //NN Output Layer Bias
-  b2 <<= -4.1912, -0.5331, -1.7284, -3.3501, 0.4975, -0.2921, 1.4950, -1.0537, -0.2524, 3.2582, 2.2640, 3.1393, -0.1171, 2.2229, 1.7639, -1.1248, 1.9382, -3.8833, 6.8564, -3.8161;
+  b2 <<= 1.1279, -0.9207, -0.1177, -0.1238, 1.4275, -1.8101, -0.5715, 1.2551, -0.8540, -0.4329, 0.4045, -0.4775, 0.8823, -1.6410, 2.5553, -0.5962, -2.0011, -3.7460, 4.1198, 0.9037;
 
   //x-minimum for MAPMINMAX transformation
-  xmin <<= 0.1566, 0.1312, 0.1290, 0.0975, 0.1496, 0.1230;
+  xmin <<= 0.4957, 0, 4.8463, 5.3856, 6.7296, 9.3213, 5.4551, 7.2807, 0.5809, 0, 1.3513, 7.0160, 7.1338, 9.0076, 0, 8.6255, 0.4222, 0, 7.3128, 5.3947, 0, 0.9255, 5.3745, 6.7113, 0, 0, 0, 0, 0, 0;
 
-  xmax <<= 3.0654, 3.0008, 3.0366, 3.0209, 3.0103, 3.0064;
-
-  std::ifstream file ( "RL_mat.csv" );
-  std::string value;
-  for(size_t i=0; i<20*3; i++){
-    for(size_t j=0; j<24; j++){
-      getline(file,value,',');
-      //std::cout<<value<<std::endl;
-      RL_mat(i,j) = std::atof(value.c_str());
-    }
-  }
-
-  
-  std::ifstream file2 ( "F_mat.csv" );
-  std::string value2;
-  for(size_t i=0; i<20; i++){
-    for(size_t j=0; j<3; j++){
-      getline(file2,value2,',');
-      std::cout<<value2<<std::endl;
-      F_mat(i,j) = (int)std::atof(value2.c_str());
-    }
-  }
-  
+  xmax <<= 27.2279, 23.6227, 25.5617, 25.0061, 32.6345, 37.2075, 21.9490, 24.3473, 26.9051, 23.7109, 25.3731, 32.2735, 32.7834, 37.1189, 22.2797, 36.7997, 26.1134, 22.6594, 36.8031, 32.4738, 22.0921, 25.2192, 33.0234, 37.4411, 22.4476, 22.5414, 16.1621, 21.7256, 21.9614, 22.2539;
 
 }
 
@@ -358,33 +331,8 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   if (dt <= 0.0) {
     throw std::invalid_argument("onStep: dt is not positive");
   }
-  /*
-  std::ifstream file ( "test.csv" );
-  std::string value;
-  matrix <double> test(3,3);
-  for(size_t i=0; i<3; i++){
-    for(size_t j=0; j<3; j++){
-      getline(file,value,',');
-      test(i,j) = std::atof(value.c_str());
-    }
-  }
-  */
-
-  /*
-  std::cout << "Full Mat: " << std::endl;
-  for(size_t i=0; i<20; i++){
-    for(size_t j=0; j<3; j++)
-      std::cout << F_mat(i,j) << ",";
-    std::cout << std::endl;
-  }
-  */
-  
-  
-  //std::cout << std::endl;
-  
   //int number;
   //std::cin >> number;
-  
   float step1[24] = {0.2630,0.4828,0.4828,0.3840,0.4360,0.3446,0.2630,0.3223,0.4066,0.3502,0.3395,0.4828,0.2630,0.4828,0.4006,0.2630,0.4828,0.4358,0.2630,0.2630,0.4026,0.4051,0.2630,0.4828};
   float step2[24] = {0.3839,0.3787,0.4139,0.3418,0.3319,0.4139,0.3319,0.4044,0.3319,0.4139,0.3542,0.4139,0.3836,0.3975,0.4044,0.3319,0.4139,0.3319,0.3840,0.3789,0.4139,0.4139,0.3319,0.3936};
   float step3[24] = {0.4343,0.4111,0.4228,0.4369,0.2569,0.4889,0.3446,0.3434,0.4889,0.4293,0.2569,0.2569,0.2569,0.2569,0.4889,0.4889,0.3184,0.4180,0.3023,0.3966,0.2569,0.4889,0.4889,0.2569};
@@ -449,46 +397,12 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
     std::copy(step12, step12+24, sequence);
     break;
   }
-  
-
-  /*
-  std::cout << "RL: " << std::endl;
-  for(size_t i=0; i<24; i++){
-    std::cout << RL_mat((currFace+1)*3-3,i) << ", ";
-  }
-  */
-
-  if(priorFace==currFace)
-    idleCount++;
-  else{
-    idleCount = 0;
-    priorFace = currFace;
-  }
-  std::cout<<"idleCount: "<<idleCount<<std::endl;
-  
-  //if(priorFace!=currFace){
-    double min_x = 1e7;
-    for(int i=0;i<3;i++){
-      double curr_x = subject.markers[F_mat(currFace,i)].getWorldPosition().z();
-      if(curr_x<min_x){
-	min_x = curr_x;
-	min_idx = i;
-      }
-      std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
-      //std::cout<<subject.markers[0].getWorldPosition().x()<<std::endl;
-    }
-    //  priorFace = currFace;
-    //}
-    
-    
-  std::cout << "min_idx: " << min_idx << std::endl;
   for(int i=0;i<24;i++){
-    m_controllers[i]->control(dt,RL_mat((currFace)*3+0,i)*sf); //scale by scaling factor here
-    //m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
+    m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
     //std::cout << "Current Control: " << sequence[i]*sf << ", ";
     //std::cout << "Start Length: " << startLength << std::endl;
     //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
-    actuators[i]->moveMotors(dt);
+    //actuators[i]->moveMotors(dt);
   }
   //std::cout << "Roll Case: " << roll_case << std::endl;
   //std::cout << "WorldTime: " << worldTime << std::endl;
@@ -507,7 +421,7 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   
   
 
-  if(fmod(worldTime,2)<=dt){
+  if(fmod(worldTime,0.01)<=dt){
     currFace = contactSurfaceDetection(currFace);
     std::cout << "Curr Face: " << currFace << std::endl;
     int mat_currFace = currFace + 1; //matlab 1-index
@@ -558,28 +472,16 @@ bool T6RollingController::checkOnGround()
 
 int T6RollingController::contactSurfaceDetection(int prevFace)
 {
-  /*
+  vector<double> faceInput(30);
   std::cout << "Cable Tensions: " << std::endl;
   for(size_t i=0; i<cables.size() ; i++){
     std::cout << cables[i]->getTension()/sf << ", ";
+    faceInput(i) = cables[i]->getTension()/sf;
   }
   std::cout << std::endl;
-  */
-  
-  // Initialize vector of phi angles (angles between rod directions and +Y axis)
-  vector<double> faceInput(6);
-  //rods
-  for(size_t i=0; i<6; i++){
-    btTransform worldTrans = rodBodies[i]->getWorldTransform();
-    btMatrix3x3 robot2world = worldTrans.getBasis();
-    btVector3 rodDir = robot2world*btVector3(0,1,0);
-    double angle = rodDir.angle(btVector3(0,1,0));
-    //std::cout << angle << std::endl;
-    faceInput(i) = angle;
-  }
     
-  vector<double> ones(6);
-  ones <<= 1, 1, 1, 1, 1, 1;
+  vector<double> ones(30);
+  ones <<= 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
   faceInput = element_div(2*(faceInput-xmin),xmax-xmin)-ones;
   /*
   for(size_t i=0; i<faceInput.size() ; i++){
@@ -646,7 +548,6 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     std::cout << outputLayer(i) << ", ";
   }
   std::cout << std::endl;
-  /*
   int currSurface = prevFace;
   double threshold = 0.05;
   int otherMax = -1;
@@ -655,14 +556,6 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     if((otherMax==-1||outputLayer(i)>outputLayer(otherMax)) && outputLayer(i)>=threshold && i!=prevFace){
       currSurface = i;
       otherMax = i;
-    }
-  }
-  */
-  double threshold = 0.99;
-  currSurface = prevFace;
-  for(int i=0; i<outputLayer.size(); i++){
-    if((outputLayer(i)>outputLayer(currSurface)) && outputLayer(i)>=threshold){
-      currSurface = i;
     }
   }
   std::cout << "Contact Surface: Face " << currSurface+1 << " with Probability " << outputLayer(currSurface) << std::endl;
@@ -874,7 +767,7 @@ bool T6RollingController::stepToFace(double dt)
 				// Check if the robot has reached the next closed face
 				if (currFace != path[2]) {
 					m_controllers[cableToActuate]->control(dt, controlLength);
-					//actuators[cableToActuate]->moveMotors(dt);
+					actuators[cableToActuate]->moveMotors(dt);
 					// std::cout << "stepToFace: (Closed -> Closed) Stepping..." << std::endl;
 					resetCounter++;
 					if (resetCounter > 3.0/dt) resetFlag = true;
@@ -901,7 +794,7 @@ bool T6RollingController::stepToFace(double dt)
 				// Check to see if robot has reached a closed face
 				if (!isClosedFace(currFace)) {
 					m_controllers[cableToActuate]->control(dt, controlLength);
-					//actuators[cableToActuate]->moveMotors(dt);
+					actuators[cableToActuate]->moveMotors(dt);
 					// std::cout << "stepToFace: (Open -> Closed) Stepping..." << std::endl;
 					resetCounter++;
 					if (resetCounter > 3.0/dt) resetFlag = true;

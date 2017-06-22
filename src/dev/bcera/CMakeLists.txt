@@ -11,6 +11,7 @@ V3_V4
 OLD_TT3_payload_thruster
 TT_Mini_Inclined_Walking
 TT3_MPC_Walking
+TT4_MPC_Walking
 )
 	
  add_executable(AppWorkspace

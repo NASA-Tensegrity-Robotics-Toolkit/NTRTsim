@@ -112,7 +112,7 @@ int main(int argc, char** argv)
   */
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
-  double gravity = 1.618*sf; //moon gravity
+  double gravity =  9.81*sf; //moon gravity
   const tgWorld::Config config(gravity); 
   tgWorld world(config, ground);
 
