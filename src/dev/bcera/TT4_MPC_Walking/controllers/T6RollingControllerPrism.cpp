@@ -56,18 +56,33 @@ namespace{
   double worldTime = 0;
   
   //Matrices holding input weights and hidden layer weights of Neural Net for CSD
-  matrix<double> FaceSide_IW(20,12);
-  matrix<double> FaceSide_LW1(20,20);
-  matrix<double> FaceSide_LW2(23,20);
-  vector<double> FaceSide_b1(20);
-  vector<double> FaceSide_b2(20);
-  vector<double> FaceSide_b3(23);
-  vector<double> FaceSide_input_xmin(12);
-  vector<double> FaceSide_input_xmax(12);
-  vector<double> FaceSide_output_xmin(23);
-  vector<double> FaceSide_output_xmax(23);
+  matrix<double> Face_IW(20,11);
+  matrix<double> Face_LW1(20,20);
+  //matrix<double> Face_LW2(23,20);
+  vector<double> Face_b1(20);
+  vector<double> Face_b2(20);
+  //vector<double> Face_b3(23);
+  vector<double> Face_input_xmin(11);
+  vector<double> Face_input_xmax(11);
+  //vector<double> Face_output_xmin(23);
+  //vector<double> Face_output_xmax(23);
 
   //Matrices holding Neural Net weights for cable actuation
+  matrix<double> Cable_IW(30,34);
+  matrix<double> Cable_LW1(30,30);
+  matrix<double> Cable_LW2(30,30);
+  matrix<double> Cable_LW3(30,30);
+  matrix<double> Cable_LW4(24,30);
+  vector<double> Cable_b1(30);
+  vector<double> Cable_b2(30);
+  vector<double> Cable_b3(30);
+  vector<double> Cable_b4(30);
+  vector<double> Cable_b5(24);
+  vector<double> Cable_input_xmin(34);
+  vector<double> Cable_input_xmax(34);
+  vector<double> Cable_output_xmin(24);
+  vector<double> Cable_output_xmax(24);
+  
   matrix<double> RL_mat(20*3,24);
 
   //Matrix of Nodes for each Face 
@@ -190,126 +205,274 @@ void T6RollingController::onSetup(PrismModel& subject)
   restLength = actuators[0]->getRestLength();
   startLength = actuators[0]->getStartLength();
 
-  //NN Input Layer Weights
-  std::ifstream file1 ( "FaceSide_IW.csv" );
-  std::string value1;
+
+  // IMPORT NEURAL NET WEIGHT DATA FROM CSV FILES //////////////////////////////////////////
+
+  std::ifstream file;// ( "Face_IW.csv" );
+  std::string value;
+
+  // CSD NEURAL NET WEIGHTS /////////////////////////////////////////////////////////////
+  //NN Input Layer Weights 
+  file.open( "Face_IW.csv" );
   for(size_t i=0; i<20; i++){
-    for(size_t j=0; j<12; j++){
-      getline(file1,value1,',');
+    for(size_t j=0; j<11; j++){
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_IW(i,j) = std::atof(value1.c_str());
+      Face_IW(i,j) = std::atof(value.c_str());
     }
   }
+  file.close();
+  
 
   //NN Hidden Layer 1 Weights
-  std::ifstream file2 ( "FaceSide_LW1.csv" );
-  std::string value2;
+  file.open( "Face_LW1.csv" );
   for(size_t i=0; i<20; i++){
     for(size_t j=0; j<20; j++){
-      getline(file2,value2,',');
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_LW1(i,j) = std::atof(value2.c_str());
+      Face_LW1(i,j) = std::atof(value.c_str());
     }
   }
+  file.close();
 
+  /*
   //NN Hidden Layer 2 Weights
-  std::ifstream file3 ( "FaceSide_LW2.csv" );
+  std::ifstream file3 ( "Face_LW2.csv" );
   std::string value3;
   for(size_t i=0; i<23; i++){
     for(size_t j=0; j<20; j++){
       getline(file3,value3,',');
       //std::cout<<value<<std::endl;
-      FaceSide_LW2(i,j) = std::atof(value3.c_str());
+      Face_LW2(i,j) = std::atof(value3.c_str());
     }
   }
+  */
 
   //NN Hidden Layer 1 Bias
-  std::ifstream file4 ( "FaceSide_b1.csv" );
-  std::string value4;
+  file.open( "Face_b1.csv" );
   for(size_t i=0; i<20; i++){
-      getline(file4,value4,',');
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_b1(i) = std::atof(value4.c_str());
+      Face_b1(i) = std::atof(value.c_str());
   }
-
+  file.close();
+  
   //NN Hidden Layer 2 Bias
-  std::ifstream file5 ( "FaceSide_b2.csv" );
-  std::string value5;
+  file.open( "Face_b2.csv" );
   for(size_t i=0; i<20; i++){
-      getline(file5,value5,',');
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_b2(i) = std::atof(value5.c_str());
+      Face_b2(i) = std::atof(value.c_str());
   }
-
+  file.close();
+  
+  /*
   //NN Output Layer Bias
-  std::ifstream file6 ( "FaceSide_b3.csv" );
+  std::ifstream file6 ( "Face_b3.csv" );
   std::string value6;
   for(size_t i=0; i<23; i++){
       getline(file6,value6,',');
       //std::cout<<value<<std::endl;
-      FaceSide_b3(i) = std::atof(value6.c_str());
+      Face_b3(i) = std::atof(value6.c_str());
   }
+  */
 
   //NN Input Layer Min
-  std::ifstream file7 ( "FaceSide_input_xmin.csv" );
-  std::string value7;
-  for(size_t i=0; i<12; i++){
-      getline(file7,value7,',');
+  file.open( "Face_input_xmin.csv" );
+  for(size_t i=0; i<11; i++){
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_input_xmin(i) = std::atof(value7.c_str());
+      Face_input_xmin(i) = std::atof(value.c_str());
   }
-
+  file.close();
+  
   //NN Input Layer Max
-  std::ifstream file8 ( "FaceSide_input_xmax.csv" );
-  std::string value8;
-  for(size_t i=0; i<12; i++){
-      getline(file8,value8,',');
+  file.open( "Face_input_xmax.csv" );
+  for(size_t i=0; i<11; i++){
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      FaceSide_input_xmax(i) = std::atof(value8.c_str());
+      Face_input_xmax(i) = std::atof(value.c_str());
   }
-
+  file.close();
+  
+  /*
   //NN Output Layer Min
-  std::ifstream file9 ( "FaceSide_output_xmin.csv" );
+  std::ifstream file9 ( "Face_output_xmin.csv" );
   std::string value9;
   for(size_t i=0; i<23; i++){
       getline(file9,value9,',');
       //std::cout<<value<<std::endl;
-      FaceSide_output_xmin(i) = std::atof(value9.c_str());
+      Face_output_xmin(i) = std::atof(value9.c_str());
   }
 
   //NN Output Layer Max
-  std::ifstream file10 ( "FaceSide_output_xmax.csv" );
+  std::ifstream file10 ( "Face_output_xmax.csv" );
   std::string value10;
   for(size_t i=0; i<23; i++){
       getline(file10,value10,',');
       //std::cout<<value<<std::endl;
-      FaceSide_output_xmax(i) = std::atof(value10.c_str());
+      Face_output_xmax(i) = std::atof(value10.c_str());
   }
+  */
+
+
+  // CABLE ACTUATION NEURAL NET WEIGHTS ///////////////////////////////////////////////////
+
+  //NN Input Layer Weights 
+  file.open( "Cable_IW.csv" );
+  for(size_t i=0; i<30; i++){
+    for(size_t j=0; j<34; j++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_IW(i,j) = std::atof(value.c_str());
+    }
+  }
+  file.close();
+  
+  file.open( "Cable_LW1.csv" );
+  for(size_t i=0; i<30; i++){
+    for(size_t j=0; j<30; j++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_LW1(i,j) = std::atof(value.c_str());
+    }
+  }
+  file.close();
+
+  file.open( "Cable_LW2.csv" );
+  for(size_t i=0; i<30; i++){
+    for(size_t j=0; j<30; j++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_LW2(i,j) = std::atof(value.c_str());
+    }
+  }
+  file.close();
+
+  file.open( "Cable_LW3.csv" );
+  for(size_t i=0; i<30; i++){
+    for(size_t j=0; j<30; j++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_LW3(i,j) = std::atof(value.c_str());
+    }
+  }
+  file.close();
+
+  file.open( "Cable_LW4.csv" );
+  for(size_t i=0; i<24; i++){
+    for(size_t j=0; j<30; j++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_LW4(i,j) = std::atof(value.c_str());
+    }
+  }
+  file.close();
+
+  //NN Hidden Layer 1 Bias
+  file.open( "Cable_b1.csv" );
+  for(size_t i=0; i<30; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_b1(i) = std::atof(value.c_str());
+  }
+  file.close();
+  
+  //NN Hidden Layer 2 Bias
+  file.open( "Cable_b2.csv" );
+  for(size_t i=0; i<30; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_b2(i) = std::atof(value.c_str());
+  }
+  file.close();
+  
+  //NN Hidden Layer 3 Bias
+  file.open( "Cable_b3.csv" );
+  for(size_t i=0; i<30; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_b3(i) = std::atof(value.c_str());
+  }
+  file.close();
+
+  //NN Hidden Layer 4 Bias
+  file.open( "Cable_b4.csv" );
+  for(size_t i=0; i<30; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_b4(i) = std::atof(value.c_str());
+  }
+  file.close();
+
+  //NN Output Layer Bias
+  file.open( "Cable_b5.csv" );
+  for(size_t i=0; i<24; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_b5(i) = std::atof(value.c_str());
+  }
+  file.close();
+
+  //NN Input Layer Min
+  file.open( "Cable_input_xmin.csv" );
+  for(size_t i=0; i<34; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_input_xmin(i) = std::atof(value.c_str());
+  }
+  file.close();
+  
+  //NN Input Layer Max
+  file.open( "Cable_input_xmax.csv" );
+  for(size_t i=0; i<34; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_input_xmax(i) = std::atof(value.c_str());
+  }
+  file.close();
+  
+  //NN Input Layer Min
+  file.open( "Cable_output_xmin.csv" );
+  for(size_t i=0; i<24; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_output_xmin(i) = std::atof(value.c_str());
+  }
+  file.close();
+  
+  //NN Input Layer Max
+  file.open( "Cable_output_xmax.csv" );
+  for(size_t i=0; i<24; i++){
+      getline(file,value,',');
+      //std::cout<<value<<std::endl;
+      Cable_output_xmax(i) = std::atof(value.c_str());
+  }
+  file.close();
 
   
-
-
+  
 
   
-  std::ifstream file11 ( "RL_mat.csv" );
-  std::string value11;
+  file.open( "RL_mat.csv" );
   for(size_t i=0; i<20*3; i++){
     for(size_t j=0; j<24; j++){
-      getline(file11,value11,',');
+      getline(file,value,',');
       //std::cout<<value<<std::endl;
-      RL_mat(i,j) = std::atof(value11.c_str());
+      RL_mat(i,j) = std::atof(value.c_str());
     }
   }
+  file.close();
 
-  std::ifstream file12 ( "F_mat.csv" );
-  std::string value12;
+  file.open( "F_mat_ordered.csv" );
   for(size_t i=0; i<20; i++){
     for(size_t j=0; j<3; j++){
-      getline(file12,value12,',');
-      std::cout<<value12<<std::endl;
-      F_mat(i,j) = (int)std::atof(value12.c_str());
+      getline(file,value,',');
+      std::cout<<value<<std::endl;
+      F_mat(i,j) = (int)std::atof(value.c_str());
     }
   }
+  file.close();
   
 
 }
@@ -332,17 +495,6 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
     }
   */
 
-  if(priorFace==currFace)
-    idleCount++;
-  else{
-    idleCount = 0;
-    priorFace = currFace;
-  }
-  //std::cout<<"idleCount: "<<idleCount<<std::endl;
-
-  /*
-  //Finding Desired Side to tip over
-  //if(priorFace!=currFace){
   double min_x = 1e7;
   for(int i=0;i<3;i++){
     double curr_x = subject.markers[F_mat(currFace,i)].getWorldPosition().z();
@@ -350,50 +502,101 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
       min_x = curr_x;
       min_idx = i;
     }
-    std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
+    //std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
     //std::cout<<subject.markers[0].getWorldPosition().x()<<std::endl;
   }
-  */
-  //  priorFace = currFace;
-  //}
     
-
-  //Actuation of Cable Restlengths
-  //std::cout << "min_idx: " << min_idx << std::endl;
-  for(int i=0;i<24;i++){
-    m_controllers[i]->control(dt,RL_mat((currFace)*3+0,i)*sf/0.66); //scale by scaling factor here
-    //m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
-    //std::cout << "Current Control: " << sequence[i]*sf << ", ";
-    //std::cout << "Start Length: " << startLength << std::endl;
-    //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
-    
-    //actuators[i]->moveMotors(dt);
-  }
-  //std::cout << "Roll Case: " << roll_case << std::endl;
-  //std::cout << "WorldTime: " << worldTime << std::endl;
-  
-  /*
-    float time_inc;
-    if(roll_case%2==0)
-    time_inc = 1.335;//1.425;
-    else
-    time_inc = 1.3;
-    if((worldTime-last_step_time)>time_inc){
-    roll_case = (roll_case+1)%12;
-    last_step_time = worldTime;
-    }
-  */
-  
-  
   //Contact Surface Detection
   if(fmod(worldTime,0.1)<=dt){
+    int prevFace = currFace;
     currFace = contactSurfaceDetection(currFace);
+
+    //testing: ignore open faces
+    vector<int> openFaces(12);
+    bool isOpenFace = 0;
+    openFaces <<= 2,4,5,7,10,12,13,15,17,18,19,20; //1-indexed from MATLAB
+    for(int j=0;j<openFaces.size();j++){
+      if(currFace==openFaces(j)-1)
+	isOpenFace=1;
+    }
+    if(isOpenFace)
+      currFace = prevFace;
+    
+    if(prevFace!=currFace){
+      idleCount = 0;
+      //roll_case = (roll_case+1)%3;
+
+      //only re-calculate side when face is new
+      double min_x = 1e7;
+      for(int i=0;i<3;i++){
+	double curr_x = subject.markers[F_mat(currFace,i)].getWorldPosition().z();
+	if(curr_x<min_x){
+	  min_x = curr_x;
+	  min_idx = i;
+	}
+	std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
+	//std::cout<<subject.markers[0].getWorldPosition().x()<<std::endl;
+      }
+    }
     std::cout << "Curr Face: " << currFace << std::endl;
     int mat_currFace = currFace + 1; //matlab 1-index
 
     //roll_case = (roll_case+1)%12;
-    std::cout << "Roll Case: " << roll_case << std::endl; 
+    std::cout << "Roll Case: " << roll_case << std::endl;
+    std::cout << "Idle Count: " << idleCount << std::endl;
   }
+  
+  
+
+  //Actuation of Cable Restlengths
+  //std::cout << "min_idx: " << min_idx << std::endl;
+  if(fmod(worldTime,0.1)<=dt){
+    vector<double> CableRL(24);
+    int side = min_idx;//roll_case;
+    CableRL = CableRestlengthCalculation(currFace,side);
+    for(int i=0;i<24;i++){
+      double min_length = 0.1*sf;
+      double max_length = 1.2*sf;
+      double des_length = actuators[i]->getRestLength()+CableRL(i)*sf*2;
+      des_length = std::max(des_length,min_length);
+      des_length = std::min(des_length,max_length);
+      m_controllers[i]->control(dt,actuators[i]->getRestLength()+CableRL(i)*sf*2); //scale by scaling factor here
+
+      //OLD RL MATRIX LOOKUP TABLE METHOD
+      //m_controllers[i]->control(dt,RL_mat((currFace)*3+1,i)*sf/.66); //scale by scaling factor here
+    
+      //m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
+      //std::cout << "Current Control: " << sequence[i]*sf << ", ";
+      //std::cout << "Start Length: " << startLength << std::endl;
+      //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
+    }
+  }
+
+  int timeDelay = 1000;
+  //actuate cables
+  for(int i=0;i<24;i++){
+    
+    //m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
+    //std::cout << "Current Control: " << sequence[i]*sf << ", ";
+    //std::cout << "Start Length: " << startLength << std::endl;
+    //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
+    vector<int> openFaces(12);
+    bool isOpenFace = 0;
+    openFaces <<= 2,4,5,7,10,12,13,15,17,18,19,20; //1-indexed from MATLAB
+    for(int j=0;j<openFaces.size();j++){
+      if(currFace==openFaces(j)-1)
+	isOpenFace=1;
+    }
+    if(idleCount<timeDelay || isOpenFace)
+	m_controllers[i]->control(dt,actuators[i]->getStartLength());
+    actuators[i]->moveMotors(dt);
+  }
+  
+  idleCount+=1;
+
+  if(idleCount>4000)
+    idleCount = 0; //Taking too long; could be running into trouble - reset cables
+  
     
 }
 
@@ -410,6 +613,205 @@ bool T6RollingController::checkOnGround()
   return onGround;
 }
 */
+
+vector<double> T6RollingController::CableRestlengthCalculation(int Face,int Side)
+{
+  int printout = 0;
+  
+  // Initialize vector of phi angles (angles between rod directions and +Y axis)
+  vector<double> phiInput(6);
+  vector<double> relthetaInput(5);
+  vector<double> faceVec(20);
+  vector<double> dirVec(3);
+
+  for(size_t i=0; i<faceVec.size() ; i++){
+    faceVec(i) = 0;
+  }
+  for(size_t i=0; i<dirVec.size() ; i++){
+    dirVec(i) = 0;
+  }
+  faceVec(Face) = 1;
+  dirVec(Side) = 1;
+
+  double rod1theta;
+  
+  //rod theta and phi angles, theta W.R.T. x-axis
+  for(size_t i=0; i<6; i++){
+    btTransform worldTrans = rodBodies[i]->getWorldTransform();
+    btMatrix3x3 robot2world = worldTrans.getBasis();
+    btVector3 rodDir = robot2world*btVector3(0,1,0);
+    
+    //calculate relative theta
+    if(i==0){
+      rod1theta = atan2(-rodDir.z(),rodDir.x());
+      if(rod1theta<0)
+	rod1theta += 2*M_PI;
+    }
+    else if(i!=0){
+      double theta = atan2(-rodDir.z(),rodDir.x());
+      theta -= rod1theta;
+      if(theta<0)
+	theta += 2*M_PI;
+      relthetaInput(i-1) = theta;
+    }
+
+    //calculate phi
+    double angle = rodDir.angle(btVector3(0,1,0));
+    phiInput(i) = angle;
+  }
+
+  //concatenate input feature vector
+  vector<double> Input(34);
+  Input <<= faceVec, dirVec, relthetaInput, phiInput;
+  std::cout << "Input size: " << Input.size() << std::endl;
+
+  if(printout){
+    for(size_t i=0; i<Input.size() ; i++){
+      std::cout << Input(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+  
+  //mapminmax pre-process feature data
+  scalar_vector <double> ones34(34,1);
+  Input = element_div(2*(Input-Cable_input_xmin),Cable_input_xmax-Cable_input_xmin)-ones34;
+
+  if(printout){
+    std::cout << "After preprocess: " << std::endl;
+    for(size_t i=0; i<Input.size() ; i++){
+      std::cout << Input(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+  
+  
+  
+  //multiply inputs by input weights - HIDDEN LAYER 1
+  vector<double> hiddenLayer1(30);
+  axpy_prod(Cable_IW,Input,hiddenLayer1,true); //multiply by weights
+  /*
+    for(size_t i=0; i<hiddenLayer.size() ; i++){
+    std::cout << hiddenLayer(i) << ", ";
+    }
+  */
+  std::cout << std::endl;
+  hiddenLayer1 += Cable_b1; //add bias
+  /*
+  std::cout << " Before tansig1: " << std::endl;
+  for(size_t i=0; i<hiddenLayer1.size() ; i++){
+    std::cout << hiddenLayer1(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+  
+  //tansig function (sigmoid with output mapped [-1,1])
+  for(size_t i=0; i<hiddenLayer1.size(); i++){
+    hiddenLayer1(i) = 2/(1+exp(-2*hiddenLayer1(i)))-1;
+  }
+
+  if(printout){
+    std::cout << "After Tansig1: " << std::endl;
+    for(size_t i=0; i<hiddenLayer1.size() ; i++){
+      std::cout << hiddenLayer1(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+
+  //multiply inputs by input weights - HIDDEN LAYER 2
+  vector<double> hiddenLayer2(30);
+  axpy_prod(Cable_LW1,hiddenLayer1,hiddenLayer2,true); //multiply by weights
+
+  std::cout << std::endl;
+  hiddenLayer2 += Cable_b2; //add bias
+  
+  //tansig function (sigmoid with output mapped [-1,1])
+  for(size_t i=0; i<hiddenLayer2.size(); i++){
+    hiddenLayer2(i) = 2/(1+exp(-2*hiddenLayer2(i)))-1;
+  }
+
+  if(printout){
+    std::cout << "After Tansig2: " << std::endl;
+    for(size_t i=0; i<hiddenLayer2.size() ; i++){
+      std::cout << hiddenLayer2(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+
+  //multiply inputs by input weights - HIDDEN LAYER 3
+  vector<double> hiddenLayer3(30);
+  axpy_prod(Cable_LW2,hiddenLayer2,hiddenLayer3,true); //multiply by weights
+
+  std::cout << std::endl;
+  hiddenLayer3 += Cable_b3; //add bias
+  
+  //tansig function (sigmoid with output mapped [-1,1])
+  for(size_t i=0; i<hiddenLayer3.size(); i++){
+    hiddenLayer3(i) = 2/(1+exp(-2*hiddenLayer3(i)))-1;
+  }
+  if(printout){
+    std::cout << "After Tansig3: " << std::endl;
+    for(size_t i=0; i<hiddenLayer3.size() ; i++){
+      std::cout << hiddenLayer3(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+
+  //multiply inputs by input weights - HIDDEN LAYER 4
+  vector<double> hiddenLayer4(30);
+  axpy_prod(Cable_LW3,hiddenLayer3,hiddenLayer4,true); //multiply by weights
+
+  std::cout << std::endl;
+  hiddenLayer4 += Cable_b4; //add bias
+  
+  //tansig function (sigmoid with output mapped [-1,1])
+  for(size_t i=0; i<hiddenLayer4.size(); i++){
+    hiddenLayer4(i) = 2/(1+exp(-2*hiddenLayer4(i)))-1;
+  }
+  if(printout){
+    std::cout << "After Tansig4: " << std::endl;
+    for(size_t i=0; i<hiddenLayer4.size() ; i++){
+      std::cout << hiddenLayer4(i) << ", ";
+    }
+    std::cout << std::endl;
+  }
+
+
+  //multiply hidden layer 2 outputs by layer1 weights
+  vector<double> outputLayer(24);
+  axpy_prod(Cable_LW4,hiddenLayer4,outputLayer,true); //multiply by weights
+  //std::cout << "hidden layer multiplied with weights: " << std::endl;
+  /*
+    for(size_t i=0; i<outputLayer.size() ; i++){
+    std::cout << outputLayer(i) << ", ";
+    }
+    std::cout << std::endl;
+  */
+  outputLayer += Cable_b5; //add bias
+
+  
+  //mapminmax post-process output layer
+  scalar_vector <double> ones24(24,1);
+  //mapminmax.reverse vvvvvvv
+  outputLayer = element_prod((outputLayer + ones24)/2,Cable_output_xmax-Cable_output_xmin)+Cable_output_xmin;
+
+  //Rescale (times 1e3 in when traind in Neural Net)
+  outputLayer /= 1000;
+
+  if(printout){
+    std::cout << "Cable RL: " << std::endl;
+    for(size_t i=0; i<outputLayer.size() ; i++){
+      std::cout << outputLayer(i) << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+  }
+  
+  return outputLayer;
+
+
+  
+}
+
 
 int T6RollingController::contactSurfaceDetection(int prevFace)
 { 
@@ -451,63 +853,79 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     target_theta(0) += 2*M_PI;
 
   //concatenate input feature vector
-  vector<double> Input(12);
-  Input <<= target_theta, phiInput, relthetaInput;
+  vector<double> Input(11);
+  Input <<= phiInput, relthetaInput;
   std::cout << "Input size: " << Input.size() << std::endl;
 
-  //mapminmax pre-process feature data
-  scalar_vector <double> ones12(12,1);
-  Input = element_div(2*(Input-FaceSide_input_xmin),FaceSide_input_xmax-FaceSide_input_xmin)-ones12;
-  
   for(size_t i=0; i<Input.size() ; i++){
     std::cout << Input(i) << ", ";
   }
   std::cout << std::endl;
   
+  //mapminmax pre-process feature data
+  scalar_vector <double> ones11(11,1);
+  Input = element_div(2*(Input-Face_input_xmin),Face_input_xmax-Face_input_xmin)-ones11;
+  std::cout << "after pre-process: " << std::endl;
+  for(size_t i=0; i<Face_input_xmax.size() ; i++){
+    std::cout << Face_input_xmax(i) << ", ";
+  }
+  /*
+  std::cout << "After preprocess: " << std::endl;
+  for(size_t i=0; i<Input.size() ; i++){
+    std::cout << Input(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+  
   
   
   //multiply inputs by input weights - HIDDEN LAYER 1
   vector<double> hiddenLayer(20);
-  axpy_prod(FaceSide_IW,Input,hiddenLayer,true); //multiply by weights
+  axpy_prod(Face_IW,Input,hiddenLayer,true); //multiply by weights
   /*
     for(size_t i=0; i<hiddenLayer.size() ; i++){
     std::cout << hiddenLayer(i) << ", ";
     }
   */
   std::cout << std::endl;
-  hiddenLayer += FaceSide_b1; //add bias
+  hiddenLayer += Face_b1; //add bias
   /*
-    for(size_t i=0; i<hiddenLayer.size() ; i++){
+  std::cout << " Before tansig1: " << std::endl;
+  for(size_t i=0; i<hiddenLayer.size() ; i++){
     std::cout << hiddenLayer(i) << ", ";
-    }
-    std::cout << std::endl;
+  }
+  std::cout << std::endl;
   */
+  
   //tansig function (sigmoid with output mapped [-1,1])
   for(size_t i=0; i<hiddenLayer.size(); i++){
     hiddenLayer(i) = 2/(1+exp(-2*hiddenLayer(i)))-1;
   }
   /*
-    for(size_t i=0; i<hiddenLayer.size() ; i++){
+  std::cout << "After Tansig1: " << std::endl;
+  for(size_t i=0; i<hiddenLayer.size() ; i++){
     std::cout << hiddenLayer(i) << ", ";
-    }
-    std::cout << std::endl;
+  }
+  std::cout << std::endl;
   */
 
+  /*
   //multiply inputs by input weights - HIDDEN LAYER 2
   vector<double> hiddenLayer2(20);
-  axpy_prod(FaceSide_LW1,hiddenLayer,hiddenLayer2,true); //multiply by weights
+  axpy_prod(Face_LW1,hiddenLayer,hiddenLayer2,true); //multiply by weights
   std::cout << std::endl;
-  hiddenLayer2 += FaceSide_b2; //add bias
-
+  hiddenLayer2 += Face_b2; //add bias
+ 
   //tansig function (sigmoid with output mapped [-1,1])
   for(size_t i=0; i<hiddenLayer2.size(); i++){
     hiddenLayer2(i) = 2/(1+exp(-2*hiddenLayer2(i)))-1;
   }
+  */
 
 
   //multiply hidden layer 2 outputs by layer1 weights
-  vector<double> outputLayer(23);
-  axpy_prod(FaceSide_LW2,hiddenLayer2,outputLayer,true); //multiply by weights
+  vector<double> outputLayer(20);
+  axpy_prod(Face_LW1,hiddenLayer,outputLayer,true); //multiply by weights
   std::cout << "hidden layer multiplied with weights: " << std::endl;
   /*
     for(size_t i=0; i<outputLayer.size() ; i++){
@@ -515,17 +933,20 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     }
     std::cout << std::endl;
   */
-  outputLayer += FaceSide_b3; //add bias
+  outputLayer += Face_b2; //add bias
   /*
-    for(size_t i=0; i<outputLayer.size() ; i++){
+  std::cout << "Before softmax: " << std::endl;
+  for(size_t i=0; i<outputLayer.size() ; i++){
     std::cout << outputLayer(i) << ", ";
-    }
-    std::cout << std::endl;
+  }
+  std::cout << std::endl;
   */
 
+  /*
   //mapminmax post-process output layer
   scalar_vector <double> ones23(23,1);
-  //outputLayer = element_div(2*(outputLayer-FaceSide_output_xmin),FaceSide_output_xmax-FaceSide_output_xmin)-ones23;
+  outputLayer = element_div(2*(outputLayer-Face_output_xmin),Face_output_xmax-Face_output_xmin)-ones23;
+  */
 
   /*
   //softmax function for output layer (Side)
@@ -540,41 +961,29 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     std::cout << outputLayer(i) << ", ";
   }
   std::cout << std::endl;
+  */
   
   //softmax function for output layer (Faces)
   std::cout << "Face Detection Probabilities: " << std::endl;
   double sum2 = 0;
-  for(size_t i=3; i<outputLayer.size(); i++){
+  for(size_t i=0; i<outputLayer.size(); i++){
     outputLayer(i) = exp(outputLayer(i));
     sum2 += outputLayer(i);
   }
-  for(size_t i=3; i<outputLayer.size(); i++){
+  for(size_t i=0; i<outputLayer.size(); i++){
     outputLayer(i) = outputLayer(i)/sum2;
     std::cout << outputLayer(i) << ", ";
   }
   std::cout << std::endl;
-  */
   
-  /*
-    int currSurface = prevFace;
-    double threshold = 0.05;
-    int otherMax = -1;
-    std::cout << "Prev Face: " << prevFace << std::endl;
-    for(int i=0; i<outputLayer.size(); i++){
-    if((otherMax==-1||outputLayer(i)>outputLayer(otherMax)) && outputLayer(i)>=threshold && i!=prevFace){
-    currSurface = i;
-    otherMax = i;
-    }
-    }
-  */
-  double threshold = 0.70;
+  double threshold = 0.98;
   currSurface = prevFace;
-  for(int i=3; i<outputLayer.size(); i++){
-    if((outputLayer(i)>outputLayer(currSurface+3)) && outputLayer(i)>=threshold){
-      currSurface = i-3;
+  for(int i=0; i<outputLayer.size(); i++){
+    if((outputLayer(i)>outputLayer(currSurface)+0.2) && outputLayer(i)>=threshold){
+      currSurface = i;
     }
   }
-  std::cout << "Contact Surface: Face " << currSurface+1 << " with Probability " << outputLayer(currSurface+3) << std::endl;
+  std::cout << "Contact Surface: Face " << currSurface+1 << " with Probability " << outputLayer(currSurface) << std::endl;
   
   return currSurface;
 }

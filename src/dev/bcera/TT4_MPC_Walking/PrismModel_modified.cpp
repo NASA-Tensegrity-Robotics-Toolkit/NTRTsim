@@ -54,7 +54,7 @@ namespace
       //Option 1: TT4 Parameters
       888.1/pow(sf,3),    // density (kg / length^3) [calculated so each rod = 0.45 kg]
       .0254/2*sf,          // radius (length)
-      515,             //stiffness (kg / sec^2) was 1500
+      515,//515,             //stiffness (kg / sec^2) was 1500
       20.0,            // damping (kg / sec)
       1.0*sf,         // rod_length (length)
       1.0,             // friction (unitless)
@@ -63,7 +63,7 @@ namespace
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
       10000*sf,         // maxTens (kg-m/s^2)
-      0.10*sf,//0.15*sf,          // targetVelocity (m/s)
+      0.15*sf,//0.15*sf,          // targetVelocity (m/s)
     };
 } // namespace
 

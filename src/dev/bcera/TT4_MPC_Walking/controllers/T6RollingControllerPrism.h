@@ -42,6 +42,9 @@
 #include <vector>
 #include <string>
 
+//Boost Vector Library
+#include <numeric/ublas/vector.hpp>
+
 
 // Forward declarations
 class PrismModel;
@@ -134,6 +137,9 @@ class T6RollingController : public tgObserver<PrismModel>
    * ToDo: test and improve for any arbitrary ground orientation
    * @return The number of the face which is in contact with the ground
    */
+
+  boost::numeric::ublas::vector<double> CableRestlengthCalculation(int Face,int Side);
+    
   int contactSurfaceDetection(int currFace);
 
   /**
