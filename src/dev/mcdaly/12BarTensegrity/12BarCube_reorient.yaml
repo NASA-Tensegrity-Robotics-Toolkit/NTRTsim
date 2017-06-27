@@ -5,5 +5,5 @@ substructures:
     #translation: [0, 10, 0]
     rotation:
       axis: [1, 0, 0]
-      angle: 180 #deg
+      angle: -90 #deg
     scale: 1

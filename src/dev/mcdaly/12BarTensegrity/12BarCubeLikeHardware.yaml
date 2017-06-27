@@ -162,8 +162,8 @@ builders:
   cable_structure:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1500 #502.5 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      #damping: 50.25 #kg/s (N-s/m) #complete guess for value
+      stiffness: 1000.0 #502.5 #kg/s^2 (N/m) #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      damping: 50.0 #kg/s (N-s/m) #complete guess for value
       pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
       #max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
@@ -175,7 +175,7 @@ builders:
     parameters:
       width: 0.2
       height: 0.2
-      density: 5 #11.11 #kg/dm^3
+      density: 5.0 #11.11 #kg/dm^3
 
   actuation_module_connectors:
     class: tgRodInfo
@@ -189,9 +189,9 @@ builders:
   actuated_cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 10000 #kg/s^2 (N/m) #make value large to mimic stiff cable
+      stiffness: 10000.0 #kg/s^2 (N/m) #make value large to mimic stiff cable
       #damping: 50.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      pretension: 0.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?
-      max_tension: 100000 #kg-dm/s^2 #corresponds to 500 N
+      max_tension: 100000.0 #kg-dm/s^2 #corresponds to 500 N
       #target_velocity: 0 #dm/s #what is this?        

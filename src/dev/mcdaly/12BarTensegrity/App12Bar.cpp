@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     // Parameters for the LengthControllerSequential are specified in that .h file,
     // repeated here:
     double startTime = 5;
-    double minLength = 0.05;
+    double minLength = 0.1;
     double rate = 1;
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("actuated_cable");

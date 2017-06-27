@@ -80,7 +80,9 @@ pair_groups:
     - [n16, n5]
 
   actuated_cable:
-    - [n2, n10]
+    - [n15, n19]
+    - [n4, n9] 
+    #- [n2, n10]
     #- [n6, n14]
 
 builders:
