@@ -281,6 +281,9 @@ class T6RollingController : public tgObserver<PrismModel>
   // Actuation policy table
   std::vector< std::vector<int> > actuationPolicy;
 
+  //vector of sides, ordered
+  std::vector<int> min_ordered;
+
   // Hold current surface from contact surface detection
   int currSurface = -1;
   int goalSurface = -1;
@@ -297,7 +300,10 @@ class T6RollingController : public tgObserver<PrismModel>
   int stepIdx = 0;
   int roll_case = 0;
   int currFace = 0;
-  int priorFace = -1;
+  int ActiveFaceCounter = 0;
+  int prevFace = -1;
+  int activeFace = 0;
+  int prevactiveFace = 0;
   int min_idx = 0;
   int idleCount = 0;
   double last_step_time = 0;

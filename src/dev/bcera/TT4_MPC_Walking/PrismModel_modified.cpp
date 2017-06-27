@@ -62,8 +62,8 @@ namespace
       0.0,              // restitution (?)
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
-      10000*sf,         // maxTens (kg-m/s^2)
-      0.15*sf,//0.15*sf,          // targetVelocity (m/s)
+      50*sf,//10000*sf,         // maxTens (kg-m/s^2)
+      0.025*sf,//0.15*sf,          // targetVelocity (m/s)
     };
 } // namespace
 
@@ -231,7 +231,7 @@ void PrismModel::setup(tgWorld& world)
   addRobot(s,globalOffset,tankToOuterRing+externalRadius);
 
   //rotate robot to sit on a specified face
-  btQuaternion rotation = rotateToFace(s, 10);
+  btQuaternion rotation = rotateToFace(s, 8);
   rotateNormVectors(rotation);
 
   double* COM = returnCOM(s,beforeRobot,12);

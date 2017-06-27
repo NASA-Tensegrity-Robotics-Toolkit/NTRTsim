@@ -56,10 +56,10 @@ namespace{
   double worldTime = 0;
   
   //Matrices holding input weights and hidden layer weights of Neural Net for CSD
-  matrix<double> Face_IW(20,11);
-  matrix<double> Face_LW1(20,20);
+  matrix<double> Face_IW(6,11);
+  matrix<double> Face_LW1(20,6);
   //matrix<double> Face_LW2(23,20);
-  vector<double> Face_b1(20);
+  vector<double> Face_b1(6);
   vector<double> Face_b2(20);
   //vector<double> Face_b3(23);
   vector<double> Face_input_xmin(11);
@@ -214,8 +214,8 @@ void T6RollingController::onSetup(PrismModel& subject)
   // CSD NEURAL NET WEIGHTS /////////////////////////////////////////////////////////////
   //NN Input Layer Weights 
   file.open( "Face_IW.csv" );
-  for(size_t i=0; i<20; i++){
-    for(size_t j=0; j<11; j++){
+  for(size_t i=0; i<Face_IW.size1(); i++){
+    for(size_t j=0; j<Face_IW.size2(); j++){
       getline(file,value,',');
       //std::cout<<value<<std::endl;
       Face_IW(i,j) = std::atof(value.c_str());
@@ -226,8 +226,8 @@ void T6RollingController::onSetup(PrismModel& subject)
 
   //NN Hidden Layer 1 Weights
   file.open( "Face_LW1.csv" );
-  for(size_t i=0; i<20; i++){
-    for(size_t j=0; j<20; j++){
+  for(size_t i=0; i<Face_LW1.size1(); i++){
+    for(size_t j=0; j<Face_LW1.size2(); j++){
       getline(file,value,',');
       //std::cout<<value<<std::endl;
       Face_LW1(i,j) = std::atof(value.c_str());
@@ -250,7 +250,7 @@ void T6RollingController::onSetup(PrismModel& subject)
 
   //NN Hidden Layer 1 Bias
   file.open( "Face_b1.csv" );
-  for(size_t i=0; i<20; i++){
+  for(size_t i=0; i<Face_b1.size(); i++){
       getline(file,value,',');
       //std::cout<<value<<std::endl;
       Face_b1(i) = std::atof(value.c_str());
@@ -259,7 +259,7 @@ void T6RollingController::onSetup(PrismModel& subject)
   
   //NN Hidden Layer 2 Bias
   file.open( "Face_b2.csv" );
-  for(size_t i=0; i<20; i++){
+  for(size_t i=0; i<Face_b2.size(); i++){
       getline(file,value,',');
       //std::cout<<value<<std::endl;
       Face_b2(i) = std::atof(value.c_str());
@@ -464,7 +464,7 @@ void T6RollingController::onSetup(PrismModel& subject)
   }
   file.close();
 
-  file.open( "F_mat_ordered.csv" );
+  file.open( "F_mat.csv" );
   for(size_t i=0; i<20; i++){
     for(size_t j=0; j<3; j++){
       getline(file,value,',');
@@ -482,6 +482,7 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   //std::cout << std::endl;
   //std::cout << "OverallTime: " << worldTime << std::endl;
   //std::cout << "RobotState: " << subject.robotState << std::endl;
+  
   worldTime += dt;
   if (dt <= 0.0) {
     throw std::invalid_argument("onStep: dt is not positive");
@@ -495,21 +496,13 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
     }
   */
 
-  double min_x = 1e7;
-  for(int i=0;i<3;i++){
-    double curr_x = subject.markers[F_mat(currFace,i)].getWorldPosition().z();
-    if(curr_x<min_x){
-      min_x = curr_x;
-      min_idx = i;
-    }
-    //std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
-    //std::cout<<subject.markers[0].getWorldPosition().x()<<std::endl;
-  }
     
   //Contact Surface Detection
   if(fmod(worldTime,0.1)<=dt){
-    int prevFace = currFace;
-    currFace = contactSurfaceDetection(currFace);
+
+    prevFace = currFace;
+    currFace = contactSurfaceDetection(prevFace);
+    prevactiveFace = activeFace;
 
     //testing: ignore open faces
     vector<int> openFaces(12);
@@ -519,30 +512,66 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
       if(currFace==openFaces(j)-1)
 	isOpenFace=1;
     }
-    if(isOpenFace)
-      currFace = prevFace;
+    if(ActiveFaceCounter >= 2)// && !isOpenFace)
+      activeFace = currFace;
+	
+    std::cout << "Current Face: " << currFace+1 << std::endl;
+    int mat_currFace = currFace + 1; //matlab 1-index
+
+    std::cout << "Acting Current Face: " << activeFace+1 << std::endl;
+    std::cout << "Currently on Open Face: " << isOpenFace << std::endl;
+
     
-    if(prevFace!=currFace){
+    if(prevactiveFace!=activeFace){
       idleCount = 0;
       //roll_case = (roll_case+1)%3;
 
-      //only re-calculate side when face is new
+      //only re-calculate Side when face is new
       double min_x = 1e7;
-      for(int i=0;i<3;i++){
-	double curr_x = subject.markers[F_mat(currFace,i)].getWorldPosition().z();
-	if(curr_x<min_x){
-	  min_x = curr_x;
-	  min_idx = i;
+      min_ordered.clear();
+      min_ordered.push_back(0);
+      for(int i=1;i<3;i++){
+	double curr_x = subject.markers[F_mat(activeFace,i)].getWorldPosition().z();
+	bool node_accounted = false;
+	for(int j=0;j<min_ordered.size();j++){
+	  if(curr_x<subject.markers[F_mat(activeFace,min_ordered[j])].getWorldPosition().z()){
+	    min_ordered.insert(min_ordered.begin()+j,i);
+	    break;
+	  }
+	  else if(j==min_ordered.size()-1){ //not lower than anything currently in list
+	    min_ordered.push_back(i);
+	    break;
+	  }
+	  
 	}
-	std::cout<<F_mat(currFace,i)<<": "<<subject.markers[F_mat(currFace,i)].getWorldPosition().z()<<std::endl;
+       
+	std::cout<<F_mat(activeFace,i)<<": "<<subject.markers[F_mat(activeFace,i)].getWorldPosition().z()<<std::endl;
 	//std::cout<<subject.markers[0].getWorldPosition().x()<<std::endl;
       }
-    }
-    std::cout << "Curr Face: " << currFace << std::endl;
-    int mat_currFace = currFace + 1; //matlab 1-index
 
+      vector<int> DifficultSides(20);
+      DifficultSides <<= -1,0,-1,2,2,-1,0,-1,-1,0,-1,2,2,-1,0,-1,2,2,2,2;
+      if(isOpenFace && DifficultSides(activeFace)==min_ordered[0])
+	min_idx = min_ordered[1];
+      else
+	min_idx = min_ordered[0];
+
+
+      
+    }
+
+
+    std::cout << "Index Side Order: " << std::endl;
+    for(int i=0;i<min_ordered.size();i++){
+      std::cout << min_ordered[i] << ", Z value: " <<
+	subject.markers[F_mat(activeFace,min_ordered[i])].getWorldPosition().z() <<
+	", Y value: " <<
+	subject.markers[F_mat(activeFace,min_ordered[i])].getWorldPosition().y()<<std::endl;
+    }
+    std::cout << std::endl;
+      
     //roll_case = (roll_case+1)%12;
-    std::cout << "Roll Case: " << roll_case << std::endl;
+    std::cout << "Side: " << min_idx << std::endl;
     std::cout << "Idle Count: " << idleCount << std::endl;
   }
   
@@ -553,26 +582,18 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
   if(fmod(worldTime,0.1)<=dt){
     vector<double> CableRL(24);
     int side = min_idx;//roll_case;
-    CableRL = CableRestlengthCalculation(currFace,side);
+    CableRL = CableRestlengthCalculation(activeFace,side);
     for(int i=0;i<24;i++){
       double min_length = 0.1*sf;
       double max_length = 1.2*sf;
-      double des_length = actuators[i]->getRestLength()+CableRL(i)*sf*2;
+      double des_length = actuators[i]->getRestLength()+CableRL(i)*sf*100;
       des_length = std::max(des_length,min_length);
       des_length = std::min(des_length,max_length);
-      m_controllers[i]->control(dt,actuators[i]->getRestLength()+CableRL(i)*sf*2); //scale by scaling factor here
-
-      //OLD RL MATRIX LOOKUP TABLE METHOD
-      //m_controllers[i]->control(dt,RL_mat((currFace)*3+1,i)*sf/.66); //scale by scaling factor here
-    
-      //m_controllers[i]->control(dt,sequence[i]*sf); //scale by scaling factor here
-      //std::cout << "Current Control: " << sequence[i]*sf << ", ";
-      //std::cout << "Start Length: " << startLength << std::endl;
-      //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
+      m_controllers[i]->control(dt,des_length); //scale by scaling factor here
     }
   }
 
-  int timeDelay = 1000;
+  int timeDelay = 1500;
   //actuate cables
   for(int i=0;i<24;i++){
     
@@ -580,22 +601,34 @@ void T6RollingController::onStep(PrismModel& subject, double dt)
     //std::cout << "Current Control: " << sequence[i]*sf << ", ";
     //std::cout << "Start Length: " << startLength << std::endl;
     //std::cout << "Actuator" <<  i << ": " << actuators[i]->getRestLength() << ", ";
+    
     vector<int> openFaces(12);
     bool isOpenFace = 0;
     openFaces <<= 2,4,5,7,10,12,13,15,17,18,19,20; //1-indexed from MATLAB
     for(int j=0;j<openFaces.size();j++){
-      if(currFace==openFaces(j)-1)
+      if(activeFace==openFaces(j)-1)
 	isOpenFace=1;
     }
-    if(idleCount<timeDelay || isOpenFace)
+    if(idleCount<timeDelay && ~isOpenFace)// ||  isOpenFace)
 	m_controllers[i]->control(dt,actuators[i]->getStartLength());
+    
     actuators[i]->moveMotors(dt);
+
+    
   }
   
-  idleCount+=1;
+  idleCount++;
 
-  if(idleCount>4000)
-    idleCount = 0; //Taking too long; could be running into trouble - reset cables
+  if(idleCount>5000){//4000/.01*.05){
+    //Taking too long; could be running into trouble - reset cables
+    bool ready = T6RollingController::setAllActuators(m_controllers, actuators, actuators[0]->getStartLength(), dt);
+    std::cout << "RESETTING! " << std::endl;
+    if(ready)
+      idleCount = 0;
+    prevactiveFace = -1;
+  }
+
+  
   
     
 }
@@ -880,7 +913,7 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
   
   
   //multiply inputs by input weights - HIDDEN LAYER 1
-  vector<double> hiddenLayer(20);
+  vector<double> hiddenLayer(Face_IW.size1());
   axpy_prod(Face_IW,Input,hiddenLayer,true); //multiply by weights
   /*
     for(size_t i=0; i<hiddenLayer.size() ; i++){
@@ -924,7 +957,7 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
 
 
   //multiply hidden layer 2 outputs by layer1 weights
-  vector<double> outputLayer(20);
+  vector<double> outputLayer(Face_LW1.size1());
   axpy_prod(Face_LW1,hiddenLayer,outputLayer,true); //multiply by weights
   std::cout << "hidden layer multiplied with weights: " << std::endl;
   /*
@@ -976,7 +1009,7 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
   }
   std::cout << std::endl;
   
-  double threshold = 0.98;
+  double threshold = 0.60;
   currSurface = prevFace;
   for(int i=0; i<outputLayer.size(); i++){
     if((outputLayer(i)>outputLayer(currSurface)+0.2) && outputLayer(i)>=threshold){
@@ -984,6 +1017,11 @@ int T6RollingController::contactSurfaceDetection(int prevFace)
     }
   }
   std::cout << "Contact Surface: Face " << currSurface+1 << " with Probability " << outputLayer(currSurface) << std::endl;
+
+  if(currSurface == prevFace)
+    ActiveFaceCounter++;
+  else
+    ActiveFaceCounter = 0;
   
   return currSurface;
 }
@@ -1257,7 +1295,7 @@ bool T6RollingController::stepToFace(double dt)
 */
 
 
-/*
+
 bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& controllers, 
 					  std::vector<tgBasicActuator*>& actuators, 
 					  double setLength, double dt)
@@ -1276,4 +1314,4 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
   std::cout << "Resetting Cable Lengths " << std::endl;
   return returnFin;
 }
-*/
+
