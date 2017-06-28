@@ -50,7 +50,7 @@
 
 #define NOSCILLATORS 4
 #define NSTATES 8
-#define USEGRAPHICS 0
+#define USEGRAPHICS 1
 #define LOGDATA 0
 #define USEHOPFCTLR 1
 
@@ -139,12 +139,12 @@ int main(int argc, char** argv)
             hopfVel[i] = (double)(rand()%1000)/500-1;
         }*/
 
-        std::cout << "\e[1;38mStates: ";
+        std::cout << "\e[1;38mStates: ";
         for(int i=0; i<NSTATES; i++)
             std::cout << hopfState[i] << ", ";
         std::cout << "\e[0m" << std::endl;   
 
-        std::cout << "\e[1;38mVelocities: ";
+        std::cout << "\e[1;38mVelocities: ";
         for(int i=0; i<NSTATES; i++)
             std::cout << hopfVel[i] << ", ";
         std::cout << "\e[0m" << std::endl;   
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
     std::vector<std::string> tagsToControl;
     tagsToControl = selectControlledStrings(tagsToControl);
 
-    // Changed from examples as this app uses a YAML model for argv[1]
+    // Changed from examples as this app uses a YAML model for argv[1]
     const std::string suffix((argc > 2) ? argv[2] : "default");
 
     HopfControllerML::Config control_config(hopfOmegaMin,      hopfOmegaMax,
@@ -354,44 +354,44 @@ void simulate(tgSimulation *simulation, LengthControllerYAML* myController) {
 std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsToControl)
 {
     //NWP triangle
-    tagsToControl.push_back("SUPERball_string05");
-    tagsToControl.push_back("SUPERball_string07");
-    tagsToControl.push_back("SUPERball_string21");
+    tagsToControl.push_back("SUPERball_string03");
+    tagsToControl.push_back("SUPERball_string18");
+    tagsToControl.push_back("SUPERball_string13");
     
     //NWD triangle
-    tagsToControl.push_back("SUPERball_string06");
-    tagsToControl.push_back("SUPERball_string08");
-    tagsToControl.push_back("SUPERball_string23");
+    tagsToControl.push_back("SUPERball_string04");
+    tagsToControl.push_back("SUPERball_string22");
+    tagsToControl.push_back("SUPERball_string15");
 
     //SWP triangle
     tagsToControl.push_back("SUPERball_string01");
-    tagsToControl.push_back("SUPERball_string03");
     tagsToControl.push_back("SUPERball_string17");
+    tagsToControl.push_back("SUPERball_string09");
 
     //SWD triangle
     tagsToControl.push_back("SUPERball_string02");
-    tagsToControl.push_back("SUPERball_string04");
-    tagsToControl.push_back("SUPERball_string19");
+    tagsToControl.push_back("SUPERball_string21");
+    tagsToControl.push_back("SUPERball_string11");
 
     //SEP triangle
-    tagsToControl.push_back("SUPERball_string09");
-    tagsToControl.push_back("SUPERball_string11");
-    tagsToControl.push_back("SUPERball_string18");
+    tagsToControl.push_back("SUPERball_string05");
+    tagsToControl.push_back("SUPERball_string19");
+    tagsToControl.push_back("SUPERball_string10");
     
     //SED triangle
-    tagsToControl.push_back("SUPERball_string10");
+    tagsToControl.push_back("SUPERball_string06");
+    tagsToControl.push_back("SUPERball_string23");
     tagsToControl.push_back("SUPERball_string12");
-    tagsToControl.push_back("SUPERball_string20");
     
     //NEP triangle
-    tagsToControl.push_back("SUPERball_string13");
-    tagsToControl.push_back("SUPERball_string15");
-    tagsToControl.push_back("SUPERball_string22");
+    tagsToControl.push_back("SUPERball_string07");
+    tagsToControl.push_back("SUPERball_string20");
+    tagsToControl.push_back("SUPERball_string14");
 
     //NED triangle
-    tagsToControl.push_back("SUPERball_string14");
-    tagsToControl.push_back("SUPERball_string16");
+    tagsToControl.push_back("SUPERball_string08");
     tagsToControl.push_back("SUPERball_string24");
+    tagsToControl.push_back("SUPERball_string16");
 
      return tagsToControl;
 }

@@ -50,7 +50,7 @@
 #include "helpers/FileHelpers.h"
 #include <stdexcept>
 
-// Other required libraries
+// Other required libraries
 #include <math.h>
 #include <fstream>
 #include <cstdio>
@@ -205,7 +205,7 @@ HopfControllerML::~HopfControllerML()
 }
 
 
-// /!\ Copied from the escape app
+// /!\ Copied from the escape app
 // So far, only score used for eventual fitness calculation of an Escape Model
 // is the maximum distance from the origin reached during that subject's episode
 void HopfControllerML::onTeardown(TensegrityModel& subject) 
@@ -302,7 +302,7 @@ void HopfControllerML::onSetup(TensegrityModel& subject)
   // Choose between keeping the learning library or manually setting parameters
   if(1)
   {    
-    std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
+    std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
     params[0][0] = 3.83366; //2.00;
     params[0][1] = 0.951536; //0.2;
     params[0][2] = -0.326143; //-0.5;
@@ -465,7 +465,7 @@ void HopfControllerML::initializeActuators(TensegrityModel& subject, std::string
   //  std::cout << "The following cables were found and will be controlled: " << std::endl;
   //Iterate through array and output strings to command line
   for (std::size_t i = 0; i < foundActuators.size(); i ++) 
-  {	
+  { 
   //    std::cout << foundActuators[i]->getTags() << std::endl;
     // Also, add the rest length of the actuator at this time
     // to the list of all initial rest lengths.
@@ -477,7 +477,7 @@ void HopfControllerML::initializeActuators(TensegrityModel& subject, std::string
   // Add this list of actuators to the full list. Thanks to:
   // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
   cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
-			 foundActuators.end() );
+       foundActuators.end() );
 }
 
 
@@ -672,10 +672,10 @@ void HopfControllerML::updateHopfState(double dt)
 void HopfControllerML::compNextHopfState(double dt, int selectedOscillator)
 {
   // /!\
-  // ATTENTION, SIZE OF COUPLINGARRAY AND COUPLEDSTATE ARRAYS HAS CHANGED WRT BACKUP
-  // /!\
+  // ATTENTION, SIZE OF COUPLINGARRAY AND COUPLEDSTATE ARRAYS HAS CHANGED WRT BACKUP
+  // /!\
 
-  switch(selectedOscillator) //TODO: CHECK COUPLINGS (SEE NOTEBOOK)
+  switch(selectedOscillator) //TODO: CHECK COUPLINGS (SEE NOTEBOOK)
   {
     case 0:
       couplingArray[0] = 0;
@@ -826,12 +826,12 @@ void HopfControllerML::resetTimePassed()
   }
   if(random)
   {
-    std::cout << "\e[1;38mStates: ";
+    std::cout << "\e[1;38mStates: ";
     for(int i=0; i<NSTATES; i++)
         std::cout << hopfState[i] << ", ";
     std::cout << "\e[0m" << std::endl;   
 
-    std::cout << "\e[1;38mVelocities: ";
+    std::cout << "\e[1;38mVelocities: ";
     for(int i=0; i<NSTATES; i++)
         std::cout << hopfVel[i] << ", ";
     std::cout << "\e[0m" << std::endl;*/   

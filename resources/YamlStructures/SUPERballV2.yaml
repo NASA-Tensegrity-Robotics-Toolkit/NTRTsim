@@ -1,0 +1,409 @@
+nodes: 
+  # left vertical rod
+  left_vert_bottom: [4.886,  1.5, 0] #[8.46,  1.5, 0] #[7.5, 0, 0]         #1
+  left_vert_top:    [4.886, 20.5, 0] #[8.46, 20.5, 0] #[7.5, 16.84, 0]     #2
+  # right vertical rod
+  right_vert_bottom: [-4.887,  1.5, 0] #[-8.46,  1.5, 0] #[-7.5, 0, 0]       #3
+  right_vert_top:    [-4.887, 20.5, 0] #[-8.46, 20.5, 0] #[-7.5, 16.84, 0]   #4
+
+  # bottom horizontal rod
+  bottom_horiz_prox: [0, 5.316, -9.5] #[0, 2.54, -9.5] #[0, 0.92, -8.42]   #5
+  bottom_horiz_dist: [0, 5.316,  9.5] #[0, 2.54,  9.5] #[0, 0.92,  8.42]   #6
+  # top horizontal rod
+  top_horiz_prox: [0, 14.94, -9.5] #[0, 19.42, -9.5] #[0, 15.92, -8.42]     #7
+  top_horiz_dist: [0, 14.94,  9.5] #[0, 19.42,  9.5] #[0, 15.92,  8.42]     #8
+
+  # proxal horizontal rod
+  prox_horiz_left:  [ 9.5, 10.09, -4.821] #[ 9.5, 11, -8.46] #[ 8.42, 8.42, -7.5]  #9
+  prox_horiz_right: [-9.5, 10.09, -4.821] #[-9.5, 11, -8.46] #[-8.42, 8.42, -7.5] #10
+  # distal horizontal rod
+  dist_horiz_left:  [ 9.5, 10.09, 4.822] #[ 9.5, 11, 8.46] #[ 8.42, 8.42, 7.5]  #11
+  dist_horiz_right: [-9.5, 10.09, 4.822] #[-9.5, 11, 8.46] #[-8.42, 8.42, 7.5]  #12
+
+pair_groups:
+  superball_rod:
+    # coronal plane
+    - [ left_vert_bottom,  left_vert_top]    #1/2
+    - [right_vert_bottom, right_vert_top]    #3/4
+    # sagittal plane
+    - [bottom_horiz_prox, bottom_horiz_dist] #5/6
+    - [   top_horiz_prox,    top_horiz_dist] #7/8
+    # transverse plane
+    - [prox_horiz_left, prox_horiz_right]    #9/10
+    - [dist_horiz_left, dist_horiz_right]    #11/12
+    
+  SUPERball_string01:
+    - [left_vert_bottom, bottom_horiz_prox]  #1/5    
+  SUPERball_string02:
+    - [left_vert_bottom, bottom_horiz_dist]  #1/6
+  SUPERball_string03:
+    - [   left_vert_top,    top_horiz_prox]  #2/7
+  SUPERball_string04:
+    - [   left_vert_top,    top_horiz_dist]  #2/8
+
+  SUPERball_string05:
+    - [right_vert_bottom, bottom_horiz_prox] #3/5
+  SUPERball_string06:
+    - [right_vert_bottom, bottom_horiz_dist] #3/6
+  SUPERball_string07:
+    - [   right_vert_top,    top_horiz_prox] #4/7
+  SUPERball_string08:
+    - [   right_vert_top,    top_horiz_dist] #4/8
+
+  SUPERball_string09:
+    - [bottom_horiz_prox,  prox_horiz_left]  #5/9
+  SUPERball_string10:
+    - [bottom_horiz_prox, prox_horiz_right]  #5/10
+  SUPERball_string11:
+    - [bottom_horiz_dist,  dist_horiz_left]  #6/11
+  SUPERball_string12:
+    - [bottom_horiz_dist, dist_horiz_right]  #6/12
+
+  SUPERball_string13:
+    - [top_horiz_prox,  prox_horiz_left]     #7/9
+  SUPERball_string14:
+    - [top_horiz_prox, prox_horiz_right]     #7/10
+  SUPERball_string15:
+    - [top_horiz_dist,  dist_horiz_left]     #8/11
+  SUPERball_string16:
+    - [top_horiz_dist, dist_horiz_right]     #8/12
+
+  SUPERball_string17:
+    - [prox_horiz_left,   left_vert_bottom]  #9/1
+  SUPERball_string18:
+    - [prox_horiz_left,      left_vert_top]  #9/2
+  SUPERball_string19:
+    - [prox_horiz_right, right_vert_bottom]  #10/3
+  SUPERball_string20:
+    - [prox_horiz_right,    right_vert_top]  #10/4
+
+  SUPERball_string21:
+    - [dist_horiz_left,   left_vert_bottom]  #11/1
+  SUPERball_string22:
+    - [dist_horiz_left,      left_vert_top]  #11/2
+  SUPERball_string23:
+    - [dist_horiz_right, right_vert_bottom]  #12/3
+  SUPERball_string24:
+    - [dist_horiz_right,    right_vert_top]  #12/4
+
+builders:
+  superball_rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.7148
+      radius: 0.375
+      friction: 0.99
+      roll_friction: 0.01
+      restitution: 0.0
+  SUPERball_string01:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2422.00818725856 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string02:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2422.00818725856 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string03:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2453.29593441395 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1      
+  SUPERball_string04:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2453.29593441395 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1      
+  SUPERball_string05:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2422.00818725856 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1      
+  SUPERball_string06:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2422.00818725856 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1      
+  SUPERball_string07:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2453.29593441395 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string08:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2453.29593441395 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1      
+  SUPERball_string09:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2433.84687563378 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string10:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2433.84687563378 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string11:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2433.84687563378 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string12:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2433.84687563378 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string13:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2471.05869901242 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string14:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2471.05869901242 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string15:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2471.05869901242 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string16:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2471.05869901242 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string17:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2385.95288911555 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string18:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2556.39896495281 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string19:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2385.95288911555 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string20:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2556.39896495281 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string21:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2385.95288911555 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string22:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2556.39896495281 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string23:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2385.95288911555 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1
+  SUPERball_string24:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 613 #613.0
+      damping: 200 #200.0
+      pretension: 2556.39896495281 #2452.0
+      history: 1
+      max_tension: 100000 #100000
+      target_velocity: 10000 #10000
+      #motor_friction: 5000
+      #back_drivable: 0
+      #min_actual_length: 1
+      #min_rest_length: 1  
