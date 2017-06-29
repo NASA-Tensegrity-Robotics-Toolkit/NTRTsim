@@ -15,6 +15,8 @@ link_libraries(tgcreator
 
 add_executable(App12Bar
     LengthControllerSequential.cpp
+    LengthControllerWithReturn.cpp
+    LengthControllerMultipleSequential.cpp
     App12Bar.cpp
 ) 
 

@@ -42,7 +42,7 @@ pair_groups:
     - [n22, n23]
 
   cable:
-    - [n0, n2]
+    - [n0, n2]  # structural cables
     - [n0, n14]
     - [n0, n11]
     - [n2, n4]
@@ -78,10 +78,17 @@ pair_groups:
     - [n9, n20]
     - [n20, n13]
     - [n16, n5]
+    - [n15, n19]  # actuatable cables
+    - [n7, n23]
+    - [n18, n22]
+    - [n6, n14]
+    - [n1, n12]
+    
 
   actuated_cable:
-    - [n15, n19]
-    - [n4, n9] 
+    - [n4, n9]
+    - [n15, n19]    
+    
     #- [n2, n10]
     #- [n6, n14]
 
@@ -108,7 +115,7 @@ builders:
   actuated_cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 10000 #kg/s^2 (N/m) #make value large to mimic stiff cable
+      stiffness: 1000 #kg/s^2 (N/m) #make value large to mimic stiff cable
       #damping: 50.0 #kg/s (N-s/m) #complete guess for value
       pretension: 0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       #history: 0 #what is this?

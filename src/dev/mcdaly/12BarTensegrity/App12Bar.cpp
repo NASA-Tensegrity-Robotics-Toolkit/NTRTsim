@@ -35,7 +35,7 @@
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Controllers
-#include "LengthControllerSequential.h"
+#include "LengthControllerMultipleSequential.h"
 
 /**
  * The entry point.
@@ -75,16 +75,16 @@ int main(int argc, char** argv)
     // Create the models with their controllers and add the models to the simulation
     TensegrityModel* const myModel = new TensegrityModel(argv[1],false); // second argument not necessary
 
-    // Parameters for the LengthControllerSequential are specified in that .h file,
+    // Parameters for the LengthControllerMultipleSequential are specified in that .h file,
     // repeated here:
     double startTime = 5;
-    double minLength = 0.1;
-    double rate = 1;
+    double minLength = 0.4;
+    double rate = 0.5;
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("actuated_cable");
     
     // Create the controller
-    LengthControllerSequential* const myController = new LengthControllerSequential(startTime, minLength, rate, tagsToControl);
+    LengthControllerMultipleSequential* const myController = new LengthControllerMultipleSequential(startTime, minLength, rate, tagsToControl);
     
     // Attach the controller to the model
     myModel->attach(myController);

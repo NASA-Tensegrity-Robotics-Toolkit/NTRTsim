@@ -124,8 +124,9 @@ void LengthControllerMultipleSequential::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
-  // Initialize flag
-  m_finished = 0;  // Finished retracting and returning all cables
+  // Initialize flags
+  m_retract = 1;  // Begin in retract mode
+  m_finished = 0;  // True when finished retracting and returning all cables
   // Initialize cable index
   m_cable_index = 0;
   // Output that controller setup is complete
@@ -140,21 +141,19 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
   if(m_timePassed > m_startTime) {   
 
     // Retract mode (retract each cable in sequence)
-    if(m_cable_index < cablesWithTags.size()) {
+    if(m_retract == 1) {
       // Grab cable index
       int i = m_cable_index;
-      // For current cable, check if its rest length is past the minimum,
-      // otherwise adjust its length according to m_rate and dt.
+      // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
-      // Calculate the minimum rest length for this cable.
-      // Remember that m_minLength is a percent.
+      // Calculate the minimum rest length for this cable
       double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
-      // If the current rest length is still greater than the minimum,
+      // If the current rest length is greater than the desired minimum,
       if(currRestLength > minRestLength) {
-        // output a progress bar for the controller, to track when control occurs.
+        // output a progress bar for the controller, to track when control occurs
         //std::cout << "." << i;
-        // Then, adjust the rest length of the actuator itself, according to
-        // m_rate and dt.
+        // Then adjust the rest length of the actuator itself, according to
+        // m_rate and dt
         double nextRestLength = currRestLength - m_rate * dt;
         //DEBUGGING
         //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
@@ -163,26 +162,45 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
       else {
         // Cable has been retracted to min length; now go to next cable
         m_cable_index += 1;
+        std::cout << "Cable index: " << m_cable_index << std::endl;
+        // If the cable index is equal to the number of cables, all cables have
+        // been retracted (because of zero indexing). Move to return state.
+        if(m_cable_index == cablesWithTags.size()) {
+          m_cable_index = 0;
+          m_retract = 0;
+
+        }
       }
     }
 
     // Return state
-    else {
-      for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {  
+    else if (m_finished == 0) {
+      //std::cout << "Made it to return state." << std::endl; 
+      // Grab cable index
+      int i = m_cable_index;
+      // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
-      // Calculate the minimum rest length for this cable.
-      // Remember that m_minLength is a percent.
+      // Calculate the initial rest length for this cable
       double initialRestLength = initialRL[cablesWithTags[i]->getTags()];
-      // If the current rest length is still greater than the minimum,
-        if(currRestLength > initialRestLength) {
-          // output a progress bar for the controller, to track when control occurs.
-          //std::cout << "." << i;
-          // Then, adjust the rest length of the actuator itself, according to
-          // m_rate and dt.
-          double nextRestLength = currRestLength + m_rate * dt;
-          //DEBUGGING
-          //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
-          cablesWithTags[i]->setControlInput(nextRestLength,dt);
+      // If the current rest length is below initial rest length,
+      if(currRestLength < initialRestLength) {
+        // output a progress bar for the controller, to track when control occurs.
+        //std::cout << "." << i;
+        // Then adjust the rest length of the actuator itself, according to
+        // m_rate and dt
+        double nextRestLength = currRestLength + m_rate * dt;
+        //DEBUGGING
+        //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+        cablesWithTags[i]->setControlInput(nextRestLength,dt);
+      }
+      else {
+        // Cable has been retracted to min length; now go to next cable
+        m_cable_index += 1;
+        std::cout << "Cable index: " << m_cable_index << std::endl;
+        // If the cable index is equal to the number of cables, all cables have
+        // been retracted (because of zero indexing). Move to return state.
+        if(m_cable_index == cablesWithTags.size()) {
+          m_finished = 1;
         }
       }
     }
