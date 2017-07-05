@@ -36,6 +36,7 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
+#include <cmath>
 
 namespace
 {
@@ -71,13 +72,13 @@ namespace
      0.688,    // density (kg / length^3)
      0.31,     // radius (length)
      613.0,   // stiffness (kg / sec^2) was 1500
-     2000.0,    // damping (kg / sec)
+     200.0,    // damping (kg / sec)
      16.84,     // rod_length (length)
-     4.21,      // rod_space (length)
+     7.5,      // rod_space (length)
      0.99,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     0*2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -92,6 +93,9 @@ namespace
   };
 } // namespace
 
+std::vector<double> azemuth_altitude_to_xyz(double azemuth, double altitude, double length,
+                                             double bx, double by, double bz);
+
 T6Model::T6Model() : tgModel() 
 {
 }
@@ -100,22 +104,37 @@ T6Model::~T6Model()
 {
 }
 
+
+
 void T6Model::addNodes(tgStructure& s)
 {
-    const double half_length = c.rod_length / 2;
-
-    s.addNode(-c.rod_space,  -half_length, 0);            // 0
-    s.addNode(-c.rod_space,   half_length, 0);            // 1
-    s.addNode( c.rod_space,  -half_length, 0);            // 2
-    s.addNode( c.rod_space,   half_length, 0);            // 3
-    s.addNode(0,           -c.rod_space,   -half_length); // 4
-    s.addNode(0,           -c.rod_space,    half_length); // 5
-    s.addNode(0,            c.rod_space,   -half_length); // 6
-    s.addNode(0,            c.rod_space,    half_length); // 7
-    s.addNode(-half_length, 0,            c.rod_space);   // 8
-    s.addNode( half_length, 0,            c.rod_space);   // 9
-    s.addNode(-half_length, 0,           -c.rod_space);   // 10
-    s.addNode( half_length, 0,           -c.rod_space);   // 11
+    double alt = M_PI/6;
+    double tl1 = c.rod_length / 2;
+    double h = c.rod_length/1.5;
+    double jut = -M_PI/8;
+    
+    // Bottom triangle rods
+    s.addNode(-tl1/2, 0, 0);            // 0
+    std::vector<double> p = azemuth_altitude_to_xyz(-M_PI/3 + jut, alt, c.rod_length, -tl1/2, 0, 0);
+    s.addNode(p[0], p[1], p[2]);        // 1
+    s.addNode(0, -tl1*sqrt(3)/2, 0);    // 2
+    p = azemuth_altitude_to_xyz(M_PI/3 + jut, alt, c.rod_length, 0, -tl1*sqrt(3)/2, 0);
+    s.addNode(p[0], p[1], p[2]);        // 3
+    s.addNode(tl1/2, 0, 0);             // 4
+    p = azemuth_altitude_to_xyz(M_PI + jut, alt, c.rod_length, tl1/2, 0, 0);
+    s.addNode(p[0], p[1], p[2]);        // 5
+    
+    double yshift = -tl1*sqrt(3)/3;
+    // Upper triangle rods
+    s.addNode(-tl1/2, yshift, h);       // 6
+    p = azemuth_altitude_to_xyz(0 + jut, -alt, c.rod_length, -tl1/2, yshift, h);
+    s.addNode(p[0], p[1], p[2]);        // 7
+    s.addNode(tl1/2, yshift, h);        // 8
+    p = azemuth_altitude_to_xyz(2*M_PI/3 + jut, -alt, c.rod_length, tl1/2, yshift, h);
+    s.addNode(p[0], p[1], p[2]);        // 9
+    s.addNode(0, tl1*sqrt(3)/2 + yshift, h);  // 10
+    p = azemuth_altitude_to_xyz(-2*M_PI/3 + jut, -alt, c.rod_length, 0, tl1*sqrt(3)/2 + yshift, h);
+    s.addNode(p[0], p[1], p[2]);        // 11
 }
 
 void T6Model::addRods(tgStructure& s)
@@ -125,45 +144,48 @@ void T6Model::addRods(tgStructure& s)
     s.addPair( 4,  5, "rod");
     s.addPair( 6,  7, "rod");
     s.addPair( 8,  9, "rod");
-    s.addPair(10, 11, "rod");
+    s.addPair( 10, 11, "rod");
 }
 
 void T6Model::addActuators(tgStructure& s)
 {
-    s.addPair(0, 4,  "muscle");
-    s.addPair(0, 5,  "muscle");
-    s.addPair(0, 8,  "muscle");
-    s.addPair(0, 10, "muscle");
-
-    s.addPair(1, 6,  "muscle");
-    s.addPair(1, 7,  "muscle");
-    s.addPair(1, 8,  "muscle");
-    s.addPair(1, 10, "muscle");
-
+    // Bottom triangle 
+    s.addPair(0, 2,  "muscle"); // 0
     s.addPair(2, 4,  "muscle");
-    s.addPair(2, 5,  "muscle");
-    s.addPair(2, 9,  "muscle");
-    s.addPair(2, 11, "muscle");
-
-    s.addPair(3, 7,  "muscle");
-    s.addPair(3, 6,  "muscle");
+    s.addPair(4, 0,  "muscle");
+    
+    // Bottom prism vertical strings
+    s.addPair(0, 5,  "muscle"); // 3
+    s.addPair(2, 1,  "muscle");
+    s.addPair(4, 3,  "muscle");
+    
+    // Top triangle 
+    s.addPair(6, 8,  "muscle"); // 6
+    s.addPair(8, 10,  "muscle");
+    s.addPair(10, 6,  "muscle");
+    
+    // Top prism vertical strings
+    s.addPair(6, 11,  "muscle"); // 9
+    s.addPair(8, 7,  "muscle");
+    s.addPair(10, 9,  "muscle");
+    
+    // Linking of top and bottom prism ends
+    s.addPair(1, 7,  "muscle"); // 12
+    s.addPair(7, 3,  "muscle");
     s.addPair(3, 9,  "muscle");
-    s.addPair(3, 11, "muscle");
-
-    s.addPair(4, 2,  "muscle");
-    s.addPair(4, 10, "muscle");
-    s.addPair(4, 11, "muscle");
-
-    s.addPair(5, 8,  "muscle");
-    s.addPair(5, 9,  "muscle");
-
-    s.addPair(6, 10, "muscle");
-    s.addPair(6, 11, "muscle");
-
-    s.addPair(7, 8,  "muscle");
-    s.addPair(7, 9,  "muscle");
-
+    s.addPair(9, 5,  "muscle");
+    s.addPair(5, 11,  "muscle");
+    s.addPair(11, 1,  "muscle");
+    
+    // Top prism to bottom prisms, end to beginning
+    s.addPair(1, 6,  "muscle"); // 18
+    s.addPair(3, 8,  "muscle");
+    s.addPair(5, 10,  "muscle");
+    s.addPair(11, 0,  "muscle");
+    s.addPair(7, 2,  "muscle");
+    s.addPair(9, 4,  "muscle");
 }
+
 
 void T6Model::setup(tgWorld& world)
 {
@@ -172,6 +194,7 @@ void T6Model::setup(tgWorld& world)
 				c.rollFriction, c.restitution);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    // Muscle configuration
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 					    c.maxTens, c.targetVelocity);
             
@@ -180,15 +203,20 @@ void T6Model::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addActuators(s);
-    //s.move(btVector3(0, 10, 0));
+    
 
-    // Add a rotation. This is needed if the ground slopes too much,
-    // otherwise  glitches put a rod below the ground.
+    // Rotate the model in the world so the default view shows normal x, y, z orientation.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    btVector3 rotationAxis = btVector3(1, 0, 0); // x-axis rotation
     double rotationAngle = M_PI/2;
-    //s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    rotationPoint = btVector3(0, 0, 0); // origin
+    rotationAxis = btVector3(0, 0, 1); // z-axis rotation
+    rotationAngle = M_PI;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    
+    s.move(btVector3(0, 10, 0)); // Move CoM to a certain point.
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -224,6 +252,16 @@ void T6Model::step(double dt)
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
     }
+}
+
+std::vector<double> azemuth_altitude_to_xyz(double azemuth, double altitude, double length,
+                                             double bx, double by, double bz)
+{
+    std::vector<double> xyz;
+    xyz.push_back(length*cos(altitude)*cos(azemuth) + bx); // x
+    xyz.push_back(length*cos(altitude)*sin(azemuth) + by); // y
+    xyz.push_back(length*sin(altitude) + bz);              // z
+    return xyz;
 }
 
 void T6Model::onVisit(tgModelVisitor& r)

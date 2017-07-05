@@ -25,12 +25,17 @@
 
 // This application
 #include "T6Model.h"
+#include "T6TensionController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
+
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -44,14 +49,13 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppSUPERball" << std::endl;
+    std::cout << "AppSUPERball Test" << std::endl;
 
     // First create the ground and world
     
     // Determine the angle of the ground in radians. All 0 is flat
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
-    //const double pitch = 0.0;
+    const double pitch = 0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
@@ -64,7 +68,7 @@ int main(int argc, char** argv)
     tgWorld world(config, NULL);
 
     // Second create the view
-    const double timestep_physics = 0.0001; // Seconds
+    const double timestep_physics = 0.001; // Seconds
     const double timestep_graphics = 1.f/60.f; // Seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -77,15 +81,29 @@ int main(int argc, char** argv)
 
     // Fifth, select the controller to use, and attach it to the model.
     // For example, you could run the following to use the T6TensionController:
-    //T6TensionController* const pTC = new T6TensionController(10000);
+    //T6TensionController* const pTC = new T6TensionController(100);
     //myModel->attach(pTC);
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
     
+    // Add some data logging
+    /*
+    std::string log_filename = "~/Desktop/SUPERballTestLog";
+    double samplingTimeInterval = 0.05;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    myDataLogger->addSenseable(myModel);
+    
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
+    myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
+    simulation.addDataManager(myDataLogger);
+    */
+    
     // Run until the user stops
     simulation.run();
-
+    
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }

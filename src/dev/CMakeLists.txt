@@ -18,5 +18,6 @@ subdirs(
     ezhu
     mcdaly
 	bgigous
+	apopescu
 )
 

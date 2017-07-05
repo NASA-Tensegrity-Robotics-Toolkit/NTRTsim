@@ -12,6 +12,8 @@ subdirs(
     craterEscape
     IROS_2015/
     motorModel/
+    testSUPERball
+    SingleRod
 )
 
 

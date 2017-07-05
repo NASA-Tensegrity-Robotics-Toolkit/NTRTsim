@@ -17,14 +17,16 @@
 */
 
 /**
- * @file AppSUPERball.cpp
- * @brief Contains the definition function main() for the SUPERball applicaiton
- * application.
+ * @file App3BarTraditional.cpp
+ * @brief Contains the definition function main() for the Three strut
+ * tensegrity prism example application (using traditional NTRT system).
+ * @author Edward Zhu, Drew Sabelhaus
  * $Id$
  */
 
 // This application
-#include "T6Model.h"
+#include "threeBarModel.h"
+#include "LengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -44,28 +46,24 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppSUPERball" << std::endl;
+    std::cout << "App3Bar" << std::endl;
 
-    // First create the ground and world
-    
-    // Determine the angle of the ground in radians. All 0 is flat
+    // First create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
-    const double pitch = M_PI/15.0;
-    //const double pitch = 0.0;
+    const double pitch = 0.0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(0); // gravity, cm/sec^2  Use this to adjust length scale of world.
-        // Note, by changing the setting below from 981 to 98.1, we've
-        // scaled the world length scale to decimeters not cm.
-
-    tgWorld world(config, NULL);
+    double sf = 10;
+    double gravity = 9.81*sf;
+    const tgWorld::Config config(gravity); // gravity, cm/sec^2
+    tgWorld world(config, ground);
 
     // Second create the view
-    const double timestep_physics = 0.0001; // Seconds
-    const double timestep_graphics = 1.f/60.f; // Seconds
+    const double timestep_physics = 0.001; // seconds
+    const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
@@ -73,17 +71,18 @@ int main(int argc, char** argv)
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    T6Model* const myModel = new T6Model();
+    threeBarModel* const myModel = new threeBarModel();
+    
+    // Create the controller
+    // FILL IN 5.4 HERE
+    LengthController* const myController = new LengthController();
 
-    // Fifth, select the controller to use, and attach it to the model.
-    // For example, you could run the following to use the T6TensionController:
-    //T6TensionController* const pTC = new T6TensionController(10000);
-    //myModel->attach(pTC);
+    // Attach controller to the model
+    myModel->attach(myController);
 
-    // Finally, add out model to the simulation
+    // Add the model to the world
     simulation.addModel(myModel);
     
-    // Run until the user stops
     simulation.run();
 
     //Teardown is handled by delete, so that should be automatic

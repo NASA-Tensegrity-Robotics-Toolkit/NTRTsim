@@ -36,6 +36,7 @@
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <stdexcept>
+#include <cmath>
 
 namespace
 {
@@ -71,13 +72,13 @@ namespace
      0.688,    // density (kg / length^3)
      0.31,     // radius (length)
      613.0,   // stiffness (kg / sec^2) was 1500
-     2000.0,    // damping (kg / sec)
+     20.0,    // damping (kg / sec)
      16.84,     // rod_length (length)
-     4.21,      // rod_space (length)
-     0.99,      // friction (unitless)
+     7.5,      // rod_space (length)
+     0.9,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     2452.0/10,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -92,6 +93,10 @@ namespace
   };
 } // namespace
 
+void addBarNodesWithCoMAzDec(tgStructure& s, double comx, double comy, double comz,
+                             double azimuth, double declination,
+                             double length);
+
 T6Model::T6Model() : tgModel() 
 {
 }
@@ -101,21 +106,48 @@ T6Model::~T6Model()
 }
 
 void T6Model::addNodes(tgStructure& s)
-{
-    const double half_length = c.rod_length / 2;
-
-    s.addNode(-c.rod_space,  -half_length, 0);            // 0
-    s.addNode(-c.rod_space,   half_length, 0);            // 1
-    s.addNode( c.rod_space,  -half_length, 0);            // 2
-    s.addNode( c.rod_space,   half_length, 0);            // 3
-    s.addNode(0,           -c.rod_space,   -half_length); // 4
-    s.addNode(0,           -c.rod_space,    half_length); // 5
-    s.addNode(0,            c.rod_space,   -half_length); // 6
-    s.addNode(0,            c.rod_space,    half_length); // 7
-    s.addNode(-half_length, 0,            c.rod_space);   // 8
-    s.addNode( half_length, 0,            c.rod_space);   // 9
-    s.addNode(-half_length, 0,           -c.rod_space);   // 10
-    s.addNode( half_length, 0,           -c.rod_space);   // 11
+{   
+    double l = c.rod_length;
+    double b = l*sqrt(3.0/8.0);
+    double delta = acos(1.0/sqrt(3.0));
+    double alpha = M_PI/3.0;
+    double h = l*cos(delta)/2.0; // overlap
+    
+    // The bar labeling and parametrization come from (Sultan 2001).
+    std::cout << "nodes = [";
+    // Bar 11, nodes 0, 1
+    addBarNodesWithCoMAzDec(s, l/2.0*sin(delta)*cos(alpha)-b/2.0, 
+                            l/2.0*sin(delta)*sin(alpha) - b/(2.0*sqrt(3.0)),
+                            l/2.0*cos(delta),
+                            alpha, delta, l);
+    // Bar 21, nodes 2, 3
+    addBarNodesWithCoMAzDec(s, l/2.0*sin(delta)*cos(alpha + 4.0*M_PI/3.0),
+                            b/sqrt(3.0) + l/2.0*sin(delta)*sin(alpha + 4.0*M_PI/3.0),
+                            l/2.0*cos(delta),
+                            alpha + 4.0*M_PI/3.0, delta, l);
+    // Bar 31, nodes 4, 5
+    addBarNodesWithCoMAzDec(s, b/2.0 + l/2.0*sin(delta)*cos(alpha + 2.0*M_PI/3.0),
+                            l/2.0*sin(delta)*sin(alpha + 2.0*M_PI/3.0) - b/(2.0*sqrt(3.0)),
+                            l/2.0*cos(delta),
+                            alpha + 2.0*M_PI/3.0, delta, l);
+    // Bar 12, nodes 6, 7
+    addBarNodesWithCoMAzDec(s,
+                   l/4*sin(delta)*cos(alpha) + sqrt(3.0)/4.0*l*sin(delta)*sin(alpha) - b/2.0,
+     b/(2.0*sqrt(3.0)) - sqrt(3.0)/4.0*l*sin(delta)*cos(alpha) + l/4.0*sin(delta)*sin(alpha),
+                            3.0/2.0*l*cos(delta) - h,
+                            alpha + 2.0*M_PI/3.0, delta, l);
+    // Bar 22, nodes 8, 9
+    addBarNodesWithCoMAzDec(s, b/2.0 - l/2.0*sin(delta)*cos(alpha),
+                            b/(2.0*sqrt(3.0)) - l/2.0*sin(delta)*sin(alpha),
+                            3.0/2.0*l*cos(delta) - h,
+                            alpha, delta, l);
+    // Bar 32, nodes 10, 11
+    addBarNodesWithCoMAzDec(s,
+                        l/4.0*sin(delta)*cos(alpha) - sqrt(3.0)/4.0*l*sin(delta)*sin(alpha),
+           l/4.0*sin(delta)*sin(alpha) + sqrt(3.0)/4.0*l*sin(delta)*cos(alpha) - b/sqrt(3.0),
+                            3.0/2.0*l*cos(delta) - h,
+                            alpha + 4.0*M_PI/3.0, delta, l);
+    std::cout << "]" << std::endl;
 }
 
 void T6Model::addRods(tgStructure& s)
@@ -125,45 +157,44 @@ void T6Model::addRods(tgStructure& s)
     s.addPair( 4,  5, "rod");
     s.addPair( 6,  7, "rod");
     s.addPair( 8,  9, "rod");
-    s.addPair(10, 11, "rod");
+    s.addPair( 10, 11, "rod");
 }
 
 void T6Model::addActuators(tgStructure& s)
 {
-    s.addPair(0, 4,  "muscle");
-    s.addPair(0, 5,  "muscle");
-    s.addPair(0, 8,  "muscle");
-    s.addPair(0, 10, "muscle");
-
-    s.addPair(1, 6,  "muscle");
-    s.addPair(1, 7,  "muscle");
-    s.addPair(1, 8,  "muscle");
-    s.addPair(1, 10, "muscle");
-
-    s.addPair(2, 4,  "muscle");
-    s.addPair(2, 5,  "muscle");
-    s.addPair(2, 9,  "muscle");
-    s.addPair(2, 11, "muscle");
-
-    s.addPair(3, 7,  "muscle");
+    // Saddle
+    s.addPair(5, 8,  "muscle"); // 0
+    s.addPair(8, 3,  "muscle");
     s.addPair(3, 6,  "muscle");
+    s.addPair(6, 1,  "muscle");
+    s.addPair(1, 10,  "muscle");
+    s.addPair(10, 5,  "muscle");
+    
+    // Vertical
+    s.addPair(0, 5,  "muscle"); // 6
+    s.addPair(4, 3,  "muscle");
+    s.addPair(2, 1,  "muscle");
+    s.addPair(10, 7,  "muscle");
+    s.addPair(6, 9,  "muscle");
+    s.addPair(8, 11,  "muscle");
+    
+    // Diagonal
+    s.addPair(0, 10,  "muscle"); // 12
+    s.addPair(2, 6,  "muscle");
+    s.addPair(4, 8,  "muscle");
+    s.addPair(1, 7,  "muscle");
     s.addPair(3, 9,  "muscle");
-    s.addPair(3, 11, "muscle");
-
+    s.addPair(5, 11,  "muscle");
+    
+    // Boundary/Base
+    s.addPair(0, 4,  "muscle"); // 18
     s.addPair(4, 2,  "muscle");
-    s.addPair(4, 10, "muscle");
-    s.addPair(4, 11, "muscle");
-
-    s.addPair(5, 8,  "muscle");
-    s.addPair(5, 9,  "muscle");
-
-    s.addPair(6, 10, "muscle");
-    s.addPair(6, 11, "muscle");
-
-    s.addPair(7, 8,  "muscle");
-    s.addPair(7, 9,  "muscle");
-
+    s.addPair(2, 0,  "muscle");
+    s.addPair(7, 11,  "muscle");
+    s.addPair(11, 9,  "muscle");
+    s.addPair(9, 7,  "muscle");
 }
+
 
 void T6Model::setup(tgWorld& world)
 {
@@ -172,6 +203,7 @@ void T6Model::setup(tgWorld& world)
 				c.rollFriction, c.restitution);
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
+    // Muscle configuration
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 					    c.maxTens, c.targetVelocity);
             
@@ -180,15 +212,20 @@ void T6Model::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addActuators(s);
-    //s.move(btVector3(0, 10, 0));
-
-    // Add a rotation. This is needed if the ground slopes too much,
-    // otherwise  glitches put a rod below the ground.
+    
+    
+    // Rotate the model in the world so the default view shows normal x, y, z orientation.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 1, 0);  // y-axis
+    btVector3 rotationAxis = btVector3(1, 0, 0); // x-axis rotation
     double rotationAngle = M_PI/2;
-    //s.addRotation(rotationPoint, rotationAxis, rotationAngle);
-
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    rotationPoint = btVector3(0, 0, 0); // origin
+    rotationAxis = btVector3(0, 0, 1); // z-axis rotation
+    rotationAngle = M_PI;
+    s.addRotation(rotationPoint, rotationAxis, rotationAngle);
+    
+    s.move(btVector3(0, 0, 0)); // Move CoM to a certain point.
+    
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
@@ -224,6 +261,25 @@ void T6Model::step(double dt)
         notifyStep(dt);
         tgModel::step(dt);  // Step any children
     }
+}
+
+void addBarNodesWithCoMAzDec(tgStructure& s, double comx, double comy, double comz,
+                             double azimuth, double declination,
+                             double length)
+{
+    // Node 1:
+    double nx = comx - length/2.0*sin(declination)*cos(azimuth);
+    double ny = comy - length/2.0*sin(declination)*sin(azimuth);
+    double nz = comz - length/2.0*cos(declination);
+    std::cout << nx << "," << ny << "," << nz << std::endl;
+    s.addNode(nx, ny, nz);
+    
+    // Node 2:
+    nx = comx + length/2.0*sin(declination)*cos(azimuth);
+    ny = comy + length/2.0*sin(declination)*sin(azimuth);
+    nz = comz + length/2.0*cos(declination);
+    std::cout << nx << "," << ny << "," << nz << std::endl;
+    s.addNode(nx, ny, nz);
 }
 
 void T6Model::onVisit(tgModelVisitor& r)
