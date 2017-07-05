@@ -110,6 +110,7 @@ void T6Model::addNodes(tgStructure& s)
     double l = c.rod_length;
     double b = l*sqrt(3.0/8.0);
     double delta = acos(1.0/sqrt(3.0));
+    delta = M_PI/4;
     double alpha = M_PI/3.0;
     double h = l*cos(delta)/2.0; // overlap
     
