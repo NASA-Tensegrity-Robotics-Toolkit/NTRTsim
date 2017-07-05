@@ -105,6 +105,26 @@ namespace
 	        0.3*sf,
 	        */
    		};
+
+   	const struct PayloadConfig
+   	{
+   		double density;
+   		double radius;
+   		double length;
+   		double friction;
+   		double rollFriction;
+   		double restitution;
+   		bool addPayload;
+   	} payloadConfig = 
+   		{
+   			4317/pow(sf,3),		// density (kg / length^3)
+   			8*0.0127/2*sf,     // radius (length)
+   			0.1*sf,		// payloadLength (length)
+   			0.99,      // friction (unitless)
+   			0.01,     // rollFriction (unitless)
+	        0.0,      // restitution (?)
+	        true,
+   		};
 }
  
 sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel() 
@@ -242,8 +262,8 @@ void sixBarModel::setup(tgWorld& world)
   	// Note that pretension is defined for this string
 	const tgRod::Config sixBarRodConfig(config.radius, config.density, config.friction,
 		config.rollFriction, config.restitution);
-	const tgRod::Config PayloadRodConfig(config.radius*8, 4317/pow(sf,3), config.friction,
-		config.rollFriction, config.restitution);
+	const tgRod::Config PayloadRodConfig(payloadConfig.radius, payloadConfig.density, payloadConfig.friction,
+		payloadConfig.rollFriction, payloadConfig.restitution);
 	const tgRod::Config motorConfig(config.radius*2, config.density, config.friction,
 		config.rollFriction, config.restitution);
 
@@ -259,7 +279,9 @@ void sixBarModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	addPayload(s);
+	if (payloadConfig.addPayload) {
+		addPayload(s);
+	}
 
 	// Move the structure
 	rotateToFace(s, 2);
@@ -276,9 +298,9 @@ void sixBarModel::setup(tgWorld& world)
 	tgBuildSpec spec;
 	spec.addBuilder("rod", new tgRodInfo(sixBarRodConfig));
 	spec.addBuilder("payload", new tgRodInfo(PayloadRodConfig));
+	spec.addBuilder("motor", new tgRodInfo(motorConfig));
 	spec.addBuilder("actuator", new tgBasicActuatorInfo(actuatorConfig));
 	spec.addBuilder("cable", new tgBasicActuatorInfo(staticCableConfig));
-	spec.addBuilder("motor", new tgRodInfo(motorConfig));
 
 	// Create the structureInfo
 	tgStructureInfo structureInfo(s, spec);
@@ -297,7 +319,12 @@ void sixBarModel::setup(tgWorld& world)
 	}
 	
 	// Get the payload for controller
-	payload.push_back(sixBarModel::find<tgRod>("payload")[0]);
+	if (payloadConfig.addPayload) {
+		payload.push_back(sixBarModel::find<tgRod>("payload")[0]);
+	}
+	// else {
+	// 	payload.push_back(NULL);
+	// }
 
 	// btRigidBody* rodBody0 = allRods[0]->getPRigidBody();
 	// btRigidBody* rodBody1 = allRods[2]->getPRigidBody();
@@ -368,6 +395,20 @@ const std::vector<btVector3>& sixBarModel::getNormVects() const
 const std::vector<abstractMarker>& sixBarModel::getAllMarkers() const
 {
     return allMarkers;
+}
+
+const double sixBarModel::getRobotMass() const
+{
+	double mass = 6*M_PI*pow(config.radius,2)*config.rodLength*config.density;
+	if (payloadConfig.addPayload) {
+		mass += M_PI*pow(payloadConfig.radius,2)*payloadConfig.length*payloadConfig.density;
+	}
+	return mass;
+}
+
+const double sixBarModel::getScalingFactor() const
+{
+	return sf;
 }
 
 void sixBarModel::teardown()
@@ -492,9 +533,8 @@ void sixBarModel::addSixBarActuators(tgStructure& s)
 
 void sixBarModel::addPayloadNodes(tgStructure& s)
 {
-	double payloadLength = 0.1*sf;
-	s.addNode(0, payloadLength/2, 0); // 12 or 24
-	s.addNode(0, -payloadLength/2, 0); //13 0r 25
+	s.addNode(0, payloadConfig.length/2, 0); // 12 or 24
+	s.addNode(0, -payloadConfig.length/2, 0); //13 0r 25
 }
 
 void sixBarModel::addPayloadRods(tgStructure& s)

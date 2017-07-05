@@ -54,7 +54,7 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, bt
 m_gravity(gravity), m_mode(mode), m_dr_goal(dr_goal), m_log_name(log_name)
 {
 	assert(m_gravity >= 0);
-	if ((mode.compare("dr") != 0) && (mode.compare("thrust") != 0)) {
+	if (mode.compare("dr") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
 		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
@@ -74,6 +74,18 @@ m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize), m_log_nam
 	}
 }
 
+T6RollingController::Config::Config (double gravity, const std::string& mode, btVector3 initVel, double thrustDist, const std::string& log_name) :
+m_gravity(gravity), m_mode(mode), m_initVel(initVel), m_thrustDist(thrustDist), m_log_name(log_name)
+{
+	assert(m_gravity >= 0);
+	if (mode.compare("thrust") != 0){
+		std::cout << "Config: invalid arguments" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Exiting..." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
 T6RollingController::T6RollingController(const T6RollingController::Config& config) : m_config(config)
 {
 	c_mode = config.m_mode;
@@ -83,6 +95,8 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_path_size = config.m_path_size;
 	c_log_name = config.m_log_name;
 	c_gravity = config.m_gravity;
+	c_initVel = config.m_initVel;
+	c_thrustDist = config.m_thrustDist;
 
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
@@ -120,8 +134,9 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		controller_mode = 3;
 	}
 	else if (c_mode.compare("thrust") == 0) {
-		std::cout << "onSetup: Thrust magnitude: [" << c_dr_goal.x() << ", " 
-			<< c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
+		std::cout << "onSetup: Initial velocity: [" << c_initVel.x() << ", " 
+			<< c_initVel.y() << ", " << c_initVel.z() << "]" << std::endl;
+		std::cout << "onSetup: Thrust distance: " << c_thrustDist << std::endl;
 		controller_mode = 4;
 	}
 	else {
@@ -139,6 +154,10 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		btRigidBody* rodBody = rod->getPRigidBody();
 		rodBodies.push_back(rodBody);
 	}
+
+	// Get robot mass
+	mass = subject.getRobotMass();
+	std::cout << "Mass: " << mass << std::endl;
 
 	// Retrive payload body from model
 	payload = subject.getPayload();
@@ -317,16 +336,17 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 	if (!c_log_name.empty()) {
 		doLog = true;
-		// std::string filename = "0P0R_Response.txt";
-		std::string filename = c_log_name;
+		filename = c_log_name;
 		// Create filestream for data log and open it
-		data_out.open(filename.c_str(), std::fstream::out);
+		data_out.open(filename.c_str(), std::fstream::app);
 		if (!data_out.is_open()) {
 			std::cout << "Failed to open output file" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, CoM_posX, CoM_posY, CoM_posZ, CoM_velX, CoM_velY, CoM_velZ, onGround, contactCounter" << std::endl << std::endl;
+			// Write first line of variable names then close filestream
+			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,onGround,contactCounter" << std::endl;
+			data_out.close();
 		}
 	}
 	else {
@@ -472,33 +492,30 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				CoM_pos = payloadBody->getCenterOfMassPosition();
 				CoM_vel = payloadBody->getLinearVelocity();
 
-				if (worldTime > 5 && worldTime <= 6) {
+				btVector3 thrustMag = getThrustMag(c_initVel, c_thrustDist);
+				double thrustPeriod = getThrustPeriod(c_initVel, thrustMag);
+
+				// std::cout << thrustMag << std::endl;
+				// std::cout << thrustPeriod << std::endl;
+				double thrust_start = 5.0;
+				double thrust_end = thrust_start + thrustPeriod;
+
+				if (worldTime > thrust_start && worldTime <= thrust_end) {
 					thrusterOn = true;
+					payloadBody->applyCentralForce(thrustMag);
 				}
 				else {
 					thrusterOn = false;
-				}
-
-				// std::cout << getRobotForce(btVector3(250,250,0)) << std::endl;
-				if (thrusterOn) {
-					// btTransform rotation;
-					// btQuaternion orientation = payloadBody->getOrientation();
-					// rotation.setRotation(orientation);
-					// btVector3 robotForce = rotation*c_dr_goal;
-					// btVector3 thrustDir = robotForce/robotForce.norm();
-					// std::cout << "x: " << thrustDir.x() << ", y: " << thrustDir.y() << ", z: " << thrustDir.z() << std::endl;
-					// robotForce = getRobotForce(c_dr_goal, payloadBody);
-					// payloadBody->applyCentralForce(robotForce);
-					payloadBody->applyCentralForce(c_dr_goal);
+					payloadBody->applyCentralForce(btVector3(0,0,0));
 				}
 			 
-				if (CoM_vel.norm() < 1.0 && worldTime > 6) {
+				if (CoM_vel.norm() < 1.0 && worldTime > thrust_end) {
 					std::cout << "Simulation complete, exiting..." << std::endl;
 					exit(EXIT_SUCCESS);
 				}
 
 				// if (!isOnGround && worldTime > 6) {
-				if (worldTime > 6) {
+				if (worldTime > thrust_end) {
 					bool tmp = false;
 					for (int i = 0; i < markers.size(); i++) {
 						if (markers[i].getWorldPosition().y() <= 1.56) {
@@ -533,7 +550,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				// 	// }
 				// }
 
-				if (isOnGround != lastFlag && worldTime > 6) {
+				if (isOnGround != lastFlag && worldTime > thrust_end) {
 					if (isOnGround) {
 						contactCounter += 1;
 					}
@@ -547,10 +564,13 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				/***************************************************************************************/
 
 				// if (doLog && isOnGround) {
-				if (doLog && !thrusterOn && worldTime > 6) {
-				    data_out << worldTime << ", " << CoM_pos.x() << ", " << CoM_pos.y() << ", " << CoM_pos.z() << ", " 
-				    		<< CoM_vel.x() << ", " << CoM_vel.y() << ", " << CoM_vel.z() << ", " 
-				    		<< isOnGround << ", " << contactCounter << std::endl;
+				if (doLog && !thrusterOn && worldTime > thrust_end) {
+					// Open filestream, record line of data, then close filestream
+					data_out.open(filename.c_str(), std::fstream::app);
+				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << "," 
+				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," 
+				    		<< isOnGround << "," << contactCounter << std::endl;
+		    		data_out.close();
 				}
 			}
 		}
@@ -918,4 +938,29 @@ bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& contr
 	}
 	// std::cout << "Resetting Cable Lengths " << std::endl;
 	return returnFin;
+}
+
+btVector3 T6RollingController::getThrustMag(btVector3 initVel, double thrustDist)
+{
+	btVector3 thrust_dir = thrustDist*initVel.normalized();
+	btVector3 thrust_mag;
+	thrust_mag.setX((mass/2)*(initVel.x()*initVel.x()/thrust_dir.x()));
+	thrust_mag.setY((mass/2)*(initVel.y()*initVel.y()/thrust_dir.y())+mass*c_gravity);
+	thrust_mag.setZ((mass/2)*(initVel.z()*initVel.z()/thrust_dir.z()));
+	
+	if (initVel.x() == 0) {
+		thrust_mag.setX(0);
+	}
+	if (initVel.y() == 0) {
+		thrust_mag.setY(0);
+	}
+	if (initVel.z() == 0) {
+		thrust_mag.setZ(0);
+	}
+	return thrust_mag;
+}
+
+double T6RollingController::getThrustPeriod(btVector3 initVel, btVector3 thrustMag)
+{
+	return initVel.x()/(thrustMag.x()/mass);
 }

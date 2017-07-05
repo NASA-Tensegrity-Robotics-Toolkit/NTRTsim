@@ -67,6 +67,7 @@ public:
 		Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name);
 		Config (double gravity, const std::string& mode, btVector3 dr_goal, const std::string& log_name);
 		Config (double gravity, const std::string& mode, int *path, int pathSize, const std::string& log_name);
+		Config (double gravity, const std::string& mode, btVector3 thrust_mag, double thrust_period, const std::string& log_name);
 
 		double m_gravity;
 
@@ -80,6 +81,9 @@ public:
 		// Goal direction to roll towards, specified as an [x,y,z] vector, height (y)
 		// is ignored
 		btVector3 m_dr_goal;
+
+		btVector3 m_initVel;
+		double m_thrustDist;
 
 		int *m_path;
 		int m_path_size;
@@ -194,9 +198,13 @@ public:
 						 std::vector<tgBasicActuator*>& actuators, 
 						 double setLength, double dt);
 
+
 	int resetCounter = 0;
 	bool resetFlag = false;
 
+	btVector3 getThrustMag(btVector3 initVel, double thrustDist);
+	double getThrustPeriod(btVector3 initVel, btVector3 thrustMag);
+	
 private:
 	// Store the configuration data for use later
 	Config m_config;
@@ -208,6 +216,10 @@ private:
 	int controller_mode;
 	std::string c_log_name;
 	double c_gravity;
+	btVector3 c_initVel;
+	double c_thrustDist;
+
+	double mass;
 
 	// Vector of rigid body objects
 	std::vector<btRigidBody*> rodBodies;
@@ -323,6 +335,7 @@ private:
 
 	// Initialize filestream and data
 	std::ofstream data_out;
+	std::string filename;
 	double worldTime = 0;
 	int actuatedCable;
 	int currentFace;

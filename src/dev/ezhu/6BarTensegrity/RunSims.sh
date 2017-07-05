@@ -3,8 +3,10 @@
 # echo ${BASH_VERSION}
 
 cd ~/NTRTsim/build/dev/ezhu/6BarTensegrity/
+rm -r ./data
+mkdir data
 
-interval=$[3]
+interval=$[1]
 min_angle=$[0]
 max_angle=$[180]
 
@@ -30,9 +32,12 @@ num_pts=$[($max_angle-$min_angle)/$interval]
 
 pitch=$[0]
 roll=$[0]
-for i in {0..60}
+for i in {0..180}
+# for i in {0..1}
 do
 	yaw=$[$i*$interval+$min_angle]
-	log_name="${yaw}Y_Response.txt"
+	log_name="./data/${yaw}Y_Response.csv"
 	./App6Bar $yaw $pitch $roll $log_name
 done
+
+zip -r data.zip ./data

@@ -135,6 +135,10 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	     */
 	    const std::vector<abstractMarker>& getAllMarkers() const;
 
+	    const double getRobotMass() const;
+
+	    const double getScalingFactor() const;
+
 	    /**
 	     * A function called during setup that rotates the structure
 	     * to a face

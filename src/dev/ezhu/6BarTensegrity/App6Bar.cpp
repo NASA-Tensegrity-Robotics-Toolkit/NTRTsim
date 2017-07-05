@@ -187,15 +187,25 @@ int main(int argc, char** argv)
     sixBarModel* const myModel = new sixBarModel(psi,theta,phi);
 
     // Define path for controller
-    int *pathPtr;
-    int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
-    int pathSize = sizeof(path)/sizeof(int);
-    pathPtr = path;
+    // int *pathPtr;
+    // int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
+    // int pathSize = sizeof(path)/sizeof(int);
+    // pathPtr = path;
+
+    // Define thrust magnitude and period
+    btVector3 initVel;
+    double initVel_x = 1*sf;
+    double initVel_y = 2*sf;
+    double initVel_z = 4*sf;
+    initVel.setX(initVel_x);
+    initVel.setY(initVel_y);
+    initVel.setZ(initVel_z);
+    double thrustDist = 2*sf;
 
     // Configure the controlller
     // const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize, log_name);
-    const T6RollingController::Config controllerConfig(gravity, "thrust", btVector3(250,250,0), log_name);
+    const T6RollingController::Config controllerConfig(gravity, "thrust", initVel, thrustDist, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(10,0,0), log_name);
 
     // Create the controller
