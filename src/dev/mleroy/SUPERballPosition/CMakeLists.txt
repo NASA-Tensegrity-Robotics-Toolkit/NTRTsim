@@ -16,6 +16,7 @@ link_libraries(tgcreator
 
 add_executable(AppSUPERballPosition
     HopfControllerML.cpp
+    PhaseOscController.cpp
     #LengthControllerML.cpp
     LengthControllerYAML.cpp
     AppSUPERballPosition.cpp
