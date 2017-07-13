@@ -17,20 +17,21 @@
  */
 
 /**
- * @file LengthControllerMultipleSequential.cpp
- * @brief Implementation of LengthControllerMultipleSequential.h
+ * @file LengthController12BarCube.cpp
+ * @brief Implementation of LengthController12BarCube.h
  * @author Drew Sabelhaus and Mallory Daly
  * $Id$
  */
 
-/* This length controler retracts and returns one or more cables based on
- * the following inputs: controller start time, minimum cable length desired,
- * retraction rate, and cables to be controlled (based on tags). The cables are
- * retracted in sequence and returned in sequence.
+/* This length controller is meant specifically for creating the walking
+ * scheme of the 12-bar cube. It retracts in sequence and then returns in 
+ * sequence the first three cables in the actuated cable list. Then it
+ * retracts and returns the next cable, and so on in sets of 3 and 1 for as
+ * many cables are provided.
  */
 
 // This module
-#include "LengthControllerMultipleSequential.h"
+#include "LengthController12BarCube.h"
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 // This library
@@ -51,13 +52,15 @@
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-LengthControllerMultipleSequential::LengthControllerMultipleSequential(double startTime,
+LengthController12BarCube::LengthController12BarCube(double startTime,
 					   double minLength,
 					   double rate,
+             bool loop,
 					   std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),
   m_rate(rate),
+  m_loop(loop),
   m_tagsToControl(tagsToControl),
   m_timePassed(0.0)
 {
@@ -77,6 +80,7 @@ LengthControllerMultipleSequential::LengthControllerMultipleSequential(double st
     throw std::invalid_argument("Rate cannot be negative.");
   }
   // @TODO: what checks to make on tags?
+  std::cout << "Looping infinitely: " << m_loop << std::endl;
 }
 
 /**
@@ -84,7 +88,7 @@ LengthControllerMultipleSequential::LengthControllerMultipleSequential(double st
  * specific actuators in the cablesWithTags array, as well as store the initial
  * rest lengths in the initialRL map.
  */
-void LengthControllerMultipleSequential::initializeActuators(TensegrityModel& subject,
+void LengthController12BarCube::initializeActuators(TensegrityModel& subject,
 					       std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -99,8 +103,8 @@ void LengthControllerMultipleSequential::initializeActuators(TensegrityModel& su
     // to the list of all initial rest lengths.
     initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
     //DEBUGGING:
-    std::cout << "Cable rest length at t=0 is "
-	      << initialRL[foundActuators[i]->getTags()] << std::endl;
+    // std::cout << "Cable rest length at t=0 is "
+	   //    << initialRL[foundActuators[i]->getTags()] << std::endl;
   }
   // Add this list of actuators to the full list. Thanks to:
   // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
@@ -113,9 +117,9 @@ void LengthControllerMultipleSequential::initializeActuators(TensegrityModel& su
  * which means just store pointers to them and record their rest lengths.
  * This method calls the helper initializeActuators.
  */
-void LengthControllerMultipleSequential::onSetup(TensegrityModel& subject)
+void LengthController12BarCube::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the LengthControllerMultipleSequential controller." << std::endl;
+  std::cout << "Setting up the LengthController12BarCube controller." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
   //	    << std::endl;
   cablesWithTags = {};
@@ -126,25 +130,31 @@ void LengthControllerMultipleSequential::onSetup(TensegrityModel& subject)
     initializeActuators(subject, *it);
   }
   // Initialize flags
-  m_retract = 1;  // Begin in retract mode
-  m_finished = 0;  // True when finished retracting and returning all cables
+  retract = 1;  // Begin in retract mode
+  finished = 0;  // True when finished retracting and returning all cables
   // Initialize cable index
-  m_cable_index = 0;
+  cable_idx = 0;
+  // Grab number of cables
+  num_cables = cablesWithTags.size();
+  num_sets = num_cables/4;
+  current_set = 0;
+  on_octagon = 1;
   // Output that controller setup is complete
-  std::cout << "Finished setting up the controller." << std::endl;    
+  std::cout << "Finished setting up the controller." << std::endl; 
+  std::cout << "----------------------------------------" << std::endl;               
 }
 
-void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double dt)
+void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
 {
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, if it's passed the time to start the controller,
-  if(m_timePassed > m_startTime) {   
+  if(m_timePassed > m_startTime) {
 
     // Retract mode (retract each cable in sequence)
-    if(m_retract == 1) {
-      // Grab cable index
-      int i = m_cable_index;
+    if(retract == 1 && finished == 0) {
+      // Create index adjusted for current set
+      int i = cable_idx + 4*current_set;
       // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
       // Calculate the minimum rest length for this cable
@@ -161,30 +171,33 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
         cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
       else {
+        std::cout << "Retracted cable " << i << "." << std::endl;                
         // Cable has been retracted to min length; now go to next cable
-        m_cable_index += 1;
-        std::cout << "Cable index: " << m_cable_index << std::endl;
-        // If the cable index is equal to the number of cables, all cables have
-        // been retracted (because of zero indexing). Move to return state.
-        if(m_cable_index == cablesWithTags.size()) {
-          m_cable_index = 0;
-          m_retract = 0;
-
+        cable_idx += 1;
+        // Check if I'm done retracting from the octagon face
+        if (cable_idx == 3 && on_octagon == 1) {
+          cable_idx = 0;
+          retract = 0;
+        }
+        // Check if I'm done retracting from the triangle face
+        else if (cable_idx == 4) {
+          retract = 0;
+          cable_idx = 3;
         }
       }
     }
 
     // Return state
-    else if (m_finished == 0) {
+    else if (finished == 0) {
       //std::cout << "Made it to return state." << std::endl; 
-      // Grab cable index
-      int i = m_cable_index;
+      // Create index adjusted for current set
+      int i = cable_idx + 4*current_set;
       // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
       // Calculate the initial rest length for this cable
       double initialRestLength = initialRL[cablesWithTags[i]->getTags()];
       // If the current rest length is below initial rest length,
-      if(currRestLength < initialRestLength) {
+      if (currRestLength < initialRestLength) {
         // output a progress bar for the controller, to track when control occurs.
         //std::cout << "." << i;
         // Then adjust the rest length of the actuator itself, according to
@@ -195,13 +208,29 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
         cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
       else {
+        std::cout << "Returned cable " << i << "." << std::endl;
         // Cable has been retracted to min length; now go to next cable
-        m_cable_index += 1;
-        std::cout << "Cable index: " << m_cable_index << std::endl;
+        cable_idx += 1;
         // If the cable index is equal to the number of cables, all cables have
         // been retracted (because of zero indexing). Move to return state.
-        if(m_cable_index == cablesWithTags.size()) {
-          m_finished = 1;
+        if (cable_idx == 3) {
+          on_octagon = 0;
+          retract = 1;
+        }
+        else if (cable_idx == 4) {
+          on_octagon = 1;
+          retract = 1;
+          current_set += 1;
+          cable_idx = 0;
+          if (current_set == num_sets) {
+            if (m_loop == true) {
+              current_set = 0;
+            }
+            else {
+              finished = 1;
+            }
+          }
+        std::cout << "----------------------------------------" << std::endl;          
         }
       }
     }

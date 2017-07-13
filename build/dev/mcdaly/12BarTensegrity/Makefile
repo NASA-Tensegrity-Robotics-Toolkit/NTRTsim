@@ -152,6 +152,33 @@ App12Bar.cpp.s:
 	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.s
 .PHONY : App12Bar.cpp.s
 
+LengthController12BarCube.o: LengthController12BarCube.cpp.o
+
+.PHONY : LengthController12BarCube.o
+
+# target to build an object file
+LengthController12BarCube.cpp.o:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthController12BarCube.cpp.o
+.PHONY : LengthController12BarCube.cpp.o
+
+LengthController12BarCube.i: LengthController12BarCube.cpp.i
+
+.PHONY : LengthController12BarCube.i
+
+# target to preprocess a source file
+LengthController12BarCube.cpp.i:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthController12BarCube.cpp.i
+.PHONY : LengthController12BarCube.cpp.i
+
+LengthController12BarCube.s: LengthController12BarCube.cpp.s
+
+.PHONY : LengthController12BarCube.s
+
+# target to generate assembly for a file
+LengthController12BarCube.cpp.s:
+	cd /home/mcdaly/NTRTsim/build && $(MAKE) -f dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/build.make dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthController12BarCube.cpp.s
+.PHONY : LengthController12BarCube.cpp.s
+
 LengthControllerMultipleSequential.o: LengthControllerMultipleSequential.cpp.o
 
 .PHONY : LengthControllerMultipleSequential.o
@@ -245,6 +272,9 @@ help:
 	@echo "... App12Bar.o"
 	@echo "... App12Bar.i"
 	@echo "... App12Bar.s"
+	@echo "... LengthController12BarCube.o"
+	@echo "... LengthController12BarCube.i"
+	@echo "... LengthController12BarCube.s"
 	@echo "... LengthControllerMultipleSequential.o"
 	@echo "... LengthControllerMultipleSequential.i"
 	@echo "... LengthControllerMultipleSequential.s"

@@ -70,49 +70,58 @@ pair_groups:
   cable:
     - [n0, n2]
     - [n0, n14]
-    - [n0, n11]
+    # - [n0, n11]   # octagon 3
+    # - [n1, n16]   # octagon 2
+    - [n1, n22]
     - [n2, n4]
     - [n2, n15]
-    - [n4, n15]
-    - [n4, n6]
-    - [n6, n8]
-    - [n6, n3]
-    # - [n8, n3]
+    - [n3, n6]
+    # - [n3, n8]    # octagon 1
     - [n3, n23]
-    - [n8, n10]
-    - [n10, n12]
-    - [n10, n7]
-    # - [n7, n12]
-    - [n14, n12]
-    - [n14, n11]
-    # - [n23, n20]
-    # - [n9, n23]
+    # - [n4, n15]
+    - [n4, n6]
+    - [n5, n16]
+    # - [n5, n18]   # octagon 3
+    # - [n5, n21]
+    - [n6, n8]
+    - [n7, n10]
+    # - [n7, n12]   # octagon 2
     - [n7, n17]
-    - [n17, n13]
-    # - [n13, n22]
-    - [n22, n17]
-    - [n22, n1]
-    # - [n1, n16]
-    - [n16, n19]
-    - [n19, n1]
-    - [n19, n11]
-    - [n5, n18]
-    # - [n18, n21]
-    - [n21, n5]
-    - [n21, n15]
-    - [n18, n9]
-    - [n9, n20]
-    - [n20, n13]
-    - [n16, n5]
+    - [n8, n10]
+    - [n9, n18]
+    # - [n9, n20]
+    # - [n9, n23]   # triangle 1
+    - [n10, n12]
+    - [n11, n14]
+    - [n11, n19]
+    - [n12, n14]
+    # - [n13, n17]  # triangle 2
+    - [n13, n20]
+    # - [n13, n22]  # octagon 1
+    - [n15, n21]
+    # - [n16, n19]
+    # - [n17, n22]  # octagon 3
+    # - [n18, n21]  # octagon 1
+    # - [n19, n1]   # triangle 3
+    # - [n20, n23]  # octagon 2
 
   actuated_cable:
-    - [n3, n8]  # hex 1
+    - [n3, n8]      # octagon 1
     - [n13, n22]
     - [n18, n21]
-    - [n9, n23]  # triangle 1
-    - [n7, n12]  # hex 2
+    - [n9, n23]     # triangle 1
+    - [n7, n12]     # octagon 2
     - [n1, n16]
     - [n20, n23]
+    - [n13, n17]    # triangle 2
+    - [n0, n11]    # octagon 3
+    - [n5, n18]
+    - [n17, n22]
+    - [n1, n19]     # triangle 3
+    - [n4, n15]
+    - [n9, n20]
+    - [n16, n19]    
+    - [n5, n21]
 
 builders:
   rod:

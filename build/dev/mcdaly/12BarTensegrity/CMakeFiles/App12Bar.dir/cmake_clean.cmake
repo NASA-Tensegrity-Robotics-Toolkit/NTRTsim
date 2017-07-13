@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/App12Bar.dir/LengthControllerSequential.cpp.o"
   "CMakeFiles/App12Bar.dir/LengthControllerWithReturn.cpp.o"
   "CMakeFiles/App12Bar.dir/LengthControllerMultipleSequential.cpp.o"
+  "CMakeFiles/App12Bar.dir/LengthController12BarCube.cpp.o"
   "CMakeFiles/App12Bar.dir/App12Bar.cpp.o"
   "App12Bar.pdb"
   "App12Bar"

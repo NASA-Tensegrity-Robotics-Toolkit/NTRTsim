@@ -17,6 +17,7 @@ add_executable(App12Bar
     LengthControllerSequential.cpp
     LengthControllerWithReturn.cpp
     LengthControllerMultipleSequential.cpp
+    LengthController12BarCube.cpp
     App12Bar.cpp
 ) 
 
