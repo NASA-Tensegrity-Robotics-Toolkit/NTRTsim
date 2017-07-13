@@ -1,6 +1,6 @@
 nodes:
 
-  # rod ends (length of 4.5 dm)
+  # Smaller triangles (rod length of 4.5 dm)
   n0: [-2.079,2.079,0.861]
   n1: [-0.861,-2.079,2.079]
   n2: [-2.079,2.079,-0.861]
@@ -26,6 +26,32 @@ nodes:
   n22: [0.861,-2.079,2.079]
   n23: [2.079,-0.861,-2.079]
 
+  # # Larger triangles (rod length of 4.5 dm)
+  # n0: [-1.8027,1.9885,0.4612]
+  # n1: [-0.4612,-1.9885,1.8027]
+  # n2: [-1.9885,1.8027,-0.4612]
+  # n3: [1.9885,0.4612,-1.8027]
+  # n4: [-0.4612,1.9885,-1.8027]
+  # n5: [-1.8027,-1.9885,-0.4612]
+  # n6: [0.4612,1.8027,-1.9885]
+  # n7: [1.8027,0.4612,1.9885]
+  # n8: [1.8027,1.9885,-0.4612]
+  # n9: [0.4612,-1.9885,-1.8027]
+  # n10: [1.9885,1.8027,0.4612]
+  # n11: [-1.9885,0.4612,1.8027]
+  # n12: [0.4612,1.9885,1.8027]
+  # n13: [1.8027,-1.9885,0.4612]
+  # n14: [-0.4612,1.8027,1.9885]
+  # n15: [-1.8027,0.4612,-1.9885]
+  # n16: [-1.9885,-1.8027,0.4612]
+  # n17: [1.9885,-0.4612,1.8027]
+  # n18: [-0.4612,-1.8027,-1.9885]
+  # n19: [-1.8027,-0.4612,1.9885]
+  # n20: [1.9885,-1.8027,-0.4612]
+  # n21: [-1.9885,-0.4612,-1.8027]
+  # n22: [0.4612,-1.8027,1.9885]
+  # n23: [1.8027,-0.4612,-1.9885]
+
 pair_groups:
   rod:
     - [n0, n1]
@@ -42,7 +68,7 @@ pair_groups:
     - [n22, n23]
 
   cable:
-    - [n0, n2]  # structural cables
+    - [n0, n2]
     - [n0, n14]
     - [n0, n11]
     - [n2, n4]
@@ -51,50 +77,42 @@ pair_groups:
     - [n4, n6]
     - [n6, n8]
     - [n6, n3]
-    #- [n8, n3]
+    # - [n8, n3]
     - [n3, n23]
     - [n8, n10]
     - [n10, n12]
     - [n10, n7]
-    - [n7, n12]
+    # - [n7, n12]
     - [n14, n12]
     - [n14, n11]
-    - [n23, n20]
-    - [n9, n23]
+    # - [n23, n20]
+    # - [n9, n23]
     - [n7, n17]
     - [n17, n13]
-    #- [n13, n22]
+    # - [n13, n22]
     - [n22, n17]
     - [n22, n1]
-    - [n1, n16]
+    # - [n1, n16]
     - [n16, n19]
     - [n19, n1]
     - [n19, n11]
     - [n5, n18]
-    #- [n18, n21]
+    # - [n18, n21]
     - [n21, n5]
     - [n21, n15]
     - [n18, n9]
     - [n9, n20]
     - [n20, n13]
     - [n16, n5]
-    #- [n15, n19]  # actuatable cables
-    #- [n7, n23]
-    #- [n18, n22]
-    #- [n6, n14]
-    #- [n1, n12]
-    
 
   actuated_cable:
-    - [n3, n8]
+    - [n3, n8]  # hex 1
     - [n13, n22]
     - [n18, n21]
-
-    #- [n4, n9]
-    #- [n15, n19]    
-    
-    #- [n2, n10]
-    #- [n6, n14]
+    - [n9, n23]  # triangle 1
+    - [n7, n12]  # hex 2
+    - [n1, n16]
+    - [n20, n23]
 
 builders:
   rod:
@@ -102,26 +120,21 @@ builders:
     parameters: # Note 6/6/17: Have been playing with these values to find effect
       density: 4.03 #kg/dm^3 #aluminum is 2.70 g/cm^3 = 2.70 kg/dm^3
       radius: 0.0475 #dm #outer diameter is 9.5 mm
-      friction: 1 
-      roll_friction: 1
-      #restitution: 0.0 #does this have to be zero?
+      #friction: 1 
+      #roll_friction: 1
 
   cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 410.7 #kg/s^2 (N/m) #410.7 is from Marshall's measurements #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      damping: 100.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 400 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
-      #history: 0 #what is this?
+      stiffness: 1500.0 #410.7 #kg/s^2 (N/m) #410.7 is from Marshall's measurements #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      damping: 40.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
-      #target_velocity: 0 #dm/s #what is this?
 
   actuated_cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000 #kg/s^2 (N/m) #make value large to mimic stiff cable
-      #damping: 50.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
-      #history: 0 #what is this?
-      max_tension: 100000 #kg-dm/s^2 #corresponds to 500 N
-      #target_velocity: 0 #dm/s #what is this?
+      stiffness: 1500.0 #410.7 #kg/s^2 (N/m) #410.7 is from Marshall's measurements #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
+      damping: 40.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N

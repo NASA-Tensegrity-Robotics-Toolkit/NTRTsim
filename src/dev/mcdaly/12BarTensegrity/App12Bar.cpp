@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
     // Parameters for the LengthControllerMultipleSequential are specified in that .h file,
     // repeated here:
-    double startTime = 5;
+    double startTime = 10;
     double minLength = 0.1;
     double rate = 0.5;
     std::vector<std::string> tagsToControl;

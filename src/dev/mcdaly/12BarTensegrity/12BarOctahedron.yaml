@@ -90,24 +90,19 @@ builders:
       radius: 0.0475 #dm #outer diameter is 9.5 mm
       friction: 1 #estimated value
       roll_friction: 1 #N or dimensionless? #nearly zero (almost no rolling resistance)
-      #restitution: 0.0 #does this have to be zero?
 
   cable:
     class: tgBasicActuatorInfo 
     parameters:
       stiffness: 476.1 #kg/s^2 (N/m) #476.1 is from Marshall's measurements #1560.0 is from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-      damping: 40 #kg/s (N-s/m) #complete guess for value
-      pretension: 400 #400.0 #kg-dm/s^2 #need to check estimate using 'Tension Results.xlsx'
-      #history: 0 #what is this?
-      max_tension: 10000 #kg-dm/s^2
-      #target_velocity: 0 #dm/s #what is this?
+      damping: 40.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 400.0 #kg-dm/s^2 #need to check estimate using 'Tension Results.xlsx'
+      max_tension: 5000 #kg-dm/s^2
 
   actuated_cable:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 10000 #kg/s^2 (N/m) #make value large to mimic stiff cable
-      #damping: 50.0 #kg/s (N-s/m) #complete guess for value
-      pretension: 0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
-      #history: 0 #what is this?
-      max_tension: 100000 #kg-dm/s^2
-      #target_velocity: 0 #dm/s #what is this?      
+      stiffness: 476.1 #kg/s^2 (N/m) #make value large to mimic stiff cable
+      damping: 50.0 #kg/s (N-s/m) #complete guess for value
+      pretension: 4000.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
+      max_tension: 5000 #kg-dm/s^2
