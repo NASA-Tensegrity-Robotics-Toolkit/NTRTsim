@@ -85,10 +85,6 @@ LengthController12BarCube::LengthController12BarCube(double startTime,
   if (m_loop == true) {
     std::cout << "Looping infinitely." << std::endl;
   }
-  std::cout << m_sequence[0] << std::endl;
-  std::cout << m_sequence[1] << std::endl;
-  std::cout << m_sequence[2] << std::endl;
-  std::cout << m_sequence[3] << std::endl;
 }
 
 /**
@@ -183,7 +179,8 @@ void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
         // Cable has been retracted to min length; now go to next cable
         cable_idx += 1;
         // Check if I'm done retracting from the octagon face
-        if (cable_idx == 3 && on_octagon == 1) {
+        // if (cable_idx == 3 && on_octagon == 1) {
+        if (cable_idx == 3 && on_octagon == 1) {          
           cable_idx = 0;
           retract = 0;
         }

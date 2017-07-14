@@ -105,29 +105,6 @@ pair_groups:
     - [n20, n13]  # 34
     - [n16, n5]   # 35
 
-  actuated_cable:
-    # - [n3, n8]      # octagon 1
-    # - [n13, n22]
-    # - [n18, n21]
-    # - [n9, n23]     # triangle 1
-    # - [n9, n23]
-    # - [n2, n4]
-    # - [n7, n10]
-    # - [n3, n8]
-
-    # - [n7, n12]     # octagon 2
-    # - [n1, n16]
-    # - [n20, n23]
-    # - [n13, n17]    # triangle 2
-    # - [n0, n11]     # octagon 3
-    # - [n5, n18]
-    # - [n17, n22]
-    # - [n1, n19]     # triangle 3
-    # - [n4, n15]     # octagon 4
-    # - [n9, n20]
-    # - [n16, n19]    
-    # - [n5, n21]     # triangle 4
-
 builders:
   rod:
     class: tgRodInfo
@@ -144,11 +121,3 @@ builders:
       damping: 40.0 #kg/s (N-s/m) #complete guess for value
       pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
       max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N
-
-  # actuated_cable:
-  #   class: tgBasicActuatorInfo
-  #   parameters:
-  #     stiffness: 1500.0 #410.7 #kg/s^2 (N/m) #410.7 is from Marshall's measurements #1560.0 is value from design sheet 'Silicone Rubber Spring Constant Data.xlsx' and drop test specimens (width = 11.11 mm, length = 118 mm)
-  #     damping: 40.0 #kg/s (N-s/m) #complete guess for value
-  #     pretension: 400.0 #kg-dm/s^2 #estimated using 'Tension Results.xlsx'
-  #     max_tension: 5000 #kg-dm/s^2 #corresponds to 500 N

@@ -5,6 +5,7 @@ link_directories(${LIB_DIR})
 message(STATUS "LIB_DIR: " ${LIB_DIR})
 
 link_libraries(tgcreator
+                controllers
                 util
                 sensors
                 core    

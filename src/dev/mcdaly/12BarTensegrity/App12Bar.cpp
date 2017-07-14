@@ -81,7 +81,8 @@ int main(int argc, char** argv)
     double minLength = 0.1;
     double rate = 0.5;
     bool loop = true;
-    int arr[] = {29, 9, 21, 18};
+    int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
+    // int arr[] = {9, 21, 29, 18, 7, 16, 20, 12, 2, 28, 22, 26, 1, 8, 30, 3};  // forward walking through alternating triangles
     std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     // std::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
     std::vector<std::string> tagsToControl;
@@ -93,9 +94,13 @@ int main(int argc, char** argv)
     // Attach the controller to the model
     myModel->attach(myController);
 
+    // Add the model to the world
+    simulation.addModel(myModel);
+
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
-    tgDataLogger2* myDataLogger = new tgDataLogger2(log);
+    double samplingTime = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log, samplingTime);
     myDataLogger->addSenseable(myModel);
 
     // Create two sensor infos, one for tgRods and other for tgSpringCableActuators
@@ -105,10 +110,7 @@ int main(int argc, char** argv)
     myDataLogger->addSensorInfo(mySCASensorInfo);
     
     // Add data logger to the world
-    //simulation.addDataManager(myDataLogger); // comment/uncomment to record data
-
-    // Add the model to the world
-    simulation.addModel(myModel);
+    simulation.addDataManager(myDataLogger); // comment/uncomment to record data
 
     // Run simulation
     simulation.run();
