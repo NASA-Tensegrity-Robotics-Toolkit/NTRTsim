@@ -71,7 +71,7 @@ public:
    * will be acted upon by this controller.
    */
   LengthController12BarCube(double startTime, double minLength, double rate, bool loop,
-			    std::vector<std::string> tagsToControl);
+			    std::vector<int> sequence, std::vector<std::string> tagsToControl);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -113,6 +113,7 @@ private:
   double m_minLength;
   double m_rate;
   bool m_loop;
+  std::vector<int> m_sequence;
   std::vector<std::string> m_tagsToControl;
 
   /**
@@ -125,6 +126,7 @@ private:
    */
   bool retract;
   bool finished;
+  bool on_octagon;
 
   /**
    * Need integer for current cable index
@@ -134,10 +136,8 @@ private:
   /**
    * Need integers to keep track of current set, where one set is 3 cables and 1 cable
    */
-  int num_cables;
   int num_sets;
   int current_set;
-  bool on_octagon;
 
   /**
    * The start length of each of the cables must be recorded.

@@ -79,13 +79,16 @@ int main(int argc, char** argv)
     // repeated here:
     double startTime = 5;
     double minLength = 0.1;
-    double rate = 1;
+    double rate = 0.5;
     bool loop = true;
+    int arr[] = {29, 9, 21, 18};
+    std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
+    // std::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
     std::vector<std::string> tagsToControl;
-    tagsToControl.push_back("actuated_cable");
+    tagsToControl.push_back("cable");
     
     // Create the controller
-    LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, tagsToControl);
+    LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);
     
     // Attach the controller to the model
     myModel->attach(myController);

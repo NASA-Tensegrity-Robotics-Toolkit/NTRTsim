@@ -56,11 +56,13 @@ LengthController12BarCube::LengthController12BarCube(double startTime,
 					   double minLength,
 					   double rate,
              bool loop,
+             std::vector<int> sequence,
 					   std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),
   m_rate(rate),
   m_loop(loop),
+  m_sequence(sequence),
   m_tagsToControl(tagsToControl),
   m_timePassed(0.0)
 {
@@ -80,7 +82,13 @@ LengthController12BarCube::LengthController12BarCube(double startTime,
     throw std::invalid_argument("Rate cannot be negative.");
   }
   // @TODO: what checks to make on tags?
-  std::cout << "Looping infinitely: " << m_loop << std::endl;
+  if (m_loop == true) {
+    std::cout << "Looping infinitely." << std::endl;
+  }
+  std::cout << m_sequence[0] << std::endl;
+  std::cout << m_sequence[1] << std::endl;
+  std::cout << m_sequence[2] << std::endl;
+  std::cout << m_sequence[3] << std::endl;
 }
 
 /**
@@ -91,14 +99,14 @@ LengthController12BarCube::LengthController12BarCube(double startTime,
 void LengthController12BarCube::initializeActuators(TensegrityModel& subject,
 					       std::string tag) {
   //DEBUGGING
-  std::cout << "Finding cables with the tag: " << tag << std::endl;
+  std::cout << "Finding cables with the tag \"" << tag << ".\"" << std::endl;
   // Pick out the actuators with the specified tag
   std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
-  std::cout << "The following cables were found and will be controlled: "
-	    << std::endl;
+  // std::cout << "The following cables were found and will be controlled: "
+	    // << std::endl;
   //Iterate through array and output strings to command line
   for (std::size_t i = 0; i < foundActuators.size(); i ++) {	
-    std::cout << foundActuators[i]->getTags() << std::endl;
+    // std::cout << foundActuators[i]->getTags() << std::endl;
     // Also, add the rest length of the actuator at this time
     // to the list of all initial rest lengths.
     initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
@@ -119,7 +127,7 @@ void LengthController12BarCube::initializeActuators(TensegrityModel& subject,
  */
 void LengthController12BarCube::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the LengthController12BarCube controller." << std::endl;
+  std::cout << "Setting up the controller." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
   //	    << std::endl;
   cablesWithTags = {};
@@ -134,9 +142,8 @@ void LengthController12BarCube::onSetup(TensegrityModel& subject)
   finished = 0;  // True when finished retracting and returning all cables
   // Initialize cable index
   cable_idx = 0;
-  // Grab number of cables
-  num_cables = cablesWithTags.size();
-  num_sets = num_cables/4;
+  // Grab number of sets
+  num_sets = m_sequence.size()/4;
   current_set = 0;
   on_octagon = 1;
   // Output that controller setup is complete
@@ -154,7 +161,8 @@ void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
     // Retract mode (retract each cable in sequence)
     if(retract == 1 && finished == 0) {
       // Create index adjusted for current set
-      int i = cable_idx + 4*current_set;
+      int seq_idx = cable_idx + 4*current_set;
+      int i = m_sequence[seq_idx];
       // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
       // Calculate the minimum rest length for this cable
@@ -191,7 +199,8 @@ void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
     else if (finished == 0) {
       //std::cout << "Made it to return state." << std::endl; 
       // Create index adjusted for current set
-      int i = cable_idx + 4*current_set;
+      int seq_idx = cable_idx + 4*current_set;
+      int i = m_sequence[seq_idx];
       // Grab current rest length
       double currRestLength = cablesWithTags[i]->getRestLength();
       // Calculate the initial rest length for this cable
