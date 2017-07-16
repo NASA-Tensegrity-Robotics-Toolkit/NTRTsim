@@ -7824,6 +7824,14 @@ tgGround.h
 
 /home/mcdaly/NTRTsim/src/core/terrain/tgGround.h
 
+/home/mcdaly/NTRTsim/src/core/tgBaseRigid.h
+tgModel.h
+/home/mcdaly/NTRTsim/src/core/tgModel.h
+LinearMath/btVector3.h
+/home/mcdaly/NTRTsim/src/core/LinearMath/btVector3.h
+vector
+-
+
 /home/mcdaly/NTRTsim/src/core/tgBasicActuator.h
 tgModel.h
 /home/mcdaly/NTRTsim/src/core/tgModel.h
@@ -7865,6 +7873,14 @@ vector
 /home/mcdaly/NTRTsim/src/core/tgModelVisitor.h
 
 /home/mcdaly/NTRTsim/src/core/tgObserver.h
+
+/home/mcdaly/NTRTsim/src/core/tgRod.h
+tgBaseRigid.h
+/home/mcdaly/NTRTsim/src/core/tgBaseRigid.h
+LinearMath/btVector3.h
+/home/mcdaly/NTRTsim/src/core/LinearMath/btVector3.h
+vector
+-
 
 /home/mcdaly/NTRTsim/src/core/tgSenseable.h
 iostream
@@ -8019,6 +8035,8 @@ core/tgString.h
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgString.h
 core/tgTags.h
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgTags.h
+core/tgRod.h
+/home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgRod.h
 cassert
 -
 stdexcept
@@ -8031,6 +8049,8 @@ helpers/FileHelpers.h
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/helpers/FileHelpers.h
 stdexcept
 -
+fstream
+-
 
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthController12BarCube.h
 core/tgObserver.h
@@ -8039,11 +8059,15 @@ core/tgSubject.h
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgSubject.h
 core/tgTags.h
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgTags.h
+core/tgRod.h
+/home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/core/tgRod.h
 string
 -
 vector
 -
 map
+-
+fstream
 -
 
 /home/mcdaly/NTRTsim/src/dev/mcdaly/12BarTensegrity/LengthControllerMultipleSequential.cpp

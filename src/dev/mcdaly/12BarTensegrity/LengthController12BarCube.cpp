@@ -39,6 +39,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "core/tgTags.h"
+#include "core/tgRod.h"
 
 //#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
@@ -48,6 +49,7 @@
 #include <iostream>
 #include "helpers/FileHelpers.h"
 #include <stdexcept>
+#include <fstream>
 
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
@@ -116,6 +118,24 @@ void LengthController12BarCube::initializeActuators(TensegrityModel& subject,
 			 foundActuators.end() );
 }
 
+
+void LengthController12BarCube::initializeRods(TensegrityModel& subject) {
+  //DEBUGGING
+  // Pick out the actuators with the specified tag
+  std::vector<tgRod*> foundRods = subject.find<tgRod>("rod");
+
+  // std::cout << "The following cables were found and will be controlled: "
+      // << std::endl;
+  // Add this list of actuators to the full list. Thanks to:
+  // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
+  rodsToSave.insert( rodsToSave.end(), foundRods.begin(),
+       foundRods.end() );
+
+  for (std::size_t i = 0; i < foundRods.size(); i ++) {
+    rodBodies.push_back(foundRods[i]->getPRigidBody());
+  }
+}
+
 /**
  * For this controller, the onSetup method initializes the actuators,
  * which means just store pointers to them and record their rest lengths.
@@ -133,6 +153,7 @@ void LengthController12BarCube::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
+  initializeRods(subject);
   // Initialize flags
   retract = 1;  // Begin in retract mode
   finished = 0;  // True when finished retracting and returning all cables
@@ -144,11 +165,33 @@ void LengthController12BarCube::onSetup(TensegrityModel& subject)
   on_octagon = 1;
   // Output that controller setup is complete
   std::cout << "Finished setting up the controller." << std::endl; 
-  std::cout << "----------------------------------------" << std::endl;               
+  std::cout << "----------------------------------------" << std::endl;     
+
+  sim_out.open("cube_single_step.csv");
+  sim_out << "time, ";
+  for (std::size_t i = 0; i < rodBodies.size(); i++) {
+      sim_out << "rod " << i << " x, " << "rod " << i << " y, " << "rod " << i << " z, " <<
+                 "rod " << i << " axial_vec_x, " << "rod " << i << " axial_vec_y, " << "rod " << i << " axial_vec_z, ";
+  }
+  sim_out << std::endl;
+  // std::cout << "Number of rod bodies: " << rodBodies.size() << std::endl;
+  // sim_out << std::endl;
+
 }
 
 void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
 {
+  sim_out << m_timePassed << ", ";
+  // Sim out results
+  for (std::size_t i = 0; i < rodBodies.size(); i++) {
+    sim_out << rodBodies[i]->getCenterOfMassPosition().x() << ", " << 
+               rodBodies[i]->getCenterOfMassPosition().y() << ", " << 
+               rodBodies[i]->getCenterOfMassPosition().z() << ", " <<
+               (rodBodies[i]->getCenterOfMassTransform()*btVector3(0,1,0)).x() << ", " <<
+               (rodBodies[i]->getCenterOfMassTransform()*btVector3(0,1,0)).y() << ", " <<
+               (rodBodies[i]->getCenterOfMassTransform()*btVector3(0,1,0)).z() << ", ";               
+  }
+  sim_out << std::endl;
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, if it's passed the time to start the controller,
@@ -239,6 +282,8 @@ void LengthController12BarCube::onStep(TensegrityModel& subject, double dt)
         std::cout << "----------------------------------------" << std::endl;          
         }
       }
+
+
     }
   }
 }

@@ -38,11 +38,14 @@
 #include "core/tgObserver.h"
 #include "core/tgSubject.h"
 #include "core/tgTags.h"
+#include "core/tgRod.h"
 
 // The C++ standard library
 #include <string>
 #include <vector>
 #include <map>
+// #include <iostream>
+#include <fstream>
 
 // Forward declarations
 class TensegrityModel;
@@ -103,6 +106,10 @@ protected:
    * actuators in this model.
    */
   void initializeActuators(TensegrityModel& subject, std::string tag);
+
+  /**
+   */
+  void initializeRods(TensegrityModel& subject);
     
 private:
 	
@@ -152,6 +159,16 @@ private:
    * by using m_tagsToControl.
    */
   std::vector<tgBasicActuator*> cablesWithTags;
+
+  /** 
+   * A list of all rods (to save data) and the corresponding rod bodies.
+   */
+  std::vector<tgRod*> rodsToSave;
+  std::vector<btRigidBody*> rodBodies;
+
+
+
+  std::ofstream sim_out;
 
 };
 

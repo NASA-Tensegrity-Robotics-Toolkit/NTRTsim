@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Create the view
-    const double timestep_physics = 0.0001; // seconds // recommened 0.001
+    const double timestep_physics = 0.0001; // seconds // recommended 0.001
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -80,9 +80,10 @@ int main(int argc, char** argv)
     double startTime = 5;
     double minLength = 0.1;
     double rate = 0.5;
-    bool loop = true;
+    bool loop = false;
     int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
     // int arr[] = {9, 21, 29, 18, 7, 16, 20, 12, 2, 28, 22, 26, 1, 8, 30, 3};  // forward walking through alternating triangles
+    // int arr[] = {9, 21, 29, 18};  // single step
     std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     // std::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
     std::vector<std::string> tagsToControl;
@@ -90,17 +91,11 @@ int main(int argc, char** argv)
     
     // Create the controller
     LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);
-    
-    // Attach the controller to the model
-    myModel->attach(myController);
-
-    // Add the model to the world
-    simulation.addModel(myModel);
 
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
-    double samplingTime = 0.1;
-    tgDataLogger2* myDataLogger = new tgDataLogger2(log, samplingTime);
+    // double samplingTime = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log);
     myDataLogger->addSenseable(myModel);
 
     // Create two sensor infos, one for tgRods and other for tgSpringCableActuators
@@ -110,7 +105,13 @@ int main(int argc, char** argv)
     myDataLogger->addSensorInfo(mySCASensorInfo);
     
     // Add data logger to the world
-    simulation.addDataManager(myDataLogger); // comment/uncomment to record data
+    // simulation.addDataManager(myDataLogger); // comment/uncomment to record data
+
+    // Attach the controller to the model
+    myModel->attach(myController);
+
+    // Add the model to the world
+    simulation.addModel(myModel);
 
     // Run simulation
     simulation.run();

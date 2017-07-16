@@ -727,12 +727,14 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/App12Bar.cpp.o
  /home/mcdaly/NTRTsim/src/core/terrain/tgBoxGround.h
  /home/mcdaly/NTRTsim/src/core/terrain/tgBulletGround.h
  /home/mcdaly/NTRTsim/src/core/terrain/tgGround.h
+ /home/mcdaly/NTRTsim/src/core/tgBaseRigid.h
  /home/mcdaly/NTRTsim/src/core/tgBulletRenderer.h
  /home/mcdaly/NTRTsim/src/core/tgCast.h
  /home/mcdaly/NTRTsim/src/core/tgException.h
  /home/mcdaly/NTRTsim/src/core/tgModel.h
  /home/mcdaly/NTRTsim/src/core/tgModelVisitor.h
  /home/mcdaly/NTRTsim/src/core/tgObserver.h
+ /home/mcdaly/NTRTsim/src/core/tgRod.h
  /home/mcdaly/NTRTsim/src/core/tgSenseable.h
  /home/mcdaly/NTRTsim/src/core/tgSimView.h
  /home/mcdaly/NTRTsim/src/core/tgSimViewGraphics.h
@@ -1474,12 +1476,14 @@ dev/mcdaly/12BarTensegrity/CMakeFiles/App12Bar.dir/LengthController12BarCube.cpp
  /home/mcdaly/NTRTsim/src/../env/include/yaml-cpp/stlemitter.h
  /home/mcdaly/NTRTsim/src/../env/include/yaml-cpp/traits.h
  /home/mcdaly/NTRTsim/src/../env/include/yaml-cpp/yaml.h
+ /home/mcdaly/NTRTsim/src/core/tgBaseRigid.h
  /home/mcdaly/NTRTsim/src/core/tgBasicActuator.h
  /home/mcdaly/NTRTsim/src/core/tgCast.h
  /home/mcdaly/NTRTsim/src/core/tgControllable.h
  /home/mcdaly/NTRTsim/src/core/tgException.h
  /home/mcdaly/NTRTsim/src/core/tgModel.h
  /home/mcdaly/NTRTsim/src/core/tgObserver.h
+ /home/mcdaly/NTRTsim/src/core/tgRod.h
  /home/mcdaly/NTRTsim/src/core/tgSenseable.h
  /home/mcdaly/NTRTsim/src/core/tgSpringCableActuator.h
  /home/mcdaly/NTRTsim/src/core/tgString.h

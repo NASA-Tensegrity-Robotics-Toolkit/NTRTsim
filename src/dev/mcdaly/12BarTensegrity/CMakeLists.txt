@@ -6,13 +6,13 @@ message(STATUS "LIB_DIR: " ${LIB_DIR})
 
 link_libraries(tgcreator
                 controllers
-                util
-                sensors
-                core    
+	            core
+		        sensors
+                util   
                 terrain 
                 tgOpenGLSupport
-    		yaml-cpp
-    		TensegrityModel)
+    		    yaml-cpp
+    		    TensegrityModel)
 
 add_executable(App12Bar
     LengthControllerSequential.cpp
