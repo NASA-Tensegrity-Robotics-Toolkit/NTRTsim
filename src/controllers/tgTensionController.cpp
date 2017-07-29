@@ -106,9 +106,8 @@ void tgTensionController::control(tgBasicActuator& sca, double dt, double setPoi
     const double currentLength = m_springCable->getRestLength();
     
     double newLength = sca.getRestLength() - diff;
-    
     // Safety check
-    newLength = newLength < 0.1 ? 0.1 : newLength;
+    newLength = newLength < 0.001 ? 0.001 : newLength;
     
 	sca.setControlInput(newLength, dt);
 }

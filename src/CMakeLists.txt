@@ -6,14 +6,14 @@ PROJECT(NASA_Tensegrity_Robotics_Toolkit)
 subdirs(
     core
     helpers
-    learning
+    #learning
     util
     sensors
     tgcreator
     models
     controllers
     dev
-    examples
+    #examples
     yamlbuilder
 )
 
@@ -34,5 +34,8 @@ SET(ENV_LIB_DIR ${ENV_DIR}/lib)
 # Bring in the bullet graphics dependencies, etc. 
 
 include(inc.CMakeBullet.txt)
+
+# For GDB
+set(CMAKE_BUILD_TYPE Debug)
 
 

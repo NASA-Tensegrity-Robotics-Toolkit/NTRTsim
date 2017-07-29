@@ -1,8 +1,8 @@
-# Install script for directory: /home/drew/repositories/NTRTsim/src/learning/Configuration
+# Install script for directory: /home/alex/Desktop/NTRTsim/src/learning/Configuration
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  SET(CMAKE_INSTALL_PREFIX "/home/drew/repositories/NTRTsim/env")
+  SET(CMAKE_INSTALL_PREFIX "/home/alex/Desktop/NTRTsim/env")
 ENDIF(NOT DEFINED CMAKE_INSTALL_PREFIX)
 STRING(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

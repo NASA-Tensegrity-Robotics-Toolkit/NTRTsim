@@ -38,22 +38,19 @@ RM = /usr/bin/cmake -E remove -f
 # Escaping for special characters.
 EQUALS = =
 
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/ccmake
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/drew/repositories/NTRTsim/src
+CMAKE_SOURCE_DIR = /home/alex/Desktop/NTRTsim/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/drew/repositories/NTRTsim/src
+CMAKE_BINARY_DIR = /home/alex/Desktop/NTRTsim/src
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
+	/usr/bin/cmake -i .
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -72,14 +69,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/drew/repositories/NTRTsim/src && $(CMAKE_COMMAND) -E cmake_progress_start /home/drew/repositories/NTRTsim/src/CMakeFiles /home/drew/repositories/NTRTsim/src/learning/Configuration/CMakeFiles/progress.marks
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/drew/repositories/NTRTsim/src/CMakeFiles 0
+	cd /home/alex/Desktop/NTRTsim/src && $(CMAKE_COMMAND) -E cmake_progress_start /home/alex/Desktop/NTRTsim/src/CMakeFiles /home/alex/Desktop/NTRTsim/src/learning/Configuration/CMakeFiles/progress.marks
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/alex/Desktop/NTRTsim/src/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/clean
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/clean
 .PHONY : clean
 
 # The main clean target
@@ -88,22 +85,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/preinstall
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/preinstall
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/drew/repositories/NTRTsim/src && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/alex/Desktop/NTRTsim/src && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 learning/Configuration/CMakeFiles/Configuration.dir/rule:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/CMakeFiles/Configuration.dir/rule
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f CMakeFiles/Makefile2 learning/Configuration/CMakeFiles/Configuration.dir/rule
 .PHONY : learning/Configuration/CMakeFiles/Configuration.dir/rule
 
 # Convenience name for target.
@@ -112,7 +109,7 @@ Configuration: learning/Configuration/CMakeFiles/Configuration.dir/rule
 
 # fast build rule for target.
 Configuration/fast:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/build
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/build
 .PHONY : Configuration/fast
 
 configuration.o: configuration.cpp.o
@@ -120,7 +117,7 @@ configuration.o: configuration.cpp.o
 
 # target to build an object file
 configuration.cpp.o:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.o
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.o
 .PHONY : configuration.cpp.o
 
 configuration.i: configuration.cpp.i
@@ -128,7 +125,7 @@ configuration.i: configuration.cpp.i
 
 # target to preprocess a source file
 configuration.cpp.i:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.i
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.i
 .PHONY : configuration.cpp.i
 
 configuration.s: configuration.cpp.s
@@ -136,7 +133,7 @@ configuration.s: configuration.cpp.s
 
 # target to generate assembly for a file
 configuration.cpp.s:
-	cd /home/drew/repositories/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.s
+	cd /home/alex/Desktop/NTRTsim/src && $(MAKE) -f learning/Configuration/CMakeFiles/Configuration.dir/build.make learning/Configuration/CMakeFiles/Configuration.dir/configuration.cpp.s
 .PHONY : configuration.cpp.s
 
 # Help Target
@@ -162,6 +159,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/drew/repositories/NTRTsim/src && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/alex/Desktop/NTRTsim/src && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

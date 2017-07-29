@@ -69,16 +69,16 @@ namespace
         double targetVelocity;
     } c =
    {
-     0.688,    // density (kg / length^3)
-     0.31,     // radius (length)
-     613.0,   // stiffness (kg / sec^2) was 1500
+     6/(M_PI*(0.05/2.0*10.0)*(0.05/2.0*10.0)*1.65*10.0)/5,    // density (kg / length^3)
+     0.05/2.0*10,     // radius (length)
+     1000.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)
-     16.84,     // rod_length (length)
+     1.65*10.0,     // rod_length (length)
      7.5,      // rod_space (length)
      0.9,      // friction (unitless)
      0.01,     // rollFriction (unitless)
      0.0,      // restitution (?)
-     2452.0/10,        // pretension -> set to 4 * 613, the previous value of the rest length controller
+     0,        // pretension -> set to 4 * 613, the previous value of the rest length controller
      0,			// History logging (boolean)
      100000,   // maxTens
      10000,    // targetVelocity
@@ -107,12 +107,19 @@ T6Model::~T6Model()
 
 void T6Model::addNodes(tgStructure& s)
 {   
+    // Initial starting configuration:
     double l = c.rod_length;
+    /* Hexagonal packing: */
     double b = l*sqrt(3.0/8.0);
+    //b = 0.2*l;
     double delta = acos(1.0/sqrt(3.0));
-    delta = M_PI/4;
+    delta = 88.0/180.0 * M_PI;
     double alpha = M_PI/3.0;
-    double h = l*cos(delta)/2.0; // overlap
+    alpha = 62.0/180.0*M_PI;
+    
+    
+    double u = sin(delta) * cos(alpha + M_PI/6.0);
+    double h = cos(delta)/(2.0*u) * (l*u + sqrt(b*b/3.0 - 3.0*l*l*u*u) - b/sqrt(3.0));
     
     // The bar labeling and parametrization come from (Sultan 2001).
     std::cout << "nodes = [";
@@ -225,7 +232,7 @@ void T6Model::setup(tgWorld& world)
     rotationAngle = M_PI;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
     
-    s.move(btVector3(0, 0, 0)); // Move CoM to a certain point.
+    s.move(btVector3(0, 2, 0)); // Move CoM to a certain point.
     
     // Create the build spec that uses tags to turn the structure into a real model
     tgBuildSpec spec;

@@ -90,16 +90,16 @@ int main(int argc, char** argv)
     double startTime = 5.0;
     double minLength = 0.7;
     double rate = 0.25;
-    std::vector<std::string> tagsToControl;
+    //std::vector<std::string> tagsToControl;
     // See the threeBarModel.YAML file to see where "vertical_string" is used.
-    tagsToControl.push_back("horizontal_string");
+    //tagsToControl.push_back("horizontal_string");
     
     // Create the controller
     // FILL IN 6.6 HERE
-    LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
+    //LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
     
     // Attach the controller to the model
-    myModel->attach(myController);
+    //myModel->attach(myController);
 
     // Add the model to the world
     simulation.addModel(myModel);

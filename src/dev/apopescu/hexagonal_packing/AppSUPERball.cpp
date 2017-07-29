@@ -25,7 +25,7 @@
 
 // This application
 #include "T6Model.h"
-#include "T6TensionController.h"
+#include "LengthController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -61,11 +61,11 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(0); // gravity, cm/sec^2  Use this to adjust length scale of world.
+    const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
         // Note, by changing the setting below from 981 to 98.1, we've
         // scaled the world length scale to decimeters not cm.
 
-    tgWorld world(config, NULL);
+    tgWorld world(config, ground);
 
     // Second create the view
     const double timestep_physics = 0.001; // Seconds
@@ -80,9 +80,8 @@ int main(int argc, char** argv)
     T6Model* const myModel = new T6Model();
 
     // Fifth, select the controller to use, and attach it to the model.
-    // For example, you could run the following to use the T6TensionController:
-    //T6TensionController* const pTC = new T6TensionController(100);
-    //myModel->attach(pTC);
+    LengthController* const pTC = new LengthController();
+    myModel->attach(pTC);
 
     // Finally, add out model to the simulation
     simulation.addModel(myModel);
@@ -94,9 +93,9 @@ int main(int argc, char** argv)
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     myDataLogger->addSenseable(myModel);
     
-    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
     tgSpringCableActuatorSensorInfo* mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
-    myDataLogger->addSensorInfo(myRodSensorInfo);
+    //myDataLogger->addSensorInfo(myRodSensorInfo);
     myDataLogger->addSensorInfo(mySCASensorInfo);
     simulation.addDataManager(myDataLogger);
     */

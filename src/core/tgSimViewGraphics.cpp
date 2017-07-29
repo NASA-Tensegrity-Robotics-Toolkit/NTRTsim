@@ -84,6 +84,7 @@ void tgSimViewGraphics::teardown()
 
 void tgSimViewGraphics::render()
 {
+    std::cout << "render called" << std::endl;
     if (m_pSimulation && m_pModelVisitor)
     {
         
@@ -92,12 +93,6 @@ void tgSimViewGraphics::render()
             GL_STENCIL_BUFFER_BIT);
         
         m_pSimulation->onVisit(*m_pModelVisitor);
-
-        //Freeglut code
-#if (0)
-        clientMoveAndDisplay();
-        tgGlutMainEventLoop();
-#endif
     }
 }
 
@@ -139,11 +134,13 @@ void tgSimViewGraphics::reset()
 
 void tgSimViewGraphics::clientMoveAndDisplay()
 {
+    std::cout << "clientMoveAndDisplay" << std::endl;
     if (isInitialzed()){
         m_pSimulation->step(m_stepSize);    
         m_renderTime += m_stepSize; 
         if (m_renderTime >= m_renderRate)
         {
+            
             render();
             // Doesn't appear to do anything yet...
             m_dynamicsWorld->debugDrawWorld();
@@ -158,6 +155,7 @@ void tgSimViewGraphics::clientMoveAndDisplay()
 
 void tgSimViewGraphics::displayCallback()
 {
+    std::cout << "DisplayCallback" << std::endl;
     if (isInitialzed())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 

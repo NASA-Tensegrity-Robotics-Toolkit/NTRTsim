@@ -58,6 +58,13 @@ void tgBulletRenderer::render(const tgRod& rod) const
     BT_PROFILE("tgBulletRenderer::renderRod");
 #endif //BT_NO_PROFILE 
         // render the rod (change color, etc. if we want)
+        // Fetch the btDynamicsWorld
+        btDynamicsWorld& dynamicsWorld =
+      tgBulletUtil::worldToDynamicsWorld(m_world);
+    
+    btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
+        std::cout << "Render rod" << std::endl;
+        pDrawer->drawLine(btVector3(0.0, 0.0, 1.0), btVector3(0.0, 0.0, 10.0), btVector3(1.0, 0.0, 0.0));
 }
 
 void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
@@ -68,7 +75,7 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
         // Fetch the btDynamicsWorld
         btDynamicsWorld& dynamicsWorld =
       tgBulletUtil::worldToDynamicsWorld(m_world);
-
+    
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
     
     const tgSpringCable* const pSpringCable = mSCA.getSpringCable();
@@ -171,7 +178,7 @@ void tgBulletRenderer::render(const tgCompressionSpringActuator& mCSA) const
 		      btVector3(0.0, 1.0, 0.0);
 		  }
 		  // Draw the string, now that color has been set.
-		  pDrawer->drawLine(springStartLoc, springEndLoc, color);
+		  //pDrawer->drawLine(springStartLoc, springEndLoc, color);
 		}
 	}
 }
