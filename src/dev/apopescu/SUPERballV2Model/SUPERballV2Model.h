@@ -35,7 +35,7 @@ class tgWorld;
 /**
  * Class that creates the six strut "superball" model using tgcreator
  */
-class SUPERBallV2Model : public tgSubject<SUPERBallV2Model>, public tgModel
+class SUPERballV2Model : public tgSubject<SUPERballV2Model>, public tgModel
 {
 public: 
 	
@@ -44,13 +44,13 @@ public:
      * Configuration parameters are within the .cpp file in this case,
      * not passed in. 
      */
-    SUPERBallV2Model();
+    SUPERballV2Model();
 	
     /**
      * Destructor. Deletes controllers, if any were added during setup.
      * Teardown handles everything else.
      */
-    virtual ~SUPERBallV2Model();
+    virtual ~SUPERballV2Model();
     
     /**
      * Create the model. Place the rods and strings into the world

@@ -16,14 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
-/**
- * @file SUPERBallV2Model.cpp
- * @brief Contains the implementation of class SUPERBallV2Model.
- * $Id$
- */
-
 // This module
-#include "SUPERBallV2Model.h"
+#include "SUPERballV2Model.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
@@ -101,15 +95,15 @@ void addBarNodesWithCoMAzDec(tgStructure& s, double comx, double comy, double co
                              double azimuth, double declination,
                              double length);
 
-SUPERBallV2Model::SUPERBallV2Model() : tgModel() 
+SUPERballV2Model::SUPERballV2Model() : tgModel() 
 {
 }
 
-SUPERBallV2Model::~SUPERBallV2Model()
+SUPERballV2Model::~SUPERballV2Model()
 {
 }
 
-void SUPERBallV2Model::addNodes(tgStructure& s)
+void SUPERballV2Model::addNodes(tgStructure& s)
 {   
     // Initial starting configuration:
     double l = c.rod_length;
@@ -162,7 +156,7 @@ void SUPERBallV2Model::addNodes(tgStructure& s)
     std::cout << "]" << std::endl;
 }
 
-void SUPERBallV2Model::addRods(tgStructure& s)
+void SUPERballV2Model::addRods(tgStructure& s)
 {
     s.addPair( 0,  1, "rod");
     s.addPair( 2,  3, "rod");
@@ -172,7 +166,7 @@ void SUPERBallV2Model::addRods(tgStructure& s)
     s.addPair( 10, 11, "rod");
 }
 
-void SUPERBallV2Model::addActuators(tgStructure& s)
+void SUPERballV2Model::addActuators(tgStructure& s)
 {
     // Saddle
     s.addPair(5, 8,  "muscle"); // 0
@@ -208,7 +202,7 @@ void SUPERBallV2Model::addActuators(tgStructure& s)
 }
 
 
-void SUPERBallV2Model::setup(tgWorld& world)
+void SUPERballV2Model::setup(tgWorld& world)
 {
     // Rod properties
     tgRod::Config rodConfig(c.radius, c.density, c.friction, 
@@ -308,7 +302,7 @@ void SUPERBallV2Model::setup(tgWorld& world)
     
 }
 
-void SUPERBallV2Model::step(double dt)
+void SUPERballV2Model::step(double dt)
 {
     // Precondition
     if (dt <= 0.0)
@@ -342,17 +336,17 @@ void addBarNodesWithCoMAzDec(tgStructure& s, double comx, double comy, double co
     s.addNode(nx, ny, nz);
 }
 
-void SUPERBallV2Model::onVisit(tgModelVisitor& r)
+void SUPERballV2Model::onVisit(tgModelVisitor& r)
 {
     tgModel::onVisit(r);
 }
 
-const std::vector<tgBasicActuator*>& SUPERBallV2Model::getAllActuators() const
+const std::vector<tgBasicActuator*>& SUPERballV2Model::getAllActuators() const
 {
     return allActuators;
 }
     
-void SUPERBallV2Model::teardown()
+void SUPERballV2Model::teardown()
 {
     notifyTeardown();
     tgModel::teardown();

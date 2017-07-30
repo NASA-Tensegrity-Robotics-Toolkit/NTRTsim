@@ -1,6 +1,8 @@
 link_libraries(tgcreator controllers core sensors)
 
-add_executable(AppSUPERBallV2
-    SUPERBallV2Model.cpp
+add_executable(AppSUPERballV2
+    SUPERballV2Model.cpp
     AppSUPERballV2.cpp
 )
+
+set(CMAKE_BUILD_TYPE Debug)

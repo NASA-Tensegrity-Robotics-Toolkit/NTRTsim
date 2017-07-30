@@ -31,11 +31,10 @@ SET(ENV_DIR ${PROJECT_SOURCE_DIR}/../env)
 SET(ENV_INC_DIR ${ENV_DIR}/include)
 SET(ENV_LIB_DIR ${ENV_DIR}/lib)
 
-# Bring in the bullet graphics dependencies, etc. 
-
-include(inc.CMakeBullet.txt)
-
 # For GDB
 set(CMAKE_BUILD_TYPE Debug)
+
+# Bring in the bullet graphics dependencies, etc. 
+include(inc.CMakeBullet.txt)
 
 

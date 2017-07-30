@@ -96,30 +96,26 @@ void tgSimViewGraphics::render()
     }
 }
 
+/* This function is called by our custom application to bring up the display window,
+   and start the simulation. */
 void tgSimViewGraphics::run(int steps) 
 {
     if (isInitialzed())
     {
+        /* This initializes GLUT and creates a display window (running in a new thread).
+           Then, OpenGL shading and light information are set, as are keyboard callback
+           functions. Importantly, we set the glutIdleFunc, glutDisplayFunc to functions
+           in the tgDemoApplication class, but since this (tgSimViewGraphics) is a derived
+           class of that base class, we implement some of the tgSimViewGraphics methods:
+               clientMoveAndDisplay()
+               displayCallback()
+               clientResetScene()
+           Finally, clientMoveAndDisplay is called once.
+               */
         tgglutmain(1024, 600, "Tensegrity Demo", this);
-
-        glutMainLoop();
         
-        /* Free glut code
-        // This would normally run forever, but this is just for testing
-        for(int i = 0; i < steps; i++) {
-            m_pSimulation->step(dt);
-            
-            if(i % 5 == 0) {
-                render();
-            }
-            if(getExitFlag())
-            {
-                break;
-            }   
-        }
-        std::cout << "leaving loop" << std::endl;
-        glutLeaveMainLoop();
-        */
+        /* Enter the GLUT event processing endless loop. */
+        glutMainLoop();
     }
 }
 

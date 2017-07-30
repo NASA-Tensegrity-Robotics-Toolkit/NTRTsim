@@ -18,7 +18,7 @@
 
 
 // This application
-#include "SUPERBallV2Model.h"
+#include "SUPERballV2Model.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -34,49 +34,51 @@
 // The C++ Standard Library
 #include <iostream>
 
-/**
- * The entry point.
- * @param[in] argc the number of command-line arguments
- * @param[in] argv argv[0] is the executable name
- * @return 0
- */
+/* Library note: The static Bullet libraries libBulletCollision.a, libBulletDynamics.a, libBulletSoftBody.a,
+   are linked from the env/lib directory. In contrast, the OpenGL DemoApplication library is linked from 
+   env/build/bullet/Demos/OpenGL_FreeGlut directory. These linked libraries are combined into the shared 
+   library libcore.so at compile time. */
 int main(int argc, char** argv)
 {
-    std::cout << "AppSUPERball Test" << std::endl;
-
-    // First create the ground and world
-    
-    // Determine the angle of the ground in radians. All 0 is flat
+    // Create the ground and world:
     const double yaw = 0.0;
     const double pitch = 0;
     const double roll = 0.0;
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
     
-    const tgWorld::Config config(98.1); // gravity, cm/sec^2  Use this to adjust length scale of world.
-        // Note, by changing the setting below from 981 to 98.1, we've
-        // scaled the world length scale to decimeters not cm.
-
+    const tgWorld::Config config(98.1); // Set gravity. Use this to adjust length scale of world.
+    // Note, by changing this setting to 98.1, we've scaled the world length scale to decimeters.
+    
+    // Create a tgWorld, which creates a Bullet btDynamicsWorld object.
     tgWorld world(config, ground);
 
-    // Second create the view
+    /* Create the tgSimViewGraphics object, which is a subclass of tgDemoApplication, a Bullet example
+       from which many graphics settings are inherited. This initializes the demo application.
+       tgSimViewGraphics is also a subclass of tgSimView. */
     const double timestep_physics = 0.001; // Seconds
     const double timestep_graphics = 1.f/60.f; // Seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
-    // Third create the simulation
+    /* Create tgSimulation object. Binds the tgSimView to the tgSimulation.
+       Then, we set up the tgSimViewGraphics and tgSimView objects, which specifies the debug drawer
+       we want to use (draws useful things like coordinate frames, normals, etc.).
+       We also create a tgModelVisitor, which is the superclass of the NTRT object rendering 
+       implementation, tgBulletRenderer. */
     tgSimulation simulation(view);
 
-    // Fourth create the models with their controllers and add the models to the
-    // simulation
-    SUPERBallV2Model* const myModel = new SUPERBallV2Model();
+    // Create our tensegrity model, which is a subclass of tgModel.
+    SUPERballV2Model* const myModel = new SUPERballV2Model();
 
-    // Fifth, select the controller to use, and attach it to the model.
+    // Select the controller to use, and attach it to the model.
     //LengthController* const pTC = new LengthController();
     //myModel->attach(pTC);
 
-    // Finally, add out model to the simulation
+    /* Add our model to the tgSimulation. This calls the setup() method of our tensegrity model.
+       So, this creates the tgStructure, tgBuildSpec, and tgStructureInfo, and creates and
+       initializes a Bullet btCollisionShape and btRigidBody for each rigid body.
+       Finally, we add each rigid body to the btDynamicsWorld (btSoftRigidDynamicsWorld) and add
+       as a child to the tgModel. */
     simulation.addModel(myModel);
     
     // Add some data logging
@@ -93,9 +95,10 @@ int main(int argc, char** argv)
     simulation.addDataManager(myDataLogger);
     */
     
-    // Run until the user stops
+    /* Run tgSimViewGraphics::run(), which initializes and runs the main loop of the tgDemoApplication.
+       This creates the graphics window and runs the display loop. */
     simulation.run();
     
-    //Teardown is handled by delete, so that should be automatic
+    // Teardown is handled by delete, so that should be automatic
     return 0;
 }
