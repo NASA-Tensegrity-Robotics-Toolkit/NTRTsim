@@ -241,7 +241,7 @@ void sixBarMiniModel::setup(tgWorld& world)
 	rotateToFace(s, 0);
 	// rotateYaw(s, 60*M_PI/180); // Two cable
 	rotateYaw(s, 45*M_PI/180); // Single cable (and two cable at 26 deg)
-	s.move(btVector3(17, 13, 50)); 
+	s.move(btVector3(0, 1, 0)); 
 	// s.move(btVector3(0, 3, 0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 

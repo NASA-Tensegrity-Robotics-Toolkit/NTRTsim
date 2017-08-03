@@ -333,7 +333,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 	doLog = false;
 
 	if (doLog) {
-		std::string filename = "0InclineRollingData_2cableSIMUL_UPFRICTION_MINI.txt";
+		std::string filename = "simultaneous.csv";
 		// Create filestream for data log and open it
 		data_out.open(filename.c_str(), std::fstream::out);
 		if (!data_out.is_open()) {
@@ -341,7 +341,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 			exit(EXIT_FAILURE);
 		}
 		else {
-			data_out << "SimTime, ActuatedCable, CurrentFace, PercentChange, TankVelX, TankVelY, TankVelZ, TankPosX, TankPosY, TankPosZ" << std::endl << std::endl;
+			data_out << "SimTime,ActuatedCable,CurrentFace,PercentChange,TankVelX,TankVelY,TankVelZ,TankPosX,TankPosY,TankPosZ" << std::endl << std::endl;
 		}
 	}
 
@@ -415,7 +415,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 				}
 			}
 		}
-		else {
+		else if (mode == 1){
 			if (moveComplete1 && moveComplete2 && isOnGround) {
 				std::cout << "Robot ready, waiting for user input..." << std::endl;
 				actuatorNum1 = sequence[sequenceIdx];
@@ -522,13 +522,17 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 	// }
 	
 	// logCounter++;
+	btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+	std::cout << payload_pos.y() << std::endl;
 
 	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();
 	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
 	    percentChange = (actuators[cableNum]->getCurrentLength()-startLength)/startLength;
 	    currSurface = contactSurfaceDetection();
-	    data_out << worldTime << ", " << cableNum << ", " << currSurface << "," << percentChange << "," << payload_vel.x() << ", " << payload_vel.y() << ", " << payload_vel.z() << ", " << payload_pos.x() << ", " << payload_pos.y() << ", " << payload_pos.z() << std::endl;
+	    data_out << worldTime << "," << cableNum << "," << currSurface << "," << percentChange << "," 
+	    	<< payload_vel.x() << "," << payload_vel.y() << "," << payload_vel.z() << "," 
+	    	<< payload_pos.x() << "," << payload_pos.y() << "," << payload_pos.z() << std::endl;
 		logCounter = 0;
 	}
 	if (doLog) {
