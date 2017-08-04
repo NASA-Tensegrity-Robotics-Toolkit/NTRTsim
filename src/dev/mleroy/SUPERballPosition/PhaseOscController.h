@@ -109,7 +109,7 @@ public:
   PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
           int ctr, double initRestLengths, bool saveToCSV,
           double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], //double hopfAccInit[NSTATES], 
-          std::string args, std::string resourcePath, std::string configFile);
+          std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -254,6 +254,8 @@ private:
    * A booelan that indicates whether the respective group is learning this run. Is passed to the evolution adapter
    */
   bool learning;
+
+  double m_paramsManual[NOSCILLATORS][NSTATES];
 };
 
 #endif // HORIZONTAL_SPINE_CONTROLLER_H

@@ -143,7 +143,7 @@ PhaseOscController::Config::Config(double hOMin, double hOMax, double hMMin, dou
 PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
                                    int ctr, double initRestLengths, bool saveToCSV,
                                    double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], //double hopfAccInit[NSTATES], 
-                                   std::string args, std::string resourcePath, std::string configFile) :
+                                   std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]) :
   m_config(config),
   m_tagsToControl(tagsToControl),
   m_timePassed(timePassed),
@@ -196,6 +196,15 @@ PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::v
 
   configData.readFile(path + configFilename);
   learning = configData.getintvalue("learning");
+
+  for(int i=0; i<NOSCILLATORS; i++)
+  {
+    for(int j=0; j<NSTATES; j++)
+    {
+      m_paramsManual[i][j] = paramsManual[i][j];
+      //std::cout << "Setting up: " << i << ", " << j << ", " << paramsManual[i][j] << ", " << m_paramsManual[i][j] << std::endl;
+    }
+  }
 }
 
 
@@ -287,7 +296,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   }
 
   initPosition = getBallCOM(subject);
-  std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
+  //std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
   //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
@@ -303,7 +312,36 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   if(1)
   {    
     std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
-    params[0][0] = 3.83366; //2.00;
+    double limMin = 0.0;
+    double limMax = 0.0;
+    for(int i = 0; i < NOSCILLATORS; i++)
+    {
+      for(int j = 0; j < NSTATES; j++)
+      {
+        switch(j)
+        {
+          case 0: limMin =  0.1; limMax = 5.0; break;
+          case 1: limMin =  0.1; limMax = 1.0; break;
+          case 2: limMin = -1.0; limMax = 1.0; break;
+          case 3: limMin = -1.0; limMax = 1.0; break;
+          case 4: limMin = -1.0; limMax = 1.0; break;
+          case 5: limMin = -1.0; limMax = 1.0; break;
+          case 6: limMin = -0.1; limMax = 0.1; break;
+          case 7: limMin = -0.1; limMax = 0.1; break;
+        }
+        params[i][j] = (m_paramsManual[i][j] * (limMax - limMin)) + limMin;
+      }
+    }
+
+    for(int i=0; i<NOSCILLATORS; i++)
+    {
+      for(int j=0; j<NSTATES; j++)
+      {
+        std::cout << "Setting: " << i << ", " << j << ", " << params[i][j] << std::endl; 
+      }
+    }
+    
+    /*params[0][0] = 3.83366; //2.00;
     params[0][1] = 0.951536; //0.2;
     params[0][2] = -0.326143; //-0.5;
     params[0][3] = -0.7548; //-0.11;
@@ -337,7 +375,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
     params[3][4] = -0.329029; //-0.30;
     params[3][5] = -0.906597; //-0.31;
     params[3][6] = 0.047229; //-0.32;
-    params[3][7] = 0.0110046;//-0.33;
+    params[3][7] = 0.0110046;//-0.33;*/
   }
   //for (int i=0; i<NOSCILLATORS; i++)
     //std::cout << "\e[1;31mThe following will be sent to setup: " << i << " " << params[i][0] << " " << params[i][1] << " " << params[i][2] << " " <<params[i][3] << " " << params[i][4] << "\e[0m" << std::endl;
@@ -530,8 +568,8 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
       //std::cout << "Test length: " << initialRL.at((tgTags)"SUPERball_string21") << std::endl;
     }*/
     ctr++;
-    if(ctr == 4500)
-      std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
+    //if(ctr == 4500)
+      //std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
     /*for(InitialRestLengths::const_iterator it = initialRL.begin(); it != initialRL.end(); ++it)
     {
       std::cout << it->first << " " << it->second << std::endl;
@@ -563,8 +601,55 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
     if(m_timePassed>CONTROLLER_STOP_TIME*dt)
     {
       double distance = displacement(subject);
-      std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl << std::endl << std::endl;      
-      
+      printf("\e[1;36mDONE, traveled %.4f \e[0m \n\n\n",distance);
+      //std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl << std::endl << std::endl;      
+      if(1){
+        FILE *pFile;
+        std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
+        fileNameStr += timebufferPO;
+        fileNameStr += "_bashScript.csv";
+        const char* fileName = fileNameStr.c_str();
+        pFile = fopen(fileName,"a");
+        if(pFile!=NULL)
+        {
+          fprintf(pFile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                            m_paramsManual[0][0],
+                            m_paramsManual[0][1],
+                            m_paramsManual[0][2],
+                            m_paramsManual[0][3],
+                            m_paramsManual[0][4],
+                            m_paramsManual[0][5],
+                            m_paramsManual[0][6],
+                            m_paramsManual[0][7],
+                            m_paramsManual[1][0],
+                            m_paramsManual[1][1],
+                            m_paramsManual[1][2],
+                            m_paramsManual[1][3],
+                            m_paramsManual[1][4],
+                            m_paramsManual[1][5],
+                            m_paramsManual[1][6],
+                            m_paramsManual[1][7],
+                            m_paramsManual[2][0],
+                            m_paramsManual[2][1],
+                            m_paramsManual[2][2],
+                            m_paramsManual[2][3],
+                            m_paramsManual[2][4],
+                            m_paramsManual[2][5],
+                            m_paramsManual[2][6],
+                            m_paramsManual[2][7],
+                            m_paramsManual[3][0],
+                            m_paramsManual[3][1],
+                            m_paramsManual[3][2],
+                            m_paramsManual[3][3],
+                            m_paramsManual[3][4],
+                            m_paramsManual[3][5],
+                            m_paramsManual[3][6],
+                            m_paramsManual[3][7],
+                            distance);
+        }
+        fclose(pFile);
+      }
+
       if(saveToCSV)
       {
         saveHistLastLengths();
@@ -625,7 +710,8 @@ void PhaseOscController::testSynchHyp()
   if(fabs(s1)>=1 || fabs(s2)>=1 || fabs(s3)>=1)
   {
     std::cout << "\e[1;32msigma=" << sigma << ", s1=" << s1 << ", s2=" << s2 << ", s3=" << s3 << "\e[0m" << std::endl;
-    throw std::invalid_argument("Not going to synchronize.");
+    throw std::invalid_argument("DONE, traveled -100.0");
+    //throw std::invalid_argument("Not going to synchronize.");
   }         
 }
 

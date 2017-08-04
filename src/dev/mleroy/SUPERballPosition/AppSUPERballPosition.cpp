@@ -53,9 +53,9 @@
 #define NSTATES 8
 #define USEGRAPHICS 1
 #define LOGDATA 0
-#define USEHOPFCTLR 1
+#define USEHOPFCTLR 0
 #define USELENGTHCTLR 0
-#define USEPHASEOSCCTLR 0
+#define USEPHASEOSCCTLR 1
 
 // Function prototypes
 tgBoxGround *createGround();
@@ -83,6 +83,11 @@ int main(int argc, char** argv)
     {
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you would like to build.");
     }
+
+    if (argv[2] != NULL)
+    {
+        //std::cout << "The passed parameters are: " << argv[2] << " " << argv[3] << std::endl;
+    }    
 
 /*  
     // create the ground and world. Specify ground rotation in radians
@@ -216,11 +221,22 @@ int main(int argc, char** argv)
                                                   couplingSeMin,     couplingSeMax,
                                                   hopfOffsetEvenMin, hopfOffsetEvenMax,
                                                   hopfOffsetOddMin,  hopfOffsetOddMax);
-
+        //std::vector<std::vector<double>> params;
+        double params[NOSCILLATORS][NSTATES];
+        int k = 2;
+        for(int i=0; i<NOSCILLATORS; i++)
+        {
+            for(int j=0; j<NSTATES; j++)
+            {
+                //std::cout << "Setting up: " << i << ", " << j << ", " << k << ", " << argv[k] << std::endl;
+                params[i][j] = atof(argv[k]);
+                k++;
+            }
+        }
         PhaseOscController* const myController = new PhaseOscController(control_config, tagsToControl, timePassed, 
                                                                         ctr, initRestLengths, saveToCSV, 
                                                                         hopfState, hopfVel, //hopfAcc, 
-                                                                        suffix, "SUPERballPosition/", "Config.ini");
+                                                                        suffix, "SUPERballPosition/", "Config.ini",params);
     #endif
 
     // Attach the controller to the model
@@ -314,7 +330,7 @@ tgSimView *createView(tgWorld *world) {
 
 /** Run a series of episodes for nSteps each */
 void simulate(tgSimulation *simulation, HopfControllerML* myController) {
-    int nEpisodes = 50;  // Number of episodes ("trial runs")
+    int nEpisodes = 1;//50;  // Number of episodes ("trial runs")
     int nSteps = 30001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
     for (int i=1; i<=nEpisodes; i++)
     {
@@ -341,7 +357,7 @@ void simulate(tgSimulation *simulation, HopfControllerML* myController) {
 }
 
 void simulate(tgSimulation *simulation, PhaseOscController* myController) {
-    int nEpisodes = 50;  // Number of episodes ("trial runs")
+    int nEpisodes = 1;  // Number of episodes ("trial runs")
     int nSteps = 30001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
     for (int i=1; i<=nEpisodes; i++)
     {
