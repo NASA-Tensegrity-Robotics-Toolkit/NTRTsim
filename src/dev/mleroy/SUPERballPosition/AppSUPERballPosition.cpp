@@ -33,6 +33,7 @@
 
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgHillyGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -51,7 +52,7 @@
 
 #define NOSCILLATORS 4
 #define NSTATES 8
-#define USEGRAPHICS 1
+#define USEGRAPHICS 0
 #define LOGDATA 0
 #define USEHOPFCTLR 0
 #define USELENGTHCTLR 0
@@ -59,6 +60,7 @@
 
 // Function prototypes
 tgBoxGround *createGround();
+tgHillyGround *createHillyGround();
 tgWorld *createWorld();
 tgSimViewGraphics *createGraphicsView(tgWorld *world);
 tgSimView *createView(tgWorld *world);
@@ -284,7 +286,9 @@ int main(int argc, char** argv)
 tgWorld *createWorld() {
     const tgWorld::Config config(98.1); // gravity, dm/sec^2  Use this to adjust length scale of world.
 
-    tgBoxGround* ground = createGround();
+    //tgBoxGround* ground = createGround();
+    tgHillyGround* ground = createHillyGround();
+
     return new tgWorld(config, ground);
 }
 
@@ -309,6 +313,31 @@ tgBoxGround *createGround() {
     const tgBoxGround::Config groundConfig(eulerAngles);
 
     return new tgBoxGround(groundConfig);
+}
+
+
+tgHillyGround *createHillyGround() {
+    // Determine the angle of the ground in radians. All 0 is flat
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const btVector3 eulerAngles = btVector3(yaw, pitch, roll);  // Default: (0.0, 0.0, 0.0)
+    
+    const double friction = 0.25;
+    const double restitution = 0.0;
+    const btVector3 size   = btVector3(0.0,0.1,0.0);
+    const btVector3 origin = btVector3(0.0,0.0,0.0);
+    const size_t nx = 100;
+    const size_t ny = 100;
+    const double margin = 0.5;
+    const double triangleSize = 4.0;
+    const double waveHeight = 2.0;
+    const double offset = 0.0;
+
+    // the world will delete this
+    const tgHillyGround::Config hillyGroundConfig(eulerAngles, friction, restitution, size, origin, nx, ny, margin, triangleSize, waveHeight, offset);
+
+    return new tgHillyGround(hillyGroundConfig);
 }
 
 

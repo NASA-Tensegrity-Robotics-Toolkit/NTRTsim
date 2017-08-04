@@ -710,7 +710,7 @@ void PhaseOscController::testSynchHyp()
   if(fabs(s1)>=1 || fabs(s2)>=1 || fabs(s3)>=1)
   {
     std::cout << "\e[1;32msigma=" << sigma << ", s1=" << s1 << ", s2=" << s2 << ", s3=" << s3 << "\e[0m" << std::endl;
-    throw std::invalid_argument("DONE, traveled -100.0");
+    throw std::invalid_argument("DONE, traveled -10.00");
     //throw std::invalid_argument("Not going to synchronize.");
   }         
 }
