@@ -1,0 +1,7 @@
+substructures:
+  rotated1:
+    path: rot1SUPERballV2.yaml
+    translation: [0,0,0]
+    rotation:
+      axis: [1,0,0]
+      angle: 54.4

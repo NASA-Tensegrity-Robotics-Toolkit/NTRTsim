@@ -17,9 +17,9 @@
 */
 
 /**
- * @file AppTestSUPERballML.cpp
+ * @file AppSUPERballChain.cpp
  * @brief Contains the definition function main() for  
- * AppTestSUPERballML which builds a YAML SUPERball 2.0.
+ * AppSUPERballChain which builds a YAML SUPERball 2.0.
  * @author Marc Leroy
  * $Id$
  */
@@ -86,32 +86,6 @@ int main(int argc, char** argv)
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you would like to build.");
     }
 
-    if (argv[2] != NULL)
-    {
-        //std::cout << "The passed parameters are: " << argv[2] << " " << argv[3] << std::endl;
-    }    
-
-/*  
-    // create the ground and world. Specify ground rotation in radians
-    const double yaw = 0.0;
-    const double pitch = 0.0; //0.0;
-    const double roll = 0.0; //0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
-
-    const tgWorld::Config config(98.1); // gravity, dm/sec^2
-    tgWorld world(config, ground);
-
-    // create the view
-    //const double timestep_physics = 0.0001; // seconds
-    const double timestep_physics = 0.001;
-    const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
-
-    // create the simulation
-    tgSimulation simulation(view);
-*/
     // First create the world
     tgWorld *world = createWorld();
 
@@ -125,7 +99,6 @@ int main(int argc, char** argv)
     // Third create the simulation
     tgSimulation *simulation = new tgSimulation(*view);
 
-
     // Create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
     // second argument.
@@ -138,18 +111,11 @@ int main(int argc, char** argv)
 
     // User-defined initial conditions, shouldn't matter much as Hopf oscillator
     // defines a stable limit cycle
-    double hopfState[NSTATES] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};//{0.1,-0.1,-0.15,0.15,0.05,-0.05,-0.2,0.2};
+    double hopfState[NSTATES] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     double hopfVel[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    //double hopfAcc[NSTATES]   = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+    
     #if(0)
     {
-        /*srand(time(NULL));
-        for(int i=0; i<NSTATES; i++)
-        {
-            hopfState[i] = (double)(rand()%1000)/500-1;
-            hopfVel[i] = (double)(rand()%1000)/500-1;
-        }*/
-
         std::cout << "\e[1;38mStates: ";
         for(int i=0; i<NSTATES; i++)
             std::cout << hopfState[i] << ", ";
@@ -181,7 +147,6 @@ int main(int argc, char** argv)
     double hopfOffsetOddMax =  0.1;
 
     int ctr = 0;
-    double initRestLengths = 10.0;
 
     std::vector<std::string> tagsToControl;
     tagsToControl = selectControlledStrings(tagsToControl);
@@ -202,7 +167,7 @@ int main(int argc, char** argv)
                                                 hopfOffsetOddMin,  hopfOffsetOddMax);
 
         HopfControllerML* const myController = new HopfControllerML(control_config, tagsToControl, timePassed, 
-                                                                    ctr, initRestLengths, saveToCSV, 
+                                                                    ctr, saveToCSV, 
                                                                     hopfState, hopfVel, //hopfAcc, 
                                                                     suffix, "SUPERballPosition/", "Config.ini");
     #endif
@@ -236,8 +201,8 @@ int main(int argc, char** argv)
             }
         }
         PhaseOscController* const myController = new PhaseOscController(control_config, tagsToControl, timePassed, 
-                                                                        ctr, initRestLengths, saveToCSV, 
-                                                                        hopfState, hopfVel, //hopfAcc, 
+                                                                        ctr, saveToCSV, 
+                                                                        hopfState, hopfVel, 
                                                                         suffix, "SUPERballPosition/", "Config.ini",params);
     #endif
 
@@ -253,7 +218,7 @@ int main(int argc, char** argv)
     #if(LOGDATA)
         // Add sensors using the new sensing framework
         // A string prefix for the filename
-        std::string log_filename = "~/projects/tg_shared/AppSUPERballPosition";
+        std::string log_filename = "~/projects/tg_shared/AppSUPERballChain";
         // The time interval between sensor readings:
         double timeInterval = 0.2;
         // First, create the data manager

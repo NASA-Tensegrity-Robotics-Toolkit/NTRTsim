@@ -141,14 +141,13 @@ PhaseOscController::Config::Config(double hOMin, double hOMax, double hMMin, dou
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
 PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
-                                   int ctr, double initRestLengths, bool saveToCSV,
+                                   int ctr, bool saveToCSV,
                                    double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], //double hopfAccInit[NSTATES], 
                                    std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]) :
   m_config(config),
   m_tagsToControl(tagsToControl),
   m_timePassed(timePassed),
   ctr(ctr),
-  initRestLengths(initRestLengths),
   saveToCSV(saveToCSV),
   // rest for learning library
   configFilename(configFile),
@@ -312,13 +311,13 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   if(1)
   {    
     std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
-    double limMin = 0.0;
-    double limMax = 0.0;
+    //double limMin = 0.0;
+    //double limMax = 0.0;
     for(int i = 0; i < NOSCILLATORS; i++)
     {
       for(int j = 0; j < NSTATES; j++)
       {
-        switch(j)
+        /*switch(j)
         {
           case 0: limMin =  0.0; limMax = 1.0; break; //omega          0.1 5.0
           case 1: limMin =  0.1; limMax = 1.0; break; //mu             0.1 1.0
@@ -329,7 +328,8 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
           case 6: limMin = -0.1; limMax = 0.1; break; //offset even   -0.1 0.1
           case 7: limMin = -0.1; limMax = 0.1; break; //offset odd    -0.1 0.1
         }
-        params[i][j] = (m_paramsManual[i][j] * (limMax - limMin)) + limMin;
+        params[i][j] = (m_paramsManual[i][j] * (limMax - limMin)) + limMin;*/
+        params[i][j] = m_paramsManual[i][j];
       }
     }
 
@@ -340,68 +340,10 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
         std::cout << "Setting: " << i << ", " << j << ", " << params[i][j] << std::endl; 
       }
     }
-    
-    /*params[0][0] = 3.83366; //2.00;
-    params[0][1] = 0.951536; //0.2;
-    params[0][2] = -0.326143; //-0.5;
-    params[0][3] = -0.7548; //-0.11;
-    params[0][4] = -0.692846; //-0.12;
-    params[0][5] = -0.301531; //-0.13;
-    params[0][6] = -0.0965834; //-0.14;
-    params[0][7] = -0.0477222;//-0.15;
-
-    params[1][0] = 3.81622; //2.01;
-    params[1][1] = 0.514954; //0.21;
-    params[1][2] = -0.301126; //-0.16;
-    params[1][3] = -0.456894; //-0.17;
-    params[1][4] = -0.288842; //-0.18;
-    params[1][5] = -0.802321; //-0.19;
-    params[1][6] = 0.005425; //-0.20;
-    params[1][7] = -0.012221;//-0.21;
-    
-    params[2][0] = 3.66452; //2.02;
-    params[2][1] = 0.910582; //0.22;
-    params[2][2] = -0.211439; //-0.22;
-    params[2][3] = -0.992296; //-0.23;
-    params[2][4] = -0.201521; //-0.24;
-    params[2][5] = -0.135209; //-0.25;
-    params[2][6] = 0.03794; //-0.26;
-    params[2][7] = -0.0895263;//-0.27;
-    
-    params[3][0] = 3.4382; //2.03;
-    params[3][1] = 0.931574; //0.23;
-    params[3][2] = -0.948404; //-0.28;
-    params[3][3] = -0.227634; //-0.29;
-    params[3][4] = -0.329029; //-0.30;
-    params[3][5] = -0.906597; //-0.31;
-    params[3][6] = 0.047229; //-0.32;
-    params[3][7] = 0.0110046;//-0.33;*/
   }
-  //for (int i=0; i<NOSCILLATORS; i++)
-    //std::cout << "\e[1;31mThe following will be sent to setup: " << i << " " << params[i][0] << " " << params[i][1] << " " << params[i][2] << " " <<params[i][3] << " " << params[i][4] << "\e[0m" << std::endl;
-    
-  /*// This one is square
-  for( std::size_t i = 0; i < configData.getintvalue("numberOfControllers"); i++)
-  {
-      for( std::size_t j = 0; j < configData.getintvalue("numberOfActions"); j++)
-      {
-        std::string whichOne = "";
-        switch(j)
-        {
-          case 0: whichOne = ", Omega: "; break;
-          case 1: whichOne = ", Mu: "; break;
-          case 2: whichOne = ", Coupling: "; break;
-        }
-        std::cout << i << " " << j << whichOne << params[i][j] << std::endl;
-      }
-      std::cout << std::endl;
-  }*/
 
   setupOscillators(subject, params);
 
-  //std::cout << "Setting up the PhaseOscController controller." << std::endl;
-  //      << "Finding cables with tags: " << m_tagsToControl
-  //      << std::endl;
   cablesWithTags = {};
   // For all the strings in the list, call initializeActuators.
   std::vector<std::string>::iterator it;
@@ -411,11 +353,6 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
     initializeActuators(subject, *it);
   }
   std::cout << "Finished setting up the controller." << std::endl;
-  //for(std::size_t i=0; i<=23; i++)
-    //std::cout << "Rest length " << i << " " << cablesWithTags[i]->getTags() << " " << cablesWithTags[i]->getHistory().restLengths[0] << std::endl;
-
-  //for(int i=0; i<24; i++)
-    //std::cout << initialRLArray[i] << std::endl; 
 }
 
 
@@ -433,9 +370,6 @@ array_2D PhaseOscController::scaleActions(std::vector< std::vector <double> > ac
   array_2D actionsUpd(boost::extents[numControllers][numActions]);
   
   array_2D limits(boost::extents[2][numActions]);
-  
-  // Check if we need to update limits
-  //assert(numActions == 2);
   
   limits[0][0] = m_config.hopfOmegaMin;
   limits[1][0] = m_config.hopfOmegaMax;
@@ -552,43 +486,19 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
         fclose(pFile);
       }
     }
-  
-    /*if(ctr==0)
-    {
-      initRestLengths=cablesWithTags[0]->getRestLength();
-
-      for(InitialRestLengths::const_iterator it = initialRL.begin(); it != initialRL.end(); ++it)
-      {
-        std::cout << it->first << " " << it->second << std::endl;
-      }
-      std::cout << ctr << " " << m_timePassed << std::endl;
-      std::cout << m_config.hopfOmegaMin << " " << m_config.hopfOmegaMax << std::endl;
-  
-      //std::cout << initRestLengths << std::endl;
-      //std::cout << "Test length: " << initialRL.at((tgTags)"SUPERball_string21") << std::endl;
-    }*/
     ctr++;
-    //if(ctr == 4500)
-      //std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
-    /*for(InitialRestLengths::const_iterator it = initialRL.begin(); it != initialRL.end(); ++it)
-    {
-      std::cout << it->first << " " << it->second << std::endl;
-    }
-    std::cout << std::endl;*/
-
+    
     updateHopfState(dt);
 
     //HopfSelector was 01010101
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 0, 2, initRestLengths,  0,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 3, 5, initRestLengths,  0,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 6, 8, initRestLengths,  1,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 9, 11, initRestLengths, 1,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 12, 14, initRestLengths,2,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 15, 17, initRestLengths,2,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 18, 20, initRestLengths,3,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 21, 23, initRestLengths,3,0,0.0);
-    //for(int i=0; i<cablesWithTags.size(); i++)
-      //cablesWithTags[i]->moveMotors(dt);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel,  0,  2,0,0,    0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel,  3,  5,0,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel,  6,  8,1,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel,  9, 11,1,0,    0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 12, 14,2,0,    0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 15, 17,2,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 18, 20,3,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 21, 23,3,0,    0.0);
   }
 
   if(m_timePassed <= (1+CONTROLLER_STOP_TIME)*dt)
@@ -722,18 +632,12 @@ void PhaseOscController::testSynchHyp()
 void PhaseOscController::updateHopfState(double dt)
 {
   double testOutArray[4] = {0,0,0,0};
-  //std::cout << "Now, ";
+
   for(int i=0; i < NOSCILLATORS; i++)
   {
     compNextHopfState(dt,i);
-    //std::cout << "Osc" << i << ": " << hopfState[2*i] << " (" << 10*(1+HOPF_AMPLIFIER*cos(hopfState[2*i])) << ") ";
-    /*if((m_timePassed > 9.999 && m_timePassed < 10.001) || (m_timePassed > 19.999 && m_timePassed < 20.001))
-    {
-      perturbateHopf(i);   
-    }*/
     testOutArray[i] = hopfState[2*i];   
   }
-  //std::cout << "and in the end, " << testOutArray[0] << " " << testOutArray[1] << " " << testOutArray[2] << " " << testOutArray[3] << std::endl;
 
   if(0)
   {
@@ -793,8 +697,6 @@ void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
       break;
   }
   
-  //double r = sqrt(hopfState[2*selectedOscillator]*hopfState[2*selectedOscillator] + hopfState[2*selectedOscillator+1]*hopfState[2*selectedOscillator+1]);
-
   hopfVel[2*selectedOscillator]   =   hopfOmega[selectedOscillator] 
                                     + couplingArray[0]*sin(hopfState[coupledState[0]]-hopfState[coupledState[1]])   
                                     - couplingArray[1]*sin(hopfState[coupledState[1]]-hopfState[coupledState[2]]);
@@ -803,18 +705,8 @@ void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
                                     + couplingArray[0]*sin(hopfState[coupledState[0]]-hopfState[coupledState[1]])   
                                     - couplingArray[1]*sin(hopfState[coupledState[1]]-hopfState[coupledState[2]]);
 
-  //double drdt = (hopfState[2*selectedOscillator]*hopfVel[2*selectedOscillator] + hopfState[2*selectedOscillator+1]*hopfVel[2*selectedOscillator+1])/r;
-
-  /*hopfAcc[2*selectedOscillator]   = -2 * r*drdt * hopfState[2*selectedOscillator]   
-                                    + (hopfMu[selectedOscillator]-r*r) * hopfVel[2*selectedOscillator]   
-                                    - hopfOmega[selectedOscillator] * hopfVel[2*selectedOscillator+1];
-
-  hopfAcc[2*selectedOscillator+1] = -2 * r*drdt * hopfState[2*selectedOscillator+1] 
-                                    + (hopfMu[selectedOscillator]-r*r) * hopfVel[2*selectedOscillator+1] 
-                                    + hopfOmega[selectedOscillator] * hopfVel[2*selectedOscillator];*/
-
-  hopfState[2*selectedOscillator]   = hopfState[2*selectedOscillator]   + hopfVel[2*selectedOscillator]*dt  ;// + 0.5*hopfAcc[2*selectedOscillator]*dt*dt;
-  hopfState[2*selectedOscillator+1] = hopfState[2*selectedOscillator+1] + hopfVel[2*selectedOscillator+1]*dt;// + 0.5*hopfAcc[2*selectedOscillator+1]*dt*dt;
+  hopfState[2*selectedOscillator]   = hopfState[2*selectedOscillator]   + hopfVel[2*selectedOscillator]*dt  ;
+  hopfState[2*selectedOscillator+1] = hopfState[2*selectedOscillator+1] + hopfVel[2*selectedOscillator+1]*dt;
 }
 
 
@@ -837,8 +729,6 @@ void PhaseOscController::perturbateHopf(int selectedOscillator)
   hopfState[2*selectedOscillator+1] = randArray[1];
   hopfVel[2*selectedOscillator]     = randArray[2];
   hopfVel[2*selectedOscillator+1]   = randArray[3];
-  //hopfAcc[2*selectedOscillator]     = randArray[4];
-  //hopfAcc[2*selectedOscillator+1]   = randArray[5];
 
   //std::cout << randArray[0] << " " << randArray[1] << " " << randArray[2] << " " << randArray[3] << " " << randArray[4] << " " << randArray[5] << std::endl;
 }
@@ -859,7 +749,7 @@ void PhaseOscController::perturbateHopf(int selectedOscillator)
  * @return void
  */
 void PhaseOscController::hopfOscillator(TensegrityModel& subject, double dt, double m_timePassed, double *hopfState, double *hopfVel, //double *hopfAcc,
-                                      int firstCable, int lastCable, double initRestLengths, int selectedOscillator, int hopfSelector, double phaseOffset)
+                                      int firstCable, int lastCable, int selectedOscillator, int hopfSelector, double phaseOffset)
 {
   for (std::size_t i = firstCable; i <= lastCable; i ++) 
   {  
@@ -897,30 +787,11 @@ void PhaseOscController::resetTimePassed()
 {
   m_timePassed = 0;
   ctr = 0;
-  bool random = false;
   
   for(int i=0; i<NSTATES; i++)
   {
-    //std::cout << "States right before reset: " << hopfState[i] << " " << hopfVel[i] << std::endl;
     hopfState[i] = 0.0;
-    hopfVel[i] = 0.0; 
-    /*if(random)
-    {
-    /hopfState[i] = (double)(rand()%1000)/500-1;
-      hopfVel[i] = (double)(rand()%1000)/500-1;
-    }
-  }
-  if(random)
-  {
-    std::cout << "\e[1;38mStates: ";
-    for(int i=0; i<NSTATES; i++)
-        std::cout << hopfState[i] << ", ";
-    std::cout << "\e[0m" << std::endl;   
-
-    std::cout << "\e[1;38mVelocities: ";
-    for(int i=0; i<NSTATES; i++)
-        std::cout << hopfVel[i] << ", ";
-    std::cout << "\e[0m" << std::endl;*/   
+    hopfVel[i] = 0.0;  
   }
 }
 
@@ -929,9 +800,6 @@ void PhaseOscController::resetTimePassed()
 // Pre-condition: This model has 6 rods
 std::vector<double> PhaseOscController::getBallCOM(TensegrityModel& subject) 
 {   
-    //std::vector <tgRod*> rods = find<tgRod>("tgRodInfo");
-    //assert(!rods.empty());
-
     btVector3 ballCenterOfMass(0, 0, 0);
 
     std::vector<tgRod*> foundRods = subject.find<tgRod>("superball_rod");
@@ -946,9 +814,7 @@ std::vector<double> PhaseOscController::getBallCOM(TensegrityModel& subject)
         ballCenterOfMass += rodCenterOfMass * rodMass;
         ballMass += rodMass;
     }
-    //std::cout << std::endl;
 
-    //assert(ballMass > 0.0);
     ballCenterOfMass /= ballMass;
 
     // Copy to the result std::vector
@@ -957,7 +823,7 @@ std::vector<double> PhaseOscController::getBallCOM(TensegrityModel& subject)
     { 
       result[i] = ballCenterOfMass[i]; 
     }
-    //std::cout << "X=" << result[0] << ", Y=" << result[1] << ", Z=" << result[2] << std::endl;
+
     return result;
 }
 
@@ -1032,7 +898,8 @@ void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<
     fclose(pFile2);
   }
 
-  double bufferVar = initRestLengths*(1+hopfState[0]);
+  //double bufferVar = initRestLengths*(1+hopfState[0]);
+  double bufferVar = 1*(1+hopfState[0]); //NB if is used again, change to actual initial rest lengths
   FILE *pFile3;
   const char* file3Name = fileNamesPO[2].c_str();
   pFile3 = fopen(file3Name,"a");

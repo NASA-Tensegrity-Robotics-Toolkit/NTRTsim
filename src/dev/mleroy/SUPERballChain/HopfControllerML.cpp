@@ -17,14 +17,14 @@
  */
 
 /**
- * @file PhaseOscController.cpp
- * @brief Implementation of PhaseOscController.
+ * @file HopfControllerML.cpp
+ * @brief Implementation of HopfControllerML.
  * @author Marc Leroy
  * $Id$
  */
 
 // This module
-#include "PhaseOscController.h"
+#include "HopfControllerML.h"
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
@@ -63,34 +63,34 @@
 
 #define USEBOOSTRK 0
 
-char timebufferPO[12];
-std::string primerHopfFileNamePO  = "_hopf_results";
-std::string primerSpeedFileNamePO = "_speed_hopf_results";
-std::string primerCableFileNamePO = "_cable_hopf_results";
-std::string primerCOMFileNamePO   = "_center_mass_results";
-static std::string hopfFileNamePO;
-static std::string speedFileNamePO;
-static std::string cableFileNamePO; 
-static std::string cOMFileNamePO;
-static std::vector<std::string> fileNamesPO;
+char timebuffer[12];
+std::string primerHopfFileName = "_hopf_results";
+std::string primerSpeedFileName = "_speed_hopf_results";
+std::string primerCableFileName = "_cable_hopf_results";
+std::string primerCOMFileName = "_center_mass_results";
+static std::string hopfFileName;
+static std::string speedFileName;
+static std::string cableFileName; 
+static std::string cOMFileName;
+static std::vector<std::string> fileNames;
 
-const double CONTROLLER_STOP_TIME = 120000.0;
-const double HOPF_AMPLIFIER       = 0.5;
-const double MATH_PI              = 3.14159265359;
+const double CONTROLLER_STOP_TIME = 30000.0;
+const double HOPF_AMPLIFIER = 0.5;
+const double MATH_PI = 3.14159265359;
 
-state_type xPO(4);
-size_t stepsPO;
+state_type x(4);
+size_t steps;
 
-void odeTestPO(const state_type &xPO, state_type &dxdt, const double t)
+void odeTest(const state_type &x, state_type &dxdt, const double t)
 {
-  dxdt[0]=3.83366-(-0.7548+0.301531)*sin(xPO[0]-xPO[1]);
-  dxdt[1]=3.81622+(-0.301126+0.288842)*sin(xPO[0]-xPO[1])-(-0.456894+0.802321)*sin(xPO[1]-xPO[2]);
-  dxdt[2]=3.66452+(-0.211439+0.201521)*sin(xPO[1]-xPO[2])-(-0.992296+0.135209)*sin(xPO[2]-xPO[3]);
-  dxdt[3]=3.4382 +(-0.948404+0.329029)*sin(xPO[2]-xPO[3]);
+  dxdt[0]=3.83366-(-0.7548+0.301531)*sin(x[0]-x[1]);
+  dxdt[1]=3.81622+(-0.301126+0.288842)*sin(x[0]-x[1])-(-0.456894+0.802321)*sin(x[1]-x[2]);
+  dxdt[2]=3.66452+(-0.211439+0.201521)*sin(x[1]-x[2])-(-0.992296+0.135209)*sin(x[2]-x[3]);
+  dxdt[3]=3.4382 +(-0.948404+0.329029)*sin(x[2]-x[3]);
 }
 
 
-PhaseOscController::Config::Config(double hOMin, double hOMax, double hMMin, double hMMax, double cUpMin, double cUpMax,
+HopfControllerML::Config::Config(double hOMin, double hOMax, double hMMin, double hMMax, double cUpMin, double cUpMax,
                                  double cDownMin, double cDownMax, double cNeMin, double cNeMax, double cSeMin, double cSeMax,
                                  double hOffEMin, double hOffEMax, double hOffOMin, double hOffOMax) :
   hopfOmegaMin(hOMin),
@@ -140,25 +140,24 @@ PhaseOscController::Config::Config(double hOMin, double hOMax, double hMMin, dou
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
-                                   int ctr, double initRestLengths, bool saveToCSV,
+HopfControllerML::HopfControllerML(HopfControllerML::Config config, std::vector<std::string> tagsToControl, double timePassed, 
+                                   int ctr, bool saveToCSV,
                                    double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], //double hopfAccInit[NSTATES], 
-                                   std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]) :
+                                   std::string args, std::string resourcePath, std::string configFile) :
   m_config(config),
   m_tagsToControl(tagsToControl),
   m_timePassed(timePassed),
   ctr(ctr),
-  initRestLengths(initRestLengths),
   saveToCSV(saveToCSV),
   // rest for learning library
   configFilename(configFile),
   evolution(args, configFile, resourcePath),
   learning(false)
 {
-  xPO[0] = 0.0;
-  xPO[1] = 0.0;
-  xPO[2] = 0.0;
-  xPO[3] = 0.0;
+  x[0] = 0.0;
+  x[1] = 0.0;
+  x[2] = 0.0;
+  x[3] = 0.0;
 
   for(int i=0; i<NSTATES; i++)
   {
@@ -173,15 +172,15 @@ PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::v
   }
 
   // Setting up the different log files
-  hopfFileNamePO  = setupCSVFiles(primerHopfFileNamePO);
-  speedFileNamePO = setupCSVFiles(primerSpeedFileNamePO);
-  cableFileNamePO = setupCSVFiles(primerCableFileNamePO);
-  cOMFileNamePO   = setupCSVFiles(primerCOMFileNamePO);
+  hopfFileName  = setupCSVFiles(primerHopfFileName);
+  speedFileName = setupCSVFiles(primerSpeedFileName);
+  cableFileName = setupCSVFiles(primerCableFileName);
+  cOMFileName   = setupCSVFiles(primerCOMFileName);
 
-  fileNamesPO.push_back(hopfFileNamePO);
-  fileNamesPO.push_back(speedFileNamePO);
-  fileNamesPO.push_back(cableFileNamePO);
-  fileNamesPO.push_back(cOMFileNamePO);
+  fileNames.push_back(hopfFileName);
+  fileNames.push_back(speedFileName);
+  fileNames.push_back(cableFileName);
+  fileNames.push_back(cOMFileName);
 
   // Setting up things for the learning library
   std::string path;
@@ -196,19 +195,10 @@ PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::v
 
   configData.readFile(path + configFilename);
   learning = configData.getintvalue("learning");
-
-  for(int i=0; i<NOSCILLATORS; i++)
-  {
-    for(int j=0; j<NSTATES; j++)
-    {
-      m_paramsManual[i][j] = paramsManual[i][j];
-      //std::cout << "Setting up: " << i << ", " << j << ", " << paramsManual[i][j] << ", " << m_paramsManual[i][j] << std::endl;
-    }
-  }
 }
 
 
-PhaseOscController::~PhaseOscController()
+HopfControllerML::~HopfControllerML()
 {
   std::cout << "Destroying" << std::endl;
 }
@@ -217,7 +207,7 @@ PhaseOscController::~PhaseOscController()
 // /!\ Copied from the escape app
 // So far, only score used for eventual fitness calculation of an Escape Model
 // is the maximum distance from the origin reached during that subject's episode
-void PhaseOscController::onTeardown(TensegrityModel& subject) 
+void HopfControllerML::onTeardown(TensegrityModel& subject) 
 {
   std::cout << "Tearing down" << std::endl;
   std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
@@ -236,7 +226,7 @@ void PhaseOscController::onTeardown(TensegrityModel& subject)
 }
 
 
-double PhaseOscController::displacement(TensegrityModel& subject) 
+double HopfControllerML::displacement(TensegrityModel& subject) 
 {
   std::vector<double> finalPosition = getBallCOM(subject);
 
@@ -253,7 +243,7 @@ double PhaseOscController::displacement(TensegrityModel& subject)
 }
 
 
-double PhaseOscController::totalEnergySpent(TensegrityModel& subject)
+double HopfControllerML::totalEnergySpent(TensegrityModel& subject)
 {
   double totalEnergySpent=0;
 
@@ -283,7 +273,7 @@ double PhaseOscController::totalEnergySpent(TensegrityModel& subject)
  * which means just store pointers to them and record their rest lengths.
  * This method calls the setter setupOscillators and helper initializeActuators.
  */
-void PhaseOscController::onSetup(TensegrityModel& subject)
+void HopfControllerML::onSetup(TensegrityModel& subject)
 {
   resetTimePassed();
   for(int i=0; i<NSTATES; i++)
@@ -296,7 +286,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   }
 
   initPosition = getBallCOM(subject);
-  //std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
+  std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
   //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
@@ -312,36 +302,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   if(1)
   {    
     std::cout << std::endl << "\e[1;34mManually setting values\e[0m" << std::endl; // ATTENTION: range of couplings changed!
-    double limMin = 0.0;
-    double limMax = 0.0;
-    for(int i = 0; i < NOSCILLATORS; i++)
-    {
-      for(int j = 0; j < NSTATES; j++)
-      {
-        switch(j)
-        {
-          case 0: limMin =  0.0; limMax = 1.0; break; //omega          0.1 5.0
-          case 1: limMin =  0.1; limMax = 1.0; break; //mu             0.1 1.0
-          case 2: limMin = -0.1; limMax = 0.1; break; //coupling Up   -1.0 1.0
-          case 3: limMin = -0.1; limMax = 0.1; break; //coupling Down -1.0 1.0
-          case 4: limMin = -0.1; limMax = 0.1; break; //coupling Ne   -1.0 1.0
-          case 5: limMin = -0.1; limMax = 0.1; break; //coupling Se   -1.0 1.0
-          case 6: limMin = -0.1; limMax = 0.1; break; //offset even   -0.1 0.1
-          case 7: limMin = -0.1; limMax = 0.1; break; //offset odd    -0.1 0.1
-        }
-        params[i][j] = (m_paramsManual[i][j] * (limMax - limMin)) + limMin;
-      }
-    }
-
-    for(int i=0; i<NOSCILLATORS; i++)
-    {
-      for(int j=0; j<NSTATES; j++)
-      {
-        std::cout << "Setting: " << i << ", " << j << ", " << params[i][j] << std::endl; 
-      }
-    }
-    
-    /*params[0][0] = 3.83366; //2.00;
+    params[0][0] = 3.83366; //2.00;
     params[0][1] = 0.951536; //0.2;
     params[0][2] = -0.326143; //-0.5;
     params[0][3] = -0.7548; //-0.11;
@@ -375,7 +336,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
     params[3][4] = -0.329029; //-0.30;
     params[3][5] = -0.906597; //-0.31;
     params[3][6] = 0.047229; //-0.32;
-    params[3][7] = 0.0110046;//-0.33;*/
+    params[3][7] = 0.0110046;//-0.33;
   }
   //for (int i=0; i<NOSCILLATORS; i++)
     //std::cout << "\e[1;31mThe following will be sent to setup: " << i << " " << params[i][0] << " " << params[i][1] << " " << params[i][2] << " " <<params[i][3] << " " << params[i][4] << "\e[0m" << std::endl;
@@ -399,7 +360,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
 
   setupOscillators(subject, params);
 
-  //std::cout << "Setting up the PhaseOscController controller." << std::endl;
+  //std::cout << "Setting up the HopfControllerML controller." << std::endl;
   //      << "Finding cables with tags: " << m_tagsToControl
   //      << std::endl;
   cablesWithTags = {};
@@ -422,7 +383,7 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
 /**
  * This method generates the configuration's settings under the required min/max constraints
  */
-array_2D PhaseOscController::scaleActions(std::vector< std::vector <double> > actions)
+array_2D HopfControllerML::scaleActions(std::vector< std::vector <double> > actions)
 {
   std::size_t numControllers = configData.getintvalue("numberOfControllers");
   std::size_t numActions     = configData.getintvalue("numberOfActions");
@@ -469,7 +430,7 @@ array_2D PhaseOscController::scaleActions(std::vector< std::vector <double> > ac
 /**
  * This method transfers the output of scaleActions into the subject's controllers setup
  */
-void PhaseOscController::setupOscillators(TensegrityModel& subject, array_2D params)
+void HopfControllerML::setupOscillators(TensegrityModel& subject, array_2D params)
 {
   for(int i=0; i<NOSCILLATORS; i++)
   {
@@ -492,7 +453,7 @@ void PhaseOscController::setupOscillators(TensegrityModel& subject, array_2D par
  * specific actuators in the cablesWithTags array, as well as store the initial
  * rest lengths in the initialRL map.
  */
-void PhaseOscController::initializeActuators(TensegrityModel& subject, std::string tag) 
+void HopfControllerML::initializeActuators(TensegrityModel& subject, std::string tag) 
 {
   //DEBUGGING
   //  std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -522,11 +483,11 @@ void PhaseOscController::initializeActuators(TensegrityModel& subject, std::stri
 /**
  * Method which computes current simulation steps
  */
-void PhaseOscController::onStep(TensegrityModel& subject, double dt)
+void HopfControllerML::onStep(TensegrityModel& subject, double dt)
 {
   m_timePassed += dt;
 
-  if(fabs(m_timePassed-1000*dt) < 0.0000001)
+  if(fabs(m_timePassed-25000*dt) < 0.0000001)
   { 
     testSynchHyp();
     std::vector<double> startingCOM = getBallCOM(subject);
@@ -537,9 +498,9 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
 
   if(m_timePassed >= 3000*dt && m_timePassed < CONTROLLER_STOP_TIME*dt)
   {
-    stepsPO=boost::numeric::odeint::integrate(odeTestPO,xPO,m_timePassed,m_timePassed+dt,dt);
+    steps=boost::numeric::odeint::integrate(odeTest,x,m_timePassed,m_timePassed+dt,dt);
     /*if((int)(1000*m_timePassed)%1000==0)
-      printf("t=%.3f, xPO[0]=%.3f, xPO[1]=%.3f, xPO[2]=%.3f, xPO[3]=%.3f\nA1=%.3f (%.3f), A2=%.3f (%.3f), A3=%.3f (%.3f), A4=%.3f (%.3f)\n\n",m_timePassed+dt,xPO[0],xPO[1],xPO[2],xPO[3],1+0.5*cos(xPO[0]),1+0.5*cos(hopfState[0]),1+0.5*cos(xPO[1]),1+0.5*cos(hopfState[2]),1+0.5*cos(xPO[2]),1+0.5*cos(hopfState[4]),1+0.5*cos(xPO[3]),1+0.5*cos(hopfState[6]));
+      printf("t=%.3f, x[0]=%.3f, x[1]=%.3f, x[2]=%.3f, x[3]=%.3f\nA1=%.3f (%.3f), A2=%.3f (%.3f), A3=%.3f (%.3f), A4=%.3f (%.3f)\n\n",m_timePassed+dt,x[0],x[1],x[2],x[3],1+0.5*cos(x[0]),1+0.5*cos(hopfState[0]),1+0.5*cos(x[1]),1+0.5*cos(hopfState[2]),1+0.5*cos(x[2]),1+0.5*cos(hopfState[4]),1+0.5*cos(x[3]),1+0.5*cos(hopfState[6]));
     */
     if(0)
     {
@@ -548,7 +509,7 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
       pFile = fopen(fileName,"a");
       if(pFile!=NULL)
       {
-        fprintf(pFile, "%f,%f,%f,%f\n",xPO[0],xPO[1],xPO[2],xPO[3]);
+        fprintf(pFile, "%f,%f,%f,%f\n",x[0],x[1],x[2],x[3]);
         fclose(pFile);
       }
     }
@@ -568,8 +529,8 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
       //std::cout << "Test length: " << initialRL.at((tgTags)"SUPERball_string21") << std::endl;
     }*/
     ctr++;
-    //if(ctr == 4500)
-      //std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
+    if(ctr == 4500)
+      std::cout << hopfState[0] << " " << hopfState[1] << std::endl;
     /*for(InitialRestLengths::const_iterator it = initialRL.begin(); it != initialRL.end(); ++it)
     {
       std::cout << it->first << " " << it->second << std::endl;
@@ -579,14 +540,14 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
     updateHopfState(dt);
 
     //HopfSelector was 01010101
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 0, 2, initRestLengths,  0,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 3, 5, initRestLengths,  0,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 6, 8, initRestLengths,  1,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 9, 11, initRestLengths, 1,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 12, 14, initRestLengths,2,0,0.0);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 15, 17, initRestLengths,2,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 18, 20, initRestLengths,3,0,MATH_PI);
-    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 21, 23, initRestLengths,3,0,0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 0, 2,  0,0,0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 3, 5,  0,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 6, 8,  1,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 9, 11, 1,0,0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 12, 14,2,0,0.0);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 15, 17,2,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 18, 20,3,0,MATH_PI);
+    hopfOscillator(subject, dt, m_timePassed, hopfState, hopfVel, 21, 23,3,0,0.0);
     //for(int i=0; i<cablesWithTags.size(); i++)
       //cablesWithTags[i]->moveMotors(dt);
   }
@@ -596,60 +557,13 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
     if(saveToCSV)
     {
       std::vector <double> resultCOM = getBallCOM(subject);
-      exportHopfCSV(m_timePassed, hopfState, fileNamesPO, resultCOM);
+      exportHopfCSV(m_timePassed, hopfState, fileNames, resultCOM);
     }
     if(m_timePassed>CONTROLLER_STOP_TIME*dt)
     {
       double distance = displacement(subject);
-      printf("\e[1;36mDONE, traveled %.4f \e[0m \n\n\n",distance);
-      //std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl << std::endl << std::endl;      
-      if(1){
-        FILE *pFile;
-        std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-        fileNameStr += timebufferPO;
-        fileNameStr += "_bashScript.csv";
-        const char* fileName = fileNameStr.c_str();
-        pFile = fopen(fileName,"a");
-        if(pFile!=NULL)
-        {
-          fprintf(pFile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
-                            m_paramsManual[0][0],
-                            m_paramsManual[0][1],
-                            m_paramsManual[0][2],
-                            m_paramsManual[0][3],
-                            m_paramsManual[0][4],
-                            m_paramsManual[0][5],
-                            m_paramsManual[0][6],
-                            m_paramsManual[0][7],
-                            m_paramsManual[1][0],
-                            m_paramsManual[1][1],
-                            m_paramsManual[1][2],
-                            m_paramsManual[1][3],
-                            m_paramsManual[1][4],
-                            m_paramsManual[1][5],
-                            m_paramsManual[1][6],
-                            m_paramsManual[1][7],
-                            m_paramsManual[2][0],
-                            m_paramsManual[2][1],
-                            m_paramsManual[2][2],
-                            m_paramsManual[2][3],
-                            m_paramsManual[2][4],
-                            m_paramsManual[2][5],
-                            m_paramsManual[2][6],
-                            m_paramsManual[2][7],
-                            m_paramsManual[3][0],
-                            m_paramsManual[3][1],
-                            m_paramsManual[3][2],
-                            m_paramsManual[3][3],
-                            m_paramsManual[3][4],
-                            m_paramsManual[3][5],
-                            m_paramsManual[3][6],
-                            m_paramsManual[3][7],
-                            distance);
-        }
-        fclose(pFile);
-      }
-
+      std::cout << "\e[1;36mDONE, traveled " << distance << "\e[0m" << std::endl << std::endl << std::endl;      
+      
       if(saveToCSV)
       {
         saveHistLastLengths();
@@ -666,7 +580,7 @@ void PhaseOscController::onStep(TensegrityModel& subject, double dt)
 /**
  * This method checks that the scaled actions will generate a synchronized network of coupled oscillators
  */
-void PhaseOscController::testSynchHyp()
+void HopfControllerML::testSynchHyp()
 {
   double a31 = couplingDown[0];//1.1;
   double a41 = couplingSe[0];//0.11;
@@ -710,8 +624,7 @@ void PhaseOscController::testSynchHyp()
   if(fabs(s1)>=1 || fabs(s2)>=1 || fabs(s3)>=1)
   {
     std::cout << "\e[1;32msigma=" << sigma << ", s1=" << s1 << ", s2=" << s2 << ", s3=" << s3 << "\e[0m" << std::endl;
-    throw std::invalid_argument("DONE, traveled -10.00");
-    //throw std::invalid_argument("Not going to synchronize.");
+    throw std::invalid_argument("Not going to synchronize.");
   }         
 }
 
@@ -719,7 +632,7 @@ void PhaseOscController::testSynchHyp()
 /**
  * This method calls the update of the Hopf oscillators for all controllers
  */
-void PhaseOscController::updateHopfState(double dt)
+void HopfControllerML::updateHopfState(double dt)
 {
   double testOutArray[4] = {0,0,0,0};
   //std::cout << "Now, ";
@@ -755,7 +668,7 @@ void PhaseOscController::updateHopfState(double dt)
  * @param[in] dt the time step used for the numerical derivation
  * @return void
  */
-void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
+void HopfControllerML::compNextHopfState(double dt, int selectedOscillator)
 {
   // /!\
   // ATTENTION, SIZE OF COUPLINGARRAY AND COUPLEDSTATE ARRAYS HAS CHANGED WRT BACKUP
@@ -822,7 +735,7 @@ void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
  * Method which perturbates a Hopf oscillator by changing its value to a random value
  * (The stable limit cycle nature of the oscillator will make it return to normal behavior)
  */
-void PhaseOscController::perturbateHopf(int selectedOscillator)
+void HopfControllerML::perturbateHopf(int selectedOscillator)
 {
   // 6 is an arbitrary number here as we have a 2D oscillator based on position, speed and acceleration
   //srand(time(NULL));
@@ -858,8 +771,8 @@ void PhaseOscController::perturbateHopf(int selectedOscillator)
  * @param[in] hopfSelector number defining which component of the oscillator will be used
  * @return void
  */
-void PhaseOscController::hopfOscillator(TensegrityModel& subject, double dt, double m_timePassed, double *hopfState, double *hopfVel, //double *hopfAcc,
-                                      int firstCable, int lastCable, double initRestLengths, int selectedOscillator, int hopfSelector, double phaseOffset)
+void HopfControllerML::hopfOscillator(TensegrityModel& subject, double dt, double m_timePassed, double *hopfState, double *hopfVel, //double *hopfAcc,
+                                      int firstCable, int lastCable, int selectedOscillator, int hopfSelector, double phaseOffset)
 {
   for (std::size_t i = firstCable; i <= lastCable; i ++) 
   {  
@@ -881,7 +794,7 @@ void PhaseOscController::hopfOscillator(TensegrityModel& subject, double dt, dou
     
     #if USEBOOSTRK
       //std::cout << "RK" << std::endl; 
-      bufferVar = xPO[selectedOscillator];
+      bufferVar = x[selectedOscillator];
     #endif
 
     //std::cout << "Cable " << cablesWithTags[i]->getTags() << ", control: " << ((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)) << std::endl;
@@ -893,7 +806,7 @@ void PhaseOscController::hopfOscillator(TensegrityModel& subject, double dt, dou
 /**
  * Method which resets the time counter (useful for multi-run simulations)
  */
-void PhaseOscController::resetTimePassed()
+void HopfControllerML::resetTimePassed()
 {
   m_timePassed = 0;
   ctr = 0;
@@ -927,7 +840,7 @@ void PhaseOscController::resetTimePassed()
 
 // Return the center of mass of this model
 // Pre-condition: This model has 6 rods
-std::vector<double> PhaseOscController::getBallCOM(TensegrityModel& subject) 
+std::vector<double> HopfControllerML::getBallCOM(TensegrityModel& subject) 
 {   
     //std::vector <tgRod*> rods = find<tgRod>("tgRodInfo");
     //assert(!rods.empty());
@@ -967,15 +880,15 @@ std::vector<double> PhaseOscController::getBallCOM(TensegrityModel& subject)
  * @param[in] fileDataType string describing start of file's name, e.g. speed or tension
  * @return outputFileName string of full path towards timestamped file
  */
-std::string PhaseOscController::setupCSVFiles(std::string fileDataType)
+std::string HopfControllerML::setupCSVFiles(std::string fileDataType)
 {  
   /*srand(time(NULL));
   time_t rawtime;
   struct tm *timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  strftime(timebufferPO,12,"%m_%d_%H_%M",timeinfo);
-  std::string outputFileName = "/home/tensegribuntu/projects/tg_shared/" + (std::string)timebufferPO + fileDataType + ".csv";*/
+  strftime(timebuffer,12,"%m_%d_%H_%M",timeinfo);
+  std::string outputFileName = "/home/tensegribuntu/projects/tg_shared/" + (std::string)timebuffer + fileDataType + ".csv";*/
   std::string outputFileName = "/home/tensegribuntu/projects/tg_shared/__changeLogsBack.csv";
  
   return (std::string)outputFileName;
@@ -987,13 +900,13 @@ std::string PhaseOscController::setupCSVFiles(std::string fileDataType)
  * This method is called at each simulation timestep and the new data is thus appended in the files
  * @param[in] t time having passed within the simulator's world
  * @param[in] hopfState current state of the Hopf oscillator
- * @param[in] fileNamesPO name of the files in which data will be stored
+ * @param[in] fileNames name of the files in which data will be stored
  * @return void
  */
-void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<std::string> fileNamesPO, std::vector <double> resultCOM)
+void HopfControllerML::exportHopfCSV(double t, double *hopfState, std::vector<std::string> fileNames, std::vector <double> resultCOM)
 {
   FILE *pFile;
-  const char* file1Name = fileNamesPO[0].c_str();
+  const char* file1Name = fileNames[0].c_str();
   pFile = fopen(file1Name,"a");
   if(pFile!=NULL){
     fprintf(pFile, "%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t,hopfState[0],hopfState[1],hopfState[2],hopfState[3],hopfState[4],hopfState[5],hopfState[6],hopfState[7]);
@@ -1001,7 +914,7 @@ void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<
   }
 
   FILE *pFile2;
-  const char* file2Name = fileNamesPO[1].c_str();
+  const char* file2Name = fileNames[1].c_str();
   pFile2 = fopen(file2Name,"a");
   if(pFile2!=NULL){
     fprintf(pFile2, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t, 
@@ -1032,9 +945,9 @@ void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<
     fclose(pFile2);
   }
 
-  double bufferVar = initRestLengths*(1+hopfState[0]);
+  double bufferVar = 1*(1+hopfState[0]); //initRestLengths*(...)
   FILE *pFile3;
-  const char* file3Name = fileNamesPO[2].c_str();
+  const char* file3Name = fileNames[2].c_str();
   pFile3 = fopen(file3Name,"a");
   if(pFile3!=NULL){
     fprintf(pFile3, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t, bufferVar,
@@ -1066,7 +979,7 @@ void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<
   }
 
   FILE *pFile4;
-  const char* file4Name = fileNamesPO[3].c_str();
+  const char* file4Name = fileNames[3].c_str();
   pFile4 = fopen(file4Name,"a");
   if(pFile4!=NULL){
     fprintf(pFile4, "%f,%f,%f,%f\n",t,resultCOM[0],resultCOM[1],resultCOM[2]);
@@ -1075,7 +988,7 @@ void PhaseOscController::exportHopfCSV(double t, double *hopfState, std::vector<
 }
 
 
-void PhaseOscController::saveHistLastLengths()
+void HopfControllerML::saveHistLastLengths()
 {
   std::deque<double> lastLengthsCable0((cablesWithTags[0]->getHistory()).lastLengths);
   std::deque<double> lastLengthsCable1((cablesWithTags[1]->getHistory()).lastLengths);
@@ -1104,7 +1017,7 @@ void PhaseOscController::saveHistLastLengths()
   
   FILE *pFile;
   std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-  fileNameStr += timebufferPO;
+  fileNameStr += timebuffer;
   fileNameStr += "_histLogLastLengths.csv";
   const char* fileName = fileNameStr.c_str();
   pFile = fopen(fileName,"a");
@@ -1143,7 +1056,7 @@ void PhaseOscController::saveHistLastLengths()
 }
 
 
-void PhaseOscController::saveHistRestLengths()
+void HopfControllerML::saveHistRestLengths()
 {
   std::deque<double> restLengthsCable0((cablesWithTags[0]->getHistory()).restLengths);
   std::deque<double> restLengthsCable1((cablesWithTags[1]->getHistory()).restLengths);
@@ -1172,7 +1085,7 @@ void PhaseOscController::saveHistRestLengths()
   
   FILE *pFile;
   std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-  fileNameStr += timebufferPO;
+  fileNameStr += timebuffer;
   fileNameStr += "_histLogRestLengths.csv";
   const char* fileName = fileNameStr.c_str();
   pFile = fopen(fileName,"a");
@@ -1211,7 +1124,7 @@ void PhaseOscController::saveHistRestLengths()
 }
 
 
-void PhaseOscController::saveHistDamping()
+void HopfControllerML::saveHistDamping()
 {
   std::deque<double> dampingCable0((cablesWithTags[0]->getHistory()).dampingHistory);
   std::deque<double> dampingCable1((cablesWithTags[1]->getHistory()).dampingHistory);
@@ -1240,7 +1153,7 @@ void PhaseOscController::saveHistDamping()
   
   FILE *pFile;
   std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-  fileNameStr += timebufferPO;
+  fileNameStr += timebuffer;
   fileNameStr += "_histLogDamping.csv";
   const char* fileName = fileNameStr.c_str();
   pFile = fopen(fileName,"a");
@@ -1279,7 +1192,7 @@ void PhaseOscController::saveHistDamping()
 }
 
 
-void PhaseOscController::saveHistLastVelocities()
+void HopfControllerML::saveHistLastVelocities()
 {
   std::deque<double> lastVelocitiesCable0((cablesWithTags[0]->getHistory()).lastVelocities);
   std::deque<double> lastVelocitiesCable1((cablesWithTags[1]->getHistory()).lastVelocities);
@@ -1308,7 +1221,7 @@ void PhaseOscController::saveHistLastVelocities()
   
   FILE *pFile;
   std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-  fileNameStr += timebufferPO;
+  fileNameStr += timebuffer;
   fileNameStr += "_histLogLastVelocities.csv";
   const char* fileName = fileNameStr.c_str();
   pFile = fopen(fileName,"a");
@@ -1347,7 +1260,7 @@ void PhaseOscController::saveHistLastVelocities()
 }
 
 
-void PhaseOscController::saveHistTension()
+void HopfControllerML::saveHistTension()
 {
   std::deque<double> tensionHistoryCable0((cablesWithTags[0]->getHistory()).tensionHistory);
   std::deque<double> tensionHistoryCable1((cablesWithTags[1]->getHistory()).tensionHistory);
@@ -1376,7 +1289,7 @@ void PhaseOscController::saveHistTension()
   
   FILE *pFile;
   std::string fileNameStr = "/home/tensegribuntu/projects/tg_shared/";
-  fileNameStr += timebufferPO;
+  fileNameStr += timebuffer;
   fileNameStr += "_histLogTension.csv";
   const char* fileName = fileNameStr.c_str();
   pFile = fopen(fileName,"a");
