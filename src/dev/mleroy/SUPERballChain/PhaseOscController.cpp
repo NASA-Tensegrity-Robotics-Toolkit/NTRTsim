@@ -141,8 +141,7 @@ PhaseOscController::Config::Config(double hOMin, double hOMax, double hMMin, dou
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
 PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
-                                   int ctr, bool saveToCSV,
-                                   double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], //double hopfAccInit[NSTATES], 
+                                   int ctr, bool saveToCSV, double hopfStateInit[NSTATES], double hopfVelInit[NSTATES],
                                    std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]) :
   m_config(config),
   m_tagsToControl(tagsToControl),
@@ -161,14 +160,11 @@ PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::v
 
   for(int i=0; i<NSTATES; i++)
   {
-    //std::cout << "Starting Hopf Oscillators" << std::endl;
     hopfState[i] = hopfStateInit[i];
     hopfVel[i]   = hopfVelInit[i];
-    //hopfAcc[i]   = hopfAccInit[i];
 
     hopfStateFirst[i] = hopfStateInit[i];
     hopfVelFirst[i]   = hopfVelInit[i];
-    //hopfAccFirst[i]   = hopfAccInit[i];
   }
 
   // Setting up the different log files
@@ -201,7 +197,6 @@ PhaseOscController::PhaseOscController(PhaseOscController::Config config, std::v
     for(int j=0; j<NSTATES; j++)
     {
       m_paramsManual[i][j] = paramsManual[i][j];
-      //std::cout << "Setting up: " << i << ", " << j << ", " << paramsManual[i][j] << ", " << m_paramsManual[i][j] << std::endl;
     }
   }
 }
@@ -287,16 +282,11 @@ void PhaseOscController::onSetup(TensegrityModel& subject)
   resetTimePassed();
   for(int i=0; i<NSTATES; i++)
   {
-    //std::cout << "Starting Hopf Oscillators again" << std::endl;
     hopfState[i] = hopfStateFirst[i];
     hopfVel[i]   = hopfVelFirst[i];
-    //hopfAcc[i]   = hopfAccFirst[i];
-    //std::cout << "Initial states: " << i << " " << hopfState[i] << " " << hopfVel[i] << std::endl;
   }
 
   initPosition = getBallCOM(subject);
-  //std::cout << "Initial Position: " << initPosition[0] << " " << initPosition[1] << " " << initPosition[2] << std::endl;
-  //std::cout << "Ctr=" << ctr << ", m_timePassed=" << m_timePassed << std::endl; 
 
   //Initialize the Learning Adapters
   /*adapter.initialize(&evolution,learning,configData);
@@ -773,9 +763,10 @@ void PhaseOscController::hopfOscillator(TensegrityModel& subject, double dt, dou
       //std::cout << "RK" << std::endl; 
       bufferVar = xPO[selectedOscillator];
     #endif
-
+    //std::cout << i << " " << selectedOscillator << " " << hopfMu[selectedOscillator] << std::endl;
     //std::cout << "Cable " << cablesWithTags[i]->getTags() << ", control: " << ((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)) << std::endl;
-    cablesWithTags[i]->setControlInput(((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)), dt);
+    //cablesWithTags[i]->setControlInput(((cablesWithTags[i]->getHistory()).restLengths[0])*(1+HOPF_AMPLIFIER*cos(bufferVar+phaseOffset)), dt);
+    cablesWithTags[i]->setControlInput(((cablesWithTags[i]->getHistory()).restLengths[0])*(1+hopfMu[selectedOscillator]*cos(bufferVar+phaseOffset)), dt);
   }
 }
 

@@ -53,7 +53,7 @@
 #define NOSCILLATORS 4
 #define NSTATES 8
 #define USEGRAPHICS 1
-#define LOGDATA 0
+#define LOGDATA 1
 #define USEHOPFCTLR 0
 #define USELENGTHCTLR 0
 #define USEPHASEOSCCTLR 1
@@ -188,14 +188,13 @@ int main(int argc, char** argv)
                                                   couplingSeMin,     couplingSeMax,
                                                   hopfOffsetEvenMin, hopfOffsetEvenMax,
                                                   hopfOffsetOddMin,  hopfOffsetOddMax);
-        //std::vector<std::vector<double>> params;
+        
         double params[NOSCILLATORS][NSTATES];
         int k = 2;
         for(int i=0; i<NOSCILLATORS; i++)
         {
             for(int j=0; j<NSTATES; j++)
             {
-                //std::cout << "Setting up: " << i << ", " << j << ", " << k << ", " << argv[k] << std::endl;
                 params[i][j] = atof(argv[k]);
                 k++;
             }

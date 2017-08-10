@@ -107,8 +107,7 @@ public:
    * will be acted upon by this controller.
    */
   PhaseOscController(PhaseOscController::Config config, std::vector<std::string> tagsToControl, double timePassed, 
-          int ctr, bool saveToCSV,
-          double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], 
+          int ctr, bool saveToCSV, double hopfStateInit[NSTATES], double hopfVelInit[NSTATES], 
           std::string args, std::string resourcePath, std::string configFile, double paramsManual[NOSCILLATORS][NSTATES]);
     
   /**
@@ -213,12 +212,10 @@ private:
 
   double hopfState[NSTATES];
   double hopfVel[NSTATES];
-  //double hopfAcc[NSTATES];
   
   double hopfStateFirst[NSTATES];
   double hopfVelFirst[NSTATES];
-  //double hopfAccFirst[NSTATES];
-
+  
   int ctr;
   bool saveToCSV;
   std::vector<double> initialRLArray;

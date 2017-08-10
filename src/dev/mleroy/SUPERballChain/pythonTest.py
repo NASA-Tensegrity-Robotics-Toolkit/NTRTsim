@@ -136,28 +136,28 @@ def con(x):
   	return [1-abs(s1),1-abs(s2),1-abs(s3)]
 
 lb1 = 0.0#999999999 #0.1
-ub1 = 1.0 #5.0
+ub1 = 1.0 #5.0            omega
 
-lb2 = 0.0#999999999 #0.1
-ub2 = 1.0 #1.0
+lb2 = -0.5#999999999 #0.1
+ub2 =  0.5 #1.0            mu/amp
 
-lb3 = 0.0#999999999 #-1.0
-ub3 = 1.0 #1.0
+lb3 = -1.0#999999999 #-1.0
+ub3 =  1.0 #1.0            up
 
-lb4 = 0.0#999999999 #-1.0
-ub4 = 1.0 #1.0
+lb4 = -1.0#999999999 #-1.0
+ub4 =  1.0 #1.0            down
 
-lb5 = 0.0#999999999 #-1.0
-ub5 = 1.0 #1.0
+lb5 = -1.0#999999999 #-1.0
+ub5 =  1.0 #1.0            ne
 
-lb6 = 0.0#999999999 #-1.0
-ub6 = 1.0 #1.0
+lb6 = -1.0#999999999 #-1.0
+ub6 =  1.0 #1.0            se
 
 lb7 = 0.0#999999999 #-0.1
-ub7 = 1.0 #0.1
+ub7 = 1.0 #0.1            even
 
 lb8 = 0.0#999999999 #-0.1
-ub8 = 1.0 #0.1
+ub8 = 1.0 #0.1            odd
 
 lb=[lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8]
 ub=[ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8]
@@ -165,27 +165,3 @@ ub=[ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,
 xopt2, fopt2 = pso(banana, lb, ub, f_ieqcons=con, args=(), kwargs={}, swarmsize=40, omega=1.0, phip=1.0, phig=1.0, maxiter=40, minstep=1e-8, minfunc=1e-8, debug=True)
 print xopt2
 print fopt2
-
-#strRands = "0.29456714 0.00186602 0.58955982 0.49066602 0.87504234 0.40926842 0.11979445 0.95327467 0.27551256 0.27928443 0.97090856 0.373467 0.49540599 0.63834546 0.61343604 0.24950855 0.36717745 0.20247448 0.82968607 0.35855628 0.09436905 0.6950763  0.8509755  0.17558195 0.31919777 0.3713239  0.45505205 0.77091409 0.58384915 0.47539946 0.76948193 0.29076581"
-#s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21,s22,s23,s24,s25,s26,s27,s28,s29,s30,s31,s32 = strRands.split()
-
-'''for x in range(0,10):
-	randNums = np.random.rand(1,32)
-	strRands = " ".join(str(x) for x in randNums)
-	strRands = strRands.replace('\n','')
-	strRands = strRands.replace('[','')
-	strRands = strRands.replace(']','')
-	strRands = strRands.replace('  ',' ')
-	s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21,s22,s23,s24,s25,s26,s27,s28,s29,s30,s31,s32 = strRands.split()
-	
-
-	try:
-		out = subprocess.check_output([appFile,yamlFile,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21,s22,s23,s24,s25,s26,s27,s28,s29,s30,s31,s32])
-		out1, out2 = out.split("DONE, traveled ")
-		out2 = out2[0:7]
-
-	except Exception:
-			out2 = "0.0"
-
-	print(out2)
-'''
