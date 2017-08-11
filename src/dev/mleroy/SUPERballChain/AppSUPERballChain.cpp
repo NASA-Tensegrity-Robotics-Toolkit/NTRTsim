@@ -351,7 +351,7 @@ void simulate(tgSimulation *simulation, HopfControllerML* myController) {
 
 void simulate(tgSimulation *simulation, PhaseOscController* myController) {
     int nEpisodes = 1;  // Number of episodes ("trial runs")
-    int nSteps = 120001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
+    int nSteps = 60001; // Number of steps in each episode, 60k is 60 seconds (timestep_physics*nSteps)
     for (int i=1; i<=nEpisodes; i++)
     {
         std::cout << "Running episode " << i << " of " << nEpisodes << " with Phase oscillator" << std::endl;
@@ -412,8 +412,7 @@ void simulate(tgSimulation *simulation, LengthControllerYAML* myController) {
  */
 std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsToControl)
 {
-/*
-    // This vector determines the order with which the strings will be controlled
+/*    // This vector determines the order with which the strings will be controlled
     std::vector<std::string> listTriangles;
     listTriangles.push_back("NED");
     listTriangles.push_back("NEP");
@@ -471,11 +470,11 @@ std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsTo
         if(listTriangles[i] == "NED") 
         {
             tagsToControl.push_back("SUPERball_string08");
-            tagsToControl.push_back("SUPERball_string24");
-            tagsToControl.push_back("SUPERball_string16");  
+            tagsToControl.push_back("SUPERball_string24");  
+            tagsToControl.push_back("SUPERball_string16");
         }
-    }
-*/    
+    }*/
+    
 
     //NWP triangle
     tagsToControl.push_back("SUPERball_string03");
@@ -517,6 +516,7 @@ std::vector<std::string> selectControlledStrings(std::vector<std::string> tagsTo
     tagsToControl.push_back("SUPERball_string24");
     tagsToControl.push_back("SUPERball_string16");
 
+    std::copy(tagsToControl.begin(), tagsToControl.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 
      return tagsToControl;
 }

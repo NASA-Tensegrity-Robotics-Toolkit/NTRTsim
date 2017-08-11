@@ -162,6 +162,6 @@ ub8 = 1.0 #0.1            odd
 lb=[lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lb8]
 ub=[ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8,ub1,ub2,ub3,ub4,ub5,ub6,ub7,ub8]
 
-xopt2, fopt2 = pso(banana, lb, ub, f_ieqcons=con, args=(), kwargs={}, swarmsize=40, omega=1.0, phip=1.0, phig=1.0, maxiter=40, minstep=1e-8, minfunc=1e-8, debug=True)
+xopt2, fopt2 = pso(banana, lb, ub, f_ieqcons=con, args=(), kwargs={}, swarmsize=40, omega=0.5, phip=0.5, phig=0.5, maxiter=40, minstep=1e-8, minfunc=1e-8, debug=True)
 print xopt2
 print fopt2

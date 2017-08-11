@@ -74,7 +74,7 @@ static std::string cableFileNamePO;
 static std::string cOMFileNamePO;
 static std::vector<std::string> fileNamesPO;
 
-const double CONTROLLER_STOP_TIME = 120000.0;
+const double CONTROLLER_STOP_TIME = 60000.0;
 const double HOPF_AMPLIFIER       = 0.5;
 const double MATH_PI              = 3.14159265359;
 
@@ -654,7 +654,7 @@ void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
   // /!\
   // ATTENTION, SIZE OF COUPLINGARRAY AND COUPLEDSTATE ARRAYS HAS CHANGED WRT BACKUP
   // /!\
-
+  
   switch(selectedOscillator) //TODO: CHECK COUPLINGS (SEE NOTEBOOK)
   {
     case 0:
@@ -686,12 +686,21 @@ void PhaseOscController::compNextHopfState(double dt, int selectedOscillator)
       coupledState[2] = 6;
       break;
   }
-  
-  hopfVel[2*selectedOscillator]   =   hopfOmega[selectedOscillator] 
+  //std::cout << "m_timePassed:" << m_timePassed << std::endl;
+  float mulFactor = 1.0;
+  /*if(m_timePassed<20.0)
+    mulFactor=1.0;
+  else
+    if(m_timePassed<40.0)
+      mulFactor=0.5;
+    else
+        mulFactor=1;*/
+
+  hopfVel[2*selectedOscillator]   =   hopfOmega[selectedOscillator] * mulFactor
                                     + couplingArray[0]*sin(hopfState[coupledState[0]]-hopfState[coupledState[1]])   
                                     - couplingArray[1]*sin(hopfState[coupledState[1]]-hopfState[coupledState[2]]);
 
-  hopfVel[2*selectedOscillator+1]   =   hopfOmega[selectedOscillator+1] 
+  hopfVel[2*selectedOscillator+1]   =   hopfOmega[selectedOscillator+1] * mulFactor
                                     + couplingArray[0]*sin(hopfState[coupledState[0]]-hopfState[coupledState[1]])   
                                     - couplingArray[1]*sin(hopfState[coupledState[1]]-hopfState[coupledState[2]]);
 
