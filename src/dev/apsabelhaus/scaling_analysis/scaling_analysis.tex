@@ -12,6 +12,7 @@
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
 \usepackage{subfigure} % make it possible to include more than one captioned figure/table in a single float
 % These packages are all incorporated in the memoir class to one degree or another...
+\usepackage[ampersand]{easylist}
 
 %%% PAGE DIMENSIONS
 \usepackage{geometry} % to change the page dimensions
@@ -80,7 +81,7 @@ Scaling Analysis for Rigid Body Simulations\\
 Andrew P. (Drew) Sabelhaus\\
 apsabelhaus@berkeley.edu \\
 Started 14 July 2014 \\
-Current as of 8 Jan 2015
+Current as of 27 Aug 2017
 \end{center}
 
 %\vspace{-1em}
@@ -138,9 +139,9 @@ I = \frac{m l^2}{3}
 %http://en.wikipedia.org/wiki/List_of_moments_of_inertia#cite_note-serway-1
 
 And the full dynamics equation is
-\[
+\begin{equation}\label{eqn:dynamics_soln}
 \ddot \theta = \frac{3}{m l^2} (\frac{mgl}{2} cos \theta + k_{\theta} \theta - k_{\theta} \theta_r - c_{\theta} \dot \theta )
-\]
+\end{equation}
 
 Note that this system has a nonlinear forcing function: the gravitational force has a $cos(\theta)$ term in it.
 Although the plant can be formulated as a linear system, the whole system response cannot be.
@@ -163,13 +164,16 @@ Also, for physical rigid body dynamics, $k$ is almost always the set of $\{Mass,
 
 \subsection{System variables and units}
 
-The above example system has the following parameters and variables (both implicit and explicit) and the following units:
+The above example system has the following parameters and variables (both implicit and explicit) and the following units.
+Here, we raise each of $\{M,L,T\}$ to the power of the underlying unit.
+For example, units of $kg / sec^2$ are represented as $M^1 T^{-2}$.
+Note, though, that the following analysis does NOT imply the use of SI units, or American units, or any other unit system: it is valid for any unit system, as long as consistent choices are made for mass, length, and time.
 
 \[
 \text{mass:} \quad m \sim M^1
 \]
 \[
-\text{spring rest angle:} \quad \theta_r \sim 0 \text{, because radians!}
+\text{spring rest angle:} \quad \theta_r \sim 1 \text{, because we are using radians!}
 \]
 \[
 \text{length of rod:} \quad l \sim L^1
@@ -197,24 +201,44 @@ The above example system has the following parameters and variables (both implic
 \text{time:} \quad t \sim T^1
 \]
 
-These were derived with force in Newtons, $kg*m/s^2$.
+Note that since the angle here is in radians, and is unitless, the angular spring constant must be in units of torque.
+
+These can be used to derive the units of force and torque as used in equation (\ref{eqn:dynamics_soln}).
+In this formulation, force and torque are called {\it derived} units, separate from the {\it base} units of mass, length, and time.
+In other words, the units of force and torque are combinations of the other three, they can be defined fully in terms of the others.
+Specifically, they are the following:
+
+\[
+\text{force:} \quad F \sim M^1 T^{-2} L^1 
+\]
+\[
+\text{torque:} \quad \tau \sim M^1 T^{-2} L^2 
+\]
+
+For example, the SI units here are $F \sim \text{Newtons} = \frac{kg*m}{s^2}$, and $\tau \sim N*m$. \\
+
+This makes a total of 9 variables for us to consider scaling here.
+One question to ask might be - do we really need to scale force (or torque) since neighter unit appears in equation (\ref{eqn:dynamics_soln})?
+Equivalently - if we can't see it, do we need to consider it?
+We'll answer that question below.
+(Phrased another way: would we need to scale force/torque BEFORE solving the dynamics equations?)
 
 Note that, unlike with longitudinal springs and dampers, their angular counterparts DO have a length dependence! This becomes important in a minute...
 
 \subsection{Generation of $\Pi$-Terms}
 
-In order to make use of Buckingham's Pi Theorem to scale our system correctly, we need to make $n-k = 7-3 = 4$ pi terms. I won't do that many until needed for illustrating a concept - I'll show the errors this generates as they occur.
+In order to make use of Buckingham's Pi Theorem to scale our system correctly, we need to make $n-k = 9-3 = 6$ pi terms. I won't do that many until needed for illustrating a concept - I'll show the errors this generates as they occur.
 
-The first step in this procedure is to select $k=3$ ``repeating variables,'' which will make up our pi terms. Any subset of 3 is fine here, under the following conditions:
+The first step in this procedure is to select $k=3$ ``repeating variables,'' which will make up our pi terms. Any subset of 3 is fine here, including the base units if we'd like, under the following conditions:
 
 1. The set of repeating variables must not be able to make a nondimensional set by themselves (i.e. they must be an independent basis)
 
 2. Avoid selecting difficult-to-scale variables as repeaters (e.g. don't choose time here because that's difficult to scale dynamically on-line as the simulation runs.)
 
+\subsubsection{Example 1: Selection of mass, length, and spring constant}
 
 Let's choose, in this example, our repeaters as $m, l, k_{\theta}$. See the Munsen textbook (or other resources) to see how to procedurally derive all the pi terms. 
-Here are the first 3 of the 4 terms that would be needed.
-Again, I'm doing this erroneously on purpose for example purposes.
+Here are the first 3 of the 6 terms that would be needed.
 You can check the units in all of these: they divide out evenly.
 
 \[
@@ -224,27 +248,71 @@ You can check the units in all of these: they divide out evenly.
 %\Pi_2 = \Pi_{g} = \frac{gm^2l}{c_{\theta}^2}
 %\]
 \[
-\Pi_2 = \Pi_{g} = \frac{gml}{k_{\theta}}
+\Pi_2 = \Pi_{g} = \frac{gml}{k_{\theta}} \sim \frac{ (L^1 T^{-2}) (M^1) (L^1)}{M^1 T^{-2} L^2} \sim 1
 \]
 %\[
 %\Pi_3 = \Pi_{k_{\theta}} = \frac{m l k_{\theta}}{c_{\theta}^2}
 %\]
 \[
-\Pi_3 = \Pi_{c_{\theta}} = \frac{c_{\theta}^2 }{m l^2 k_{\theta}}
+\Pi_3 = \Pi_{c_{\theta}} = \frac{c_{\theta}^2 }{m l^2 k_{\theta}} \sim \frac{ (M^1 T^{-1} L^2)^2 }{ (M^1) (L^2) (M^1 T^{-2} L^2) } \sim 1
+\]
+
+What we'll show now is that only doing 3 terms, and not the full 6, leads to incorrect results!
+Specifically, we'll show that if we neglect some of the parameters in the simulation (or forget about them), our results come out wrong.
+
+\subsubsection{Example 2: Selection of mass, gravity, and spring constant}
+
+In comparison to example 1, let's re-generate these first three $\Pi$-terms using $m, g, k_\theta$.
+These three are also independent: no combination of them creates one of themselves.
+
+The first $\Pi$-term now is for length, and is the same as the previous example (all four variables are the same here, the expression includes gravity, length, mass, and spring constant.)
+This makes sense - just because we've changed which terms are 'repeating' doesn't mean that the same combination of variables would need a different scaling.
+
+\[
+\Pi_1 = \frac{ l m g}{k_\theta}
 \]
 
 \subsection{$\Pi$-Term Analysis for Scaling}
 
-So, if for this system, we want to scale gravitional acceleration by a factor $s$, such that
+As an example, say that our simulation environment requires that we make a robot larger than its true dimensions.
+(This is the case with the NASA Tensegrity Robotics Toolkit and the underlying Bullet Physics.)
+For example, if we want to make all the lengths larger by a factor of $s$, we would write this as:
+%So, if for this system, we want to scale gravitional acceleration by a factor $s$, such that
 
 \[
-g_2 = (s) (g_1)
+l_2 = (s) l_1
 \]
 
-We would also need to scale length of rod (because of $\Pi_2$) and angular damping constant (because of $\Pi_3$) by the following:
+Intuitively: if the robot should be 10 times larger in simulation than in hardware, all the lengths that define the robot's mechanisms should be 10 times larger.
+
+%\[
+%g_2 = (s) (g_1)
+%\]
+
+Then, we would need to choose a scaling of the remaining parameters such that all the pi terms remain unitless.
+%One option would be to scale length of rod, $l$, motivated by looking at $\Pi_2$, and then also the angular damping constant, $c_\theta$, in order to make $\Pi_3$ come out to 1 as a result.
+Looking at $\Pi_2$ - how can we make it equal 1 still? Let's scale the gravitational constant of our simulation, $g$.
+
+ERROR - THIS IS WRONG AS OF AUGUST 27TH
+
+
+This would be the following:
 
 \[
-l_2 = \frac{1}{s} l_1, \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}
+g_2 = (\frac{1}{s}) (g_1)
+\]
+
+These two scalings combined will keep $\Pi_2$ unitless.
+Next, we also need to keep $\Pi_3$ unitless.
+Since we've already specified changes to $l$ and $g$, it would be easiest to scale $c_\theta$, since scaling either of the other two variables in $\Pi_3$, which are mass and time, would need to propogate back to $\Pi_2$.
+Let's scale $c_\theta$.
+
+%\[
+%l_2 = \frac{1}{s} l_1, \quad \quad c_{\theta_2} = \frac{1}{s} c_{\theta_1}
+%\]
+
+\[
+c_{\theta_2} = \frac{1}{s} c_{\theta_1}
 \]
 
 However, there are other combinations we could choose! 
@@ -490,6 +558,16 @@ Please feel free to use the MATLAB code in the subdirectory here to help analyze
 
 \bibliographystyle{plain}
 \bibliography{scaling_analysis}
+
+\section{Ongoing Questions}
+
+\begin{easylist}
+  & Do we need to include 'invisble' terms, like force/torque in the first example?\\
+  & If our system uses a unit like torque, that depends on force, do we just choose one of the two? E.g. just choose force, then no need to scale torque? Or do we need to choose both?\\
+  & Can we use the base units as the repeating variables? E.g., is it valid to use mass and length as repeating variables when we use mass, length, time as the base units?\\
+  & When we 'scale' torque, does that mean we need to scale the applied torque every place that the torque ie applied? E.g., do we need to scale BEFORE solving the dynamics equations? E.g., when doing a numerical simulation, do we need to scale the applied torques before they are actually applied? \\
+  & Can we scale the base units? Would we ever scale mass, length, or time here? Or does needing to do that imply that something is wrong in the analysis? Or is it OK, but just makes our simulation more difficult to implement?
+\end{easylist}
 
 \end{document}
 
