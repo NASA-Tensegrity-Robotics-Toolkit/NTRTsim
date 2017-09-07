@@ -1,0 +1,29 @@
+# Test YAML structure to see if connecting substructures by their nodes
+# will also create connections internal to the substructure.
+# Answer: it appears that, NO, that does not happen.
+# For example, here, the right <-> center cable ONLY happens
+# between the "outer" vertebrae of TwoSegSpine, not BETWEEN
+# the two vertebrae in one TwoSegSpine.
+substructures:
+
+  s1/s2/s3:
+    path: ./TwoSegSpine.yaml
+    offset: [-30, 0 , 0]
+    translation: [0, 30.5, 30]
+
+bond_groups:
+  connectorCable:
+   s1/s2/s3/node_node:
+     - [right, center]
+
+builders: 
+  connectorCable:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 10.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
