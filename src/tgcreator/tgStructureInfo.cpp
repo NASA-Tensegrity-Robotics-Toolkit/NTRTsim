@@ -205,7 +205,7 @@ tgConnectorInfo* tgStructureInfo::initConnectorInfo(const T& connectorCandidate,
 void tgStructureInfo::autoCompoundRigids()
 {
   tgRigidAutoCompound c(getAllRigids());
-  m_compounded = c.execute();
+  m_compounded = c.execute(); // Store the result of AutoCompounding.
 }
 
 void tgStructureInfo::chooseConnectorRigids()
@@ -276,15 +276,22 @@ void tgStructureInfo::initConnectors(tgWorld& world)
  */
 void tgStructureInfo::buildInto(tgModel& model, tgWorld& world) 
 {
-    // These take care of things on a global level
+    // Create the m_rigids vector, which is a list of tgRigidInfos.
     addRigidsAndConnectors();    
+    // Assign the m_rigidInfoGroup for each tgRigidInfo in m_rigids, which
+    // specifies only 1 rigid body that represents each group of tgRigidInfos.
     autoCompoundRigids();    
     chooseConnectorRigids();
+    // Initialize the rigid bodies. Only 1 rigid body for each group of m_rigids
+    // is created, due to duplication catching. This also will create a vector of 
+    // display shapes for each rigid body.
     initRigidBodies(world);
     // Note: Muscle2Ps won't show up yet -- 
     // they need to be part of a model to have rendering...
     initConnectors(world);
-    // Now build into the model
+    /* This function will use a tgStructureInfo object to create many
+       tgModels, and add them as children to the parent model. Each tgModel
+       is created by calling tgRigidInfo::createModel(). */
     buildIntoHelper(model, world, *this);
 
     /*
@@ -321,8 +328,10 @@ void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,
     assert(pRigidInfo != NULL);
         tgModel* const pModel = pRigidInfo->createModel(world);
         if (pModel != NULL)
-    {
-        pModel->setTags(pRigidInfo->getTags());
+        {
+            // Copy over the displayshape we made:
+            pModel->setDisplayShape(pRigidInfo->getDisplayShape());
+            pModel->setTags(pRigidInfo->getTags());
             model.addChild(pModel);
         }
     }

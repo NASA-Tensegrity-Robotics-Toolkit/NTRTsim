@@ -47,27 +47,32 @@ using namespace std;
 // @todo: we want to start using this and get rid of the set-based constructor, but until we can refactor...
 tgRigidAutoCompound::tgRigidAutoCompound(std::vector<tgRigidInfo*> rigids)
 {
+    // Take in the uncompounded, raw tgRigidInfos.
     m_rigids.insert(m_rigids.end(), rigids.begin(), rigids.end());
 }
 
 tgRigidAutoCompound::tgRigidAutoCompound(std::deque<tgRigidInfo*> rigids) : m_rigids(rigids)
 {}
     
+// This is where we actually compound the rigidinfos.
 std::vector< tgRigidInfo* > tgRigidAutoCompound::execute() {
 
-    // Determine the grouping of our rigids
+    std::cout << "Starting with " << m_rigids.size() << " rigids." <<std::endl;
+    // Determine the grouping of our rigids, stored in m_groups.
     groupRigids();
 
-    // Create the compounds as necessary
+    // Create the compounded tgRigidInfos as necessary in m_compounded.
     createCompounds();
-
+    std::cout << "Found " << m_groups.size() << " groups." <<std::endl;
     // Set the rigid body for the various groups
     for(int i=0; i < m_groups.size(); i++) {
         // Note: rigids that are not connected to anything else are placed
         //into a group of their own, so they're represented here too
         setRigidInfoForGroup(m_compounded[i], m_groups[i]);
     }
+    
     // Need to return this so we can delete it at the appropreate time
+    // Return the new compounded tgRigidInfo vector, which only consists of groups now!
     return m_compounded;
 };
        
@@ -81,7 +86,11 @@ void tgRigidAutoCompound::setRigidBodyForGroup(btCollisionObject* body, std::deq
 
 void tgRigidAutoCompound::setRigidInfoForGroup(tgRigidInfo* rigidInfo, std::deque<tgRigidInfo*>& group) {
     for(int i = 0; i < group.size(); i++) {
+        // For each tgRigidInfo of the group, set m_rigidInfoGroup to the one singular rigid body that now will
+        // represent ALL the previous tgRigidInfos, which is rigidInfo
         group[i]->setRigidInfoGroup(rigidInfo);
+        // Save which display shape we are using.
+        group[i]->setDisplayShapeIdx(i);
     }
 }
 
@@ -143,6 +152,7 @@ void tgRigidAutoCompound::createCompounds() {
     }
 }
 
+// Create a tgCompoundRigidInfo for a group of tgRigidInfos, and return it.
 tgRigidInfo* tgRigidAutoCompound::createCompound(std::deque<tgRigidInfo*> rigids) {
     tgCompoundRigidInfo* c = new tgCompoundRigidInfo();
     // Add an additional tag to this compound rigid info.

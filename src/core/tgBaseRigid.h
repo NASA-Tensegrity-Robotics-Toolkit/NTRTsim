@@ -69,14 +69,18 @@ public:
      * @return the center of mass of the rod, a vector in 3-space
      */
     virtual btVector3 centerOfMass() const;
+    
+    virtual btVector3 getDrawColor() const = 0;
+    virtual bool getDrawTextureOn() const = 0;
 
     /**
      * Getter for rigid body
      */
-    virtual btRigidBody* getPRigidBody() 
+    virtual btRigidBody* getPRigidBody() const
     {
         return m_pRigidBody;
     }
+    
 
     /**
      * Return the rod's orientation in Euler angles.

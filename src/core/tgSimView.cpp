@@ -159,24 +159,6 @@ void tgSimView::run(int steps)
     }
 }
 
-void tgSimView::render() const
-{
-	if ((m_pSimulation != NULL) && (m_pModelVisitor != NULL))
-    {
-            // The tgSimView has been passed to a tgSimulation
-        m_pSimulation->onVisit(*m_pModelVisitor);
-    }
-}
-
-void tgSimView::render(const tgModelVisitor& r) const
-{
-    if (m_pSimulation != NULL)
-    {
-            // The tgSimView has been passed to a tgSimulation
-        m_pSimulation->onVisit(r);
-    }
-}
-
 void tgSimView::reset() 
 {
 	if (m_pSimulation != NULL)
@@ -192,6 +174,24 @@ void tgSimView::setRenderRate(double renderRate)
 
     // Postcondition
     assert(invariant());
+}
+
+void tgSimView::render() const
+{
+    if ((m_pSimulation != NULL) && (m_pModelVisitor != NULL))
+    {
+         // The tgSimView has been passed to a tgSimulation
+         m_pSimulation->onVisit(*m_pModelVisitor);
+    }
+}
+ 
+void tgSimView::render(const tgModelVisitor& r) const
+{
+    if (m_pSimulation != NULL)
+    {
+         // The tgSimView has been passed to a tgSimulation
+         m_pSimulation->onVisit(r);
+    }
 }
     
 void tgSimView::setStepSize(double stepSize)

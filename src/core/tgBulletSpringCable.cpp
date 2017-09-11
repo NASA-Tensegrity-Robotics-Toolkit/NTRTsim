@@ -82,7 +82,7 @@ void tgBulletSpringCable::step(double dt)
     {
         throw std::invalid_argument("dt is not positive!");
     }
-
+    
     calculateAndApplyForce(dt);
     assert(invariant());
 }
@@ -101,6 +101,10 @@ void tgBulletSpringCable::calculateAndApplyForce(double dt)
     
     magnitude =  m_coefK * stretch;
     
+    // Cap magnitude BEFORE applying damping:
+    double max_mag = 200.0*10.0; // Deca N
+    if (magnitude > max_mag) magnitude = max_mag;
+    
     const double deltaStretch = currLength - m_prevLength;
     m_velocity = deltaStretch / dt;
     
@@ -117,6 +121,12 @@ void tgBulletSpringCable::calculateAndApplyForce(double dt)
     #if (0)
     std::cout << "Length: " << dist.length() << " rl: " << m_restLength <<std::endl; 
     #endif
+    
+    /* Alex P. : Question: Can magnitude be negative when damping is applied?????
+    */
+    // Save tension+damping value:
+    if (magnitude < 0) magnitude = 0; // Ensure no negative tensions!
+    m_lastTensionApplied = magnitude;
       
     if (dist.length() > m_restLength)
     {   
@@ -126,6 +136,9 @@ void tgBulletSpringCable::calculateAndApplyForce(double dt)
     {
         // Leave force as the zero vector
     }
+    
+    // Log force:
+    //std::cout<<force.norm()/10.0<<" N"<<std::endl;
     
     // Finished calculating, so can store things
     m_prevLength = currLength;
@@ -149,9 +162,9 @@ const double tgBulletSpringCable::getActualLength() const
 
 const double tgBulletSpringCable::getTension() const
 {
-    double tension = (getActualLength() - m_restLength) * m_coefK;
-    tension = (tension < 0.0) ? 0.0 : tension;
-    return tension;
+    //double tension = (getActualLength() - m_restLength) * m_coefK;
+    //tension = (tension < 0.0) ? 0.0 : tension;
+    return m_lastTensionApplied;
 }
 
 const std::vector<const tgSpringCableAnchor*> tgBulletSpringCable::getAnchors() const

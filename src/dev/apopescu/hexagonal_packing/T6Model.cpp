@@ -69,7 +69,7 @@ namespace
         double targetVelocity;
     } c =
    {
-     6/(M_PI*(0.05/2.0*10.0)*(0.05/2.0*10.0)*1.65*10.0)/5,    // density (kg / length^3)
+     6.0/(M_PI*(0.05/2.0*10.0)*(0.05/2.0*10.0)*1.65*10.0),    // density (kg / length^3)
      0.05/2.0*10,     // radius (length)
      1000.0,   // stiffness (kg / sec^2) was 1500
      20.0,    // damping (kg / sec)

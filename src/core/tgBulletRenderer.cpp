@@ -19,7 +19,7 @@
 /**
  * @file tgBulletRenderer.cpp
  * @brief Contains the definitions of members of class tgBulletRenderer
- * @author Brian Tietz
+ * @author Brian Tietz, Alex Popescu
  * $Id$
  */
 
@@ -35,6 +35,8 @@
 #include "tgCompressionSpringActuator.h"
 #include "tgWorld.h"
 #include "tgWorldBulletPhysicsImpl.h"
+#include "tgGLDebugDrawer.h"
+#include "tgGlutDemoApplication.h"
 
 #include "tgCast.h"
 
@@ -43,28 +45,125 @@
 // OpenGL_FreeGlut (patched Bullet)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
-#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
+#include "BulletCollision/CollisionShapes/btUniformScalingShape.h"
+#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
+#include "LinearMath/btDefaultMotionState.h"
+#include "GL_ShapeDrawer.h"
 // The C++ Standard Library
 #include <cassert>
 
 
-tgBulletRenderer::tgBulletRenderer(const tgWorld& world) : m_world(world)
+// This requires a reference to a shape drawer and tgWorld to be constructed.
+tgBulletRenderer::tgBulletRenderer(tgWorld& world, GL_ShapeDrawer* shapeDrawer, btVector3 sunAngle)
+    : m_world(world),
+      m_shapeDrawer(shapeDrawer),
+      m_sunAngle(sunAngle)
 {
 }
 
-void tgBulletRenderer::render(const tgRod& rod) const
+/* Custom rendering function for rigid bodies */
+void tgBulletRenderer::render(const tgBaseRigid& rigid) const
 {
+    //std::cout << "Render rigid body" <<std::endl;
+    if(getDebugMode()& btIDebugDraw::DBG_DrawWireframe) return; // Do not render in wireframe mode!
+    // Save profiler information, to see how long rendering takes:
 #ifndef BT_NO_PROFILE 
-    BT_PROFILE("tgBulletRenderer::renderRod");
+    BT_PROFILE("tgBulletRenderer::render(rigid)");
 #endif //BT_NO_PROFILE 
-        // render the rod (change color, etc. if we want)
-        // Fetch the btDynamicsWorld
-        btDynamicsWorld& dynamicsWorld =
-      tgBulletUtil::worldToDynamicsWorld(m_world);
-    
-    btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
-        std::cout << "Render rod" << std::endl;
-        pDrawer->drawLine(btVector3(0.0, 0.0, 1.0), btVector3(0.0, 0.0, 10.0), btVector3(1.0, 0.0, 0.0));
+    btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+    btVector3 aabbMin,aabbMax;
+	dynamicsWorld.getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
+	aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+	aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+	
+	btScalar m[16];
+	btMatrix3x3	rot;
+	rot.setIdentity();
+	
+	// Get the collision object:
+	const btRigidBody* body = rigid.getPRigidBody();
+	// Get the display shape:
+	const btCollisionShape* displayShape = rigid.getDisplayShape();
+	
+	// Get the transform matrix for the rigid body:
+	if(body&&body->getMotionState())
+	{
+		btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+		myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+		rot=myMotionState->m_graphicsWorldTrans.getBasis();
+	}
+	else
+	{
+		body->getWorldTransform().getOpenGLMatrix(m);
+		rot=body->getWorldTransform().getBasis();
+	}
+	
+	// Note: we render the display shape, with the transform of the collision object.
+	
+	// Set texture and color:
+	m_shapeDrawer->enableTexture(rigid.getDrawTextureOn());
+	btVector3 shapeColor = rigid.getDrawColor();
+	
+	// Draw shape:
+    switch(getPass())
+	{
+	case	0:	m_shapeDrawer->drawOpenGL(m,displayShape,shapeColor,0,aabbMin,aabbMax);break;
+	case	1:	m_shapeDrawer->drawShadow(m,m_sunAngle*rot,displayShape,aabbMin,aabbMax);break;
+	case	2:	m_shapeDrawer->drawOpenGL(m,displayShape,shapeColor*btScalar(0.5),0,aabbMin,aabbMax);break;
+	}
+}
+
+/* Custom rendering function for ground */
+void tgBulletRenderer::render(const tgBulletGround& ground) const
+{
+    //std::cout << "Render ground" <<std::endl;
+    // Save profiler information, to see how long rendering takes:
+#ifndef BT_NO_PROFILE 
+    BT_PROFILE("tgBulletRenderer::render(ground)");
+#endif //BT_NO_PROFILE 
+    if(getDebugMode()& btIDebugDraw::DBG_DrawWireframe) return; // Do not render in wireframe mode!
+    btDynamicsWorld& dynamicsWorld = tgBulletUtil::worldToDynamicsWorld(m_world);
+    btVector3 aabbMin,aabbMax;
+	dynamicsWorld.getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
+	aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+	aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+	
+	btScalar m[16];
+	btMatrix3x3	rot;
+	rot.setIdentity();
+	
+	// Get the collision object:
+	const btRigidBody* body = ground.getGroundRigidBody();
+	const btCollisionShape* colShape = body->getCollisionShape();
+	
+	// Get the transform matrix for the body:
+	if(body&&body->getMotionState())
+	{
+		btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+		myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+		rot=myMotionState->m_graphicsWorldTrans.getBasis();
+	}
+	else
+	{
+		body->getWorldTransform().getOpenGLMatrix(m);
+		rot=body->getWorldTransform().getBasis();
+	}
+	
+	btVector3 shapeColor(1, 1, 1); // Ground color
+	
+	m_shapeDrawer->enableTexture(true); // Ground texture
+	
+	// Draw shape:
+    switch(getPass())
+	{
+	case	0:	m_shapeDrawer->drawOpenGL(m,colShape,shapeColor,0,aabbMin,aabbMax);break;
+	case	1:	m_shapeDrawer->drawShadow(m,m_sunAngle*rot,colShape,aabbMin,aabbMax);break;
+	case	2:	m_shapeDrawer->drawOpenGL(m,colShape,shapeColor*btScalar(0.5),0,aabbMin,aabbMax);break;
+	}
 }
 
 void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
@@ -72,9 +171,13 @@ void tgBulletRenderer::render(const tgSpringCableActuator& mSCA) const
 #ifndef BT_NO_PROFILE 
     BT_PROFILE("tgBulletRenderer::renderString");
 #endif //BT_NO_PROFILE 
+    //std::cout<<"Draw string"<<std::endl;
         // Fetch the btDynamicsWorld
         btDynamicsWorld& dynamicsWorld =
       tgBulletUtil::worldToDynamicsWorld(m_world);
+    
+    // Disable texture for drawing lines:
+    glDisable (GL_TEXTURE_2D);
     
     btIDebugDraw* const pDrawer = dynamicsWorld.getDebugDrawer();
     

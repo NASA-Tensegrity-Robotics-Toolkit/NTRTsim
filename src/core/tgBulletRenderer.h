@@ -29,12 +29,21 @@
 // This application
 #include "tgModelVisitor.h"
 
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "GL_ShapeDrawer.h"
+#include "tgBaseRigid.h"
+#include "terrain/tgBulletGround.h"
+
 // Forward declarations
 class tgSpringCableActuator;
 class tgCompressionSpringActuator;
 class tgModel;
 class tgRod;
 class tgWorld;
+class	btCollisionShape;
+class	btDynamicsWorld;
+class	btRigidBody;
 
 /**
  * A concrete tgRenderer for Bullet Physics.
@@ -47,7 +56,7 @@ public:
    * The only constructor.
    * @param[in,out] world a reference to the tgWorld being rendered
    */
-  tgBulletRenderer(const tgWorld& world);
+  tgBulletRenderer(tgWorld& world, GL_ShapeDrawer* shapeDrawer, btVector3 sunAngle);
 
   /**
    * Render a tgSpringCableActuator.
@@ -61,11 +70,10 @@ public:
    */
   virtual void render(const tgCompressionSpringActuator& compressionSpringActuator) const;
  
-  /**
-   * Render a tgRod.
-   * @param[in] rod a const reference to a tgRod to render
-   */
-  virtual void render(const tgRod& rod) const;
+  // Render a rigid body
+  virtual void render(const tgBaseRigid& rigid) const;
+  // Render the ground
+  virtual void render(const tgBulletGround& ground) const;
         
   /**
    * Render a tgModel.
@@ -79,6 +87,9 @@ private:
    * A reference to the tgWorld being rendered.
    */
   const tgWorld& m_world;
+  GL_ShapeDrawer*	m_shapeDrawer;
+  btVector3 m_sunAngle;
+  
 };
 
 #endif

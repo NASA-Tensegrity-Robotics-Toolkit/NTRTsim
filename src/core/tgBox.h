@@ -61,7 +61,9 @@ public:
                     double d = 1.0,
 		    double f = 1.0,
                     double rf = 0.0,
-                    double res = 0.2);
+                    double res = 0.2,
+                    btVector3 col = btVector3(0.5,0.5,0.5),
+                    bool enTx = false);
 
 
             /** The box's width; must be nonnegative. */
@@ -84,11 +86,17 @@ public:
             /** The box's coefficient of restitution; 
              * must be between 0 and 1 (inclusive). */
             const double restitution;
+            
+            const btVector3 color;
+            const bool enableTexture;
     };
-    
-        tgBox(btRigidBody* pRigidBody,
+                
+                // Add default:
+        tgBox(btRigidBody* pRigidBody, 
                 const tgTags& tags,
-                const double length);
+                const double length,
+                const btVector3 color = btVector3(0.5, 0.5, 0.5),
+                const bool enableTex = false);
     
 	/** A class with a virtual memeber function requires a virtual destructor. */
 	virtual ~tgBox();
@@ -102,6 +110,9 @@ public:
      * @return the box's length in application-dependent units
      */
     double length() const { return m_length; }
+    
+    btVector3 getDrawColor() const {return m_color; };
+    bool getDrawTextureOn() const {return m_enableTexture; };
 
 
 private:
@@ -113,6 +124,8 @@ private:
     
     /** The box's length. The units are application dependent. */
     const double m_length;
+       const btVector3 m_color;
+    const bool m_enableTexture;
 };
 
 #endif

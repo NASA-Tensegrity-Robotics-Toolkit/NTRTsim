@@ -323,6 +323,24 @@ public:
     // @todo: maybe -- don't like having to know about pairs and nodes here...
     // virtual bool matches(const tgPair& pair) = 0;
     // virtual bool matches(const tgNode& node) = 0;
+    
+    // Return the a shape from display shapes stored in the special rigidInfoGroup tgRigidInfo, which
+    // represents a group of tgRigidInfos.
+    virtual btCollisionShape* getDisplayShape() const {
+        if (m_rigidInfoGroup->m_displayShapesForRigids.size() == 0) {
+            // This means no group was created for this shape!
+            // So, just return the collision shape as the display shape.
+            return m_collisionShape;
+        }
+        // Otherwise, this a compound shape.
+        if (m_displayShapeIdx >= m_rigidInfoGroup->m_displayShapesForRigids.size())
+            std::cout << "Display shape idx out of bounds!" <<std::endl;
+        return m_rigidInfoGroup->m_displayShapesForRigids[m_displayShapeIdx];
+    }
+    
+    virtual void setDisplayShapeIdx(int idx) {
+        m_displayShapeIdx = idx;
+    }
 
 protected:  // Protected, not private -- subclasses need access
     
@@ -345,6 +363,11 @@ protected:  // Protected, not private -- subclasses need access
      * Typically a btRigidBody, but can also be a btGhostObject
      */
     mutable btCollisionObject* m_collisionObject;
+    
+    // Store the new display shapes of each tgRigidInfo, if this tgRigidInfo represents
+    // a group of tgRigidInfos.
+    mutable std::vector<btCompoundShape *> m_displayShapesForRigids;
+    int m_displayShapeIdx;
     
 };
 

@@ -34,13 +34,15 @@
 #include <stdexcept>
 
 tgBox::Config::Config(double w, double h, double d,
-                        double f, double rf, double res) :
+                        double f, double rf, double res, btVector3 col, bool enableTex) :
   width(w),
   height(h),
   density(d),
   friction(f),
   rollFriction(rf),
-  restitution(res)
+  restitution(res),
+  color(col),
+  enableTexture(enableTex)
 {
         if (density < 0.0) { throw std::range_error("Negative density"); }
         if (width < 0.0)  { throw std::range_error("Negative width");  }
@@ -60,9 +62,13 @@ tgBox::Config::Config(double w, double h, double d,
 
 tgBox::tgBox(btRigidBody* pRigidBody, 
                 const tgTags& tags,
-                const double length) : 
+                const double length,
+                const btVector3 color,
+                const bool enableTex) : 
   tgBaseRigid(pRigidBody, tags),
-  m_length(length)
+  m_length(length),
+    m_color(color),
+  m_enableTexture(enableTex)
 {
         if (pRigidBody == NULL)
     {

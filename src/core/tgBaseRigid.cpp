@@ -58,6 +58,7 @@ tgBaseRigid::~tgBaseRigid() { }
 
 void tgBaseRigid::onVisit(const tgModelVisitor& v) const
 {
+    // When this tgBaseRigid is visited by the renderer, render it.
     v.render(*this);
     
 }

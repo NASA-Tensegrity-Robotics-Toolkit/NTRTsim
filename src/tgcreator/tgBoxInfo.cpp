@@ -92,7 +92,7 @@ tgModel* tgBoxInfo::createModel(tgWorld& world)
     std::cout << "creating box with tags " << getTags() << std::endl; 
     #endif
     
-    tgBox* box = new tgBox(getRigidBody(), getTags(), getLength());
+    tgBox* box = new tgBox(getRigidBody(), getTags(), getLength(), m_config.color, m_config.enableTexture);
 
     return box;
 }
@@ -105,6 +105,7 @@ btCollisionShape* tgBoxInfo::getCollisionShape(tgWorld& world) const
         const double height = m_config.height;
         const double length = getLength();
         // Nominally x, y, z should we adjust here or the transform?
+        // Note, width and height are reall half-width and half-height.
         m_collisionShape =
             new btBoxShape(btVector3(width, length / 2.0, height));
     
@@ -128,6 +129,7 @@ double tgBoxInfo::getMass() const
   const double height = m_config.height;
   const double density = m_config.density;
   const double volume =  length * (width*2) * (height*2);
+  //std::cout<<length<<" " <<width*2<<" "<<height*2<<" "<<density<<std::endl;
   return volume * density;
 }
 

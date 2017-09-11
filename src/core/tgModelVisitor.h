@@ -19,6 +19,7 @@
 #ifndef TG_MODEL_VISITOR_H
 #define TG_MODEL_VISITOR_H
 
+
 /**
  * @file tgModelVisitor.h
  * @brief Contains the definition of interface class tgModelVisitor.
@@ -29,7 +30,8 @@
 // Forward declarations
 class tgSpringCableActuator;
 class tgModel;
-class tgRod;
+class tgBaseRigid;
+class tgBulletGround;
 class tgCompressionSpringActuator;
 
 /**
@@ -43,10 +45,14 @@ public:
   virtual ~tgModelVisitor() { }
     
   /**
-   * Render a tgRod.
-   * @param[in] rod a const reference to a tgRod to render
+   * Render a tgBaseRigid.
    */
-  virtual void render(const tgRod& rod) const {};
+  virtual void render(const tgBaseRigid& rigid) const {};
+  
+  /**
+   * Render a tgBulletGround.
+   */
+  virtual void render(const tgBulletGround& ground) const {};
 
   /**
    * Render a tgSpringCableActuator.
@@ -65,6 +71,17 @@ public:
    * @param[in] model a const reference to a tgModel to render.
    */
   virtual void render(const tgModel& m) const {};
+  
+  int getPass() const { return m_pass; };
+  void setPass(int pass) { m_pass = pass; };
+  
+  int getDebugMode() const { return m_debugMode; };
+  void setDebugMode(int debugMode) { m_debugMode = debugMode; };
+  
+  private:
+  int m_pass;
+  int m_debugMode;
+  
 };
 
 #endif

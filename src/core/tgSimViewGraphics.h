@@ -29,6 +29,8 @@
 // This application
 #include "tgSimView.h"
 #include "tgBulletRenderer.h"
+#include "terrain/tgBulletGround.h"
+#include "tgWorld.h"
 // Bullet OpenGL_FreeGlut (patched files)
 #include "tgGlutStuff.h"
 // The Bullet Physics library
@@ -134,6 +136,8 @@ public:
      * Contains a smaller set of rendering functions than clientMoveAndDisplay
      */
     virtual void displayCallback();
+    
+    void renderscene(int pass);
     
     /**
      * Called when the space bar is pressed. Calls reset,

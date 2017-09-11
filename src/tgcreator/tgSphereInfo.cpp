@@ -92,7 +92,7 @@ tgModel* tgSphereInfo::createModel(tgWorld& world)
     std::cout << "creating sphere with tags " << getTags() << std::endl; 
     #endif
     
-    tgSphere* sphere = new tgSphere(getRigidBody(), getTags());
+    tgSphere* sphere = new tgSphere(getRigidBody(), getTags(), m_config.color, m_config.enableTexture);
 
     return sphere;
 }

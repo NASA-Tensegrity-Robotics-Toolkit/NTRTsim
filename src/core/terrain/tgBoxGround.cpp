@@ -72,7 +72,7 @@ m_config(config)
 
 btRigidBody* tgBoxGround::getGroundRigidBody() const
 {
-        std::cout << "Box Ground" << std::endl;
+        //std::cout << "Box Ground" << std::endl;
     const btScalar mass = 0.0;
     
     btTransform groundTransform;

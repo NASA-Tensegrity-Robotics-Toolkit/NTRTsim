@@ -34,12 +34,14 @@
 #include <stdexcept>
 
 tgSphere::Config::Config(double r, double d,
-                        double f, double rf, double res) :
+                        double f, double rf, double res, btVector3 col, bool enableTex) :
   radius(r),
   density(d),
   friction(f),
   rollFriction(rf),
-  restitution(res)
+  restitution(res),
+    color(col),
+  enableTexture(enableTex)
 {
         if (density < 0.0) { throw std::range_error("Negative density"); }
         if (radius < 0.0)  { throw std::range_error("Negative radius");  }
@@ -56,8 +58,12 @@ tgSphere::Config::Config(double r, double d,
 }
 
 tgSphere::tgSphere(btRigidBody* pRigidBody, 
-                const tgTags& tags) : 
-  tgBaseRigid(pRigidBody, tags)
+                const tgTags& tags,
+                const btVector3 color,
+                const bool enableTex) : 
+  tgBaseRigid(pRigidBody, tags),
+    m_color(color),
+  m_enableTexture(enableTex)
 {
         if (pRigidBody == NULL)
     {

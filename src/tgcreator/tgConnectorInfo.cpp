@@ -82,11 +82,11 @@ void tgConnectorInfo::chooseRigids(std::set<tgRigidInfo*> rigids)
 tgRigidInfo* tgConnectorInfo::chooseRigid(std::set<tgRigidInfo*> rigids, const btVector3& v) {
 
     std::set<tgRigidInfo*> candidateRigids = findRigidsContaining(rigids, v);
-    
+    //std::cout<<"Size: " << candidateRigids.size() <<std::endl;
     tgRigidInfo* chosenRigid;
     if (candidateRigids.size() == 1) {
       // Choose the first element since there's only one
-      chosenRigid = *(candidateRigids.begin());  
+      chosenRigid = *(candidateRigids.begin());
     }
     else if (candidateRigids.size() > 1 ){
       // find the best candidate (if more than one rigid, use the rigid whose center of mass is closest to v. This seems like a reasonable approach...)
@@ -107,6 +107,16 @@ tgRigidInfo* tgConnectorInfo::chooseRigid(std::set<tgRigidInfo*> rigids, const b
 		  << std::endl;
       }
       chosenRigid = findClosestCenterOfMass(candidateRigids, v);
+      std::set<tgRigidInfo*>::iterator it;
+        for (it = candidateRigids.begin(); it != candidateRigids.end(); ++it) {
+            tgRigidInfo* candidate = *it;
+            //std::cout<<candidate->getTags()<<std::endl;
+            // HACK: Make sure to choose the rigid body with this tag, to not get
+            // confused with other compounds!
+            if (candidate->hasTag("cableAttach"))
+                chosenRigid = candidate;
+        }
+
     }
     else if (candidateRigids.size() == 0) {
       //DEBUGGING:

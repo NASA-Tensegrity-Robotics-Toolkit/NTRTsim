@@ -35,6 +35,9 @@
 #include <iostream>
 #include <vector>
 
+#include "core/tgWorldBulletPhysicsImpl.h"
+#include "btBulletDynamicsCommon.h"
+
 // Forward declarations
 class tgModelVisitor;
 class tgWorld;
@@ -162,6 +165,14 @@ public:
      * for tgSenseables.
      */
     virtual std::vector<tgSenseable*> getSenseableDescendants() const;
+    
+    btCollisionShape* getDisplayShape() const {
+        return m_displayShape;
+    }
+    
+    void setDisplayShape(btCollisionShape* shape) {
+        m_displayShape = shape;
+    }
 
 private:
 
@@ -178,6 +189,8 @@ private:
     std::vector<tgModel*> m_children;
 
     std::vector<abstractMarker> m_markers;
+    
+    btCollisionShape* m_displayShape;
 
 };
 

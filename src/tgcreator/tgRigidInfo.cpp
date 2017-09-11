@@ -96,6 +96,7 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
         if(!getRigidBody()) {
 
             // we want to do this based on group instead the rigid itself; otherwise we throw away autocompounding.
+            // Set another tgRigidInfo to be initialized, instead of this (this) object.
             tgRigidInfo* rigid = getRigidInfoGroup();
 
             // If we're not using autocompounding, use the rigid body itself.
@@ -115,6 +116,7 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
                         mass,
                         transform,
                         shape);
+                std::cout<<"Creating rigid body with mass: " << mass << " kg" << std::endl;
                 body->setFlags(BT_ENABLE_GYROPSCOPIC_FORCE);
                 rigid->setRigidBody(body);
             }

@@ -127,6 +127,7 @@ private:
 private: 
     /** Ensures integrity of member variables */
     bool invariant(void) const;
+    double m_lastTensionApplied;
 };
 
 #endif  // SRC_CORE_TG_BULLET_SPRING_CABLE_H_

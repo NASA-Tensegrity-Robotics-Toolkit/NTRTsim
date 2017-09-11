@@ -36,12 +36,14 @@
 #include <iostream> //for strings.
 
 tgRod::Config::Config(double r, double d,
-                        double f, double rf, double res) :
+                        double f, double rf, double res, btVector3 col, bool enableTex) :
   radius(r),
   density(d),
   friction(f),
   rollFriction(rf),
-  restitution(res)
+  restitution(res),
+  color(col),
+  enableTexture(enableTex)
 {
         if (density < 0.0) { throw std::range_error("Negative density"); }
         if (radius < 0.0)  { throw std::range_error("Negative radius");  }
@@ -59,9 +61,13 @@ tgRod::Config::Config(double r, double d,
 
 tgRod::tgRod(btRigidBody* pRigidBody, 
                 const tgTags& tags,
-                const double length) : 
+                const double length,
+                const btVector3 color,
+                const bool enableTex) : 
   tgBaseRigid(pRigidBody, tags),
-  m_length(length)
+  m_length(length),
+  m_color(color),
+  m_enableTexture(enableTex)
 {
         if (pRigidBody == NULL)
     {

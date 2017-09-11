@@ -214,6 +214,8 @@ protected:
      * The btCompoundShape that represents this compound to Bullet.
      */
     mutable btCompoundShape * m_compoundShape;
+    
+
 
 };
 

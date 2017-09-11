@@ -114,6 +114,11 @@ public:
    * Returns the level of gravity in this world.
    */
   double getWorldGravity() const;
+  
+  tgGround& getGround() const
+  {
+    return *m_pGround;
+  }
  
 private:
 

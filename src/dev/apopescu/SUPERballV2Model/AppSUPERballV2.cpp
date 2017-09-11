@@ -19,6 +19,7 @@
 
 // This application
 #include "SUPERballV2Model.h"
+#include "RestlenPlaybackController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -71,9 +72,9 @@ int main(int argc, char** argv)
     SUPERballV2Model* const myModel = new SUPERballV2Model();
 
     // Select the controller to use, and attach it to the model.
-    //LengthController* const pTC = new LengthController();
-    //myModel->attach(pTC);
-
+    RestlenPlaybackController* const pTC = new RestlenPlaybackController("src/dev/apopescu/SUPERballV2Model/cyl_horiz_pack_len_ten_prestress.csv", 200);
+    myModel->attach(pTC);
+    
     /* Add our model to the tgSimulation. This calls the setup() method of our tensegrity model.
        So, this creates the tgStructure, tgBuildSpec, and tgStructureInfo, and creates and
        initializes a Bullet btCollisionShape and btRigidBody for each rigid body.

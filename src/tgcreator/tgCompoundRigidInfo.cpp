@@ -73,6 +73,12 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
             btTransform t = rigid->getTransform();
             t.setOrigin(t.getOrigin() - com);
             m_compoundShape->addChildShape(t, rigid->getCollisionShape(world));
+            
+            // For each tgRigidInfo, save the original display shape, so we can render
+            // each tgRigidInfo separately.
+            btCompoundShape* displayShape = new btCompoundShape(&world);
+            displayShape->addChildShape(t, rigid->getCollisionShape(world));
+            m_displayShapesForRigids.push_back(displayShape);
         }        
         // Add the collision shape to the array so we can delete it later
         tgWorldBulletPhysicsImpl& bulletWorld =

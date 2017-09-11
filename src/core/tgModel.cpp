@@ -106,6 +106,7 @@ void tgModel::step(double dt)
 
 void tgModel::onVisit(const tgModelVisitor& r) const
 {
+  //std::cout << toString("Visiting ") <<std::endl;
   r.render(*this);
 
   // Call onRender for all children (if we have any)

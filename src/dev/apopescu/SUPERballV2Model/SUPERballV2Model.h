@@ -91,27 +91,14 @@ public:
     
 private:
 	
-	/**
-     * A function called during setup that determines the positions of
-     * the nodes based on construction parameters. Rewrite this function
-     * for your own models
-     * @param[in] tetra: A tgStructure that we're building into
-     */
-    static void addNodes(tgStructure& s);
-	
-	/**
-     * A function called during setup that creates rods from the
-     * relevant nodes. Rewrite this function for your own models.
-     * @param[in] s A tgStructure that we're building into
-     */
-    static void addRods(tgStructure& s);
+    static void moveRodsToEqMani(tgStructure* rod1, tgStructure* rod2, tgStructure* rod3, tgStructure* rod4, tgStructure* rod5, tgStructure* rod6, double delta, double alpha, double b, double l);
 	
 	/**
      * A function called during setup that creates muscles (Strings) from
      * the relevant nodes. Rewrite this function for your own models.
      * @param[in] s A tgStructure that we're building into
      */
-    static void addActuators(tgStructure& s);
+    static void addActuators(tgStructure* rod1, tgStructure* rod2, tgStructure* rod3, tgStructure* rod4, tgStructure* rod5, tgStructure* rod6);
    
 
 private:

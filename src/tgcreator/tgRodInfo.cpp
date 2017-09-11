@@ -78,6 +78,7 @@ void tgRodInfo::initRigidBody(tgWorld& world)
     getRigidBody()->setRestitution(m_config.restitution);
 }
 
+// This function converts a tgRigidInfo ---> tgModel.
 tgModel* tgRodInfo::createModel(tgWorld& world)
 {
     // @todo: handle tags -> model
@@ -91,7 +92,7 @@ tgModel* tgRodInfo::createModel(tgWorld& world)
     std::cout << "creating rod with tags " << getTags() << std::endl; 
     #endif
     
-    tgRod* rod = new tgRod(getRigidBody(), getTags(), getLength());
+    tgRod* rod = new tgRod(getRigidBody(), getTags(), getLength(), m_config.color, m_config.enableTexture);
 
     return rod;
 }

@@ -60,7 +60,9 @@ public:
                     double d = 1.0,
                     double f = 1.0,
                     double rf = 0.0,
-                    double res = 0.2);
+                    double res = 0.2,
+                    btVector3 col = btVector3(0.5,0.5,0.5),
+                    bool enTx = false);
 
 
 
@@ -81,6 +83,9 @@ public:
             /** The sphere's coefficient of restitution; 
              * must be between 0 and 1 (inclusive). */
             const double restitution;
+            
+            const btVector3 color;
+            const bool enableTexture;
     };
     
     /**
@@ -89,7 +94,9 @@ public:
      * class in tgcreator.
      */
         tgSphere(btRigidBody* pRigidBody,
-                const tgTags& tags);
+                const tgTags& tags,
+                const btVector3 color,
+                const bool enableTex);
     
         /** A class with a virtual memeber function requires a virtual destructor. */
         virtual ~tgSphere();
@@ -102,10 +109,15 @@ public:
     
     virtual void onVisit(const tgModelVisitor& v) const;
     
+    btVector3 getDrawColor() const {return m_color; };
+    bool getDrawTextureOn() const {return m_enableTexture; };
+    
 private:
 
     /** Integrity predicate. */
     bool invariant() const;
+       const btVector3 m_color;
+    const bool m_enableTexture;
 
 };
 
