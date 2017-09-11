@@ -1,6 +1,12 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+Branch apopescu
+========
+This branch contains work on deployment vizualization with more accurate SUPERball collision models than just cylindrical rods, e.g. the motors and endcaps are modeled. These additional geometrical components are important for the packing/unpacking problem. In addition, various tgX objects (tgRod, tgSphere, tgBox), are modified so you can add _colors_ to your vizualization!
+-Alex Popescu
+
+
 3/19/15 - Warning: OS X Setup/Build Failures
 ---------
 Currently the simulator is not compiling under OS X. We hope to have this resolved soon. In the meantime if you wish to use the simulator your best bet is to install a Linux VM and install NTRT there. In the near future we hope to include a .vmdk which contains Ubuntu pre-installed with NTRT and supporting tools/libraries -- the INSTALL file will be updated onec that is complete (currently aiming for ~3/22/15).
