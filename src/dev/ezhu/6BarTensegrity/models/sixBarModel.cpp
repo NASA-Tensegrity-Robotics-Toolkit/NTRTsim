@@ -269,7 +269,7 @@ void sixBarModel::setup(tgWorld& world)
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
-	tgBasicActuator::Config staticCableConfig(config.stiffness*2, config.damping*2, config.pretension*3,
+	tgBasicActuator::Config staticCableConfig(config.stiffness*2, config.damping*3, config.pretension*5,
 		config.hist, config.maxTension, config.targetVelocity);
 
 	// Create a structure that will hold the details of this model
@@ -288,8 +288,8 @@ void sixBarModel::setup(tgWorld& world)
 	rotateYaw(s, yaw_init*M_PI/180);
 	rotatePitch(s, pitch_init*M_PI/180);
 	rotateRoll(s, roll_init*M_PI/180);
-	s.move(btVector3(0, 7, -0)); 
-	//s.move(btVector3(100, 3420,-100));
+	// s.move(btVector3(0, 7, -0)); 
+	s.move(btVector3(10, -1440,-10));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));
 	//s.move(btVector3(0, config.rodLength, 0));
