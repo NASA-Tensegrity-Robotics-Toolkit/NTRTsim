@@ -40,7 +40,8 @@ namespace
 
    double sf = 10;
 
-   const struct Config 
+   // TT4-mini parameters
+   /*const struct Config 
    {
    		double density;
    		double radius;
@@ -86,7 +87,36 @@ namespace
 			0,                // History logging (boolean)
 			100000*sf,         // maxTens (kg-m/s^2)
 			0.1*sf,          // targetVelocity (m/s)
-   		};
+   		};*/
+
+	// Superball params
+	const struct Config {
+		double density;
+		double radius;
+		double stiffness;
+		double damping;
+		double rodLength;
+		double friction;
+		double rollFriction;
+		double restitution;
+		double pretension;
+		double hist;
+		double maxTension;
+		double targetVelocity;
+	} config = {
+		0.826,
+		0.14,
+		258.25,
+		10.0,
+		10.4,
+		0.99,
+		0.01,
+		0.0,
+		100.0,
+		0,
+		40000,
+		0.5,
+	};
 }
 
 sixBarMiniModel::sixBarMiniModel() : tgModel() 
@@ -235,13 +265,13 @@ void sixBarMiniModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	addPayload(s);
+	// addPayload(s);
 
 	// Move the structure
 	rotateToFace(s, 0);
 	// rotateYaw(s, 60*M_PI/180); // Two cable
 	rotateYaw(s, 45*M_PI/180); // Single cable (and two cable at 26 deg)
-	s.move(btVector3(0, 1, 0)); 
+	s.move(btVector3(0, 2, 0)); 
 	// s.move(btVector3(0, 3, 0)); 
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
@@ -273,7 +303,7 @@ void sixBarMiniModel::setup(tgWorld& world)
 	}
 	
 	// Get the payload for controller
-	payload = sixBarMiniModel::find<tgRod>("payload");
+	// payload = sixBarMiniModel::find<tgRod>("payload");
 
 	// btRigidBody* rodBody0 = allRods[1]->getPRigidBody();
 	// btRigidBody* rodBody1 = allRods[3]->getPRigidBody();

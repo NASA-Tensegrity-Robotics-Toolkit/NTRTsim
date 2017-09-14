@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
 		int line_index = 0;
 		double maxX = 0;
 		double maxY = 0;
+		double maxZ = -10000;
 		
 		// Parse triangle verticies from .stl file
 		//for (int i = 0; i < 204; i++) {
@@ -169,6 +170,9 @@ int main(int argc, char* argv[]) {
 							case 2:
 								file_out << num << "] ";
 								element_index = 0;
+								if (num > maxZ) {
+									maxZ = num;
+								}
 								break;
 						}
 						found_char_last = found_char_curr;
@@ -189,7 +193,7 @@ int main(int argc, char* argv[]) {
 					cout << "Reached end of file, closing files" << endl;
 					cout << "Number of verticies extracted: " << vertex_count << endl;
 					cout << "Number of triangles: " << triangle_count << endl;
-					cout << "Max X: " << maxX << ", Max Y: " << maxY << endl;
+					cout << "Max X: " << maxX << ", Max Y: " << maxY << ", Max Z: " << maxZ << endl;
 					break;
 				}
 				else if (file_in.fail()) {

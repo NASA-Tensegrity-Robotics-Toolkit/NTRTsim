@@ -328,6 +328,7 @@ private:
 	bool isOnGround = false;
 	int pathIdx = 1;
 	int stepIdx = 0;
+	int goalFace;
 	bool doLog;
 
 	// Direction to travel

@@ -300,7 +300,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	node5AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(17)(-1)(12)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(15); // 5
 	node6AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(15)(-1)( 9)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 6
 	node7AP  = boost::assign::list_of(-1)(-1)(-1)(19)(-1)(-1)(13)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(14)(-1); // 7
-	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(10); // 8
+	node8AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 9)(-1)(-1)(23)(-1)(-1)(-1)(-1)(-1)(-1)(11); // 8
 	node9AP  = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(11)(-1)(10)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1); // 9
 	node10AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(21)(-1)(-1)(-1)(-1)(-1)(-1)(10)(-1); // 10
 	node11AP = boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)( 8)(-1)(-1)(-1)(-1)( 4)(-1)(-1)(-1)(-1); // 11
@@ -420,10 +420,21 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 			}
 		case 2:
 			{
+				// std::cout << resetFlag << isOnGround << stepFin << runPathGen << std::endl;
 				// Code for dead reckoning mode
 				if (resetFlag) {
 					resetFlag = !setAllActuators(m_controllers, actuators, restLength, dt);
 					resetCounter = 0;
+					if (!resetFlag) {
+						std::cout << "Reset complete" << std::endl;
+						if (contactSurfaceDetection() != goalFace) {
+							std::cout << contactSurfaceDetection() << "|" << goalFace << std::endl;
+							std::cout << "Current face does not match with previous goal" << std::endl;
+							isOnGround = checkOnGround();
+							stepFin = true;
+							runPathGen = false;
+						}
+					}
 				}
 				else {
 					if (isOnGround && stepFin && !resetFlag) {
@@ -605,7 +616,7 @@ bool T6RollingController::checkOnGround()
 
 	btVector3 payloadVel = payloadBody->getLinearVelocity();
 	double payloadSpeed = payloadVel.norm();
-	if (abs(payloadSpeed) < 0.001) onGround = true;
+	if (abs(payloadSpeed) < 0.01) onGround = true;
 
 	return onGround;
 }
@@ -845,6 +856,7 @@ bool T6RollingController::stepToFace(double dt)
 	int cableToActuate = -1;
 	// Get which cable to actuate from actuation policy table
 	if (path.size() > 1) {
+		goalFace = path[2];
 		cableToActuate = actuationPolicy[path[0]][path[1]];
 		actuatedCable = cableToActuate;
 
@@ -883,6 +895,7 @@ bool T6RollingController::stepToFace(double dt)
 		}
 		// Perfom actuation to get from an open face to a closed face
 		else {
+			std::cout << "Open -> Closed" << std::endl;
 			if (cableToActuate >= 0) {
 				// Check to see if robot has reached a closed face
 				if (!isClosedFace(currFace)) {

@@ -150,9 +150,9 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 	}
 
 	// Retrive payload body from model
-	payload = subject.getPayload();
-	tgRod* payloadRod = payload[0];
-	payloadBody = payloadRod->getPRigidBody();
+	// payload = subject.getPayload();
+	// tgRod* payloadRod = payload[0];
+	// payloadBody = payloadRod->getPRigidBody();
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
@@ -416,6 +416,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 			}
 		}
 		else if (mode == 1){
+			double retract_rest_length = 1;
 			if (moveComplete1 && moveComplete2 && isOnGround) {
 				std::cout << "Robot ready, waiting for user input..." << std::endl;
 				actuatorNum1 = sequence[sequenceIdx];
@@ -477,7 +478,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 				// Fully contract if cable was released
 				if (actuatorStatus[actuatorNum1-1] == false) {
 					// std::cout << "Contracting..." << std::endl;
-					moveComplete1 = setSingleActuator(m_controllers[cableNum1], actuators[cableNum1], 0.001, dt);
+					moveComplete1 = setSingleActuator(m_controllers[cableNum1], actuators[cableNum1], retract_rest_length, dt);
 
 				}
 				// Fully release if cable was contracted
@@ -487,7 +488,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 				}
 				if (actuatorStatus[actuatorNum2-1] == false) {
 					// std::cout << "Contracting..." << std::endl;
-					moveComplete2 = setSingleActuator(m_controllers[cableNum2], actuators[cableNum2], 0.001, dt);
+					moveComplete2 = setSingleActuator(m_controllers[cableNum2], actuators[cableNum2], retract_rest_length, dt);
 
 				}
 				// Fully release if cable was contracted
@@ -522,8 +523,20 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 	// }
 	
 	// logCounter++;
-	btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
-	std::cout << payload_pos.y() << std::endl;
+	// btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
+	// std::cout << payload_pos.y() << std::endl;
+	
+	btVector3 com;
+	com.setX(0);
+	com.setY(0);
+	com.setZ(0);
+
+	for (int i = 0; i < rodBodies.size(); i++) {
+		com += rodBodies[i]->getCenterOfMassPosition();
+	}
+	com = com/rodBodies.size();
+
+	std::cout << "Time: " << worldTime << ", x: " << com.x() << ", z: " << com.z() << std::endl;
 
 	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();
@@ -544,13 +557,13 @@ bool T6MiniRollingController::checkOnGround()
 {
 	bool onGround = false;
 	
-	// btVector3 rodVel = rodBodies[2]->getLinearVelocity();
-	// double rodSpeed = rodVel.norm();
-	// if (abs(rodSpeed) < 0.001) onGround = true;
+	btVector3 rodVel = rodBodies[2]->getLinearVelocity();
+	double rodSpeed = rodVel.norm();
+	if (abs(rodSpeed) < 0.001) onGround = true;
 
-	btVector3 payloadVel = payloadBody->getLinearVelocity();
-	double payloadSpeed = payloadVel.norm();
-	if (abs(payloadSpeed) < 0.0001) onGround = true;
+	// btVector3 payloadVel = payloadBody->getLinearVelocity();
+	// double payloadSpeed = payloadVel.norm();
+	// if (abs(payloadSpeed) < 0.0001) onGround = true;
 
 	return onGround;
 }
