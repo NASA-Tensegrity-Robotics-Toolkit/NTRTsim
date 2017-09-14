@@ -127,11 +127,11 @@ namespace
    		};
 }
  
-sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel() 
+sixBarModel::sixBarModel(float yaw, float pitch, float roll) : tgModel() 
 {
-	yaw_init = yaw;
-	pitch_init = pitch;
-	roll_init = roll;
+	yaw_init = double(yaw);
+	pitch_init = double(pitch);
+	roll_init = double(roll);
 }
 
 sixBarModel::sixBarModel() : tgModel() 
@@ -158,6 +158,8 @@ void sixBarModel::addPayload(tgStructure& s)
 
 void sixBarModel::setup(tgWorld& world)
 {
+	srand(time(NULL));
+
 	// Calculate the space between two parallel rods based on the rod length from Config
 	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 
@@ -285,10 +287,22 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Move the structure
 	rotateToFace(s, 2);
-	rotateYaw(s, yaw_init*M_PI/180);
-	rotatePitch(s, pitch_init*M_PI/180);
-	rotateRoll(s, roll_init*M_PI/180);
-	s.move(btVector3(0, 7, -0)); 
+	// rotateYaw(s, yaw_init*M_PI/180);
+	// rotatePitch(s, pitch_init*M_PI/180);
+	// rotateRoll(s, roll_init*M_PI/180);
+	// s.move(btVector3(0, 7, -0)); 
+
+	yaw_init = rand()*(1.0/RAND_MAX)*2*M_PI;
+	x_pos_init = generateGaussianNoise(0,0.5*10);
+	y_pos_init = 0.5*10;
+	z_pos_init = generateGaussianNoise(0,0.5*10);
+	rotateYaw(s, yaw_init);
+	s.move(btVector3(x_pos_init, y_pos_init, z_pos_init));
+
+	std::cout << "Initial X: " << x_pos_init << std::endl;
+	std::cout << "Initial Y: " << y_pos_init << std::endl;
+	std::cout << "Initial Z: " << z_pos_init << std::endl;
+	std::cout << "Initial yaw: " << yaw_init*180/M_PI << std::endl;
 	//s.move(btVector3(100, 3420,-100));
 	// -8 for 0.26, -9 for 0.25, 
 	// s.move(btVector3(0, config.rodLength-9, 0));
@@ -587,4 +601,49 @@ void sixBarModel::rotatePitch(tgStructure& s, double theta)
 void sixBarModel::rotateRoll(tgStructure& s, double phi)
 {
 	s.addRotation(btVector3(0,0,0), btVector3(1,0,0), phi);
+}
+
+double sixBarModel::generateGaussianNoise(double mu, double sigma)
+{
+  /**
+   * (From Wikipedia)
+   * The standard Box-Muller transform generates 
+   * values from the standard normal distribution 
+   * (i.e. standard normal deviates) with mean 0 and standard deviation 1. 
+   * The implementation below in standard C++ generates values 
+   * from any normal distribution with mean \mu and variance \sigma^2. 
+   * If Z is a standard normal deviate, then X = Z\sigma + \mu will 
+   * have a normal distribution with mean \mu and standard deviation \sigma. 
+   */ 
+  const double epsilon = std::numeric_limits<double>::min();
+  const double two_pi = 2*M_PI;//2.0*3.14159265358979323846;
+
+  static double z0, z1;
+  static bool generate;
+  generate = !generate;
+
+  if (!generate)
+    return z1 * sigma + mu;
+
+  double u1, u2;
+  do
+    {
+      u1 = rand() * (1.0 / RAND_MAX);
+      u2 = rand() * (1.0 / RAND_MAX);
+    }
+  while ( u1 <= epsilon );
+
+  z0 = sqrt(-2.0 * log(u1)) * cos(two_pi * u2);
+  z1 = sqrt(-2.0 * log(u1)) * sin(two_pi * u2);
+  return z0 * sigma + mu;
+}
+
+std::vector<double> sixBarModel::getInitialConds()
+{
+	std::vector<double> initConds(4,0);
+	initConds[0] = x_pos_init;
+	initConds[1] = y_pos_init;
+	initConds[2] = z_pos_init;
+	initConds[3] = yaw_init;
+	return initConds;
 }

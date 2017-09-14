@@ -45,6 +45,8 @@
 
 // C++ Standard Libraries
 #include <vector>
+#include <limits>
+#include <math.h>
 
 // Forward declarations
 class tgModelVisitor;
@@ -66,7 +68,7 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	     * .cpp file in this case, not passed in. 
 	     */
 		sixBarModel();
-	    sixBarModel(int yaw, int pitch, int roll);
+	    sixBarModel(float yaw, float pitch, float roll);
 	    
 	    /**
 	     * Destructor. Deletes controllers, if any were added during setup.
@@ -152,6 +154,10 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 	    void rotatePitch(tgStructure& s, double theta);
 
 	    void rotateRoll(tgStructure& s, double phi);
+
+	    double generateGaussianNoise(double mu, double sigma);
+
+	    std::vector<double> getInitialConds();
 
 	    double rodDist;
 
@@ -296,9 +302,12 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 
 		bool motorModel;
 
-		int yaw_init = 0;
-		int pitch_init = 0;
-		int roll_init = 0;
+		double yaw_init = 0;
+		double pitch_init = 0;
+		double roll_init = 0;
+		double x_pos_init = 0;
+		double y_pos_init = 0;
+		double z_pos_init = 0;
 };
 
 #endif

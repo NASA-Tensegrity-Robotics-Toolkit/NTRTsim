@@ -44,6 +44,7 @@
 #include <string>
 #include <fstream>
 #include <ostream>
+#include <math.h>
 
 // Forward declarations
 class sixBarModel;
@@ -335,7 +336,9 @@ private:
 
 	// Initialize filestream and data
 	std::ofstream data_out;
-	std::string filename;
+	std::ofstream param_out;
+	std::string filename_data;
+	std::string filename_param;
 	double worldTime = 0;
 	int actuatedCable;
 	int currentFace;
