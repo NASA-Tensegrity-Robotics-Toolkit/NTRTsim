@@ -119,7 +119,7 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     // Parse input arguments
     // ---------------------------------------------------------------------------------
-    int psi, theta, phi;
+    float psi, theta, phi;
     std::string log_name;
 
     if (argc == 2) {
@@ -130,19 +130,31 @@ int main(int argc, char** argv)
     }
     else if (argc == 4) {
         // Initial yaw
+<<<<<<< HEAD
         psi = atoi(argv[1]);
         // Initial pitch
         theta = atoi(argv[2]);
+=======
+        psi = atof(argv[1]);
+        // Initial pitch 
+        theta = atof(argv[2]);
+>>>>>>> 954b7c74d8ab39f6d2596b3df7086c598f5b0ce3
         // Initial roll
-        phi = atoi(argv[3]);
+        phi = atof(argv[3]);
     }
     else if (argc == 5) {
         // Initial yaw
+<<<<<<< HEAD
         psi = atoi(argv[1]);
         // Initial pitch
         theta = atoi(argv[2]);
+=======
+        psi = atof(argv[1]);
+        // Initial pitch 
+        theta = atof(argv[2]);
+>>>>>>> 954b7c74d8ab39f6d2596b3df7086c598f5b0ce3
         // Initial roll
-        phi = atoi(argv[3]);
+        phi = atof(argv[3]);
         // File to write to
         log_name = argv[4];
     }
@@ -188,9 +200,9 @@ int main(int argc, char** argv)
 
     // Define thrust magnitude and period
     btVector3 initVel;
-    double initVel_x = 1*sf;
+    double initVel_x = 0*sf;
     double initVel_y = 2*sf;
-    double initVel_z = 4*sf;
+    double initVel_z = 2*sf;
     initVel.setX(initVel_x);
     initVel.setY(initVel_y);
     initVel.setZ(initVel_z);

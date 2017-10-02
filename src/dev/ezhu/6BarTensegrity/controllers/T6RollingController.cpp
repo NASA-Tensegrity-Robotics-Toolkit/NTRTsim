@@ -336,9 +336,26 @@ void T6RollingController::onSetup(sixBarModel& subject)
 
 	if (!c_log_name.empty()) {
 		doLog = true;
-		filename = c_log_name;
+		filename_data = c_log_name;
+		filename_param = c_log_name.replace(c_log_name.end()-3,c_log_name.end(),"txt");
+		param_out.open(filename_param.c_str());
+		if (!param_out.is_open()) {
+			std::cout << "Failed to open output file" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		else {
+			std::vector<double> initConds = subject.getInitialConds();
+			param_out << "X=" << initConds[0]/10 << std::endl;
+			param_out << "Y=" << initConds[1]/10 << std::endl;
+			param_out << "Z=" << initConds[2]/10 << std::endl;
+			param_out << "Vx=" << c_initVel[0]/10 << std::endl;
+			param_out << "Vy=" << c_initVel[1]/10 << std::endl;
+			param_out << "Vz=" << c_initVel[2]/10 << std::endl;
+			param_out << "yaw=" << initConds[3] << std::endl;
+			param_out.close();
+		}
 		// Create filestream for data log and open it
-		data_out.open(filename.c_str(), std::fstream::app);
+		data_out.open(filename_data.c_str(), std::fstream::app);
 		if (!data_out.is_open()) {
 			std::cout << "Failed to open output file" << std::endl;
 			exit(EXIT_FAILURE);
@@ -577,7 +594,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				// if (doLog && isOnGround) {
 				if (doLog && !thrusterOn && worldTime > thrust_end) {
 					// Open filestream, record line of data, then close filestream
-					data_out.open(filename.c_str(), std::fstream::app);
+					data_out.open(filename_data.c_str(), std::fstream::app);
 				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << "," 
 				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," 
 				    		<< isOnGround << "," << contactCounter << std::endl;
@@ -957,23 +974,30 @@ btVector3 T6RollingController::getThrustMag(btVector3 initVel, double thrustDist
 {
 	btVector3 thrust_dir = thrustDist*initVel.normalized();
 	btVector3 thrust_mag;
-	thrust_mag.setX((mass/2)*(initVel.x()*initVel.x()/thrust_dir.x()));
-	thrust_mag.setY((mass/2)*(initVel.y()*initVel.y()/thrust_dir.y())+mass*c_gravity);
-	thrust_mag.setZ((mass/2)*(initVel.z()*initVel.z()/thrust_dir.z()));
 	
 	if (initVel.x() == 0) {
 		thrust_mag.setX(0);
 	}
+	else {
+		thrust_mag.setX((mass/2)*(initVel.x()*initVel.x()/thrust_dir.x()));
+	}
 	if (initVel.y() == 0) {
 		thrust_mag.setY(0);
+	}
+	else {
+		thrust_mag.setY((mass/2)*(initVel.y()*initVel.y()/thrust_dir.y())+mass*c_gravity);
 	}
 	if (initVel.z() == 0) {
 		thrust_mag.setZ(0);
 	}
+	else {
+		thrust_mag.setZ((mass/2)*(initVel.z()*initVel.z()/thrust_dir.z()));
+	}
+
 	return thrust_mag;
 }
 
 double T6RollingController::getThrustPeriod(btVector3 initVel, btVector3 thrustMag)
 {
-	return initVel.x()/(thrustMag.x()/mass);
+	return sqrt(pow(initVel.x(),2)+pow(initVel.z(),2))/(sqrt(pow(thrustMag.x(),2)+pow(thrustMag.z(),2))/mass);
 }

@@ -30,14 +30,20 @@ num_pts=$[($max_angle-$min_angle)/$interval]
 # 	done
 # done
 
-pitch=$[0]
-roll=$[0]
-for i in {0..180}
-# for i in {0..1}
+# pitch=$[0]
+# roll=$[0]
+# for i in {0..180}
+# # for i in {0..1}
+# do
+# 	yaw=$[$i*$interval+$min_angle]
+# 	log_name="./data/${yaw}Y_Response.csv"
+# 	./App6Bar $yaw $pitch $roll $log_name
+# done
+
+for i in {0..500}
 do
-	yaw=$[$i*$interval+$min_angle]
-	log_name="./data/${yaw}Y_Response.csv"
-	./App6Bar $yaw $pitch $roll $log_name
+	log_name="./data/${i}_Response.csv"
+	./App6Bar $log_name
 done
 
 zip -r data.zip ./data
