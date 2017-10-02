@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -31,7 +31,7 @@
 // Utility Library
 #include "../utility.hpp"
 
-namespace 
+namespace
 {
 	/**
    * Configuration parameters so they're easily accessable.
@@ -41,7 +41,7 @@ namespace
    double sf = 10;
 
    // TT4-mini parameters
-   /*const struct Config 
+   const struct Config
    {
    		double density;
    		double radius;
@@ -58,7 +58,7 @@ namespace
    		// double motorLength;
    	} config =
    		{
-   			
+
    			// SuperBall parameters
    			// 688/pow(sf,3),    // density (kg / length^3)
 	     //    0.031*sf,     // radius (length)
@@ -73,9 +73,9 @@ namespace
 	     //    10000*sf,   // maxTension
 	     //    0.5*sf,    // targetVelocity
 	        // 0.3175*sf, // Motor length
-	        
+
 	        //TT_MINI Parameters
-			2485/pow(sf,3),    // density (kg / length^3) 
+			2485/pow(sf,3),    // density (kg / length^3)
 			0.0045*sf,          // radius (length)
 			300, //300,//47.173,           // stiffness (kg / sec^2) was 1500
 			2,            // damping (kg / sec)
@@ -87,8 +87,8 @@ namespace
 			0,                // History logging (boolean)
 			100000*sf,         // maxTens (kg-m/s^2)
 			0.1*sf,          // targetVelocity (m/s)
-   		};*/
-
+   		};
+/*
 	// Superball params
 	const struct Config {
 		double density;
@@ -117,9 +117,10 @@ namespace
 		40000,
 		0.5,
 	};
+  */
 }
 
-sixBarMiniModel::sixBarMiniModel() : tgModel() 
+sixBarMiniModel::sixBarMiniModel() : tgModel()
 {
 
 }
@@ -265,18 +266,18 @@ void sixBarMiniModel::setup(tgWorld& world)
 	addSixBar(s);
 
 	// Add in the payload
-	// addPayload(s);
+	addPayload(s);
 
 	// Move the structure
 	rotateToFace(s, 0);
-	// rotateYaw(s, 60*M_PI/180); // Two cable
-	rotateYaw(s, 45*M_PI/180); // Single cable (and two cable at 26 deg)
-	s.move(btVector3(0, 2, 0)); 
-	// s.move(btVector3(0, 3, 0)); 
+	rotateYaw(s, 35*M_PI/180); // Two cable
+	// rotateYaw(s, 45*M_PI/180); // Single cable (and two cable at 26 deg)
+	s.move(btVector3(10, 8, 25));
+	// s.move(btVector3(0, 3, 0));
 	//s.move(btVector3(100, 3420,-100));
-	// -8 for 0.26, -9 for 0.25, 
+	// -8 for 0.26, -9 for 0.25,
 	// s.move(btVector3(0, config.rodLength-9, 0));
-	//s.move(btVector3(0, config.rodLength, 0));
+	// s.move(btVector3(0, config.rodLength, 0));
 
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;
@@ -301,9 +302,9 @@ void sixBarMiniModel::setup(tgWorld& world)
 	for (int i = 0; i < actuators.size(); i++) {
 		allActuators.push_back(sixBarMiniModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
 	}
-	
+
 	// Get the payload for controller
-	// payload = sixBarMiniModel::find<tgRod>("payload");
+	payload = sixBarMiniModel::find<tgRod>("payload");
 
 	// btRigidBody* rodBody0 = allRods[1]->getPRigidBody();
 	// btRigidBody* rodBody1 = allRods[3]->getPRigidBody();
@@ -353,17 +354,17 @@ const std::vector<tgBasicActuator*>& sixBarMiniModel::getAllActuators() const
 	return allActuators;
 }
 
-const std::vector<tgRod*>& sixBarMiniModel::getAllRods() const 
+const std::vector<tgRod*>& sixBarMiniModel::getAllRods() const
 {
 	return allRods;
 }
 
-const std::vector<tgRod*>& sixBarMiniModel::getPayload() const 
+const std::vector<tgRod*>& sixBarMiniModel::getPayload() const
 {
 	return payload;
 }
 
-const std::vector<btVector3>& sixBarMiniModel::getNormVects() const 
+const std::vector<btVector3>& sixBarMiniModel::getNormVects() const
 {
 	return normalVectors;
 }
@@ -384,7 +385,7 @@ void sixBarMiniModel::addSixBarNodes(tgStructure& s)
 	/* Starting configuration where the rods are parallel to the principle directions
 	 * and the origin is at the center of the tensegrity
 	 */
-	
+
 	// Calculate the space between two parallel rods based on the rod length from Config
 	double rodSpace = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 

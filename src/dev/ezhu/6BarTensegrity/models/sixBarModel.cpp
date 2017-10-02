@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -31,7 +31,7 @@
 // Utility Library
 #include "../utility.hpp"
 
-namespace 
+namespace
 {
 	/**
    * Configuration parameters so they're easily accessable.
@@ -40,7 +40,7 @@ namespace
 
    double sf = 10;
 
-   const struct Config 
+   const struct Config
    {
    		double density;
    		double radius;
@@ -73,7 +73,7 @@ namespace
 	        0.5*sf,    // targetVelocity
 	        0.3175*sf, // Motor length
 	        */
-	        
+
 	        // TT-3 parameters
 	        2990/pow(sf,3),    // density (kg / length^3)
 	        0.0127/2*sf,     // radius (length)
@@ -115,26 +115,26 @@ namespace
    		double rollFriction;
    		double restitution;
    		bool addPayload;
-   	} payloadConfig = 
+   	} payloadConfig =
    		{
    			4317/pow(sf,3),		// density (kg / length^3)
    			8*0.0127/2*sf,     // radius (length)
    			0.1*sf,		// payloadLength (length)
    			0.99,      // friction (unitless)
    			0.01,     // rollFriction (unitless)
-	        0.0,      // restitution (?)
-	        true,
+        0.0,      // restitution (?)
+        true,
    		};
 }
- 
-sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel() 
+
+sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel()
 {
 	yaw_init = yaw;
 	pitch_init = pitch;
 	roll_init = roll;
 }
 
-sixBarModel::sixBarModel() : tgModel() 
+sixBarModel::sixBarModel() : tgModel()
 {
 }
 
@@ -288,9 +288,9 @@ void sixBarModel::setup(tgWorld& world)
 	rotateYaw(s, yaw_init*M_PI/180);
 	rotatePitch(s, pitch_init*M_PI/180);
 	rotateRoll(s, roll_init*M_PI/180);
-	// s.move(btVector3(0, 7, -0)); 
+	// s.move(btVector3(0, 7, -0));
 	s.move(btVector3(10, -1440,-10));
-	// -8 for 0.26, -9 for 0.25, 
+	// -8 for 0.26, -9 for 0.25,
 	// s.move(btVector3(0, config.rodLength-9, 0));
 	//s.move(btVector3(0, config.rodLength, 0));
 
@@ -317,7 +317,7 @@ void sixBarModel::setup(tgWorld& world)
 	for (int i = 0; i < actuators.size(); i++) {
 		allActuators.push_back(sixBarModel::find<tgBasicActuator>(tgString("actuator num", i))[0]);
 	}
-	
+
 	// Get the payload for controller
 	if (payloadConfig.addPayload) {
 		payload.push_back(sixBarModel::find<tgRod>("payload")[0]);
@@ -377,17 +377,17 @@ const std::vector<tgBasicActuator*>& sixBarModel::getAllActuators() const
 	return allActuators;
 }
 
-const std::vector<tgRod*>& sixBarModel::getAllRods() const 
+const std::vector<tgRod*>& sixBarModel::getAllRods() const
 {
 	return allRods;
 }
 
-const std::vector<tgRod*>& sixBarModel::getPayload() const 
+const std::vector<tgRod*>& sixBarModel::getPayload() const
 {
 	return payload;
 }
 
-const std::vector<btVector3>& sixBarModel::getNormVects() const 
+const std::vector<btVector3>& sixBarModel::getNormVects() const
 {
 	return normalVectors;
 }
@@ -422,7 +422,7 @@ void sixBarModel::addSixBarNodes(tgStructure& s)
 	/* Starting configuration where the rods are parallel to the principle directions
 	 * and the origin is at the center of the tensegrity
 	 */
-	
+
 	// Calculate the space between two parallel rods based on the rod length from Config
 	double rodSpace = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
 

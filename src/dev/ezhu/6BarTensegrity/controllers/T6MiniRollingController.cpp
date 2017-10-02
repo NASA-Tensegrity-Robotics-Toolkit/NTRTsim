@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -36,7 +36,7 @@
 // Utility Library
 #include "../utility.hpp"
 
-T6MiniRollingController::Config::Config (double gravity, const std::string& mode, int face_goal) : 
+T6MiniRollingController::Config::Config (double gravity, const std::string& mode, int face_goal) :
 m_gravity(gravity), m_mode(mode), m_face_goal(face_goal)
 {
 	assert(m_gravity >= 0);
@@ -116,7 +116,7 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 		}
 	}
 	else if (c_mode.compare("dr") == 0) {
-		std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", " 
+		std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", "
 			<< c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
 		controller_mode = 2;
 	}
@@ -150,9 +150,9 @@ void T6MiniRollingController::onSetup(sixBarMiniModel& subject)
 	}
 
 	// Retrive payload body from model
-	// payload = subject.getPayload();
-	// tgRod* payloadRod = payload[0];
-	// payloadBody = payloadRod->getPRigidBody();
+	payload = subject.getPayload();
+	tgRod* payloadRod = payload[0];
+	payloadBody = payloadRod->getPRigidBody();
 
 	// Retrieve normal vectors from model
 	normVects = subject.getNormVects();
@@ -357,7 +357,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 		worldTime += dt;
 	}
 	isOnGround = checkOnGround();
-	
+
 	if (robotReady && worldTime > 3) {
 		if (mode == 0) {
 			if (moveComplete && isOnGround) {
@@ -416,7 +416,7 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 			}
 		}
 		else if (mode == 1){
-			double retract_rest_length = 1;
+			double retract_rest_length = 0.001;
 			if (moveComplete1 && moveComplete2 && isOnGround) {
 				std::cout << "Robot ready, waiting for user input..." << std::endl;
 				actuatorNum1 = sequence[sequenceIdx];
@@ -521,30 +521,30 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 	// 	std::cout << marker0Pos << "," << marker1Pos << "," << marker2Pos << "," << marker3Pos << "," << payload_pos << std::endl;
 	// 	logCounter = 0;
 	// }
-	
+
 	// logCounter++;
 	// btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
 	// std::cout << payload_pos.y() << std::endl;
-	
-	btVector3 com;
-	com.setX(0);
-	com.setY(0);
-	com.setZ(0);
 
-	for (int i = 0; i < rodBodies.size(); i++) {
-		com += rodBodies[i]->getCenterOfMassPosition();
-	}
-	com = com/rodBodies.size();
-
-	std::cout << "Time: " << worldTime << ", x: " << com.x() << ", z: " << com.z() << std::endl;
+	// btVector3 com;
+	// com.setX(0);
+	// com.setY(0);
+	// com.setZ(0);
+	//
+	// for (int i = 0; i < rodBodies.size(); i++) {
+	// 	com += rodBodies[i]->getCenterOfMassPosition();
+	// }
+	// com = com/rodBodies.size();
+	//
+	// std::cout << "Time: " << worldTime << ", x: " << com.x() << ", z: " << com.z() << std::endl;
 
 	if (doLog && logCounter == 100) {
 		btVector3 payload_vel = payloadBody->getLinearVelocity();
 	    btVector3 payload_pos = payloadBody->getCenterOfMassPosition();
 	    percentChange = (actuators[cableNum]->getCurrentLength()-startLength)/startLength;
 	    currSurface = contactSurfaceDetection();
-	    data_out << worldTime << "," << cableNum << "," << currSurface << "," << percentChange << "," 
-	    	<< payload_vel.x() << "," << payload_vel.y() << "," << payload_vel.z() << "," 
+	    data_out << worldTime << "," << cableNum << "," << currSurface << "," << percentChange << ","
+	    	<< payload_vel.x() << "," << payload_vel.y() << "," << payload_vel.z() << ","
 	    	<< payload_pos.x() << "," << payload_pos.y() << "," << payload_pos.z() << std::endl;
 		logCounter = 0;
 	}
@@ -556,14 +556,14 @@ void T6MiniRollingController::onStep(sixBarMiniModel& subject, double dt)
 bool T6MiniRollingController::checkOnGround()
 {
 	bool onGround = false;
-	
-	btVector3 rodVel = rodBodies[2]->getLinearVelocity();
-	double rodSpeed = rodVel.norm();
-	if (abs(rodSpeed) < 0.001) onGround = true;
 
-	// btVector3 payloadVel = payloadBody->getLinearVelocity();
-	// double payloadSpeed = payloadVel.norm();
-	// if (abs(payloadSpeed) < 0.0001) onGround = true;
+	// btVector3 rodVel = rodBodies[2]->getLinearVelocity();
+	// double rodSpeed = rodVel.norm();
+	// if (abs(rodSpeed) < 0.001) onGround = true;
+
+	btVector3 payloadVel = payloadBody->getLinearVelocity();
+	double payloadSpeed = payloadVel.norm();
+	if (abs(payloadSpeed) < 0.001) onGround = true;
 
 	return onGround;
 }
@@ -635,7 +635,7 @@ int T6MiniRollingController::headingSurfaceDetection(btVector3& travelDirWorld, 
 	return goalSurface;
 }
 
-btVector3 T6MiniRollingController::getRobotGravity() 
+btVector3 T6MiniRollingController::getRobotGravity()
 {
 	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
@@ -648,7 +648,7 @@ btVector3 T6MiniRollingController::getRobotGravity()
 	return gravVectRobot;
 }
 
-btVector3 T6MiniRollingController::getRobotDir(btVector3 dirVectWorld) 
+btVector3 T6MiniRollingController::getRobotDir(btVector3 dirVectWorld)
 {
 	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
@@ -661,7 +661,7 @@ btVector3 T6MiniRollingController::getRobotDir(btVector3 dirVectWorld)
 	return dirVectRobot;
 }
 
-std::vector<int> T6MiniRollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 
+std::vector<int> T6MiniRollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode)
 {
 	// Check validity of start and end nodes
 	int nodes = adjMat.size();
@@ -781,7 +781,7 @@ bool T6MiniRollingController::stepToFace(double dt)
 	// Length for cables to retract to
 	//double controlLength = 0.2;
 	double controlLength = restLength * 0;
-	
+
 	int cableToActuate = -1;
 	// Get which cable to actuate from actuation policy table
 	if (path.size() > 1) {
@@ -795,7 +795,7 @@ bool T6MiniRollingController::stepToFace(double dt)
 		// Perform actuation from one closed face to another
 		if (isClosedFace(path[0])) {
 			if (cableToActuate >= 0) {
-				// path[0] is current face, path[1] is the adjacent open face, 
+				// path[0] is current face, path[1] is the adjacent open face,
 				// path[2] is the next closed face
 				// Check if the robot has reached the next closed face
 				if (currFace != path[2]) {
@@ -878,8 +878,8 @@ bool T6MiniRollingController::isAdjacentFace(int currFace, int desFace)
 	return isAdjacentFace;
 }
 
-bool T6MiniRollingController::setAllActuators(std::vector<tgBasicController*>& controllers, 
-										  std::vector<tgBasicActuator*>& actuators, 
+bool T6MiniRollingController::setAllActuators(std::vector<tgBasicController*>& controllers,
+										  std::vector<tgBasicActuator*>& actuators,
 										  double setLength, double dt)
 {
 	bool returnFin = true;

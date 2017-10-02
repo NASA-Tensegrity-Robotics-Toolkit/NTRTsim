@@ -69,53 +69,53 @@ int main(int argc, char** argv)
     // Import Ground
     // ---------------------------------------------------------------------------------
     // Set ground parameters
-    btVector3 orientation = btVector3(yaw, pitch, roll);
-    const double friction = 1;
-    const double restitution = 0.0;
-    btVector3 origin = btVector3(0.0, 0.0, 0.0);
-    const double margin = 0.05;
-    const double offset = 0.5;
-    const double scalingFactor = 1;
-    // const double scalingFactor = sf*1000;
-    const int interp = 0;
-    const bool twoLayer = false;
+    // btVector3 orientation = btVector3(yaw, pitch, roll);
+    // const double friction = 1;
+    // const double restitution = 0.0;
+    // btVector3 origin = btVector3(0.0, 0.0, 0.0);
+    // const double margin = 0.05;
+    // const double offset = 0.5;
+    // const double scalingFactor = 1;
+    // // const double scalingFactor = sf*1000;
+    // const int interp = 0;
+    // const bool twoLayer = false;
+    //
+    // // Configure ground characteristics
+    // const tgImportGround::Config groundConfig(orientation, friction, restitution,
+    //     origin, margin, offset, scalingFactor, interp, twoLayer);
+    //
+    // // Get filename from argv
+    // // std::string filename_in = argv[1];
+    // std::string filename_in = "./lunar_terrain_8_16_17.txt";
+    //
+    // // Check filename
+    // if (filename_in.find(".txt") == std::string::npos) {
+    //     std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
+    //
+    // //Create filestream
+    // std::fstream file_in;
+    //
+    // // Open filestream
+    // file_in.open(filename_in.c_str(), std::fstream::in);
+    //
+    // // Check if input file opened successfully
+    // if (!file_in.is_open()) {
+    //     std::cout << "Failed to open input file" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
+    // else {
+    //     std::cout << "Input file opened successfully" << std::endl;
+    // }
+    // tgImportGround* ground = new tgImportGround(groundConfig, file_in);
 
-    // Configure ground characteristics
-    const tgImportGround::Config groundConfig(orientation, friction, restitution,
-        origin, margin, offset, scalingFactor, interp, twoLayer);
-
-    // Get filename from argv
-    // std::string filename_in = argv[1];
-    std::string filename_in = "./lunar_terrain_8_16_17.txt";
-
-    // Check filename
-    if (filename_in.find(".txt") == std::string::npos) {
-        std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    //Create filestream 
-    std::fstream file_in; 
-
-    // Open filestream
-    file_in.open(filename_in.c_str(), std::fstream::in);
-
-    // Check if input file opened successfully
-    if (!file_in.is_open()) {
-        std::cout << "Failed to open input file" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    else {
-        std::cout << "Input file opened successfully" << std::endl;
-    }
-    tgImportGround* ground = new tgImportGround(groundConfig, file_in);
-    
     // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
-    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // tgBoxGround* ground = new tgBoxGround(groundConfig);
-    
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
+
     // ---------------------------------------------------------------------------------
     // Parse input arguments
     // ---------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
     else if (argc == 4) {
         // Initial yaw
         psi = atoi(argv[1]);
-        // Initial pitch 
+        // Initial pitch
         theta = atoi(argv[2]);
         // Initial roll
         phi = atoi(argv[3]);
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
     else if (argc == 5) {
         // Initial yaw
         psi = atoi(argv[1]);
-        // Initial pitch 
+        // Initial pitch
         theta = atoi(argv[2]);
         // Initial roll
         phi = atoi(argv[3]);
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
     double gravity = 1.62*sf;
     const tgWorld::Config config(gravity); // gravity, dm/sec^2
     tgWorld world(config, ground);
-  
+
     // create the view
     const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
@@ -199,19 +199,19 @@ int main(int argc, char** argv)
     // Configure the controlller
     // const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize, log_name);
-    // const T6RollingController::Config controllerConfig(gravity, "thrust", initVel, thrustDist, log_name);
-    const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(100,0,-100), log_name);
+    const T6RollingController::Config controllerConfig(gravity, "thrust", initVel, thrustDist, log_name);
+    // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(100,0,-100), log_name);
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
     T6RollingController* const rollingController = new T6RollingController(controllerConfig);
-    
+
     // Attach controller to the model
     myModel->attach(rollingController);
 
     // Add the model to the world
     simulation.addModel(myModel);
-    
+
     // Run the simulation
     simulation.run();
 

@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -96,7 +96,7 @@ public:
 	virtual ~T6MiniRollingController();
 
 	/**
-	 * Select controller mode based on configuration. Define the normal vectors for 
+	 * Select controller mode based on configuration. Define the normal vectors for
 	 * all icosahedron faces as well as the adjacency matrix.
 	 * @param[in] subject - the model that the controller attaches to
 	 */
@@ -149,7 +149,7 @@ public:
 	 * @param[in] endNode - The destination node
 	 * @return A vector containing the sequence of steps to get from the start node to end node
 	 */
-	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat, 
+	std::vector<int> findPath(std::vector< std::vector<int> >& adjMat,
 							  int startNode, int endNode);
 
 	/**
@@ -183,8 +183,8 @@ public:
 	 * @param[in] dt - Time step
 	 * @return A boolean indicating whether or not the action has completed
 	 */
-	bool setAllActuators(std::vector<tgBasicController*>& controllers, 
-						 std::vector<tgBasicActuator*>& actuators, 
+	bool setAllActuators(std::vector<tgBasicController*>& controllers,
+						 std::vector<tgBasicActuator*>& actuators,
 						 double setLength, double dt);
 
 	/**
@@ -273,7 +273,7 @@ private:
 
 	// Vector to hold controllers for the cables
 	std::vector<tgBasicController*> m_controllers;
-	
+
 	// Rest length and start length of cables
 	double restLength;
 	double startLength;
@@ -346,7 +346,7 @@ private:
 	int currentFace;
 	double percentChange = 0;
 
-	int mode = 1; // 0: nonsequential 1: simultaneous
+	int mode = 0; // 0: nonsequential 1: simultaneous
 };
 
 #endif
