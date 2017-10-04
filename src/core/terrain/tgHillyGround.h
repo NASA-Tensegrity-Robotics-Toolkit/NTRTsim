@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -110,7 +110,7 @@ class tgHillyGround : public tgBulletGround
         virtual ~tgHillyGround();
 
         /**
-         * Setup and return a return a rigid body based on the collision 
+         * Setup and return a return a rigid body based on the collision
          * object
          */
         virtual btRigidBody* getGroundRigidBody() const;
@@ -120,18 +120,18 @@ class tgHillyGround : public tgBulletGround
          */
         btCollisionShape* hillyCollisionShape();
 
-    private:  
+    private:
         /** Store the configuration data for use later */
         Config m_config;
 
-        /** Pre-condition: Quantity of triangles and vertices must each be greater than zero 
-         *  Post-condition: Returns a mesh, as configured by the input parameters, 
+        /** Pre-condition: Quantity of triangles and vertices must each be greater than zero
+         *  Post-condition: Returns a mesh, as configured by the input parameters,
          *                  to be used as a template for a btBvhTriangleMeshShape
          */
         btTriangleIndexVertexArray* createMesh(std::size_t triangleCount, int indices[], std::size_t vertexCount, btVector3 vertices[]);
 
         /** Pre-condition: Given mesh is a valig btTriangleIndexVertexArray with all values initialized
-         *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured 
+         *  Post-condition: Returns a btBvhTriangleMeshShape in the shape of the hills as configured
          */
         btCollisionShape *createShape(btTriangleIndexVertexArray * pMesh);
 
@@ -144,7 +144,7 @@ class tgHillyGround : public tgBulletGround
          * @param[out] A flattened array of indices in the mesh
          */
         void setIndices(int indices[]);
-        
+
         // Store this so we can delete it later
         btTriangleIndexVertexArray* m_pMesh;
         btVector3 * m_vertices;

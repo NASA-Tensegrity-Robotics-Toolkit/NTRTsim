@@ -19,17 +19,17 @@ link_libraries(core
 	             Adapters
 	             TensegrityModel)
 
-#add_executable(App6Bar
-#    controllers/T6RollingController.cpp
-#    models/sixBarModel.cpp
-#    App6Bar.cpp)
+add_executable(App6Bar
+    controllers/T6RollingController.cpp
+    models/sixBarModel.cpp
+    App6Bar.cpp)
 
 #add_executable(AppUphillRolling
 #    controllers/T6RollingControllerPrism.cpp
 #    models/PrismModel_mini.cpp
 #    AppPrismModel.cpp)
 
-add_executable(App6Mini
-    controllers/T6MiniRollingController.cpp
-    models/sixBarMiniModel.cpp
-    App6BarMini.cpp)
+#add_executable(App6Mini
+#    controllers/T6MiniRollingController.cpp
+#    models/sixBarMiniModel.cpp
+#    App6BarMini.cpp)

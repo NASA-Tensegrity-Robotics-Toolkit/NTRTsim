@@ -126,17 +126,16 @@ namespace
         true,
    		};
 }
-<<<<<<< HEAD
 
-sixBarModel::sixBarModel(int yaw, int pitch, int roll) : tgModel()
-=======
-
-sixBarModel::sixBarModel(float yaw, float pitch, float roll) : tgModel()
->>>>>>> 954b7c74d8ab39f6d2596b3df7086c598f5b0ce3
+sixBarModel::sixBarModel(float yaw, float pitch, float roll, double x, double y, double z, bool pos_init_uc) : tgModel()
 {
 	yaw_init = double(yaw);
 	pitch_init = double(pitch);
 	roll_init = double(roll);
+  x_pos_init = x;
+  y_pos_init = y;
+  z_pos_init = z;
+  init_uc = pos_init_uc;
 }
 
 sixBarModel::sixBarModel() : tgModel()
@@ -163,7 +162,7 @@ void sixBarModel::addPayload(tgStructure& s)
 
 void sixBarModel::setup(tgWorld& world)
 {
-	srand(time(NULL));
+	// srand(time(NULL));
 
 	// Calculate the space between two parallel rods based on the rod length from Config
 	rodDist = (-config.rodLength + sqrt(pow(config.rodLength,2)+4*pow(config.rodLength,2)))/2;
@@ -292,29 +291,21 @@ void sixBarModel::setup(tgWorld& world)
 
 	// Move the structure
 	rotateToFace(s, 2);
-	// rotateYaw(s, yaw_init*M_PI/180);
-	// rotatePitch(s, pitch_init*M_PI/180);
-	// rotateRoll(s, roll_init*M_PI/180);
-	// s.move(btVector3(0, 7, -0));
 
-	yaw_init = rand()*(1.0/RAND_MAX)*2*M_PI;
-	x_pos_init = generateGaussianNoise(0,0.5*10);
-	y_pos_init = 0.5*10;
-	z_pos_init = generateGaussianNoise(0,0.5*10);
-	rotateYaw(s, yaw_init);
+	// yaw_init = rand()*(1.0/RAND_MAX)*2*M_PI;
+  if (init_uc) {
+  	x_pos_init = x_pos_init + generateGaussianNoise(0,0.5*10);
+  	z_pos_init = z_pos_init + generateGaussianNoise(0,0.5*10);
+  }
+	rotateYaw(s, yaw_init*M_PI/180.0);
+  rotatePitch(s, pitch_init*M_PI/180.0);
+	rotateRoll(s, roll_init*M_PI/180.0);
 	s.move(btVector3(x_pos_init, y_pos_init, z_pos_init));
 
-	std::cout << "Initial X: " << x_pos_init << std::endl;
-	std::cout << "Initial Y: " << y_pos_init << std::endl;
-	std::cout << "Initial Z: " << z_pos_init << std::endl;
-	std::cout << "Initial yaw: " << yaw_init*180/M_PI << std::endl;
-	//s.move(btVector3(100, 3420,-100));
-	rotateYaw(s, yaw_init*M_PI/180);
-	rotatePitch(s, pitch_init*M_PI/180);
-	rotateRoll(s, roll_init*M_PI/180);
-	s.move(btVector3(0, 7, -0));
-	// s.move(btVector3(10, -1440,-10));
-
+	// std::cout << "Initial X: " << x_pos_init << std::endl;
+	// std::cout << "Initial Y: " << y_pos_init << std::endl;
+	// std::cout << "Initial Z: " << z_pos_init << std::endl;
+	// std::cout << "Initial yaw: " << yaw_init << std::endl;
 
 	// Create the build spec that uses tags to turn the structure into a real model
 	tgBuildSpec spec;

@@ -32,6 +32,7 @@
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgImportGround.h"
+#include "core/terrain/tgHillyGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -64,6 +65,8 @@ int main(int argc, char** argv)
     const double roll = 0.0;
 
     double sf = 10;
+
+    srand(time(NULL));
 
     // ---------------------------------------------------------------------------------
     // Import Ground
@@ -113,8 +116,12 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    const tgHillyGround::Config groundConfig(btVector3(yaw,pitch,roll),1,0,btVector3(1000.0, 1.5, 1000.0),
+        btVector3(0.0, 0.0, 0.0),100,100,0.5,20.0,10.0,0.5);
+    tgHillyGround* ground = new tgHillyGround(groundConfig);
 
     // ---------------------------------------------------------------------------------
     // Parse input arguments
@@ -130,29 +137,17 @@ int main(int argc, char** argv)
     }
     else if (argc == 4) {
         // Initial yaw
-<<<<<<< HEAD
-        psi = atoi(argv[1]);
-        // Initial pitch
-        theta = atoi(argv[2]);
-=======
         psi = atof(argv[1]);
-        // Initial pitch 
+        // Initial pitch
         theta = atof(argv[2]);
->>>>>>> 954b7c74d8ab39f6d2596b3df7086c598f5b0ce3
         // Initial roll
         phi = atof(argv[3]);
     }
     else if (argc == 5) {
         // Initial yaw
-<<<<<<< HEAD
-        psi = atoi(argv[1]);
-        // Initial pitch
-        theta = atoi(argv[2]);
-=======
         psi = atof(argv[1]);
-        // Initial pitch 
+        // Initial pitch
         theta = atof(argv[2]);
->>>>>>> 954b7c74d8ab39f6d2596b3df7086c598f5b0ce3
         // Initial roll
         phi = atof(argv[3]);
         // File to write to
@@ -163,7 +158,10 @@ int main(int argc, char** argv)
         theta = 0;
         phi = 0;
     }
-    std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
+
+    // Random initial yaw
+    psi = rand()*(1.0/RAND_MAX)*360;
+
     if (!log_name.empty()) {
         std::cout << "Writing to file: " << log_name << std::endl;
     }
@@ -188,9 +186,17 @@ int main(int argc, char** argv)
     // Use yaml model builder
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
+    // Define initial position
+    double x_init = -3.0*sf;
+    double y_init = 1.0*sf;
+    double z_init = 1.0*sf;
+    bool init_uc = false;
+
+    std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
+    std::cout << "Initializing model with x: " << x_init << ", y: " << y_init << ", and z: " << z_init << std::endl;
     // Use tgCreator
     // sixBarModel* const myModel = new sixBarModel();
-    sixBarModel* const myModel = new sixBarModel(psi,theta,phi);
+    sixBarModel* const myModel = new sixBarModel(psi,theta,phi,x_init,y_init,z_init,init_uc);
 
     // Define path for controller
     // int *pathPtr;
@@ -198,11 +204,16 @@ int main(int argc, char** argv)
     // int pathSize = sizeof(path)/sizeof(int);
     // pathPtr = path;
 
-    // Define thrust magnitude and period
+    // Define thrust magnitude and period, assume 45 deg launch angle
+    double launch_dir = rand()*(1.0/RAND_MAX)*2*PI;
+    double vert_vel_mag = 5*sf;
+    double hor_vel_mag = 5*sf;
+
+    double initVel_x = hor_vel_mag*cos(launch_dir);
+    double initVel_y = vert_vel_mag;
+    double initVel_z = hor_vel_mag*sin(launch_dir);
+
     btVector3 initVel;
-    double initVel_x = 0*sf;
-    double initVel_y = 2*sf;
-    double initVel_z = 2*sf;
     initVel.setX(initVel_x);
     initVel.setY(initVel_y);
     initVel.setZ(initVel_z);

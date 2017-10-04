@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -36,7 +36,7 @@
 // Utility Library
 #include "../utility.hpp"
 
-T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name) : 
+T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name) :
 m_gravity(gravity), m_mode(mode), m_face_goal(face_goal), m_log_name(log_name)
 {
 	assert(m_gravity >= 0);
@@ -120,7 +120,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		}
 	}
 	else if (c_mode.compare("dr") == 0) {
-		std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", " 
+		std::cout << "onSetup: Dead reckoning goal: [" << c_dr_goal.x() << ", "
 			<< c_dr_goal.y() << ", " << c_dr_goal.z() << "]" << std::endl;
 		controller_mode = 2;
 	}
@@ -134,7 +134,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		controller_mode = 3;
 	}
 	else if (c_mode.compare("thrust") == 0) {
-		std::cout << "onSetup: Initial velocity: [" << c_initVel.x() << ", " 
+		std::cout << "onSetup: Initial velocity: [" << c_initVel.x() << ", "
 			<< c_initVel.y() << ", " << c_initVel.z() << "]" << std::endl;
 		std::cout << "onSetup: Thrust distance: " << c_thrustDist << std::endl;
 		controller_mode = 4;
@@ -381,7 +381,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 	else {
 		worldTime += dt;
 	}
-	
+
 	isOnGround = checkOnGround();
 
 	if (robotReady == true) {
@@ -525,7 +525,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				// std::cout << thrustMag << std::endl;
 				// std::cout << thrustPeriod << std::endl;
-				double thrust_start = 5.0;
+				double thrust_start = 10.0;
 				double thrust_end = thrust_start + thrustPeriod;
 
 				if (worldTime > thrust_start && worldTime <= thrust_end) {
@@ -536,7 +536,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					thrusterOn = false;
 					payloadBody->applyCentralForce(btVector3(0,0,0));
 				}
-			 
+
 				if (CoM_vel.norm() < 1.0 && worldTime > thrust_end) {
 					std::cout << "Simulation complete, exiting..." << std::endl;
 					exit(EXIT_SUCCESS);
@@ -595,8 +595,8 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				if (doLog && !thrusterOn && worldTime > thrust_end) {
 					// Open filestream, record line of data, then close filestream
 					data_out.open(filename_data.c_str(), std::fstream::app);
-				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << "," 
-				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," 
+				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
 				    		<< isOnGround << "," << contactCounter << std::endl;
 		    		data_out.close();
 				}
@@ -609,7 +609,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 bool T6RollingController::checkOnGround()
 {
 	bool onGround = false;
-	
+
 	// btVector3 rodVel = rodBodies[2]->getLinearVelocity();
 	// double rodSpeed = rodVel.norm();
 	// if (abs(rodSpeed) < 0.001) onGround = true;
@@ -688,7 +688,7 @@ int T6RollingController::headingSurfaceDetection(btVector3& travelDirWorld, int 
 	return goalSurface;
 }
 
-btVector3 T6RollingController::getRobotGravity() 
+btVector3 T6RollingController::getRobotGravity()
 {
 	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
@@ -701,7 +701,7 @@ btVector3 T6RollingController::getRobotGravity()
 	return gravVectRobot;
 }
 
-btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld) 
+btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld)
 {
 	btTransform worldTrans = rodBodies[2]->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
@@ -714,7 +714,7 @@ btVector3 T6RollingController::getRobotDir(btVector3 dirVectWorld)
 	return dirVectRobot;
 }
 
-btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld, btRigidBody* body) 
+btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld, btRigidBody* body)
 {
 	btTransform worldTrans = body->getWorldTransform();
 	btMatrix3x3 robotToWorld = worldTrans.getBasis();
@@ -732,7 +732,7 @@ btVector3 T6RollingController::getRobotForce(btVector3 forceVectWorld, btRigidBo
 	return forceVectRobot;
 }
 
-std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode) 
+std::vector<int> T6RollingController::findPath(std::vector< std::vector<int> >& adjMat, int startNode, int endNode)
 {
 	// Check validity of start and end nodes
 	int nodes = adjMat.size();
@@ -852,7 +852,7 @@ bool T6RollingController::stepToFace(double dt)
 	// Length for cables to retract to
 	//double controlLength = 0.2;
 	double controlLength = restLength * 0;
-	
+
 	int cableToActuate = -1;
 	// Get which cable to actuate from actuation policy table
 	if (path.size() > 1) {
@@ -867,7 +867,7 @@ bool T6RollingController::stepToFace(double dt)
 		// Perform actuation from one closed face to another
 		if (isClosedFace(path[0])) {
 			if (cableToActuate >= 0) {
-				// path[0] is current face, path[1] is the adjacent open face, 
+				// path[0] is current face, path[1] is the adjacent open face,
 				// path[2] is the next closed face
 				// Check if the robot has reached the next closed face
 				if (currFace != path[2]) {
@@ -951,8 +951,8 @@ bool T6RollingController::isAdjacentFace(int currFace, int desFace)
 	return isAdjacentFace;
 }
 
-bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& controllers, 
-										  std::vector<tgBasicActuator*>& actuators, 
+bool T6RollingController::setAllActuators(std::vector<tgBasicController*>& controllers,
+										  std::vector<tgBasicActuator*>& actuators,
 										  double setLength, double dt)
 {
 	bool returnFin = true;
@@ -974,7 +974,7 @@ btVector3 T6RollingController::getThrustMag(btVector3 initVel, double thrustDist
 {
 	btVector3 thrust_dir = thrustDist*initVel.normalized();
 	btVector3 thrust_mag;
-	
+
 	if (initVel.x() == 0) {
 		thrust_mag.setX(0);
 	}

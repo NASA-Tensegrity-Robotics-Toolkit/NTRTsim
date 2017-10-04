@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -59,123 +59,123 @@ class tgWorld;
  * uses the new (to v1.1) ability to define pretension in a
  * tgBasicActuator's constructor
  */
-class sixBarModel : public tgSubject<sixBarModel>, public tgModel 
+class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 {
 	public:
-	 	
+
 	 	/**
 	     * The only constructor. Configuration parameters are within the
-	     * .cpp file in this case, not passed in. 
+	     * .cpp file in this case, not passed in.
 	     */
 		sixBarModel();
-	    sixBarModel(float yaw, float pitch, float roll);
-	    
-	    /**
-	     * Destructor. Deletes controllers, if any were added during setup.
-	     * Teardown handles everything else.
-	     */
-	    virtual ~sixBarModel();
+    sixBarModel(float yaw, float pitch, float roll, double x, double y, double z, bool pos_init_uc);
 
-	    /**
-	     * Create the model. Place the rods and strings into the world
-	     * that is passed into the simulation. This is triggered
-	     * automatically when the model is added to the simulation, when
-	     * tgModel::setup(world) is called (if this model is a child),
-	     * and when reset is called. Also notifies controllers of setup.
-	     * @param[in] world - the world we're building into
-	     */
-	    virtual void setup(tgWorld& world);
-	    
-	    /**
-	     * Undoes setup. Deletes child models. Called automatically on
-	     * reset and end of simulation. Notifies controllers of teardown
-	     */
-	    virtual void teardown();
-	    
-	    /**
-	     * Step the model, its children. Notifies controllers of step.
-	     * @param[in] dt, the timestep. Must be positive.
-	     */
-	    virtual void step(double dt);
-	    
-	    /**
-	     * Receives a tgModelVisitor and dispatches itself into the
-	     * visitor's "render" function. This model will go to the default
-	     * tgModel function, which does nothing.
-	     * @param[in] r - a tgModelVisitor which will pass this model back
-	     * to itself 
-	     */
-	    virtual void onVisit(tgModelVisitor& r);
+    /**
+     * Destructor. Deletes controllers, if any were added during setup.
+     * Teardown handles everything else.
+     */
+    virtual ~sixBarModel();
 
-	    /**
-	     * Return a vector of all muscles for the controllers to work with.
-	     * @return A vector of all of the muscles
-	     */
-	    const std::vector<tgBasicActuator*>& getAllActuators() const;
+    /**
+     * Create the model. Place the rods and strings into the world
+     * that is passed into the simulation. This is triggered
+     * automatically when the model is added to the simulation, when
+     * tgModel::setup(world) is called (if this model is a child),
+     * and when reset is called. Also notifies controllers of setup.
+     * @param[in] world - the world we're building into
+     */
+    virtual void setup(tgWorld& world);
 
-	    /**
-	     * Return a vector of all rod bodies for the controllers to work with.
-	     * @return A vector of all of the rod rigid bodies
-	     */
-	    const std::vector<tgRod*>& getAllRods() const;
+    /**
+     * Undoes setup. Deletes child models. Called automatically on
+     * reset and end of simulation. Notifies controllers of teardown
+     */
+    virtual void teardown();
 
-	    /**
-	     * Return a vector of the payload body for the controllers to work with.
-	     * @return A vector of the payload rigid body
-	     */
-	    const std::vector<tgRod*>& getPayload() const;
+    /**
+     * Step the model, its children. Notifies controllers of step.
+     * @param[in] dt, the timestep. Must be positive.
+     */
+    virtual void step(double dt);
 
-	    /**
-	     * Return a vector of all normal vectors for the controllers to work with.
-	     * @return A vector of all of the normal vectors
-	     */
-	    const std::vector<btVector3>& getNormVects() const;
+    /**
+     * Receives a tgModelVisitor and dispatches itself into the
+     * visitor's "render" function. This model will go to the default
+     * tgModel function, which does nothing.
+     * @param[in] r - a tgModelVisitor which will pass this model back
+     * to itself
+     */
+    virtual void onVisit(tgModelVisitor& r);
 
-	    /**
-	     * Return a vector of all abstract markers for the controllers to work with.
-	     * @return A vector of all of the abstract markers
-	     */
-	    const std::vector<abstractMarker>& getAllMarkers() const;
+    /**
+     * Return a vector of all muscles for the controllers to work with.
+     * @return A vector of all of the muscles
+     */
+    const std::vector<tgBasicActuator*>& getAllActuators() const;
 
-	    const double getRobotMass() const;
+    /**
+     * Return a vector of all rod bodies for the controllers to work with.
+     * @return A vector of all of the rod rigid bodies
+     */
+    const std::vector<tgRod*>& getAllRods() const;
 
-	    const double getScalingFactor() const;
+    /**
+     * Return a vector of the payload body for the controllers to work with.
+     * @return A vector of the payload rigid body
+     */
+    const std::vector<tgRod*>& getPayload() const;
 
-	    /**
-	     * A function called during setup that rotates the structure
-	     * to a face
-	     * @param[in] s A tgStructure that we're building into
-	     * @param[in] face The face to rotate to
-	     */
-	    void rotateToFace(tgStructure& s, int face);
+    /**
+     * Return a vector of all normal vectors for the controllers to work with.
+     * @return A vector of all of the normal vectors
+     */
+    const std::vector<btVector3>& getNormVects() const;
 
-	    void rotateYaw(tgStructure& s, double psi);
+    /**
+     * Return a vector of all abstract markers for the controllers to work with.
+     * @return A vector of all of the abstract markers
+     */
+    const std::vector<abstractMarker>& getAllMarkers() const;
 
-	    void rotatePitch(tgStructure& s, double theta);
+    const double getRobotMass() const;
 
-	    void rotateRoll(tgStructure& s, double phi);
+    const double getScalingFactor() const;
 
-	    double generateGaussianNoise(double mu, double sigma);
+    /**
+     * A function called during setup that rotates the structure
+     * to a face
+     * @param[in] s A tgStructure that we're building into
+     * @param[in] face The face to rotate to
+     */
+    void rotateToFace(tgStructure& s, int face);
 
-	    std::vector<double> getInitialConds();
+    void rotateYaw(tgStructure& s, double psi);
 
-	    double rodDist;
+    void rotatePitch(tgStructure& s, double theta);
 
-	    // Nodes at the end of each of the rods
-	    btVector3 node0;
-	    btVector3 node1;
-	    btVector3 node2;
-	    btVector3 node3;
-	    btVector3 node4;
-	    btVector3 node5;
-	    btVector3 node6;
-	    btVector3 node7;
-	    btVector3 node8;
-	    btVector3 node9;
-	    btVector3 node10;
-	    btVector3 node11;
+    void rotateRoll(tgStructure& s, double phi);
 
-	    // Edge vectors of all closed triangles
+    double generateGaussianNoise(double mu, double sigma);
+
+    std::vector<double> getInitialConds();
+
+    double rodDist;
+
+    // Nodes at the end of each of the rods
+    btVector3 node0;
+    btVector3 node1;
+    btVector3 node2;
+    btVector3 node3;
+    btVector3 node4;
+    btVector3 node5;
+    btVector3 node6;
+    btVector3 node7;
+    btVector3 node8;
+    btVector3 node9;
+    btVector3 node10;
+    btVector3 node11;
+
+    // Edge vectors of all closed triangles
 		btVector3 face0Edge0;
 		btVector3 face0Edge1;
 		btVector3 face0Edge2;
@@ -212,7 +212,7 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 		/**
 	     * A function called during setup that determines the positions of
 	     * the nodes based on construction parameters. This function uses the
-	     * rod length parameter in the Config struct in sixBarModel.cpp to 
+	     * rod length parameter in the Config struct in sixBarModel.cpp to
 	     * determine the size of the tensegrity
 	     * @param[in] s: A tgStructure that we're building into
 	     */
@@ -308,6 +308,7 @@ class sixBarModel : public tgSubject<sixBarModel>, public tgModel
 		double x_pos_init = 0;
 		double y_pos_init = 0;
 		double z_pos_init = 0;
+    bool init_uc = false;
 };
 
 #endif
