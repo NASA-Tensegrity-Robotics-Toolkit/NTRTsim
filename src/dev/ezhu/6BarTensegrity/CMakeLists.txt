@@ -1,6 +1,6 @@
 project(6BarTensegrity)
 
-set(BOOST_HOME_DIR ../../../../env/build/boost/boost)
+set(BOOST_HOME_DIR ../../../../env/build/boost)
 
 include_directories(${BOOST_HOME_DIR})
 link_directories(${LIB_DIR})

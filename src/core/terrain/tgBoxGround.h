@@ -2,7 +2,7 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 /**
  * \dir core/terrain
  * @brief The terrain library gives terrain options for the world.
- * 
+ *
  * Allows for a variety of terrain. As of version 1.0.0, a box ground
  * which can be rotated into a slope is supported in tgBoxGround
  */
@@ -47,7 +47,7 @@ class btRigidBody;
 class tgBoxGround : public tgBulletGround
 {
 public:
-    
+
     struct Config
     {
     public:
@@ -60,35 +60,35 @@ public:
        * Euler angles are specified as yaw pitch and roll
        */
       btVector3 m_eulerAngles;
-      
+
       /**
-       * Friction value of the ground, must be between 0 to 1 
+       * Friction value of the ground, must be between 0 to 1
        */
       btScalar  m_friction;
-      
+
        /**
-       * Restitution coefficient of the ground, must be between 0 to 1 
+       * Restitution coefficient of the ground, must be between 0 to 1
        */
       btScalar  m_restitution;
-      
+
       /**
        * Size of the ground, must be between non-negitive
        */
       btVector3 m_size;
-      
+
       /**
        * Origin position of the ground
        */
       btVector3 m_origin;
     };
-    
+
     /**
      * Default construction that uses the default values of config
      * Sets up a collision object that is stored in the bulletGround
      * object
      */
     tgBoxGround();
-    
+
     /**
      * Allows a user to specify their own config
      */
@@ -96,14 +96,14 @@ public:
 
     /** Clean up the implementation. The base class holds nothing. */
     virtual ~tgBoxGround() { }
-    
+
     /**
-     * Setup and return a return a rigid body based on the collision 
+     * Setup and return a return a rigid body based on the collision
      * object
      */
     virtual btRigidBody* getGroundRigidBody() const;
 
-private:  
+private:
     /**
      * Store the configuration data for use later
      */

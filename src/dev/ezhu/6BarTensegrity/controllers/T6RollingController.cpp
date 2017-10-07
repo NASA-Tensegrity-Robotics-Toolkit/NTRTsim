@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <math.h>
 // Boost Matrix Library
-#include "assign/list_of.hpp"
+#include "boost/assign/list_of.hpp"
 // Utility Library
 #include "../utility.hpp"
 
@@ -371,6 +371,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	}
 
 	markers = subject.getAllMarkers();
+
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
@@ -512,13 +513,19 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				btVector3 CoM_pos;
 				btVector3 CoM_vel;
 
-				// for (int i = 0; i < rodBodies.size(); i++) {
-				// 	CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
-				// 	CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
-				// }
+				for (int i = 0; i < rodBodies.size(); i++) {
+					CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
+					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
+				}
 
-				CoM_pos = payloadBody->getCenterOfMassPosition();
-				CoM_vel = payloadBody->getLinearVelocity();
+				btVector3 velDiff = CoM_vel - lastVel;
+				std::cout << velDiff.x() << ',' << velDiff.y() << ',' << velDiff.z() << std::endl;
+
+				lastVel = CoM_vel;
+
+				// CoM_pos = payloadBody->getCenterOfMassPosition();
+				// CoM_vel = payloadBody->getLinearVelocity();
+
 
 				btVector3 thrustMag = getThrustMag(c_initVel, c_thrustDist);
 				double thrustPeriod = getThrustPeriod(c_initVel, thrustMag);

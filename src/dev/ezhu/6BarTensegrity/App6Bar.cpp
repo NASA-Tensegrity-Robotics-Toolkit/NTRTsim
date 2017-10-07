@@ -116,12 +116,15 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
-    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // tgBoxGround* ground = new tgBoxGround(groundConfig);
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),1,0,btVector3(1000.0, 1.5, 1000.0));
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgHillyGround::Config groundConfig(btVector3(yaw,pitch,roll),1,0,btVector3(1000.0, 1.5, 1000.0),
-        btVector3(0.0, 0.0, 0.0),100,100,0.5,20.0,10.0,0.5);
-    tgHillyGround* ground = new tgHillyGround(groundConfig);
+    // ---------------------------------------------------------------------------------
+    // Hilly ground
+    // ---------------------------------------------------------------------------------
+    // const tgHillyGround::Config groundConfig(btVector3(yaw,pitch,roll),1,0,btVector3(1000.0, 1.5, 1000.0),
+    //     btVector3(0.0, 0.0, 0.0),100,100,0.5,20.0,10.0,0.5);
+    // tgHillyGround* ground = new tgHillyGround(groundConfig);
 
     // ---------------------------------------------------------------------------------
     // Parse input arguments
@@ -204,11 +207,12 @@ int main(int argc, char** argv)
     // int pathSize = sizeof(path)/sizeof(int);
     // pathPtr = path;
 
-    // Define thrust magnitude and period, assume 45 deg launch angle
+    // Define thrust magnitude, thrust period, launch direction, and launch angle
     double launch_dir = rand()*(1.0/RAND_MAX)*2*PI;
-    double vert_vel_mag = 5*sf;
-    double hor_vel_mag = 5*sf;
-
+    double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*10)*sf;
+    double launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180;
+    double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;
+    double hor_vel_mag = vel_mag*cos(launch_ang);//5*sf;
     double initVel_x = hor_vel_mag*cos(launch_dir);
     double initVel_y = vert_vel_mag;
     double initVel_z = hor_vel_mag*sin(launch_dir);
