@@ -33,6 +33,7 @@
 #include <math.h>
 // Boost Matrix Library
 #include "boost/assign/list_of.hpp"
+
 // Utility Library
 #include "../utility.hpp"
 
@@ -101,6 +102,8 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
 	gravVectWorld.setZ(0.0);
+
+	cb.set_capacity(100);
 }
 
 T6RollingController::~T6RollingController()
@@ -337,23 +340,24 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	if (!c_log_name.empty()) {
 		doLog = true;
 		filename_data = c_log_name;
-		filename_param = c_log_name.replace(c_log_name.end()-3,c_log_name.end(),"txt");
-		param_out.open(filename_param.c_str());
-		if (!param_out.is_open()) {
-			std::cout << "Failed to open output file" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		else {
-			std::vector<double> initConds = subject.getInitialConds();
-			param_out << "X=" << initConds[0]/10 << std::endl;
-			param_out << "Y=" << initConds[1]/10 << std::endl;
-			param_out << "Z=" << initConds[2]/10 << std::endl;
-			param_out << "Vx=" << c_initVel[0]/10 << std::endl;
-			param_out << "Vy=" << c_initVel[1]/10 << std::endl;
-			param_out << "Vz=" << c_initVel[2]/10 << std::endl;
-			param_out << "yaw=" << initConds[3] << std::endl;
-			param_out.close();
-		}
+		// filename_param = c_log_name.replace(c_log_name.end()-3,c_log_name.end(),"txt");
+		// param_out.open(filename_param.c_str());
+		// if (!param_out.is_open()) {
+		// 	std::cout << "Failed to open output file" << std::endl;
+		// 	exit(EXIT_FAILURE);
+		// }
+		// else {
+		// 	std::cout << "Writing parameters to file" << std::endl;
+		// 	std::vector<double> initConds = subject.getInitialConds();
+		// 	param_out << "X=" << initConds[0]/10 << std::endl;
+		// 	param_out << "Y=" << initConds[1]/10 << std::endl;
+		// 	param_out << "Z=" << initConds[2]/10 << std::endl;
+		// 	param_out << "Vx=" << c_initVel[0]/10 << std::endl;
+		// 	param_out << "Vy=" << c_initVel[1]/10 << std::endl;
+		// 	param_out << "Vz=" << c_initVel[2]/10 << std::endl;
+		// 	param_out << "yaw=" << initConds[3] << std::endl;
+		// 	param_out.close();
+		// }
 		// Create filestream for data log and open it
 		data_out.open(filename_data.c_str(), std::fstream::app);
 		if (!data_out.is_open()) {
@@ -362,7 +366,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		}
 		else {
 			// Write first line of variable names then close filestream
-			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,onGround,contactCounter" << std::endl;
+			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,onGround,contactCounter,slopeX,slopeZ" << std::endl;
 			data_out.close();
 		}
 	}
@@ -518,11 +522,36 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
 				}
 
-				btVector3 velDiff = CoM_vel - lastVel;
-				std::cout << velDiff.x() << ',' << velDiff.y() << ',' << velDiff.z() << std::endl;
+				cb.push_back(CoM_vel);
 
-				lastVel = CoM_vel;
+				if (cb.full()){
+					btVector3 velDiff = CoM_vel-cb[0];
+					// if(velDiff.norm() > maxDiff) {
+					// 	maxDiff = velDiff.norm();
+					// }
+					// std::cout << maxDiff << std::endl;
+					if ((velDiff.norm() > 5.5) && !collision) {
+						collision = true;
+						impactPos.setValue(CoM_pos.x(),CoM_pos.y(),CoM_pos.z());
+						std::cout << impactPos.y() << std::endl;
+						contactCounter += 1;
+						// minPos = 1000;
+						// for (int i = 0; i < markers.size(); i++) {
+						// 	if (markers[i].getWorldPosition().y() < minPos) {
+						// 		minPos = markers[i].getWorldPosition().y();
+						// 		contactNode = i;
+						// 	}
+						// }
+						// std::cout << minPos << std::endl;
+					}
+					// else if (collision && (markers[contactNode].getWorldPosition().y() > minPos+0.01)) {
+					else if (collision && CoM_pos.y() > impactPos.y()) {
+						collision = false;
+						std::cout << CoM_pos.y() << std::endl;
+					}
+				}
 
+				// std::cout << contactCounter << std::endl;
 				// CoM_pos = payloadBody->getCenterOfMassPosition();
 				// CoM_vel = payloadBody->getLinearVelocity();
 
@@ -532,7 +561,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				// std::cout << thrustMag << std::endl;
 				// std::cout << thrustPeriod << std::endl;
-				double thrust_start = 10.0;
+				double thrust_start = 4.0;
 				double thrust_end = thrust_start + thrustPeriod;
 
 				if (worldTime > thrust_start && worldTime <= thrust_end) {
@@ -550,21 +579,21 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				}
 
 				// if (!isOnGround && worldTime > 6) {
-				if (worldTime > thrust_end) {
-					bool tmp = false;
-					for (int i = 0; i < markers.size(); i++) {
-						if (markers[i].getWorldPosition().y() <= 1.56) {
-							tmp = true;
-							break;
-							// contactNode = i;
-						}
-						// std::cout << i << std::endl;
-					}
-					isOnGround = tmp;
-					// if (CoM_pos.y() <= 5) {
-					// 	isOnGround = true;
-					// }
-				}
+				// if (worldTime > thrust_end) {
+				// 	bool tmp = false;
+				// 	for (int i = 0; i < markers.size(); i++) {
+				// 		if (markers[i].getWorldPosition().y() <= 1.56) {
+				// 			tmp = true;
+				// 			break;
+				// 			// contactNode = i;
+				// 		}
+				// 		// std::cout << i << std::endl;
+				// 	}
+				// 	isOnGround = tmp;
+				// 	// if (CoM_pos.y() <= 5) {
+				// 	// 	isOnGround = true;
+				// 	// }
+				// }
 				// Data logging ends when the same rod leaves the ground
 				// else if (worldTime > 6) {
 				// 	// std::cout << markers[contactNode].getWorldPosition().y() << std::endl;
@@ -585,12 +614,12 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				// 	// }
 				// }
 
-				if (isOnGround != lastFlag && worldTime > thrust_end) {
-					if (isOnGround) {
-						contactCounter += 1;
-					}
-					lastFlag = isOnGround;
-				}
+				// if (isOnGround != lastFlag && worldTime > thrust_end) {
+				// 	if (isOnGround) {
+				// 		contactCounter += 1;
+				// 	}
+				// 	lastFlag = isOnGround;
+				// }
 
 				// std::cout << isOnGround << std::endl;
 
@@ -599,12 +628,13 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				/***************************************************************************************/
 
 				// if (doLog && isOnGround) {
-				if (doLog && !thrusterOn && worldTime > thrust_end) {
+				// if (doLog && !thrusterOn && worldTime > thrust_end) {
+				if (doLog && !thrusterOn && worldTime > thrust_end && collision) {
 					// Open filestream, record line of data, then close filestream
 					data_out.open(filename_data.c_str(), std::fstream::app);
 				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
 				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-				    		<< isOnGround << "," << contactCounter << std::endl;
+				    		<< isOnGround << "," << contactCounter << ",0,0" << std::endl;
 		    		data_out.close();
 				}
 			}

@@ -163,7 +163,7 @@ int main(int argc, char** argv)
     }
 
     // Random initial yaw
-    psi = rand()*(1.0/RAND_MAX)*360;
+    psi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
 
     if (!log_name.empty()) {
         std::cout << "Writing to file: " << log_name << std::endl;
@@ -180,7 +180,8 @@ int main(int argc, char** argv)
     // create the view
     const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -208,15 +209,16 @@ int main(int argc, char** argv)
     // pathPtr = path;
 
     // Define thrust magnitude, thrust period, launch direction, and launch angle
-    double launch_dir = rand()*(1.0/RAND_MAX)*2*PI;
-    double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*10)*sf;
-    double launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180;
+    double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
+    double launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
     double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;
     double hor_vel_mag = vel_mag*cos(launch_ang);//5*sf;
     double initVel_x = hor_vel_mag*cos(launch_dir);
     double initVel_y = vert_vel_mag;
     double initVel_z = hor_vel_mag*sin(launch_dir);
 
+    std::cout << "launch dir: " << launch_dir*180/PI << ", launch angle: " << launch_ang*180/PI << ", velocity: " << vel_mag << std::endl;
     btVector3 initVel;
     initVel.setX(initVel_x);
     initVel.setY(initVel_y);
@@ -229,6 +231,30 @@ int main(int argc, char** argv)
     const T6RollingController::Config controllerConfig(gravity, "thrust", initVel, thrustDist, log_name);
     // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(100,0,-100), log_name);
 
+    if (!log_name.empty()) {
+  		std::string filename_param = log_name.replace(log_name.end()-3,log_name.end(),"txt");
+      std::ofstream param_out;
+      param_out.open(filename_param.c_str());
+  		if (!param_out.is_open()) {
+  			std::cout << "Failed to open output file" << std::endl;
+  			exit(EXIT_FAILURE);
+  		}
+  		else {
+  			std::cout << "Writing parameters to file" << std::endl;
+  			param_out << "X=" << x_init/sf << std::endl;
+  			param_out << "Y=" << y_init/sf << std::endl;
+  			param_out << "Z=" << z_init/sf << std::endl;
+  			param_out << "Vx=" << initVel_x/sf << std::endl;
+  			param_out << "Vy=" << initVel_y/sf << std::endl;
+  			param_out << "Vz=" << initVel_z/sf << std::endl;
+  			param_out << "yaw=" << psi*180.0/PI << std::endl;
+        param_out << "launch_dir=" << launch_dir*180.0/PI << std::endl;
+        param_out << "launch_ang=" << launch_ang*180.0/PI << std::endl;
+        param_out << "vel_mag=" << vel_mag/sf << std::endl;
+  			param_out.close();
+  		}
+    }
+
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
     T6RollingController* const rollingController = new T6RollingController(controllerConfig);
@@ -240,7 +266,7 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
 
     // Run the simulation
-    simulation.run();
+    simulation.run(5000000);
 
     // teardown is handled by delete
     return 0;

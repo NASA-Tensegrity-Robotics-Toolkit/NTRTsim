@@ -340,9 +340,9 @@ private:
 
 	// Initialize filestream and data
 	std::ofstream data_out;
-	std::ofstream param_out;
+	// std::ofstream param_out;
 	std::string filename_data;
-	std::string filename_param;
+	// std::string filename_param;
 	double worldTime = 0;
 	int actuatedCable;
 	int currentFace;
@@ -355,7 +355,11 @@ private:
 	int contactCounter = 0;
 	std::vector<bool> contactVec;
 	btVector3 lastVel = btVector3(0,0,0);
-	boost::circular_buffer<float> cb;
+	boost::circular_buffer<btVector3> cb;
+	float maxDiff = 0;
+	bool collision = false;
+	btVector3 impactPos;
+	float minPos = 1000;
 };
 
 #endif
