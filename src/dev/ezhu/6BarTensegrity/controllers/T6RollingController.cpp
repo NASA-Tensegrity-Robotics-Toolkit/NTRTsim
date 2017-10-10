@@ -548,6 +548,8 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					else if (collision && CoM_pos.y() > impactPos.y()) {
 						collision = false;
 						std::cout << CoM_pos.y() << std::endl;
+						std::cout << "Simulation complete, exiting..." << std::endl;
+						exit(EXIT_SUCCESS);
 					}
 				}
 
@@ -634,7 +636,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					data_out.open(filename_data.c_str(), std::fstream::app);
 				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
 				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-				    		<< isOnGround << "," << contactCounter << ",0,0" << std::endl;
+				    		<< isOnGround << "," << contactCounter << ",0.0,0.0" << std::endl;
 		    		data_out.close();
 				}
 			}

@@ -191,9 +191,9 @@ int main(int argc, char** argv)
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
     // Define initial position
-    double x_init = -3.0*sf;
-    double y_init = 1.0*sf;
-    double z_init = 1.0*sf;
+    double x_init = 0.0; //-3.0*sf;
+    double y_init = 0.7*sf;
+    double z_init = 0.0; //1.0*sf;
     bool init_uc = false;
 
     std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
@@ -209,7 +209,8 @@ int main(int argc, char** argv)
     // pathPtr = path;
 
     // Define thrust magnitude, thrust period, launch direction, and launch angle
-    double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    // double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    double launch_dir = 0.0;
     double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
     double launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
     double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;

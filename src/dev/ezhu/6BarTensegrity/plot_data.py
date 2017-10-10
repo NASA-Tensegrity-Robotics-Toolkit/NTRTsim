@@ -32,7 +32,7 @@ for row in file:
 	CoM_velZ.append(float(row["CoM_velZ"]))
 	onGround.append(int(row["onGround"]))
 	contactCounter.append(int(row["contactCounter"]))
-	
+
 data_size = len(SimTime)
 # print(data_size)
 
@@ -60,15 +60,15 @@ plt.subplot(313)
 plt.plot(SimTime,CoM_velZ)
 plt.ylabel("Z")
 
-contactStart = onGround.index(1)+1
-contactEnd = onGround[contactStart:].index(0)+contactStart+1
-
-plt.figure(3)
-plt.subplot(211)
-plt.plot(SimTime[contactStart:contactEnd],CoM_posY[contactStart:contactEnd])
-plt.ylabel("Y")
-plt.subplot(212)
-plt.plot(SimTime[contactStart:contactEnd],CoM_velY[contactStart:contactEnd])
-plt.ylabel("Vy")
+# contactStart = onGround.index(1)+1
+# contactEnd = onGround[contactStart:].index(0)+contactStart+1
+#
+# plt.figure(3)
+# plt.subplot(211)
+# plt.plot(SimTime[contactStart:contactEnd],CoM_posY[contactStart:contactEnd])
+# plt.ylabel("Y")
+# plt.subplot(212)
+# plt.plot(SimTime[contactStart:contactEnd],CoM_velY[contactStart:contactEnd])
+# plt.ylabel("Vy")
 
 plt.show()
