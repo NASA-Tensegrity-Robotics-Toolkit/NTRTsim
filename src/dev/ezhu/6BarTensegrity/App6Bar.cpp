@@ -66,8 +66,6 @@ int main(int argc, char** argv)
 
     double sf = 10;
 
-    srand(time(NULL));
-
     // ---------------------------------------------------------------------------------
     // Import Ground
     // ---------------------------------------------------------------------------------
@@ -116,7 +114,7 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),1,0,btVector3(1000.0, 1.5, 1000.0));
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),1,0,btVector3(100.0, 1.5, 100.0));
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // ---------------------------------------------------------------------------------
@@ -130,6 +128,7 @@ int main(int argc, char** argv)
     // Parse input arguments
     // ---------------------------------------------------------------------------------
     float psi, theta, phi;
+    int seed;
     std::string log_name;
 
     if (argc == 2) {
@@ -137,6 +136,13 @@ int main(int argc, char** argv)
         theta = 0;
         phi = 0;
         log_name = argv[1];
+    }
+    else if (argc == 3) {
+        psi = 0;
+        theta = 0;
+        phi = 0;
+        log_name = argv[1];
+        seed = atoi(argv[2]);
     }
     else if (argc == 4) {
         // Initial yaw
@@ -162,8 +168,12 @@ int main(int argc, char** argv)
         phi = 0;
     }
 
-    // Random initial yaw
+    srand(time(NULL)+seed);
+
+    // Random initial orientation
     psi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    theta = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    phi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
 
     if (!log_name.empty()) {
         std::cout << "Writing to file: " << log_name << std::endl;
@@ -192,7 +202,7 @@ int main(int argc, char** argv)
 
     // Define initial position
     double x_init = 0.0; //-3.0*sf;
-    double y_init = 0.7*sf;
+    double y_init = 2*sf; //0.7*sf;
     double z_init = 0.0; //1.0*sf;
     bool init_uc = false;
 
@@ -212,7 +222,7 @@ int main(int argc, char** argv)
     // double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
     double launch_dir = 0.0;
     double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
-    double launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
+    double launch_ang = -(25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
     double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;
     double hor_vel_mag = vel_mag*cos(launch_ang);//5*sf;
     double initVel_x = hor_vel_mag*cos(launch_dir);

@@ -40,10 +40,10 @@ num_pts=$[($max_angle-$min_angle)/$interval]
 # 	./App6Bar $yaw $pitch $roll $log_name
 # done
 
-for i in {0..5000}
+for i in {0..100000}
 do
 	log_name="./data/${i}_Response.csv"
-	./App6Bar $log_name
+	./App6Bar $log_name $i
 done
 
 zip -r data.zip ./data

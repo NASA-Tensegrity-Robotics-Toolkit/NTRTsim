@@ -37,6 +37,8 @@
 // Utility Library
 #include "../utility.hpp"
 
+#define PI 3.14159
+
 T6RollingController::Config::Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name) :
 m_gravity(gravity), m_mode(mode), m_face_goal(face_goal), m_log_name(log_name)
 {
@@ -513,15 +515,30 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 			}
 		case 4:
 			{
+				// Set initial velocity for rapid impact simulations
+				if (counter == 0) {
+					for (int i = 0; i < rodBodies.size(); i++) {
+						rodBodies[i]->setLinearVelocity(c_initVel);
+					}
+					payloadBody->setLinearVelocity(c_initVel);
+				}
 				// Thruster mode
 				btVector3 CoM_pos;
 				btVector3 CoM_vel;
+				btQuaternion q;
+
+				q = payloadBody->getOrientation();
+				double phi = atan2(2*(q[0]*q[1]+q[2]*q[3]),(1-2*(pow(q[1],2)+pow(q[2],2))));
+				double theta = asin(2*(q[0]*q[2]-q[3]*q[1]));
+				double psi = atan2(2*(q[0]*q[3]+q[1]*q[2]),(1-2*(pow(q[2],2)+pow(q[3],2))));
+				// std::cout << "phi: " << phi*180/PI << ", theta: " << theta*180/PI << ", psi: " << psi*180/PI << std::endl;
 
 				for (int i = 0; i < rodBodies.size(); i++) {
 					CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
 					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
 				}
 
+				// std::cout << CoM_vel.x() << std::endl;
 				cb.push_back(CoM_vel);
 
 				if (cb.full()){
@@ -535,29 +552,38 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 						impactPos.setValue(CoM_pos.x(),CoM_pos.y(),CoM_pos.z());
 						std::cout << impactPos.y() << std::endl;
 						contactCounter += 1;
-						// minPos = 1000;
-						// for (int i = 0; i < markers.size(); i++) {
-						// 	if (markers[i].getWorldPosition().y() < minPos) {
-						// 		minPos = markers[i].getWorldPosition().y();
-						// 		contactNode = i;
-						// 	}
-						// }
-						// std::cout << minPos << std::endl;
+						
+						if (doLog) {
+							data_out.open(filename_data.c_str(), std::fstream::app);
+						    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+						    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
+						    		<< isOnGround << "," << contactCounter << ",0.0,0.0," 
+						    		<< phi << "," << theta << "," << psi << std::endl;
+				    		data_out.close();
+						}
 					}
 					// else if (collision && (markers[contactNode].getWorldPosition().y() > minPos+0.01)) {
 					else if (collision && CoM_pos.y() > impactPos.y()) {
 						collision = false;
 						std::cout << CoM_pos.y() << std::endl;
+
+						if (doLog) {
+							data_out.open(filename_data.c_str(), std::fstream::app);
+						    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+						    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
+						    		<< isOnGround << "," << contactCounter << ",0.0,0.0,"
+						    		<< phi << "," << theta << "," << psi << std::endl;
+				    		data_out.close();
+						}
+
 						std::cout << "Simulation complete, exiting..." << std::endl;
 						exit(EXIT_SUCCESS);
 					}
 				}
 
-				// std::cout << contactCounter << std::endl;
-				// CoM_pos = payloadBody->getCenterOfMassPosition();
-				// CoM_vel = payloadBody->getLinearVelocity();
+				counter++;
 
-
+				/*
 				btVector3 thrustMag = getThrustMag(c_initVel, c_thrustDist);
 				double thrustPeriod = getThrustPeriod(c_initVel, thrustMag);
 
@@ -574,12 +600,14 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					thrusterOn = false;
 					payloadBody->applyCentralForce(btVector3(0,0,0));
 				}
+				
 
 				if (CoM_vel.norm() < 1.0 && worldTime > thrust_end) {
 					std::cout << "Simulation complete, exiting..." << std::endl;
 					exit(EXIT_SUCCESS);
 				}
-
+				*/
+				
 				// if (!isOnGround && worldTime > 6) {
 				// if (worldTime > thrust_end) {
 				// 	bool tmp = false;
@@ -625,20 +653,20 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				// std::cout << isOnGround << std::endl;
 
-				/***************************************************************************************/
+				/**************************************************************************************
 				// Data logging
 				/***************************************************************************************/
 
 				// if (doLog && isOnGround) {
 				// if (doLog && !thrusterOn && worldTime > thrust_end) {
-				if (doLog && !thrusterOn && worldTime > thrust_end && collision) {
-					// Open filestream, record line of data, then close filestream
-					data_out.open(filename_data.c_str(), std::fstream::app);
-				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-				    		<< isOnGround << "," << contactCounter << ",0.0,0.0" << std::endl;
-		    		data_out.close();
-				}
+				// if (doLog && !thrusterOn && worldTime > thrust_end && collision) {
+				// 	// Open filestream, record line of data, then close filestream
+				// 	data_out.open(filename_data.c_str(), std::fstream::app);
+				//     data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+				//     		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
+				//     		<< isOnGround << "," << contactCounter << ",0.0,0.0" << std::endl;
+		  //   		data_out.close();
+				// }
 			}
 		}
 	}

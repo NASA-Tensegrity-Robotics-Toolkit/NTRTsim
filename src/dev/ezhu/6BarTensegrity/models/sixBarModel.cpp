@@ -298,7 +298,7 @@ void sixBarModel::setup(tgWorld& world)
   	z_pos_init = z_pos_init + generateGaussianNoise(0,0.5*10);
   }
 	rotateYaw(s, yaw_init);
-  rotatePitch(s, pitch_init);
+  	rotatePitch(s, pitch_init);
 	rotateRoll(s, roll_init);
 	s.move(btVector3(x_pos_init, y_pos_init, z_pos_init));
 
