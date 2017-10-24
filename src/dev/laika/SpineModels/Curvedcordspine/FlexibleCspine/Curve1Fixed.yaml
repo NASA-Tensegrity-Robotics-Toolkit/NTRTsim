@@ -1,0 +1,32 @@
+# this structure is a c curved core
+
+nodes:
+  center: [0, 0, 0]
+  cright: [0,0,-2]
+  ccright: [-4,0,-3.5] 
+  bright: [-5, 0, -4]
+  tright: [-10, 0, -4]
+  cleft:  [0,0,2]  
+  ccleft: [-4,0,3.5]
+  bleft: [-5, 0, 4]
+  tleft: [-10, 0, 4]
+ 
+
+pair_groups:
+  rodFixed:
+    - [cleft, center]
+    - [ccleft, cleft]
+    - [bleft, ccleft]
+    - [cright, center]
+    - [ccright,cright]
+    - [bright, ccright]
+    - [tleft, bleft]
+    - [tright, bright]
+    
+# Density used to be 0.014
+builders:
+  rodFixed:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.5

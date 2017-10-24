@@ -1,0 +1,27 @@
+substructures:
+
+  C1/C2:
+    path: ../FlexibleCspine/Curve1.yaml
+    offset: [3,0, 0]
+    translation: [0,0,0]
+
+  C1:
+    rotation: 
+     axis: [1,0,0]
+     angle: 90
+  C2:
+    rotation: 
+     axis: [0,1,0]
+     angle: -180
+
+pair_groups:
+  rod:
+    - [C1.center, C2.center]
+       
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5    
+   

@@ -1,0 +1,54 @@
+# Units are currently in cm
+
+nodes:    # Look for frontlegs.png for a pictoral reference of each node in github folder
+  V1: [0, 0, 0]   
+  V2: [0, 1.5, -1]
+  V3: [0, 4, .25]
+  V4: [0, 18, -2]
+  V5: [0, 27, -10]
+  V6: [0, 31.5, -6.5]
+  V7: [0, 19.5, 2.75]
+  V8: [0, 4, 3]
+  V9: [0, 0, 1]   
+  V10: [1, 1.5, -1]
+  V11: [1, 4, .25]
+  V12: [1, 18, -2]
+  V13: [1, 27, -10]
+  V14: [1, 31.5, -6.5]
+  V15: [1, 19.5, 2.75]
+  V16: [1, 4, 3]
+
+
+pair_groups:
+  rod:
+    - [V1, V2]
+    - [V2, V3]
+    - [V3, V4]
+    - [V4, V5]
+    - [V5, V6]
+    - [V6, V7]
+    - [V7, V8]
+    - [V8, V1]
+    - [V1, V9]
+    - [V2, V10]
+    - [V3, V11]
+    - [V4, V12]
+    - [V5, V13]
+    - [V6, V14]
+    - [V7, V15]
+    - [V8, V16]
+    - [V9, V10]
+    - [V10, V11]
+    - [V11, V12]
+    - [V12, V13]
+    - [V13, V14]
+    - [V14, V15]
+    - [V15, V16] 
+    - [V16, V9]
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5

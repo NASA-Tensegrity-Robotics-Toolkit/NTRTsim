@@ -1,0 +1,229 @@
+# YAML file for the Laika w symmetrical Spine with kinematic actuators.
+# Used for the 2017 ULTRA Spine MEng student.
+
+# This spine has multiple substructures,
+# including the spine itself (t1-t6) and the supporting pieces.
+substructures:
+
+  t0:
+    path: ../wsymmetricrotateFixed.yaml
+    offset: [-6, 0 , 0]
+    translation: [0, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+  t1:
+    path: ../wextended.yaml
+    offset: [-6, 0 , 0]
+    translation: [-6, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+
+  t2:
+    path: ../wsymmetricrotate.yaml
+    offset: [-6, 0 , 0]
+    translation: [-12, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+  t3:
+    path: ../wextended.yaml
+    offset: [-6, 0 , 0]
+    translation: [-18, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+    
+  t4:
+    path: ../wsymmetricrotate.yaml
+    offset: [-6, 0 , 0]
+    translation: [-24, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+  t5:
+    path: ../wextended.yaml
+    offset: [-6, 0 , 0]
+    translation: [-30, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+    
+  t6:
+    path: ../wsymmetricrotate.yaml
+    offset: [-6, 0 , 0]
+    translation: [-36, 15, 0]
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+
+#Horizontal Right cable connecting nodes at 0 degree counterclockwise in the XY plane    
+#Horizontal Right Upper cable connecting nodes at 45 degree counterclockwise in the XY plane 
+# Vertical Upper connection nodes at 90 degree counterclockwise in the XY plane  
+#Horizontal Left Upper cable connecting nodes at 135 degree counterclockwise in the XY plane
+# Horizontal Left connection nodes at 180 degree counterclockwise in the XY plane 
+#Horizontal Left lower cable connecting nodes at 225 degree counterclockwise in the XY plane
+# Vertical lower connection nodes at 270 degree counterclockwise in the XY plane
+#Horizontal Right Lower cable connecting nodes at 315 degree counterclockwise in the XY plane
+#Torque Cable Right
+#Torque Cable Left
+ 
+bond_groups:
+
+  HR:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [LUFront, LUFront]
+ 
+  VU:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [RUFront, RUFront] 
+
+  HL:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [RLFront, RLFront]
+
+  VL:     
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [LLFront, LLFront]
+
+  TCR:
+   t1/t2/node_node:
+     - [RUUFront, LUFront]
+     - [LLLFront, RLFront]
+   t3/t4/node_node:
+     - [RUUFront, LUFront]
+     - [LLLFront, RLFront]    
+   t5/t6/node_node:
+     - [RUUFront, LUFront]
+     - [LLLFront, RLFront]
+  TCL:
+   t1/t2/node_node:
+     - [LLLFront, LUFront]
+     - [RUUFront, RLFront]
+   t3/t4/node_node:
+     - [LLLFront, LUFront]
+     - [RUUFront, RLFront]
+   t5/t6/node_node:
+     - [LLLFront, LUFront]
+     - [RUUFront, RLFront]
+
+
+
+# Right Lower
+# Right Upper
+# Left Upper
+# Left
+  SFR:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [LUFront,RUBack] 
+     - [RLFront,LLBack] 
+
+  SRL:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [LUFront, LLBack] 
+     - [RLFront,RUBack] 
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+
+builders: 
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 4000
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+ 
+  VU:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 7000
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 4000
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+ 
+  VL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 3000
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  
+
+  TCR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0   
+
+  TCL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0 
+
+
+  RCL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0 
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  

@@ -1,0 +1,42 @@
+
+nodes:
+  center: [0, 0, 0]
+  cright: [0,0,-2]
+  ccright: [-4,0,-3.5] 
+  bright: [-5, 0, -4]
+  bbright: [-7.5,0,-4]
+  ttright: [-8.5,0,-5]
+  tttright: [-9.5,0,-6]
+  tright: [-10, 0,-7]
+  cleft:  [0,0,2]  
+  ccleft: [-4,0,3.5]
+  bleft: [-5, 0, 4]
+  bbleft: [-7.5, 0,4]
+  ttleft: [-8.5,0,5]
+  tttleft: [-9.5,0,6]
+  tleft: [-10, 0, 7]
+
+pair_groups:
+  rodFixed:
+    - [cleft, center]
+    - [ccleft, cleft]
+    - [bleft, ccleft]
+    - [bbleft, bleft]
+    - [ttleft,bbleft]
+    - [tttleft,ttleft]
+    - [tleft,tttleft]
+    - [cright, center]
+    - [ccright,cright]
+    - [bright, ccright]
+    - [bbright, bright]
+    - [ttright,bbright]
+    - [tttright,ttright]
+    - [tright,tttright]
+    
+# Density used to be 0.014
+builders:
+  rodFixed:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.5
