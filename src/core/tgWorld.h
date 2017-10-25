@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -29,6 +29,7 @@
 // Forward declarations
 class tgWorldImpl;
 class tgGround;
+class tgWorldBulletPhysicsImpl;
 
 /**
  * Represents the world in which the Tensegrities operate, including
@@ -60,13 +61,13 @@ public:
 
   /** Construct with the default configuration. */
   tgWorld();
-    
+
   /**
    * Construct with a supplied configuration.
    * @param[in] config a tgWorld::Config
    */
   tgWorld(const Config& config);
-  
+
   /**
    * Construct with a supplied configuration and a supplied ground
    * @param[in] config a tgWorld::Config
@@ -92,11 +93,11 @@ public:
    * @param[in] ground the new ground
    */
   void reset(tgGround* ground);
-    
+
   /**
    * Advance the simulation.
    * @param[in] dt the number of seconds since the previous call;
-   * std::invalid_argument is thrown if dt is not positive 
+   * std::invalid_argument is thrown if dt is not positive
    */
   void step(double dt) const;
 
@@ -105,11 +106,12 @@ public:
    * @return a pointer to the implementation; may be NULL.
    * Consider making this private, and making its clients friends.
    */
-  tgWorldImpl& implementation() const
+  // tgWorldImpl& implementation() const
+  tgWorldBulletPhysicsImpl& implementation() const // Changed 10/25/17
   {
     return *m_pImpl;
   }
- 
+
 private:
 
   /** Integrity predicate */
@@ -121,12 +123,13 @@ private:
    * The configuration data passed at construction or upon reset.
    */
   Config m_config;
-  
+
   /** Implementation of the ground, such as a box, hills or ramp */
   tgGround* m_pGround;
 
   /** The implementation of the tgWorld. */
-  tgWorldImpl * m_pImpl;
+  // tgWorldImpl * m_pImpl;
+  tgWorldBulletPhysicsImpl* m_pImpl; // Changed 10/25/17
 };
 
 #endif //TG_BULLET_WORLD_H

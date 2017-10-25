@@ -89,7 +89,7 @@ m_gravity(gravity), m_mode(mode), m_initVel(initVel), m_thrustDist(thrustDist), 
 	}
 }
 
-T6RollingController::T6RollingController(const T6RollingController::Config& config) : m_config(config)
+T6RollingController::T6RollingController(const T6RollingController::Config& config, tgWorld* world) : m_config(config)
 {
 	c_mode = config.m_mode;
 	c_face_goal = config.m_face_goal;
@@ -100,6 +100,11 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_gravity = config.m_gravity;
 	c_initVel = config.m_initVel;
 	c_thrustDist = config.m_thrustDist;
+
+	// std::cout << world << std::endl;
+	tgWorldBulletPhysicsImpl& worldImpl = world->implementation();
+	btDynamicsWorld& dynWorld = worldImpl.dynamicsWorld();
+	dynWorldPtr = &dynWorld;
 
 	gravVectWorld.setX(0.0);
 	gravVectWorld.setY(-config.m_gravity);
@@ -158,6 +163,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		tgRod* rod = rods[i];
 		btRigidBody* rodBody = rod->getPRigidBody();
 		rodBodies.push_back(rodBody);
+		// rodForces.push_back(0.0);
 	}
 
 	// Get robot mass
@@ -368,7 +374,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		}
 		else {
 			// Write first line of variable names then close filestream
-			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,onGround,contactCounter,slopeX,slopeZ" << std::endl;
+			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,slopeX,slopeZ,phi,theta,psi,onGround,contactCounter" << std::endl;
 			data_out.close();
 		}
 	}
@@ -377,11 +383,11 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	}
 
 	markers = subject.getAllMarkers();
-
 }
 
 void T6RollingController::onStep(sixBarModel& subject, double dt)
 {
+
 	if (dt <= 0.0) {
 		throw std::invalid_argument("onStep: dt is not positive");
 	}
@@ -527,6 +533,7 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 				btVector3 CoM_vel;
 				btQuaternion q;
 
+				// Convert from quaternions to euler angles
 				q = payloadBody->getOrientation();
 				double phi = atan2(2*(q[0]*q[1]+q[2]*q[3]),(1-2*(pow(q[1],2)+pow(q[2],2))));
 				double theta = asin(2*(q[0]*q[2]-q[3]*q[1]));
@@ -538,51 +545,33 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
 				}
 
-				// std::cout << CoM_vel.x() << std::endl;
-				cb.push_back(CoM_vel);
+				collision = checkCollision(dynWorldPtr);
+				// std::cout << collision << std::endl;
 
-				if (cb.full()){
-					btVector3 velDiff = CoM_vel-cb[0];
-					// if(velDiff.norm() > maxDiff) {
-					// 	maxDiff = velDiff.norm();
-					// }
-					// std::cout << maxDiff << std::endl;
-					if ((velDiff.norm() > 5.5) && !collision) {
-						collision = true;
-						impactPos.setValue(CoM_pos.x(),CoM_pos.y(),CoM_pos.z());
-						std::cout << impactPos.y() << std::endl;
-						contactCounter += 1;
-						
-						if (doLog) {
-							data_out.open(filename_data.c_str(), std::fstream::app);
-						    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-						    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-						    		<< isOnGround << "," << contactCounter << ",0.0,0.0," 
-						    		<< phi << "," << theta << "," << psi << std::endl;
-				    		data_out.close();
-						}
+				if (collision) {
+					if (doLog && (contactCounter%writeFreq==0)) {
+						data_out.open(filename_data.c_str(), std::fstream::app);
+				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ",0.0,0.0,"
+				    		<< phi << "," << theta << "," << psi << "," << isOnGround << "," << contactCounter << std::endl;
+		    		data_out.close();
 					}
-					// else if (collision && (markers[contactNode].getWorldPosition().y() > minPos+0.01)) {
-					else if (collision && CoM_pos.y() > impactPos.y()) {
-						collision = false;
-						std::cout << CoM_pos.y() << std::endl;
-
-						if (doLog) {
-							data_out.open(filename_data.c_str(), std::fstream::app);
-						    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-						    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-						    		<< isOnGround << "," << contactCounter << ",0.0,0.0,"
-						    		<< phi << "," << theta << "," << psi << std::endl;
-				    		data_out.close();
-						}
-
-						std::cout << "Simulation complete, exiting..." << std::endl;
-						exit(EXIT_SUCCESS);
+					contactCounter ++;
+				}
+				if (lastCollision && !collision){
+					if (doLog) {
+						data_out.open(filename_data.c_str(), std::fstream::app);
+						data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+								<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ",0.0,0.0,"
+								<< phi << "," << theta << "," << psi << "," << isOnGround << "," << contactCounter << std::endl;
+		    		data_out.close();
 					}
+					std::cout << "Simulation complete, exiting..." << std::endl;
+					exit(EXIT_SUCCESS);
 				}
 
 				counter++;
-
+				lastCollision = collision;
 				/*
 				btVector3 thrustMag = getThrustMag(c_initVel, c_thrustDist);
 				double thrustPeriod = getThrustPeriod(c_initVel, thrustMag);
@@ -600,14 +589,14 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					thrusterOn = false;
 					payloadBody->applyCentralForce(btVector3(0,0,0));
 				}
-				
+
 
 				if (CoM_vel.norm() < 1.0 && worldTime > thrust_end) {
 					std::cout << "Simulation complete, exiting..." << std::endl;
 					exit(EXIT_SUCCESS);
 				}
 				*/
-				
+
 				// if (!isOnGround && worldTime > 6) {
 				// if (worldTime > thrust_end) {
 				// 	bool tmp = false;
@@ -1067,4 +1056,20 @@ btVector3 T6RollingController::getThrustMag(btVector3 initVel, double thrustDist
 double T6RollingController::getThrustPeriod(btVector3 initVel, btVector3 thrustMag)
 {
 	return sqrt(pow(initVel.x(),2)+pow(initVel.z(),2))/(sqrt(pow(thrustMag.x(),2)+pow(thrustMag.z(),2))/mass);
+}
+
+bool T6RollingController::checkCollision(btDynamicsWorld* dynWorld)
+{
+	bool collision = false;
+	dynWorld->performDiscreteCollisionDetection();
+	int numManifolds = dynWorld->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++) {
+		btPersistentManifold* contactManifold = dynWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		int numContacts = contactManifold->getNumContacts();
+		if (numContacts > 0) {
+			collision = true;
+			break;
+		}
+	}
+	return collision;
 }

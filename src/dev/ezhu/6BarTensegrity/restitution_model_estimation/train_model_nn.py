@@ -37,17 +37,27 @@ def build_mlp(
                     kernel_regularizer=tf.nn.l2_loss)
     return out
 
-def train(args, x_train, y_train):
+def train(args, data):
+
+    # Extract training data
+    x_train = data['x_train']['features']
+    y_train = data['y_train']['state_diff']
+    x_state = data['x_train']['states']
+    y_state = data['y_train']['states']
+
+    # Define saving and printing intervals
     SAVE_INT = 1000
     SAVE_STEP = 0
     PRINT_INT = 1000
     x_dim = x_train.shape[1]
     y_dim = y_train.shape[1]
     n_data = x_train.shape[0]
+    state_dim = x_state.shape[1]
 
     # Define placeholders for input and actual output
     x_ph = tf.placeholder(tf.float32,[None,x_dim])
     y_ph = tf.placeholder(tf.float32,[None,y_dim])
+    state_ph = tf.placeholder(tf.float32,[None,state_dim])
 
     # Build nn and loss
     y_mean = build_mlp(x_ph,y_dim,'restitution_model',args.n_layers,args.size,tf.tanh,None)
@@ -57,6 +67,9 @@ def train(args, x_train, y_train):
 
     loss = -tf.reduce_mean(logprog)
     update_op = tf.train.AdamOptimzer(args.learning_rate).minimize(loss)
+
+    # Build op for making predictions
+
 
     n_batches = int(n_data/args.batch_size)
     batch_counter = 0
@@ -75,11 +88,13 @@ def train(args, x_train, y_train):
     x_mean_save = tf.constant(x_mean, name='x_mean')
     x_std_save = tf.constant(x_std, name='x_std')
 
+    # Training loop
     for i in range(n_iter):
+        # Get batch
         start_pos = batch_counter*args.batch_size
         if batch_counter <= (n_batches-1):
-            if start_pos == 0:
-                x_train, y_train = preprocessing.shuffle(x_train, y_train)
+            # if start_pos == 0:
+            #     x_train, y_train = preprocessing.shuffle(x_train, y_train)
             end_pos = (batch_counter+1)*batch_size
             batch_counter += 1
         else:
@@ -103,8 +118,9 @@ def train(args, x_train, y_train):
         model_path = saver.save(sess,model_name,global_step=SAVE_STEP)
         SAVE_STEP += 1
 
-def test(args, x_test, y_test):
-    pass
+def test(args, data):
+    x_test = data['x_test']
+    y_test = data['y_test']
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -116,11 +132,11 @@ if __name__ == '__main__':
     parser.add_argument('batch_size', type=int, default=100)
     args = parser.parse_args()
 
-    x_train, y_train, x_test, y_test = preprocessing.get_training_set()
+    data = preprocessing.get_dataset()
 
     if args.mode == 'train':
         print('Train mode')
-        train(args,x_train,y_train)
+        train(args,data)
     elif args.mode = 'test':
         print('Test mode')
-        test(args,x_test,y_test)
+        test(args,data)

@@ -32,6 +32,9 @@
 #include "core/tgRod.h"
 #include "core/abstractMarker.h"
 #include "controllers/tgBasicController.h"
+#include "core/tgWorld.h"
+#include "core/tgWorldImpl.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
 
 // The Model
 #include "../models/sixBarModel.h"
@@ -71,7 +74,7 @@ public:
 		Config (double gravity, const std::string& mode, int face_goal, const std::string& log_name);
 		Config (double gravity, const std::string& mode, btVector3 dr_goal, const std::string& log_name);
 		Config (double gravity, const std::string& mode, int *path, int pathSize, const std::string& log_name);
-		Config (double gravity, const std::string& mode, btVector3 thrust_mag, double thrust_period, const std::string& log_name);
+		Config (double gravity, const std::string& mode, btVector3 initVel, double thrustDist, const std::string& log_name);
 
 		double m_gravity;
 
@@ -96,7 +99,7 @@ public:
 	/**
 	 * Constructor, allows a user to specify their own config
 	 */
-	T6RollingController(const T6RollingController::Config& config);
+	T6RollingController(const T6RollingController::Config& config, tgWorld* world);
 
 	/**
 	 * Destructor
@@ -208,6 +211,7 @@ public:
 
 	btVector3 getThrustMag(btVector3 initVel, double thrustDist);
 	double getThrustPeriod(btVector3 initVel, btVector3 thrustMag);
+	bool checkCollision(btDynamicsWorld* dynWorld);
 
 private:
 	// Store the configuration data for use later
@@ -354,12 +358,14 @@ private:
 	bool lastFlag = isOnGround;
 	int contactCounter = 0;
 	std::vector<bool> contactVec;
-	btVector3 lastVel = btVector3(0,0,0);
+
 	boost::circular_buffer<btVector3> cb;
-	float maxDiff = 0;
+
 	bool collision = false;
-	btVector3 impactPos;
-	float minPos = 1000;
+	bool lastCollision = false;
+
+	btDynamicsWorld* dynWorldPtr;
+	int writeFreq = 10;
 };
 
 #endif
