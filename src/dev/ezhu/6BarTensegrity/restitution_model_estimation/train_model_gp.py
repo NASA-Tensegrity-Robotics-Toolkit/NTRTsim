@@ -58,7 +58,12 @@ def conditional(kernel, params, x_new, x_train, y_train):
     return mu, sigma
 
 def main():
-    data = preprocessing.get_dataset(n_train=10,n_test=10,shuf=True,full_data=False)
+    n_train = 500
+    n_test = 100
+    n_data = n_train + n_test
+    paths = preprocessing.get_paths(n_data,full_data=False)
+    data = preprocessing.get_train_test_sets(n_train,n_test,paths,shuf=True)
+
     x_train = data['x_train']['features']
     y_train = data['y_train']['labels']
     x_test = data['x_test']['features']
@@ -68,8 +73,6 @@ def main():
     y_dim = y_train.shape[1]
     n_train = x_train.shape[0]
     n_test = x_test.shape[0]
-
-    state = 3
 
     # plt.figure()
     # plt.plot(x_train[:,0],y_train[:,0],'kx',mew=2)
@@ -101,13 +104,13 @@ def main():
     print('Building model...')
 
     k1 = gp.kernels.RBF(input_dim=1,variance=1,lengthscales=1)
-    k2 = gp.kernels.Matern52(input_dim=1,lengthscales=1)
+    k2 = gp.kernels.RBF(input_dim=x_dim,variance=1,lengthscales=1)
     # meanf = gp.mean_functions.Linear(1,0)
     meanf = gp.mean_functions.Zero()
     # likelihood = gp.likelihoods.Gaussian()
     gp_models = []
 
-    # m = gp.gpr.GPR(x_train[:,state].reshape((n_train,1)),y_train[:,state].reshape((n_train,1)),kern=k1)
+    m_full = gp.gpr.GPR(x_train,y_train,kern=k2,mean_function=meanf)
 
     # to_train = [0,3,4,5]
     to_train = [3]
@@ -133,31 +136,34 @@ def main():
         m.optimize()
         print(m)
 
-        x = x_train[:,to_train[i]]
-        y = y_train[:,to_train[i]]
+        x = x_test[:,to_train[i]]
+        y = y_test[:,to_train[i]]
         x_min = np.min(x)
         x_max = np.max(x)
         buff = (x_max-x_min)*0.1
         x_lin = np.linspace(x_min,x_max,100).reshape((100,1))
 
-        # idx = np.argsort(x)
-        # x = x[idx]
-        # y = y[idx]
+        idx = np.argsort(x)
+        x = x[idx].reshape((n_test,1))
+        y = y[idx].reshape((n_test,1))
 
-        mean_y1,var_y1 = m.predict_y(x_lin)
-        mean_f1,var_f1 = m.predict_f(x_lin)
+        mean_y1,var_y1 = m.predict_y(x)
+        mean_f1,var_f1 = m.predict_f(x)
+        _,cov_f1 = m.predict_f_full_cov(x)
+
+        print(cov_f1.shape)
 
         plt.figure()
         plt.plot(x,y,'kx',mew=2)
 
-        plt.plot(x_lin,mean_y1,'b',lw=2)
-        plt.plot(x_lin,mean_y1-2*np.sqrt(var_y1),'r',lw=2)
-        plt.plot(x_lin,mean_y1+2*np.sqrt(var_y1),'r',lw=2)
+        plt.plot(x,mean_y1,'b',lw=2)
+        plt.plot(x,mean_y1-2*np.sqrt(var_y1),'r',lw=2)
+        plt.plot(x,mean_y1+2*np.sqrt(var_y1),'r',lw=2)
 
 
-        plt.plot(x_lin,mean_f1,'b-.',lw=2)
-        plt.plot(x_lin,mean_f1-2*np.sqrt(var_f1),'r-.',lw=2)
-        plt.plot(x_lin,mean_f1+2*np.sqrt(var_f1),'r-.',lw=2)
+        plt.plot(x,mean_f1,'b-.',lw=2)
+        plt.plot(x,mean_f1-2*np.sqrt(var_f1),'r-.',lw=2)
+        plt.plot(x,mean_f1+2*np.sqrt(var_f1),'r-.',lw=2)
 
         plt.xlabel('state '+str(to_train[i])+' in')
         plt.ylabel('state '+str(to_train[i])+' out')

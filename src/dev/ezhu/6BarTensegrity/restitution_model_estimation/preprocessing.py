@@ -25,7 +25,7 @@ def standardize(X):
 
     return X_std, mean, std
 
-def read_csv_data(filename, x_data, y_data, full_data=False):
+def read_csv_data(filename, full_data=False):
     success = True
 
     with open(filename,'r') as f_in:
@@ -34,11 +34,13 @@ def read_csv_data(filename, x_data, y_data, full_data=False):
     if rows == 1:
         print('Empty file, skipping...')
         success = False
-        return x_data, y_data
+        path = []
+        return path
     elif rows == 2:
         print('Data incomplete, skipping...')
         success = False
-        return x_data, y_data
+        path = []
+        return path
 
     data_tmp = np.loadtxt(filename,delimiter=',',dtype=None,skiprows=1)
 
@@ -53,14 +55,9 @@ def read_csv_data(filename, x_data, y_data, full_data=False):
         x_tmp = data_tmp[0:-2,]
         y_tmp = data_tmp[1:-1,]
 
-    if len(x_data) == 0:
-        x_data = x_tmp
-        y_data = y_tmp
-    else:
-        x_data = np.append(x_data,x_tmp,axis=0)
-        y_data = np.append(y_data,y_tmp,axis=0)
+    path = {'observations':x_tmp,'next_observations':y_tmp}
 
-    return x_data, y_data
+    return path
 
 def process_data(x_data, y_data):
     sf = 10
@@ -80,31 +77,40 @@ def process_data(x_data, y_data):
 
     return x_feat, y_feat, x_state, y_state
 
-def get_dataset(n_train, n_test, shuf=True, full_data=False):
-    print('Loading data sets')
+def get_paths(n_data, full_data=False):
+    print('Loading data into paths...')
     directory = '../../../../../../Documents/data/'
-    x_data = []
-    y_data = []
+    paths = []
+    datapoints = 0
 
-    n_data = n_train + n_test
     n_files = int(np.round(len(os.listdir(directory))/2))
     file_num_list = np.arange(n_files)
 
     while True:
         file_num = np.random.choice(file_num_list,1)[0]
         filename = directory+str(file_num)+'_Response.csv'
-        x_data, y_data = read_csv_data(filename,x_data,y_data,full_data)
-        if x_data.shape[0] >= n_data:
+        path = read_csv_data(filename,full_data)
+        if len(path) > 0:
+            paths.append(path)
+            datapoints += path['observations'].shape[0]
+
+        if datapoints >= n_data:
             break
 
         idx = np.nonzero(file_num_list==file_num)
         file_num_list = np.delete(file_num_list,idx)
 
-    x_data = x_data[0:n_data]
-    y_data = y_data[0:n_data]
+    return paths
+
+def get_train_test_sets(n_train, n_test, paths, shuf=True):
+    print('Creating training and test sets...')
+
+    data = paths_to_array(paths)
+    x_data = data['obs_t']
+    y_data = data['obs_tp1']
 
     if shuf:
-        x_data, y_data = shuffle(x_data,y_data)
+        x_data, y_data = shuffle(x_data, y_data)
 
     x_feat, y_feat, x_state, y_state = process_data(x_data,y_data)
 
@@ -114,6 +120,25 @@ def get_dataset(n_train, n_test, shuf=True, full_data=False):
     y_test = {'labels':y_feat[n_train:], 'states':y_state[n_train:]}
 
     data = {'x_train':x_train, 'y_train':y_train, 'x_test':x_test, 'y_test':y_test, 'x_state':x_state, 'y_state':y_state}
-    print('Load data done...')
 
+    return data
+
+def paths_to_array(paths):
+    print('Converting paths to dataset...')
+
+    if type(paths) == dict:
+        obs_t = paths['observations']
+        obs_tp1 = paths['next_observations']
+    else:
+        for i in range(len(paths)):
+            if i == 0:
+                obs_t = paths[i]['observations']
+                obs_tp1 = paths[i]['next_observations']
+            else:
+                obs_t = np.append(obs_t,paths[i]['observations'],axis=0)
+                obs_tp1 = np.append(obs_tp1,paths[i]['next_observations'],axis=0)
+
+    n_data = obs_t.shape[0]
+    data = {'obs_t':obs_t, 'obs_tp1':obs_tp1}
+    print('Dataset built with %i datapoints' % n_data)
     return data

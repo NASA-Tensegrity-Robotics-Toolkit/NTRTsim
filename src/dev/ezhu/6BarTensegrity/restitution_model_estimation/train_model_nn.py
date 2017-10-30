@@ -3,140 +3,118 @@ import numpy as np
 import math
 import time
 import preprocessing
+import argparse
+from dynamics_auto_uc import NNDynamicsModel_Auto_UC
+import matplotlib.pyplot as plt
 
-def build_mlp(
-        input_placeholder,
-        output_size,
-        scope,
-        n_layers=2,
-        size=64,
-        activation=tf.tanh,
-        output_activation=None):
+def compute_normalization(data):
 
-    with tf.name_scope(scope):
-        for layer in range(n_layers+1):
-            # Input layer
-            if layer == 0:
-                out = tf.layers.dense(input_placeholder,size,activation,
-                    # kernel_initializer=tf.truncated_normal_initializer,
-                    kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                    bias_initializer=tf.constant_initializer(0.1),
-                    kernel_regularizer=tf.nn.l2_loss)
-            # Output layer
-            elif layer == n_layers:
-                out = tf.layers.dense(out,output_size,output_activation,
-                    # kernel_initializer=tf.truncated_normal_initializer,
-                    kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                    bias_initializer=tf.constant_initializer(0.1),
-                    kernel_regularizer=tf.nn.l2_loss)
-            else:
-                out = tf.layers.dense(out,size,activation,
-                    # kernel_initializer=tf.truncated_normal_initializer,
-                    kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                    bias_initializer=tf.constant_initializer(0.1),
-                    kernel_regularizer=tf.nn.l2_loss)
-    return out
+    print('Computing normalization statistics...')
+    obs_t = data['obs_t']
+    obs_tp1 = data['obs_tp1']
+    deltas = obs_tp1-obs_t
 
-def train(args, data):
+    mean_obs = np.mean(obs_t,axis=0)
+    std_obs = np.std(obs_t,axis=0)
+    mean_obs_tp1 = np.mean(obs_tp1,axis=0)
+    std_obs_tp1 = np.std(obs_tp1,axis=0)
+    mean_deltas = np.mean(deltas,axis=0)
+    std_deltas = np.std(deltas,axis=0)
+
+    normalization = {'mean_obs':mean_obs, 'std_obs':std_obs,
+                    'mean_obs_tp1':mean_obs_tp1, 'std_obs_tp1':std_obs_tp1,
+                    'mean_deltas':mean_deltas, 'std_deltas':std_deltas}
+    return normalization
+
+def train(args, data, sess):
 
     # Extract training data
     x_train = data['x_train']['features']
-    y_train = data['y_train']['state_diff']
-    x_state = data['x_train']['states']
-    y_state = data['y_train']['states']
+    y_train = data['y_train']['labels']
 
-    # Define saving and printing intervals
-    SAVE_INT = 1000
-    SAVE_STEP = 0
-    PRINT_INT = 1000
+    data_new = {'obs_t':x_train, 'obs_tp1':y_train}
+
     x_dim = x_train.shape[1]
     y_dim = y_train.shape[1]
     n_data = x_train.shape[0]
-    state_dim = x_state.shape[1]
 
-    # Define placeholders for input and actual output
-    x_ph = tf.placeholder(tf.float32,[None,x_dim])
-    y_ph = tf.placeholder(tf.float32,[None,y_dim])
-    state_ph = tf.placeholder(tf.float32,[None,state_dim])
+    normalization = compute_normalization(data_new)
 
-    # Build nn and loss
-    y_mean = build_mlp(x_ph,y_dim,'restitution_model',args.n_layers,args.size,tf.tanh,None)
-    logstd = tf.Variable(0*tf.ones([y_dim]),dtype=tf.float32)
-    # sampled_y = y_mean+tf.multiply(tf.exp(logstd),tf.random_normal([tf.shape(y_mean)[0],y_dim]))
-    logprob = -tf.reduce_sum(tf.divide((y_ph-y_mean)**2,2*(tf.exp(logstd)**2)),1)-tf.reduce_sum(logstd)-tf.log(2*math.pi)
+    dyn_model = NNDynamicsModel_Auto_UC(x_dim,y_dim,args.n_layers,args.size,tf.tanh,None,
+        normalization,args.batch_size,args.n_iters,args.learning_rate,sess)
 
-    loss = -tf.reduce_mean(logprog)
-    update_op = tf.train.AdamOptimzer(args.learning_rate).minimize(loss)
+    dyn_model.fit(data_new)
 
-    # Build op for making predictions
+    return dyn_model
 
+def test(args, path, dyn_model, sess):
 
-    n_batches = int(n_data/args.batch_size)
-    batch_counter = 0
+    data = preprocessing.paths_to_array(path)
 
-    iters = []
-    loss_val = []
+    x_data = data['obs_t']
+    y_data = data['obs_tp1']
 
-    tf_config = tf.ConfigProto(inter_op_parallelism_threads=1, intra_op_parallelism_threads=1)
-    sess = tf.Session(config=tf_config)
-    sess.__enter__()
-    sess.run(tf.global_variables_initializer())
+    x_data, y_data, _, _ = preprocessing.process_data(x_data,y_data)
 
-    saver = tf.train.Saver()
+    x_dim = x_data.shape[1]
+    y_dim = y_data.shape[1]
+    n_data = x_data.shape[0]
 
-    x_train, x_mean, x_std = preprocessing.standardize(x_train)
-    x_mean_save = tf.constant(x_mean, name='x_mean')
-    x_std_save = tf.constant(x_std, name='x_std')
+    for i in range(x_data.shape[0]):
+        s_k = x_data[i,:].reshape((1,x_dim))
+        s_kp1_samp, s_kp1_mean, var = dyn_model.predict(s_k)
 
-    # Training loop
-    for i in range(n_iter):
-        # Get batch
-        start_pos = batch_counter*args.batch_size
-        if batch_counter <= (n_batches-1):
-            # if start_pos == 0:
-            #     x_train, y_train = preprocessing.shuffle(x_train, y_train)
-            end_pos = (batch_counter+1)*batch_size
-            batch_counter += 1
+        if i == 0:
+            y_pred_samp = s_kp1_samp.reshape((1,y_dim))
+            y_pred_mean = s_kp1_mean.reshape((1,y_dim))
+            var_vec = var.reshape((1,y_dim))
         else:
-            end_pos = -1
-            batch_counter = 0
+            y_pred_samp = np.append(y_pred_samp,s_kp1_samp.reshape((1,y_dim)),axis=0)
+            y_pred_mean = np.append(y_pred_mean,s_kp1_mean.reshape((1,y_dim)),axis=0)
+            var_vec = np.append(var_vec,var.reshape((1,y_dim)),axis=0)
 
-        x_batch = x_train[start_pos:end_pos,:]
-        y_batch = y_train[start_pos:end_pos,:]
+    for i in range(y_dim):
+        plt.figure()
+        plt.plot(np.arange(n_data),y_data[:,i],'r')
+        plt.plot(np.arange(n_data),y_pred_samp[:,i],'b')
+        plt.plot(np.arange(n_data),y_pred_mean[:,i],'g')
+        plt.plot(np.arange(n_data),y_pred_mean[:,i]+2*np.sqrt(var_vec[:,i]),'g--')
+        plt.plot(np.arange(n_data),y_pred_mean[:,i]-2*np.sqrt(var_vec[:,i]),'g--')
 
-        sess.run(update_op,feed_dict={x_ph:x_batch,y_ph:y_batch})
+        plt.draw()
 
-    if i % PRINT_INT == 0 or i == n_iter-1:
-        curr_loss = loss.eval(x_ph:x_batch,y_ph:y_batch)
-        print('Iteration: %d, Loss: %g' % (i,curr_loss))
-        iters.append(i)
-        loss_val.append(curr_loss)
-
-    if i % SAVE_INT == 0:
-        print('Saving model at iteration %d' % (i))
-        model_name = './models/restiution_model_'+time.strftime("%d-%m-%Y_%H-%M-%S")
-        model_path = saver.save(sess,model_name,global_step=SAVE_STEP)
-        SAVE_STEP += 1
-
-def test(args, data):
-    x_test = data['x_test']
-    y_test = data['y_test']
+    plt.show()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-	parser.add_argument('mode', type=str, default='train')
-    parser.add_argument('n_layers', type=int, default=2)
-    parser.add_argument('size', type=int, default=32)
-    parser.add_argument('learning_rate', type=float, default=5e-3)
-    parser.add_argument('n_iter', type=int, default=50000)
-    parser.add_argument('batch_size', type=int, default=100)
+    parser.add_argument('--mode', type=str, default='train')
+    parser.add_argument('--n_layers', type=int, default=2)
+    parser.add_argument('--size', type=int, default=32)
+    parser.add_argument('--learning_rate', type=float, default=5e-3)
+    parser.add_argument('--n_iters', type=int, default=50)
+    parser.add_argument('--batch_size', type=int, default=200)
+    parser.add_argument('--seed', type=int, default=3)
     args = parser.parse_args()
 
-    data = preprocessing.get_dataset()
+    # Set seed
+    np.random.seed(args.seed)
+    tf.set_random_seed(args.seed)
+
+    n_train = 50000
+    n_test = 5000
+    n_data = n_train+n_test
+
+    paths = preprocessing.get_paths(n_data,full_data=True)
+    data = preprocessing.get_train_test_sets(n_train,n_test,paths[0:-2],shuf=True)
+
+    test_path = paths[-1]
+
+    sess = tf.Session()
 
     if args.mode == 'train':
         print('Train mode')
-        train(args,data)
-    elif args.mode = 'test':
+        dyn_model = train(args,data,sess)
+        test(args,test_path,dyn_model,sess)
+    elif args.mode == 'test':
         print('Test mode')
-        test(args,data)
+        test(args,data,sess)
