@@ -289,7 +289,6 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
-    /////////////////////////////////////////////////////////////////////////
     // ROS stuff
     control_cb_class control_cb;
 
@@ -327,3 +326,8 @@ int main(int argc, char** argv)
     // teardown is handled by delete
     return 0;
 }
+
+// Function for returning pointers to actuators which can be controlled via ros
+// std::vector<tgBasicActuator*> getAllActuators(TensegrityModel* model) {
+//
+// }
