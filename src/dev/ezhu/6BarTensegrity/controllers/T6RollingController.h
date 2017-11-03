@@ -99,7 +99,7 @@ public:
 	/**
 	 * Constructor, allows a user to specify their own config
 	 */
-	T6RollingController(const T6RollingController::Config& config, tgWorld* world);
+	T6RollingController(const T6RollingController::Config& config, tgWorld* world, double sx, double sz);
 
 	/**
 	 * Destructor
@@ -363,9 +363,14 @@ private:
 
 	bool collision = false;
 	bool lastCollision = false;
+	bool collided = false;
+	int collidedTime = 0;
 
 	btDynamicsWorld* dynWorldPtr;
 	int writeFreq = 10;
+
+	double m_sx;
+	double m_sz;
 };
 
 #endif

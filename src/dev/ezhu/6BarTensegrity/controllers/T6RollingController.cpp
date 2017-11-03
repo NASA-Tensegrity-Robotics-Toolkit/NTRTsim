@@ -89,7 +89,7 @@ m_gravity(gravity), m_mode(mode), m_initVel(initVel), m_thrustDist(thrustDist), 
 	}
 }
 
-T6RollingController::T6RollingController(const T6RollingController::Config& config, tgWorld* world) : m_config(config)
+T6RollingController::T6RollingController(const T6RollingController::Config& config, tgWorld* world, double sx, double sz) : m_config(config), m_sx(sx), m_sz(sz)
 {
 	c_mode = config.m_mode;
 	c_face_goal = config.m_face_goal;
@@ -100,6 +100,8 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_gravity = config.m_gravity;
 	c_initVel = config.m_initVel;
 	c_thrustDist = config.m_thrustDist;
+
+	std::cout << "x slope: " << sx << ", z slope: " << sz << std::endl;
 
 	// std::cout << world << std::endl;
 	tgWorldBulletPhysicsImpl& worldImpl = world->implementation();
@@ -374,7 +376,7 @@ void T6RollingController::onSetup(sixBarModel& subject)
 		}
 		else {
 			// Write first line of variable names then close filestream
-			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,slopeX,slopeZ,phi,theta,psi,onGround,contactCounter" << std::endl;
+			data_out << "SimTime,CoM_posX,CoM_posY,CoM_posZ,CoM_velX,CoM_velY,CoM_velZ,slopeX,slopeZ,phi,theta,psi,collision,contactCounter" << std::endl;
 			data_out.close();
 		}
 	}
@@ -545,6 +547,8 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
 				}
 
+				// std::cout << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << std::endl;
+
 				collision = checkCollision(dynWorldPtr);
 				// std::cout << collision << std::endl;
 
@@ -552,22 +556,28 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					if (doLog && (contactCounter%writeFreq==0)) {
 						data_out.open(filename_data.c_str(), std::fstream::app);
 				    data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ",0.0,0.0,"
-				    		<< phi << "," << theta << "," << psi << "," << isOnGround << "," << contactCounter << std::endl;
+				    		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," << m_sx << "," << m_sz << ","
+				    		<< phi << "," << theta << "," << psi << "," << collision << "," << contactCounter << std::endl;
 		    		data_out.close();
 					}
 					contactCounter ++;
 				}
 				if (lastCollision && !collision){
-					if (doLog) {
+					collided = true;
+					collidedTime = counter;
+				}
+				if (collided && counter-collidedTime <= 100) {
+					if (doLog && ((counter-collidedTime)%writeFreq==0)) {
 						data_out.open(filename_data.c_str(), std::fstream::app);
 						data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-								<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ",0.0,0.0,"
-								<< phi << "," << theta << "," << psi << "," << isOnGround << "," << contactCounter << std::endl;
+								<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," << m_sx << "," << m_sz << ","
+								<< phi << "," << theta << "," << psi << "," << collision << "," << contactCounter << std::endl;
 		    		data_out.close();
 					}
-					std::cout << "Simulation complete, exiting..." << std::endl;
-					exit(EXIT_SUCCESS);
+					if (counter-collidedTime == 100) {
+						std::cout << "Simulation complete, exiting..." << std::endl;
+						exit(EXIT_SUCCESS);
+					}
 				}
 
 				counter++;

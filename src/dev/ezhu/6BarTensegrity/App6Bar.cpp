@@ -59,12 +59,31 @@
  */
 int main(int argc, char** argv)
 {
-    // create the ground and world. Specify ground rotation in radians
-    const double yaw = 0.0;
-    const double pitch =0.0*PI/180;
-    const double roll = 0.0;
+  // ---------------------------------------------------------------------------------
+  // Parse input arguments
+  // ---------------------------------------------------------------------------------
+  float psi, theta, phi;
+  int seed = 0;
+  std::string log_name;
 
-    double sf = 10;
+  if (argc == 2) {
+      log_name = argv[1];
+  }
+  else if (argc == 3) {
+      log_name = argv[1];
+      seed = atoi(argv[2]);
+  }
+
+  srand(time(NULL)+seed);
+
+  // create the ground and world. Specify ground rotation in radians
+  const double yaw = 0.0;
+  // const double pitch = 0.0*PI/180; // About x axis, in z direction
+  // const double roll = 30.0*PI/180; // About z axis, in x direction
+  const double pitch = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
+  const double roll = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
+  std::cout << roll << "," << pitch << std::endl;
+  double sf = 10;
 
     // ---------------------------------------------------------------------------------
     // Import Ground
@@ -123,52 +142,6 @@ int main(int argc, char** argv)
     // const tgHillyGround::Config groundConfig(btVector3(yaw,pitch,roll),1,0,btVector3(1000.0, 1.5, 1000.0),
     //     btVector3(0.0, 0.0, 0.0),100,100,0.5,20.0,10.0,0.5);
     // tgHillyGround* ground = new tgHillyGround(groundConfig);
-
-    // ---------------------------------------------------------------------------------
-    // Parse input arguments
-    // ---------------------------------------------------------------------------------
-    float psi, theta, phi;
-    int seed;
-    std::string log_name;
-
-    if (argc == 2) {
-        // psi = 0;
-        // theta = 0;
-        // phi = 0;
-        log_name = argv[1];
-    }
-    else if (argc == 3) {
-        // psi = 0;
-        // theta = 0;
-        // phi = 0;
-        log_name = argv[1];
-        seed = atoi(argv[2]);
-    }
-    // else if (argc == 4) {
-    //     // Initial yaw
-    //     psi = atof(argv[1]);
-    //     // Initial pitch
-    //     theta = atof(argv[2]);
-    //     // Initial roll
-    //     phi = atof(argv[3]);
-    // }
-    // else if (argc == 5) {
-    //     // Initial yaw
-    //     psi = atof(argv[1]);
-    //     // Initial pitch
-    //     theta = atof(argv[2]);
-    //     // Initial roll
-    //     phi = atof(argv[3]);
-    //     // File to write to
-    //     log_name = argv[4];
-    // }
-    // else {
-    //     psi = 0;
-    //     theta = 0;
-    //     phi = 0;
-    // }
-
-    srand(time(NULL)+seed);
 
     // Random initial orientation
     psi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
@@ -275,7 +248,7 @@ int main(int argc, char** argv)
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
-    T6RollingController* const rollingController = new T6RollingController(controllerConfig, worldPtr);
+    T6RollingController* const rollingController = new T6RollingController(controllerConfig, worldPtr, tan(roll), -tan(pitch));
 
     // Attach controller to the model
     myModel->attach(rollingController);
