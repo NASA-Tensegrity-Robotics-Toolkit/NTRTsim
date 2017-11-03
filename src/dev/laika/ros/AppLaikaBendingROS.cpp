@@ -47,6 +47,15 @@
 #include "std_msgs/String.h"
 #include "std_msgs/UInt32.h"
 
+class control_cb_class {
+  public:
+    std::string control_msg = "step";
+    void cb(const std_msgs::String::ConstPtr& msg) {
+      control_msg = msg->data;
+      ROS_INFO("Control: %s", msg->data.c_str());
+    }
+};
+
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -62,14 +71,6 @@ int main(int argc, char** argv)
     // {
     //   throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
     // }
-
-    // Initialize ROS node
-    ros::init(argc,argv,"laika_pub");
-    ros::NodeHandle n;
-    ros::Publisher laikaPub = n.advertise<std_msgs::UInt32>("laika_topic",1000);
-    int counter = 0;
-    std_msgs::UInt32 msg;
-    ros::Rate loop_rate(10);
 
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -288,19 +289,34 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
-    // simulation.run();
+    // ROS stuff
+    control_cb_class control_cb;
+
+    // Initialize ROS node
+    ros::init(argc,argv,"laika_model");
+    ros::NodeHandle n;
+    ros::Publisher pub = n.advertise<std_msgs::UInt32>("state",1);
+    ros::Subscriber sub = n.subscribe("control",1,&control_cb_class::cb,&control_cb);
+
+    int counter = 0;
+    std_msgs::UInt32 msg;
+    ros::Rate loop_rate(10);
+
     while (ros::ok()) {
-      if (counter >= 100) {
+      ros::spinOnce();
+      msg.data = counter;
+
+      if (control_cb.control_msg == "reset") {
         simulation.reset();
+        simulation.run(1);
         counter = 0;
         std::cout << "Simulation reset" << std:: endl;
       }
-      msg.data = counter;
-      ROS_INFO("Counter: %d", counter);
-      laikaPub.publish(msg);
-      ros::spinOnce();
-
-      simulation.run(1);
+      else if (control_cb.control_msg == "step") {
+        simulation.run(1);
+        pub.publish(msg);
+      }
+      ROS_INFO("State: %d", counter);
 
       ++counter;
 
@@ -310,3 +326,8 @@ int main(int argc, char** argv)
     // teardown is handled by delete
     return 0;
 }
+
+// Function for returning pointers to actuators which can be controlled via ros
+// std::vector<tgBasicActuator*> getAllActuators(TensegrityModel* model) {
+//
+// }
