@@ -43,10 +43,11 @@
 #include <vector>
 
 // Added for ROS
-#include "ros/ros.h"
-#include "std_msgs/String.h"
-#include "std_msgs/UInt32.h"
+//#include "ros/ros.h"
+//#include "std_msgs/String.h"
+//#include "std_msgs/UInt32.h"
 
+/*
 class control_cb_class {
   public:
     std::string control_msg = "step";
@@ -55,6 +56,7 @@ class control_cb_class {
       ROS_INFO("Control: %s", msg->data.c_str());
     }
 };
+*/
 
 /**
  * The entry point.
@@ -87,8 +89,8 @@ int main(int argc, char** argv)
     const double timestep_physics = 0.0001; // seconds
     //const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
-    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
-    tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    //tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -254,7 +256,7 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
     // second argument.
-    std::string model_path("/home/edward/NTRTsim/src/dev/laika/ros/TetrahedralSpineDropped.yaml");
+    std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/laikaWalkingDRL/TetrahedralSpineDropped.yaml");
     TensegrityModel* const myModel = new TensegrityModel(model_path.c_str(),false);
     // TensegrityModel* const myModel = new TensegrityModel(argv[1],false);
 
@@ -289,7 +291,11 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
+    // Finally, run the simulation.
+    simulation.run();
+
     // ROS stuff
+    /*
     control_cb_class control_cb;
 
     // Initialize ROS node
@@ -322,6 +328,7 @@ int main(int argc, char** argv)
 
       loop_rate.sleep();
     }
+    */
 
     // teardown is handled by delete
     return 0;

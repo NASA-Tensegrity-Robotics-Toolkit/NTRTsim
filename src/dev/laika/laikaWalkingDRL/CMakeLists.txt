@@ -1,5 +1,5 @@
 #### Added for ROS ####
-find_package(catkin REQUIRED COMPONENTS std_msgs)
+#find_package(catkin REQUIRED COMPONENTS std_msgs)
 #######################
 
 link_directories(${LIB_DIR})
@@ -24,9 +24,9 @@ add_executable(AppLaikaBendingROS
 )
 
 #### Added for ROS ####
-target_link_libraries(AppLaikaBendingROS
-  /opt/ros/indigo/lib/librostime.so
-  /opt/ros/indigo/lib/libroscpp.so
-  /opt/ros/indigo/lib/librosconsole.so
-  /opt/ros/indigo/lib/libroscpp_serialization.so)
+#target_link_libraries(AppLaikaBendingROS
+#  /opt/ros/indigo/lib/librostime.so
+#  /opt/ros/indigo/lib/libroscpp.so
+#  /opt/ros/indigo/lib/librosconsole.so
+#  /opt/ros/indigo/lib/libroscpp_serialization.so)
 #######################
