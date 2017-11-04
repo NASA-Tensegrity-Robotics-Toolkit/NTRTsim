@@ -111,6 +111,18 @@ public:
      */
     const static double boxRestitution = 0.2;
 
+    // Sphere parameters:
+    
+    /*
+     * Default sphere radius, density, friction, rolling friction, density, etc.
+     * See tgSphere.h.
+     */
+    const static double sphereRadius = 0.5;
+    const static double sphereDensity = 1.0;
+    const static double sphereFriction = 1.0;
+    const static double sphereRollFriction = 0.0;
+    const static double sphereRestitution = 0.2;
+
     // String parameters:
     
     /*
@@ -388,6 +400,11 @@ private:
      * Responsible for adding a builder that uses the tgBox config
      */
     void addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
+     * Responsible for adding a builder that uses the tgSphere config
+     */
+    void addSphereBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
 
     /*
      * Ensures YAML node contains only keys from the supplied vector
