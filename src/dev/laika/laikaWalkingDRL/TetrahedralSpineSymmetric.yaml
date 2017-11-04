@@ -1,5 +1,7 @@
-# YAML file for the Horizontal Spine with kinematic actuators.
-# Used for the 2017 ULTRA Spine ICRA paper.
+# YAML file for Laika with movable legs.
+# This file MUST be used with LaikaWalkingModel, not with TensegrityModel.
+# Otherwise, the legs will not be attached to the hips: TensegrityModel does
+# add the btHingeConstraints that are needed.
 
 # This spine has multiple substructures,
 # including the spine itself (t1-t6) and the supporting pieces.
