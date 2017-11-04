@@ -32,12 +32,14 @@
 #include "core/tgKinematicActuator.h"
 #include "core/tgRod.h"
 #include "core/tgBox.h"
+#include "core/tgSphere.h"
 #include "tgcreator/tgBasicActuatorInfo.h"
 #include "tgcreator/tgBasicContactCableInfo.h"
 #include "tgcreator/tgKinematicActuatorInfo.h"
 #include "tgcreator/tgKinematicContactCableInfo.h"
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgBoxInfo.h"
+#include "tgcreator/tgSphereInfo.h"
 #include "tgcreator/tgStructureInfo.h"
 
 /**
@@ -84,12 +86,13 @@ void TensegrityModel::setup(tgWorld& world) {
     // create the build spec that uses tags to turn the structure into a model
     tgBuildSpec spec;
 
-    // add default builders (rods, strings, boxes) that match the tags (rods, strings, boxes)
+    // add default builders (rods, strings, boxes) that match the tags (rods, strings, boxes, spheres)
     // (these will be overwritten if a different builder is specified for those tags)
     Yam emptyYam = Yam();
     addRodBuilder("tgRodInfo", "rod", emptyYam, spec);
     addBasicActuatorBuilder("tgBasicActuatorInfo", "string", emptyYam, spec);
     addBoxBuilder("tgBoxInfo", "box", emptyYam, spec);
+    addSphereBuilder("tgSphereInfo", "sphere", emptyYam, spec);
 
     tgStructure structure;
     buildStructure(structure, topLvlStructurePath, spec);
@@ -612,6 +615,9 @@ void TensegrityModel::addBuilders(tgBuildSpec& spec, const Yam& builders) {
 	else if (builderClass == "tgBoxInfo") {
             addBoxBuilder(builderClass, tagMatch, parameters, spec);
         }
+	else if (builderClass == "tgSphereInfo") {
+	    addSphereBuilder(builderClass, tagMatch, parameters, spec);
+	}
         // add more builders here if they use a different Config
         else {
             throw std::invalid_argument("Unsupported builder class: " + builderClass);
@@ -816,6 +822,60 @@ void TensegrityModel::addBoxBuilder(const std::string& builderClass, const std::
         // tgBuildSpec takes ownership of the tgBoxInfo object
         spec.addBuilder(tagMatch, new tgBoxInfo(boxConfig));
     }
+}
+
+void TensegrityModel::addSphereBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec){
+  /**
+   * Builder prcedure:
+   * (1) create list of all possible parameters, as with box (for example)
+   * (2) substitute in any passed-in paremeters in the YAML file
+   * (3) VALIDATION: for the sphere, we must demand that BOTH NODES be the same.
+   *     This is a pretty terrible hack at the moment, but the YAML parser only
+   *     supports two-node objects, whereas the sphere is a single-node object.
+   * (4) create the tgSphereInfo object and add it to the list of builders.
+   */
+
+  // (1)
+  // Parameters to be used in tgSphere::Config. See core/tgSphere.h
+  // Spheres are simple: one point, one radius, and then same
+  // rigid body parameters as the rest of the gang.
+  // Create a map of strings to doubles that will hold the sphere parameters
+  std::map<std::string, double> sp;
+  sp["radius"] = sphereRadius;
+  sp["density"] = sphereDensity;
+  sp["friction"] = sphereFriction;
+  sp["roll_friction"] = sphereRollFriction;
+  sp["restitution"] = sphereRestitution;
+
+  // (2) sub in the new stuff if any exists
+  if (parameters) {
+    for (YAML::const_iterator parameter = parameters.begin(); parameter != parameters.end(); ++parameter) {
+      std::string parameterName = parameter->first.as<std::string>();
+      if (sp.find(parameterName) == sp.end()) {
+	throw std::invalid_argument("Unsupported " + builderClass + " parameter: " + parameterName);
+      }
+      // if defined overwrite default parameter value
+      sp[parameterName] = parameter->second.as<double>();
+    }
+  }
+
+  // (3)
+  // VALIDATION. We need the node locations to be the same.
+  // Can't create a sphere in two different places.
+  // This is a hack. To-do: refactor the YAML parser so that builders can be
+  // created for a single node, or more than two nodes.
+  // ...actually, we can't do this check here. Makes things more difficult...
+
+  // (4) add the builder. HOPEFULLY, this will create a builder that only
+  // looks for nodes, not pairs. To do, check tgSphereInfo to see what happens if
+  // it encounters a pair of spheres.
+  const tgSphere::Config sphereConfig = tgSphere::Config(sp["radius"],
+		 sp["density"], sp["friction"], sp["roll_friction"], sp["restitution"]);
+  if (builderClass == "tgSphereInfo") {
+    // tgBuildSpec takes ownership of the tgSphereInfo object
+    spec.addBuilder(tagMatch, new tgSphereInfo(sphereConfig));
+  }
+  
 }
 
 void TensegrityModel::yamlNoDuplicates(const Yam& yam, const std::string structurePath) {
