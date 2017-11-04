@@ -5,16 +5,19 @@
 
 # This spine has multiple substructures,
 # including the spine itself (t1-t6) and the supporting pieces.
+
 substructures:
 
   t1/t2/t3/t4/t5/t6:
     path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
     translation: [0, 30.5, 0]
+    
   hips:
     path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
     translation: [0, 40.5, 0]
+    
   front:
     path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
@@ -23,14 +26,21 @@ substructures:
       axis: [0, 1, 0]
       angle: 180
       reference: [0, 0, 0]
-  #backlegsleft/backlegsright:
-  #  path: ../BaseStructuresLaika/backlegs.yaml
-  #  offset: [0, 0, 17]
-  #  translation: [20, 10, -10] # 20 - 30 = -10
-  #frontlegsleft/frontlegsright:
-  #  path: ../BaseStructuresLaika/frontlegs.yaml
-  #  offset: [0, 0, 30]
-  #  translation: [-57, 10, -15] # 15 - 30 = -15
+
+  # We're doing two legs here. The hips are +/- 15 units wide.
+  # Offset is between each leg. Second leg is +30 from first.
+  backlegsleft/backlegsright:
+    path: ../BaseStructuresLaika/StickLegs.yaml
+    offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
+    # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
+    # the ends of the hips (15 units back.)
+    translation: [15, 10.5, -16] # 
+    
+  frontlegsleft/frontlegsright:
+    path: ../BaseStructuresLaika/StickLegs.yaml
+    offset: [0, 0, 32]
+    # Only difference from front legs is in x-direction.
+    translation: [-75, 10.5, -16] # 60 offset + 15 for hips
 
 bond_groups:
   HF:
@@ -60,28 +70,26 @@ bond_groups:
 
   rod:
   
-  # For the hips, connect at just one point, from the center of the
-  # last vetrebra to one end of the box.
+   # For the hips, connect at just one point, from the center of the
+   # last vetrebra to one end of the box.
    t1/hips/node_node:
       - [center, V1]
 
-  # For the front, also just connect at centers.
+   # For the front, also just connect at centers.
    t6/front/node_node: 
       - [center, V1]
    
-   #hips/backlegsleft/node_node:
-   #   - [V15, V6]
-   #   - [V19, V7]
+   hips/backlegsleft/node_node:
+      - [V4, legtop]
 
-   #hips/backlegsright/node_node:
-   #   - [V16, V6]
-   #   - [V20, V7]
+   hips/backlegsright/node_node:
+      - [V3, legtop]
  
-   #front/frontlegsleft/node_node:
-   #   - [V16, V6]
+   front/frontlegsleft/node_node:
+      - [V3, legtop]
 
-   #front/frontlegsright/node_node:  
-   #   - [V17, V6]
+   front/frontlegsright/node_node:  
+      - [V4, legtop]
 
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
