@@ -1,0 +1,25 @@
+# Units are currently in cm
+# This file defines one leg, as a "stick."
+# It will be one long box with a ball at its foot,
+# like the legs on the current Laika.
+
+nodes:    
+  V1: [0, 0, 0]
+  # Second vertex is the endpoint. Let's extend the legs "down."
+  # Seemed to be about 30 units down.
+  V2: [0, -30, 0]
+
+pair_groups:
+  legBox:
+    - [V1, V2]
+    
+
+builders:
+
+  # box
+  legBox:
+    class: tgBoxInfo
+    parameters:
+      density: 0 # was 0.014
+      width: 3
+      height: 0.5

@@ -10,23 +10,27 @@ substructures:
   t1/t2/t3/t4/t5/t6:
     path: ./TetrahedronSymmetric.yaml
     offset: [-12, 0 , 0]
-    translation: [0, 30.5, 30]
+    translation: [0, 30.5, 0]
   hips:
-    path: ../BaseStructuresLaika/hips.yaml
+    path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
-    translation: [0, 35.5, 25]
+    translation: [0, 40.5, 0]
   front:
-    path: ../BaseStructuresLaika/front.yaml
+    path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
-    translation: [-68, 35.5, 17]
-  backlegsleft/backlegsright:
-    path: ../BaseStructuresLaika/backlegs.yaml
-    offset: [0, 0, 17]
-    translation: [20, 10, 20]
-  frontlegsleft/frontlegsright:
-    path: ../BaseStructuresLaika/frontlegs.yaml
-    offset: [0, 0, 30]
-    translation: [-57, 10, 15]
+    translation: [-60, 40.5, 0] # 68
+    rotation:
+      axis: [0, 1, 0]
+      angle: 180
+      reference: [0, 0, 0]
+  #backlegsleft/backlegsright:
+  #  path: ../BaseStructuresLaika/backlegs.yaml
+  #  offset: [0, 0, 17]
+  #  translation: [20, 10, -10] # 20 - 30 = -10
+  #frontlegsleft/frontlegsright:
+  #  path: ../BaseStructuresLaika/frontlegs.yaml
+  #  offset: [0, 0, 30]
+  #  translation: [-57, 10, -15] # 15 - 30 = -15
 
 bond_groups:
   HF:
@@ -54,34 +58,30 @@ bond_groups:
    t1/t2/t3/t4/t5/t6/node_node: 
       - [left, back]  
 
-  rod: 
+  rod:
+  
+  # For the hips, connect at just one point, from the center of the
+  # last vetrebra to one end of the box.
    t1/hips/node_node:
-      - [right, V2]
-      - [right, V3]
-      - [left, V1]
-      - [left, V4]
-      - [right, V7]
-      - [right, V8]
+      - [center, V1]
 
+  # For the front, also just connect at centers.
    t6/front/node_node: 
-      - [left, V11]
-      - [left, V12]
-      - [right, V3]
-      - [right, V2]
+      - [center, V1]
    
-   hips/backlegsleft/node_node:
-      - [V15, V6]
-      - [V19, V7]
+   #hips/backlegsleft/node_node:
+   #   - [V15, V6]
+   #   - [V19, V7]
 
-   hips/backlegsright/node_node:
-      - [V16, V6]
-      - [V20, V7]
+   #hips/backlegsright/node_node:
+   #   - [V16, V6]
+   #   - [V20, V7]
  
-   front/frontlegsleft/node_node:
-      - [V16, V6]
+   #front/frontlegsleft/node_node:
+   #   - [V16, V6]
 
-   front/frontlegsright/node_node:  
-      - [V17, V6]
+   #front/frontlegsright/node_node:  
+   #   - [V17, V6]
 
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
@@ -96,7 +96,7 @@ builders:
   rod:
     class: tgRodInfo
     parameters:
-      density: 0.0044
+      density: 0.014
       radius: 0.25
       friction: 0.5
       roll_friction: 0.5
