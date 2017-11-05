@@ -107,8 +107,8 @@ bond_groups:
    t6/front/node_node: 
       - [center, V1]
    
-   hips/backlegsleft/node_node:
-      - [V4, legtop]
+   #hips/backlegsleft/node_node:
+   #   - [V4, legtop]
 
    hips/backlegsright/node_node:
       - [V3, legtop]

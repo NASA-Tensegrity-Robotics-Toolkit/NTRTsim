@@ -35,9 +35,7 @@
 #include <vector>
 
 // Forward declarations
-//class tgSpringCableActuator;
-//class tgStructure;
-//class tgStructureInfo;
+//class tgWorld; // will we need this for adding the btHingeConstraint?
 
 // This class will inherit from TensegrityModel, and we don't really
 // need to do much else besides add some extra methods to get the rigid bodies

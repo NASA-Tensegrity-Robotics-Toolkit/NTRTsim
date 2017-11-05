@@ -27,6 +27,9 @@
 #include "LaikaWalkingModel.h"
 // This library
 #include "core/tgCast.h"
+#include "core/tgWorld.h" // for hinge hack
+#include "core/tgWorldBulletPhysicsImpl.h" // for hinge hack
+#include "core/tgBox.h"
 //#include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
@@ -38,7 +41,11 @@
 #include "tgcreator/tgStructureInfo.h"
 #include "tgcreator/tgUtil.h"
 // The Bullet Physics library
+#include "LinearMath/btVector3.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h" // for hinge hack
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
@@ -85,9 +92,100 @@ void LaikaWalkingModel::mapMuscles(LaikaWalkingModel::MuscleMap& muscleMap,
 
 void LaikaWalkingModel::setup(tgWorld& world)
 {
-    // Call the parent's function.
+  // Call the parent's function.
   std::cout << "Setting up the LaikaWalkingModel using TensegrityModel's YAML parser..." << std::endl;
   TensegrityModel::setup(world);
+
+  // Next, add the btHingeConstraints for the legs.
+  // First, the tags for each hinge. Here's the tags for the hips/shoulders:
+  std::string hipsTagForHinge = "hipsBack";
+  std::string shouldersTagForHinge = "shouldersBack";
+
+  // Tags for each leg's box to attach:
+  std::string legBackLeftTagForHinge = "legBoxBackLeft";
+  std::string legBackRightTagForHinge = "legBoxBackRight";
+  std::string legFrontLeftTagForHinge = "legBoxFrontLeft";
+  std::string legFrontRightTagForHinge = "legBoxFrontRight";
+
+  std::cout << "Setting up the btHingeConstraints for the LaikaWalkingModel's legs."
+	    << std::endl;
+
+  // Let's get a reference to the btDynamicsWorld. (Hope this is set up by now?)
+  // Next, we need to get a reference to the Bullet Physics world, to put the hinges.
+  tgWorldImpl& impl = world.implementation();
+  tgWorldBulletPhysicsImpl& bulletWorld =
+    static_cast<tgWorldBulletPhysicsImpl&>(impl);
+  btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+
+  /**
+   * Let's get references to the rods we'll use for the shoulder/hips hinges.
+   */
+  std::vector<tgRod*> hipHingeRods = find<tgRod>(hipsTagForHinge);
+  // Make sure this list is not empty:
+  if( hipHingeRods.empty() ) {
+    throw std::invalid_argument("No rods found with hipsTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( hipHingeRods[0] == NULL) {
+    throw std::runtime_error("Pointer to the first rod with hipsTagForHinge is NULL.");
+  }
+
+  // Arbitrarily choose the first of the two rods. Doesn't matter, just off
+  // by an orientation.
+  btRigidBody* hipHingeRod = hipHingeRods[0]->getPRigidBody();
+
+  /**
+   * Next, let's do the same for each leg.
+   */
+  
+  // Note, these are BOXES not rods.
+  std::vector<tgBox*> legBackLeftHingeBoxes = find<tgBox>(legBackLeftTagForHinge);
+  // Make sure this list is not empty:
+  if( legBackLeftHingeBoxes.empty() ) {
+    throw std::invalid_argument("No boxes found with legBackLeftTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( legBackLeftHingeBoxes[0] == NULL) {
+    throw std::runtime_error("Pointer to the first box with legBackLeftTagForHinge is NULL.");
+  }
+
+  // There really should only be one of these.
+  btRigidBody* legBackLeftHingeBox = legBackLeftHingeBoxes[0]->getPRigidBody();
+
+
+
+  /**
+   * CREATE THE HINGE CONSTRAINTS
+   */
+
+  // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+  // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
+  //    between two vertebrae should be.
+  // For the rotating joint, need to compensate for the vertical translation,
+  // which could be like +30 to rod 2.
+  // I think the first two btVectors are the locations of the contact point, relative
+  // to each rigid body. Let's do it like an offset from the leg, and zero from
+  // the hip. But we need to 
+  // The last two btVector3s are the axis for each element.
+  // We'll choose to be Y for both.
+  // For example - the first btVector3 moves the point on the hips to the edge of
+  // the hips, then translates it in by half the rod radius (3/2) to center it.
+  // The second btVector3 moves the point on the leg to its top. The total leg
+  // height is (30 + sphere radius / 2) = 16.5 ?
+  // and then also centers it. (Width = 3.)
+
+  // NOT PLACED ALONG CORRECT POINT? It seems like the end nodes align now, but the
+  // center of rotation seems to be slightly "down" the leg...
+  // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
+  btHingeConstraint* legBackLeftHinge =
+    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
+			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  btVector3(0, 0, 1));
+  // 1.5, was hips 2
+  // Add the hinge to the world.
+  btWorld->addConstraint(legBackLeftHinge);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
