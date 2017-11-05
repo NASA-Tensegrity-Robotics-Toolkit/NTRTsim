@@ -120,6 +120,11 @@ void LaikaWalkingModel::setup(tgWorld& world)
   /**
    * Let's get references to the rods we'll use for the shoulder/hips hinges.
    */
+
+  //
+  // Hips:
+  //
+  
   std::vector<tgRod*> hipHingeRods = find<tgRod>(hipsTagForHinge);
   // Make sure this list is not empty:
   if( hipHingeRods.empty() ) {
@@ -134,10 +139,33 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // Arbitrarily choose the first of the two rods. Doesn't matter, just off
   // by an orientation.
   btRigidBody* hipHingeRod = hipHingeRods[0]->getPRigidBody();
+  
+  //
+  // Shoulders:
+  //
+
+  std::vector<tgRod*> shoulderHingeRods = find<tgRod>(shouldersTagForHinge);
+  // Make sure this list is not empty:
+  if( shoulderHingeRods.empty() ) {
+    throw std::invalid_argument("No rods found with shouldersTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( shoulderHingeRods[0] == NULL) {
+    throw std::runtime_error("Pointer to the first rod with shouldersTagForHinge is NULL.");
+  }
+
+  // Arbitrarily choose the first of the two rods. Doesn't matter, just off
+  // by an orientation.
+  btRigidBody* shoulderHingeRod = shoulderHingeRods[0]->getPRigidBody();
 
   /**
    * Next, let's do the same for each leg.
    */
+
+  //
+  // Back Left Leg:
+  //
   
   // Note, these are BOXES not rods.
   std::vector<tgBox*> legBackLeftHingeBoxes = find<tgBox>(legBackLeftTagForHinge);
@@ -150,11 +178,59 @@ void LaikaWalkingModel::setup(tgWorld& world)
   if( legBackLeftHingeBoxes[0] == NULL) {
     throw std::runtime_error("Pointer to the first box with legBackLeftTagForHinge is NULL.");
   }
-
   // There really should only be one of these.
   btRigidBody* legBackLeftHingeBox = legBackLeftHingeBoxes[0]->getPRigidBody();
 
+  //
+  // Back Right Leg:
+  //
+  
+  std::vector<tgBox*> legBackRightHingeBoxes = find<tgBox>(legBackRightTagForHinge);
+  // Make sure this list is not empty:
+  if( legBackRightHingeBoxes.empty() ) {
+    throw std::invalid_argument("No boxes found with legBackRightTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( legBackRightHingeBoxes[0] == NULL) {
+    throw std::runtime_error("Pointer to the first box with legBackRightTagForHinge is NULL.");
+  }
+  // There really should only be one of these.
+  btRigidBody* legBackRightHingeBox = legBackRightHingeBoxes[0]->getPRigidBody();
 
+  //
+  // Front Left Leg:
+  //
+
+  std::vector<tgBox*> legFrontLeftHingeBoxes = find<tgBox>(legFrontLeftTagForHinge);
+  // Make sure this list is not empty:
+  if( legFrontLeftHingeBoxes.empty() ) {
+    throw std::invalid_argument("No boxes found with legFrontLefttTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( legFrontLeftHingeBoxes[0] == NULL) {
+    throw std::runtime_error("Pointer to the first box with legfrontleftTagForHinge is NULL.");
+  }
+  // There really should only be one of these.
+  btRigidBody* legFrontLeftHingeBox = legFrontLeftHingeBoxes[0]->getPRigidBody();
+
+  //
+  // Front Right Leg:
+  //
+
+  std::vector<tgBox*> legFrontRightHingeBoxes = find<tgBox>(legFrontRightTagForHinge);
+  // Make sure this list is not empty:
+  if( legFrontRightHingeBoxes.empty() ) {
+    throw std::invalid_argument("No boxes found with legFrontRightTagForHinge.");
+  }
+  // Now, we know that element 0 exists.
+  // Confirm that it is not a null pointer.
+  if( legFrontRightHingeBoxes[0] == NULL) {
+    throw std::runtime_error("Pointer to the first box with legFrontRightTagForHinge is NULL.");
+  }
+  // There really should only be one of these.
+  btRigidBody* legFrontRightHingeBox = legFrontRightHingeBoxes[0]->getPRigidBody();
 
   /**
    * CREATE THE HINGE CONSTRAINTS
@@ -186,6 +262,30 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // 1.5, was hips 2
   // Add the hinge to the world.
   btWorld->addConstraint(legBackLeftHinge);
+
+  // For the back right:
+  btHingeConstraint* legBackRightHinge =
+    new btHingeConstraint(*hipHingeRod, *legBackRightHingeBox,
+			  btVector3(1.5, 2, 20),
+			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  btVector3(0, 0, 1));
+  btWorld->addConstraint(legBackRightHinge);
+
+  // For the front left:
+  btHingeConstraint* legFrontLeftHinge =
+    new btHingeConstraint(*shoulderHingeRod, *legFrontLeftHingeBox,
+			  btVector3(1.5, 2, -20),
+			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  btVector3(0, 0, 1));
+  btWorld->addConstraint(legFrontLeftHinge);
+
+  // For the front right:
+  btHingeConstraint* legFrontRightHinge =
+    new btHingeConstraint(*shoulderHingeRod, *legFrontRightHingeBox,
+			  btVector3(1.5, 2, 20),
+			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  btVector3(0, 0, 1));
+  btWorld->addConstraint(legFrontRightHinge);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    

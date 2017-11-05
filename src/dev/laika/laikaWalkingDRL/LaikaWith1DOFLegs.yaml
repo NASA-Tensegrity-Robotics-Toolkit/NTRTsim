@@ -110,14 +110,14 @@ bond_groups:
    #hips/backlegsleft/node_node:
    #   - [V4, legtop]
 
-   hips/backlegsright/node_node:
-      - [V3, legtop]
+   #hips/backlegsright/node_node:
+   #   - [V3, legtop]
  
-   front/frontlegsleft/node_node:
-      - [V3, legtop]
+   #front/frontlegsleft/node_node:
+   #   - [V3, legtop]
 
-   front/frontlegsright/node_node:  
-      - [V4, legtop]
+   #front/frontlegsright/node_node:  
+   #   - [V4, legtop]
 
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
