@@ -43,6 +43,20 @@
 #include <string>
 #include <vector>
 
+// Added for ROS
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include "std_msgs/UInt32.h"
+
+// Class for control callbacks
+class control_cb_class {
+  public:
+    std::string control_msg = "step";
+    void cb(const std_msgs::String::ConstPtr& msg) {
+      control_msg = msg->data;
+      ROS_INFO("Control: %s", msg->data.c_str());
+    }
+};
 
 /**
  * The entry point.
@@ -78,9 +92,9 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    //tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -134,8 +148,42 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
+    // ROS stuff
+    control_cb_class control_cb;
+
+    // Initialize ROS node
+    ros::init(argc,argv,"laika_model");
+    ros::NodeHandle n;
+    ros::Publisher pub = n.advertise<std_msgs::UInt32>("state",1);
+    ros::Subscriber sub = n.subscribe("control",1,&control_cb_class::cb,&control_cb);
+
+    int counter = 0;
+    std_msgs::UInt32 msg;
+    ros::Rate loop_rate(10);
+
+    while (ros::ok()) {
+      ros::spinOnce();
+      msg.data = counter;
+
+      if (control_cb.control_msg == "reset") {
+        simulation.reset();
+        simulation.run(1);
+        counter = 0;
+        std::cout << "Simulation reset" << std:: endl;
+      }
+      else if (control_cb.control_msg == "step") {
+        simulation.run(1);
+        pub.publish(msg);
+      }
+      ROS_INFO("State: %d", counter);
+
+      ++counter;
+
+      loop_rate.sleep();
+    }
+    
     // Finally, run the simulation.
-    simulation.run();
+    // simulation.run();
 
     // teardown is handled by delete
     return 0;
