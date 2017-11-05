@@ -139,7 +139,14 @@ class T6RollingController : public tgObserver<PrismModel>
    */
 
   boost::numeric::ublas::vector<double> CableRestlengthCalculation(int Face,int Side);
-    
+
+  boost::numeric::ublas::vector<double> CableRestlengthCalculation_noFace(int Side);
+
+  typedef std::pair<double,int> mypair;
+  static bool comparator(const mypair& l,const mypair& r);
+  
+  int contactSurfaceDetection_using_markers(PrismModel& subject,int prevFace);
+  
   int contactSurfaceDetection(int currFace);
 
   /**
@@ -296,6 +303,7 @@ class T6RollingController : public tgObserver<PrismModel>
   bool reorient = false;
   bool drGoalReached = false;
   bool isOnGround;
+  bool transitioning = false;
   int pathIdx = 1;
   int stepIdx = 0;
   int roll_case = 0;

@@ -19,12 +19,16 @@
 #include "LinearMath/btVector3.h"
 #include "core/tgWorldBulletPhysicsImpl.h"
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
+//Boost Vector Library
+#include <numeric/ublas/vector.hpp>
+//#include <numeric/ublas/assignment.hpp> //TODO: understand why including this creates a multiple-definition compilation error
 // The C++ Standard Library
 #include <stdexcept>
 #include <math.h>
 
 #define PI 3.14159265
 
+using namespace boost::numeric::ublas;
 namespace
 {
   /**
@@ -58,14 +62,15 @@ namespace
       20.0,            // damping (kg / sec)
       1.0*sf,         // rod_length (length)
       1.0,             // friction (unitless)
-      0.01,             // rollFriction (unitless)
+      0.99,             // rollFriction (unitless)
       0.0,              // restitution (?)
       17.5*sf,         // pretension (kg-m/s^2) -> set to 4 * 613, the previous value of the rest length controller
       0,                // History logging (boolean)
-      50*sf,//10000*sf,         // maxTens (kg-m/s^2)
-      0.025*sf,//0.15*sf,          // targetVelocity (m/s)
+      1000*sf,//10000*sf,         // maxTens (kg-m/s^2)
+      0.15*sf,//0.025*sf,//0.15*sf,          // targetVelocity (m/s)
     };
 } // namespace
+
 
 PrismModel::PrismModel() :
   tgModel() 
@@ -137,7 +142,6 @@ PrismModel::PrismModel() :
   face5Norm = (face5Edge0.cross(face5Edge2)).normalize();
   face6Norm = (face7Edge2.cross(face5Edge1)).normalize();
   face7Norm = (face7Edge0.cross(face7Edge2)).normalize();
-
   face8Norm = (face8Edge0.cross(face8Edge2)).normalize();
   face9Norm = (face8Edge1.cross(face10Edge0)).normalize();
   face10Norm = (face10Edge0.cross(face10Edge2)).normalize();
@@ -146,7 +150,6 @@ PrismModel::PrismModel() :
   face13Norm = (face13Edge0.cross(face13Edge2)).normalize();
   face14Norm = (face15Edge2.cross(face13Edge1)).normalize();
   face15Norm = (face15Edge0.cross(face15Edge2)).normalize();
-
   face16Norm = (face0Edge0.cross(face13Edge2)).normalize();
   face17Norm = (face15Edge1.cross(face2Edge1)).normalize();
   face18Norm = (face7Edge1.cross(face10Edge1)).normalize();
@@ -195,7 +198,6 @@ void PrismModel::setup(tgWorld& world)
   double payloadLength = 0.05*sf;
   
   // Define the configurations of the rods and strings
-  
   const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
   const tgRod::Config tankConfig(tankRadius, 21645/pow(sf,3), c.friction, //density calculated so tank - 8.5 kg
@@ -208,30 +210,30 @@ void PrismModel::setup(tgWorld& world)
 				   c.rollFriction, c.restitution);
   tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension, c.hist, 
 				       c.maxTens, c.targetVelocity);
-
-  // Note that pretension is defined for this string
+  // Note that pretension is defined differently for these inner passive cables
   tgBasicActuator::Config tankLinkConfig(c.stiffness, c.damping, c.pretension*1.5, c.hist, 
 					 c.maxTens, c.targetVelocity);
 
-    
+  
   // Create a structure that will hold the details of this model
   tgStructure s;
-  
-  int nPtsExtRing = 48*4;  //Number of rod segments to build circular external gimbal ring; Must be divisible by four
-  int nPtsIntRing = 48*4;  //Number of rod segments to build circular internal gimbal ring; Must be divisible by four
 
+  
   //Incremented by reference assignment in each call below
   int globalOffset = 0;
 
-  /*ROBOT*/
-  int beforeRobot = globalOffset;  //Save the node position
   
-  //**If you comment out the robot constructor below, also comment out the string constructor further down below to avoid segfault error
+  /*ROBOT*/
+  int beforeRobot = globalOffset;  //Save the node position before anything is defined, this is trivially 0
+
+  
+  //**If you comment out the robot constructor below,
+  //  also comment out the string constructor further down below to avoid segfault error
   ///*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   addRobot(s,globalOffset,tankToOuterRing+externalRadius);
 
   //rotate robot to sit on a specified face
-  btQuaternion rotation = rotateToFace(s, 8);
+  btQuaternion rotation = rotateToFace(s, 0);
   rotateNormVectors(rotation);
 
   double* COM = returnCOM(s,beforeRobot,12);
@@ -240,9 +242,12 @@ void PrismModel::setup(tgWorld& world)
   //*/
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  
   //Payload Constructor Functions /////////////////////////////////////////////////////////////////
   /*
   //GIMBAL
+  int nPtsExtRing = 48*4;  //Number of rod segments to build circular external gimbal ring; Must be divisible by four
+  int nPtsIntRing = 48*4;  //Number of rod segments to build circular internal gimbal ring; Must be divisible by four
   int gimbalStart = globalOffset; //Save the node position before adding the gimbal
   addRing(s,externalRadius,nPtsExtRing,globalOffset);
   addRing(s,internalRadius,nPtsIntRing,globalOffset);
@@ -255,7 +260,7 @@ void PrismModel::setup(tgWorld& world)
   
   //HINGES
   int hingeStart = globalOffset; //Save the node position before adding hinge joints
-  makeLinks(s,externalRadius,internalRadius,tankToOuterRing,tankRadius,nPtsExtRing,globalOffset,baseStartLink,gimbalStart); //Adds 4 nodes
+  makeLinks(s,externalRadius,internalRadius,tankToOuterRing,tankRadius,nPtsExtRing,globalOffset,baseStartLink,gimbalStart); 
   std::cout << "After Hinges: " << globalOffset << std::endl;
   
   //THRUSTER
@@ -284,9 +289,11 @@ void PrismModel::setup(tgWorld& world)
   spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
   spec.addBuilder("string", new tgBasicActuatorInfo(tankLinkConfig));
 
+  
   // Create your structureInfo
   tgStructureInfo structureInfo(s, spec);
   structureInfo.buildInto(*this, world);
+
   
   // Get the rod rigid bodies for controller
   std::vector<tgRod*> rods = PrismModel::find<tgRod>("rod");
@@ -294,13 +301,16 @@ void PrismModel::setup(tgWorld& world)
     allRods.push_back(PrismModel::find<tgRod>(tgString("rod num", i))[0]);
   }
 
-  //set larger margin for collision detection
-  btScalar marg = 0.25;
+  
+  //set larger margin for collision detection (had previous issues with clipping at high velocity impacts)
+  
+  btScalar marg = 0.04;//0.25;
   for (int i = 0; i < rods.size(); i++) {
     allRods[i]->getPRigidBody()->getCollisionShape()->setMargin(marg);
   }
-
-  // Get the actuators for any controllers
+  
+  
+  // Get the actuators for controllers, allActuators = actuated outer cables, allCables include passive inner cables
   std::vector<tgBasicActuator*> actuators = PrismModel::find<tgBasicActuator>("muscle");
   std::vector<tgBasicActuator*> innerCables = PrismModel::find<tgBasicActuator>("string");
   for (int i = 0; i < actuators.size(); i++) {
@@ -311,6 +321,7 @@ void PrismModel::setup(tgWorld& world)
     allCables.push_back(PrismModel::find<tgBasicActuator>(tgString("string num", i))[0]);
   }
 
+  
   //Comment out below if not using inner-payload
   /*
   //Get linking rods
@@ -350,7 +361,7 @@ void PrismModel::setup(tgWorld& world)
   btRigidBody* tankRigidBody = tankRod->getPRigidBody();
   TankBodies.push_back(tankRigidBody);
 
-  //Add Marker to Visualize Thruster Orientation
+  //Debugging: Add Marker to Visualize Thruster Orientation
   btTransform inverseTransform = thrusterRigidBody->getWorldTransform().inverse();
   btVector3 pos = btVector3(0,0,7);
   abstractMarker thrust_dir=abstractMarker(thrusterRigidBody,pos,btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
@@ -358,25 +369,19 @@ void PrismModel::setup(tgWorld& world)
   */
 
   
-  // Get the rod rigid bodies for controller
+  //Place Markers on Face 0 for easy identification
   int thrusterNode = globalOffset; //un-comment if not using inner-payload
   allRods = PrismModel::find<tgRod>("rod");
   btRigidBody* rodBody = allRods[0]->getPRigidBody();
   abstractMarker NODE0 = abstractMarker(rodBody,btVector3(0,-c.rod_length/2,0),btVector3(1,0,.0),thrusterNode); // body, position, color, node number
-  btRigidBody* rodBody0 = allRods[3]->getPRigidBody();
-  abstractMarker NODE7  = abstractMarker(rodBody0,btVector3(0,-c.rod_length/2,0),btVector3(0,0,1),thrusterNode); // body, position, color, node number
   btRigidBody* rodBody1 = allRods[4]->getPRigidBody();
   abstractMarker NODE8 = abstractMarker(rodBody1,btVector3(0,-c.rod_length/2,0),btVector3(.0,1,.0),thrusterNode); // body, position, color, node number
-  btRigidBody* rodBody2 = allRods[0]->getPRigidBody();
-  abstractMarker NODE1 = abstractMarker(rodBody2,btVector3(0,c.rod_length/2,0),btVector3(.0,0,.1),thrusterNode); // body, position, color, node number
   btRigidBody* rodBody3 = allRods[2]->getPRigidBody();
   abstractMarker NODE4 = abstractMarker(rodBody3,btVector3(0,-c.rod_length/2,0),btVector3(.0,0,1),thrusterNode); // body, position, color, node number
   this->addMarker(NODE0); //added base node marker
   this->addMarker(NODE8); //added base node marker
   this->addMarker(NODE4); //added base node marker
-  
-  // Get the actuators for controller
-  allActuators = PrismModel::find<tgBasicActuator>("muscle");
+
 
   //Grab all the markers on the model
   if(1){
@@ -390,6 +395,7 @@ void PrismModel::setup(tgWorld& world)
       markers.push_back(LOG_NODE_2);
     }
 
+    //Below section only if payload+gimbal is included
     /*
     abstractMarker LOG_NODE_1 = abstractMarker(tankRigidBody,btVector3(0,payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
     abstractMarker LOG_NODE_2 = abstractMarker(tankRigidBody,btVector3(0,-payloadLength/2,0),btVector3(.0,0,0),thrusterNode); // body, position, color, node number
@@ -399,10 +405,12 @@ void PrismModel::setup(tgWorld& world)
     markers.push_back(LOG_NODE_2);
     */
       
-    //Open log file
-    //sim_out.open("Marker Node Positions");
   }
-      
+
+  if(marker_log){
+    //Open log file
+    sim_out.open("Marker Node Positions");
+  }
   
   // Notify controllers that setup has finished.
   notifySetup();
@@ -410,15 +418,16 @@ void PrismModel::setup(tgWorld& world)
   // Actually setup the children
   tgModel::setup(world);
 
-  std::cout << "Model Setup Complete ~~~~~~~~~~~~" << std::endl;
+  std::cout << "~~~~~~~~~~~~ Model Setup Complete ~~~~~~~~~~~~" << std::endl;
 }
 
 void PrismModel::step(double dt)
 {        
   notifyStep(dt);
 
-  //std::cout << "Tank Position: " << TankBodies[0]->getCenterOfMassPosition() << std::endl;
-  if(0){
+  //std::cout << "Tank Position: " << allRods[0]->getPRigidBody()->getCenterOfMassPosition() << std::endl;
+
+  if(marker_log){
     std::cout << "Marker Logging~~~" << markers.size() << std::endl;
     for(int i=0;i<markers.size();i++){
       std::cout << "Node_pos" << i << ", "; 
@@ -433,6 +442,16 @@ void PrismModel::step(double dt)
     }
     std::cout << std::endl;
   }
+
+  /*
+  std::cout << "Simulated Sensors: ";
+  boost::numeric::ublas::vector<double> Input = simulate_Orientation_Sensors();
+  for(size_t i=0; i<Input.size() ; i++){
+    std::cout << Input(i) << ", ";
+  }
+  std::cout << std::endl;
+  */
+    
   tgModel::step(dt);  // Step any children
 }
 
@@ -458,13 +477,6 @@ std::vector<tgBasicActuator*>& PrismModel::getAllCables()
 {
   return allCables;
 }
-
-/*
-  std::vector<abstractMarker> PrismModel::getAllMarkers()
-  {
-  return markers;
-  }
-*/
 
 std::vector<tgRod*>& PrismModel::getAllRods()
 {
@@ -577,31 +589,6 @@ void PrismModel::addStrings(tgStructure& s, int baseStartLink, int nPtBeforeRobo
 
 void PrismModel::addNodes(tgStructure& s, int offset, double tankToOuterRing)
 {
-  //DEPRECATED NODE DEFINITIONS MATCHING ORIGINAL MATLAB CONSTRUCTION
-  /*
-    double L = c.rod_length; //already scaled
-    double t = 1.2213*L/1.9912; //find exact geometric ratio later
-    double r = t/(2*sin(36*M_PI/180)); 
-    double theta = asin(r/t)*180/M_PI;
-    double m = sqrt(pow(t,2)+pow((2*t*sin(54*M_PI/180)),2)); //tip to tip of reg. icosahedron
-    double var = m-t*cos(theta*M_PI/180);
-
-    //Values below copied from Icosahderon_w_payload.m, with Y_ntrt = Z_matlab  and Z_ntrt = -Y_matlab
-    //Coordinate transformation necessary as NTRT height direction is (0,1,0) Y unit vector
-
-    s.addNode(0, -m/2-tankToOuterRing, 0);  // 0
-    s.addNode(0, var-m/2-tankToOuterRing, r);  // 1
-    s.addNode(0, t*cos(theta*M_PI/180)-m/2-tankToOuterRing, -r);  // 2
-    s.addNode(0, m-m/2-tankToOuterRing, 0); // 3
-    s.addNode(-r*cos(18*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    -r*sin(18*M_PI/180));   // 4
-    s.addNode(r*cos(18*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    -r*sin(18*M_PI/180));  // 5
-    s.addNode(-r*cos(18*M_PI/180),   var-m/2-tankToOuterRing,    r*sin(18*M_PI/180));  // 6
-    s.addNode(r*cos(18*M_PI/180),   var-m/2-tankToOuterRing,    r*sin(18*M_PI/180));  // 7
-    s.addNode(-r*sin(36*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    r*cos(36*M_PI/180));  // 8
-    s.addNode(-r*sin(36*M_PI/180),   var-m/2-tankToOuterRing,    -r*cos(36*M_PI/180));  // 9
-    s.addNode(r*sin(36*M_PI/180),   t*cos(theta*M_PI/180)-m/2-tankToOuterRing,    r*cos(36*M_PI/180));  // 10
-    s.addNode(r*sin(36*M_PI/180),   var-m/2-tankToOuterRing,    -r*cos(36*M_PI/180));  // 11
-  */
 
   // Calculate the space between two parallel rods based on the rod length from Config
   double rodSpace = (-c.rod_length + sqrt(pow(c.rod_length,2)+4*pow(c.rod_length,2)))/2;
@@ -725,9 +712,54 @@ void PrismModel::changeRobotState(int state)
   robotState = state;
 }
 
+/*
+boost::numeric::ublas::vector<double> PrismModel::simulate_Orientation_Sensors()
+{
+  // Convert from tgRod objects to btRigidBody objects
+  std::vector<btRigidBody*> rodBodies; // Vector of rigid body objects
+  for (size_t i = 0; i < allRods.size(); i++) {
+    tgRod* rod = allRods[i];
+    btRigidBody* rodBody = rod->getPRigidBody();
+    rodBodies.push_back(rodBody);
+  }
+  
+  // Initialize vector of phi angles (angles between rod directions and +Y axis)
+  boost::numeric::ublas::vector<double> phiInput(6);
+  boost::numeric::ublas::vector<double> relthetaInput(5);
+  btVector3 target_dir = btVector3(1,0,0);
+  double rod1theta;
+  
+  //rod theta and phi angles, theta W.R.T. x-axis
+  for(size_t i=0; i<6; i++){
+    btTransform worldTrans = rodBodies[i]->getWorldTransform();
+    btMatrix3x3 robot2world = worldTrans.getBasis();
+    btVector3 rodDir = robot2world*btVector3(0,1,0);
+    
+    //calculate relative theta
+    if(i==0){
+      rod1theta = atan2(-rodDir.z(),rodDir.x());
+      if(rod1theta<0)
+	rod1theta += 2*M_PI;
+    }
+    else if(i!=0){
+      double theta = atan2(-rodDir.z(),rodDir.x());
+      theta -= rod1theta;
+      if(theta<0)
+	theta += 2*M_PI;
+      relthetaInput(i-1) = theta;
+    }
 
+    //calculate phi
+    double angle = rodDir.angle(btVector3(0,1,0));
+    phiInput(i) = angle;
+  }
 
-
+  boost::numeric::ublas::vector<double> Input(11);
+  Input <<= phiInput, relthetaInput;
+  
+  return Input;
+}
+*/
 
 
 

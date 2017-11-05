@@ -29,8 +29,10 @@
 #include "Marker.h"
 #include "RPThruster.h"
 #include "controllers/T6RollingControllerPrism.h"
+#include "controllers/SimulatedSensors.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgHillyGround.h"
 #include "core/terrain/tgImportGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimViewGraphics.h"
@@ -63,10 +65,15 @@ int main(int argc, char** argv)
   //Option 1: Uncomment to implement flat ground environment (must comment out STL importer below)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-  const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+  const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),0.0);
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
   
+  /*
+  const tgHillyGround::Config groundConfig(btVector3(yaw, pitch, roll));
+  // the world will delete this
+  tgHillyGround* ground = new tgHillyGround(groundConfig);
+  */
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   //Option 2: Uncomment below to import parsed STL file (must comment out flat ground above)
@@ -153,6 +160,9 @@ int main(int argc, char** argv)
   myModel->attach(rollingController1);
   T6RollingController* const rollingController2 = new T6RollingController(controllerConfig2);
   myModel->attach(rollingController2);
+
+  SimulatedSensors* const orientationSensor = new SimulatedSensors();
+  //myModel->attach(orientationSensor);
     
   // Add the models to the world
   simulation.addModel(marker);

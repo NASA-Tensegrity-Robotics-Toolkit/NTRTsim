@@ -55,9 +55,9 @@ public:
 	int getNodeNumber() const {
 		return nodeNumber;
 	}
-
+	btVector3 color;
 private:
-        btVector3 color;
+        
         const btRigidBody *attachedBody;
         //Relative position to the body when it is first constructed
         btVector3 attachedRelativeOriginalPosition;

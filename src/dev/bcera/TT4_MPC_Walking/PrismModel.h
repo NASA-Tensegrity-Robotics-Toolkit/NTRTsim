@@ -51,7 +51,8 @@
 #include <stdexcept>
 #include <math.h>
 #include <vector>
-
+//Boost Vector Library
+#include <numeric/ublas/vector.hpp>
 //Debug Drawers
 #include "GL_ShapeDrawer.h"
 #include "LinearMath/btIDebugDraw.h"
@@ -137,6 +138,8 @@ public:
     std::vector<btVector3>& getNormVects();
 
     std::vector<btRigidBody*>& getTank();
+
+
 
     std::vector<abstractMarker> markers;
 
@@ -248,6 +251,8 @@ private:
     static void addRobot(tgStructure& s, int& offset, double tankToOuterRing);
 
     static double* returnCOM(tgStructure &s, int firstNode, int numberofNodes);
+
+    boost::numeric::ublas::vector<double> simulate_Orientation_Sensors();
 
 
 private:    

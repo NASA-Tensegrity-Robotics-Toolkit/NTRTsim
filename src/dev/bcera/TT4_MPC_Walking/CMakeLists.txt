@@ -24,5 +24,6 @@ add_executable(App_TT4_MPC_Walking
     RPThruster.cpp
     Marker.cpp
     controllers/T6RollingControllerPrism.cpp
+    controllers/SimulatedSensors.cpp
 ) 
 
