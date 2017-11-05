@@ -13,8 +13,8 @@ link_libraries(core
                terrain
                tgOpenGLSupport
                yaml-cpp
-	             Adapters
-	             TensegrityModel)
+	       Adapters
+	       TensegrityModel)
 
 add_executable(AppLaikaWalkingDRL
   HorizontalSpineController.cpp

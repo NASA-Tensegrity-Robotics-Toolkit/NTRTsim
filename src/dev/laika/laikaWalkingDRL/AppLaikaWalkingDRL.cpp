@@ -36,6 +36,10 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+// for the sensors...
+//#include "sensors/tgDataLogger2.h"
+#include "sensors/tgFullStateMonitor.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -151,6 +155,19 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
+
+    // Let's make some sensors to test out tgFullStateMonitor.
+    //std::string log_filename = "~/NTRTsim_logs/tests_for_laikaWalkingDRL";
+    //double samplingTimeInterval = 0.1;
+    //tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    tgFullStateMonitor* myFullStateMonitor = new tgFullStateMonitor();
+    //myDataLogger->addSenseable(myModel);
+    myFullStateMonitor->addSenseable(myModel);
+    tgCompoundRigidSensorInfo* myCompoundRigidSensorInfo = new tgCompoundRigidSensorInfo();
+    //myDataLogger->addSensorInfo(myCompoundRigidSensorInfo);
+    //simulation.addDataManager(myDataLogger);
+    myFullStateMonitor->addSensorInfo(myCompoundRigidSensorInfo);
+    simulation.addDataManager(myFullStateMonitor);
 
     // ROS stuff
     control_cb_class control_cb;
