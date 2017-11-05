@@ -1,0 +1,34 @@
+# Units are currently in cm
+# This file defines one leg, as a "stick."
+# It will be one long box with a ball at its foot,
+# like the legs on the current Laika.
+# We need to name the legs differently so we can add the hinges correctly
+# to each of them. Legs are the same modulo their names.
+
+nodes:
+  # Second vertex is the endpoint. 
+  # Seemed to be about 30 units down.
+  # But, to visualize this by itself, put the start of the leg "up".
+  legtop: [0, 30, 0]
+  endpoint: [0, 0, 0]
+
+pair_groups:
+  legBoxFrontRight:
+    - [legtop, endpoint]
+
+builders:
+
+  # box
+  legBoxFrontRight:
+    class: tgBoxInfo
+    parameters:
+      density: 0.001 # was 0.014
+      width: 3
+      height: 0.5
+
+  # Spheres are created according to node names.
+  endpoint:
+    class: tgSphereInfo
+    parameters:
+      density: 0.001
+      radius: 3

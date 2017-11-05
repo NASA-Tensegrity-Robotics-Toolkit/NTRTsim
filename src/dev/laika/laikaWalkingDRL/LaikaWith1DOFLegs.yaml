@@ -14,12 +14,24 @@ substructures:
     translation: [0, 30.5, 0]
     
   hips:
-    path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
+    path: ../BaseStructuresLaika/StructuresForHinges/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
     translation: [0, 40.5, 0]
-    
+
+  # Previously, we just swapped around the hips:
+  #front:
+  #  path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
+  #  offset: [0, 0, 0]
+  #  translation: [-60, 40.5, 0] # 68
+  #  rotation:
+  #    axis: [0, 1, 0]
+  #    angle: 180
+  #    reference: [0, 0, 0]
+
+  # ...but now, we need to use separate shoulders, so we can have
+  # different tags for the rods that will be used for the hinges.
   front:
-    path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
+    path: ../BaseStructuresLaika/StructuresForHinges/ShouldersFor1DOFLegs.yaml
     offset: [0, 0, 0]
     translation: [-60, 40.5, 0] # 68
     rotation:
@@ -27,20 +39,36 @@ substructures:
       angle: 180
       reference: [0, 0, 0]
 
+  # Previously, we could do sets of legs, easily, as in:
   # We're doing two legs here. The hips are +/- 15 units wide.
   # Offset is between each leg. Second leg is +30 from first.
-  backlegsleft/backlegsright:
-    path: ../BaseStructuresLaika/StickLegs.yaml
-    offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
-    # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
-    # the ends of the hips (15 units back.)
-    translation: [15, 10.5, -16] # 
+  #backlegsleft/backlegsright:
+  #  path: ../BaseStructuresLaika/StructuresForHinges/StickLegs.yaml
+  #  offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
+  #  # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
+  #  # the ends of the hips (15 units back.)
+  #  translation: [15, 10.5, -16] # 
     
-  frontlegsleft/frontlegsright:
-    path: ../BaseStructuresLaika/StickLegs.yaml
-    offset: [0, 0, 32]
-    # Only difference from front legs is in x-direction.
+  #frontlegsleft/frontlegsright:
+  #  path: ../BaseStructuresLaika/StickLegs.yaml
+  #  offset: [0, 0, 32]
+  #  # Only difference from front legs is in x-direction.
+  #  translation: [-75, 10.5, -16] # 60 offset + 15 for hips
+
+  # However, now we need to have each leg separate. This is required for us
+  # to be able to pick out the tags for the btHingeConstraints.
+  backlegsleft:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackLeft.yaml
+    translation: [15, 10.5, -16]
+  backlegsright:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackRight.yaml
+    translation: [15, 10.5, 16]
+  frontlegsleft:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontLeft.yaml
     translation: [-75, 10.5, -16] # 60 offset + 15 for hips
+  frontlegsright:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontRight.yaml
+    translation: [-75, 10.5, 16]
 
 bond_groups:
   HF:
