@@ -92,9 +92,9 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    tgSimView view(world, timestep_physics, timestep_graphics);
+    //tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
     // Otherwise, this app won't run.
     std::cout << "WARNING: Be sure to change the hard-coded path to the YAML file in AppLaikaWalking, which will depend on the folder path on your computer." << std::endl;
 
-    std::string model_path("/home/edward/NTRTsim/src/dev/laika/laikaWalkingDRL/LaikaWith1DOFLegs.yaml");
+    std::string model_path("/home/brian/NTRTsim/src/dev/laika/laikaWalkingDRL/LaikaWith1DOFLegs.yaml");
     //std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/BaseStructuresLaika/StickLegs.yaml");
     std::cout << "Setting up the LaikaWalkingModel..." << std::endl;
     LaikaWalkingModel* const myModel = new LaikaWalkingModel(model_path.c_str(),false);

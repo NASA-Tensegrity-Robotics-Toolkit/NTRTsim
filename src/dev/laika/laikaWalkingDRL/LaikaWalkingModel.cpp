@@ -255,10 +255,13 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // NOT PLACED ALONG CORRECT POINT? It seems like the end nodes align now, but the
   // center of rotation seems to be slightly "down" the leg...
   // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
+  
   btHingeConstraint* legBackLeftHinge =
-    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
+    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(3, 0, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
+  
+  
   // 1.5, was hips 2
   // Add the hinge to the world.
   btWorld->addConstraint(legBackLeftHinge);
@@ -266,7 +269,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the back right:
   btHingeConstraint* legBackRightHinge =
     new btHingeConstraint(*hipHingeRod, *legBackRightHingeBox,
-			  btVector3(1.5, 2, 20),
+			  btVector3(3, 0, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legBackRightHinge);
@@ -274,7 +277,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the front left:
   btHingeConstraint* legFrontLeftHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontLeftHingeBox,
-			  btVector3(1.5, 2, -20),
+			  btVector3(-3, 0, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontLeftHinge);
@@ -282,7 +285,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the front right:
   btHingeConstraint* legFrontRightHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontRightHingeBox,
-			  btVector3(1.5, 2, 20),
+			  btVector3(-3, 0, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontRightHinge);

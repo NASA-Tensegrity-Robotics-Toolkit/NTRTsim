@@ -13,7 +13,7 @@ subdirs(
     ultra-spine
     muscleNP
     jbruce
-    dhustigschultz
+    #dhustigschultz
     eajung
     #ezhu
     #mcdaly

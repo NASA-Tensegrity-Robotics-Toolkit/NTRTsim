@@ -2,6 +2,8 @@
 find_package(catkin REQUIRED COMPONENTS std_msgs)
 #######################
 
+include_directories(${catkin_INCLUDE_DIRS})
+
 link_directories(${LIB_DIR})
 
 link_libraries(core
@@ -22,8 +24,8 @@ add_executable(AppLaikaWalkingDRL
 
 #### Added for ROS ####
 target_link_libraries(AppLaikaWalkingDRL
-  /opt/ros/indigo/lib/librostime.so
-  /opt/ros/indigo/lib/libroscpp.so
-  /opt/ros/indigo/lib/librosconsole.so
-  /opt/ros/indigo/lib/libroscpp_serialization.so)
+  /opt/ros/kinetic/lib/librostime.so
+  /opt/ros/kinetic/lib/libroscpp.so
+  /opt/ros/kinetic/lib/librosconsole.so
+  /opt/ros/kinetic/lib/libroscpp_serialization.so)
 #######################
