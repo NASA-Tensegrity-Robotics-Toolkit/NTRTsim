@@ -110,8 +110,12 @@ int main(int argc, char** argv)
     // Otherwise, this app won't run.
     std::cout << "WARNING: Be sure to change the hard-coded path to the YAML file in AppLaikaWalking, which will depend on the folder path on your computer." << std::endl;
 
-    std::string model_path("/home/brian/NTRTsim/src/dev/laika/laikaWalkingDRL/LaikaWith1DOFLegs.yaml");
+    // The YAML file absolute paths for Drew's and Brian's computers:
+    //std::string model_path("/home/brian/NTRTsim/src/dev/laika/laikaWalkingDRL/LaikaWith1DOFLegs.yaml");
     //std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/BaseStructuresLaika/StickLegs.yaml");
+
+    // a RELATIVE path to the YAML file...
+    std::string model_path("../../../../src/dev/laika/laikaWalkingDRL/LaikaWith1DOFLegs.yaml");
     std::cout << "Setting up the LaikaWalkingModel..." << std::endl;
     LaikaWalkingModel* const myModel = new LaikaWalkingModel(model_path.c_str(),false);
 
