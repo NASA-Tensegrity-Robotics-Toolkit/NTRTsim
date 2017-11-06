@@ -147,4 +147,10 @@ std::vector<std::string> tgSpringCableActuatorSensor::getSensorData() {
   return sensordata;
 }
 
+// Return the type of sensor (its "name.)
+std::string tgSpringCableActuatorSensor::getSensorType()
+{
+  return "tgSpringCableActuatorSensor";
+}
+
 //end.

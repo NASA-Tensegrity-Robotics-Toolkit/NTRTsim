@@ -37,7 +37,7 @@ class tgSenseable;
 /**
  * This class defines methods for use with sensors.
  * Any individual sensor (ex., a tgRodSensor) will need to re-implement
- * both of these methods.
+ * all of these methods.
  * Note that we make everything pure virtual here to force re-definition.
  * Sensing data from objects occurs in two places in the NTRTsim workflow.
  * First, when setting up the simulation, a heading for the data is given.
@@ -88,6 +88,16 @@ public:
    * in the same order as the headings.
    */
   virtual std::vector<std::string> getSensorData() = 0;
+
+  /**
+   * Return the type of sensor that this is.
+   * Used to (for example) differentiate between the types of output
+   * that will be received. Some data managers (eg FullStateMonitor) will only
+   * be recording certain types of data, in certain ways, from certain types
+   * of sensors.
+   * @return a string, ideally the "name" of the sensor, like tgRodSensor etc.
+   */
+  virtual std::string getSensorType() = 0;
 
   // TO-DO: should any of this be const?
 

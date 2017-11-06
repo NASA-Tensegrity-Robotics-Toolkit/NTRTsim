@@ -36,6 +36,11 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+// for the sensors...
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgFullStateMonitor.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
+#include "sensors/tgRodSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library

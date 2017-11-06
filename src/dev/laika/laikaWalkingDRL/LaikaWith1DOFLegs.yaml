@@ -8,26 +8,31 @@
 
 substructures:
 
-  # t1/t2/t3/t4/t5/t6:
-  t1/t2/t3/t4/t5:
+  #t1/t2/t3/t4/t5:
+  #  path: ./TetrahedronSymmetric.yaml
+  #  offset: [-12, 0 , 0]
+  #  translation: [0, 30.5, 0]
+  
+  t1:
     path: ./TetrahedronSymmetric.yaml
-    offset: [-12, 0 , 0]
     translation: [0, 30.5, 0]
+  t2:
+    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronA.yaml
+    translation: [-12, 30.5, 0]
+  t3:
+    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronB.yaml
+    translation: [-24, 30.5, 0]
+  t4:
+    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronC.yaml
+    translation: [-36, 30.5, 0]
+  t5:
+    path: ./TetrahedronSymmetric.yaml
+    translation: [-48, 30.5, 0]
 
   hips:
     path: ../BaseStructuresLaika/StructuresForHinges/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
     translation: [0, 40.5, 0]
-
-  # Previously, we just swapped around the hips:
-  #front:
-  #  path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
-  #  offset: [0, 0, 0]
-  #  translation: [-60, 40.5, 0] # 68
-  #  rotation:
-  #    axis: [0, 1, 0]
-  #    angle: 180
-  #    reference: [0, 0, 0]
 
   # ...but now, we need to use separate shoulders, so we can have
   # different tags for the rods that will be used for the hinges.
@@ -40,22 +45,6 @@ substructures:
       axis: [0, 1, 0]
       angle: 180
       reference: [0, 0, 0]
-
-  # Previously, we could do sets of legs, easily, as in:
-  # We're doing two legs here. The hips are +/- 15 units wide.
-  # Offset is between each leg. Second leg is +30 from first.
-  #backlegsleft/backlegsright:
-  #  path: ../BaseStructuresLaika/StructuresForHinges/StickLegs.yaml
-  #  offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
-  #  # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
-  #  # the ends of the hips (15 units back.)
-  #  translation: [15, 10.5, -16] #
-
-  #frontlegsleft/frontlegsright:
-  #  path: ../BaseStructuresLaika/StickLegs.yaml
-  #  offset: [0, 0, 32]
-  #  # Only difference from front legs is in x-direction.
-  #  translation: [-75, 10.5, -16] # 60 offset + 15 for hips
 
   # However, now we need to have each leg separate. This is required for us
   # to be able to pick out the tags for the btHingeConstraints.
@@ -76,35 +65,27 @@ substructures:
 
 bond_groups:
   HF:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [front, front]
   HR:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [right, right]
   HL:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [left, left]
   HB:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [back, back]
   SFR:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [right, back]
   SRL:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [right, front]
   SBF:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
      - [left, front]
   SBL:
-  #  t1/t2/t3/t4/t5/t6/node_node:
     t1/t2/t3/t4/t5/node_node:
       - [left, back]
 
@@ -120,17 +101,6 @@ bond_groups:
    t5/front/node_node:
       - [center, V1]
 
-   #hips/backlegsleft/node_node:
-   #   - [V4, legtop]
-
-   #hips/backlegsright/node_node:
-   #   - [V3, legtop]
-
-   #front/frontlegsleft/node_node:
-   #   - [V3, legtop]
-
-   #front/frontlegsright/node_node:
-   #   - [V4, legtop]
 
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,

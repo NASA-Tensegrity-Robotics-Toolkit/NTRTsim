@@ -177,7 +177,12 @@ void TensegrityModel::addChild(tgStructure& structure, const std::string &parent
         childPath = parentPath.substr(0, parentPath.rfind("/") + 1) + childPath;
     }
     tgStructure childStructure = tgStructure(childName);
+    //DEBUGGING: trying to tag individual elements with the name of the substructure.
+    // doesn't seem to be working 2017-11-05 so giving up on that - Drew S.
+    //std::cout << "Inside TensegrityModel, created a tgStructure with childName: " << childName << std::endl;
+    //buildStructure(childStructure, childPath, spec, childName);
     buildStructure(childStructure, childPath, spec);
+    //childStructure.addTags(childName);
     structure.addChild(childStructure);
 }
 
@@ -234,6 +239,13 @@ void TensegrityModel::addChildTranslation(tgStructure& childStructure, const Yam
 }
 
 void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec) {
+    // Call the more versatile method, just with an empty string.
+    // In NTRT, adding an empty string as a tag is valid, does nothing.
+    // As of 2017-11-05: this didn't seem to work, but keeping the skeleton around for future use... -Drew S.
+    buildStructure(structure, structurePath, spec, "");
+}
+
+void TensegrityModel::buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec, std::string tags) {
     /** 
      * This call to YAML::LoadFile can return the exception YAML::BadFile 
      * if any of the yaml files or substructure files cannot be found. 
@@ -263,6 +275,10 @@ void TensegrityModel::buildStructure(tgStructure& structure, const std::string& 
     yamlContainsOnly(root, structurePath, rootKeysVector);
     yamlNoDuplicates(root, structurePath);
 
+    // First, add the tags to the structure.
+    // ...doesn't seem to be doing anything, so commented out. -Drew S. 2017-11-05
+    //structure.addTags(tags);
+    // then, add everything else:
     addChildren(structure, structurePath, spec, root["substructures"]);
     addBuilders(spec, root["builders"]);
     addNodes(structure, root["nodes"]);

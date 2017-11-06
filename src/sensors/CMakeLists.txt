@@ -19,6 +19,7 @@ add_library( ${PROJECT_NAME} SHARED
   # For the new sensors
   tgDataManager.cpp
   tgDataLogger2.cpp
+  tgFullStateMonitor.cpp
     
   tgSensor.cpp
   tgRodSensor.cpp

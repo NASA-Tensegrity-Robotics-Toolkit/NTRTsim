@@ -183,4 +183,10 @@ std::vector<std::string> tgRodSensor::getSensorData() {
   return sensordata;
 }
 
+// Return the type of sensor (its "name.)
+std::string tgRodSensor::getSensorType()
+{
+  return "tgRodSensor";
+}
+
 //end.
