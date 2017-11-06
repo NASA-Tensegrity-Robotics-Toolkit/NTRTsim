@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -50,10 +50,11 @@
 #include <iostream>
 #include <stdexcept>
 #include <math.h>
+#include <sstream>
 
 // The two constructors. Should just call the parent.
 LaikaWalkingModel::LaikaWalkingModel(const std::string& structurePath) :
-    TensegrityModel(structurePath) 
+    TensegrityModel(structurePath)
 {
 }
 
@@ -68,18 +69,18 @@ void LaikaWalkingModel::mapMuscles(LaikaWalkingModel::MuscleMap& muscleMap,
             tgModel& model, size_t segmentCount)
 {
     // create names for muscles (for getMuscles function)
-    
+
     // vertical muscles
     muscleMap["vertical a"] = model.find<tgSpringCableActuator>("vertical muscle a");
     muscleMap["vertical b"] = model.find<tgSpringCableActuator>("vertical muscle b");
     muscleMap["vertical c"] = model.find<tgSpringCableActuator>("vertical muscle c");
     muscleMap["vertical d"] = model.find<tgSpringCableActuator>("vertical muscle d");
-        
+
     // saddle muscles
     for (size_t i = 1; i < segmentCount ; i++)
     {
         muscleMap[tgString("saddle", i-1)] = model.find<tgSpringCableActuator>(tgString("saddle muscle seg", i-1));
-            
+
     }
 }
 */
@@ -124,7 +125,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   //
   // Hips:
   //
-  
+
   std::vector<tgRod*> hipHingeRods = find<tgRod>(hipsTagForHinge);
   // Make sure this list is not empty:
   if( hipHingeRods.empty() ) {
@@ -139,7 +140,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // Arbitrarily choose the first of the two rods. Doesn't matter, just off
   // by an orientation.
   btRigidBody* hipHingeRod = hipHingeRods[0]->getPRigidBody();
-  
+
   //
   // Shoulders:
   //
@@ -166,7 +167,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   //
   // Back Left Leg:
   //
-  
+
   // Note, these are BOXES not rods.
   std::vector<tgBox*> legBackLeftHingeBoxes = find<tgBox>(legBackLeftTagForHinge);
   // Make sure this list is not empty:
@@ -184,7 +185,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   //
   // Back Right Leg:
   //
-  
+
   std::vector<tgBox*> legBackRightHingeBoxes = find<tgBox>(legBackRightTagForHinge);
   // Make sure this list is not empty:
   if( legBackRightHingeBoxes.empty() ) {
@@ -243,7 +244,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // which could be like +30 to rod 2.
   // I think the first two btVectors are the locations of the contact point, relative
   // to each rigid body. Let's do it like an offset from the leg, and zero from
-  // the hip. But we need to 
+  // the hip. But we need to
   // The last two btVector3s are the axis for each element.
   // We'll choose to be Y for both.
   // For example - the first btVector3 moves the point on the hips to the edge of
@@ -255,13 +256,13 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // NOT PLACED ALONG CORRECT POINT? It seems like the end nodes align now, but the
   // center of rotation seems to be slightly "down" the leg...
   // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
-  
+
   btHingeConstraint* legBackLeftHinge =
     new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(3, 0, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  
-  
+
+
   // 1.5, was hips 2
   // Add the hinge to the world.
   btWorld->addConstraint(legBackLeftHinge);
@@ -289,71 +290,37 @@ void LaikaWalkingModel::setup(tgWorld& world)
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontRightHinge);
-
-    // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
-    // that we want to control.    
-    //allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
-    //mapMuscles(muscleMap, *this, m_segments);
-
-    // Let's see what type of objects are inside the spine.
-    //std::vector<tgModel*> all_children = getDescendants();
-    // Pick out the tgBaseRigid objects
-    //std::vector<tgBaseRigid*> all_tgBaseRigid = tgCast::filter<tgModel, tgBaseRigid>(all_children);
-
-    // Print out the tgBaseRigids
-    // std::cout << "Spine tgBaseRigids: " << std::endl;
-    // for (size_t i = 0; i < all_tgBaseRigid.size(); i++)
-    //   {
-    // 	std::cout << "object number " << i << ": " << std::endl;
-    // 	std::cout << "mass: " << all_tgBaseRigid[i]->mass() << std::endl;
-    // 	std::cout << all_tgBaseRigid[i]->toString() << std::endl;
-    //   }
-    
-    //trace(structureInfo, *this);
-
-    // Actually setup the children
-    //notifySetup();
-    //tgModel::setup(world);
 }
 
-
-/*
-void LaikaWalkingModel::step(double dt)
-{
-    if (dt < 0.0)
-    {
-        throw std::invalid_argument("dt is not positive");
-    }
-    else
-    {
-        // Notify observers (controllers) of the step so that they can take action
-        notifyStep(dt);
-        // Step any children
-        tgModel::step(dt);
-    }
-}
-*/
-
-/*
-const std::vector<tgSpringCableActuator*>&
-LaikaWalkingModel::getMuscles (const std::string& key) const
-{
-    const MuscleMap::const_iterator it = muscleMap.find(key);
-    if (it == muscleMap.end())
-    {
-        throw std::invalid_argument("Key '" + key + "' not found in muscle map");
-    }
-    else
-    {
-        return it->second;
-    }
-}
-*/
-
-/*
-const std::vector<tgSpringCableActuator*>& LaikaWalkingModel::getAllMuscles() const
-{
-    return allMuscles;
-}
-*/
-
+// std::vector<tgBasicActuator*> LaikaWalkingModel::getAllActuators(std::vector<std::string> actuatorTags)
+// {
+//   std::vector<tgBasicActuator*> allActuators;
+//
+//   for (int i = 0; i < actuatorTags.size(); i++) {
+//     // Sort through actuators to make sure the order is the same
+//     for (int j = 0; j < numVertebrae-1; j++) {
+//       std::ostringstream num1;
+//       std::ostringstream num2;
+//       num1 << j+1;
+//       num2 << j+2;
+//
+//       std::string tag;
+//       tag = actuatorTags[i] + " t" + num1.str() + "/t" + num2.str();
+//       std::vector<tgBasicActuator*> actuator = find<tgBasicActuator>(tag);
+//       // std::cout << tag << std::endl;
+//
+//       // Make sure this list is not empty:
+//       if(actuator.empty()) {
+//         throw std::invalid_argument("No actuators found with " + actuatorTags[i] + ".");
+//       }
+//       // Now, we know that element 0 exists.
+//       // Confirm that it is not a null pointer.
+//       if(actuator[0] == NULL) {
+//         throw std::runtime_error("Pointer to the first actuator with " + actuatorTags[i] + " is NULL.");
+//       }
+//       allActuators.push_back(actuator[0]);
+//     }
+//   }
+//
+//   return allActuators;
+// }

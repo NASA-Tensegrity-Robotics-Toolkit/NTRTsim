@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef HORIZONTAL_SPINE_CONTROLLER_H
-#define HORIZONTAL_SPINE_CONTROLLER_H
+#ifndef LAIKA_WALKING_CONTROLLER_H
+#define LAIKA_WALKING_CONTROLLER_H
 
 /**
- * @file HorizontalSpineController.h
- * @brief Contains the definition of class HorizontalSpineController.
- * @author Drew Sabelhaus, Lara Janse van Vuuren
+ * @file LaikaWalkingController.h
+ * @brief Contains the definition of class LaikaWalkingController.
+ * @author Edward Zhu, Drew Sabelhaus, Lara Janse van Vuuren
  * $Id$
  */
 
@@ -38,37 +38,37 @@
 
 // Forward declarations
 class TensegrityModel;
+// class LaikaWalkingModel;
 class tgBasicActuator;
 
 /**
- * A controller to apply the length change in the cables of the HorizontalSpine
- * model. This is used for the ICRA 2016 ULTRA Spine paper results.
+ * A controller to apply the length change in the cables and leg torques of the LaikaWalking
+ * model. This is used for the CS294-112 DRL
  */
-class HorizontalSpineController : public tgObserver<TensegrityModel>, public tgSubject<HorizontalSpineController>
+class LaikaWalkingController : public tgObserver<TensegrityModel>, public tgSubject<LaikaWalkingController>
 {
 public:
-	
+
   /**
-   * Construct a HorizontalSpineController.
+   * Construct a LaikaWalkingController.
    * @param[in] startTime, a double that determines when the controller
    * begins its motion, how many seconds after the simulation starts.
    * @param[in] minLength, a double that is the percent of the initial length
-   * that this controller will reduce down to. E.g., if minLength = 0.25, 
+   * that this controller will reduce down to. E.g., if minLength = 0.25,
    * controller will act until the rest length of the cables is 25% of initial.
    * @param[in] rate, the rate at which the rest length of the cables will be
    * changed. Expressed in meters/sec.
-   * @param[in] tagsToControl, a vector (array) of strings, which is a list of the 
+   * @param[in] tagsToControl, a vector (array) of strings, which is a list of the
    * tags of all the
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
-  HorizontalSpineController(double startTime, double minLength, double rate,
-			    std::vector<std::string> tagsToControl);
-    
+  LaikaWalkingController(double startTime, double minLength, double rate);
+
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~HorizontalSpineController() { }
+  virtual ~LaikaWalkingController() { }
 
   /**
    * Apply the controller. On setup, adjust the cable
@@ -77,7 +77,7 @@ public:
    * have a list of allMuscles populated
    */
   virtual void onSetup(TensegrityModel& subject);
-    
+
   /**
    * The onStep method is not used for this controller.
    * @param[in] subject - the TensegrityModel that is being controlled. Must
@@ -86,25 +86,18 @@ public:
    */
   virtual void onStep(TensegrityModel& subject, double dt);
 
-protected:
+// protected:
 
-  /**
-   * A helper function to find and initialize the actuators that this class
-   * will control.
-   * @param[in] tag, a string of the tag for which to search in the list of 
-   * actuators in this model.
-   */
-  void initializeActuators(TensegrityModel& subject, std::string tag);
-    
 private:
-	
+
+  std::vector<tgBasicActuator*> getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags);
+
   /**
    * The private variables for each of the values passed in to the constructor.
    */
   double m_startTime;
   double m_minLength;
   double m_rate;
-  std::vector<std::string> m_tagsToControl;
 
   /**
    * Need an accumulator variable to determine when to start the controller.
@@ -120,11 +113,13 @@ private:
   InitialRestLengths initialRL;
 
   /**
-   * A list of all the actuators to control. This is populated in onSetup
-   * by using m_tagsToControl.
+   * A list of all the actuators to control.
    */
-  std::vector<tgBasicActuator*> cablesWithTags;
+  std::vector<tgBasicActuator*> m_allActuators;
 
+  std::vector<std::string> actuatorTags;
+
+  int numVertebrae = 5;
 };
 
-#endif // HORIZONTAL_SPINE_CONTROLLER_H
+#endif // LAIKA_WALKING_CONTROLLER_H
