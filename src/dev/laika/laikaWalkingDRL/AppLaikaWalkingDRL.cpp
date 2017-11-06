@@ -114,8 +114,8 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.0001; // seconds
-    //const double timestep_physics = 0.001;
+    // const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
     ros::Subscriber sub_cmd = n.subscribe("cmd", 1, &cmd_cb_class::cb, &cmd_cb);
 
     int counter = 0;
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(100);
 
     // Get number of bodies
     simulation.run(1);
