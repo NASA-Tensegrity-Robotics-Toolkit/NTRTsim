@@ -1,0 +1,37 @@
+nodes:
+# This vertebra named differently so that we can pick out
+# a specific rod in the model file.
+
+# Below is a symmetric version of this tetrahedron:
+  center: [0, 10, 0]
+  front: [10, 10, 10]
+  right: [-10, 20, 0]
+  back: [10, 10, -10] 
+  left: [-10, 0, 0]
+
+pair_groups:
+  rod:
+    - [center, front]
+    - [center, right]
+    - [center, back]
+  #  - [center, left]
+  vertebraBbottomrod:
+    - [center, left]
+
+
+builders:
+
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.25
+      
+  vertebraBbottomrod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
