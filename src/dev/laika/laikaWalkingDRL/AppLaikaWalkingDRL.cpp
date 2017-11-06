@@ -27,8 +27,8 @@
  */
 
 // This application
-#include "yamlbuilder/TensegrityModel.h"
-#include "HorizontalSpineController.h"
+// #include "yamlbuilder/TensegrityModel.h"
+#include "LaikaWalkingController.h"
 #include "LaikaWalkingModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
@@ -131,28 +131,18 @@ int main(int argc, char** argv)
     // @TODO: should this throw an error when attached to a model that
     // wasn't built with the HorizontalSpine YAML file?
 
-    /*
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
     double startTime = 10.0;
     double minLength = 0.8;
     double rate = 0.25;
-    std::vector<std::string> tagsToControl;
-    // HF is the right horizontal set
-    // HL is the bottom horizontal set maybe?
-    // HB is the left horizontal set
-    // HR is the top horizontal set.
-    // BUT, something is wrong here. Probably Bullet's numerical problems.
-    //tagsToControl.push_back("HR");
-    //tagsToControl.push_back("HF");
-    tagsToControl.push_back("HB");
+
     // Call the constructor for the controller
-    HorizontalSpineController* const controller =
-      new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
+    LaikaWalkingController* const controller =
+      new LaikaWalkingController(startTime, minLength, rate);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
-    */
 
     // Add the model to the world
     simulation.addModel(myModel);
@@ -206,15 +196,10 @@ int main(int argc, char** argv)
 
       loop_rate.sleep();
     }
-    
+
     // Finally, run the simulation.
     // simulation.run();
 
     // teardown is handled by delete
     return 0;
 }
-
-// Function for returning pointers to actuators which can be controlled via ros
-// std::vector<tgBasicActuator*> getAllActuators(TensegrityModel* model) {
-//
-// }
