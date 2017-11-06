@@ -78,9 +78,11 @@ class action_cb_class {
 class cmd_cb_class {
   public:
     std::string cmd_msg = "step";
+    int msg_time = 0;
     // void cb(const std_msgs::String::ConstPtr& msg) {
     void cb(const gps_agent_pkg::LaikaCommand::ConstPtr& msg) {
       cmd_msg = msg->cmd;
+      msg_time = msg->header.stamp.nsec;
       ROS_INFO("action: %s", msg->cmd.c_str());
     }
 };
@@ -183,6 +185,8 @@ int main(int argc, char** argv)
     int bodies = int(states.size()/12);
     simulation.reset();
 
+    int last_cmd_msg_time = 0;
+
     // Step simulation
     while (ros::ok()) {
       ros::spinOnce();
@@ -193,14 +197,26 @@ int main(int argc, char** argv)
 
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
-        simulation.reset();
-        simulation.run(1);
-        // counter = 0;
-        std::cout << "Simulation reset" << std:: endl;
+        if (cmd_cb.msg_time != last_cmd_msg_time) {
+          simulation.reset();
+          simulation.run(1);
+          // counter = 0;
+          std::cout << "Simulation reset" << std::endl;
+        }
+        else {
+          std::cout << "Reset message stale" << std::endl;
+        }
       }
       else if (cmd_cb.cmd_msg == "step") {
-        simulation.run(1);
+        if (cmd_cb.msg_time != last_cmd_msg_time) {
+          simulation.run(1);
+        }
+        else {
+          std::cout << "Step message stale" << std::endl;
+        }
       }
+
+      last_cmd_msg_time = cmd_cb.msg_time;
 
       std::vector<double> states = myModel->getLaikaWalkingModelStates();
       for(int i = 0; i < bodies; i++) {
