@@ -17,13 +17,13 @@ substructures:
     path: ./TetrahedronSymmetric.yaml
     translation: [0, 30.5, 0]
   t2:
-    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronA.yaml
+    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronC.yaml
     translation: [-12, 30.5, 0]
   t3:
     path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronB.yaml
     translation: [-24, 30.5, 0]
   t4:
-    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronC.yaml
+    path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronA.yaml
     translation: [-36, 30.5, 0]
   t5:
     path: ./TetrahedronSymmetric.yaml
