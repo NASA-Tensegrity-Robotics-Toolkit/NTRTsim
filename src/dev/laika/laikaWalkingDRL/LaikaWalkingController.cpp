@@ -134,16 +134,16 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	legBodies = getRigidBodies(subject, legTags);
 
 	// Define initial torques
-	btVector3 initialTorqueFL(0.0, 0.0, 0.0);
-	btVector3 initialTorqueFR(0.0, 0.0, 0.0);
-	btVector3 initialTorqueBL(0.0, 0.0, 0.0);
-	btVector3 initialTorqueBR(0.0, 0.0, 0.0);
-
-	std::vector<btVector3> initialTorques;
-	initialTorques.push_back(initialTorqueFL);
-	initialTorques.push_back(initialTorqueFR);
-	initialTorques.push_back(initialTorqueBL);
-	initialTorques.push_back(initialTorqueBR);
+	// btVector3 initialTorqueFL(0.0, 0.0, 0.0);
+	// btVector3 initialTorqueFR(0.0, 0.0, 0.0);
+	// btVector3 initialTorqueBL(0.0, 0.0, 0.0);
+	// btVector3 initialTorqueBR(0.0, 0.0, 0.0);
+  //
+	std::vector<double> initialTorques;
+	initialTorques.push_back(0.0);
+	initialTorques.push_back(0.0);
+	initialTorques.push_back(0.0);
+	initialTorques.push_back(0.0);
 
 	// Update initial torques
 	updateTorques(initialTorques);
@@ -235,11 +235,16 @@ void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
 	desCableRL.assign(controlRL.begin(), controlRL.end());
 }
 
-void LaikaWalkingController::updateTorques(std::vector<btVector3> controlTorques) {
+void LaikaWalkingController::updateTorques(std::vector<double> controlTorques) {
 	if (controlTorques.size() != leg_action_dim) {
 		throw std::runtime_error("Leg action dimension mismatch");
 	}
-	legTorques.assign(controlTorques.begin(), controlTorques.end());
+
+  std::vector<btVector3> tmp;
+  for (int i = 0; i < controlTorques.size(); i++) {
+    tmp.push_back(btVector3(0.0,0.0,controlTorques[i]));
+  }
+  legTorques.assign(tmp.begin(), tmp.end());
 }
 
 void LaikaWalkingController::setRestLengths(double dt) {

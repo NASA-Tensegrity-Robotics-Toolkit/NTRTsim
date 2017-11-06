@@ -63,16 +63,13 @@ class action_cb_class {
     action_cb_class(LaikaWalkingController* controller) : m_controller(controller) {};
     std::vector<double> cable_action_msg;
     std::vector<double> leg_action_msg;
-    std::vector<btVector3> leg_torques;
+    std::vector<double> leg_torques;
     LaikaWalkingController* m_controller;
     void cb(const gps_agent_pkg::LaikaAction::ConstPtr& msg) {
       leg_torques.clear();
-      cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-12);
+      cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
       m_controller->updateRestLengths(cable_action_msg);
-      leg_torques.push_back(btVector3(msg->actions[32], msg->actions[33], msg->actions[34]));
-      leg_torques.push_back(btVector3(msg->actions[35], msg->actions[36], msg->actions[37]));
-      leg_torques.push_back(btVector3(msg->actions[38], msg->actions[39], msg->actions[40]));
-      leg_torques.push_back(btVector3(msg->actions[41], msg->actions[42], msg->actions[43]));
+      leg_torques.assign(msg->actions.end()-4, msg->actions.end());
       m_controller->updateTorques(leg_torques);
     }
 };
