@@ -300,6 +300,12 @@ private:
     void buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec);
 
     /*
+     * A version of buildStructure with the ability to add additional tags to the new structure.
+     * This is used to pass in the name of a substructure as a tag to its children.
+     */
+    void buildStructure(tgStructure& structure, const std::string& structurePath, tgBuildSpec& spec, std::string tags);
+    
+    /*
      * Responsible for adding nodes to the structure.
      */
     void addNodes(tgStructure& structure, const Yam& nodes);

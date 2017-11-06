@@ -37,9 +37,10 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
 // for the sensors...
-//#include "sensors/tgDataLogger2.h"
+#include "sensors/tgDataLogger2.h"
 #include "sensors/tgFullStateMonitor.h"
 #include "sensors/tgCompoundRigidSensorInfo.h"
+#include "sensors/tgRodSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -160,14 +161,17 @@ int main(int argc, char** argv)
     //std::string log_filename = "~/NTRTsim_logs/tests_for_laikaWalkingDRL";
     //double samplingTimeInterval = 0.1;
     //tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
-    tgFullStateMonitor* myFullStateMonitor = new tgFullStateMonitor();
+    //tgFullStateMonitor* myFullStateMonitor = new tgFullStateMonitor();
     //myDataLogger->addSenseable(myModel);
-    myFullStateMonitor->addSenseable(myModel);
-    tgCompoundRigidSensorInfo* myCompoundRigidSensorInfo = new tgCompoundRigidSensorInfo();
-    //myDataLogger->addSensorInfo(myCompoundRigidSensorInfo);
+    //myFullStateMonitor->addSenseable(myModel);
+    //tgCompoundRigidSensorInfo* myCompoundRigidSensorInfoLogger = new tgCompoundRigidSensorInfo();
+    //tgCompoundRigidSensorInfo* myCompoundRigidSensorInfoState = new tgCompoundRigidSensorInfo();
+    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    //myDataLogger->addSensorInfo(myCompoundRigidSensorInfoLogger);
+    //myDataLogger->addSensorInfo(myRodSensorInfo);
     //simulation.addDataManager(myDataLogger);
-    myFullStateMonitor->addSensorInfo(myCompoundRigidSensorInfo);
-    simulation.addDataManager(myFullStateMonitor);
+    //myFullStateMonitor->addSensorInfo(myCompoundRigidSensorInfoState);
+    //simulation.addDataManager(myFullStateMonitor);
 
     // ROS stuff
     control_cb_class control_cb;

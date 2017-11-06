@@ -84,6 +84,9 @@ public:
   virtual std::vector<std::string> getSensorDataHeadings();
   virtual std::vector<std::string> getSensorData();
 
+  // ...and the name of this sensor.
+  virtual std::string getSensorType();
+
  private:
 
   /**

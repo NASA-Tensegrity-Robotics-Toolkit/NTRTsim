@@ -157,7 +157,63 @@ void tgFullStateMonitor::step(double dt)
  */
 void tgFullStateMonitor::getCurrentStateHelper()
 {
+  // First, declare a new vector of doubles to which we'll append the data
+  std::vector<double> updatedState;
   
+  std::cout << "m_sensors.size is: " << m_sensors.size() << std::endl;
+    
+  // Then, loop through all the sensors. If any of the sensors are something
+  // that this class "knows how to deal with," e.g. has a type that matches
+  // a getSensorType() that's known.
+  for (size_t i=0; i < m_sensors.size(); i++) {
+    
+    // Check if this sensor is something we're interested in.
+    // First, let's just do compound rigid bodies.
+    // TO-DO: make different sensor types OPTIONAL for this class,
+    // e.g., maybe pass in some subset of which types to sense.
+    // Alternatively: maybe use an "exclusion" parameter in the constructor,
+    // that would do the following: if exclusion = 0, report back data on ALL
+    // sensors. If exclusion = 1, do NOT report data from (example) tgRodSensors
+    // that are also being sensed by a tgCompoundRigidSensor. That way, we won't
+    // get back "double info" from the rods within compound rigids.
+
+    if( m_sensors[i]->getSensorType() == "tgCompoundRigidSensor") {
+      std::cout << "Will be taking data from sensor " << i << " which is a compound rigid sensor." << std::endl;
+    }
+
+    // ON 2017-11-05:
+    // Major bugs, so this class is not used. Three main issues:
+
+    // (1) Substructures in YAML are not being tagged the way I want.
+    // For example, the rods within 't1' need to have 't1' as a tag, not just 'rod'.
+    // Maybe, instead of (in addition to?) tagging compounded bodies according
+    // to the hash I did, use the substructure name from YAML also.
+
+    // (2) Structures are being presented out-of-order. This is kind of expected,
+    // I guess, since it has to do with the randomness of the tags that are
+    // assigned to the compound rigid bodies. However, we need consistent ordering
+    // for the state vector that's being returned (the components need to refer
+    // to the same rigid bodies from one run to the next!!!). So, we'd really need
+    // to index by some externally defined name, not just alphabetize by compound
+    // hash, since compound hash changes each time.
+
+    // (3) BIGGEST BUG: not all compound bodies are sensed!!!! Or, maybe tags
+    // aren't assigned to all compounded bodies. Example: run this with
+    // AppLaikaWalkingDRL, and see that the number of sensors changes from 7, to 8,
+    // to 9 seemingly randomly. There should always be 9 sensors.
+    // However - this is probably more a problem with tgCompoundRigidSensor and its
+    // friends, since the same "missing sensors" actually seems to happen with
+    // tgDataLogger2 for the same App. Did Robel's code drop sensors like this?
+
+    /*
+    std::vector<std::string> sensordata = m_sensors[i]->getSensorData();
+    // Iterate and output each data sample
+    for (std::size_t j=0; j < sensordata.size(); j++) {
+      // Include a comma, since this is a comma-separated-value log file.
+      tgOutput << sensordata[j] << ",";
+    }
+    */
+  }
 }
 
 /**

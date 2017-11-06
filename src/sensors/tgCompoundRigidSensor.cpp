@@ -83,6 +83,14 @@ tgCompoundRigidSensor::tgCompoundRigidSensor(tgModel* pModel, std::string tag) :
     throw std::runtime_error("tgCompoundRigidSensor found no rigid bodies with its tag - something is wrong (inside constructor.)");
   }
   // TO-DO: better validation.
+
+  //DEBUGGING
+  std::cout << "Creating a tgCompoundRigidSensor with tag " << tag
+	    << " consisting of " << m_rigids.size() << " rigid bodies."
+	    << " They have the following tags: " << std::endl;
+  for(int i=0; i < m_rigids.size(); i++ ){
+    std::cout << m_rigids[i]->getTags() << std::endl;
+  }
   
   // Next, get the initial orientation of the rigid body.
   // This will be needed for comparison later.
@@ -282,5 +290,12 @@ std::vector<std::string> tgCompoundRigidSensor::getSensorData() {
   
   return sensordata;
 }
+
+// Return the type of sensor (its "name.)
+std::string tgCompoundRigidSensor::getSensorType()
+{
+  return "tgCompoundRigidSensor";
+}
+
 
 //end.
