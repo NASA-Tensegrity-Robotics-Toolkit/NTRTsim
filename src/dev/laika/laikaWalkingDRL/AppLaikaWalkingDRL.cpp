@@ -147,22 +147,6 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
-    // Let's make some sensors to test out tgFullStateMonitor.
-    //std::string log_filename = "~/NTRTsim_logs/tests_for_laikaWalkingDRL";
-    //double samplingTimeInterval = 0.1;
-    //tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
-    //tgFullStateMonitor* myFullStateMonitor = new tgFullStateMonitor();
-    //myDataLogger->addSenseable(myModel);
-    //myFullStateMonitor->addSenseable(myModel);
-    //tgCompoundRigidSensorInfo* myCompoundRigidSensorInfoLogger = new tgCompoundRigidSensorInfo();
-    //tgCompoundRigidSensorInfo* myCompoundRigidSensorInfoState = new tgCompoundRigidSensorInfo();
-    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
-    //myDataLogger->addSensorInfo(myCompoundRigidSensorInfoLogger);
-    //myDataLogger->addSensorInfo(myRodSensorInfo);
-    //simulation.addDataManager(myDataLogger);
-    //myFullStateMonitor->addSensorInfo(myCompoundRigidSensorInfoState);
-    //simulation.addDataManager(myFullStateMonitor);
-
     // ROS stuff
     control_cb_class control_cb;
 
