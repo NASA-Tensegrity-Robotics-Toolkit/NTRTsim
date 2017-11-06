@@ -131,15 +131,9 @@ int main(int argc, char** argv)
     // @TODO: should this throw an error when attached to a model that
     // wasn't built with the HorizontalSpine YAML file?
 
-    // Parameters for the Horizontal Spine Controller are specified in that .h file,
-    // repeated here:
-    double startTime = 10.0;
-    double minLength = 0.8;
-    double rate = 0.25;
-
     // Call the constructor for the controller
     LaikaWalkingController* const controller =
-      new LaikaWalkingController(startTime, minLength, rate);
+      new LaikaWalkingController();
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);

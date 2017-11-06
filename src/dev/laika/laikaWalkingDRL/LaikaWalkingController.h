@@ -40,6 +40,7 @@
 class TensegrityModel;
 // class LaikaWalkingModel;
 class tgBasicActuator;
+class tgBasicController;
 
 /**
  * A controller to apply the length change in the cables and leg torques of the LaikaWalking
@@ -63,7 +64,7 @@ public:
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
-  LaikaWalkingController(double startTime, double minLength, double rate);
+  LaikaWalkingController();
 
   /**
    * Nothing to delete, destructor must be virtual
@@ -86,40 +87,47 @@ public:
    */
   virtual void onStep(TensegrityModel& subject, double dt);
 
+  void updateRestLengths(std::vector<double> controlRL);
+
+  void updateTorques(std::vector<double> controlTorques);
+
 // protected:
 
 private:
 
   std::vector<tgBasicActuator*> getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags);
+  
+  void setRestLengths(double dt);
 
-  /**
-   * The private variables for each of the values passed in to the constructor.
-   */
-  double m_startTime;
-  double m_minLength;
-  double m_rate;
-
-  /**
-   * Need an accumulator variable to determine when to start the controller.
-   */
-  double m_timePassed;
-
-  /**
-   * The start length of each of the cables must be recorded.
-   * This map takes a string (the space-separated list of all the tags for
-   * an individual cable) and outputs a double (the rest length at time t=0.)
-   */
-  typedef std::map<tgTags, double> InitialRestLengths;
-  InitialRestLengths initialRL;
+  void setTorques(double dt);
 
   /**
    * A list of all the actuators to control.
    */
-  std::vector<tgBasicActuator*> m_allActuators;
-
   std::vector<std::string> actuatorTags;
+  std::vector<tgBasicActuator*> m_allActuators;
+  std::vector<tgBasicController*> m_allControllers;
 
+  /**
+   * Number of vertebrae in the model
+   */
   int numVertebrae = 5;
+
+  int cable_action_dim;
+  int leg_action_dim = 4;
+
+  /**
+   * Cable control rest lengths
+   */
+  std::vector<double> desCableRL;
+  std::vector<double> actCableRL;
+
+  /**
+   * Leg torques
+   */
+  std::vector<double> legTorques;
+
+  double worldTime = 0;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H
