@@ -12,7 +12,7 @@ substructures:
   #  path: ./TetrahedronSymmetric.yaml
   #  offset: [-12, 0 , 0]
   #  translation: [0, 30.5, 0]
-  
+
   t1:
     path: ./TetrahedronSymmetric.yaml
     translation: [0, 30.5, 0]
@@ -50,18 +50,18 @@ substructures:
   # to be able to pick out the tags for the btHingeConstraints.
   backlegsleft:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackLeft.yaml
-    translation: [15, 10.5, -16]
+    translation: [15, 10.5, 16]
   backlegsright:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackRight.yaml
-    translation: [15, 10.5, 16]
+    translation: [15, 10.5, -16]
   frontlegsleft:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontLeft.yaml
     # translation: [-75, 10.5, -16] # 60 offset (6 vertebrae)+ 15 for hips
-    translation: [-63, 10.5, -16] # 48 offset (5 vertebrae)+ 15 for hips
+    translation: [-63, 10.5, 16] # 48 offset (5 vertebrae)+ 15 for hips
   frontlegsright:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontRight.yaml
     # translation: [-75, 10.5, 16]
-    translation: [-63, 10.5, 16]
+    translation: [-63, 10.5, -16]
 
 bond_groups:
   HF:

@@ -259,11 +259,10 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
 
   btHingeConstraint* legBackLeftHinge =
-    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(3, 0, -20),
+    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox,
+        btVector3(3, 0, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-
-
   // 1.5, was hips 2
   // Add the hinge to the world.
   btWorld->addConstraint(legBackLeftHinge);
@@ -271,7 +270,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the back right:
   btHingeConstraint* legBackRightHinge =
     new btHingeConstraint(*hipHingeRod, *legBackRightHingeBox,
-			  btVector3(3, 0, 20),
+			  btVector3(3, 0, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legBackRightHinge);
@@ -279,7 +278,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the front left:
   btHingeConstraint* legFrontLeftHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontLeftHingeBox,
-			  btVector3(-3, 0, -20),
+			  btVector3(-3, 0, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontLeftHinge);
@@ -287,7 +286,7 @@ void LaikaWalkingModel::setup(tgWorld& world)
   // For the front right:
   btHingeConstraint* legFrontRightHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontRightHingeBox,
-			  btVector3(-3, 0, 20),
+			  btVector3(-3, 0, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontRightHinge);
@@ -303,7 +302,7 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelStates()
 {
   // We'll be putting the data here:
   std::vector<double> states;
-  
+
   // First, a list of all the tags we'll be picking out from the children.
   // In order, we want to do shoulder, vertebrae, hips, legs.
   // Pick out the box for each of the shoulders/hips and the boxes for the legs,
@@ -325,9 +324,9 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelStates()
   // (3) get the btRigidBody
   // (4) get the positions, orientations, velocities, and rot velocities
   // (5) append each of those to 'states'
-  
+
   for(int i=0; i < laikaRigidBodyTags.size(); i++) {
-    
+
     // (1) get the rigid bodies with this tag
     std::vector<tgBaseRigid*> currentBodies =
       find<tgBaseRigid>(laikaRigidBodyTags[i]);
@@ -367,7 +366,7 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelStates()
     states.push_back(angularvel.y());
     states.push_back(angularvel.z());
   }
-  
+
   return states;
 }
 

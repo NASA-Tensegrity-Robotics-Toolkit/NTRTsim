@@ -99,7 +99,7 @@ int main(int argc, char** argv)
     // Two different simulation views. Use the graphical view for debugging...
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    //tgSimView view(world, timestep_physics, timestep_graphics);
+    // tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -141,15 +141,6 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
-    // A test of the getLaikaWalkingStates method.
-    std::cout << "Testing the getLaikaWalkingStates method: " << std::endl;
-    std::vector<double> states = myModel->getLaikaWalkingModelStates();
-    std::cout << "There are " << states.size() << " states, which are: "
-	      << std::endl;
-    for(int i=0; i < states.size(); i++) {
-      std::cout << states[i] << std::endl;
-    }
-
     // ROS stuff
     control_cb_class control_cb;
 
@@ -161,7 +152,7 @@ int main(int argc, char** argv)
 
     int counter = 0;
     std_msgs::UInt32 msg;
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(100);
 
     while (ros::ok()) {
       ros::spinOnce();
@@ -176,6 +167,15 @@ int main(int argc, char** argv)
       else if (control_cb.control_msg == "step") {
         simulation.run(1);
         pub.publish(msg);
+        // A test of the getLaikaWalkingStates method.
+        // std::cout << "Testing the getLaikaWalkingStates method: " << std::endl;
+        // std::vector<double> states = myModel->getLaikaWalkingModelStates();
+        // std::cout << "There are " << states.size() << " states, which are: "
+    	      // << std::endl;
+        // for(int i=0; i < states.size(); i++) {
+        //   std::cout << states[i] << std::endl;
+        // }
+
       }
       ROS_INFO("State: %d", counter);
 

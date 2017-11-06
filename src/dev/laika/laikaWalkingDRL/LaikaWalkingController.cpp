@@ -34,7 +34,10 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "core/tgTags.h"
+#include "core/tgRod.h"
 #include "LinearMath/btVector3.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
 //#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
 #include <cassert>
@@ -88,21 +91,42 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	cable_action_dim = m_allActuators.size();
 
 	// Set up controllers
-	std::cout << "Initial rest lengths: ";
+	// std::cout << "Initial rest lengths: ";
+	std::vector<double> desRL;
 	for (int i = 0; i < m_allActuators.size(); i++) {
 		actCableRL.push_back(m_allActuators[i]->getRestLength());
-		if (i == m_allActuators.size()-1) {
-			std::cout << actCableRL[i] << std::endl;
-		}
-		else {
-			std::cout << actCableRL[i] << ",";
-		}
+		desRL.push_back(actCableRL[i]);
+		// if (i == m_allActuators.size()-1) {
+		// 	std::cout << actCableRL[i] << std::endl;
+		// }
+		// else {
+		// 	std::cout << actCableRL[i] << ",";
+		// }
 		tgBasicController* m_lenController = new tgBasicController(m_allActuators[i], actCableRL[i]);
 		m_allControllers.push_back(m_lenController);
 	}
 
-	updateRestLengths(actCableRL);
+	// Update target rest lengths
+	updateRestLengths(desRL);
 
+	// Get pointers to the rigid bodies
+	std::vector<std::string> shoulderTag;
+	shoulderTag.push_back("shouldersBack");
+
+	std::vector<std::string> hipTag;
+	hipTag.push_back("hipsBack");
+
+	std::vector<std::string> legTags;
+	legTags.push_back("legBoxFrontLeft");
+	legTags.push_back("legBoxFrontRight");
+	legTags.push_back("legBoxBackLeft");
+	legTags.push_back("legBoxBackRight");
+
+	shoulderBody = getRigidBodies(subject, shoulderTag)[0];
+	hipBody = getRigidBodies(subject, hipTag)[0];
+	legBodies = getRigidBodies(subject, legTags);
+
+	// Define initial torques
 	btVector3 initialTorqueFL(0.0, 0.0, 0.0);
 	btVector3 initialTorqueFR(0.0, 0.0, 0.0);
 	btVector3 initialTorqueBL(0.0, 0.0, 0.0);
@@ -114,6 +138,7 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	initialTorques.push_back(initialTorqueBL);
 	initialTorques.push_back(initialTorqueBR);
 
+	// Update initial torques
 	updateTorques(initialTorques);
 
   std::cout << "Finished setting up the controller." << std::endl;
@@ -129,6 +154,7 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
 	}
 
 	setRestLengths(dt);
+	setTorques(dt);
 }
 
 std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags)
@@ -164,6 +190,26 @@ std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(Tensegrity
   return allActuators;
 }
 
+std::vector<btRigidBody*> LaikaWalkingController::getRigidBodies(TensegrityModel& subject, std::vector<std::string> tags) {
+	std::vector<btRigidBody*> rigidBodies;
+	for (int i = 0; i < tags.size(); i++) {
+		std::vector<tgBaseRigid*> rigids = subject.find<tgBaseRigid>(tags[i]);
+		std::cout << rigids.size() << std::endl;
+		if( rigids.empty() ) {
+	    throw std::invalid_argument("No rods found with " + tags[i] + ".");
+	  }
+	  // Now, we know that element 0 exists.
+	  // Confirm that it is not a null pointer.
+	  if( rigids[0] == NULL) {
+	    throw std::runtime_error("Pointer to the first rod with " + tags[i] + " is NULL.");
+	  }
+		btRigidBody* rigidBody = rigids[0]->getPRigidBody();
+		rigidBodies.push_back(rigidBody);
+	}
+
+	return rigidBodies;
+}
+
 void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
 	if (controlRL.size() != cable_action_dim) {
 		throw std::runtime_error("Cable action dimension mismatch");
@@ -193,5 +239,15 @@ void LaikaWalkingController::setRestLengths(double dt) {
 }
 
 void LaikaWalkingController::setTorques(double dt) {
-	
+	// Order is FL, FR, BL, BR
+	for (int i = 0; i < legTorques.size(); i++) {
+		std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
+		legBodies[i]->applyTorqueImpulse(legTorques[i]);
+		if (i == 0 || i == 1) { // Front legs
+			shoulderBody->applyTorqueImpulse(-legTorques[i]);
+		}
+		else { // Back legs
+			hipBody->applyTorqueImpulse(-legTorques[i]);
+		}
+	}
 }
