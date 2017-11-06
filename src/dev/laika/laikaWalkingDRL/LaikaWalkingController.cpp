@@ -29,6 +29,7 @@
 #include "yamlbuilder/TensegrityModel.h"
 // #include "LaikaWalkingModel.h"
 // This library
+#include "controllers/tgBasicController.h"
 #include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
@@ -47,30 +48,9 @@
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-LaikaWalkingController::LaikaWalkingController(double startTime,
-						     double minLength,
-						     double rate) :
-  m_startTime(startTime),
-  m_minLength(minLength),
-  m_rate(rate),
-  m_timePassed(0.0)
+LaikaWalkingController::LaikaWalkingController()
 {
-  // start time must be greater than or equal to zero
-  if( m_startTime < 0.0 ) {
-    throw std::invalid_argument("Start time must be greater than or equal to zero.");
-  }
-  // min length must be between 1 and 0
-  else if( m_minLength > 1 ) {
-    throw std::invalid_argument("minLength is a percent, must be less than 1. (100%)");
-  }
-  else if( m_minLength < 0.0) {
-    throw std::invalid_argument("minLength is a percent, must be greater than 0.");
-  }
-  // rate must be greater than zero
-  else if( rate < 0.0 ) {
-    throw std::invalid_argument("Rate cannot be negative.");
-  }
-  // @TODO: what checks to make on tags?
+
 }
 
 /**
@@ -100,15 +80,42 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 			std::cout << actuatorTags[i] << ", ";
 		}
 	}
+	// Get actuators based on tags defined above
 	m_allActuators = getAllActuators(subject, actuatorTags);
 	std::cout << m_allActuators.size() << " actuators found" << std::endl;
+
+	// Set action space dimension
+	cable_action_dim = m_allActuators.size();
+
+	// Set up controllers
+	std::cout << "Initial rest lengths: ";
+	for (int i = 0; i < m_allActuators.size(); i++) {
+		actCableRL.push_back(m_allActuators[i]->getRestLength());
+		if (i == m_allActuators.size()-1) {
+			std::cout << actCableRL[i] << std::endl;
+		}
+		else {
+			std::cout << actCableRL[i] << ",";
+		}
+		tgBasicController* m_lenController = new tgBasicController(m_allActuators[i], actCableRL[i]);
+		m_allControllers.push_back(m_lenController);
+	}
+
+	updateRestLengths(actCableRL);
 
   std::cout << "Finished setting up the controller." << std::endl;
 }
 
 void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
 {
+	if (dt <= 0.0) {
+		throw std::invalid_argument("onStep: dt is not positive");
+	}
+	else {
+		worldTime += dt;
+	}
 
+	setRestLengths(dt);
 }
 
 std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags)
@@ -142,4 +149,36 @@ std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(Tensegrity
   }
 
   return allActuators;
+}
+
+void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
+	if (controlRL.size() != cable_action_dim) {
+		throw std::runtime_error("Cable action dimension mismatch");
+	}
+	desCableRL.assign(controlRL.begin(), controlRL.end());
+}
+
+void LaikaWalkingController::updateTorques(std::vector<double> controlTorques) {
+	if (controlTorques.size() != leg_action_dim) {
+		throw std::runtime_error("Leg action dimension mismatch");
+	}
+	legTorques.assign(controlTorques.begin(), controlTorques.end());
+}
+
+void LaikaWalkingController::setRestLengths(double dt) {
+	// std::cout << "Desired rest length: ";
+	for (int i = 0; i < m_allControllers.size(); i++) {
+		// if (i == m_allControllers.size()-1) {
+		// 	std::cout << desCableRL[i] << std::endl;
+		// }
+		// else {
+		// 	std::cout << desCableRL[i] << ",";
+		// }
+		m_allControllers[i]->control(dt, desCableRL[i]);
+		m_allActuators[i]->moveMotors(dt);
+	}
+}
+
+void LaikaWalkingController::setTorques(double dt) {
+
 }
