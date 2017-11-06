@@ -23,15 +23,15 @@ add_executable(AppLaikaWalkingDRL
 )
 
 #### Added for ROS ####
-#target_link_libraries(AppLaikaWalkingDRL
-#  /opt/ros/indigo/lib/librostime.so
-#  /opt/ros/indigo/lib/libroscpp.so
-#  /opt/ros/indigo/lib/librosconsole.so
-#  /opt/ros/indigo/lib/libroscpp_serialization.so)
-
 target_link_libraries(AppLaikaWalkingDRL
-  /opt/ros/kinetic/lib/librostime.so
-  /opt/ros/kinetic/lib/libroscpp.so
-  /opt/ros/kinetic/lib/librosconsole.so
-  /opt/ros/kinetic/lib/libroscpp_serialization.so)
+  /opt/ros/indigo/lib/librostime.so
+  /opt/ros/indigo/lib/libroscpp.so
+  /opt/ros/indigo/lib/librosconsole.so
+  /opt/ros/indigo/lib/libroscpp_serialization.so)
+
+#target_link_libraries(AppLaikaWalkingDRL
+#  /opt/ros/kinetic/lib/librostime.so
+#  /opt/ros/kinetic/lib/libroscpp.so
+#  /opt/ros/kinetic/lib/librosconsole.so
+#  /opt/ros/kinetic/lib/libroscpp_serialization.so)
 #######################

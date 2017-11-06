@@ -41,6 +41,7 @@ class TensegrityModel;
 // class LaikaWalkingModel;
 class tgBasicActuator;
 class tgBasicController;
+class btVector3;
 
 /**
  * A controller to apply the length change in the cables and leg torques of the LaikaWalking
@@ -89,13 +90,19 @@ public:
 
   void updateRestLengths(std::vector<double> controlRL);
 
-  void updateTorques(std::vector<double> controlTorques);
+  void updateTorques(std::vector<btVector3> controlTorques);
 
 // protected:
 
 private:
 
   std::vector<tgBasicActuator*> getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags);
+
+  tgBaseRigid* getShoulder(TensegrityModel& subject);
+
+  tgBaseRigid* getHip(TensegrityModel& subject);
+
+  tgBaseRigid* getLegs(TensegrityModel& subject);
   
   void setRestLengths(double dt);
 
@@ -125,7 +132,7 @@ private:
   /**
    * Leg torques
    */
-  std::vector<double> legTorques;
+  std::vector<btVector3> legTorques;
 
   double worldTime = 0;
 };

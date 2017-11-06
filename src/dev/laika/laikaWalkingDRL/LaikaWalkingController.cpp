@@ -34,7 +34,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "core/tgTags.h"
-
+#include "LinearMath/btVector3.h"
 //#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
 #include <cassert>
@@ -103,6 +103,19 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 
 	updateRestLengths(actCableRL);
 
+	btVector3 initialTorqueFL(0.0, 0.0, 0.0);
+	btVector3 initialTorqueFR(0.0, 0.0, 0.0);
+	btVector3 initialTorqueBL(0.0, 0.0, 0.0);
+	btVector3 initialTorqueBR(0.0, 0.0, 0.0);
+
+	std::vector<btVector3> initialTorques;
+	initialTorques.push_back(initialTorqueFL);
+	initialTorques.push_back(initialTorqueFR);
+	initialTorques.push_back(initialTorqueBL);
+	initialTorques.push_back(initialTorqueBR);
+
+	updateTorques(initialTorques);
+
   std::cout << "Finished setting up the controller." << std::endl;
 }
 
@@ -158,7 +171,7 @@ void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
 	desCableRL.assign(controlRL.begin(), controlRL.end());
 }
 
-void LaikaWalkingController::updateTorques(std::vector<double> controlTorques) {
+void LaikaWalkingController::updateTorques(std::vector<btVector3> controlTorques) {
 	if (controlTorques.size() != leg_action_dim) {
 		throw std::runtime_error("Leg action dimension mismatch");
 	}
@@ -180,5 +193,5 @@ void LaikaWalkingController::setRestLengths(double dt) {
 }
 
 void LaikaWalkingController::setTorques(double dt) {
-
+	
 }
