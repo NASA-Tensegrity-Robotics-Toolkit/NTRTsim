@@ -134,16 +134,16 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	legBodies = getRigidBodies(subject, legTags);
 
 	// Define initial torques
-	// btVector3 initialTorqueFL(0.0, 0.0, 0.0);
-	// btVector3 initialTorqueFR(0.0, 0.0, 0.0);
-	// btVector3 initialTorqueBL(0.0, 0.0, 0.0);
-	// btVector3 initialTorqueBR(0.0, 0.0, 0.0);
-  //
+	double initialTorqueFL = 0.0;
+	double initialTorqueFR = 0.0;
+	double initialTorqueBL = -0.0;
+	double initialTorqueBR = -0.0;
+
 	std::vector<double> initialTorques;
-	initialTorques.push_back(0.0);
-	initialTorques.push_back(0.0);
-	initialTorques.push_back(0.0);
-	initialTorques.push_back(0.0);
+	initialTorques.push_back(initialTorqueFL);
+	initialTorques.push_back(initialTorqueFR);
+	initialTorques.push_back(initialTorqueBL);
+	initialTorques.push_back(initialTorqueBR);
 
 	// Update initial torques
 	updateTorques(initialTorques);
@@ -168,9 +168,9 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
   //     std::cout << desCableRL[i] << ",";
   //   }
   // }
-  for (int i = 0; i < legTorques.size(); i++) {
-    std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
-  }
+  // for (int i = 0; i < legTorques.size(); i++) {
+  //   std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
+  // }
 	setRestLengths(dt);
 	setTorques(dt);
 }
