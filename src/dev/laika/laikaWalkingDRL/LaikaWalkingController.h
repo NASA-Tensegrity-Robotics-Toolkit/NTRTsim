@@ -98,7 +98,7 @@ public:
 private:
 
   std::vector<tgBasicActuator*> getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags);
-  
+
   std::vector<btRigidBody*> getRigidBodies(TensegrityModel& subject, std::vector<std::string> tags);
 
   void setRestLengths(double dt);
@@ -108,7 +108,6 @@ private:
   /**
    * A list of all the actuators to control.
    */
-  std::vector<std::string> actuatorTags;
   std::vector<tgBasicActuator*> m_allActuators;
   std::vector<tgBasicController*> m_allControllers;
 

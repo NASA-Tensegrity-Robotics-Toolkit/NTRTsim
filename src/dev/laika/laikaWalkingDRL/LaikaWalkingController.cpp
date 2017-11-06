@@ -65,6 +65,10 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the LaikaWalking controller." << std::endl;
 
+  m_allActuators.clear();
+  m_allControllers.clear();
+
+  std::vector<std::string> actuatorTags;
 	actuatorTags.push_back("HF");
   actuatorTags.push_back("HR");
   actuatorTags.push_back("HL");
@@ -102,6 +106,9 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 		// else {
 		// 	std::cout << actCableRL[i] << ",";
 		// }
+    if(actCableRL[i] == NULL) {
+      throw std::runtime_error("Pointer to the first actuator with  is NULL.");
+    }
 		tgBasicController* m_lenController = new tgBasicController(m_allActuators[i], actCableRL[i]);
 		m_allControllers.push_back(m_lenController);
 	}
@@ -153,6 +160,17 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
 		worldTime += dt;
 	}
 
+  // for (int i = 0; i < desCableRL.size(); i++) {
+  //   if (i == desCableRL.size()-1) {
+  //     std::cout << desCableRL[i] << std::endl;
+  //   }
+  //   else{
+  //     std::cout << desCableRL[i] << ",";
+  //   }
+  // }
+  for (int i = 0; i < legTorques.size(); i++) {
+    std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
+  }
 	setRestLengths(dt);
 	setTorques(dt);
 }
@@ -194,7 +212,7 @@ std::vector<btRigidBody*> LaikaWalkingController::getRigidBodies(TensegrityModel
 	std::vector<btRigidBody*> rigidBodies;
 	for (int i = 0; i < tags.size(); i++) {
 		std::vector<tgBaseRigid*> rigids = subject.find<tgBaseRigid>(tags[i]);
-		std::cout << rigids.size() << std::endl;
+		// std::cout << rigids.size() << std::endl;
 		if( rigids.empty() ) {
 	    throw std::invalid_argument("No rods found with " + tags[i] + ".");
 	  }
@@ -241,7 +259,7 @@ void LaikaWalkingController::setRestLengths(double dt) {
 void LaikaWalkingController::setTorques(double dt) {
 	// Order is FL, FR, BL, BR
 	for (int i = 0; i < legTorques.size(); i++) {
-		std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
+		// std::cout << legTorques[i].x() << "," << legTorques[i].y() << "," << legTorques[i].z() << std::endl;
 		legBodies[i]->applyTorqueImpulse(legTorques[i]);
 		if (i == 0 || i == 1) { // Front legs
 			shoulderBody->applyTorqueImpulse(-legTorques[i]);

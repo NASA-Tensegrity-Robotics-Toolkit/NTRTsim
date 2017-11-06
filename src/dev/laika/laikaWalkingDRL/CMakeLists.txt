@@ -1,8 +1,9 @@
 #### Added for ROS ####
-find_package(catkin REQUIRED COMPONENTS std_msgs)
+find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs)
 #######################
 
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS}
+  /home/edward/gps-spine/src/gps_agent_pkg/msg_gen/cpp/include)
 
 link_directories(${LIB_DIR})
 
