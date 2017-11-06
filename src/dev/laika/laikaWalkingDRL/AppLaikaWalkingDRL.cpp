@@ -147,6 +147,15 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
+    // A test of the getLaikaWalkingStates method.
+    std::cout << "Testing the getLaikaWalkingStates method: " << std::endl;
+    std::vector<double> states = myModel->getLaikaWalkingModelStates();
+    std::cout << "There are " << states.size() << " states, which are: "
+	      << std::endl;
+    for(int i=0; i < states.size(); i++) {
+      std::cout << states[i] << std::endl;
+    }
+
     // ROS stuff
     control_cb_class control_cb;
 

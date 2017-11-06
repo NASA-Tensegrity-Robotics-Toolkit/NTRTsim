@@ -64,6 +64,14 @@ public:
      */
     virtual void setup(tgWorld& world);
 
+    /**
+     * This function will return the rigid body states of each of the
+     * bodies in the model.
+     * Note that it is hand-tuned to only select out specific rigid bodies,
+     * and must be modified in the cpp file to return more or less states.
+     */
+    std::vector<double> getLaikaWalkingModelStates();
+
 		/**
      * Get all cable actuators.
      */
