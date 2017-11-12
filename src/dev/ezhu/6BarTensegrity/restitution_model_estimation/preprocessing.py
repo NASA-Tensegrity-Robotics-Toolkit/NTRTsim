@@ -43,7 +43,8 @@ def read_csv_data(filename, full_data=False):
         return path
 
     data_tmp = np.loadtxt(filename,delimiter=',',dtype=None,skiprows=1)
-
+    # print(filename)
+    # print(data_tmp.shape)
     if not full_data:
         # Only save state in (first state) and state out (last state) information
         x_tmp = data_tmp[0,]

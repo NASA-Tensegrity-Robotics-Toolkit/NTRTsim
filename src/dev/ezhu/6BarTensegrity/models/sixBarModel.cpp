@@ -74,12 +74,12 @@ namespace
 	        0.3175*sf, // Motor length
 	        */
 
-	        // TT-3 parameters
-	        2990/pow(sf,3),    // density (kg / length^3)
-	        0.0127/2*sf,     // radius (length)
-	        500.0,   // stiffness (kg / sec^2) was 1500
-	        20.0,    // damping (kg / sec)
-	        0.66*sf,     // rodLength (length)
+	        // TT-5 parameters
+	        3508.5/pow(sf,3), //2990/pow(sf,3),    // density (kg / length^3)
+	        0.0191/2*sf, //0.0127/2*sf,     // radius (length)
+	        525, //500.0,   // stiffness (kg / sec^2) was 1500
+	        50,    // damping (kg / sec) (approx 1 s settling time)
+	        1*sf, //0.66*sf,     // rodLength (length)
 	        0.99,      // friction (unitless)
 	        0.01,     // rollFriction (unitless)
 	        0.0,      // restitution (?)
@@ -114,15 +114,21 @@ namespace
    		double friction;
    		double rollFriction;
    		double restitution;
+      double stiffness;
+      double damping;
+      double pretension;
    		bool addPayload;
    	} payloadConfig =
    		{
-   			4317/pow(sf,3),		// density (kg / length^3)
-   			8*0.0127/2*sf,     // radius (length)
+   			1273/pow(sf,3), //4317/pow(sf,3),		// density (kg / length^3)
+   			0.1/2*sf, //8*0.0127/2*sf,     // radius (length)
    			0.1*sf,		// payloadLength (length)
    			0.99,      // friction (unitless)
    			0.01,     // rollFriction (unitless)
         0.0,      // restitution (?)
+        525,      // stiffness
+        50,       // damping
+        2*17.5*sf, //200*sf,      // pretension
         true,
    		};
 }
@@ -275,7 +281,7 @@ void sixBarModel::setup(tgWorld& world)
 
 	tgBasicActuator::Config actuatorConfig(config.stiffness, config.damping, config.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
-	tgBasicActuator::Config staticCableConfig(config.stiffness*2, config.damping*3, config.pretension*5,
+	tgBasicActuator::Config staticCableConfig(payloadConfig.stiffness, payloadConfig.damping, payloadConfig.pretension,
 		config.hist, config.maxTension, config.targetVelocity);
 
 	// Create a structure that will hold the details of this model
@@ -358,9 +364,9 @@ void sixBarModel::setup(tgWorld& world)
 	// allMarkers.push_back(NODE1);
 	// allMarkers.push_back(NODE2);
 
-	for (int i = 0; i < allMarkers.size(); i++) {
-		this->addMarker(allMarkers[i]);
-	}
+	// for (int i = 0; i < allMarkers.size(); i++) {
+	// 	this->addMarker(allMarkers[i]);
+	// }
 
 	// Notify controllers that setup has finished
 	notifySetup();

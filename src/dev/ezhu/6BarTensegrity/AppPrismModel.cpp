@@ -2,13 +2,13 @@
  * Copyright © 2012, United States Government, as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
- * 
+ *
  * The NASA Tensegrity Robotics Toolkit (NTRT) v1 platform is licensed
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -53,13 +53,13 @@
 int main(int argc, char** argv)
 {
   double sf = 100; //Scaling Factor - match with model and controller files
-   
+
   // First create the ground and world. Specify ground rotation in radians
   const double yaw = 0.0;
   const double pitch = -15*PI/180;//0.1;//0.2;
   const double roll = 0.0;
 
-  
+
   const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
   const double timestep_physics = 0.001; // seconds
   const double timestep_graphics = 1.f/60.f; // seconds
   tgSimViewGraphics view(world, timestep_physics, timestep_graphics); //turn on graphics
-  //tgSimView view(world, timestep_physics, timestep_graphics); // turn off graphics for faster data logging
+  // tgSimView view(world, timestep_physics, timestep_graphics); // turn off graphics for faster data logging
 
   // Third create the simulation
   tgSimulation simulation(view);
@@ -132,11 +132,11 @@ int main(int argc, char** argv)
   const T6RollingController::Config controllerConfig(gravity, "path", ptr, pathSize);
   T6RollingController* const rollingController = new T6RollingController(controllerConfig);
   //myModel->attach(rollingController);
-  
-    
+
+
   // Add the model to the world
   simulation.addModel(myModel);
-    
+
   simulation.run(100000);
 
   //Teardown is handled by delete, so that should be automatic

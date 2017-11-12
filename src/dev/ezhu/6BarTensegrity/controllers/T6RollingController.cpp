@@ -101,7 +101,7 @@ T6RollingController::T6RollingController(const T6RollingController::Config& conf
 	c_initVel = config.m_initVel;
 	c_thrustDist = config.m_thrustDist;
 
-	std::cout << "x slope: " << sx << ", z slope: " << sz << std::endl;
+	// std::cout << "x slope: " << sx << ", z slope: " << sz << std::endl;
 
 	// std::cout << world << std::endl;
 	tgWorldBulletPhysicsImpl& worldImpl = world->implementation();

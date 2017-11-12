@@ -78,11 +78,16 @@ int main(int argc, char** argv)
 
   // create the ground and world. Specify ground rotation in radians
   const double yaw = 0.0;
-  // const double pitch = 0.0*PI/180; // About x axis, in z direction
-  // const double roll = 30.0*PI/180; // About z axis, in x direction
-  const double pitch = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
-  const double roll = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
-  std::cout << roll << "," << pitch << std::endl;
+  const double pitch = 0.0*PI/180; // About x axis, in z direction
+  const double roll = 0.0*PI/180; // About z axis, in x direction
+  // const double pitch = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
+  // const double roll = (-30.0+rand()*(1.0/RAND_MAX)*60.0)*PI/180.0;
+
+  const double sx = tan(roll);
+  const double sz = -tan(pitch);
+
+  std::cout << "Ground roll: " << roll << ", Ground pitch: " << pitch << "| X slope: " << sx << ", Z slope: " << sz << std::endl;
+
   double sf = 10;
 
     // ---------------------------------------------------------------------------------
@@ -238,7 +243,6 @@ int main(int argc, char** argv)
   			param_out << "Vx=" << initVel_x/sf << std::endl;
   			param_out << "Vy=" << initVel_y/sf << std::endl;
   			param_out << "Vz=" << initVel_z/sf << std::endl;
-  			param_out << "yaw=" << psi*180.0/PI << std::endl;
         param_out << "launch_dir=" << launch_dir*180.0/PI << std::endl;
         param_out << "launch_ang=" << launch_ang*180.0/PI << std::endl;
         param_out << "vel_mag=" << vel_mag/sf << std::endl;
@@ -248,7 +252,7 @@ int main(int argc, char** argv)
 
     // Create the controller
     //tensionSensor* const tension_sensor = new tensionSensor();
-    T6RollingController* const rollingController = new T6RollingController(controllerConfig, worldPtr, tan(roll), -tan(pitch));
+    T6RollingController* const rollingController = new T6RollingController(controllerConfig, worldPtr, sx, sz);
 
     // Attach controller to the model
     myModel->attach(rollingController);
