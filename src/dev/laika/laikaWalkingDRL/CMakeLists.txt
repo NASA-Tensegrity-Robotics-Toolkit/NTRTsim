@@ -1,9 +1,10 @@
 #### Added for ROS ####
-find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs genmsg)
 #######################
 
-include_directories(${catkin_INCLUDE_DIRS}
-  /home/edward/gps-spine/src/gps_agent_pkg/msg_gen/cpp/include)
+include_directories(include ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  ~/gps-spine/src/Laika/devel/include)
 
 link_directories(${LIB_DIR})
 
@@ -24,15 +25,17 @@ add_executable(AppLaikaWalkingDRL
 )
 
 #### Added for ROS ####
-target_link_libraries(AppLaikaWalkingDRL
-  /opt/ros/indigo/lib/librostime.so
-  /opt/ros/indigo/lib/libroscpp.so
-  /opt/ros/indigo/lib/librosconsole.so
-  /opt/ros/indigo/lib/libroscpp_serialization.so)
-
 #target_link_libraries(AppLaikaWalkingDRL
-#  /opt/ros/kinetic/lib/librostime.so
-#  /opt/ros/kinetic/lib/libroscpp.so
-#  /opt/ros/kinetic/lib/librosconsole.so
-#  /opt/ros/kinetic/lib/libroscpp_serialization.so)
+#  /opt/ros/indigo/lib/librostime.so
+#  /opt/ros/indigo/lib/libroscpp.so
+#  /opt/ros/indigo/lib/librosconsole.so
+#  /opt/ros/indigo/lib/libroscpp_serialization.so)
+
+target_link_libraries(AppLaikaWalkingDRL
+  ${catkin_LIBRARIES}
+  /opt/ros/kinetic/lib/librostime.so
+  /opt/ros/kinetic/lib/libroscpp.so
+  /opt/ros/kinetic/lib/librosconsole.so
+  /opt/ros/kinetic/lib/libroscpp_serialization.so)
+
 #######################

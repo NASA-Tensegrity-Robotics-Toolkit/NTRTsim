@@ -22,7 +22,7 @@
  * which builds a horizontal spine structure defined in YAML (under the laika branch)
  * but which will be tied to ROS / deep reinforcement learning code in the laika_drl
  * branch.
- * @author Edward Zhu, Andrew Sabelhaus
+ * @author Edward Zhu, Brian Cera, Andrew Sabelhaus
  * $Id$
  */
 
@@ -65,11 +65,12 @@ class action_cb_class {
     std::vector<double> leg_action_msg;
     std::vector<double> leg_torques;
     LaikaWalkingController* m_controller;
+
     void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
       leg_torques.clear();
       cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
-      m_controller->updateRestLengths(cable_action_msg);
       leg_torques.assign(msg->actions.end()-4, msg->actions.end());
+      m_controller->updateRestLengths(cable_action_msg);
       m_controller->updateTorques(leg_torques);
     }
 };
@@ -80,6 +81,7 @@ class cmd_cb_class {
     std::string cmd_msg = "step";
     int msg_time = 0;
     // void cb(const std_msgs::String::ConstPtr& msg) {
+
     void cb(const Laika_ROS::LaikaCommand::ConstPtr& msg) {
       cmd_msg = msg->cmd;
       msg_time = msg->header.stamp.nsec;
@@ -251,7 +253,7 @@ int main(int argc, char** argv)
         std::cout << cableRL[i] << ", ";
       }
       std::cout << std::endl;
-      
+
       // ROS_INFO(state_array_msg);
 
       ++counter;
