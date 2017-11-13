@@ -258,10 +258,10 @@ int main(int argc, char** argv)
       state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
       pub_state.publish(state_array_msg);
 
-      for (int i = 0; i < cableRL.size(); i++) {
-        std::cout << cableRL[i] << ", ";
-      }
-      std::cout << std::endl;
+      // for (int i = 0; i < cableRL.size(); i++) {
+      //   std::cout << cableRL[i] << ", ";
+      // }
+      // std::cout << std::endl;
 
       // ROS_INFO(state_array_msg);
 
