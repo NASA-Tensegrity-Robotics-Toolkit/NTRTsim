@@ -91,6 +91,8 @@ public:
 
   void updateRestLengths(std::vector<double> controlRL);
 
+  void updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt);
+
   void updateTorques(std::vector<double> controlTorques);
 
 // protected:

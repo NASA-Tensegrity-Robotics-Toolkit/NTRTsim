@@ -235,6 +235,26 @@ void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
 	desCableRL.assign(controlRL.begin(), controlRL.end());
 }
 
+void LaikaWalkingController::updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt) {
+	if (controlRL.size() != cable_action_dim) {
+		throw std::runtime_error("Cable action dimension mismatch");
+	}
+  for (int i = 0; i < controlRL.size(); i++) {
+    if (controlRL[i] == -1) {
+      desCableRL.push_back(m_allActuators[i]->getRestLength()-targetVel*dt);
+    }
+    else if (controlRL[i] == 1) {
+      desCableRL.push_back(m_allActuators[i]->getRestLength()+targetVel*dt);
+    }
+    else if (controlRL[i] == 0) {
+      desCableRL.push_back(m_allActuators[i]->getRestLength());
+    }
+    else {
+      throw std::runtime_error("Unrecognized cable input");
+    }
+  }
+}
+
 void LaikaWalkingController::updateTorques(std::vector<double> controlTorques) {
 	if (controlTorques.size() != leg_action_dim) {
 		throw std::runtime_error("Leg action dimension mismatch");

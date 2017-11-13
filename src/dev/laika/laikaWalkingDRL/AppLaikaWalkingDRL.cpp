@@ -63,15 +63,18 @@ class action_cb_class {
     action_cb_class(LaikaWalkingController* controller) : m_controller(controller) {};
     std::vector<double> cable_action_msg;
     std::vector<double> leg_action_msg;
-    std::vector<double> leg_torques;
     LaikaWalkingController* m_controller;
+    double dt;
+    double target_velocity;
 
     void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
-      leg_torques.clear();
+      cable_action_msg.clear();
+      leg_action_msg.clear();
       cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
-      leg_torques.assign(msg->actions.end()-4, msg->actions.end());
-      m_controller->updateRestLengths(cable_action_msg);
-      m_controller->updateTorques(leg_torques);
+      leg_action_msg.assign(msg->actions.end()-4, msg->actions.end());
+      // m_controller->updateRestLengths(cable_action_msg);
+      m_controller->updateRestLengthsDiscrete(cable_action_msg, target_velocity, dt);
+      m_controller->updateTorques(leg_action_msg);
     }
 };
 
@@ -161,8 +164,10 @@ int main(int argc, char** argv)
     // wasn't built with the HorizontalSpine YAML file?
 
     // Call the constructor for the controller
+    // LaikaWalkingController* const controller =
+    //   new LaikaWalkingController(policy_file,test_policy);
     LaikaWalkingController* const controller =
-      new LaikaWalkingController(policy_file,test_policy);
+      new LaikaWalkingController();
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
@@ -170,9 +175,13 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
+    const double target_velocity = 12.0; // MAKE SURE THIS MATCHES WITH THE YAML FILE!!!
+
     // ROS stuff
     cmd_cb_class cmd_cb;
     action_cb_class action_cb(controller);
+    action_cb.dt = timestep_physics;
+    action_cb.target_velocity = target_velocity;
 
     // Initialize ROS node
     ros::init(argc,argv,"laika_model");
