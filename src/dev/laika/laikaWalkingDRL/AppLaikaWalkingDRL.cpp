@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 
     // Call the constructor for the controller
     LaikaWalkingController* const controller =
-      new LaikaWalkingController(policy_file,test_policy);
+      new LaikaWalkingController();
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
