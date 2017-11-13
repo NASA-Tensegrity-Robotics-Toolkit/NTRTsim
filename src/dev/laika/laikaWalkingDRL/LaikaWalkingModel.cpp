@@ -391,6 +391,7 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelCableRL()
   }
   return cableRL;
 }
+
 std::vector<tgBasicActuator*> LaikaWalkingModel::getAllActuators(std::vector<std::string> actuatorTags)
 {
   std::vector<tgBasicActuator*> allActuators;
