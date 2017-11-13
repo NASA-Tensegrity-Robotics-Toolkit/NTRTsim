@@ -72,12 +72,26 @@ public:
      */
     std::vector<double> getLaikaWalkingModelStates();
 
+    /**
+     * This function will return the cable rest lengths.
+     * Note that it is hand-tuned to only select out specific rigid bodies,
+     * and must be modified in the cpp file to return more or less states.
+     */
+    std::vector<double> getLaikaWalkingModelCableRL();
+
 		/**
      * Get all cable actuators.
      */
-		// std::vector<tgBasicActuator*> getAllActuators(std::vector<std::string> actuatorTags);
+		std::vector<tgBasicActuator*> getAllActuators(std::vector<std::string> actuatorTags);
 
-// private:
+private:
+
+  /**
+   * Number of vertebrae in the model
+   */
+  int numVertebrae = 5;
+
+  std::vector<tgBasicActuator*> m_allActuators;
 
 };
 

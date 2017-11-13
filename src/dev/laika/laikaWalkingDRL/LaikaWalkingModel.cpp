@@ -290,6 +290,19 @@ void LaikaWalkingModel::setup(tgWorld& world)
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontRightHinge);
+
+  std::vector<std::string> actuatorTags;
+	actuatorTags.push_back("HF");
+  actuatorTags.push_back("HR");
+  actuatorTags.push_back("HL");
+  actuatorTags.push_back("HB");
+  actuatorTags.push_back("SFR");
+  actuatorTags.push_back("SRL");
+  actuatorTags.push_back("SBF");
+  actuatorTags.push_back("SBL");
+
+  m_allActuators.clear();
+  m_allActuators = getAllActuators(actuatorTags);
 }
 
 /**
@@ -370,35 +383,43 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelStates()
   return states;
 }
 
-// std::vector<tgBasicActuator*> LaikaWalkingModel::getAllActuators(std::vector<std::string> actuatorTags)
-// {
-//   std::vector<tgBasicActuator*> allActuators;
-//
-//   for (int i = 0; i < actuatorTags.size(); i++) {
-//     // Sort through actuators to make sure the order is the same
-//     for (int j = 0; j < numVertebrae-1; j++) {
-//       std::ostringstream num1;
-//       std::ostringstream num2;
-//       num1 << j+1;
-//       num2 << j+2;
-//
-//       std::string tag;
-//       tag = actuatorTags[i] + " t" + num1.str() + "/t" + num2.str();
-//       std::vector<tgBasicActuator*> actuator = find<tgBasicActuator>(tag);
-//       // std::cout << tag << std::endl;
-//
-//       // Make sure this list is not empty:
-//       if(actuator.empty()) {
-//         throw std::invalid_argument("No actuators found with " + actuatorTags[i] + ".");
-//       }
-//       // Now, we know that element 0 exists.
-//       // Confirm that it is not a null pointer.
-//       if(actuator[0] == NULL) {
-//         throw std::runtime_error("Pointer to the first actuator with " + actuatorTags[i] + " is NULL.");
-//       }
-//       allActuators.push_back(actuator[0]);
-//     }
-//   }
-//
-//   return allActuators;
-// }
+std::vector<double> LaikaWalkingModel::getLaikaWalkingModelCableRL()
+{
+  std::vector<double> cableRL;
+  for (int i = 0; i < m_allActuators.size(); i++) {
+    cableRL.push_back(m_allActuators[i]->getRestLength());
+  }
+  return cableRL;
+}
+std::vector<tgBasicActuator*> LaikaWalkingModel::getAllActuators(std::vector<std::string> actuatorTags)
+{
+  std::vector<tgBasicActuator*> allActuators;
+
+  for (int i = 0; i < actuatorTags.size(); i++) {
+    // Sort through actuators to make sure the order is the same
+    for (int j = 0; j < numVertebrae-1; j++) {
+      std::ostringstream num1;
+      std::ostringstream num2;
+      num1 << j+1;
+      num2 << j+2;
+
+      std::string tag;
+      tag = actuatorTags[i] + " t" + num1.str() + "/t" + num2.str();
+      std::vector<tgBasicActuator*> actuator = find<tgBasicActuator>(tag);
+      // std::cout << tag << std::endl;
+
+      // Make sure this list is not empty:
+      if(actuator.empty()) {
+        throw std::invalid_argument("No actuators found with " + actuatorTags[i] + ".");
+      }
+      // Now, we know that element 0 exists.
+      // Confirm that it is not a null pointer.
+      if(actuator[0] == NULL) {
+        throw std::runtime_error("Pointer to the first actuator with " + actuatorTags[i] + " is NULL.");
+      }
+      allActuators.push_back(actuator[0]);
+    }
+  }
+
+  return allActuators;
+}

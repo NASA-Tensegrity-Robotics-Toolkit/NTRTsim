@@ -52,10 +52,10 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/UInt32.h"
-#include "gps_agent_pkg/LaikaState.h"
-#include "gps_agent_pkg/LaikaStateArray.h"
-#include "gps_agent_pkg/LaikaAction.h"
-#include "gps_agent_pkg/LaikaCommand.h"
+#include "Laika_ROS/LaikaState.h"
+#include "Laika_ROS/LaikaStateArray.h"
+#include "Laika_ROS/LaikaAction.h"
+#include "Laika_ROS/LaikaCommand.h"
 
 // Class for action callbacks
 class action_cb_class {
@@ -65,7 +65,7 @@ class action_cb_class {
     std::vector<double> leg_action_msg;
     std::vector<double> leg_torques;
     LaikaWalkingController* m_controller;
-    void cb(const gps_agent_pkg::LaikaAction::ConstPtr& msg) {
+    void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
       leg_torques.clear();
       cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
       m_controller->updateRestLengths(cable_action_msg);
@@ -80,7 +80,7 @@ class cmd_cb_class {
     std::string cmd_msg = "step";
     int msg_time = 0;
     // void cb(const std_msgs::String::ConstPtr& msg) {
-    void cb(const gps_agent_pkg::LaikaCommand::ConstPtr& msg) {
+    void cb(const Laika_ROS::LaikaCommand::ConstPtr& msg) {
       cmd_msg = msg->cmd;
       msg_time = msg->header.stamp.nsec;
       ROS_INFO("action: %s", msg->cmd.c_str());
@@ -103,6 +103,9 @@ int main(int argc, char** argv)
     {
        throw std::invalid_argument("This app does not take in a YAML file, it's hard-coded to for DRL purposes. Use another Laika app for testing different YAML files, or edit the string path to the YAML file in this app.");
     }
+
+    std::string policy_file("/home/edward/gps-spine/python/gps/model_rl/models_builder/saved_model.pb");
+    bool test_policy = false;
 
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -157,7 +160,7 @@ int main(int argc, char** argv)
 
     // Call the constructor for the controller
     LaikaWalkingController* const controller =
-      new LaikaWalkingController();
+      new LaikaWalkingController(policy_file,test_policy);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
@@ -172,7 +175,7 @@ int main(int argc, char** argv)
     // Initialize ROS node
     ros::init(argc,argv,"laika_model");
     ros::NodeHandle n;
-    ros::Publisher pub_state = n.advertise<gps_agent_pkg::LaikaStateArray>("state", 1);
+    ros::Publisher pub_state = n.advertise<Laika_ROS::LaikaStateArray>("state", 1);
     ros::Subscriber sub_act = n.subscribe("action",1,&action_cb_class::cb,&action_cb);
     ros::Subscriber sub_cmd = n.subscribe("cmd", 1, &cmd_cb_class::cb, &cmd_cb);
 
@@ -191,7 +194,7 @@ int main(int argc, char** argv)
     while (ros::ok()) {
       ros::spinOnce();
 
-      gps_agent_pkg::LaikaStateArray state_array_msg;
+      Laika_ROS::LaikaStateArray state_array_msg;
       state_array_msg.header.seq = counter;
       state_array_msg.header.stamp = ros::Time::now();
 
@@ -219,8 +222,9 @@ int main(int argc, char** argv)
       last_cmd_msg_time = cmd_cb.msg_time;
 
       std::vector<double> states = myModel->getLaikaWalkingModelStates();
+      std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
       for(int i = 0; i < bodies; i++) {
-        gps_agent_pkg::LaikaState state_msg;
+        Laika_ROS::LaikaState state_msg;
         state_msg.body_id = i;
         for (int j = 0; j < 12; j++) {
           switch(j) {
@@ -240,7 +244,14 @@ int main(int argc, char** argv)
         }
         state_array_msg.states.push_back(state_msg);
       }
+      state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
       pub_state.publish(state_array_msg);
+
+      for (int i = 0; i < cableRL.size(); i++) {
+        std::cout << cableRL[i] << ", ";
+      }
+      std::cout << std::endl;
+      
       // ROS_INFO(state_array_msg);
 
       ++counter;
