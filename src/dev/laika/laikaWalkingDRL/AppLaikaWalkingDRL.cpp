@@ -205,10 +205,6 @@ int main(int argc, char** argv)
     while (ros::ok()) {
       ros::spinOnce();
 
-      Laika_ROS::LaikaStateArray state_array_msg;
-      state_array_msg.header.seq = counter;
-      state_array_msg.header.stamp = ros::Time::now();
-
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
         if (cmd_cb.msg_time != last_cmd_msg_time) {
@@ -230,40 +226,47 @@ int main(int argc, char** argv)
         }
       }
 
-      last_cmd_msg_time = cmd_cb.msg_time;
+      if (cmd_cb.msg_time != last_cmd_msg_time) {
+        std::vector<double> states = myModel->getLaikaWalkingModelStates();
+        std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
 
-      std::vector<double> states = myModel->getLaikaWalkingModelStates();
-      std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
-      for(int i = 0; i < bodies; i++) {
-        Laika_ROS::LaikaState state_msg;
-        state_msg.body_id = i;
-        for (int j = 0; j < 12; j++) {
-          switch(j) {
-            case 0: state_msg.position.x = states[12*i+j];
-            case 1: state_msg.position.y = states[12*i+j];
-            case 2: state_msg.position.z = states[12*i+j];
-            case 3: state_msg.orientation.x = states[12*i+j];
-            case 4: state_msg.orientation.y = states[12*i+j];
-            case 5: state_msg.orientation.z = states[12*i+j];
-            case 6: state_msg.lin_vel.x = states[12*i+j];
-            case 7: state_msg.lin_vel.y = states[12*i+j];
-            case 8: state_msg.lin_vel.z = states[12*i+j];
-            case 9: state_msg.ang_vel.x = states[12*i+j];
-            case 10: state_msg.ang_vel.y = states[12*i+j];
-            case 11: state_msg.ang_vel.z = states[12*i+j];
+        Laika_ROS::LaikaStateArray state_array_msg;
+        state_array_msg.header.seq = counter;
+        state_array_msg.header.stamp = ros::Time::now();
+
+        for(int i = 0; i < bodies; i++) {
+          Laika_ROS::LaikaState state_msg;
+          state_msg.body_id = i;
+          for (int j = 0; j < 12; j++) {
+            switch(j) {
+              case 0: state_msg.position.x = states[12*i+j];
+              case 1: state_msg.position.y = states[12*i+j];
+              case 2: state_msg.position.z = states[12*i+j];
+              case 3: state_msg.orientation.x = states[12*i+j];
+              case 4: state_msg.orientation.y = states[12*i+j];
+              case 5: state_msg.orientation.z = states[12*i+j];
+              case 6: state_msg.lin_vel.x = states[12*i+j];
+              case 7: state_msg.lin_vel.y = states[12*i+j];
+              case 8: state_msg.lin_vel.z = states[12*i+j];
+              case 9: state_msg.ang_vel.x = states[12*i+j];
+              case 10: state_msg.ang_vel.y = states[12*i+j];
+              case 11: state_msg.ang_vel.z = states[12*i+j];
+            }
           }
+          state_array_msg.states.push_back(state_msg);
         }
-        state_array_msg.states.push_back(state_msg);
+        
+        state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
+        pub_state.publish(state_array_msg);
       }
-      state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
-      pub_state.publish(state_array_msg);
-
       // for (int i = 0; i < cableRL.size(); i++) {
       //   std::cout << cableRL[i] << ", ";
       // }
       // std::cout << std::endl;
 
       // ROS_INFO(state_array_msg);
+
+      last_cmd_msg_time = cmd_cb.msg_time;
 
       ++counter;
 
