@@ -47,7 +47,7 @@ m_gravity(gravity), m_mode(mode), m_face_goal(face_goal), m_log_name(log_name)
 
 	if (m_mode.compare("face") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', 'thrust', or 'launch'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -59,7 +59,7 @@ m_gravity(gravity), m_mode(mode), m_dr_goal(dr_goal), m_log_name(log_name)
 	assert(m_gravity >= 0);
 	if (mode.compare("dr") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', 'thrust', or 'launch'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -71,7 +71,7 @@ m_gravity(gravity), m_mode(mode), m_path(path), m_path_size(pathSize), m_log_nam
 	assert(m_gravity >= 0);
 	if (mode.compare("path") != 0) {
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', 'thrust', or 'launch'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -81,9 +81,9 @@ T6RollingController::Config::Config (double gravity, const std::string& mode, bt
 m_gravity(gravity), m_mode(mode), m_initVel(initVel), m_thrustDist(thrustDist), m_log_name(log_name)
 {
 	assert(m_gravity >= 0);
-	if (mode.compare("thrust") != 0){
+	if (mode.compare("thrust") != 0 && mode.compare("launch") != 0){
 		std::cout << "Config: invalid arguments" << std::endl;
-		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', or 'thrust'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
+		std::cout << "Usage: first arg is a string for mode ('face', 'path', 'dr', 'thrust', or 'launch'). Second arg is based on mode, if 'face' was used, then an int between 0 and 7 is expected. If 'dr' was used, then a btVector3 is expected" << std::endl;
 		std::cout << "Exiting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -150,6 +150,12 @@ void T6RollingController::onSetup(sixBarModel& subject)
 			<< c_initVel.y() << ", " << c_initVel.z() << "]" << std::endl;
 		std::cout << "onSetup: Thrust distance: " << c_thrustDist << std::endl;
 		controller_mode = 4;
+	}
+	else if (c_mode.compare("launch") == 0) {
+		std::cout << "onSetup: Initial velocity: [" << c_initVel.x() << ", "
+			<< c_initVel.y() << ", " << c_initVel.z() << "]" << std::endl;
+		std::cout << "onSetup: Thrust distance: " << c_thrustDist << std::endl;
+		controller_mode = 5;
 	}
 	else {
 		std::cout << "onSetup: Controller mode not recognized, exiting..." << std::endl;
@@ -350,24 +356,6 @@ void T6RollingController::onSetup(sixBarModel& subject)
 	if (!c_log_name.empty()) {
 		doLog = true;
 		filename_data = c_log_name;
-		// filename_param = c_log_name.replace(c_log_name.end()-3,c_log_name.end(),"txt");
-		// param_out.open(filename_param.c_str());
-		// if (!param_out.is_open()) {
-		// 	std::cout << "Failed to open output file" << std::endl;
-		// 	exit(EXIT_FAILURE);
-		// }
-		// else {
-		// 	std::cout << "Writing parameters to file" << std::endl;
-		// 	std::vector<double> initConds = subject.getInitialConds();
-		// 	param_out << "X=" << initConds[0]/10 << std::endl;
-		// 	param_out << "Y=" << initConds[1]/10 << std::endl;
-		// 	param_out << "Z=" << initConds[2]/10 << std::endl;
-		// 	param_out << "Vx=" << c_initVel[0]/10 << std::endl;
-		// 	param_out << "Vy=" << c_initVel[1]/10 << std::endl;
-		// 	param_out << "Vz=" << c_initVel[2]/10 << std::endl;
-		// 	param_out << "yaw=" << initConds[3] << std::endl;
-		// 	param_out.close();
-		// }
 		// Create filestream for data log and open it
 		data_out.open(filename_data.c_str(), std::fstream::app);
 		if (!data_out.is_open()) {
@@ -530,7 +518,8 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					}
 					payloadBody->setLinearVelocity(c_initVel);
 				}
-				// Thruster mode
+
+				// Get robot states
 				btVector3 CoM_pos;
 				btVector3 CoM_vel;
 				btQuaternion q;
@@ -566,6 +555,10 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					collided = true;
 					collidedTime = counter;
 				}
+
+				/***************************************************************************************/
+				// Data logging
+				/***************************************************************************************/
 				if (collided && counter-collidedTime <= 100) {
 					if (doLog && ((counter-collidedTime)%writeFreq==0)) {
 						data_out.open(filename_data.c_str(), std::fstream::app);
@@ -582,12 +575,11 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 
 				counter++;
 				lastCollision = collision;
-				/*
+			}
+		case 5:
+			{
 				btVector3 thrustMag = getThrustMag(c_initVel, c_thrustDist);
 				double thrustPeriod = getThrustPeriod(c_initVel, thrustMag);
-
-				// std::cout << thrustMag << std::endl;
-				// std::cout << thrustPeriod << std::endl;
 				double thrust_start = 4.0;
 				double thrust_end = thrust_start + thrustPeriod;
 
@@ -600,72 +592,49 @@ void T6RollingController::onStep(sixBarModel& subject, double dt)
 					payloadBody->applyCentralForce(btVector3(0,0,0));
 				}
 
+				// Get robot states
+				btVector3 CoM_pos;
+				btVector3 CoM_vel;
+				btQuaternion q;
+
+				// Convert from quaternions to euler angles
+				q = payloadBody->getOrientation();
+				double phi = atan2(2*(q[0]*q[1]+q[2]*q[3]),(1-2*(pow(q[1],2)+pow(q[2],2))));
+				double theta = asin(2*(q[0]*q[2]-q[3]*q[1]));
+				double psi = atan2(2*(q[0]*q[3]+q[1]*q[2]),(1-2*(pow(q[2],2)+pow(q[3],2))));
+				// std::cout << "phi: " << phi*180/PI << ", theta: " << theta*180/PI << ", psi: " << psi*180/PI << std::endl;
+
+				for (int i = 0; i < rodBodies.size(); i++) {
+					CoM_pos = CoM_pos + rodBodies[i]->getCenterOfMassPosition()/rodBodies.size();
+					CoM_vel = CoM_vel + rodBodies[i]->getLinearVelocity()/rodBodies.size();
+				}
+
+				collision = checkCollision(dynWorldPtr);
+
+				if (collision && !lastCollision && (worldTime > thrust_end)) {
+					contactCounter += 1;
+				}
 
 				if (CoM_vel.norm() < 1.0 && worldTime > thrust_end) {
 					std::cout << "Simulation complete, exiting..." << std::endl;
 					exit(EXIT_SUCCESS);
 				}
-				*/
 
-				// if (!isOnGround && worldTime > 6) {
-				// if (worldTime > thrust_end) {
-				// 	bool tmp = false;
-				// 	for (int i = 0; i < markers.size(); i++) {
-				// 		if (markers[i].getWorldPosition().y() <= 1.56) {
-				// 			tmp = true;
-				// 			break;
-				// 			// contactNode = i;
-				// 		}
-				// 		// std::cout << i << std::endl;
-				// 	}
-				// 	isOnGround = tmp;
-				// 	// if (CoM_pos.y() <= 5) {
-				// 	// 	isOnGround = true;
-				// 	// }
-				// }
-				// Data logging ends when the same rod leaves the ground
-				// else if (worldTime > 6) {
-				// 	// std::cout << markers[contactNode].getWorldPosition().y() << std::endl;
-				// 	// if (markers[contactNode].getWorldPosition().y() > 1.56) {
-				// 	// 	isOnGround = false;
-				// 	// 	exit(EXIT_SUCCESS);
-				// 	// }
-
-				// 	for (int i = 0; i < markers.size(); i++) {
-				// 		if (markers[i].getWorldPosition().y() > 1.56) {
-				// 			isOnGround = isOnGround & true;
-				// 		}
-				// 		isOnGround = ~isOnGround;
-				// 	}
-				// 	// if (CoM_pos.y() > 5) {
-				// 	// 	isOnGround = false;
-				// 	// 	// exit(EXIT_SUCCESS);
-				// 	// }
-				// }
-
-				// if (isOnGround != lastFlag && worldTime > thrust_end) {
-				// 	if (isOnGround) {
-				// 		contactCounter += 1;
-				// 	}
-				// 	lastFlag = isOnGround;
-				// }
-
-				// std::cout << isOnGround << std::endl;
-
-				/**************************************************************************************
+				/***************************************************************************************/
 				// Data logging
 				/***************************************************************************************/
+				if (doLog && (counter%writeFreq==0) && !thrusterOn && (worldTime > thrust_end)) {
+					data_out.open(filename_data.c_str(), std::fstream::app);
+					data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
+							<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << "," << m_sx << "," << m_sz << ","
+							<< phi << "," << theta << "," << psi << "," << collision << "," << contactCounter << std::endl;
+					data_out.close();
+				}
+				if (!thrusterOn && (worldTime > thrust_end)) {
+					counter ++;
+				}
 
-				// if (doLog && isOnGround) {
-				// if (doLog && !thrusterOn && worldTime > thrust_end) {
-				// if (doLog && !thrusterOn && worldTime > thrust_end && collision) {
-				// 	// Open filestream, record line of data, then close filestream
-				// 	data_out.open(filename_data.c_str(), std::fstream::app);
-				//     data_out << worldTime << "," << CoM_pos.x() << "," << CoM_pos.y() << "," << CoM_pos.z() << ","
-				//     		<< CoM_vel.x() << "," << CoM_vel.y() << "," << CoM_vel.z() << ","
-				//     		<< isOnGround << "," << contactCounter << ",0.0,0.0" << std::endl;
-		  //   		data_out.close();
-				// }
+				lastCollision = collision;
 			}
 		}
 	}

@@ -87,6 +87,8 @@ def get_paths(n_data, full_data=False):
     n_files = int(np.round(len(os.listdir(directory))/2))
     file_num_list = np.arange(n_files)
 
+    # print(n_files)
+
     while True:
         file_num = np.random.choice(file_num_list,1)[0]
         filename = directory+str(file_num)+'_Response.csv'

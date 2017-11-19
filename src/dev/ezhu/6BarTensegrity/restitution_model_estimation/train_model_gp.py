@@ -58,8 +58,8 @@ def conditional(kernel, params, x_new, x_train, y_train):
     return mu, sigma
 
 def main():
-    n_train = 500
-    n_test = 100
+    n_train = 1000
+    n_test = 200
     n_data = n_train + n_test
     paths = preprocessing.get_paths(n_data,full_data=False)
     data = preprocessing.get_train_test_sets(n_train,n_test,paths,shuf=True)
@@ -73,6 +73,8 @@ def main():
     y_dim = y_train.shape[1]
     n_train = x_train.shape[0]
     n_test = x_test.shape[0]
+
+    print(x_train.shape)
 
     # plt.figure()
     # plt.plot(x_train[:,0],y_train[:,0],'kx',mew=2)
@@ -112,8 +114,9 @@ def main():
 
     m_full = gp.gpr.GPR(x_train,y_train,kern=k2,mean_function=meanf)
 
-    # to_train = [0,3,4,5]
-    to_train = [3]
+    # to_train = [3]
+    to_train = [0,1,2,3,4,5]
+
     for i in to_train:
         x = x_train[:,i].reshape((n_train,1))
         y = y_train[:,i].reshape((n_train,1))
@@ -141,32 +144,47 @@ def main():
         x_min = np.min(x)
         x_max = np.max(x)
         buff = (x_max-x_min)*0.1
-        x_lin = np.linspace(x_min,x_max,100).reshape((100,1))
+        x_lin = np.linspace(x_min-buff,x_max+buff,100).reshape((100,1))
 
         idx = np.argsort(x)
         x = x[idx].reshape((n_test,1))
         y = y[idx].reshape((n_test,1))
 
-        mean_y1,var_y1 = m.predict_y(x)
-        mean_f1,var_f1 = m.predict_f(x)
-        _,cov_f1 = m.predict_f_full_cov(x)
+        mean_y1,var_y1 = m.predict_y(x_lin)
+
+        print(var_y1)
+        mean_f1,var_f1 = m.predict_f(x_lin)
+        _,cov_f1 = m.predict_f_full_cov(x_lin)
 
         print(cov_f1.shape)
 
         plt.figure()
-        plt.plot(x,y,'kx',mew=2)
+        plt.plot(x,y,'ko',mew=2)
 
-        plt.plot(x,mean_y1,'b',lw=2)
-        plt.plot(x,mean_y1-2*np.sqrt(var_y1),'r',lw=2)
-        plt.plot(x,mean_y1+2*np.sqrt(var_y1),'r',lw=2)
+        plt.plot(x_lin,mean_y1,'b',lw=2)
+        plt.plot(x_lin,mean_y1-2*np.sqrt(var_y1),'r',lw=2)
+        plt.plot(x_lin,mean_y1+2*np.sqrt(var_y1),'r',lw=2)
 
 
-        plt.plot(x,mean_f1,'b-.',lw=2)
-        plt.plot(x,mean_f1-2*np.sqrt(var_f1),'r-.',lw=2)
-        plt.plot(x,mean_f1+2*np.sqrt(var_f1),'r-.',lw=2)
+        # plt.plot(x_lin,mean_f1,'b-.',lw=2)
+        # plt.plot(x_lin,mean_f1-2*np.sqrt(var_f1),'r-.',lw=2)
+        # plt.plot(x_lin,mean_f1+2*np.sqrt(var_f1),'r-.',lw=2)
 
-        plt.xlabel('state '+str(to_train[i])+' in')
-        plt.ylabel('state '+str(to_train[i])+' out')
+        plt.xlabel('Touchdown state')
+        plt.ylabel('Liftoff state')
+
+        if to_train[i] == 0:
+            plt.title('X position [m]')
+        elif to_train[i] == 1:
+            plt.title('Y position [m]')
+        elif to_train[i] == 2:
+            plt.title('Z position [m]')
+        elif to_train[i] == 3:
+            plt.title('X velocity [m/s]')
+        elif to_train[i] == 4:
+            plt.title('Y velocity [m/s]')
+        elif to_train[i] == 5:
+            plt.title('Z velocity [m/s]')
 
         # plt.figure()
         # plt.plot(x_lin,var_y1,'b',lw=2)

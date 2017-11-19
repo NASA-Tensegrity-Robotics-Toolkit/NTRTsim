@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     // Box ground
     // ---------------------------------------------------------------------------------
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),1,0,btVector3(100.0, 1.5, 100.0));
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll),1,0,btVector3(1000.0, 1.5, 1000.0));
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // ---------------------------------------------------------------------------------
@@ -147,14 +147,6 @@ int main(int argc, char** argv)
     // const tgHillyGround::Config groundConfig(btVector3(yaw,pitch,roll),1,0,btVector3(1000.0, 1.5, 1000.0),
     //     btVector3(0.0, 0.0, 0.0),100,100,0.5,20.0,10.0,0.5);
     // tgHillyGround* ground = new tgHillyGround(groundConfig);
-
-    // Random initial orientation
-    psi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
-    theta = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
-    phi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
-    // psi = 0;
-    // theta = 0;
-    // phi = 0;
 
     if (!log_name.empty()) {
         std::cout << "Writing to file: " << log_name << std::endl;
@@ -174,8 +166,8 @@ int main(int argc, char** argv)
     // create the view
     const double timestep_physics = 0.0001; // seconds
     const double timestep_graphics = 1.f/60.f; // seconds
-    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
-    tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -184,49 +176,102 @@ int main(int argc, char** argv)
     // Use yaml model builder
     //TensegrityModel* const myModel = new TensegrityModel(argv[1]);
 
-    // Define initial position
-    double x_init = 0.0; //-3.0*sf;
-    double y_init = 2*sf; //0.7*sf;
-    double z_init = 0.0; //1.0*sf;
-    bool init_uc = false;
+    // Random initial orientation
+    psi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    theta = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    phi = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+    // psi = 0;
+    // theta = 0;
+    // phi = 0;
+
+    // Controller mode
+    std::string mode("launch");
+
+    bool init_uc = false; // Default to no uncertainty in inital position
+    double x_init = 0.0;
+    double y_init = 1.0*sf;
+    double z_init = 0.0;
+    double initVel_x = 0.0;
+    double initVel_y = 0.0;
+    double initVel_z = 0.0;
+    btVector3 initVel;
+    double launch_dir = 0.0;
+    double vel_mag = 0.0;
+    double launch_ang = 0.0;
+    double thrustDist = 2*sf;
+
+    // Initialize controller
+    if (mode == "thrust") {
+      y_init = 2.0*sf; // for rapid downward impact tests
+
+      // Define thrust magnitude, thrust period, launch direction, and launch angle
+      // double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+
+      launch_dir = 0.0;
+      vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
+      launch_ang = -(25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
+      double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;
+      double hor_vel_mag = vel_mag*cos(launch_ang);//5*sf;
+      initVel_x = hor_vel_mag*cos(launch_dir);
+      initVel_y = vert_vel_mag;
+      initVel_z = hor_vel_mag*sin(launch_dir);
+
+      std::cout << "launch dir: " << launch_dir*180/PI << ", launch angle: " << launch_ang*180/PI << ", velocity: " << vel_mag << std::endl;
+      initVel.setX(initVel_x);
+      initVel.setY(initVel_y);
+      initVel.setZ(initVel_z);
+    }
+    else if (mode == "launch") {
+      init_uc = true; // for launch tests
+
+      // Define thrust magnitude, thrust period, launch direction, and launch angle
+      // double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
+
+      launch_dir = 0.0;
+      // vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
+      vel_mag = 5.0*sf;
+      // launch_ang = (25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
+      launch_ang = 45*PI/180;
+      double vert_vel_mag = vel_mag*sin(launch_ang);
+      double hor_vel_mag = vel_mag*cos(launch_ang);
+      initVel_x = hor_vel_mag*cos(launch_dir);
+      initVel_y = vert_vel_mag;
+      initVel_z = hor_vel_mag*sin(launch_dir);
+
+      std::cout << "launch dir: " << launch_dir*180/PI << ", launch angle: " << launch_ang*180/PI << ", velocity: " << vel_mag << std::endl;
+      initVel.setX(initVel_x);
+      initVel.setY(initVel_y);
+      initVel.setZ(initVel_z);
+    }
+
+    // Define path for controller for path mode
+    int *pathPtr;
+    int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
+    int pathSize = sizeof(path)/sizeof(int);
+    pathPtr = path;
+
+    // Define direction to roll towards for dr mode
+    btVector3 roll_dir(100,0,-100);
+
+    // Define face to start on for face mode
+    int face = 2;
 
     std::cout << "Initializing model with yaw: " << psi << ", pitch: " << theta << ", and roll: " << phi << std::endl;
-    std::cout << "Initializing model with x: " << x_init << ", y: " << y_init << ", and z: " << z_init << std::endl;
+    if (!init_uc) {
+      std::cout << "Initializing model with x: " << x_init << ", y: " << y_init << ", and z: " << z_init << std::endl;
+    }
+    else {
+      std::cout << "Initializing model with y: " << y_init << ", randomly initializing x and z positions" << std::endl;
+    }
     // Use tgCreator
     // sixBarModel* const myModel = new sixBarModel();
     sixBarModel* const myModel = new sixBarModel(psi,theta,phi,x_init,y_init,z_init,init_uc);
 
-    // Define path for controller
-    // int *pathPtr;
-    // int path[] = {2, 15, 13, 0, 5, 7, 10}; // Repeat unit is [15, 13, 0, 5, 7, 10]
-    // int pathSize = sizeof(path)/sizeof(int);
-    // pathPtr = path;
-
-    // Define thrust magnitude, thrust period, launch direction, and launch angle
-    // double launch_dir = (-180.0+rand()*(1.0/RAND_MAX)*360.0)*PI/180.0;
-
-    double launch_dir = 0.0;
-    double vel_mag = (2.0+rand()*(1.0/RAND_MAX)*8.0)*sf;
-    double launch_ang = -(25.0+rand()*(1.0/RAND_MAX)*40.0)*PI/180.0;
-    double vert_vel_mag = vel_mag*sin(launch_ang);//5*sf;
-    double hor_vel_mag = vel_mag*cos(launch_ang);//5*sf;
-    double initVel_x = hor_vel_mag*cos(launch_dir);
-    double initVel_y = vert_vel_mag;
-    double initVel_z = hor_vel_mag*sin(launch_dir);
-
-    std::cout << "launch dir: " << launch_dir*180/PI << ", launch angle: " << launch_ang*180/PI << ", velocity: " << vel_mag << std::endl;
-    btVector3 initVel;
-    initVel.setX(initVel_x);
-    initVel.setY(initVel_y);
-    initVel.setZ(initVel_z);
-    double thrustDist = 2*sf;
-
-    // Configure the controlller
-    // const T6RollingController::Config controllerConfig(gravity, "face", 2, log_name);
-    // const T6RollingController::Config controllerConfig(gravity, "path", pathPtr, pathSize, log_name);
-    const T6RollingController::Config controllerConfig(gravity, "thrust", initVel, thrustDist, log_name);
-    // const T6RollingController::Config controllerConfig(gravity, "dr", btVector3(100,0,-100), log_name);
-
+    const T6RollingController::Config controllerConfig(gravity, mode, initVel, thrustDist, log_name);
+    // const T6RollingController::Config controllerConfig(gravity, mode, pathPtr, pathSize, log_name);
+    // const T6RollingController::Config controllerConfig(gravity, mode, roll_dir, log_name);
+    // const T6RollingController::Config controllerConfig(gravity, mode, face, log_name);
+    
     if (!log_name.empty()) {
   		std::string filename_param = log_name.replace(log_name.end()-3,log_name.end(),"txt");
       std::ofstream param_out;
@@ -261,7 +306,7 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
 
     // Run the simulation
-    simulation.run(50000);
+    simulation.run();
 
     // teardown is handled by delete
     return 0;
