@@ -329,7 +329,7 @@ std::vector<double> LaikaWalkingModel::getLaikaWalkingModelStates()
   laikaRigidBodyTags.push_back("legBoxBackLeft");
   laikaRigidBodyTags.push_back("legBoxBackRight");
   laikaRigidBodyTags.push_back("legBoxFrontLeft");
-  laikaRigidBodyTags.push_back("vertebraBbottomrod");
+  laikaRigidBodyTags.push_back("legBoxFrontRight");
 
   // For each of the tags, do the following.
   // (1) get all the rigid bodies that have that tag

@@ -81,14 +81,15 @@ class action_cb_class {
 // Class for command callbacks
 class cmd_cb_class {
   public:
-    std::string cmd_msg = "step";
+    std::string cmd_msg = "";
     int msg_time = 0;
     // void cb(const std_msgs::String::ConstPtr& msg) {
 
     void cb(const Laika_ROS::LaikaCommand::ConstPtr& msg) {
       cmd_msg = msg->cmd;
       msg_time = msg->header.stamp.nsec;
-      ROS_INFO("action: %s", msg->cmd.c_str());
+      // ROS_INFO("action: %s", msg->cmd.c_str());
+      std::cout << "Message received: " << cmd_msg << std::endl;
     }
 };
 
@@ -201,32 +202,44 @@ int main(int argc, char** argv)
 
     int last_cmd_msg_time = 0;
 
+    bool publish_state = false;
+
     // Step simulation
     while (ros::ok()) {
       ros::spinOnce();
 
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
-        if (cmd_cb.msg_time != last_cmd_msg_time) {
+        // if (cmd_cb.msg_time != last_cmd_msg_time) {
+          cmd_cb.cmd_msg = "";
+          publish_state = true;
           simulation.reset();
-          simulation.run(1);
+          simulation.run(30);
           // counter = 0;
           std::cout << "Simulation reset" << std::endl;
-        }
-        else {
-          std::cout << "Reset message stale" << std::endl;
-        }
+        // }
+        // else {
+        //   std::cout << "Reset message stale" << std::endl;
+        // }
       }
       else if (cmd_cb.cmd_msg == "step") {
-        if (cmd_cb.msg_time != last_cmd_msg_time) {
+        // if (cmd_cb.msg_time != last_cmd_msg_time) {
+          cmd_cb.cmd_msg = "";
+          publish_state = true;
           simulation.run(1);
-        }
-        else {
-          std::cout << "Step message stale" << std::endl;
-        }
+      //   }
+      //   else {
+      //     std::cout << "Step message stale" << std::endl;
+      //   }
+      }
+      else {
+        // std::cout << "Command not recognized" << std::endl;
       }
 
-      if (cmd_cb.msg_time != last_cmd_msg_time) {
+      // if (cmd_cb.msg_time != last_cmd_msg_time) {
+      if (publish_state) {
+        publish_state = false;
+        std::cout << "Publishing state message" << std::endl;
         std::vector<double> states = myModel->getLaikaWalkingModelStates();
         std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
 
@@ -255,7 +268,7 @@ int main(int argc, char** argv)
           }
           state_array_msg.states.push_back(state_msg);
         }
-        
+
         state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
         pub_state.publish(state_array_msg);
       }
