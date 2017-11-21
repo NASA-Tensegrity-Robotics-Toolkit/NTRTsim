@@ -61,23 +61,25 @@
 
 // Class for action callbacks
 class action_cb_class {
-  public:
-    action_cb_class(LaikaWalkingController* controller) : m_controller(controller) {};
-    std::vector<double> cable_action_msg;
-    std::vector<double> leg_action_msg;
-    LaikaWalkingController* m_controller;
-    double dt;
-    double target_velocity;
+public:
+  action_cb_class(LaikaWalkingController* controller) : m_controller(controller) {};
+  std::vector<double> cable_action_msg;
+  std::vector<double> leg_action_msg;
+  LaikaWalkingController* m_controller;
+  double dt;
+  double target_velocity;
+  std::string action_ready = "";
 
-    void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
-      cable_action_msg.clear();
-      leg_action_msg.clear();
-      cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
-      leg_action_msg.assign(msg->actions.end()-4, msg->actions.end());
-      // m_controller->updateRestLengths(cable_action_msg);
-      m_controller->updateRestLengthsDiscrete(cable_action_msg, target_velocity, dt);
-      m_controller->updateTorques(leg_action_msg);
-    }
+  void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
+    action_ready = "True";
+    cable_action_msg.clear();
+    leg_action_msg.clear();
+    cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
+    leg_action_msg.assign(msg->actions.end()-4, msg->actions.end());
+    // m_controller->updateRestLengths(cable_action_msg);
+    m_controller->updateRestLengthsDiscrete(cable_action_msg, target_velocity, dt);
+    m_controller->updateTorques(leg_action_msg);
+  }
 };
 
 // Class for command callbacks
@@ -129,9 +131,9 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    //tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    // tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -219,11 +221,12 @@ int main(int argc, char** argv)
         //   std::cout << "Reset message stale" << std::endl;
         // }
       }
-      else if (cmd_cb.cmd_msg == "step") {
+      else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready == "True") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-          cmd_cb.cmd_msg = "";
-          publish_state = true;
-          simulation.run(1);
+	action_cb.action_ready = "";
+	cmd_cb.cmd_msg = "";
+	publish_state = true;
+	simulation.run(1);
       //   }
       //   else {
       //     std::cout << "Step message stale" << std::endl;
