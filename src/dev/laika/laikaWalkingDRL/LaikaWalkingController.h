@@ -36,6 +36,9 @@
 #include <vector>
 #include <map>
 
+#include "NeuralNet.h"
+#include "RandomShootingMPC.h"
+
 // Forward declarations
 class TensegrityModel;
 // class LaikaWalkingModel;
@@ -107,6 +110,7 @@ private:
 
   void setTorques(double dt);
 
+  std::vector<double> getLaikaWalkingModelStates(TensegrityModel& subject);
   /**
    * A list of all the actuators to control.
    */
@@ -138,6 +142,11 @@ private:
   std::vector<btVector3> legTorques;
 
   double worldTime = 0;
+
+  NeuralNet dyn_nn;
+
+  // Vector of current discrete actions -1, 0, or 1
+  std::vector<double> currCableAction;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H

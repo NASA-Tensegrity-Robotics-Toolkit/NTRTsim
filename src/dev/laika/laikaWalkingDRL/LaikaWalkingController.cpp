@@ -48,6 +48,10 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <numeric/ublas/vector.hpp>
+
+using namespace boost::numeric::ublas;
+
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
@@ -148,6 +152,17 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	// Update initial torques
 	updateTorques(initialTorques);
 
+  // int in_dim = 176;
+  // int out_dim = 140;
+  // int hid_dim = 500;
+  // int n_layers = 2;
+  // bool transpose = true;
+  // dyn_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
+  //
+  // dyn_nn.setLayerWeights(0, "fit_2_layer_0.csv");
+  // dyn_nn.setLayerWeights(1, "fit_2_layer_1.csv");
+  // dyn_nn.setLayerWeights(2, "fit_2_layer_out.csv");
+
   std::cout << "Finished setting up the controller." << std::endl;
 }
 
@@ -173,6 +188,9 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
   // }
 	setRestLengths(dt);
 	setTorques(dt);
+
+  std::vector<double> states = getLaikaWalkingModelStates(subject);
+
 }
 
 std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags)
@@ -238,6 +256,7 @@ void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
 
 void LaikaWalkingController::updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt) {
   desCableRL.clear();
+
   std::vector<double> tmp;
   if (controlRL.size() != cable_action_dim) {
 		throw std::runtime_error("Cable action dimension mismatch");
@@ -298,4 +317,76 @@ void LaikaWalkingController::setTorques(double dt) {
 			hipBody->applyTorqueImpulse(-legTorques[i]);
 		}
 	}
+}
+
+std::vector<double> LaikaWalkingController::getLaikaWalkingModelStates(TensegrityModel& subject)
+{
+  // We'll be putting the data here:
+  std::vector<double> states;
+
+  // First, a list of all the tags we'll be picking out from the children.
+  // In order, we want to do shoulder, vertebrae, hips, legs.
+  // Pick out the box for each of the shoulders/hips and the boxes for the legs,
+  // and the bottom rod of each of the three floating vertebrae.
+  std::vector<std::string> laikaRigidBodyTags;
+  laikaRigidBodyTags.push_back("shouldersBase");
+  laikaRigidBodyTags.push_back("vertebraAbottomrod");
+  laikaRigidBodyTags.push_back("vertebraBbottomrod");
+  laikaRigidBodyTags.push_back("vertebraCbottomrod");
+  laikaRigidBodyTags.push_back("hipsBase");
+  laikaRigidBodyTags.push_back("legBoxBackLeft");
+  laikaRigidBodyTags.push_back("legBoxBackRight");
+  laikaRigidBodyTags.push_back("legBoxFrontLeft");
+  laikaRigidBodyTags.push_back("legBoxFrontRight");
+
+  // For each of the tags, do the following.
+  // (1) get all the rigid bodies that have that tag
+  // (2) confirm that there is exactly one element (one rigid)
+  // (3) get the btRigidBody
+  // (4) get the positions, orientations, velocities, and rot velocities
+  // (5) append each of those to 'states'
+
+  for(int i=0; i < laikaRigidBodyTags.size(); i++) {
+
+    // (1) get the rigid bodies with this tag
+    std::vector<tgBaseRigid*> currentBodies =
+      subject.find<tgBaseRigid>(laikaRigidBodyTags[i]);
+    // Make sure this list is not empty:
+    if( currentBodies.size() != 1 ) {
+      throw std::invalid_argument("Wrong number of bodies with tag for states.");
+    }
+    // Now, we know that element 0 exists.
+    // (2) Confirm that it is not a null pointer.
+    if( currentBodies[0] == NULL) {
+      throw std::runtime_error("Pointer to the first rigid body for states is NULL");
+    }
+    // (3)Get the single body.
+    btRigidBody* currentBody = currentBodies[0]->getPRigidBody();
+
+    // (4) In order, get and append positions, orient, vel, and rot vel
+    btVector3 pos = currentBody->getCenterOfMassPosition();
+    double yaw;
+    double pitch;
+    double roll;
+    currentBody->getCenterOfMassTransform().getBasis().getEulerYPR(yaw, pitch, roll);
+    btVector3 vel = currentBody->getLinearVelocity();
+    btVector3 angularvel = currentBody->getAngularVelocity();
+
+    // (5) put all this nice data into the 'states' vector.
+    // Indexing into a btVector3 happens via the x, y, z methods. Elements 0, 1, 2.
+    states.push_back(pos.x());
+    states.push_back(pos.y());
+    states.push_back(pos.z());
+    states.push_back(yaw);
+    states.push_back(pitch);
+    states.push_back(roll);
+    states.push_back(vel.x());
+    states.push_back(vel.y());
+    states.push_back(vel.z());
+    states.push_back(angularvel.x());
+    states.push_back(angularvel.y());
+    states.push_back(angularvel.z());
+  }
+
+  return states;
 }

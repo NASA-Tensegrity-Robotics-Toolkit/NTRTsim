@@ -2,8 +2,10 @@
 find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs genmsg)
 #######################
 
+set(BOOST_HOME_DIR ../../../../env/build/boost/boost)
+
 include_directories(include ${catkin_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
+  ${BOOST_HOME_DIR}
   ~/gps-spine/src/Laika/devel/include)
 
 link_directories(${LIB_DIR})
@@ -15,13 +17,15 @@ link_libraries(core
                terrain
                tgOpenGLSupport
                yaml-cpp
-	       Adapters
-	       TensegrityModel)
+	             Adapters
+	             TensegrityModel)
 
 add_executable(AppLaikaWalkingDRL
   LaikaWalkingController.cpp
   LaikaWalkingModel.cpp
   AppLaikaWalkingDRL.cpp
+  NeuralNet.cpp
+  RandomShootingMPC.cpp
 )
 
 #### Added for ROS ####

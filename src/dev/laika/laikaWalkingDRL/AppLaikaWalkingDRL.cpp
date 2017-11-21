@@ -57,6 +57,8 @@
 #include "Laika_ROS/LaikaAction.h"
 #include "Laika_ROS/LaikaCommand.h"
 
+// #include "NeuralNet.h"
+
 // Class for action callbacks
 class action_cb_class {
   public:
@@ -110,9 +112,6 @@ int main(int argc, char** argv)
        throw std::invalid_argument("This app does not take in a YAML file, it's hard-coded to for DRL purposes. Use another Laika app for testing different YAML files, or edit the string path to the YAML file in this app.");
     }
 
-    std::string policy_file("/home/edward/gps-spine/python/gps/model_rl/models_builder/saved_model.pb");
-    bool test_policy = false;
-
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -130,9 +129,9 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    tgSimView view(world, timestep_physics, timestep_graphics);
+    // tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
@@ -165,8 +164,6 @@ int main(int argc, char** argv)
     // wasn't built with the HorizontalSpine YAML file?
 
     // Call the constructor for the controller
-    // LaikaWalkingController* const controller =
-    //   new LaikaWalkingController(policy_file,test_policy);
     LaikaWalkingController* const controller =
       new LaikaWalkingController();
     // Attach the controller to the model. Must happen before running the
