@@ -36,8 +36,12 @@
 #include <vector>
 #include <map>
 
-#include "NeuralNet.h"
+#include "NeuralNetDynamics.h"
 #include "RandomShootingMPC.h"
+
+#include <numeric/ublas/vector.hpp>
+
+using namespace boost::numeric::ublas;
 
 // Forward declarations
 class TensegrityModel;
@@ -69,7 +73,7 @@ public:
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
-  LaikaWalkingController();
+  LaikaWalkingController(bool train, double target_velocity);
 
   /**
    * Nothing to delete, destructor must be virtual
@@ -106,11 +110,15 @@ private:
 
   std::vector<btRigidBody*> getRigidBodies(TensegrityModel& subject, std::vector<std::string> tags);
 
+  vector<double> getCurrActions();
+
+  vector<double> getCurrRestLengths();
+
   void setRestLengths(double dt);
 
   void setTorques(double dt);
 
-  std::vector<double> getLaikaWalkingModelStates(TensegrityModel& subject);
+  vector<double> getLaikaWalkingModelStates(TensegrityModel& subject);
   /**
    * A list of all the actuators to control.
    */
@@ -122,31 +130,43 @@ private:
   btRigidBody* shoulderBody;
   btRigidBody* hipBody;
   std::vector<btRigidBody*> legBodies;
-  /**
-   * Number of vertebrae in the model
-   */
-  int numVertebrae = 5;
 
+  /**
+   * Number of vertebrae in the model, set in setup
+   */
+  int num_vertebrae;
+  int num_legs;
+
+  /**
+   * Action and state space dimensions, set in setup
+   */
+  int state_dim;
   int cable_action_dim;
-  int leg_action_dim = 4;
+  int leg_action_dim;
 
   /**
    * Cable control rest lengths
    */
   std::vector<double> desCableRL;
-  std::vector<double> actCableRL;
 
   /**
    * Leg torques
    */
   std::vector<btVector3> legTorques;
 
-  double worldTime = 0;
+  double worldTime;
 
-  NeuralNet dyn_nn;
+  NeuralNetDynamics dyn_nn;
 
-  // Vector of current discrete actions -1, 0, or 1
+  // Vector of current discrete cable actions -1, 0, or 1
   std::vector<double> currCableAction;
+  // Vector of current leg torques
+  std::vector<double> currLegTorques;
+
+  RandomShootingMPC controller;
+
+  bool m_train;
+  double m_target_velocity;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H

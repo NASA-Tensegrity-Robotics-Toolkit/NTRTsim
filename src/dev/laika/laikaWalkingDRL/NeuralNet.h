@@ -9,6 +9,8 @@
 
 #include <numeric/ublas/matrix.hpp>
 #include <numeric/ublas/vector.hpp>
+#include <numeric/ublas/assignment.hpp>
+#include <numeric/ublas/operation.hpp>
 
 using namespace boost::numeric::ublas;
 
@@ -28,6 +30,8 @@ public:
   void setLayerWeights(int layer, std::string filename);
 
   void setNNParams(int in_dim, int out_dim, int hid_dim, int n_layers, bool transpose);
+
+  std::vector<int> getDims();
 
 private:
   int m_in_dim, m_out_dim, m_hid_dim, m_n_layers;

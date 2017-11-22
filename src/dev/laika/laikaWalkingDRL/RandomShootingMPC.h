@@ -3,9 +3,10 @@
 
 #include <numeric/ublas/matrix.hpp>
 #include <numeric/ublas/vector.hpp>
-#include "NeuralNet.h"
+#include "NeuralNetDynamics.h"
 #include <string>
 #include <vector>
+#include <time.h>
 
 using namespace boost::numeric::ublas;
 
@@ -13,24 +14,26 @@ class RandomShootingMPC
 {
 public:
   RandomShootingMPC();
-  RandomShootingMPC(NeuralNet* dyn_model, int horizon, int num_paths);
+  RandomShootingMPC(NeuralNetDynamics* dyn_model, int horizon, int num_paths);
 
   virtual ~RandomShootingMPC() {}
 
-  void attachModel(NeuralNet* dyn_model);
+  void attachDynamicsModel(NeuralNetDynamics* dyn_model);
 
-  void setMPCParams(int horizon, int num_paths);
+  void setMPCParams(int horizon, int num_paths, int num_cables, int num_legs);
 
-  void setInputLims(std::vector<double> uL, std::vector<double> lL);
+  void setInputLims(vector<double> uL, vector<double> lL);
 
-  std::vector<double> getAction(vector<double> state);
+  vector<double> getAction(vector<double> state);
 
 private:
   double costFunction(vector<double> state, vector<double> action, vector<double> next_state);
-  
-  int m_horizon, m_num_paths;
-  NeuralNet* m_dyn_model;
-  std::vector<double> m_uL, m_lL;
+
+  vector<double> sampleAction();
+
+  int m_horizon, m_num_paths, m_num_cables, m_num_legs, m_num_c, m_num_d;
+  NeuralNetDynamics* m_dyn_model;
+  vector<double> m_uL, m_lL;
 };
 
 #endif

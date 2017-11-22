@@ -131,7 +131,7 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    //tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
     tgSimView view(world, timestep_physics, timestep_graphics);
 
@@ -166,16 +166,16 @@ int main(int argc, char** argv)
     // wasn't built with the HorizontalSpine YAML file?
 
     // Call the constructor for the controller
+    bool train = true;
+    const double target_velocity = 12.0; // MAKE SURE THIS MATCHES WITH THE YAML FILE!!!
     LaikaWalkingController* const controller =
-      new LaikaWalkingController();
+      new LaikaWalkingController(train, target_velocity);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
 
     // Add the model to the world
     simulation.addModel(myModel);
-
-    const double target_velocity = 12.0; // MAKE SURE THIS MATCHES WITH THE YAML FILE!!!
 
     // ROS stuff
     cmd_cb_class cmd_cb;
@@ -210,12 +210,12 @@ int main(int argc, char** argv)
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-          cmd_cb.cmd_msg = "";
-          publish_state = true;
-          simulation.reset();
-          simulation.run(30);
-          // counter = 0;
-          std::cout << "Simulation reset" << std::endl;
+        cmd_cb.cmd_msg = "";
+        publish_state = true;
+        simulation.reset();
+        simulation.run(30);
+        // counter = 0;
+        std::cout << "Simulation reset" << std::endl;
         // }
         // else {
         //   std::cout << "Reset message stale" << std::endl;
@@ -223,14 +223,14 @@ int main(int argc, char** argv)
       }
       else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready == "True") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-	action_cb.action_ready = "";
-	cmd_cb.cmd_msg = "";
-	publish_state = true;
-	simulation.run(1);
-      //   }
-      //   else {
-      //     std::cout << "Step message stale" << std::endl;
-      //   }
+      	action_cb.action_ready = "";
+      	cmd_cb.cmd_msg = "";
+      	publish_state = true;
+      	simulation.run(1);
+        //   }
+        //   else {
+        //     std::cout << "Step message stale" << std::endl;
+        //   }
       }
       else {
         // std::cout << "Command not recognized" << std::endl;

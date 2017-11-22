@@ -1,8 +1,5 @@
 #include "NeuralNet.h"
 
-#include <numeric/ublas/assignment.hpp>
-#include <numeric/ublas/operation.hpp>
-
 NeuralNet::NeuralNet() {}
 
 NeuralNet::NeuralNet(int in_dim, int out_dim, int hid_dim, int n_layers, bool transpose)
@@ -138,4 +135,16 @@ void NeuralNet::setNNParams(int in_dim, int out_dim, int hid_dim, int n_layers, 
 
   m_weights.clear();
   m_weights.assign(weights_tmp.begin(), weights_tmp.end());
+}
+
+std::vector<int> NeuralNet::getDims()
+{
+  std::vector<int> dims;
+
+  dims.push_back(m_in_dim);
+  dims.push_back(m_out_dim);
+  dims.push_back(m_hid_dim);
+  dims.push_back(m_n_layers);
+
+  return dims;
 }
