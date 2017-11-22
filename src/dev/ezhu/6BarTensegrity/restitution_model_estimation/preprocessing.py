@@ -25,7 +25,7 @@ def standardize(X):
 
     return X_std, mean, std
 
-def read_csv_data(filename, full_data=False):
+def read_csv_data(filename, full_data=False, zero_x = False):
     success = True
 
     with open(filename,'r') as f_in:
@@ -45,6 +45,10 @@ def read_csv_data(filename, full_data=False):
     data_tmp = np.loadtxt(filename,delimiter=',',dtype=None,skiprows=1)
     # print(filename)
     # print(data_tmp.shape)
+    if zero_x:
+        x_0 = data_tmp[0,1]
+        data_tmp[:,1] = data_tmp[:,1] - x_0
+
     if not full_data:
         # Only save state in (first state) and state out (last state) information
         x_tmp = data_tmp[0,]
@@ -65,20 +69,28 @@ def process_data(x_data, y_data):
 
     # With all pos and all vels
     x_feat = x_data[:,1:7]/sf
-    # With x, y, z pos and x, z slopes
-    # x_feat = np.delete(x_data,[0,7,8,11,12,13],1)
-    # x_feat[:,0:6] = x_feat[:,0:6]/sf
-
-    # delta labels
-    # y_feat = (y_data[:,1:7]-x_data[:,1:7])/sf
-    # state labels
     y_feat = y_data[:,1:7]/sf
     x_state = x_data[:,1:7]/sf
     y_state = y_data[:,1:7]/sf
 
+    # Change back to z vertical
+    tmp = -x_feat[:,2]
+    x_feat[:,2] = x_feat[:,1]
+    x_feat[:,1] = tmp
+    tmp = -x_feat[:,5]
+    x_feat[:,5] = x_feat[:,4]
+    x_feat[:,4] = tmp
+
+    tmp = -y_feat[:,2]
+    y_feat[:,2] = y_feat[:,1]
+    y_feat[:,1] = tmp
+    tmp = -y_feat[:,5]
+    y_feat[:,5] = y_feat[:,4]
+    y_feat[:,4] = tmp
+
     return x_feat, y_feat, x_state, y_state
 
-def get_paths(n_data, full_data=False):
+def get_paths(n_data, full_data=False, zero_x=False):
     print('Loading data into paths...')
     directory = '../../../../../../Documents/data/'
     paths = []
@@ -92,7 +104,7 @@ def get_paths(n_data, full_data=False):
     while True:
         file_num = np.random.choice(file_num_list,1)[0]
         filename = directory+str(file_num)+'_Response.csv'
-        path = read_csv_data(filename,full_data)
+        path = read_csv_data(filename,full_data,zero_x)
         if len(path) > 0:
             paths.append(path)
             datapoints += path['observations'].shape[0]

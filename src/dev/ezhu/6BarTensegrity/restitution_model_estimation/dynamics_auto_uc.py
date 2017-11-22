@@ -13,9 +13,9 @@ def build_mlp(input_placeholder,
               ):
     out = input_placeholder
     with tf.variable_scope(scope):
-        for _ in range(n_layers):
-            out = tf.layers.dense(out, size, activation=activation)
-        out = tf.layers.dense(out, output_size, activation=output_activation)
+        for i in range(n_layers):
+            out = tf.layers.dense(out, size, activation=activation, name='layer_'+str(i))
+        out = tf.layers.dense(out, output_size, activation=output_activation, name='layer_out')
     return out
 
 def shuffle(a, o):
@@ -47,6 +47,7 @@ class NNDynamicsModel_Auto_UC():
         # Define other parameters
         self.print_int = 100
         self.eps = 1e-6
+        self.n_layers = n_layers
 
         self.normalization = normalization
         self.batch_size = batch_size
@@ -118,6 +119,31 @@ class NNDynamicsModel_Auto_UC():
                                 self.norm_deltas_act:norm_deltas_batch})
                 print('Iteration: %d, Loss: %g' % (i,curr_loss))
 
+        print('Saving nn weights')
+        for i in range(self.n_layers+1):
+            model_name = 'dyn_model/'
+            if i == self.n_layers:
+                layer_name = 'layer_out'
+                kernel = tf.get_default_graph().get_tensor_by_name(model_name+layer_name+'/kernel:0').eval(session=self.sess)
+                bias = tf.get_default_graph().get_tensor_by_name(model_name+layer_name+'/bias:0').eval(session=self.sess)
+                weights = np.vstack((kernel,bias.reshape(1,len(bias))))
+                print(weights.shape)
+            else:
+                layer_name = 'layer_'+str(i)
+                kernel = tf.get_default_graph().get_tensor_by_name(model_name+layer_name+'/kernel:0').eval(session=self.sess)
+                bias = tf.get_default_graph().get_tensor_by_name(model_name+layer_name+'/bias:0').eval(session=self.sess)
+                weights = np.vstack((kernel,bias.reshape(1,len(bias))))
+                print(weights.shape)
+            filename = './data/dynamics_nn_'+layer_name+'.csv'
+            np.savetxt(filename,weights,delimiter=',')
+
+        # Save normalization
+        np.savetxt('./data/norm_obs.csv',np.vstack((self.normalization['mean_obs'],self.normalization['std_obs'])),delimiter=',')
+
+        # Save standard deviations
+        std = np.exp(self.logstd.eval(session=self.sess))
+        np.savetxt('./data/std_vec.csv', std, delimiter=',')
+
     def predict(self, states):
         """ Write a function to take in a batch of (unnormalized) states and (unnormalized) actions and return the (unnormalized) next states as predicted by using the model """
         # First normalize
@@ -134,6 +160,6 @@ class NNDynamicsModel_Auto_UC():
         next_states_mean = states + deltas_mean
         next_states_samp = states + deltas_samp
 
-        var = np.exp(self.logstd.eval(session=self.sess))
+        std = np.exp(self.logstd.eval(session=self.sess))
 
-        return next_states_samp, next_states_mean, var
+        return next_states_samp, next_states_mean, std
