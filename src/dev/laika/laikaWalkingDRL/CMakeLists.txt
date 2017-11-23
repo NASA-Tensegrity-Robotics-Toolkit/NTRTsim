@@ -27,6 +27,7 @@ add_executable(AppLaikaWalkingDRL
   NeuralNet.cpp
   RandomShootingMPC.cpp
   NeuralNetDynamics.cpp
+  NeuralNetPolicy.cpp
 )
 
 #### Added for ROS ####

@@ -68,10 +68,10 @@ public:
   LaikaWalkingController* m_controller;
   double dt;
   double target_velocity;
-  std::string action_ready = "";
+  bool action_ready = false;
 
   void cb(const Laika_ROS::LaikaAction::ConstPtr& msg) {
-    action_ready = "True";
+    action_ready = true;
     cable_action_msg.clear();
     leg_action_msg.clear();
     cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
@@ -96,6 +96,24 @@ class cmd_cb_class {
       std::cout << "Message received: " << cmd_msg << std::endl;
     }
 };
+
+// Function for resetting the simulation
+bool reset(tgSimulation* simulation, int steps) {
+  simulation->reset();
+  simulation->run(steps);
+  return true;
+}
+
+// Function for resetting the simulation after an initial command has been assigned
+bool reset_with_action(tgSimulation* simulation, int steps, bool action_ready) {
+  bool done = false;
+  if (action_ready) {
+    simulation->reset();
+    simulation->run(steps);
+    done = true;
+  }
+  return done;
+}
 
 /**
  * The entry point.
@@ -202,6 +220,8 @@ int main(int argc, char** argv)
     int last_cmd_msg_time = 0;
 
     bool publish_state = false;
+    bool reset_done = false;
+    int steps_after_reset = 30;
 
     // Step simulation
     while (ros::ok()) {
@@ -210,33 +230,29 @@ int main(int argc, char** argv)
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-        cmd_cb.cmd_msg = "";
-        publish_state = true;
-        simulation.reset();
-        simulation.run(30);
-        // counter = 0;
-        std::cout << "Simulation reset" << std::endl;
-        // }
-        // else {
-        //   std::cout << "Reset message stale" << std::endl;
-        // }
+        reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
+        // reset_done = reset(simulation, steps_after_reset);
+        if (reset_done) {
+          cmd_cb.cmd_msg = "";
+          publish_state = true;
+          action_cb.action_ready = false;
+          counter = 0;
+          std::cout << "Simulation reset" << std::endl;
+        }
+        // simulation.reset();
+        // simulation.run(30);
       }
-      else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready == "True") {
+      else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready) {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-      	action_cb.action_ready = "";
+      	action_cb.action_ready = false;
       	cmd_cb.cmd_msg = "";
       	publish_state = true;
       	simulation.run(1);
-        //   }
-        //   else {
-        //     std::cout << "Step message stale" << std::endl;
-        //   }
       }
       else {
         // std::cout << "Command not recognized" << std::endl;
       }
 
-      // if (cmd_cb.msg_time != last_cmd_msg_time) {
       if (publish_state) {
         publish_state = false;
         std::cout << "Publishing state message" << std::endl;

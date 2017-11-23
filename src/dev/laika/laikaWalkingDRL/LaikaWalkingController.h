@@ -37,6 +37,7 @@
 #include <map>
 
 #include "NeuralNetDynamics.h"
+#include "NeuralNetPolicy.h"
 #include "RandomShootingMPC.h"
 
 #include <numeric/ublas/vector.hpp>
@@ -157,6 +158,7 @@ private:
   double worldTime;
 
   NeuralNetDynamics dyn_nn;
+  NeuralNetPolicy policy_nn;
 
   // Vector of current discrete cable actions -1, 0, or 1
   std::vector<double> currCableAction;
