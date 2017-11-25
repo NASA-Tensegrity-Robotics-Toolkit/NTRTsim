@@ -214,7 +214,7 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    //tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
     tgSimView view(world, timestep_physics, timestep_graphics);
 
@@ -280,13 +280,16 @@ int main(int argc, char** argv)
     simulation.run(1);
     std::vector<double> states = myModel->getLaikaWalkingModelStates();
     int bodies = int(states.size()/12);
-    simulation.reset();
+    //simulation.reset();
 
     int last_cmd_msg_time = 0;
 
     bool publish_state = false;
     bool reset_done = false;
-    int steps_after_reset = 30;
+    int steps_after_reset = 200;
+
+    reset_done = reset(&simulation, steps_after_reset);
+    reset_done = false;
 
     // Step simulation
     while (ros::ok()) {
