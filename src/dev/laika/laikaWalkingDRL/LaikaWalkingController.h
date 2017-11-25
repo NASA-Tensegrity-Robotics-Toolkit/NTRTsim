@@ -98,7 +98,7 @@ public:
    */
   virtual void onStep(TensegrityModel& subject, double dt);
 
-  void updateRestLengths(std::vector<double> controlRL);
+  void updateRestLengths(std::vector<double> controlRL, double targetVel, double dt);
 
   void updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt);
 

@@ -77,8 +77,8 @@ public:
     leg_action_msg.clear();
     cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
     leg_action_msg.assign(msg->actions.end()-4, msg->actions.end());
-    // m_controller->updateRestLengths(cable_action_msg);
-    m_controller->updateRestLengthsContinuous(cable_action_msg, target_velocity, dt);
+    m_controller->updateRestLengths(cable_action_msg, target_velocity, dt);
+    // m_controller->updateRestLengthsContinuous(cable_action_msg, target_velocity, dt);
     m_controller->updateTorques(leg_action_msg);
   }
 };

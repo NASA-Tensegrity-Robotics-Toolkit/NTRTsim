@@ -293,12 +293,17 @@ std::vector<btRigidBody*> LaikaWalkingController::getRigidBodies(TensegrityModel
 	return rigidBodies;
 }
 
-void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL) {
+void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL, double targetVel, double dt) {
   desCableRL.clear();
+  std::vector<double> tmp;
   if (controlRL.size() != cable_action_dim) {
 		throw std::runtime_error("Cable action dimension mismatch");
 	}
-	desCableRL.assign(controlRL.begin(), controlRL.end());
+  for (int i = 0; i < controlRL.size(); i++) {
+    double sigmoid = 1/(1+exp(-controlRL[i]));
+    tmp.push_back(m_allActuators[i]->getRestLength()+sigmoid*targetVel*dt);
+  }
+	desCableRL.assign(tmp.begin(), tmp.end());
 }
 
 void LaikaWalkingController::updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt) {
