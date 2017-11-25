@@ -300,7 +300,8 @@ void LaikaWalkingController::updateRestLengths(std::vector<double> controlRL, do
 		throw std::runtime_error("Cable action dimension mismatch");
 	}
   for (int i = 0; i < controlRL.size(); i++) {
-    double sigmoid = 1/(1+exp(-controlRL[i]));
+    // Get sigmoid output with nn output and scale from [0,1] to [-1,1]
+    double sigmoid = 2*(1/(1+exp(-controlRL[i])))-1;
     tmp.push_back(m_allActuators[i]->getRestLength()+sigmoid*targetVel*dt);
   }
 	desCableRL.assign(tmp.begin(), tmp.end());
