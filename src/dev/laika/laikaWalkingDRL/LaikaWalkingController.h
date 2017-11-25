@@ -39,6 +39,7 @@
 #include "NeuralNetDynamics.h"
 #include "NeuralNetPolicy.h"
 #include "RandomShootingMPC.h"
+#include "ElevationSensor.h"
 
 #include <numeric/ublas/vector.hpp>
 
@@ -101,6 +102,8 @@ public:
 
   void updateRestLengthsDiscrete(std::vector<double> controlRL, double targetVel, double dt);
 
+  void updateRestLengthsContinuous(std::vector<double> controlRL, double targetVel, double dt);
+
   void updateTorques(std::vector<double> controlTorques);
 
 // protected:
@@ -157,18 +160,20 @@ private:
 
   double worldTime;
 
-  NeuralNetDynamics dyn_nn;
-  NeuralNetPolicy policy_nn;
+  // NeuralNetDynamics dyn_nn;
+  // NeuralNetPolicy policy_nn;
 
   // Vector of current discrete cable actions -1, 0, or 1
   std::vector<double> currCableAction;
   // Vector of current leg torques
   std::vector<double> currLegTorques;
 
-  RandomShootingMPC controller;
+  // RandomShootingMPC controller;
 
   bool m_train;
   double m_target_velocity;
+
+  // ElevationSensor elev_sens;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H

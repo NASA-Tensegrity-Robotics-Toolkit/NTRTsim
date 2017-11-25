@@ -92,7 +92,6 @@ private:
   int numVertebrae = 5;
 
   std::vector<tgBasicActuator*> m_allActuators;
-
 };
 
 #endif

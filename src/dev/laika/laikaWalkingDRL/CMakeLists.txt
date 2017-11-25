@@ -2,7 +2,7 @@
 find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs genmsg)
 #######################
 
-set(BOOST_HOME_DIR ../../../../env/build/boost/boost)
+set(BOOST_HOME_DIR ../../../../env/include/boost)
 
 include_directories(include ${catkin_INCLUDE_DIRS}
   ${BOOST_HOME_DIR}
@@ -28,7 +28,17 @@ add_executable(AppLaikaWalkingDRL
   RandomShootingMPC.cpp
   NeuralNetDynamics.cpp
   NeuralNetPolicy.cpp
+  ElevationSensor.cpp
 )
+
+add_executable(AppSTLParser
+  world/parser/AppSTLParser.cpp)
+
+#add_executable(AppElevationGrabber
+#	world/parser/AppElevationGrabber.cpp)
+
+#add_executable(AppElevationMap
+#	world/parser/AppElevationMap.cpp)
 
 #### Added for ROS ####
 target_link_libraries(AppLaikaWalkingDRL

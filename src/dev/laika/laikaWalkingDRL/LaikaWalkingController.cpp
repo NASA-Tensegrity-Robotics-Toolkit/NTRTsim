@@ -153,35 +153,50 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	hipBody = getRigidBodies(subject, hipTag)[0];
 	legBodies = getRigidBodies(subject, legTags);
 
-  if (!m_train) {
-    int in_dim = 176;
-    int out_dim = 140;
-    int hid_dim = 500;
-    int n_layers = 2;
-    bool transpose = true;
-    dyn_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
+  // if (!m_train) {
+  //   int in_dim = 176;
+  //   int out_dim = 140;
+  //   int hid_dim = 500;
+  //   int n_layers = 2;
+  //   bool transpose = true;
+  //   dyn_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
+  //
+  //   dyn_nn.setLayerWeights(0, "fit_0_layer_0.csv");
+  //   dyn_nn.setLayerWeights(1, "fit_0_layer_1.csv");
+  //   dyn_nn.setLayerWeights(2, "fit_0_layer_out.csv");
+  //
+  //   dyn_nn.setInputNormalization("fit_0_in_mean.csv", "fit_0_in_std.csv");
+  //   dyn_nn.setOuputNormalization("fit_0_out_mean.csv", "fit_0_out_std.csv");
+  //
+  //   int num_paths = 10;
+  //   int horizon = 5;
+  //   vector<double> action_ulim(cable_action_dim+leg_action_dim);
+  //   vector<double> action_llim(cable_action_dim+leg_action_dim);
+  //   action_ulim <<= 1, 1, 1, 1, 1, 1, 1, 1,
+  //                   1, 1, 1, 1, 1, 1, 1, 1,
+  //                   1, 1, 1, 1, 1, 1, 1, 1,
+  //                   1, 1, 1, 1, 1, 1, 1, 1,
+  //                   5, 5, 5, 5;
+  //   action_llim = -action_ulim;
+  //   controller.setMPCParams(horizon, num_paths, cable_action_dim, leg_action_dim);
+  //   controller.attachDynamicsModel(&dyn_nn);
+  //   controller.setInputLims(action_ulim, action_llim);
+  // }
 
-    dyn_nn.setLayerWeights(0, "fit_0_layer_0.csv");
-    dyn_nn.setLayerWeights(1, "fit_0_layer_1.csv");
-    dyn_nn.setLayerWeights(2, "fit_0_layer_out.csv");
-
-    dyn_nn.setInputNormalization("fit_0_in_mean.csv", "fit_0_in_std.csv");
-    dyn_nn.setOuputNormalization("fit_0_out_mean.csv", "fit_0_out_std.csv");
-
-    int num_paths = 10;
-    int horizon = 5;
-    vector<double> action_ulim(cable_action_dim+leg_action_dim);
-    vector<double> action_llim(cable_action_dim+leg_action_dim);
-    action_ulim <<= 1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1,
-                    5, 5, 5, 5;
-    action_llim = -action_ulim;
-    controller.setMPCParams(horizon, num_paths, cable_action_dim, leg_action_dim);
-    controller.attachDynamicsModel(&dyn_nn);
-    controller.setInputLims(action_ulim, action_llim);
-  }
+  // std::cout << "Setting up elevation sensor" << std::endl;
+  // double range = 2.0;
+  // double resolution = 1.0;
+  // std::string filename = "flat_slope_transition_5deg.STL";
+  // // std::string filename = "flat_terrain.STL";
+  // elev_sens.setSensorParams(range, resolution, 10.0);
+  // elev_sens.buildElevationMap(filename);
+  //
+  // vector<double> body_states(getLaikaWalkingModelStates(subject));
+  // double com_x = (body_states(0)+body_states(12)+body_states(24)+body_states(36)+body_states(48))/5;
+  // double com_y = (body_states(1)+body_states(13)+body_states(25)+body_states(37)+body_states(49))/5;
+  // double com_z = (body_states(2)+body_states(14)+body_states(26)+body_states(38)+body_states(50))/5;
+  // btVector3 pos(310,10,0);
+  // matrix<double> reading(elev_sens.getSensorReading(pos));
 
   std::cout << "Finished setting up the controller." << std::endl;
 }
@@ -194,30 +209,32 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
 	else {
 		worldTime += dt;
 	}
+  // vector<double> body_states(getLaikaWalkingModelStates(subject));
+  // std::cout << body_states(0) << "," << body_states(1) << "," << body_states(2) << std::endl;
 
-  if (!m_train) {
-    vector<double> body_states(getLaikaWalkingModelStates(subject));
-    vector<double> rl_states(getCurrRestLengths());
-    vector<double> states(state_dim+cable_action_dim);
-    states <<= body_states, rl_states;
-    // vector<double> actions(getCurrActions());
-    // vector<double> next_states_pred(dyn_nn.getNNDynOutput(states, actions));
-    // std::cout << states(0) << "," << next_states_pred(0) << std::endl;
-
-    vector<double> actions(controller.getAction(states));
-    std::vector<double> cable_cmd;
-    std::vector<double> torque_cmd;
-    for (int i = 0; i < actions.size(); i++) {
-      if (i < cable_action_dim) {
-        cable_cmd.push_back(actions(i));
-      }
-      else {
-        torque_cmd.push_back(actions(i));
-      }
-    }
-    updateRestLengthsDiscrete(cable_cmd, m_target_velocity, dt);
-    updateTorques(torque_cmd);
-  }
+  // if (!m_train) {
+  //   vector<double> body_states(getLaikaWalkingModelStates(subject));
+  //   vector<double> rl_states(getCurrRestLengths());
+  //   vector<double> states(state_dim+cable_action_dim);
+  //   states <<= body_states, rl_states;
+  //   // vector<double> actions(getCurrActions());
+  //   // vector<double> next_states_pred(dyn_nn.getNNDynOutput(states, actions));
+  //   // std::cout << states(0) << "," << next_states_pred(0) << std::endl;
+  //
+  //   vector<double> actions(controller.getAction(states));
+  //   std::vector<double> cable_cmd;
+  //   std::vector<double> torque_cmd;
+  //   for (int i = 0; i < actions.size(); i++) {
+  //     if (i < cable_action_dim) {
+  //       cable_cmd.push_back(actions(i));
+  //     }
+  //     else {
+  //       torque_cmd.push_back(actions(i));
+  //     }
+  //   }
+  //   updateRestLengthsDiscrete(cable_cmd, m_target_velocity, dt);
+  //   updateTorques(torque_cmd);
+  // }
 
   setRestLengths(dt);
 	setTorques(dt);
@@ -302,6 +319,36 @@ void LaikaWalkingController::updateRestLengthsDiscrete(std::vector<double> contr
       tmp.push_back(m_allActuators[i]->getRestLength()+targetVel*dt);
     }
     else if (controlRL[i] == 0) {
+      tmp.push_back(m_allActuators[i]->getRestLength());
+    }
+    else {
+      throw std::runtime_error("Unrecognized cable input");
+    }
+  }
+
+  // Assign new contents
+  desCableRL.assign(tmp.begin(), tmp.end());
+  currCableAction.assign(controlRL.begin(), controlRL.end());
+}
+
+void LaikaWalkingController::updateRestLengthsContinuous(std::vector<double> controlRL, double targetVel, double dt) {
+  // Clear contents of vectors
+  desCableRL.clear();
+  currCableAction.clear();
+
+  // Save cable rest lengths to be applied
+  std::vector<double> tmp;
+  if (controlRL.size() != cable_action_dim) {
+		throw std::runtime_error("Cable action dimension mismatch");
+	}
+  for (int i = 0; i < controlRL.size(); i++) {
+    if (controlRL[i] < -0.1) {
+      tmp.push_back(m_allActuators[i]->getRestLength()-targetVel*dt);
+    }
+    else if (controlRL[i] > 0.1) {
+      tmp.push_back(m_allActuators[i]->getRestLength()+targetVel*dt);
+    }
+    else if (controlRL[i] <= 0.1 && controlRL[i] >= -0.1) {
       tmp.push_back(m_allActuators[i]->getRestLength());
     }
     else {

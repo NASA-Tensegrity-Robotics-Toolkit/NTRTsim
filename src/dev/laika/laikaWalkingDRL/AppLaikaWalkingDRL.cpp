@@ -32,6 +32,7 @@
 #include "LaikaWalkingModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgImportGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -57,7 +58,7 @@
 #include "Laika_ROS/LaikaAction.h"
 #include "Laika_ROS/LaikaCommand.h"
 
-// #include "NeuralNet.h"
+#define PI 3.14159
 
 // Class for action callbacks
 class action_cb_class {
@@ -77,7 +78,7 @@ public:
     cable_action_msg.assign(msg->actions.begin(), msg->actions.end()-4);
     leg_action_msg.assign(msg->actions.end()-4, msg->actions.end());
     // m_controller->updateRestLengths(cable_action_msg);
-    m_controller->updateRestLengthsDiscrete(cable_action_msg, target_velocity, dt);
+    m_controller->updateRestLengthsContinuous(cable_action_msg, target_velocity, dt);
     m_controller->updateTorques(leg_action_msg);
   }
 };
@@ -115,6 +116,64 @@ bool reset_with_action(tgSimulation* simulation, int steps, bool action_ready) {
   return done;
 }
 
+tgImportGround* getImportedGround(std::string filename)
+{
+  // Set ground parameters
+  const double yaw = 0.0;
+  const double pitch = 0.0*PI/180; // About x axis, in z direction
+  const double roll = 0.0*PI/180; // About z axis, in x direction
+  btVector3 orientation(yaw, pitch, roll);
+  const double friction = 1;
+  const double restitution = 0.0;
+  btVector3 origin(0.0, -10.0, 0.0);
+  const double margin = 0.05;
+  const double offset = 0.0;
+  const double scalingFactor = 10;
+  const int interp = 0;
+  const bool twoLayer = false;
+  const bool flipZY = false;
+
+  // Configure ground characteristics
+  const tgImportGround::Config groundConfig(orientation, friction, restitution,
+      origin, margin, offset, scalingFactor, interp, twoLayer, flipZY);
+
+  // Check filename
+  if (filename.find(".txt") == std::string::npos) {
+      std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+      exit(EXIT_FAILURE);
+  }
+
+  //Create filestream
+  std::fstream file_in;
+  file_in.open(filename.c_str(), std::fstream::in);
+
+  // Check if input file opened successfully
+  if (!file_in.is_open()) {
+      std::cout << "Failed to open input file" << std::endl;
+      exit(EXIT_FAILURE);
+  }
+  else {
+      std::cout << "Building world with file: " << filename << std::endl;
+  }
+  tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+  return ground;
+}
+
+tgBoxGround* getBoxGround()
+{
+  // Set ground parameters
+  const double yaw = 0.0;
+  const double pitch = 0.0*PI/180; // About x axis, in z direction
+  const double roll = 0.0*PI/180; // About z axis, in x direction
+  btVector3 orientation(yaw, pitch, roll);
+  const double friction = 1.0;
+  const double restitution = 0.0;
+  btVector3 size(1000.0, 1.0, 1000.0);
+  btVector3 origin(0.0, 0.0, 0.0);
+  const tgBoxGround::Config groundConfig(orientation,friction,restitution,size,origin);
+  tgBoxGround* ground = new tgBoxGround(groundConfig);
+  return ground;
+}
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -132,13 +191,19 @@ int main(int argc, char** argv)
        throw std::invalid_argument("This app does not take in a YAML file, it's hard-coded to for DRL purposes. Use another Laika app for testing different YAML files, or edit the string path to the YAML file in this app.");
     }
 
-    // create the ground and world. Specify ground rotation in radians
-    const double yaw = 0.0;
-    const double pitch = 0.0;
-    const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
-    // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    // // create the ground and world. Specify ground rotation in radians
+    // const double yaw = 0.0;
+    // const double pitch = 0.0;
+    // const double roll = 0.0;
+    // const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // // the world will delete this
+    // tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    tgBoxGround* ground = getBoxGround();
+
+    // std::string filename = "flat_slope_transition_5deg.txt";
+    // std::string filename = "flat_terrain.txt";
+    // tgImportGround* ground = getImportedGround(filename);
 
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
@@ -230,8 +295,8 @@ int main(int argc, char** argv)
       // Handle command
       if (cmd_cb.cmd_msg == "reset") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-        reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
-        // reset_done = reset(simulation, steps_after_reset);
+        // reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
+        reset_done = reset(&simulation, steps_after_reset);
         if (reset_done) {
           cmd_cb.cmd_msg = "";
           publish_state = true;
