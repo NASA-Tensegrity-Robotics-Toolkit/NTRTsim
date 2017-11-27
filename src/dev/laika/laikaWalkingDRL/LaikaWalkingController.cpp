@@ -183,6 +183,19 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
   //   controller.setInputLims(action_ulim, action_llim);
   // }
 
+  if (!m_train) {
+    int in_dim = 140;
+    int out_dim = 36;
+    int hid_dim = 100;
+    int n_layers = 2;
+    bool transpose = true;
+
+    policy_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
+
+    policy_nn.setLayerWeights(0, "pol_wgts_l_0_itr_0.csv");
+    policy_nn.setLayerWeights(1, "pol_wgts_l_1_itr_0.csv");
+    policy_nn.setLayerWeights(2, "pol_wgts_l_2_itr_0.csv");
+  }
   // std::cout << "Setting up elevation sensor" << std::endl;
   // double range = 2.0;
   // double resolution = 1.0;
@@ -197,6 +210,8 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
   // double com_z = (body_states(2)+body_states(14)+body_states(26)+body_states(38)+body_states(50))/5;
   // btVector3 pos(310,10,0);
   // matrix<double> reading(elev_sens.getSensorReading(pos));
+
+  counter = 0;
 
   std::cout << "Finished setting up the controller." << std::endl;
 }
@@ -236,8 +251,34 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
   //   updateTorques(torque_cmd);
   // }
 
+  if (!m_train && counter >= 200) {
+    std::cout << "Updating action commands" << std::endl;
+    vector<double> body_states(getLaikaWalkingModelStates(subject));
+    vector<double> rl_states(getCurrRestLengths());
+    vector<double> states(state_dim+cable_action_dim);
+    states <<= body_states, rl_states;
+    vector<double> actions(policy_nn.getNNPolicyOutput(states));
+    std::vector<double> cable_cmd;
+    std::vector<double> torque_cmd;
+    for (int i = 0; i < actions.size(); i++) {
+      if (i < cable_action_dim) {
+        cable_cmd.push_back(actions(i));
+      }
+      else {
+        torque_cmd.push_back(actions(i));
+      }
+      std::cout << actions(i) << ",";
+    }
+    std::cout << std::endl;
+
+    updateRestLengths(cable_cmd, m_target_velocity, dt);
+    updateTorques(torque_cmd);
+  }
+
   setRestLengths(dt);
 	setTorques(dt);
+
+  counter++;
 }
 
 std::vector<tgBasicActuator*> LaikaWalkingController::getAllActuators(TensegrityModel& subject, std::vector<std::string> actuatorTags)

@@ -64,19 +64,17 @@ void NeuralNetPolicy::setOuputNormalization(std::string filename_mean, std::stri
   // std::cout << output_normalization_mean(out_dim-1) << ',' << output_normalization_std(out_dim-1) << std::endl;
 }
 
-vector<double> NeuralNetPolicy::getNNPolicyOutput(vector<double> states, vector<double> actions)
+vector<double> NeuralNetPolicy::getNNPolicyOutput(vector<double> states)
 {
   // Check if inputs match expected input dimension
-  int in_dim = states.size() + actions.size();
+  int in_dim = states.size();
   // std::cout << states.size() << "," << actions.size() << std::endl;
   if (in_dim != getDims()[0]) {
     throw std::runtime_error("Input dimension does not match expected from neural net");
   }
 
-  vector<double> in_vec(in_dim);
+  vector<double> in_vec(states);
   vector<double> out_vec(getDims()[1]);
-
-  in_vec <<= states, actions;
 
   // Choose whether or not to normalize inputs and outputs based on size of normalization vectors
   if (m_input_normalization_mean.empty() && !m_output_normalization_mean.empty()) {
@@ -92,7 +90,7 @@ vector<double> NeuralNetPolicy::getNNPolicyOutput(vector<double> states, vector<
     out_vec = unnormalizeOuput(getNNOutput(normalizeInput(in_vec)));
   }
 
-  return states + out_vec;
+  return out_vec;
 }
 
 vector<double> NeuralNetPolicy::normalizeInput(vector<double> input)

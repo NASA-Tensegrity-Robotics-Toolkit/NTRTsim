@@ -18,7 +18,7 @@ public:
   void setOuputNormalization(std::string filename_mean, std::string filename_std);
 
 
-  vector<double> getNNPolicyOutput(vector<double> states, vector<double> actions);
+  vector<double> getNNPolicyOutput(vector<double> states);
 
 private:
   vector<double> normalizeInput(vector<double> input);

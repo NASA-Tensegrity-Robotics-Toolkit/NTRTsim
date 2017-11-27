@@ -214,7 +214,7 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    //tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
     tgSimView view(world, timestep_physics, timestep_graphics);
 

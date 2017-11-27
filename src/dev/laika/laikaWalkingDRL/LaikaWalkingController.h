@@ -161,7 +161,7 @@ private:
   double worldTime;
 
   // NeuralNetDynamics dyn_nn;
-  // NeuralNetPolicy policy_nn;
+  NeuralNetPolicy policy_nn;
 
   // Vector of current discrete cable actions -1, 0, or 1
   std::vector<double> currCableAction;
@@ -174,6 +174,8 @@ private:
   double m_target_velocity;
 
   // ElevationSensor elev_sens;
+
+  int counter;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H
