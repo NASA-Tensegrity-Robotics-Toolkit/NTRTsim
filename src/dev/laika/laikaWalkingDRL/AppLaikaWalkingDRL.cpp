@@ -299,14 +299,14 @@ int main(int argc, char** argv)
       // Handle command
       if (cmd_cb.cmd_msg == "reset" || cmd_cb.cmd_msg == "reset_w_action") {
         // if (cmd_cb.msg_time != last_cmd_msg_time) {
-	if(cmd_cb.cmd_msg == "reset_w_action"){
-	  reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
-	}
-	else if(cmd_cb.cmd_msg == "reset"){
-	  reset_done = reset(&simulation, steps_after_reset);
-	}
+      	if(cmd_cb.cmd_msg == "reset_w_action"){
+      	  reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
+      	}
+      	else if(cmd_cb.cmd_msg == "reset"){
+      	  reset_done = reset(&simulation, steps_after_reset);
+      	}
         if (reset_done) {
-	  std::cout << "Simulation " << cmd_cb.cmd_msg << std::endl;
+          std::cout << "Simulation " << cmd_cb.cmd_msg << std::endl;
           cmd_cb.cmd_msg = "";
           publish_state = true;
           action_cb.action_ready = false;
