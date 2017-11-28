@@ -81,13 +81,13 @@ vector<double> NeuralNetPolicy::getNNPolicyOutput(vector<double> states)
     out_vec = unnormalizeOuput(getNNOutput(in_vec));
   }
   else if (!m_input_normalization_mean.empty() && m_output_normalization_mean.empty()) {
-    out_vec = getNNOutput(normalizeInput(in_vec));
+    out_vec = getNNOutput(normalizeInputAlt(in_vec));
   }
   else if (m_input_normalization_mean.empty() && m_output_normalization_mean.empty()) {
     out_vec = getNNOutput(in_vec);
   }
   else {
-    out_vec = unnormalizeOuput(getNNOutput(normalizeInput(in_vec)));
+    out_vec = unnormalizeOuput(getNNOutput(normalizeInputAlt(in_vec)));
   }
 
   return out_vec;
@@ -96,6 +96,13 @@ vector<double> NeuralNetPolicy::getNNPolicyOutput(vector<double> states)
 vector<double> NeuralNetPolicy::normalizeInput(vector<double> input)
 {
   return element_div(input-m_input_normalization_mean, m_input_normalization_std);
+}
+
+vector<double> NeuralNetPolicy::normalizeInputAlt(vector<double> input)
+{
+  // This is from gps-spine/python/gps/algorithm/policy_opt/policy_opt_tf.py
+  // normalization std is 1/max(obs) (scales to 1), normalization mean is -mean(obs) (centers at 0)
+  return element_prod(input,m_input_normalization_std) + m_input_normalization_mean;
 }
 
 vector<double> NeuralNetPolicy::unnormalizeOuput(vector<double> output)

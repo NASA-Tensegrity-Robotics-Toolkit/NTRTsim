@@ -176,6 +176,8 @@ private:
   // ElevationSensor elev_sens;
 
   int counter;
+
+  int substeps;
 };
 
 #endif // LAIKA_WALKING_CONTROLLER_H

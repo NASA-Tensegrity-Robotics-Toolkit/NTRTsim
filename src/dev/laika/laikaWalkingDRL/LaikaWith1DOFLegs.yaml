@@ -128,7 +128,8 @@ builders:
       pretension: 20.0
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   HF:
     class: tgBasicActuatorInfo
@@ -138,7 +139,8 @@ builders:
       pretension: 20.0
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   HB:
     class: tgBasicActuatorInfo
@@ -148,7 +150,8 @@ builders:
       pretension: 20.0
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   HL:
     class: tgBasicActuatorInfo
@@ -158,7 +161,8 @@ builders:
       pretension: 20.0
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   SFR:
     class: tgBasicActuatorInfo
@@ -168,7 +172,8 @@ builders:
       pretension: 0.0
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
   SRL:
     class: tgBasicActuatorInfo
     parameters:
@@ -177,7 +182,8 @@ builders:
       pretension: 0.0
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   SBF:
     class: tgBasicActuatorInfo
@@ -187,7 +193,8 @@ builders:
       pretension: 0.0
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5
 
   SBL:
     class: tgBasicActuatorInfo
@@ -197,4 +204,5 @@ builders:
       pretension: 0.0
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      # target_velocity: 12.0
+      target_velocity: 0.5

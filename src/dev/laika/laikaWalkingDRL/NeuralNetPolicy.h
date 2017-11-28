@@ -23,6 +23,8 @@ public:
 private:
   vector<double> normalizeInput(vector<double> input);
 
+  vector<double> normalizeInputAlt(vector<double> input);
+
   vector<double> unnormalizeOuput(vector<double> output);
 
   vector<double> m_input_normalization_mean;

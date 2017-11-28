@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 
     // create the view
     // const double timestep_physics = 0.0001; // seconds
-    const double timestep_physics = 0.002;
+    const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
@@ -221,6 +221,9 @@ int main(int argc, char** argv)
 
     // create the simulation
     tgSimulation simulation(view);
+
+    // Flag for initializing the model in training or testing mode
+    bool train = true;
 
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
@@ -250,7 +253,6 @@ int main(int argc, char** argv)
     // wasn't built with the HorizontalSpine YAML file?
 
     // Call the constructor for the controller
-    bool train = true;
     const double target_velocity = 12.0; // MAKE SURE THIS MATCHES WITH THE YAML FILE!!!
     LaikaWalkingController* const controller =
       new LaikaWalkingController(train, target_velocity);
@@ -287,7 +289,9 @@ int main(int argc, char** argv)
 
     bool publish_state = false;
     bool reset_done = false;
-    int steps_after_reset = 200;
+
+    double time_after_reset = 0.5; // seconds
+    int steps_after_reset = int(time_after_reset/timestep_physics); // 200;
 
     reset_done = reset(&simulation, steps_after_reset);
     reset_done = false;

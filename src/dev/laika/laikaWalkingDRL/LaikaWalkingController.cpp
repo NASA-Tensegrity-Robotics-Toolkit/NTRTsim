@@ -122,10 +122,10 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	updateRestLengthsDiscrete(initialCableActions,12.0,0.002);
 
   // Define initial torques
-	double initialTorqueFL = 0.0;
-	double initialTorqueFR = 0.0;
-	double initialTorqueBL = -0.0;
-	double initialTorqueBR = -0.0;
+	double initialTorqueFL = 0.0; //20.0; //0.0;
+	double initialTorqueFR = 0.0; //20.0; //0.0;
+	double initialTorqueBL = 0.0; //20.0; //-0.0;
+	double initialTorqueBR = 0.0; //20.0; //-0.0;
 
 	std::vector<double> initialTorques;
 	initialTorques.push_back(initialTorqueFL);
@@ -189,13 +189,16 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
     int hid_dim = 100;
     int n_layers = 2;
     bool transpose = true;
+    substeps = 50;
 
     policy_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
 
-    policy_nn.setLayerWeights(0, "pol_wgts_l_0_itr_0.csv");
-    policy_nn.setLayerWeights(1, "pol_wgts_l_1_itr_0.csv");
-    policy_nn.setLayerWeights(2, "pol_wgts_l_2_itr_0.csv");
+    policy_nn.setLayerWeights(0, "pol_wgts_l_0_itr_11.csv");
+    policy_nn.setLayerWeights(1, "pol_wgts_l_1_itr_11.csv");
+    policy_nn.setLayerWeights(2, "pol_wgts_l_2_itr_11.csv");
+    policy_nn.setInputNormalization("nn_in_bias.csv", "nn_in_scale.csv");
   }
+
   // std::cout << "Setting up elevation sensor" << std::endl;
   // double range = 2.0;
   // double resolution = 1.0;
@@ -251,13 +254,32 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
   //   updateTorques(torque_cmd);
   // }
 
-  if (!m_train && counter >= 200) {
+  if (!m_train && counter >= 200 && (counter % substeps == 0)) {
     std::cout << "Updating action commands" << std::endl;
     vector<double> body_states(getLaikaWalkingModelStates(subject));
+    vector<double> body_pos(6*(num_vertebrae+num_legs));
+    vector<double> body_vel(6*(num_vertebrae+num_legs));
+    for (int i = 0; i < num_vertebrae+num_legs; i++) {
+      body_pos.insert_element(i*6,   body_states(i*12));
+      body_pos.insert_element(i*6+1, body_states(i*12+1));
+      body_pos.insert_element(i*6+2, body_states(i*12+2));
+      body_pos.insert_element(i*6+3, body_states(i*12+3));
+      body_pos.insert_element(i*6+4, body_states(i*12+4));
+      body_pos.insert_element(i*6+5, body_states(i*12+5));
+
+      body_vel.insert_element(i*6,   body_states(i*12+6));
+      body_vel.insert_element(i*6+1, body_states(i*12+7));
+      body_vel.insert_element(i*6+2, body_states(i*12+8));
+      body_vel.insert_element(i*6+3, body_states(i*12+9));
+      body_vel.insert_element(i*6+4, body_states(i*12+10));
+      body_vel.insert_element(i*6+5, body_states(i*12+11));
+    }
     vector<double> rl_states(getCurrRestLengths());
     vector<double> states(state_dim+cable_action_dim);
-    states <<= body_states, rl_states;
+    states <<= body_pos, body_vel, rl_states;
+
     vector<double> actions(policy_nn.getNNPolicyOutput(states));
+
     std::vector<double> cable_cmd;
     std::vector<double> torque_cmd;
     for (int i = 0; i < actions.size(); i++) {
@@ -278,6 +300,7 @@ void LaikaWalkingController::onStep(TensegrityModel& subject, double dt)
   setRestLengths(dt);
 	setTorques(dt);
 
+  // std::cout << counter << std::endl;
   counter++;
 }
 
