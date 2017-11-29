@@ -15,24 +15,24 @@ substructures:
 
   t1:
     path: ./TetrahedronSymmetric.yaml
-    translation: [0, 20.5, 0]
+    translation: [0, 22.5, 0]
   t2:
     path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronC.yaml
-    translation: [-12, 20.5, 0]
+    translation: [-12, 22.5, 0]
   t3:
     path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronB.yaml
-    translation: [-24, 20.5, 0]
+    translation: [-24, 22.5, 0]
   t4:
     path: ../BaseStructuresLaika/IndividualVertebrae/TetrahedronA.yaml
-    translation: [-36, 20.5, 0]
+    translation: [-36, 22.5, 0]
   t5:
     path: ./TetrahedronSymmetric.yaml
-    translation: [-48, 20.5, 0]
+    translation: [-48, 22.5, 0]
 
   hips:
     path: ../BaseStructuresLaika/StructuresForHinges/HipsFor1DOFLegs.yaml
     offset: [0, 0, 0]
-    translation: [0, 30.5, 0]
+    translation: [0, 32.5, 0]
 
   # ...but now, we need to use separate shoulders, so we can have
   # different tags for the rods that will be used for the hinges.
@@ -40,7 +40,7 @@ substructures:
     path: ../BaseStructuresLaika/StructuresForHinges/ShouldersFor1DOFLegs.yaml
     offset: [0, 0, 0]
     # translation: [-60, 40.5, 0] # 68 (6 vertebrae)
-    translation: [-48, 30.5, 0] # 5 vertebrae
+    translation: [-48, 32.5, 0] # 5 vertebrae
     rotation:
       axis: [0, 1, 0]
       angle: 180
@@ -50,18 +50,18 @@ substructures:
   # to be able to pick out the tags for the btHingeConstraints.
   backlegsleft:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackLeft.yaml
-    translation: [15, 0.5, 16]
+    translation: [15, 2.5, 16]
   backlegsright:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackRight.yaml
-    translation: [15, 0.5, -16]
+    translation: [15, 2.5, -16]
   frontlegsleft:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontLeft.yaml
     # translation: [-75, 10.5, -16] # 60 offset (6 vertebrae)+ 15 for hips
-    translation: [-63, 0.5, 16] # 48 offset (5 vertebrae)+ 15 for hips
+    translation: [-63, 2.5, 16] # 48 offset (5 vertebrae)+ 15 for hips
   frontlegsright:
     path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontRight.yaml
     # translation: [-75, 10.5, 16]
-    translation: [-63, 0.5, -16]
+    translation: [-63, 2.5, -16]
 
 bond_groups:
   HF:
@@ -129,7 +129,7 @@ builders:
       history: 1
       max_tension: 70000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   HF:
     class: tgBasicActuatorInfo
@@ -140,7 +140,7 @@ builders:
       history: 1
       max_tension: 70000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   HB:
     class: tgBasicActuatorInfo
@@ -151,7 +151,7 @@ builders:
       history: 1
       max_tension: 70000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   HL:
     class: tgBasicActuatorInfo
@@ -162,7 +162,7 @@ builders:
       history: 1
       max_tension: 70000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   SFR:
     class: tgBasicActuatorInfo
@@ -173,7 +173,7 @@ builders:
       history: 1
       max_tension: 7000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
   SRL:
     class: tgBasicActuatorInfo
     parameters:
@@ -183,7 +183,7 @@ builders:
       history: 1
       max_tension: 7000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   SBF:
     class: tgBasicActuatorInfo
@@ -194,7 +194,7 @@ builders:
       history: 1
       max_tension: 7000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5
 
   SBL:
     class: tgBasicActuatorInfo
@@ -205,4 +205,4 @@ builders:
       history: 1
       max_tension: 7000.0
       # target_velocity: 12.0
-      target_velocity: 0.5
+      target_velocity: 5

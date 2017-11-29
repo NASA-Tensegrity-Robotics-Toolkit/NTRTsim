@@ -119,7 +119,7 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 	}
 
 	// Update target rest lengths
-	updateRestLengthsDiscrete(initialCableActions,12.0,0.002);
+	updateRestLengths(initialCableActions,5.0,0.001);
 
   // Define initial torques
 	double initialTorqueFL = 0.0; //20.0; //0.0;
