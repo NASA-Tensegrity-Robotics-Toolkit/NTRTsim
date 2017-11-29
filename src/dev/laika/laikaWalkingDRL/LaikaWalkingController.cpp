@@ -193,9 +193,9 @@ void LaikaWalkingController::onSetup(TensegrityModel& subject)
 
     policy_nn.setNNParams(in_dim, out_dim, hid_dim, n_layers, transpose);
 
-    policy_nn.setLayerWeights(0, "pol_wgts_l_0_itr_11.csv");
-    policy_nn.setLayerWeights(1, "pol_wgts_l_1_itr_11.csv");
-    policy_nn.setLayerWeights(2, "pol_wgts_l_2_itr_11.csv");
+    policy_nn.setLayerWeights(0, "pol_wgts_itr_11_l_0.csv");
+    policy_nn.setLayerWeights(1, "pol_wgts_itr_11_l_1.csv");
+    policy_nn.setLayerWeights(2, "pol_wgts_itr_11_l_2.csv");
     policy_nn.setInputNormalization("nn_in_bias.csv", "nn_in_scale.csv");
   }
 

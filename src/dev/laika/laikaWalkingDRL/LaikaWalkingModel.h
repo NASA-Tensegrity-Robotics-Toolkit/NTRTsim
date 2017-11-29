@@ -84,6 +84,8 @@ public:
      */
 		std::vector<tgBasicActuator*> getAllActuators(std::vector<std::string> actuatorTags);
 
+    std::vector<btRigidBody*> getAllBodies();
+
 private:
 
   /**

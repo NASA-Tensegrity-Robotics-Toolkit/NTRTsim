@@ -424,3 +424,40 @@ std::vector<tgBasicActuator*> LaikaWalkingModel::getAllActuators(std::vector<std
 
   return allActuators;
 }
+
+std::vector<btRigidBody*> LaikaWalkingModel::getAllBodies()
+{
+  std::vector<btRigidBody*> allBodies;
+
+  // Tags for all the bodies
+  std::vector<std::string> laikaRigidBodyTags;
+  laikaRigidBodyTags.push_back("shouldersBase");
+  laikaRigidBodyTags.push_back("vertebraAbottomrod");
+  laikaRigidBodyTags.push_back("vertebraBbottomrod");
+  laikaRigidBodyTags.push_back("vertebraCbottomrod");
+  laikaRigidBodyTags.push_back("hipsBase");
+  laikaRigidBodyTags.push_back("legBoxBackLeft");
+  laikaRigidBodyTags.push_back("legBoxBackRight");
+  laikaRigidBodyTags.push_back("legBoxFrontLeft");
+  laikaRigidBodyTags.push_back("legBoxFrontRight");
+
+  for(int i=0; i < laikaRigidBodyTags.size(); i++) {
+
+    // (1) get the rigid bodies with this tag
+    std::vector<tgBaseRigid*> currentBodies =
+      find<tgBaseRigid>(laikaRigidBodyTags[i]);
+    // Make sure this list is not empty:
+    if( currentBodies.size() != 1 ) {
+      throw std::invalid_argument("Wrong number of bodies with tag for states.");
+    }
+    // Now, we know that element 0 exists.
+    // (2) Confirm that it is not a null pointer.
+    if( currentBodies[0] == NULL) {
+      throw std::runtime_error("Pointer to the first rigid body for states is NULL");
+    }
+    // (3)Get the single body.
+    btRigidBody* currentBody = currentBodies[0]->getPRigidBody();
+    allBodies.push_back(currentBody);
+  }
+  return allBodies;
+}

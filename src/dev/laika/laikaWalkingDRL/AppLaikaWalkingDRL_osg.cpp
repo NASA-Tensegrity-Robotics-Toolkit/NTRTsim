@@ -58,6 +58,20 @@
 #include "Laika_ROS/LaikaAction.h"
 #include "Laika_ROS/LaikaCommand.h"
 
+// OSG
+#include <osg/Geometry>
+#include <osgViewer/Viewer>
+#include <osg/ref_ptr>
+#include <osg/io_utils>
+#include <osg/ShapeDrawable>
+#include <osg/MatrixTransform>
+#include <osg/Material>
+#include <osg/Texture2D>
+#include <osg/Array>
+#include <osg/TexEnv>
+#include <osgGA/NodeTrackerManipulator>
+#include <osgText/Text>
+
 #define PI 3.14159
 
 // Class for action callbacks
@@ -175,6 +189,123 @@ tgBoxGround* getBoxGround()
   tgBoxGround* ground = new tgBoxGround(groundConfig);
   return ground;
 }
+
+void makeCheckImage64x64x3(GLubyte img[64][64][3], int numSquaresPerEdge, int lowVal, int highVal) {
+    const int widthInPixels=64;
+    const int heightInPixels=64;
+    assert(lowVal >= 0 && lowVal <= 255);
+    assert(highVal >= 0 && highVal <= 255);
+
+    int wOn=0;
+    int hOn=0;
+    for (int i=0; i < widthInPixels; i++) {
+        if ((i % (widthInPixels/numSquaresPerEdge)) == 0) {
+            wOn = wOn ? 0 : 1;
+        }
+        for (int j=0; j < heightInPixels; j++) {
+            if ((j % (heightInPixels/numSquaresPerEdge)) == 0) {
+                hOn = hOn ? 0 : 1;
+            }
+            int c = (wOn^hOn);
+            if (c==0) {
+                c = lowVal;
+            } else {
+                c = highVal;
+            }
+            img[i][j][0] = (GLubyte) c;
+            img[i][j][1] = (GLubyte) c;
+            img[i][j][2] = (GLubyte) c;
+        }
+    }
+}
+
+osg::Image *createCheckImage() {
+    osg::Image *img = new osg::Image;
+    img->allocateImage(64, 64, 3, GL_RGB, GL_UNSIGNED_BYTE);
+
+    GLubyte checkImage[64][64][3];
+
+    // Draw the chess-board in memory
+    makeCheckImage64x64x3(checkImage, 2, 12, 200);
+
+    // copy to the image
+    int n = 0;
+    for (uint i=0; i < 64; i++) {
+        for (uint j=0; j < 64; j++) {
+            for (uint k=0; k < 3; k++) {
+                img->data()[n++] = checkImage[i][j][k];
+            }
+        }
+    }
+    return img;
+}
+
+osg::Node* createGroundPlane() {
+    // Create the geode
+    osg::Geode* groundPlaneGeode_ = new osg::Geode;
+
+    // Create the texture
+    osg::ref_ptr<osg::Image> checkImage = createCheckImage();
+
+    osg::ref_ptr<osg::Texture2D> checkTexture = new osg::Texture2D;
+    // protect from being optimized away as static state:
+    checkTexture->setDataVariance(osg::Object::DYNAMIC);
+    checkTexture->setImage(checkImage.get());
+
+    // Tell the texture to repeat
+    checkTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    checkTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+
+    // Create a new StateSet with default settings:
+    osg::ref_ptr<osg::StateSet> groundPlaneStateSet = new osg::StateSet();
+
+    // Assign texture unit 0 of our new StateSet to the texture
+    // we just created and enable the texture.
+    groundPlaneStateSet->setTextureAttributeAndModes(0, checkTexture.get(), osg::StateAttribute::ON);
+
+    // Texture mode
+    osg::TexEnv* texEnv = new osg::TexEnv;
+    texEnv->setMode(osg::TexEnv::DECAL); // (osg::TexEnv::MODULATE);
+    groundPlaneStateSet->setTextureAttribute(0, texEnv);
+
+    // Associate this state set with our Geode
+    groundPlaneGeode_->setStateSet(groundPlaneStateSet.get());
+
+    // Create the ground plane
+    osg::ref_ptr<osg::Geometry> groundPlaneGeometry = new osg::Geometry();
+    double groundPlaneSquareSpacing_ = 1;
+
+    const double infty=100;
+
+    const double metresPerTile=2*groundPlaneSquareSpacing_;
+    const double texCoordExtreme=2*infty/metresPerTile;
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    groundPlaneGeometry->setVertexArray(vertices.get());
+
+    osg::ref_ptr<osg::Vec2Array> texCoords = new osg::Vec2Array;
+    groundPlaneGeometry->setTexCoordArray(0, texCoords.get());
+
+    vertices->push_back(osg::Vec3d(-infty, -infty, 0));
+    texCoords->push_back(osg::Vec2(0, 0));
+    vertices->push_back(osg::Vec3d(infty, -infty, 0));
+    texCoords->push_back(osg::Vec2(texCoordExtreme, 0));
+    vertices->push_back(osg::Vec3d(infty,  infty, 0));
+    texCoords->push_back(osg::Vec2(texCoordExtreme, texCoordExtreme));
+    vertices->push_back(osg::Vec3d(-infty,  infty, 0));
+    texCoords->push_back(osg::Vec2(0, texCoordExtreme));
+
+    osg::ref_ptr<osg::DrawElementsUInt> quad = new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS);
+    for (uint i=0; i < vertices->size(); i++) {
+        quad->push_back(i);
+    }
+
+    groundPlaneGeometry->addPrimitiveSet(quad.get());
+
+    groundPlaneGeode_->addDrawable(groundPlaneGeometry.get());
+    return groundPlaneGeode_;
+}
+
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -215,15 +346,15 @@ int main(int argc, char** argv)
     const double timestep_graphics = 1.f/60.f; // seconds
 
     // Two different simulation views. Use the graphical view for debugging...
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+    // tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
     // ...or the basic view for running DRL.
-    // tgSimView view(world, timestep_physics, timestep_graphics);
+    tgSimView view(world, timestep_physics, timestep_graphics);
 
     // create the simulation
     tgSimulation simulation(view);
 
     // Flag for initializing the model in training or testing mode
-    bool train = false;
+    bool train = true;
 
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
@@ -277,7 +408,7 @@ int main(int argc, char** argv)
     ros::Subscriber sub_cmd = n.subscribe("cmd", 1, &cmd_cb_class::cb, &cmd_cb);
 
     int counter = 0;
-    ros::Rate loop_rate(100);
+    // ros::Rate loop_rate(100);
 
     // Get number of bodies
     simulation.run(1);
@@ -296,87 +427,171 @@ int main(int argc, char** argv)
     reset_done = reset(&simulation, steps_after_reset);
     reset_done = false;
 
-    // Step simulation
-    while (ros::ok()) {
-      ros::spinOnce();
-
-      // Handle command
-      if (cmd_cb.cmd_msg == "reset" || cmd_cb.cmd_msg == "reset_w_action") {
-        // if (cmd_cb.msg_time != last_cmd_msg_time) {
-      	if(cmd_cb.cmd_msg == "reset_w_action"){
-      	  reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
-      	}
-      	else if(cmd_cb.cmd_msg == "reset"){
-      	  reset_done = reset(&simulation, steps_after_reset);
-      	}
-        if (reset_done) {
-          std::cout << "Simulation " << cmd_cb.cmd_msg << std::endl;
-          cmd_cb.cmd_msg = "";
-          publish_state = true;
-          action_cb.action_ready = false;
-          counter = 0;
-        }
-        // simulation.reset();
-        // simulation.run(30);
+    // OSG setup
+    // First get references to all rigid bodies
+    std::vector<btRigidBody*> allBodies = myModel->getAllBodies();
+    // std::cout << allBodies.size() << std::endl;
+    // Set up some plotting and rendering
+    osg::ref_ptr<osg::Group> m_root = new osg::Group;
+    osg::ref_ptr<osg::Group> m_robot = new osg::Group;
+    osgViewer::Viewer m_viewer;
+    std::vector<osg::MatrixTransform*> tfs;
+    m_root->addChild(m_robot);
+    m_root->addChild(createGroundPlane());
+    // Setup bodies in osg
+    for (int i = 0; i < allBodies.size(); i++) {
+      osg::MatrixTransform* tf = new osg::MatrixTransform;
+      tfs.push_back(tf);
+      m_robot->addChild(tf);
+      osg::Cylinder* bar = new osg::Cylinder();
+      if (i == 0 || i == 4) { // All lengths are unscaled
+        // Hips and shoulders
+        bar->setRadius(0.1);
+        bar->setHeight(3);
+        osg::Quat rot(0.7071, 0, 0, 0.7071);
+        bar->setRotation(rot);
       }
-      else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready) {
-        // if (cmd_cb.msg_time != last_cmd_msg_time) {
-      	action_cb.action_ready = false;
-      	cmd_cb.cmd_msg = "";
-      	publish_state = true;
-      	simulation.run(1);
+      else if (i == 1 || i == 2 || i == 3) {
+        // tetrahedron as a cylinder
+        bar->setRadius(0.2);
+        bar->setHeight(0.4);
       }
       else {
-        // std::cout << "Command not recognized" << std::endl;
+        // legs
+        bar->setRadius(0.15);
+        bar->setHeight(2.6);
       }
+      osg::Geode* geode = new osg::Geode;
+      osg::ShapeDrawable* drawable = new osg::ShapeDrawable(bar);
+      geode->addDrawable(drawable);
+      tf->addChild(((osg::Node*) geode));
+    }
+    m_viewer.setSceneData(m_root.get());
+    m_viewer.setUpViewInWindow(0, 0, 640, 480);
+    m_viewer.realize();
 
-      if (publish_state) {
-        publish_state = false;
-        std::cout << "Publishing state message" << std::endl;
-        std::vector<double> states = myModel->getLaikaWalkingModelStates();
-        std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
+    osg::ref_ptr<osgGA::NodeTrackerManipulator> nodeTracker = new osgGA::NodeTrackerManipulator;
+    nodeTracker->setHomePosition(osg::Vec3(0.0, -20.0, 0.0), osg::Vec3(), osg::Z_AXIS);
+    nodeTracker->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+    nodeTracker->setRotationMode(osgGA::NodeTrackerManipulator::TRACKBALL);
+    nodeTracker->setTrackNode(m_robot);
+    m_viewer.setCameraManipulator(nodeTracker);
+    m_viewer.frame();
+    ros::Time last_frame = ros::Time::now();
 
-        Laika_ROS::LaikaStateArray state_array_msg;
-        state_array_msg.header.seq = counter;
-        state_array_msg.header.stamp = ros::Time::now();
+    bool no_ros = false;
 
-        for(int i = 0; i < bodies; i++) {
-          Laika_ROS::LaikaState state_msg;
-          state_msg.body_id = i;
-          for (int j = 0; j < 12; j++) {
-            switch(j) {
-              case 0: state_msg.position.x = states[12*i+j];
-              case 1: state_msg.position.y = states[12*i+j];
-              case 2: state_msg.position.z = states[12*i+j];
-              case 3: state_msg.orientation.x = states[12*i+j];
-              case 4: state_msg.orientation.y = states[12*i+j];
-              case 5: state_msg.orientation.z = states[12*i+j];
-              case 6: state_msg.lin_vel.x = states[12*i+j];
-              case 7: state_msg.lin_vel.y = states[12*i+j];
-              case 8: state_msg.lin_vel.z = states[12*i+j];
-              case 9: state_msg.ang_vel.x = states[12*i+j];
-              case 10: state_msg.ang_vel.y = states[12*i+j];
-              case 11: state_msg.ang_vel.z = states[12*i+j];
-            }
+    // Step simulation
+    while (ros::ok()) {
+      if (no_ros) {
+        simulation.run(1);
+      }
+      else {
+        ros::spinOnce();
+
+        // Handle command
+        if (cmd_cb.cmd_msg == "reset" || cmd_cb.cmd_msg == "reset_w_action") {
+          // if (cmd_cb.msg_time != last_cmd_msg_time) {
+        	if(cmd_cb.cmd_msg == "reset_w_action"){
+        	  reset_done = reset_with_action(&simulation, steps_after_reset, action_cb.action_ready);
+        	}
+        	else if(cmd_cb.cmd_msg == "reset"){
+        	  reset_done = reset(&simulation, steps_after_reset);
+        	}
+          if (reset_done) {
+            std::cout << "Simulation " << cmd_cb.cmd_msg << std::endl;
+            cmd_cb.cmd_msg = "";
+            publish_state = true;
+            action_cb.action_ready = false;
+            counter = 0;
+            allBodies = myModel->getAllBodies();
           }
-          state_array_msg.states.push_back(state_msg);
+          // simulation.reset();
+          // simulation.run(30);
+        }
+        else if (cmd_cb.cmd_msg == "step" && action_cb.action_ready) {
+          // if (cmd_cb.msg_time != last_cmd_msg_time) {
+        	action_cb.action_ready = false;
+        	cmd_cb.cmd_msg = "";
+        	publish_state = true;
+        	simulation.run(1);
+        }
+        else {
+          // std::cout << "Command not recognized" << std::endl;
         }
 
-        state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
-        pub_state.publish(state_array_msg);
+        if (publish_state) {
+          publish_state = false;
+          std::cout << "Publishing state message" << std::endl;
+          std::vector<double> states = myModel->getLaikaWalkingModelStates();
+          std::vector<double> cableRL = myModel->getLaikaWalkingModelCableRL();
+
+          Laika_ROS::LaikaStateArray state_array_msg;
+          state_array_msg.header.seq = counter;
+          state_array_msg.header.stamp = ros::Time::now();
+
+          for(int i = 0; i < bodies; i++) {
+            Laika_ROS::LaikaState state_msg;
+            state_msg.body_id = i;
+            for (int j = 0; j < 12; j++) {
+              switch(j) {
+                case 0: state_msg.position.x = states[12*i+j];
+                case 1: state_msg.position.y = states[12*i+j];
+                case 2: state_msg.position.z = states[12*i+j];
+                case 3: state_msg.orientation.x = states[12*i+j];
+                case 4: state_msg.orientation.y = states[12*i+j];
+                case 5: state_msg.orientation.z = states[12*i+j];
+                case 6: state_msg.lin_vel.x = states[12*i+j];
+                case 7: state_msg.lin_vel.y = states[12*i+j];
+                case 8: state_msg.lin_vel.z = states[12*i+j];
+                case 9: state_msg.ang_vel.x = states[12*i+j];
+                case 10: state_msg.ang_vel.y = states[12*i+j];
+                case 11: state_msg.ang_vel.z = states[12*i+j];
+              }
+            }
+            state_array_msg.states.push_back(state_msg);
+          }
+
+          state_array_msg.cable_rl.assign(cableRL.begin(),cableRL.end());
+          pub_state.publish(state_array_msg);
+        }
+        // for (int i = 0; i < cableRL.size(); i++) {
+        //   std::cout << cableRL[i] << ", ";
+        // }
+        // std::cout << std::endl;
+
+        // ROS_INFO(state_array_msg);
+
+        last_cmd_msg_time = cmd_cb.msg_time;
+        ++counter;
+        // loop_rate.sleep();
       }
-      // for (int i = 0; i < cableRL.size(); i++) {
-      //   std::cout << cableRL[i] << ", ";
-      // }
-      // std::cout << std::endl;
 
-      // ROS_INFO(state_array_msg);
+      // Set positions and orientations of bodies in osg visualization
+      for (unsigned i=0; i<allBodies.size(); ++i) {
+        const btRigidBody* const body = allBodies[i];
+        btScalar x = body->getCenterOfMassPosition().x()/10;
+        btScalar y = body->getCenterOfMassPosition().y()/10;
+        btScalar z = body->getCenterOfMassPosition().z()/10;
+        osg::Vec3 com(x, y, z);
+        btScalar qx = body->getOrientation().getX();
+        btScalar qy = body->getOrientation().getY();
+        btScalar qz = body->getOrientation().getZ();
+        btScalar qw = body->getOrientation().getW();
+        osg::Quat rot(qx, qy, qz, qw);
+        osg::Matrix mat;
+        mat.setTrans(com);
+        mat.setRotate(rot);
+        mat.preMultRotate(osg::Quat(PI*0.5, osg::Vec3(1.0, 0.0, 0.0))); // TODO: explain why this is here
+        osg::Matrix rotmat(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        mat.postMult(rotmat);
+        tfs[i]->setMatrix(mat);
+      }
 
-      last_cmd_msg_time = cmd_cb.msg_time;
-
-      ++counter;
-
-      loop_rate.sleep();
+      if((ros::Time::now()-last_frame).toSec()>0.1){
+        m_viewer.frame();
+      	last_frame = ros::Time::now();
+      }
     }
 
     // Finally, run the simulation.
