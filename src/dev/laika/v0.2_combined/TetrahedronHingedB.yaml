@@ -1,0 +1,35 @@
+nodes:
+
+# Below is a symmetric version of this tetrahedron,
+# with an extra small node for a "rod" that will serve
+# as the axis for a hinged joint.
+# Renamed to put "B" so that we can differentiate between the two
+# vertebrae in the rotating joint.
+  centerB: [0, 10, 0]
+  frontB: [10, 10, 10]
+  rightB: [-10, 20, 0]
+  backB: [10, 10, -10] 
+  leftB: [-10, 0, 0]
+  rodHingeEnd: [-2, 10, 0]
+
+pair_groups:
+  rodTetraB:
+    - [centerB, frontB]
+    - [centerB, rightB]
+    - [centerB, backB]
+    - [centerB, leftB]
+  rodForHinge:
+    - [centerB, rodHingeEnd]
+
+# Density used to be 0.014
+builders:
+  rodTetraB:
+    class: tgRodInfo
+    parameters:
+      density: 0.0022 # was 0.014
+      radius: 0.25
+  rodForHinge:
+    class: tgRodInfo
+    parameters:
+      density: 0.0 # was 0.014
+      radius: 2.0

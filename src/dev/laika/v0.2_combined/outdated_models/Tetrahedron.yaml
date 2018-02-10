@@ -1,0 +1,38 @@
+nodes:
+ # center: [0, 10, 0]
+ # front: [10, 20, 10]
+ # right: [10, 0, -10]
+ # back: [-10, 20, -10]
+ # left: [-10, 0,10]
+
+ # center: [0, 10, 0]
+ # front: [10, 10, 20]
+ # right: [10, -10, 0]
+ # back: [-10, -10, 20] 
+ # left: [-10, -10, 0]
+
+ # center: [0, 10, 0]
+ # front: [20, 10, 10]      
+ # right: [0, 10, -10]
+ # back: [20, -10, -10] 
+ # left: [0, -10, 10]
+
+  center: [0, 10, 0]
+  front: [20, 10, 10]
+  right: [-10, 20, 0]
+  back: [10, 10, -20] 
+  left: [-10, -10, 0]	
+
+pair_groups:
+  rod:
+    - [center, front]
+    - [center, right]
+    - [center, back]
+    - [center, left]
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.5

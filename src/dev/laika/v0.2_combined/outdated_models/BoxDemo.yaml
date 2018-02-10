@@ -1,0 +1,17 @@
+# YAML file showing how to use a tgBox
+
+nodes:
+  bottom: [0, 2, 0]
+  top:	  [0, 10, 0]
+
+pair_groups:
+  box:
+    - [bottom, top]
+
+builders:
+  box:
+    class: tgBoxInfo
+    parameters:
+      width: 0.5
+      height: 5
+      density: 0.014
