@@ -89,6 +89,9 @@ void CombinedSpineControllerRotVert::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up a CombinedSpineControllerRotVert with tag: "
 	    << m_rodHingeTag << std::endl;
+  // We have an A element and a B element with this tag.
+  // In general, Drew is using "A" to be the one that's at the origin in the
+  // local frame of the split vertebra.
   // First, get all the tgRods.
   std::vector<tgRod*> allRods = subject.find<tgRod>(m_rodHingeTag);
   // Make sure this list is not empty:

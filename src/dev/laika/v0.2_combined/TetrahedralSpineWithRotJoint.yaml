@@ -20,7 +20,7 @@ substructures:
     #translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
     translation: [-12, 40.5, 8]
   rotJoint:
-    path: ./RotVert.yaml
+    path: ./RotVertHalved.yaml
     #translation: [ -2, 40.5, 8]
     translation: [ -2, 35.5, 8]
   hips:

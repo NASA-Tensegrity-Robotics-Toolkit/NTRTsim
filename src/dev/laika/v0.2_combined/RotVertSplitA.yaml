@@ -1,3 +1,6 @@
+# NOTE that as of 2018-02-10, the vertebrae are now centered at the origin,
+# NOT at some z-displacement!!!
+
 nodes:
 
 # Below is a symmetric version of this tetrahedron,
@@ -5,20 +8,23 @@ nodes:
 # as the axis for a hinged joint.
 # Renamed to put "A" so that we can differentiate between the two
 # vertebrae in the rotating joint.
-  centerA: [0, 10, 0]
-  frontA: [10, 10, 10]
-  rightA: [-10, 20, 0]
-  backA: [10, 10, -10] 
-  leftA: [-10, 0, 0]
-  rodHingeEnd: [-2, 10, 0]
+# To-Do: remove the two legs that aren't used: from the working YAML model,
+# the TetrahedralSpineWithRotJoint, it looks like front/backA are used, and
+# only left/rightB are used.
+  centerA: [0, 0, 0]
+  frontA: [10, 0, 10]
+  rightA: [-10, 10, 0]
+  backA: [10, 0, -10] 
+  leftA: [-10, -10, 0]
+  rodHingeEnd: [-2, 0, 0]
 
 pair_groups:
   rodTetraA:
     - [centerA, frontA]
-    - [centerA, rightA]
+#    - [centerA, rightA] # this is the extra one, I think
     - [centerA, backA]
-    - [centerA, leftA]
-  rodForHinge:
+#    - [centerA, leftA] # this is the extra one, I think
+  rodForHingeA:
     - [centerA, rodHingeEnd]
 
 # Density used to be 0.014
@@ -28,7 +34,7 @@ builders:
     parameters:
       density: 0.0022 # was 0.014
       radius: 0.25
-  rodForHinge:
+  rodForHingeA:
     class: tgRodInfo
     parameters:
       density: 0.0 # was 0.014

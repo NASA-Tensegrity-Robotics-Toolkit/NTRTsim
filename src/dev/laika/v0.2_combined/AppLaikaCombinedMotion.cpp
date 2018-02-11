@@ -144,49 +144,115 @@ int main(int argc, char** argv)
 
     // Add the controller to the YAML model.
     // TO-DO: can we do this after adding the model to the simulation?
-    // Will the controller's onSetup method still be called?
-    myModel->attach( rotController );
+    // Will the controller's onSetup method still be
+    //myModel->attach( rotController );
 
     // Add the model to the world
     simulation.addModel(myModel);
     
     // Next, add a constraint manually. This will be for the hinged, rotating
-    // vertebra. TO-DO: made it a tgModel instead of doing this
-    // from the app file? Super hacky...
+    // vertebra.
+    // We're going to try to do this by picking out each of the two very specific
+    // rods.
+    // The tag for the "forward" half, at the origin in the local frame of the
+    // RotVertHalved.
+    std::string rodHingeTagA = "rodForHingeA";
+    std::string rodHingeTagB = "rodForHingeB";
+    // Get what are (hopefully) exactly one rod from the whole model:
+    std::vector<tgRod*> allRodsA = myModel->find<tgRod>(rodHingeTagA);
+    std::vector<tgRod*> allRodsB = myModel->find<tgRod>(rodHingeTagB);
+    // DEBUGGING: check the contents of both these arrays.
     /*
-    std::vector<tgModel*> all_children = myModel->getDescendants();
-    // Pick out the tgRods that will be used for the hinge.
-    // These should be tagged rodForHinge in the YAML file.
-    std::cout << "Getting all the rods for the hinge..." << std::endl;
-    std::vector<tgRod*> allRodsCast = tgCast::filter<tgModel, tgRod>(all_children);
-    // A different way:
-    std::vector<tgRod*> allRods = myModel->find<tgRod>("rodForHinge");
-    for (size_t i = 0; i < allRods.size(); i++)
+    for (size_t i = 0; i < allRodsA.size(); i++)
     {
-      std::cout << "Inside App: rod number " << i << ": " << std::endl;
-      std::cout << "tags: " << allRods[i]->getTags() << std::endl;
-      std::cout << allRods[i]->toString() << std::endl;
+      std::cout << "Inside App, A: rod number " << i << ": " << std::endl;
+      std::cout << "tags: " << allRodsA[i]->getTags() << std::endl;
+      std::cout << allRodsA[i]->toString() << std::endl;
     }
-    
-    // Test of the btHingeConstraint.
+        for (size_t i = 0; i < allRodsB.size(); i++)
+    {
+      std::cout << "Inside App, B: rod number " << i << ": " << std::endl;
+      std::cout << "tags: " << allRodsB[i]->getTags() << std::endl;
+      std::cout << allRodsB[i]->toString() << std::endl;
+    }
+    */
+
+    // Confirm that both these arryas have exactly one element.
+    // Make sure this list is not empty:
+    if( allRodsA.empty() ) {
+      throw std::invalid_argument("No rods found with rodHingeTagA.");
+    }
+    if( allRodsB.empty() ) {
+      throw std::invalid_argument("No rods found with rodHingeTagB.");
+    }
+    // Now, we know that element 0 exists for each.
+    // Confirm that it is not a null pointer.
+    if( allRodsA[0] == NULL) {
+      throw std::runtime_error("Pointer to rod with rodHingeTagA is NULL.");
+    }
+    if( allRodsB[0] == NULL) {
+      throw std::runtime_error("Pointer to rod with rodHingeTagB is NULL.");
+    }
+
+    // Store the rigid body for each rod.
     // First, pick out the Bullet rigid bodies of the two rods.
-    btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
-    btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
-        // Create the hinge constraint
+    btRigidBody* rodA_rb = allRodsA[0]->getPRigidBody();
+    btRigidBody* rodB_rb = allRodsB[0]->getPRigidBody();
+
+    // Constructor for the hinge constraint, as understood by Drew when doing
+    // the Laika walking DRL stuff:
     // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+    // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
+    //    between two vertebrae should be.
+    // For the rotating joint, need to compensate for the vertical translation,
+    // which could be like +30 to rod 2.
+    // I think the first two btVectors are the locations of the contact point, relative
+    // to each rigid body. Let's do it like an offset from the leg, and zero from
+    // the hip. But we need to
+    // The last two btVector3s are the axis for each element.
+    // We'll choose to be Y for both.
+    // For example - the first btVector3 moves the point on the hips to the edge of
+    // the hips, then translates it in by half the rod radius (3/2) to center it.
+    // The second btVector3 moves the point on the leg to its top. The total leg
+    // height is (30 + sphere radius / 2) = 16.5 ?
+    // and then also centers it. (Width = 3.)
+    
+    // Create the hinge constraint
+    // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+    // Let's see if we can do this distance automatically.
+    // Get the XYZ from the rodA:
+    
+    // Get the centers of mass of each of the rods.
+    btVector3 rodA_com = allRodsA[0]->centerOfMass();
+    btVector3 rodB_com = allRodsB[0]->centerOfMass();
+    // Calculate the distance between them.
+    // If we do A minus B, then the displacement should be the second argument
+    // to the hinge constraint.
+    btVector3 net_com = rodA_com - rodB_com;
+    // DEBUGGING: list these coms.
+    //std::cout << rodA_com << std::endl;
+    //std::cout << rodB_com << std::endl;
+    std::cout << net_com << std::endl;
+
+    // The displacement between the two rods is the second argument here, since
+    // the first rigid body is at the origin and the second rod is displaced
+    // from the origin.
     btHingeConstraint* rotHinge =
-      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(-10, 0, 0),
-			    btVector3(0, 0, 0), btVector3(1, 0, 0),
+      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 0, 0),
+			    net_com, btVector3(1, 0, 0),
 			    btVector3(1, 0, 0), false);
     // Next, we need to get a reference to the Bullet Physics world.
+    // Commented out because we do it above for the version that's passed in to
+    // the controller.
+    /*
     tgWorld simWorld = simulation.getWorld();
     tgWorldImpl& impl = world.implementation();
     tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+    */
     // Add the hinge constraint to the world.
     btWorld->addConstraint(rotHinge);
 
-    */
 
         // Create the force plate by passing in its config struct.
     // There is no need to create another model file here, since the
@@ -280,6 +346,7 @@ int main(int argc, char** argv)
     // this pointer has to be a ForcePlateModel pointer not just a tgModel pointer.
     // That's because the attach method is inherited from tgSubject.
 
+    /*
     // Create one for each foot:
     ForcePlateModel* forcePlateRearLeft = new ForcePlateModel(forcePlateConfig,
 						      forcePlateLocationRearLeft,
@@ -297,6 +364,7 @@ int main(int argc, char** argv)
 						      forcePlateLocationFrontRight,
 						      forcePlateDebugging,
 						      labelFrontRight);
+    */
 
     //DEBUGGING
     //std::cout << "In the App, this force plate model has label: "
@@ -316,6 +384,7 @@ int main(int argc, char** argv)
     // A reasonable time between samples is 0.01 seconds.
     double timeBetweenSamples = 0.01;
 
+    /*
     // Create the sensors
     // Rear Left
     ForcePlateSensor* forceSensorRearLeft =
@@ -346,6 +415,7 @@ int main(int argc, char** argv)
     simulation.addModel(forcePlateFrontLeft);
     simulation.addModel(forcePlateRearRight);
     simulation.addModel(forcePlateFrontRight);
+    */
     
     // Finally, run the simulation.
     simulation.run();
