@@ -92,32 +92,43 @@ void CombinedSpineControllerRotVert::onSetup(TensegrityModel& subject)
   // We have an A element and a B element with this tag.
   // In general, Drew is using "A" to be the one that's at the origin in the
   // local frame of the split vertebra.
-  // First, get all the tgRods.
-  std::vector<tgRod*> allRods = subject.find<tgRod>(m_rodHingeTag);
-  // Make sure this list is not empty:
-  if( allRods.empty() ) {
-    throw std::invalid_argument("No rods found with rodHingedTag.");
-  }
-  // Now, we know that element 0 exists.
-  // Confirm that it is not a null pointer.
-  if( allRods[0] == NULL) {
-    throw std::runtime_error("Pointer to the first rod with rodHingeTag is NULL.");
-  }
-  if( allRods[1] == NULL) {
-    throw std::runtime_error("Pointer to the second rod with rodHingeTag is NULL.");
-  }
-  // Finally, store these pointers.
-  // This is so we can apply one torque to one side,
-  // and another torque to another side.
-  hingedRodA = allRods[0];
-  hingedRodB = allRods[1];
+  std::string rodHingeTagA = m_rodHingeTag + "A";
+  std::string rodHingeTagB = m_rodHingeTag + "B";
+  // Get what are (hopefully) exactly one rod each from the whole model:
+  std::vector<tgRod*> allRodsA = subject.find<tgRod>(rodHingeTagA);
+  std::vector<tgRod*> allRodsB = subject.find<tgRod>(rodHingeTagB);
 
-  std::cout << "Size of allRods: "
-	    << allRods.size() << std::endl;
+  // Confirm that both these arryas have exactly one element.
+  // Make sure this list is not empty:
+  if( allRodsA.empty() ) {
+    throw std::invalid_argument("No rods found with rodHingeTagA.");
+  }
+  if( allRodsB.empty() ) {
+    throw std::invalid_argument("No rods found with rodHingeTagB.");
+  }
+  // Now, we know that element 0 exists for each.
+  // Confirm that it is not a null pointer.
+  if( allRodsA[0] == NULL) {
+    throw std::runtime_error("Pointer to rod with rodHingeTagA is NULL.");
+  }
+  if( allRodsB[0] == NULL) {
+    throw std::runtime_error("Pointer to rod with rodHingeTagB is NULL.");
+  }
+
+  // We'll need these pointers for applying torques later.
+  hingedRodA = allRodsA[0];
+  hingedRodB = allRodsB[0];
 
   // Next, create the rotating ("hinge") joint.
-  btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
-  btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
+  btRigidBody* rodA_rb = allRodsA[0]->getPRigidBody();
+  btRigidBody* rodB_rb = allRodsB[0]->getPRigidBody();
+  // We also need to calculate their displacement so we can set the constraint
+  // correctly.
+  btVector3 rodA_com = allRodsA[0]->centerOfMass();
+  btVector3 rodB_com = allRodsB[0]->centerOfMass();
+  // If we do A minus B, then the displacement should be the second argument
+  // to the hinge constraint.
+  btVector3 net_com = rodA_com - rodB_com;
   // Create the hinge constraint
   // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
   // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
@@ -125,9 +136,17 @@ void CombinedSpineControllerRotVert::onSetup(TensegrityModel& subject)
   // For the rotating joint, need to compensate for the vertical translation,
   // which could be like +30 to rod 2.
   // 5 worked, also 10.
+  // Previously was:
+  /*
   btHingeConstraint* rotHinge =
     new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(4, 0, 0),
 			  btVector3(0, 0, 0), btVector3(1, 0, 0),
+			  btVector3(1, 0, 0), false);
+  */
+  
+  btHingeConstraint* rotHinge =
+    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 0, 0),
+			  net_com, btVector3(1, 0, 0),
 			  btVector3(1, 0, 0), false);
   // Add to the world.
   m_world->addConstraint( rotHinge );

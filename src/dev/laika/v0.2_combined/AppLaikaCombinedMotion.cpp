@@ -134,7 +134,7 @@ int main(int argc, char** argv)
     //double phaseTwoTimeRot = 3.5;
     double phaseTwoTimeRot = 5.45;
     //double phaseTwoTimeRot = 7.5;
-    btVector3 phaseTwoTorqueRot = btVector3(-0.053225, 0, 0); // was -0.054
+    btVector3 phaseTwoTorqueRot = btVector3(-0.2, 0, 0); // was -0.053225
     //btVector3 phaseTwoTorqueRot = btVector3(0, 0, 0);
     std::string rodHingeTag = "rodForHinge";
     CombinedSpineControllerRotVert* rotController =
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
     // Add the controller to the YAML model.
     // TO-DO: can we do this after adding the model to the simulation?
     // Will the controller's onSetup method still be
-    //myModel->attach( rotController );
+    myModel->attach( rotController );
 
     // Add the model to the world
     simulation.addModel(myModel);
@@ -237,6 +237,8 @@ int main(int argc, char** argv)
     // The displacement between the two rods is the second argument here, since
     // the first rigid body is at the origin and the second rod is displaced
     // from the origin.
+    // In other words - the displacement between rotating vertebra halves is now
+    // determined by the YAML file that combines the two halves.
     btHingeConstraint* rotHinge =
       new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 0, 0),
 			    net_com, btVector3(1, 0, 0),
@@ -251,7 +253,7 @@ int main(int argc, char** argv)
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
     */
     // Add the hinge constraint to the world.
-    btWorld->addConstraint(rotHinge);
+    //btWorld->addConstraint(rotHinge);
 
 
         // Create the force plate by passing in its config struct.

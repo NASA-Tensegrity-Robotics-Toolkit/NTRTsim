@@ -4,11 +4,11 @@
 substructures:
   tA:
     path: ./RotVertSplitA.yaml
-    translation: [ -2, 35.5, 8]
+    translation: [0, 0, 0]
     scale: 1
   tB:
     path: ./RotVertSplitB.yaml
-    translation: [ -7, 35.5, 8]
+    translation: [-3, 0, 0]
     scale: 1
 
 # The original TetrahedralSpineWithRotJoint had translated this yaml
@@ -18,3 +18,5 @@ substructures:
 
 # NOTE that as of 2018-02-10, the vertebrae are now centered at the origin,
 # NOT at some z-displacement!!!
+
+# An x-displacement for tB of-5 worked.

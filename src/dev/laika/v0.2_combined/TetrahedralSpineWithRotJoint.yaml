@@ -7,22 +7,26 @@
 substructures:
 
   t1/t2:
-    path: ./TetrahedronSymmetricScaled.yaml
+    path: ./TetrahedronSymmetric.yaml
     #offset: [-12, 0 , 0]
+    # used to use the 'scaled' version
     offset: [-6, 0, 0]
     #translation: [22, 40.5, 8] # was 30.5
-    translation: [10, 40.5, 8]
+    # also, since now centered at the origin, and twice the size,
+    # center it same as the rot vert.
+    translation: [10, 45.5, 8]
   t5/t6:
-    path: ./TetrahedronSymmetricScaled.yaml
+    path: ./TetrahedronSymmetric.yaml
     #offset: [-12, 0 , 0]
     offset: [-6, 0 , 0]
     # RotVert gives -4, -6 gap, -2 offset = -12
     #translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
-    translation: [-12, 40.5, 8]
+    translation: [-12, 45.5, 8]
   rotJoint:
     path: ./RotVertHalved.yaml
-    #translation: [ -2, 40.5, 8]
-    translation: [ -2, 35.5, 8]
+    #scale: 0.5
+    # was y = 35.5, before adjusting local frame to the origin. Also rescaled the local YAML file, since in the future we want to get rid of all the scale = 0.5
+    translation: [ -2, 45.5, 8]
   hips:
     path: ../BaseStructuresLaika/HipsScaled.yaml
     #translation: [22, 45.5, 3]
