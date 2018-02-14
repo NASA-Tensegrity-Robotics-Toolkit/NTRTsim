@@ -205,13 +205,21 @@ void CombinedSpineControllerRotVertPosition::onStep(TensegrityModel& subject, do
     // First, a control constant. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
     // is on the order of 0.2. So maybe a K of 5 or 10?
-    double K = 1000; // 50 worked, but lots of overshoot
+    double K_P = 1000; // 50 worked, but lots of overshoot
+
     // Calculate the new torque we want to apply, - K * (x - x_ref)
     // we've arbitrarily choosen torques to be negative?
     // The error between the current and desired, x - x_ref, is
     double error = netRotScalar - m_setAngle;
+    // Let's do an integral term also.
+    m_accumulatedError = m_accumulatedError + error;
+    // a really small constant here works best.
+    double K_I = 0.5;
+    // Combined control input is:
+    double controlInput = - (K_P * error) - (K_I * m_accumulatedError);
+    
     // As a torque vector, along the x-axis:
-    btVector3 controlledTorque( -K * error, 0, 0);
+    btVector3 controlledTorque( controlInput, 0, 0);
     //DEBUGGING: what's the error that we're controlling around?
     // Need to develop a control such that this trends to zero.
     std::cout << "error: " << error << std::endl;
@@ -223,7 +231,9 @@ void CombinedSpineControllerRotVertPosition::onStep(TensegrityModel& subject, do
     hingedRodA->getPRigidBody()->applyTorqueImpulse( worldControlledTorque );
     hingedRodB->getPRigidBody()->applyTorqueImpulse( -worldControlledTorque );
     // this worked. With just P control, seems to have steady-state error.
-    // Need to add I.
+    // With I control, seems to track down to machine precision.
+    // TO-DO: SEEMS TO ONLY USE FLOATS, NOT DOUBLES? We've only got 7 digits
+    // of precision and not 14...
   }
 }
 	
