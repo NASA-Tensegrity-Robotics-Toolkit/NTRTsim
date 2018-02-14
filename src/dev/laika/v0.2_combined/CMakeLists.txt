@@ -15,7 +15,7 @@ link_libraries(core
 #     TensegrityModel.cpp)
 
 add_executable(AppLaikaCombinedMotion
-  CombinedSpineControllerRotVert.cpp
+  CombinedSpineControllerRotVertPosition.cpp
   CombinedSpineControllerBending.cpp
   AppLaikaCombinedMotion.cpp
 )
