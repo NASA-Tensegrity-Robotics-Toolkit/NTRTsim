@@ -129,18 +129,14 @@ int main(int argc, char** argv)
     // Create the controller for the rotating vertebra.
     double startTimeRot = 4.0;
     //double startTimeRot = 6.0;
-    btVector3 startTorqueRot = btVector3(-0.065, 0, 0); // was -0.064
-    //btVector3 startTorqueRot = btVector3(0, 0, 0);
-    //double phaseTwoTimeRot = 3.5;
-    double phaseTwoTimeRot = 5.45;
-    //double phaseTwoTimeRot = 7.5;
-    btVector3 phaseTwoTorqueRot = btVector3(-0.2, 0, 0); // was -0.053225
-    //btVector3 phaseTwoTorqueRot = btVector3(0, 0, 0);
+    double setAngle = 0.5; // radians
+    // a test: can we do a whole 90 degree rotation?
+    //double setAngle = 1.6;
+    // hehehe it works but the Laika model explodes.
     std::string rodHingeTag = "rodForHinge";
     CombinedSpineControllerRotVertPosition* rotController =
-      new CombinedSpineControllerRotVertPosition( startTimeRot, startTorqueRot,
-				      phaseTwoTimeRot, phaseTwoTorqueRot,
-				      rodHingeTag, btWorld);
+      new CombinedSpineControllerRotVertPosition( startTimeRot, setAngle,
+						  rodHingeTag, btWorld);
 
     // Add the controller to the YAML model.
     // TO-DO: can we do this after adding the model to the simulation?

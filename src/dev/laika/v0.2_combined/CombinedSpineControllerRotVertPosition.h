@@ -43,8 +43,8 @@ class tgRod;
 class btDynamicsWorld;
 
 /**
- * A controller to apply torques to the rotating vertebra joint in the spine. 
- * This is used for the IROS 2017 ULTRA Spine paper results.
+ * A controller to track an angular difference (position) between rotating vertebrae 
+ * This is used for the IROS 2018 Laika paper results.
  * Note that a specific TensegrityModel, one of the two hinged rods, is what's observed.
  */
 class CombinedSpineControllerRotVertPosition : public tgObserver<TensegrityModel>, public tgSubject<CombinedSpineControllerRotVertPosition>
@@ -53,20 +53,16 @@ public:
 	
   /**
    * Construct a CombinedSpineControllerRotVertPosition.
-   * Note that the torques are with respect to the local coordinate frame.
+   * Note that the rotation is specified with respect to the local frame
    * @param[in] startTime, a double that determines when the controller
-   * begins the first set of applied torque. Usually, set to 0.
-   * @param[in] startTorque, vector amount of torque to apply at startTime.
-   * controller will act until the rest length of the cables is 25% of initial.
-   * @param[in] phaseTwoTime, a double that determines when the change occurs.
-   * @param[in] phaseTwoTorque, vector of torque as of phaseTwoTime.
+   * begins to track the position.
+   * @param[in] setAngle, double, in radians, difference in rotation b/w halves
    * @param[in] rodHingeTag, a string of the tag that's associated with the
    *    tgRods that are part of the hinged joint.
    *@param[in] world, pointer to the btDynamicsWorld that's governing this 
    *    simulation. This is so that the controller can add in the hinge constraint.
    */
-  CombinedSpineControllerRotVertPosition(double startTime, btVector3 startTorque,
-			     double phaseTwoTime, btVector3 phaseTwoTorque,
+  CombinedSpineControllerRotVertPosition(double startTime, double setAngle,
 			     std::string rodHingeTag, btDynamicsWorld* world);
     
   /**
@@ -94,9 +90,7 @@ private:
    * The private variables for each of the values passed in to the constructor.
    */
   double m_startTime;
-  btVector3 m_startTorque;
-  double m_phaseTwoTime;
-  btVector3 m_phaseTwoTorque;
+  double m_setAngle;
   std::string m_rodHingeTag;
 
   // This is a pointer to the first of the two rods with the tag above.
@@ -111,6 +105,12 @@ private:
    * Need an accumulator variable to determine when to start the controller.
    */
   double m_timePassed;
+
+  /**
+   * Also, need some variables to do PID control in discrete-time.
+   */
+  double m_accumulatedError; // for I
+  double m_prevError; //  for D
 
 };
 

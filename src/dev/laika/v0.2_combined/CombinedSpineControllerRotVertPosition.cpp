@@ -52,39 +52,32 @@
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
 CombinedSpineControllerRotVertPosition::CombinedSpineControllerRotVertPosition(double startTime,
-						       btVector3 startTorque,
-						       double phaseTwoTime,
-						       btVector3 phaseTwoTorque,
+						       double setAngle,
 						       std::string rodHingeTag,
 						       btDynamicsWorld* world) :
   m_startTime(startTime),
-  m_startTorque(startTorque),
-  m_phaseTwoTime(phaseTwoTime),
-  m_phaseTwoTorque(phaseTwoTorque),
+  m_setAngle(setAngle),
   m_rodHingeTag(rodHingeTag),
   m_world(world),
-  m_timePassed(0.0)
+  m_timePassed(0.0),
+  m_accumulatedError(0.0),
+  m_prevError(0.0)
 {
   // start time must be greater than or equal to zero
   if( m_startTime < 0.0 ) {
     throw std::invalid_argument("Start time must be greater than or equal to zero.");
   }
-  // torques cannot be null
-  else if( (m_startTorque == NULL) || (m_phaseTwoTorque == NULL) ) {
-    throw std::invalid_argument("A torque is NULL, must supply a torque.");
-  }
-  // phase two time must be greater than or equal to zero
-  if( m_phaseTwoTime < 0.0 ) {
-    throw std::invalid_argument("Phase two time must be greater than or equal to zero.");
+  // set angle cannot be null
+  else if( (m_setAngle == NULL )) {
+    throw std::invalid_argument("Set angle is NULL, need to specify angle.");
   }
   // @TODO: what checks to make on tags?
 }
 
 /**
- * For this controller, the onSetup method picks out the first rod with 
- * rodHingeTag.
- * Also, as a hack, this onSetup method adds the hinge constraint between the two
- * rods with m_rodHingeTag.
+ * For this controller, the onSetup method picks out the two rods with rodHingeTag
+ * and "A" or "B" attached to the tag. The hingeconstraint is created here,
+ * which is not great, but makes it so we don't need to make an extra model class.
  */
 void CombinedSpineControllerRotVertPosition::onSetup(TensegrityModel& subject)
 {
@@ -131,36 +124,21 @@ void CombinedSpineControllerRotVertPosition::onSetup(TensegrityModel& subject)
   // to the hinge constraint.
   btVector3 net_com = rodA_com - rodB_com;
   // Create the hinge constraint
-  // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
-  // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
-  //    between two vertebrae should be.
-  // For the rotating joint, need to compensate for the vertical translation,
-  // which could be like +30 to rod 2.
-  // 5 worked, also 10.
-  // Previously was:
-  /*
-  btHingeConstraint* rotHinge =
-    new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(4, 0, 0),
-			  btVector3(0, 0, 0), btVector3(1, 0, 0),
-			  btVector3(1, 0, 0), false);
-  */
-  
+  // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.  
   btHingeConstraint* rotHinge =
     new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 0, 0),
 			  net_com, btVector3(1, 0, 0),
 			  btVector3(1, 0, 0), false);
   // Add to the world.
   m_world->addConstraint( rotHinge );
-  // fingers crossed...
-  // NOPE. this segfaults on reset (space bar.) That's probably better for now,
+  // This segfaults on reset (space bar.) That's probably better for now,
   // actually, until we get this formalized...
 }
 
 /**
  * The onStep method does one of the following things:
  * If between time zero and startTime: apply no torque.
- * If between startTime and phaseTwoTime: apply startTorque.
- * If after phaseTwoTime: apply phaseTwoTorque.
+ * If after startTime: apply a control to track the desired position (set angle).
  */
 void CombinedSpineControllerRotVertPosition::onStep(TensegrityModel& subject, double dt)
 {
@@ -168,130 +146,84 @@ void CombinedSpineControllerRotVertPosition::onStep(TensegrityModel& subject, do
   m_timePassed += dt;
   // Then, check which action to perform:
   if( m_timePassed > m_startTime ) {
-    // Get the rotation matrix that will transform the body-aligned torque
-    // with the world-aligned torque. This will allow us to apply a torque
-    // only along the axis of the hinge.
-    btTransform worldAlignment = hingedRodA->getPRigidBody()->getWorldTransform();
-    btMatrix3x3 worldAlignmentBasis = worldAlignment.getBasis();
-    // Calculate the first-phase torque, then change it later if needed.
-    btVector3 torqueToApply = m_startTorque;
-    btVector3 worldAlignedTorque = worldAlignmentBasis * m_startTorque;
-    if( m_timePassed > m_phaseTwoTime ) {
-      // If time for phase two torque, calculate it:
-      torqueToApply = m_phaseTwoTorque;
-      worldAlignedTorque = worldAlignmentBasis * torqueToApply;
-    }
-    // Finally, apply the torque.
-    // Note that we apply equal and opposite torques to the two rods.
-    //std::cout << "Applying torque: " << worldAlignedTorque << std::endl;
-    //std::cout << "Applying torque: " << torqueToApply << std::endl;
-    //std::cout << "World alignment is: " << worldAlignmentBasis << std::endl;
-    //hingedRodA->getPRigidBody()->applyTorqueImpulse( worldAlignedTorque );
-    //hingedRodB->getPRigidBody()->applyTorqueImpulse( -worldAlignedTorque );
-
-    // Let's do a bit of math to find the Euler angles between the two coordinate
-    // frames of the vertebra halves. This way, we'll be able to measure the angle
-    // of rotation between them (along the axis of the constraint), to do a
-    // position controller.
-    // Thanks to the wikipedia entry on rotation matrices, and
-    // https://math.stackexchange.com/questions/1870661/find-angle-between-two-coordinate-systems
-
-    btVector3 xAxis(1, 0, 0); // since we want to rotate along x
-    // Orient the vector along the axis of the first body
-    btVector3 xAxisRodA = worldAlignmentBasis * xAxis;
-    // DEBUGGING: let's see what this new unit vector will be.
-    //std::cout << xAxisRodA << std::endl;
-    // great, as expected, it's very close to the (1,0,0) of the world.
+    // Calculate and apply a torque that will be controlled around a position
+    // (angle between the two vertebrae.)
     
-    // Next, let's see if we can get a rotation matrix that represents
-    // a specific rotation around this new unit vector.
-    // The angle of rotation around xAxisRodA will be
-    btScalar t = 0.3; // local rotation, in radians? Named "t" for "theta."
-    // Write out each component of the new rotation matrix, according to
+    // We want to obtain the rotation around the axis that aligns rod A and rod B.
+    // Luckily enough, we already know that the frame will be aligned along the
+    // X-axis, since that's how we've set up the btHingConstraint.
+    // So, we can take advantage of quaternions here:
+    // a quaternion is (axis + angle), so just taking the angle of the quaternion
+    // that represents this A-to-B rotation will give us what we want.
+
+    // Here's the procedure that is used in this code.
+    // We'll use rotation matrices first.
+    // 1) Get the rotation matrix of each of the two frames (rod A, rod B), with
+    //    respect to the world
+    // 2) Get the net rotation from one frame to another
+    // 2) Get the angle along the axis that connects these two frames (which, if R is going from A to B, just the rotation implied in R around R's unit vector.)
+    // (note, we *know* that the unit vector u of R_net will really only have one component, along the x-direction, since we've constrainted along the other two.
+    // 3) Calculate the difference between this angle, and the t_set
+    // 4) Calculate and apply a torque proportional to t_diff (the control.)
+    
+    // Much credit to the wikipedia article on rotations:
     // https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-    // rename xAxisRodA for brevity
-    btVector3 u = xAxisRodA;
-    // the std::pow function takes doubles, and I'm getting some issues with
-    // Bullet's automatic conversion with btScalar.
-    // So, let's use doubles.
-    double ux = u.getX();
-    double uy = u.getY();
-    double uz = u.getZ();
-    // Note, pow takes (double, double), so needs to be 2.0 and not just 2
-    // First row:
-    btScalar r11 = cos(t) + std::pow(ux, 2.0) * ( 1 - cos(t));
-    btScalar r12 = ux * uy * (1 - cos(t)) - uz * sin(t);
-    btScalar r13 = ux * uz * (1 - cos(t)) + uy * sin(t);
-    // Second row:
-    btScalar r21 = uy * ux * (1 - cos(t)) + uz * sin(t);
-    btScalar r22 = cos(t) + std::pow(uy, 2.0) * (1 - cos(t));
-    btScalar r23 = uy * uz * (1 - cos(t)) - ux * sin(t);
-    // Third row:
-    btScalar r31 = uz * ux * (1 - cos(t)) - uy * sin(t);
-    btScalar r32 = uz * uy * (1 - cos(t)) + ux * sin(t);
-    btScalar r33 = cos(t) + std::pow(uz, 2.0) * (1 - cos(t));
-    // Create the new rotation matrix with these values.
-    btMatrix3x3 rodbRot(r11, r12, r13,
-			r21, r22, r23,
-			r32, r32, r33);
-    // DEBUGGING
-    //std::cout << rodbRot.getColumn(2) << std::endl;
-
-    // ...finally, let's try and manually set the rotation of rod B using
-    // this rotation matrix.
-    // Step 1, get the second rod's world transform (position)
+    // As well as some comments on coordinate systems from stackexchange:
+    // https://math.stackexchange.com/questions/1870661/find-angle-between-two-coordinate-systems  
+    
+    // OK, so one way to get the net rotation matrix between the two is to
+    // first rotate A back to the origin, then apply the rotation to get from
+    // the origin to B. Since we have R_a_origin, and R_b_origin, given by the basis
+    // for the transformation for both rigid body objects, this could be:
+    btTransform rodaTransform = hingedRodA->getPRigidBody()->getWorldTransform();
     btTransform rodbTransform = hingedRodB->getPRigidBody()->getWorldTransform();
-    // get it in quaternion form
-    //btQuaternion rodbQuat = rodb
-    // Step 2, get the euler angles from the rotation matrix
-    btScalar yaw;
-    btScalar pitch;
-    btScalar roll;
-    rodbRot.getEulerYPR(yaw, pitch, roll);
+    // We can get the rotation matrices from each transform
+    // (note that we want to ignore the translation!)
+    btMatrix3x3 rodaWorldRotation = rodaTransform.getBasis();
+    btMatrix3x3 rodbWorldRotation = rodbTransform.getBasis();
+    // ...we might have been able to just use quaternions here, but this made more
+    // sense to Drew at the time.
+    // To get the net, invert the rod A transform, then apply the B transform.
+    // Using Bullet's methods, we can say:
+    btMatrix3x3 netRotation = rodaWorldRotation.inverse() * rodbWorldRotation;
+    // The order doesn't matter here, just off by a +/-, since the only difference
+    // when "looking" from one rod to another is the direction of the unit vector.
+
+    // Next, let's get the quaternion for this net rotation, and extract its angle.
+    btQuaternion netRotQuat;
+    netRotation.getRotation(netRotQuat);
+    btScalar netRotScalar = netRotQuat.getAngle();
+    // for checking: let's get the axis here too. Should be only in one direction.
+    //btVector3 netRotAxis = netRotQuat.getAxis();
     //DEBUGGING
-    //std::cout << yaw << " " << pitch << " " << roll << std::endl;
-    // Step 3, apply the rotation to the 
-    //rodbTransform.setRotation
-    //hingedRodB->getPRigidBody()->setCenterOfMassTransform(rodbTransform);
-
-    // Let's try creating a transform directly from our rotation matrix
-    // and setting it.
-    btTransform rodbRotTransform = btTransform(rodbRot);
-    //hingedRodB->getPRigidBody()->setCenterOfMassTransform(rodbTransformRotated);
-    // Interesting! It does seem to put the vertebra along the world-aligned axis.
-    // Maybe multiply the two transforms? Which order?
-    btTransform rodbTransformRotated = rodbRotTransform * rodbTransform;
-    //hingedRodB->getPRigidBody()->setCenterOfMassTransform(rodbTransformRotated);
-    // haha. robot flies away.
-
-    // Let's try the original idea and instead of setting the rotation, calculate
-    // the difference, and apply a control input.
-
-    // Again, from the wikipedia article, the unit vector of the rotation
-    // is [h - f; c - g; d - b], which is then
-    // [r32 - r23; r13 - r31; r21 - r12]
-    btVector3 uRot( r32 - r23, r13 - r31, r21 - r12);
-    //DEBUGGING
-    std::cout << uRot << std::endl;
-    // kind of looks like the second element of uRot is the angle we want to change.
-    // Great. Let's re-do the calculations above.
+    //std::cout << "netRotScalar: " << netRotScalar << std::endl;
+    //std::cout << "netRotAxis: " << netRotAxis << std::endl;
+    // GREAT THIS SEEMS TO WORK. netRotAxis is roughly (1, 0, 0),
+    // and netRotScalar is some reasonable value.
+    
+    // Great. Let's perform the control.
     // First, a control constant. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
     // is on the order of 0.2. So maybe a K of 5 or 10?
-    double K = 50; // 50 worked
-    // set point:
-    double t_set = 0.1; // 0.3 worked
-    // Calculate the new torque we want to apply, K * (x - x_ref)
+    double K = 1000; // 50 worked, but lots of overshoot
+    // Calculate the new torque we want to apply, - K * (x - x_ref)
     // we've arbitrarily choosen torques to be negative?
-    // torque only goes along the x-axis, like in the original use of this controller
-    btVector3 controlledTorque(-K * (uRot.getY() - t_set), 0, 0);
-    // torque, aligned with the world
-    btVector3 worldControlledTorque = worldAlignmentBasis * controlledTorque;
-    // ...apply
+    // The error between the current and desired, x - x_ref, is
+    double error = netRotScalar - m_setAngle;
+    // As a torque vector, along the x-axis:
+    btVector3 controlledTorque( -K * error, 0, 0);
+    //DEBUGGING: what's the error that we're controlling around?
+    // Need to develop a control such that this trends to zero.
+    std::cout << "error: " << error << std::endl;
+    // it would be interesting to plot this.
+    // torque, aligned with the world, referenced against rod A.
+    // (choice is arbitrary, since we can just do +/- switching A to B.)
+    btVector3 worldControlledTorque = rodaWorldRotation * controlledTorque;
+    // ...apply the torque, opposite to each body.
     hingedRodA->getPRigidBody()->applyTorqueImpulse( worldControlledTorque );
     hingedRodB->getPRigidBody()->applyTorqueImpulse( -worldControlledTorque );
-    // this worked. With just P control, result is a bit shaky. Probably
-    // need to put in I and D terms. Or maybe could just tune the controller better.
+    // this worked. With just P control, seems to have steady-state error.
+    // Need to add I.
   }
 }
 	
