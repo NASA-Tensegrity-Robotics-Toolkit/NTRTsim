@@ -295,9 +295,48 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     // and netRotScalar is some reasonable value.
 
     // Index into the set point trajectory for this timestep.
+    // Let's do it this way. Start at time zero, and keep incrementing through the
+    // first column of the array (the timestep) until the timestep is larger
+    // than the accumulated time. Then, take the setpoint at the most recent element.
+    // But, we'll need to check and reset the index if we've run off the end of
+    // the array.
+    std::cout << "before setpoint traj length" << std::endl;
+    //std::cout << typeid(setpointTrajectory[0]).name() << std::endl;
+    //std::cout << typeid(setpointTrajectory[0].size()).name() << std::endl;
+    // Seems we need to be oddly specific about the type of this variable.
+    // https://stackoverflow.com/questions/23028854/how-to-store-size-of-a-vector
+    //std::vector<double>::size_type totalSteps = setpointTrajectory[0].size();
+    //std::cout << "total traj length: " << totalSteps << std::cout;
+    double timestepIndex = 0;
+    // While accumulated time greater than the time at timestep index
+    // AND the index is smaller than the total array size,
+    std::cout << "m_timePassed is " << m_timePassed << std::endl;
+    // We actually need to index into m_timePassed - m_startTime, otherwise
+    // the control skips to m_timePassed in the sequence (we want to start from 0.)
+    double m_controlTime = m_timePassed - m_startTime;
+    // The max index into the array is size - 1, since "size" includes the 0 element.
+    while( (m_controlTime > setpointTrajectory[0][timestepIndex]) &&
+	   timestepIndex < (setpointTrajectory[0].size() - 1) )
+    {
+      /*
+      std::cout << "Checked on element " << timestepIndex
+		<< " with value " << setpointTrajectory[0][timestepIndex]
+		<< std:: endl;
+      */
+      // remember, indexing is [row][column]
+      timestepIndex = timestepIndex + 1;
+    }
+    //DEBUGGING
+    std::cout << "setpoint index (time): " << timestepIndex << std::endl;
+    // get the tracked point at timestepIndex
+    double m_setAngle = setpointTrajectory[1][timestepIndex];
+    // TO-DO: reset to max if over.
+    // OR, include this in the while loop.
+    std::cout << m_setAngle << std::endl;
+      
     //DEBUGGING: just do the first element.
-    std::cout << "tracked: " << setpointTrajectory[0][1] << std::endl;
-    double m_setAngle = setpointTrajectory[0][1]; // first row 2nd column
+    //std::cout << "tracked: " << setpointTrajectory[1][0] << std::endl;
+    //double m_setAngle = setpointTrajectory[1][0]; // first row 2nd column
     
     // Great. Let's perform the control.
     // First, a control constant. The angle seems to be in the range of
