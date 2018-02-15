@@ -27,7 +27,7 @@
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 #include "CombinedSpineControllerBending.h"
-#include "CombinedSpineControllerRotVertPosition.h"
+#include "CombinedSpineControllerRotVertPositionTraj.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
     //myModel->attach(controller);
 
     // Next, we need to get a reference to the Bullet Physics world.
-    // This is for passing in to the CombinedSpineControllerRotVertPosition, so it can
+    // This is for passing in to the CombinedSpineControllerRotVertPositionTraj, so it can
     // create the hinge.
     // TO-DO: does this reference get destroyed and re-created?? this will break...
     tgWorld simWorld = simulation.getWorld();
@@ -129,13 +129,18 @@ int main(int argc, char** argv)
     // Create the controller for the rotating vertebra.
     double startTimeRot = 4.0;
     //double startTimeRot = 6.0;
-    double setAngle = 0.5; // radians
+    // For the single set point:
+    //double setAngle = 0.5; // radians
     // a test: can we do a whole 90 degree rotation?
     //double setAngle = 1.6;
     // hehehe it works but the Laika model explodes.
+
+    // For the trajectory tracking: need a CSV file.
+    // Drew copied one in here - TO DO, make more general.
+    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_example_dt01_tt_50.csv";
     std::string rodHingeTag = "rodForHinge";
-    CombinedSpineControllerRotVertPosition* rotController =
-      new CombinedSpineControllerRotVertPosition( startTimeRot, setAngle,
+    CombinedSpineControllerRotVertPositionTraj* rotController =
+      new CombinedSpineControllerRotVertPositionTraj( startTimeRot, csvPath,
 						  rodHingeTag, btWorld);
 
     // Add the controller to the YAML model.
