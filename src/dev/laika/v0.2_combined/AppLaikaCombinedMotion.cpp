@@ -35,8 +35,9 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
-#include "sensors/forceplate/ForcePlateModel.h"
-#include "sensors/forceplate/ForcePlateSensor.h"
+// For tracking positions:
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgSphereSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 #include "core/tgWorldBulletPhysicsImpl.h" // for hinge hack
@@ -150,7 +151,19 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
-    
+
+    // Let's log info from the spheres (bottom of Laika's feet.)
+    // has to end with the prefix to the log file name.
+    std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";
+    double samplingTimeInterval = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    // add the model to the data logger
+    myDataLogger->addSenseable(myModel);
+    // Make it so the data logger can dispatch sphere sensors
+    tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
+    myDataLogger->addSensorInfo(mySphereSensorInfo);
+    // Add the data logger to the simulation.
+    simulation.addDataManager(myDataLogger);
     
     // Finally, run the simulation.
     simulation.run();

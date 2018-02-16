@@ -12,7 +12,7 @@ substructures:
   hips:
     path: ./SimpleHips.yaml
     translation: [0, 0, 0]
-  legBackright:
+  legBackRight:
     path: ./SimpleLeg.yaml
     translation: [15, 0, 15]
   legBackLeft:
