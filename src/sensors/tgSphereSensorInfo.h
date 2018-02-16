@@ -75,7 +75,7 @@ class tgSphereSensorInfo : public tgSensorInfo
    * for this pSenseable.
    * @return a list of pointers to tgSphereSensors. Note that this should ALWAYS
    * have size 1.
-   * Don't create sensors for elements that just have rods as descendants, only create
+   * Don't create sensors for elements that just have spheres as descendants, only create
    * sensors for an actual tgSphere. (This eliminates redundant sensor creation.)
    * @throws invalid_argument if pSenseable is not a tgSphere. This enforces the caller to
    * check isThisMySenseable before creating sensors. Play nice!

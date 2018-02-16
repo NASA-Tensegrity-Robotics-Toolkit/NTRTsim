@@ -140,7 +140,7 @@ void tgDataLogger2::setup()
   // Output a first line of the header.
   tgOutput << "tgDataLogger2 started logging at time " << fileTime << ", with "
 	   << m_sensors.size() << " sensors on " << m_senseables.size()
-	   << " senseable objects." << std::endl;
+	   << " senseable root objects (not including children.)" << std::endl;
 
   // The first column of data will be "time", the m_totalTime since beginning
   // of the simulation.

@@ -122,6 +122,15 @@ std::vector<std::string> tgSphereSensor::getSensorData() {
   // In that case, this tgSphereSensor does not point to a tgSphere!!!
   assert( m_pSphere != 0);
   // Pick out the XYZ position of the center of mass of this sphere.
+  
+  //ERROR HERE: Drew thinks that this might return the center of mass of
+  // the ENTIRE RIGID BODY, not just the sub-component. For example,
+  // if this sphere is connected to a rod, then maybe this returns the
+  // center of mass of the rod + sphere!!!
+  //TO-DO: examine the auto-compounding code, and see if the pointers
+  // get mushed together, and see if btRigidBody outputs the combined
+  // COM with any other btRigidBodies it's compounded with, or if
+  // it truly only returns the COM of the element within the compound.
   btVector3 com = m_pSphere->centerOfMass();
   // Note that the 'orientation' method also returns a btVector3.
 

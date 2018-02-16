@@ -150,7 +150,12 @@ tgRigidInfo* tgRigidAutoCompound::createCompound(std::deque<tgRigidInfo*> rigids
     std::stringstream newtag;
     newtag << "compound_" << random_tag_hash();
     for(int i = 0; i < rigids.size(); i++) {
-      rigids[i]->addTags(newtag.str());
+      //ERROR: first, this random tag hash is not re-seeded,
+      // so the tags aren't random, and get re-applied to
+      // different compounds. Second, this seems to mess with
+      // the data manager / sensors. So, remove it and see
+      // if tags don't get crossed up.
+      //rigids[i]->addTags(newtag.str());
       c->addRigid(*rigids[i]);
     }
     return (tgRigidInfo*)c;

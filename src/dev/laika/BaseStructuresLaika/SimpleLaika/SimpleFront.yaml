@@ -13,10 +13,10 @@ substructures:
     path: ./SimpleShoulders.yaml
     translation: [0, 0, 0]
   legFrontRight:
-    path: ./SimpleLeg.yaml
+    path: ./SimpleLegA.yaml
     translation: [-15, 0, 15]
   legFrontLeft:
-    path: ./SimpleLeg.yaml
+    path: ./SimpleLegB.yaml
     translation: [-15, 0, -15]
 
 # ...don't need the below, since auto-compounding works when nodes intersect.

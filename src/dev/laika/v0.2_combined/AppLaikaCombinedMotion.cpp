@@ -38,6 +38,10 @@
 // For tracking positions:
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
+//DEBUGGING: see if the rod COMs, for the shoulders/hips, are the same as
+// for the spheres. That would mean that bullet's COM command does the COM
+// for the ENTIRE rigid, not each component, when auto-compounded!!!
+#include "sensors/tgRodSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 #include "core/tgWorldBulletPhysicsImpl.h" // for hinge hack
@@ -161,7 +165,10 @@ int main(int argc, char** argv)
     myDataLogger->addSenseable(myModel);
     // Make it so the data logger can dispatch sphere sensors
     tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
+    //DEBUGGING: rods too
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
     myDataLogger->addSensorInfo(mySphereSensorInfo);
+    myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
     simulation.addDataManager(myDataLogger);
     
