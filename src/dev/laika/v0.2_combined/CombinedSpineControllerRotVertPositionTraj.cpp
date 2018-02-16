@@ -144,7 +144,7 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
   
   // Next, read the data from the CSV file into an array, for use down below.
   // DEBUGGING:
-  std::cout << "Opening the CSV of trajectory set point angles..." << std::endl;
+  //std::cout << "Opening the CSV of trajectory set point angles..." << std::endl;
   // Next, open it as an input file stream
   // This needs to be a c-style string for some reason.
   std::ifstream csv_file(m_csvPath.c_str());
@@ -179,7 +179,7 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
 	break;
       }
       // TESTING: just output to the command line.
-      std::cout << "Element from the input csv file: " << temp_element << std::endl;
+      //std::cout << "Element from the input csv file: " << temp_element << std::endl;
       // FROM ANKITA'S CODE, WAS CALLED CABLE_TRAJECTORY
       // Finally, append this element to the proper list in setpointTrajectory.
       // The first index into setpointTrajectory is column.
@@ -211,6 +211,7 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
   std::cout << "Finished reading in the CSV file." << std::endl;
   std::cout << "There were " << setpointTrajectory.size() << " columns and "
 	    << setpointTrajectory[0].size() << " rows." << std::endl;
+  /*
   // DEBUGGING:
   // Output the resulting vector of vectors, just to test that it looks right.
   std::cout << "CSV values are: " << std::endl;
@@ -226,6 +227,7 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
     // At the end of a row, put a newline.
     std::cout << std::endl;
   }
+  */
 }
 
 /**
@@ -244,7 +246,7 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     
     // We want to obtain the rotation around the axis that aligns rod A and rod B.
     // Luckily enough, we already know that the frame will be aligned along the
-    // X-axis, since that's how we've set up the btHingConstraint.
+    // X-axis, since that's how we've set up the btHingeConstraint.
     // So, we can take advantage of quaternions here:
     // a quaternion is (axis + angle), so just taking the angle of the quaternion
     // that represents this A-to-B rotation will give us what we want.
@@ -256,8 +258,8 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     // 2) Get the net rotation from one frame to another
     // 2) Get the angle along the axis that connects these two frames (which, if R is going from A to B, just the rotation implied in R around R's unit vector.)
     // (note, we *know* that the unit vector u of R_net will really only have one component, along the x-direction, since we've constrainted along the other two.
-    // 3) Calculate the difference between this angle, and the t_set
-    // 4) Calculate and apply a torque proportional to t_diff (the control.)
+    // 3) Calculate the difference between this angle, and the m_setPoint
+    // 4) Calculate and apply a torque proportional to the difference (the control.)
     
     // Much credit to the wikipedia article on rotations:
     // https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
@@ -300,58 +302,38 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     // than the accumulated time. Then, take the setpoint at the most recent element.
     // But, we'll need to check and reset the index if we've run off the end of
     // the array.
-    std::cout << "before setpoint traj length" << std::endl;
-    //std::cout << typeid(setpointTrajectory[0]).name() << std::endl;
-    //std::cout << typeid(setpointTrajectory[0].size()).name() << std::endl;
-    // Seems we need to be oddly specific about the type of this variable.
-    // https://stackoverflow.com/questions/23028854/how-to-store-size-of-a-vector
-    //std::vector<double>::size_type totalSteps = setpointTrajectory[0].size();
-    //std::cout << "total traj length: " << totalSteps << std::cout;
     double timestepIndex = 0;
-    // While accumulated time greater than the time at timestep index
-    // AND the index is smaller than the total array size,
-    std::cout << "m_timePassed is " << m_timePassed << std::endl;
     // We actually need to index into m_timePassed - m_startTime, otherwise
     // the control skips to m_timePassed in the sequence (we want to start from 0.)
     double m_controlTime = m_timePassed - m_startTime;
     // The max index into the array is size - 1, since "size" includes the 0 element.
+    // While accumulated time greater than the time at timestep index
+    // AND the index is smaller than the total array size,
     while( (m_controlTime > setpointTrajectory[0][timestepIndex]) &&
 	   timestepIndex < (setpointTrajectory[0].size() - 1) )
     {
-      /*
-      std::cout << "Checked on element " << timestepIndex
-		<< " with value " << setpointTrajectory[0][timestepIndex]
-		<< std:: endl;
-      */
-      // remember, indexing is [row][column]
+      // Look into the next entry into the array...
       timestepIndex = timestepIndex + 1;
     }
     //DEBUGGING
-    std::cout << "setpoint index (time): " << timestepIndex << std::endl;
+    //std::cout << "setpoint index (time): " << timestepIndex << std::endl;
     // get the tracked point at timestepIndex
     double m_setAngle = setpointTrajectory[1][timestepIndex];
-    // TO-DO: reset to max if over.
-    // OR, include this in the while loop.
-    std::cout << m_setAngle << std::endl;
-      
-    //DEBUGGING: just do the first element.
-    //std::cout << "tracked: " << setpointTrajectory[1][0] << std::endl;
-    //double m_setAngle = setpointTrajectory[1][0]; // first row 2nd column
     
     // Great. Let's perform the control.
-    // First, a control constant. The angle seems to be in the range of
+    // First, control constants. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
-    // is on the order of 0.2. So maybe a K of 5 or 10?
-    double K_P = 1000; // 50 worked, but lots of overshoot
+    // is on the order of 0.2. So maybe a K_P of 5 or 10?
+    double K_P = 1000; // 50 worked, but lots of overshoot.
+    // a really small constant for integral control worked best.
+    double K_I = 0.5;
 
-    // Calculate the new torque we want to apply, - K * (x - x_ref)
+    // Calculate the new torque we want to apply, - K * (x - x_ref)... with I term.
     // we've arbitrarily choosen torques to be negative?
     // The error between the current and desired, x - x_ref, is
     double error = netRotScalar - m_setAngle;
     // Let's do an integral term also.
     m_accumulatedError = m_accumulatedError + error;
-    // a really small constant here works best.
-    double K_I = 0.5;
     // Combined control input is:
     double controlInput = - (K_P * error) - (K_I * m_accumulatedError);
     
@@ -359,7 +341,7 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     btVector3 controlledTorque( controlInput, 0, 0);
     //DEBUGGING: what's the error that we're controlling around?
     // Need to develop a control such that this trends to zero.
-    std::cout << "error: " << error << std::endl;
+    std::cout << "Rotating vertebra tracking control error: " << error << std::endl;
     // it would be interesting to plot this.
     // torque, aligned with the world, referenced against rod A.
     // (choice is arbitrary, since we can just do +/- switching A to B.)
