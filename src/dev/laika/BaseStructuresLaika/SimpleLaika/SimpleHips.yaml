@@ -1,0 +1,38 @@
+# Units are currently in cm
+# These hips are just one box.
+# NOTE that these can be used for both legs on one end, just rotated.
+# Drew thinks of these as cd (connection dist) and ld (leg dist) for the T-shape/.
+
+nodes:
+  # first two are the base connection for the hips
+  V1: [0, 0, 0]   
+  V2: [15, 0, 0]
+  # second two are the two endpoints of the "T"
+  V3: [15, 0, 15]
+  V4: [15, 0, -15]
+
+pair_groups:
+  # The base part of the hips will be a box
+  hipsBase:
+    - [V1, V2]
+  # The back part of the hips will be rods
+  hipsBack:
+    - [V2, V3]
+    - [V2, V4]
+
+builders:
+
+  # box
+  hipsBase:
+    class: tgBoxInfo
+    parameters:
+      density: 0.001 # was 0.014
+      width: 1
+      height: 4.0
+      
+  # "rods" just big cylinders really
+  hipsBack:
+    class: tgRodInfo
+    parameters:
+      density: 0.001 # really light hips, since they're big.
+      radius: 3 # more "cylinder" than "rod"

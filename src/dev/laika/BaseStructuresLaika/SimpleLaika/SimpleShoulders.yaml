@@ -1,0 +1,38 @@
+# Units are currently in cm
+# These shoulders are just one box.
+# NOTE that these can be used for both legs on one end, just rotated.
+# Drew thinks of these as cd (connection dist) and ld (leg dist) for the T-shape/.
+
+nodes:
+  # first two are the base connection for the shoulders
+  V1: [0, 0, 0]   
+  V2: [-15, 0, 0]
+  # second two are the two endpoints of the "T"
+  V3: [-15, 0, 15]
+  V4: [-15, 0, -15]
+
+pair_groups:
+  # The base part of the shoulders will be a box
+  shouldersBase:
+    - [V1, V2]
+  # The back part of the shoulders will be rods
+  shouldersBack:
+    - [V2, V3]
+    - [V2, V4]
+
+builders:
+
+  # box
+  shouldersBase:
+    class: tgBoxInfo
+    parameters:
+      density: 0.001 # was 0.014
+      width: 1
+      height: 4.0
+      
+  # "rods" just big cylinders really
+  shouldersBack:
+    class: tgRodInfo
+    parameters:
+      density: 0.001 # really light shoulders, since they're big.
+      radius: 3 # more "cylinder" than "rod"

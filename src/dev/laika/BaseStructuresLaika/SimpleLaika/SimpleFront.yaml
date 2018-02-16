@@ -1,0 +1,36 @@
+# A combined set of hips and legs for the rear of Laika.
+# This is just stick legs with balls at the bottom.
+
+# Where things go:
+# The tetrahedron connection point is at the origin
+# Leg connection points are at [+cd, 0, +/-ld]
+# (connection distance, leg distance, Drew's names.)
+# Leg origin is at [0, -length, 0]
+# So, let's move the legs down, to keep vertebra connection at origin.
+
+substructures:
+  shoulders:
+    path: ./SimpleShoulders.yaml
+    translation: [0, 0, 0]
+  legFrontRight:
+    path: ./SimpleLeg.yaml
+    translation: [-15, 0, 15]
+  legFrontLeft:
+    path: ./SimpleLeg.yaml
+    translation: [-15, 0, -15]
+
+# ...don't need the below, since auto-compounding works when nodes intersect.
+# let's bond the legs to the shoulders.
+#bond_groups:
+#  legConnect:
+#    shoulders/legBackLeft/node_node:
+#      - [V3, legtop]
+
+# need to make a little rod to connect the leg to the hip
+# (just create the rigid connection)
+#builders:
+#  legConnect:
+#    class: tgRodInfo
+#    parameters:
+#      density: 0.1
+#      radius: 0.1

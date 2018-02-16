@@ -28,28 +28,12 @@ substructures:
     # was y = 35.5, before adjusting local frame to the origin. Also rescaled the local YAML file, since in the future we want to get rid of all the scale = 0.5
     translation: [ -2, 45.5, 8]
   hips:
-    path: ../BaseStructuresLaika/HipsScaled.yaml
-    #translation: [22, 45.5, 3]
-    translation: [5, 40, 3]
+    path: ../BaseStructuresLaika/SimpleLaika/SimpleRear.yaml
+    translation: [10, 45.5, 8]
   front:
-    path: ../BaseStructuresLaika/FrontScaled.yaml
-    # t6 was at -21 -12 = -33
-    # t6 is now at -12 -6 = -18, difference is then -15
-    #translation: [-48, 45.5, -5]
-    translation: [-28, 38.5, -5]
-  backlegsleft/backlegsright:
-    #path: ../BaseStructuresLaika/backlegs.yaml
-    path: ../BaseStructuresLaika/BackLegsScaled.yaml
-    offset: [0, 0, 17]
-    translation: [20, 23, -2]
-    #translation: [42, 20, -2]
-  frontlegsleft/frontlegsright: 
-    #path: ../BaseStructuresLaika/frontlegs.yaml
-    path: ../BaseStructuresLaika/FrontLegsScaled.yaml
-    #offset: [0, 0, 30]
-    offset: [0, 0, 15]
-    #translation: [-37, 20, -7]
-    translation: [-18, 23, 0.5]
+    path: ../BaseStructuresLaika/SimpleLaika/SimpleFront.yaml
+    # we're now at the translation of t5/t6 plus one offset to t6.
+    translation: [-18, 45.5, 8]
 
 bond_groups:
   HF:
@@ -133,35 +117,6 @@ bond_groups:
    rotJoint/t5/node_node:
      - [leftB, back]
 
-  rod: 
-   t1/hips/node_node:
-      - [right, V2]
-      - [right, V3]
-      - [left, V1]
-      - [left, V4]
-      - [right, V7]
-      - [right, V8]
-
-   t6/front/node_node: 
-      - [left, V11]
-      - [left, V12]
-      - [right, V3]
-      - [right, V2]
-   
-   hips/backlegsleft/node_node:
-      - [V15, V6]
-      - [V19, V7]
-
-   hips/backlegsright/node_node:
-      - [V16, V6]
-      - [V20, V7]
- 
-   front/frontlegsleft/node_node:
-      - [V16, V6]
-
-   front/frontlegsright/node_node:  
-      - [V17, V6]
-
 # Rod radius reduced to half for tests at 0.5 scale.
 # Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
 # 1.62 * 9.81 = 15.9 N
@@ -171,6 +126,8 @@ bond_groups:
 # For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
 # (was 5000)
 # Lowered friction from 1 to 0.5.
+
+# TO-DO: IS rod USED ANYMORE, ANYWHERE?
 builders: 
   rod:
     class: tgRodInfo
