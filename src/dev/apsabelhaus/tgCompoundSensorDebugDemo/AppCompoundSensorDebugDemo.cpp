@@ -26,8 +26,6 @@
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
-#include "CombinedSpineControllerBending.h"
-#include "CombinedSpineControllerRotVertPositionTraj.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -38,15 +36,9 @@
 // For tracking positions:
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
-//DEBUGGING: see if the rod COMs, for the shoulders/hips, are the same as
-// for the spheres. That would mean that bullet's COM command does the COM
-// for the ENTIRE rigid, not each component, when auto-compounded!!!
 #include "sensors/tgRodSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
-#include "core/tgWorldBulletPhysicsImpl.h" // for hinge hack
-#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
-#include "BulletDynamics/Dynamics/btDynamicsWorld.h" // for hinge hack
 // The C++ Standard Library
 #include <iostream>
 #include <string>
@@ -93,72 +85,12 @@ int main(int argc, char** argv)
     // second argument.
     TensegrityModel* const myModel = new TensegrityModel(argv[1],true);
 
-    // Attach a controller to the model, if desired.
-    // This is a controller that interacts with a generic TensegrityModel as
-    // built by the TensegrityModel file, BUT it only actually works
-    // with the specific HorizontalSpine YAML file.
-    // @TODO: should this throw an error when attached to a model that
-    // wasn't built with the HorizontalSpine YAML file?
-
-    // Parameters for the Horizontal Spine Controller are specified in that .h file,
-    // repeated here:
-    double startTime = 5.0;
-    double minLength = 0.8;
-    double rate = 0.25;
-    std::vector<std::string> tagsToControl;
-    // HF is the right horizontal set
-    // HL is the bottom horizontal set maybe?
-    // HB is the left horizontal set
-    // HR is the top horizontal set.
-    // BUT, something is wrong here. Probably Bullet's numerical problems.
-    tagsToControl.push_back("HR");
-    tagsToControl.push_back("testnone");
-    //tagsToControl.push_back("HF");
-    //tagsToControl.push_back("HB");
-    // Call the constructor for the controller
-    //CombinedSpineControllerBending* const controller =
-    //  new CombinedSpineControllerBending(startTime, minLength, rate, tagsToControl);
-    // Attach the controller to the model. Must happen before running the
-    // simulation.
-    //myModel->attach(controller);
-
-    // Next, we need to get a reference to the Bullet Physics world.
-    // This is for passing in to the CombinedSpineControllerRotVertPositionTraj, so it can
-    // create the hinge.
-    // TO-DO: does this reference get destroyed and re-created?? this will break...
-    tgWorld simWorld = simulation.getWorld();
-    tgWorldImpl& impl = world.implementation();
-    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
-    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
-
-    // Create the controller for the rotating vertebra.
-    double startTimeRot = 4.0;
-    //double startTimeRot = 6.0;
-    // For the single set point:
-    //double setAngle = 0.5; // radians
-    // a test: can we do a whole 90 degree rotation?
-    //double setAngle = 1.6;
-    // hehehe it works but the Laika model explodes.
-
-    // For the trajectory tracking: need a CSV file.
-    // Drew copied one in here - TO DO, make more general.
-    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_example_dt01_tt_50.csv";
-    std::string rodHingeTag = "rodForHinge";
-    CombinedSpineControllerRotVertPositionTraj* rotController =
-      new CombinedSpineControllerRotVertPositionTraj( startTimeRot, csvPath,
-						  rodHingeTag, btWorld);
-
-    // Add the controller to the YAML model.
-    // TO-DO: can we do this after adding the model to the simulation?
-    // Will the controller's onSetup method still be
-    myModel->attach( rotController );
-
     // Add the model to the world
     simulation.addModel(myModel);
 
     // Let's log info from the spheres (bottom of Laika's feet.)
     // has to end with the prefix to the log file name.
-    std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";
+    std::string log_filename = "~/NTRTsim_logs/CompoundSensorDebugDemo";
     double samplingTimeInterval = 0.1;
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     // add the model to the data logger
@@ -166,9 +98,9 @@ int main(int argc, char** argv)
     // Make it so the data logger can dispatch sphere sensors
     tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
-    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
     myDataLogger->addSensorInfo(mySphereSensorInfo);
-    //myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
     simulation.addDataManager(myDataLogger);
     

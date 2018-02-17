@@ -4,5 +4,6 @@ Project(apsabelhaus)
 subdirs(
   groundforcesensor_demo
   tgBoxAnchorDebugDemo
+  tgCompoundSensorDebugDemo
 )
 

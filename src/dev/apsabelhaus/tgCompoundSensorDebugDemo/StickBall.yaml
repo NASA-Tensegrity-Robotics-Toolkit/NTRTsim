@@ -6,26 +6,26 @@
 nodes:
   # Second vertex is the endpoint. 
   # Seemed to be about 30 units down.
-  legtop: [0, 0, 0]
-  endpointA: [0, -30, 0]
+  # moved upward for demo.
+  legtop: [0, 30, 0]
+  endpoint: [0, 0, 0]
 
 pair_groups:
-  legBoxA:
-    - [legtop, endpointA]
+  legrod:
+    - [legtop, endpoint]
 
 builders:
 
-  # box
-  legBoxA:
-    class: tgBoxInfo
+  # rod
+  legrod:
+    class: tgRodInfo
     parameters:
-      density: 0.1 # was 0.014, 0.001
-      width: 3
-      height: 0.5
+      density: 0.1 # was 0.014
+      radius: 1
 
   # Spheres are created according to node names.
-  endpointA:
+  endpoint:
     class: tgSphereInfo
     parameters:
-      density: 0.001
+      density: 0.1
       radius: 3

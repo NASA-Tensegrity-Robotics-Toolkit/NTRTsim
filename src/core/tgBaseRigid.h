@@ -100,6 +100,14 @@ protected:
      * The Bullet Physics implementation of the rod.
      */
     btRigidBody* m_pRigidBody;
+
+    /**
+     * For compound rigids, the rigid body pointer might be pointing
+     * to the compound shape. But, for data logging, we really want
+     * the center of mass of the individual shape instead.
+     * So, store, in addition, a pointer to the original btRigidBody of just
+     * this rigid.
+     */
     
     /** The rod's mass. The units are application dependent. */
     const double m_mass;

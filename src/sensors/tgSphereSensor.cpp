@@ -41,6 +41,7 @@
 
 // Includes from Bullet Physics:
 #include "LinearMath/btVector3.h"
+#include "btBulletDynamicsCommon.h" //for collision shapes etc.
 
 /**
  * This class is a sensor for tgSpheres.
@@ -134,6 +135,63 @@ std::vector<std::string> tgSphereSensor::getSensorData() {
   btVector3 com = m_pSphere->centerOfMass();
   // Note that the 'orientation' method also returns a btVector3.
 
+  //DEBUGGING.
+  // Technically, the COM here is of the whole compound rigid.
+  // Let's try to change that.
+  // We'll pick out the collision shape from Bullet, which (if it's compound,)
+  // should have a list of the sub-collision shapes.
+  // TO-DO: can we get the transforms (world positions) of the individual
+  // sub-shapes? Was looking into Bullet's library and it seems the child
+  // shapes of a compound have transforms. Although... might be local
+  // transforms with respect to the local frame?
+
+  //DEBUGGING
+  // Pick out the rigid body, then the collision shape, then cast to a compound
+  // collision shape, then for each shape, print out some debugging info
+  // about it. Do both have the same COM? Origin?
+  /*
+  std::cout << "Inside tgSphereSensor, pick out the multiple shapes, "
+	    << "and return their origins." << std::endl;
+  btCollisionShape* wholeShape = m_pSphere->getPRigidBody()->getCollisionShape();
+  // Cast to a compound shape
+  btCompoundShape* wholeShapeCompound =
+    tgCast::cast<btCollisionShape, btCompoundShape>(wholeShape);
+  std::cout << "Compound shape has " << wholeShapeCompound->getNumChildShapes()
+	    << " child shapes. Each compound has origin: " << std::endl;
+  for(int jj=0; jj < wholeShapeCompound->getNumChildShapes(); jj++){
+    btCollisionShape* individualShape = wholeShapeCompound->getChildShape(jj);
+    std::cout << individualShape->getName() << std::endl;
+    
+  }
+  
+  
+  //DEBUGGING
+  // Let's see what the local supporting vertex (?) is for each shape.
+
+  // HACK BAD: sphere seems to be the first element, cylinder second,
+  // in Drew's demo file. This *will* segfault anywhere else.
+  //btCylinderShape* cylinder =
+  //  tgCast::cast<btCollisionShape, btCylinderShape>(wholeShapeCompound->getChildShape(1));
+  //std::cout << "Cylinder support: " << cylinder->localGetSupportingVer
+  
+  for(int i=0; i < wholeShapeCompound->getNumChildShapes(); i++){
+    // Get the rotation matrix (basis?)
+    btTransform trans = wholeShapeCompound->getChildTransform(i);
+    btMatrix3x3 basis = trans.getBasis();
+    //btMatrix3x3& basis = wholeShapeCompound->getChildTransform(i).getBasis();
+    //btQuaternion rotationi = wholeShapeCompound->getChildTransform(i).getRotation();
+    // Display all its rows. It's 3x3.
+    for(int j=0; j<3; j++){
+      // For some reason, getColumn returns a btvector3, but getRow returns
+      // a btVector3&.
+      std::cout << j << ",, ";
+      std::cout << basis[j] << ", " << std::endl;
+    }
+    //std::cout << rotationi.getAxis();
+    std::cout << (*trans.getOrigin()) << std::endl;
+  }
+  */
+  
   // The list of sensor data that will be returned:
   std::vector<std::string> sensordata;
 
