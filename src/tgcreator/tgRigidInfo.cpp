@@ -107,8 +107,8 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
             if (rigid->getRigidBody() == NULL) { // Init only if it doesn't have a btRigidBody (has already been initialized)
 
 	      //DEBUGGING
-	      std::cout << "Inside tgRigidInfo, initializing a rigid body with tags "
-			<< rigid->getTags() << std::endl;
+	      //std::cout << "Inside tgRigidInfo, initializing a rigid body with tags "
+	      //		<< rigid->getTags() << std::endl;
 	      // OK, by here, we're already a single rigid body, compounded
 	      // together already. E.g., collision shape is already defined,
 	      // by StructureInfo? StructureInfo assigns m_rigidInfoGroup?

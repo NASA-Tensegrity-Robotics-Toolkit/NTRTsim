@@ -37,6 +37,7 @@
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
 #include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -99,8 +100,10 @@ int main(int argc, char** argv)
     tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
     tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgCompoundRigidSensorInfo* myCompoundSensorInfo = new tgCompoundRigidSensorInfo();
     myDataLogger->addSensorInfo(mySphereSensorInfo);
     myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(myCompoundSensorInfo);
     // Add the data logger to the simulation.
     simulation.addDataManager(myDataLogger);
     

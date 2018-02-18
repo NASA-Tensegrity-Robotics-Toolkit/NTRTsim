@@ -29,6 +29,7 @@ substructures:
     translation: [ -2, 45.5, 8]
   hips:
     path: ../BaseStructuresLaika/SimpleLaika/SimpleRear.yaml
+    # used to be SimpleRear.
     translation: [10, 45.5, 8]
   front:
     path: ../BaseStructuresLaika/SimpleLaika/SimpleFront.yaml

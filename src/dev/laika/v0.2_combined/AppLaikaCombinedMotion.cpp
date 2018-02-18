@@ -142,7 +142,9 @@ int main(int argc, char** argv)
 
     // For the trajectory tracking: need a CSV file.
     // Drew copied one in here - TO DO, make more general.
-    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_example_dt01_tt_50.csv";
+    //std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_example_dt01_tt_50.csv";
+    // For the more realistic ramp:
+    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
     std::string rodHingeTag = "rodForHinge";
     CombinedSpineControllerRotVertPositionTraj* rotController =
       new CombinedSpineControllerRotVertPositionTraj( startTimeRot, csvPath,
@@ -166,9 +168,9 @@ int main(int argc, char** argv)
     // Make it so the data logger can dispatch sphere sensors
     tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
-    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
     myDataLogger->addSensorInfo(mySphereSensorInfo);
-    //myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
     simulation.addDataManager(myDataLogger);
     

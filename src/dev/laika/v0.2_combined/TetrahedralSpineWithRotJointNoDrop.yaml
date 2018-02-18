@@ -1,0 +1,9 @@
+# move the robot downward so it doesn't drop
+# at the initial time. Also correct for weird
+# math that was previously needed to move the robot onto
+# the force plates (thank god we don't need those anymore.)
+substructures:
+  SpineNoDrop:
+    path: ./TetrahedralSpineWithRotJoint.yaml
+    translation: [0, -10.5, -8]
+
