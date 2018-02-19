@@ -21,11 +21,11 @@ builders:
     class: tgRodInfo
     parameters:
       density: 0.1 # was 0.014
-      radius: 1
+      radius: 2
 
   # Spheres are created according to node names.
   endpoint:
     class: tgSphereInfo
     parameters:
-      density: 0.1
-      radius: 3
+      density: 1
+      radius: 0.2

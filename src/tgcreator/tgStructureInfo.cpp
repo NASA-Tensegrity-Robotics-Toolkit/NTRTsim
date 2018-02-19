@@ -318,13 +318,39 @@ void tgStructureInfo::buildIntoHelper(tgModel& model, tgWorld& world,
     for (std::size_t i = 0; i < rigids.size(); i++)
     {
         tgRigidInfo * const pRigidInfo = rigids[i];
-    assert(pRigidInfo != NULL);
+	assert(pRigidInfo != NULL);
+	//DEBUGGING. Want to see if, here, we can get the nodes for a rigid info.
+	// Goal would then be to pass that into the tgModel itself, so tgModels
+	// can have a reference to the nodes in their local coordinate frames.
+	// This will later let us add abstract markers to tgModels automatically(?)
+	std::cout << "Inside tgStructureInfo::buildIntoHelper, nodes are: "
+		  << std::endl;
+	std::set<btVector3> containedNodes = pRigidInfo->getContainedNodes();
+	std::set<btVector3>::iterator it;
+	for (it = containedNodes.begin(); it != containedNodes.end(); ++it) {
+	    btVector3 n = *it; // need to dereference the iterator
+	    std:: cout << n << ", " << std::endl;
+	}
+	// GREAT! We can get the nodes! Let's see if we can give them to
+	// the tgModel that's then created.
         tgModel* const pModel = pRigidInfo->createModel(world);
-        if (pModel != NULL)
-    {
-        pModel->setTags(pRigidInfo->getTags());
-            model.addChild(pModel);
+        if (pModel != NULL){
+	  pModel->setTags(pRigidInfo->getTags());
+	  // Now with nodes too. Pass in a pointer/address.
+	  pModel->setLocalNodes(containedNodes);
+	  model.addChild(pModel);
         }
+	//MORE DEBUGGING
+	std::cout << "Inside tgStructureInfo::buildIntoHelper, again, nodes are: "
+		  << std::endl;
+	std::set<btVector3> containedNodesAgain = pRigidInfo->getContainedNodes();
+	//std::set<btVector3>::iterator it;
+	for (it = containedNodesAgain.begin(); it != containedNodesAgain.end(); ++it) {
+	    btVector3 n = *it; // need to dereference the iterator
+	    std:: cout << n << ", " << std::endl;
+	    //DEBUGGING
+	    pModel->setLocalNode(n);
+	}
     }
     
     const std::vector<tgConnectorInfo*> connectors = structureInfo.getConnectors();

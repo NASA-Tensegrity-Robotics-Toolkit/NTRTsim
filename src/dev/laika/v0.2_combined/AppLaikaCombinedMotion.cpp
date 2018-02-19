@@ -35,6 +35,7 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+#include "core/abstractMarker.h"
 // For tracking positions:
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
@@ -158,6 +159,22 @@ int main(int argc, char** argv)
     // Add the model to the world
     simulation.addModel(myModel);
 
+    // Let's try to add markers at the feet.
+    std::cout << "getting the rigid body for front: " << std::endl;
+    std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersBack");
+    for(int jj=0; jj < frontRigids.size(); jj++) {
+      std::cout << frontRigids[jj]->centerOfMass() << std::endl;
+    }
+    // Add a marker in the global world. Subtract away the COM of the rigid
+    // body, since markers seemed to be referenced against tha
+    //btVector3 offsetFootA(0, 0, 0);
+    // Feet are at ( -33 / +25, 5, +/- 15)
+    btVector3 offsetFootA(-33, 5, 15);
+    abstractMarker marker2(frontRigids[0]->getPRigidBody(),
+			   offsetFootA - frontRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
+			   btVector3(0, 1, 1), 0);
+    myModel->addMarker(marker2);
+	   
     // Let's log info from the spheres (bottom of Laika's feet.)
     // has to end with the prefix to the log file name.
     std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";

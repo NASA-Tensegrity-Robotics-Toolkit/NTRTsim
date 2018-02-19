@@ -38,12 +38,15 @@
 #include "sensors/tgSphereSensorInfo.h"
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgCompoundRigidSensorInfo.h"
+#include "core/abstractMarker.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 #include <string>
 #include <vector>
+// For manipulating the set of nodes:
+#include <set>
 
 /**
  * The entry point.
@@ -88,6 +91,36 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
+
+    //DEBUGGING
+    // Let's see if we can add abstract markers to each of the nodes.
+    std::vector<tgBaseRigid*> all_rigids = tgCast::filter<tgModel, tgBaseRigid>(myModel->getDescendants());
+    std::cout << "Number of rigid bodies in model: "
+	      << all_rigids.size() << std::endl;
+    // Great, we have all the rigids from the model. Let's see if we can get
+    // all the nodes.
+    // Maybe we have to iterate over all the model descendants?
+    std::set<btVector3> modelNodes = myModel->getLocalNodes();
+    // and print them out.
+    std::cout << "In app, we got " << modelNodes.size() << " nodes." << std::endl;
+    std::set<btVector3>::iterator it;
+    for (it = modelNodes.begin(); it != modelNodes.end(); ++it) {
+      btVector3 n = *it; // need to dereference the iterator
+      std::cout << n << ", " << std::endl;
+    }
+    // hmm. Something bad with pointers. Let's try for the markers manually.
+    btVector3 offset(5,5,0);
+    abstractMarker marker1(all_rigids[0]->getPRigidBody(),
+			   all_rigids[0]->getPRigidBody()->getCenterOfMassPosition() + offset,
+			   btVector3(1, 1, 1), 0);
+    myModel->addMarker(marker1);
+    // Let's do another one, in the global world. Subtract away the COM of the rigid
+    // body, since markers seemed to be referenced against tha
+    btVector3 offset2(0, 0, 0);
+    abstractMarker marker2(all_rigids[1]->getPRigidBody(),
+			   offset2 - all_rigids[0]->getPRigidBody()->getCenterOfMassPosition(),
+			   btVector3(0, 1, 1), 0);
+    myModel->addMarker(marker2);
 
     // Let's log info from the spheres (bottom of Laika's feet.)
     // has to end with the prefix to the log file name.

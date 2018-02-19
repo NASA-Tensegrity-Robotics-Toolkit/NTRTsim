@@ -28,4 +28,4 @@ builders:
     class: tgSphereInfo
     parameters:
       density: 0.001
-      radius: 3
+      radius: 0.2
