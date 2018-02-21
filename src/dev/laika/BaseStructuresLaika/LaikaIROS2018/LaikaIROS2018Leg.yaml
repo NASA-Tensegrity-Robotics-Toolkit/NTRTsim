@@ -1,0 +1,35 @@
+# This YAML file has two parts:
+# (1) Leg box, single leg, local frame is at top of leg
+# (2) foot, which is a "sphere" approxed in place of a "rod" since it's easier
+# to align the nodes that way.
+
+nodes:
+  # First vertex is at origin, allows for easy attachment to hips.
+  legtop: [0, 0, 0]
+  # no translation in X or "Z", perfectly in the "Y" plane.
+  # Legs are 22.1cm from top to full bottom, so we need to subtract
+  # away half the top height (to align the legtop node with the hips)
+  # and the foot radius (to align legboxend with foot.)
+  # 22.1 - (6/2) - 1.25
+  legboxend: [0, -17.85, 0]
+  # Instead of a rod, put a sphere with the same radius, at legboxend.
+
+pair_groups:
+  legBox:
+    - [legtop, legboxend]
+
+builders:
+  # Let's do the box for the leg.
+  # It's 0.3 cm thick (in X) and 2.5 cm wide (in Y.)
+  legBox:
+    class: tgBoxInfo
+    parameters:
+      density: 0.001 # CHANGE THIS!
+      width: 0.3
+      height: 1.25
+  # Also need a sphere. Created according to node names, not groups.
+  legboxend:
+    class: tgSphereInfo
+    parameters:
+      density: 0.001 # CHANGE THIS!
+      radius: 1.25
