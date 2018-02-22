@@ -1,0 +1,40 @@
+# Two boxes that will connect the legs to the vertebrae. (Shoulders.)
+# We'll do it as a "T" shape.
+# Center of shoulders at origin.
+# For shoulders, all directions are -X.
+
+nodes:
+  # where the vertebrae will be connected.
+  vertConnect: [0, 0, 0]
+  # the endpoint of the bottom of the "T". Measured 12.6cm to center of wood.
+  shoulderEnd: [-12.6, 0, 0]
+  # connecting each of the two legs.
+  # This will be the shoulders, so leg A will be the front right, D left.
+  # displacement left/right is 17.6/2 - (leg width/2), 7.55
+  legAconnect: [-12.6, 0, 7.55]
+  legBconnect: [-12.6, 0, -7.55]
+
+pair_groups:
+  # We do 3 boxes, one for each section of the T.
+  shouldersVertConnect:
+    - [vertConnect, shoulderEnd]
+  shouldersABconnect:
+    - [shoulderEnd, legAconnect]
+    - [shoulderEnd, legBconnect]
+
+builders:
+  # each part might have different dimensions because of box orientation
+  # issues. See issue on github for automatic box orientation selection prob.
+  shouldersVertConnect:
+    class: tgBoxInfo
+    parameters:
+      width: 3.5 # 7 in +/- Y, total
+      height: 3.0 # 6 in +/- Z, total
+      density: 0.001 # CHANGE THIS!
+  shouldersABconnect:
+    class: tgBoxInfo
+    parameters:
+      width: 0.3 # wood thickness
+      height: 3.0 # same as shoulder box
+      density: 0.001 # CHANGE THIS!
+
