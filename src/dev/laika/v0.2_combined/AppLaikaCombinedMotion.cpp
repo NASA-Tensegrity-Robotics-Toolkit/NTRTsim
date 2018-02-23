@@ -172,15 +172,43 @@ int main(int argc, char** argv)
     // For TetrahedralSpineWithRotVert:
     //std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersBack");
     // For LaikaIROS2018:
+
+    // For the front (feet A/B):
     std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersVertConnect");
+    if( frontRigids.size() == 0){
+      std::cout << "Warning! Did not find any rigids to put markers on!" << std::endl;
+    }
     for(int jj=0; jj < frontRigids.size(); jj++) {
-      std::cout << frontRigids[jj]->centerOfMass() << std::endl;
+      std::cout << "Picked out a front rigid with com: "
+		<< frontRigids[jj]->centerOfMass() << std::endl;
+    }
+    
+    // For the rear (feet C/D):
+    std::cout << "getting the rigid body for rear: " << std::endl;
+    std::vector<tgBaseRigid*> rearRigids = myModel->find<tgBaseRigid>("hipsVertConnect");
+    if( rearRigids.size() == 0){
+      std::cout << "Warning! Did not find any rigids to put markers on!" << std::endl;
+    }
+    for(int jj=0; jj < rearRigids.size(); jj++) {
+      std::cout << "Picked out a rear rigid with com: "
+		<< rearRigids[jj]->centerOfMass() << std::endl;
     }
     // Add a marker in the global world. Subtract away the COM of the rigid
     // body, since markers seemed to be referenced against tha
     //btVector3 offsetFootA(0, 0, 0);
-    // Feet are at ( -33 / +25, 5, +/- 15)
-    btVector3 offsetFootA(-33, 5, 15);
+    // For the generic TetrahedralSpineWithRotJoint, feet are at
+    // ( -33 / +25, 5, +/- 15)
+    // For the Laika IROS 2018 model, in cm, feet are at: (0 for hips)
+    // quick calculation: front X is -52.201, -12.6 for leg offset, = -64.801
+    // ( 0 / -64.801 , 1.5, +/- 7.55)
+    
+    //btVector3 offsetFootA(-33, 5, 15);
+    // Foot A/B at -x. Foot B/C at -y. (front is -x, right is -y.)
+    btVector3 offsetFootA( -64.801, 1.5, -7.55);
+    btVector3 offsetFootB( -64.801, 1.5, 7.55);
+    btVector3 offsetFootC( 0, 1.5, -7.55);
+    btVector3 offsetFootD( 0, 1.5, 7.55);
+
     abstractMarker marker2(frontRigids[0]->getPRigidBody(),
 			   offsetFootA - frontRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
 			   btVector3(0, 1, 1), 0);

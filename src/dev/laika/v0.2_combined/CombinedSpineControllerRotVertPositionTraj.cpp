@@ -324,9 +324,9 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     // First, control constants. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
     // is on the order of 0.2. So maybe a K_P of 5 or 10?
-    double K_P = 50; // 50 worked, but lots of overshoot. Was 1000.
+    double K_P = 1000; // 50 worked, but lots of overshoot. Was 1000.
     // a really small constant for integral control worked best.
-    double K_I = 0.05; // was 0.5
+    double K_I = 0.5; // was 0.5
 
     // Calculate the new torque we want to apply, - K * (x - x_ref)... with I term.
     // we've arbitrarily choosen torques to be negative?
@@ -341,7 +341,7 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     btVector3 controlledTorque( controlInput, 0, 0);
     //DEBUGGING: what's the error that we're controlling around?
     // Need to develop a control such that this trends to zero.
-    std::cout << "Rotating vertebra tracking control error: " << error << std::endl;
+    //std::cout << "Rotating vertebra tracking control error: " << error << std::endl;
     // it would be interesting to plot this.
     // torque, aligned with the world, referenced against rod A.
     // (choice is arbitrary, since we can just do +/- switching A to B.)
