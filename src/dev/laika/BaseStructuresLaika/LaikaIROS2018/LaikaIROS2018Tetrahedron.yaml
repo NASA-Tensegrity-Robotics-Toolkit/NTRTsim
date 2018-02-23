@@ -9,12 +9,14 @@
 # be the second parameter.
 # NOTE that "X" is positive to the left, ugh. We're switching that so that the "X"
 # axis points to the right, like normal people. All X switched from matlab calcs.
+# ALSO, "Y" positive goes "backward/into the page", not towards the viewer. So, we
+# also switch the right/left from the MATLAB calculations.
 nodes:
   center: [0, 0, 0]
   top: [-6.5, 9.6, 0]
   bottom: [-6.5, -9.6, 0]
-  right: [6.5, 0, 9.6]
-  left: [6.5, 0, -9.6]
+  right: [6.5, 0, -9.6]
+  left: [6.5, 0, 9.6]
 
 pair_groups:
   tetraRod:
@@ -29,5 +31,5 @@ builders:
   tetraRod:
     class: tgRodInfo
     parameters:
-      density: 0
+      density: 0.014
       radius: 0.64

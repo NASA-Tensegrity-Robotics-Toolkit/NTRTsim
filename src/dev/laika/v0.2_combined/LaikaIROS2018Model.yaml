@@ -8,6 +8,10 @@
 
 # NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
 # (ground is not at origin.) So, that's 19.35 + 1.5 = 19.35
+
+# TO-DO: switch around the labelling of foot ABCD, since Y has to be switched
+# same as +/- X. E.g, front-right foot is actually at -x, -y.
+
 substructures:
   rear:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Rear.yaml
@@ -35,37 +39,103 @@ substructures:
     # Translation is directly at the center of t5.
     translation: [-52.201, 19.35, 0]
 
-# Rod radius reduced to half for tests at 0.5 scale.
-# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
-# 1.62 * 9.81 = 15.9 N
-# Rod density changed from 0.014 to 0.0044.
-# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
-# (was either 1000 or 5000)
-# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
-# (was 5000)
-# Lowered friction from 1 to 0.5.
+# Define the cables.
+# Here, we'll use HT, HR, HB, HL to mean the horizontal cables
+# across each of the top, right, bottom, and left respectively.
+# The saddles are similarly named: SBL means saddle, connecting bottom to left.
 
-# TO-DO: IS rod USED ANYMORE, ANYWHERE?
-builders: 
-  rod:
-    class: tgRodInfo
-    parameters:
-      density: 0.01 # was 0.0044
-      radius: 0.25
-      friction: 0.5
-      roll_friction: 0.5
+###########################
+bond_groups:
+
+  # Horizontal cables:
+  HT:
+   t1/t2/node_node:
+     - [top, top]
+   t4/t5/node_node:
+     - [top, top]
+   t2/rotVert/node_node:
+     - [top, topB]
+   rotVert/t4/node_node:
+     - [topB, top]
+
+  HB:
+   t1/t2/node_node:
+     - [bottom, bottom]
+   t4/t5/node_node:
+     - [bottom, bottom]
+   t2/rotVert/node_node:
+     - [bottom, bottomB]
+   rotVert/t4/node_node:
+     - [bottomB, bottom]
 
   HR:
-    class: tgBasicActuatorInfo
-    parameters:
-      stiffness: 1000.0 # was 1000
-      damping: 100.0 # was 100
-      pretension: 20.0 # was 20
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
+   t1/t2/node_node:
+     - [right, right]
+   t4/t5/node_node:
+     - [right, right]
+   t2/rotVert/node_node:
+     - [right, rightA]
+   rotVert/t4/node_node:
+     - [rightA, right]
 
-  HF:
+  HL:
+   t1/t2/node_node:
+     - [left, left]
+   t4/t5/node_node:
+     - [left, left]
+   t2/rotVert/node_node:
+     - [left, leftA]
+   rotVert/t4/node_node:
+     - [leftA, left]
+
+  # Saddle cables:
+  STR:
+   t1/t2/node_node:
+     - [top, right]
+   t4/t5/node_node:
+     - [top, right]
+   t2/rotVert/node_node:
+     - [top, rightA]
+   rotVert/t4/node_node:
+     - [topB, right]
+
+  STL:
+   t1/t2/node_node:
+     - [top, left]
+   t4/t5/node_node:
+     - [top, left]
+   t2/rotVert/node_node:
+     - [top, leftA]
+   rotVert/t4/node_node:
+     - [topB, left]
+
+  SBR:
+   t1/t2/node_node:
+     - [bottom, right]
+   t4/t5/node_node:
+     - [bottom, right]
+   t2/rotVert/node_node:
+     - [bottom, rightA]
+   rotVert/t4/node_node:
+     - [bottomB, right]
+
+  SBL:
+   t1/t2/node_node:
+     - [bottom, left]
+   t4/t5/node_node:
+     - [bottom, left]
+   t2/rotVert/node_node:
+     - [bottom, leftA]
+   rotVert/t4/node_node:
+     - [bottomB, left]
+
+# Define the cable parameters
+
+#############################
+builders:
+
+  # Horizontal cables:
+  HT:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1000.0
@@ -76,6 +146,16 @@ builders:
       target_velocity: 12.0
 
   HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      
+  HR:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1000.0
@@ -95,16 +175,18 @@ builders:
       max_tension: 70000.0
       target_velocity: 12.0
 
-  SFR:
+  # Saddle cables:
+  STR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226 # was 1226
+      stiffness: 1226
       damping: 100.0
       pretension: 0.0
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
-  SRL:
+      
+  STL:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1226
@@ -114,7 +196,7 @@ builders:
       max_tension: 70000.0
       target_velocity: 12.0
 
-  SBF:
+  SBR:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1226.0

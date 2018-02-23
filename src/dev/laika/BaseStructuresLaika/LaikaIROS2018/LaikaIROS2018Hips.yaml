@@ -10,8 +10,8 @@ nodes:
   # connecting each of the two legs.
   # This will be the hips, so leg C will be the back right, D left.
   # displacement left/right is 17.6/2 - (leg width/2), 7.55
-  legCconnect: [12.6, 0, 7.55]
-  legDconnect: [12.6, 0, -7.55]
+  legCconnect: [12.6, 0, -7.55]
+  legDconnect: [12.6, 0, 7.55]
 
 pair_groups:
   # We do 3 boxes, one for each section of the T.

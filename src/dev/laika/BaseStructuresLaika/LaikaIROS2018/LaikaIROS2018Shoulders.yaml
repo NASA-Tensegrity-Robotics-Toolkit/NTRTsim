@@ -11,8 +11,8 @@ nodes:
   # connecting each of the two legs.
   # This will be the shoulders, so leg A will be the front right, D left.
   # displacement left/right is 17.6/2 - (leg width/2), 7.55
-  legAconnect: [-12.6, 0, 7.55]
-  legBconnect: [-12.6, 0, -7.55]
+  legAconnect: [-12.6, 0, -7.55]
+  legBconnect: [-12.6, 0, 7.55]
 
 pair_groups:
   # We do 3 boxes, one for each section of the T.

@@ -27,5 +27,5 @@ builders:
   rodForHingeB:
     class: tgRodInfo
     parameters:
-      density: 0.0 # was 0.014
+      density: 0.014 # was 0.014
       radius: 3
