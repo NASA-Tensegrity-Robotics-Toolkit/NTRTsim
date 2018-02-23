@@ -9,21 +9,22 @@
 # NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
 # (ground is not at origin.) So, that's 19.35 + 1.5 = 19.35
 
-# Converted to cm.
+# TO-DO: switch around the labelling of foot ABCD, since Y has to be switched
+# same as +/- X. E.g, front-right foot is actually at -x, -y.
 
 substructures:
   rear:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Rear.yaml
-    translation: [-0.126, 0.1935, 0]
+    translation: [-12.6, 19.35, 0]
   t1/t2:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
-    translation: [-0.126, 0.1935, 0]
-    offset: [-0.099, 0, 0]
+    translation: [-12.6, 19.35, 0]
+    offset: [-9.9, 0, 0]
   rotVert:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018RotVert.yaml
     # The translation for the rotating vertebra is t1 translation plus
     # two offsets.
-    translation: [-0.324, 0.1935, 0]
+    translation: [-32.4, 19.35, 0]
   t4/t5:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
     # Translation is rotVert plus one offset.
@@ -31,12 +32,12 @@ substructures:
     # the hips if the intersection is exactly 52.3. Who knows why or how
     # this is happening. Hack for now is to make a slight offset.
     # This probably means there's a pointer problem somewhere.
-    translation: [-0.42301, 0.1935, 0]
-    offset: [-0.099, 0, 0]
+    translation: [-42.301, 19.35, 0]
+    offset: [-9.9, 0, 0]
   front:
     path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Front.yaml
     # Translation is directly at the center of t5.
-    translation: [-0.52201, 0.1935, 0]
+    translation: [-52.201, 19.35, 0]
 
 # Define the cables.
 # Here, we'll use HT, HR, HB, HL to mean the horizontal cables
@@ -139,7 +140,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 1.04
+      pretension: 104
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -149,7 +150,7 @@ builders:
     parameters:
       stiffness: 291
       damping: 100.0
-      pretension: 4.65
+      pretension: 465
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -159,7 +160,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 0.69
+      pretension: 69
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -169,7 +170,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 0.69
+      pretension: 69
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -180,7 +181,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 9.04
+      pretension: 904
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -190,7 +191,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 9.04
+      pretension: 904
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -200,7 +201,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 9.04
+      pretension: 904
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -210,7 +211,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 9.04
+      pretension: 904
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0

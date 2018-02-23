@@ -2,18 +2,16 @@
 # We'll do it as a "T" shape.
 # Center of hips at origin.
 
-# Converted to meters.
-
 nodes:
   # where the vertebrae will be connected.
   vertConnect: [0, 0, 0]
   # the endpoint of the bottom of the "T". Measured 12.6cm to center of wood.
-  shoulderEnd: [0.126, 0, 0]
+  shoulderEnd: [12.6, 0, 0]
   # connecting each of the two legs.
   # This will be the hips, so leg C will be the back right, D left.
   # displacement left/right is 17.6/2 - (leg width/2), 7.55
-  legCconnect: [0.126, 0, -0.0755]
-  legDconnect: [0.126, 0, 0.0755]
+  legCconnect: [12.6, 0, -7.55]
+  legDconnect: [12.6, 0, 7.55]
 
 pair_groups:
   # We do 3 boxes, one for each section of the T.
@@ -29,13 +27,13 @@ builders:
   hipsVertConnect:
     class: tgBoxInfo
     parameters:
-      width: 0.035 # 7 in +/- Y, total
-      height: 0.03 # 6 in +/- Z, total
-      density: 299 # From matlab calculations
+      width: 3.5 # 7 in +/- Y, total
+      height: 3.0 # 6 in +/- Z, total
+      density: 0.0003 # From matlab calculations
   hipsCDconnect:
     class: tgBoxInfo
     parameters:
-      width: 0.003 # wood thickness
-      height: 0.03 # same as shoulder box
-      density: 299 # From matlab calculations
+      width: 0.3 # wood thickness
+      height: 3.0 # same as shoulder box
+      density: 0.0003 # From matlab calculations
 

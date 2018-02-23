@@ -140,17 +140,23 @@ x0_else = 9.5;
 
 % At equilibrium, with Laika standing, here were the "stretched" lengths
 % of each cable: (in cm, measured with calipers)
-x_saddle = 14.7;
-x_top = 10.1;
-x_sides = 9.9;
-x_bottom = 9.4;
+x_saddle_cm = 14.7;
+x_top_cm = 10.1;
+x_sides_cm = 9.9;
+x_bottom_cm = 9.4;
 
 % Then, as we'll be doing F = k (x - x0), the total stretched length (x-x0)
 % for each will be:
-stretch_saddle = x_saddle - x0_else;
-stretch_top = x_top - x0_else;
-stretch_sides = x_sides - x0_else;
-stretch_bottom = x_bottom - x0_bottom;
+stretch_saddle_cm = x_saddle_cm - x0_else;
+stretch_top_cm = x_top_cm - x0_else;
+stretch_sides_cm = x_sides_cm - x0_else;
+stretch_bottom_cm = x_bottom_cm - x0_bottom;
+
+% Need to convert these to meters.
+stretch_saddle_m = stretch_saddle_cm * (1/s);
+stretch_top_m = stretch_top_cm * (1/s);
+stretch_sides_m = stretch_sides_cm * (1/s);
+stretch_bottom_m = stretch_bottom_cm * (1/s);
 
 % From the spreadsheet, here are the spring constants for each segment.
 % Thicknesses are: 
@@ -162,21 +168,22 @@ k_else = 174;
 
 % Then, we can calculate "pretension", which is F = k * stretch
 % for each cable. E.g., we're placing Laika in its equilibrium
-% configuration at the start of the simulation.
-F_saddle = k_else * stretch_saddle;
-F_top = k_else * stretch_top;
-F_sides = k_else * stretch_sides;
-F_bottom = k_bottom * stretch_bottom;
+% configuration at the start of the simulation. In N.
+F_saddle = k_else * stretch_saddle_m;
+F_top = k_else * stretch_top_m;
+F_sides = k_else * stretch_sides_m;
+F_bottom = k_bottom * stretch_bottom_m;
 
 % And just to record it here, the offset between the vertebrae should
 % roughly be the same as the horizontal distance between two vertebrae
 % nodes, as in
-offset = x_sides;
+offset = x_sides_cm;
 
 % According to our earlier dimensional analysis,
 % we've got to scale pretension force by the same quantity as gravity and
 % lengths.
-% Here, we're working in centimeters, so forces then become:
+% Roughly, this is the same as if we just used cm in the stretch
+% originally.
 F_saddle_adj = F_saddle * s;
 F_top_adj = F_top * s;
 F_sides_adj = F_sides * s;

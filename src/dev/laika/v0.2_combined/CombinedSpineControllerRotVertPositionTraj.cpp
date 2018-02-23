@@ -324,9 +324,9 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     // First, control constants. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
     // is on the order of 0.2. So maybe a K_P of 5 or 10?
-    double K_P = 1000; // 50 worked, but lots of overshoot.
+    double K_P = 50; // 50 worked, but lots of overshoot. Was 1000.
     // a really small constant for integral control worked best.
-    double K_I = 0.5;
+    double K_I = 0.05; // was 0.5
 
     // Calculate the new torque we want to apply, - K * (x - x_ref)... with I term.
     // we've arbitrarily choosen torques to be negative?

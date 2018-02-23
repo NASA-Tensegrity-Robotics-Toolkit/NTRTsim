@@ -11,7 +11,7 @@ nodes:
   # away half the top height (to align the legtop node with the hips)
   # and the foot radius (to align legboxend with foot.)
   # 22.1 - (6/2) - 1.25
-  legboxend: [0, -0.1785, 0]
+  legboxend: [0, -17.85, 0]
   # Instead of a rod, put a sphere with the same radius, at legboxend.
 
 pair_groups:
@@ -24,12 +24,12 @@ builders:
   legBox:
     class: tgBoxInfo
     parameters:
-      density: 299 # From matlab calculations
-      width: 0.003
-      height: 0.0125
+      density: 0.0003 # From matlab calculations
+      width: 0.3
+      height: 1.25
   # Also need a sphere. Created according to node names, not groups.
   legboxend:
     class: tgSphereInfo
     parameters:
-      density: 299 # From matlab calculations
-      radius: 0.0125
+      density: 0.0003 # From matlab calculations
+      radius: 1.25

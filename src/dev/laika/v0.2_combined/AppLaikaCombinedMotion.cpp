@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     // passed in.
     if (argv[1] == NULL)
     {
-      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you would like to build.");
     }
   
     // create the ground and world. Specify ground rotation in radians
@@ -77,7 +77,15 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(98.1); // gravity, dm/sec^2
+    // We're working in centimeters, so scaling factor = 100.
+    const tgWorld::Config config(98.1); // gravity, dm/sec^2 is 98.1.
+    // As of the commit when this comment appears, the units are still
+    // a bit off. Gravity and cable force are still with s=10 (decimeters
+    // and 1/10 factor on pretensions), but the length and density
+    // units are for s=100 (centimeters).
+    // Drew believes this is still kinematically valid, though,
+    // since we're not recording force, but instead are recording
+    // (effectively) the center-of-mass shift with respect to the spine.
     tgWorld world(config, ground);
 
     // create the view
@@ -161,7 +169,10 @@ int main(int argc, char** argv)
 
     // Let's try to add markers at the feet.
     std::cout << "getting the rigid body for front: " << std::endl;
-    std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersBack");
+    // For TetrahedralSpineWithRotVert:
+    //std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersBack");
+    // For LaikaIROS2018:
+    std::vector<tgBaseRigid*> frontRigids = myModel->find<tgBaseRigid>("shouldersVertConnect");
     for(int jj=0; jj < frontRigids.size(); jj++) {
       std::cout << frontRigids[jj]->centerOfMass() << std::endl;
     }
@@ -181,15 +192,15 @@ int main(int argc, char** argv)
     double samplingTimeInterval = 0.1;
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     // add the model to the data logger
-    myDataLogger->addSenseable(myModel);
+    //myDataLogger->addSenseable(myModel);
     // Make it so the data logger can dispatch sphere sensors
-    tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
+    //tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
-    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
-    myDataLogger->addSensorInfo(mySphereSensorInfo);
-    myDataLogger->addSensorInfo(myRodSensorInfo);
+    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    //myDataLogger->addSensorInfo(mySphereSensorInfo);
+    //myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
-    simulation.addDataManager(myDataLogger);
+    //simulation.addDataManager(myDataLogger);
     
     // Finally, run the simulation.
     simulation.run();

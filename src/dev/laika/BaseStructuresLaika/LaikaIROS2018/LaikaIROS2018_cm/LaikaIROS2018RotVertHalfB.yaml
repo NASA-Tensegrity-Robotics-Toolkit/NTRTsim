@@ -5,10 +5,10 @@
 # each other. A gap of 2 means moving the centers out by 1 each.
 
 nodes:
-  centerB: [-0.0075, 0, 0]
-  topB: [-0.065, 0.096, 0]
-  bottomB: [-0.065, -0.096, 0]
-  rodHingeEnd: [-0.035, 0, 0]
+  centerB: [-0.75, 0, 0]
+  topB: [-6.5, 9.6, 0]
+  bottomB: [-6.5, -9.6, 0]
+  rodHingeEnd: [-3.5, 0, 0]
 
 pair_groups:
   rodTetraB:
@@ -22,10 +22,10 @@ builders:
   rodTetraB:
     class: tgRodInfo
     parameters:
-      density: 2630 # was 0.014
-      radius: 0.0064
+      density: 0.0 # was 0.014
+      radius: 0.64
   rodForHingeB:
     class: tgRodInfo
     parameters:
-      density: 0.0 # was 0.014
-      radius: 0.03
+      density: 0.0026 # was 0.014
+      radius: 3

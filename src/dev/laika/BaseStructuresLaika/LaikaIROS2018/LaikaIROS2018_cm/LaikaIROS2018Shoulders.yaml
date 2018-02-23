@@ -3,18 +3,16 @@
 # Center of shoulders at origin.
 # For shoulders, all directions are -X.
 
-# Converted to m.
-
 nodes:
   # where the vertebrae will be connected.
   vertConnect: [0, 0, 0]
   # the endpoint of the bottom of the "T". Measured 12.6cm to center of wood.
-  shoulderEnd: [-0.126, 0, 0]
+  shoulderEnd: [-12.6, 0, 0]
   # connecting each of the two legs.
   # This will be the shoulders, so leg A will be the front right, D left.
   # displacement left/right is 17.6/2 - (leg width/2), 7.55
-  legAconnect: [-0.126, 0, -0.0755]
-  legBconnect: [-0.126, 0, 0.0755]
+  legAconnect: [-12.6, 0, -7.55]
+  legBconnect: [-12.6, 0, 7.55]
 
 pair_groups:
   # We do 3 boxes, one for each section of the T.
@@ -30,13 +28,13 @@ builders:
   shouldersVertConnect:
     class: tgBoxInfo
     parameters:
-      width: 0.035 # 7 in +/- Y, total
-      height: 0.030 # 6 in +/- Z, total
-      density: 299 # From matlab calculations
+      width: 3.5 # 7 in +/- Y, total
+      height: 3.0 # 6 in +/- Z, total
+      density: 0.0003 # From matlab calculations
   shouldersABconnect:
     class: tgBoxInfo
     parameters:
-      width: 0.003 # wood thickness
-      height: 0.03 # same as shoulder box
-      density: 299 # From matlab calculations
+      width: 0.3 # wood thickness
+      height: 3.0 # same as shoulder box
+      density: 0.0003 # From matlab calculations
 

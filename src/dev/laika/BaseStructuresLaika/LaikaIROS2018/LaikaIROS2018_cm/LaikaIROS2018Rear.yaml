@@ -4,18 +4,16 @@
 # which should be [12.6, 0, +/- 7.55].
 # We're calling C the "back right" leg, which I believe is +Y.
 
-# Converted into m.
-
 substructures:
   hips:
     path: ./LaikaIROS2018Hips.yaml
     translation: [0, 0, 0]
   legC:
     path: ./LaikaIROS2018Leg.yaml
-    translation: [0.126, 0, 0.0755]
+    translation: [12.6, 0, 7.55]
   legD:
     path: ./LaikaIROS2018Leg.yaml
-    translation: [0.126, 0, -0.0755]
+    translation: [12.6, 0, -7.55]
 
 
 # ...and everything should auto-compound.
