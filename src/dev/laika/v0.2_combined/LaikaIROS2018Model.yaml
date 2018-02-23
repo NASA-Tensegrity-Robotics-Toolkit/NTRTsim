@@ -1,0 +1,135 @@
+# YAML file for the Laika IROS 2018 submission.
+# These calculations place the origin as in-between the two feet at the robot's rear.
+# Includes the front/rear, and then two vert / rot vert / two vert for 5 total.
+
+# We're going to assemble with the rear two feet across the origin,
+# so move the rear's origin (attachment for t1) up by the leg's vertical amount,
+# and "forward" (-X) by the leg attachment point.
+
+# NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
+# (ground is not at origin.) So, that's 19.35 + 1.5 = 19.35
+substructures:
+  rear:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Rear.yaml
+    translation: [-12.6, 19.35, 0]
+  t1/t2:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
+    translation: [-12.6, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  rotVert:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018RotVert.yaml
+    # The translation for the rotating vertebra is t1 translation plus
+    # two offsets.
+    translation: [-32.4, 19.35, 0]
+  t4/t5:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
+    # Translation is rotVert plus one offset.
+    # so, there's a horrible bug somewhere that makes t5 not auto-compound to
+    # the hips if the intersection is exactly 52.3. Who knows why or how
+    # this is happening. Hack for now is to make a slight offset.
+    # This probably means there's a pointer problem somewhere.
+    translation: [-42.301, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  front:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Front.yaml
+    # Translation is directly at the center of t5.
+    translation: [-52.201, 19.35, 0]
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+
+# TO-DO: IS rod USED ANYMORE, ANYWHERE?
+builders: 
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.01 # was 0.0044
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0 # was 1000
+      damping: 100.0 # was 100
+      pretension: 20.0 # was 20
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226 # was 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
