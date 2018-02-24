@@ -34,6 +34,10 @@
 #include "core/tgString.h"
 #include "core/tgTags.h"
 #include "core/abstractMarker.h"
+// Manually logging data
+#include "sensors/tgDataLogger2.h"
+#include "sensors/abstractMarkerSensor.h"
+#include "sensors/abstractMarkerSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
@@ -229,6 +233,15 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
     std::cout << std::endl;
   }
   */
+
+  // Manual data logging:
+  // Here's the plan.
+  // (1) make a tgDataLogger2, as in an app file.
+  // (2) Do the same setup as in an app, BUT manually adding
+  // (3) pointers to the
+  // ...we can't do this. The pointers are the problem, since tgModel
+  // stores its markers as objects, not pointers to objects.
+  // Will have issues with references versus pointers and const and whatnot.
 }
 
 /**
@@ -241,11 +254,11 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
   //DEBUGGING:
   // Let's see if we get the positions of the abstract markers from the subject here.
   std::vector<abstractMarker> markers = subject.getMarkers();
-  std::cout << "Inside rot vert controllers, markers are at: " << std::endl;
+  //std::cout << "Inside rot vert controllers, markers are at: " << std::endl;
   for(int i=0; i < markers.size(); i++){
-    std::cout << markers[i].getWorldPosition() << std::endl;
+    //std::cout << markers[i].getWorldPosition() << std::endl;
   }
-  std::cout << std::endl;
+  //std::cout << std::endl;
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, check which action to perform:

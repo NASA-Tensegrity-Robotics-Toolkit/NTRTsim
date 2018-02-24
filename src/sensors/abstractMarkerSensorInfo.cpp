@@ -54,9 +54,16 @@ bool abstractMarkerSensorInfo::isThisMySenseable(tgSenseable* pSenseable)
 {
   // The following cast will return 0 if the senseable is not a abstractMarker.
   abstractMarker* m_pAbstractMarker = tgCast::cast<tgSenseable, abstractMarker>(pSenseable);
-  if( m_pAbstractMarker == 0 )
+  // ...checking, this might be a reference instead?? Use C++'s casting, not tgCast.
+  //abstractMarker* m_pAbstractMarker = dynamic_cast<abstractMarker>(pSenseable);
+  if( m_pAbstractMarker == 0 ) {
+    //DEBUGGING
+    std::cout << "Inside abstractMarkerSensorInfo, isThisMySenseable returned 0." << std::endl;
     return 0;
+  }
   else {
+    //DEBUGGING
+    std::cout << "Inside abstractMarkerSensorInfo, isThisMySenseable returned 1." << std::endl;
     return 1;
   }
 }

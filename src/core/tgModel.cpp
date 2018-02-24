@@ -198,10 +198,21 @@ std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
     mySenseableDescendants.push_back(myDescendants[i]);
   }
   // Also do abstract markers. But remember, need to be pointers!
-  /*
+  // The getMarkers method returns an alias... ?
+  // Let's do the following, manually. Let's make a list of pointers
+  // to each marker, and pass those pointers into the returned vector.
+  std::vector<tgSenseable*> pointersToMarkers;
   std::vector<abstractMarker> myMarkers = getMarkers();
-  for (size_t j=0; j < myMarkers.size(); j++) {
-    mySenseableDescendants.push_back(&myMarkers[j]);
+  for( size_t k=0; k < myMarkers.size(); k++) {
+    std::cout << "Converting marker pointer..." << std::endl;
+    tgSenseable* currentMarkerPointer = &(myMarkers[k]);
+    pointersToMarkers.push_back(currentMarkerPointer);
+    //DEBUGGING
+    std::cout << "Pushed back pointer: " << currentMarkerPointer << std::endl;
+  }
+  for (size_t j=0; j < pointersToMarkers.size(); j++) {
+    mySenseableDescendants.push_back(pointersToMarkers[j]);
+    //mySenseableDescendants.push_back(&(myMarkers[j]));
   }
 
   //DEBUGGING
@@ -212,11 +223,10 @@ std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
 	    << " and total number of senseable descendants was "
 	    << mySenseableDescendants.size() 
 	    << ", color of marker(s) were: " << std::endl;
-  for (size_t k = myDescendants.size(); k < mySenseableDescendants.size(); k++) {
-    std::cout << mySenseableDescendants[k]->getSenseableDescendants() << std::endl;
-  }
+  //for (size_t k = myDescendants.size(); k < mySenseableDescendants.size(); k++) {
+  //  std::cout << mySenseableDescendants[k]->getSenseableDescendants() << std::endl;
+  //}
   std::cout << "executed successfully." << std::endl;
-  */
   return mySenseableDescendants;
 }
 
