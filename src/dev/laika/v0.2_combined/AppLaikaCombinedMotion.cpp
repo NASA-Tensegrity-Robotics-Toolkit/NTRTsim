@@ -39,6 +39,7 @@
 // For tracking positions:
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
+#include "sensors/abstractMarkerSensorInfo.h"
 //DEBUGGING: see if the rod COMs, for the shoulders/hips, are the same as
 // for the spheres. That would mean that bullet's COM command does the COM
 // for the ENTIRE rigid, not each component, when auto-compounded!!!
@@ -208,11 +209,28 @@ int main(int argc, char** argv)
     btVector3 offsetFootB( -64.801, 1.5, 7.55);
     btVector3 offsetFootC( 0, 1.5, -7.55);
     btVector3 offsetFootD( 0, 1.5, 7.55);
+    // Specify some colors for each marker.
+    btVector3 colorA( 0.5, 0.5, 0.5);
+    btVector3 colorB( 0.2, 0.7, 0.2);
+    btVector3 colorC( 0.5, 0.2, 0.0);
+    btVector3 colorD( 0.0, 0.7, 0.7);
 
-    abstractMarker marker2(frontRigids[0]->getPRigidBody(),
+    abstractMarker markerA(frontRigids[0]->getPRigidBody(),
 			   offsetFootA - frontRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
-			   btVector3(0, 1, 1), 0);
-    myModel->addMarker(marker2);
+			   colorA, 0);
+    abstractMarker markerB(frontRigids[0]->getPRigidBody(),
+			   offsetFootB - frontRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
+			   colorB, 0);
+    abstractMarker markerC(rearRigids[0]->getPRigidBody(),
+			   offsetFootC - rearRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
+			   colorC, 0);
+    abstractMarker markerD(rearRigids[0]->getPRigidBody(),
+			   offsetFootD - rearRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
+			   colorD, 0);
+    myModel->addMarker(markerA);
+    myModel->addMarker(markerB);
+    myModel->addMarker(markerC);
+    myModel->addMarker(markerD);
 	   
     // Let's log info from the spheres (bottom of Laika's feet.)
     // has to end with the prefix to the log file name.
@@ -220,15 +238,17 @@ int main(int argc, char** argv)
     double samplingTimeInterval = 0.1;
     tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     // add the model to the data logger
-    //myDataLogger->addSenseable(myModel);
+    myDataLogger->addSenseable(myModel);
     // Make it so the data logger can dispatch sphere sensors
+    abstractMarkerSensorInfo* myAbstractMarkerSensorInfo = new abstractMarkerSensorInfo();
     //tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
     //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    myDataLogger->addSensorInfo(myAbstractMarkerSensorInfo);
     //myDataLogger->addSensorInfo(mySphereSensorInfo);
     //myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
-    //simulation.addDataManager(myDataLogger);
+    simulation.addDataManager(myDataLogger);
     
     // Finally, run the simulation.
     simulation.run();

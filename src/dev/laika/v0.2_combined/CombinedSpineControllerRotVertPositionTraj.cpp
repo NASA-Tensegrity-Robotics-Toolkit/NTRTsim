@@ -33,6 +33,7 @@
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "core/tgTags.h"
+#include "core/abstractMarker.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
@@ -237,6 +238,14 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
  */
 void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject, double dt)
 {
+  //DEBUGGING:
+  // Let's see if we get the positions of the abstract markers from the subject here.
+  std::vector<abstractMarker> markers = subject.getMarkers();
+  std::cout << "Inside rot vert controllers, markers are at: " << std::endl;
+  for(int i=0; i < markers.size(); i++){
+    std::cout << markers[i].getWorldPosition() << std::endl;
+  }
+  std::cout << std::endl;
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, check which action to perform:

@@ -19,7 +19,7 @@
 /**
  * @file abstractMarker.cpp
  * @brief Markers for specific places on a tensegrity
- * @author Atil Iscen
+ * @author Atil Iscen, Drew Sabelhaus
  * @date Jul 15, 2014
  * $Id$
  */
@@ -54,5 +54,15 @@ btVector3 abstractMarker::getWorldPosition() const
 {
 	btTransform tr = attachedBody->getWorldTransform();
 	return tr * attachedRelativeOriginalPosition;
+}
+
+// For sensing, just return nothing? We'll already have a reference to this...
+// (in other words, tgModel's getDescendants just returns children, not
+// including the parent object.)
+std::vector<tgSenseable*> abstractMarker::getSenseableDescendants() const
+{
+  std::vector<tgSenseable*> descendants;
+  //descendants.push_back(this);
+  return descendants;
 }
 

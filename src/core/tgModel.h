@@ -170,9 +170,10 @@ public:
 
     /**
      * From tgSenseable: need to return all the children of this class.
-     * Since tgModels are tgSenseables, just return getDescendants().
+     * Since tgModels are tgSenseables, just return getDescendants(),
+     * and all abstract markers (since those are now senseables also.)
      * @return a vector of tgModels, with pointers changed into pointers
-     * for tgSenseables.
+     * for tgSenseables, plus abstract markers.
      */
     virtual std::vector<tgSenseable*> getSenseableDescendants() const;
 

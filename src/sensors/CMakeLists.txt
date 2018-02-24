@@ -25,12 +25,14 @@ add_library( ${PROJECT_NAME} SHARED
   tgSphereSensor.cpp
   tgSpringCableActuatorSensor.cpp
   tgCompoundRigidSensor.cpp
+  abstractMarkerSensor.cpp
   
   tgSensorInfo.cpp
   tgRodSensorInfo.cpp
   tgSphereSensorInfo.cpp
   tgSpringCableActuatorSensorInfo.cpp
   tgCompoundRigidSensorInfo.cpp
+  abstractMarkerSensorInfo.cpp
 
   # The ForcePlateModel and sensor are also needed here,
   # since the data logger needs to know how to render a force plate.
