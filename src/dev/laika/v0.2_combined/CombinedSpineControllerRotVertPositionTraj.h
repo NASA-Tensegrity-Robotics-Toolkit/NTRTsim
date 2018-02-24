@@ -96,8 +96,8 @@ public:
   //void openMarkerDataFile(std::string fileNamePrefix);
   void writeMarkerDataHeader(TensegrityModel& subject, std::string dataFileNamePrefix);
   std::vector<std::string> getMarkerDataHeadings(abstractMarker& marker);
-  //void writeMarkerDataSample(TensegrityModel& subject, double dt);
-  //void closeMarkerDataFile();
+  void writeMarkerDataSample(TensegrityModel& subject, double timePassed);
+  std::vector<std::string> getMarkerSensorData(abstractMarker& marker);
     
 private:
 	
@@ -139,6 +139,9 @@ private:
   std::string m_dataFileName;
   std::string m_dataFileNamePrefix;
   int hasBeenInitialized = 0;
+  // We'll also store a counter for only collecting data at certain time intervals.
+  double m_timeInterval; // like 0.1 or something
+  double m_updateTime = 0.0; // will be updated/reset in onStep
   
   /**
    * A file stream, based on m_dataFileName.

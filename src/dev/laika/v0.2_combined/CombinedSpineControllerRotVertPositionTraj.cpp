@@ -245,6 +245,8 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
 
   // Specify the file name prefix here (TO-DO: move to app, at least.)
   m_dataFileNamePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerData";
+  // And the time interval for data collection.
+  m_timeInterval = 0.1;
   // Seems we can't write a header yet, since the model hasn't been initialized.
   // For a quick fix, we can check and initialize in onStep instead.
   //writeMarkerDataHeader(subject, m_dataFileNamePrefix);
@@ -259,24 +261,36 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
  * If after startTime: apply a control to track the desired position (set angle).
  */
 void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject, double dt)
-{
+{  
+  // First, increment the accumulator variable.
+  m_timePassed += dt;
+
   //DEBUGGING:
   // Let's see if we get the positions of the abstract markers from the subject here.
   std::vector<abstractMarker> markers = subject.getMarkers();
   //std::cout << "Inside rot vert controllers, markers are at: " << std::endl;
-  for(int i=0; i < markers.size(); i++){
+  //for(int i=0; i < markers.size(); i++){
     //std::cout << markers[i].getWorldPosition() << std::endl;
-  }
+  //}
   //std::cout << std::endl;
 
-  // Write marker data to a file. This is a temporary fix.
+  // Write marker headers to a file if needed. This is a temporary fix.
   if( hasBeenInitialized == 0){
     writeMarkerDataHeader(subject, m_dataFileNamePrefix);
     hasBeenInitialized = 1;
   }
+  // Then, write data at this datapoint. Note that time incrementing must happen
+  // in this onStep first, and all time management occurs here.
+  // Need to check if we should write a point now (since logging at a slower
+  // interval than simulating.)
+  m_updateTime += dt;
+  if( m_updateTime >= m_timeInterval) {
+    // Then write a data point with the total time at this step
+    writeMarkerDataSample(subject, m_timePassed);
+    // and reset our counter
+    m_updateTime = 0.0;
+  }
   
-  // First, increment the accumulator variable.
-  m_timePassed += dt;
   // Then, check which action to perform:
   if( m_timePassed > m_startTime ) {
     // Calculate and apply a torque that will be controlled around a position
@@ -439,11 +453,14 @@ void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(Tensegrit
   
   // Output a first line of the header.
   tgOutput << "CombinedSpineCont... started logging at time "
-	   << fileTime << ", with "
+	   << fileTime << " with "
 	   << markers.size() << " abstract markers." << std::endl;
 
-  // Get the headings for each marker, and append them to the file.
+
+  // Need to add total time as the first column
+  tgOutput << "time (sec),";
   
+  // Get the headings for each marker, and append them to the file.
   for (std::size_t i=0; i < markers.size(); i++) {
     // Get the vector of sensor data headings for each marker.
     std::vector<std::string> headings = getMarkerDataHeadings(markers[i]);
@@ -475,7 +492,7 @@ std::vector<std::string> CombinedSpineControllerRotVertPositionTraj::getMarkerDa
   // Turn the color into a string for use later. Make a stringstream
   // that will then be converted into a string.
   std::stringstream colorStream;
-  colorStream << "(" << colorVec.getX() << ", " << colorVec.getY() << ", "
+  colorStream << "(" << colorVec.getX() << "  " << colorVec.getY() << "  "
 	      << colorVec.getZ() << ")";
   std::string color = colorStream.str();
   
@@ -495,11 +512,6 @@ std::vector<std::string> CombinedSpineControllerRotVertPositionTraj::getMarkerDa
 
   // The string 'prefix' will be added to each heading.
   std::string prefix = "abstractMarker(";
-
-  // Note that the orientation is a btVector3 object of Euler angles,
-  // which I believe are overloaded as strings...
-  // Also, the XYZ positions are of the center of mass.
-  // TO-DO: check which euler angles are which!!!
   
   headings.push_back( prefix + color + ").X" );
   headings.push_back( prefix + color + ").Y" );
@@ -507,4 +519,81 @@ std::vector<std::string> CombinedSpineControllerRotVertPositionTraj::getMarkerDa
 
   // Return the resulting vector.
   return headings;
+}
+
+/**
+ * helper for writing one datapoint of all abstract markers
+ */
+void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataSample(TensegrityModel& subject, double timePassed) {
+  // We want to write to the log with the contents of each abstract marker.
+  // Let's get all markers, loop through and collect their data, and append.
+  // Get all markers:
+  std::vector<abstractMarker> markers = subject.getMarkers();
+  // Open the log file for writing, appending and not overwriting.
+  tgOutput.open(m_dataFileName.c_str(), std::ios::app);
+  // Then output the time.
+  tgOutput << timePassed << ",";
+  // Collect the data and output it to the file!
+  // TO-DO: here, we're assuming that the ordering of markers DOES NOT CHANGE
+  // between the headings and the multiple iterations of onStep.
+  // Drew doesn't think that this is guaranteed. Need to enforce something.
+  // Should work for now though.
+  for (size_t i=0; i < markers.size(); i++) {
+    // Get the vector of sensor data from this sensor
+    std::vector<std::string> sensordata = getMarkerSensorData(markers[i]);
+    // Iterate and output each data sample
+    for (std::size_t j=0; j < sensordata.size(); j++) {
+      // Include a comma, since this is a comma-separated-value log file.
+      tgOutput << sensordata[j] << ",";
+    }
+  }
+  tgOutput << std::endl;
+  // Close the output, to be re-opened next step.
+  tgOutput.close();
+}
+
+/**
+ * Helper that gets the data from one individual marker as a list
+ */
+std::vector<std::string> CombinedSpineControllerRotVertPositionTraj::getMarkerSensorData(abstractMarker& marker) {
+  // For one marker,
+  // Pick out the XYZ position of this abstractMarker, in the world frame.
+  btVector3 pos = marker.getWorldPosition();
+
+  // The list of sensor data that will be returned:
+  std::vector<std::string> sensordata;
+
+  /**
+   * The original version of this section of code, which 
+   * output one string, looked like:
+   * std::stringstream sensordata;
+   * sensordata << com[0] << ","
+   *	     << com[1] << ","
+   *	     << com[2] << ","
+   *	     << orient[0] << ","
+   *	     << orient[1] << ","
+   *	     << orient[2] << ","
+   *	     << m_pAbstractMarker->mass() << ",";
+   */
+  
+  // The floats (btScalars?) need to be converted to strings
+  // via a stringstream.
+  std::stringstream ss;
+
+  // pos[0]
+  ss << pos[0];
+  sensordata.push_back( ss.str() );
+  // Reset the stream.
+  ss.str("");
+  
+  // pos[1]
+  ss << pos[1];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  // pos[2]
+  ss << pos[2];
+  sensordata.push_back( ss.str() );
+  ss.str("");
+  
+  return sensordata;
 }
