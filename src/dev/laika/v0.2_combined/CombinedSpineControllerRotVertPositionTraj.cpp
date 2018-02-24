@@ -62,10 +62,20 @@
 CombinedSpineControllerRotVertPositionTraj::CombinedSpineControllerRotVertPositionTraj(double startTime,
 						       std::string csvPath,
 						       std::string rodHingeTag,
+						       std::string fileNamePrefix,
+						       double timeInterval,
+						       double KP,
+						       double KI,
+						       double KD,
 						       btDynamicsWorld* world) :
   m_startTime(startTime),
   m_csvPath(csvPath),
   m_rodHingeTag(rodHingeTag),
+  m_dataFileNamePrefix(fileNamePrefix),
+  m_timeInterval(timeInterval),
+  m_KP(KP),
+  m_KI(KI),
+  m_KD(KD),
   m_world(world),
   m_timePassed(0.0),
   m_accumulatedError(0.0),
@@ -78,6 +88,16 @@ CombinedSpineControllerRotVertPositionTraj::CombinedSpineControllerRotVertPositi
   // path to the CSV file must not be null
   else if( (m_csvPath.empty() )) {
     throw std::invalid_argument("CSV path is not present. Must provide a file with angle data.");
+  }
+  // If there's a tilde in the file name prefix, replace with the home directory
+  // This copied from tgDataLogger2.
+  if (m_dataFileNamePrefix.at(0) == '~') {
+    // Get the $HOME environment variable
+    std::string home = std::getenv("HOME");
+    // Remove the tilde (the first element) from the string
+    m_dataFileNamePrefix.erase(0,1);
+    // Concatenate the home directory.
+    m_dataFileNamePrefix = home + m_dataFileNamePrefix;
   }
   // @TODO: what checks to make on tags?
 }
@@ -244,9 +264,9 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
   // Will have issues with references versus pointers and const and whatnot.
 
   // Specify the file name prefix here (TO-DO: move to app, at least.)
-  m_dataFileNamePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerData";
+  //m_dataFileNamePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerData";
   // And the time interval for data collection.
-  m_timeInterval = 0.1;
+  //m_timeInterval = 0.1;
   // Seems we can't write a header yet, since the model hasn't been initialized.
   // For a quick fix, we can check and initialize in onStep instead.
   //writeMarkerDataHeader(subject, m_dataFileNamePrefix);
@@ -276,7 +296,7 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
 
   // Write marker headers to a file if needed. This is a temporary fix.
   if( hasBeenInitialized == 0){
-    writeMarkerDataHeader(subject, m_dataFileNamePrefix);
+    writeMarkerDataHeader(subject);
     hasBeenInitialized = 1;
   }
   // Then, write data at this datapoint. Note that time incrementing must happen
@@ -340,6 +360,10 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     btQuaternion netRotQuat;
     netRotation.getRotation(netRotQuat);
     btScalar netRotScalar = netRotQuat.getAngle();
+
+    // FOR DATA LOGGING: we're doing to record this angle too.
+    prevRotVertPos = netRotScalar;
+    
     // for checking: let's get the axis here too. Should be only in one direction.
     //btVector3 netRotAxis = netRotQuat.getAxis();
     //DEBUGGING
@@ -367,18 +391,23 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
       // Look into the next entry into the array...
       timestepIndex = timestepIndex + 1;
     }
-    //DEBUGGING
-    //std::cout << "setpoint index (time): " << timestepIndex << std::endl;
     // get the tracked point at timestepIndex
     double m_setAngle = setpointTrajectory[1][timestepIndex];
+
+    //DEBUGGING
+    std::cout << "setpoint index (time): " << setpointTrajectory[0][timestepIndex]
+	      << ", setpoint angle (rad): " << m_setAngle << std::endl;
     
     // Great. Let's perform the control.
     // First, control constants. The angle seems to be in the range of
     // like 0.00 to 0.03 radians, for our purposes. And the torque to apply
     // is on the order of 0.2. So maybe a K_P of 5 or 10?
-    double K_P = 1000; // 50 worked, but lots of overshoot. Was 1000.
+    // for the IROS 2018 model, there's a TON of overshoot, for even small consts like 0.1
+    //double K_P = 0.5; // 50 worked, but lots of overshoot. Was 1000.
     // a really small constant for integral control worked best.
-    double K_I = 0.5; // was 0.5
+    //double K_I = 0.00001; // was 0.5
+
+    // UPDATE: these are now passed to the constructor.
 
     // Calculate the new torque we want to apply, - K * (x - x_ref)... with I term.
     // we've arbitrarily choosen torques to be negative?
@@ -386,8 +415,16 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     double error = netRotScalar - m_setAngle;
     // Let's do an integral term also.
     m_accumulatedError = m_accumulatedError + error;
+    // The D term is the difference between previous timestep's error and current
+    // error.
     // Combined control input is:
-    double controlInput = - (K_P * error) - (K_I * m_accumulatedError);
+    double controlInput = - (m_KP * error) - (m_KI * m_accumulatedError)
+      - (m_KD * (error - m_prevError));
+
+    //std::cout << m_KD << ", " << error - m_prevError << std::endl;
+
+    // now, reset to new "previous" error for next timestep.
+    m_prevError = error;
     
     // As a torque vector, along the x-axis:
     btVector3 controlledTorque( controlInput, 0, 0);
@@ -409,19 +446,8 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
 }
 	
 // The functions for writing data from the foot markers.
-void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(TensegrityModel& subject, std::string dataFileNamePrefix)
+void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(TensegrityModel& subject)
 {
-  // Before anything else - we need to account for the tilde in possible file names.
-  // This copied from tgDataLogger2.
-  if (dataFileNamePrefix.at(0) == '~') {
-    // Get the $HOME environment variable
-    std::string home = std::getenv("HOME");
-    // Remove the tilde (the first element) from the string
-    dataFileNamePrefix.erase(0,1);
-    // Concatenate the home directory.
-    dataFileNamePrefix = home + dataFileNamePrefix;
-  }
-  
   // Create the full name of file, with timestamp. Write the headers. Close.
   // (1) Create the full filename of the log file.
   // Credit to Brian Tietz Mirletz, via the original tgDataObserver.
@@ -436,7 +462,7 @@ void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(Tensegrit
   currentTime = localtime(&rawtime);
   strftime(fileTime, fileTimeSize, "%m%d%Y_%H%M%S", currentTime);
   // Result: fileTime is a string with the time information.
-  m_dataFileName = dataFileNamePrefix + "_" + fileTime + ".txt";
+  m_dataFileName = m_dataFileNamePrefix + "_" + fileTime + ".txt";
 
   // DEBUGGING output:
   std::cout << "CombinedSpineControllerRotVertPositionTraj will be saving data to the file: " << std::endl
@@ -459,6 +485,9 @@ void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(Tensegrit
 
   // Need to add total time as the first column
   tgOutput << "time (sec),";
+
+  // FOR NOW: we want to record the actual position of the rotating vertebra.
+  tgOutput << "rot vert pos (rad),";
   
   // Get the headings for each marker, and append them to the file.
   for (std::size_t i=0; i < markers.size(); i++) {
@@ -533,6 +562,9 @@ void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataSample(Tensegrit
   tgOutput.open(m_dataFileName.c_str(), std::ios::app);
   // Then output the time.
   tgOutput << timePassed << ",";
+  // ALSO, FOR IROS 2018: record the rotating vertebra position.
+  tgOutput << prevRotVertPos << ",";
+  
   // Collect the data and output it to the file!
   // TO-DO: here, we're assuming that the ordering of markers DOES NOT CHANGE
   // between the headings and the multiple iterations of onStep.

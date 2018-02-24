@@ -1,4 +1,4 @@
-link_directories(${LIB_DIR})
+link_directories(${LIB_DIR} boost_system)
 
 link_libraries(core
                tgcreator

@@ -62,12 +62,23 @@ public:
    *    the trajectory of positions to track. Needs two columns (see below.)
    * @param[in] rodHingeTag, a string of the tag that's associated with the
    *    tgRods that are part of the hinged joint.
+   * @param[in] fileNamePrefix, where to save marker data
+   * @param[in] timeInterval, dt for logging
+   * @param[in] KP, proportional control constant for tracking rot vert position
+   * @param[in] KI, integral control constant for tracking rot vert position
+   * @param[in] KD, derivative control const for vert pos tracking
    *@param[in] world, pointer to the btDynamicsWorld that's governing this 
    *    simulation. This is so that the controller can add in the hinge constraint.
    */
   CombinedSpineControllerRotVertPositionTraj(double startTime,
-			     std::string csvPath, std::string rodHingeTag,
-			     btDynamicsWorld* world);
+					     std::string csvPath,
+					     std::string rodHingeTag,
+					     std::string fileNamePrefix,
+					     double timeInterval,
+					     double KP,
+					     double KI,
+					     double KD,
+					     btDynamicsWorld* world);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -94,7 +105,7 @@ public:
    * that make it easier.
    */
   //void openMarkerDataFile(std::string fileNamePrefix);
-  void writeMarkerDataHeader(TensegrityModel& subject, std::string dataFileNamePrefix);
+  void writeMarkerDataHeader(TensegrityModel& subject);
   std::vector<std::string> getMarkerDataHeadings(abstractMarker& marker);
   void writeMarkerDataSample(TensegrityModel& subject, double timePassed);
   std::vector<std::string> getMarkerSensorData(abstractMarker& marker);
@@ -115,6 +126,16 @@ private:
   tgRod* hingedRodA;
   // Second rod:
   tgRod* hingedRodB;
+
+  /**
+   * For IROS 2018, we need different control constants for the left/right
+   * bending for each foot. This is because the cables are tensioned differently
+   * on each side (Drew thinks, at least - not sure why else?
+   * But, need to programatically pass these in from the app.
+   */
+  double m_KP;
+  double m_KI;
+  double m_KD;
 
   // Keep track of the world, for adding the hinge constraint.
   btDynamicsWorld* m_world;
@@ -142,6 +163,15 @@ private:
   // We'll also store a counter for only collecting data at certain time intervals.
   double m_timeInterval; // like 0.1 or something
   double m_updateTime = 0.0; // will be updated/reset in onStep
+
+  // Also, we're going to save the ACTUAL position of the rotating vertebra,
+  // so it can be indexed against foot position. This requires
+  // an extra private variable so it can be written in onStep, and read
+  // in writeMarkerDataSample.
+  // Since we write data before calculating / applying torque, we're recording
+  // the previous timestep. Since data collection is happening so fast,
+  // this shouldn't matter.
+  double prevRotVertPos = 0.0;
   
   /**
    * A file stream, based on m_dataFileName.

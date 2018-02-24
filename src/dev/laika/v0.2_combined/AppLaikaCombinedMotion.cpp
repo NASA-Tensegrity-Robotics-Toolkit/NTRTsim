@@ -40,6 +40,8 @@
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
 #include "sensors/abstractMarkerSensorInfo.h"
+// Correlating positions to cable lengths.
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 //DEBUGGING: see if the rod COMs, for the shoulders/hips, are the same as
 // for the spheres. That would mean that bullet's COM command does the COM
 // for the ENTIRE rigid, not each component, when auto-compounded!!!
@@ -53,6 +55,18 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdexcept> // for some error handling
+
+
+// A helper function for converting doubles to strings, for filenames.
+// Thanks to http://www.cplusplus.com/articles/D9j2Nwbp/
+template <typename T>
+std::string NumberToString ( T Number )
+{
+  std::ostringstream ss;
+  ss << Number;
+  return ss.str();
+}
 
 /**
  * The entry point.
@@ -103,6 +117,128 @@ int main(int argc, char** argv)
     // second argument.
     TensegrityModel* const myModel = new TensegrityModel(argv[1],true);
 
+    /**
+     * FOR IROS 2018 DATA COLLECTION
+     * Specify which foot should be lifted. 
+     * This way, we can parameterize data collection more easily.
+     */
+    
+    // String specifier of which foot to lift. 1, 2, 3, 4 are A,B,C,D.
+    // Correspond to FR, FL, BR, BL.
+    int whichFoot = 4;
+    
+    // switch on the string and assign the following:
+    // (1) parameters for the horizontal bending controller
+    // (2) parameters for the rotation controller, including data collection
+    // we'll make the log file name also include min length percent.
+
+    // first, declare everything we need.
+    // Some of these are initialized to prevent segfaults accidentally
+    // Rotating vertebra controller + data logging:
+    std::string footDataFilePrefix;
+    double timeInterval = 0.0;
+    double startTimeRot = 0.0;
+    std::string csvPath;
+    double KP = 0.0; // proportional control const for rot ver pos tracking
+    double KI = 0.0; // integral control const for rot ver pos tracking
+    double KD = 0.0; // deriv control const for rot vert pos tracking
+    // Horizontal bending controller
+    double startTimeBend = 0.0;
+    double minLength = 0.0;
+    double rate = 0.0;
+    std::vector<std::string> tagsToControl;
+    
+    switch (whichFoot) {
+
+      case 1:
+	// FR
+	// bend:
+	startTimeBend = 2.0;
+	minLength = 0.9; // as a percent
+	rate = 0.25;
+	// front right foot requires COM shifting to the left
+	// Pulling in the right cable shifts robot to the left.
+	tagsToControl.push_back("HR");
+	// rot:
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_" +
+	  NumberToString(minLength);
+	timeInterval = 0.01;
+	startTimeRot = 8.0;
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
+	// that rotation might just be too dynamic for laika (tips over.)
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
+	KP = 0.2;
+	KI = 0.000001;
+	KD = 0.2;
+	break;
+      
+      case 2:
+	// FL
+	// bend:
+	startTimeBend = 2.0;
+	minLength = 0.9; // as a percent
+	rate = 0.25;
+	// front left foot requires COM shifting to the right
+	// Pulling in the left cable shifts robot to the right.
+	tagsToControl.push_back("HL");
+	// rot:
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
+	  NumberToString(minLength);
+	timeInterval = 0.01;
+	startTimeRot = 8.0;
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
+	KP = 0.5;
+	KI = 0.00001;
+	KD = 0.0;
+	break;
+
+    case 3:
+	// BR
+      	// bend:
+	startTimeBend = 2.0;
+	minLength = 0.9; // as a percent
+	rate = 0.25;
+	// back right foot requires bending to the left
+	// pulling on the right cables shifts COM to the left
+	tagsToControl.push_back("HR");
+	// rot:
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataC_"+
+	  NumberToString(minLength);
+	timeInterval = 0.1;
+	startTimeRot = 10.0;
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
+	KP = 0.5;
+	KI = 0.00001;
+	KD = 0.0;
+	break;
+
+    case 4:
+	// BL
+	// bend:
+	startTimeBend = 2.0;
+	minLength = 0.9; // as a percent
+	rate = 0.25;
+	// back left foot requires COM shifting to the right
+	// Pulling in the left cable shifts robot to the left.
+	tagsToControl.push_back("HL");
+	// rot:
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataD_" +
+	  NumberToString(minLength);
+	timeInterval = 0.01;
+	startTimeRot = 10.0;
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
+	// that rotation might just be too dynamic for laika (tips over.)
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
+	KP = 0.2;
+	KI = 0.000001;
+	KD = 0.2;
+	break;
+	
+      default:
+	// need to throw an error here
+	throw std::invalid_argument("Need to specify which foot to lift.");
+    }
+
     // Attach a controller to the model, if desired.
     // This is a controller that interacts with a generic TensegrityModel as
     // built by the TensegrityModel file, BUT it only actually works
@@ -112,25 +248,25 @@ int main(int argc, char** argv)
 
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
-    double startTime = 5.0;
-    double minLength = 0.8;
-    double rate = 0.25;
-    std::vector<std::string> tagsToControl;
+    //double startTime = 5.0;
+    //double minLength = 0.8;
+    //double rate = 0.25;
+    //std::vector<std::string> tagsToControl;
     // HF is the right horizontal set
     // HL is the bottom horizontal set maybe?
     // HB is the left horizontal set
     // HR is the top horizontal set.
     // BUT, something is wrong here. Probably Bullet's numerical problems.
-    tagsToControl.push_back("HR");
-    tagsToControl.push_back("testnone");
+    //tagsToControl.push_back("HR");
+    //tagsToControl.push_back("testnone");
     //tagsToControl.push_back("HF");
     //tagsToControl.push_back("HB");
     // Call the constructor for the controller
-    //CombinedSpineControllerBending* const controller =
-    //  new CombinedSpineControllerBending(startTime, minLength, rate, tagsToControl);
+    CombinedSpineControllerBending* const controller =
+      new CombinedSpineControllerBending(startTimeBend, minLength, rate, tagsToControl);
     // Attach the controller to the model. Must happen before running the
     // simulation.
-    //myModel->attach(controller);
+    myModel->attach(controller);
 
     // Next, we need to get a reference to the Bullet Physics world.
     // This is for passing in to the CombinedSpineControllerRotVertPositionTraj, so it can
@@ -142,23 +278,17 @@ int main(int argc, char** argv)
     btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
 
     // Create the controller for the rotating vertebra.
-    double startTimeRot = 4.0;
-    //double startTimeRot = 6.0;
-    // For the single set point:
-    //double setAngle = 0.5; // radians
-    // a test: can we do a whole 90 degree rotation?
-    //double setAngle = 1.6;
-    // hehehe it works but the Laika model explodes.
 
     // For the trajectory tracking: need a CSV file.
-    // Drew copied one in here - TO DO, make more general.
-    //std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_example_dt01_tt_50.csv";
-    // For the more realistic ramp:
-    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
+    //std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
+    
     std::string rodHingeTag = "rodForHinge";
+    // NOTE THAT THIS CONTROLLER ALSO LOGS MARKER DATA.
     CombinedSpineControllerRotVertPositionTraj* rotController =
       new CombinedSpineControllerRotVertPositionTraj( startTimeRot, csvPath,
-						  rodHingeTag, btWorld);
+						      rodHingeTag, footDataFilePrefix,
+						      timeInterval, KP, KI, KD,
+						      btWorld);
 
     // Add the controller to the YAML model.
     // TO-DO: can we do this after adding the model to the simulation?
@@ -233,22 +363,27 @@ int main(int argc, char** argv)
     myModel->addMarker(markerD);
 	   
     // Let's log info from the spheres (bottom of Laika's feet.)
+    // EDIT: UNUSED, LOGGING OCCURS IN CONTROLLER NOW.
+    
     // has to end with the prefix to the log file name.
-    std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";
-    double samplingTimeInterval = 0.1;
-    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    //std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";
+    //double samplingTimeInterval = 0.1;
+    //tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     // add the model to the data logger
-    myDataLogger->addSenseable(myModel);
+    //myDataLogger->addSenseable(myModel);
     // Make it so the data logger can dispatch sphere sensors
-    abstractMarkerSensorInfo* myAbstractMarkerSensorInfo = new abstractMarkerSensorInfo();
+    //abstractMarkerSensorInfo* myAbstractMarkerSensorInfo = new abstractMarkerSensorInfo();
+    // Correlating the cable lengths to foot positions.
+    //tgSpringCableActuatorSensorInfo * mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
     //tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
     //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
-    myDataLogger->addSensorInfo(myAbstractMarkerSensorInfo);
+    //myDataLogger->addSensorInfo(myAbstractMarkerSensorInfo);
+    //myDataLogger->addSensorInfo(mySCASensorInfo);
     //myDataLogger->addSensorInfo(mySphereSensorInfo);
     //myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
-    simulation.addDataManager(myDataLogger);
+    //simulation.addDataManager(myDataLogger);
     
     // Finally, run the simulation.
     simulation.run();
