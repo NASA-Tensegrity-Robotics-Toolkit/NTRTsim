@@ -242,6 +242,15 @@ void CombinedSpineControllerRotVertPositionTraj::onSetup(TensegrityModel& subjec
   // ...we can't do this. The pointers are the problem, since tgModel
   // stores its markers as objects, not pointers to objects.
   // Will have issues with references versus pointers and const and whatnot.
+
+  // Specify the file name prefix here (TO-DO: move to app, at least.)
+  m_dataFileNamePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerData";
+  // Seems we can't write a header yet, since the model hasn't been initialized.
+  // For a quick fix, we can check and initialize in onStep instead.
+  //writeMarkerDataHeader(subject, m_dataFileNamePrefix);
+  //DEBUGGING
+  //std::cout << "In controller, model had " << subject.getMarkers().size()
+  //	    << " markers." << std::endl;
 }
 
 /**
@@ -259,6 +268,13 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
     //std::cout << markers[i].getWorldPosition() << std::endl;
   }
   //std::cout << std::endl;
+
+  // Write marker data to a file. This is a temporary fix.
+  if( hasBeenInitialized == 0){
+    writeMarkerDataHeader(subject, m_dataFileNamePrefix);
+    hasBeenInitialized = 1;
+  }
+  
   // First, increment the accumulator variable.
   m_timePassed += dt;
   // Then, check which action to perform:
@@ -378,4 +394,117 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
   }
 }
 	
- 
+// The functions for writing data from the foot markers.
+void CombinedSpineControllerRotVertPositionTraj::writeMarkerDataHeader(TensegrityModel& subject, std::string dataFileNamePrefix)
+{
+  // Before anything else - we need to account for the tilde in possible file names.
+  // This copied from tgDataLogger2.
+  if (dataFileNamePrefix.at(0) == '~') {
+    // Get the $HOME environment variable
+    std::string home = std::getenv("HOME");
+    // Remove the tilde (the first element) from the string
+    dataFileNamePrefix.erase(0,1);
+    // Concatenate the home directory.
+    dataFileNamePrefix = home + dataFileNamePrefix;
+  }
+  
+  // Create the full name of file, with timestamp. Write the headers. Close.
+  // (1) Create the full filename of the log file.
+  // Credit to Brian Tietz Mirletz, via the original tgDataObserver.
+  // Adapted from: http://www.cplusplus.com/reference/clibrary/ctime/localtime/
+  // Also http://www.cplusplus.com/forum/unices/2259/
+  time_t rawtime;
+  tm* currentTime;
+  int fileTimeSize = 64;
+  char fileTime [fileTimeSize];
+  
+  time (&rawtime);
+  currentTime = localtime(&rawtime);
+  strftime(fileTime, fileTimeSize, "%m%d%Y_%H%M%S", currentTime);
+  // Result: fileTime is a string with the time information.
+  m_dataFileName = dataFileNamePrefix + "_" + fileTime + ".txt";
+
+  // DEBUGGING output:
+  std::cout << "CombinedSpineControllerRotVertPositionTraj will be saving data to the file: " << std::endl
+	    << m_dataFileName << std::endl;
+
+  // Attempt to open the log file
+  tgOutput.open(m_dataFileName.c_str());
+  if (!tgOutput.is_open()) {
+    throw std::runtime_error("Log file could not be opened. Usually, this is because the directory you specified does not exist. Check for spelling errors.");
+  }
+
+  // Get the abstract markers.
+  std::vector<abstractMarker> markers = subject.getMarkers();
+  
+  // Output a first line of the header.
+  tgOutput << "CombinedSpineCont... started logging at time "
+	   << fileTime << ", with "
+	   << markers.size() << " abstract markers." << std::endl;
+
+  // Get the headings for each marker, and append them to the file.
+  
+  for (std::size_t i=0; i < markers.size(); i++) {
+    // Get the vector of sensor data headings for each marker.
+    std::vector<std::string> headings = getMarkerDataHeadings(markers[i]);
+    // Iterate and output each heading
+    for (std::size_t j=0; j < headings.size(); j++) {
+      // Prepend with the sensor number and an underscore.
+      // Also, end with a comma, since this is a comma-separated-value log file.
+      tgOutput << i << "_" << headings[j] << ",";
+    }
+  }
+  // End with a new line.
+  tgOutput << std::endl;
+
+  // Done! Close the output for now, will be re-opened during step.
+  tgOutput.close();
+}
+
+/**
+ * helper for putting together a header string for one marker
+ */
+std::vector<std::string> CombinedSpineControllerRotVertPositionTraj::getMarkerDataHeadings(abstractMarker& marker) {
+
+  // The list to which we'll append all the sensor headings:
+  std::vector<std::string> headings;
+  
+  // Pull out the color for the marker,
+  // that's what we'll include instead of a tag.
+  btVector3 colorVec = marker.getColor();
+  // Turn the color into a string for use later. Make a stringstream
+  // that will then be converted into a string.
+  std::stringstream colorStream;
+  colorStream << "(" << colorVec.getX() << ", " << colorVec.getY() << ", "
+	      << colorVec.getZ() << ")";
+  std::string color = colorStream.str();
+  
+
+  //DEBUGGING
+  std::cout << "creating an abstract marker sensor for a marker with color: "
+	    << color << std::endl;
+  // Copied from tgSensor.h:
+  /**
+   * Headings should have the following form:
+   * The type of sensor, then an open parenthesis "(" and the tags
+   * of the specific tgSenseable object, then a ")." and a label for the 
+   * specific field that will be output in that row.
+   * For example, if sensor will be sensing a abstractMarker 
+   * with color (1, 1, 0), its label for the X position might be "abstractMarker((1,1,0)).X"
+   */
+
+  // The string 'prefix' will be added to each heading.
+  std::string prefix = "abstractMarker(";
+
+  // Note that the orientation is a btVector3 object of Euler angles,
+  // which I believe are overloaded as strings...
+  // Also, the XYZ positions are of the center of mass.
+  // TO-DO: check which euler angles are which!!!
+  
+  headings.push_back( prefix + color + ").X" );
+  headings.push_back( prefix + color + ").Y" );
+  headings.push_back( prefix + color + ").Z" );
+
+  // Return the resulting vector.
+  return headings;
+}

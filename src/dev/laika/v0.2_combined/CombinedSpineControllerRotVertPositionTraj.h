@@ -36,11 +36,13 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <fstream> // for file writing
 
 // Forward declarations
 class TensegrityModel;
 class tgRod;
 class btDynamicsWorld;
+class abstractMarker;
 
 /**
  * A controller to track an angular difference (position) between rotating vertebrae 
@@ -85,6 +87,17 @@ public:
    * @param[in] dt, current timestep must be positive
    */
   virtual void onStep(TensegrityModel& subject, double dt);
+
+  /**
+   * We're also going to save foot position data using this controller,
+   * as unfortunate as that may be for now. Here are a few functions
+   * that make it easier.
+   */
+  //void openMarkerDataFile(std::string fileNamePrefix);
+  void writeMarkerDataHeader(TensegrityModel& subject, std::string dataFileNamePrefix);
+  std::vector<std::string> getMarkerDataHeadings(abstractMarker& marker);
+  //void writeMarkerDataSample(TensegrityModel& subject, double dt);
+  //void closeMarkerDataFile();
     
 private:
 	
@@ -122,6 +135,15 @@ private:
    */
   std::vector< std::vector<double> > setpointTrajectory;
 
+  // For the data collection we're saving, store the full path to the file.
+  std::string m_dataFileName;
+  std::string m_dataFileNamePrefix;
+  int hasBeenInitialized = 0;
+  
+  /**
+   * A file stream, based on m_dataFileName.
+   */
+  std::ofstream tgOutput;
 };
 
 #endif // COMBINED_SPINE_CONTROLLER_ROTVERT_POSITION_TRAJ_H
