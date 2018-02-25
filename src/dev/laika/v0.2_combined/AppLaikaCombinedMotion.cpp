@@ -187,7 +187,9 @@ int main(int argc, char** argv)
 	timeInterval = 0.01; // was 0.01 for data collection.
 	startTimeRot = 15.0; // was 8.0
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
-	KP = 10; // was 0.05
+	// The original, with lots of rotation, was:
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
+	KP = 0.01; // was 0.05
 	//KI = 0.00001; // was 0.00001
 	KI = 0.0;
 	KD = 0.0;
@@ -275,7 +277,8 @@ int main(int argc, char** argv)
       new CombinedSpineControllerBending(startTimeBend, minLength, rate, tagsToControl);
     // Attach the controller to the model. Must happen before running the
     // simulation.
-    myModel->attach(controller);
+    // TEMPORARILY: can we get a leg to lift, in the SI units model?
+    //myModel->attach(controller);
 
     // Next, we need to get a reference to the Bullet Physics world.
     // This is for passing in to the CombinedSpineControllerRotVertPositionTraj, so it can
@@ -348,10 +351,18 @@ int main(int argc, char** argv)
     // That adds 33.0255 to all X positions.
     // SO, -64.801 + 33.0255 = -31.7755
     // and then + that number for the others.
+    /*
     btVector3 offsetFootA( -31.7755, 1.5, -7.55);
     btVector3 offsetFootB( -31.7755, 1.5, 7.55);
     btVector3 offsetFootC( 31.7755, 1.5, -7.55);
     btVector3 offsetFootD( 31.7755, 1.5, 7.55);
+    */
+    // For the Laika with SI units, convert all down to meters.
+    // The 'dropped' model is moved up by 1.55 meters.
+    btVector3 offsetFootA( -0.64801, 1.55, -0.0755);
+    btVector3 offsetFootB( -0.64801, 1.55, 0.0755);
+    btVector3 offsetFootC( 0.64801, 1.55, -0.0755);
+    btVector3 offsetFootD( 0.64801, 1.55, 0.0755);
     // Specify some colors for each marker.
     btVector3 colorA( 0.5, 0.5, 0.5);
     btVector3 colorB( 0.2, 0.7, 0.2);
