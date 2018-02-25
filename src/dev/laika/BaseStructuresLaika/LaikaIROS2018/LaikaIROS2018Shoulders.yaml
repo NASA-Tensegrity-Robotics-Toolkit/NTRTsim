@@ -32,11 +32,11 @@ builders:
     parameters:
       width: 0.035 # 7 in +/- Y, total
       height: 0.030 # 6 in +/- Z, total
-      density: 299 # From matlab calculations
+      density: 299 # From matlab calculations, 299
   shouldersABconnect:
     class: tgBoxInfo
     parameters:
       width: 0.003 # wood thickness
       height: 0.03 # same as shoulder box
-      density: 299 # From matlab calculations
+      density: 299 # From matlab calculations, 299
 

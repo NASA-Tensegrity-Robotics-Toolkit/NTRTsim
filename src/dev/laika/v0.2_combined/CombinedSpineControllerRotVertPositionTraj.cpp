@@ -396,7 +396,8 @@ void CombinedSpineControllerRotVertPositionTraj::onStep(TensegrityModel& subject
 
     //DEBUGGING
     std::cout << "setpoint index (time): " << setpointTrajectory[0][timestepIndex]
-	      << ", setpoint angle (rad): " << m_setAngle << std::endl;
+	      << ", setpoint angle (rad): " << m_setAngle
+	      << ", actual angle(rad): " << netRotScalar << std::endl;
     
     // Great. Let's perform the control.
     // First, control constants. The angle seems to be in the range of

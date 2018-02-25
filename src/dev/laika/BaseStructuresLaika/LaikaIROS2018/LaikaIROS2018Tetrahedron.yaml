@@ -33,5 +33,5 @@ builders:
   tetraRod:
     class: tgRodInfo
     parameters:
-      density: 2430 # From matlab calculations
+      density: 2430 # From matlab calculations, 2430
       radius: 0.0064

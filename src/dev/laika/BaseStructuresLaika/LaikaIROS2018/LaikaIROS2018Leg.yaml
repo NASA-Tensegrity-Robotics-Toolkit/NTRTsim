@@ -24,7 +24,7 @@ builders:
   legBox:
     class: tgBoxInfo
     parameters:
-      density: 299 # From matlab calculations
+      density: 0.0 # From matlab calculations, 299
       width: 0.003
       height: 0.0125
   # Also need a sphere. Created according to node names, not groups.
@@ -32,7 +32,7 @@ builders:
   legboxend:
     class: tgSphereInfo
     parameters:
-      density: 299 # From matlab calculations
+      density: 299 # From matlab calculations, 299
       radius: 0.0125
       friction: 0.0
       roll_friction: 0.0

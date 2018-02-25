@@ -134,7 +134,10 @@ bond_groups:
 #############################
 builders:
 
-# hack for decimeters, change all pretensions down by factor of 10
+# hack for centi/decimeters, change all pretensions down by factor of 100.
+# For initial tests, pretension was 10.4 for HT, 46.5 for HB, etc.
+# Saddle cable pretension was before 90.4, etc.
+# Now reducing it more.
 
   # Horizontal cables:
   HT:
@@ -183,7 +186,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 90.4
+      pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -193,7 +196,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 90.4
+      pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -203,7 +206,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 90.4
+      pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -213,7 +216,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 90.4
+      pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0

@@ -1,0 +1,8 @@
+# Trying out, again, the version of laika actually in meters.
+# Needs to be shifted up out of the ground.
+
+substructures:
+  FinalLaikaIROS2018:
+    path: ./LaikaIROS2018Model.yaml
+    translation: [0, 1.55, 0]
+

@@ -17,6 +17,13 @@ clc;
 
 % All below, we use the following scaling.
 % For example, an s=100 means we're using length units of cm.
+% ^EDIT: this script is not set up properly. Procedure SHOULD BE:
+% (1) get everything in SI units
+% (2) apply scaling factor AFTER all in SI units. 
+% ...right now, we're applying scaling factor to non-SI units and it's
+% getting all mixed up. For example, should get density in kg/m^3 by just
+% convering g/cm^3 the regular high-school physics way, then after that,
+% apply the 's'.
 s = 100;
 
 % Physical parameters of the models. Lengths in cm.
@@ -69,8 +76,8 @@ rear_vol_cm = 2 * leg_vol + ...
            hip_length_X * hip_height * hip_length_Y + ...
            hip_T_height * hip_T_width * hip_T_length_Y;
 
-% Convert volume in cm^3 to m^3: that's (1e-2)^3.
-rear_vol_m = rear_vol_cm * (1/ s^3);
+% Convert volume in cm^3 to m^3: that's 1/(10^3).
+rear_vol_m = rear_vol_cm * (1e-6);
        
 % Now, for density. We want the total force to be in N, for F = m*g.
 % Here, however, we're using g' = 100 * g, so total mass (in kg) should be
@@ -93,7 +100,7 @@ rear_mass_kg = 0.181; % was 181 grams
 % using the m^3 volume above.
 
 % From older analysis: seems we should do 1 / s^3 (where 's' is scaling
-% factor.) So for example, this would be 1 / (100^3) = 1e-6, again.
+% factor.) So for example, this would be 1 / (10^3) = 1e-6, again.
 
 rear_dens_si = rear_mass_kg / rear_vol_m;
 rear_dens_adj = rear_dens_si * (1 / s^3);
@@ -110,8 +117,8 @@ rot_rod_l = norm(v_rot_r);
 v_vol_cm = 4 * ( pi * rod_r^2 * rod_l);
 v_rot_vol_cm = 4 * (pi * rod_r^2 * rot_rod_l);
 % converted to m^3:
-v_vol_m = v_vol_cm * (1/s^3);
-v_rot_vol_m = v_rot_vol_cm * (1/s^3);
+v_vol_m = v_vol_cm * (1e-6);
+v_rot_vol_m = v_rot_vol_cm * (1e-6);
 
 % one vertebra weighs:
 v_mass_kg = 0.145;

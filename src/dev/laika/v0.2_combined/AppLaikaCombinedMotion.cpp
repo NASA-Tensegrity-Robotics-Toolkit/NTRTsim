@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // We're working in centimeters, so scaling factor = 100.
-    const tgWorld::Config config(98.1); // gravity, dm/sec^2 is 98.1.
+    const tgWorld::Config config(9.81); // gravity, dm/sec^2 is 98.1.
     // As of the commit when this comment appears, the units are still
     // a bit off. Gravity and cable force are still with s=10 (decimeters
     // and 1/10 factor on pretensions), but the length and density
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
     
     // String specifier of which foot to lift. 1, 2, 3, 4 are A,B,C,D.
     // Correspond to FR, FL, BR, BL.
-    int whichFoot = 4;
+    int whichFoot = 2;
     
     // switch on the string and assign the following:
     // (1) parameters for the horizontal bending controller
@@ -162,8 +162,8 @@ int main(int argc, char** argv)
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_" +
 	  NumberToString(minLength);
-	timeInterval = 0.01;
-	startTimeRot = 8.0;
+	timeInterval = 1; // was 0.01 for data collection.
+	startTimeRot = 15.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
@@ -184,11 +184,12 @@ int main(int argc, char** argv)
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
 	  NumberToString(minLength);
-	timeInterval = 0.01;
-	startTimeRot = 8.0;
+	timeInterval = 0.01; // was 0.01 for data collection.
+	startTimeRot = 15.0; // was 8.0
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
-	KP = 0.5;
-	KI = 0.00001;
+	KP = 10; // was 0.05
+	//KI = 0.00001; // was 0.00001
+	KI = 0.0;
 	KD = 0.0;
 	break;
 
@@ -204,8 +205,8 @@ int main(int argc, char** argv)
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataC_"+
 	  NumberToString(minLength);
-	timeInterval = 0.1;
-	startTimeRot = 10.0;
+	timeInterval = 1; // was 0.01 for data collection.
+	startTimeRot = 15.0; // was 8.0
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
 	KP = 0.5;
 	KI = 0.00001;
@@ -224,8 +225,8 @@ int main(int argc, char** argv)
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataD_" +
 	  NumberToString(minLength);
-	timeInterval = 0.01;
-	startTimeRot = 10.0;
+	timeInterval = 1; // was 0.01 for data collection.
+	startTimeRot = 15.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
@@ -238,6 +239,14 @@ int main(int argc, char** argv)
 	// need to throw an error here
 	throw std::invalid_argument("Need to specify which foot to lift.");
     }
+
+    /**
+     * ALSO FOR IROS 2018 DATA COLLECTION
+     * For generating figures of the robot lifting its feet, we need to move it around a bit.
+     * Which means ...
+     * ...maybe I don't have to do this, just translate the robot by half its X,
+     * and move the markers that way also.
+     */
 
     // Attach a controller to the model, if desired.
     // This is a controller that interacts with a generic TensegrityModel as
@@ -335,10 +344,14 @@ int main(int argc, char** argv)
     
     //btVector3 offsetFootA(-33, 5, 15);
     // Foot A/B at -x. Foot B/C at -y. (front is -x, right is -y.)
-    btVector3 offsetFootA( -64.801, 1.5, -7.55);
-    btVector3 offsetFootB( -64.801, 1.5, 7.55);
-    btVector3 offsetFootC( 0, 1.5, -7.55);
-    btVector3 offsetFootD( 0, 1.5, 7.55);
+    // FOR FINAL_LAIKA: translated the whole robot so it's centered.
+    // That adds 33.0255 to all X positions.
+    // SO, -64.801 + 33.0255 = -31.7755
+    // and then + that number for the others.
+    btVector3 offsetFootA( -31.7755, 1.5, -7.55);
+    btVector3 offsetFootB( -31.7755, 1.5, 7.55);
+    btVector3 offsetFootC( 31.7755, 1.5, -7.55);
+    btVector3 offsetFootD( 31.7755, 1.5, 7.55);
     // Specify some colors for each marker.
     btVector3 colorA( 0.5, 0.5, 0.5);
     btVector3 colorB( 0.2, 0.7, 0.2);
