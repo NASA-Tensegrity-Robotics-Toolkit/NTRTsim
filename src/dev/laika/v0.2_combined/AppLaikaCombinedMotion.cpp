@@ -125,7 +125,8 @@ int main(int argc, char** argv)
     
     // String specifier of which foot to lift. 1, 2, 3, 4 are A,B,C,D.
     // Correspond to FR, FL, BR, BL.
-    int whichFoot = 2;
+    
+    int whichFoot = 4;
     
     // switch on the string and assign the following:
     // (1) parameters for the horizontal bending controller
@@ -158,18 +159,26 @@ int main(int argc, char** argv)
 	rate = 0.25;
 	// front right foot requires COM shifting to the left
 	// Pulling in the right cable shifts robot to the left.
-	tagsToControl.push_back("HR");
+	// Somewhere in here we switched right and left?? 
+	tagsToControl.push_back("HL");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_" +
 	  NumberToString(minLength);
-	timeInterval = 1; // was 0.01 for data collection.
-	startTimeRot = 15.0; // was 8.0
+	timeInterval = 0.01; // was 0.01 for data collection.
+	startTimeRot = 8.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
-	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
+	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_neg_pi4.csv";
+	/* constants for the centimeters model:
 	KP = 0.2;
 	KI = 0.000001;
 	KD = 0.2;
+	*/
+	KP = 0.0001;
+	KI = 0.0;
+	KD = 0.0;
 	break;
       
       case 2:
@@ -180,7 +189,7 @@ int main(int argc, char** argv)
 	rate = 0.25;
 	// front left foot requires COM shifting to the right
 	// Pulling in the left cable shifts robot to the right.
-	tagsToControl.push_back("HL");
+	tagsToControl.push_back("HR");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
 	  NumberToString(minLength);
@@ -201,20 +210,22 @@ int main(int argc, char** argv)
 	// BR
       	// bend:
 	startTimeBend = 2.0;
-	minLength = 0.9; // as a percent
+	minLength = 0.9; // as a percent. Was 0.9
 	rate = 0.25;
 	// back right foot requires bending to the left
 	// pulling on the right cables shifts COM to the left
-	tagsToControl.push_back("HR");
+	tagsToControl.push_back("HL");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataC_"+
 	  NumberToString(minLength);
-	timeInterval = 1; // was 0.01 for data collection.
-	startTimeRot = 15.0; // was 8.0
-	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
-	KP = 0.5;
-	KI = 0.00001;
-	KD = 0.0;
+	timeInterval = 0.01; // was 0.01 for data collection.
+	startTimeRot = 8.0; // was 8.0
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
+	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_pi4.csv";
+	KP = 0.0001;
+	KI = 0.0000001;
+	KD = 0.00001;
 	break;
 
     case 4:
@@ -225,18 +236,21 @@ int main(int argc, char** argv)
 	rate = 0.25;
 	// back left foot requires COM shifting to the right
 	// Pulling in the left cable shifts robot to the left.
-	tagsToControl.push_back("HL");
+	tagsToControl.push_back("HR");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataD_" +
 	  NumberToString(minLength);
-	timeInterval = 1; // was 0.01 for data collection.
-	startTimeRot = 15.0; // was 8.0
+	timeInterval = 0.01; // was 0.01 for data collection.
+	startTimeRot = 8.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
-	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
-	KP = 0.2;
-	KI = 0.000001;
-	KD = 0.2;
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
+	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_neg_pi4.csv";
+	KP = 0.0001;
+	KI = 0.0;
+	//KI = 0.0000001;
+	KD = 0.00001;
 	break;
 	
       default:
@@ -280,7 +294,7 @@ int main(int argc, char** argv)
     // Attach the controller to the model. Must happen before running the
     // simulation.
     // TEMPORARILY: can we get a leg to lift, in the SI units model?
-    //myModel->attach(controller);
+    myModel->attach(controller);
 
     // Next, we need to get a reference to the Bullet Physics world.
     // This is for passing in to the CombinedSpineControllerRotVertPositionTraj, so it can
