@@ -169,8 +169,14 @@ stretch_bottom_m = stretch_bottom_cm * (1/s);
 % Thicknesses are: 
 % Bottom: 0.35 inch
 % All else: (was it 1.6? see spreadsheet...)
-k_bottom = 291;
-k_else = 174;
+%k_bottom = 291;
+%k_else = 174;
+% This was at -1 std dev on the data. Instead, we could try the following:
+% Min: bottom = 252, else = 141
+% Mean: bottom = 434, else = 244
+% Max: bottom = 616, else = 346
+k_bottom = 434;
+k_else = 244;
 % in N/m.0.
 
 % Then, we can calculate "pretension", which is F = k * stretch

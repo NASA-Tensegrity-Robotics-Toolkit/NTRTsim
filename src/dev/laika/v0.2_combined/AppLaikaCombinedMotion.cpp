@@ -185,11 +185,13 @@ int main(int argc, char** argv)
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 15.0; // was 8.0
-	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
+	startTimeRot = 8.0; // was 8.0
+	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
 	// The original, with lots of rotation, was:
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
-	KP = 0.01; // was 0.05
+	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
+	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_pi4.csv";
+	KP = 0.01; // was 0.05, for centimeters model, or 0.01.
 	//KI = 0.00001; // was 0.00001
 	KI = 0.0;
 	KD = 0.0;
@@ -359,10 +361,12 @@ int main(int argc, char** argv)
     */
     // For the Laika with SI units, convert all down to meters.
     // The 'dropped' model is moved up by 1.55 meters.
+    // On 2018-02-26: Feet C and D markers, the back two, need to be at 0
+    // and not at +0.64801, since the robot is zero-ed at the back legs.
     btVector3 offsetFootA( -0.64801, 1.55, -0.0755);
     btVector3 offsetFootB( -0.64801, 1.55, 0.0755);
-    btVector3 offsetFootC( 0.64801, 1.55, -0.0755);
-    btVector3 offsetFootD( 0.64801, 1.55, 0.0755);
+    btVector3 offsetFootC( 0.0, 1.55, -0.0755);
+    btVector3 offsetFootD( 0.0, 1.55, 0.0755);
     // Specify some colors for each marker.
     btVector3 colorA( 0.5, 0.5, 0.5);
     btVector3 colorB( 0.2, 0.7, 0.2);

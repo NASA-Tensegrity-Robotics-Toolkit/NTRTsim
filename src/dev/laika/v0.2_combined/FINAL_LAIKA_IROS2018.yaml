@@ -6,8 +6,20 @@
 # which would be -52.201 -12.6 -1.25 (for the foot.)
 # = -66.051, half = 33.0255
 
+#substructures:
+#  FinalLaikaIROS2018:
+#    path: ./LaikaIROS2018Model_cm.yaml
+#    translation: [33.0255, 0, 0]
+
+# We're going to use the SI model for data collection,
+# and the centimeters model for good video.
+# The SI units model starts with the 'rear' at the -x (e.g., towards
+# the right) at the distance away of the leg center node.
+# So, in the App, need to make sure the CD feet at at 0 x translation.
+
+# As of 2-26-18, this is the same as the "_m_dropped" model.
 substructures:
   FinalLaikaIROS2018:
-    path: ./LaikaIROS2018Model_cm.yaml
-    translation: [33.0255, 0, 0]
+    path: ./LaikaIROS2018Model.yaml
+    translation: [0, 1.55, 0]
 
