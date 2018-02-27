@@ -57,8 +57,8 @@
 LengthController12BarCube::LengthController12BarCube(double startTime,
 					   double minLength,
 					   double rate,
-             bool loop,
-             std::vector<int> sequence,
+             				   bool loop,
+             				   std::vector<int> sequence,
 					   std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),

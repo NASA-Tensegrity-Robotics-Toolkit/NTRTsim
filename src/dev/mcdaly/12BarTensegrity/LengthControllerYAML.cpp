@@ -53,10 +53,10 @@
 LengthControllerYAML::LengthControllerYAML(double startTime,
 					   double minLength,
 					   double rate,
-					   std::vector<std::string> tagsToControl) :
+					    std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),
-  m_rate(rate),
+  m_rate(rate), 
   m_tagsToControl(tagsToControl),
   m_timePassed(0.0)
 {

@@ -68,7 +68,7 @@ public:
    * will be acted upon by this controller.
    */
   LengthControllerYAML(double startTime, double minLength, double rate,
-			    std::vector<std::string> tagsToControl);
+			   std::vector<std::string> tagsToControl);
     
   /**
    * Nothing to delete, destructor must be virtual

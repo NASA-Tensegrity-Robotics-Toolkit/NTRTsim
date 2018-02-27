@@ -35,9 +35,8 @@
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Controllers
-#include "LengthController12BarCube.h"
-//#include "LengthControllerYAML.h"
-
+//#include "LengthController12BarCube.h"
+#include "LengthControllerWithReturn.h"
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -78,22 +77,31 @@ int main(int argc, char** argv)
 
     // Parameters for the LengthController12BarCube are specified in that .h file,
     // repeated here:
-    double startTime = 5;
-    double minLength = 0.1;
-    double rate = 0.5;
-    bool loop = false;
-    int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
+    //double startTime = 5;
+    //double minLength = 0.1;
+    //double rate = 0.5;
+    //bool loop = false;
+    //int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
     // int arr[] = {9, 21, 29, 18, 7, 16, 20, 12, 2, 28, 22, 26, 1, 8, 30, 3};  // forward walking through alternating triangles
     // int arr[] = {9, 21, 29, 18};  // single step
-    std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
+   // std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     // std::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
+    //std::vector<std::string> tagsToControl;
+   // tagsToControl.push_back("cable");
+    
+    // Parameters for the LengthControllerWithReturn are speciefied in the corresponding .h-file
+    // repeated here
+    double startTime = 3;
+    double minLength = 0.9;
+    double rate = 0.1;
+    int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
+    std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     std::vector<std::string> tagsToControl;
     tagsToControl.push_back("cable");
-    
-    // Create the controller
-    // LengthControllerYAML* const myController = new LengthControllerYAML(startTime, minLength, rate, tagsToControl);
-    LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);
 
+    // Create the controller
+    //LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);
+    LengthControllerWithReturn* const myController = new LengthControllerWithReturn(startTime, minLength, rate, tagsToControl);
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
     // double samplingTime = 0.1;

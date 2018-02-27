@@ -20,6 +20,21 @@ add_executable(App12Bar
     LengthControllerMultipleSequential.cpp
     LengthController12BarCube.cpp
     App12Bar.cpp
+)
+
+add_executable(App12BarTest1
+    LengthControllerSequential.cpp
+    LengthControllerWithReturn.cpp
+    LengthControllerMultipleSequential.cpp
+    LengthController12BarCube.cpp
+    App12BarTest1.cpp
 ) 
+ 
+add_executable(App12BarTest2
+    LengthControllerSequential.cpp
+    LengthControllerWithReturn.cpp
+    LengthControllerMultipleSequential.cpp
+    App12BarTest2.cpp
+)
 
 
