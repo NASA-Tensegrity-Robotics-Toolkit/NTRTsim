@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // Create the view
-    const double timestep_physics = 0.0001; // seconds // recommended 0.001
+    const double timestep_physics = 0.01; // seconds // recommended 0.001
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
@@ -92,14 +92,14 @@ int main(int argc, char** argv)
     
     // Parameters for the LengthControllerWithReturn are speciefied in the corresponding .h-file
     // repeated here
-    double startTime = 10;
-    double minLength = 0.1;
-    double rate = 0.5;
-    int arr[] = {1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};  // forward walking with through same side triangles
-    //int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
+    double startTime = 5;
+    double minLength = 0.3;
+    double rate = 0.9;
+    //int arr[] = {1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};  // forward walking with through same side triangles
+    int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
     std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     std::vector<std::string> tagsToControl;
-    tagsToControl.push_back("cable");
+    tagsToControl.push_back("cable_structure"); // Keyword to look for in .yaml file
 
     // Create the controller
     //LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);

@@ -92,6 +92,12 @@ void LengthControllerMultipleSequential::initializeActuators(TensegrityModel& su
   std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
   std::cout << "The following cables were found and will be controlled: "
 	    << std::endl;
+
+  // If no actuators are found
+  if (foundActuators.size() == 0){
+    std::cout << "No actuators found." << std::endl;
+  }
+
   //Iterate through array and output strings to command line
   for (std::size_t i = 0; i < foundActuators.size(); i ++) {	
     std::cout << foundActuators[i]->getTags() << std::endl;
@@ -116,8 +122,8 @@ void LengthControllerMultipleSequential::initializeActuators(TensegrityModel& su
 void LengthControllerMultipleSequential::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the LengthControllerMultipleSequential controller." << std::endl;
-  //	    << "Finding cables with tags: " << m_tagsToControl
-  //	    << std::endl;
+  //std::cout << "Finding cables with tags: " << m_tagsToControl << std::endl;
+  
   cablesWithTags = {};
   // For all the strings in the list, call initializeActuators.
   std::vector<std::string>::iterator it;
@@ -152,12 +158,12 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
       // If the current rest length is greater than the desired minimum,
       if(currRestLength > minRestLength) {
         // output a progress bar for the controller, to track when control occurs
-        //std::cout << "." << i;
+        std::cout << "Control occurs, cable index: " << i << std::endl;
         // Then adjust the rest length of the actuator itself, according to
         // m_rate and dt
         double nextRestLength = currRestLength - m_rate * dt;
         //DEBUGGING
-        //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+        std::cout << "Next Rest Length: " << nextRestLength << std::endl;
         cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
       else {
@@ -176,7 +182,7 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
 
     // Return state
     else if (m_finished == 0) {
-      //std::cout << "Made it to return state." << std::endl; 
+      std::cout << "Made it to return state." << std::endl; 
       // Grab cable index
       int i = m_cable_index;
       // Grab current rest length
@@ -186,12 +192,12 @@ void LengthControllerMultipleSequential::onStep(TensegrityModel& subject, double
       // If the current rest length is below initial rest length,
       if(currRestLength < initialRestLength) {
         // output a progress bar for the controller, to track when control occurs.
-        //std::cout << "." << i;
+        std::cout << "Control occured. Cable index: " << i << std::endl;
         // Then adjust the rest length of the actuator itself, according to
         // m_rate and dt
         double nextRestLength = currRestLength + m_rate * dt;
         //DEBUGGING
-        //std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+        std::cout << "Next Rest Length: " << nextRestLength << std::endl;
         cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
       else {
