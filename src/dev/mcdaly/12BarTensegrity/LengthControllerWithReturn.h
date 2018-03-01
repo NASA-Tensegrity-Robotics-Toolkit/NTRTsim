@@ -139,5 +139,4 @@ private:
   std::vector<tgBasicActuator*> cablesWithTags;
 
 };
-
 #endif

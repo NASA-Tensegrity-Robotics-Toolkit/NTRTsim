@@ -1,9 +1,0 @@
-substructures:
-  12BarCube:
-    path: ./12BarCubeFriction.yaml
-    translation: [0, 4, 0] #dm
-    #translation: [0, 10, 0]
-    rotation:
-      axis: [1, 0, 0]
-      angle: 180 #deg
-    scale: 1

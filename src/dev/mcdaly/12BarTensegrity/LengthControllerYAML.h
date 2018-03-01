@@ -31,6 +31,9 @@
  * retraction rate, and cables to be controlled (based on tags).
  */
 
+#ifndef LENGTHCONTROLLERYAML_H // Added by Hannah 2/28/2018
+#define LENGTHCONTROLLERYAML_H
+
 // The NTRT core library
 #include "core/tgObserver.h"
 #include "core/tgSubject.h"
@@ -137,4 +140,4 @@ private:
 
 };
 
-// #endif // HORIZONTAL_SPINE_CONTROLLER_H
+#endif // HORIZONTAL_SPINE_CONTROLLER_H
