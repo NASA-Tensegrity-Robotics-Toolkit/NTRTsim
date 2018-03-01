@@ -93,7 +93,10 @@ int main(int argc, char** argv)
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // We're working in centimeters, so scaling factor = 100.
+    // FOR IROS 2018 DATA COLLECTION:
     const tgWorld::Config config(9.81); // gravity, dm/sec^2 is 98.1.
+    // FOR IROS 2018 VISUALIZATION:
+    //const tgWorld::Config config(98.1);
     // As of the commit when this comment appears, the units are still
     // a bit off. Gravity and cable force are still with s=10 (decimeters
     // and 1/10 factor on pretensions), but the length and density
@@ -125,7 +128,8 @@ int main(int argc, char** argv)
     
     // String specifier of which foot to lift. 1, 2, 3, 4 are A,B,C,D.
     // Correspond to FR, FL, BR, BL.
-    
+
+    // hack to prevent controllers from running: input 0.
     int whichFoot = 4;
     
     // switch on the string and assign the following:
@@ -136,16 +140,18 @@ int main(int argc, char** argv)
     // first, declare everything we need.
     // Some of these are initialized to prevent segfaults accidentally
     // Rotating vertebra controller + data logging:
-    std::string footDataFilePrefix;
-    double timeInterval = 0.0;
-    double startTimeRot = 0.0;
-    std::string csvPath;
+    std::string footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_";
+    // Default value for logging should be "large enough so that we don't log data"
+    // Default rotating control should occur "very long after sim begins"
+    double timeInterval = 100.0;
+    double startTimeRot = 100.0;
+    std::string csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_neg_pi4.csv";
     double KP = 0.0; // proportional control const for rot ver pos tracking
     double KI = 0.0; // integral control const for rot ver pos tracking
     double KD = 0.0; // deriv control const for rot vert pos tracking
     // Horizontal bending controller
     double startTimeBend = 0.0;
-    double minLength = 0.0;
+    double minLength = 1.0; // 1.0 is 100%, no bending
     double rate = 0.0;
     std::vector<std::string> tagsToControl;
     
@@ -255,7 +261,9 @@ int main(int argc, char** argv)
 	
       default:
 	// need to throw an error here
-	throw std::invalid_argument("Need to specify which foot to lift.");
+	//throw std::invalid_argument("Need to specify which foot to lift.");
+	// Let's instead just run no control
+	std::cout << "WARNING: NO FOOT WILL BE LIFTED" << std::endl;
     }
 
     /**
@@ -399,10 +407,16 @@ int main(int argc, char** argv)
     abstractMarker markerD(rearRigids[0]->getPRigidBody(),
 			   offsetFootD - rearRigids[0]->getPRigidBody()->getCenterOfMassPosition(),
 			   colorD, 0);
-    myModel->addMarker(markerA);
-    myModel->addMarker(markerB);
-    myModel->addMarker(markerC);
-    myModel->addMarker(markerD);
+
+    // Turn markers on or off
+    bool markersOn = 1;
+    if(markersOn){
+      myModel->addMarker(markerA);
+      myModel->addMarker(markerB);
+      myModel->addMarker(markerC);
+      myModel->addMarker(markerD);
+    }
+    
 	   
     // Let's log info from the spheres (bottom of Laika's feet.)
     // EDIT: UNUSED, LOGGING OCCURS IN CONTROLLER NOW.

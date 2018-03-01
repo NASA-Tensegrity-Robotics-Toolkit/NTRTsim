@@ -143,6 +143,7 @@ bond_groups:
 # Min: bottom = 252, else = 141
 # Mean: bottom = 434, else = 244
 # Max: bottom = 616, else = 346
+# For the black lattice: bottom is estimated at 515 N/m, Holly's data.
 
 builders:
 
@@ -150,9 +151,9 @@ builders:
   HT:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 174 # used mean for first set of IROS data, 244
       damping: 100.0
-      pretension: 1.46
+      pretension: 1.04 # was 1.46
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -160,9 +161,9 @@ builders:
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 434
+      stiffness: 515 # used red lattice mean for first IROS data, 434
       damping: 100.0
-      pretension: 6.94
+      pretension: 7.72 # orig with mean, red, was 6.94
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -170,9 +171,9 @@ builders:
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 174
       damping: 100.0
-      pretension: 0.98
+      pretension: 0.70 # was 0.98
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -180,9 +181,9 @@ builders:
   HL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 174
       damping: 100.0
-      pretension: 0.98
+      pretension: 0.70
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -191,9 +192,9 @@ builders:
   STR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 174 # initial data with 244
       damping: 100.0
-      pretension: 12.69
+      pretension: 9.05 # initial data with 12.69
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -201,9 +202,9 @@ builders:
   STL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 174
       damping: 100.0
-      pretension: 12.69
+      pretension: 9.05
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -211,9 +212,9 @@ builders:
   SBR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244.0
+      stiffness: 174
       damping: 100.0
-      pretension: 12.69
+      pretension: 9.05
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -221,9 +222,9 @@ builders:
   SBL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244.0
+      stiffness: 174
       damping: 100.0
-      pretension: 12.69
+      pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0

@@ -155,7 +155,7 @@ builders:
     parameters:
       stiffness: 291
       damping: 100.0
-      pretension: 46.5
+      pretension: 150.0 # was 46.5, for visualization make large
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -164,8 +164,8 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 174
-      damping: 100.0
-      pretension: 6.9
+      damping: 100.0 
+      pretension: 69 # was 6.9, for visualization make large
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -175,7 +175,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 6.9
+      pretension: 69
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -186,7 +186,7 @@ builders:
     parameters:
       stiffness: 174
       damping: 100.0
-      pretension: 9.04
+      pretension: 90.4 # was 9.04, for visualization make large
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -206,7 +206,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 9.04
+      pretension: 90.4
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -216,7 +216,7 @@ builders:
     parameters:
       stiffness: 174.0
       damping: 100.0
-      pretension: 9.04
+      pretension: 90.4
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0

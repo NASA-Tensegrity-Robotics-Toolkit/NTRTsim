@@ -163,6 +163,7 @@ private:
   // We'll also store a counter for only collecting data at certain time intervals.
   double m_timeInterval; // like 0.1 or something
   double m_updateTime = 0.0; // will be updated/reset in onStep
+  //bool logData; // Turn data logging on or off
 
   // Also, we're going to save the ACTUAL position of the rotating vertebra,
   // so it can be indexed against foot position. This requires

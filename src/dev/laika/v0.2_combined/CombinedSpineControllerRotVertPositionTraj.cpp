@@ -88,6 +88,8 @@ CombinedSpineControllerRotVertPositionTraj::CombinedSpineControllerRotVertPositi
   // path to the CSV file must not be null
   else if( (m_csvPath.empty() )) {
     throw std::invalid_argument("CSV path is not present. Must provide a file with angle data.");
+    // Just output a warning instead
+    //std::cout << "WARNING: NO FOOT POSITION LOGGING WILL OCCUR" << std::endl;
   }
   // If there's a tilde in the file name prefix, replace with the home directory
   // This copied from tgDataLogger2.

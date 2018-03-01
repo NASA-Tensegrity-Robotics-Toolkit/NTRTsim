@@ -150,7 +150,7 @@ x0_else = 9.5;
 x_saddle_cm = 14.7;
 x_top_cm = 10.1;
 x_sides_cm = 9.9;
-x_bottom_cm = 9.4;
+x_bottom_cm = 9.3; % for black lattice strip, Drew measured 9.3, not 9.4
 
 % Then, as we'll be doing F = k (x - x0), the total stretched length (x-x0)
 % for each will be:
@@ -175,8 +175,11 @@ stretch_bottom_m = stretch_bottom_cm * (1/s);
 % Min: bottom = 252, else = 141
 % Mean: bottom = 434, else = 244
 % Max: bottom = 616, else = 346
-k_bottom = 434;
-k_else = 244;
+%k_bottom = 434;
+% for the black lattice material, https://docs.google.com/spreadsheets/d/1vufW-rk9Y2as5zzanuQNYwpHWIGvXa4Yp8Swb1RdZeA/edit#gid=0
+k_bottom = 515;
+%k_else = 244;
+k_else = 174; % from some calcs on google drive
 % in N/m.0.
 
 % Then, we can calculate "pretension", which is F = k * stretch
