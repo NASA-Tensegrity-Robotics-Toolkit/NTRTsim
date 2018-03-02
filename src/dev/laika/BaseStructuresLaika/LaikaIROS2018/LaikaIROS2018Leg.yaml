@@ -21,6 +21,8 @@ pair_groups:
 builders:
   # Let's do the box for the leg.
   # It's 0.3 cm thick (in X) and 2.5 cm wide (in Y.)
+  # On 3/1/18: when factoring in new mass of cables, desity from 299 to 425
+  # ...also adding friction.
   legBox:
     class: tgBoxInfo
     parameters:
@@ -32,7 +34,7 @@ builders:
   legboxend:
     class: tgSphereInfo
     parameters:
-      density: 299 # From matlab calculations, 299
+      density: 425 # From matlab calculations, 299
       radius: 0.0125
-      friction: 0.0
-      roll_friction: 0.0
+      friction: 0.5
+      roll_friction: 0.5

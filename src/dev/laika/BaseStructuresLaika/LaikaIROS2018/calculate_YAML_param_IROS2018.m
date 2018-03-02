@@ -91,6 +91,9 @@ rear_vol_m = rear_vol_cm * (1e-6);
 
 % Measured mass of one full rear:
 rear_mass_kg = 0.181; % was 181 grams
+% ADJUSTED on 3/1/18: forgot to include the weight of the cables for the
+% motors! Those were 38g each, so the new mass is
+rear_mass_kg = 0.257;
 % So we want the mass to be
 %read_mass_adj = rear_mass_kg * 100;
 
@@ -121,7 +124,15 @@ v_vol_m = v_vol_cm * (1e-6);
 v_rot_vol_m = v_rot_vol_cm * (1e-6);
 
 % one vertebra weighs:
-v_mass_kg = 0.145;
+% EDIT 3/1/15: re-weighing the vertebra put it at 283 with cables,
+% so subtracting the cables gives us
+%v_mass_kg = 0.207;
+%v_mass_kg = 0.145;
+% ...actually, need to average over all vertebrae, really.
+% passive are 90g, rotvert is 167 - cable = 129
+% So, total among all vertebrae is
+all_vert_mass = (0.207 * 2 + 0.090 * 2 + 0.129);
+v_mass_kg = all_vert_mass/5;
 
 % density is then:
 v_dens_si = v_mass_kg / v_vol_m;

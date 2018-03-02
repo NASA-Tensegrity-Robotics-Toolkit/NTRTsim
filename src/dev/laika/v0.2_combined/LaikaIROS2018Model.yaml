@@ -145,86 +145,105 @@ bond_groups:
 # Max: bottom = 616, else = 346
 # For the black lattice: bottom is estimated at 515 N/m, Holly's data.
 
+# NOTE! min_actual_length defaults to 0.1. This has to change down
+# for SI units testing. Same with min rest length.
+
 builders:
 
   # Horizontal cables:
   HT:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174 # used mean for first set of IROS data, 244
-      damping: 100.0
-      pretension: 1.04 # was 1.46
+      stiffness: 244 # used mean for first set of IROS data, 244
+      damping: 10.0
+      pretension: 1.46 # was 1.46 for 244, 1.04 for 174
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
 
   HB:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 515 # used red lattice mean for first IROS data, 434
-      damping: 100.0
+      damping: 10.0
       pretension: 7.72 # orig with mean, red, was 6.94
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
       
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174
-      damping: 100.0
-      pretension: 0.70 # was 0.98
+      stiffness: 244
+      damping: 10.0
+      pretension: 0.98 # was 0.98 for 244, 0.7 for 174
       history: 1
-      max_tension: 70000.0
+      max_tension: 700000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
 
   HL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174
-      damping: 100.0
-      pretension: 0.70
+      stiffness: 244
+      damping: 10.0
+      pretension: 0.98
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
 
   # Saddle cables:
   STR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174 # initial data with 244
-      damping: 100.0
+      stiffness: 244 # initial data with 244
+      damping: 10.0
       pretension: 9.05 # initial data with 12.69
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
       
   STL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174
-      damping: 100.0
+      stiffness: 244
+      damping: 10.0
       pretension: 9.05
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
 
   SBR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174
-      damping: 100.0
+      stiffness: 244
+      damping: 10.0
       pretension: 9.05
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
 
   SBL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 174
-      damping: 100.0
+      stiffness: 244
+      damping: 10.0
       pretension: 9.04
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0

@@ -27,16 +27,17 @@ pair_groups:
 builders:
   # each part might have different dimensions because of box orientation
   # issues. See issue on github for automatic box orientation selection prob.
+  # On 3/1/18: when factoring in new mass of cables, desity from 299 to 425
   shouldersVertConnect:
     class: tgBoxInfo
     parameters:
       width: 0.035 # 7 in +/- Y, total
       height: 0.030 # 6 in +/- Z, total
-      density: 299 # From matlab calculations, 299
+      density: 425 # From matlab calculations, 299
   shouldersABconnect:
     class: tgBoxInfo
     parameters:
       width: 0.003 # wood thickness
       height: 0.03 # same as shoulder box
-      density: 299 # From matlab calculations, 299
+      density: 425 # From matlab calculations, 299
 

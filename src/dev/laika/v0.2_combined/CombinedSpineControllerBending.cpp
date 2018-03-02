@@ -110,12 +110,12 @@ void CombinedSpineControllerBending::initializeActuators(TensegrityModel& subjec
 void CombinedSpineControllerBending::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the HorizontalSpine controller." << std::endl;
-  //	    << "Finding cables with tags: " << m_tagsToControl
-  //	    << std::endl;
   cablesWithTags = {};
   // For all the strings in the list, call initializeActuators.
   std::vector<std::string>::iterator it;
   for( it = m_tagsToControl.begin(); it < m_tagsToControl.end(); it++ ) {
+    //DEBUGGING
+    //std::cout << "Finding cables with tags: " << *it << std::endl;
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
@@ -130,20 +130,31 @@ void CombinedSpineControllerBending::onStep(TensegrityModel& subject, double dt)
   if( m_timePassed > m_startTime ) {
     // For each cable, check if its rest length is past the minimum,
     // otherwise adjust its length according to m_rate and dt.
-    for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {	
+    for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {
+      // Note: if we get errors here, be sure to check the config struct
+      // for spring cable actuator, with things like max tension, min lengths, etc.
       double currRestLength = cablesWithTags[i]->getRestLength();
+      /*
+      std::cout << "rest length for cable with tags: "
+		<< cablesWithTags[i]->getTags() << " is "
+		<< currRestLength << std::endl;
+      */
       // Calculate the minimum rest length for this cable.
       // Remember that m_minLength is a percent.
       double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
       // If the current rest length is still greater than the minimum,
       if( currRestLength > minRestLength ) {
 	// output a progress bar for the controller, to track when control occurs.
-	std::cout << "." << i;
+	std::cout << "Bending on cable with "
+		  << initialRL[cablesWithTags[i]->getTags()] << " x0, and "
+		  << currRestLength << " curr rest length, down to "
+		  << initialRL[cablesWithTags[i]->getTags()] * m_minLength
+		  << " final rest length." << std::endl;
 	// Then, adjust the rest length of the actuator itself, according to
 	// m_rate and dt.
 	double nextRestLength = currRestLength - m_rate * dt;
 	//DEBUGGING
-	//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+	std::cout << "Next Rest Length: " << nextRestLength << std::endl;
 	cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
     }   

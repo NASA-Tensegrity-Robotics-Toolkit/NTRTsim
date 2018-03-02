@@ -29,9 +29,13 @@ pair_groups:
 
 # Density used to be 0.014,
 # but newer calculation puts it at 0.0024 when lengths in cm.
+# Density previously was 2430, but re-weighing the vertebra
+# puts it at 3468
+# Recorrection: not all vertebrae are the ones with motors. Averaged out,
+# and re-weighed (See MATLAB) is now
 builders:
   tetraRod:
     class: tgRodInfo
     parameters:
-      density: 2430 # From matlab calculations, 2430
+      density: 2423 # From matlab calculations
       radius: 0.0064

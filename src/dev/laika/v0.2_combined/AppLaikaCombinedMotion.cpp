@@ -130,7 +130,7 @@ int main(int argc, char** argv)
     // Correspond to FR, FL, BR, BL.
 
     // hack to prevent controllers from running: input 0.
-    int whichFoot = 4;
+    int whichFoot = 1;
     
     // switch on the string and assign the following:
     // (1) parameters for the horizontal bending controller
@@ -161,17 +161,17 @@ int main(int argc, char** argv)
 	// FR
 	// bend:
 	startTimeBend = 2.0;
-	minLength = 0.9; // as a percent
-	rate = 0.25;
+	minLength = 0.8; // as a percent
+	rate = 0.025;
 	// front right foot requires COM shifting to the left
 	// Pulling in the right cable shifts robot to the left.
 	// Somewhere in here we switched right and left?? 
-	tagsToControl.push_back("HL");
+	tagsToControl.push_back("HR");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 8.0; // was 8.0
+	startTimeRot = 6.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
@@ -182,8 +182,15 @@ int main(int argc, char** argv)
 	KI = 0.000001;
 	KD = 0.2;
 	*/
+	/*
 	KP = 0.0001;
 	KI = 0.0;
+	KD = 0.0;
+	*/
+	KP = 0.00001; // was 0.05, for centimeters model, or 0.01.
+	KI = 0.000000001; // was 0.00001
+	//KI = 0.0;
+	//KD = 0.00001;
 	KD = 0.0;
 	break;
       
@@ -191,46 +198,53 @@ int main(int argc, char** argv)
 	// FL
 	// bend:
 	startTimeBend = 2.0;
-	minLength = 0.9; // as a percent
-	rate = 0.25;
+	minLength = 0.8; // as a percent
+	rate = 0.025; // was 0.25
 	// front left foot requires COM shifting to the right
 	// Pulling in the left cable shifts robot to the right.
-	tagsToControl.push_back("HR");
+	tagsToControl.push_back("HL");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 8.0; // was 8.0
+	startTimeRot = 6.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
 	// The original, with lots of rotation, was:
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_10_max_05.csv";
 	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_pi4.csv";
-	KP = 0.01; // was 0.05, for centimeters model, or 0.01.
-	//KI = 0.00001; // was 0.00001
-	KI = 0.0;
-	KD = 0.0;
+	// Hardware test required up to 1 rad.
+        //csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_1rad.csv";
+	KP = 0.0001; // was 0.05, for centimeters model, or 0.01.
+	KI = 0.000000001; // was 0.00001
+	//KI = 0.0;
+	KD = 0.00001;
 	break;
 
     case 3:
 	// BR
       	// bend:
 	startTimeBend = 2.0;
-	minLength = 0.9; // as a percent. Was 0.9
-	rate = 0.25;
+	minLength = 0.8; // as a percent. Was 0.9
+	rate = 0.025;
 	// back right foot requires bending to the left
 	// pulling on the right cables shifts COM to the left
-	tagsToControl.push_back("HL");
+	tagsToControl.push_back("HR");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataC_"+
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 8.0; // was 8.0
+	startTimeRot = 6.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_pi8.csv";
 	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_pi4.csv";
+	/*
 	KP = 0.0001;
 	KI = 0.0000001;
+	KD = 0.00001;
+	*/
+	KP = 0.0001; // was 0.05, for centimeters model, or 0.01.
+	KI = 0.000000001; // was 0.00001
 	KD = 0.00001;
 	break;
 
@@ -238,25 +252,32 @@ int main(int argc, char** argv)
 	// BL
 	// bend:
 	startTimeBend = 2.0;
-	minLength = 0.9; // as a percent
-	rate = 0.25;
+	minLength = 0.8; // as a percent
+	rate = 0.025;
 	// back left foot requires COM shifting to the right
 	// Pulling in the left cable shifts robot to the left.
-	tagsToControl.push_back("HR");
+	tagsToControl.push_back("HL");
 	// rot:
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataD_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 8.0; // was 8.0
+	startTimeRot = 6.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
 	// Going all the way up to pi/4, 45 degrees, but with the same speed (thus same control):
 	csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_40_max_neg_pi4.csv";
+	/*
 	KP = 0.0001;
 	KI = 0.0;
 	//KI = 0.0000001;
 	KD = 0.00001;
+	*/
+	KP = 0.00001; // was 0.05, for centimeters model, or 0.01.
+	KI = 0.000000001; // was 0.00001
+	//KI = 0.0;
+	//KD = 0.00001;
+	KD = 0.0;
 	break;
 	
       default:
@@ -287,21 +308,11 @@ int main(int argc, char** argv)
     //double minLength = 0.8;
     //double rate = 0.25;
     //std::vector<std::string> tagsToControl;
-    // HF is the right horizontal set
-    // HL is the bottom horizontal set maybe?
-    // HB is the left horizontal set
-    // HR is the top horizontal set.
-    // BUT, something is wrong here. Probably Bullet's numerical problems.
-    //tagsToControl.push_back("HR");
-    //tagsToControl.push_back("testnone");
-    //tagsToControl.push_back("HF");
-    //tagsToControl.push_back("HB");
     // Call the constructor for the controller
     CombinedSpineControllerBending* const controller =
       new CombinedSpineControllerBending(startTimeBend, minLength, rate, tagsToControl);
     // Attach the controller to the model. Must happen before running the
     // simulation.
-    // TEMPORARILY: can we get a leg to lift, in the SI units model?
     myModel->attach(controller);
 
     // Next, we need to get a reference to the Bullet Physics world.

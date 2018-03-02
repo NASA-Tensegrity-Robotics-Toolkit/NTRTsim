@@ -24,10 +24,10 @@ builders:
   rodTetraA:
     class: tgRodInfo
     parameters:
-      density: 2630 # 2630 from matlab
+      density: 2620 # from matlab
       radius: 0.0064
   rodForHingeA:
     class: tgRodInfo
     parameters:
-      density: 0.0 # was 0.014
+      density: 2620 # was 0.014
       radius: 0.03
