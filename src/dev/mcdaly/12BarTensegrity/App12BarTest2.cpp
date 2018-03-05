@@ -35,7 +35,7 @@
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Controllers
-//#include "LengthController12BarCube.h"
+#include "LengthController12BarOctahedron.h"
 #include "LengthControllerMultipleSequential.h"
 
 /**
