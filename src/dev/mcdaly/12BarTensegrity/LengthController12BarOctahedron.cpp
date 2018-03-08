@@ -46,8 +46,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
-#include "helpers/Filehelpers.h"
-#include <stdexcept>
+#include "helpers/FileHelpers.h"
 
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
@@ -58,7 +57,7 @@ LengthController12BarOctahedron::LengthController12BarOctahedron(double startTim
 							 std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
   m_minLength(minLength),
-  m_rate,
+  m_rate(rate),
   m_tagsToControl(tagsToControl),
   m_timePassed(0.0)
 {
@@ -94,13 +93,23 @@ void LengthController12BarOctahedron::initializeActuators(TensegrityModel& subje
   std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
   std::cout << "The following cables were found and will be controlled: " << std::endl;
 
+  // If no actuators are found
+  if (foundActuators.size() == 0){
+    std::cout << "No actuators found." << std::endl;
+  }
+
   // Iterate through array and output strings to command line
   for (std::size_t i = 0; i < foundActuators.size(); i++ ) {
-    std::cout << foundActuators[i] -> getTags() << std::endl;
+    //std::cout << foundActuators[i] -> getTags() << std::endl; // This just prints 'cable'
     // Add the rest length of the actuator at this time to the list of all initial rest lengths
     initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
     // DEBUGGING
-    std::cout << "Cable rest length at t = 0 is: " << initialRL[foundActuators[i]->getTags()] << std::endl;
+    std::cout << "Cable " << i << " with rest length " << initialRL[foundActuators[i]->getTags()] << " at t = 0." << std::endl;
+  }
+  // Add this list of actuators to the full list. Thanks to:
+  // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
+  cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
+                         foundActuators.end() );
 }
 
 /**
@@ -110,8 +119,8 @@ void LengthController12BarOctahedron::initializeActuators(TensegrityModel& subje
  */
 void LengthController12BarOctahedron::onSetup(TensegrityModel& subject)
 {
-  std::cout << "Setting up the LengthController12BarOctahedron controller."  
-            << "Finding cables with tags: " << m_tagsToControl << std::endl;
+  std::cout << "Setting up the LengthController12BarOctahedron controller." << std::endl;
+ // std::cout << "Finding cables with tags: " << m_tagsToControl << std::endl;
   cablesWithTags = {};
  
   // For all the strings in the list, call initializeActuators.
@@ -138,32 +147,46 @@ void LengthController12BarOctahedron::onSetup(TensegrityModel& subject)
  * have a list of allMuscles populated
  * @param[in] dt, current timestep must be positive
  */
-void LengthController12BarOctahedron::onStep(TensegrityModel& subject, double dt)
-{
-  // First, increment the accumulator variable
+void LengthController12BarOctahedron::onStep(TensegrityModel& subject, double dt) {
+  
+  //std::cout << "Time passed: " << m_timePassed << std::endl;
+ 
+ // First, increment the accumulator variable
   m_timePassed += dt;
+
   // If it is past the time to start the controller, start
   if( m_timePassed > m_startTime ) 
   {
     // Retract mode (retract each cable in sequence)
     if( m_retract == 1 ) {
       int i = m_cable_index; // Grab cable index. Unnecessary?
+   //  std::cout << "Cable index: " << m_cable_index << std::endl;
+//	 std::cout << "Entered retract mode for cable index: " << i << std::endl; // Debugging 
+
       double currRestLength = cablesWithTags[i]->getRestLength(); // Grab current rest length
+  //    std::cout << "Current rest length is: " << currRestLength << std::endl;
+
       double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength; // Calculate the minimum rest length for this cable
-      // If the current rest length is greater than the desired minimum
+    //  std::cout << "Minimum rest length is: " << minRestLength << std::endl;
+
+ // If the current rest length is greater than the desired minimum
       if( currRestLength > minRestLength ) {
         // Output a progress bar for the controller, to track when controll occurs
-        std::cout << "Control occurs, cable index: " << i << std::endl;
+      //  std::cout << "Control occurs, cable index: " << i << std::endl;
         // Adjust rest length of the actuator
         double nextRestLength = currRestLength - m_rate*dt;
+
         // DEBUGGING
-        stf::cout << "Next rest length: " << m_cable_index << std::endl;
-        cablesWithTags[i]->setControlInput(nextRestLength, dt);
+        //std::cout << "m_rate:  " << m_rate << std::endl;
+        //std::cout << "dt: " << dt << std::endl;
+        //std::cout << "Next rest length: " << nextRestLength << std::endl;
+       
+        cablesWithTags[i]->setControlInput(nextRestLength, dt); 
       }
       else {
          // Cable has been retracted to min length, go to next cable
-        m_cable_index ++;//? OBS OBS OBS
-        std::cout << "Cable index: " << m_cable_index << std::endl;
+        m_cable_index = m_cable_index + 1;
+        std::cout << "Cable finished retracting, go to cable with index: " << m_cable_index << std::endl;
         // If the cable index is equal to the number of cables, all cables have been retracted
         // Move to return state
         if( m_cable_index == cablesWithTags.size() ) {
@@ -175,17 +198,17 @@ void LengthController12BarOctahedron::onStep(TensegrityModel& subject, double dt
 
   // Return state
   else if ( m_finished == 0 ) {
-    std::cout << "Make it to return state." << std::endl;
+    //std::cout << "Made it to return state." << std::endl;
     int i = m_cable_index; // Grab cable index 
     double currRestLength = cablesWithTags[i]->getRestLength(); // Grab current rest length
     double initialRestLength = initialRL[cablesWithTags[i]->getTags()]; // Calculate initial rest length for this cable
     // If the current rest length is below initial rest length
     if( currRestLength < initialRestLength ) {
       // Output a progress bar for the controller to track when control occurs
-      std::cout << "Control occured. Cable index: " << i << std::endl;
+      //std::cout << "Control occured. Cable index: " << i << std::endl;
       double nextRestLength = currRestLength = m_rate*dt; // Adjust rest length of the actuator 
       // DEBUGGING
-      std::cout << "Next rest length: " << nextRestLength << std::endl;
+      //std::cout << "Next rest length: " << nextRestLength << std::endl;
       cablesWithTags[i]->setControlInput(nextRestLength, dt);
     } 
     else {
@@ -198,4 +221,5 @@ void LengthController12BarOctahedron::onStep(TensegrityModel& subject, double dt
       }
     } 
   }
+}
 }

@@ -36,7 +36,9 @@
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Controllers
 //#include "LengthController12BarCube.h"
-#include "LengthControllerWithReturn.h"
+//#include "LengthControllerWithReturn.h"
+#include "LengthController12BarOctahedron.h"
+
 /**
  * The entry point.
  * @param[in] argc the number of command-line arguments
@@ -52,6 +54,8 @@ int main(int argc, char** argv)
     {
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
     }
+    
+    std::cout << "App12BarTest1.cpp" << std::endl;
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -91,17 +95,17 @@ int main(int argc, char** argv)
     
     // Parameters for the LengthControllerWithReturn are speciefied in the corresponding .h-file
     // repeated here
-    double startTime = 3;
-    double minLength = 0.9;
-    double rate = 0.1;
+    double startTime = 1;
+    double minLength = 0.1;
+    double rate = 0;// 1; // 0.5;
+    //int arr[] = {}; What does this one do?
     int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
     std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
     std::vector<std::string> tagsToControl;
-    tagsToControl.push_back("cable");
+    tagsToControl.push_back("actuated_cable");
 
     // Create the controller
-    //LengthController12BarCube* const myController = new LengthController12BarCube(startTime, minLength, rate, loop, sequence, tagsToControl);
-    LengthControllerWithReturn* const myController = new LengthControllerWithReturn(startTime, minLength, rate, tagsToControl);
+    LengthController12BarOctahedron* const myController = new LengthController12BarOctahedron(startTime, minLength, rate, tagsToControl);
     // Create data logger
     std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
     // double samplingTime = 0.1;
@@ -115,7 +119,7 @@ int main(int argc, char** argv)
     myDataLogger->addSensorInfo(mySCASensorInfo);
     
     // Add data logger to the world
-    // simulation.addDataManager(myDataLogger); // comment/uncomment to record data
+    //simulation.addDataManager(myDataLogger); // comment/uncomment to record data
 
     // Attach the controller to the model
     myModel->attach(myController);

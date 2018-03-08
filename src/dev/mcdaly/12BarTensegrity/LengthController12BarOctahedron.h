@@ -48,7 +48,7 @@ class tgBasicActuator;
 /**
  * A controller to apply the length change in the cables.
  */
-class LengthController12BarOctahedron : public tgObserver<TensegrityModel>, public tgSubject<LengthControllerWithReturn>
+class LengthController12BarOctahedron : public tgObserver<TensegrityModel>, public tgSubject<LengthController12BarOctahedron>
 {
 public:
 
@@ -135,9 +135,9 @@ private:
   /** OBS OBS OBS OBS OBS
    * Need a boolean for returning or retracting the cable, not clear which one to use at this point
    */
- // bool m_return;
- // bool m_retract;
- // bool m_finished; 
+  bool m_return;
+  bool m_retract;
+  bool m_finished; 
 
 };
 

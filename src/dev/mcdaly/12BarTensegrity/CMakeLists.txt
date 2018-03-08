@@ -26,14 +26,14 @@ add_executable(App12BarTest1
     LengthControllerSequential.cpp
     LengthControllerWithReturn.cpp
     LengthControllerMultipleSequential.cpp
- #   LengthController12BarCube.cpp
+    LengthController12BarOctahedron.cpp
     App12BarTest1.cpp
 ) 
  
 add_executable(App12BarTest2
     LengthControllerSequential.cpp
     LengthControllerWithReturn.cpp
-    LengthController12BarOctahedron.cpp    
+#    LengthController12BarOctahedron.cpp    
     LengthControllerMultipleSequential.cpp
     App12BarTest2.cpp
 )
