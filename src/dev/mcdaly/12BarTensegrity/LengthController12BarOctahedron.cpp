@@ -149,10 +149,15 @@ void LengthController12BarOctahedron::onSetup(TensegrityModel& subject)
  */
 void LengthController12BarOctahedron::onStep(TensegrityModel& subject, double dt) {
   
-  //std::cout << "Time passed: " << m_timePassed << std::endl;
+
  
  // First, increment the accumulator variable
   m_timePassed += dt;
+
+  if( std::fmod(m_timePassed, 1.0) == 1 )
+  {
+    std::cout << "Time passed: " << m_timePassed << std::endl;
+  }
 
   // If it is past the time to start the controller, start
   if( m_timePassed > m_startTime ) 

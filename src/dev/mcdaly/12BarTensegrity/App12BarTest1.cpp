@@ -18,25 +18,28 @@
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
+
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+
 // Bullet Physics
 #include "LinearMath/btVector3.h"
+
 // The C++ Standard Library
 #include <iostream>
 #include <string>
 #include <vector>
+
 // Sensors
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
+
 // Controllers
-//#include "LengthController12BarCube.h"
-//#include "LengthControllerWithReturn.h"
 #include "LengthController12BarOctahedron.h"
 
 /**
@@ -57,7 +60,7 @@ int main(int argc, char** argv)
     
     std::cout << "App12BarTest1.cpp" << std::endl;
 
-    // Create the ground and world. Specify ground rotation in radians
+      // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
@@ -65,7 +68,7 @@ int main(int argc, char** argv)
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
-    const tgWorld::Config config(98.1); // gravity, dm/s^2
+    const tgWorld::Config config(98.1); // gravity, 98.1 dm/s^2, 981 for scaled model
     tgWorld world(config, ground);
 
     // Create the view
@@ -97,7 +100,7 @@ int main(int argc, char** argv)
     // repeated here
     double startTime = 1;
     double minLength = 0.1;
-    double rate = 0;// 1; // 0.5;
+    double rate = 0.9; // 1; // 0.5;
     //int arr[] = {}; What does this one do?
     int arr[] = {9, 21, 29, 18, 14, 24, 17, 20, 2, 28, 22, 26, 5, 33, 25, 30};  // forward walking with through same side triangles
     std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
