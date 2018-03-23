@@ -25,16 +25,20 @@
  */
 
 // This application
-#include "Learning12Bar.h"
-// This library
-#include "examples/learningSpines/BaseSpineCPGControl.h"
+#include "ModelLearning12Bar.h"  /* Here, the yaml files should be instead */
+// This library  
+#include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
-#include "core/tgSimView.h"
+#include "core/tgSimView.h" // Is this library necessary?
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
 // The C++ Standard Library
 #include <iostream>
+#include <string>
+#include <vector>
+// Controllers
+#include "examples/learningSpines/BaseSpineCPGControl.h" 	/* Change controller to Length..Con..12Bar..cpp */
 
 /**
  * The entry point.
@@ -45,33 +49,49 @@
  */
 int main(int argc, char** argv)
 {
-    std::cout << "AppNestedStructureTest" << std::endl;
+    std::cout << "AppLearning12Bar" << std::endl;
+
+    /* Insert the following for checking YAML file:
+    // For this YAML parser app, need to check that an argument path was
+    // passed in.
+    if (argv[1] == NULL)
+    {
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+    }*/
+
+    // Create the ground and world. Specify ground rotation in radians
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // the world will delete this
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // First create the world
-    const tgWorld::Config config(981); // gravity, cm/sec^2
+    const tgWorld::Config config(981); // gravity, cm/sec^2 	/* OBS note the unit */
     tgWorld world(config); 
 
     // Second create the view
-    const double stepSize = 1.0/1000.0; // Seconds
-    const double renderRate = 1.0/60.0; // Seconds
-    tgSimViewGraphics view(world, stepSize, renderRate);
+    const double timestep_physics = 1.0/1000.0; // Seconds 		/* Note timestep, could be divided by 10000 */
+    const double timestep_graphics = 1.0/60.0; // Seconds		
+    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
     // Third create the simulation
     tgSimulation simulation(view);
 
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12;
-    Learning12Bar* myModel =
-      new Learning12Bar(segments);
+    const int segments = 12; 			/* Here, add Tensegrity model insted */
+    ModelLearning12Bar* myModel =
+      new ModelLearning12Bar(segments);
     
-    /* Required for setting up learning file input/output. */
+    // Required for setting up learning file input/output. 			/* This is new */
     const std::string suffix((argc > 1) ? argv[1] : "default");
     
-    const int segmentSpan = 3;
-    const int numMuscles = 4;
-    const int numParams = 2;
-    const int segNumber = 0;
+    const int segmentSpan = 3;							/* All of these are input parameters */
+    const int numMuscles = 4;							/* to the CPG controller. Will probably */
+    const int numParams = 2;							/* be able to delete all of this. */
+    const int segNumber = 0;							/* From here... */
     
     const double controlTime = 0.1;
     const double lowPhase = -1 * M_PI;
@@ -86,21 +106,45 @@ int main(int argc, char** argv)
     BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
 												lowAmplitude, highAmplitude, lowPhase, highPhase,
 												tension, kPosition, kVelocity);
+										/* ... to here */
+	
+	/* Here, initialize parameters for LengthController */
+
     BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "learningSpines/OctahedralComplex/");
+      new BaseSpineCPGControl(control_config, suffix, "learningSpines/OctahedralComplex/");    	/* Change to lengthcontroller here */
+
+/* If sensor data logger wanted, add this:
+    // Create data logger
+    std::string log = "~/12-bar-tensegrity/NTRT_logs/log";
+    // double samplingTime = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log);
+    myDataLogger->addSenseable(myModel);
+    // Create two sensor infos, one for tgRods and other for tgSpringCableActuators
+    tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
+    myDataLogger->addSensorInfo(myRodSensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
+
+    // Add data logger to the world
+    // simulation.addDataManager(myDataLogger); // comment/uncomment to record data
+*/
+
+    // Attach the controller to the model
     myModel->attach(myControl);
     
+    // Add the model to the world
     simulation.addModel(myModel);
     
-    int i = 0;
-    while (i < 20000)
+    // Run simulation
+    int i = 0;	
+    while (i < 20000)			/* I'm guessing this is to not let it run in all eternity */
     {
         simulation.run(60000);
         simulation.reset();
         i++;
     }
     
-    /// @todo Does the model assume ownership of the controller?
+    /// @todo Does the model assume ownership of the controller?		/* What is this? */
     /** No - a single controller could be attached to multiple subjects
     * However, having this here causes a segfault, since there is a call
     * to onTeardown() when the simulation is deleted
@@ -108,6 +152,7 @@ int main(int argc, char** argv)
     #if (0)
     delete myControl;
     #endif
+
     //Teardown is handled by delete, so that should be automatic
     return 0;
 }
