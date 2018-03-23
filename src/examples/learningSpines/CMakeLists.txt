@@ -22,8 +22,8 @@ add_library(${PROJECT_NAME} SHARED
             SpineFeedbackControl.cpp
             )
 
-subdirs(    OctahedralComplex
-    ribDemo
-    TetrahedralComplex
-    TetraSpine
-    )
+#subdirs(    OctahedralComplex
+ #   ribDemo
+  #  TetrahedralComplex
+   # TetraSpine
+   # )
