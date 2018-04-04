@@ -25,7 +25,7 @@
  */
 
 // This application
-#include "ModelLearning12Bar.h"  /* Here, the yaml files should be instead */
+#include "yamlbuilder/TensegrityModel.h"
 // This library  
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -33,12 +33,18 @@
 #include "core/tgSimViewGraphics.h"
 #include "core/tgSimulation.h"
 #include "core/tgWorld.h"
+//Bullet physics
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 #include <string>
 #include <vector>
+// Sensors
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgRodSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Controllers
-#include "examples/learningSpines/BaseSpineCPGControl.h" 	/* Change controller to Length..Con..12Bar..cpp */
+#include "LearningController12Bar.h"
 
 /**
  * The entry point.
@@ -51,13 +57,12 @@ int main(int argc, char** argv)
 {
     std::cout << "AppLearning12Bar" << std::endl;
 
-    /* Insert the following for checking YAML file:
     // For this YAML parser app, need to check that an argument path was
     // passed in.
     if (argv[1] == NULL)
     {
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
-    }*/
+    }
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -68,30 +73,54 @@ int main(int argc, char** argv)
     tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // First create the world
-    const tgWorld::Config config(981); // gravity, cm/sec^2 	/* OBS note the unit */
-    tgWorld world(config); 
+    const tgWorld::Config config(98.1); // gravity, dm/sec^2 	/* OBS note the unit */
+    tgWorld world(config, ground); 
+
+    // DEBUGGING
+    std::cout << "World created." << std::endl;
 
     // Second create the view
     const double timestep_physics = 1.0/1000.0; // Seconds 		/* Note timestep, could be divided by 10000 */
     const double timestep_graphics = 1.0/60.0; // Seconds		
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 
+    // DEBUGGING
+    std::cout << "View created." << std::endl;
+
     // Third create the simulation
     tgSimulation simulation(view);
 
+    // DEBUGGING
+    std::cout << "Simulation created" << std::endl;
+
     // Fourth create the models with their controllers and add the models to the
     // simulation
-    const int segments = 12; 			/* Here, add Tensegrity model insted */
-    ModelLearning12Bar* myModel =
-      new ModelLearning12Bar(segments);
+    TensegrityModel* const myModel = new TensegrityModel(argv[1], false);  
+  
+    // DEBUGGING
+    std::cout << "Model created" << std::endl;
+
+   // DEBUGGING
+    std::cout << "Did we come this far?" << std::endl;
     
-    // Required for setting up learning file input/output. 			/* This is new */
+    double startTime = 5;
+    double minLength = 0.3;
+    double rate = 0.9;
+    //std::vector<int> sequence(arr,arr+sizeof(arr)/sizeof(int));
+    std::vector<std::string> tagsToControl;
+    tagsToControl.push_back("actuated_cable"); // Keyword to look for in .yaml file
+
+    // DEBUGGING
+    std::cout << "What about this far?" << std::endl;
+
+    // Required for setting up learning file input/output.
     const std::string suffix((argc > 1) ? argv[1] : "default");
+ 
     
-    const int segmentSpan = 3;							/* All of these are input parameters */
-    const int numMuscles = 4;							/* to the CPG controller. Will probably */
-    const int numParams = 2;							/* be able to delete all of this. */
-    const int segNumber = 0;							/* From here... */
+    const int segmentSpan = 3;
+    const int numMuscles = 4;
+    const int numParams = 2;
+    const int segNumber = 0;
     
     const double controlTime = 0.1;
     const double lowPhase = -1 * M_PI;
@@ -103,15 +132,13 @@ int main(int argc, char** argv)
     const double kPosition = 400.0;
     const double kVelocity = 40.0; 
 
-    BaseSpineCPGControl::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
-												lowAmplitude, highAmplitude, lowPhase, highPhase,
-												tension, kPosition, kVelocity);
-										/* ... to here */
-	
-	/* Here, initialize parameters for LengthController */
+    LearningController12Bar::Config control_config(segmentSpan, numMuscles, numMuscles, numParams, segNumber, controlTime,
+                                                   lowAmplitude, highAmplitude, lowPhase, tension, kPosition, kVelocity);
+   LearningController12Bar* const myControl =
+      new LearningController12Bar(control_config, startTime, minLength, rate, tagsToControl, suffix, "12BarOctahedron/", "", "");
 
-    BaseSpineCPGControl* const myControl =
-      new BaseSpineCPGControl(control_config, suffix, "learningSpines/OctahedralComplex/");    	/* Change to lengthcontroller here */
+    // DEBUGGING
+    std::cout << "Controller setup complete." << std::endl;
 
 /* If sensor data logger wanted, add this:
     // Create data logger

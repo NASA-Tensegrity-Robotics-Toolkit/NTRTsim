@@ -834,7 +834,7 @@ void TensegrityModel::yamlNoDuplicates(const Yam& yam, const std::string structu
         }
     }
 }
-
+ 
 void TensegrityModel::yamlContainsOnly(const Yam& yam, const std::string structurePath, const std::vector<std::string> keys) {
     for (YAML::const_iterator key = yam.begin(); key != yam.end(); ++key) {
         std::string keyName = key->first.as<std::string>();
