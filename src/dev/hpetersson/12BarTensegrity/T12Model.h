@@ -93,6 +93,22 @@ public:
     */
     std::vector<double> getBallCOM();
     
+   /**
+    * Returns the center of mass of given rod as an <x,y,z>
+    */
+    std::vector<double> getRodCOM(int rodIndex);
+
+   /**
+    * Returns the position vector relative to the origin for a node as an <x,y,z>
+    * Outputs: result[0] = node 1 x
+    * Outputs: result[1] = node 1 y
+    * Outputs: result[2] = node 1 z
+    * Outputs: result[3] = node 2 x
+    * Outputs: result[4] = node 2 y
+    * Outputs: result[5] = node 2 z
+    */
+    std::vector<double> getNodePosition(int rodIndex);
+
     /**
      * Return a vector of all muscles for the controllers to work with.
      * @return A vector of all of the muscles

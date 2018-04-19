@@ -46,6 +46,7 @@
  */
 int main(int argc, char** argv)
 {
+    std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "App12BarCpp" << std::endl;
 
     // Create the ground and world. Specify ground rotation in radians
@@ -71,8 +72,8 @@ int main(int argc, char** argv)
     T12Model* const myModel = new T12Model(); // second argument not necessary
 
     // Select controller to be used 
-    double initialLength = 1.3;
-    double startTime = 2;
+    double initialLength = 1.0;
+    double startTime = 3;
     T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
 
     // Attach the controller to the model 
@@ -86,4 +87,6 @@ int main(int argc, char** argv)
 
     // teardown is handled by delete
     return 0;
+
 }
+

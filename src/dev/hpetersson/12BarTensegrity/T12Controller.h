@@ -55,6 +55,7 @@ class T12Controller : public tgObserver<T12Model>
 
         virtual void onTeardown(T12Model& subject);
 
+
     protected:
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
@@ -72,10 +73,14 @@ class T12Controller : public tgObserver<T12Model>
         vector< vector<double> > actions; // For modifications between episodes
 
         // Muscle Clusters
-        int nClusters;
-        int musclesPerCluster;
-        /** A vector clusters, each of which contains a vector of muscles */
-        vector<vector<tgBasicActuator*> > clusters; 
+        int nSquareClusters;
+	int nHexaClusters;
+	int musclesPerSquareCluster;
+        int musclesPerHexaCluster;
+
+        /** Two vectors clusters, each of which contains a vector of muscles */
+        vector<vector<tgBasicActuator*> > squareClusters;  
+        vector<vector<tgBasicActuator*> > hexaClusters; 
 
         // Sine Wave Data
         double* amplitude;
@@ -108,6 +113,16 @@ class T12Controller : public tgObserver<T12Model>
         std::vector<double> readManualParams(int lineNumber, const char* filename);
 
         void printSineParams();
+
+	void getGroundFace(T12Model& subject);
+
+	/* For a certain rod configuration, determine corresponding face */
+	void determineFace();
+
+	vector<double> groundRods; // for checking which face is on the ground
+        int groundFace; // Current face on ground
+        vector<int> groundFaceHistory; // Vector containing all faces touching ground
+  
 };
 
 #endif // T12CONTROLLER

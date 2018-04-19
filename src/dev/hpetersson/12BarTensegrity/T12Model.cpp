@@ -38,6 +38,8 @@ z * @brief Contains the implementation of class T12Model.
 // The C++ Standard Library
 #include <stdexcept>
 
+using namespace std;
+
 namespace
 {
     // Note: This model of the 12 bar rod will be 1.0m long by 3cm (0.03m) radius,
@@ -145,18 +147,18 @@ void T12Model::addNodes(tgStructure& s)
 
 void T12Model::addRods(tgStructure& s)
 {
-    s.addPair( 0,  1, "rod");
-    s.addPair( 2,  3, "rod");
-    s.addPair( 4,  5, "rod");
-    s.addPair( 6,  7, "rod");
-    s.addPair( 8,  9, "rod");
-    s.addPair(10, 11, "rod");
-    s.addPair(12, 13, "rod");
-    s.addPair(14, 15, "rod");
-    s.addPair(16, 17, "rod");
-    s.addPair(18, 19, "rod");
-    s.addPair(20, 21, "rod");
-    s.addPair(22, 23, "rod");
+    s.addPair( 0,  1, "rod"); // 0
+    s.addPair( 2,  3, "rod"); // 1
+    s.addPair( 4,  5, "rod"); // 2
+    s.addPair( 6,  7, "rod"); // 3
+    s.addPair( 8,  9, "rod"); // 4
+    s.addPair(10, 11, "rod"); // 5
+    s.addPair(12, 13, "rod"); // 6
+    s.addPair(14, 15, "rod"); // 7
+    s.addPair(16, 17, "rod"); // 8
+    s.addPair(18, 19, "rod"); // 9
+    s.addPair(20, 21, "rod"); // 10
+    s.addPair(22, 23, "rod"); // 11
 }
 
 void T12Model::addMuscles(tgStructure& s)
@@ -243,8 +245,8 @@ void T12Model::setup(tgWorld& world)
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
     btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(1, 1, 0.5);  // For landing on a square, use (1, 1, 0.5)
-    double rotationAngle = M_PI/6;
+    btVector3 rotationAxis = btVector3(1, 1, 0.75);  // For landing on a square, use (1, 1, 0.5)
+    double rotationAngle = M_PI/3;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model
@@ -297,14 +299,12 @@ void T12Model::onVisit(tgModelVisitor& r)
 }
 
 // Return the center of mass of this model
-// Pre-condition: This model has 6 rods
 std::vector<double> T12Model::getBallCOM() {
     std::vector <tgRod*> rods = find<tgRod>("rod");
     assert(!rods.empty());
-
     btVector3 ballCenterOfMass(0, 0, 0);
     double ballMass = 0.0;
-    for (std::size_t i = 0; i < rods.size(); i++) {
+    for (std::size_t i = 0; i < 12; i++) {
         const tgRod* const rod = rods[i];
         assert(rod != NULL);
         const double rodMass = rod->mass();
@@ -323,6 +323,55 @@ std::vector<double> T12Model::getBallCOM() {
 
     return result;
 }
+
+// Return the center of mass of rod
+std::vector<double> T12Model::getRodCOM(int rodIndex) {
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    assert(!rods.empty());
+    //cout << "Number of rods: " << rods.size() << endl;
+    const tgRod* const rod = rods[rodIndex];
+    assert(rod != NULL);
+    btVector3 rodCenterOfMass = rod->centerOfMass();
+
+    // Copy to the result std::vector
+    std::vector<double> result(3);
+    for (size_t i = 0; i < 3; ++i) { 
+        result[i] = rodCenterOfMass[i]; 
+    }
+
+    return result;
+}
+
+
+// @TODO: Return the position of nodes connected to rod number rodIndex
+std::vector<double> T12Model::getNodePosition(int rodIndex) {
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    const tgRod* const rod = rods[rodIndex];
+    btVector3 rodCOM = rod->centerOfMass();
+    btScalar x = rodCOM[0];
+    btScalar y = rodCOM[1];
+    btScalar z = rodCOM[2];
+    
+    btMatrix3x3 rotation = btMatrix3x3(((tgBaseRigid*) rod)->getPRigidBody()->getOrientation());
+
+    btVector3 orig1 = btVector3(0, (rod->length())/2, 0); // Distance between rod COM and node1
+    btVector3 orig2 = btVector3(0, -(rod->length())/2, 0); // Distance between rod COM and node2
+
+    btVector3 pos1 = (rotation * orig1) + rodCOM; // position of node1 
+    btVector3 pos2 = (rotation * orig2) + rodCOM; // position of node2
+
+    // Copy to the result std::vector
+    std::vector<double> result(6);
+    for (size_t i = 0; i < 3; ++i) { 
+        result[i] = pos1[i];
+        result[i+3] = pos2[i]; 
+    }	
+//    cout << "Node position 1: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
+//    cout << "Node position 2: (" << result[3] << ", " << result[4] << ", " << result[5] << ")\n";
+
+    return result;
+}
+
 
 const std::vector<tgBasicActuator*>& T12Model::getAllMuscles() const
 {
