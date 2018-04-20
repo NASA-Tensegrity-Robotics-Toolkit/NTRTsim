@@ -24,6 +24,7 @@ z * @brief Contains the implementation of class T12Model.
 
 // This module
 #include "T12Model.h"
+#include "T12Controller.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgRod.h"
@@ -396,5 +397,6 @@ const double T12Model::muscleRatio()
     
 void T12Model::teardown()
 {
+//    T12Controller.onTeardown(T12Model);
     tgModel::teardown();
 }

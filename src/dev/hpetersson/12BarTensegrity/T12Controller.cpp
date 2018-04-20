@@ -52,6 +52,8 @@
 #include <string>
 #include <iostream> 
 #include <fstream>
+#include <sstream>
+#include <ctime>
 
 # define M_PI 3.14159265358979323846 
                                
@@ -68,7 +70,7 @@ T12Controller::T12Controller(T12Model* subject, const double initialLength, doub
     nHexaClusters(9), 
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
     musclesPerHexaCluster(6),
-    groundRods(4)
+    groundRods(4) // Used for determining which face is on ground
 {
     squareClusters.resize(nSquareClusters);
     for (int i=0; i<nSquareClusters; i++) {
@@ -87,6 +89,10 @@ void T12Controller::onSetup(T12Model& subject)
     double dt = 0.0001;
     
     groundFace = 9999;
+
+    getFileName();
+    cout << "Will save to file " << path << endl;
+    cout << endl;
 
     //Set the initial length of every muscle in the subject
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
@@ -113,16 +119,6 @@ void T12Controller::onSetup(T12Model& subject)
     vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
     vector< vector <double> > actions(nSquareClusters);
 
-    /*TEST
-    int faceNumber = NULL; 
-    vector<double> cluster(4); 
-    cluster[0] = 1, cluster[1] = 2, cluster[2] = 18, cluster[3] = 20;
-    for( int i=0; i<4; i++ ) {
-	cout << cluster[i] << endl;
-    }
-    //faceNumber = determineFace(&cluster);
-    cout << "Face number: " << faceNumber << endl;*/
-
     //get the actions (between 0 and 1) from evolution (todo)
     //actions = evolutionAdapter.step(dt,state);
     
@@ -139,7 +135,6 @@ void T12Controller::onStep(T12Model& subject, double dt)
 {
     double distanceMoved;
 
-    //cout << "Entered onStep." << endl;
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
     }
@@ -198,7 +193,7 @@ void T12Controller::onTeardown(T12Model& subject) {
 vector< vector <double> > T12Controller::transformActions(vector< vector <double> > actions1D)
 {
     vector< vector <double> > actions2D(nSquareClusters, vector<double>(4)); // Vector to be returned
-    cout << "actions2D size: " << actions2D.size() << ", " << actions2D[0].size() << endl;
+    //cout << "actions2D size: " << actions2D.size() << ", " << actions2D[0].size() << endl;
     
     bool usingManualParams = true;
     vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
@@ -251,12 +246,10 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
 void T12Controller::applyActions(T12Model& subject, vector< vector <double> > actions)
 {
     // DEBUGGING
-    cout << "Action size: " << actions.size() << endl;
+    //cout << "Action size: " << actions.size() << endl;
+    //cout << "Cluster size: " << squareClusters.size() << endl;
 
     assert(actions.size() == squareClusters.size());
-
-    // DEBUGGING
-    cout << "Cluster size: " << squareClusters.size() << endl;
 
     // Apply actions by cluster
     for (size_t cluster = 0; cluster < squareClusters.size(); cluster++) {
@@ -308,7 +301,7 @@ double T12Controller::totalEnergySpent(T12Model& subject) {
 
 // Pre-condition: every element in muscles must be defined
 // Post-condition: every muscle will have a new target length
-void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
+/*void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
     double phase = 0; // Phase of cluster1
   
     int nMuscles = 36;
@@ -321,8 +314,8 @@ void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
   //      cout << "Going through muscle: " << iMuscle << endl;
         oldCluster = cluster;
         clusterMember = true;
-
         const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector (could be done outside?)
+
         tgBasicActuator *const pMuscle = muscles[iMuscle];
 
         assert(pMuscle != NULL);
@@ -363,8 +356,34 @@ void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
             }
         }
     }
-}
+}*/
 
+void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
+
+    double phase = 0;
+
+    for(int j = 0; j < squareClusters.size(); j++) { // squareClusters.size() gives number of rows
+// 	cout << "j: " << j << endl;   
+	double newLength = amplitude[j] * sin(angularFrequency[j] * m_totalTime + phase) + dcOffset[j];
+        double minLength = m_initialLengths * (1-maxStringLengthFactor);
+        double maxLength = m_initialLengths * (1+maxStringLengthFactor);
+        
+        if (newLength <= minLength) {
+            newLength = minLength;
+        } else if (newLength >= maxLength) {
+            newLength = maxLength;
+        }
+	for(int i = 0; i < (squareClusters.size())/2; i++) { // squareClusters[0].size gives number of int columns (= # of double*2)
+	    tgBasicActuator *const pMuscle = squareClusters[i][j];
+//	    cout << "i :" << i << endl;
+ 	    assert(pMuscle != NULL);
+
+            pMuscle->setControlInput(newLength, dt);
+	    
+        } 
+            phase += phaseChange[j];
+    }
+}
 
 void T12Controller::populateClusters(T12Model& subject) {
 
@@ -385,7 +404,7 @@ void T12Controller::populateClusters(T12Model& subject) {
         tgBasicActuator *const pMuscle = muscles[iMuscle];
 
         assert(pMuscle != NULL);
-        cout << "iMuscle: " << iMuscle << ", muscle: " << pMuscle << endl;
+    //    cout << "iMuscle: " << iMuscle << ", muscle: " << pMuscle << endl;
         // Group muscles in clusters, square
         if (iMuscle == 1 || iMuscle == 2|| iMuscle == 18|| iMuscle == 20) { // Cluster 0
             squareClusters.at(0).push_back(pMuscle);
@@ -412,15 +431,15 @@ void T12Controller::populateClusters(T12Model& subject) {
             squareClusters.at(i5).at(5) = pMuscle;
             i5++;
         } else {
-            cout << "Muscle is not related to the square faces." << endl;
+    //        cout << "Muscle is not related to the square faces." << endl;
         }
     }
 
     // DEBUGGING
     cout << "Square cluster: " << endl;
-    for(int i=0; i<6; i++) {
-	for(int j=0; j<4; j++){
-		cout << squareClusters[j][i] << " ";
+    for(int j=0; j<6; j++) {
+	for(int i=0; i<4; i++){
+		cout << squareClusters[i][j] << " ";
 	}
         cout << endl;
     }
@@ -567,7 +586,7 @@ void T12Controller::printSineParams() {
     }     
 }
 
-// @ TODO: Implement for hexagon faces too
+// @ TODO: Implement for hexagon faces
 // For a certain rod configuration, determine corresponding face 
 void T12Controller::determineFace() {
 
@@ -612,7 +631,7 @@ void T12Controller::getGroundFace(T12Model& subject) {
 
         int i = 0;
         vector<double> nodePos(6);
-	int oldGroundFace = groundFace;
+	double oldGroundFace = groundFace;
 
         for( int rodNumber = 0; rodNumber<12; rodNumber++) {   // Get position of every endcap of rod
             nodePos = subject.getNodePosition(rodNumber);
@@ -642,9 +661,62 @@ void T12Controller::getGroundFace(T12Model& subject) {
     if(groundFace != oldGroundFace) {
 	cout << "New face number, current ground face is: " << groundFace << endl;
         groundFaceHistory.push_back(groundFace);
-        cout << "Absolute distance moved: " << displacement(subject) << endl;   
+
+	double currentDisplacement = displacement(subject);
+        cout << "Absolute distance moved: " << currentDisplacement << endl;   
+	
+	write2file(groundFaceHistory[0], "groundFace :", false);
+	write2file(groundFaceHistory.back(), "", true);
+	write2file(groundFaceHistory[0], "Absolute distance moved :", false);
+	write2file(currentDisplacement, "", true);
     } 
 }
 
 
+void T12Controller::write2file(double contentDouble, char const* contentString, bool isDouble) {
+    
+    ofstream myFile(path.c_str(), ios::app);
+    if(isDouble) {
+        myFile << contentDouble << endl;
+    } else {
+        myFile << contentString << endl;
+    }
+    myFile.close();
+}
+
+void T12Controller::getFileName(void) {
+
+    time_t timer;
+    time_t current_time = time(&timer);
+ 
+    string temp = ".txt";
+    ostringstream path_out(temp);
+
+    path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/exampleRun";
+
+    time_t year = current_time/31540000 + 1970; // Calculate year 
+    time_t month = current_time/2628000 - 575; // Month
+    time_t day = current_time/86400 - 17622; // Day
+    time_t hour = current_time/3600 - 423367; // Hour
+    time_t min = current_time/60 - 25403040; // Min
+    time_t sec = current_time - 1524183707; // Sec
+
+    if(hour > 24) {
+        int n = hour/60;
+        hour = hour/(n+1);
+    }
+
+    if(min > 60) {
+        int n = min/60;
+        min = min/(n+1);
+    }
+
+    if(sec > 60) {
+        int n = sec/60;
+        sec = sec/(n+1);
+    }
+
+    path_out << "_" << year << "-" << "0" << month << "-" << day << "_" << hour << ":" << min << ":" << sec << ".txt";
+    path = path_out.str();
+}
 

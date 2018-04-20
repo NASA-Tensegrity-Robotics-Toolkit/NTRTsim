@@ -55,7 +55,6 @@ class T12Controller : public tgObserver<T12Model>
 
         virtual void onTeardown(T12Model& subject);
 
-
     protected:
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
@@ -120,9 +119,13 @@ class T12Controller : public tgObserver<T12Model>
 	void determineFace();
 
 	vector<double> groundRods; // for checking which face is on the ground
-        int groundFace; // Current face on ground
-        vector<int> groundFaceHistory; // Vector containing all faces touching ground
-  
+        double groundFace; // Current face on ground
+        vector<double> groundFaceHistory; // Vector containing all faces touching ground
+
+     	void write2file(double contentDouble, char const* contentString, bool isDouble);
+
+	void getFileName(void);
+  	string path;
 };
 
 #endif // T12CONTROLLER

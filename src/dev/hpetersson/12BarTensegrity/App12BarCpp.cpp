@@ -44,6 +44,8 @@
  * @param[in] argv argv[1] is the path of the YAML encoded structure
  * @return 0
  */
+
+
 int main(int argc, char** argv)
 {
     std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
@@ -73,7 +75,7 @@ int main(int argc, char** argv)
 
     // Select controller to be used 
     double initialLength = 1.0;
-    double startTime = 3;
+    double startTime = 1;
     T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
 
     // Attach the controller to the model 
@@ -86,6 +88,7 @@ int main(int argc, char** argv)
     simulation.run();
 
     // teardown is handled by delete
+
     return 0;
 
 }
