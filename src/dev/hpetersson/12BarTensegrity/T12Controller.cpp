@@ -60,8 +60,8 @@
 using namespace std;
 
 /* S E T T I N G S */
-bool saveData = false; // Save data to file
-bool useLearning = false; // Use learning alt. use parameters from file
+bool saveData = true; // Save data to file
+bool useLearning = true; // Use learning alt. use parameters from file
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters

@@ -343,31 +343,30 @@ std::vector<double> T12Model::getRodCOM(int rodIndex) {
 }
 
 
-	// @TODO: Return the position of nodes connected to rod number rodIndex
-	std::vector<double> T12Model::getNodePosition(int rodIndex) {
-	    std::vector <tgRod*> rods = find<tgRod>("rod");
-	    const tgRod* const rod = rods[rodIndex];
-	    btVector3 rodCOM = rod->centerOfMass();
-	    btScalar x = rodCOM[0];
-	    btScalar y = rodCOM[1];
-	    btScalar z = rodCOM[2];
-	    
-	    btMatrix3x3 rotation = btMatrix3x3(((tgBaseRigid*) rod)->getPRigidBody()->getOrientation());
+// @TODO: Return the position of nodes connected to rod number rodIndex
+std::vector<double> T12Model::getNodePosition(int rodIndex) {
+    std::vector <tgRod*> rods = find<tgRod>("rod");
+    const tgRod* const rod = rods[rodIndex];
+    btVector3 rodCOM = rod->centerOfMass();
+    btScalar x = rodCOM[0];
+    btScalar y = rodCOM[1];
+    btScalar z = rodCOM[2];
+    
+    btMatrix3x3 rotation = btMatrix3x3(((tgBaseRigid*) rod)->getPRigidBody()->getOrientation());
+    btVector3 orig1 = btVector3(0, (rod->length())/2, 0); // Distance between rod COM and node1
+    btVector3 orig2 = btVector3(0, -(rod->length())/2, 0); // Distance between rod COM and node2
 
-	    btVector3 orig1 = btVector3(0, (rod->length())/2, 0); // Distance between rod COM and node1
-	    btVector3 orig2 = btVector3(0, -(rod->length())/2, 0); // Distance between rod COM and node2
+    btVector3 pos1 = (rotation * orig1) + rodCOM; // position of node1 
+    btVector3 pos2 = (rotation * orig2) + rodCOM; // position of node2
 
-	    btVector3 pos1 = (rotation * orig1) + rodCOM; // position of node1 
-	    btVector3 pos2 = (rotation * orig2) + rodCOM; // position of node2
-
-	    // Copy to the result std::vector
-	    std::vector<double> result(6);
-	    for (size_t i = 0; i < 3; ++i) { 
-		result[i] = pos1[i];
-		result[i+3] = pos2[i]; 
-	    }	
-	//    cout << "Node position 1: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
-	//    cout << "Node position 2: (" << result[3] << ", " << result[4] << ", " << result[5] << ")\n";
+    // Copy to the result std::vector
+    std::vector<double> result(6);
+    for (size_t i = 0; i < 3; ++i) { 
+	result[i] = pos1[i];
+	result[i+3] = pos2[i]; 
+    }	
+//    cout << "Node position 1: (" << result[0] << ", " << result[1] << ", " << result[2] << ")\n";
+//    cout << "Node position 2: (" << result[3] << ", " << result[4] << ", " << result[5] << ")\n";
 
     return result;
 }

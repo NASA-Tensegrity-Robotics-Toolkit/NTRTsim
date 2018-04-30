@@ -79,6 +79,7 @@ void tgModel::teardown()
   // Postcondition
   assert(invariant());
   assert(m_children.empty());
+  std::cout << "All children deleted." << std::endl;
 }
 
 void tgModel::step(double dt) 

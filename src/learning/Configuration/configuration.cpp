@@ -115,7 +115,7 @@ void configuration::readFile(const std::string filename)
 		this->data[ key ] = value;
 	}
 	confFile.close();
-	cout << "Configuration fil read" << endl;
+	cout << "Configuration file read" << endl;
 	return;
 }
 
