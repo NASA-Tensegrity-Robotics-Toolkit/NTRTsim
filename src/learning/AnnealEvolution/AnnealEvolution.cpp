@@ -64,14 +64,17 @@ Temp(1.0)
 	if (path != "")
 	{
 		resourcePath = FileHelpers::getResourcePath(path);
+//		cout << "Found resource path " << resourcePath << endl;
 	}
 	else
 	{
 		resourcePath = "";
+//		cout << "Did I find resource path? Found resource path " << resourcePath << endl;
 	}
 	
 	std::string configPath = resourcePath + config;
-	
+	cout << "Final configuration path: " << configPath << endl;
+
     configuration myconfigdataaa;
     myconfigdataaa.readFile(configPath);
     populationSize=myconfigdataaa.getintvalue("populationSize");
@@ -109,8 +112,8 @@ Temp(1.0)
         evolutionLog.open((resourcePath + "logs/evolution" + suffix + ".csv").c_str(),ios::out);
         if (!evolutionLog.is_open())
         {
-			throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
-		}
+            throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
+	}
     }
 }
 

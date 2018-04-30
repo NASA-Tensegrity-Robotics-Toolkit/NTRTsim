@@ -39,7 +39,7 @@ class tgBasicActuator;
 //namespace std for vectors
 using namespace std;
 
-/** Escape Controller for T6 */
+/** Escape Controller for T12` */
 class T12Controller : public tgObserver<T12Model>
 {
     public:
@@ -54,7 +54,8 @@ class T12Controller : public tgObserver<T12Model>
         virtual void onStep(T12Model& subject, double dt);
 
         virtual void onTeardown(T12Model& subject);
-
+	
+	void test(void);
     protected:
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
@@ -116,16 +117,19 @@ class T12Controller : public tgObserver<T12Model>
 	void getGroundFace(T12Model& subject);
 
 	/* For a certain rod configuration, determine corresponding face */
-	void determineFace();
+	void determineFace(bool isSquareFace);
 
 	vector<double> groundRods; // for checking which face is on the ground
         double groundFace; // Current face on ground
+        double oldGroundFace; // Previous face on ground
         vector<double> groundFaceHistory; // Vector containing all faces touching ground
 
      	void write2file(double contentDouble, char const* contentString, bool isDouble);
 
 	void getFileName(void);
   	string path;
+
+	void saveData2File(void);
 };
 
 #endif // T12CONTROLLER

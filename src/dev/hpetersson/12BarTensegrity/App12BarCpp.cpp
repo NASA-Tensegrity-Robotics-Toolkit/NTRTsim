@@ -43,13 +43,26 @@
  * @param[in] argv argv[0] is the executable name
  * @param[in] argv argv[1] is the path of the YAML encoded structure
  * @return 0
- */
+ 
+*/
+const bool  useGraphics = false;
 
+
+
+void simulate(tgSimulation simulation) { 
+    int nEpisodes = 1; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    for (int i = 0; i<nEpisodes; i++) { 
+	simulation.run(nSteps);
+	simulation.reset();
+    }
+}
 
 int main(int argc, char** argv)
 {
     std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "App12BarCpp" << std::endl;
+//    std::cout << "Graphics = " << useGraphics << std::endl;
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -62,13 +75,19 @@ int main(int argc, char** argv)
     const tgWorld::Config config(98.1); // gravity, dm/s^2
     tgWorld world(config, ground);
 
-    // Create the view
     const double timestep_physics = 0.0001; // seconds // recommended 0.001
     const double timestep_graphics = 1.f/60.f; // seconds
-    tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
+
+
+    tgSimView *view;
+    // Create the view
+    if(useGraphics)
+        view = new tgSimViewGraphics (world, timestep_physics, timestep_graphics);
+    else
+	view = new tgSimView(world);
 
     // Create the simulation
-    tgSimulation simulation(view);
+    tgSimulation simulation(*view);
 
     // Create the models with their controllers and add the models to the simulation
     T12Model* const myModel = new T12Model(); // second argument not necessary
@@ -85,11 +104,20 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
 
     // Run simulation
-    simulation.run();
+    if(useGraphics) {
+        simulation.run();
+ 	cout << "Using graphics." << endl;
+    } else {
+	simulate(simulation);
+    }
 
     // teardown is handled by delete
 
+    delete myModel;
+//    delete myController;
+   // delete view;
+    //delete ground;
     return 0;
 
-}
 
+}
