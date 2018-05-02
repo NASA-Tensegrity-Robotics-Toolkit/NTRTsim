@@ -49,20 +49,52 @@ const bool  useGraphics = false;
 
 
 
-void simulate(tgSimulation simulation) { 
-    int nEpisodes = 1; // Number of episodes ("trial runs")
+void simulateNoGraphics() { 
+    int nEpisodes = 10; // Number of episodes ("trial runs")
     int nSteps = 6000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    
+    // Create the ground and world. Specify ground rotation in radians
+    const double yaw = 0.0;
+    const double pitch = 0.0;
+    const double roll = 0.0;
+    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    // the world will delete this
+    tgBoxGround* ground = new tgBoxGround(groundConfig);
+
+    const tgWorld::Config config(98.1); // gravity, dm/s^2
+    tgWorld world(config, ground);
+
+    tgSimView *view;
+    // Create the view
+    view = new tgSimView (world);
+    
+    // Create the simulation
+    tgSimulation simulation(*view);
+
+    // Create the models with their controllers and add the models to the simulation
+    T12Model* const myModel = new T12Model(); // second argument not necessary
+
+    // Select controller to be used 
+    double initialLength = 1.0;
+    double startTime = 1;
+    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
+
+    // Attach the controller to the model 
+    myModel->attach(myController);
+
+    // Add the model to the world
+    simulation.addModel(myModel);
+
+    myController->getFileName();
+
     for (int i = 0; i<nEpisodes; i++) { 
 	simulation.run(nSteps);
-//	simulation.reset();
+        myController->onTeardown(*myModel);
+	simulation.reset();
     }
 }
 
-int main(int argc, char** argv)
-{
-    std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
-    std::cout << "App12BarCpp" << std::endl;
-//    std::cout << "Graphics = " << useGraphics << std::endl;
+void simulateWithGraphics(void) {
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -78,13 +110,9 @@ int main(int argc, char** argv)
     const double timestep_physics = 0.0001; // seconds // recommended 0.001
     const double timestep_graphics = 1.f/60.f; // seconds
 
-
     tgSimView *view;
     // Create the view
-    if(useGraphics)
-        view = new tgSimViewGraphics (world, timestep_physics, timestep_graphics);
-    else
-	view = new tgSimView(world);
+    view = new tgSimViewGraphics (world, timestep_physics, timestep_graphics);
 
     // Create the simulation
     tgSimulation simulation(*view);
@@ -104,20 +132,28 @@ int main(int argc, char** argv)
     simulation.addModel(myModel);
 
     // Run simulation
+    simulation.run();
+}
+
+int main(int argc, char** argv)
+{
+    std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
+    std::cout << "App12BarCpp" << std::endl;
+//    std::cout << "Graphics = " << useGraphics << std::endl;
+
     if(useGraphics) {
-        simulation.run();
- 	cout << "Using graphics." << endl;
-    } else {
-	simulate(simulation);
+        simulateWithGraphics();
+    } else { 
+	simulateNoGraphics();
     }
 
-    // teardown is handled by delete
 
-  //  delete myModel;
+    // teardown is handled by delete
+    /*delete myModel;
     delete myController;
-  //  delete view;
-  //  delete ground;
-    return 0;
+    delete view;
+    delete ground;*/
+    //return 0;
 
 
 }

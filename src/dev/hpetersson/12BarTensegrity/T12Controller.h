@@ -49,13 +49,13 @@ class T12Controller : public tgObserver<T12Model>
         /** Nothing to delete, destructor must be virtual */
         virtual ~T12Controller() { }
 
+	void getFileName(void);
+
         virtual void onSetup(T12Model& subject);
 
         virtual void onStep(T12Model& subject, double dt);
 
         virtual void onTeardown(T12Model& subject);
-	
-	void test(void);
     protected:
         virtual vector< vector <double> > transformActions(vector< vector <double> > act);
 
@@ -91,8 +91,9 @@ class T12Controller : public tgObserver<T12Model>
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
 
-        /** Returns amount of energy spent by each muscle in subject */
+        /** Returns amount of (double content);energy spent by each muscle in subject */
         double totalEnergySpent(T12Model& subject);
+	double energySpent;
 
         /** Sets target lengths for each muscle */
         void setPreferredMuscleLengths(T12Model& subject, double dt);
@@ -108,6 +109,8 @@ class T12Controller : public tgObserver<T12Model>
         /** Difference in position between initPosition and finalPosition
          * of subject */
         double displacement(T12Model& subject);
+	double distanceMovedManhattan;
+	double distanceMovedSnorkel;
 
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, const char* filename);
@@ -121,15 +124,18 @@ class T12Controller : public tgObserver<T12Model>
 
 	vector<double> groundRods; // for checking which face is on the ground
         double groundFace; // Current face on ground
-        double oldGroundFace; // Previous face on ground
         vector<double> groundFaceHistory; // Vector containing all faces touching ground
 
-     	void write2file(double contentDouble, char const* contentString, bool isDouble);
+     	void write2txtFile(double contentDouble, char const* contentString, bool isDouble);
+        void write2csvFile(double contentDouble, char const* sign, bool isDouble);
 
-	void getFileName(void);
-  	string path;
+  	string txtPath;  // file name for txt file
+	string csvPath;  // file name for csv file
 
 	void saveData2File(void);
+
+	void clearParams(void);
+	int simulationNumber;
 };
 
 #endif // T12CONTROLLER
