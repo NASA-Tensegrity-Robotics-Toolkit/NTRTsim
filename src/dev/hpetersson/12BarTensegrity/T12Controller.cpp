@@ -225,14 +225,14 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
 
     // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths - m_initialLengths/2, 
-                       0.3, //Hz
+    double mins[4]  = {m_initialLengths/2, 
+                       0.3, // intially said Hz, but should be rad/s
                        -1 * M_PI, 
                        m_initialLengths};// * (1 - maxStringLengthFactor)};
 
     // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths + m_initialLengths/2, 
-                       20, //Hz (can cheat to 50Hz, if feeling immoral)
+    double maxes[4] = {m_initialLengths*3/2, 
+                       20, // initially said Hz (can cheat to 50Hz, if feeling immoral), should be rad/s
                        M_PI, 
                        m_initialLengths};// * (1 + maxStringLengthFactor)}; 
 
@@ -240,8 +240,9 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
     // DEBUGGING
-    cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
+    //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
 
+    // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
     for(int i=0;i<actions2D.size();i++) { //6x
         for (int j=0; j<actions2D[i].size(); j++) { //4x
             if (!useLearning) {
@@ -253,7 +254,30 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
             }
         }
     }
-    cout << "transformActions() completed." << endl;
+
+    // Find maximum angular frequency with the help of the amplitude 
+    double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
+    double maxAngFrequencies[6];
+    double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3};
+    double rangeAngFrequencies[6];	
+    vector<double> amps(6);
+    for(int i = 0; i < actions2D.size(); i++) { 
+	amps[i] = actions2D[i][0];
+        maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i];
+        rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
+    }
+
+    // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
+    for(int i=0;i<actions2D.size();i++) { //6x
+        if (!useLearning) {
+            actions2D[i][1] = manualParams[i*actions2D[i].size() + 1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
+            //cout << "action: " << actions2D[i][j] << endl;
+        } else if(useLearning) {
+            actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
+            cout << "action2D: " << actions2D[i][1] << endl;
+        }
+    }
+
     return actions2D;
 }
 
