@@ -94,7 +94,7 @@ namespace
      0.0,      // restitution (?)
      399.0,        // pretensionA (force), from (0.4)*(998)
      1000.0,        // pretensionB (force), from (0.4)*(3152) 1261.0
-     0,			// History logging (boolean)
+     1,			// History logging (boolean)
      100000,   // maxTens
      10000    // targetVelocity
 

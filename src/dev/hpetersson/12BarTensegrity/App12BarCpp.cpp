@@ -50,7 +50,7 @@ const bool  useGraphics = false;
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 10; // Number of episodes ("trial runs")
+    int nEpisodes = 1; // Number of episodes ("trial runs")
     int nSteps = 6000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
@@ -76,7 +76,7 @@ void simulateNoGraphics() {
 
     // Select controller to be used 
     double initialLength = 1.0;
-    double startTime = 1;
+    double startTime = 3;
     T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
 
     // Attach the controller to the model 
