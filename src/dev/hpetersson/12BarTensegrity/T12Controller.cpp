@@ -258,12 +258,12 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     // Find maximum angular frequency with the help of the amplitude 
     double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
     double maxAngFrequencies[6];
-    double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3};
+    double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3}; // Appropriate
     double rangeAngFrequencies[6];	
     vector<double> amps(6);
     for(int i = 0; i < actions2D.size(); i++) { 
 	amps[i] = actions2D[i][0];
-        maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i];
+        maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
         rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
     }
 
@@ -610,6 +610,7 @@ void T12Controller::determineFace(bool isSquareFace) {
 
 // Calculate energy spent
 double T12Controller::totalEnergySpent(T12Model& subject) {
+
     double totalEnergySpent=0;
 
     vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
@@ -626,15 +627,15 @@ double T12Controller::totalEnergySpent(T12Model& subject) {
             const double currentLength = stringHist.restLengths[j];
 
 	    // DEBUGGING	
- 	    /*cout << "Previous tension: " << previousTension << endl;
- 	    cout << "Previous length: " << previousLength << endl;
- 	    cout << "Current length: " << currentLength << endl;*/
+// 	    cout << "Previous tension: " << previousTension << endl;
+// 	    cout << "Previous length: " << previousLength << endl;
+// 	    cout << "Current length: " << currentLength << endl;
 
             //TODO: examine this assumption - free spinning motor may require more power         
             double motorSpeed = (currentLength-previousLength);
-            if(motorSpeed > 0) // Vestigial code
+            if(motorSpeed > 0) // Assumption: No energy is required to elongate cable
                 motorSpeed = 0;
-            const double workDone = previousTension * motorSpeed;
+            const double workDone = - previousTension * motorSpeed;
             totalEnergySpent += workDone;
         }
     }

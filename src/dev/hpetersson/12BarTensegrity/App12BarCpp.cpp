@@ -50,8 +50,8 @@ const bool  useGraphics = false;
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 1; // Number of episodes ("trial runs")
-    int nSteps = 6000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int nEpisodes = 150; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
