@@ -61,7 +61,7 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save data to file
-bool useLearning = true; // Use learning alt. use parameters from file
+bool useLearning = false; // Use learning alt. use parameters from file
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -140,7 +140,7 @@ void T12Controller::onSetup(T12Model& subject)
     actions = transformActions(actions);
 
     //apply these actions to the appropriate muscles according to the sensor values
-    applyActions(subject, actions);
+    if(useLearning) applyActions(subject, actions);
 }
 
 void T12Controller::onStep(T12Model& subject, double dt)
@@ -151,7 +151,7 @@ void T12Controller::onStep(T12Model& subject, double dt)
     m_totalTime+=dt;
 
     if( m_totalTime > m_startTime) {
-        getGroundFace(subject); 
+        if(useLearning) getGroundFace(subject); 
         setPreferredMuscleLengths(subject, dt);
         const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
@@ -164,7 +164,7 @@ void T12Controller::onStep(T12Model& subject, double dt)
         }
 
 //    double distance = displacement(subject);
-  // cout << "Distance moved: " << distance << endl;    
+	  //cout << "Distance moved: " << distance << endl;    
     //instead, generate it here for now!
        /* for(int i=0; i<muscles.size(); i++)
         {
@@ -215,11 +215,13 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
 
     if(!useLearning) { 
-        const char* filename = "logs/paramSortedBestTrials.dat";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions20180509-152225.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
-        cout << "manualParams.size(): " << manualParams.size() << endl;
+	for(int i = 0; i < manualParams.size(); i++) {
+            cout << "manualParams: " << manualParams[i] << endl;
+        }
     }
 
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
@@ -243,17 +245,29 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
 
     // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
+    int k = 0;
     for(int i=0;i<actions2D.size();i++) { //6x
         for (int j=0; j<actions2D[i].size(); j++) { //4x
             if (!useLearning) {
-                actions2D[i][j] = manualParams[i*actions2D[i].size() + j]*(ranges[j])+mins[j];
+                //actions2D[i][j] = manualParams[k]; //manualParams[i*actions2D[i].size() + j]*(ranges[j])+mins[j];
+		//k++;
                 //cout << "action: " << actions2D[i][j] << endl;
-            } else if(useLearning) {
-                actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
+            } else if(useLearning) { 
+                //actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
                 //cout << "action2D: " << actions2D[i][j] << endl;
             }
         }
     }
+
+    if(!useLearning) {
+	for(int i = 0; i<squareClusters.size(); i++) { 
+	    amplitude[i] = manualParams[i];
+	    angularFrequency[i] = manualParams[i+squareClusters.size()];
+	    phaseChange[i] = manualParams[i+2*squareClusters.size()];
+	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
+	}
+    } 
+    printSineParams();
 
     // Find maximum angular frequency with the help of the amplitude 
     double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
@@ -270,7 +284,7 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
     for(int i=0;i<actions2D.size();i++) { //6x
         if (!useLearning) {
-            actions2D[i][1] = manualParams[i*actions2D[i].size() + 1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
+            //actions2D[i][1] = manualParams[i*actions2D[i].size() + 1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
             //cout << "action: " << actions2D[i][j] << endl;
         } else if(useLearning) {
             actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
@@ -299,7 +313,7 @@ void T12Controller::applyActions(T12Model& subject, vector< vector <double> > ac
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
     }
-    //printSineParams();
+    printSineParams();
 }
 
 
@@ -517,7 +531,7 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
     }
 
     // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     <----- WHY?
-    for (int i=0; i < result.size(); i++) {
+/*    for (int i=0; i < result.size(); i++) {
         //std::cout<<"Cell " << i << ": " << result[i] << "\n";
         double seed = ((double) (rand() % 100)) / 100;
         result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
@@ -527,7 +541,7 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
         }
       
         //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-    }
+	    }*/
 
     cout << "readManualParams() finished. result.size = " << result.size() << endl;
 

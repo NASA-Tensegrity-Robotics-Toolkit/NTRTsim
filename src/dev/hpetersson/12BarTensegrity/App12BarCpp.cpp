@@ -45,12 +45,12 @@
  * @return 0
  
 */
-const bool  useGraphics = false;
+const bool  useGraphics = true;
 
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 150; // Number of episodes ("trial runs")
+    int nEpisodes = 100; // Number of episodes ("trial runs")
     int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
