@@ -61,7 +61,7 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save data to file
-bool useLearning = false; // Use learning alt. use parameters from file
+bool useLearning = true; // Use learning alt. use parameters from file
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -125,9 +125,9 @@ void T12Controller::onSetup(T12Model& subject)
         vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
         //get the actions (between 0 and 1) from evolution
         actions = evolutionAdapter.step(dt,state);
-        /*for(int k = 0; k < actions.size(); k++) {
+        /* for(int k = 0; k < actions.size(); k++) {
 	    for(int l = 0; l < actions[0].size(); l++) {
-                cout << "actions[" << l << "][" << k << "]" << actions[l][k] << endl;
+                cout << "actions[" << k << "][" << l << "]" << actions[k][l] << endl;
             }
 	}*/
     } else {
@@ -212,9 +212,10 @@ void T12Controller::onTeardown(T12Model& subject) {
 vector< vector <double> > T12Controller::transformActions(vector< vector <double> > actions1D)
 {
     vector< vector <double> > actions2D(nSquareClusters, vector<double>(4)); // Vector to be returned
-    vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
 
+    // If reading parameters from file, do this
     if(!useLearning) { 
+       vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
         const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions20180509-152225.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
@@ -222,76 +223,68 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
 	for(int i = 0; i < manualParams.size(); i++) {
             cout << "manualParams: " << manualParams[i] << endl;
         }
-    }
-
-//    double pretension = 0.9; // Tweak this value if need be. What is this actually?
-
-    // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
-    double mins[4]  = {m_initialLengths/2, 
-                       0.3, // intially said Hz, but should be rad/s
-                       -1 * M_PI, 
-                       m_initialLengths};// * (1 - maxStringLengthFactor)};
-
-    // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
-    double maxes[4] = {m_initialLengths*3/2, 
-                       20, // initially said Hz (can cheat to 50Hz, if feeling immoral), should be rad/s
-                       M_PI, 
-                       m_initialLengths};// * (1 + maxStringLengthFactor)}; 
-
-    assert((maxes[0]-mins[0])>0);
-    double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
-
-    // DEBUGGING
-    //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
-
-    // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
-    int k = 0;
-    for(int i=0;i<actions2D.size();i++) { //6x
-        for (int j=0; j<actions2D[i].size(); j++) { //4x
-            if (!useLearning) {
-                //actions2D[i][j] = manualParams[k]; //manualParams[i*actions2D[i].size() + j]*(ranges[j])+mins[j];
-		//k++;
-                //cout << "action: " << actions2D[i][j] << endl;
-            } else if(useLearning) { 
-                //actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
-                //cout << "action2D: " << actions2D[i][j] << endl;
-            }
-        }
-    }
-
-    if(!useLearning) {
 	for(int i = 0; i<squareClusters.size(); i++) { 
 	    amplitude[i] = manualParams[i];
 	    angularFrequency[i] = manualParams[i+squareClusters.size()];
 	    phaseChange[i] = manualParams[i+2*squareClusters.size()];
 	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
 	}
-    } 
-    printSineParams();
-
-    // Find maximum angular frequency with the help of the amplitude 
-    double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
-    double maxAngFrequencies[6];
-    double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3}; // Appropriate
-    double rangeAngFrequencies[6];	
-    vector<double> amps(6);
-    for(int i = 0; i < actions2D.size(); i++) { 
-	amps[i] = actions2D[i][0];
-        maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
-        rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
+        printSineParams();
     }
 
-    // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
-    for(int i=0;i<actions2D.size();i++) { //6x
-        if (!useLearning) {
-            //actions2D[i][1] = manualParams[i*actions2D[i].size() + 1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-            //cout << "action: " << actions2D[i][j] << endl;
-        } else if(useLearning) {
+    // If learning is used, do this
+    if(useLearning) {
+//    double pretension = 0.9; // Tweak this value if need be. What is this actually?
+
+         // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
+        double mins[4]  = {m_initialLengths/2, 
+                           0.3, // intially said Hz, but should be rad/s
+                           -1 * M_PI, 
+                           m_initialLengths};// * (1 - maxStringLengthFactor)};
+
+        // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+        double maxes[4] = {m_initialLengths*3/2, 
+                           20, // initially said Hz (can cheat to 50Hz, if feeling immoral), should be rad/s
+                           M_PI, 
+                           m_initialLengths};// * (1 + maxStringLengthFactor)}; 
+
+        assert((maxes[0]-mins[0])>0);
+        double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+
+        // DEBUGGING
+        //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
+
+        // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
+        int k = 0;
+        for(int i=0;i<actions2D.size();i++) { //6x
+            for (int j=0; j<actions2D[i].size(); j++) { //4x
+                actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
+                //cout << "action2D: " << actions2D[i][j] << endl;
+            }
+        }
+       
+
+        // Find maximum angular frequency with the help of the amplitude 
+        double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
+        double maxAngFrequencies[6];
+        double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3}; // Appropriate
+        double rangeAngFrequencies[6];	
+        vector<double> amps(6);
+        for(int i = 0; i < actions2D.size(); i++) { 
+	    amps[i] = actions2D[i][0];
+            //cout << "amps: " << amps[i] << endl;
+            maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
+            //cout << "max freq: " << maxAngFrequencies[i] << endl;
+            rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
+        }
+
+        // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
+        for(int i=0;i<actions2D.size();i++) { //6x
             actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-            cout << "action2D: " << actions2D[i][1] << endl;
+            //cout << "action1D: " << actions1D[i][1] << endl;
         }
     }
-
+    
     return actions2D;
 }
 
@@ -313,7 +306,7 @@ void T12Controller::applyActions(T12Model& subject, vector< vector <double> > ac
         phaseChange[cluster] = actions[cluster][2];
         dcOffset[cluster] = actions[cluster][3];
     }
-    printSineParams();
+    //printSineParams();
 }
 
 
@@ -750,8 +743,8 @@ void T12Controller::getFileName(void) {
     time_t min = (now->tm_min);
     time_t sec = (now->tm_sec);
 
-    txt_path_out << year << "0" << month <<  "0" << day << "-" << hour << min << sec << ".txt";
-    csv_path_out << year << "0" << month <<  "0" << day << "-" << hour << min << sec << ".csv";
+    txt_path_out << year << "0" << month << day << "-" << hour << min << sec << ".txt";
+    csv_path_out << year << "0" << month << day << "-" << hour << min << sec << ".csv";
  
     txtPath = txt_path_out.str();
     csvPath = csv_path_out.str();

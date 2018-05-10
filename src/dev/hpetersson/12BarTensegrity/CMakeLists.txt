@@ -1,6 +1,6 @@
 #sublink_directories(${LIB_DIR})
 
-find_package(catkin REQUIRED COMPONENTS std_msgs sensor_msgs geometry_msgs)
+#find_package(catkin REQUIRED COMPONENTS std_msgs sensor_msgs geometry_msgs)
 
 link_directories(${LIB_DIR})
 
@@ -15,7 +15,7 @@ link_libraries(tgcreator
                 tgOpenGLSupport
         	yaml-cpp
     		TensegrityModel
-		# learning
+#		learning
 		learningSpines
 		Adapters
 		Configuration	
