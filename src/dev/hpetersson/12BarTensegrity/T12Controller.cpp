@@ -319,6 +319,7 @@ void T12Controller::setupAdapter() {
     configEvolutionAdapter.readFile(configAnnealEvolution);
 
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
+
 }
 
 
@@ -731,8 +732,8 @@ void T12Controller::getFileName(void) {
     ostringstream txt_path_out(txttemp);
     ostringstream csv_path_out(csvtemp);
 
-    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/testnograph2";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/matlabtest";
+    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/sim60ksquareActuation";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/sim60ksquareActuation";
 
     //csv_path_out << "C:/Users/Hannah/Documents/NASA/SimOutput/matlabtest";
     

@@ -50,8 +50,8 @@ const bool  useGraphics = false;
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 3; // Number of episodes ("trial runs")
-    int nSteps = 6000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int nEpisodes = 8000; // Number of episodes ("trial runs")
+    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -85,6 +85,7 @@ void simulateNoGraphics() {
     // Add the model to the world
     simulation.addModel(myModel);
 
+    // Get file name (once) for saving all data to one file
     myController->getFileName();
 
     for (int i = 0; i<nEpisodes; i++) { 
@@ -92,6 +93,11 @@ void simulateNoGraphics() {
         myController->onTeardown(*myModel);
 	simulation.reset();
     }
+    // teardown is handled by delete
+    /*delete myModel;
+    delete view;
+    delete myController;
+    delete ground;*/
 }
 
 void simulateWithGraphics(void) {
@@ -133,6 +139,12 @@ void simulateWithGraphics(void) {
 
     // Run simulation
     simulation.run();
+    
+    // teardown is handled by delete
+    delete myModel;
+    delete view;
+    delete myController;
+    delete ground;
 }
 
 int main(int argc, char** argv)
@@ -148,11 +160,6 @@ int main(int argc, char** argv)
     }
 
 
-    // teardown is handled by delete
-    /*delete myModel;
-    delete myController;
-    delete view;
-    delete ground;*/
     //return 0;
 
 
