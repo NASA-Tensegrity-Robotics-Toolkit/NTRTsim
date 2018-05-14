@@ -902,4 +902,5 @@ void T12Controller::clearParams(void) {
     
     simulationNumber++;
     cout << "Simulation number: " << simulationNumber << endl;
+    if( simulationNumber == 1000) simulationNumber = 0;
 }
