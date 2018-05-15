@@ -36,7 +36,7 @@
 class AnnealEvolution
 {
 public:
-    AnnealEvolution(std::string suffix, std::string config = "config.ini", std::string path = "");
+    AnnealEvolution(std::string suffix, std::string config = "config.ini", std::string path = "", double simNumber = 0);
     ~AnnealEvolution();
     void mutateEveryController();
     void orderAllPopulations();
@@ -46,17 +46,16 @@ public:
     const std::string suffix;
     /// @todo make this const if we decide to force everyone to put their logs in resources
     std::string resourcePath;
-    
+    int simNumber;
+ 
 private:
-    int populationSize;
-    int numberOfControllers;
     std::tr1::ranlux64_base_01 eng;
     std::vector< AnnealEvoPopulation *> populations;
     std::vector <AnnealEvoMember *>  selectedControllers;
     std::vector< std::vector< double > > scoresOfTheGeneration;
     
-//  double minValue;
-//  double maxValue;
+    int populationSize;
+    int numberOfControllers;
     double leniencyCoef;
     bool seeded;
     double Temp;
@@ -68,6 +67,9 @@ private:
     int numberOfElementsToMutate;
     int numberOfSubtests;
     int subTests;
+    bool learning;
+//  double minValue;
+//  double maxValue;
 };
 
 #endif /* ANNEALEVOLUTION_H_ */

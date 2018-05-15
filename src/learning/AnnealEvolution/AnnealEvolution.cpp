@@ -53,14 +53,14 @@ unsigned long long rdtsc(){
 
 #endif
 
-AnnealEvolution::AnnealEvolution(std::string suff, std::string config, std::string path) :
+AnnealEvolution::AnnealEvolution(std::string suff, std::string config, std::string path, double simNumber) :
 suffix(suff),
 Temp(1.0)
 {
     currentTest=0;
     subTests = 0;
     generationNumber=0;
-	
+/*	
 	if (path != "")
 	{
 		resourcePath = FileHelpers::getResourcePath(path);
@@ -74,20 +74,32 @@ Temp(1.0)
 	
 	std::string configPath = resourcePath + config;
 	cout << "Final configuration path: " << configPath << endl;
-
+*/
     configuration myconfigdataaa;
-    myconfigdataaa.readFile(configPath);
-    populationSize=myconfigdataaa.getintvalue("populationSize");
-    numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
-    numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
-    numberOfSubtests=myconfigdataaa.getintvalue("numberOfSubtests");
-    numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
-    leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
-    coevolution=myconfigdataaa.getintvalue("coevolution");
-    seeded = myconfigdataaa.getintvalue("startSeed");
     
-    bool learning = myconfigdataaa.getintvalue("learning");
+    /*if( simNumber == 0) { 
+       myconfigdataaa.readFile(configPath);
+        cout << "File opened and read." << endl;
+        populationSize=myconfigdataaa.getintvalue("populationSize");
+        numberOfElementsToMutate=myconfigdataaa.getintvalue("numberOfElementsToMutate");
+        numberOfTestsBetweenGenerations=myconfigdataaa.getintvalue("numberOfTestsBetweenGenerations");
+        numberOfSubtests=myconfigdataaa.getintvalue("numberOfSubtests");
+        numberOfControllers=myconfigdataaa.getintvalue("numberOfControllers"); //shared with ManhattanToyController
+        leniencyCoef=myconfigdataaa.getDoubleValue("leniencyCoef");
+        coevolution=myconfigdataaa.getintvalue("coevolution");
+        seeded = myconfigdataaa.getintvalue("startSeed");
+        learning = myconfigdataaa.getintvalue("learning");
+    }*/
 
+    populationSize = 36;
+    numberOfElementsToMutate = 5;
+    numberOfTestsBetweenGenerations = 50;
+    numberOfSubtests = 1;
+    numberOfControllers = 6;
+    leniencyCoef = 1.0;
+    coevolution = 0;
+    seeded = 0;
+    learning = 1;
     srand(rdtsc());
     eng.seed(rdtsc());
 
@@ -95,7 +107,6 @@ Temp(1.0)
     {
         populations.push_back(new AnnealEvoPopulation(populationSize,myconfigdataaa));
     }
-    
     // Overwrite the random parameters based on data
     if(seeded) // Test that the file exists
     {
@@ -109,11 +120,11 @@ Temp(1.0)
     }
     if(learning)
     {
-        evolutionLog.open((resourcePath + "logs/evolution" + suffix + ".csv").c_str(),ios::out);
+ /*       evolutionLog.open((resourcePath + "logs/evolution" + suffix + ".csv").c_str(),ios::out);
         if (!evolutionLog.is_open())
         {
             throw std::runtime_error("Logs does not exist. Please create a logs folder in your build directory or update your cmake file");
-	}
+	}*/
     }
 }
 

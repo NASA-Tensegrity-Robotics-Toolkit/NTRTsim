@@ -313,10 +313,10 @@ void T12Controller::applyActions(T12Model& subject, vector< vector <double> > ac
 void T12Controller::setupAdapter() {
     string suffix = "_12Bar";
     string configAnnealEvolution = "Config.ini";
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution);
+    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution, "", simulationNumber);
     bool isLearning = true;
     configuration configEvolutionAdapter;
-    configEvolutionAdapter.readFile(configAnnealEvolution);
+    //configEvolutionAdapter.readFile(configAnnealEvolution);
 
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
 
@@ -902,5 +902,4 @@ void T12Controller::clearParams(void) {
     
     simulationNumber++;
     cout << "Simulation number: " << simulationNumber << endl;
-    if( simulationNumber == 1000) simulationNumber = 0;
 }

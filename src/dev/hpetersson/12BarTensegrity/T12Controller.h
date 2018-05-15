@@ -135,7 +135,7 @@ class T12Controller : public tgObserver<T12Model>
 	void saveData2File(void);
 
 	void clearParams(void);
-	int simulationNumber;
+	double simulationNumber;
 };
 
 #endif // T12CONTROLLER

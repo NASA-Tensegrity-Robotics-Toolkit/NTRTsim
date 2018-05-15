@@ -45,9 +45,9 @@ void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuratio
 {
 //    cout << "Learning: " << isLearning <<  endl;
 
-    numberOfActions=configdata.getDoubleValue("numberOfActions"); // 	CHECK THIS FUNCTION, SOMETHING IS UP HERE
-    numberOfStates=configdata.getDoubleValue("numberOfStates");
-    numberOfControllers=configdata.getDoubleValue("numberOfControllers");
+    numberOfActions=3; //configdata.getDoubleValue("numberOfActions"); // 	CHECK THIS FUNCTION, SOMETHING IS UP HERE
+    numberOfStates=0;//configdata.getDoubleValue("numberOfStates");
+    numberOfControllers=6;//configdata.getDoubleValue("numberOfControllers");
     totalTime=0.0;
 
     //This Function initializes the parameterset from evo.

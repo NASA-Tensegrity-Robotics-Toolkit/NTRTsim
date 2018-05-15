@@ -36,10 +36,11 @@ using namespace std;
 AnnealEvoMember::AnnealEvoMember(configuration config)
 {
     //readConfigFromXML(configFile);
-    this->numOutputs=config.getintvalue("numberOfActions");
-    this->devBase=config.getDoubleValue("deviation");
-    this->monteCarlo=config.getintvalue("MonteCarlo");
-    
+    // IF DESIRE TO CHANGE THESE VALUES, GET FROM FILE. THIS IS A WORKAROUND FOR BEING ABLE TO 
+    this->numOutputs=3; //config.getintvalue("numberOfActions");
+    this->devBase=0.5; //config.getDoubleValue("deviation");
+    this->monteCarlo=1; //config.getintvalue("MonteCarlo");
+//    cout << "this is a good place to break down huh" << endl;
     statelessParameters.resize(numOutputs);
     for(int i=0;i<numOutputs;i++)
         statelessParameters[i]=rand()*1.0/RAND_MAX;

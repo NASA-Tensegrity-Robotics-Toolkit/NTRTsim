@@ -37,14 +37,14 @@ using namespace std;
 
 AnnealEvoPopulation::AnnealEvoPopulation(int populationSize,configuration config)
 {
-    compareAverageScores=true;
+    compareAverageScores=false;
     clearScoresBetweenGenerations=false;
-    this->compareAverageScores=config.getintvalue("compareAverageScores");
-    this->clearScoresBetweenGenerations=config.getintvalue("clearScoresBetweenGenerations");
+    this->compareAverageScores=1; //config.getintvalue("compareAverageScores");
+    this->clearScoresBetweenGenerations=0; //config.getintvalue("clearScoresBetweenGenerations");
 
     for(int i=0;i<populationSize;i++)
     {
-        //cout<<"  creating members"<<endl;
+//        cout<<"population size " << populationSize <<endl;
         controllers.push_back(new AnnealEvoMember(config));
     }
 }
