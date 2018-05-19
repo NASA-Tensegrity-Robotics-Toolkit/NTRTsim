@@ -1,0 +1,9 @@
+substructures:
+  12BarCube:
+    path: ./12BarCubeLikeHardware.yaml
+    translation: [0, 3.7, 0] #dm
+    #translation: [0, 12.84, 0] #dm
+    rotation:
+      axis: [1, 0, 0]
+      angle: 180 #deg
+    scale: 1

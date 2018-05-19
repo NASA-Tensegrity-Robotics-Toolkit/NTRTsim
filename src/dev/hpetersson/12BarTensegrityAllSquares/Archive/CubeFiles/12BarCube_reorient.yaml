@@ -1,0 +1,11 @@
+substructures:
+  12BarCube:
+    path: ./12BarCube.yaml
+    translation: [0, 4.5, 0] #dm
+    #translation: [0, 10, 0]
+    rotation:
+      axis: [1, 0, 0]  # to rest on hexagon
+      angle: -90 #deg
+      # axis: [-1, 0, -1]  # to rest on triangle
+      # angle: 45 #deg
+    scale: 1

@@ -1,0 +1,458 @@
+
+
+    vector <tgBasicActuator*> squareCol; // Vectors to create cluster matrices
+  //	  squareClusters.push_back(squareCol);
+    vector <tgBasicActuator*> hexaCol;  
+//    hexaClusters.push_back(hexaCol);
+   
+ 
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector (could be done outside?)
+    
+    // Cable 0
+    hexaClusters.at(0).push_back(muscles[0]); // Hexa cluster 6 (0)
+    hexaClusters.at(0).at(0) = muscles[0];
+
+    hexaClusters.at(1).push_back(muscles[0]); // Hexa cluster 7 (1)
+    hexaClusters.at(0).at(1) = muscles[0];
+
+    // Cable 1
+    squareClusters.at(0).push_back(muscles[1]); // Square cluster 0
+    squareClusters.at(0).at(0) = muscles[1];
+
+    hexaClusters.at(1).push_back(muscles[1]); // Hexa cluster 6 (0)
+    hexaClusters.at(1).at(0) = muscles[1];
+    
+    // Cable 2
+    squareClusters.at(1).push_back(muscles[2]); // Square cluster 0
+    squareClusters.at(1).at(1) = muscles[2];
+
+    hexaClusters.at(1).push_back(muscles[2]); // Hexa cluster 7 (1)
+    hexaClusters.at(1).at(1) = muscles[2];
+
+    // Cable 3
+    squareClusters.at(0).push_back(muscles[3]); // Square cluster 0
+    squareClusters.at(0).at(1) = muscles[3];
+
+    hexaClusters.at(0).push_back(muscles[3]); // Hexa cluster 9 (3)
+    hexaClusters.at(0).at(3) = muscles[3];
+ 
+
+    // Cable 4
+    hexaClusters.at(0).push_back(muscles[4]); // Hexa cluster 8 (2)
+    hexaClusters.at(0).at(2) = muscles[4];
+    
+    hexaClusters.at(1).push_back(muscles[4]); // Hexa cluster 9 (3)
+    hexaClusters.at(1).at(3) = muscles[4];
+
+    // Cable 5
+    squareClusters.at(1).push_back(muscles[5]); // Square cluster 1
+    squareClusters.at(1).at(1) = muscles[5];
+
+    hexaClusters.at(1).push_back(muscles[5]); // Hexa cluster 8 (2)
+
+    hexaClusters.at(1).at(2) = muscles[5];
+
+    // Cable 6
+    hexaClusters.at(2).push_back(muscles[6]); // Hexa cluster 7 (1)
+    hexaClusters.at(2).at(1) = muscles[6];
+
+    hexaClusters.at(0).push_back(muscles[6]); // Hexa cluster 10(4)
+    hexaClusters.at(0).at(4) = muscles[6];
+
+    // Cable 7
+    squareClusters.at(0).push_back(muscles[7]); // Square cluster 2
+    squareClusters.at(0).at(2) = muscles[7];
+    hexaClusters.at(1).push_back(muscles[7]); // Hexa cluster 10(4)
+    hexaClusters.at(1).at(4) = muscles[7];
+
+    // Cable 8
+    squareClusters.at(1).push_back(muscles[8]); // Square cluster 1
+    squareClusters.at(1).at(1) = muscles[8];
+
+    hexaClusters.at(3).push_back(muscles[8]); // Hexa cluster 7 (1)
+    hexaClusters.at(3).at(1) = muscles[8];
+
+    // Cable 9
+
+
+
+// DEBUGGING
+    cout << "Square cluster: " << endl;
+    for(int j=0; j<squareClusters.size(); j++) {
+
+	for(int i=0; i<squareClusters[0].size(); i++){
+		cout << squareClusters[i][j] << " ";
+	}
+        cout << endl;
+    }
+
+    // DEBUGGGING
+    cout << "Hexagon cluster: " << endl;
+    for(int i=0; i<hexaClusters.size(); i++) {
+	for(int j=0; j<hexaClusters[0].size(); j++){
+		cout << hexaClusters[j][i] << " ";
+	}
+        cout << endl;
+}
+/*
+    // Populate hexagonial clusters
+    for(iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
+        tgBasicActuator *const pMuscle = muscles[iMuscle];
+
+        assert(pMuscle != NULL);
+        cout << "iMuscle: " << iMuscle << ", muscle: " << pMuscle << endl;
+        // Group muscles in clusters, hexagon
+        switch (iMuscle) {
+             case (0 || 1 || 22 || 23 || 30 || 35): // Cluster 6
+                 hexaClusters.at(0).push_back(pMuscle);
+                 hexaClusters.at(i6).at(0) = pMuscle;
+                 i6++;
+             case ( 0 || 2 || 6 || 8 || 12 || 14): // Cluster 7
+                 hexaClusters.at(1).push_back(pMuscle);
+                 hexaClusters.at(i7).at(1) = pMuscle;
+                 i7++;
+             case (4 || 5 || 9 || 10 || 15 || 17): // Cluster 8
+                 hexaClusters.at(2).push_back(pMuscle);
+                 hexaClusters.at(i8).at(2) = pMuscle;
+                 i8++;
+             case (3 || 4 || 18 || 19 || 22 || 26): // Cluster 9
+                 hexaClusters.at(3).push_back(pMuscle);
+                 hexaClusters.at(i9).at(3) = pMuscle;
+                 i9++;
+             case (6 || 7 || 21 || 24 || 27 || 29):  // Cluster 10
+                 hexaClusters.at(4).push_back(pMuscle);
+                 hexaClusters.at(i10).at(4) = pMuscle;
+                 i10++;
+             case (13 || 14 || 19 || 20 || 32 || 33): // Cluster 11
+                 hexaClusters.at(5).push_back(pMuscle);
+                 hexaClusters.at(i11).at(5) = pMuscle;
+                 i11++;
+             case (16 || 17 || 27 || 28 || 31 || 33): // Cluster 12
+                 hexaClusters.at(5).push_back(pMuscle);
+                 hexaClusters.at(i12).at(6) = pMuscle;
+                 i12++;
+             case (10 || 11 || 24 || 25 || 34 || 35): // Cluster 13
+                 hexaClusters.at(5).push_back(pMuscle);
+                 hexaClusters.at(i13).at(7) = pMuscle;
+                 i13++;
+           }
+        }
+    }
+
+    // DEBUGGGING
+    cout << "Hexagon cluster: " << endl;
+    for(int i=0; i<8; i++) {
+	for(int j=0; j<6; j++){
+		cout << hexaClusters[j][i] << " ";
+	}
+        cout << endl;
+    }
+
+
+    // Populate hexagon clusters
+    for(iMuscle = 0; iMuscle < nMuscles; iMuscle++) {
+	tgBasicActuator *const pMuscle = muscles[iMuscle]; 
+
+	// Group muscles in clusters, hexagons
+	if(iMuscle == 0 || iMuscle == 1 || iMuscle == 22 || iMuscle == 23 || iMuscle == 30 || iMuscle == 35) { // Cluster 6
+	    hexaClusters.at(0).push_back(pMuscle);
+	    hexaClusters.at(i6).at(0) = pMuscle;
+	    i6++;
+	} else if(iMuscle == 0 || iMuscle == 1 || iMuscle == 22 || iMuscle == 23 || iMuscle == 30 || iMuscle == 35) { // Cluster 6
+	    hexaClusters.at(0).push_back(pMuscle);
+	    hexaClusters.at(i6).at(0) = pMuscle;
+	    i6++;
+*/	
+  /*  cout << "groundRods[0] = " << groundRods[0] << endl;
+    cout << "groundRods[1] = " << groundRods[1] << endl;
+    cout << "groundRods[2] = " << groundRods[2] << endl;
+    cout << "groundRods[3] = " << groundRods[3] << endl;
+*/
+//    cout << "Size of groundRods = " << groundRods.size() << endl;
+ 
+    //assert(groundRods.size() == cluster0.size());
+ 
+    
+//    cout << "Facenumber before: " << faceNumber << endl;
+
+ 
+	    //cout << "Checking rod number: " << rodNumber << endl;
+		//cout << "size of nodePos: " << nodePos.size() << endl;
+		//for(int j=0; j<nodePos.size(); j++){
+		//    cout << "Position element [" << nodePos[j] << "]" << endl;
+		//}
+
+/* ARCHIVE */
+l
+/*
+//TODO: Doesn't seem to correctly calculate energy spent by tensegrity
+double T12Controller::totalEnergySpent(T12Model& subject) {
+    double totalEnergySpent=0;
+
+    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
+    for(int i=0; i<tmpStrings.size(); i++)
+    {
+        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+
+        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power         
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    return totalEnergySpent;
+}*/
+
+// @TODO
+/* The following part needs to be re-defined, as the switch cases can't take input defined in another case
+
+// Pre-condition: every element in muscles must be defined
+// Post-condition: every muscle will have a new target length
+void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
+    double phase = 0; // Phase of cluster1
+  
+    int nMuscles = 36;
+    int oldCluster = 0;
+    int cluster = 0;
+    bool clusterMember = true; 	// Parameter to determine if action should be taken or not
+
+    for( int iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
+
+  //      cout << "Going through muscle: " << iMuscle << endl;
+        oldCluster = cluster;
+        clusterMember = true;
+        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector (could be done outside?)
+
+        tgBasicActuator *const pMuscle = muscles[iMuscle];
+
+        assert(pMuscle != NULL);
+
+        // Group muscles in clusters
+        if (iMuscle == 1 || iMuscle == 2|| iMuscle == 18|| iMuscle == 20) {
+            cluster = 0;
+        } else if (iMuscle == 3 || iMuscle == 5 || iMuscle == 23 || iMuscle == 34) {
+            cluster = 1;
+        } else if (iMuscle == 7 || iMuscle == 8 || iMuscle == 25 || iMuscle == 30) {
+            cluster = 2;
+        } else if (iMuscle == 9 || iMuscle == 11 || iMuscle == 28 || iMuscle == 29) {
+            cluster = 3;
+        } else if (iMuscle == 12 || iMuscle == 13 || iMuscle == 21 || iMuscle == 31) {
+            cluster = 4;
+        } else if (iMuscle == 15 || iMuscle == 16 || iMuscle == 26 || iMuscle == 32) {
+            cluster = 5;
+        } else {
+            clusterMember = false;
+        }
+
+//        cout << "clusterMember: " << clusterMember << endl;
+
+        if (clusterMember) {
+            double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+            double minLength = m_initialLengths * (1-maxStringLengthFactor);
+            double maxLength = m_initialLengths * (1+maxStringLengthFactor);
+        
+            if (newLength <= minLength) {
+                newLength = minLength;
+            } else if (newLength >= maxLength) {
+                newLength = maxLength;
+            }
+            pMuscle->setControlInput(newLength, dt);
+            
+            if (oldCluster != cluster) {
+                phase += phaseChange[cluster];
+            }
+        }
+    }
+}
+
+/*    vector< vector <double> > actions2D(nSquareClusters, vector<double>(4)); // Vector to be returned
+    //cout << "actions2D size: " << actions2D.size() << ", " << actions2D[0].size() << endl;
+    
+    bool usingManualParams = true;
+    vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
+    if (usingManualParams) {
+        const char* filename = "logs/paramSortedBestTrials.dat";
+        std::cout << "Using manually set parameters from file " << filename << endl; 
+        int lineNumber = 1;
+        manualParams = readManualParams(lineNumber, filename);  
+        cout << "manualParams.size(): " << manualParams.size() << endl;
+  } 
+
+    double pretension = 0.9; // Tweak this value if need be
+
+    cout << "maxStrinLengthFactor :" << maxStringLengthFactor << endl;
+
+   // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
+    double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
+                       0.3, //Hz
+                       -1 * M_PI, 
+                       m_initialLengths};// * (1 - maxStringLengthFactor)};
+
+    // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+    double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
+                       20, //Hz (can cheat to 50Hz, if feeling immoral)
+                       M_PI, 
+                       m_initialLengths};// * (1 + maxStringLengthFactor)}; 
+
+    double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+
+    cout << "Actions matrix is of size: (" << actions2D.size() << ", " << actions2D[0].size() << ")" << endl;
+
+    for(int i=0;i<actions2D.size();i++) { //6x
+        for (int j=0; j<actions2D[i].size(); j++) { //4x
+            if (usingManualParams) {
+                actions2D[i][j] = manualParams[i*actions2D[i].size() + j]*(ranges[j])+mins[j];
+                //cout << "action: " << actions2D[i][j] << endl;
+            } else {
+                actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+                //cout << "action: " << actions[i][j] << endl;
+            }
+        }
+    }
+    cout << "transformActions() completed." << endl;
+    return actions2D;
+*/
+/* ARCHIVE */
+
+/*
+//TODO: Doesn't seem to correctly calculate energy spent by tensegrity
+double T12Controller::totalEnergySpent(T12Model& subject) {
+    double totalEnergySpent=0;
+
+    vector<tgBasicActuator* > tmpStrings = subject.getAllMuscles();
+    for(int i=0; i<tmpStrings.size(); i++)
+    {
+        tgBaseString::BaseStringHistory stringHist = tmpStrings[i]->getHistory();
+
+        for(int j=1; j<stringHist.tensionHistory.size(); j++)
+        {
+            const double previousTension = stringHist.tensionHistory[j-1];
+            const double previousLength = stringHist.restLengths[j-1];
+            const double currentLength = stringHist.restLengths[j];
+            //TODO: examine this assumption - free spinning motor may require more power         
+            double motorSpeed = (currentLength-previousLength);
+            if(motorSpeed > 0) // Vestigial code
+                motorSpeed = 0;
+            const double workDone = previousTension * motorSpeed;
+            totalEnergySpent += workDone;
+        }
+    }
+    return totalEnergySpent;
+}*/
+
+// @TODO
+/* The following part needs to be re-defined, as the switch cases can't take input defined in another case
+
+// Pre-condition: every element in muscles must be defined
+// Post-condition: every muscle will have a new target length
+void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
+    double phase = 0; // Phase of cluster1
+  
+    int nMuscles = 36;
+    int oldCluster = 0;
+    int cluster = 0;
+    bool clusterMember = true; 	// Parameter to determine if action should be taken or not
+
+    for( int iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
+
+  //      cout << "Going through muscle: " << iMuscle << endl;
+        oldCluster = cluster;
+        clusterMember = true;
+        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector (could be done outside?)
+
+        tgBasicActuator *const pMuscle = muscles[iMuscle];
+
+        assert(pMuscle != NULL);
+
+        // Group muscles in clusters
+        if (iMuscle == 1 || iMuscle == 2|| iMuscle == 18|| iMuscle == 20) {
+            cluster = 0;
+        } else if (iMuscle == 3 || iMuscle == 5 || iMuscle == 23 || iMuscle == 34) {
+            cluster = 1;
+        } else if (iMuscle == 7 || iMuscle == 8 || iMuscle == 25 || iMuscle == 30) {
+            cluster = 2;
+        } else if (iMuscle == 9 || iMuscle == 11 || iMuscle == 28 || iMuscle == 29) {
+            cluster = 3;
+        } else if (iMuscle == 12 || iMuscle == 13 || iMuscle == 21 || iMuscle == 31) {
+            cluster = 4;
+        } else if (iMuscle == 15 || iMuscle == 16 || iMuscle == 26 || iMuscle == 32) {
+            cluster = 5;
+        } else {
+            clusterMember = false;
+        }
+
+//        cout << "clusterMember: " << clusterMember << endl;
+
+        if (clusterMember) {
+            double newLength = amplitude[cluster] * sin(angularFrequency[cluster] * m_totalTime + phase) + dcOffset[cluster];
+            double minLength = m_initialLengths * (1-maxStringLengthFactor);
+            double maxLength = m_initialLengths * (1+maxStringLengthFactor);
+        
+            if (newLength <= minLength) {
+                newLength = minLength;
+            } else if (newLength >= maxLength) {
+                newLength = maxLength;
+            }
+            pMuscle->setControlInput(newLength, dt);
+            
+            if (oldCluster != cluster) {
+                phase += phaseChange[cluster];
+            }
+        }
+    }
+}
+
+/*    vector< vector <double> > actions2D(nSquareClusters, vector<double>(4)); // Vector to be returned
+    //cout << "actions2D size: " << actions2D.size() << ", " << actions2D[0].size() << endl;
+    
+    bool usingManualParams = true;
+    vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
+    if (usingManualParams) {
+        const char* filename = "logs/paramSortedBestTrials.dat";
+        std::cout << "Using manually set parameters from file " << filename << endl; 
+        int lineNumber = 1;
+        manualParams = readManualParams(lineNumber, filename);  
+        cout << "manualParams.size(): " << manualParams.size() << endl;
+  } 
+
+    double pretension = 0.9; // Tweak this value if need be
+
+    cout << "maxStrinLengthFactor :" << maxStringLengthFactor << endl;
+
+   // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
+    double mins[4]  = {m_initialLengths * (pretension - maxStringLengthFactor), 
+                       0.3, //Hz
+                       -1 * M_PI, 
+                       m_initialLengths};// * (1 - maxStringLengthFactor)};
+
+    // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+    double maxes[4] = {m_initialLengths * (pretension + maxStringLengthFactor), 
+                       20, //Hz (can cheat to 50Hz, if feeling immoral)
+                       M_PI, 
+                       m_initialLengths};// * (1 + maxStringLengthFactor)}; 
+
+    double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+
+    cout << "Actions matrix is of size: (" << actions2D.size() << ", " << actions2D[0].size() << ")" << endl;
+
+    for(int i=0;i<actions2D.size();i++) { //6x
+        for (int j=0; j<actions2D[i].size(); j++) { //4x
+            if (usingManualParams) {
+                actions2D[i][j] = manualParams[i*actions2D[i].size() + j]*(ranges[j])+mins[j];
+                //cout << "action: " << actions2D[i][j] << endl;
+            } else {
+                actions[i][j] = actions[i][j]*(ranges[j])+mins[j];
+                //cout << "action: " << actions[i][j] << endl;
+            }
+        }
+    }
+    cout << "transformActions() completed." << endl;
+    return actions2D;
+*/
