@@ -46,15 +46,15 @@
  
 */
 const bool  useGraphics = false;
-    const double initialLength = 1.0;
-    const double startTime = 1;
-    const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
-    const double timestep_graphics = 1.f/60.f; // seconds
+const double initialLength = 1.0;
+const double startTime = 1; // How long after the simulation the controller starts
+const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
+const double timestep_graphics = 1.f/60.f; // seconds
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 2000; // Number of episodes ("trial runs")
-    int nSteps = 6000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int nEpisodes = 20000; // Number of episodes ("trial runs")
+    int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;

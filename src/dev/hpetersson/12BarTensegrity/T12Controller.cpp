@@ -61,7 +61,8 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save data to file
-bool useLearning = false; // Use learning alt. use parameters from file
+bool useLearning = true; // Use learning alt. use parameters from file
+bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5%
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -93,41 +94,31 @@ void T12Controller::onSetup(T12Model& subject)
     
     cout << "Current time is: " << m_totalTime << endl;
 
-    if(saveData) {
-        cout << "Will save to csv file " << csvPath << endl;
-        cout << endl;
-    }
-
     //Set the initial length of every muscle in the subject
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    //std::cout << "Muscle.size: " << muscles.size() << std::endl;
     for (size_t i = 0; i < muscles.size(); ++i) {
-	//std::cout << "Muscles: " << muscles[i] << std::endl;
         tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->setControlInput(this->m_initialLengths, dt);
     }
+   
+    // Populate the square clusters with muscles
     populateClusters(subject);
 
     initPosition = subject.getBallCOM();
-
     // DEBUGGING
     /*cout << "initPosition x: " << initPosition[1] << endl;
     cout << "initPosition y: " << initPosition[2] << endl;
     cout << "initPosition z: " << initPosition[3] << endl;
     cout << endl;*/
 
+    // If learning is used, setup adapter and learning parameters
     if(useLearning) { 
         setupAdapter();
 	cout << "Adapter finished setting up." << endl;
         vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
         //get the actions (between 0 and 1) from evolution
         actions = evolutionAdapter.step(dt,state);
-        /* for(int k = 0; k < actions.size(); k++) {
-	    for(int l = 0; l < actions[0].size(); l++) {
-                cout << "actions[" << k << "][" << l << "]" << actions[k][l] << endl;
-            }
-	}*/
     } else {
     	vector< vector<double> > actions;
     }
@@ -138,6 +129,7 @@ void T12Controller::onSetup(T12Model& subject)
     actions = transformActions(actions);
 
     //apply these actions to the appropriate muscles according to the sensor values
+    // (If parameters are read from file, this is done in transformActions)
     if(useLearning) applyActions(subject, actions);
 }
 
@@ -150,8 +142,8 @@ void T12Controller::onStep(T12Model& subject, double dt)
 
 
     if( m_totalTime > m_startTime) {
-        getGroundFace(subject); 
-        setPreferredMuscleLengths(subject, dt);
+        getGroundFace(subject); // check which face the robot is currently standing on 
+        setPreferredMuscleLengths(subject, dt); 
         const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
         //Move motors for all the muscles
@@ -161,35 +153,16 @@ void T12Controller::onStep(T12Model& subject, double dt)
             assert(pMuscle != NULL);
             pMuscle->moveMotors(dt);
         }
-
-//    double distance = displacement(subject);
-	  //cout << "Distance moved: " << distance << endl;    
-    //instead, generate it here for now!
-       /* for(int i=0; i<muscles.size(); i++)
-        {
-            vector<double> tmp;
-            for(int j=0;j<2;j++)
-            {
-                tmp.push_back(0.5);
-            }
-            actions.push_back(tmp);
-        }*/
     }
 }
 
-// So far, only score used for eventual fitness calculation of an Escape Model
-// is the maximum distance from the origin reached during that subject's episode
+// Things to be done in between each simulation, calculate scores, save data and clear parameters
 void T12Controller::onTeardown(T12Model& subject) {
-    std::cout << "Tearing down controller" << std::endl;
+    cout << endl << "Tearing down controller" << endl;
 
-    //std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
-   // double distance = displacement(subject);
     energySpent = totalEnergySpent(subject);
     cout << "Energy spent: " << energySpent << endl;
-    //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    //scores.push_back(distance);
-    //scores.push_back(energySpent);
-
+    
     if(saveData) {
     	saveData2File();
 	cout << "Data saved." << endl;
@@ -199,8 +172,7 @@ void T12Controller::onTeardown(T12Model& subject) {
     
     // update simulation number
     simulationNumber++;
-    cout << "Simulation number: " << simulationNumber << endl;
-    //evolutionAdapter.endEpisode(scores);
+    cout << "Simulation number: " << simulationNumber << endl << endl;
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
@@ -218,19 +190,10 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrityAllSquares/allSquareActuation/InputActions/actions_11106.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_11106.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
-	//for(int i = 0; i < manualParams.size(); i++) {
-          //  cout << "manualParams: " << manualParams[i] << endl;
-        //}
-	/*for(int i = 0; i<squareClusters.size(); i++) { 
-	    amplitude[i] = manualParams[i];
-	    angularFrequency[i] = manualParams[i+squareClusters.size()];
-	    phase[i] = manualParams[i+2*squareClusters.size()];
-	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
-	}*/
 	for(int i = 0; i<squareClusters.size(); i++) { 
 	    amplitude[i] = manualParams[i];
 	    angularFrequency[i] = manualParams[i+squareClusters.size()];
@@ -259,9 +222,6 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
         assert((maxes[0]-mins[0])>0);
         double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
-        // DEBUGGING
-        //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
-
         // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
         int k = 0;
         for(int i=0;i<actions2D.size();i++) { //6x
@@ -280,16 +240,13 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
         vector<double> amps(6);
         for(int i = 0; i < actions2D.size(); i++) { 
 	    amps[i] = actions2D[i][0];
-            //cout << "amps: " << amps[i] << endl;
             maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
-            //cout << "max freq: " << maxAngFrequencies[i] << endl;
             rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
         }
 
         // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
         for(int i=0;i<actions2D.size();i++) { //6x
             actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-            //cout << "action1D: " << actions1D[i][1] << endl;
         }
     }
     
@@ -302,8 +259,8 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
 void T12Controller::applyActions(T12Model& subject, vector< vector <double> > actions)
 {
     // DEBUGGING
-    cout << "Action size: " << actions.size() << endl;
-    cout << "Cluster size: " << squareClusters.size() << endl;
+    //cout << "Action size: " << actions.size() << endl;
+    //cout << "Cluster size: " << squareClusters.size() << endl;
 
     assert(actions.size() == squareClusters.size());
 
@@ -336,7 +293,6 @@ void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
 
     // Calculate the new length, one cluster at a time, and apply it to that cluster
     for(int j = 0; j < squareClusters.size(); j++) { // squareClusters.size() gives number of columns
-//  	cout << "phase " << j << " "  << phase[j] << endl;
 	double newLength = amplitude[j] * sin(angularFrequency[j] * m_totalTime + phase[j]) + dcOffset[j];
         double minLength = m_initialLengths * (1-maxStringLengthFactor);
         double maxLength = m_initialLengths * (1+maxStringLengthFactor);
@@ -350,8 +306,6 @@ void T12Controller::setPreferredMuscleLengths(T12Model& subject, double dt) {
         }
 
 	for(int i = 0; i < squareClusters[0].size(); i++) { // squareClusters[0].size gives number of rows
-	    //cout << "[j ,i]: " << j << i << endl;
-	    //cout << "squareClusters[j][i]: " << squareClusters[j][i] << endl;
 	    assert(squareClusters[j][i] != NULL);
 	    tgBasicActuator *const pMuscle = squareClusters[j][i];
  	    assert(pMuscle != NULL);
@@ -414,83 +368,20 @@ void T12Controller::populateClusters(T12Model& subject) {
     //        cout << "Muscle is not related to the square faces." << endl;
         }
     }
-
-   /* // Populate square clusters
-    for(iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
-        tgBasicActuator *const pMuscle = muscles[iMuscle];
-
-        assert(pMuscle != NULL);
-        
-	// Group muscles in clusters, square
-        if (iMuscle == 1 || iMuscle == 2|| iMuscle == 18|| iMuscle == 20) { // Cluster 0
-            squareClusters.at(0).push_back(pMuscle);
-            squareClusters.at(i0).at(0) = pMuscle;
-            i0++;
-    cout <<"squarecluster[0].size " << squareClusters[0].size() << endl;
-    cout <<"squarecluster.size " << squareClusters.size() << endl;
-    
-    // DEBUGGING
-    cout << "Square cluster: " << endl;
-    for(int j=0; j<squareClusters[0].size(); j++) {
-	for(int i=0; i<squareClusters.size(); i++){
-		cout << squareClusters[i][j] << " ";
-	}
-        cout << endl;
-    }
-        } else if (iMuscle == 3 || iMuscle == 5 || iMuscle == 23 || iMuscle == 34) { // Cluster 1
-            squareClusters.at(1).push_back(pMuscle);
-            squareClusters.at(i1).at(1) = pMuscle;
-            i1++;
-        } else if (iMuscle == 7 || iMuscle == 8 || iMuscle == 25 || iMuscle == 30) { // Cluster 2
-            squareClusters.at(2).push_back(pMuscle);
-            squareClusters.at(i2).at(2) = pMuscle;
-            i2++;
-        } else if (iMuscle == 9 || iMuscle == 11 || iMuscle == 28 || iMuscle == 29) { // Cluster 3
-            squareClusters.at(3).push_back(pMuscle);
-            squareClusters.at(i3).at(3) = pMuscle;
-            i3++;
-        } else if (iMuscle == 12 || iMuscle == 13 || iMuscle == 21 || iMuscle == 31) { // Cluster 4
-            squareClusters.at(4).push_back(pMuscle);
-            squareClusters.at(i4).at(4) = pMuscle;
-            i4++;
-        } else if (iMuscle == 15 || iMuscle == 16 || iMuscle == 26 || iMuscle == 32) { // Cluster 5
-            squareClusters.at(5).push_back(pMuscle);
-            squareClusters.at(i5).at(5) = pMuscle;
-            i5++;
-        } else {
-    //        cout << "Muscle is not related to the square faces." << endl;
-        }
-    }*/
-
-//    cout <<"squarecluster[0].size " << squareClusters[0].size() << endl;
-  // cout <<"squarecluster.size " << squareClusters.size() << endl;
-    
-    // DEBUGGING
-/*    cout << "Square cluster: " << endl;
-    for(int j=0; j<squareClusters[0].size(); j++) {
-	for(int i=0; i<squareClusters.size(); i++){
-		cout << squareClusters[i][j] << " ";
-	}
-        cout << endl;
-    } */
 }
 
 /* Initializes sine waves, each cluster has identical parameters */
 void T12Controller::initializeSineWaves() {
     amplitude = new double[nSquareClusters];
     angularFrequency = new double[nSquareClusters];
-    phase = new double[nSquareClusters]; // Does not use last value stored in array
+    phase = new double[nSquareClusters];
     dcOffset = new double[nSquareClusters];    
-
-    // DEBUGGING
-    //cout << " amplitude: " << amplitude << " angularFrequency: " << angularFrequency << " phase: " << phase << " dcOffset: " << dcOffset << endl;
 }
 
 double T12Controller::displacement(T12Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
-    // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
-    //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
+    assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
     const double newX = finalPosition[0];
     const double newZ = finalPosition[2];
@@ -520,8 +411,6 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
         cout << "Error opening file." << endl;
     }
 
-    //cout << "Using: " << line << " as input for starting parameter values\n";
-
     // Split line into parameters
     stringstream lineStream(line);
     string cell;
@@ -531,23 +420,25 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
         iCell++;
     }
 
-    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     <----- WHY?
-/*    for (int i=0; i < result.size(); i++) {
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-        double seed = ((double) (rand() % 100)) / 100;
-        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     
+    if (tweakParams) {
+        cout << "Tweaking parameters from file with up to 0.5%." << endl;
+        for (int i=0; i < result.size(); i++) {
+            //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+            double seed = ((double) (rand() % 100)) / 100;
+            result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
 
-        if(result[i] >= 1) {
-            result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
+            //if(result[i] >= 1) {
+             //   result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
+            //}
         }
-      
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-	    }*/
+    }
 
     return result;
 }
 
 void T12Controller::printSineParams() {
+    cout << endl;
     for (size_t cluster = 0; cluster < squareClusters.size(); cluster++) {
         cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << endl;
         cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << endl;
@@ -736,8 +627,8 @@ void T12Controller::getFileName(void) {
     ostringstream txt_path_out(txttemp);
     ostringstream csv_path_out(csvtemp);
 
-    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrityAllSquares/allSquareActuation/outputFiles/textgen_a_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrityAllSquares/allSquareActuation/outputFiles/gen_a_";
+    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b_";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_b_";
 
     
     time_t year = (now->tm_year + 1900);
