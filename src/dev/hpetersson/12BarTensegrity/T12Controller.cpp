@@ -381,7 +381,7 @@ void T12Controller::initializeSineWaves() {
 double T12Controller::displacement(T12Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
-    assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
+    //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
     const double newX = finalPosition[0];
     const double newZ = finalPosition[2];

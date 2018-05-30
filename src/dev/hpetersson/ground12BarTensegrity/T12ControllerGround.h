@@ -85,7 +85,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
         // Sine Wave Data
         double* amplitude;
         double* angularFrequency;
-        double* phaseChange;
+        double* phase;
         double* dcOffset;
 
         /** Initialize the evolution adapter as well as its own parameters */
@@ -96,13 +96,13 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 	double energySpent;
 
         /** Sets target lengths for each muscle */
-        void setPreferredMuscleLengths(T12ModelGround& subject, double dt);
+        void setPreferredMuscleLengths(T12ModelGround& subject, double dt, double oldCluster, double currentCluster);
 
         /** Divides the 24 muscles of an Escape_T6Model 
          * into 8 clusters of 3 muscles */
         void populateClusters(T12ModelGround& subject);
 
-        /** Sets the amplitude, angularFrequency, phase change, and dcOffset 
+        /** Sets the amplitude, angularFrequency, phase, and dcOffset 
          * for each sine wave used in muscle actuation */
         void initializeSineWaves();
 
@@ -117,7 +117,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
         void printSineParams();
 
-	void getGroundFace(T12ModelGround& subject);
+ 	double getGroundFace(T12ModelGround& subject);
 
 	/* For a certain rod configuration, determine corresponding face */
 	void determineFace(bool isSquareFace);
@@ -138,4 +138,4 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 	double simulationNumber;
 };
 
-#endif // T12CONTROLLER
+#endif // T12CONTROLLERGROUND

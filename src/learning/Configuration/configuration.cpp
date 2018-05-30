@@ -56,7 +56,10 @@ int configuration::getintvalue( const std::string& key )
 
 double configuration::getDoubleValue(const std::string& key )
 {
-	if (!iskey( key )) throw 0;
+	if (!iskey( key )) {
+	    std::cout<<"Cannot find the key in the config file, Key: "<<key<<endl;
+   	    throw 0;
+	}
 	std::istringstream ss( this->data.operator [] ( key ) );
 	double result;
 	ss >> result;

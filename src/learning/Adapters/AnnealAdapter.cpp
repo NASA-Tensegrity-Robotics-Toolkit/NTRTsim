@@ -43,11 +43,11 @@ AnnealAdapter::~AnnealAdapter(){};
 
 void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuration configdata)
 {
-//    cout << "Learning: " << isLearning <<  endl;
+    cout << "Learning: " << isLearning <<  endl;
 
-    numberOfActions=3; //configdata.getDoubleValue("numberOfActions"); // 	CHECK THIS FUNCTION, SOMETHING IS UP HERE
-    numberOfStates=0;//configdata.getDoubleValue("numberOfStates");
-    numberOfControllers=6;//configdata.getDoubleValue("numberOfControllers");
+    numberOfActions=configdata.getDoubleValue("numberOfActions"); // 	CHECK THIS FUNCTION, SOMETHING IS UP HERE
+    numberOfStates = configdata.getDoubleValue("numberOfStates");
+    numberOfControllers = configdata.getDoubleValue("numberOfControllers");
     totalTime=0.0;
 
     //This Function initializes the parameterset from evo.
@@ -64,18 +64,19 @@ void AnnealAdapter::initialize(AnnealEvolution *evo,bool isLearning,configuratio
             stringstream ss;
             ss << annealEvo->resourcePath << "logs/bestParameters-" << this->annealEvo->suffix << "-" << i << ".nnw";
             currentControllers[i]->loadFromFile(ss.str().c_str());
-//          currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
+ //           currentControllers[i]->getNn()->loadWeights(ss.str().c_str());
         }
     }
     errorOfFirstController=0.0;
+    cout << "Number of actions " << numberOfActions << endl;
 }
+
 
 vector<vector<double> > AnnealAdapter::step(double deltaTimeSeconds,vector<double> state)
 {
     totalTime+=deltaTimeSeconds;
   cout<<"NN adapter, state: "<<state[0]<<" "<<state[1]<<" "<<state[2]<<" "<<state[3]<<" "<<state[4]<<" "<<endl;
     vector< vector<double> > actions;
-
     for(int i=0;i<currentControllers.size();i++)
     {
         vector<double> tmpAct;

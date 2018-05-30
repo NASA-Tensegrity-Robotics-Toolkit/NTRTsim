@@ -30,9 +30,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
 // Sensors
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
@@ -49,12 +46,15 @@
  
 */
 const bool  useGraphics = true;
-
+const double initialLength = 1.0;
+const double startTime = 1; // How long after the simulation the controller starts
+const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
+const double timestep_graphics = 1.f/60.f; // seconds
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 2000; // Number of episodes ("trial runs")
-    int nSteps = 60000; // Number of steps in each episode, 60k is 100 seconds (timestep_physics*nSteps)
+    int nEpisodes = 20000; // Number of episodes ("trial runs")
+    int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -69,7 +69,8 @@ void simulateNoGraphics() {
 
     tgSimView *view;
     // Create the view
-    view = new tgSimView (world);
+    view = new tgSimView (world, timestep_physics, timestep_graphics) ;
+    //view = new tgSimView (world);
     
     // Create the simulation
     tgSimulation simulation(*view);
@@ -78,8 +79,6 @@ void simulateNoGraphics() {
     T12ModelGround* const myModel = new T12ModelGround(); // second argument not necessary
 
     // Select controller to be used 
-    double initialLength = 1.0;
-    double startTime = 3;
     T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime);
 
     // Attach the controller to the model 
@@ -94,7 +93,7 @@ void simulateNoGraphics() {
     for (int i = 0; i<nEpisodes; i++) { 
 	simulation.run(nSteps);
         myController->onTeardown(*myModel);
-		simulation.reset();
+	simulation.reset();
     }
     // teardown is handled by delete
    // delete myModel;
@@ -116,9 +115,6 @@ void simulateWithGraphics(void) {
     const tgWorld::Config config(98.1); // gravity, dm/s^2
     tgWorld world(config, ground);
 
-    const double timestep_physics = 0.0001; // seconds // recommended 0.001
-    const double timestep_graphics = 1.f/60.f; // seconds
-
     tgSimView *view;
     // Create the view
     view = new tgSimViewGraphics (world, timestep_physics, timestep_graphics);
@@ -130,8 +126,6 @@ void simulateWithGraphics(void) {
     T12ModelGround* const myModel = new T12ModelGround(); // second argument not necessary
 
     // Select controller to be used 
-    double initialLength = 1.0;
-    double startTime = 1;
     T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime);
 
     // Attach the controller to the model 
@@ -153,7 +147,7 @@ void simulateWithGraphics(void) {
 int main(int argc, char** argv)
 {
     std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
-    std::cout << "App12BarCpp" << std::endl;
+    std::cout << "App12BarGround" << std::endl;
 //    std::cout << "Graphics = " << useGraphics << std::endl;
 
     if(useGraphics) {

@@ -54,15 +54,15 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <stdlib.h>
 
 # define M_PI 3.14159265358979323846 
                                
 using namespace std;
 
 /* S E T T I N G S */
-bool saveData = true; // Save data to file
+bool saveData = false; // Save data to file
 bool useLearning = true; // Use learning alt. use parameters from file
+bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5%
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -72,7 +72,7 @@ T12ControllerGround::T12ControllerGround(T12ModelGround* subject, const double i
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     nSquareClusters(6),  // 6 = number of squares on 12Bar. On SUPERball, the number of faces is 8.
-    nHexaClusters(9), 
+    nHexaClusters(8), 
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
     musclesPerHexaCluster(6)
 {
@@ -91,56 +91,48 @@ T12ControllerGround::T12ControllerGround(T12ModelGround* subject, const double i
 void T12ControllerGround::onSetup(T12ModelGround& subject)
 {
     double dt = 0.0001;
-    srand(3);    
-    //groundFace = -1;
-
-    if(saveData) {
-        //getFileNamg();
-        cout << "Will save to txt file " << txtPath << endl;
-        cout << "Will save to csv file " << csvPath << endl;
-        cout << endl;
-    }
+    
+    cout << "Current time is: " << m_totalTime << endl;
 
     //Set the initial length of every muscle in the subject
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    //std::cout << "Muscle.size: " << muscles.size() << std::endl;
     for (size_t i = 0; i < muscles.size(); ++i) {
-	//std::cout << "Muscles: " << muscles[i] << std::endl;
         tgBasicActuator * const pMuscle = muscles[i];
         assert(pMuscle != NULL);
         pMuscle->setControlInput(this->m_initialLengths, dt);
     }
+   
+    // Populate the clusters with muscles
     populateClusters(subject);
 
     initPosition = subject.getBallCOM();
-
     // DEBUGGING
     /*cout << "initPosition x: " << initPosition[1] << endl;
     cout << "initPosition y: " << initPosition[2] << endl;
     cout << "initPosition z: " << initPosition[3] << endl;
     cout << endl;*/
 
+    // If learning is used, setup adapter and learning parameters
     if(useLearning) { 
         setupAdapter();
 	cout << "Adapter finished setting up." << endl;
         vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
         //get the actions (between 0 and 1) from evolution
         actions = evolutionAdapter.step(dt,state);
-        /* for(int k = 0; k < actions.size(); k++) {
-	    for(int l = 0; l < actions[0].size(); l++) {
-                cout << "actions[" << k << "][" << l << "]" << actions[k][l] << endl;
-            }
-	}*/
     } else {
     	vector< vector<double> > actions;
     }
 
+    cout << "Current time is: " << m_totalTime << endl;
     initializeSineWaves(); // For muscle actuation
 
+    cout << "Current time is: " << m_totalTime << endl;
     //transform them to the size of the structure
     actions = transformActions(actions);
 
+    cout << "Current time is: " << m_totalTime << endl;
     //apply these actions to the appropriate muscles according to the sensor values
+    // (If parameters are read from file, this is done in transformActions)
     if(useLearning) applyActions(subject, actions);
 }
 
@@ -151,55 +143,44 @@ void T12ControllerGround::onStep(T12ModelGround& subject, double dt)
     }
     m_totalTime+=dt;
 
-    if( m_totalTime > m_startTime) {
-        if(useLearning) getGroundFace(subject); 
-        setPreferredMuscleLengths(subject, dt);
-        const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    
-        //Move motors for all the muscles
-        for (size_t i = 0; i < muscles.size(); ++i)
-        {
-            tgBasicActuator * const pMuscle = muscles[i];
-            assert(pMuscle != NULL);
-            pMuscle->moveMotors(dt);
-        }
+    double newCluster, currentCluster, oldCluster;
 
-//    double distance = displacement(subject);
-	  //cout << "Distance moved: " << distance << endl;    
-    //instead, generate it here for now!
-       /* for(int i=0; i<muscles.size(); i++)
-        {
-            vector<double> tmp;
-            for(int j=0;j<2;j++)
+    if( m_totalTime > m_startTime) {
+        currentCluster = getGroundFace(subject); // check which face the robot is currently standing on 
+
+	while (currentCluster == newCluster) {
+            setPreferredMuscleLengths(subject, dt, oldCluster, currentCluster); 
+            const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    
+            //Move motors for all the muscles
+            for (size_t i = 0; i < muscles.size(); ++i)
             {
-                tmp.push_back(0.5);
+                tgBasicActuator * const pMuscle = muscles[i];
+                assert(pMuscle != NULL);
+                pMuscle->moveMotors(dt);
             }
-            actions.push_back(tmp);
-        }*/
+            newCluster = getGroundFace(subject);
+	} 
     }
 }
 
-// So far, only score used for eventual fitness calculation of an Escape Model
-// is the maximum distance from the origin reached during that subject's episode
+// Things to be done in between each simulation, calculate scores, save data and clear parameters
 void T12ControllerGround::onTeardown(T12ModelGround& subject) {
-    std::cout << "Tearing down controller" << std::endl;
+    cout << endl << "Tearing down controller" << endl;
 
-    //std::vector<double> scores; //scores[0] == displacement, scores[1] == energySpent
-   // double distance = displacement(subject);
     energySpent = totalEnergySpent(subject);
     cout << "Energy spent: " << energySpent << endl;
-    //Invariant: For now, scores must be of size 2 (as required by endEpisode())
-    //scores.push_back(distance);
-    //scores.push_back(energySpent);
-
+    
     if(saveData) {
     	saveData2File();
 	cout << "Data saved." << endl;
     }
 
     clearParams(); // Clear all parameters for next simulation
-
-    //evolutionAdapter.endEpisode(scores);
+    
+    // update simulation number
+    simulationNumber++;
+    cout << "Simulation number: " << simulationNumber << endl << endl;
 
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
@@ -208,26 +189,23 @@ void T12ControllerGround::onTeardown(T12ModelGround& subject) {
  * Returns the modified actions 2D vector such that 
  * each action value is now scaled to fit the model
  * Invariant: actions[x].size() == 4 for all legal values of x
- * Invariant: Each actions[] contains: amplitude, angularFrequency, phaseChange, dcOffset
+ * Invariant: Each actions[] contains: amplitude, angularFrequency, phase, dcOffset
  */
 vector< vector <double> > T12ControllerGround::transformActions(vector< vector <double> > actions1D)
 {
-    vector< vector <double> > actions2D(nSquareClusters, vector<double>(4)); // Vector to be returned
+    vector< vector <double> > actions2D(2, vector<double>(4)); // Vector to be returned
 
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions20180518-115229.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_11106.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
-	for(int i = 0; i < manualParams.size(); i++) {
-            cout << "manualParams: " << manualParams[i] << endl;
-        }
 	for(int i = 0; i<squareClusters.size(); i++) { 
 	    amplitude[i] = manualParams[i];
 	    angularFrequency[i] = manualParams[i+squareClusters.size()];
-	    phaseChange[i] = manualParams[i+2*squareClusters.size()];
+	    phase[i] = manualParams[i+2*squareClusters.size()];
 	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
 	}
         printSineParams();
@@ -237,13 +215,13 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
 
-         // Minimum amplitude, angularFrequency, phaseChange, and dcOffset
+         // Minimum amplitude, angularFrequency, phase, and dcOffset
         double mins[4]  = {m_initialLengths/2, 
                            0.3, // intially said Hz, but should be rad/s
                            -1 * M_PI, 
                            m_initialLengths};// * (1 - maxStringLengthFactor)};
 
-        // Maximum amplitude, angularFrequency, phaseChange, and dcOffset
+        // Maximum amplitude, angularFrequency, phase, and dcOffset
         double maxes[4] = {m_initialLengths*3/2, 
                            20, // initially said Hz (can cheat to 50Hz, if feeling immoral), should be rad/s
                            M_PI, 
@@ -252,37 +230,30 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
         assert((maxes[0]-mins[0])>0);
         double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
 
-        // DEBUGGING
-        //cout << "Actions matrix is of size: (" << actions2D[0].size() << ", " << actions2D.size() << ")" << endl;
-
         // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
         int k = 0;
         for(int i=0;i<actions2D.size();i++) { //6x
             for (int j=0; j<actions2D[i].size(); j++) { //4x
                 actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
-                //cout << "action2D: " << actions2D[i][j] << endl;
+                cout << "action2D: " << actions2D[i][j] << endl;
             }
         }
        
 
         // Find maximum angular frequency with the help of the amplitude 
         double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
-        double maxAngFrequencies[6];
-        double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3}; // Appropriate
-        double rangeAngFrequencies[6];	
-        vector<double> amps(6);
+        double maxAngFrequencies[2];
+        double minAngFrequencies[2] = {0.3, 0.3}; // Appropriate
+        double rangeAngFrequencies[2];	
+        vector<double> amps(2);
         for(int i = 0; i < actions2D.size(); i++) { 
 	    amps[i] = actions2D[i][0];
-            //cout << "amps: " << amps[i] << endl;
             maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
-            //cout << "max freq: " << maxAngFrequencies[i] << endl;
             rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
         }
-
-        // Apply output of learing to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
+        // Apply output of learning to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
         for(int i=0;i<actions2D.size();i++) { //6x
             actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-            //cout << "action1D: " << actions1D[i][1] << endl;
         }
     }
     
@@ -295,19 +266,16 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
 void T12ControllerGround::applyActions(T12ModelGround& subject, vector< vector <double> > actions)
 {
     // DEBUGGING
-    cout << "Action size: " << actions.size() << endl;
-    cout << "Cluster size: " << squareClusters.size() << endl;
-
-    assert(actions.size() == squareClusters.size());
+    //cout << "Action size: " << actions.size() << endl;
+    //cout << "Cluster size: " << squareClusters.size() << endl;
 
     // Apply actions by cluster
-    for (size_t cluster = 0; cluster < squareClusters.size(); cluster++) {
-        amplitude[cluster] = actions[cluster][0];    
-  	angularFrequency[cluster] = actions[cluster][1];
-        phaseChange[cluster] = actions[cluster][2];
-        dcOffset[cluster] = actions[cluster][3];
-    }
-    //printSineParams();
+    amplitude[0] = actions[0][0];    
+    angularFrequency[0] = actions[0][1];
+    phase[0] = actions[0][2];
+    dcOffset[0] = actions[0][3];
+ 
+   //printSineParams();
 }
 
 
@@ -317,34 +285,39 @@ void T12ControllerGround::setupAdapter() {
     AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution, "", simulationNumber);
     bool isLearning = true;
     configuration configEvolutionAdapter;
-    //configEvolutionAdapter.readFile(configAnnealEvolution);
+    configEvolutionAdapter.readFile(configAnnealEvolution);
 
     evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
-
 }
 
 
 
-void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, double dt) {
+void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, double dt, double oldCluster, double currentCluster) {
+ 
+    if (oldCluster < 6) oldIndex = 0;
+    else oldIndex = 1;
 
-    double phase = 0;
+    if (currentCluster < 6) currentIndex = 0;
+    else currentIndex = 1;
 
+
+
+/*
     // Calculate the new length, one cluster at a time, and apply it to that cluster
     for(int j = 0; j < squareClusters.size(); j++) { // squareClusters.size() gives number of columns
-
-	double newLength = amplitude[j] * sin(angularFrequency[j] * m_totalTime + phase) + dcOffset[j];
+	double newLength = amplitude[j] * sin(angularFrequency[j] * m_totalTime + phase[j]) + dcOffset[j];
         double minLength = m_initialLengths * (1-maxStringLengthFactor);
         double maxLength = m_initialLengths * (1+maxStringLengthFactor);
         
         if (newLength <= minLength) {
+	    //cout << "Hit minLength limit." << endl;
             newLength = minLength;
         } else if (newLength >= maxLength) {
+	    //cout << "Hit maxLength limit." << endl;
             newLength = maxLength;
         }
 
 	for(int i = 0; i < squareClusters[0].size(); i++) { // squareClusters[0].size gives number of rows
-	    //cout << "[j ,i]: " << j << i << endl;
-	    //cout << "squareClusters[j][i]: " << squareClusters[j][i] << endl;
 	    assert(squareClusters[j][i] != NULL);
 	    tgBasicActuator *const pMuscle = squareClusters[j][i];
  	    assert(pMuscle != NULL);
@@ -352,8 +325,7 @@ void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, dou
             pMuscle->setControlInput(newLength, dt);
 	    
         } 
-        phase += phaseChange[j];
-
+  */   
      // DEBUGGING
     /*cout << "Square cluster: " << endl;
     for(int j=0; j<6; j++) {
@@ -374,7 +346,7 @@ void T12ControllerGround::populateClusters(T12ModelGround& subject) {
     vector <tgBasicActuator*> hexaCol;  
     // hexaClusters.push_back(hexaCol);
 
-    int i0 = 0, i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0;
+    int i0 = 0, i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0, i6 =0, i7 = 0, i8 = 0, i9 = 0, i10 = 0, i11 = 0, i12 = 0, i13 = 0;
 
 
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector
@@ -407,83 +379,65 @@ void T12ControllerGround::populateClusters(T12ModelGround& subject) {
         } else {
     //        cout << "Muscle is not related to the square faces." << endl;
         }
-    }
 
-   /* // Populate square clusters
-    for(iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
-        tgBasicActuator *const pMuscle = muscles[iMuscle];
-
-        assert(pMuscle != NULL);
-        
-	// Group muscles in clusters, square
-        if (iMuscle == 1 || iMuscle == 2|| iMuscle == 18|| iMuscle == 20) { // Cluster 0
-            squareClusters.at(0).push_back(pMuscle);
-            squareClusters.at(i0).at(0) = pMuscle;
-            i0++;
-    cout <<"squarecluster[0].size " << squareClusters[0].size() << endl;
-    cout <<"squarecluster.size " << squareClusters.size() << endl;
-    
-    // DEBUGGING
-    cout << "Square cluster: " << endl;
-    for(int j=0; j<squareClusters[0].size(); j++) {
-	for(int i=0; i<squareClusters.size(); i++){
-		cout << squareClusters[i][j] << " ";
-	}
-        cout << endl;
-    }
-        } else if (iMuscle == 3 || iMuscle == 5 || iMuscle == 23 || iMuscle == 34) { // Cluster 1
-            squareClusters.at(1).push_back(pMuscle);
-            squareClusters.at(i1).at(1) = pMuscle;
-            i1++;
-        } else if (iMuscle == 7 || iMuscle == 8 || iMuscle == 25 || iMuscle == 30) { // Cluster 2
-            squareClusters.at(2).push_back(pMuscle);
-            squareClusters.at(i2).at(2) = pMuscle;
-            i2++;
-        } else if (iMuscle == 9 || iMuscle == 11 || iMuscle == 28 || iMuscle == 29) { // Cluster 3
-            squareClusters.at(3).push_back(pMuscle);
-            squareClusters.at(i3).at(3) = pMuscle;
-            i3++;
-        } else if (iMuscle == 12 || iMuscle == 13 || iMuscle == 21 || iMuscle == 31) { // Cluster 4
-            squareClusters.at(4).push_back(pMuscle);
-            squareClusters.at(i4).at(4) = pMuscle;
-            i4++;
-        } else if (iMuscle == 15 || iMuscle == 16 || iMuscle == 26 || iMuscle == 32) { // Cluster 5
-            squareClusters.at(5).push_back(pMuscle);
-            squareClusters.at(i5).at(5) = pMuscle;
-            i5++;
+        // Group muscles in clusters, hexagon
+        if (iMuscle == 0 || iMuscle == 1|| iMuscle == 22 || iMuscle == 23 || iMuscle == 30 || iMuscle == 35) { // Cluster 6
+            hexaClusters[0][i6] = pMuscle;
+            i6++;
+        } if (iMuscle == 0 || iMuscle == 2 || iMuscle == 6 || iMuscle == 8 || iMuscle == 12 || iMuscle == 14) { // Cluster 7
+            hexaClusters[1][i7] = pMuscle;
+            i7++;
+        } if (iMuscle == 4 || iMuscle == 5 || iMuscle == 9 || iMuscle == 10 || iMuscle == 15 || iMuscle == 17) { // Cluster 8
+            hexaClusters[2][i8] = pMuscle;
+            i8++;
+        } if (iMuscle == 3 || iMuscle == 4 || iMuscle == 18 || iMuscle == 19 || iMuscle == 22 || iMuscle == 26) { // Cluster 9
+            hexaClusters[3][i9] = pMuscle;
+            i9++;
+        } if (iMuscle == 6 || iMuscle == 7 || iMuscle == 21 || iMuscle == 24 || iMuscle == 27 || iMuscle == 29) { // Cluster 10
+            hexaClusters[4][i10] = pMuscle;
+            i10++;
+        } if (iMuscle == 13 || iMuscle == 14 || iMuscle == 19 || iMuscle == 20 || iMuscle == 32 || iMuscle == 33) { // Cluster 11
+            hexaClusters[5][i11] = pMuscle;
+            i11++;
+        } if (iMuscle == 16 || iMuscle == 17 || iMuscle == 27 || iMuscle == 28 || iMuscle == 31 || iMuscle == 33) { // Cluster 12
+            hexaClusters[6][i12] = pMuscle;
+            i12++;
+        } if (iMuscle == 10 || iMuscle == 11 || iMuscle == 24 || iMuscle == 25 || iMuscle == 34 || iMuscle == 35) { // Cluster 13
+            hexaClusters[7][i13] = pMuscle;
+            i13++;
         } else {
     //        cout << "Muscle is not related to the square faces." << endl;
         }
-    }*/
+    }
 
-//    cout <<"squarecluster[0].size " << squareClusters[0].size() << endl;
-  // cout <<"squarecluster.size " << squareClusters.size() << endl;
-    
-    // DEBUGGING
-/*    cout << "Square cluster: " << endl;
-    for(int j=0; j<squareClusters[0].size(); j++) {
-	for(int i=0; i<squareClusters.size(); i++){
-		cout << squareClusters[i][j] << " ";
+    // Make sure it is ok
+    cout << "Square clusters: " << endl;
+    for(int i = 0; i<squareClusters.size(); i++) {
+	for(int j = 0; j<squareClusters[0].size(); j++) {
+	    cout << squareClusters[i][j] << " "; 
 	}
-        cout << endl;
-    } */
+	cout << endl;
+    }
+    cout << "Hexa clusters: " << endl;
+    for(int i = 0; i<hexaClusters.size(); i++) {
+	for(int j = 0; j<hexaClusters[0].size(); j++) {
+	    cout << hexaClusters[i][j] << " "; 
+	}
+	cout << endl;
+    }
 }
 
 /* Initializes sine waves, each cluster has identical parameters */
 void T12ControllerGround::initializeSineWaves() {
-    amplitude = new double[nSquareClusters];
-    angularFrequency = new double[nSquareClusters];
-    phaseChange = new double[nSquareClusters]; // Does not use last value stored in array
-    dcOffset = new double[nSquareClusters];    
-
-    // DEBUGGING
-    //cout << " amplitude: " << amplitude << " angularFrequency: " << angularFrequency << " phaseChange: " << phaseChange << " dcOffset: " << dcOffset << endl;
+    amplitude = new double[2];
+    angularFrequency = new double[2];
+    phase = new double[2];
+    dcOffset = new double[2];    
 }
 
 double T12ControllerGround::displacement(T12ModelGround& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
-    // 'X' and 'Z' are irrelevant. Both variables measure lateral direction
     //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
     const double newX = finalPosition[0];
@@ -498,7 +452,7 @@ double T12ControllerGround::displacement(T12ModelGround& subject) {
 
 std::vector<double> T12ControllerGround::readManualParams(int lineNumber, const char* filename) {
     assert(lineNumber > 0);
-    vector<double> result(32, 1.0); // Why 32?
+    vector<double> result(24, 1.0); // earlier, this was set to 32. I don\t see the reason why 
     string line;
     ifstream infile(filename, ifstream::in);
 
@@ -514,8 +468,6 @@ std::vector<double> T12ControllerGround::readManualParams(int lineNumber, const 
         cout << "Error opening file." << endl;
     }
 
-    //cout << "Using: " << line << " as input for starting parameter values\n";
-
     // Split line into parameters
     stringstream lineStream(line);
     string cell;
@@ -525,29 +477,29 @@ std::vector<double> T12ControllerGround::readManualParams(int lineNumber, const 
         iCell++;
     }
 
-    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     <----- WHY?
-/*    for (int i=0; i < result.size(); i++) {
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-        double seed = ((double) (rand() % 100)) / 100;
-        result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     
+    if (tweakParams) {
+        cout << "Tweaking parameters from file with up to 0.5%." << endl;
+        for (int i=0; i < result.size(); i++) {
+            //std::cout<<"Cell " << i << ": " << result[i] << "\n";
+            double seed = ((double) (rand() % 100)) / 100;
+            result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
 
-        if(result[i] >= 1) {
-            result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
+            //if(result[i] >= 1) {
+             //   result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
+            //}
         }
-      
-        //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-	    }*/
-
-    cout << "readManualParams() finished. result.size = " << result.size() << endl;
+    }
 
     return result;
 }
 
 void T12ControllerGround::printSineParams() {
+    cout << endl;
     for (size_t cluster = 0; cluster < squareClusters.size(); cluster++) {
         cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << endl;
         cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << endl;
-        cout << "phaseChange[" << cluster << "]: " << phaseChange[cluster] << endl;
+        cout << "phase[" << cluster << "]: " << phase[cluster] << endl;
         cout << "dcOffset[" << cluster << "]: " << dcOffset[cluster] << endl;
         cout << endl; 
     }     
@@ -654,7 +606,7 @@ double T12ControllerGround::totalEnergySpent(T12ModelGround& subject) {
 
 
 /* Function to determine which face the robot stands on */
-void T12ControllerGround::getGroundFace(T12ModelGround& subject) {
+double T12ControllerGround::getGroundFace(T12ModelGround& subject) {
 
         int i = 0;
         vector<double> nodePos(6);
@@ -682,10 +634,11 @@ void T12ControllerGround::getGroundFace(T12ModelGround& subject) {
     double oldManhattan = distanceMovedManhattan;
     distanceMovedManhattan = displacement(subject);
     distanceMovedSnorkel += abs(oldManhattan - distanceMovedManhattan); 
-
     if(groundFace != oldGroundFace) { // && groundFace != -1) {
         groundFaceHistory.push_back(groundFace); // Save ground face in history log
     } 
+
+    return groundFace;
 }
 
 /* Function for writing data to txt file */
@@ -733,10 +686,9 @@ void T12ControllerGround::getFileName(void) {
     ostringstream txt_path_out(txttemp);
     ostringstream csv_path_out(csvtemp);
 
-    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/sim60ksquareActuation";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/sim60ksquareActuation";
+    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/textgen_c_";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/gen_c_";
 
-    //csv_path_out << "C:/Users/Hannah/Documents/NASA/SimOutput/matlabtest";
     
     time_t year = (now->tm_year + 1900);
     time_t month = (now->tm_mon + 1);
@@ -745,8 +697,8 @@ void T12ControllerGround::getFileName(void) {
     time_t min = (now->tm_min);
     time_t sec = (now->tm_sec);
 
-    txt_path_out << year << "0" << month << day << "-" << hour << min << sec << ".txt";
-    csv_path_out << year << "0" << month << day << "-" << hour << min << sec << ".csv";
+    txt_path_out << year << "0" << month << day << "_" << hour << "h" << min << "m" << sec << "s" << ".txt";
+    csv_path_out << year << "0" << month << day << "_" << hour << "h" << min << "m" << sec << "s" << ".csv";
  
     txtPath = txt_path_out.str();
     csvPath = csv_path_out.str();
@@ -767,7 +719,7 @@ void T12ControllerGround::getFileName(void) {
 	write2csvFile(i, "", 1);
 	write2csvFile(0, "],angularFrequency[", 0);
 	write2csvFile(i, "", 1);
-	write2csvFile(0, "],phaseChange[", 0);
+	write2csvFile(0, "],phase[", 0);
 	write2csvFile(i, "", 1);
 	write2csvFile(0, "],dcOffset[", 0);
 	write2csvFile(i, "", 1);
@@ -793,7 +745,7 @@ void T12ControllerGround::saveData2File(void) {
 	write2txtFile(0, "         ", 0);
 	write2txtFile(angularFrequency[i], "", 1);
 	write2txtFile(0, "         ", 0);
-	write2txtFile(phaseChange[i], "", 1);
+	write2txtFile(phase[i], "", 1);
 	write2txtFile(0, "         ", 0);
 	write2txtFile(dcOffset[i], "", 1);
 	write2txtFile(0, "\n", 0);
@@ -846,8 +798,10 @@ void T12ControllerGround::saveData2File(void) {
     // manhattan distance moved
     write2csvFile(distanceMovedManhattan,"",1);
     write2csvFile(0,",",0);
-    
+   
     // snirky distance moved
+    cout << "Manhattan distance moved: " << distanceMovedManhattan << endl; 
+    cout << "Total distance moved: " << distanceMovedSnorkel << endl; 
     write2csvFile(distanceMovedSnorkel,"",1);
     write2csvFile(0,",",0);
 
@@ -869,7 +823,7 @@ void T12ControllerGround::saveData2File(void) {
 	write2csvFile(0, ",", 0);
 	write2csvFile(angularFrequency[i], "", 1);
 	write2csvFile(0, ",", 0);
-	write2csvFile(phaseChange[i], "", 1);
+	write2csvFile(phase[i], "", 1);
 	write2csvFile(0, ",", 0);
 	write2csvFile(dcOffset[i], "", 1);
 	write2csvFile(0, ",", 0);
@@ -896,11 +850,22 @@ void T12ControllerGround::saveData2File(void) {
 
 void T12ControllerGround::clearParams(void) { 
    
+    cout << "Current time is: " << m_totalTime << endl;
     groundFaceHistory.clear();
     distanceMovedManhattan = 0;
     distanceMovedSnorkel = 0;
     energySpent = 0;
-    
-    simulationNumber++;
-    cout << "Simulation number: " << simulationNumber << endl;
+    m_totalTime = 0; 
+    groundFace = 0;
+    initPosition.clear();
+
+    for (int i = 0; i < nSquareClusters; i++) {
+	amplitude[i] = 0;
+	angularFrequency[i] = 0;
+	phase[i] = 0;
+	dcOffset[i] = 0;
+    }
+
+    actions.clear();
+
 }

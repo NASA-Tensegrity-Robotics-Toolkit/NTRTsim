@@ -39,8 +39,8 @@ AnnealEvoPopulation::AnnealEvoPopulation(int populationSize,configuration config
 {
     compareAverageScores=false;
     clearScoresBetweenGenerations=false;
-    this->compareAverageScores=1; //config.getintvalue("compareAverageScores");
-    this->clearScoresBetweenGenerations=0; //config.getintvalue("clearScoresBetweenGenerations");
+    this->compareAverageScores = config.getintvalue("compareAverageScores");
+    this->clearScoresBetweenGenerations = config.getintvalue("clearScoresBetweenGenerations");
 
     for(int i=0;i<populationSize;i++)
     {
