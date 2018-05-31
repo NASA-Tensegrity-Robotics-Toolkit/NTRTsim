@@ -83,10 +83,8 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
         vector<vector<tgBasicActuator*> > hexaClusters; 
 
         // Sine Wave Data
-        double* amplitude;
-        double* angularFrequency;
-        double* phase;
-        double* dcOffset;
+        double* retractRate;
+        double* elongateRate;
 
         /** Initialize the evolution adapter as well as its own parameters */
         void setupAdapter();
@@ -104,7 +102,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
         /** Sets the amplitude, angularFrequency, phase, and dcOffset 
          * for each sine wave used in muscle actuation */
-        void initializeSineWaves();
+        void initializeRates();
 
         /** Difference in position between initPosition and finalPosition
          * of subject */
@@ -115,7 +113,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, const char* filename);
 
-        void printSineParams();
+        void printRates();
 
  	double getGroundFace(T12ModelGround& subject);
 

@@ -45,7 +45,7 @@
  * @return 0
  
 */
-const bool  useGraphics = true;
+const bool  useGraphics = false;
 const double initialLength = 1.0;
 const double startTime = 1; // How long after the simulation the controller starts
 const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001

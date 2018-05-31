@@ -60,7 +60,7 @@
 using namespace std;
 
 /* S E T T I N G S */
-bool saveData = false; // Save data to file
+bool saveData = true; // Save data to file
 bool useLearning = true; // Use learning alt. use parameters from file
 bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5%
 
@@ -123,14 +123,11 @@ void T12ControllerGround::onSetup(T12ModelGround& subject)
     	vector< vector<double> > actions;
     }
 
-    cout << "Current time is: " << m_totalTime << endl;
-    initializeSineWaves(); // For muscle actuation
+    initializeRates(); // For muscle actuation
 
-    cout << "Current time is: " << m_totalTime << endl;
     //transform them to the size of the structure
     actions = transformActions(actions);
 
-    cout << "Current time is: " << m_totalTime << endl;
     //apply these actions to the appropriate muscles according to the sensor values
     // (If parameters are read from file, this is done in transformActions)
     if(useLearning) applyActions(subject, actions);
@@ -145,21 +142,26 @@ void T12ControllerGround::onStep(T12ModelGround& subject, double dt)
 
     double newCluster, currentCluster, oldCluster;
 
+    newCluster = getGroundFace(subject);
+    oldCluster = -1; 
+
     if( m_totalTime > m_startTime) {
         currentCluster = getGroundFace(subject); // check which face the robot is currently standing on 
-
+        //cout << "Current cluster: " << currentCluster << endl;
 	while (currentCluster == newCluster) {
             setPreferredMuscleLengths(subject, dt, oldCluster, currentCluster); 
             const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
-            //Move motors for all the muscles
+            //Move motors for 
             for (size_t i = 0; i < muscles.size(); ++i)
             {
                 tgBasicActuator * const pMuscle = muscles[i];
                 assert(pMuscle != NULL);
                 pMuscle->moveMotors(dt);
+	        //cout << "Motor moved for muscle  " << pMuscle << endl;
             }
             newCluster = getGroundFace(subject);
+	   //cout << "New cluster: " << newCluster << endl;
 	} 
     }
 }
@@ -172,7 +174,7 @@ void T12ControllerGround::onTeardown(T12ModelGround& subject) {
     cout << "Energy spent: " << energySpent << endl;
     
     if(saveData) {
-    	saveData2File();
+    	//saveData2File();
 	cout << "Data saved." << endl;
     }
 
@@ -193,10 +195,10 @@ void T12ControllerGround::onTeardown(T12ModelGround& subject) {
  */
 vector< vector <double> > T12ControllerGround::transformActions(vector< vector <double> > actions1D)
 {
-    vector< vector <double> > actions2D(2, vector<double>(4)); // Vector to be returned
+    vector< vector <double> > actions2D(2, vector<double>(2)); // Vector to be returned
 
     // If reading parameters from file, do this
-    if(!useLearning) { 
+    /*if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
         const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_11106.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
@@ -209,73 +211,44 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
 	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
 	}
         printSineParams();
-    }
+    }*/
 
     // If learning is used, do this
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
 
-         // Minimum amplitude, angularFrequency, phase, and dcOffset
-        double mins[4]  = {m_initialLengths/2, 
-                           0.3, // intially said Hz, but should be rad/s
-                           -1 * M_PI, 
-                           m_initialLengths};// * (1 - maxStringLengthFactor)};
+         // Minimum rates
+        double minRate  = 0.2; // dm/s 
 
         // Maximum amplitude, angularFrequency, phase, and dcOffset
-        double maxes[4] = {m_initialLengths*3/2, 
-                           20, // initially said Hz (can cheat to 50Hz, if feeling immoral), should be rad/s
-                           M_PI, 
-                           m_initialLengths};// * (1 + maxStringLengthFactor)}; 
+        double maxRate = 1.5; // dm/s 
 
-        assert((maxes[0]-mins[0])>0);
-        double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
+        assert(maxRate-minRate>0);
+        double range = maxRate - minRate;
 
-        // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
+        // Apply output of learing to all rates
         int k = 0;
-        for(int i=0;i<actions2D.size();i++) { //6x
-            for (int j=0; j<actions2D[i].size(); j++) { //4x
-                actions2D[i][j] = actions1D[i][j]*(ranges[j])+mins[j];
+        for(int i=0;i<actions2D.size();i++) { //2x
+            for (int j=0; j<actions2D[i].size(); j++) { //2x
+                actions2D[i][j] = actions1D[i][j]*range + minRate;
                 cout << "action2D: " << actions2D[i][j] << endl;
             }
         }
-       
-
-        // Find maximum angular frequency with the help of the amplitude 
-        double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
-        double maxAngFrequencies[2];
-        double minAngFrequencies[2] = {0.3, 0.3}; // Appropriate
-        double rangeAngFrequencies[2];	
-        vector<double> amps(2);
-        for(int i = 0; i < actions2D.size(); i++) { 
-	    amps[i] = actions2D[i][0];
-            maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
-            rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
-        }
-        // Apply output of learning to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
-        for(int i=0;i<actions2D.size();i++) { //6x
-            actions2D[i][1] = actions1D[i][1]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-        }
     }
-    
+   
     return actions2D;
 }
 
 /**
- * Defines each cluster's sine wave according to actions
+ * Defines the retract rate and elongation rate of the squares and hexagons according to actions
  */
 void T12ControllerGround::applyActions(T12ModelGround& subject, vector< vector <double> > actions)
 {
-    // DEBUGGING
-    //cout << "Action size: " << actions.size() << endl;
-    //cout << "Cluster size: " << squareClusters.size() << endl;
-
     // Apply actions by cluster
-    amplitude[0] = actions[0][0];    
-    angularFrequency[0] = actions[0][1];
-    phase[0] = actions[0][2];
-    dcOffset[0] = actions[0][3];
- 
-   //printSineParams();
+    retractRate[0] = actions[0][0]; // square    
+    retractRate[1] = actions[1][0]; // hexagon
+    elongateRate[0] = actions[0][1]; // square
+    elongateRate[0] = actions[1][1]; // hexagon
 }
 
 
@@ -293,12 +266,90 @@ void T12ControllerGround::setupAdapter() {
 
 
 void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, double dt, double oldCluster, double currentCluster) {
- 
-    if (oldCluster < 6) oldIndex = 0;
-    else oldIndex = 1;
 
-    if (currentCluster < 6) currentIndex = 0;
-    else currentIndex = 1;
+    bool oldClusterSquare, currentClusterSquare;
+    double newLength;
+ 
+    if (oldCluster < 6) oldClusterSquare = true;   // Determine if cluster is square (0) or hexa (1)
+    else oldClusterSquare = false;
+
+    if (currentCluster < 6) currentClusterSquare = true;
+    else currentClusterSquare = false;
+
+    
+    // make sure all muscles have some form of input
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for (int i = 0; i < muscles.size(); i++) { 
+        tgBasicActuator * const pMuscle = muscles[i];
+	assert(pMuscle != NULL); 
+	pMuscle->setControlInput(m_initialLengths, dt);
+    }
+
+
+    // Retract the muscles of the ground face. 
+    if(currentClusterSquare) {
+	for (int i = 0; i < squareClusters[0].size(); i++) { 
+	    tgBasicActuator *const pMuscle = squareClusters[currentCluster][i];
+	    cout << "ok" << endl;
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle from to be retracted from squareCluster[" << currentCluster << "][" << i  << "] with ID: " << squareClusters[currentCluster][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength - retractRate[0]*dt;
+	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+            if (newLength > m_initialLengths - maxStringLengthFactor) {
+   	        pMuscle->setControlInput(newLength, dt);
+    	    }
+	}	
+    }
+    // If hexagon 
+    if(!currentClusterSquare) {
+	for (int i = 0; i < hexaClusters[0].size(); i++) { 
+	    tgBasicActuator *const pMuscle = hexaClusters[currentCluster - squareClusters.size()][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength - retractRate[1]*dt;
+	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+            if (newLength > m_initialLengths - maxStringLengthFactor) {
+   	        pMuscle->setControlInput(newLength, dt);
+    	    }
+	}	
+    }
+
+
+
+
+    // Elongate old clusters muscles to the start length. This action will override the previous control input
+    // in case one muscle is in both the old and new cluster. The muscle should in this case be elongated, 
+    // to not make the robot fall back but move forward. 
+    if(oldClusterSquare && oldCluster != -1) {
+	for (int i = 0; i < squareClusters[0].size(); i++) { 
+	    tgBasicActuator *const pMuscle = squareClusters[oldCluster][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle to be elongated from squareCluster[" << oldCluster << "][" << i << "] with ID: " << squareClusters[oldCluster][i];
+	    double currentLength = pMuscle->getRestLength();
+            if (currentLength < m_initialLengths) {
+		newLength = currentLength + elongateRate[0]*dt;
+		pMuscle->setControlInput(newLength, dt);
+    		}
+	}	
+    }
+   
+    if(!oldClusterSquare && oldCluster != -1) {
+	for (int i = 0; i < hexaClusters[0].size(); i++) { 
+	    tgBasicActuator *const pMuscle = hexaClusters[oldCluster - squareClusters.size()][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle to be elongated from hexaCluster[" << i << "][" << oldCluster - squareClusters.size() << "] with ID: " << hexaClusters[oldCluster - squareClusters.size()][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+            if (currentLength < m_initialLengths) {
+		newLength = currentLength + elongateRate[1]*dt;
+		pMuscle->setControlInput(newLength, dt);
+    		}
+	}	
+    }
+
+
+	 
 
 
 
@@ -334,7 +385,7 @@ void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, dou
 	}
         cout << endl;
     }*/
-   }
+   
 }
 
 void T12ControllerGround::populateClusters(T12ModelGround& subject) {
@@ -428,11 +479,12 @@ void T12ControllerGround::populateClusters(T12ModelGround& subject) {
 }
 
 /* Initializes sine waves, each cluster has identical parameters */
-void T12ControllerGround::initializeSineWaves() {
-    amplitude = new double[2];
-    angularFrequency = new double[2];
-    phase = new double[2];
-    dcOffset = new double[2];    
+void T12ControllerGround::initializeRates() {
+    cout << "Rates initialized." << endl;
+    retractRate = new double[2]; // [0] for squares, [1] for hexagons
+    elongateRate = new double[2];
+    // DEBUGGING
+    cout << "Rates initialized." << endl;
 }
 
 double T12ControllerGround::displacement(T12ModelGround& subject) {
@@ -494,15 +546,13 @@ std::vector<double> T12ControllerGround::readManualParams(int lineNumber, const 
     return result;
 }
 
-void T12ControllerGround::printSineParams() {
+void T12ControllerGround::printRates() {
     cout << endl;
-    for (size_t cluster = 0; cluster < squareClusters.size(); cluster++) {
-        cout << "amplitude[" << cluster << "]: " << amplitude[cluster] << endl;
-        cout << "angularFrequency[" << cluster << "]: " << angularFrequency[cluster] << endl;
-        cout << "phase[" << cluster << "]: " << phase[cluster] << endl;
-        cout << "dcOffset[" << cluster << "]: " << dcOffset[cluster] << endl;
-        cout << endl; 
-    }     
+    cout << "Square retract rate: " << retractRate[0] << endl;
+    cout << "Hexagon retract rate: " << retractRate[1] << endl;
+    cout << "Square elongation rate: " << retractRate[0] << endl;
+    cout << "Hexagon elongation rate: " << retractRate[1] << endl;
+    cout << endl; 
 }
 
 // @ TODO: Implement for hexagon faces
@@ -736,7 +786,7 @@ void T12ControllerGround::saveData2File(void) {
 
 // WRITE TO TEXT FILE FOR EASY ACCESS TO DATA
     // Sine params
-    write2txtFile(0, "Index - Amplitude - Angular Frequency - Phase Change - DC Offset", 0); 
+   /* write2txtFile(0, "Index - Amplitude - Angular Frequency - Phase Change - DC Offset", 0); 
     write2txtFile(0, "\n", 0);
     for (int i = 0; i < nSquareClusters; i++) {
 	write2txtFile(i, "", 1);
@@ -749,7 +799,7 @@ void T12ControllerGround::saveData2File(void) {
 	write2txtFile(0, "         ", 0);
 	write2txtFile(dcOffset[i], "", 1);
 	write2txtFile(0, "\n", 0);
-    }
+    }*/
 
     write2txtFile(0, "\n", 0);
     
@@ -818,7 +868,7 @@ void T12ControllerGround::saveData2File(void) {
     }	
 
     // sine params
-    for (int i = 0; i < nSquareClusters; i++) {
+    /*for (int i = 0; i < nSquareClusters; i++) {
 	write2csvFile(amplitude[i], "", 1);
 	write2csvFile(0, ",", 0);
 	write2csvFile(angularFrequency[i], "", 1);
@@ -827,7 +877,7 @@ void T12ControllerGround::saveData2File(void) {
 	write2csvFile(0, ",", 0);
 	write2csvFile(dcOffset[i], "", 1);
 	write2csvFile(0, ",", 0);
-    }
+    }*/
 
     // Initial length
     write2csvFile(m_initialLengths, "", 1);
@@ -859,11 +909,9 @@ void T12ControllerGround::clearParams(void) {
     groundFace = 0;
     initPosition.clear();
 
-    for (int i = 0; i < nSquareClusters; i++) {
-	amplitude[i] = 0;
-	angularFrequency[i] = 0;
-	phase[i] = 0;
-	dcOffset[i] = 0;
+    for (int i = 0; i < 2; i++) {
+	retractRate[i] = 0;
+	elongateRate[i] = 0;
     }
 
     actions.clear();
