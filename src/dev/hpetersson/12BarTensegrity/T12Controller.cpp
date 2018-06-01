@@ -61,8 +61,8 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save data to file
-bool useLearning = true; // Use learning alt. use parameters from file
-bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5%
+bool useLearning = false; // Use learning alt. use parameters from file
+bool tweakParams = true; // When reading parameters from file, tweak with up to 0.5%
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -190,7 +190,7 @@ vector< vector <double> > T12Controller::transformActions(vector< vector <double
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_11106.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_b_15164.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
@@ -381,7 +381,7 @@ void T12Controller::initializeSineWaves() {
 double T12Controller::displacement(T12Model& subject) {
     vector<double> finalPosition = subject.getBallCOM();
 
-    assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
+    //assert(finalPosition[0] > 0); //Negative y-value indicates a flaw in the simulator that run (tensegrity went 'underground')
 
     const double newX = finalPosition[0];
     const double newZ = finalPosition[2];
@@ -420,19 +420,21 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
         iCell++;
     }
 
-    // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     
-    if (tweakParams) {
-        cout << "Tweaking parameters from file with up to 0.5%." << endl;
-        for (int i=0; i < result.size(); i++) {
-            //std::cout<<"Cell " << i << ": " << result[i] << "\n";
-            double seed = ((double) (rand() % 100)) / 100;
-            result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
-
-            //if(result[i] >= 1) {
-             //   result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
-            //}
+    if (simulationNumber > 10) { // Don't tweak for the first 10 simulation to ensure consistency
+        // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     
+        if (tweakParams) {
+            cout << "Tweaking parameters from file with up to 0.5%." << endl;
+            for (int i=0; i < result.size() - 6; i++) {
+                std::cout<<"Cell " << i << ": " << result[i];
+                double seed = ((double) (rand() % 100)) / 100;
+                result[i] += (0.01 * seed) - 0.005; // Value +/- 0.005 of original
+	        cout << ", tweaked: " << result[i] << endl;
+                //if(result[i] >= 1) {
+                 //   result[i] = result[i] - 0.5; // Dummy solution before values from learning is found for 12 bar
+                //}
+            }
         }
-    }
+    } else cout << "Actions not tweaked for the first 10 simulations." << endl;
 
     return result;
 }
@@ -627,8 +629,8 @@ void T12Controller::getFileName(void) {
     ostringstream txt_path_out(txttemp);
     ostringstream csv_path_out(csvtemp);
 
-    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_b_";
+    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b_mandist_";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_b_mandist_";
 
     
     time_t year = (now->tm_year + 1900);
