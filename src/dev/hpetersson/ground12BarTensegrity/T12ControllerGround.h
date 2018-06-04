@@ -117,6 +117,8 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
  	double getGroundFace(T12ModelGround& subject);
 
+  	double getAdjacentFace(void);
+
 	/* For a certain rod configuration, determine corresponding face */
 	void determineFace(bool isSquareFace);
 
