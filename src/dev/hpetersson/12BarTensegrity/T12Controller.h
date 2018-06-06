@@ -44,7 +44,7 @@ class T12Controller : public tgObserver<T12Model>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        T12Controller(T12Model* subject, const double prefLength=5.0, double startTime=3);
+        T12Controller(T12Model* subject, const double prefLength=1.0, double startTime=1);
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~T12Controller() { }
@@ -110,7 +110,7 @@ class T12Controller : public tgObserver<T12Model>
          * of subject */
         double displacement(T12Model& subject);
 	double distanceMovedManhattan;
-	double distanceMovedSnorkel;
+	double distanceMovedTotal;
 
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, const char* filename);

@@ -53,7 +53,7 @@ const double timestep_graphics = 1.f/60.f; // seconds
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 20000; // Number of episodes ("trial runs")
+    int nEpisodes =100; // Number of episodes ("trial runs")
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
@@ -149,12 +149,6 @@ int main(int argc, char** argv)
     std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "App12BarCpp" << std::endl;
 //    std::cout << "Graphics = " << useGraphics << std::endl;
-
-    if(useGraphics) {
-        simulateWithGraphics();
-    } else { 
-	simulateNoGraphics();
-    }
 
     if(useGraphics) {
         simulateWithGraphics();
