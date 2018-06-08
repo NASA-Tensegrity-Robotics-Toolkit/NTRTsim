@@ -122,24 +122,14 @@ void T12Controller::onSetup(T12Model& subject)
     } 
     cout << endl;
     // If learning is used, setup adapter and learning parameters
-    if(useLearning) { 
-       /* setupAdapter();
-	cout << "Adapter finished setting up." << endl;
-        vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
-        actions = evolutionAdapter.step(dt,state); //get the actions (between 0 and 1) from evolution*/
-    	//vector< vector<double> > actions;
-        randomizeParams();
-    } else {
-    	vector< vector<double> > actions;
-    }
+    if(useLearning) randomizeParams();
 
     initializeSineWaves(); // For muscle actuation
 
     actions = transformActions(); // Transform the actions to right format
 
     //apply these actions to the appropriate muscles according to the sensor values
-    // (If parameters are read from file, this is done in transformActions)
-    if(useLearning) applyActions(subject);
+    applyActions(subject);
 
     printSineParams();
 }
@@ -192,27 +182,28 @@ void T12Controller::onTeardown(T12Model& subject) {
 }
 
 /** 
- * Returns the modified actions 2D vector such that 
+ * Returns the modified actions vector such that 
  * each action value is now scaled to fit the model
  * Invariant: actions[x].size() == 4 for all legal values of x
  * Invariant: Each actions[] contains: amplitude, angularFrequency, phase, dcOffset
  */
 vector< vector <double> > T12Controller::transformActions()
 { 
-
+    // DEBUGGING 
     for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
-            for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
-                cout << actions[i][j] << " ";
-            }
-            cout << endl;
+        for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
+            cout << actions[i][j] << " ";
         }
-  	cout << "\n";
+        cout << endl;
+    }
+    cout << "\n";
 
 
     vector< vector <double> > adaptedActions(musclesPerSquareCluster, vector<double>(nSquareClusters, 0)); // Vector to be returned
     adaptedActions = actions;
 
     assert(adaptedActions.size() == actions.size());
+
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
@@ -220,14 +211,14 @@ vector< vector <double> > T12Controller::transformActions()
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
-	for(int i = 0; i<squareClusters.size(); i++) {  // Assign sine parameters 
+/*	for(int i = 0; i<squareClusters.size(); i++) {  // Assign sine parameters 
 	    amplitude[i] = manualParams[i];
 	    angularFrequency[i] = manualParams[i+squareClusters.size()];
 	    phase[i] = manualParams[i+2*squareClusters.size()];
 	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
-	}
+	}*/
 
-	int k = 0; // Assign actions (same as sine parameters, done for completness)
+	int k = 0; // Assign actions (same as sine parameters, done for completeness)
 	for(int j = 0; j<musclesPerSquareCluster; j++) {
 	    for(int i = 0; i<nSquareClusters; i++) {
 	    adaptedActions[j][i] = manualParams[k];
