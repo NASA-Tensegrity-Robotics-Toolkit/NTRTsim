@@ -28,9 +28,9 @@ l */
  */
 
 #include <vector>
-
+#include <fstream>
 #include "core/tgObserver.h"
-#include "learning/Adapters/AnnealAdapter.h"
+//#include "learning/Adapters/AnnealAdapter.h"
 
 // Forward declarations
 class T12Model;
@@ -39,7 +39,7 @@ class tgBasicActuator;
 //namespace std for vectors
 using namespace std;
 
-/** Escape Controller for T12` */
+/** Controller for T12` */
 class T12Controller : public tgObserver<T12Model>
 {
     public:
@@ -57,9 +57,9 @@ class T12Controller : public tgObserver<T12Model>
 
         virtual void onTeardown(T12Model& subject);
     protected:
-        virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+        virtual vector< vector <double> > transformActions(void);
 
-        virtual void applyActions(T12Model& subject, vector< vector <double> > act);
+        virtual void applyActions(T12Model& subject);
 
     private:
         vector<double> initPosition; // Initial position of model
@@ -69,9 +69,12 @@ class T12Controller : public tgObserver<T12Model>
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
 
         // Evolution and Adapter
-        AnnealAdapter evolutionAdapter;
+        //AnnealAdapter evolutionAdapter;
         vector< vector<double> > actions; // For modifications between episodes
 
+        //actions.resize(4, vector< double> (6, 0)); // For modifications between episodes
+        void randomizeParams(void);
+     
         // Muscle Clusters
         int nSquareClusters;
 	int nHexaClusters;

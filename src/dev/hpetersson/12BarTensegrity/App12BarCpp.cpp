@@ -30,6 +30,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+// Colors
+//#include "colormod.h"
 // Sensors
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgRodSensorInfo.h"
@@ -53,7 +55,7 @@ const double timestep_graphics = 1.f/60.f; // seconds
 
 
 void simulateNoGraphics() { 
-    int nEpisodes =100; // Number of episodes ("trial runs")
+    int nEpisodes = 100; // Number of episodes ("trial runs")
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
@@ -146,7 +148,11 @@ void simulateWithGraphics(void) {
 
 int main(int argc, char** argv)
 {
-    std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
+
+   // Color::Modifier green(Color::FG_GREEN);
+   // Color::Modifier def(Color::FG_DEFAULT);
+
+    std::cout <<  "---------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "App12BarCpp" << std::endl;
 //    std::cout << "Graphics = " << useGraphics << std::endl;
 
