@@ -66,11 +66,12 @@ bool tweakParams = false; // When reading parameters from file, tweak with up to
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-T12Controller::T12Controller(T12Model* subject, const double initialLength, double startTime) :
+T12Controller::T12Controller(T12Model* subject, const double initialLength, double startTime, int simNum) :
     m_initialLengths(initialLength),
     m_startTime(startTime),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
+    simulationNumber(simNum),
     nSquareClusters(6),  // 6 = number of squares on 12Bar. On SUPERball, the number of faces is 8.
     nHexaClusters(9),  // 9 = number of hexagons on a 12Bar
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
@@ -93,7 +94,7 @@ void T12Controller::onSetup(T12Model& subject)
 {
     double dt = 0.0001;
     
-    cout << "Current time is: " << m_totalTime << endl; // To verify each simulation starts with t = 0
+    cout << "Current time is " << m_totalTime << " for simulation number " << simulationNumber << "." << endl; // To verify each simulation starts with t = 0
 
     //Set the initial length of every muscle in the subject
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
@@ -114,19 +115,21 @@ void T12Controller::onSetup(T12Model& subject)
 
  
     actions.resize(musclesPerSquareCluster, vector<double> (nSquareClusters, 0));
-    for (int j = 0; j<nSquareClusters; j++) { 
+
+    // DEBUGGING
+    /*for (int j = 0; j<nSquareClusters; j++) { 
 	for (int i = 0; i<musclesPerSquareCluster; i++) {
  	    cout << actions[i][j] << " ";
         }
    	cout << endl;
     } 
-    cout << endl;
-    // If learning is used, setup adapter and learning parameters
+    cout << endl;*/
+
     if(useLearning) randomizeParams();
 
     initializeSineWaves(); // For muscle actuation
 
-    actions = transformActions(); // Transform the actions to right format
+    actions = transformActions(); // get actions and transform them to right format
 
     //apply these actions to the appropriate muscles according to the sensor values
     applyActions(subject);
@@ -156,7 +159,7 @@ void T12Controller::onStep(T12Model& subject, double dt)
         }
 //        cout << m_totalTime << endl;
 	//DEBUGGING 
-	if (m_totalTime > 60 && m_totalTime < 60.1) cout << "Distance after 60 s: " << displacement(subject) << endl; 
+	//if (m_totalTime > 60 && m_totalTime < 60.1) cout << "Distance after 60 s: " << displacement(subject) << endl; 
     }
 }
 
@@ -169,15 +172,11 @@ void T12Controller::onTeardown(T12Model& subject) {
     
     if(saveData) {
     	saveData2File();
-	cout << "Data saved." << endl;
+        cout << "Data saved to " << csvPath << endl; 
     }
 
     clearParams(); // Clear all parameters for next simulation
     
-    // update simulation number
-    simulationNumber++;
-    cout << "Simulation number: " << simulationNumber << endl << endl;
-
     // If any of subject's dynamic objects need to be freed, this is the place to do so
 }
 
@@ -189,41 +188,34 @@ void T12Controller::onTeardown(T12Model& subject) {
  */
 vector< vector <double> > T12Controller::transformActions()
 { 
-    // DEBUGGING 
-    for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
+    // DEBUGGING (all elements should be equal to 0) 
+    /*for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
         for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
             cout << actions[i][j] << " ";
         }
         cout << endl;
     }
-    cout << "\n";
-
+    cout << "\n";*/
 
     vector< vector <double> > adaptedActions(musclesPerSquareCluster, vector<double>(nSquareClusters, 0)); // Vector to be returned
-    adaptedActions = actions;
+    //adaptedActions = actions;
 
     assert(adaptedActions.size() == actions.size());
 
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_b_5.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_b_3.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
-/*	for(int i = 0; i<squareClusters.size(); i++) {  // Assign sine parameters 
-	    amplitude[i] = manualParams[i];
-	    angularFrequency[i] = manualParams[i+squareClusters.size()];
-	    phase[i] = manualParams[i+2*squareClusters.size()];
-	    dcOffset[i] = manualParams[i+3*squareClusters.size()];
-	}*/
 
-	int k = 0; // Assign actions (same as sine parameters, done for completeness)
-	for(int j = 0; j<musclesPerSquareCluster; j++) {
-	    for(int i = 0; i<nSquareClusters; i++) {
-	    adaptedActions[j][i] = manualParams[k];
-	    cout << adaptedActions[j][i] << " ";
-	    k++; 
+	int k = 0; // Assign actions 
+	for(int j = 0; j<nSquareClusters; j++) {
+	    for(int i = 0; i<musclesPerSquareCluster; i++) {
+	        adaptedActions[i][j] = manualParams[k];
+	        cout << adaptedActions[i][j] << " ";
+	        k++; 
     	    }
 	    cout << endl; 
         }
@@ -233,7 +225,24 @@ vector< vector <double> > T12Controller::transformActions()
     // If learning is used, do this
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
-
+/*
+       vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/randominputsactions.csv";
+        std::cout << "Using randomly set parameters from file " << filename << endl; 
+        int lineNumber = simulationNumber + 1;
+        cout << "Using line number: " << lineNumber << endl;
+        manualParams = readManualParams(lineNumber, filename);  
+	int k = 0; // Assign actions (same as sine parameters, done for completeness)
+	for(int j = 0; j<musclesPerSquareCluster; j++) {
+	    for(int i = 0; i<nSquareClusters; i++) {
+	        actions[j][i] = manualParams[k];
+	        cout << actions[j][i] << " ";
+	        k++; 
+    	    }
+	    cout << endl; 
+        }
+	cout << endl; 
+ */
          // Minimum amplitude, angularFrequency, phase, and dcOffset
         double mins[4]  = {0.3, 
                            0, // dummy 
@@ -297,7 +306,7 @@ vector< vector <double> > T12Controller::transformActions()
 
 void T12Controller::randomizeParams() { 
     
-    if (simulationNumber == 0) srand(time(NULL));
+    srand(time(NULL));
 
     int nParams = nSquareClusters * musclesPerSquareCluster;
     cout << "Number of inputs: " << nParams << endl;
@@ -658,6 +667,7 @@ isDouble - indicating which type to write
 void T12Controller::write2csvFile(double contentDouble, char const* sign, bool isDouble) {
     
     ofstream myFile(csvPath.c_str(), ios::app);
+    //assert(myFile.is_open());
     if(isDouble) {
         myFile << contentDouble;
     } else {
@@ -682,7 +692,7 @@ void T12Controller::getFileName(void) {
     ostringstream csv_path_out(csvtemp);
 
     txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b3_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_b3_";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_ultimateTestPlayback.csv";
 
     
     time_t year = (now->tm_year + 1900);
@@ -692,14 +702,15 @@ void T12Controller::getFileName(void) {
     time_t min = (now->tm_min);
     time_t sec = (now->tm_sec);
 
-    txt_path_out << year << "0" << month << "0" << day << "_" << hour << "h" << min << "m" << sec << "s" << ".txt";
-    csv_path_out << year << "0" << month << "0" << day << "_" << hour << "h" << min << "m" << sec << "s" << ".csv";
+    //txt_path_out << year << "0" << month << "0" << day << "_" << hour << "h" << min << "m" << sec << "s" << ".txt";
+    //csv_path_out << year << "0" << month << "0" << day << "_" << hour << "h" << min << "m" << sec << "s" << ".csv";
  
     txtPath = txt_path_out.str();
     csvPath = csv_path_out.str();
 
+    //cout << "Data saved to " << csvPath << endl; 
     // Print header for csv file
-    write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,", 0);
+   /* write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,", 0);
     for (int i = 0; i < actions[0].size(); i++) {
 	for (int j = 0; j < actions.size(); j++) { // First, print all elements in the row  
             write2csvFile(0, "actions[", 0);       // When done, switch to next row
@@ -722,7 +733,7 @@ void T12Controller::getFileName(void) {
     }
 
     write2csvFile(0, "Initial Length,Start time,Faces", 0);
-    write2csvFile(0, "\n", 0);
+    write2csvFile(0, "\n", 0);*/
 }
 
 
@@ -737,7 +748,7 @@ void T12Controller::saveData2File() {
 
 // WRITE TO TEXT FILE FOR EASY ACCESS TO DATA
     // Sine params
-    write2txtFile(0, "Index - Amplitude - Angular Frequency - Phase Change - DC Offset", 0); 
+   /* write2txtFile(0, "Index - Amplitude - Angular Frequency - Phase Change - DC Offset", 0); 
     write2txtFile(0, "\n", 0);
     for (int i = 0; i < nSquareClusters; i++) {
 	write2txtFile(i, "", 1);
@@ -788,7 +799,7 @@ void T12Controller::saveData2File() {
     // Total energy spent
     write2txtFile(0, "Total energy spent: ", 0);
     write2txtFile(energySpent, "", 1);
-    
+    */
 
 // WRITE TO CSV FILE FOR MATLAB EVALUATION
 

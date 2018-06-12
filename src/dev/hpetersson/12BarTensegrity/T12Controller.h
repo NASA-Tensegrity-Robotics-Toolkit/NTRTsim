@@ -44,7 +44,7 @@ class T12Controller : public tgObserver<T12Model>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        T12Controller(T12Model* subject, const double prefLength=1.0, double startTime=1);
+        T12Controller(T12Model* subject, const double prefLength=1.0, double startTime=1, int simNum=-1);
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~T12Controller() { }
@@ -138,7 +138,7 @@ class T12Controller : public tgObserver<T12Model>
 	void saveData2File(void);
 
 	void clearParams(void);
-	double simulationNumber;
+	int simulationNumber;
 };
 
 #endif // T12CONTROLLER

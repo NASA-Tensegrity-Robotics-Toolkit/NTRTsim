@@ -54,10 +54,10 @@ const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0
 const double timestep_graphics = 1.f/60.f; // seconds
 
 
-void simulateNoGraphics() { 
-    int nEpisodes = 100; // Number of episodes ("trial runs")
+void simulateNoGraphics(int simNumber) { 
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
+    std::cout << "Sim Num: " << simNumber << std::endl;
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -81,7 +81,7 @@ void simulateNoGraphics() {
     T12Model* const myModel = new T12Model(); // second argument not necessary
 
     // Select controller to be used 
-    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
+    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime, simNumber);
 
     // Attach the controller to the model 
     myModel->attach(myController);
@@ -92,16 +92,8 @@ void simulateNoGraphics() {
     // Get file name (once) for saving all data to one file
     myController->getFileName();
 
-    for (int i = 0; i<nEpisodes; i++) { 
-	simulation.run(nSteps);
-        myController->onTeardown(*myModel);
-	simulation.reset();
-    }
-    // teardown is handled by delete
-   // delete myModel;
-   // delete view;
-    //delete myController;
-    //delete ground;
+    simulation.run(nSteps);
+    myController->onTeardown(*myModel);
 }
 
 void simulateWithGraphics(void) {
@@ -149,6 +141,11 @@ void simulateWithGraphics(void) {
 int main(int argc, char** argv)
 {
 
+   assert(argv[1]);
+   int simNum = atoi(argv[1]);
+
+
+
    // Color::Modifier green(Color::FG_GREEN);
    // Color::Modifier def(Color::FG_DEFAULT);
 
@@ -159,10 +156,10 @@ int main(int argc, char** argv)
     if(useGraphics) {
         simulateWithGraphics();
     } else { 
-	simulateNoGraphics();
+	simulateNoGraphics(simNum);
     }
 
-    //return 0;
+    return 0;
 
 
 }
