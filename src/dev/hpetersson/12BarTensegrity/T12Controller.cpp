@@ -45,6 +45,7 @@
 // File helpers to use resources folder
 #include "helpers/FileHelpers.h"
 // The C++ Standard Library
+#include <iomanip>
 #include <cassert>
 #include <cmath>
 #include <stdexcept>
@@ -61,8 +62,8 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save parameters and result to file
-bool useLearning = false; // True: Use learning (Monte Carlo), False: use parameters from file
-bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5% to optimize output from previous runs
+bool useLearning = true; // True: Use learning (Monte Carlo), False: use parameters from file
+bool tweakParams = true; // When reading parameters from file, tweak with up to 0.5% to optimize output from previous runs
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
@@ -94,6 +95,7 @@ void T12Controller::onSetup(T12Model& subject)
 {
     double dt = 0.0001;
     
+    cout <<fixed << setprecision(10) <<  " ";
     cout << "Current time is " << m_totalTime << " for simulation number " << simulationNumber << "." << endl; // To verify each simulation starts with t = 0
 
     //Set the initial length of every muscle in the subject
@@ -125,7 +127,7 @@ void T12Controller::onSetup(T12Model& subject)
     } 
     cout << endl;*/
 
-    if(useLearning) randomizeParams();
+    //if(useLearning) randomizeParams();
 
     initializeSineWaves(); // For muscle actuation
 
@@ -205,7 +207,7 @@ vector< vector <double> > T12Controller::transformActions()
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_b_3.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_d_tests3_0.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
@@ -225,14 +227,15 @@ vector< vector <double> > T12Controller::transformActions()
     // If learning is used, do this
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
-/*
+
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/randominputsactions.csv";
+        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputRandomMatlab/randomactions_d_3_2018-06-13-10-39.csv";
         std::cout << "Using randomly set parameters from file " << filename << endl; 
         int lineNumber = simulationNumber + 1;
         cout << "Using line number: " << lineNumber << endl;
         manualParams = readManualParams(lineNumber, filename);  
-	int k = 0; // Assign actions (same as sine parameters, done for completeness)
+
+	int k = 0; // Assign actions 
 	for(int j = 0; j<musclesPerSquareCluster; j++) {
 	    for(int i = 0; i<nSquareClusters; i++) {
 	        actions[j][i] = manualParams[k];
@@ -242,7 +245,7 @@ vector< vector <double> > T12Controller::transformActions()
 	    cout << endl; 
         }
 	cout << endl; 
- */
+
          // Minimum amplitude, angularFrequency, phase, and dcOffset
         double mins[4]  = {0.3, 
                            0, // dummy 
@@ -301,6 +304,18 @@ vector< vector <double> > T12Controller::transformActions()
 	    cout << endl;
         }
         cout << endl; 
+
+
+     for(int j=0;j<nSquareClusters;j++) { //6x
+        for (int i=0; i<musclesPerSquareCluster; i++) { //4x
+	    adaptedActions[i][j] *= 10000.;
+	    int k = adaptedActions[i][j];
+	    adaptedActions[i][j] = (double) k / 10000.;
+            cout << adaptedActions[i][j] << " ";
+        }
+	cout << endl;
+    }
+
     return adaptedActions;
 }
 
@@ -314,11 +329,14 @@ void T12Controller::randomizeParams() {
     for(int j=0;j<nSquareClusters;j++) { //6x
         for (int i=0; i<musclesPerSquareCluster; i++) { //4x
             actions[i][j] = ((double) rand() / RAND_MAX);
-            cout << actions[i][j] << " ";
+            cout <<fixed << setprecision(55) <<  actions[i][j] << " ";
         }
 	cout << endl;
     }
-    cout << "Random parameters obtained." << endl;
+ 
+	cout << endl;
+	cout << endl;
+       cout << "Random parameters obtained." << endl;
 }
 
 
@@ -486,7 +504,7 @@ std::vector<double> T12Controller::readManualParams(int lineNumber, const char* 
         iCell++;
     }
 
-    if (simulationNumber > 10) { // Don't tweak for the first 10 simulation to ensure consistency
+    if (simulationNumber > 1) { // Don't tweak for the first 10 simulation to ensure consistency
         // Tweak each read-in parameter by as much as 0.5% (params range: [0,1])     
         if (tweakParams) {
             cout << "Tweaking parameters from file with up to 0.5%." << endl;
@@ -692,7 +710,7 @@ void T12Controller::getFileName(void) {
     ostringstream csv_path_out(csvtemp);
 
     txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b3_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_ultimateTestPlayback.csv";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_tests4.csv";
 
     
     time_t year = (now->tm_year + 1900);
