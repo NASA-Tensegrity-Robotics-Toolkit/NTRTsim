@@ -710,7 +710,7 @@ void T12Controller::getFileName(void) {
     ostringstream csv_path_out(csvtemp);
 
     txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b3_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_tests4.csv";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_tests5.csv";
 
     
     time_t year = (now->tm_year + 1900);
