@@ -13,13 +13,14 @@ link_libraries(tgcreator
                 util   
                 terrain 
                 tgOpenGLSupport
-        	yaml-cpp
+#        	yaml-cpp
     		TensegrityModel
 #		learning
-		learningSpines
-		Adapters
-		Configuration	
-		AnnealEvolution)
+#		learningSpines
+#		Adapters
+#		Configuration	
+#		AnnealEvolution
+)
 
 
 add_executable(App12BarCpp

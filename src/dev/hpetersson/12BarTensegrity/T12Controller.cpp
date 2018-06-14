@@ -63,16 +63,18 @@ using namespace std;
 /* S E T T I N G S */
 bool saveData = true; // Save parameters and result to file
 bool useLearning = true; // True: Use learning (Monte Carlo), False: use parameters from file
-bool tweakParams = true; // When reading parameters from file, tweak with up to 0.5% to optimize output from previous runs
+bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5% to optimize output from previous runs
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-T12Controller::T12Controller(T12Model* subject, const double initialLength, double startTime, int simNum) :
+T12Controller::T12Controller(T12Model* subject, const double initialLength, double startTime, int simNum, const char* inputPath, const char* outputPath) :
     m_initialLengths(initialLength),
     m_startTime(startTime),
     m_totalTime(0.0),
     maxStringLengthFactor(0.50),
     simulationNumber(simNum),
+    randomInputPath(inputPath),
+    csvPath(outputPath),
     nSquareClusters(6),  // 6 = number of squares on 12Bar. On SUPERball, the number of faces is 8.
     nHexaClusters(9),  // 9 = number of hexagons on a 12Bar
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
@@ -94,7 +96,7 @@ T12Controller::T12Controller(T12Model* subject, const double initialLength, doub
 void T12Controller::onSetup(T12Model& subject)
 {
     double dt = 0.0001;
-    
+    cout << "Input: " << randomInputPath << endl << "Output: " << csvPath << endl; 
     cout <<fixed << setprecision(10) <<  " ";
     cout << "Current time is " << m_totalTime << " for simulation number " << simulationNumber << "." << endl; // To verify each simulation starts with t = 0
 
@@ -207,7 +209,7 @@ vector< vector <double> > T12Controller::transformActions()
     // If reading parameters from file, do this
     if(!useLearning) { 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_d_tests3_0.csv";
+        const char* filename = randomInputPath.c_str(); //"/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_d_tests3_0.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
         int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
@@ -229,8 +231,8 @@ vector< vector <double> > T12Controller::transformActions()
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
 
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
-        const char* filename = "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputRandomMatlab/randomactions_d_3_2018-06-13-10-39.csv";
-        std::cout << "Using randomly set parameters from file " << filename << endl; 
+        const char* filename = randomInputPath.c_str(); //"/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputRandomMatlab/randomactions_d_3_2018-06-13-10-39.csv";
+        std::cout << "Using randomly set parameters from file " << randomInputPath << endl; 
         int lineNumber = simulationNumber + 1;
         cout << "Using line number: " << lineNumber << endl;
         manualParams = readManualParams(lineNumber, filename);  
@@ -308,9 +310,9 @@ vector< vector <double> > T12Controller::transformActions()
 
      for(int j=0;j<nSquareClusters;j++) { //6x
         for (int i=0; i<musclesPerSquareCluster; i++) { //4x
-	    adaptedActions[i][j] *= 10000.;
+	    adaptedActions[i][j] *= 100000.;
 	    int k = adaptedActions[i][j];
-	    adaptedActions[i][j] = (double) k / 10000.;
+	    adaptedActions[i][j] = (double) k / 100000.;
             cout << adaptedActions[i][j] << " ";
         }
 	cout << endl;
@@ -477,7 +479,7 @@ double T12Controller::displacement(T12Model& subject) {
 }
 
 /* Function to read parameters from file, and if desired, tweak input parameters with up to 0.5% */
-std::vector<double> T12Controller::readManualParams(int lineNumber, const char* filename) {
+std::vector<double> T12Controller::readManualParams(int lineNumber, char const* filename) {
     assert(lineNumber > 0);
     vector<double> result(24, 1.0);
     string line;
@@ -660,6 +662,7 @@ void T12Controller::getGroundFace(T12Model& subject) {
     distanceMovedTotal += abs(oldManhattan - distanceMovedManhattan); 
     if(groundFace != oldGroundFace) { // && groundFace != -1) {
         groundFaceHistory.push_back(groundFace); // Save ground face in history log
+	cout << "At time: " << m_totalTime << ", change of groundFace to: " << groundFace << endl;
     } 
 }
 
@@ -710,7 +713,7 @@ void T12Controller::getFileName(void) {
     ostringstream csv_path_out(csvtemp);
 
     txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/textgen_b3_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_tests5.csv";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_D_tests5_1.csv";
 
     
     time_t year = (now->tm_year + 1900);
@@ -724,7 +727,7 @@ void T12Controller::getFileName(void) {
     //csv_path_out << year << "0" << month << "0" << day << "_" << hour << "h" << min << "m" << sec << "s" << ".csv";
  
     txtPath = txt_path_out.str();
-    csvPath = csv_path_out.str();
+    //csvPath = csv_path_out.str();
 
     //cout << "Data saved to " << csvPath << endl; 
     // Print header for csv file

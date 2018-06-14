@@ -30,6 +30,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <ostream>
 // Colors
 //#include "colormod.h"
 // Sensors
@@ -53,8 +54,7 @@ const double startTime = 1; // How long after the simulation the controller star
 const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
 const double timestep_graphics = 1.f/60.f; // seconds
 
-
-void simulateNoGraphics(int simNumber) { 
+void simulateNoGraphics(int simNumber, const char* inputPath, const char* outputPath) { 
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     std::cout << "Sim Num: " << simNumber << std::endl;
@@ -81,7 +81,7 @@ void simulateNoGraphics(int simNumber) {
     T12Model* const myModel = new T12Model(); // second argument not necessary
 
     // Select controller to be used 
-    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime, simNumber);
+    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime, simNumber, inputPath, outputPath);
 
     // Attach the controller to the model 
     myModel->attach(myController);
@@ -96,7 +96,7 @@ void simulateNoGraphics(int simNumber) {
     myController->onTeardown(*myModel);
 }
 
-void simulateWithGraphics(void) {
+void simulateWithGraphics(int simNumber, char const* inputPath, char const* outputPath) {
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -120,7 +120,7 @@ void simulateWithGraphics(void) {
     T12Model* const myModel = new T12Model(); // second argument not necessary
 
     // Select controller to be used 
-    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime);
+    T12Controller* const myController = new T12Controller(myModel, initialLength, startTime, simNumber, inputPath, outputPath);
 
     // Attach the controller to the model 
     myModel->attach(myController);
@@ -144,7 +144,11 @@ int main(int argc, char** argv)
    assert(argv[1]);
    int simNum = atoi(argv[1]);
 
+    assert(argv[2]);
+    assert(argv[3]);
 
+    char const* inputPath = argv[2];
+    char const* outputPath = argv[3];
 
    // Color::Modifier green(Color::FG_GREEN);
    // Color::Modifier def(Color::FG_DEFAULT);
@@ -154,9 +158,9 @@ int main(int argc, char** argv)
 //    std::cout << "Graphics = " << useGraphics << std::endl;
 
     if(useGraphics) {
-        simulateWithGraphics();
+        simulateWithGraphics(simNum, inputPath, outputPath);
     } else { 
-	simulateNoGraphics(simNum);
+	simulateNoGraphics(simNum, inputPath, outputPath);
     }
 
     return 0;
