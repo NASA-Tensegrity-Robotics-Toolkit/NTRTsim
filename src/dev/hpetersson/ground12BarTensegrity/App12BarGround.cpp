@@ -47,13 +47,13 @@
 */
 const bool  useGraphics = false;
 const double initialLength = 1.0;
-const double startTime = 1; // How long after the simulation the controller starts
+const double startTime = 0.9; // How long after the simulation the controller starts
 const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
 const double timestep_graphics = 1.f/60.f; // seconds
 
 
 void simulateNoGraphics() { 
-    int nEpisodes = 20000; // Number of episodes ("trial runs")
+    //int nEpisodes = 20000; // Number of episodes ("trial runs")
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
     // Create the ground and world. Specify ground rotation in radians
@@ -69,7 +69,7 @@ void simulateNoGraphics() {
 
     tgSimView *view;
     // Create the view
-    view = new tgSimView (world, timestep_physics, timestep_graphics) ;
+    view = new tgSimView (world, timestep_physics, timestep_graphics);
     //view = new tgSimView (world);
     
     // Create the simulation
@@ -89,12 +89,9 @@ void simulateNoGraphics() {
 
     // Get file name (once) for saving all data to one file
     myController->getFileName();
-
-    for (int i = 0; i<nEpisodes; i++) { 
-	simulation.run(nSteps);
-        myController->onTeardown(*myModel);
-	simulation.reset();
-    }
+    
+    simulation.run(nSteps);
+    myController->onTeardown(*myModel);
     // teardown is handled by delete
    // delete myModel;
    // delete view;
@@ -156,13 +153,8 @@ int main(int argc, char** argv)
 	simulateNoGraphics();
     }
 
-    if(useGraphics) {
-        simulateWithGraphics();
-    } else { 
-	simulateNoGraphics();
-    }
 
-    //return 0;
+    return 0;
 
 
 }

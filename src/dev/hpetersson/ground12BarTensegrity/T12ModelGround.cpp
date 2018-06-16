@@ -241,13 +241,13 @@ void T12ModelGround::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addMuscles(s);
-    s.move(btVector3(0, 2, 0));
+    s.move(btVector3(1, 0, 1));
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
-    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
-    btVector3 rotationAxis = btVector3(0, 0, 0);  // For landing on a square, use (1, 1, 0.5)
-    double rotationAngle = 0;
+    btVector3 rotationPoint = btVector3(1, 1.5, 1); // origin
+    btVector3 rotationAxis = btVector3(1, 1, 0.5);  // For landing on a square, use (1, 1, 0.5)
+    double rotationAngle = 3;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model

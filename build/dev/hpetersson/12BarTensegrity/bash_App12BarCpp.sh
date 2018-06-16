@@ -4,7 +4,7 @@ echo "Bash script is running"
 
 nEpisodes=2
 
-inputPath="/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputRandomMatlab/randomactions_d_3_2018-06-13-10-30.csv" 
+inputPath="/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputRandomMatlab/randomactions_d_3_2018-06-13-10-39.csv" 
 
 outputPath="/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/outputFiles/gen_d_filetest_1.csv"
 	

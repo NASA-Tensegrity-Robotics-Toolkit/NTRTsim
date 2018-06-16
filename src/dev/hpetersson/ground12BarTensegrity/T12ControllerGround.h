@@ -44,7 +44,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        T12ControllerGround(T12ModelGround* subject, const double prefLength=5.0, double startTime=3);
+        T12ControllerGround(T12ModelGround* subject, const double prefLength=5.0, double startTime=1);
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~T12ControllerGround() { }
@@ -81,6 +81,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
         /** Two vectors clusters, each of which contains a vector of muscles */
         vector<vector<tgBasicActuator*> > squareClusters;  
         vector<vector<tgBasicActuator*> > hexaClusters; 
+	//vector<vector<
 
         // Sine Wave Data
         double* retractRate;
@@ -109,6 +110,11 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
         double displacement(T12ModelGround& subject);
 	double distanceMovedManhattan;
 	double distanceMovedSnorkel;
+	//vector<double> COM;
+	vector<double> COMx;
+	vector<double> COMy;
+	vector<double> COMz;
+        void saveCOM(T12ModelGround& subject);
 
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, const char* filename);
@@ -117,7 +123,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
  	double getGroundFace(T12ModelGround& subject);
 
-  	double getAdjacentFace(void);
+  	vector<int> getAdjacentFace(double groundFace);
 
 	/* For a certain rod configuration, determine corresponding face */
 	void determineFace(bool isSquareFace);

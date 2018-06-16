@@ -38,10 +38,6 @@
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
-// For AnnealEvolution
-#include "learning/AnnealEvolution/AnnealEvolution.h"
-#include "learning/Adapters/AnnealAdapter.h"
-#include "learning/Configuration/configuration.h"
 // File helpers to use resources folder
 #include "helpers/FileHelpers.h"
 // The C++ Standard Library
@@ -70,7 +66,7 @@ T12ControllerGround::T12ControllerGround(T12ModelGround* subject, const double i
     m_initialLengths(initialLength),
     m_startTime(startTime),
     m_totalTime(0.0),
-    maxStringLengthFactor(0.50),
+    maxStringLengthFactor(0.90),
     nSquareClusters(6),  // 6 = number of squares on 12Bar. On SUPERball, the number of faces is 8.
     nHexaClusters(8), 
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
@@ -106,65 +102,65 @@ void T12ControllerGround::onSetup(T12ModelGround& subject)
     populateClusters(subject);
 
     initPosition = subject.getBallCOM();
+    saveCOM(subject);
+
     // DEBUGGING
-    /*cout << "initPosition x: " << initPosition[1] << endl;
-    cout << "initPosition y: " << initPosition[2] << endl;
-    cout << "initPosition z: " << initPosition[3] << endl;
+    /*cout << "initPosition x: " << initPosition[0] << endl;
+    cout << "initPosition y: " << initPosition[1] << endl;
+    cout << "initPosition z: " << initPosition[2] << endl;
     cout << endl;*/
 
     // If learning is used, setup adapter and learning parameters
-    if(useLearning) { 
-        setupAdapter();
-	cout << "Adapter finished setting up." << endl;
-        vector<double> state(nSquareClusters); // For config file usage (including Monte Carlo simulations)
-        //get the actions (between 0 and 1) from evolution
-        actions = evolutionAdapter.step(dt,state);
-    } else {
-    	vector< vector<double> > actions;
-    }
+    vector< vector<double> > actions;
 
     initializeRates(); // For muscle actuation
 
     //transform them to the size of the structure
-    actions = transformActions(actions);
+    //actions = transformActions(actions);
 
     //apply these actions to the appropriate muscles according to the sensor values
     // (If parameters are read from file, this is done in transformActions)
-    if(useLearning) applyActions(subject, actions);
+    applyActions(subject, actions);
+
+    cout << "Setup completed." << endl;
 }
 
 void T12ControllerGround::onStep(T12ModelGround& subject, double dt)
 {
+    int index = 0;
+    //cout << "Current time: " << m_totalTime << endl;
     if (dt <= 0.0) {
         throw std::invalid_argument("dt is not positive");
     }
     m_totalTime+=dt;
-
+    //cout << "Entered onStep." << endl;
     double newCluster, currentCluster, oldCluster;
 
     newCluster = getGroundFace(subject);
-    oldCluster = -1; 
+    if (index == 0) oldCluster = -1; 
 
     if( m_totalTime > m_startTime) {
-      //for (int i = 0; i < 10000; i++) {
         currentCluster = getGroundFace(subject); // check which face the robot is currently standing on 
- //       cout << "Current cluster: " << currentCluster << endl;
+        //cout << "Current cluster: " << currentCluster << endl;
 	//while (currentCluster == newCluster) {
             setPreferredMuscleLengths(subject, dt, oldCluster, currentCluster); 
+ 
             const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
     
             //Move motors for 
-            for (size_t i = 0; i < muscles.size(); ++i)
+            /*for (size_t i = 0; i < muscles.size(); ++i)
             {
                 tgBasicActuator * const pMuscle = muscles[i];
                 assert(pMuscle != NULL);
                 pMuscle->moveMotors(dt);
 	        //cout << "Motor moved for muscle  " << pMuscle << endl;
-            }
+            }*/
             newCluster = getGroundFace(subject);
-	   //cout << "New cluster: " << newCluster << endl;
+	    if (newCluster != currentCluster) oldCluster == currentCluster; 
+	 //  cout << "New cluster: " << newCluster << endl;
 //}	//} }
     }
+    index++;
 }
 
 // Things to be done in between each simulation, calculate scores, save data and clear parameters
@@ -175,7 +171,7 @@ void T12ControllerGround::onTeardown(T12ModelGround& subject) {
     cout << "Energy spent: " << energySpent << endl;
     
     if(saveData) {
-    	//saveData2File();
+    	saveData2File();
 	cout << "Data saved." << endl;
     }
 
@@ -249,110 +245,224 @@ void T12ControllerGround::applyActions(T12ModelGround& subject, vector< vector <
     retractRate[0] = 10; //actions[0][0]; // square    
     retractRate[1] = 10; //actions[1][0]; // hexagon
     elongateRate[0] = 10; //actions[0][1]; // square
-    elongateRate[0] = 10; //actions[1][1]; // hexagon
-}
+    elongateRate[1] = 10; //actions[1][1]; // hexagon
 
-
-void T12ControllerGround::setupAdapter() {
-    string suffix = "_12Bar";
-    string configAnnealEvolution = "Config.ini";
-    AnnealEvolution* evo = new AnnealEvolution(suffix, configAnnealEvolution, "", simulationNumber);
-    bool isLearning = true;
-    configuration configEvolutionAdapter;
-    configEvolutionAdapter.readFile(configAnnealEvolution);
-
-    evolutionAdapter.initialize(evo, isLearning, configEvolutionAdapter);
+    cout << "Actions applied. " << retractRate[0] << retractRate[1] << elongateRate[0] << elongateRate[1] << endl;
 }
 
 
 
 void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, double dt, double oldCluster, double currentCluster) {
 
-    double adjacentCluster = getAdjacentFace(); 
-    
-    bool oldClusterSquare, currentClusterSquare, adjacentClusterSquare;
-    double newLength;
+    vector<int> adjacentClusters = getAdjacentFace(currentCluster);
+    int adjacentClusterForward = adjacentClusters[0];
+    int adjacentClusterBackward = adjacentClusters[1];
+    //cout << "The adjacent faces are: " << adjacentClusters[0] << " " << adjacentClusters[1] << endl;
+//    assert(adjacentClusterForward != '\0');
+//    assert(adjacentClusterBackward != NULL);
+
+    vector<tgBasicActuator*> movedMuscle; 
  
-    if (oldCluster < 6) oldClusterSquare = true;   // Determine if cluster is square (0) or hexa (1)
-    else oldClusterSquare = false;
+    double newLength;
+    double minLength = 0.1; // (Initial length = 1)
+    double maxLength = 1.5;
 
-    if (currentCluster < 6) currentClusterSquare = true;
-    else currentClusterSquare = false;
+    int usedIndex = 0;
 
-    
-    if (adjacentCluster < 6) adjacentClusterSquare = true;
-    else adjacentClusterSquare = false;
+    // FIRST: elongate all the muscles connected to the adjacent face in the backward direction to guide the robot to not roll over backwards
+    if (adjacentClusterBackward < 6) { // Face is a square
+	for (int i = 0; i < squareClusters[0].size(); i++) { 
+	    usedIndex = 0;
+	    tgBasicActuator *const pMuscle = squareClusters[adjacentClusterBackward][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle from to be retracted from squareCluster[" << currentCluster << "][" << i  << "] with ID: " << squareClusters[currentCluster][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength + elongateRate[0]*dt;
+	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+            if (newLength > minLength && newLength < maxLength) {
+   	        //pMuscle->setControlInput(newLength);
+   	        pMuscle->setControlInput(newLength, dt);
+	        movedMuscle.push_back(pMuscle);
+    	    }
+//	    else //cout << "Adjacent square muscle wanted to be outside of boundaries" << endl;
+        }	
+    }
 
-    // make sure all muscles have some form of input
-    /*const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
-    for (int i = 0; i < muscles.size(); i++) { 
-        tgBasicActuator * const pMuscle = muscles[i];
-	assert(pMuscle != NULL); 
-	double currentLength = pMuscle->getRestLength();
-	pMuscle->setControlInput(currentLength, dt);
+    else if (adjacentClusterBackward > 5) { // Ground face is a hexagon
+	for (int i = 0; i < hexaClusters[0].size(); i++) { 
+	    usedIndex = 0;
+	    tgBasicActuator *const pMuscle = hexaClusters[adjacentClusterBackward - squareClusters.size()][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength + elongateRate[1]*dt;
+	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+            if (newLength > minLength && newLength < maxLength) {
+   	        //pMuscle->setControlInput(newLength);
+   	        pMuscle->setControlInput(newLength, dt);
+	        movedMuscle.push_back(pMuscle);
+    	    }// else cout << "Hexagon muscle wanted to be outside of boundaries." << endl;
+	}
+    }
+/*
+    cout << "Size of vector: " << movedMuscle.size() << endl;
+    for (int i = 0; i < movedMuscle.size(); i++) {
+	cout << "Muscle no " << i << " with ID " << movedMuscle[i] << endl;
+    }*/   
+    // SECOND: retract all the muscles connected to the adjacent face in the forward direction to guide the robot to roll over forward
+    if (adjacentClusterForward < 6) { // Face is a square
+	for (int i = 0; i < squareClusters[0].size(); i++) { 
+	    usedIndex = 0;
+	    tgBasicActuator *const pMuscle = squareClusters[adjacentClusterForward][i];
+	    assert(pMuscle != NULL);
+//	    cout << "Muscle from to be retracted from squareCluster[" << adjacentClusterForward << "][" << i  << "] with ID: " << squareClusters[adjacentClusterForward][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength - retractRate[0]*dt;
+	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+
+	    for (int b = 0; b < movedMuscle.size(); b++) {
+//	 	cout << "b " << b << " movedMuslce " << movedMuscle[b] << " pMuscle " << pMuscle << endl;
+		if (movedMuscle[b] == pMuscle) {
+			usedIndex = 1;
+//			cout << "usedIndex = " << usedIndex << " for muscle " << pMuscle << endl;
+		}
+	    }
+            if (newLength > minLength && newLength < maxLength && usedIndex == 0) {
+   	        pMuscle->setControlInput(newLength, dt);
+	        movedMuscle.push_back(pMuscle);
+   	        //pMuscle->setControlInput(newLength);
+    	    }   else usedIndex = 0;
+        }	
+    }
+
+    else if (adjacentClusterForward > 5) { // Ground face is a hexagon
+	for (int i = 0; i < hexaClusters[0].size(); i++) { 
+	    usedIndex = 0;
+	    tgBasicActuator *const pMuscle = hexaClusters[adjacentClusterForward - squareClusters.size()][i];
+	    assert(pMuscle != NULL);
+	    //cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
+	    double currentLength = pMuscle->getRestLength();
+	    newLength = currentLength - retractRate[1]*dt;
+//	    cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
+        
+	    for (int b = 0; b < movedMuscle.size(); b++) {
+//	 	cout << "b " << b << endl;
+		if (movedMuscle[b] == pMuscle) {
+			usedIndex = 1;
+//			cout << "usedIndex = " << usedIndex << " for muscle " << pMuscle << endl;
+		}
+	    }    
+	    if (newLength > minLength && newLength < maxLength && usedIndex == 0) {
+   	        pMuscle->setControlInput(newLength, dt);
+	        movedMuscle.push_back(pMuscle);
+   	        //pMuscle->setControlInput(newLength);
+    	    } else usedIndex = 0;
+//else cout << "Hexagon muscle wanted to be outside of boundaries." << endl;
+	}
+    }
+  /*  cout << "Size of vector: " << movedMuscle.size() << endl;
+    for (int i = 0; i < movedMuscle.size(); i++) {
+	cout << "Muscle no " << i << " with ID " << movedMuscle[i] << endl;
     }*/
 
-
-    // Retract the muscles of the ground face and the adjacent face to move forward
-    if(currentClusterSquare) {
+// THIRD: retract all the muscles connected to the ground face to minimize the area the robot is standing on
+    if (currentCluster < 6) { // Ground face is a square
 	for (int i = 0; i < squareClusters[0].size(); i++) { 
+	    usedIndex = 0;
 	    tgBasicActuator *const pMuscle = squareClusters[currentCluster][i];
 	    assert(pMuscle != NULL);
 	    //cout << "Muscle from to be retracted from squareCluster[" << currentCluster << "][" << i  << "] with ID: " << squareClusters[currentCluster][i] << endl;
 	    double currentLength = pMuscle->getRestLength();
 	    newLength = currentLength - retractRate[0]*dt;
 	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
-            if (newLength > m_initialLengths - 2*maxStringLengthFactor) {
+         
+	    for (int b = 0; b < movedMuscle.size(); b++) {
+	 //	cout << "b " << b << endl;
+		if (movedMuscle[b] == pMuscle) {
+			usedIndex = 1;
+//			cout << "usedIndex = " << usedIndex << " for muscle " << pMuscle << endl;
+		}
+	    } 
+            if (newLength > minLength && newLength < maxLength && usedIndex == 0) {
    	        pMuscle->setControlInput(newLength, dt);
-    	    }
-            cout << "ok" << endl;
-	    // For the adjacent cluster
-  	    tgBasicActuator *const oMuscle = squareClusters[adjacentCluster][i];
-	    assert(oMuscle != NULL);
-	    //cout << "Muscle from to be retracted from squareCluster[" << currentCluster << "][" << i  << "] with ID: " << squareClusters[currentCluster][i] << endl;
-	    currentLength = oMuscle->getRestLength();
-	    newLength = currentLength - retractRate[0]*dt;
-	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
-            if (newLength > m_initialLengths - 2*maxStringLengthFactor) {
-   	        pMuscle->setControlInput(newLength, dt);
-    	    }
-	}	
+	        movedMuscle.push_back(pMuscle);
+   	        //pMuscle->setControlInput(newLength);
+    	    } else usedIndex = 0;
+
+	    //else cout << "Square muscle wanted to be outside of boundaries" << endl;
+        }	
     }
-    // If hexagon 
-    if(!currentClusterSquare) {
+
+    else if (currentCluster > 5) { // Ground face is a hexagon
 	for (int i = 0; i < hexaClusters[0].size(); i++) { 
+	    usedIndex = 0;
 	    tgBasicActuator *const pMuscle = hexaClusters[currentCluster - squareClusters.size()][i];
 	    assert(pMuscle != NULL);
-	    //cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
+//	    cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
 	    double currentLength = pMuscle->getRestLength();
 	    newLength = currentLength - retractRate[1]*dt;
 	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
-            if (newLength > m_initialLengths - 2*maxStringLengthFactor) {
+     
+	    for (int b = 0; b < movedMuscle.size(); b++) {
+	 //	cout << "b " << b << endl;
+		if (movedMuscle[b] == pMuscle) {
+			usedIndex = 1;
+//			cout << "usedIndex = " << usedIndex << " for muscle " << pMuscle << endl;
+		}
+	    }           
+	    if (newLength > minLength && newLength < maxLength && usedIndex == 0) {
+   	        //pMuscle->setControlInput(newLength);
    	        pMuscle->setControlInput(newLength, dt);
-    	    }
-	
-            cout << "ok" << endl;
-	    // For the adjacent face
-	    tgBasicActuator *const oMuscle = hexaClusters[adjacentCluster - squareClusters.size()][i];
-	    assert(oMuscle != NULL);
-	    //cout << "Muscle from to be retracted from hexaCluster[" << currentCluster - squareClusters.size()<< "][" << i << "] with ID: " << hexaClusters[currentCluster - squareClusters.size()][i] << endl;
-	    currentLength = oMuscle->getRestLength();
-	    newLength = currentLength - retractRate[1]*dt;
-	    //cout << "Current Length: " << currentLength << " and new length: " << newLength << endl;
-            if (newLength > m_initialLengths - 2*maxStringLengthFactor) {
-   	        pMuscle->setControlInput(newLength, dt);
-    	    }
+	        movedMuscle.push_back(pMuscle);
+    	    } else usedIndex = 0;
+//else cout << "Hexagon muscle wanted to be outside of boundaries." << endl;
+	}
+    }
 
-	}	
+
+
+    /*cout << "Size of vector: " << movedMuscle.size() << endl;
+    for (int i = 0; i < movedMuscle.size(); i++) {
+	cout << "Muscle no " << i << " with ID " << movedMuscle[i] << endl;
+    }
+  */ 
+ // FOURTH: check all muscles to return the previously used ones to the initial length
+    const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles();
+    for (int i = 0; i < muscles.size(); i++) { 
+	usedIndex = 0;
+        tgBasicActuator * const pMuscle = muscles[i];
+	assert(pMuscle != NULL); 
+	double currentLength = pMuscle->getRestLength();
+	for (int b = 0; b < movedMuscle.size(); b++) {
+	 //	cout << "b " << b << endl;
+	    if (movedMuscle[b] == pMuscle) {
+		usedIndex = 1;
+//		cout << "usedIndex = " << usedIndex << " for muscle " << pMuscle << endl;
+	    }
+	}           
+	if (currentLength > m_initialLengths) newLength = currentLength - retractRate[0]*dt; // implement +/-5%   
+        else if (currentLength < m_initialLengths) newLength = currentLength + elongateRate[0]*dt;
+	else newLength = currentLength;
+	if (usedIndex == 0) {
+	    pMuscle->setControlInput(newLength, dt);
+	    movedMuscle.push_back(pMuscle);
+	}
+//	cout << "All muscles altered." << endl;
     }
 
 
 
 
+
+    /*cout << "Size of vector: " << movedMuscle.size() << endl;
+    for (int i = 0; i < movedMuscle.size(); i++) {
+	cout << "Muscle no " << i << " with ID " << movedMuscle[i] << endl;
+    }*/
+//while(1);    
     // Elongate old clusters muscles to the start length. This action will override the previous control input
     // in case one muscle is in both the old and new cluster. The muscle should in this case be elongated, 
     // to not make the robot fall back but move forward. 
-    if(oldClusterSquare && oldCluster != -1) {
+ /*   if(oldClusterSquare && oldCluster != -1) {
 	for (int i = 0; i < squareClusters[0].size(); i++) { 
 	    tgBasicActuator *const pMuscle = squareClusters[oldCluster][i];
 	    assert(pMuscle != NULL);
@@ -381,7 +491,7 @@ void T12ControllerGround::setPreferredMuscleLengths(T12ModelGround& subject, dou
 
 	 
 
-
+*/
 
 
     // Calculate the new length, one cluster at a time, and apply it to that cluster
@@ -433,7 +543,7 @@ void T12ControllerGround::populateClusters(T12ModelGround& subject) {
     const std::vector<tgBasicActuator*> muscles = subject.getAllMuscles(); // Save all muscles in vector
 
     // Populate square clusters
-    for(iMuscle = 0; iMuscle < nMuscles; iMuscle ++) {
+    for(iMuscle = 0; iMuscle < nMuscles; iMuscle++) {
         tgBasicActuator *const pMuscle = muscles[iMuscle];
 
         assert(pMuscle != NULL);
@@ -514,7 +624,7 @@ void T12ControllerGround::initializeRates() {
     retractRate = new double[2]; // [0] for squares, [1] for hexagons
     elongateRate = new double[2];
     // DEBUGGING
-    cout << "Rates initialized." << endl;
+//    cout << "Rates initialized. Sizes: " << retractRate.size() << elongateRate.size()  << endl;
 }
 
 double T12ControllerGround::displacement(T12ModelGround& subject) {
@@ -580,8 +690,8 @@ void T12ControllerGround::printRates() {
     cout << endl;
     cout << "Square retract rate: " << retractRate[0] << endl;
     cout << "Hexagon retract rate: " << retractRate[1] << endl;
-    cout << "Square elongation rate: " << retractRate[0] << endl;
-    cout << "Hexagon elongation rate: " << retractRate[1] << endl;
+    cout << "Square elongation rate: " << elongateRate[0] << endl;
+    cout << "Hexagon elongation rate: " << elongateRate[1] << endl;
     cout << endl; 
 }
 
@@ -716,23 +826,49 @@ double T12ControllerGround::getGroundFace(T12ModelGround& subject) {
     distanceMovedSnorkel += abs(oldManhattan - distanceMovedManhattan); 
     if(groundFace != oldGroundFace) { // && groundFace != -1) {
         groundFaceHistory.push_back(groundFace); // Save ground face in history log
+	saveCOM(subject);
     } 
 
     return groundFace;
 }
 
 
-double T12ControllerGround::getAdjacentFace(void) {
+void T12ControllerGround::saveCOM(T12ModelGround& subject) {
 
-    double adjacentFace;
+    vector<double> COM = subject.getBallCOM();
+    COMx.push_back(COM[0]);
+    COMy.push_back(COM[1]);
+    COMz.push_back(COM[2]);
 
-    if (groundFace == 7) adjacentFace = 0;
-    else if (groundFace == 0) adjacentFace = 9;
-    else if (groundFace == 9) adjacentFace = 8;
-    else if (groundFace == 8) adjacentFace = 3;
-    else if (groundFace == 3) adjacentFace = 10;
-    else if (groundFace == 10) adjacentFace = 7;
+    cout << "COM: " << COM[0] << " " << COM[1] << " " << COM[2] << endl;
+}
 
+vector<int> T12ControllerGround::getAdjacentFace(double groundFace) {
+
+    vector<int> adjacentFace(2);
+
+//    cout << "ground face: " << groundFace << endl;
+    if (groundFace == 7) {
+        adjacentFace[0] = 0; 
+  	adjacentFace[1] = 10;
+    } else if (groundFace == 0) { 
+	adjacentFace[0] = 9;
+	adjacentFace[1] = 7;
+    } else if (groundFace == 9) {
+	adjacentFace[0] = 8;
+	adjacentFace[1] = 0;
+    } else if (groundFace == 8) {
+	adjacentFace[0] = 3;
+	adjacentFace[1] = 9;
+    } else if (groundFace == 3) {
+	adjacentFace[0] = 10;
+	adjacentFace[1] = 8;
+    } else if (groundFace == 10) {
+	adjacentFace[0] = 7;
+	adjacentFace[1] = 3;
+    }
+
+    //cout << "adjacent face: " << adjacentFace[0] << adjacentFace[1] << endl;
     return adjacentFace; 
 
 }
@@ -782,8 +918,8 @@ void T12ControllerGround::getFileName(void) {
     ostringstream txt_path_out(txttemp);
     ostringstream csv_path_out(csvtemp);
 
-    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/textgen_c_";
-    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/gen_c_";
+    txt_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/textgen_z_";
+    csv_path_out << "/home/hannah/Projects/NTRTsim/src/dev/hpetersson/ground12BarTensegrity/outputFiles/gen_z_";
 
     
     time_t year = (now->tm_year + 1900);
@@ -798,32 +934,11 @@ void T12ControllerGround::getFileName(void) {
  
     txtPath = txt_path_out.str();
     csvPath = csv_path_out.str();
-
+    cout << "File name is " << csvPath << endl;
     // Print header for csv file
-    write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,", 0);
-    for (int i = 0; i < actions[0].size(); i++) {
-	for (int j = 0; j < actions.size(); j++) { // First, print all elements in the row  
-            write2csvFile(0, "actions[", 0);       // When done, switch to next row
-	    write2csvFile(j, "", 1);
-	    write2csvFile(0, "][", 0);
-	    write2csvFile(i, "", 1);
-  	    write2csvFile(0, "],", 0);
-	}
-    }	 
-    for (int i = 0; i < nSquareClusters; i++) { // Print sine params
-	write2csvFile(0, "amplitude[", 0);
-	write2csvFile(i, "", 1);
-	write2csvFile(0, "],angularFrequency[", 0);
-	write2csvFile(i, "", 1);
-	write2csvFile(0, "],phase[", 0);
-	write2csvFile(i, "", 1);
-	write2csvFile(0, "],dcOffset[", 0);
-	write2csvFile(i, "", 1);
-	write2csvFile(0, "],", 0);
-    }
-
-    write2csvFile(0, "Initial Length,Start time,Faces", 0);
+    write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,Initial Length,Start time,Faces,COMx,COMy,COMz", 0);
     write2csvFile(0, "\n", 0);
+    cout << "File name is " << csvPath << endl;
 }
 
 
@@ -850,7 +965,7 @@ void T12ControllerGround::saveData2File(void) {
     write2txtFile(0, "\n", 0);
     
     // Actions
-    write2txtFile(0, "Actions", 0); 
+    /*write2txtFile(0, "Actions", 0); 
     write2txtFile(0, "\n", 0);
     for (int i = 0; i < actions[0].size(); i++) {
 	for (int j = 0; j < actions.size(); j++) {  
@@ -858,7 +973,7 @@ void T12ControllerGround::saveData2File(void) {
 	    write2txtFile(0, ", ", 0);
 	}
 	write2txtFile(0, "\n", 0);
-    }
+    }*/
 
     write2txtFile(0, "\n", 0);
     
@@ -905,26 +1020,6 @@ void T12ControllerGround::saveData2File(void) {
     write2csvFile(energySpent,"",1);
     write2csvFile(0,",",0);
 
-    // actions
-    for (int i = 0; i < actions[0].size(); i++) {
-	for (int j = 0; j < actions.size(); j++) {  
-            write2csvFile(actions[j][i], "", 1);
-	    write2csvFile(0, ",",  0);
-	}
-    }	
-
-    // sine params
-    /*for (int i = 0; i < nSquareClusters; i++) {
-	write2csvFile(amplitude[i], "", 1);
-	write2csvFile(0, ",", 0);
-	write2csvFile(angularFrequency[i], "", 1);
-	write2csvFile(0, ",", 0);
-	write2csvFile(phase[i], "", 1);
-	write2csvFile(0, ",", 0);
-	write2csvFile(dcOffset[i], "", 1);
-	write2csvFile(0, ",", 0);
-    }*/
-
     // Initial length
     write2csvFile(m_initialLengths, "", 1);
     write2csvFile(0, ",", 0);
@@ -936,10 +1031,39 @@ void T12ControllerGround::saveData2File(void) {
 
 
     // ground face
-    for(int i = 1; i < groundFaceHistory.size(); i++) {
+    for(int i = 0; i < groundFaceHistory.size(); i++) {
         write2csvFile(groundFaceHistory[i], "", 1);
  	write2csvFile(0, ",", 0);
     }
+
+    write2csvFile(0, "NaN", 0);
+ 	write2csvFile(0, ",", 0);
+
+    // COM
+    for (int i = 0; i < COMx.size(); i++)  { // x
+        write2csvFile(COMx[i],"",1);
+	write2csvFile(0,",", 0);
+    }
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+
+    for (int i = 0; i < COMy.size(); i++)  { // y
+        write2csvFile(COMy[i],"",1);
+	write2csvFile(0,",", 0);
+    }
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+ 
+    for (int i = 0; i < COMz.size(); i++)  { // z
+        write2csvFile(COMz[i],"",1);
+	write2csvFile(0,",", 0);
+    }
+    write2csvFile(0, "NaN", 0);   
+    write2csvFile(0, ",", 0);
+
+    write2csvFile(0, "NaN", 0);   
     write2csvFile(0, "\n", 0);
 
 }
