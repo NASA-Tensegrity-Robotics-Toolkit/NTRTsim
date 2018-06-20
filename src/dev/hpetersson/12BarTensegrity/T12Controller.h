@@ -57,7 +57,7 @@ class T12Controller : public tgObserver<T12Model>
 
         virtual void onTeardown(T12Model& subject);
     protected:
-        virtual vector< vector <double> > transformActions(void);
+        virtual vector< vector <double> > getActions(void);
 
         virtual void applyActions(T12Model& subject);
 
@@ -114,6 +114,10 @@ class T12Controller : public tgObserver<T12Model>
         double displacement(T12Model& subject);
 	double distanceMovedManhattan;
 	double distanceMovedTotal;
+	vector<double> COMx;
+	vector<double> COMy;
+	vector<double> COMz;
+	void saveCOM(T12Model& subject);
 
         /** Select action paramters from a comma-separated line in a file */
         std::vector<double> readManualParams(int lineNumber, char const* filename);

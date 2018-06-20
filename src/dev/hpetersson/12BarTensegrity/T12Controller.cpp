@@ -120,20 +120,9 @@ void T12Controller::onSetup(T12Model& subject)
  
     actions.resize(musclesPerSquareCluster, vector<double> (nSquareClusters, 0));
 
-    // DEBUGGING
-    /*for (int j = 0; j<nSquareClusters; j++) { 
-	for (int i = 0; i<musclesPerSquareCluster; i++) {
- 	    cout << actions[i][j] << " ";
-        }
-   	cout << endl;
-    } 
-    cout << endl;*/
-
-    //if(useLearning) randomizeParams();
-
     initializeSineWaves(); // For muscle actuation
 
-    actions = transformActions(); // get actions and transform them to right format
+    actions = getActions(); // get actions and transform them to right format
 
     //apply these actions to the appropriate muscles according to the sensor values
     applyActions(subject);
@@ -190,7 +179,7 @@ void T12Controller::onTeardown(T12Model& subject) {
  * Invariant: actions[x].size() == 4 for all legal values of x
  * Invariant: Each actions[] contains: amplitude, angularFrequency, phase, dcOffset
  */
-vector< vector <double> > T12Controller::transformActions()
+vector< vector <double> > T12Controller::getActions()
 { 
     // DEBUGGING (all elements should be equal to 0) 
     /*for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
@@ -211,7 +200,7 @@ vector< vector <double> > T12Controller::transformActions()
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
         const char* filename = randomInputPath.c_str(); //"/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_d_tests3_0.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
-        int lineNumber = 1 + simulationNumber;
+        int lineNumber = 1;
         manualParams = readManualParams(lineNumber, filename);  
 
 	int k = 0; // Assign actions 
@@ -255,66 +244,7 @@ vector< vector <double> > T12Controller::transformActions()
         }
 	cout << endl; 
 
-         // Minimum amplitude, angularFrequency, phase, and dcOffset
-        double mins[4]  = {0.3, 
-                           0, // dummy 
-                           -1 * M_PI, 
-                           m_initialLengths};// * (1 - maxStringLengthFactor)};
-
-        // Maximum amplitude, angularFrequency, phase, and dcOffset
-        double maxes[4] = {m_initialLengths/2, 
-                           0, // dummy
-                           M_PI, 
-                           m_initialLengths};// * (1 + maxStringLengthFactor)}; 
-
-        assert((maxes[0]-mins[0])>0);
-        double ranges[4] = {maxes[0]-mins[0], maxes[1]-mins[1], maxes[2]-mins[2], maxes[3]-mins[3]};
-
-        for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
-            for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
-                cout << actions[i][j] << " ";
-            }
-            cout << endl;
-        }
-  	cout << "\n";
-
-        // Apply output of learing to all parameters but the angular frequency (since the maximum angular frequency is dependent on the amplitude)
-        for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
-            for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
-                adaptedActions[i][j] = actions[i][j]*(ranges[i])+mins[i];
-                cout << adaptedActions[i][j] << " ";
-            }
-	    cout << endl;
-        }
-        cout << endl; 
-
-        // Find maximum angular frequency with the help of the amplitude 
-        double maxMotorVelocity = 1; // Reasonable values would be 5-10 cm/s --> 0.5/1 dm/s (SUPERball has 2 cm/s)
-        double maxAngFrequencies[6];
-        double minAngFrequencies[6] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3}; // Appropriate
-        double rangeAngFrequencies[6];	
-        vector<double> amps(6);
-        for(int i = 0; i <nSquareClusters; i++) { 
-	    amps[i] = adaptedActions[0][i];
-	    cout << "amps: " << amps[i] << endl;
-            maxAngFrequencies[i] = M_PI * maxMotorVelocity / amps[i]; // Frequency limit is based on motor velocity
-            rangeAngFrequencies[i] = maxAngFrequencies[i] - minAngFrequencies[i];
-        }
         
-        // Apply output of learning to the angular frequency parameters (since the maximum angular frequency is dependent on the amplitude)
-        for(int i=0;i<nSquareClusters;i++) { //6x
-            adaptedActions[1][i] = actions[1][i]*(rangeAngFrequencies[i])+minAngFrequencies[i];
-        }
-    }
-      for(int j=0;j<nSquareClusters;j++) { //6x, number of rows
-            for (int i=0; i<musclesPerSquareCluster; i++) { //4x, number of columns
-                cout << adaptedActions[i][j] << " ";
-            }
-	    cout << endl;
-        }
-        cout << endl; 
-
-
      for(int j=0;j<nSquareClusters;j++) { //6x
         for (int i=0; i<musclesPerSquareCluster; i++) { //4x
 	    adaptedActions[i][j] *= 100000.;
@@ -325,27 +255,8 @@ vector< vector <double> > T12Controller::transformActions()
 	cout << endl;
     }
 
-    return adaptedActions;
-}
-
-void T12Controller::randomizeParams() { 
-    
-    srand(time(NULL));
-
-    int nParams = nSquareClusters * musclesPerSquareCluster;
-    cout << "Number of inputs: " << nParams << endl;
-
-    for(int j=0;j<nSquareClusters;j++) { //6x
-        for (int i=0; i<musclesPerSquareCluster; i++) { //4x
-            actions[i][j] = ((double) rand() / RAND_MAX);
-            cout <<fixed << setprecision(55) <<  actions[i][j] << " ";
-        }
-	cout << endl;
     }
- 
-	cout << endl;
-	cout << endl;
-       cout << "Random parameters obtained." << endl;
+    return adaptedActions;
 }
 
 
@@ -670,8 +581,23 @@ void T12Controller::getGroundFace(T12Model& subject) {
     if(groundFace != oldGroundFace) { // && groundFace != -1) {
         groundFaceHistory.push_back(groundFace); // Save ground face in history log
 	cout << "At time: " << m_totalTime << ", change of groundFace to: " << groundFace << endl;
+	saveCOM(subject);
     } 
 }
+
+
+void T12Controller::saveCOM(T12Model& subject) {
+
+    vector<double> COM = subject.getBallCOM();
+    COMx.push_back(COM[0]);
+    COMy.push_back(COM[1]);
+    COMz.push_back(COM[2]);
+
+    cout << "COM: " << COM[0] << " " << COM[1] << endl;
+
+}
+
+
 
 /* Function for writing data to txt file */
 void T12Controller::write2txtFile(double contentDouble, char const* contentString, bool isDouble) {
@@ -760,7 +686,7 @@ void T12Controller::getFileName(void) {
 	write2csvFile(0, "],", 0);
     }
 
-    write2csvFile(0, "Initial Length,Start time,Faces", 0);
+    write2csvFile(0, "Initial Length,Start time,Total time,Faces,COMx,COMy,COMz", 0);
     write2csvFile(0, "\n", 0);*/
 }
 
@@ -878,12 +804,50 @@ void T12Controller::saveData2File() {
     write2csvFile(m_startTime, "", 1);
     write2csvFile(0, ",", 0);
 
+// Total simulated time 
+    write2csvFile(m_totalTime, "", 1);
+    write2csvFile(0, ",", 0);
 
+    
     // ground face
-    for(int i = 1; i < groundFaceHistory.size(); i++) {
+    for(int i = 0; i < groundFaceHistory.size(); i++) {
         write2csvFile(groundFaceHistory[i], "", 1);
  	write2csvFile(0, ",", 0);
     }
+
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+    // COMx
+    for (int i = 0; i < COMx.size(); i++) { 
+  	write2csvFile(COMx[i], "", 1);
+  	write2csvFile(0, ",", 0);
+    }
+
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+    // COMy
+    for (int i = 0; i < COMy.size(); i++) { 
+  	write2csvFile(COMy[i], "", 1);
+  	write2csvFile(0, ",", 0);
+    }
+
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+
+    // COMz
+    for (int i = 0; i < COMz.size(); i++) { 
+  	write2csvFile(COMz[i], "", 1);
+  	write2csvFile(0, ",", 0);
+    }
+
+    write2csvFile(0, "NaN", 0);
+    write2csvFile(0, ",", 0);
+
+
+
     write2csvFile(0, "\n", 0);
 
 }

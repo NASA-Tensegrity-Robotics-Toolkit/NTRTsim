@@ -936,7 +936,7 @@ void T12ControllerGround::getFileName(void) {
     csvPath = csv_path_out.str();
     cout << "File name is " << csvPath << endl;
     // Print header for csv file
-    write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,Initial Length,Start time,Faces,COMx,COMy,COMz", 0);
+    write2csvFile(0, "Simulation number,Manhattan distance,Snirky distance,Energy spent,Initial Length,Start time,Total time,Faces,COMx,COMy,COMz", 0);
     write2csvFile(0, "\n", 0);
     cout << "File name is " << csvPath << endl;
 }
@@ -1029,6 +1029,11 @@ void T12ControllerGround::saveData2File(void) {
     write2csvFile(m_startTime, "", 1);
     write2csvFile(0, ",", 0);
 
+    // Total time
+    write2csvFile(m_totalTime, "", 1);
+    write2csvFile(0, ",", 0);
+
+
 
     // ground face
     for(int i = 0; i < groundFaceHistory.size(); i++) {
@@ -1036,8 +1041,11 @@ void T12ControllerGround::saveData2File(void) {
  	write2csvFile(0, ",", 0);
     }
 
+    write2csvFile(m_totalTime, "", 1);
+    write2csvFile(0, ",", 0);
+    
     write2csvFile(0, "NaN", 0);
- 	write2csvFile(0, ",", 0);
+    write2csvFile(0, ",", 0);
 
     // COM
     for (int i = 0; i < COMx.size(); i++)  { // x
