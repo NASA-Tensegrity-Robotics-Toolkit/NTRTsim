@@ -62,7 +62,7 @@ using namespace std;
 
 /* S E T T I N G S */
 bool saveData = true; // Save parameters and result to file
-bool useLearning = true; // True: Use learning (Monte Carlo), False: use parameters from file
+bool useLearning = false; // True: Use learning (Monte Carlo), False: use parameters from file
 bool tweakParams = false; // When reading parameters from file, tweak with up to 0.5% to optimize output from previous runs
 
 //Constructor using the model subject and a single pref length for all muscles.
@@ -211,7 +211,7 @@ vector< vector <double> > T12Controller::transformActions()
        vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
         const char* filename = randomInputPath.c_str(); //"/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_d_tests3_0.csv";
         std::cout << "Using manually set parameters from file " << filename << endl; 
-        int lineNumber = 1;
+        int lineNumber = 1 + simulationNumber;
         manualParams = readManualParams(lineNumber, filename);  
 
 	int k = 0; // Assign actions 
@@ -223,9 +223,16 @@ vector< vector <double> > T12Controller::transformActions()
     	    }
 	    cout << endl; 
         }
+	 for(int j=0;j<nSquareClusters;j++) { //6x
+            for (int i=0; i<musclesPerSquareCluster; i++) { //4x
+	    adaptedActions[i][j] *= 100000.;
+	    int k = adaptedActions[i][j];
+	    adaptedActions[i][j] = (double) k / 100000.;
+            cout << adaptedActions[i][j] << " ";
+	    }
 	cout << endl; 
+        }
     }
-
     // If learning is used, do this
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
