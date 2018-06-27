@@ -111,6 +111,8 @@ void T12Controller::onSetup(T12Model& subject)
     populateClusters(subject); // Populate the square clusters with muscles
 
     initPosition = subject.getBallCOM(); // Get initial position for calculation of distance travelledee
+    saveCOM(subject);
+
     // DEBUGGING
     /*cout << "initPosition x: " << initPosition[1] << endl;
     cout << "initPosition y: " << initPosition[2] << endl;

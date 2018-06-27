@@ -34,6 +34,7 @@ z * @brief Contains the implementation of class T12ModelGround.
 #include "tgcreator/tgRodInfo.h"
 #include "tgcreator/tgStructure.h"
 #include "tgcreator/tgStructureInfo.h"
+#include "core/abstractMarker.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -241,13 +242,13 @@ void T12ModelGround::setup(tgWorld& world)
     addNodes(s);
     addRods(s);
     addMuscles(s);
-    s.move(btVector3(1, 0, 1));
+    s.move(btVector3(0, 6, 0)); // For landing on square 0, use (0, 6, 0). Square 1, use (0, 4, 0). Square 4, use (0, 10, 0). 
 
     // Add a rotation. This is needed if the ground slopes too much,
     // otherwise  glitches put a rod below the ground.
-    btVector3 rotationPoint = btVector3(1, 1.5, 1); // origin
-    btVector3 rotationAxis = btVector3(1, 1, 0.5);  // For landing on a square, use (1, 1, 0.5)
-    double rotationAngle = 3;
+    btVector3 rotationPoint = btVector3(0, 0, 0); // origin
+    btVector3 rotationAxis = btVector3(1, 0, 1);  // For landing on a square, use (1, 1, 0.5)
+    double rotationAngle = -1.1;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
 
     // Create the build spec that uses tags to turn the structure into a real model

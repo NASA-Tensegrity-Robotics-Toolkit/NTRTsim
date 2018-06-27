@@ -67,7 +67,9 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
    	double m_startTime;
         double m_totalTime;
         double const maxStringLengthFactor; // Proportion of string's initial length by which a given actuator can increase/decrease
-
+	int index;
+	int jndex = 0;
+	
         // Evolution and Adapter
         AnnealAdapter evolutionAdapter;
         vector< vector<double> > actions; // For modifications between episodes
@@ -95,7 +97,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 	double energySpent;
 
         /** Sets target lengths for each muscle */
-        void setPreferredMuscleLengths(T12ModelGround& subject, double dt, double oldCluster, double currentCluster);
+        void setPreferredMuscleLengths(T12ModelGround& subject, double dt, double currentCluster);
 
         /** Divides the 24 muscles of an Escape_T6Model 
          * into 8 clusters of 3 muscles */
