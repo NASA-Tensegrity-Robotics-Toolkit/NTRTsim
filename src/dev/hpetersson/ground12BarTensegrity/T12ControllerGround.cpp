@@ -60,11 +60,14 @@ bool tweakParams = false; // When reading parameters from file, tweak with up to
 
 //Constructor using the model subject and a single pref length for all muscles.
 //Currently calibrated to decimeters
-T12ControllerGround::T12ControllerGround(T12ModelGround* subject, const double initialLength, double startTime) :
+T12ControllerGround::T12ControllerGround(T12ModelGround* subject, const double initialLength, double startTime, int simNum, const char* inputPath, const char* outputPath) :
     m_initialLengths(initialLength),
     m_startTime(startTime),
     m_totalTime(0.0),
     maxStringLengthFactor(0.90),
+    simulationNumber(simNum),
+    randomInputPath(inputPath),
+    csvPath(outputPath),
     nSquareClusters(6),  // 6 = number of squares on 12Bar. On SUPERball, the number of faces is 8.
     nHexaClusters(8), 
     musclesPerSquareCluster(4), // 4 = number of muscles per square. On SUPERball, the number is 3.
@@ -111,6 +114,8 @@ void T12ControllerGround::onSetup(T12ModelGround& subject)
     vector< vector<double> > actions;
 
     initializeRates(); // For muscle actuation
+
+    actions = getActions();
 
     applyActions(subject, actions);
 
@@ -175,9 +180,10 @@ void T12ControllerGround::onTeardown(T12ModelGround& subject) {
  * Invariant: actions[x].size() == 4 for all legal values of x
  * Invariant: Each actions[] contains: amplitude, angularFrequency, phase, dcOffset
  */
-vector< vector <double> > T12ControllerGround::transformActions(vector< vector <double> > actions1D)
+vector< vector <double> > T12ControllerGround::getActions()
 {
-    vector< vector <double> > actions2D(2, vector<double>(2)); // Vector to be returned
+    vector<double> actionsRaw(4); // Vector to be returned
+    vector< vector <double> > adaptedActions(2, vector<double>(2)); // Vector to be returned
 
     // If reading parameters from file, do this
     /*if(!useLearning) { 
@@ -198,27 +204,39 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
     // If learning is used, do this
     if(useLearning) {
 //    double pretension = 0.9; // Tweak this value if need be. What is this actually?
-
-         // Minimum rates
-        double minRate  = 0.2; // dm/s 
-
-        // Maximum amplitude, angularFrequency, phase, and dcOffset
-        double maxRate = 1.5; // dm/s 
-
-        assert(maxRate-minRate>0);
-        double range = maxRate - minRate;
-
+       vector <double> manualParams(24, 1); // '4' for the number of sine wave parameters, nClusters = 6 -> 24 total
+        const char* filename = randomInputPath.c_str(); //"/home/hannah/Projects/NTRTsim/src/dev/hpetersson/12BarTensegrity/InputActions/actions_11106.csv";
+        std::cout << "Using manually set parameters from file " << filename << endl; 
+        int lineNumber = 1 + simulationNumber;
+        manualParams = readManualParams(lineNumber, filename);  
+	for(int i = 0; i<actionsRaw.size(); i++) { 
+	    actionsRaw[i] = manualParams[i];
+	    cout << "manualParams: " << manualParams[i] << endl;
+	}
+ 
         // Apply output of learing to all rates
         int k = 0;
-        for(int i=0;i<actions2D.size();i++) { //2x
-            for (int j=0; j<actions2D[i].size(); j++) { //2x
-                actions2D[i][j] = actions1D[i][j]*range + minRate;
-                cout << "action2D: " << actions2D[i][j] << endl;
+        for(int i=0;i<adaptedActions.size();i++) { //2x
+            for (int j=0; j<adaptedActions[0].size(); j++) { //2x
+                adaptedActions[i][j] = actionsRaw[k];
+                cout << "adapted action: " << adaptedActions[i][j] << endl;
+		k++;
             }
         }
     }
-   
-    return actions2D;
+  
+    // Limit to five decimals
+    for(int j=0; j<adaptedActions.size(); j++) {
+	for (int i=0; i<adaptedActions[0].size(); i++) {
+	    adaptedActions[i][j] *= 100000;
+	    int k = adaptedActions[i][j];
+	    adaptedActions[i][j] = (double) k / 100000;
+	    cout << adaptedActions[i][j] << " ";
+	}
+	cout <<endl;
+    }
+     
+    return adaptedActions;
 }
 
 /**
@@ -227,12 +245,12 @@ vector< vector <double> > T12ControllerGround::transformActions(vector< vector <
 void T12ControllerGround::applyActions(T12ModelGround& subject, vector< vector <double> > actions)
 {
     // Apply actions by cluster
-    retractRate[0] = 1; //actions[0][0]; // square    
-    retractRate[1] = 7; //actions[1][0]; // hexagon
-    elongateRate[0] = 1; //actions[0][1]; // square
-    elongateRate[1] = 7; //actions[1][1]; // hexagon
+    retractRate[0] = actions[0][0]; // square    
+    retractRate[1] = actions[0][1]; // hexagon
+    elongateRate[0] = actions[1][0]; // square
+    elongateRate[1] = actions[1][1]; // hexagon
 
-    //cout << "Actions applied. " << retractRate[0] << ", " << retractRate[1]  << ", " << elongateRate[0]  << ", " << elongateRate[1] << endl;
+    cout << "Actions applied. Square retract rate: " << retractRate[0] << ", hexagon retract rate: " << retractRate[1]  << ", square elongation rate: " << elongateRate[0]  << ", hexagon elongation rate: " << elongateRate[1] << endl;
 }
 
 

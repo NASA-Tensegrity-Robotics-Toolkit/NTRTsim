@@ -47,12 +47,12 @@
 */
 const bool  useGraphics = false;
 const double initialLength = 1.0;
-const double startTime = 4; // How long after the simulation the controller starts
+const double startTime = 3; // How long after the simulation the controller starts
 const double timestep_physics = 0.0001; // seconds // from Hannah: recommended 0.0001, from earlier: recommended 0.001
 const double timestep_graphics = 1.f/60.f; // seconds
 
 
-void simulateNoGraphics() { 
+void simulateNoGraphics(int simNumber, const char* inputPath, const char* outputPath) { 
     //int nEpisodes = 20000; // Number of episodes ("trial runs")
     int nSteps = 600000; // Number of steps in each episode, 600k is 60 seconds (timestep_physics*nSteps)
     
@@ -79,7 +79,7 @@ void simulateNoGraphics() {
     T12ModelGround* const myModel = new T12ModelGround(); // second argument not necessary
 
     // Select controller to be used 
-    T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime);
+    T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime, simNumber, inputPath, outputPath);
 
     // Attach the controller to the model 
     myModel->attach(myController);
@@ -99,7 +99,7 @@ void simulateNoGraphics() {
     //delete ground;
 }
 
-void simulateWithGraphics(void) {
+void simulateWithGraphics(int simNumber, char const* inputPath, char const* outputPath) {
 
     // Create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
@@ -123,7 +123,7 @@ void simulateWithGraphics(void) {
     T12ModelGround* const myModel = new T12ModelGround(); // second argument not necessary
 
     // Select controller to be used 
-    T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime);
+    T12ControllerGround* const myController = new T12ControllerGround(myModel, initialLength, startTime, simNumber, inputPath, outputPath);
 
     // Attach the controller to the model 
     myModel->attach(myController);
@@ -143,14 +143,22 @@ void simulateWithGraphics(void) {
 
 int main(int argc, char** argv)
 {
+
+    assert(argv[1]);
+    assert(argv[2]);
+    assert(argv[3]);
+    int simNum = atoi(argv[1]); 
+    char const* inputPath = argv[2];
+    char const* outputPath = argv[3];
+
     std::cout << "---------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "App12BarGround" << std::endl;
 //    std::cout << "Graphics = " << useGraphics << std::endl;
 
     if(useGraphics) {
-        simulateWithGraphics();
+        simulateWithGraphics(simNum, inputPath, outputPath);
     } else { 
-	simulateNoGraphics();
+	simulateNoGraphics(simNum, inputPath, outputPath);
     }
 
 

@@ -44,7 +44,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 {
     public:
         // Note that currently this is calibrated for decimeters.
-        T12ControllerGround(T12ModelGround* subject, const double prefLength=5.0, double startTime=1);
+        T12ControllerGround(T12ModelGround* subject, const double prefLength=5.0, double startTime=1, int simNum=-1, const char* inputPath="/home/hannah/error", const char* outputPath="/home/hannah/error");
 
         /** Nothing to delete, destructor must be virtual */
         virtual ~T12ControllerGround() { }
@@ -57,7 +57,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
         virtual void onTeardown(T12ModelGround& subject);
     protected:
-        virtual vector< vector <double> > transformActions(vector< vector <double> > act);
+        virtual vector< vector <double> > getActions(void);
 
         virtual void applyActions(T12ModelGround& subject, vector< vector <double> > act);
 
@@ -139,6 +139,7 @@ class T12ControllerGround : public tgObserver<T12ModelGround>
 
   	string txtPath;  // file name for txt file
 	string csvPath;  // file name for csv file
+        string randomInputPath;
 
 	void saveData2File(void);
 
