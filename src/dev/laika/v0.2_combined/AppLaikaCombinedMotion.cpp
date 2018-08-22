@@ -104,6 +104,10 @@ int main(int argc, char** argv)
     // Drew believes this is still kinematically valid, though,
     // since we're not recording force, but instead are recording
     // (effectively) the center-of-mass shift with respect to the spine.
+    // For ICRA 2019 submission: no longer consider the g ~= 9.81 cases valid,
+    // since the forces from the lattice/cables are scaled, and that throws
+    // everything off. I really don't think NTRT simulations are OK unless
+    // everything is at-scale right now. Only use g=9.81 for real data collection.
     tgWorld world(config, ground);
 
     // create the view
