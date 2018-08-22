@@ -400,6 +400,13 @@ int main(int argc, char** argv)
     // The 'dropped' model is moved up by 1.55 meters.
     // On 2018-02-26: Feet C and D markers, the back two, need to be at 0
     // and not at +0.64801, since the robot is zero-ed at the back legs.
+    // On 2018-08-22: explanation of the vertical height:
+    //     From the main model YAML file, translation is
+    //          (+from local origin of leg = 17.85
+    //          +sphere height = 1.25) = was 19.35? Should be 19.1 actually
+    //     From the "FINAL" YAML file that drops the robot, +1.55 to adjust for gnd
+    //     So, the marker's 1.55 offset here is *correct* as long as the main
+    //          model file from the YAML places the bottom of its foot at Y=0 height.
     btVector3 offsetFootA( -0.64801, 1.55, -0.0755);
     btVector3 offsetFootB( -0.64801, 1.55, 0.0755);
     btVector3 offsetFootC( 0.0, 1.55, -0.0755);
