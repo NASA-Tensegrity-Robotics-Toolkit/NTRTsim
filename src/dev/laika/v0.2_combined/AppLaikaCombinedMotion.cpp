@@ -134,7 +134,7 @@ int main(int argc, char** argv)
     // Correspond to FR, FL, BR, BL.
 
     // hack to prevent controllers from running: input 0.
-    int whichFoot = 1;
+    int whichFoot = 3;
     
     // switch on the string and assign the following:
     // (1) parameters for the horizontal bending controller

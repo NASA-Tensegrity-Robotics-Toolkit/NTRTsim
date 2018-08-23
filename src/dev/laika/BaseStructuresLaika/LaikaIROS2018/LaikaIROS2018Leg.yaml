@@ -36,5 +36,5 @@ builders:
     parameters:
       density: 425 # From matlab calculations, 299
       radius: 0.0125
-      friction: 0.5
-      roll_friction: 0.5
+      friction: 0.0 # for IROS 2018, choose 0.5.
+      roll_friction: 0.0 # for IROS 2018, choose 0.5.

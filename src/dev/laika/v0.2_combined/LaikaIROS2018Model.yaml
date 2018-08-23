@@ -156,6 +156,17 @@ bond_groups:
 # NOTE! min_actual_length defaults to 0.1. This has to change down
 # for SI units testing. Same with min rest length.
 
+############################
+# For the ICRA 2019 paper:
+# The bottom cable really should be "springs in parallel." Don't know why
+# we didn't model that before. The final model we used had 2 x regular width
+# + 1 x black material. That's 2*244 + 515 = 1003.
+# Also, the spring constant for the left/right side that's pulled in is
+# the mechanical spring. Jones #240. k = 187 N/m. BUT, the other side is lattice!
+
+# Foot A and C tests pull in the HR cables. So HR = 187, HL = 244
+# Foot B and D tests pull in the HL cables. So HR = 244, HL = 187
+
 builders:
 
   # Horizontal cables:
@@ -164,7 +175,7 @@ builders:
     parameters:
       stiffness: 244 # used mean for first set of IROS data, 244
       damping: 10.0
-      pretension: 1.46 # was 1.46 for 244, 1.04 for 174
+      pretension: 1.46 # was 1.46 for 244, 1.04 for 174, 0.98 for something else?
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -174,9 +185,9 @@ builders:
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 515 # used red lattice mean for first IROS data, 434
+      stiffness: 1003 # used red lattice mean for first IROS data, 434. 515 for later.
       damping: 10.0
-      pretension: 7.72 # orig with mean, red, was 6.94
+      pretension: 15 # orig with mean, red, was 6.94. used 7.72 for IROS 2018.
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -186,7 +197,7 @@ builders:
   HR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 244
+      stiffness: 187
       damping: 10.0
       pretension: 0.98 # was 0.98 for 244, 0.7 for 174
       history: 1
@@ -200,7 +211,7 @@ builders:
     parameters:
       stiffness: 244
       damping: 10.0
-      pretension: 0.98
+      pretension: 0.98 # was 0.98 for 244, 0.7 for 174
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -213,7 +224,7 @@ builders:
     parameters:
       stiffness: 244 # initial data with 244
       damping: 10.0
-      pretension: 9.05 # initial data with 12.69
+      pretension: 12.7 # initial data with 12.69. IROS 2018 with 9.05.
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -225,7 +236,7 @@ builders:
     parameters:
       stiffness: 244
       damping: 10.0
-      pretension: 9.05
+      pretension: 12.7
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -237,7 +248,7 @@ builders:
     parameters:
       stiffness: 244
       damping: 10.0
-      pretension: 9.05
+      pretension: 12.7
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0
@@ -249,7 +260,7 @@ builders:
     parameters:
       stiffness: 244
       damping: 10.0
-      pretension: 9.04
+      pretension: 12.7
       history: 1
       max_tension: 70000.0
       target_velocity: 12.0

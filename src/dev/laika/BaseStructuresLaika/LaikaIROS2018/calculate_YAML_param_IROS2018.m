@@ -188,10 +188,20 @@ stretch_bottom_m = stretch_bottom_cm * (1/s);
 % Max: bottom = 616, else = 346
 %k_bottom = 434;
 % for the black lattice material, https://docs.google.com/spreadsheets/d/1vufW-rk9Y2as5zzanuQNYwpHWIGvXa4Yp8Swb1RdZeA/edit#gid=0
-k_bottom = 515;
-%k_else = 244;
-k_else = 174; % from some calcs on google drive
+%k_bottom = 515;
+k_else = 244;
+%k_else = 174; % from some calcs on google drive
 % in N/m.0.
+
+% For ICRA 2018, making the following changes:
+% 1) The bottom lattice really needs to be a sum of all the lattices there.
+% Even though some went slack, it's going to be best to model it as springs
+% in parallel. That means, 2*244 + 515 = 1003
+k_bottom = 1003;
+% 2) For the sides, we actually need two different models! One for the
+% actuated side, with the mechanical springs, and one for the unactuated
+% side, with the lattice. From the W.B. Jones #240 spring, 1.07 lbf/in, =
+k_mechspring = 187;
 
 % Then, we can calculate "pretension", which is F = k * stretch
 % for each cable. E.g., we're placing Laika in its equilibrium
@@ -200,6 +210,19 @@ F_saddle = k_else * stretch_saddle_m;
 F_top = k_else * stretch_top_m;
 F_sides = k_else * stretch_sides_m;
 F_bottom = k_bottom * stretch_bottom_m;
+
+% NOTE! for the actuated side, we *cannot* do:
+% F_mechspringside = k_mechspring * stretch_sides_m;
+% ...because that's not the condition that holds. Instead, what's going on
+% is that we tensioned the cable side so it had zero force at the length of
+% the lattice cables. This actually gets really complicated, with 2 springs
+% happening for some amount of time, then when the spring force from the
+% mechanical spring causes a length change that surpasses the lattice, it
+% goes back to only one cable.
+% Let's not model that (see what we can do otherwise.)
+% One easy way is to say "pretension is the same." That way we know we have
+% equilibrium.
+F_mechspringside = F_sides;
 
 % And just to record it here, the offset between the vertebrae should
 % roughly be the same as the horizontal distance between two vertebrae
@@ -215,6 +238,8 @@ F_saddle_adj = F_saddle * s;
 F_top_adj = F_top * s;
 F_sides_adj = F_sides * s;
 F_bottom_adj = F_bottom * s;
+% For the mechanical spring,
+F_mechspringside_adj = F_mechspringside * s;
 
 
 
