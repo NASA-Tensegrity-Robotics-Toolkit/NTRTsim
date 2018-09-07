@@ -134,7 +134,7 @@ int main(int argc, char** argv)
     // Correspond to FR, FL, BR, BL.
 
     // hack to prevent controllers from running: input 0.
-    int whichFoot = 3;
+    int whichFoot = 4;
     
     // switch on the string and assign the following:
     // (1) parameters for the horizontal bending controller
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
     // first, declare everything we need.
     // Some of these are initialized to prevent segfaults accidentally
     // Rotating vertebra controller + data logging:
-    std::string footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_";
+    std::string footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataA_";
     // Default value for logging should be "large enough so that we don't log data"
     // Default rotating control should occur "very long after sim begins"
     double timeInterval = 100.0;
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 	// Somewhere in here we switched right and left?? 
 	tagsToControl.push_back("HR");
 	// rot:
-	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataA_" +
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataA_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
 	startTimeRot = 6.0; // was 8.0
@@ -208,7 +208,7 @@ int main(int argc, char** argv)
 	// Pulling in the left cable shifts robot to the right.
 	tagsToControl.push_back("HL");
 	// rot:
-	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataB_" +
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataB_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
 	startTimeRot = 6.0; // was 8.0
@@ -235,7 +235,7 @@ int main(int argc, char** argv)
 	// pulling on the right cables shifts COM to the left
 	tagsToControl.push_back("HR");
 	// rot:
-	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataC_"+
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataC_"+
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
 	startTimeRot = 6.0; // was 8.0
@@ -262,7 +262,7 @@ int main(int argc, char** argv)
 	// Pulling in the left cable shifts robot to the left.
 	tagsToControl.push_back("HL");
 	// rot:
-	footDataFilePrefix = "~/NTRTsim_logs/LaikaIROS2018MarkerDataD_" +
+	footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataD_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
 	startTimeRot = 6.0; // was 8.0

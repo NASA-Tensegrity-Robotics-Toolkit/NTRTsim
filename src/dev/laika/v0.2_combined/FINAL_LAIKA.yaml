@@ -17,9 +17,10 @@
 # the right) at the distance away of the leg center node.
 # So, in the App, need to make sure the CD feet at at 0 x translation.
 
-# As of 2-26-18, this is the same as the "_m_dropped" model.
+# Use the "IROS" model for the original submission's data,
+# and the "ICRA" model for the corrected simulation.
 substructures:
-  FinalLaikaIROS2018:
-    path: ./LaikaIROS2018Model.yaml
+  FinalLaikaICRA2019:
+    path: ./LaikaICRA2019Model.yaml
     translation: [0, 1.55, 0]
 

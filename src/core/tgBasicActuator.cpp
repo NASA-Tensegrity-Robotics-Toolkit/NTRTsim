@@ -179,7 +179,13 @@ void tgBasicActuator::moveMotors(double dt)
     // Reverse the sign if restLength >= preferredLength
     // Velocity limiter
     double stepSize = m_config.targetVelocity * dt;
-    const double actualLength = m_springCable->getActualLength(); 
+    const double actualLength = m_springCable->getActualLength();
+    //DEBUGGING
+    //std::cout << "stepSize, actualLength: " << stepSize << ", " << actualLength
+    //	      << std::endl;
+
+    //DEBUGGING
+    //std::cout << "PL: " << m_preferredLength << ", ";
     
     // First, change preferred length so we don't go over max tension
     if ((actualLength - m_preferredLength) * stiffness
@@ -187,17 +193,27 @@ void tgBasicActuator::moveMotors(double dt)
     {
         m_preferredLength = actualLength - m_config.maxTens / stiffness;
     }
+
+    //DEBUGGING
+    //std::cout << "PL after tension adjust: " << m_preferredLength << std::endl;
     
     double diff =  m_preferredLength - m_restLength;
     const double fabsDiff = abs(diff);
+    //DEBUGGING
+    //std::cout << "diff, absdiff: " << diff << " " << fabsDiff << std::endl;
     
     /*
      * actualLength must be greater than minActualLength to shorten
      * diff > 0 means can always lengthen.
      */
+    //DEBUGGING
+    //std::cout << "Default params for tgBasicactuator seem to be minActuatlLength "
+    //	      << m_config.minActualLength << std::endl;
     if ((actualLength > m_config.minActualLength) || 
     (diff > 0))
     {
+      //DEBUGGING
+      //std::cout << "Check on minactuallength is true" << std::endl;
         if (abs(diff) > stepSize)
         {      
           m_restLength += (diff/fabsDiff)*stepSize;
@@ -207,17 +223,19 @@ void tgBasicActuator::moveMotors(double dt)
             m_restLength += diff;
         }
     }
+    //DEBUGGING
+    //std::cout << "First change of m_restLength is to: " << m_restLength << std::endl;
     
      m_restLength =
       (m_restLength > m_config.minRestLength) ? m_restLength : m_config.minRestLength;
-     #if (0)
-     std::cout << "RL: " << m_restLength << " M2P RL: " << m_springCable->getRestLength() << std::endl;
-     
-     
-     std::cout  << "RL: " << m_restLength
-     << " Vel: " << (m_restLength  -m_springCable->getRestLength()) / dt 
-     << " prev Vel: " << prevVel
-     << " force " << (actualLength - m_restLength)*stiffness << std::endl;
+#if (0)
+     std::cout << "RL: " << m_restLength << ",  M2P RL: "
+	       << m_springCable->getRestLength() << ",  PL: "
+	       << m_preferredLength << std::endl
+	       << "RL: " << m_restLength
+	       << " Vel: " << (m_restLength  -m_springCable->getRestLength()) / dt 
+	       << " prev Vel: " << prevVel
+	       << " force " << (actualLength - m_restLength)*stiffness << std::endl;
      prevVel = (m_restLength  -m_springCable->getRestLength()) / dt ;
      #endif
      m_springCable->setRestLength(m_restLength);

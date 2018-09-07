@@ -189,15 +189,53 @@ stretch_bottom_m = stretch_bottom_cm * (1/s);
 %k_bottom = 434;
 % for the black lattice material, https://docs.google.com/spreadsheets/d/1vufW-rk9Y2as5zzanuQNYwpHWIGvXa4Yp8Swb1RdZeA/edit#gid=0
 %k_bottom = 515;
-k_else = 244;
+%k_else = 244;
 %k_else = 174; % from some calcs on google drive
 % in N/m.0.
 
-% For ICRA 2018, making the following changes:
+%%%%%% FOR THE ICRA 2019 TESTS:
+% Here are the spring constants for the orange lattice spread out over the
+% range of tests:
+
+%k_else = 216;
+%k_else = 227;
+%k_else = 237;
+%k_else = 248;
+k_else = 258;
+
+% A larger test to see if the foot lift continues to increase
+% monotonically:
+%k_else = 300;
+%k_else = 400;
+
+% For ICRA 2019, making the following changes:
 % 1) The bottom lattice really needs to be a sum of all the lattices there.
 % Even though some went slack, it's going to be best to model it as springs
 % in parallel. That means, 2*244 + 515 = 1003
-k_bottom = 1003;
+%k_bottom = 1003;
+% ...but, now that we're varying the orange lattice material, this is more
+% properly:
+%k_bottom = 2*k_else + 515
+
+% with the corrected data, it seems like it's probably only the black that
+% was in tension (was seen from the model itself), since the spring const
+% for one black element is:
+%k_bottom = 810;
+% at + (1/5) * 1 std dev, spring const would be
+%k_bottom = 941;
+
+% For the two-cables-varying tests, here are all the +/- 2 sigma test
+% points for the black buna-n cable:
+%k_bottom = 547;
+%k_bottom = 678;
+%k_bottom = 810;
+%k_bottom = 941;
+k_bottom = 1073;
+
+% ...but did we really have all 3 in tension? Or was is just two?
+% 244 + 515 = 759
+%k_bottom = 759;
+
 % 2) For the sides, we actually need two different models! One for the
 % actuated side, with the mechanical springs, and one for the unactuated
 % side, with the lattice. From the W.B. Jones #240 spring, 1.07 lbf/in, =
