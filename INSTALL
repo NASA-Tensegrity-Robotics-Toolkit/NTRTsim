@@ -59,6 +59,29 @@ anything.
     libboost-1.53.0-dev, as counterintuitive as that seems. See a known
     issue below about this compilation under Ubuntu 14.04.
 
+  ** Known Issue with GCC/G++ 7 and Ubuntu 18.04 / Debian Stretch **
+
+  - NTRTsim is broken with the newer versions of GNU's C/C++ compilers. A change occurred somewhere 
+    between gcc and g++ 4.8 and version 7 that changed functionality that NTRTsim and/or Bullet 2.82
+    relied upon. A symptom of this error occurs when trying to build (e.g.) the NeuroEvo classes.
+    No known fix allows NTRTsim to be built with these compilers.
+    However, it is possible to install version 4.8 alongside 7 and switch between them.
+    For Ubuntu, as motivated by http://charette.no-ip.com:81/programming/2011-12-24_GCCv47/,
+    the fix is as follows. Please read that link carefully before attempting the fix, to understand what's happening.
+
+    sudo apt-get install g++-4.8
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 40 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+    sudo upate-alternatives --config gcc
+
+    ...and select the 4.8 compiler. You can check which is being used by 
+    ls -lah /usr/bin/g++*
+    ls -lah /etc/alternatives/g++* 
+
+    If you had previously run setup.sh using the 7 series compilers,
+    you must delete all files in env/ and build/ and re-run setup.sh to recompile all
+    libraries with the 4.8 compilers before running bin/build.sh.
+
   ** Running the setup script **
 
   - Ensure that all of the dependencies above are installed before running setup.sh. If

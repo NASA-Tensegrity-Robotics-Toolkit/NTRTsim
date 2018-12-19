@@ -1,6 +1,15 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+12/19/18 - Warning: G++ > 7 Build Failures (Ubuntu 18.04 / Bionic)
+---------
+
+Currently, the simulator depends on functionality that has changed somewhere between gcc/g++ 4.8 and gcc/g++ 7. This problem arises when installing NTRTsim on Ubuntu 18.04 and Debian Stretch, as well as upgrading from Ubuntu 16.04 to 18.04. Errors will arise with (for example) the NeuroEvo classes. No fix that uses g++ 7 is available at this time. 
+
+However, it is possible to install gcc 4.8 anf g++ 4.8 on Ubuntu 18.04, and switch between 4.8 and 7. Instructions in the INSTALL file.
+
+This problem may be related to NTRTsim's/Bullet 2.x's reliance on C++98. 
+
 3/19/15 - Warning: OS X Setup/Build Failures
 ---------
 Currently the simulator is not compiling under OS X. We hope to have this resolved soon. In the meantime if you wish to use the simulator your best bet is to install a Linux VM and install NTRT there. In the near future we hope to include a .vmdk which contains Ubuntu pre-installed with NTRT and supporting tools/libraries -- the INSTALL file will be updated onec that is complete (currently aiming for ~3/22/15).
