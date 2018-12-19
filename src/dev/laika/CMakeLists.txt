@@ -6,4 +6,5 @@ subdirs(
   v0.2_combined
   RotatingVertebra
   laikaWalkingDRL
+  InvKinTests
 )
