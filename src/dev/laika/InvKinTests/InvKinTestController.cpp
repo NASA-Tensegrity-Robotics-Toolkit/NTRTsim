@@ -69,6 +69,16 @@ InvKinTestController::InvKinTestController(double startTime,
   if( m_invkinCSVPath.empty() ){
     throw std::invalid_argument("CSV path not passed in. Must provide a file with inv kin rest lengths.");
   }
+  // If there's a tilde in the file name prefix, replace with the home directory
+  // This copied from tgDataLogger2.
+  if (m_invkinCSVPath.at(0) == '~') {
+    // Get the $HOME environment variable
+    std::string home = std::getenv("HOME");
+    // Remove the tilde (the first element) from the string
+    m_invkinCSVPath.erase(0,1);
+    // Concatenate the home directory.
+    m_invkinCSVPath = home + m_invkinCSVPath;
+  }
   // @TODO: what asserts?
   // Note that unlike in C, we don't need to allocate the maps or vectors.
   // Declaring them creates empty ones for us.

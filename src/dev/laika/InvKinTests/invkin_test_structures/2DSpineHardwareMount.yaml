@@ -1,0 +1,29 @@
+# This is the fixed "vertebra" that's used as a mounting point for the 2D spine hardware test.
+
+# For now, it just uses the frame from MATLAB, *not* centered at the CoM.
+
+# Notes on dimensions:
+# "X" is positive to the left, ugh. We're using NTRT's frame for ease but the visualization looks backwards.
+# ALSO, "Y" positive goes "backward/into the page", not towards the viewer. So, we
+# also switch the right/left from the MATLAB calculations.
+
+# Taken directly from the MATLAB script.
+nodes:
+  bottom: [-0.1778, -0.0826, 0]
+  midbottom: [0, -0.0191, 0]
+  midtop: [0, 0.0191, 0]
+  top: [-0.1778, 0.0826, 0]
+
+pair_groups:
+  mountingRod:
+    - [bottom, midbottom]
+    - [midbottom, midtop]
+    - [midtop, top]
+
+# Zero density = doesn't move.
+builders:
+  mountingRod:
+    class: tgRodInfo
+    parameters:
+      density: 0 # From matlab calculations
+      radius: 0.0064
