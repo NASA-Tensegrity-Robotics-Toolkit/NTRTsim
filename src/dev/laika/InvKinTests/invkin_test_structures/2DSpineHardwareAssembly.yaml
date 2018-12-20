@@ -5,13 +5,16 @@
 # That 1.5 offset is in METERS, not cm.
 # These units are converted from cm into m (SI units.)
 
+# We move the vertebra out by the MATLAB's trajectory's amount,
+# bar_endpoint * (3/4), which is 0.0762
+
 substructures:
   mount:
     path: 2DSpineHardwareMount.yaml
     translation: [0, 3, 0]
   vertebra:
     path: 2DSpineHardwareVertebra.yaml
-    translation: [0, 3, 0]
+    translation: [0.0762, 3, 0]
 
 # Define the cables.
 # HB, HT = horizontal bottom, horizontal top. SB, ST = saddle top, saddle botton.
@@ -49,7 +52,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 248 # used mean for first set of IROS data, 244
-      damping: 10.0
+      damping: 1.0
       pretension: 1.49 # was 1.46 for 244, 1.04 for 174, 0.98 for something else?
       history: 1
       max_tension: 70000.0
@@ -61,7 +64,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 941 # used red lattice mean for first IROS data, 434. 515 for later.
-      damping: 10.0
+      damping: 1.0
       pretension: 14.12 # orig with mean, red, was 6.94. used 7.72 for IROS 2018.
       history: 1
       max_tension: 70000.0
@@ -74,7 +77,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 248 # initial data with 244
-      damping: 10.0
+      damping: 1.0
       pretension: 12.9 # initial data with 12.69. IROS 2018 with 9.05.
       history: 1
       max_tension: 70000.0
@@ -86,7 +89,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 248
-      damping: 10.0
+      damping: 1.0
       pretension: 12.9
       history: 1
       max_tension: 70000.0

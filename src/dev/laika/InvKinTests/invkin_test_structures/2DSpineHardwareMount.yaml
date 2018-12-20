@@ -7,12 +7,14 @@
 # ALSO, "Y" positive goes "backward/into the page", not towards the viewer. So, we
 # also switch the right/left from the MATLAB calculations.
 
+# to-do: why negative switch for second coordinate.
+
 # Taken directly from the MATLAB script.
 nodes:
-  bottom: [-0.1778, -0.0826, 0]
-  midbottom: [0, -0.0191, 0]
-  midtop: [0, 0.0191, 0]
-  top: [-0.1778, 0.0826, 0]
+  bottom: [-0.1778, 0.0826, 0]
+  midbottom: [0, 0.0191, 0]
+  midtop: [0, -0.0191, 0]
+  top: [-0.1778, -0.0826, 0]
 
 pair_groups:
   mountingRod:

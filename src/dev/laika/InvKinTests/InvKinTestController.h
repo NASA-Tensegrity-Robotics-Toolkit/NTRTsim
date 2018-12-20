@@ -41,6 +41,8 @@
 class TensegrityModel;
 // to store references to the cables via a map
 class tgBasicActuator;
+// For pulling out bodies that will be constrained vertical
+class tgTagSearch;
 
 /**
  * A controller to apply a set of inverse kinematics rest lengths as specified by a CSV file.
@@ -87,6 +89,8 @@ private:
    */
   void assignCableInputMap();
   void assignCableTagMap(TensegrityModel& subject);
+  //void addVerticalConstraint(TensegrityModel& subject, const tgTagSearch& tagSearch);
+  void addVerticalConstraint(TensegrityModel& subject, std::string tag);
 	
   /**
    * The private variables for each of the values passed in to the constructor.
