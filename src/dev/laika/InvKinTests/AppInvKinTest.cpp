@@ -143,13 +143,15 @@ int main(int argc, char** argv)
     // (a) a start time, after the simulation. Used for the structure to settle into place.
     // (b) hold time. Number of seconds after start time to apply the first input in the CSV file.
     //      This is for the structure to settle into its "starting point" for the control.
-    // (c) the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
+    // (c) period. How often to advance to the next control input. This is kinda like the control frequency in a ZOH sense. In sec.
+    // (d) the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
     double startTime = 0.0;
     double holdTime = 0.0;
+    double period = 0.1;
 
     // Create the controller.
     InvKinTestController* const controller = new InvKinTestController(startTime, 
-        holdTime, invkinCSVPath);
+        holdTime, period, invkinCSVPath);
 
     // attach to the model
     myModel->attach(controller);

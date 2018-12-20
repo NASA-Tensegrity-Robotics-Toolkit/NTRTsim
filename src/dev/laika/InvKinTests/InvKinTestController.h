@@ -54,9 +54,10 @@ public:
    * @param[in] startTime, a start time, after the simulation. Used for the structure to settle into place.
    * @param[in] holdTime, Number of seconds after start time to apply the first input in the CSV file.
    *     This is for the structure to settle into its "starting point" for the control.
+   * @param[in] period, the amount of time between switching from one control input to the next. 1/frequency.
    * @param[in] invkinCSVPath the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
    */
-  InvKinTestController(double startTime, double holdTime, std::string invkinCSVPath);
+  InvKinTestController(double startTime, double holdTime, double period, std::string invkinCSVPath);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -75,12 +76,20 @@ public:
   virtual void onStep(TensegrityModel& subject, double dt);
     
 private:
+
+  // A function (thanks to stackoverflow) to make the CSV file parsing easier.
+  std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& str);
+  /**
+   * A series of helper functions to set up the controller.
+   */
+  void assignCableInputMap();
 	
   /**
    * The private variables for each of the values passed in to the constructor.
    */
   double m_startTime;
   double m_holdTime;
+  double m_period;
   std::string m_invkinCSVPath;
 
   /**
@@ -88,11 +97,9 @@ private:
    * cableTagMap, a map from tag to the corresponding cable (pointer). For ease.
    * cableInputMap, a map from tag to the corresponding vector of rest lengths to apply.
    *  These are read from the CSV. A tag is a string.
-   * times, a std::vector<double> of the number of seconds from holdTime at which to apply the control.
    */
   std::map<std::string, tgBasicActuator*> cableTagMap;
   std::map<std::string, std::vector<double> > cableInputMap;
-  std::vector<double> times;
 
   /**
    * Need an accumulator variable to determine what behavior to do (start, hold, etc.)
