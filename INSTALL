@@ -61,26 +61,48 @@ anything.
 
   ** Known Issue with GCC/G++ 7 and Ubuntu 18.04 / Debian Stretch **
 
-  - NTRTsim is broken with the newer versions of GNU's C/C++ compilers. A change occurred somewhere 
-    between gcc and g++ 4.8 and version 7 that changed functionality that NTRTsim and/or Bullet 2.82
-    relied upon. A symptom of this error occurs when trying to build (e.g.) the NeuroEvo classes.
-    No known fix allows NTRTsim to be built with these compilers.
-    However, it is possible to install version 4.8 alongside 7 and switch between them.
-    For Ubuntu, as motivated by http://charette.no-ip.com:81/programming/2011-12-24_GCCv47/,
-    the fix is as follows. Please read that link carefully before attempting the fix, to understand what's happening.
+ - NTRTsim is broken with the newer versions of GNU's C/C++ compilers. A change occurred somewhere
+   between gcc and g++ 4.8 and version 7 that changed functionality that NTRTsim and/or Bullet 2.82
+   relied upon. A symptom of this error occurs when trying to build (e.g.) the NeuroEvo classes.
+   No known fix allows NTRTsim to be built with these compilers.
+   However, it is possible to install version 4.8 alongside 7 and switch between them.
 
-    sudo apt-get install g++-4.8
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 40 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-    sudo upate-alternatives --config gcc
+   As motivated by http://charette.no-ip.com:81/programming/2011-12-24_GCCv47/,
+   the fix is as follows. Please read that link carefully before attempting the fix, to understand what's happening.
 
-    ...and select the 4.8 compiler. You can check which is being used by 
-    ls -lah /usr/bin/g++*
-    ls -lah /etc/alternatives/g++* 
+   * For Ubuntu:
 
-    If you had previously run setup.sh using the 7 series compilers,
-    you must delete all files in env/ and build/ and re-run setup.sh to recompile all
-    libraries with the 4.8 compilers before running bin/build.sh.
+   sudo apt-get install g++-4.8
+   sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+   sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 40 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+   sudo upate-alternatives --config gcc
+
+   ...and select the 4.8 compiler. You can check which is being used by
+   ls -lah /usr/bin/g++*
+   ls -lah /etc/alternatives/g++*
+
+   * For Debian:
+
+   In the /etc/apt/sources.list, please include the following lines:
+
+   deb http://ftp.us.debian.org/debian/ jessie main contrib non-free
+   deb-src http://ftp.us.debian.org/debian/ jessie main contrib non-free
+
+   Do apt-get update && apt-get install g++-4.8
+   Comment out or remove the two jessie lines in sources.list
+
+   sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+   sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 40 --slave /usr/bin/g++ g++ /usr/bin/g++-6
+   sudo upate-alternatives --config gcc
+
+   ...and select the 4.8 compiler. You can check which is being used by
+   ls -lah /usr/bin/g++*
+   ls -lah /etc/alternatives/g++*
+
+
+   If you had previously run setup.sh using the 7 series compilers,
+   you must delete all files in env/ and build/ and re-run setup.sh to recompile all libraries with the 4.8 compilers before running bin/build.sh.
+
 
   ** Running the setup script **
 
@@ -102,9 +124,9 @@ anything.
 
   - Run setup.sh. (sh setup.sh or bash setup.sh)
 
-  - The setup.sh script may be run multiple times without hurting anything. 
+  - The setup.sh script may be run multiple times if it fails without hurting anything. 
 
-  - To build the the src tree, run bin/build.sh 
+  - To build the the src tree, run bin/build.sh (may be run multiple times if failling is encounter)
 
     The resulting executables will be located under the 'build' folder.
 
