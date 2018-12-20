@@ -103,7 +103,7 @@ void InvKinTestController::onSetup(TensegrityModel& subject)
   // (a) get the list of tags and store the rest length inputs in their map
   // (b) assign the map of cables.
   InvKinTestController::assignCableInputMap();
-  // InvKinTestController::assignCableTagMap(subject);
+  InvKinTestController::assignCableTagMap(subject);
 
   // Do some checks:
   // (1) neither result is empty
@@ -210,6 +210,30 @@ void InvKinTestController::assignCableInputMap()
   }
   //debugging
   std::cout << "InvKin CSV file read into memory." << std::endl;
+}
+
+// This helper picks out the pointers to the actuators.
+void InvKinTestController::assignCableTagMap(TensegrityModel& subject) {
+  // Iterate through the known cables that we need to control
+  // It's important that this is called AFTER assignCableInputMap,
+  // so that we can use the tags pulled out of the CSV file.
+  std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
+  while(it != cableInputMap.end()) {
+    // The tag here is
+    std::string tag = it->first;
+    //debugging
+    std::cout << "Finding cables with tag: " << tag << std::endl;
+    // Pick out the actuators with the specified tag
+    std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
+    // There should be exactly one cable here. If not throw an error.
+    if( foundActuators.size() != 1 ) {
+      throw std::runtime_error("Incorrect number of cables with tag " + tag );
+    }
+    // Store that one and only cable in the map.
+    cableTagMap[tag] = foundActuators[0];
+    // increment to the next cable tag
+    it++;
+  }
 }
 
 // The function to help parse the CSV file. Credit goes to StackOverflow's Martin York.

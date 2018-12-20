@@ -79,10 +79,14 @@ private:
 
   // A function (thanks to stackoverflow) to make the CSV file parsing easier.
   std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& str);
+
   /**
    * A series of helper functions to set up the controller.
+   * Important: cassignCableInputMap must be called before assignCableTagMap,
+   * so that cableInputMap is populated with the tags of the cables to search for.
    */
   void assignCableInputMap();
+  void assignCableTagMap(TensegrityModel& subject);
 	
   /**
    * The private variables for each of the values passed in to the constructor.
