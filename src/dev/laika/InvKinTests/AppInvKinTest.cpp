@@ -30,6 +30,7 @@
 //#include "CombinedSpineControllerBending.h"
 //#include "CombinedSpineControllerRotVertPositionTraj.h"
 #include "InvKinTestController.h"
+#include "VertConstraintForModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -155,6 +156,19 @@ int main(int argc, char** argv)
 
     // attach to the model
     myModel->attach(controller);
+
+    // Similarly, add a vertical constraint.
+    // Right now this is an observer which is meh since there's no need for an onStep function,
+    // but this was the most flexible implementation I could think of.
+    // These CANNOT be the tags of the body in an assembly: must be the tags for the individual
+    // elements within a YAML file that supplies the builder. E.g., not "vertebra" but "tetraRod."
+
+    // create the observer
+    // can use either constructor. But for now there's only one body so no need for a list.
+    VertConstraintForModel* const constrainer = new VertConstraintForModel("tetraRod");
+
+    // and attach it too.
+    myModel->attach(constrainer);
 
     // Add the model to the world
     simulation.addModel(myModel);    

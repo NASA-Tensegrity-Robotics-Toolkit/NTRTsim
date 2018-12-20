@@ -106,11 +106,6 @@ void InvKinTestController::onSetup(TensegrityModel& subject)
   // (b) assign the map of cables.
   assignCableInputMap();
   assignCableTagMap(subject);
-  // One additional call, for 2D motion:
-  // Set all nonzero-density bodies to be constrained in the vertical plane.
-  // These CANNOT be the tags of the body in an assembly: must be the tags for the individual
-  // elements within a YAML file that supplies the builder. E.g., not "vertebra" but "tetraRod."
-  addVerticalConstraint(subject, "tetraRod");
 
   // Do some checks:
   // (1) neither result is empty
@@ -240,33 +235,6 @@ void InvKinTestController::assignCableTagMap(TensegrityModel& subject) {
     cableTagMap[tag] = foundActuators[0];
     // increment to the next cable tag
     it++;
-  }
-}
-
-// The vertical constraint.
-void InvKinTestController::addVerticalConstraint(TensegrityModel& subject, std::string tag) { //const tgTagSearch& tagSearch) {
-  //debugging
-  //std::vector<tgModel*> descendants = subject.getDescendants();
-  // for( std::vector<tgModel*>::iterator it = descendants.begin(); it != descendants.end(); ++it) {
-  //   std::cout << "Descendant has tags " << (*it)->getTags() << std::endl;
-  // }
-  // std::vector<tgBaseRigid*> testFind = subject.find<tgBaseRigid>("tetraRod");
-  // for( std::vector<tgBaseRigid*>::iterator it = testFind.begin(); it != testFind.end(); ++it) {
-  //   std::cout << "Descendant has tags " << (*it)->getTags() << std::endl;
-  // }
-  // Get the bodies with these tags.
-  // Must be base rigids so that mass is a thing.
-  std::vector<tgBaseRigid*> foundBodies = subject.find<tgBaseRigid>(tag);
-  //std::vector<tgRod*> foundBodies = subject.find<tgRod>(tag);
-  // debugging
-  //std::cout << "Searching through a body with tags " << subject.getTags() << std::endl; // << " for a tag " << tagSearch << std::endl;
-  // For all these, add the vertical "constraint."
-  for(std::vector<tgBaseRigid*>::iterator it = foundBodies.begin(); it != foundBodies.end(); ++it) {
-    tgBaseRigid* currentBody = *it;
-    //tgRod* currentBody = *it;
-    //debugging
-    std::cout << "Found a body with tags " << currentBody->getTags() << std::endl;
-    currentBody->getPRigidBody()->setLinearFactor(btVector3(1,1,0));
   }
 }
 

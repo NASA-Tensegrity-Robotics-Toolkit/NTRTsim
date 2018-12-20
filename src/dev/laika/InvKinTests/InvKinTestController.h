@@ -89,8 +89,6 @@ private:
    */
   void assignCableInputMap();
   void assignCableTagMap(TensegrityModel& subject);
-  //void addVerticalConstraint(TensegrityModel& subject, const tgTagSearch& tagSearch);
-  void addVerticalConstraint(TensegrityModel& subject, std::string tag);
 	
   /**
    * The private variables for each of the values passed in to the constructor.

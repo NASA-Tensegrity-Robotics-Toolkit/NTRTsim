@@ -16,6 +16,7 @@ link_libraries(core
 add_executable(AppInvKinTest
 	AppInvKinTest.cpp
 	InvKinTestController.cpp
+     VertConstraintForModel.cpp
 #  CombinedSpineControllerRotVertPositionTraj.cpp
 #  CombinedSpineControllerBending.cpp
 #  AppLaikaCombinedMotion.cpp
