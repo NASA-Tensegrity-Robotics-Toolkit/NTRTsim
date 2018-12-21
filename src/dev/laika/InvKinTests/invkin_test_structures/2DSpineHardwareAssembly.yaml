@@ -58,6 +58,8 @@ builders:
       target_velocity: 0.1
       min_actual_length: 0.0
       min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
 
   HT:
     class: tgBasicActuatorInfo
@@ -70,6 +72,8 @@ builders:
       target_velocity: 0.2
       min_actual_length: 0.0
       min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
 
   # Saddle cables:
   SB:
@@ -83,6 +87,8 @@ builders:
       target_velocity: 0.1
       min_actual_length: 0.0
       min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
       
   ST:
     class: tgBasicActuatorInfo
@@ -95,3 +101,5 @@ builders:
       target_velocity: 0.1
       min_rest_length: 0.0
       min_actual_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
