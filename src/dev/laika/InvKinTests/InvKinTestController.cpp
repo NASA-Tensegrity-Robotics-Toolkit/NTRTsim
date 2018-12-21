@@ -60,15 +60,16 @@ InvKinTestController::InvKinTestController(double startTime,
   m_holdTime(holdTime),
   m_period(period),
   m_invkinCSVPath(invkinCSVPath),
-  m_timePassed(0.0)
+  m_timePassed(0.0),
+  m_timeSinceLastInput(0.0)
 {
   // start time must be greater than or equal to zero
   if( m_startTime < 0.0 ) {
     throw std::invalid_argument("Start time must be greater than or equal to zero.");
   }
-  // hold time must be greater than or equal to start time
-  if( m_holdTime < m_startTime ) {
-    throw std::invalid_argument("Hold time must be greater than or equal to start time.");
+  // hold time must be greater than or equal to zero.
+  if( m_holdTime < 0.0 ) {
+    throw std::invalid_argument("Hold time must be greater than or equal to zero.");
   }
   // the period needs to be nonzero and positive.
   if( m_period <= 0.0 ) {
@@ -124,12 +125,36 @@ void InvKinTestController::onStep(TensegrityModel& subject, double dt)
   m_timePassed += dt;
   // Then, check which action to perform:
   if( m_timePassed > m_startTime ) {
-    if(m_timePassed > m_holdTime) {
+    // the hold time is in addition to start time.
+    if(m_timePassed > (m_startTime + m_holdTime)) {
       // Apply the control input at the point
 
     }
     else {
       // Apply the first control input
+      //debugging
+      std::cout << "Current and applied rest lengths are: " << std::endl;
+      // Iterate over the map of inputs
+      std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
+      while(it != cableInputMap.end()) {
+        // The tag here is
+        std::string tag = it->first;
+        // Get the pointer to the correct cable
+        tgBasicActuator* ithCable = cableTagMap[tag];
+        //debugging
+        std::cout << ithCable->getRestLength() << ", ";
+        // And the first input in the list of controls
+        double ithRestLength = cableInputMap[tag][0];
+        // Apply the rest length.
+        // To-do: figure out why we need to call the version with dt here.
+        // Some design decision was made long ago that may not make sense anymore...
+        ithCable->setControlInput(ithRestLength, dt);
+        //debugging
+        std::cout << ithRestLength << " " << std::endl;
+        // increment to the next tag (next cable).
+        it++;
+      }
+      std::cout << std::endl;
     }
   }
   // else, do nothing.

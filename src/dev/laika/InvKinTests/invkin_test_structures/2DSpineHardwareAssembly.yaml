@@ -43,55 +43,55 @@ bond_groups:
 
 # Define the cable parameters
 # The spring constants are in N/m, as converted in MATLAB inv kin script.
-# TO-DO: PUT ALL IN HERE. The pretension should be from inv kin.
 
 builders:
 
   # Horizontal cables:
-  HT:
-    class: tgBasicActuatorInfo
-    parameters:
-      stiffness: 248 # used mean for first set of IROS data, 244
-      damping: 1.0
-      pretension: 1.49 # was 1.46 for 244, 1.04 for 174, 0.98 for something else?
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
-      min_actual_length: 0.0
-      min_rest_length: 0.0
-
   HB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 941 # used red lattice mean for first IROS data, 434. 515 for later.
-      damping: 1.0
-      pretension: 14.12 # orig with mean, red, was 6.94. used 7.72 for IROS 2018.
+      stiffness: 838.9
+      damping: 10.0
+      pretension: 0.06773
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 0.1
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  HT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 838.9
+      damping: 10.0
+      pretension: 2.6292
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.2
       min_actual_length: 0.0
       min_rest_length: 0.0
 
   # Saddle cables:
-  ST:
-    class: tgBasicActuatorInfo
-    parameters:
-      stiffness: 248 # initial data with 244
-      damping: 1.0
-      pretension: 12.9 # initial data with 12.69. IROS 2018 with 9.05.
-      history: 1
-      max_tension: 70000.0
-      target_velocity: 12.0
-      min_actual_length: 0.0
-      min_rest_length: 0.0
-      
   SB:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 248
-      damping: 1.0
-      pretension: 12.9
+      stiffness: 4448.2
+      damping: 10.0
+      pretension: 6.0849
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 0.1
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      
+  ST:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 4448.2
+      damping: 10.0
+      pretension: 0.67716
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.1
+      min_rest_length: 0.0
       min_actual_length: 0.0

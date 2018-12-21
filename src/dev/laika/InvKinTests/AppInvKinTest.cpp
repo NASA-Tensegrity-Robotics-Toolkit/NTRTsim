@@ -134,7 +134,8 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
     // second argument.
-    TensegrityModel* const myModel = new TensegrityModel(modelPath,true);
+    //TensegrityModel* const myModel = new TensegrityModel(modelPath,true);
+    TensegrityModel* const myModel = new TensegrityModel(modelPath, false);
     
 
     // For the inverse kinematics test, we're doing all the parsing of the 
@@ -146,8 +147,8 @@ int main(int argc, char** argv)
     //      This is for the structure to settle into its "starting point" for the control.
     // (c) period. How often to advance to the next control input. This is kinda like the control frequency in a ZOH sense. In sec.
     // (d) the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
-    double startTime = 0.0;
-    double holdTime = 0.0;
+    double startTime = 5.0;
+    double holdTime = 5.0;
     double period = 0.1;
 
     // Create the controller.

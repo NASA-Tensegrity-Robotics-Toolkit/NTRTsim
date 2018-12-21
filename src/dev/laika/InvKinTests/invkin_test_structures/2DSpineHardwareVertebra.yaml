@@ -22,10 +22,12 @@ pair_groups:
     - [center, ytop]
     - [center, ybottom]
 
-# TO-DO: calculate density here. Should total to 0.495 kg.
+# Some densities:
+# With r = 0.015, d = 1832.
+# With r = 0.005, d = 16495
 builders:
   tetraRod:
     class: tgRodInfo
     parameters:
-      density: 2423 # From matlab calculations
-      radius: 0.0064
+      density: 16495 # From matlab calculations
+      radius: 0.015 # A 1.5cm diamater rod seems fine. Was 0.0064

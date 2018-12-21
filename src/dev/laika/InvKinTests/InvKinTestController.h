@@ -109,8 +109,10 @@ private:
 
   /**
    * Need an accumulator variable to determine what behavior to do (start, hold, etc.)
+   * and another to count time between inputs.
    */
   double m_timePassed;
+  double m_timeSinceLastInput;
 
 };
 
