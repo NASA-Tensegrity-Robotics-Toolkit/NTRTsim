@@ -71,6 +71,12 @@ public:
    * @param[in] subject - the TensegrityModel that is being controlled.
    */
   virtual void onSetup(TensegrityModel& subject);
+
+  /**
+   * Some cleanup for reset.
+   * @param[in] subject - the TensegrityModel. Not used since the controller only resets itself and nothing else.
+   */
+  virtual void onTeardown(TensegrityModel& subject);
     
   /**
    * Apply the appropriate rest length to each cable.

@@ -115,6 +115,20 @@ void InvKinTestController::onSetup(TensegrityModel& subject)
   // (2) there are no null pointers in either map
 }
 
+// The teardown just resets everything in the controller.
+void InvKinTestController::onTeardown(TensegrityModel& subject)
+{
+  // The values passed in to the constructor stay, but everything that's initialized there,
+  // done in onSetup, and onStep, is reset.
+  m_timeSinceLastInput = 0.0;
+  m_inputIndex = 0;
+  m_timePassed = 0.0;
+  m_numInputs = 0;
+  // the maps
+  cableInputMap.clear();
+  cableTagMap.clear();
+}
+
 /**
  * The onStep method does one of the following things:
  * If between time zero and startTime: no change to rest length (the defaults from the YAML file are used.)
