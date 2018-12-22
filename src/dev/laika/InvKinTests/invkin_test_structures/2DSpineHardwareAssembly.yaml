@@ -51,7 +51,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 838.9
-      damping: 10.0
+      damping: 80.0
       pretension: 0.06773
       history: 1
       max_tension: 70000.0
@@ -65,7 +65,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 838.9
-      damping: 10.0
+      damping: 80.0
       pretension: 2.6292
       history: 1
       max_tension: 70000.0
@@ -80,7 +80,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 4448.2
-      damping: 10.0
+      damping: 400.0
       pretension: 6.0849
       history: 1
       max_tension: 70000.0
@@ -94,7 +94,7 @@ builders:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 4448.2
-      damping: 10.0
+      damping: 400.0
       pretension: 0.67716
       history: 1
       max_tension: 70000.0

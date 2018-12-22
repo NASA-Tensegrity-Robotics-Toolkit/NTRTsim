@@ -149,7 +149,7 @@ int main(int argc, char** argv)
     // (d) the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
     double startTime = 5.0;
     double holdTime = 5.0;
-    double period = 0.1;
+    double period = 1;
 
     // Create the controller.
     InvKinTestController* const controller = new InvKinTestController(startTime, 

@@ -89,6 +89,10 @@ private:
    */
   void assignCableInputMap();
   void assignCableTagMap(TensegrityModel& subject);
+
+  // A helper that applies a specifically-indexed control input.
+  // This is for code re-use in the onStep function.
+  void applyIthControlInput(int i, double dt);
 	
   /**
    * The private variables for each of the values passed in to the constructor.
@@ -108,11 +112,19 @@ private:
   std::map<std::string, std::vector<double> > cableInputMap;
 
   /**
-   * Need an accumulator variable to determine what behavior to do (start, hold, etc.)
-   * and another to count time between inputs.
+   * Need an accumulator variable to determine what behavior to do (start, hold, etc.).
+   * Also, and another to count time between inputs,
+   * and an index variable into the input list. We could technically do something with timestamps
+   * and searching for the "right" input every time, but as long as the simulation timestep is small,
+   * it's close enough to just apply the "next" input at every period as opposed to searching for the one
+   * that's technically correct given the overall time (since m_startTime + m_holdTime.)
    */
   double m_timePassed;
   double m_timeSinceLastInput;
+  int m_inputIndex;
+  // Also, it's useful to record the number of inputs we expect to apply.
+  // This way we don't have to roundabout query the first element of cableInputMap for its size.
+  int m_numInputs;
 
 };
 

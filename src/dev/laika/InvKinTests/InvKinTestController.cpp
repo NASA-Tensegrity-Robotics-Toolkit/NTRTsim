@@ -61,7 +61,9 @@ InvKinTestController::InvKinTestController(double startTime,
   m_period(period),
   m_invkinCSVPath(invkinCSVPath),
   m_timePassed(0.0),
-  m_timeSinceLastInput(0.0)
+  m_timeSinceLastInput(0.0),
+  m_inputIndex(0),
+  m_numInputs(0)
 {
   // start time must be greater than or equal to zero
   if( m_startTime < 0.0 ) {
@@ -125,39 +127,65 @@ void InvKinTestController::onStep(TensegrityModel& subject, double dt)
   m_timePassed += dt;
   // Then, check which action to perform:
   if( m_timePassed > m_startTime ) {
+    // Do *something*. Either the initial hold, or actually iterate through the list of inputs.
     // the hold time is in addition to start time.
     if(m_timePassed > (m_startTime + m_holdTime)) {
-      // Apply the control input at the point
+      // We now count the period for the actual control loop.
+      // This is a bit off from a zero order hold implementation. What we do here is:
+      // At 0 <= m_timeSinceLastInput < m_period, no change in the input. Iterate to next if m_timeSinceLastInput > period.
+      // Since we've enforced that m_holdTime > 0, the "first" input is already being applied when
+      // this loop runs for the first time, so we don't need to worry, just start counting towards the next input.
 
+      // Increment the timing conter
+      m_timeSinceLastInput += dt;
+      // If appropriate, increment the index into the inputs
+      // Two checks: 
+      // (1) if the timer has fired for the input to change, 
+      // (2) if we haven't fallen off the end of the list. Note that we correct for C's zero-indexing.
+      //if( (m_timeSinceLastInput > m_period) && (m_inputIndex < (cableInputMap.size()-1)) ) {
+      if( (m_timeSinceLastInput > m_period) && (m_inputIndex < (m_numInputs-1)) ) {
+        // Advance to the next input in the list
+        m_inputIndex++;
+        // and reset the counter.
+        m_timeSinceLastInput = 0.0;
+      }
+      // Finally, apply the resulting input.
+      applyIthControlInput(m_inputIndex, dt);
     }
     else {
-      // Apply the first control input
-      //debugging
-      std::cout << "Current and applied rest lengths are: " << std::endl;
-      // Iterate over the map of inputs
-      std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
-      while(it != cableInputMap.end()) {
-        // The tag here is
-        std::string tag = it->first;
-        // Get the pointer to the correct cable
-        tgBasicActuator* ithCable = cableTagMap[tag];
-        //debugging
-        std::cout << ithCable->getRestLength() << ", ";
-        // And the first input in the list of controls
-        double ithRestLength = cableInputMap[tag][0];
-        // Apply the rest length.
-        // To-do: figure out why we need to call the version with dt here.
-        // Some design decision was made long ago that may not make sense anymore...
-        ithCable->setControlInput(ithRestLength, dt);
-        //debugging
-        std::cout << ithRestLength << " " << std::endl;
-        // increment to the next tag (next cable).
-        it++;
-      }
-      std::cout << std::endl;
+      // // Apply the first control input
+      applyIthControlInput(0, dt);
     }
   }
   // else, do nothing.
+}
+
+// Implementation of the helper to onStep.
+void InvKinTestController::applyIthControlInput(int i, double dt)
+{
+  //debugging
+  std::cout << "At input number " << i << ", current and applied rest lengths are: " << std::endl;
+  // Iterate over the map of inputs
+  std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
+  while(it != cableInputMap.end()) {
+    // The tag here is
+    std::string tag = it->first;
+    // Get the pointer to the correct cable
+    tgBasicActuator* currentCable = cableTagMap[tag];
+    //debugging
+    std::cout << currentCable->getRestLength() << ", ";
+    // And the i-th input in the list of controls
+    double currentRestLength = cableInputMap[tag][i];
+    // Apply the rest length.
+    // To-do: figure out why we need to call the version with dt here.
+    // Some design decision was made long ago that may not make sense anymore...
+    currentCable->setControlInput(currentRestLength, dt);
+    //debugging
+    std::cout << currentRestLength << " " << std::endl;
+    // increment to the next tag (next cable).
+    it++;
+  }
+  std::cout << std::endl;
 }
 
 // Implementations of the helpers.
@@ -235,6 +263,11 @@ void InvKinTestController::assignCableInputMap()
     // Advance one row.
     row = getNextLineAndSplitIntoTokens(csvFile);
   }
+  // Here, query the map for the size of the first array of inputs.
+  // That's the number of timesteps we expect for the control.
+  std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
+  // iterator now points to the first pair. "second" is the list of inputs for the first key, value pair.
+  m_numInputs = it->second.size();
   //debugging
   std::cout << "InvKin CSV file read into memory." << std::endl;
 }
