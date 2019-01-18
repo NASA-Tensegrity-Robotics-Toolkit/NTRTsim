@@ -148,14 +148,18 @@ tgRigidInfo* tgRigidAutoCompound::createCompound(std::deque<tgRigidInfo*> rigids
     // Add an additional tag to this compound rigid info.
     // This is of the form "compound_3qhA8L" for example.
     std::stringstream newtag;
-    newtag << "compound_" << random_tag_hash();
+    newtag << "compound_" << randomTagHash();
+    //DEBUGGING
+    std::cout << "Created tag in tgRigidAutoCompound: " << std::endl;
+    std::cout << newtag.str() << std::endl;
     for(int i = 0; i < rigids.size(); i++) {
       //ERROR: first, this random tag hash is not re-seeded,
       // so the tags aren't random, and get re-applied to
       // different compounds. Second, this seems to mess with
       // the data manager / sensors. So, remove it and see
       // if tags don't get crossed up.
-      //rigids[i]->addTags(newtag.str());
+      // 2018-01-16: It seems to be random now?? Maybe Drew was just being careless before.
+      rigids[i]->addTags(newtag.str());
       c->addRigid(*rigids[i]);
     }
     return (tgRigidInfo*)c;
@@ -170,7 +174,7 @@ bool tgRigidAutoCompound::rigidBelongsIn(tgRigidInfo* rigid, std::deque<tgRigidI
     return false;
 };
 
-std::string tgRigidAutoCompound::random_tag_hash() {
+std::string tgRigidAutoCompound::randomTagHash() {
   /**
    * Many thanks to StackOverflow users Ates Goral and Mehrdad Afshari
    * for a framework for this function.
@@ -187,10 +191,14 @@ std::string tgRigidAutoCompound::random_tag_hash() {
   boost::random::random_device rng;
 
   // A constant variable for the chracters that will be chosen from
+  // FIX on 2019-01-16: We can't include "0" in this list, because then
+  // the string terminates early!!! That's why the tag appeared to have
+  // varying lengths at random times. Since this does not effect the intended
+  // result, the 0 was just removed.
   static const char alphanum[] =
-    "0123456789"
+    "123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "0123456789"
+    "123456789"
     "abcdefghijklmnopqrstuvwxyz";
 
   // A uniform distribution over the indices into the character array
@@ -206,6 +214,10 @@ std::string tgRigidAutoCompound::random_tag_hash() {
 
   // set the string termination character
   s[length] = 0;
+
+  //DEBUGGING
+  std::cout << "Inside randomTagHash, created tag: " << std::endl;
+  std::cout << s << std::endl;
 
   // Returning a character array is the same as returning a string.
   return s;

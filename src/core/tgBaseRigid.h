@@ -79,7 +79,7 @@ public:
     }
 
     /**
-     * Return the rod's orientation in Euler angles.
+     * Return the rod's orientation in YPR Euler angles, units of radians.
      * @return 3-vector of these euler angles
      */
     virtual btVector3 orientation() const;

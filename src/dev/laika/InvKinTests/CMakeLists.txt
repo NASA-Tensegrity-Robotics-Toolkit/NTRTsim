@@ -8,7 +8,7 @@ link_libraries(core
                tgOpenGLSupport
                yaml-cpp
                Adapters
-	            TensegrityModel)
+               TensegrityModel)
 
 # add_library(TensegrityModel
 #     TensegrityModel.cpp)

@@ -81,17 +81,15 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
 
     }
     //DEBUGGING
-    /*
-    std::cout << "Inside tgCompoundRigidInfo::createCompoundShape, created a "
-	      << "btCollisionShape (btCompoundShape) with "
-	      << m_compoundShape->getNumChildShapes() << " shapes," << std::endl
-	      << " with transforms that have origins: " << std::endl;
-    for(int i=0; i < m_compoundShape->getNumChildShapes(); i++){
-      std:: cout << *(m_compoundShape->getChildTransform(i).getOrigin())
-		 << ", ";
-    }
-    std::cout << std::endl;
-    */
+   //  std::cout << "Inside tgCompoundRigidInfo::createCompoundShape, created a "
+	  //     << "btCollisionShape (btCompoundShape) with "
+	  //     << m_compoundShape->getNumChildShapes() << " shapes," << std::endl
+	  //     << " with transforms that have origins: " << std::endl;
+   //  for(int i=0; i < m_compoundShape->getNumChildShapes(); i++){
+   //    std:: cout << *(m_compoundShape->getChildTransform(i).getOrigin())
+		 // << ", ";
+   //  }
+   //  std::cout << std::endl;
     return m_compoundShape;
 }
 

@@ -90,7 +90,7 @@ protected:
      * This function generates a 6-digit alphanumeric hash.
      * @return a 6-character string of random alphanumberic characters.
      */
-    std::string random_tag_hash();
+    std::string randomTagHash();
     
     // Doesn't look like we own these
     std::deque<tgRigidInfo*> m_rigids;

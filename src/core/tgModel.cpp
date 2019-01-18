@@ -201,32 +201,32 @@ std::vector<tgSenseable*> tgModel::getSenseableDescendants() const
   // The getMarkers method returns an alias... ?
   // Let's do the following, manually. Let's make a list of pointers
   // to each marker, and pass those pointers into the returned vector.
-  std::vector<tgSenseable*> pointersToMarkers;
-  std::vector<abstractMarker> myMarkers = getMarkers();
-  for( size_t k=0; k < myMarkers.size(); k++) {
-    std::cout << "Converting marker pointer..." << std::endl;
-    tgSenseable* currentMarkerPointer = &(myMarkers[k]);
-    pointersToMarkers.push_back(currentMarkerPointer);
-    //DEBUGGING
-    std::cout << "Pushed back pointer: " << currentMarkerPointer << std::endl;
-  }
-  for (size_t j=0; j < pointersToMarkers.size(); j++) {
-    mySenseableDescendants.push_back(pointersToMarkers[j]);
-    //mySenseableDescendants.push_back(&(myMarkers[j]));
-  }
+  // std::vector<tgSenseable*> pointersToMarkers;
+  // std::vector<abstractMarker> myMarkers = getMarkers();
+  // for( size_t k=0; k < myMarkers.size(); k++) {
+  //   std::cout << "Converting marker pointer..." << std::endl;
+  //   tgSenseable* currentMarkerPointer = &(myMarkers[k]);
+  //   pointersToMarkers.push_back(currentMarkerPointer);
+  //   //DEBUGGING
+  //   std::cout << "Pushed back pointer: " << currentMarkerPointer << std::endl;
+  // }
+  // for (size_t j=0; j < pointersToMarkers.size(); j++) {
+  //   mySenseableDescendants.push_back(pointersToMarkers[j]);
+  //   //mySenseableDescendants.push_back(&(myMarkers[j]));
+  // }
 
   //DEBUGGING
   std::cout << "Inside tgModel, called getSenseableDescendants, and "
-	    << "we are returning a list with the following: " << std::endl;
+	    << "we are returning a list with the following results: " << std::endl;
   std::cout << "Number of model descendants was " << myDescendants.size()
-	    << " and number of markers was " << myMarkers.size()
+	    // << " and number of markers was " << myMarkers.size()
 	    << " and total number of senseable descendants was "
-	    << mySenseableDescendants.size() 
-	    << ", color of marker(s) were: " << std::endl;
+	    << mySenseableDescendants.size() << std::endl;
+	    // << ", color of marker(s) were: " << std::endl;
   //for (size_t k = myDescendants.size(); k < mySenseableDescendants.size(); k++) {
   //  std::cout << mySenseableDescendants[k]->getSenseableDescendants() << std::endl;
   //}
-  std::cout << "executed successfully." << std::endl;
+  // std::cout << "executed successfully." << std::endl;
   return mySenseableDescendants;
 }
 

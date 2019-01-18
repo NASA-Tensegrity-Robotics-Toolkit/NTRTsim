@@ -42,6 +42,7 @@
 // For tracking positions:
 #include "sensors/tgDataLogger2.h"
 #include "sensors/tgSphereSensorInfo.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
 //#include "sensors/abstractMarkerSensorInfo.h"
 // Correlating positions to cable lengths.
 #include "sensors/tgSpringCableActuatorSensorInfo.h"
@@ -134,8 +135,8 @@ int main(int argc, char** argv)
     // create the models with their controllers and add the models to the simulation
     // This constructor for TensegrityModel takes the 'debugging' flag as the
     // second argument.
-    //TensegrityModel* const myModel = new TensegrityModel(modelPath,true);
-    TensegrityModel* const myModel = new TensegrityModel(modelPath, false);
+    TensegrityModel* const myModel = new TensegrityModel(modelPath,true);
+    //TensegrityModel* const myModel = new TensegrityModel(modelPath, false);
     
 
     // For the inverse kinematics test, we're doing all the parsing of the 
@@ -147,8 +148,8 @@ int main(int argc, char** argv)
     //      This is for the structure to settle into its "starting point" for the control.
     // (c) period. How often to advance to the next control input. This is kinda like the control frequency in a ZOH sense. In sec.
     // (d) the csv file itself, containing rest lengths from the inverse kinematics from MATLAB.
-    double startTime = 5.0;
-    double holdTime = 5.0;
+    double startTime = 10.0;
+    double holdTime = 20.0;
     double period = 1;
 
     // Create the controller.
@@ -178,24 +179,27 @@ int main(int argc, char** argv)
     // EDIT: UNUSED, LOGGING OCCURS IN CONTROLLER NOW.
     
     // has to end with the prefix to the log file name.
-    //std::string log_filename = "~/NTRTsim_logs/LaikaCombinedMotion";
-    //double samplingTimeInterval = 0.1;
-    //tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    std::string log_filename = "~/NTRTsim_logs/InvKin_testing_";
+    double samplingTimeInterval = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
     // add the model to the data logger
-    //myDataLogger->addSenseable(myModel);
+    myDataLogger->addSenseable(myModel);
     // Make it so the data logger can dispatch sphere sensors
     //abstractMarkerSensorInfo* myAbstractMarkerSensorInfo = new abstractMarkerSensorInfo();
     // Correlating the cable lengths to foot positions.
-    //tgSpringCableActuatorSensorInfo * mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
+    // for the compound bodies (this should be all vertebrae)
+    tgCompoundRigidSensorInfo* myCRSensorInfo = new tgCompoundRigidSensorInfo();
     //tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
     //DEBUGGING: rods too
     //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
     //myDataLogger->addSensorInfo(myAbstractMarkerSensorInfo);
-    //myDataLogger->addSensorInfo(mySCASensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
+    myDataLogger->addSensorInfo(myCRSensorInfo);
     //myDataLogger->addSensorInfo(mySphereSensorInfo);
     //myDataLogger->addSensorInfo(myRodSensorInfo);
     // Add the data logger to the simulation.
-    //simulation.addDataManager(myDataLogger);
+    simulation.addDataManager(myDataLogger);
     
     // Finally, run the simulation.
     simulation.run();
