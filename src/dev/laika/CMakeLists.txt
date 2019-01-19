@@ -7,4 +7,5 @@ subdirs(
   RotatingVertebra
   laikaWalkingDRL
   InvKinTests
+  LaikaVideos
 )
