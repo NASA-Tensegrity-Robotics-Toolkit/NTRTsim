@@ -1,0 +1,19 @@
+# The full rear, including hips and two legs.
+# Leaving the hips at their default position,
+# the legs need to be placed at the connection point to the hips,
+# which should be [12.6, 0, +/- 7.55].
+# We're calling C the "back right" leg, which I believe is +Y.
+
+substructures:
+  hips:
+    path: Laika2018Model_Hips_massless.yaml
+    translation: [0, 0, 0]
+  legC:
+    path: Laika2018Model_Leg_massless.yaml
+    translation: [12.6, 0, 7.55]
+  legD:
+    path: Laika2018Model_Leg_massless.yaml
+    translation: [12.6, 0, -7.55]
+
+
+# ...and everything should auto-compound.

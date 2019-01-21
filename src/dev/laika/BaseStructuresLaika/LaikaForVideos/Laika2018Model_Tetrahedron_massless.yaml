@@ -1,0 +1,35 @@
+# This is the "passive" vertebra for the Laika prototype for the IROS 2018
+# submission, in cm.
+
+# Centered at the local origin.
+# nodes are now re-named, as looked at from the robot's right side (right and left
+# are as if I was the robot, standing on my hands and knees), with top and bottom
+# as on the robot's back and stomach, and left-right on its sides.
+# In comparison to the MATLAB script, here, we need to have vertical position
+# be the second parameter.
+# NOTE that "X" is positive to the left, ugh. We're switching that so that the "X"
+# axis points to the right, like normal people. All X switched from matlab calcs.
+# ALSO, "Y" positive goes "backward/into the page", not towards the viewer. So, we
+# also switch the right/left from the MATLAB calculations.
+nodes:
+  center: [0, 0, 0]
+  top: [-6.5, 9.6, 0]
+  bottom: [-6.5, -9.6, 0]
+  right: [6.5, 0, -9.6]
+  left: [6.5, 0, 9.6]
+
+pair_groups:
+  tetraRodMassless:
+    - [center, top]
+    - [center, bottom]
+    - [center, right]
+    - [center, left]
+
+# Density used to be 0.014,
+# but newer calculation puts it at 0.0024 when lengths in cm.
+builders:
+  tetraRodMassless:
+    class: tgRodInfo
+    parameters:
+      density: 0 # fixed in space
+      radius: 0.64

@@ -32,6 +32,7 @@
 #include "../v0.2_combined/CombinedSpineControllerBending.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgEmptyGround.h"
 #include "core/tgModel.h"
 #include "core/tgRod.h"
 #include "core/tgSimulation.h"
@@ -90,13 +91,13 @@ int main(int argc, char** argv)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
-    const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
+    //const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
-    tgBoxGround* ground = new tgBoxGround(groundConfig);
+    //tgBoxGround* ground = new tgBoxGround(groundConfig);
 
     // We're working in centimeters, so scaling factor = 100.
     // FOR IROS 2018 DATA COLLECTION:
-    const tgWorld::Config config(9.81); // gravity, dm/sec^2 is 98.1.
+    const tgWorld::Config config(98.1); // gravity, dm/sec^2 is 98.1.
     // FOR IROS 2018 VISUALIZATION:
     //const tgWorld::Config config(98.1);
     // As of the commit when this comment appears, the units are still
@@ -110,7 +111,8 @@ int main(int argc, char** argv)
     // since the forces from the lattice/cables are scaled, and that throws
     // everything off. I really don't think NTRT simulations are OK unless
     // everything is at-scale right now. Only use g=9.81 for real data collection.
-    tgWorld world(config, ground);
+    //tgWorld world(config, ground);
+    tgWorld world(config, new tgEmptyGround());
 
     // create the view
     const double timestep_physics = 0.0001; // seconds
