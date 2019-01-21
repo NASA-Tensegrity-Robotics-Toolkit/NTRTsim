@@ -135,20 +135,32 @@ int main(int argc, char** argv)
     // double startTimeBend = 0.0;
     // double minLength = 1.0; // 1.0 is 100%, no bending
     // double rate = 0.0;
-    std::vector<std::string> tagsToControl;
-    tagsToControl.push_back("HR");
+    std::vector<std::string> tagsToControl1;
+    tagsToControl1.push_back("STR");
+
+    std::vector<std::string> tagsToControl2;
+    tagsToControl2.push_back("HL");
+    tagsToControl2.push_back("HT");
+    //tagsToControl2.push_back()
 
     // Parameters for the Horizontal Spine Controller are specified in that .h file,
     // repeated here:
-    double startTime = 5.0;
-    double minLength = 0.8;
-    double rate = 0.25;
+    double startTime1 = 15.0;
+    double minLength1 = 0.8;
+    double rate1 = 2;
+
+    double startTime2 = 15.0;
+    double minLength2 = 0.9;
+    double rate2 = 0.2;
     // Call the constructor for the controller
-    CombinedSpineControllerBending* const controller =
-      new CombinedSpineControllerBending(startTime, minLength, rate, tagsToControl);
+    CombinedSpineControllerBending* const controller1 =
+      new CombinedSpineControllerBending(startTime1, minLength1, rate1, tagsToControl1);
+    CombinedSpineControllerBending* const controller2 =
+      new CombinedSpineControllerBending(startTime2, minLength2, rate2, tagsToControl2);
     // Attach the controller to the model. Must happen before running the
     // simulation.
-    myModel->attach(controller);
+    myModel->attach(controller1);
+    myModel->attach(controller2);
     
     // Add the model to the world
     simulation.addModel(myModel);    
