@@ -1,0 +1,43 @@
+# A combined set of hips and legs for the rear of Laika.
+# This is just stick legs with balls at the bottom.
+# This version doesn't auto-combine the rigid bodies,
+# but puts the legs at a very small distance, and connects
+# them to the hips with a cable.
+# That way, we get around Bullet's ugly combined rigid body position tracking
+# problem.
+
+# Where things go:
+# The tetrahedron connection point is at the origin
+# Leg connection points are at [+cd, 0, +/-ld]
+# (connection distance, leg distance, Drew's names.)
+# Leg origin is at [0, -length, 0]
+# So, let's move the legs down, to keep vertebra connection at origin.
+
+substructures:
+  hips:
+    path: ./SimpleHips.yaml
+    translation: [0, 0, 0]
+  legBackRight:
+    path: ./SimpleLegC.yaml
+    translation: [15, 0, 15.05]
+  legBackLeft:
+    path: ./SimpleLegD.yaml
+    translation: [15, 0, -15.05]
+
+# use a cable to connect the legs to the hips.
+bond_groups:
+  legConnect:
+    hips/legBackRight/node_node:
+      - [V3, legtop]
+    hips/legBackLeft/node_node:
+      - [V4, legtop]
+
+# need to make a little cable to hold the leg tightly to the hips
+builders:
+  legConnect:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 10000000
+      damping: 10000
+      pretension: 100000
+      max_tension: 10000000

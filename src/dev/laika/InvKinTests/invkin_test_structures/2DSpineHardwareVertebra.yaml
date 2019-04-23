@@ -1,0 +1,33 @@
+# This is the moving, Y-shaped vertebra from the 2D spine control hardware test.
+
+# Centered at the center of mass (supposedly, need to check), where the center node
+# is at the origin. This is NOT the frame in MATLAB that was used in Dec. 2018. 
+
+# Notes on dimensions:
+# "X" is positive to the left, ugh. We're using NTRT's frame for ease but the visualization looks backwards.
+# The second coordinate vertical - but be careful of handedness issues.
+# ALSO, "Y" positive goes "backward/into the page", not towards the viewer. So, we
+# also switch the right/left from the MATLAB calculations.
+
+# Taken directly from the MATLAB script.
+nodes:
+  center: [0, 0, 0]
+  tip: [0.1222, 0, 0]
+  ytop: [-0.081, -0.1016, 0]
+  ybottom: [-0.081, 0.1016, 0]
+
+pair_groups:
+  tetraRod:
+    - [center, tip]
+    - [center, ytop]
+    - [center, ybottom]
+
+# Some densities:
+# With r = 0.015, d = 1832.
+# With r = 0.005, d = 16495
+builders:
+  tetraRod:
+    class: tgRodInfo
+    parameters:
+      density: 16495 # From matlab calculations
+      radius: 0.015 # A 1.5cm diamater rod seems fine. Was 0.0064

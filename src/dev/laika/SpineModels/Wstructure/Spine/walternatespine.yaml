@@ -1,0 +1,264 @@
+# YAML file for the Laika w symmetrical Spine with kinematic actuators.
+# Used for the 2017 ULTRA Spine MEng student.
+
+# This spine has multiple substructures,
+# including the spine itself (t1-t6) and the supporting pieces.
+substructures:
+
+  t0:
+    path: ../wsymmetricrotateFixed.yaml
+    offset: [-4, 0 , 0]
+    translation: [0, 25, 0]
+
+
+  t1/t2/t3/t4/t5/t6:
+    path: ../wsymmetricrotate.yaml
+    offset: [-4, 0 , 0]
+    translation: [-4, 25, 0]
+
+  t1:
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+    
+  t3: 
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+      
+  t5:
+    rotation:
+      axis: [1, 0, 0]
+      angle: 45
+#Horizontal Right cable connecting nodes at 0 degree counterclockwise in the XY plane    
+#Horizontal Right Upper cable connecting nodes at 45 degree counterclockwise in the XY plane 
+# Vertical Upper connection nodes at 90 degree counterclockwise in the XY plane  
+#Horizontal Left Upper cable connecting nodes at 135 degree counterclockwise in the XY plane
+# Horizontal Left connection nodes at 180 degree counterclockwise in the XY plane 
+#Horizontal Left lower cable connecting nodes at 225 degree counterclockwise in the XY plane
+# Vertical lower connection nodes at 270 degree counterclockwise in the XY plane
+#Horizontal Right Lower cable connecting nodes at 315 degree counterclockwise in the XY plane
+#Torque Cable Right
+#Torque Cable Left
+ 
+bond_groups:
+
+  HR:
+   t1/t3/t5/node_node:
+     - [LUFront, LUFront]
+  HRU: 
+   t0/t2/t4/t6/node_node:
+     - [RUFront, RUFront] 
+  VU:
+   t1/t3/t5/node_node:
+     - [RUFront, RUFront] 
+  HLU:
+   t0/t2/t4/t6/node_node: 
+     - [RLFront, RLFront]
+  HL:
+   t1/t3/t5/node_node: 
+     - [RLFront, RLFront]
+  HLL:
+   t0/t2/t4/t6/node_node:
+     - [LLFront, LLFront]
+  VL:     
+   t1/t3/t5/node_node:
+     - [LLFront, LLFront]
+  HRL:
+   t0/t2/t4/t6/node_node:
+     - [LUFront, LUFront]
+  TCR:
+   t1/t2/node_node:
+     - [RUFront, RUFront]
+   t3/t4/node_node:
+     - [RUFront, RUFront]
+   t5/t6/node_node:
+     - [RUFront, RUFront]
+  TCL:
+   t1/t2/node_node:
+     - [RUFront, RLFront]
+   t3/t4/node_node:
+     - [RUFront, RLFront]
+   t5/t6/node_node:
+     - [RUFront, RLFront]  
+# Right Lower
+# Right Upper
+# Left Upper
+# Left
+  SFR:
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+     - [Core,LUBack] 
+   t1/t0/node_node:
+     - [LLBack,LUFront] 
+   t3/t2/node_node:
+     - [LLBack,LUFront]    
+   t5/t4/node_node:
+     - [LLBack,LUFront] 
+  SRL:
+   t0/t1/t2/t3/t4/t5/t6/node_node: 
+     - [Core, RUBack]
+   t1/t0/node_node:
+     - [RUBack,RUFront] 
+   t3/t2/node_node:
+     - [RUBack,RUFront]   
+   t5/t4/node_node:
+     - [RUBack,RUFront] 
+  SBF: 
+   t0/t1/t2/t3/t4/t5/t6/node_node:
+      - [Core,RUBack]
+   t1/t0/node_node:
+     - [RUBack,RLFront] 
+   t3/t2/node_node:
+     - [RUBack,RLFront]   
+   t5/t4/node_node:
+     - [RUBack,RLFront] 
+  SBL: 
+   t0/t1/t2/t3/t4/t5/t6/node_node: 
+      - [Core, LLBack]  
+   t1/t0/node_node:
+     - [LLBack,LLFront] 
+   t3/t2/node_node:
+     - [LLBack,LLFront]
+   t5/t4/node_node:
+     - [LLBack,LLFront]
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+
+builders: 
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500
+      damping: 100.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  HRU:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500.0
+      damping: 100.0
+      pretension: 500
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  VU:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000.0
+      damping: 100.0
+      pretension: 500
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  HLU:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500.0
+      damping: 100.0
+      pretension: 500
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  HLL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500.0
+      damping: 100.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  VL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1500.0
+      damping: 100.0
+      pretension: 50
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  HRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 500.0
+      damping: 100.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  TCR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 600
+      damping: 100.0
+      pretension: 0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0   
+
+  TCL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 600
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0 
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0

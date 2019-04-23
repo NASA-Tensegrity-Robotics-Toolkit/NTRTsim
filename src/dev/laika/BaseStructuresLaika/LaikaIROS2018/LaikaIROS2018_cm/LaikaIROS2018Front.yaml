@@ -1,0 +1,19 @@
+# The full front including shoulders and two legs.
+# Leaving the hips at their default position,
+# the legs need to be placed at the connection point to the hips,
+# which should be [-12.6, 0, +/- 7.55].
+# We're calling A the "front right" leg, which I believe is +Y.
+
+substructures:
+  hips:
+    path: ./LaikaIROS2018Shoulders.yaml
+    translation: [0, 0, 0]
+  legC:
+    path: ./LaikaIROS2018Leg.yaml
+    translation: [-12.6, 0, 7.55]
+  legD:
+    path: ./LaikaIROS2018Leg.yaml
+    translation: [-12.6, 0, -7.55]
+
+
+# ...and everything should auto-compound.

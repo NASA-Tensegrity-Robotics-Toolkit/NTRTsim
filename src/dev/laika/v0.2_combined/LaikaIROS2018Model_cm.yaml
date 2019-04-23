@@ -1,0 +1,222 @@
+# YAML file for the Laika IROS 2018 submission.
+# These calculations place the origin as in-between the two feet at the robot's rear.
+# Includes the front/rear, and then two vert / rot vert / two vert for 5 total.
+
+# We're going to assemble with the rear two feet across the origin,
+# so move the rear's origin (attachment for t1) up by the leg's vertical amount,
+# and "forward" (-X) by the leg attachment point.
+
+# NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
+# (ground is not at origin.) So, that's 19.35 + 1.5 = 19.35
+
+# TO-DO: switch around the labelling of foot ABCD, since Y has to be switched
+# same as +/- X. E.g, front-right foot is actually at -x, -y.
+
+substructures:
+  rear:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Rear.yaml
+    translation: [-12.6, 19.35, 0]
+  t1/t2:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Tetrahedron.yaml
+    translation: [-12.6, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  rotVert:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018RotVert.yaml
+    # The translation for the rotating vertebra is t1 translation plus
+    # two offsets.
+    translation: [-32.4, 19.35, 0]
+  t4/t5:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Tetrahedron.yaml
+    # Translation is rotVert plus one offset.
+    # so, there's a horrible bug somewhere that makes t5 not auto-compound to
+    # the hips if the intersection is exactly 52.3. Who knows why or how
+    # this is happening. Hack for now is to make a slight offset.
+    # This probably means there's a pointer problem somewhere.
+    translation: [-42.301, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  front:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Front.yaml
+    # Translation is directly at the center of t5.
+    translation: [-52.201, 19.35, 0]
+
+# Define the cables.
+# Here, we'll use HT, HR, HB, HL to mean the horizontal cables
+# across each of the top, right, bottom, and left respectively.
+# The saddles are similarly named: SBL means saddle, connecting bottom to left.
+
+###########################
+bond_groups:
+
+  # Horizontal cables:
+  HT:
+   t1/t2/node_node:
+     - [top, top]
+   t4/t5/node_node:
+     - [top, top]
+   t2/rotVert/node_node:
+     - [top, topB]
+   rotVert/t4/node_node:
+     - [topB, top]
+
+  HB:
+   t1/t2/node_node:
+     - [bottom, bottom]
+   t4/t5/node_node:
+     - [bottom, bottom]
+   t2/rotVert/node_node:
+     - [bottom, bottomB]
+   rotVert/t4/node_node:
+     - [bottomB, bottom]
+
+  HR:
+   t1/t2/node_node:
+     - [right, right]
+   t4/t5/node_node:
+     - [right, right]
+   t2/rotVert/node_node:
+     - [right, rightA]
+   rotVert/t4/node_node:
+     - [rightA, right]
+
+  HL:
+   t1/t2/node_node:
+     - [left, left]
+   t4/t5/node_node:
+     - [left, left]
+   t2/rotVert/node_node:
+     - [left, leftA]
+   rotVert/t4/node_node:
+     - [leftA, left]
+
+  # Saddle cables:
+  STR:
+   t1/t2/node_node:
+     - [top, right]
+   t4/t5/node_node:
+     - [top, right]
+   t2/rotVert/node_node:
+     - [top, rightA]
+   rotVert/t4/node_node:
+     - [topB, right]
+
+  STL:
+   t1/t2/node_node:
+     - [top, left]
+   t4/t5/node_node:
+     - [top, left]
+   t2/rotVert/node_node:
+     - [top, leftA]
+   rotVert/t4/node_node:
+     - [topB, left]
+
+  SBR:
+   t1/t2/node_node:
+     - [bottom, right]
+   t4/t5/node_node:
+     - [bottom, right]
+   t2/rotVert/node_node:
+     - [bottom, rightA]
+   rotVert/t4/node_node:
+     - [bottomB, right]
+
+  SBL:
+   t1/t2/node_node:
+     - [bottom, left]
+   t4/t5/node_node:
+     - [bottom, left]
+   t2/rotVert/node_node:
+     - [bottom, leftA]
+   rotVert/t4/node_node:
+     - [bottomB, left]
+
+# Define the cable parameters
+
+#############################
+builders:
+
+# hack for centi/decimeters, change all pretensions down by factor of 100.
+# For initial tests, pretension was 10.4 for HT, 46.5 for HB, etc.
+# Saddle cable pretension was before 90.4, etc.
+# Now reducing it more.
+
+  # Horizontal cables:
+  HT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174
+      damping: 100.0
+      pretension: 10.4
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 291
+      damping: 100.0
+      pretension: 150.0 # was 46.5, for visualization make large
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174
+      damping: 100.0 
+      pretension: 69 # was 6.9, for visualization make large
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174
+      damping: 100.0
+      pretension: 69
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  # Saddle cables:
+  STR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174
+      damping: 100.0
+      pretension: 90.4 # was 9.04, for visualization make large
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      
+  STL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174
+      damping: 100.0
+      pretension: 9.04
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174.0
+      damping: 100.0
+      pretension: 90.4
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 174.0
+      damping: 100.0
+      pretension: 90.4
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0

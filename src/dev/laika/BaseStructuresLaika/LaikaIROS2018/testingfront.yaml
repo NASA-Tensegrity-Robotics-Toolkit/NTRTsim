@@ -1,0 +1,16 @@
+substructures:
+#  tetra:
+#    path: ./LaikaIROS2018Tetrahedron.yaml
+#    translation: [0, 19.35, 0]
+#  front:
+#    path: ./LaikaIROS2018Front.yaml
+#    translation: [0, 19.35, 0]
+  t4/t5:
+    path: ./LaikaIROS2018Tetrahedron.yaml
+    # Translation is rotVert plus one offset.
+    translation: [-42.301, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  front:
+    path: ./LaikaIROS2018Front.yaml
+    # Translation is directly at the center of t5.
+    translation: [-52.201, 19.35, 0]

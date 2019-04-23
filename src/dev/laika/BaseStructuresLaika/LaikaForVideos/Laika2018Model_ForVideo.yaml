@@ -1,0 +1,167 @@
+# YAML file that uses the 2018 model for Laika, but for taking videos.
+# based off the 2018IROS_cm model.
+
+# These calculations place the origin as in-between the two feet at the robot's rear.
+
+# We're going to assemble with the rear two feet across the origin,
+# so move the rear's origin (attachment for t1) up by the leg's vertical amount,
+# and "forward" (-X) by the leg attachment point.
+
+# NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
+# (ground is not at origin.) So, that's 19.35 + 1.5 = 19.35
+
+# TO-DO: switch around the labelling of foot ABCD, since Y has to be switched
+# same as +/- X. E.g, front-right foot is actually at -x, -y.
+
+# We need to have a massless tetrahedron for t1 so the hips stay at zero density
+# when auto-compounded.
+
+substructures:
+  rear:
+    path: Laika2018Model_Rear_massless.yaml
+    translation: [-12.6, 19.35, 0]
+  t1:
+    path: Laika2018Model_Tetrahedron_massless.yaml
+    translation: [-12.6, 19.35, 0]
+  t2/t3/t4/t5:
+    path: ../LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Tetrahedron.yaml
+    translation: [-22.5, 19.35, 0]
+    offset: [-9.9, 0, 0]
+  front:
+    path: ../LaikaIROS2018/LaikaIROS2018_cm/LaikaIROS2018Front.yaml
+    # Translation is directly at the center of t5.
+    translation: [-52.2, 19.35, 0]
+
+# Define the cables.
+# Here, we'll use HT, HR, HB, HL to mean the horizontal cables
+# across each of the top, right, bottom, and left respectively.
+# The saddles are similarly named: SBL means saddle, connecting bottom to left.
+
+###########################
+bond_groups:
+
+  # Horizontal cables:
+  HT:
+   t1/t2/t3/t4/t5/node_node:
+     - [top, top]
+
+  HB:
+   t1/t2/t3/t4/t5/node_node:
+     - [bottom, bottom]
+
+  HR:
+   t1/t2/t3/t4/t5/node_node:
+     - [right, right]
+
+  HL:
+   t1/t2/t3/t4/t5/node_node:
+     - [left, left]
+
+  # Saddle cables:
+  STR:
+   t1/t2/t3/t4/t5/node_node:
+     - [top, right]
+
+  STL:
+   t1/t2/t3/t4/t5/node_node:
+     - [top, left]
+
+  SBR:
+   t1/t2/t3/t4/t5/node_node:
+     - [bottom, right]
+
+  SBL:
+   t1/t2/t3/t4/t5/node_node:
+     - [bottom, left]
+
+# Define the cable parameters
+
+#############################
+builders:
+
+# hack for centi/decimeters, change all pretensions down by factor of 100.
+# For initial tests, pretension was 10.4 for HT, 46.5 for HB, etc.
+# Saddle cable pretension was before 90.4, etc.
+# Now reducing it more.
+
+  # Horizontal cables:
+  HT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 200.0
+      pretension: 500 # was 10
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 200.0
+      pretension: 400 # was 46.5, for visualization make large
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 200.0 
+      pretension: 500
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 200.0
+      pretension: 500
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  # Saddle cables:
+  STR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 300
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      
+  STL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 300
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 300
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 100.0
+      pretension: 300
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0

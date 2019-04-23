@@ -1,0 +1,268 @@
+# YAML file for the Laika IROS 2018 submission.
+# These calculations place the origin as in-between the two feet at the robot's rear.
+# Includes the front/rear, and then two vert / rot vert / two vert for 5 total.
+
+# We're going to assemble with the rear two feet across the origin,
+# so move the rear's origin (attachment for t1) up by the leg's vertical amount,
+# and "forward" (-X) by the leg attachment point.
+
+# For IROS 2018:
+# NOTE: The vertical displacement is leg height plus the 1.5 offset of the ground
+# (ground is not at origin.) So, that's 17.85 + 1.5 = 19.35
+
+# For ICRA 2019:
+# **CORRECTION: We aren't vertically displacing for the ground here!
+# That 1.5 offset is in METERS, not cm, and is done in the "FINAL" file that drops
+# the robot. Here, the actual correct is for the *feet* of the robot, the spheres.
+# That's a radius of 0.0125 meters, so the total y-displacement should really be
+# 17.85 + 1.25 = 19.1 cm (0.191 m).
+
+# These units are converted from cm into m (SI units.)
+
+substructures:
+  rear:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Rear.yaml
+    translation: [-0.126, 0.191, 0]
+  t1/t2:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
+    translation: [-0.126, 0.191, 0]
+    offset: [-0.099, 0, 0]
+  rotVert:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018RotVert.yaml
+    # The translation for the rotating vertebra is t1 translation plus
+    # two offsets.
+    translation: [-0.324, 0.191, 0]
+  t4/t5:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Tetrahedron.yaml
+    # Translation is rotVert plus one offset.
+    # so, there's a horrible bug somewhere that makes t5 not auto-compound to
+    # the hips if the intersection is exactly 52.3. Who knows why or how
+    # this is happening. Hack for now is to make a slight offset.
+    # This probably means there's a pointer problem somewhere.
+    translation: [-0.42301, 0.191, 0]
+    offset: [-0.099, 0, 0]
+  front:
+    path: ../BaseStructuresLaika/LaikaIROS2018/LaikaIROS2018Front.yaml
+    # Translation is directly at the center of t5.
+    translation: [-0.52201, 0.191, 0]
+
+# Define the cables.
+# Here, we'll use HT, HR, HB, HL to mean the horizontal cables
+# across each of the top, right, bottom, and left respectively.
+# The saddles are similarly named: SBL means saddle, connecting bottom to left.
+
+###########################
+bond_groups:
+
+  # Horizontal cables:
+  HT:
+   t1/t2/node_node:
+     - [top, top]
+   t4/t5/node_node:
+     - [top, top]
+   t2/rotVert/node_node:
+     - [top, topB]
+   rotVert/t4/node_node:
+     - [topB, top]
+
+  HB:
+   t1/t2/node_node:
+     - [bottom, bottom]
+   t4/t5/node_node:
+     - [bottom, bottom]
+   t2/rotVert/node_node:
+     - [bottom, bottomB]
+   rotVert/t4/node_node:
+     - [bottomB, bottom]
+
+  HR:
+   t1/t2/node_node:
+     - [right, right]
+   t4/t5/node_node:
+     - [right, right]
+   t2/rotVert/node_node:
+     - [right, rightA]
+   rotVert/t4/node_node:
+     - [rightA, right]
+
+  HL:
+   t1/t2/node_node:
+     - [left, left]
+   t4/t5/node_node:
+     - [left, left]
+   t2/rotVert/node_node:
+     - [left, leftA]
+   rotVert/t4/node_node:
+     - [leftA, left]
+
+  # Saddle cables:
+  STR:
+   t1/t2/node_node:
+     - [top, right]
+   t4/t5/node_node:
+     - [top, right]
+   t2/rotVert/node_node:
+     - [top, rightA]
+   rotVert/t4/node_node:
+     - [topB, right]
+
+  STL:
+   t1/t2/node_node:
+     - [top, left]
+   t4/t5/node_node:
+     - [top, left]
+   t2/rotVert/node_node:
+     - [top, leftA]
+   rotVert/t4/node_node:
+     - [topB, left]
+
+  SBR:
+   t1/t2/node_node:
+     - [bottom, right]
+   t4/t5/node_node:
+     - [bottom, right]
+   t2/rotVert/node_node:
+     - [bottom, rightA]
+   rotVert/t4/node_node:
+     - [bottomB, right]
+
+  SBL:
+   t1/t2/node_node:
+     - [bottom, left]
+   t4/t5/node_node:
+     - [bottom, left]
+   t2/rotVert/node_node:
+     - [bottom, leftA]
+   rotVert/t4/node_node:
+     - [bottomB, left]
+
+# Define the cable parameters
+
+#############################
+# For the IROS 2018 paper, we're using SI units, and these values for the cables
+# were calculated in the following way:
+# (1) Get constants from Hunter's data on the elastic lattice,
+#     via google drive doc
+# (2) use the 'calculate...' script in the BaseStructures directory to convert
+#     to pretensions from rest lengths.
+# The original model used a low-end spring constant for the lattice, at
+# 291 for the bottom strip and 174 for all else.
+# This was at -1 std dev on the data. Instead, we could try the following:
+# Min: bottom = 252, else = 141
+# Mean: bottom = 434, else = 244
+# Max: bottom = 616, else = 346
+# For the black lattice: bottom is estimated at 515 N/m, Holly's data.
+
+# NOTE! min_actual_length defaults to 0.1. This has to change down
+# for SI units testing. Same with min rest length.
+
+############################
+# For the ICRA 2019 paper:
+# The bottom cable really should be "springs in parallel." Don't know why
+# we didn't model that before. The final model we used had 2 x regular width
+# + 1 x black material. That's 2*244 + 515 = 1003.
+# Also, the spring constant for the left/right side that's pulled in is
+# the mechanical spring. Jones #240. k = 187 N/m. BUT, the other side is lattice!
+
+# Foot A and C tests pull in the HR cables. So HR = 187, HL = 244
+# Foot B and D tests pull in the HL cables. So HR = 244, HL = 187
+
+builders:
+
+  # Horizontal cables:
+  HT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244 # used mean for first set of IROS data, 244
+      damping: 10.0
+      pretension: 1.46 # was 1.46 for 244, 1.04 for 174, 0.98 for something else?
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1003 # used red lattice mean for first IROS data, 434. 515 for later.
+      damping: 10.0
+      pretension: 15 # orig with mean, red, was 6.94. used 7.72 for IROS 2018.
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 187
+      damping: 10.0
+      pretension: 0.98 # was 0.98 for 244, 0.7 for 174
+      history: 1
+      max_tension: 700000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244
+      damping: 10.0
+      pretension: 0.98 # was 0.98 for 244, 0.7 for 174
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  # Saddle cables:
+  STR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244 # initial data with 244
+      damping: 10.0
+      pretension: 12.7 # initial data with 12.69. IROS 2018 with 9.05.
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      
+  STL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244
+      damping: 10.0
+      pretension: 12.7
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  SBR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244
+      damping: 10.0
+      pretension: 12.7
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 244
+      damping: 10.0
+      pretension: 12.7
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+      min_actual_length: 0.0
+      min_rest_length: 0.0

@@ -1,0 +1,99 @@
+substructures:
+
+  C1/C2:
+    path: ./Curve1Fixed.yaml
+    offset: [3,0, 0]
+    translation: [0,0,0]
+    
+
+  C1:
+    rotation: 
+     axis: [1,0,0]
+     angle: 90
+  C2:
+    rotation: 
+     axis: [0,1,0]
+     angle: -180
+       
+#internal Right Top
+#internal Right Bottom
+#internal Left Top
+#internal Left Bottom
+#Extenal Rigid cables
+bond_groups:
+   IRT: 
+    C1/C2/node_node:
+     - [bleft,bleft]       
+   IRB:
+    C1/C2/node_node:
+     - [bleft,bright] 
+   ILT:
+    C1/C2/node_node:
+     - [bright,bright]  
+   ILB:
+    C1/C2/node_node:
+      - [bright,bleft] 
+   ER: 
+    C1/C2/node_node:
+     - [center,bleft] 
+     - [center,bright]
+     - [bleft,center]  
+     - [bright,center]  
+
+
+builders: 
+  rodFixed:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
+  IRT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 1000.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  IRB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 1000.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  ILT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 1000.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  ILB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 1000.0
+      pretension: 5
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  ER:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 10000
+      damping: 1000.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0

@@ -1,0 +1,105 @@
+# YAML file for the fully assembly of the 2D spine hardware test.
+
+# The ground is actually at 1.5 meters from the origin.
+# So translate everything up by, for example, 3 m.
+# That 1.5 offset is in METERS, not cm.
+# These units are converted from cm into m (SI units.)
+
+# We move the vertebra out by the MATLAB's trajectory's amount,
+# bar_endpoint * (3/4), which is 0.0762
+
+substructures:
+  mount:
+    path: 2DSpineHardwareMount.yaml
+    translation: [0, 3, 0]
+  vertebra:
+    path: 2DSpineHardwareVertebra.yaml
+    translation: [0.0762, 3, 0]
+
+# Define the cables.
+# HB, HT = horizontal bottom, horizontal top. SB, ST = saddle top, saddle botton.
+
+###########################
+bond_groups:
+
+  # Horizontal cables:
+  HB:
+   mount/vertebra/node_node:
+     - [bottom, ybottom]
+
+  HT:
+   mount/vertebra/node_node:
+     - [top, ytop]
+
+  # Saddle cables:
+  SB:
+   mount/vertebra/node_node:
+     - [midbottom, ybottom]
+
+  ST:
+   mount/vertebra/node_node:
+     - [midtop, ytop]
+
+
+# Define the cable parameters
+# The spring constants are in N/m, as converted in MATLAB inv kin script.
+
+builders:
+
+  # Horizontal cables:
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 838.9
+      damping: 80.0
+      pretension: 0.06773
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.1
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
+
+  HT:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 838.9
+      damping: 80.0
+      pretension: 2.6292
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.2
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
+
+  # Saddle cables:
+  SB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 4448.2
+      damping: 400.0
+      pretension: 6.0849
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.1
+      min_actual_length: 0.0
+      min_rest_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false
+      
+  ST:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 4448.2
+      damping: 400.0
+      pretension: 0.67716
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 0.1
+      min_rest_length: 0.0
+      min_actual_length: 0.0
+      moveCablePointAToEdge: false
+      moveCablePointBToEdge: false

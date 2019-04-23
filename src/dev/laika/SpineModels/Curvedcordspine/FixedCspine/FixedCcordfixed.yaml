@@ -1,0 +1,32 @@
+substructures:
+
+  C1/C2:
+    path: ../FlexibleCspine/Curve1Fixed.yaml
+    offset: [3,0, 0]
+    translation: [0,0,0]
+    
+
+  C1:
+    rotation: 
+     axis: [1,0,0]
+     angle: 90
+  C2:
+    rotation: 
+     axis: [0,1,0]
+     angle: -180
+       
+pair_groups:
+  rodFixed:
+    - [C1.center, C2.center]
+       
+
+builders: 
+  rodFixed:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.5
+      friction: 0.5
+      roll_friction: 0.5
+
+  

@@ -1,0 +1,24 @@
+nodes:
+
+# Same scale as the rotating vertebra, now, and located at the origin.
+# Below is a symmetric version of this tetrahedron:
+  center: [0, 0, 0]
+  front: [10, 0, 10]
+  right: [-10, 10, 0]
+  back: [10, 0, -10] 
+  left: [-10, -10, 0]
+
+pair_groups:
+  rod:
+    - [center, front]
+    - [center, right]
+    - [center, back]
+    - [center, left]
+
+% Density used to be 0.014
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.5

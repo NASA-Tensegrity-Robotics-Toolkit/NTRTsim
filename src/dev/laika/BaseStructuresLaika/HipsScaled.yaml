@@ -1,0 +1,6 @@
+# Units are currently in cm
+
+substructures:
+  hipsScaled:
+    path: ./hips.yaml
+    scale: 0.5

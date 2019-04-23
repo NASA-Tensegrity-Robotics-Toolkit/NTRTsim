@@ -1,0 +1,31 @@
+# The "B" half of the vertebra.
+# only a V-shape with a rod for rotation at the center.
+
+# Seems we need a pretty big gap so that the rods don't hit
+# each other. A gap of 2 means moving the centers out by 1 each.
+
+nodes:
+  centerB: [-0.75, 0, 0]
+  topB: [-6.5, 9.6, 0]
+  bottomB: [-6.5, -9.6, 0]
+  rodHingeEnd: [-3.5, 0, 0]
+
+pair_groups:
+  rodTetraB:
+    - [centerB, topB]
+    - [centerB, bottomB]
+  rodForHingeB:
+    - [centerB, rodHingeEnd]
+
+# Density used to be 0.014
+builders:
+  rodTetraB:
+    class: tgRodInfo
+    parameters:
+      density: 0.0 # was 0.014
+      radius: 0.64
+  rodForHingeB:
+    class: tgRodInfo
+    parameters:
+      density: 0.0026 # was 0.014
+      radius: 3

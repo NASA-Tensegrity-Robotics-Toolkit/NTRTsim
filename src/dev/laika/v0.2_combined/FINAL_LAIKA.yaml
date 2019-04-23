@@ -1,0 +1,26 @@
+# This is the final version of Laika
+# that will be used for the IROS 2018 data.
+# We use the 'cm' version, and translate it
+# so that it's centered in the camera.
+# Total length of the robot is 'front' translation plus 'front' length,
+# which would be -52.201 -12.6 -1.25 (for the foot.)
+# = -66.051, half = 33.0255
+
+#substructures:
+#  FinalLaikaIROS2018:
+#    path: ./LaikaIROS2018Model_cm.yaml
+#    translation: [33.0255, 0, 0]
+
+# We're going to use the SI model for data collection,
+# and the centimeters model for good video.
+# The SI units model starts with the 'rear' at the -x (e.g., towards
+# the right) at the distance away of the leg center node.
+# So, in the App, need to make sure the CD feet at at 0 x translation.
+
+# Use the "IROS" model for the original submission's data,
+# and the "ICRA" model for the corrected simulation.
+substructures:
+  FinalLaikaICRA2019:
+    path: ./LaikaICRA2019Model.yaml
+    translation: [0, 1.55, 0]
+

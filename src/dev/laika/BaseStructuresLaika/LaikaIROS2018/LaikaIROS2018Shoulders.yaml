@@ -1,0 +1,43 @@
+# Two boxes that will connect the legs to the vertebrae. (Shoulders.)
+# We'll do it as a "T" shape.
+# Center of shoulders at origin.
+# For shoulders, all directions are -X.
+
+# Converted to m.
+
+nodes:
+  # where the vertebrae will be connected.
+  vertConnect: [0, 0, 0]
+  # the endpoint of the bottom of the "T". Measured 12.6cm to center of wood.
+  shoulderEnd: [-0.126, 0, 0]
+  # connecting each of the two legs.
+  # This will be the shoulders, so leg A will be the front right, D left.
+  # displacement left/right is 17.6/2 - (leg width/2), 7.55
+  legAconnect: [-0.126, 0, -0.0755]
+  legBconnect: [-0.126, 0, 0.0755]
+
+pair_groups:
+  # We do 3 boxes, one for each section of the T.
+  shouldersVertConnect:
+    - [vertConnect, shoulderEnd]
+  shouldersABconnect:
+    - [shoulderEnd, legAconnect]
+    - [shoulderEnd, legBconnect]
+
+builders:
+  # each part might have different dimensions because of box orientation
+  # issues. See issue on github for automatic box orientation selection prob.
+  # On 3/1/18: when factoring in new mass of cables, desity from 299 to 425
+  shouldersVertConnect:
+    class: tgBoxInfo
+    parameters:
+      width: 0.035 # 7 in +/- Y, total
+      height: 0.030 # 6 in +/- Z, total
+      density: 425 # From matlab calculations, 299
+  shouldersABconnect:
+    class: tgBoxInfo
+    parameters:
+      width: 0.003 # wood thickness
+      height: 0.03 # same as shoulder box
+      density: 425 # From matlab calculations, 299
+

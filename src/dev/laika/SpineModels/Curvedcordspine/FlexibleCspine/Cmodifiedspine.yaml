@@ -1,0 +1,99 @@
+substructures:
+  t0:
+    path: ./CcordmodifiedFixed.yaml
+    offset: [0 ,0, 0]
+    translation: [0,15,0]
+  
+  t1/t2/t3/t4:
+    path: ./Ccordmodified.yaml
+    offset: [-7,0, 0]
+    translation: [-7,15,0]
+
+  
+bond_groups:
+
+  TCR: 
+    t0/t1/t2/t3/t4/node_node:
+      - [C1.bright, C2.tleft]  
+      - [C1.bleft, C2.tright] 
+      - [C1.tright, C2.bleft]
+      - [C1.tleft, C2.bright]
+  TCL: 
+    t0/t1/t2/t3/t4/node_node:  
+      - [C1.bright, C2.tright]
+      - [C1.bleft, C2.tleft]
+      - [C1.tright, C2.bright]  
+      - [C1.tleft, C2.bleft]
+  VL:  
+   t0/t1/t2/t3/t4/node_node:
+      - [C1.tleft, C1.tleft]  
+  VU:  
+   t0/t1/t2/t3/t4/node_node:
+      - [C1.tright, C1.tright]
+  HR: 
+   t0/t1/t2/t3/t4/node_node:
+      - [C2.tleft,C2.tleft] 
+  HL: 
+   t0/t1/t2/t3/t4/node_node:
+      - [C2.tright,C2.tright]
+
+builders: 
+
+  TCR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000.0
+      damping: 300.0
+      pretension: 0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  TCL: 
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000.0
+      damping: 300.0
+      pretension: 0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 4000
+      history: 1
+      max_tension: 700000.0
+      target_velocity: 12.0
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 4000
+      history: 1
+      max_tension: 700000.0
+      target_velocity: 12.0
+
+  VU: 
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 7000
+      history: 1
+      max_tension: 700000.0
+      target_velocity: 12.0
+  VL: 
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000.0
+      damping: 3000.0
+      pretension: 3000
+      history: 1
+      max_tension: 700000.0
+      target_velocity: 12.0
+  

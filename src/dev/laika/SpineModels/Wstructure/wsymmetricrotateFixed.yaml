@@ -1,0 +1,34 @@
+nodes:
+  Core: [0, 0, 0]
+  LUBack: [6, -3, -3]
+  LLBack: [6, -3, 3]
+  LUFront: [0, -6, -6]
+  LLFront: [0, -6, 6]
+  RUBack: [6, 3, -3]
+  RLBack: [6, 3, 3]
+  RUFront: [0, 6, -6]
+  RLFront: [0, 6, 6]
+
+# Below are the definitions for the acronyms used:
+#  LU Left Upper
+#  LL Left Lower
+#  RU Right Upper
+#  RL Right Lower
+
+pair_groups:
+  rodFixed:
+    - [Core, LUBack]
+    - [Core, LLBack]
+    - [Core, RUBack]
+    - [Core, RLBack]
+    - [LUBack, LUFront]
+    - [LLBack, LLFront]
+    - [RUBack, RUFront]
+    - [RLBack, RLFront]
+
+builders:
+  rodFixed:
+    class: tgRodInfo
+    parameters:
+      density: 0.0
+      radius: 0.25

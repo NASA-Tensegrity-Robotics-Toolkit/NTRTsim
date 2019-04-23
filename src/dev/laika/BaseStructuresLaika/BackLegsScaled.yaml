@@ -1,0 +1,6 @@
+# Units are currently in cm
+
+substructures:
+  backLegsScaled:
+    path: ./backlegs.yaml
+    scale: 0.5

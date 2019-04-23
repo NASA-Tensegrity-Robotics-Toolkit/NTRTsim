@@ -1,0 +1,256 @@
+# YAML file for the Horizontal Spine with kinematic actuators.
+# Used for the 2017 ULTRA Spine ICRA paper.
+
+# This spine has multiple substructures,
+# including the spine itself (t1-t6) and the supporting pieces.
+# Adding translation [22, 0, -22] to remove need for "Dropped".
+substructures:
+
+  t1/t2:
+    path: ./TetrahedronSymmetricScaled.yaml
+    #offset: [-12, 0 , 0]
+    offset: [-6, 0, 0]
+    #translation: [22, 40.5, 8] # was 30.5
+    translation: [10, 60.5, 8]
+  t5/t6:
+    path: ./TetrahedronSymmetricScaled.yaml
+    #offset: [-12, 0 , 0]
+    offset: [-6, 0 , 0]
+    # RotVert gives -4, -6 gap, -2 offset = -12
+    #translation: [-21, 40.5, 8] # TwoSegSpine gives -12 + -5 = -17 extra (-41)
+    translation: [-12, 60.5, 8]
+  rotJoint:
+    path: ./RotVert.yaml
+    #translation: [ -2, 40.5, 8]
+    translation: [ -2, 55.5, 8]
+  hips:
+    path: ../BaseStructuresLaika/HipsScaled.yaml
+    #translation: [22, 45.5, 3]
+    translation: [5, 60, 3]
+  front:
+    path: ../BaseStructuresLaika/FrontScaled.yaml
+    # t6 was at -21 -12 = -33
+    # t6 is now at -12 -6 = -18, difference is then -15
+    #translation: [-48, 45.5, -5]
+    translation: [-28, 58.5, -5]
+  backlegsleft/backlegsright:
+    #path: ../BaseStructuresLaika/backlegs.yaml
+    path: ../BaseStructuresLaika/BackLegsScaled.yaml
+    offset: [0, 0, 17]
+    translation: [20, 43, -2]
+    #translation: [42, 20, -2]
+  frontlegsleft/frontlegsright: 
+    #path: ../BaseStructuresLaika/frontlegs.yaml
+    path: ../BaseStructuresLaika/FrontLegsScaled.yaml
+    #offset: [0, 0, 30]
+    offset: [0, 0, 15]
+    #translation: [-37, 20, -7]
+    translation: [-18, 43, 0.5]
+
+bond_groups:
+  HF:
+   t1/t2/node_node:
+     - [front, front]
+   t5/t6/node_node:
+     - [front, front]
+   t2/rotJoint/node_node:
+     - [front, frontA]
+   rotJoint/t5/node_node:
+     - [frontA, front]
+
+  HR:
+   t1/t2/node_node:
+     - [right, right]
+   t5/t6/node_node:
+     - [right, right]
+   t2/rotJoint/node_node: # this one causes problems
+     - [right, rightB]
+   rotJoint/t5/node_node:
+     - [rightB, right]
+
+  HL: 
+   t1/t2/node_node:
+     - [left, left]
+   t5/t6/node_node:
+     - [left, left]
+   t2/rotJoint/node_node: # this one causes problems
+     - [left, leftB]
+   rotJoint/t5/node_node:
+     - [leftB, left]
+
+  HB:
+   t1/t2/node_node:
+     - [back, back]
+   t5/t6/node_node: 
+     - [back, back]
+   t2/rotJoint/node_node:
+     - [back, backA]
+   rotJoint/t5/node_node:
+     - [backA, back]
+
+  SFR:
+   t1/t2/node_node:
+     - [right, back]
+   t5/t6/node_node:
+     - [right, back]
+   t2/rotJoint/node_node:
+     - [right, backA]
+   rotJoint/t5/node_node:
+     - [rightB, back]
+
+
+  SRL:
+   t1/t2/node_node:
+     - [right, front]
+   t5/t6/node_node: 
+     - [right, front]
+   t2/rotJoint/node_node:
+     - [right, frontA]
+   rotJoint/t5/node_node:
+     - [rightB, front]
+
+  SBF: 
+   t1/t2/node_node:
+     - [left, front]
+   t5/t6/node_node:
+     - [left, front]
+   t2/rotJoint/node_node:
+     - [left, frontA]
+   rotJoint/t5/node_node:
+     - [leftB, front]
+
+  SBL: 
+   t1/t2/node_node:
+     - [left, back]
+   t5/t6/node_node: 
+     - [left, back]
+   t2/rotJoint/node_node:
+     - [left, backA]
+   rotJoint/t5/node_node:
+     - [leftB, back]
+
+  rod: 
+   t1/hips/node_node:
+      - [right, V2]
+      - [right, V3]
+      - [left, V1]
+      - [left, V4]
+      - [right, V7]
+      - [right, V8]
+
+   t6/front/node_node: 
+      - [left, V11]
+      - [left, V12]
+      - [right, V3]
+      - [right, V2]
+   
+   hips/backlegsleft/node_node:
+      - [V15, V6]
+      - [V19, V7]
+
+   hips/backlegsright/node_node:
+      - [V16, V6]
+      - [V20, V7]
+ 
+   front/frontlegsleft/node_node:
+      - [V16, V6]
+
+   front/frontlegsright/node_node:  
+      - [V17, V6]
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+builders: 
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.01 # was 0.0044
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0 # was 1000
+      damping: 100.0 # was 100
+      pretension: 20.0 # was 20
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226 # was 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0

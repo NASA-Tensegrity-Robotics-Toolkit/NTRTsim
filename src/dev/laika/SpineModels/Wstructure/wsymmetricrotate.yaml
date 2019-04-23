@@ -1,0 +1,37 @@
+# This version of "W" structure Spine geometry was designed in such a way that the diagonal distances in the XZ plane from the core to subsequent nodes in same direction at a ratio of 1:1. 
+nodes:
+  Core: [0, 0, 0]
+  LUBack: [6,-3, -3]
+  LLBack: [6,-3, 3]
+  LUFront: [0,-6, -6]
+  LLFront: [0,-6, 6]
+  RUBack: [6, 3, -3]
+  RLBack: [6, 3, 3]
+  RUFront: [0, 6, -6]
+  RLFront: [0, 6, 6]
+
+# Below are the definitions for the acronyms used:
+#  LU Left Upper
+#  LL Left Lower
+#  RU Right Upper
+#  RL Right Lower
+
+pair_groups:
+  rod:
+    - [Core, LUBack]
+    - [Core, LLBack]
+    - [Core, RUBack]
+    - [Core, RLBack]
+    - [LUBack, LUFront]
+    - [LLBack, LLFront]
+    - [RUBack, RUFront]
+    - [RLBack, RLFront]
+
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.25
+
