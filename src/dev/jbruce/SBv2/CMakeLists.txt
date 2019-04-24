@@ -5,7 +5,7 @@ link_libraries(core
 	util
 	sensors
 	terrain
-	tgOpenGlSupport
+	tgOpenGLSupport
 	yaml-cpp
 	TensegrityModel)
 
