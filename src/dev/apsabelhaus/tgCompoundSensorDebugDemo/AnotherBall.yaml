@@ -1,0 +1,13 @@
+# Make just one ball.
+# Testing for point2point constraint
+
+nodes:
+  ballcenter: [0, 0, 0]
+
+builders:
+  # Spheres are created according to node names.
+  ballcenter:
+    class: tgSphereInfo
+    parameters:
+      density: 0.1
+      radius: 3

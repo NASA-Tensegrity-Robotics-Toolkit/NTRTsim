@@ -106,6 +106,13 @@ void tgRigidInfo::initRigidBody(tgWorld& world)
 
             if (rigid->getRigidBody() == NULL) { // Init only if it doesn't have a btRigidBody (has already been initialized)
 
+	      //DEBUGGING
+	      //std::cout << "Inside tgRigidInfo, initializing a rigid body with tags "
+	      //		<< rigid->getTags() << std::endl;
+	      // OK, by here, we're already a single rigid body, compounded
+	      // together already. E.g., collision shape is already defined,
+	      // by StructureInfo? StructureInfo assigns m_rigidInfoGroup?
+
                 double mass = rigid->getMass();
                 btTransform transform = rigid->getTransform();
                 btCollisionShape* shape = rigid->getCollisionShape(world);
@@ -134,6 +141,10 @@ const btRigidBody* tgRigidInfo::getRigidBody() const {
 
 void tgRigidInfo::setRigidBody(btRigidBody* rigidBody)
 {
+  //DEBUGGING:
+  // See how many times this is called, and if it's overwritten.
+  std::cout << "Inside tgRigidInfo, setting a rigid body for a rigid with tags "
+	    << getTags() << std::endl;
     /// @todo Does this leak any previous value of m_collisionObject?
     m_collisionObject = rigidBody;
 }

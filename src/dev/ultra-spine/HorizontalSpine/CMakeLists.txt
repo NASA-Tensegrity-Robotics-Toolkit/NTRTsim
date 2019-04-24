@@ -8,13 +8,15 @@ link_libraries(core
                tgOpenGLSupport
                yaml-cpp
 	       Adapters
-	       TensegrityModel)
+	       TensegrityModel
+	       forceplate)
 
 # add_library(TensegrityModel
 #     TensegrityModel.cpp)
 
 add_executable(AppHorizontalSpine
-#    TensegrityModel.cpp
-    AppHorizontalSpine.cpp)
+  HorizontalSpineController.cpp
+  AppHorizontalSpine.cpp
+)
 
 

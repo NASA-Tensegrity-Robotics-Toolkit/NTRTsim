@@ -29,6 +29,9 @@
 #include "tgSensor.h"
 #include "core/tgSenseable.h"
 #include "tgSensorInfo.h"
+#include "core/tgTaggable.h"
+// For debugging, casting senseables to taggables
+#include "core/tgCast.h"
 // The C++ Standard Library
 //#include <stdio.h> // for sprintf
 #include <iostream>
@@ -95,8 +98,20 @@ void tgDataManager::addSensorsHelper(tgSenseable* pSenseable)
   // Loop over all tgSensorInfos in the list.
   for (size_t i=0; i < m_sensorInfos.size(); i++){
     // If this particular sensor info is appropriate for the pSenseable,
+    //DEBUGGING
+    /*
+    std::cout << "tgDataManager examining senseable object: ";
+    tgTaggable* pTaggedSenseable = tgCast::cast<tgSenseable, tgTaggable>(pSenseable);
+    if(pTaggedSenseable == 0){
+      std::cout << "Senseable object was not taggable." << std::endl;
+    }
+    std::cout << pTaggedSenseable->getTags() << std::endl;
+    */
+
     if( m_sensorInfos[i]->isThisMySenseable(pSenseable) ) {
       // Possibly create sensors (usually, this returns a list of size 1.
+      //DEBUGGING
+      //std::cout << "added a sensor for this senseable object." << std::endl;
       std::vector<tgSensor*> newSensors =
 	m_sensorInfos[i]->createSensorsIfAppropriate(pSenseable);
       // Add everything in the list to m_sensors.
@@ -232,6 +247,21 @@ void tgDataManager::addSenseable(tgSenseable* pSenseable)
   // TO-DO: should we check to see if this senseable object is already
   // in the m_senseables list???
   m_senseables.push_back(pSenseable);
+
+  //DEBUGGING
+  /*
+  std::cout << "Inside tgDataManager, adding senseable object to the list: " <<
+    std::endl;
+  // Instead of making tgSenseable have to inherit from tgTaggable, in order to
+  // get more info about the tags, let's just cast here.
+  // In general, the only objects we care about are tgModels anyway
+  // TO-DO: make this more general!
+  tgTaggable* pTaggedSenseable = tgCast::cast<tgSenseable, tgTaggable>(pSenseable);
+  if(pTaggedSenseable == 0){
+    std::cout << "Senseable object was not taggable." << std::endl;
+  }
+  std::cout << pTaggedSenseable->getTags() << std::endl;
+  */
 
   // Postcondition
   assert(invariant());

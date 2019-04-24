@@ -10,6 +10,7 @@ subdirs(
     learningSpines
     testjson
     craterEscape
+    forcePlateDemo
     IROS_2015/
     motorModel/
 )

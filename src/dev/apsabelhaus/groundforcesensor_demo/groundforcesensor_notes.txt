@@ -1,0 +1,181 @@
+Some notes during the process of creating the groundforcesensor functionality.
+-Drew Sabelhaus 2016-08-02
+
+First, find out exactly how the tgBasicActuator and friends are created.
+
+-----------------------------
+Notes about the classes themselves:
+
+IN CORE:
+
+tgSpringCableActuator
+	constructor requires a tgSpringCable reference to be passed in
+
+tgSpringCable
+	does NOT inherent from anything
+	does NOT contain references to any underlying Bullet classes
+	but, does have a list of tgSpringCableAnchor .
+	
+tgBulletSpringCable
+	inherets from tgSpringCable, is a type of tgSringCable
+	FORMERLY KNOWN AS muscle2p
+	this is the class that applies a force to the anchors!
+
+IN TGCREATOR:
+
+tgStructureInfo
+	actually creates the parts of the model by calling functions like
+
+...
+
+-----------------------------
+Notes about the flow of function calls:
+
+App creates simulation
+App creates tgModel
+    simulation calls setup in tgModel
+    	       setup creates:
+	       	     tgStructure
+		     tgStructureInfo
+		     tgBuildSpec
+			setup adds builders to the buildspec (for example, tgRodInfo and tgBasicActuatorInfo)
+	        setup calls tgStructureInfo's buildInto method
+		      buildInto calls helper functions inside tgStructureInfo, specifically, calls addRigidsAndConnectors
+		      		addRigidsAndConnectors calls the methods:
+					getConnectorAgents, inside tgBuildSpec
+					initConnectorInfo, inside itself (the tgStructureInfo class). Uses the connectorAgents from getConnectorAgents.
+						calls infoFactory from each connectorAgent. connectorAgent is inside tgBuildSpec.
+						infoFactory returns a tgConnectorInfo (NOTE THAT tgRigidInfo and tgConnectorInfo are infoFactories.)
+						tgConnectorInfo calls its createConnectorInfo method.
+					initConnectors, inside itself
+						calls initConnector from each tgConnectorInfo
+						      initConnector is only defined in subclasses of ConnectorInfo. For example, in tgBasicActuatorInfo,
+						      
+
+-----------------------------
+
+What I will need to do:
+
+FOR THE COMPRESSION SPRING ITSELF:
+Create the classes:
+
+tgCompressionSpring (equivalent to tgSpringCable)
+	not-quite-abstract class that defines the behavior of a compression spring
+	just like tgSpringCable, but with requirements about pos/neg of spring constants to be flipped etc.
+	MIGHT NOT NEED THIS ONE, unless we want fancy polymorphism.
+
+tgBulletCompressionSpring (equivalent to tgBulletSpringCable)
+	just like tgBulletSpringCable. Might actually be almost exactly the same code.
+
+TO CHECK:
+   can we re-use tgSpringCableAnchor and tgBulletSpringCableAnchor?
+       Probably. In particular, tgBulletSpringCableAnchor refers to a btRigidBody directly, and
+       since our world is a btRigidBody, then it could attach.
+       Additionally, we may not even need two anchors for our ground force sensor: the sensor could
+       just have a reference to its own non-moving point in space (a btVector3) as the anchor of the spring.
+
+   where is tgSpringCable used in the builder? it looks like tgBulletCompressionSpring is used directly.
+
+FOR THE BUILDER:
+
+tgCompressionSpringInfo
+	see: tgBasicActuatorInfo
+
+ORDER OF OPERATIONS FOR THE CLASSES TO CREATE:
+
+1) tgCompressionSpringActuatorInfo
+	will call or use:
+	     tgBulletCompressionSpring
+	     tgBulletSpringCableAnchor (...this should be OK, unless Bullet tries to apply a force on the world ground and then crashes...) < nope, works fine.
+	      ^ the header file for this is added in the .cpp file for tgCompressionSpringActuatorInfo.
+
+2) tgCompressionSpringActuator
+        As per the tgBulletSpringCable/tgBasicActuatorInfo/tgBasicActuator trio of classes, the new compression spring should also have
+	the trio of tgBulletCompressionSpring/tgCompressionSpringActuatorInfo/tgCompressionSpringActuator.
+	Look into the tgBasicActuator class for this one.
+	Need to (a) put the config from tgSpringCableActuator here, and (b) modify it to have restLength and not pretension, (c) add this class to the YAML builder.
+	     see tgCompressionSpringActuatorInfo versus tgBasicActuatorInfo for the use of the config struct.
+	     
+3) tgBulletCompressionSpring
+	Use the class from tgBulletSpringCable.
+
+^ above done 7pm 2016-08-02
+
+4) Demo using a tgCompressionSpringActuator
+
+CHANGES TO THINK ABOUT WHEN COPYING OVER tgSpringCableActuator INTO tgCompressionSpringActuator:
+	Check on tgBulletRenderer. Calls a method from tgSpringCableActuator that returned a tgSpringCable.
+	      tgCompressionSpringActuator's onVisit method calls the render method of tgModelVisitor.
+	      Might have to implement virtual void render(const tgCompressionSpringActuator& compressionSpringActuator) const {}; in tgDataLogger and tscDataLogger.
+	      ^ done as of 5pm 2016-08-02.
+	      Fill in the getRestLength() and related methods in tgCompressionSpringActuator once I've written them in tgBulletCompressionSpring.
+	      ^ this is needed if we actually want to drawn the force sensors in the NTRT window.
+	There is some "scale" thing going on in tgSpringCableActuator. Is this called from somewhere else? Does it need to be implemented in tgCompressionSpring?
+	      ^ might be something in tgBulletRenderer...
+	Check all the CMakeLists files to be sure all the new files are included.
+
+As of 8:30pm 2016-08-02, it looks like this is actually working. The one potential problem might be the calculations inside
+tgBulletCompressionSpring, since I couldn't quite tell if the calculations from tgBulletSpringCable would still apply... there
+is something weird with changing the magnitude of the spring force vs. damping force.
+
+To-Do 2016-08-03: Make a TwoBoxesModel class instead of a TwoRods class, since the rods just rolled around and I couldn't
+determine if the forces were being applied correctly.
+See Brian's BoxFeet model for a useage of tgBox.
+
+^ 2016-08-03 12:30pm confirmed working! We now have a tgCompressionSpringActuator class.
+
+--------------------------------------------------------------------------------------------------------------------
+
+2016-08-03:
+
+Now, make the sensor.
+One option for the spring should be:
+    - fixed on one end. aka, have a specified vertical location of the fixed end, or a specified btVector3 like (~, height, ~).
+    - Apply a force only in the vertical direction
+    - Apply a force proportional only to the z-distance between the fixed end and the moving end
+
+Questions to answer:
+	  - can we apply forces to a surface instead of just a point? Or will we need to have (for example) four springs on the bottom of our force plate?
+	  - is it OK for the robot feet to float in space, or do we need to have the force sensor between a plate and object so the robot doesn't slide around?
+
+
+Classes to make:
+
+1) tgFixedVerticalCompressionSpring (corresponds to tgCompressionSpringActuator)
+
+2) tgFixedVerticalCompressionSpringInfo (corresponds to tgCompressionSpringActuator)
+
+3) tgBulletFixedVerticalCompressionSpring
+
+--------------------------------------------------------------------------------------------------------------------
+
+2016-08-03:
+
+It will be difficult to make a floating spring, especially one that will integrate well with the YAMl infrastructure.
+
+So, let's just make a tgModel of the force plate, with some unidirectional compression springs attached.
+
+Classes to make:
+
+1) tgBulletUnidirectionalCompressionSpring
+
+^ done.
+
+2) tgUnidirectionalCompressionSpringActuator
+
+3) tgUnidirectionalCompressionSpringActuatorInfo
+
+^ done.
+
+Need to check: Memory usage and the passing around of the btVector3 'direction'.
+Needs to be stored as a pointer, and then the initialized value needs to be
+deleted before storing a new value.
+
+Need to implement checks on 'direction' as it's passed in. Find a good way
+of checking that it's solely a unit vector.
+
+Need to include some warnings in this class, including:
+"Reminder: in NTRT, the three axes are (X, Y, Z), but Y is the vertical direction.
+So, (0, 1, 0) will create a vertical unidirectional compression spring."
+
+It would be good to render these springs in the view window now, too.

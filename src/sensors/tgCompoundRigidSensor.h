@@ -112,9 +112,10 @@ public:
    * Also, store the inverse: we'll be using the inverse at each step,
    * better to calculate it now.
    * TO-DO: that means we need to make sure that list doesn't change!
+   * 2019-01-18: Not needed, since there's only one btRigidBody. Just query that body's state.
    */
-  btQuaternion origOrientQuat;
-  btQuaternion origOrientQuatInv;
+  // btQuaternion origOrientQuat;
+  // btQuaternion origOrientQuatInv;
 
 };
 

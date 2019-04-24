@@ -36,6 +36,8 @@
 #include "sensors/tgRodSensor.h"
 // The Bullet Physics library
 #include "LinearMath/btVector3.h"
+#include "core/tgWorldBulletPhysicsImpl.h"
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
 // The C++ Standard Library
 #include <stdexcept>
 
@@ -72,6 +74,7 @@ namespace
     } c =
    {
      0.688,    // density (kg / length^3)
+     //0.0,    // density (kg / length^3)
      3.0,     // radius (length)
      2.0,      // rodLength (length)
      613.0,   // stiffness (kg / sec^2) was 1500
@@ -116,13 +119,13 @@ void tgBoxAnchorDebugModel::addNodes(tgStructure& s)
 
 void tgBoxAnchorDebugModel::addRods(tgStructure& s)
 {
-    s.addPair( 0,  1, "rod");
-    s.addPair( 2,  3, "rod");
+    s.addPair( 0,  1, "rod rodA");
+    s.addPair( 2,  3, "rod rodB");
 }
 
 void tgBoxAnchorDebugModel::addActuators(tgStructure& s)
 {
-    s.addPair(1, 2,  "muscle");
+  //s.addPair(1, 2,  "muscle");
 }
 
 void tgBoxAnchorDebugModel::setup(tgWorld& world)
@@ -130,6 +133,9 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
 
     const tgRod::Config rodConfig(c.radius, c.density, c.friction, 
 				c.rollFriction, c.restitution);
+
+    std::cout << "rodConfig: " << std::endl;
+    std::cout << rodConfig << std::endl;
     
     /// @todo acceleration constraint was removed on 12/10/14 Replace with tgKinematicActuator as appropreate
     tgBasicActuator::Config muscleConfig(c.stiffness, c.damping, c.pretension,
@@ -139,6 +145,9 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     // after the config struct has been constructed:
     muscleConfig.moveCablePointAToEdge = c.moveCablePointAToEdge;
     muscleConfig.moveCablePointBToEdge = c.moveCablePointBToEdge;
+
+    //std::cout << "muscleConfig: " << std::endl;
+    //std::cout << muscleConfig << std::endl;
             
     // Start creating the structure
     tgStructure s;
@@ -197,8 +206,7 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     double rotationAngle = M_PI/2;
     s.addRotation(rotationPoint, rotationAxis, rotationAngle);
     */
-
-    // Create the build spec that uses tags to turn the structure into a real model
+    
     tgBuildSpec spec;
     spec.addBuilder("rod", new tgRodInfo(rodConfig));
     spec.addBuilder("muscle", new tgBasicActuatorInfo(muscleConfig));
@@ -206,8 +214,13 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
     // Create your structureInfo
     tgStructureInfo structureInfo(s, spec);
 
+    
+    std::cout << s << std::endl;
+
     // Use the structureInfo to build ourselves
     structureInfo.buildInto(*this, world);
+
+    // BULLET OBJECTS NOW EXIST
 
     // We could now use tgCast::filter or similar to pull out the
     // models (e.g. muscles) that we want to control. 
@@ -226,6 +239,28 @@ void tgBoxAnchorDebugModel::setup(tgWorld& world)
       std::cout << "tags: " << allRods[i]->getTags() << std::endl;
       std::cout << allRods[i]->toString() << std::endl;
     }
+
+    
+    // Test of the btHingeConstraint.
+    // First, pick out the Bullet rigid bodies of the two rods.
+    btRigidBody* rodA_rb = allRods[0]->getPRigidBody();
+    btRigidBody* rodB_rb = allRods[1]->getPRigidBody();
+    // Create the hinge constraint
+    // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
+    btHingeConstraint* rotHinge =
+      new btHingeConstraint(*rodA_rb, *rodB_rb, btVector3(0, 3, 0),
+			    btVector3(0, 0, 0), btVector3(0, 1, 0),
+			    btVector3(0, 1, 0), false);
+    // Next, we need to get a reference to the Bullet Physics world.
+    tgWorldImpl& impl = world.implementation();
+    tgWorldBulletPhysicsImpl& bulletWorld = static_cast<tgWorldBulletPhysicsImpl&>(impl);
+    btDynamicsWorld* btWorld = &bulletWorld.dynamicsWorld();
+    // Add the hinge constraint to the world.
+    //btWorld->addConstraint(rotHinge);
+
+    // Let's try to move one of the rods.
+    rodB_rb->setAngularVelocity( btVector3(0, 20, 0) );
+    
 
     // Now, create some sensors and test them out.
     for (size_t i = 0; i < allRods.size(); i++)

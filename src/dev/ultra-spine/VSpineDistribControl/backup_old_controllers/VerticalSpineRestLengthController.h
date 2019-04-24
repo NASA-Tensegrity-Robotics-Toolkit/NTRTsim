@@ -16,67 +16,63 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef TENSEGRITY_MODEL_CONTROLLER_H
-#define TENSEGRITY_MODEL_CONTROLLER_H
+#ifndef VERTICAL_SPINE_RESTLENGTH_CONTROLLER_H
+#define VERTICAL_SPINE_RESTLENGTH_CONTROLLER_H
 
 /**
- * @file TensegrityModelController.h
- * @brief Contains the definition of class TensegrityModelController.
- * @author Drew Sabelhaus, Lara Janse van Vuuren
+ * @file VerticalSpineRestLengthController.h
+ * @brief Contains the definition of class VerticalSpineRestLengthController.
+ * @author Drew Sabelhaus, Brian Tietz, Michael Fanton
+ * @version 1.0.0
  * $Id$
  */
 
 // This library
 #include "core/tgObserver.h"
-#include "core/tgSubject.h"
-
-// the data collection class
-//#include "sensors/tgDataObserver.h"
-#include <string>
 
 // Forward declarations
-class TensegrityModel;
+class VerticalSpineModel;
 
 /**
  * A controller to apply uniform rest length offset to all cables in a
- * TensegrityModel. Does a one-time adjust of all cable rest lengths, thereby
+ * SpineModel. Does a one-time adjust of all cable rest lengths, thereby
  * tightening up the structure and keeping it held together without
  * further control input.
  */
-class TensegrityModelController : public tgObserver<TensegrityModel>, public tgSubject<TensegrityModelController>
+class VerticalSpineRestLengthController : public tgObserver<VerticalSpineModel>
 {
 public:
 	
   /**
-   * Construct a TensegrityRestLengthController.
+   * Construct a VerticalSpineRestLengthController.
    * @param[in] restLengthDiff, the amount of cable retraction to enact.
    * This length will be subtracted from the geometric length of
    * each cable in the structure.
    */
   
   // Note that currently this is calibrated for decimeters.
-  TensegrityModelController();
+  VerticalSpineRestLengthController();
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~TensegrityModelController() { }
+  virtual ~VerticalSpineRestLengthController() { }
 
   /**
-   * Apply the controller. On setup, adjust the cable
+   * Apply the RestLength controller. On setup, adjust the cable
    * lengths one time.
-   * @param[in] subject - the TensegrityModel that is being controlled. Must
+   * @param[in] subject - the SpineModel that is being controlled. Must
    * have a list of allMuscles populated
    */
-  virtual void onSetup(TensegrityModel& subject);
+  virtual void onSetup(VerticalSpineModel& subject);
     
   /**
    * The onStep method is not used for this controller.
-   * @param[in] subject - the TensegrityModel that is being controlled. Must
+   * @param[in] subject - the SpineModel that is being controlled. Must
    * have a list of allMuscles populated
    * @param[in] dt, current timestep must be positive
    */
-  virtual void onStep(TensegrityModel& subject, double dt);
+  virtual void onStep(VerticalSpineModel& subject, double dt);
     
 private:
 	
@@ -85,12 +81,16 @@ private:
    * in the constructor.
    */
     
- 
+   double desiredRestLength;
+   double verticalRL;
+   double saddleRL1;
+   double saddleRL2;
+   double saddleRL3;
+   double saddleRL4;
 
   // For data logging. TO-DO: implement this fully.
-  //tgDataObserver m_dataObserver;
-  //double m_updateTime;
-
+  // tgDataObserver m_dataObserver;
+  // double m_updateTime;
 };
 
-#endif // Tensegrity_MODEL_CONTROLLER_H
+#endif // Spine_RESTLENGTH_CONTROLLER_H

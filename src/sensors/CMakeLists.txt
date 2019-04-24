@@ -1,5 +1,9 @@
 project(sensors)
 
+# specify the force plate as a separate library.
+subdirs(
+  forceplate
+)
 
 link_directories(${LIB_DIR})
 
@@ -18,13 +22,22 @@ add_library( ${PROJECT_NAME} SHARED
     
   tgSensor.cpp
   tgRodSensor.cpp
+  tgSphereSensor.cpp
   tgSpringCableActuatorSensor.cpp
   tgCompoundRigidSensor.cpp
+  abstractMarkerSensor.cpp
   
   tgSensorInfo.cpp
   tgRodSensorInfo.cpp
+  tgSphereSensorInfo.cpp
   tgSpringCableActuatorSensorInfo.cpp
   tgCompoundRigidSensorInfo.cpp
+  abstractMarkerSensorInfo.cpp
+
+  # The ForcePlateModel and sensor are also needed here,
+  # since the data logger needs to know how to render a force plate.
+  forceplate/ForcePlateModel.cpp
+  forceplate/ForcePlateSensor.cpp
 )
 
 

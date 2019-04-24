@@ -22,7 +22,7 @@
 /**
  * @file tgDataLogger.h
  * @brief Contains the definition of interface class tgDataLogger.
- * @author Brian Tietz
+ * @author Brian Tietz, Drew Sabelhaus
  * $Id$
  */
  
@@ -32,9 +32,11 @@
 
 // Forward declarations
 class tgSpringCableActuator;
+class tgCompressionSpringActuator;
 class tgBasicActuator;
 class tgModel;
 class tgRod;
+class ForcePlateModel;
 
 /**
  * Interface for Data Logger.
@@ -50,13 +52,26 @@ public:
   
   virtual void render(const tgRod& rod) const;
   
-   /**
+  /**
    * Render a tgSpringCableActuator
    * @param[in] linearString a const reference to a tgSpringCableActuator to log data
    */
     virtual void render(const tgSpringCableActuator& mSCA) const;
+
+ /**
+   * Render a tgCompressionSpringActuator.
+   * @param[in] compressionSpringActuator a const reference to a tgCompressionSpringActuator to render
+   */
+  virtual void render(const tgCompressionSpringActuator& compressionSpringActuator) const;
+
+  /**
+   * Render a ForcePlateModel. This outputs the forces from the plate to the log.
+   * @param[in] forcePlate: a const reference to a ForcePlateModel from which to
+   * read the forces from.
+   */
+  virtual void render(const ForcePlateModel& forcePlate) const;
     
-    virtual void render(const tgModel& model) const;
+  virtual void render(const tgModel& model) const;
 
 private:
     

@@ -31,20 +31,33 @@
 #include "tgTaggable.h"
 #include "tgTagSearch.h"
 #include "tgSenseable.h"
+// This library
+//#include "tgcreator/tgNodes.h" // should come with tgNode also.
+// We've got some dependency issues when trying to refer to
+// classes within tgCreators. As such, let's just store
+// nodes as btVector3 for now.
+// Bullet Physics:
+#include "LinearMath/btVector3.h"
 // The C++ Standard Library
 #include <iostream>
 #include <vector>
+// For the set of nodes:
+#include <set>
 
 // Forward declarations
 class tgModelVisitor;
 class tgWorld;
 class abstractMarker;
+//class tgNodes;
 
 /**
  * A root-level model is a Tensegrity. It can contain sub-models.
  * The Composite design pattern is used for the sub-models.
  * Note that this is a sense-able object, meaning that pointers to tgModels
  * can be passed around in the sensing infrastructure.
+ * In order to automatically add abstract markers, a tgModel
+ * should now know the nodes that were used to build it, in the local
+ * coordinate frame. See setLocalNodes() and getLocalNodes().
  */
 class tgModel : public tgTaggable, public tgSenseable
 {
@@ -157,11 +170,39 @@ public:
 
     /**
      * From tgSenseable: need to return all the children of this class.
-     * Since tgModels are tgSenseables, just return getDescendants().
+     * Since tgModels are tgSenseables, just return getDescendants(),
+     * and all abstract markers (since those are now senseables also.)
      * @return a vector of tgModels, with pointers changed into pointers
-     * for tgSenseables.
+     * for tgSenseables, plus abstract markers.
      */
     virtual std::vector<tgSenseable*> getSenseableDescendants() const;
+
+    /**
+     * Keep track of the nodes of this model, in its original local
+     * coordinate frame. (These can later be pushed through a 
+     * btTransform to move them along with the model, as happens
+     * with abstractMarker for rigid bodies.)
+     */
+    void setLocalNodes(std::set<btVector3>& n){
+      nodes = n;
+      //DEBUGGING
+      std::cout << "Inside tgModel, recording the nodes: " << std::endl;
+      std::set<btVector3>::iterator it;
+      for (it = nodes.begin(); it != nodes.end(); ++it) {
+	btVector3 tempnode = *it; // need to dereference the iterator in addition to pointer to set?
+	std::cout << *tempnode << ", " << std::endl;
+      }
+      std::cout << " for model with tags: " << getTags() << std::endl;
+    }
+
+    void setLocalNode(btVector3& node_to_add){
+      //DEBUGGING
+      std::cout << "Adding node " << node_to_add << " to model." << std::endl;
+    }
+    
+    std::set<btVector3> getLocalNodes(){
+      return nodes;
+    }
 
 private:
 
@@ -178,6 +219,9 @@ private:
     std::vector<tgModel*> m_children;
 
     std::vector<abstractMarker> m_markers;
+
+    // Nodes in the original, local coordinate system.
+    std::set<btVector3> nodes;
 
 };
 

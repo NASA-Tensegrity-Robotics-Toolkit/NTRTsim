@@ -49,6 +49,11 @@
 //#include "BulletDynamics/Dynamics/btRigidBody.h" // accessing the btRigids inside m_rigids.
 
 /**
+ * WARNING: THIS CLASS HAS BUGS.
+ * Need to confirm that mass outputs correctly. Seems there may be something with InvMass?
+ */
+
+/**
  * This class is a sensor for tgCompoundRigids.
  * The constructor with only a pointer will always fail,
  * since it's required that a compound tag be passed in too,
@@ -89,13 +94,25 @@ tgCompoundRigidSensor::tgCompoundRigidSensor(tgModel* pModel, std::string tag) :
   // TO-DO: make sure this is called AFTER the rigid body is "moved into place"
   // ...is that what happens in NTRT/Bullet??
 
-  // (1) get the first Bullet rigid body from the list
-  btRigidBody* firstRigid = m_rigids[0]->getPRigidBody();
-  // (2) store its current orientation
-  origOrientQuat = firstRigid->getOrientation();
-  // (3) have Bullet calculate the inverse quaternion.
-  //     That's what will be used below.
-  origOrientQuatInv = origOrientQuat.inverse();
+  // //DEBUGGING
+  // // Want to test if this compound rigid has tgModel descendants that all point to the same btRigidBody.
+  // std::cout << "Inside tgCompoundRigidSensor constructor, we have a set of tgBaseRigids and btRigidBodies with pointers:" << std::endl;
+  // //std::map<std::string, std::vector<double> >::iterator it = cableInputMap.begin();
+  // for( std::vector<tgBaseRigid*>::iterator it = m_rigids.begin(); it != m_rigids.end(); ++it ) {
+  //   // For this rigid, print its pointer and the btRigidBody's pointer.
+  //   std::cout << "tgBaseRigid pointer: " << *it << " , btRigidBody pointer: " << (*it)->getPRigidBody() << std::endl;
+  // }
+
+  // TO-DO: we shouldn't need to do this, actually. Just query the body itself for its rotation every time.
+  // Drew 2019-01-16
+
+  // // (1) get the first Bullet rigid body from the list
+  // btRigidBody* firstRigid = m_rigids[0]->getPRigidBody();
+  // // (2) store its current orientation
+  // origOrientQuat = firstRigid->getOrientation();
+  // // (3) have Bullet calculate the inverse quaternion.
+  // //     That's what will be used below.
+  // origOrientQuatInv = origOrientQuat.inverse();
 }
 
 /** 
@@ -115,66 +132,59 @@ tgCompoundRigidSensor::~tgCompoundRigidSensor()
 
 // Three data collection methods. They should all
 // return zeroes if m_rigids is empty.
-// NEED TO DO ASAP: this is INCORRECT, we need to average / integrate
-//   over all the volume of the rigids, not just avg their individual COMs.
 btVector3 tgCompoundRigidSensor::getCenterOfMass()
 {
-  // This method takes the average of all the centers of mass.
-  // It should be sufficient to just add then divide each component
-  // of the 3D vector.
-  // The resulting vector:
-  btVector3* pCom = new btVector3(0.0, 0.0, 0.0);
-  // Iterate and add all the centers of mass of the components.
-  for( size_t i=0; i < m_rigids.size(); i++){
-    *pCom += m_rigids[i]->centerOfMass();
-  }
-  // Average the components:
-  *pCom /= m_rigids.size();
-
-  return *pCom;
+  // Since there's only one btRigidBody that's pointed to by all tgBaseRigids,
+  // just query the mass from the first rigid.
+  return m_rigids[0]->centerOfMass();
 }
 
 btVector3 tgCompoundRigidSensor::getOrientation()
 {
-  // For now, it will be easier to poke around at the underlying Bullet Physics
-  // objects.
-  // TO-DO: encapsulate this functionality inside tgBaseRigid.
-  // To get the "difference" between wherever the first rigid body was,
-  // and where it is now, multiply Q_curr * inv(Q_0).
-  // First, get the orientation of the underlying Bullet rigid body:
-  btQuaternion currentOrientQuat = m_rigids[0]->getPRigidBody()->getOrientation();
-  // The "difference" is then
-  btQuaternion diffOrientQuat = currentOrientQuat * origOrientQuatInv;
-  // Convert to roll/pitch/yaw just like inside tgBaseRigid::orientation().
-  btMatrix3x3 rotMat = btMatrix3x3( diffOrientQuat );
-  btScalar yaw = 0.0;
-  btScalar pitch = 0.0;
-  btScalar roll = 0.0;
-  rotMat.getEulerYPR(yaw, pitch, roll);
-  // Convert from radians to degrees, since that's what most people
-  // will care about when parsing this data.
-  yaw = 180/M_PI * yaw;
-  pitch = 180/M_PI * pitch;
-  roll = 180/M_PI * roll;  
+  // // For now, it will be easier to poke around at the underlying Bullet Physics
+  // // objects.
+  // // TO-DO: encapsulate this functionality inside tgBaseRigid.
+  // // To get the "difference" between wherever the first rigid body was,
+  // // and where it is now, multiply Q_curr * inv(Q_0).
+  // // First, get the orientation of the underlying Bullet rigid body:
+  // btQuaternion currentOrientQuat = m_rigids[0]->getPRigidBody()->getOrientation();
+  // // The "difference" is then
+  // btQuaternion diffOrientQuat = currentOrientQuat * origOrientQuatInv;
+  // // Convert to roll/pitch/yaw just like inside tgBaseRigid::orientation().
+  // btMatrix3x3 rotMat = btMatrix3x3( diffOrientQuat );
+  // btScalar yaw = 0.0;
+  // btScalar pitch = 0.0;
+  // btScalar roll = 0.0;
+  // rotMat.getEulerYPR(yaw, pitch, roll);
+  // // Convert from radians to degrees, since that's what most people
+  // // will care about when parsing this data.
+  // yaw = 180/M_PI * yaw;
+  // pitch = 180/M_PI * pitch;
+  // roll = 180/M_PI * roll;  
 
-  // The final result:
-  btVector3 orient = btVector3(yaw, pitch, roll);
-  return orient;
+  // // The final result:
+  // btVector3 orient = btVector3(yaw, pitch, roll);
+  // return orient;
   
-  // The resulting vector:
-  //btVector3* orient = new btVector3(0.0, 0.0, 0.0);
+  // // The resulting vector:
+  // //btVector3* orient = new btVector3(0.0, 0.0, 0.0);
 
-  //return *orient;
+  // //return *orient;
+
+  // 2019-01-18:
+  // Since there's only one btRigidBody for all tgBaseRigids,
+  // just query that one's orientation.
+  // This method, implemented in tgBaseRigid, transforms the body's quaternion into a
+  // rotation matrix then into yaw-pitch-roll Euler angles.
+  // Since that transformation is not unique, this function might return non-smooth results.
+  return m_rigids[0]->orientation();
 }
 
 double tgCompoundRigidSensor::getMass()
 {
-  // Add the mass of all the rigid bodies.
-  double mass = 0;
-  for( size_t i=0; i < m_rigids.size(); i++){
-    mass += m_rigids[i]->mass();
-  }
-  return mass;
+  // Since there's only one btRigidBody for all tgRigidBodys, 
+  // just query its mass.
+  return m_rigids[0]->mass();
 }
 
 /**
@@ -213,9 +223,9 @@ std::vector<std::string> tgCompoundRigidSensor::getSensorDataHeadings() {
   headings.push_back( prefix + m_tag + ").X" );
   headings.push_back( prefix + m_tag + ").Y" );
   headings.push_back( prefix + m_tag + ").Z" );
-  headings.push_back( prefix + m_tag + ").YawDegrees" );
-  headings.push_back( prefix + m_tag + ").PitchDegrees" );
-  headings.push_back( prefix + m_tag + ").RollDegrees" );
+  headings.push_back( prefix + m_tag + ").YawRad" );
+  headings.push_back( prefix + m_tag + ").PitchRad" );
+  headings.push_back( prefix + m_tag + ").RollRad" );
   headings.push_back( prefix + m_tag + ").mass" );
 
   // Return the resulting vector.

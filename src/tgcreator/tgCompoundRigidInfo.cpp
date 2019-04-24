@@ -80,6 +80,16 @@ btCompoundShape* tgCompoundRigidInfo::createCompoundShape(tgWorld& world) const
         bulletWorld.addCollisionShape(m_compoundShape);
 
     }
+    //DEBUGGING
+   //  std::cout << "Inside tgCompoundRigidInfo::createCompoundShape, created a "
+	  //     << "btCollisionShape (btCompoundShape) with "
+	  //     << m_compoundShape->getNumChildShapes() << " shapes," << std::endl
+	  //     << " with transforms that have origins: " << std::endl;
+   //  for(int i=0; i < m_compoundShape->getNumChildShapes(); i++){
+   //    std:: cout << *(m_compoundShape->getChildTransform(i).getOrigin())
+		 // << ", ";
+   //  }
+   //  std::cout << std::endl;
     return m_compoundShape;
 }
 
@@ -128,8 +138,18 @@ void tgCompoundRigidInfo::setRigidBody(btRigidBody* const rigidBody)
     m_collisionObject = rigidBody;
     // Set the rigid body for all components
     /// @todo Use std::for_each()
+    //DEBUGGING
+    //std::cout << "Inside tgCompoundRigidInfo, setting a rigid body for a rigid with tags "
+    //	    << getTags() << std::endl;
     for (int ii = 0; ii < m_rigids.size(); ii++) {
-        m_rigids[ii]->setRigidBody(rigidBody);
+      //DEBUGGING: 
+      //std::cout << "setting the compound rigid body for leaf rigid with tags "
+      //		<< m_rigids[ii]->getTags() << std::endl;
+      // Note that this is required, can't be ignored. There is only one
+      // btRigidBody for the whole tgCompoundRigid! It's one btCompoundShape
+      // that contains btCollisionShapes according to each element in the compound,
+      // but one btRigidBody for one btCompoundShape.
+      m_rigids[ii]->setRigidBody(rigidBody);
     }
 }
 

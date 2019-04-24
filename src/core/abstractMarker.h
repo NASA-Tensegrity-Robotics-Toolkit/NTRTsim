@@ -29,15 +29,16 @@
 #include "LinearMath/btVector3.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "tgSubject.h"
-
+#include "tgSenseable.h"
 
 /** ColoredMarkers are non-physical markers that are attached to a specific physical body.
  * They are  presented as colored spheres at the simulation.
  * Markers are considered to move with the physical body.
  * (they use orientation and translation vectors of the body)
  * Using the orientation of the physical body, it can return its absolute position when requested.
+ * Addition: make markers sense-able to be used with data logging.
 */
-class abstractMarker : public tgSubject<abstractMarker>
+class abstractMarker : public tgSubject<abstractMarker>, public tgSenseable
 {
 public:
         abstractMarker();
@@ -55,6 +56,10 @@ public:
 	int getNodeNumber() const {
 		return nodeNumber;
 	}
+
+	// As required from the tgSenseable abstract class. Return an empty list,
+	// since markers do not have any descendants.
+	virtual std::vector<tgSenseable*> getSenseableDescendants() const;
 
 private:
         btVector3 color;

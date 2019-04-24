@@ -15,8 +15,8 @@ subdirs(
     jbruce
     dhustigschultz
     eajung
-    ezhu
-    mcdaly
-	bgigous
+    #ezhu
+    #mcdaly
+    bgigous
+    laika
 )
-

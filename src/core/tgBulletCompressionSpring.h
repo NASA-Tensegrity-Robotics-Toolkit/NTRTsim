@@ -166,7 +166,6 @@ public:
      * @todo figure out how to cast and pass by reference
      */
     virtual const std::vector<const tgSpringCableAnchor*> getAnchors() const;
-
     
 protected:
     
