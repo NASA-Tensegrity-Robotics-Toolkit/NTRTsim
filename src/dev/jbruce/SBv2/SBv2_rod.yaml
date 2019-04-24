@@ -1,0 +1,17 @@
+nodes:
+  n0: [0, 0, 0]
+  n1: [0, 1.75, 0]
+
+pair_groups:
+  rod:
+    - [n0, n1]
+
+builders:
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.688
+      radius: 0.21
+      friction: 0.99
+      roll_friction: 0.01
+      restitution: 0.0 
