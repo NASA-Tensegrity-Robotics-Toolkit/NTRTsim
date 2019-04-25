@@ -71,9 +71,13 @@ builders:
     parameters:
       density: 0.2
       radius: 0.5
+      roll_friction: 0.9
+      restitution: 0.0
   
   s3:
     class: tgSphereInfo
     parameters:
       density: 0.2
       radius: 0.5
+      roll_friction: 0.9
+      restitution: 0.0
