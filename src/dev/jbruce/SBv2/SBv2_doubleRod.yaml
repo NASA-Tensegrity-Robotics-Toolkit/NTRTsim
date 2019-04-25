@@ -1,0 +1,10 @@
+# This file is testing using SBv2_rod to make
+# substrctures of SBv2
+
+substructures:
+  rod0:
+    path: ./SBv2_rod_1.yaml
+    translation: [0, 10, 0]
+  rod1:
+    path: ./SBv2_rod_2.yaml
+    translation: [10, 10, 0]

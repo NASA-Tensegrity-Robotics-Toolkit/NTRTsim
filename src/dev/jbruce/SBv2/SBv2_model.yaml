@@ -1,0 +1,58 @@
+# This file is testing using SBv2_rod to make
+# substrctures of SBv2
+
+substructures:
+  rods01:
+    path: ./SBv2_doubleRod.yaml
+
+  rods23:
+    path: ./SBv2_doubleRod_yRotation.yaml
+    rotation:
+      axis: [0, 0, -1]
+      angle: 90
+      reference: [5, 19.29, 0]
+
+  rods45:
+    path: ./SBv2_doubleRod_yRotation.yaml
+    rotation:
+      axis: [-1, 0, 0]
+      angle: 90
+      reference: [5, 19.29, 0]
+
+bond_groups:
+  string:
+    rods01/rods45/node_node:
+      - [n0, n0]
+      - [n0, n1]
+      - [n1, n2]
+      - [n1, n3]
+      - [n2, n0]
+      - [n2, n1]
+      - [n3, n2]
+      - [n3, n3]
+    rods23/rods01/node_node:
+      - [n0, n0]
+      - [n0, n1]
+      - [n1, n2]
+      - [n1, n3]
+      - [n2, n0]
+      - [n2, n1]
+      - [n3, n2]
+      - [n3, n3]
+    rods45/rods23/node_node:
+      - [n0, n2]
+      - [n0, n3]
+      - [n1, n0]
+      - [n1, n1]
+      - [n2, n2]
+      - [n2, n3]
+      - [n3, n0]
+      - [n3, n1]
+
+builders:
+  string:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 600
+      pretension: 1500

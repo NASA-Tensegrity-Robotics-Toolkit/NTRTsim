@@ -1,0 +1,10 @@
+# This file is testing using SBv2_rod to make
+# substrctures of SBv2
+
+substructures:
+  doubleRod:
+    path: ./SBv2_doubleRod.yaml
+    rotation:
+      axis: [0, -1, 0]
+      angle: 90
+      reference: [5, 0, 0]
