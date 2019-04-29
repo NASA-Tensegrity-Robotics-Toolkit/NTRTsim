@@ -1,0 +1,17 @@
+# This file imports the SUPERball v2 model
+# from SBv2_model.yaml and rotates it around
+# the x axis. This is the first rotation to
+# orient the robot onto a standard closed 
+# triangle face. 
+#
+# Usually used in conjunction with 
+# SBv2_model_rotate_x-z.yaml located in 
+# one folder up form this file's location.
+
+substructures:
+  SBv2:
+    path: ./SBv2_model.yaml
+    rotation:
+      axis: [1, 0, 0]
+      angle: -50
+      reference: [5, 19.29, 0]

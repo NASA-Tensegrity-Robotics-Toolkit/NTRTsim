@@ -1,6 +1,6 @@
 substructures:
   SBv2:
-    path: ./SBv2_yaml_files/SBv2_model_rotate_x.yaml
+    path: ./SBv2_yaml_files/SBv2_model_payload_rotate_x.yaml
     rotation:
       axis: [0, 0, 1]
       angle: -35

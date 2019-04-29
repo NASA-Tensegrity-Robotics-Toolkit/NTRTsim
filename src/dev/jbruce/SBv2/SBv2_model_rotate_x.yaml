@@ -1,7 +1,0 @@
-substructures:
-  SBv2:
-    path: ./SBv2_model.yaml
-    rotation:
-      axis: [1, 0, 0]
-      angle: 30
-      reference: [5, 19.29, 0]

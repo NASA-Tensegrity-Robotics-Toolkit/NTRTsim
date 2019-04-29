@@ -1,0 +1,15 @@
+# This file creates a new set of double rods
+# in the x-y rods from file
+# SBv2_doubleRod.yaml and rotaes it by 
+# negative 90 degress around the y axis. 
+# This sets up the rotation to orient the 
+# rods in the x-z plane correctly.
+# (Should be rods 4 and 5)
+
+substructures:
+  doubleRod:
+    path: ./SBv2_doubleRod.yaml
+    rotation:
+      axis: [0, 1, 0]
+      angle: -90
+      reference: [5, 0, 0]

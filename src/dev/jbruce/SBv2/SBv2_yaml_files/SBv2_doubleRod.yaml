@@ -1,5 +1,5 @@
-# This file is testing using SBv2_rod to make
-# substrctures of SBv2
+# This file is creates one set of parallel rods
+# in the x-y plane used in SUPERball v2.  
 
 substructures:
   rod0:
