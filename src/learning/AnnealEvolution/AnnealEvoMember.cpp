@@ -122,7 +122,7 @@ void AnnealEvoMember::loadFromFile(const char * outputFilename)
 		{
 			//cout<<"success opening file"<<endl;
 			// @todo fix the infinite loop that occurs here!
-			if(getline ( ss, value, ',' )>0)
+			if(!getline ( ss, value, ',' ).eof())
 			{
 				//cout<<"value read as string: "<<value<<endl;
 				statelessParameters[i++]=atof(value.c_str());
