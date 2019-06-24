@@ -51,26 +51,26 @@ builders:
   motor_block:
     class: tgBoxInfo
     parameters:
-      density: 0.69854
+      density: 3.543 # mass of 2.5kg
       width: 0.75
       height: 0.75
 
   top_motor_block:
     class: tgRodInfo
     parameters:
-      density: 0.3
+      density: 0.01
       radius: 0.5
 
   sphere_connector:
      class: tgRodInfo
      parameters:
-       density: 0.1
+       density: 0.01
        radius: 0.01
 
   s2:
     class: tgSphereInfo
     parameters:
-      density: 0.2
+      density: 0.382 # mass of 0.2kg
       radius: 0.5
       roll_friction: 0.9
       restitution: 0.0
@@ -78,7 +78,7 @@ builders:
   s3:
     class: tgSphereInfo
     parameters:
-      density: 0.2
+      density: 0.382 # mass of 0.2kg
       radius: 0.5
       roll_friction: 0.9
       restitution: 0.0

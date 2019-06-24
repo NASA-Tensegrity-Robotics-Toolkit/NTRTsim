@@ -102,9 +102,9 @@ builders:
   baseString: &baseString
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 2000
+      stiffness: 4000
       damping: 1000
-      pretension: 1500
+      pretension: 3800
 
   m01: *baseString
   m02: *baseString
