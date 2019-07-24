@@ -10,7 +10,7 @@ subdirs(
     steve
     kmorse
     apsabelhaus
-    ultra-spine
+    #ultra-spine
     muscleNP
     jbruce
     dhustigschultz

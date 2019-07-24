@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef HORIZONTAL_SPINE_CONTROLLER_H
-#define HORIZONTAL_SPINE_CONTROLLER_H
+#ifndef SINGLE_CABLE_CONTROLLER_H
+#define SINGLE_CABLE_CONTROLLER_H
 
 /**
- * @file HorizontalSpineController.h
- * @brief Contains the definition of class HorizontalSpineController.
- * @author Drew Sabelhaus, Lara Janse van Vuuren
+ * @file SingleCableController.h
+ * @brief Contains the definition of class SingleCableController. Based on Ultra-Spines HorizontalSpineController
+ * @author Jonathan Bruce
  * $Id$
  */
 
@@ -41,15 +41,14 @@ class TensegrityModel;
 class tgBasicActuator;
 
 /**
- * A controller to apply the length change in the cables of the HorizontalSpine
- * model. This is used for the ICRA 2016 ULTRA Spine paper results.
+ * A controller to apply the length change in the cables of SUPERball V2 model
  */
-class HorizontalSpineController : public tgObserver<TensegrityModel>, public tgSubject<HorizontalSpineController>
+class SingleCableController : public tgObserver<TensegrityModel>, public tgSubject<SingleCableController>
 {
 public:
 
   /**
-   * Construct a HorizontalSpineController.
+   * Construct a SingleCableController.
    * @param[in] startTime, a double that determines when the controller
    * begins its motion, how many seconds after the simulation starts.
    * @param[in] minLength, a double that is the percent of the initial length
@@ -62,13 +61,13 @@ public:
    * cables upon which to act. All the cables which have a tag in this list of tags
    * will be acted upon by this controller.
    */
-  HorizontalSpineController(double startTime, double minLength, double rate,
+  SingleCableController(double startTime, double minLength, double rate,
 			    std::vector<std::string> tagsToControl);
 
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~HorizontalSpineController() { }
+  virtual ~SingleCableController() { }
 
   /**
    * Apply the controller. On setup, adjust the cable
@@ -91,7 +90,7 @@ protected:
   /**
    * A helper function to find and initialize the actuators that this class
    * will control.
-   * @param[in] tag, a string of the tag for which to search in the list of 
+   * @param[in] tag, a string of the tag for which to search in the list of
    * actuators in this model.
    */
   void initializeActuators(TensegrityModel& subject, std::string tag);
@@ -127,4 +126,4 @@ private:
 
 };
 
-#endif // HORIZONTAL_SPINE_CONTROLLER_H
+#endif // SINGLE_CABLE_CONTROLLER_H

@@ -18,13 +18,14 @@
 
 /**
  * @file AppSBTest.cpp
- * @brief Basic Testing of YAML and SB model building. Should be 
+ * @brief Basic Testing of YAML and SB model building. Should be
  * depricated once the offical model is done
  * $Id$
  */
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
+#include "SingleCableController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -53,7 +54,7 @@ int main(int argc, char** argv)
     {
       throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
     }
-  
+
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -81,31 +82,21 @@ int main(int argc, char** argv)
 
     // Attach a controller to the model, if desired.
     // This is a controller that interacts with a generic TensegrityModel as
-    // built by the TensegrityModel file, BUT it only actually works
-    // with the specific HorizontalSpine YAML file.
-    // @TODO: should this throw an error when attached to a model that
-    // wasn't built with the HorizontalSpine YAML file?
+    // built by the TensegrityModel file
 
-    // Parameters for the Horizontal Spine Controller are specified in that .h file,
+    // Parameters for the SingleCableController are specified in that .h file,
     // repeated here:
-    //double startTime = 10.0;
-    //double minLength = 0.8;
-    //double rate = 0.25;
-    //std::vector<std::string> tagsToControl;
-    // HF is the right horizontal set
-    // HL is the bottom horizontal set maybe?
-    // HB is the left horizontal set
-    // HR is the top horizontal set.
-    // BUT, something is wrong here. Probably Bullet's numerical problems.
-    //tagsToControl.push_back("HR");
-    //tagsToControl.push_back("HF");
-    //tagsToControl.push_back("HB");
+    double startTime = 5.0;
+    double minLength = 0.05;
+    double rate = 0.1;
+    std::vector<std::string> tagsToControl;
+    tagsToControl.push_back("m18"); // Tag located in SBv2_yaml_files/SBv2_model.yaml line: 28
     // Call the constructor for the controller
-    //HorizontalSpineController* const controller =
-      //new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
+    SingleCableController* const controller =
+      new SingleCableController(startTime, minLength, rate, tagsToControl);
     // Attach the controller to the model. Must happen before running the
     // simulation.
-    //myModel->attach(controller);
+    myModel->attach(controller);
 
     // Add the model to the world
     simulation.addModel(myModel);
