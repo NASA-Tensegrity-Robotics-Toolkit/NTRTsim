@@ -137,14 +137,14 @@ void SingleCableController::onStep(TensegrityModel& subject, double dt)
       double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
       // If the current rest length is still greater than the minimum,
       if( currRestLength > minRestLength ) {
-	// output a progress bar for the controller, to track when control occurs.
-	std::cout << "." << i;
-	// Then, adjust the rest length of the actuator itself, according to
-	// m_rate and dt.
-	double nextRestLength = currRestLength - m_rate * dt;
-	//DEBUGGING
-	//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
-	cablesWithTags[i]->setControlInput(nextRestLength,dt);
+      	// output a progress bar for the controller, to track when control occurs.
+      	std::cout << "." << i;
+      	// Then, adjust the rest length of the actuator itself, according to
+      	// m_rate and dt.
+      	double nextRestLength = currRestLength - m_rate * dt;
+      	//DEBUGGING
+      	//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+      	cablesWithTags[i]->setControlInput(nextRestLength,dt);
       }
     }
   }

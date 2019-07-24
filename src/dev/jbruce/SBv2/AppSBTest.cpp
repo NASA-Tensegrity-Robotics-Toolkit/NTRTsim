@@ -87,10 +87,34 @@ int main(int argc, char** argv)
     // Parameters for the SingleCableController are specified in that .h file,
     // repeated here:
     double startTime = 5.0;
-    double minLength = 0.05;
-    double rate = 0.1;
+    double minLength = 0.1;
+    double rate = 10.0;
     std::vector<std::string> tagsToControl;
-    tagsToControl.push_back("m18"); // Tag located in SBv2_yaml_files/SBv2_model.yaml line: 28
+    //tagsToControl.push_back("m18"); // Tag located in SBv2_yaml_files/SBv2_model.yaml line: 28
+    tagsToControl.push_back("m01");
+    tagsToControl.push_back("m02");
+    tagsToControl.push_back("m03");
+    tagsToControl.push_back("m04");
+    tagsToControl.push_back("m05");
+    tagsToControl.push_back("m06");
+    tagsToControl.push_back("m07");
+    tagsToControl.push_back("m08");
+    tagsToControl.push_back("m09");
+    tagsToControl.push_back("m10");
+    tagsToControl.push_back("m11");
+    tagsToControl.push_back("m12");
+    tagsToControl.push_back("m13");
+    tagsToControl.push_back("m14");
+    tagsToControl.push_back("m15");
+    tagsToControl.push_back("m16");
+    tagsToControl.push_back("m17");
+    tagsToControl.push_back("m18");
+    tagsToControl.push_back("m19");
+    tagsToControl.push_back("m20");
+    tagsToControl.push_back("m21");
+    tagsToControl.push_back("m22");
+    tagsToControl.push_back("m23");
+    tagsToControl.push_back("m24");
     // Call the constructor for the controller
     SingleCableController* const controller =
       new SingleCableController(startTime, minLength, rate, tagsToControl);
