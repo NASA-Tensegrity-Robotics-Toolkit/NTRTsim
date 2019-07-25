@@ -17,14 +17,14 @@
  */
 
 /**
- * @file SingleCableController.cpp
- * @brief Implementation of SingleCableController. Based on Ultra-Spines HorizontalSpineController
+ * @file StepwiseController.cpp
+ * @brief Implementation of StepwiseController. Based on Ultra-Spines HorizontalSpineController
  * @author Jonathan Bruce
  * $Id$
  */
 
 // This module
-#include "SingleCableController.h"
+#include "StepwiseController.h"
 // This application
 #include "yamlbuilder/TensegrityModel.h"
 // This library
@@ -45,19 +45,27 @@
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-SingleCableController::SingleCableController(double startTime,
+StepwiseController::StepwiseController(double startTime,
+								 double stepTime,
 						     double minLength,
 						     double rate,
 						     std::vector<std::string> tagsToControl) :
   m_startTime(startTime),
+	m_stepTime(stepTime),
   m_minLength(minLength),
   m_rate(rate),
   m_tagsToControl(tagsToControl),
-  m_timePassed(0.0)
+  m_timePassed(0.0),
+	m_previousTime(stepTime+startTime),
+	m_count(0)
 {
   // start time must be greater than or equal to zero
   if( m_startTime < 0.0 ) {
     throw std::invalid_argument("Start time must be greater than or equal to zero.");
+  }
+	// step time must be greater than or equal to zero
+  if( m_stepTime < 0.0 ) {
+    throw std::invalid_argument("Step time must be greater than or equal to zero.");
   }
   // min length must be between 1 and 0
   else if( m_minLength > 1 ) {
@@ -78,7 +86,7 @@ SingleCableController::SingleCableController(double startTime,
  * specific actuators in the cablesWithTags array, as well as store the initial
  * rest lengths in the initialRL map.
  */
-void SingleCableController::initializeActuators(TensegrityModel& subject,
+void StepwiseController::initializeActuators(TensegrityModel& subject,
 						    std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -107,7 +115,7 @@ void SingleCableController::initializeActuators(TensegrityModel& subject,
  * which means just store pointers to them and record their rest lengths.
  * This method calls the helper initializeActuators.
  */
-void SingleCableController::onSetup(TensegrityModel& subject)
+void StepwiseController::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the HorizontalSpine controller." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
@@ -122,7 +130,7 @@ void SingleCableController::onSetup(TensegrityModel& subject)
   std::cout << "Finished setting up the controller." << std::endl;
 }
 
-void SingleCableController::onStep(TensegrityModel& subject, double dt)
+void StepwiseController::onStep(TensegrityModel& subject, double dt)
 {
   // First, increment the accumulator variable.
   m_timePassed += dt;
@@ -132,26 +140,42 @@ void SingleCableController::onStep(TensegrityModel& subject, double dt)
     // otherwise adjust its length according to m_rate and dt.
     for (std::size_t i = 0; i < cablesWithTags.size(); i ++) {
       double currRestLength = cablesWithTags[i]->getRestLength();
-      // Calculate the minimum rest length for this cable.
-      // Remember that m_minLength is a percent.
-      double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
-      // If the current rest length is still greater than the minimum,
-      if( currRestLength > minRestLength ) {
-      	// output a progress bar for the controller, to track when control occurs.
-      	std::cout << "." << i;
-      	// Then, adjust the rest length of the actuator itself, according to
-      	// m_rate and dt.
-      	double nextRestLength = currRestLength - m_rate * dt;
-				if(nextRestLength <= 0){
-					nextRestLength = minRestLength;
-				}
-      	//DEBUGGING
-      	//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
-      	cablesWithTags[i]->setControlInput(nextRestLength,dt);
-      }
-			else{
-				std::cout << "/" << cablesWithTags[i]->getTension();
+			double nextRestLength;
+			// Only adjust the cable one at a time in order of the cablesWithTags list
+			// at a rate govered by m_stepTime
+			if(i == m_count){
+				// Calculate the minimum rest length for this cable.
+	      // Remember that m_minLength is a percent.
+	      double minRestLength = initialRL[cablesWithTags[i]->getTags()] * m_minLength;
+	      // If the current rest length is still greater than the minimum,
+	      if( currRestLength > minRestLength ) {
+	      	// output a progress bar for the controller, to track when control occurs.
+	      	std::cout << "." << i;
+	      	// Then, adjust the rest length of the actuator itself, according to
+	      	// m_rate and dt.
+	      	nextRestLength = currRestLength - m_rate * dt;
+					if(nextRestLength <= 0){
+						nextRestLength = minRestLength;
+					}
+	      }
 			}
+			else {
+				if(currRestLength < initialRL[cablesWithTags[i]->getTags()]){
+					// Then, adjust the rest length of the actuator itself, according to
+	      	// m_rate and dt.
+					nextRestLength = currRestLength + m_rate * dt;
+				}
+			}
+			if((m_timePassed - m_previousTime) > m_stepTime){
+				m_previousTime = m_timePassed;
+				m_count++;
+				if(m_count > 5){
+					m_count = 0;
+				}
+			}
+			//DEBUGGING
+			//std::cout << "Next Rest Length: " << nextRestLength << std::endl;
+			cablesWithTags[i]->setControlInput(nextRestLength,dt);
     }
   }
 }

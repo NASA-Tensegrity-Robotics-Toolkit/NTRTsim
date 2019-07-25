@@ -10,6 +10,7 @@ link_libraries(core
 	TensegrityModel)
 
 add_executable(AppSBTest
+	StepwiseController.cpp
   SingleCableController.cpp
 	AppSBTest.cpp
 	)

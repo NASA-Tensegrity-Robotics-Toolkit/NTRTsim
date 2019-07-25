@@ -105,8 +105,11 @@ builders:
       stiffness: 4000.0
       damping: 1000.0
       pretension: 3800.0
-      max_tension: 100000.0
+      max_tension: 15000.0
       target_velocity: 12.0
+      min_actual_length: 0.001
+      min_rest_length: 0.001
+      history: 1
 
   m01: *baseString
   m02: *baseString
