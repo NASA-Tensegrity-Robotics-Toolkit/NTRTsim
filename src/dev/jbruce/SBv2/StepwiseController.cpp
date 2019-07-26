@@ -56,7 +56,7 @@ StepwiseController::StepwiseController(double startTime,
   m_rate(rate),
   m_tagsToControl(tagsToControl),
   m_timePassed(0.0),
-	m_previousTime(stepTime+startTime),
+	m_previousTime(startTime),
 	m_count(0)
 {
   // start time must be greater than or equal to zero
@@ -150,7 +150,7 @@ void StepwiseController::onStep(TensegrityModel& subject, double dt)
 	      // If the current rest length is still greater than the minimum,
 	      if( currRestLength > minRestLength ) {
 	      	// output a progress bar for the controller, to track when control occurs.
-	      	std::cout << "." << i;
+	      	// std::cout << "." << i;
 	      	// Then, adjust the rest length of the actuator itself, according to
 	      	// m_rate and dt.
 	      	nextRestLength = currRestLength - m_rate * dt;

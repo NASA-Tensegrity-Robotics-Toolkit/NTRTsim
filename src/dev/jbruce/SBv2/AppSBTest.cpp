@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     double startTime = 5.0;
     double stepTime = 2.0;
     double minLength = 0.1;
-    double rate = 10.0;
+    double rate = 3.5;
     std::vector<std::string> tagsToControl;
     //tagsToControl.push_back("m18"); // Tag located in SBv2_yaml_files/SBv2_model.yaml line: 28
 
