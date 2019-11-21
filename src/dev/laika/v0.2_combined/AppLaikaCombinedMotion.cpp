@@ -94,9 +94,9 @@ int main(int argc, char** argv)
 
     // We're working in centimeters, so scaling factor = 100.
     // FOR IROS 2018 DATA COLLECTION:
-    const tgWorld::Config config(9.81); // gravity, dm/sec^2 is 98.1.
+    //const tgWorld::Config config(9.81); // gravity, dm/sec^2 is 98.1.
     // FOR IROS 2018 VISUALIZATION:
-    //const tgWorld::Config config(98.1);
+    const tgWorld::Config config(98.1);
     // As of the commit when this comment appears, the units are still
     // a bit off. Gravity and cable force are still with s=10 (decimeters
     // and 1/10 factor on pretensions), but the length and density
@@ -255,9 +255,13 @@ int main(int argc, char** argv)
     case 4:
 	// BL
 	// bend:
-	startTimeBend = 2.0;
-	minLength = 0.8; // as a percent
-	rate = 0.025;
+	startTimeBend = 10.0;
+	// minLength = 0.8; // as a percent. Was 0.8 for meters model.
+    minLength = 0.9;
+	// rate = 0.025;
+    // was 0.025 for meters model.
+    // for cm model:
+    rate = 0.25;
 	// back left foot requires COM shifting to the right
 	// Pulling in the left cable shifts robot to the left.
 	tagsToControl.push_back("HL");
@@ -265,7 +269,7 @@ int main(int argc, char** argv)
 	footDataFilePrefix = "~/NTRTsim_logs/LaikaICRA2019MarkerDataD_" +
 	  NumberToString(minLength);
 	timeInterval = 0.01; // was 0.01 for data collection.
-	startTimeRot = 6.0; // was 8.0
+	startTimeRot = 16.0; // was 8.0
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi8.csv";
 	// that rotation might just be too dynamic for laika (tips over.)
 	//csvPath = "../../../../src/dev/laika/v0.2_combined/setpoint_trajectories/motor_data_ramp_dt01_tt_20_max_neg_pi32.csv";
@@ -277,8 +281,12 @@ int main(int argc, char** argv)
 	//KI = 0.0000001;
 	KD = 0.00001;
 	*/
-	KP = 0.00001; // was 0.05, for centimeters model, or 0.01.
-	KI = 0.000000001; // was 0.00001
+    // For meters model:
+	// KP = 0.00001; // was 0.05, for centimeters model, or 0.01.
+	// KI = 0.000000001; // was 0.00001
+    // for centimeters model:
+    KP = 0.005; // was 0.05, for centimeters model, or 0.01.
+    KI = 0.00001; // was 0.00001
 	//KI = 0.0;
 	//KD = 0.00001;
 	KD = 0.0;
@@ -431,7 +439,7 @@ int main(int argc, char** argv)
 			   colorD, 0);
 
     // Turn markers on or off
-    bool markersOn = 1;
+    bool markersOn = 0;
     if(markersOn){
       myModel->addMarker(markerA);
       myModel->addMarker(markerB);
