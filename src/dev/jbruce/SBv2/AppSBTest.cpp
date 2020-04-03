@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     // This is a controller that interacts with a generic TensegrityModel as
     // built by the TensegrityModel file
 
-    // Parameters for the SingleCableController are specified in that .h file,
+    // Parameters for the SingleCableController or StewiseController are specified in that .h file,
     // repeated here:
     double startTime = 5.0;
     double stepTime = 2.0;
@@ -124,9 +124,11 @@ int main(int argc, char** argv)
     // tagsToControl.push_back("m22");
     // tagsToControl.push_back("m23");
     // tagsToControl.push_back("m24");
+
     // Call the constructor for the controller
     StepwiseController* const controller =
       new StepwiseController(startTime, stepTime, minLength, rate, tagsToControl);
+
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
