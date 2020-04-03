@@ -168,7 +168,7 @@ void tgDataObserver::onSetup(tgModel& model)
       // At the moment, only handle force plates as parent models, not children.
       std::cout << "WARNING! tgDataObserver is currently not set up to "
 		<< "handle ForcePlateModel as a child! No output will occur "
-		<< "from this force plate." << std::cout;
+		<< "from this force plate.";
     }
     // Else do nothing since tgDataLogger won't touch it.
   }
