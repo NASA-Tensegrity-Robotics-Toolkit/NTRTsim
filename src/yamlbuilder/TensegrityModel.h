@@ -66,50 +66,50 @@ public:
     /*
      * Default rod radius.
      */
-    const static double rodRadius = 0.5;
+    static constexpr double rodRadius = 0.5;
     /*
      * Default rod density.
      */
-    const static double rodDensity = 1.0;
+    static constexpr double rodDensity = 1.0;
     /*
      * Default rod friction.
      */
-    const static double rodFriction = 1.0;
+    static constexpr double rodFriction = 1.0;
     /*
      * Default rod roll friction.
      */
-    const static double rodRollFriction = 0.0;
+    static constexpr double rodRollFriction = 0.0;
     /*
      * Default rod restitution.
      */
-    const static double rodRestitution = 0.2;
+    static constexpr double rodRestitution = 0.2;
 
     // Box parameters:
   
     /*
      * Default box width. (see tgBox.h)
      */
-    const static double boxWidth = 1.0;
+    static constexpr double boxWidth = 1.0;
     /*
      * Default box height. (see tgBox.h)
      */
-    const static double boxHeight = 1.0;
+    static constexpr double boxHeight = 1.0;
     /*
      * Default box density. (see tgBox.h)
      */
-    const static double boxDensity = 1.0;
+    static constexpr double boxDensity = 1.0;
     /*
      * Default box friction. (see tgBox.h)
      */
-    const static double boxFriction = 1.0;
+    static constexpr double boxFriction = 1.0;
     /*
      * Default box rolling friction. (see tgBox.h)
      */
-    const static double boxRollFriction = 0.0;
+    static constexpr double boxRollFriction = 0.0;
     /*
      * Default box restitution. (see tgBox.h)
      */
-    const static double boxRestitution = 0.2;
+    static constexpr double boxRestitution = 0.2;
 
     // Sphere parameters:
     
@@ -117,66 +117,66 @@ public:
      * Default sphere radius, density, friction, rolling friction, density, etc.
      * See tgSphere.h.
      */
-    const static double sphereRadius = 0.5;
-    const static double sphereDensity = 1.0;
-    const static double sphereFriction = 1.0;
-    const static double sphereRollFriction = 0.0;
-    const static double sphereRestitution = 0.2;
+    static constexpr double sphereRadius = 0.5;
+    static constexpr double sphereDensity = 1.0;
+    static constexpr double sphereFriction = 1.0;
+    static constexpr double sphereRollFriction = 0.0;
+    static constexpr double sphereRestitution = 0.2;
 
     // String parameters:
     
     /*
      * Default string stiffness.
      */
-    const static double stringStiffness = 1000.0;
+    static constexpr double stringStiffness = 1000.0;
     /*
      * Default string damping.
      */
-    const static double stringDamping = 10.0;
+    static constexpr double stringDamping = 10.0;
     /*
      * Default string pretension.
      */
-    const static double stringPretension = 0.0;
+    static constexpr double stringPretension = 0.0;
     /*
      * Default string radius.
      */
-    const static double stringRadius = 1.0;
+    static constexpr double stringRadius = 1.0;
     /*
      * Default string motor friction.
      */
-    const static double stringMotorFriction = 0.0;
+    static constexpr double stringMotorFriction = 0.0;
     /*
      * Default string motor intertia.
      */
-    const static double stringMotorInertia = 1.0;
+    static constexpr double stringMotorInertia = 1.0;
     /*
      * Default string back drivable (boolean).
      */
-    const static double stringBackDrivable = 0;
+    static constexpr double stringBackDrivable = 0;
     /*
      * Default string history (boolean).
      */
-    const static double stringHistory = 0;
+    static constexpr double stringHistory = 0;
     /*
      * Default string max tension.
      */
-    const static double stringMaxTension = 1000.0;
+    static constexpr double stringMaxTension = 1000.0;
     /*
      * Default string target velocity.
      */
-    const static double stringTargetVelocity = 100.0;
+    static constexpr double stringTargetVelocity = 100.0;
     /*
      * Default string min actual length.
      */
-    const static double stringMinActualLength = 0.1;
+    static constexpr double stringMinActualLength = 0.1;
     /*
      * Default string min rest length.
      */
-    const static double stringMinRestLength = 0.1;
+    static constexpr double stringMinRestLength = 0.1;
     /*
      * Default string rotation.
      */
-    const static double stringRotation = 0;
+    static constexpr double stringRotation = 0;
     /*
      * Default flags for automatic movement of cable anchor points.
      * See the config struct in tgBasicActuator.h for more information.
