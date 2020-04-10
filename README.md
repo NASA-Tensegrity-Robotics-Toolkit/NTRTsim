@@ -1,6 +1,16 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+2020-04-10 - Legacy Branch for G++ 4.8
+--------
+
+Reverted the fixes to support G++ > 7 located in master branch. This legacy branch may not get any future updates from master.
+
+2020-04-02 - Dependency Library Fix
+--------
+
+Fixed the dependency download locations in conf files because ntrt.perryb.ca is no longer running.
+
 12/19/18 - Warning: G++ > 7 Build Failures (Ubuntu 18.04 / Bionic)
 ---------
 
