@@ -4,7 +4,7 @@ NASA Tensegrity Robotics Toolkit
 2020-04-10 - Created new branch to support g++ 4.8
 --------
 
-The fixes fro G++ > 7 brakes the build if you are still using an old version of g++. There is now a branch called "legacy_gcc-4.8" to allow for older compilers to stil build NTRT.
+The fixes for G++ > 7 brakes the build if you are still using an old version of g++. There is now a branch called "legacy_gcc-4.8" to allow for older compilers to stil build NTRT.
 
 2020-04-02 - Dependency Library Fix
 --------
