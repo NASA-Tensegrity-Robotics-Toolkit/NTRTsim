@@ -165,7 +165,7 @@ void NeuroEvoMember::loadFromFile(const char * outputFilename)
 			while(!ss.eof())
 			{
 				//cout<<"success opening file"<<endl;
-				if(!getline( ss, value, ',' ).eof())
+				if(getline ( ss, value, ',' )>0)
 				{
 					//cout<<"value read as string: "<<value<<endl;
 					statelessParameters[i++]=atof(value.c_str());

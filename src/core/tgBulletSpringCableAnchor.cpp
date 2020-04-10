@@ -330,5 +330,5 @@ std::pair<btScalar, btVector3> tgBulletSpringCableAnchor::getManifoldDistance(bt
         }
     }
 	
-	return std::pair<btScalar, btVector3> (length, newNormal);
+	return std::make_pair<btScalar, btVector3> (length, newNormal);
 }
