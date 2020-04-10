@@ -1,16 +1,6 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
-2020-04-02 - Dependency Library Fix
---------
-
-Fixed the dependency download locations in conf files because ntrt.perryb.ca is no longer running.
-
-2019-06-04 - Provisionally resolved G++ > 7 features.
---------
-
-Fixed the build errors referenced below.  Still testing before reaching confidence in the fixes.
-
 12/19/18 - Warning: G++ > 7 Build Failures (Ubuntu 18.04 / Bionic)
 ---------
 
