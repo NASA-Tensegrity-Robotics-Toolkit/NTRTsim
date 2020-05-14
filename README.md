@@ -68,9 +68,9 @@ doxygen and graphviz (required) can be done by running "sudo apt-get
 install doxygen graphviz". HTML-based documentation can then be found 
 under src/DoxyDocs/index.html.
 
-Pre-built documentation for the repository can be found here:
+Old documentation for the repository can be found here:
 
-http://ntrt.perryb.ca/doxygen
+http://www.magicalrobot.org/NTRT/Docs/NTRTv1.1/html/
 
 Tutorials
 ----------
@@ -85,13 +85,6 @@ Additionally, some of our developers have recorded an introductory seminar
 for NTRT, available at https://www.youtube.com/watch?v=jyP5h_t73xw.
 To follow that video, please first compile and install NTRT (see 'INSTALL'
 in this directory).
-
-Build Status
----------
-
-NTRTsim's automated build system (BuildBot) can be found at:
-
-http://ntrt.perryb.ca/bb/waterfall
 
 About Tensegrity Robots and The Goals of NTRT
 ----------
