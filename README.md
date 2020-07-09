@@ -1,6 +1,30 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+2020-04-10 - Created new branch to support g++ 4.8
+--------
+
+The fixes for G++ > 7 breaks the build if you are still using an old version of g++. There is now a branch called "legacy_gcc-4.8" to allow for older compilers to still build NTRT.
+
+2020-04-02 - Dependency Library Fix
+--------
+
+Fixed the dependency download locations in conf files because ntrt.perryb.ca is no longer running.
+
+2019-06-04 - Provisionally resolved G++ > 7 features.
+--------
+
+Fixed the build errors referenced below.  Still testing before reaching confidence in the fixes.
+
+<del>12/19/18 - Warning: G++ > 7 Build Failures (Ubuntu 18.04 / Bionic)</del>
+---------
+
+<del>Currently, the simulator depends on functionality that has changed somewhere between gcc/g++ 4.8 and gcc/g++ 7. This problem arises when installing NTRTsim on Ubuntu 18.04 and Debian Stretch, as well as upgrading from Ubuntu 16.04 to 18.04. Errors will arise with (for example) the NeuroEvo classes. No fix that uses g++ 7 is available at this time.</del>
+
+<del>However, it is possible to install gcc 4.8 anf g++ 4.8 on Ubuntu 18.04, and switch between 4.8 and 7. Instructions in the INSTALL file.</del>
+
+<del>This problem may be related to NTRTsim's/Bullet 2.x's reliance on C++98.</del>
+
 3/19/15 - Warning: OS X Setup/Build Failures
 ---------
 Currently the simulator is not compiling under OS X. We hope to have this resolved soon. In the meantime if you wish to use the simulator your best bet is to install a Linux VM and install NTRT there. In the near future we hope to include a .vmdk which contains Ubuntu pre-installed with NTRT and supporting tools/libraries -- the INSTALL file will be updated onec that is complete (currently aiming for ~3/22/15).
@@ -44,9 +68,9 @@ doxygen and graphviz (required) can be done by running "sudo apt-get
 install doxygen graphviz". HTML-based documentation can then be found 
 under src/DoxyDocs/index.html.
 
-Pre-built documentation for the repository can be found here:
+Old documentation for the repository can be found here:
 
-http://ntrt.perryb.ca/doxygen
+http://www.magicalrobot.org/NTRT/Docs/NTRTv1.1/html/
 
 Tutorials
 ----------
@@ -57,12 +81,10 @@ http://ntrtsim.readthedocs.org/en/latest/index.html
 
 The source for that site is located under doc.
 
-Build Status
----------
-
-NTRTsim's automated build system (BuildBot) can be found at:
-
-http://ntrt.perryb.ca/bb/waterfall
+Additionally, some of our developers have recorded an introductory seminar
+for NTRT, available at https://www.youtube.com/watch?v=jyP5h_t73xw.
+To follow that video, please first compile and install NTRT (see 'INSTALL'
+in this directory).
 
 About Tensegrity Robots and The Goals of NTRT
 ----------

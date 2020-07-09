@@ -30,8 +30,8 @@
 #include "TetraSpineKinematic.h"
 
 // controller 
-#include "dev/CPG_feedback/SpineFeedbackControl.h"
-#include "dev/btietz/kinematicString/KinematicSpineCPGControl.h"
+#include "examples/learningSpines/SpineFeedbackControl.h"
+#include "examples/learningSpines/KinematicSpineCPGControl.h"
 
 // obstacles
 #include "models/obstacles/tgBlockField.h"

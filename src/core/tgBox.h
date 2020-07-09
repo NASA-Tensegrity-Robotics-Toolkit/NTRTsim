@@ -37,7 +37,7 @@
 //class btRigidBody;
 
 /**
- * A rod is a rigid body. Length is defined by nodes, width, height and density
+ * A box is a rigid body. Length is defined by nodes. Width, height and density
  * are defined by config.
  */
 class tgBox : public tgBaseRigid
@@ -46,20 +46,20 @@ public:
 
     /**
      * Holds two public member variables, density and radius, describing a
-     * rod configuration.
+     * box configuration.
      * A constructor allows them to be set together and to default.
      */
     struct Config
     {
-            /**
+        /**
          * Initialize with radius and density, which may default.
-         * @param[in] radius the rod's radius; must be non-negative
-         * @param[in] density the rod's density; must be non-negative
+         * @param[in] radius the box's radius; must be non-negative
+         * @param[in] density the box's density; must be non-negative
          */
             Config(double w = 1.0,
                     double h = 1.0,
                     double d = 1.0,
-					double f = 1.0,
+		    double f = 1.0,
                     double rf = 0.0,
                     double res = 0.2);
 
@@ -67,21 +67,21 @@ public:
             /** The box's width; must be nonnegative. */
             const double width;
 
-            /** The rod's height; must be nonnegative. */
+            /** The box's height; must be nonnegative. */
             const double height;
             
-			/** The rod's density; must be nonnegative. */
+            /** The box's density; must be nonnegative. */
             const double density;
             
-            /** The rod's friction; 
+            /** The box's friction; 
              * must be greater than or equal to 0 */
             const double friction;
 
-            /** The rod's rolling friction; 
+            /** The box's rolling friction; 
              * must be greater than or equal to 0 */
             const double rollFriction;
             
-            /** The rod's coefficient of restitution; 
+            /** The box's coefficient of restitution; 
              * must be between 0 and 1 (inclusive). */
             const double restitution;
     };
@@ -98,8 +98,8 @@ public:
     virtual void onVisit(const tgModelVisitor& v) const;
     
     /**
-     * Return the rod's length in application-dependent units.
-     * @return the rod's length in application-dependent units
+     * Return the box's length in application-dependent units.
+     * @return the box's length in application-dependent units
      */
     double length() const { return m_length; }
 
@@ -111,7 +111,7 @@ private:
 
 private:
     
-    /** The rod's length. The units are application dependent. */
+    /** The box's length. The units are application dependent. */
     const double m_length;
 };
 

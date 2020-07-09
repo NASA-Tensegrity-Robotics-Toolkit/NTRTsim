@@ -27,7 +27,7 @@
 // This application
 #include "examples/learningSpines/OctahedralComplex/FlemonsSpineModelLearningCL.h"
 // This library
-#include "dev/CPG_feedback/SpineFeedbackControl.h"
+#include "examples/learningSpines/SpineFeedbackControl.h"
 #include "examples/learningSpines/tgCPGLogger.h"
 #include "core/tgModel.h"
 #include "core/tgSimView.h"

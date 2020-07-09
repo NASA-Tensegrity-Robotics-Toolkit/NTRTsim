@@ -1,0 +1,1 @@
+This project is a first attempt at being able to couple the CPGs in the legs, hips, and spine in the MountainGoat without making the state space gigantic. Based on code from src/dev/dhusticschultz/BP_SC_SymmetricSpiral2.

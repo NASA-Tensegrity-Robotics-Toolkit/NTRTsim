@@ -65,8 +65,12 @@ int main(int argc, char** argv)
     // create the simulation
     tgSimulation simulation(view);
 
-    // create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    // create the models with their controllers and add the models to
+    // the simulation.
+    // This constructor for TensegrityModel takes the "debugging" flag
+    // as its second parameter. Set to true, and the simulation will
+    // output lots of information about the model that's created.
+    TensegrityModel* const myModel = new TensegrityModel(argv[1], false);
 
     // Add the model to the world
     simulation.addModel(myModel);

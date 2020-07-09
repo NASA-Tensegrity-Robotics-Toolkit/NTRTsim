@@ -5,6 +5,7 @@
  For a detailed description see page \ref core 
  
  \page core Core
+ 
  The core directory contains all of the necessary components for
  modeling and simulation. This includes:
  - the world tgWorld, 
@@ -16,6 +17,21 @@
  - actuators such as tgBasicActuator and tgKinematicActuator
  - the ability to tag models and components with tgTags and tgTaggable
  - basic components of controllers tgSubject and tgObserver
+
+A quick note about the cable colors in the files under core:
+
+In NTRTsim, the cables have different colors depending on the tensions that are applied in each cable (equivalently, the amount of "stretch" of each cable, given its current length and rest length.
+
+Briefly, here are the colors. More information can be found in the tgBulletRenderer.cpp file, under the render() functions.
+
+For tgSpringCableActuator:
+    - Blue = slack (no tension)
+    - Yellow/Red = in tension. More red = higher tension.
+
+For tgCompressionSpringActuator:
+    - Blue = slack (no tension)
+    - Red = in tension. Note that this color does not scale, like tgSpringCableActutaor.
+    - Green = in compression, the spring is "pushing."
  
- \version 1.1.0
+ \version 1.2.0
  */

@@ -1,0 +1,106 @@
+{
+    "filePrefix"   : "monteOut",
+    "fileSuffix"   : ".json",
+    "resourcePath" : "../../../resources/src/",
+    "lowerPath"    : "bgigous/AppQuadCoupling/",
+    "executable" : "./../../../build/dev/bgigous/MG_FirstAttempt/AppQuadCoupling",
+    "terrain" : [[[0, 0, 0, 0.0, 10000]]],
+    "learningParams": 
+    {
+        "trialLength" : 10000,
+        "numTrials" : 100,
+        "numGenerations" : 1,
+        "deterministic": 0,
+        "nodeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 5,
+            "numberOfInstances" : 10,
+            "populationSize" : 100,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+        "edgeVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 752,
+            "populationSize" : 100,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+        },
+		"highVals" :
+		{
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 10,
+            "populationSize" : 100,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+		},
+		"hLowVals" :
+		{
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 0,
+            "numberOfOutputs" : 2,
+            "numberOfInstances" : 5,
+            "populationSize" : 100,
+            "useAverage" : true,
+            "numberToMutate" : 2,
+            "numberOfChildren" : 1,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": 0.0,
+            "childMutationChance" : 0.9
+		},
+        "feedbackVals" :
+        {
+            "learning" : true,
+            "startingControllers" : 0,
+            "monteCarlo" : true,
+            "numberOfStates" : 2,
+            "numberOfOutputs" : 3,
+            "numberHidden" : 4,
+            "numberOfInstances" : 1,
+            "populationSize" : 100,
+            "useAverage" : true,
+            "numberToMutate" : 15,
+            "numberOfChildren" : 5,
+            "mutationChance" : 0.5,
+            "mutationDev" : 0.03,
+            "paramMax" : 1.0,
+            "paramMin": -1.0,
+            "childMutationChance" : 0.7
+        }
+    }
+}

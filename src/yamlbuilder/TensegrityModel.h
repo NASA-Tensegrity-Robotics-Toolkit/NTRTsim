@@ -22,7 +22,8 @@
 /**
  * @file TensegrityModel.cpp
  * @brief Contains the definition of the members of the class TensegrityModel.
- * @author Simon Kotwicz & Jonah Eisen
+ * @author Simon Kotwicz, Jonah Eisen, Drew Sabelhaus
+ * @copyright Copyright (C) 2016 NASA Ames Research Center
  * $Id$
  */
 
@@ -44,6 +45,7 @@
 class tgSpringCableActuator;
 class tgModelVisitor;
 class tgWorld;
+class tgStructureInfo;
 
 typedef YAML::Node Yam; // to avoid confusion with structure nodes
 
@@ -54,79 +56,135 @@ class TensegrityModel : public tgSubject<TensegrityModel>, public tgModel
 {
 public:
 
+    /**
+     * List of all the default config parameters for all the
+     * types of objects that wil be supported.
+     */
+
+    // Rod parameters:
+  
     /*
      * Default rod radius.
      */
-    const static double rodRadius = 0.5;
+    static constexpr double rodRadius = 0.5;
     /*
      * Default rod density.
      */
-    const static double rodDensity = 1.0;
+    static constexpr double rodDensity = 1.0;
     /*
      * Default rod friction.
      */
-    const static double rodFriction = 1.0;
+    static constexpr double rodFriction = 1.0;
     /*
      * Default rod roll friction.
      */
-    const static double rodRollFriction = 0.0;
+    static constexpr double rodRollFriction = 0.0;
     /*
      * Default rod restitution.
      */
-    const static double rodRestitution = 0.2;
+    static constexpr double rodRestitution = 0.2;
 
+    // Box parameters:
+  
+    /*
+     * Default box width. (see tgBox.h)
+     */
+    static constexpr double boxWidth = 1.0;
+    /*
+     * Default box height. (see tgBox.h)
+     */
+    static constexpr double boxHeight = 1.0;
+    /*
+     * Default box density. (see tgBox.h)
+     */
+    static constexpr double boxDensity = 1.0;
+    /*
+     * Default box friction. (see tgBox.h)
+     */
+    static constexpr double boxFriction = 1.0;
+    /*
+     * Default box rolling friction. (see tgBox.h)
+     */
+    static constexpr double boxRollFriction = 0.0;
+    /*
+     * Default box restitution. (see tgBox.h)
+     */
+    static constexpr double boxRestitution = 0.2;
+
+    // Sphere parameters:
+    
+    /*
+     * Default sphere radius, density, friction, rolling friction, density, etc.
+     * See tgSphere.h.
+     */
+    static constexpr double sphereRadius = 0.5;
+    static constexpr double sphereDensity = 1.0;
+    static constexpr double sphereFriction = 1.0;
+    static constexpr double sphereRollFriction = 0.0;
+    static constexpr double sphereRestitution = 0.2;
+
+    // String parameters:
+    
     /*
      * Default string stiffness.
      */
-    const static double stringStiffness = 1000.0;
+    static constexpr double stringStiffness = 1000.0;
     /*
      * Default string damping.
      */
-    const static double stringDamping = 10.0;
+    static constexpr double stringDamping = 10.0;
     /*
      * Default string pretension.
      */
-    const static double stringPretension = 0.0;
+    static constexpr double stringPretension = 0.0;
     /*
      * Default string radius.
      */
-    const static double stringRadius = 1.0;
+    static constexpr double stringRadius = 1.0;
     /*
      * Default string motor friction.
      */
-    const static double stringMotorFriction = 0.0;
+    static constexpr double stringMotorFriction = 0.0;
     /*
      * Default string motor intertia.
      */
-    const static double stringMotorInertia = 1.0;
+    static constexpr double stringMotorInertia = 1.0;
     /*
      * Default string back drivable (boolean).
      */
-    const static double stringBackDrivable = 0;
+    static constexpr double stringBackDrivable = 0;
     /*
      * Default string history (boolean).
      */
-    const static double stringHistory = 0;
+    static constexpr double stringHistory = 0;
     /*
      * Default string max tension.
      */
-    const static double stringMaxTension = 1000.0;
+    static constexpr double stringMaxTension = 1000.0;
     /*
      * Default string target velocity.
      */
-    const static double stringTargetVelocity = 100.0;
+    static constexpr double stringTargetVelocity = 100.0;
     /*
      * Default string min actual length.
      */
-    const static double stringMinActualLength = 0.1;
+    static constexpr double stringMinActualLength = 0.1;
     /*
      * Default string min rest length.
      */
-    const static double stringMinRestLength = 0.1;
+    static constexpr double stringMinRestLength = 0.1;
     /*
      * Default string rotation.
      */
-    const static double stringRotation = 0;
+    static constexpr double stringRotation = 0;
+    /*
+     * Default flags for automatic movement of cable anchor points.
+     * See the config struct in tgBasicActuator.h for more information.
+     * NTRTsim defaults to moving cable anchor points to the edges of
+     * a rigid body.
+     */
+    const static bool stringMoveCablePointAToEdge = true;
+    const static bool stringMoveCablePointBToEdge = true;
 
     /*
      * YAML-encoded structure path.
@@ -134,10 +192,25 @@ public:
     std::string topLvlStructurePath;
 
     /**
-     * The only constructor.
+     * Boolean flag that enables or disables debugging.
+     * All places this flag works in TensegrityModel.cpp can be found
+     * by searching through that file for the string "DEBUGGING".
+     */
+    bool debugging_on = false;
+
+    /**
+     * The simplest constructor.
+     * This constructor sets debugging_on = false.
      * @param[in] structurePath the path of the YAML-encoded structure
      */
     TensegrityModel(const std::string& structurePath);
+
+    /**
+     * Constructor that takes 'debugging' as a parameter.
+     * @param[in] structurePath the path of the YAML-encoded structure
+     * @param[in] debugging the flag that controls debugging output on/off.
+     */
+    TensegrityModel(const std::string& structurePath, bool debugging);
 
     /**
      * Destructor. Deletes controllers, if any were added during setup.
@@ -324,6 +397,16 @@ private:
     void addKinematicActuatorBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
 
     /*
+     * Responsible for adding a builder that uses the tgBox config
+     */
+    void addBoxBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
+     * Responsible for adding a builder that uses the tgSphere config
+     */
+    void addSphereBuilder(const std::string& builderClass, const std::string& tagMatch, const Yam& parameters, tgBuildSpec& spec);
+
+    /*
      * Ensures YAML node contains only keys from the supplied vector
      */
     void yamlContainsOnly(const Yam& yam, const std::string structurePath, const std::vector<std::string> keys);
@@ -332,6 +415,12 @@ private:
      * Ensures that YAML has all unique keys within each map
      */
     void yamlNoDuplicates(const Yam& yam, const std::string structurePath);
+
+    /**
+     * Output debugging information for this model and structure.
+     */
+    void trace(const tgStructure& structure,
+		      const tgStructureInfo& structureInfo, tgModel& model);
 
 };
 

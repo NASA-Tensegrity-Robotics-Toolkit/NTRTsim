@@ -76,25 +76,50 @@ double tgBasicActuatorInfo::getMass()
 
 tgBulletSpringCable* tgBasicActuatorInfo::createTgBulletSpringCable()
 {
-    //std::cout << "tgBasicActuatorInfo::createMuscle2P()" << std::endl;
-    
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo() << std::endl;
-    //std::cout << "  getFromRigidInfo(): " << getFromRigidInfo()->getRigidInfoGroup() << std::endl;
-    
+     
     // @todo: need to check somewhere that the rigid bodies have been set...
     btRigidBody* fromBody = getFromRigidBody();
     btRigidBody* toBody = getToRigidBody();
 
-    btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
-    btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
+    // This method can create the spring-cable either at the node location
+    // as specified, or it can automatically re-locate either anchor end
+    // to the edge of a rigid body.
+    btVector3 from;
+    btVector3 to;
+
+    // Choose either the node location (as given by the tgConnectorInfo's point),
+    // or the point returned by the attached rigid body's getConnectorInfo method.
+    
+    // Point "A" is the "From" point, the first btVector3 in the pair.
+    if( m_config.moveCablePointAToEdge ){
+      from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(),
+						    m_config.rotation);
+    }
+    else {
+      // The getFrom method is inherited from tgConnectorInfo.
+      from = getFrom();
+    }
+    // Point "B" is the "To" point, the second btVector3 in the pair.
+    if( m_config.moveCablePointBToEdge ){
+      to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(),
+						m_config.rotation);
+    }
+    else {
+      // The getTo method is inherited from tgConnectorInfo.
+      to = getTo();
+    }    
+
+    // Older version of this code: always relocate the anchors.
+    //btVector3 from = getFromRigidInfo()->getConnectionPoint(getFrom(), getTo(), m_config.rotation);
+    //btVector3 to = getToRigidInfo()->getConnectionPoint(getTo(), getFrom(), m_config.rotation);
 	
-	std::vector<tgBulletSpringCableAnchor*> anchorList;
+    std::vector<tgBulletSpringCableAnchor*> anchorList;
 	
-	tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
-	anchorList.push_back(anchor1);
+    tgBulletSpringCableAnchor* anchor1 = new tgBulletSpringCableAnchor(fromBody, from);
+    anchorList.push_back(anchor1);
 	
-	tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
-	anchorList.push_back(anchor2);
+    tgBulletSpringCableAnchor* anchor2 = new tgBulletSpringCableAnchor(toBody, to);
+    anchorList.push_back(anchor2);
 	
     return new tgBulletSpringCable(anchorList, m_config.stiffness, m_config.damping, m_config.pretension);
 }

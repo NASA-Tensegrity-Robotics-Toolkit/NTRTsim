@@ -1,7 +1,6 @@
 link_directories(${LIB_DIR})
 
 link_libraries(octahedralComplex
-                CPG_feedback
                 learningSpines
                 sensors
                 tgcreator

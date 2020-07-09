@@ -2,6 +2,9 @@ Project(dhustigschultz)
 
 subdirs(
     BigDoxie
+    BigDoxieNoFeet
+    BigDoxieSpirals
+
     BigPuppy_Model
     BigPuppy_Model2
     BigPuppy_Symmetric
@@ -23,6 +26,8 @@ subdirs(
     BP_SC_SymmetricSpiral2
     BP_SC_NoLegs
     BP_SC_Doxie
+    BP_SC_Doxie_NoFeet
+    BP_SC_DoxieSpirals
     BigPuppy_NoFeet
     BigPuppy_RigidFeet
 
@@ -30,6 +35,19 @@ subdirs(
 
     BP_SC_SymmetricSpiral3
     BigPuppy_SymmetricSpiral_Metrics
+
     MountainGoat
+    MountainGoatFM0
     MG_Controller
+    MG_CPGHierarchy
+
+    MountainGoatAchilles
+    MG_Achilles_CPGHierarchy
+    MG_AchillesOnly_CPGH
+    MG_FewerMuscles1
+    MG_FewerMuscles0
+
+    MountainGoatNL2
+
 )
+

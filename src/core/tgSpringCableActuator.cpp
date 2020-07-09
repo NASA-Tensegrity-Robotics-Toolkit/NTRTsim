@@ -42,7 +42,9 @@ tgSpringCableActuator::Config::Config(double s,
                    double tVel,
                    double mnAL,
                    double mnRL,
-                   double rot) :
+		   double rot,
+   	           bool moveCPA,
+		   bool moveCPB) :
   stiffness(s),
   damping(d),
   pretension(p),
@@ -51,7 +53,9 @@ tgSpringCableActuator::Config::Config(double s,
   targetVelocity(tVel),
   minActualLength(mnAL),
   minRestLength(mnRL),
-  rotation(rot)        
+  rotation(rot),
+  moveCablePointAToEdge(moveCPA),
+  moveCablePointBToEdge(moveCPB)
 {
     ///@todo is this the right place for this, or the constructor of this class?
     if (s < 0.0)
@@ -79,8 +83,8 @@ tgSpringCableActuator::Config::Config(double s,
     }
     else if (abs(rot) > M_PI * 2.0)
     {
-		throw std::invalid_argument("Abs of rotation is greater than 2pi. Are you sure you're setting the right parameters?");
-	}
+         throw std::invalid_argument("Abs of rotation is greater than 2pi. Are you sure you're setting the right parameters?");
+    }
 }
 
 void tgSpringCableActuator::Config::scale (double sf)

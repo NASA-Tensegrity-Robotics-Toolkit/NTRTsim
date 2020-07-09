@@ -1,8 +1,5 @@
 link_libraries(obstacles
-                KinematicString
                flemonsSpineContact
-               CPG_feedback
-                KinematicString
                 learningSpines
                 sensors
                 controllers

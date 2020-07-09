@@ -26,6 +26,7 @@
 
 // This application
 #include "../../../yamlbuilder/TensegrityModel.h"
+#include "../../../yamlbuilder/TensegrityModelController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/tgModel.h"
@@ -46,6 +47,13 @@
  */
 int main(int argc, char** argv)
 {
+    // For this YAML parser app, need to check that an argument path was
+    // passed in.
+    if (argv[1] == NULL)
+    {
+      throw std::invalid_argument("No arguments passed in to the application. You need to specify which YAML file you wouldd like to build.");
+    }
+  
     // create the ground and world. Specify ground rotation in radians
     const double yaw = 0.0;
     const double pitch = 0.0;
@@ -66,7 +74,12 @@ int main(int argc, char** argv)
     tgSimulation simulation(view);
 
     // create the models with their controllers and add the models to the simulation
-    TensegrityModel* const myModel = new TensegrityModel(argv[1]);
+    // This constructor for TensegrityModel takes the 'debugging' flag as the
+    // second argument.
+    TensegrityModel* const myModel = new TensegrityModel(argv[1], true);
+
+    TensegrityModelController* const controller = new TensegrityModelController();
+    myModel->attach(controller);
 
     // Add the model to the world
     simulation.addModel(myModel);

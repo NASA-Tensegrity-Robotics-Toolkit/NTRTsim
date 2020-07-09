@@ -1,0 +1,31 @@
+# This will be a test of adding tgSphere functionality to the YAML builder.
+
+nodes:
+  # Add a random stick.
+  center: [0, 1, 0]
+  endpoint: [0, 11, 0]
+  # Spheres will be created whenever a node has the tag of
+  # a builder. So, no need to do a pair group, just place a node!
+  endingsphere: [0, 11, 0]
+
+pair_groups:
+  # First, just a stick.
+  stickbox:
+    - [center, endpoint]
+  # Just to emphasize again: no pairs needed for spheres!
+  
+# Builders. First, the box:
+builders:
+
+  stickbox:
+    class: tgBoxInfo
+    parameters:
+      density: 0.5
+      width: 0.5
+      height: 0.5
+
+  endingsphere:
+    class: tgSphereInfo
+    parameters:
+      density: 0.5
+      radius: 2

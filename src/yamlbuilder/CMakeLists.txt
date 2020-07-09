@@ -6,13 +6,18 @@ link_libraries(core
                sensors
                terrain
                tgOpenGLSupport
-               yaml-cpp)
+               yaml-cpp
+)
 
 add_library(TensegrityModel
-    TensegrityModel.cpp)
+    TensegrityModel.cpp
+    TensegrityModelController.cpp
+)
 
 add_executable(BuildModel
     TensegrityModel.cpp
-    BuildTensegrityModel.cpp)
+    BuildTensegrityModel.cpp
+    TensegrityModelController.cpp
+)
 
 

@@ -56,6 +56,7 @@ Tensegrity structures are made up of rods and strings. The vertices of the rods 
   nodes:
     bottom1: [-5, 0, 0]
 
+
 Adding Pairs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,6 +66,7 @@ Rods and strings are defined using the “pair_groups” keyword and are grouped
   pair_groups:
     rod:
       - [bottom1, top2]
+
 
 Adding Builders
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,6 +90,54 @@ Shown below is an example of builders that can be used to modify how rods and st
 The “builders” keyword is used to define one or more builders. Builders work through tag matching. For example, the builder “rod” will match any pairs with the tag “rod”. The builder “rod” will also match any pairs with the tag “prism rod” since “prism rod” is treated as two different tags and the “rod” builder is looking for any pairs that include the tag “rod”. As was mentioned earlier, the YAML model builder automatically adds a default “rod” and “string” builder to make building structures even faster. If a “rod ”or “string” builder is defined by the user, it will override the default “rod” and “string” builder. Builders defined inside one file should never overlap (eg. using a “muscle” and “leg muscle” builder in the same file).
 
 Each builder tag needs to be given a class using the “class” keyword. The class determines the properties of the rod or string. The basic rod and string classes are tgRodInfo and tgBasicActuatorInfo. More information about different string/cable classes can be found in the `motors and cables`_ section. Each builder takes a number of parameters which are specified using the “parameters” keyword. All parameters are optional (if they are not specified they will take on default values). Some of the most common parameters for tgRodInfo and tgBasicActuatorInfo are shown in the example above. More information about the parameters used by tgRodInfo_ or tgBasicActuatorInfo_ can be found in their respective classes.
+
+
+Adding Single-Node Structures versus Multiple-Element Structures (Spheres vs. Rods/Boxes)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Most stuctures are built out of more than one node. For example, rods are made from two nodes: one for each endpoint of the rod. Consequently, to make a rod, you'd need to specify two nodes (with whatever tag you'd like), then make a pair with a *specific* tag which then must correlate with a builder. For example, let's emphasize using a full example of making one rod:
+
+::
+
+  nodes:
+    rodEndA: [-5, 0, 0]
+    rodEndB: [5, 0, 0]
+
+  pair_groups:
+    rod:
+      - [rodEndA, rodEndB]
+
+  builders:
+    rod:
+      class: tgRodInfo
+      parameters:
+        density: 0.688
+        radius: 0.31
+
+Here, you can see that "rodEndA" and "rodEndB" are arbitrary names. You could have chosen whatever you'd like, as long as the same node names (tags) are used for the line in pair_groups.
+Instead, the tag "rod" is the important one! That's what correlates the nodes to a specific type of builder.
+
+
+This is NOT the case when creating single-element rigid bodies. For example, consider a sphere. Spheres only have one node associated with them: their centerpoint. Since it doesn't make sense to have spheres be a "pair," NTRTsim implements the following.
+Single-element rigid bodies must correlate the *node tag* to a builder, not the *pair tag* to a builder.
+Here's an example of creating a sphere.
+
+::
+
+  nodes:
+    examplesphere: [0, 5, 0]
+
+  builders:
+    examplesphere:
+      class: tgSphereInfo
+      parameters:
+        density: 0.5
+        radius: 2
+
+
+If you create a pair_group with the same tag as used for a builder, nothing will happen. (To-do: check and confirm nothing is accidentally created, handle these edge cases.)
+Point is - use the above example for making spheres.
 
 Combining Structures
 -----------------------------------------
@@ -183,10 +233,10 @@ If the “leg” structure is itself a superstructure with multiple substructure
       foot/leg/node_node:
         - [top, knee.bottom]
 
-Spine Structures
+Series of Substructures (Including Spine Structures)
 '''''''''''''''''''''''''''''''''''''''''
 
-Spines structures can be easily defined using the syntax below. The syntax makes it possible to define a set of pairs that is used to connect more than two structures.
+A series of substructures, for example the vertebrae in a spine structure, can be easily defined using the syntax below. The syntax makes it possible to define a set of pairs that is used to connect more than two structures. When using this syntax with slashes between multiple substructures, the connections are only made between adjacent substructures in the series of slashes. In this example, the front-to-front connection is made between t1 and t2 (since they are next to each other) as well as t2 to t3 (for the same reason), but no connection is made from t1 to t3.
 ::
 
   bond_groups:
