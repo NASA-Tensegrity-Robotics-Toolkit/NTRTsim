@@ -28,7 +28,7 @@
 #include "PrismModel.h"
 #include "Marker.h"
 #include "RPThruster.h"
-#include "controllers/T6RollingControllerPrism.h"
+//#include "controllers/T6RollingControllerPrism.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
 #include "core/terrain/tgImportGround.h"
@@ -62,13 +62,12 @@ int main(int argc, char** argv)
 
   //Option 1: Uncomment to implement flat ground environment (must comment out STL importer below)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+ /* 
   const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
   // the world will delete this
   tgBoxGround* ground = new tgBoxGround(groundConfig);
-  
+ */
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /*
   //Option 2: Uncomment below to import parsed STL file (must comment out flat ground above)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Set ground parameters
@@ -78,7 +77,7 @@ int main(int argc, char** argv)
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
   const double margin = 30;//0.05;
   const double offset = 0.5;
-  const double scalingFactor = sf*1000/63;
+  const double scalingFactor = 100000000; //sf*1000/63;
   int Interp = 0;
   bool twoLayer = false;
   
@@ -88,7 +87,7 @@ int main(int argc, char** argv)
   
   // Get filename from argv
   //std::string filename_in = "./LunarScape_mission.txt";
-  std::string filename_in = "./LunarMission_Easy.txt";
+  std::string filename_in = "./STL_output.txt" ;
   
   // Check filename
   if (filename_in.find(".txt") == std::string::npos) {
@@ -110,7 +109,7 @@ int main(int argc, char** argv)
   }
   tgImportGround* ground = new tgImportGround(groundConfig, file_in);
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  */ 
+   
 
   double gravity = 1.618*sf; //moon gravity
   const tgWorld::Config config(gravity); 
@@ -141,18 +140,18 @@ int main(int argc, char** argv)
   MarkerModel* const marker = new MarkerModel(marker_target);
     
   //Create Active Thruster
-  RPThruster* const thrust_control = new RPThruster(2,3,1,target); //robotstate=2 activates thruster controller, goes to state 3 if robot is within distance threshold, else state 1
-  myModel->attach(thrust_control);
+  //RPThruster* const thrust_control = new RPThruster(2,3,1,target); //robotstate=2 activates thruster controller, goes to state 3 if robot is within distance threshold, else state 1
+  //myModel->attach(thrust_control);
 
   //Robot Starts in State 1
-  const T6RollingController::Config controllerConfig1(gravity, "face", 0, 1, 2); //reorientation controller is state 1 -> state 2 thrust control
-  const T6RollingController::Config controllerConfig2(gravity, "dr", target, 3, 1); //dead reckoning is state 3 -> state 1 reorientation
+  //const T6RollingController::Config controllerConfig1(gravity, "face", 0, 1, 2); //reorientation controller is state 1 -> state 2 thrust control
+  //const T6RollingController::Config controllerConfig2(gravity, "dr", target, 3, 1); //dead reckoning is state 3 -> state 1 reorientation
 
   //Attach both rolling controllers (dead reckoning and reorientation rolling)
-  T6RollingController* const rollingController1 = new T6RollingController(controllerConfig1);
-  myModel->attach(rollingController1);
-  T6RollingController* const rollingController2 = new T6RollingController(controllerConfig2);
-  myModel->attach(rollingController2);
+  //T6RollingController* const rollingController1 = new T6RollingController(controllerConfig1);
+  //myModel->attach(rollingController1);
+  //T6RollingController* const rollingController2 = new T6RollingController(controllerConfig2);
+  //myModel->attach(rollingController2);
     
   // Add the models to the world
   simulation.addModel(marker);
