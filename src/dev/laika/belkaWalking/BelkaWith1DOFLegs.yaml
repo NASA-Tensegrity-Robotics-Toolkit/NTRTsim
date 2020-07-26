@@ -1,0 +1,217 @@
+# YAML file for Laika with movable legs.
+# This file MUST be used with LaikaWalkingModel, not with TensegrityModel.
+# Otherwise, the legs will not be attached to the hips: TensegrityModel does
+# add the btHingeConstraints that are needed.
+
+# This spine has multiple substructures,
+# including the spine itself (t1-t6) and the supporting pieces.
+
+substructures:
+
+  t1/t2/t3/t4/t5/t6:
+    path: ./TetrahedronSymmetric.yaml
+    offset: [-12, 0 , 0]
+    translation: [0, 30.5, 0]
+    
+  hips:
+    path: ../BaseStructuresLaika/StructuresForHinges/HipsFor1DOFLegs.yaml
+    offset: [0, 0, 0]
+    translation: [0, 40.5, 0]
+
+  # Previously, we just swapped around the hips:
+  #front:
+  #  path: ../BaseStructuresLaika/HipsFor1DOFLegs.yaml
+  #  offset: [0, 0, 0]
+  #  translation: [-60, 40.5, 0] # 68
+  #  rotation:
+  #    axis: [0, 1, 0]
+  #    angle: 180
+  #    reference: [0, 0, 0]
+
+  # ...but now, we need to use separate shoulders, so we can have
+  # different tags for the rods that will be used for the hinges.
+  front:
+    path: ../BaseStructuresLaika/StructuresForHinges/ShouldersFor1DOFLegs.yaml
+    offset: [0, 0, 0]
+    translation: [-60, 40.5, 0] # 68
+    rotation:
+      axis: [0, 1, 0]
+      angle: 180
+      reference: [0, 0, 0]
+
+  # Previously, we could do sets of legs, easily, as in:
+  # We're doing two legs here. The hips are +/- 15 units wide.
+  # Offset is between each leg. Second leg is +30 from first.
+  #backlegsleft/backlegsright:
+  #  path: ../BaseStructuresLaika/StructuresForHinges/StickLegs.yaml
+  #  offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
+  #  # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
+  #  # the ends of the hips (15 units back.)
+  #  translation: [15, 10.5, -16] # 
+    
+  #frontlegsleft/frontlegsright:
+  #  path: ../BaseStructuresLaika/StickLegs.yaml
+  #  offset: [0, 0, 32]
+  #  # Only difference from front legs is in x-direction.
+  #  translation: [-75, 10.5, -16] # 60 offset + 15 for hips
+
+  # However, now we need to have each leg separate. This is required for us
+  # to be able to pick out the tags for the btHingeConstraints.
+  backlegsleft:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackLeft.yaml
+    translation: [15, 10.5, -16]
+  backlegsright:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegBackRight.yaml
+    translation: [15, 10.5, 16]
+  frontlegsleft:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontLeft.yaml
+    translation: [-75, 10.5, -16] # 60 offset + 15 for hips
+  frontlegsright:
+    path: ../BaseStructuresLaika/StructuresForHinges/StickLegFrontRight.yaml
+    translation: [-75, 10.5, 16]
+
+bond_groups:
+  HF:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [front, front]
+  HR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, right]      
+  HL: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, left]
+  HB:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [back, back]
+  SFR:
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [right, back] 
+  SRL:
+   t1/t2/t3/t4/t5/t6/node_node: 
+     - [right, front]
+  SBF: 
+   t1/t2/t3/t4/t5/t6/node_node:
+     - [left, front]
+  SBL: 
+   t1/t2/t3/t4/t5/t6/node_node: 
+      - [left, back]  
+
+  rod:
+  
+   # For the hips, connect at just one point, from the center of the
+   # last vetrebra to one end of the box.
+   t1/hips/node_node:
+      - [center, V1]
+
+   # For the front, also just connect at centers.
+   t6/front/node_node: 
+      - [center, V1]
+   
+   #hips/backlegsleft/node_node:
+   #   - [V4, legtop]
+
+   #hips/backlegsright/node_node:
+   #   - [V3, legtop]
+ 
+   #front/frontlegsleft/node_node:
+   #   - [V3, legtop]
+
+   #front/frontlegsright/node_node:  
+   #   - [V4, legtop]
+
+# Rod radius reduced to half for tests at 0.5 scale.
+# Mass calculations: Robot weighed 1.62 kg on 2016-09-09,
+# 1.62 * 9.81 = 15.9 N
+# Rod density changed from 0.014 to 0.0044.
+# For the saddle cables, spring constant is 7 lb/in = 1226 N/m
+# (was either 1000 or 5000)
+# For the horizontal cables, spring constant is 1.07 lb/in = 187 N/m
+# (was 5000)
+# Lowered friction from 1 to 0.5.
+builders: 
+  rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.014
+      radius: 0.25
+      friction: 0.5
+      roll_friction: 0.5
+
+  HR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HB:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  HL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1000.0
+      damping: 100.0
+      pretension: 20.0
+      history: 1
+      max_tension: 70000.0
+      target_velocity: 12.0
+
+  SFR:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+  SRL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBF:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0
+
+  SBL:
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 1226.0
+      damping: 100.0
+      pretension: 0.0
+      history: 1
+      max_tension: 7000.0
+      target_velocity: 12.0

@@ -8,4 +8,5 @@ subdirs(
   laikaWalkingDRL
   InvKinTests
   LaikaVideos
+  belkaWalking
 )
