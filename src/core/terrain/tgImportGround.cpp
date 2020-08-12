@@ -200,7 +200,8 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
     btTriangleMesh* const pMesh = 
         new btTriangleMesh();
 
-    double max_X = 0, max_Y = 0, max_Z = 0, min_Y = 100*scalingFactor;
+    // double max_X = 0, max_Y = 0, max_Z = 0, min_Y = 100*scalingFactor;
+    double max_X = 0, max_Y = 0, max_Z = 0, min_Y = 0;
     double x, y, z;
 
     while (file.good()) {
@@ -274,7 +275,7 @@ btTriangleMesh* tgImportGround::createMesh_alt(std::fstream& file, double scalin
             continue;
         }
 
-	max_Y = 7202;
+	// max_Y = 7202;
         v0.setY(v0.y()-max_Y);
         v1.setY(v1.y()-max_Y);
         v2.setY(v2.y()-max_Y);

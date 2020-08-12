@@ -77,7 +77,7 @@ int main(int argc, char** argv)
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
   const double margin = 30;//0.05;
   const double offset = 0.5;
-  const double scalingFactor = 100000000; //sf*1000/63;
+  const double scalingFactor = 1; //sf*1000/63;
   int Interp = 0;
   bool twoLayer = false;
   
@@ -87,7 +87,9 @@ int main(int argc, char** argv)
   
   // Get filename from argv
   //std::string filename_in = "./LunarScape_mission.txt";
-  std::string filename_in = "./STL_output.txt" ;
+  // std::string filename_in = "./STL_output.txt" ;
+  std::string filename_in = "/home/jonathan/test.txt" ;
+
   
   // Check filename
   if (filename_in.find(".txt") == std::string::npos) {
