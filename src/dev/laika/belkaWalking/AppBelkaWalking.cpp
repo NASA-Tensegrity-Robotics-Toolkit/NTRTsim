@@ -27,7 +27,7 @@
 
 // This application
 #include "yamlbuilder/TensegrityModel.h"
-#include "HorizontalSpineController.h"
+#include "BelkaWalkingController.h"
 #include "BelkaWalkingModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
@@ -95,7 +95,8 @@ int main(int argc, char** argv)
     // Otherwise, this app won't run.
     std::cout << "WARNING: Be sure to change the hard-coded path to the YAML file in AppBelkaWalking, which will depend on the folder path on your computer." << std::endl;
     
-    std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/belkaWalking/BelkaWith1DOFLegs.yaml");
+    // std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/belkaWalking/BelkaWith1DOFLegs.yaml");
+    std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/belkaWalking/BelkaTranslated.yaml");
     //std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/BaseStructuresLaika/StickLegs.yaml");
     std::cout << "Setting up the BelkaWalkingModel..." << std::endl;
     BelkaWalkingModel* const myModel = new BelkaWalkingModel(model_path.c_str(),false);
@@ -113,7 +114,10 @@ int main(int argc, char** argv)
     double startTime = 10.0;
     double minLength = 0.8;
     double rate = 0.25;
-    std::vector<std::string> tagsToControl;
+    */
+
+    std::vector<std::string> spineTags;
+    std::vector<std::string> legHingeTags;
     // HF is the right horizontal set
     // HL is the bottom horizontal set maybe?
     // HB is the left horizontal set
@@ -121,14 +125,15 @@ int main(int argc, char** argv)
     // BUT, something is wrong here. Probably Bullet's numerical problems.
     //tagsToControl.push_back("HR");
     //tagsToControl.push_back("HF");
-    tagsToControl.push_back("HB");
+    spineTags.push_back("HB");
+
     // Call the constructor for the controller
-    HorizontalSpineController* const controller =
-      new HorizontalSpineController(startTime, minLength, rate, tagsToControl);
+    // TO-DO: figure out what we should do with the spine or leg tags here...
+    BelkaWalkingController* const controller =
+      new BelkaWalkingController(spineTags, legHingeTags);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
-    */
 
     // Add the model to the world
     simulation.addModel(myModel);

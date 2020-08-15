@@ -16,13 +16,13 @@
  * governing permissions and limitations under the License.
 */
 
-#ifndef HORIZONTAL_SPINE_CONTROLLER_H
-#define HORIZONTAL_SPINE_CONTROLLER_H
+#ifndef BELKA_WALKING_CONTROLLER_H
+#define BELKA_WALKING_CONTROLLER_H
 
 /**
- * @file HorizontalSpineController.h
- * @brief Contains the definition of class HorizontalSpineController.
- * @author Drew Sabelhaus, Lara Janse van Vuuren
+ * @file BelkaWalkingController.h
+ * @brief Contains the definition of class BelkaWalkingController.
+ * @author Drew Sabelhaus
  * $Id$
  */
 
@@ -41,47 +41,34 @@ class TensegrityModel;
 class tgBasicActuator;
 
 /**
- * A controller to apply the length change in the cables of the HorizontalSpine
- * model. This is used for the ICRA 2016 ULTRA Spine paper results.
+ * A controller for Belka's spine and legs, whole thing.
  */
-class HorizontalSpineController : public tgObserver<TensegrityModel>, public tgSubject<HorizontalSpineController>
+class BelkaWalkingController : public tgObserver<TensegrityModel>, public tgSubject<BelkaWalkingController>
 {
 public:
 	
   /**
-   * Construct a HorizontalSpineController.
-   * @param[in] startTime, a double that determines when the controller
-   * begins its motion, how many seconds after the simulation starts.
-   * @param[in] minLength, a double that is the percent of the initial length
-   * that this controller will reduce down to. E.g., if minLength = 0.25, 
-   * controller will act until the rest length of the cables is 25% of initial.
-   * @param[in] rate, the rate at which the rest length of the cables will be
-   * changed. Expressed in meters/sec.
-   * @param[in] tagsToControl, a vector (array) of strings, which is a list of the 
-   * tags of all the
-   * cables upon which to act. All the cables which have a tag in this list of tags
-   * will be acted upon by this controller.
+   * Construct a BelkaWalkingController.
+   * @param[in] spineTags, a vector (array) of strings, which is a list of the 
+   * tags of all the spine cables to act on (ordered by index.)
+   * @param[in] legHingeTags, same as spineTags but for the leg hinges (angular displacement.)
    */
-  HorizontalSpineController(double startTime, double minLength, double rate,
-			    std::vector<std::string> tagsToControl);
+  BelkaWalkingController(std::vector<std::string> spineTags, std::vector<std::string> legHingeTags);
     
   /**
    * Nothing to delete, destructor must be virtual
    */
-  virtual ~HorizontalSpineController() { }
+  virtual ~BelkaWalkingController() { }
 
   /**
-   * Apply the controller. On setup, adjust the cable
-   * lengths one time.
-   * @param[in] subject - the TensegrityModel that is being controlled. Must
-   * have a list of allMuscles populated
+   * Set up the controller (finding pointers and such)
+   * @param[in] subject - the TensegrityModel that is being controlled.
    */
   virtual void onSetup(TensegrityModel& subject);
     
   /**
-   * The onStep method is not used for this controller.
-   * @param[in] subject - the TensegrityModel that is being controlled. Must
-   * have a list of allMuscles populated
+   * Take the next control step
+   * @param[in] subject - the TensegrityModel that is being controlled.
    * @param[in] dt, current timestep must be positive
    */
   virtual void onStep(TensegrityModel& subject, double dt);
@@ -101,13 +88,11 @@ private:
   /**
    * The private variables for each of the values passed in to the constructor.
    */
-  double m_startTime;
-  double m_minLength;
-  double m_rate;
-  std::vector<std::string> m_tagsToControl;
+  std::vector<std::string> m_spineTags;
+  std::vector<std::string> m_legHingeTags;
 
   /**
-   * Need an accumulator variable to determine when to start the controller.
+   * Let's keep our own accumulator... though we really should be asking the simulation
    */
   double m_timePassed;
 
@@ -116,8 +101,8 @@ private:
    * This map takes a string (the space-separated list of all the tags for
    * an individual cable) and outputs a double (the rest length at time t=0.)
    */
-  typedef std::map<tgTags, double> InitialRestLengths;
-  InitialRestLengths initialRL;
+  // typedef std::map<tgTags, double> InitialRestLengths;
+  // InitialRestLengths initialRL;
 
   /**
    * A list of all the actuators to control. This is populated in onSetup
@@ -127,4 +112,4 @@ private:
 
 };
 
-#endif // HORIZONTAL_SPINE_CONTROLLER_H
+#endif // BELKA_WALKING_CONTROLLER_H

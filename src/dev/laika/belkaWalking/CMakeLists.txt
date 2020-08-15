@@ -11,7 +11,7 @@ link_libraries(core
 	       TensegrityModel)
 
 add_executable(AppBelkaWalking
-  HorizontalSpineController.cpp
+  BelkaWalkingController.cpp
   BelkaWalkingModel.cpp
   AppBelkaWalking.cpp
 )

@@ -1,0 +1,9 @@
+# This is a placeholder for moving around the final Belka model,
+# so that the path can be hard-coded in the App file.
+# Will orient the robot with the vertical axis z=0 aligned with the center of the vertebrae, then translate vertically
+# that distance should be a total of 27.5 cm, plus a fudge factor. The ground is 1.5 units above zero, actually, so... +1.6=29.1
+substructures:
+  BelkaTranslated:
+    path: ./BelkaModelYAML/BelkaWith1DOFLegs.yaml
+    translation: [0, 29.1, 0]
+

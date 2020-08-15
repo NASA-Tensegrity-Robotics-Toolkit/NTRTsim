@@ -1,0 +1,47 @@
+# Units are currently in cm
+# These shoulders are just one box.
+# NOTE that these can be used for both legs on one end, but need to use a
+# different file for the shoulders and for the hips.
+# That's because we couldn't differentiate between which shoulder/hips otherwise
+# when applying the btHingeConstraint.
+# Procedure for hinged legs: create a btHingeConstraint between the center point
+# 	    of one of the hipsBack rods. This can be the same constraint for
+#	    both legs, since it doesn't really matter the distance between
+#	    the rigid bodies. We'll be "applying a torque" between each leg
+#	    and the center of the hips, but that should be OK... right?
+
+nodes:
+  # first two are the base connection for the shoulders
+  # the hips frame is 19.2cm away from the center of its closest vertebra
+  V1: [0, 0, 0]   
+  V2: [19.2, 0, 0]
+  # second two are the two endpoints of the "T"
+  # the legs are 17.8cm away from the centerline
+  V3: [19.2, 0, 17.8]
+  V4: [19.2, 0, -17.8]
+
+pair_groups:
+  # The base part of the shoulders will be a box
+  shouldersBase:
+    - [V1, V2]
+  # The back part of the hips will be rods
+  shouldersBack:
+    - [V2, V3]
+    - [V2, V4]
+
+builders:
+
+  # box
+  shouldersBase:
+    class: tgBoxInfo
+    parameters:
+      density: 0.001 # was 0.014
+      width: 1
+      height: 4.0
+      
+  # "rods" just big cylinders really
+  shouldersBack:
+    class: tgRodInfo
+    parameters:
+      density: 0.001 # really light hips, since they're big.
+      radius: 3 # more "cylinder" than "rod"

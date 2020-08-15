@@ -233,13 +233,17 @@ void BelkaWalkingModel::setup(tgWorld& world)
   // NOT PLACED ALONG CORRECT POINT? It seems like the end nodes align now, but the
   // center of rotation seems to be slightly "down" the leg...
   // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
+  // btHingeConstraint* legBackLeftHinge =
+  //   new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
+	// 		  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+	// 		  btVector3(0, 0, 1));
   btHingeConstraint* legBackLeftHinge =
     new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   // 1.5, was hips 2
   // Add the hinge to the world.
-  btWorld->addConstraint(legBackLeftHinge);
+  // btWorld->addConstraint(legBackLeftHinge);
 
   // For the back right:
   btHingeConstraint* legBackRightHinge =
@@ -247,7 +251,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(1.5, 2, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  btWorld->addConstraint(legBackRightHinge);
+  // btWorld->addConstraint(legBackRightHinge);
 
   // For the front left:
   btHingeConstraint* legFrontLeftHinge =
@@ -255,7 +259,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(1.5, 2, -20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  btWorld->addConstraint(legFrontLeftHinge);
+  // btWorld->addConstraint(legFrontLeftHinge);
 
   // For the front right:
   btHingeConstraint* legFrontRightHinge =
@@ -263,7 +267,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(1.5, 2, 20),
 			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  btWorld->addConstraint(legFrontRightHinge);
+  // btWorld->addConstraint(legFrontRightHinge);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
