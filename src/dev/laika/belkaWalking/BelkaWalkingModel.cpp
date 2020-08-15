@@ -237,13 +237,22 @@ void BelkaWalkingModel::setup(tgWorld& world)
   //   new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
 	// 		  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
 	// 		  btVector3(0, 0, 1));
+
+  // For the 2020 work: what *should* these be?
+  // Hip: we're getting the rod that's the top of the "T"
+  // Kinda works: btVector3(3, 3, -19), btVector3(-1.5, 16.5, 0), 
+  // The E1 direction (into/out of the board), controlled by (~, ~, x3), is good at 17.8 + ((1/2)*0.5 legbox) + fudge = 19
+  // The frame is frustratingly offset. Leg seems OK at 0,0, but the rod seems to give us the corner not the center????
+  // Also works: seems clear that the origin is some weird CoM thing. btVector3(0, 0, -19), btVector3(0, 16.5, 0), 
   btHingeConstraint* legBackLeftHinge =
-    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
-			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+    new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
+        btVector3(0, 0, -19),
+			  btVector3(0, 13.75, 0), 
+        btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
   // 1.5, was hips 2
   // Add the hinge to the world.
-  // btWorld->addConstraint(legBackLeftHinge);
+  btWorld->addConstraint(legBackLeftHinge);
 
   // For the back right:
   btHingeConstraint* legBackRightHinge =
