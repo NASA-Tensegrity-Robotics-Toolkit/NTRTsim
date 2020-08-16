@@ -269,16 +269,19 @@ void BelkaWalkingModel::setup(tgWorld& world)
   btVector3 legFLHingeBoxCoM = legFrontLeftHingeBox->getCenterOfMassTransform().getOrigin();
   btVector3 legFRHingeBoxCoM = legFrontRightHingeBox->getCenterOfMassTransform().getOrigin();
   // and finally, the eight vectors we need: four constraints, each constraint has two.
+  // back left
   btVector3 hipBLrelative = legBLworld - hipHingeRodCoM;
   btVector3 legBLrelative = legBLworld - legBLHingeBoxCoM;
+  // back right
+  btVector3 hipBRrelative = legBRworld - hipHingeRodCoM;
+  btVector3 legBRrelative = legBRworld - legBRHingeBoxCoM;
+  // front left
+  btVector3 shoulderFLrelative = legFLworld - shoulderHingeRodCoM;
+  btVector3 legFLrelative = legFLworld - legFLHingeBoxCoM;
+  // front right
+  btVector3 shoulderFRrelative = legFRworld - shoulderHingeRodCoM;
+  btVector3 legFRrelative = legFRworld - legFRHingeBoxCoM;
 
-  // btHingeConstraint* legBackLeftHinge =
-  //   new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
-  //       btVector3(0, 0, -19),
-	// 		  btVector3(0, 13.75, 0), 
-  //       btVector3(0, 0, 1),
-	// 		  btVector3(0, 0, 1));
-  // 1.5, was hips 2
   btHingeConstraint* legBackLeftHinge =
     new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
         hipBLrelative,
@@ -292,26 +295,29 @@ void BelkaWalkingModel::setup(tgWorld& world)
   // For the back right:
   btHingeConstraint* legBackRightHinge =
     new btHingeConstraint(*hipHingeRod, *legBackRightHingeBox,
-			  btVector3(1.5, 2, 20),
-			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  hipBRrelative,
+			  legBRrelative, 
+        btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // btWorld->addConstraint(legBackRightHinge);
+  btWorld->addConstraint(legBackRightHinge);
 
   // For the front left:
   btHingeConstraint* legFrontLeftHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontLeftHingeBox,
-			  btVector3(1.5, 2, -20),
-			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  shoulderFLrelative,
+			  legFLrelative, 
+        btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // btWorld->addConstraint(legFrontLeftHinge);
+  btWorld->addConstraint(legFrontLeftHinge);
 
   // For the front right:
   btHingeConstraint* legFrontRightHinge =
     new btHingeConstraint(*shoulderHingeRod, *legFrontRightHingeBox,
-			  btVector3(1.5, 2, 20),
-			  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
+			  shoulderFRrelative,
+			  legFRrelative, 
+        btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // btWorld->addConstraint(legFrontRightHinge);
+  btWorld->addConstraint(legFrontRightHinge);
 
     // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
     // that we want to control.    
