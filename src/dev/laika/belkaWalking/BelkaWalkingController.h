@@ -36,14 +36,16 @@
 #include <vector>
 #include <map>
 
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
+
 // Forward declarations
-class TensegrityModel;
+class BelkaWalkingModel; // not needed, we're directly including the BelkaWalkingModel.h now
 class tgBasicActuator;
 
 /**
  * A controller for Belka's spine and legs, whole thing.
  */
-class BelkaWalkingController : public tgObserver<TensegrityModel>, public tgSubject<BelkaWalkingController>
+class BelkaWalkingController : public tgObserver<BelkaWalkingModel>, public tgSubject<BelkaWalkingController>
 {
 public:
 	
@@ -53,7 +55,7 @@ public:
    * tags of all the spine cables to act on (ordered by index.)
    * @param[in] legHingeTags, same as spineTags but for the leg hinges (angular displacement.)
    */
-  BelkaWalkingController(std::vector<std::string> spineTags, std::vector<std::string> legHingeTags);
+  BelkaWalkingController(std::vector<std::string> spineTags);
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -62,16 +64,16 @@ public:
 
   /**
    * Set up the controller (finding pointers and such)
-   * @param[in] subject - the TensegrityModel that is being controlled.
+   * @param[in] subject - the BelkaWalkingModel that is being controlled.
    */
-  virtual void onSetup(TensegrityModel& subject);
+  virtual void onSetup(BelkaWalkingModel& subject);
     
   /**
    * Take the next control step
-   * @param[in] subject - the TensegrityModel that is being controlled.
+   * @param[in] subject - the BelkaWalkingModel that is being controlled.
    * @param[in] dt, current timestep must be positive
    */
-  virtual void onStep(TensegrityModel& subject, double dt);
+  virtual void onStep(BelkaWalkingModel& subject, double dt);
 
 protected:
 
@@ -81,7 +83,7 @@ protected:
    * @param[in] tag, a string of the tag for which to search in the list of 
    * actuators in this model.
    */
-  void initializeActuators(TensegrityModel& subject, std::string tag);
+  void initializeActuators(BelkaWalkingModel& subject, std::string tag);
     
 private:
 	
@@ -89,7 +91,6 @@ private:
    * The private variables for each of the values passed in to the constructor.
    */
   std::vector<std::string> m_spineTags;
-  std::vector<std::string> m_legHingeTags;
 
   /**
    * Let's keep our own accumulator... though we really should be asking the simulation
@@ -109,6 +110,9 @@ private:
    * by using m_tagsToControl.
    */
   std::vector<tgBasicActuator*> cablesWithTags;
+
+  // From the model, store the leg hinges.
+  std::vector<btHingeConstraint*> legHinges;
 
 };
 

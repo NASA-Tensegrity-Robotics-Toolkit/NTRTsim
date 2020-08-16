@@ -26,7 +26,7 @@
  */
 
 // This application
-#include "yamlbuilder/TensegrityModel.h"
+// #include "yamlbuilder/TensegrityModel.h"
 #include "BelkaWalkingController.h"
 #include "BelkaWalkingModel.h"
 // This library
@@ -117,7 +117,6 @@ int main(int argc, char** argv)
     */
 
     std::vector<std::string> spineTags;
-    std::vector<std::string> legHingeTags;
     // HF is the right horizontal set
     // HL is the bottom horizontal set maybe?
     // HB is the left horizontal set
@@ -130,7 +129,7 @@ int main(int argc, char** argv)
     // Call the constructor for the controller
     // TO-DO: figure out what we should do with the spine or leg tags here...
     BelkaWalkingController* const controller =
-      new BelkaWalkingController(spineTags, legHingeTags);
+      new BelkaWalkingController(spineTags);
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);

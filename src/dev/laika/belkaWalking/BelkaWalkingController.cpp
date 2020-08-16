@@ -26,7 +26,8 @@
 // This module
 #include "BelkaWalkingController.h"
 // This application
-#include "yamlbuilder/TensegrityModel.h"
+// #include "yamlbuilder/TensegrityModel.h"
+#include "BelkaWalkingModel.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
@@ -46,9 +47,8 @@
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
 BelkaWalkingController::BelkaWalkingController(
-						     std::vector<std::string> spineTags, std::vector<std::string> legHingeTags) :
+						     std::vector<std::string> spineTags) :
   m_spineTags(spineTags),
-  m_legHingeTags(legHingeTags),
   m_timePassed(0.0)
 {
   // @TODO: what checks to make on tags?
@@ -58,7 +58,7 @@ BelkaWalkingController::BelkaWalkingController(
  * The initializeActuators method is call in onSetup to put pointers to 
  * specific actuators in the cablesWithTags array
  */
-void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
+void BelkaWalkingController::initializeActuators(BelkaWalkingModel& subject,
 						    std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -87,7 +87,7 @@ void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
  * which means just store pointers to them and record their rest lengths.
  * This method calls the helper initializeActuators.
  */
-void BelkaWalkingController::onSetup(TensegrityModel& subject)
+void BelkaWalkingController::onSetup(BelkaWalkingModel& subject)
 {
   std::cout << "Setting up the BelkaWalkingController." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
@@ -99,10 +99,12 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
+  // And get the hinges from the model.
+  legHinges = subject.
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
-void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
+void BelkaWalkingController::onStep(BelkaWalkingModel& subject, double dt)
 {
   // First, increment the accumulator variable.
   m_timePassed += dt;

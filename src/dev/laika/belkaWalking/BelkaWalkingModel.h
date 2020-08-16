@@ -33,6 +33,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
 
 // Forward declarations
 //class tgWorld; // will we need this for adding the btHingeConstraint?
@@ -67,10 +68,16 @@ public:
      * @param[in] dt, the timestep. Must be positive.
      */
     //virtual void step(const double dt);
+
+    /**
+     * Helper to hand off the leg joints to the controller.
+     */
+    std::vector<btHingeConstraint*> getLegHinges();
     
 private:
 	
-    // Nothing. Used to be lots of local variables, now handled by the controller
+    // the leg hinges
+    std::vector<btHingeConstraint*> legHinges;
     
 };
 

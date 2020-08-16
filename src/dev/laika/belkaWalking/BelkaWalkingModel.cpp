@@ -45,7 +45,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h" // for hinge hack
-#include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
+// #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack, now in .h file where it should have been
 // The C++ Standard Library
 #include <iostream>
 #include <stdexcept>
@@ -319,25 +319,13 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(0, 0, 1));
   btWorld->addConstraint(legFrontRightHinge);
 
-    // We could now use tgCast::filter or similar to pull out the models (e.g. muscles)
-    // that we want to control.    
-    //allMuscles = tgCast::filter<tgModel, tgSpringCableActuator> (getDescendants());
-    //mapMuscles(muscleMap, *this, m_segments);
-
-    // Let's see what type of objects are inside the spine.
-    //std::vector<tgModel*> all_children = getDescendants();
-    // Pick out the tgBaseRigid objects
-    //std::vector<tgBaseRigid*> all_tgBaseRigid = tgCast::filter<tgModel, tgBaseRigid>(all_children);
-
-    // Print out the tgBaseRigids
-    // std::cout << "Spine tgBaseRigids: " << std::endl;
-    // for (size_t i = 0; i < all_tgBaseRigid.size(); i++)
-    //   {
-    // 	std::cout << "object number " << i << ": " << std::endl;
-    // 	std::cout << "mass: " << all_tgBaseRigid[i]->mass() << std::endl;
-    // 	std::cout << all_tgBaseRigid[i]->toString() << std::endl;
-    //   }
-    
-    //trace(structureInfo, *this);
+  // Finally, store all the hinge pointers for future use.
+  legHinges.push_back(legBackLeftHinge);
+  legHinges.push_back(legBackRightHinge);
+  legHinges.push_back(legFrontLeftHinge);
+  legHinges.push_back(legFrontRightHinge);
 }
 
+std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
+  return legHinges;
+}
