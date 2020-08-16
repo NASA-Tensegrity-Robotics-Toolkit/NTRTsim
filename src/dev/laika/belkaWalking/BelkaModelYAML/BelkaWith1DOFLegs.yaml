@@ -47,22 +47,6 @@ substructures:
       angle: 180
       reference: [0, 0, 0]
 
-  # Previously, we could do sets of legs, easily, as in:
-  # We're doing two legs here. The hips are +/- 15 units wide.
-  # Offset is between each leg. Second leg is +30 from first.
-  #backlegsleft/backlegsright:
-  #  path: ../BaseStructuresLaika/StructuresForHinges/StickLegs.yaml
-  #  offset: [0, 0, 32] # giving a bit of extra width to clear the hips.
-  #  # Legs are already up by 30 units, only need 10.5 vertical. Also offset to
-  #  # the ends of the hips (15 units back.)
-  #  translation: [15, 10.5, -16] # 
-    
-  #frontlegsleft/frontlegsright:
-  #  path: ../BaseStructuresLaika/StickLegs.yaml
-  #  offset: [0, 0, 32]
-  #  # Only difference from front legs is in x-direction.
-  #  translation: [-75, 10.5, -16] # 60 offset + 15 for hips
-
   # However, now we need to have each leg separate. This is required for us
   # to be able to pick out the tags for the btHingeConstraints.
   # Legs need to be stuck downwards. With their origin at (0,0,0), leg top is +24.5, bottom of sphere foot is -3.

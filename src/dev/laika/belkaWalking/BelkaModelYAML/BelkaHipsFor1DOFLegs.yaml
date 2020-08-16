@@ -36,12 +36,12 @@ builders:
     class: tgBoxInfo
     parameters:
       density: 0.001 # was 0.014
-      width: 1
-      height: 4.0
+      width: 2.0
+      height: 2.0
       
   # "rods" just big cylinders really
   hipsBack:
     class: tgRodInfo
     parameters:
       density: 0.001 # really light hips, since they're big.
-      radius: 3 # more "cylinder" than "rod"
+      radius: 2.0 # more "cylinder" than "rod"

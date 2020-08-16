@@ -24,7 +24,7 @@ builders:
     class: tgBoxInfo
     parameters:
       density: 0.001 # was 0.014
-      width: 3
+      width: 2
       height: 0.5
 
   # Spheres are created according to node names.
