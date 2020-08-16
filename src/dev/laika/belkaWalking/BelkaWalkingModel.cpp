@@ -244,13 +244,48 @@ void BelkaWalkingModel::setup(tgWorld& world)
   // The E1 direction (into/out of the board), controlled by (~, ~, x3), is good at 17.8 + ((1/2)*0.5 legbox) + fudge = 19
   // The frame is frustratingly offset. Leg seems OK at 0,0, but the rod seems to give us the corner not the center????
   // Also works: seems clear that the origin is some weird CoM thing. btVector3(0, 0, -19), btVector3(0, 16.5, 0), 
+
+  // Let's try the following. Assume the frames are with respect to CoM of the body, wherever that is. 
+  // The vector from CoM to world point is then
+  // p = h - r
+  // where h is the vector in the world frame, r is the CoM.
+  // So, let's define the desired hinge position of all four shoulders. 
+  // First, as created in BelkaWith1DOFLegs.yaml, before the final shift: 19.2cm left/right, 19cm fudge factor into/out of the board
+  btVector3 legBLworld = btVector3(19.2, 0.0, -19.0);
+  btVector3 legBRworld = btVector3(19.2, 0.0, 19.0);
+  btVector3 legFLworld = btVector3(-76.0, 0.0, -19.0);
+  btVector3 legFRworld = btVector3(-76.0, 0.0, -19.0);
+  // Adjust all vectors in accordance with the robot's final location at the start of the simulation
+  btVector3 finaltrans = btVector3(0.0, 29.1, 0.0);
+  legBLworld += finaltrans;
+  legBRworld += finaltrans;
+  legFLworld += finaltrans;
+  legFRworld += finaltrans;
+  // Now, get the relative vector for each body in each case.
+  btVector3 hipHingeRodCoM = hipHingeRod->getCenterOfMassTransform().getOrigin();
+  btVector3 shoulderHingeRodCoM = shoulderHingeRod->getCenterOfMassTransform().getOrigin();
+  btVector3 legBLHingeBoxCoM = legBackLeftHingeBox->getCenterOfMassTransform().getOrigin();
+  btVector3 legBRHingeBoxCoM = legBackRightHingeBox->getCenterOfMassTransform().getOrigin();
+  btVector3 legFLHingeBoxCoM = legFrontLeftHingeBox->getCenterOfMassTransform().getOrigin();
+  btVector3 legFRHingeBoxCoM = legFrontRightHingeBox->getCenterOfMassTransform().getOrigin();
+  // and finally, the eight vectors we need: four constraints, each constraint has two.
+  btVector3 hipBLrelative = legBLworld - hipHingeRodCoM;
+  btVector3 legBLrelative = legBLworld - legBLHingeBoxCoM;
+
+  // btHingeConstraint* legBackLeftHinge =
+  //   new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
+  //       btVector3(0, 0, -19),
+	// 		  btVector3(0, 13.75, 0), 
+  //       btVector3(0, 0, 1),
+	// 		  btVector3(0, 0, 1));
+  // 1.5, was hips 2
   btHingeConstraint* legBackLeftHinge =
     new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
-        btVector3(0, 0, -19),
-			  btVector3(0, 13.75, 0), 
+        hipBLrelative,
+			  legBLrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // 1.5, was hips 2
+
   // Add the hinge to the world.
   btWorld->addConstraint(legBackLeftHinge);
 
