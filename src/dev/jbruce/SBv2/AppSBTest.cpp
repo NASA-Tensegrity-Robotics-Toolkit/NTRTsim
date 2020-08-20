@@ -28,6 +28,7 @@
 #include "StepwiseController.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
+#include "core/terrain/tgImportGround.h"
 #include "core/tgModel.h"
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
@@ -38,6 +39,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+
 
 /**
  * The entry point.
@@ -59,9 +62,57 @@ int main(int argc, char** argv)
     const double yaw = 0.0;
     const double pitch = 0.0;
     const double roll = 0.0;
+    //Option 1: Uncomment to implement flat ground environment (must comment out STL importer below)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /* 
     const tgBoxGround::Config groundConfig(btVector3(yaw, pitch, roll));
     // the world will delete this
     tgBoxGround* ground = new tgBoxGround(groundConfig);
+  */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //Option 2: Uncomment below to import parsed STL file (must comment out flat ground above)
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Set ground parameters
+  btVector3 orientation = btVector3(yaw, pitch, roll);
+  const double friction = 1.0;
+  const double restitution = 0.0;
+  btVector3 origin = btVector3(0.0, 0.0, 0.0);
+  const double margin = 30;//0.05;
+  const double offset = 0.5;
+  const double scalingFactor = 100; //sf*1000/63;
+  int Interp = 0;
+  bool twoLayer = false;
+  
+  // Configure ground characteristics for simulation
+  const tgImportGround::Config groundConfig(orientation, friction, restitution,
+					    origin, margin, offset, scalingFactor,Interp,twoLayer);
+  
+  // Get filename from argv
+  //std::string filename_in = "./LunarScape_mission.txt";
+  // std::string filename_in = "./STL_output.txt" ;
+  std::string filename_in = "/home/jonathan/test.txt" ;
+
+  
+  // Check filename
+  if (filename_in.find(".txt") == std::string::npos) {
+    std::cout << "Incorrect filetype, input file should be a .txt file" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  //Create filestream
+  std::fstream file_in;
+  // Open filestream
+  file_in.open(filename_in.c_str(), std::fstream::in);
+  // Check if input file opened successfully
+  if (!file_in.is_open()) {
+    std::cout << "Failed to open input file" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  else {
+    std::cout << "Input file opened successfully" << std::endl;
+  }
+  tgImportGround* ground = new tgImportGround(groundConfig, file_in);
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     const tgWorld::Config config(98.1); // gravity, dm/sec^2
     tgWorld world(config, ground);
