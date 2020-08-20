@@ -1,0 +1,84 @@
+# This file tries to simulate rods that are 
+# similar to SUPERball v2's for mass 
+# distribution and size. So there are many
+# nodes connected with different properties.
+#
+# Node Types:
+# * Note "#" below correspond to the endcap number on SBv2 *
+# n# -> main nodes with strings attached to them
+# s# -> nodes to make end cap spheres
+# r#0/r#1 -> nodes for connecting rods between endcaps 
+# and to connect spheres to the endcap
+
+nodes:
+  # Endcap 0
+  s2: [0, 0.5, 0]
+  r20: [0, 0.8, 0]
+  n2: [0, 1.17, 0]
+  r21: [0, 2.39, 0]
+  # Endcap 1
+  r31: [0, 16.19, 0]
+  n3: [0, 17.41, 0]
+  r30: [0, 17.78, 0]
+  s3: [0, 18.08, 0]
+
+pair_groups:
+  alu_rod:
+    - [r21, r31]
+
+  motor_block:
+    - [n2, r21]
+    - [n3, r31]
+
+  top_motor_block:
+    - [r20, n2]
+    - [r30, n3]
+
+  sphere_connector:
+    - [s2, r20]
+    - [s3, r30]
+
+builders:
+  alu_rod:
+    class: tgRodInfo
+    parameters:
+      density: 0.69854
+      radius: 0.175
+      friction: 0.99
+      roll_friction: 0.90
+      restitution: 0.0
+
+  motor_block:
+    class: tgBoxInfo
+    parameters:
+      density: 3.543 # mass of 2.5kg
+      width: 0.75
+      height: 0.75
+
+  top_motor_block:
+    class: tgRodInfo
+    parameters:
+      density: 0.01
+      radius: 0.5
+
+  sphere_connector:
+     class: tgRodInfo
+     parameters:
+       density: 0.01
+       radius: 0.01
+
+  s2:
+    class: tgSphereInfo
+    parameters:
+      density: 0.382 # mass of 0.2kg
+      radius: 0.5
+      roll_friction: 0.9
+      restitution: 0.0
+  
+  s3:
+    class: tgSphereInfo
+    parameters:
+      density: 0.382 # mass of 0.2kg
+      radius: 0.5
+      roll_friction: 0.9
+      restitution: 0.0

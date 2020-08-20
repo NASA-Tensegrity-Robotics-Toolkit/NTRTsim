@@ -1,0 +1,137 @@
+# This file takes the three double rods created in files
+# SBv2_doubleRod.yaml, SBv2_doubleRod_yRotation_p.yaml, and
+# SBv2_doubleRod_yRotation_n.yaml to create the six rods
+# used in SUPERball v2. It then assigns strings using the
+# robot's motor numbering to create the basic robot model.
+# (Note: this model will not be roated correctly to sit on
+# face at start up)
+
+substructures:
+  rods01:
+    path: ./SBv2_doubleRod.yaml
+
+  rods23:
+    path: ./SBv2_doubleRod_yRotation_p.yaml
+    rotation:
+      axis: [1, 0, 0]
+      angle: 90
+      reference: [5, 19.29, 0]
+
+  rods45:
+    path: ./SBv2_doubleRod_yRotation_n.yaml
+    rotation:
+      axis: [0, 0, 1]
+      angle: -90
+      reference: [5, 19.29, 0]
+
+bond_groups:
+  m01:
+    rods01/rods23/node_node:
+      - [n0, n0] # 1, 5
+  m02:
+    rods01/rods23/node_node:
+      - [n0, n1] # 1, 6
+  m03:
+    rods01/rods23/node_node:
+      - [n1, n2] # 2, 7
+  m04:
+    rods01/rods23/node_node:
+      - [n1, n3] # 2, 8
+  m05:
+    rods01/rods23/node_node:
+      - [n2, n0] # 3, 5
+  m06:
+    rods01/rods23/node_node:
+      - [n2, n1] # 3, 6
+  m07:
+    rods01/rods23/node_node:
+      - [n3, n2] # 4, 7
+  m08:
+    rods01/rods23/node_node:
+      - [n3, n3] # 4, 8
+  m09:
+    rods23/rods45/node_node:
+      - [n0, n0] # 5, 9
+  m10:
+    rods23/rods45/node_node:
+      - [n0, n1] # 5, 10
+  m11:
+    rods23/rods45/node_node:
+      - [n1, n2] # 6, 11
+  m12:
+    rods23/rods45/node_node:
+      - [n1, n3] # 6, 12
+  m13:
+    rods23/rods45/node_node:
+      - [n2, n0] # 7, 9
+  m14:
+    rods23/rods45/node_node:
+      - [n2, n1] # 7, 10
+  m15:
+    rods23/rods45/node_node:
+      - [n3, n2] # 8, 11
+  m16:
+    rods23/rods45/node_node:
+      - [n3, n3] # 8, 12
+  m17:
+    rods45/rods01/node_node:
+      - [n0, n0] # 9, 1
+  m18:
+    rods45/rods01/node_node:
+      - [n0, n1] # 9, 2
+  m19:
+    rods45/rods01/node_node:
+      - [n1, n2] # 10, 3
+  m20:
+    rods45/rods01/node_node:
+      - [n1, n3] # 10, 4
+  m21:
+    rods45/rods01/node_node:
+      - [n2, n0] # 11, 1
+  m22:
+    rods45/rods01/node_node:
+      - [n2, n1] # 11, 2
+  m23:
+    rods45/rods01/node_node:
+      - [n3, n2] # 12, 3
+  m24:
+    rods45/rods01/node_node:
+      - [n3, n3] # 12, 4
+
+builders:
+  baseString: &baseString
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 4000.0
+      damping: 1000.0
+      pretension: 3800.0
+      max_tension: 15000.0
+      target_velocity: 12.0
+      min_actual_length: 0.001
+      min_rest_length: 0.001
+      history: 1
+
+  m01: *baseString
+  m02: *baseString
+  m03: *baseString
+  m04: *baseString
+  m05: *baseString
+  m06: *baseString
+  m07: *baseString
+  m08: *baseString
+  m09: *baseString
+  m10: *baseString
+  m11: *baseString
+  m12: *baseString
+  m13: *baseString
+  m14: *baseString
+  m15: *baseString
+  m16: *baseString
+  m17: *baseString
+  m18: *baseString
+  m19: *baseString
+  m20: *baseString
+  m21: *baseString
+  m22: *baseString
+  m23: *baseString
+  m24: *baseString

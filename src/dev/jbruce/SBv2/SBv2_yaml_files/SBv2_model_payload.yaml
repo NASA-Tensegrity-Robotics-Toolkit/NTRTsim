@@ -1,0 +1,73 @@
+# This file takes the six bar model created in file
+# SBv2_model.yaml and SBv2_payload.yaml to create 
+# SUPERball v2 with a ball payload connected ot each node
+# by a passive string. 
+# (Note: this model will not be roated correctly to sit on
+# face at start up)
+
+substructures:
+  SBv2:
+    path: ./SBv2_model.yaml
+    
+  payload:
+    path: ./SBv2_payload.yaml
+    translation: [0, 10, 0]
+
+bond_groups:
+  p00:
+    rods01/payload/node_node:
+      - [n0, payload]
+  p01:
+    rods01/payload/node_node:
+      - [n1, payload]
+  p02:
+    rods01/payload/node_node:
+      - [n2, payload]
+  p03:
+    rods01/payload/node_node:
+      - [n3, payload]
+  p04:
+    rods23/payload/node_node:
+      - [n0, payload]
+  p05:
+    rods23/payload/node_node:
+      - [n1, payload]
+  p06:
+    rods23/payload/node_node:
+      - [n2, payload]
+  p07:
+    rods23/payload/node_node:
+      - [n3, payload]
+  p08:
+    rods45/payload/node_node:
+      - [n0, payload]
+  p09:
+    rods45/payload/node_node:
+      - [n1, payload]
+  p10:
+    rods45/payload/node_node:
+      - [n2, payload]
+  p11:
+    rods45/payload/node_node:
+      - [n3, payload]
+
+builders:
+  basePayloadString: &basePayloadString
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 2000
+      damping: 600
+      pretension: 1500
+
+  p00: *basePayloadString
+  p01: *basePayloadString
+  p02: *basePayloadString
+  p03: *basePayloadString
+  p04: *basePayloadString
+  p05: *basePayloadString
+  p06: *basePayloadString
+  p07: *basePayloadString
+  p08: *basePayloadString
+  p09: *basePayloadString
+  p10: *basePayloadString
+  p11: *basePayloadString

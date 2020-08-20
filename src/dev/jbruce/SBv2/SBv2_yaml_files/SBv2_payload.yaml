@@ -1,0 +1,16 @@
+# Payload sphere model. 
+# Should be located within the middle 
+# of SUPERball v2's six rods. 
+
+nodes:
+  payload: [5, 9.29, 0]
+
+builders:
+  payload:
+    class: tgSphereInfo
+    parameters:
+      density: 0.4
+      radius: 1.5
+      friction: 0.99
+      roll_friction: 0.99
+      restitution: 0.0

@@ -1,0 +1,10 @@
+# This file is creates one set of parallel rods
+# in the x-y plane used in SUPERball v2.  
+
+substructures:
+  rod0:
+    path: ./SBv2_rod_1.yaml
+    translation: [0, 10, 0]
+  rod1:
+    path: ./SBv2_rod_2.yaml
+    translation: [10, 10, 0]
