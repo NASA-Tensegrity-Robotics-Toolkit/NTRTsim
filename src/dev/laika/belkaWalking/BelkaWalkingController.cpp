@@ -26,13 +26,14 @@
 // This module
 #include "BelkaWalkingController.h"
 // This application
-// #include "yamlbuilder/TensegrityModel.h"
+#include "yamlbuilder/TensegrityModel.h"
 #include "BelkaWalkingModel.h"
 // This library
 #include "core/tgBasicActuator.h"
 #include "core/tgSpringCableActuator.h"
 #include "core/tgString.h"
 #include "core/tgTags.h"
+#include "core/tgCast.h"
 
 //#include "sensors/tgDataObserver.h"
 // The C++ Standard Library
@@ -58,7 +59,7 @@ BelkaWalkingController::BelkaWalkingController(
  * The initializeActuators method is call in onSetup to put pointers to 
  * specific actuators in the cablesWithTags array
  */
-void BelkaWalkingController::initializeActuators(BelkaWalkingModel& subject,
+void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
 						    std::string tag) {
   //DEBUGGING
   std::cout << "Finding cables with the tag: " << tag << std::endl;
@@ -87,7 +88,7 @@ void BelkaWalkingController::initializeActuators(BelkaWalkingModel& subject,
  * which means just store pointers to them and record their rest lengths.
  * This method calls the helper initializeActuators.
  */
-void BelkaWalkingController::onSetup(BelkaWalkingModel& subject)
+void BelkaWalkingController::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the BelkaWalkingController." << std::endl;
   //	    << "Finding cables with tags: " << m_tagsToControl
@@ -100,11 +101,13 @@ void BelkaWalkingController::onSetup(BelkaWalkingModel& subject)
     initializeActuators(subject, *it);
   }
   // And get the hinges from the model.
-  legHinges = subject.
+  // First, cast the pointer to a BelkaWalkingModel from the superclass TensegrityModel.
+  BelkaWalkingModel* subjectBelka = tgCast::cast<TensegrityModel, BelkaWalkingModel>(subject);
+  legHinges = subjectBelka->getLegHinges();
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
-void BelkaWalkingController::onStep(BelkaWalkingModel& subject, double dt)
+void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
 {
   // First, increment the accumulator variable.
   m_timePassed += dt;

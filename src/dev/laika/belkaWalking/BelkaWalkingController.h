@@ -39,13 +39,14 @@
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h" // for hinge hack
 
 // Forward declarations
-class BelkaWalkingModel; // not needed, we're directly including the BelkaWalkingModel.h now
+// class BelkaWalkingModel;
+class TensegrityModel;
 class tgBasicActuator;
 
 /**
  * A controller for Belka's spine and legs, whole thing.
  */
-class BelkaWalkingController : public tgObserver<BelkaWalkingModel>, public tgSubject<BelkaWalkingController>
+class BelkaWalkingController : public tgObserver<TensegrityModel>, public tgSubject<BelkaWalkingController>
 {
 public:
 	
@@ -66,14 +67,14 @@ public:
    * Set up the controller (finding pointers and such)
    * @param[in] subject - the BelkaWalkingModel that is being controlled.
    */
-  virtual void onSetup(BelkaWalkingModel& subject);
+  virtual void onSetup(TensegrityModel& subject);
     
   /**
    * Take the next control step
    * @param[in] subject - the BelkaWalkingModel that is being controlled.
    * @param[in] dt, current timestep must be positive
    */
-  virtual void onStep(BelkaWalkingModel& subject, double dt);
+  virtual void onStep(TensegrityModel& subject, double dt);
 
 protected:
 
@@ -83,7 +84,7 @@ protected:
    * @param[in] tag, a string of the tag for which to search in the list of 
    * actuators in this model.
    */
-  void initializeActuators(BelkaWalkingModel& subject, std::string tag);
+  void initializeActuators(TensegrityModel& subject, std::string tag);
     
 private:
 	

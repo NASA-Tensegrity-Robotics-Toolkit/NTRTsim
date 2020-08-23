@@ -99,7 +99,8 @@ int main(int argc, char** argv)
     std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/belkaWalking/BelkaTranslated.yaml");
     //std::string model_path("/home/drew/repositories/NTRTsim/src/dev/laika/BaseStructuresLaika/StickLegs.yaml");
     std::cout << "Setting up the BelkaWalkingModel..." << std::endl;
-    BelkaWalkingModel* const myModel = new BelkaWalkingModel(model_path.c_str(),false);
+    // BelkaWalkingModel* const myModel = new BelkaWalkingModel(model_path.c_str(),false);
+    TensegrityModel* const myModel = new BelkaWalkingModel(model_path.c_str(),false);
 
     // Attach a controller to the model, if desired.
     // This is a controller that interacts with a generic TensegrityModel as

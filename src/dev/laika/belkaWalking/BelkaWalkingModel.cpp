@@ -327,5 +327,11 @@ void BelkaWalkingModel::setup(tgWorld& world)
 }
 
 std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
+  // debugging.
+  // std::cout << "returning leg hinge constraints from within BelkaWalkingModel..." << std::endl;
   return legHinges;
 }
+
+// void BelkaWalkingModel::attach(BelkaWalkingController* pCtrlr){
+//   tgSubject<BelkaWalkingModel>::attach(pCtrlr);
+// }
