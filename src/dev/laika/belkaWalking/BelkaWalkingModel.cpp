@@ -282,6 +282,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
   btVector3 shoulderFRrelative = legFRworld - shoulderHingeRodCoM;
   btVector3 legFRrelative = legFRworld - legFRHingeBoxCoM;
 
+  // the bullet demo example calls enableAngularMotor first before adding the constraint to the world...
   btHingeConstraint* legBackLeftHinge =
     new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, 
         hipBLrelative,
@@ -290,6 +291,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(0, 0, 1));
 
   // Add the hinge to the world.
+  // legBackLeftHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legBackLeftHinge);
 
   // For the back right:
@@ -299,6 +301,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legBRrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
+  // legBackRightHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legBackRightHinge);
 
   // For the front left:
@@ -308,6 +311,8 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legFLrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
+  // legFrontLeftHinge->enableAngularMotor(true, 1.0, 1.0);
+  // legFrontLeftHinge->setMotorTarget(1.0, 0.001);
   btWorld->addConstraint(legFrontLeftHinge);
 
   // For the front right:
@@ -317,6 +322,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legFRrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
+  // legFrontRightHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legFrontRightHinge);
 
   // Finally, store all the hinge pointers for future use.
@@ -324,11 +330,13 @@ void BelkaWalkingModel::setup(tgWorld& world)
   legHinges.push_back(legBackRightHinge);
   legHinges.push_back(legFrontLeftHinge);
   legHinges.push_back(legFrontRightHinge);
+  // std::cout << "Leg hinges in setup has size: " << legHinges.size() << std::endl;
+  // std::cout << "..." << std::endl;
 }
 
 std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
   // debugging.
-  // std::cout << "returning leg hinge constraints from within BelkaWalkingModel..." << std::endl;
+  // std::cout << "From within BelkaWalkingModel getLegHinges, legHinges has size " << legHinges.size() << std::endl;
   return legHinges;
 }
 

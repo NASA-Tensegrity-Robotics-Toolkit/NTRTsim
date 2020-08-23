@@ -115,6 +115,9 @@ private:
   // From the model, store the leg hinges.
   std::vector<btHingeConstraint*> legHinges;
 
+  // a global constant: max motor impulse. Since we want high stiffness here let's let the motor be powerful.
+  double max_im = 2000.0;
+
 };
 
 #endif // BELKA_WALKING_CONTROLLER_H
