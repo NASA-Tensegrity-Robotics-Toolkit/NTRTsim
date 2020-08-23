@@ -102,25 +102,7 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
   }
 
   // ***NOTE: leg hinges must be done elsewhere. At this point, they're not populated in the model yet.
-
-  // // And get the hinges from the model.
-  // // First, cast the pointer to a BelkaWalkingModel from the superclass TensegrityModel.
-  // BelkaWalkingModel* subjectBelka = tgCast::cast<TensegrityModel, BelkaWalkingModel>(subject);
-  // legHinges = subjectBelka->getLegHinges();
-  // std::cout << "Leg hinges has size: " << legHinges.size() << std::endl;
-
-  // // Also, initialize the hinges: they're actuated, with zero velocity.
-  // // ***NOTE this has to be done before adding to the world, so the model does it now.
-  // for(size_t i=0; i < legHinges.size(); i++){
-  //   // on, zero velocity, the pre-specified maximum impulse.
-  //   // legHinges[i]->enableAngularMotor(true, 1.0, max_im);
-  //   // actually, let's use the angle-only formulation, which has a high stiffness PID controller inside the hinge
-  //   // legHinges[i]->enableMotor(true);
-  //   // legHinges[i]->setMaxMotorImpulse(max_im);
-  //   // the step methods will set the angle.
-  //   std::cout << "Leg hinge target velocity: " << legHinges[i]->getMotorTargetVelosity() << std::endl;
-  // }
-  // std::cout << "Finished setting up the controller." << std::endl;    
+  std::cout << "Finished setting up the controller." << std::endl;    
 }
 
 void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
@@ -153,13 +135,9 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
 
   // For the motors: for now, just set everyone to zero.
   for(size_t i=0; i < legHinges.size(); i++){
-    // std::cout << "Leg hinge target velocity: " << legHinges[i]->getMotorTargetVelosity() << std::endl;
     legHinges[i]->setMotorTarget(0.0*M_PI/180.0, dt);
-    // actually it looks like we need to call the enable function each timestep?
+    // To set a velocity, it would be like this:
     // legHinges[i]->enableAngularMotor(true, 10.0, max_im);
-    // nope, it's setting the angle or target velocity
-    // legHinges[i]->setMotorTargetVelocity(100.0);
-    // legHinges[i]->setMotorTarget(1.0, dt);
   }
 }
 	

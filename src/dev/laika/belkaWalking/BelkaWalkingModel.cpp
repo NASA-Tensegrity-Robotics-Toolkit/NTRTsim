@@ -215,35 +215,7 @@ void BelkaWalkingModel::setup(tgWorld& world)
    */
 
   // Constructor is: 2 x btRigidBody, 4 x btVector3, 1 x bool.
-  // For TwoSegSpine: first btVector3 is (-10, 0, 0), or whatever the spacing
-  //    between two vertebrae should be.
-  // For the rotating joint, need to compensate for the vertical translation,
-  // which could be like +30 to rod 2.
-  // I think the first two btVectors are the locations of the contact point, relative
-  // to each rigid body. Let's do it like an offset from the leg, and zero from
-  // the hip. But we need to 
-  // The last two btVector3s are the axis for each element.
-  // We'll choose to be Y for both.
-  // For example - the first btVector3 moves the point on the hips to the edge of
-  // the hips, then translates it in by half the rod radius (3/2) to center it.
-  // The second btVector3 moves the point on the leg to its top. The total leg
-  // height is (30 + sphere radius / 2) = 16.5 ?
-  // and then also centers it. (Width = 3.)
-
-  // NOT PLACED ALONG CORRECT POINT? It seems like the end nodes align now, but the
-  // center of rotation seems to be slightly "down" the leg...
-  // maybe move the point of contact in the Z direction for the hip? Not 1.5 but 3?
-  // btHingeConstraint* legBackLeftHinge =
-  //   new btHingeConstraint(*hipHingeRod, *legBackLeftHingeBox, btVector3(1.5, 2, -20),
-	// 		  btVector3(0, 16.5, 0), btVector3(0, 0, 1),
-	// 		  btVector3(0, 0, 1));
-
-  // For the 2020 work: what *should* these be?
-  // Hip: we're getting the rod that's the top of the "T"
-  // Kinda works: btVector3(3, 3, -19), btVector3(-1.5, 16.5, 0), 
-  // The E1 direction (into/out of the board), controlled by (~, ~, x3), is good at 17.8 + ((1/2)*0.5 legbox) + fudge = 19
-  // The frame is frustratingly offset. Leg seems OK at 0,0, but the rod seems to give us the corner not the center????
-  // Also works: seems clear that the origin is some weird CoM thing. btVector3(0, 0, -19), btVector3(0, 16.5, 0), 
+  // The frist two btVector3 are location with respect to the center of mass of the body, last two are axis/orientation of the hinge at each of those points.
 
   // Let's try the following. Assume the frames are with respect to CoM of the body, wherever that is. 
   // The vector from CoM to world point is then
@@ -291,7 +263,6 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  btVector3(0, 0, 1));
 
   // Add the hinge to the world.
-  // legBackLeftHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legBackLeftHinge);
 
   // For the back right:
@@ -301,7 +272,6 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legBRrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // legBackRightHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legBackRightHinge);
 
   // For the front left:
@@ -311,8 +281,6 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legFLrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // legFrontLeftHinge->enableAngularMotor(true, 1.0, 1.0);
-  // legFrontLeftHinge->setMotorTarget(1.0, 0.001);
   btWorld->addConstraint(legFrontLeftHinge);
 
   // For the front right:
@@ -322,7 +290,6 @@ void BelkaWalkingModel::setup(tgWorld& world)
 			  legFRrelative, 
         btVector3(0, 0, 1),
 			  btVector3(0, 0, 1));
-  // legFrontRightHinge->enableAngularMotor(true, 1.0, 1.0);
   btWorld->addConstraint(legFrontRightHinge);
 
   // Finally, store all the hinge pointers for future use.
@@ -330,16 +297,8 @@ void BelkaWalkingModel::setup(tgWorld& world)
   legHinges.push_back(legBackRightHinge);
   legHinges.push_back(legFrontLeftHinge);
   legHinges.push_back(legFrontRightHinge);
-  // std::cout << "Leg hinges in setup has size: " << legHinges.size() << std::endl;
-  // std::cout << "..." << std::endl;
 }
 
 std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
-  // debugging.
-  // std::cout << "From within BelkaWalkingModel getLegHinges, legHinges has size " << legHinges.size() << std::endl;
   return legHinges;
 }
-
-// void BelkaWalkingModel::attach(BelkaWalkingController* pCtrlr){
-//   tgSubject<BelkaWalkingModel>::attach(pCtrlr);
-// }

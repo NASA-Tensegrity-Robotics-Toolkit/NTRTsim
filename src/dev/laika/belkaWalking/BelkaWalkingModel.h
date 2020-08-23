@@ -37,7 +37,6 @@
 
 // Forward declarations
 //class tgWorld; // will we need this for adding the btHingeConstraint?
-// class BelkaWalkingController; // awkward, but we have to deal with the fact that TensegrityModel is a tgSubject before us...
 
 // This class will inherit from TensegrityModel, and we don't really
 // need to do much else besides add some extra methods to get the rigid bodies
@@ -63,16 +62,10 @@ public:
      * then add a little extra in.
      */
     virtual void setup(tgWorld& world);
-
-    /**
-     * Overload the attach method here... seems we may be having issues with TensegrityModel being its own observer
-     * versus older code where the model was a subclass of tgModel only, so calls to attach are ambiguous now.
-     * RESULT: Still doesn't work, can't seem to force a conversion between BelkaWalkingController and tgObserver<BelkaWalkingModel>.
-     */
-    // virtual void attach(BelkaWalkingController* pCtrlr);
 	
     /**
      * Step the model, its children. Notifies controllers of step.
+     * NOT OVERLOADED HERE since the parent class does all we need (steps the controller for us)
      * @param[in] dt, the timestep. Must be positive.
      */
     //virtual void step(const double dt);
