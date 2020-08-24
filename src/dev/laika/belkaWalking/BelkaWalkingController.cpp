@@ -47,12 +47,9 @@
 // Constructor assigns variables, does some simple sanity checks.
 // Also, initializes the accumulator variable timePassed so that it can
 // be incremented in onStep.
-BelkaWalkingController::BelkaWalkingController(
-						     std::vector<std::string> spineTags) :
-  m_spineTags(spineTags),
-  m_timePassed(0.0)
+BelkaWalkingController::BelkaWalkingController() : m_timePassed(0.0)
 {
-  // @TODO: what checks to make on tags?
+  // onSetup should take care of any initialization: that way we can do teardown/restart properly.
 }
 
 /**
@@ -67,20 +64,24 @@ void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
   std::vector<tgBasicActuator*> foundActuators = subject.find<tgBasicActuator>(tag);
   std::cout << "The following cables were found and will be controlled: "
 	    << std::endl;
-  // //Iterate through array and output strings to command line
-  // for (std::size_t i = 0; i < foundActuators.size(); i ++) {	
-  //   std::cout << foundActuators[i]->getTags() << std::endl;
-  //   // Also, add the rest length of the actuator at this time
-  //   // to the list of all initial rest lengths.
-  //   initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
-  //   //DEBUGGING:
-  //   std::cout << "Cable rest length at t=0 is "
-	//       << initialRL[foundActuators[i]->getTags()] << std::endl;
-  // }
+  // Iterate through array and output strings to command line,
+  // and record the cable's rest length.
+  std::vector<double> rl;
+  for (std::size_t i = 0; i < foundActuators.size(); i ++) {	
+    std::cout << foundActuators[i]->getTags() << std::endl;
+    rl.push_back(foundActuators[i]->getRestLength());
+    // initialRL[foundActuators[i]->getTags()] = foundActuators[i]->getRestLength();
+    //DEBUGGING:
+    std::cout << "Cable rest length at t=0 is " << rl[i] << std::endl;
+  }
   // Add this list of actuators to the full list. Thanks to:
   // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
-  cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
-			 foundActuators.end() );
+  // cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
+			//  foundActuators.end() );
+  // We're now storing in a better data structure. Just add to the map.
+  cable_ptrs[tag] = foundActuators;
+  // and now also the initial rest lengths.
+  init_rest_lens[tag] = rl;
 }
 
 /**
@@ -91,17 +92,38 @@ void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
 void BelkaWalkingController::onSetup(TensegrityModel& subject)
 {
   std::cout << "Setting up the BelkaWalkingController." << std::endl;
-  //	    << "Finding cables with tags: " << m_tagsToControl
-  //	    << std::endl;
-  cablesWithTags = {};
+  // Hard coding the tags here.
+  // HF is the right horizontal set
+  // HL is the bottom horizontal set maybe?
+  // HR is the top horizontal set.
+  // HB is the left horizontal set
+  cableTags.push_back("HF");
+  cableTags.push_back("HL");
+  cableTags.push_back("HR");
+  cableTags.push_back("HB");
+  // Next four are the spine rotation.
+  cableTags.push_back("SFR");
+  cableTags.push_back("SRL");
+  cableTags.push_back("SBF");
+  cableTags.push_back("SBL");
   // For all the strings in the list, call initializeActuators.
   std::vector<std::string>::iterator it;
-  for( it = m_spineTags.begin(); it < m_spineTags.end(); it++ ) {
+  for( it = cableTags.begin(); it < cableTags.end(); it++ ) {
     // Call the helper for this tag.
     initializeActuators(subject, *it);
   }
-
   // ***NOTE: leg hinges must be done elsewhere. At this point, they're not populated in the model yet.
+  // Initialize our control inputs to zero. That means leg angle of zero (i.e. perp to ground), and 0% retraction for bending/rotation cables.
+  // I'm still unclear as to what version of C++ we're using, so just to be super backward compatible, 
+  // here's an ugly loop. There are 6 inputs.
+  double initial_angle = 20.0;
+  u_in.clear();
+  for(size_t i=0; i < 4; i++){
+    u_in.push_back(initial_angle);
+  }
+  // tack on the two retractions.
+  u_in.push_back(0.0); 
+  u_in.push_back(0.0);
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
@@ -133,9 +155,10 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
   // std::cout << "onStep within BelkaWalkingController..." << std::endl;
 	// cablesWithTags[i]->setControlInput(nextRestLength,dt);
 
-  // For the motors: for now, just set everyone to zero.
+  // For the motors: assume the first four entries in u_in are for the leg motors, in degrees.
   for(size_t i=0; i < legHinges.size(); i++){
-    legHinges[i]->setMotorTarget(0.0*M_PI/180.0, dt);
+    legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
+    // legHinges[i]->setMotorTarget(0.0*M_PI/180.0, dt);
     // To set a velocity, it would be like this:
     // legHinges[i]->enableAngularMotor(true, 10.0, max_im);
   }

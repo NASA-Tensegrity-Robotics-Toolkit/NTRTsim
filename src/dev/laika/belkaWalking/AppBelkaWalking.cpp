@@ -72,6 +72,7 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
+    // const double timestep_physics = 0.00001; // seconds
     const double timestep_physics = 0.0001; // seconds
     //const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
@@ -117,20 +118,18 @@ int main(int argc, char** argv)
     double rate = 0.25;
     */
 
-    std::vector<std::string> spineTags;
+    // std::vector<std::string> spineTags;
     // HF is the right horizontal set
     // HL is the bottom horizontal set maybe?
     // HB is the left horizontal set
     // HR is the top horizontal set.
     // BUT, something is wrong here. Probably Bullet's numerical problems.
-    //tagsToControl.push_back("HR");
-    //tagsToControl.push_back("HF");
-    spineTags.push_back("HB");
+    // spineTags.push_back("HB");
 
-    // Call the constructor for the controller
-    // TO-DO: figure out what we should do with the spine or leg tags here...
-    BelkaWalkingController* const controller =
-      new BelkaWalkingController(spineTags);
+    // Call the constructor for the controller. Tags are now hard-coded.
+    // BelkaWalkingController* const controller =
+      // new BelkaWalkingController(spineTags);
+    BelkaWalkingController* const controller = new BelkaWalkingController();
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);

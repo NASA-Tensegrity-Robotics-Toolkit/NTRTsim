@@ -91,7 +91,7 @@ bond_groups:
    t1/t2/t3/t4/t5/node_node: 
       - [left, back]  
 
-  rod:
+  connectorRod:
   
    # For the hips, connect at just one point, from the center of the
    # last vetrebra to one end of the box.
@@ -124,7 +124,7 @@ bond_groups:
 # (was 5000)
 # Lowered friction from 1 to 0.5.
 builders: 
-  rod:
+  connectorRod:
     class: tgRodInfo
     parameters:
       density: 0.014

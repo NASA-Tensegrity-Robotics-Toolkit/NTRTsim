@@ -51,12 +51,9 @@ class BelkaWalkingController : public tgObserver<TensegrityModel>, public tgSubj
 public:
 	
   /**
-   * Construct a BelkaWalkingController.
-   * @param[in] spineTags, a vector (array) of strings, which is a list of the 
-   * tags of all the spine cables to act on (ordered by index.)
-   * @param[in] legHingeTags, same as spineTags but for the leg hinges (angular displacement.)
+   * Construct a BelkaWalkingController. We're hard-coding the cables so no arguments.
    */
-  BelkaWalkingController(std::vector<std::string> spineTags);
+  BelkaWalkingController();
     
   /**
    * Nothing to delete, destructor must be virtual
@@ -89,9 +86,9 @@ protected:
 private:
 	
   /**
-   * The private variables for each of the values passed in to the constructor.
+   * The private variables for each of the values. Now created in constructor, hard-coded.
    */
-  std::vector<std::string> m_spineTags;
+  std::vector<std::string> cableTags;
 
   /**
    * Let's keep our own accumulator... though we really should be asking the simulation
@@ -99,24 +96,29 @@ private:
   double m_timePassed;
 
   /**
-   * The start length of each of the cables must be recorded.
-   * This map takes a string (the space-separated list of all the tags for
-   * an individual cable) and outputs a double (the rest length at time t=0.)
+   * To keep track of all the actuators, we need a dictionary of lists.
+   * Each dictionary key is a tag, and value is the list of pointers to all the cables with those tags.
    */
-  // typedef std::map<tgTags, double> InitialRestLengths;
-  // InitialRestLengths initialRL;
+  std::map<std::string, std::vector<tgBasicActuator*> > cable_ptrs;
 
   /**
-   * A list of all the actuators to control. This is populated in onSetup
-   * by using m_tagsToControl.
+   * The start length of each of the cables must be recorded.
+   * The vector here is ordered according to the same list in cable_ptrs.
    */
-  std::vector<tgBasicActuator*> cablesWithTags;
+  std::map<std::string, std::vector<double> > init_rest_lens;
 
   // From the model, store the leg hinges.
   std::vector<btHingeConstraint*> legHinges;
 
-  // a global constant: max motor impulse. Since we want high stiffness here let's let the motor be powerful.
-  double max_im = 2000.0;
+  // a global constant: max motor impulse. Since we want high stiffness here let's let the motor be powerful. Maybe 2000?
+  // This creates a bad large impulse on the ground. Make it smaller so the robot doesn't kick itself upward.
+  double max_im = 20.0;
+
+  /**
+   * The control inputs here will be the four legs, then spine L/R and CW/CCW. Total of 6.
+   * We'll map the L/R and CW/CCW into percentages of each of the relevant tagged cables.
+   */
+  std::vector<double> u_in;
 
 };
 
