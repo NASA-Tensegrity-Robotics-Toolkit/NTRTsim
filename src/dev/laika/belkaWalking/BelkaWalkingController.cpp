@@ -74,11 +74,7 @@ void BelkaWalkingController::initializeActuators(TensegrityModel& subject,
     //DEBUGGING:
     std::cout << "Cable rest length at t=0 is " << rl[i] << std::endl;
   }
-  // Add this list of actuators to the full list. Thanks to:
-  // http://stackoverflow.com/questions/201718/concatenating-two-stdvectors
-  // cablesWithTags.insert( cablesWithTags.end(), foundActuators.begin(),
-			//  foundActuators.end() );
-  // We're now storing in a better data structure. Just add to the map.
+  // Add to the map.
   cable_ptrs[tag] = foundActuators;
   // and now also the initial rest lengths.
   init_rest_lens[tag] = rl;
@@ -113,6 +109,7 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
     initializeActuators(subject, *it);
   }
   // ***NOTE: leg hinges must be done elsewhere. At this point, they're not populated in the model yet.
+
   // Initialize our control inputs to zero. That means leg angle of zero (i.e. perp to ground), and 0% retraction for bending/rotation cables.
   // I'm still unclear as to what version of C++ we're using, so just to be super backward compatible, 
   // here's an ugly loop. There are 6 inputs.
@@ -124,6 +121,7 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
   // tack on the two retractions.
   u_in.push_back(0.0); 
   u_in.push_back(0.0);
+
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
@@ -158,9 +156,6 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
   // For the motors: assume the first four entries in u_in are for the leg motors, in degrees.
   for(size_t i=0; i < legHinges.size(); i++){
     legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
-    // legHinges[i]->setMotorTarget(0.0*M_PI/180.0, dt);
-    // To set a velocity, it would be like this:
-    // legHinges[i]->enableAngularMotor(true, 10.0, max_im);
   }
 }
 	

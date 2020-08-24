@@ -302,3 +302,5 @@ void BelkaWalkingModel::setup(tgWorld& world)
 std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
   return legHinges;
 }
+
+// TO-DO: add teardown method and properly recreate the hinges.
