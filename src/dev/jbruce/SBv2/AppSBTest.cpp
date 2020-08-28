@@ -74,12 +74,12 @@ int main(int argc, char** argv)
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Set ground parameters
   btVector3 orientation = btVector3(yaw, pitch, roll);
-  const double friction = 1.0;
+  const double friction = 0.9;
   const double restitution = 0.0;
   btVector3 origin = btVector3(0.0, 0.0, 0.0);
-  const double margin = 30;//0.05;
-  const double offset = 0.5;
-  const double scalingFactor = 100; //sf*1000/63;
+  const double margin = 0;//0.05;
+  const double offset = 0;
+  const double scalingFactor = 500; //sf*1000/63;
   int Interp = 0;
   bool twoLayer = false;
   
@@ -118,8 +118,8 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    const double timestep_physics = 0.0001; // seconds
-    //const double timestep_physics = 0.001;
+//    const double timestep_physics = 0.0001; // seconds
+    const double timestep_physics = 0.001;
     const double timestep_graphics = 1.f/60.f; // seconds
     tgSimViewGraphics view(world, timestep_physics, timestep_graphics);
 

@@ -1,0 +1,170 @@
+nodes: 
+  N1: [0.76, 103.91, 13.78]
+  N2: [13.78, 96.09, 0.76] 
+  N3: [7.27, 101.45, 12.60]
+  N4: [-6.30, 89.82, 3.64]
+  N5: [0, 98.55, 14.55]
+  N6: [-7.27, 110.18, 0]
+  N7: [-11.55, 103.91, 7.55]
+  N8: [6.23, 96.09, 12.32]
+  N9: [-7.27, 101.45, 12.60]
+  N10: [-6.30, 89.82, -3.64]
+  N11: [-12.60, 98.55, 7.27]
+  N12: [-3.64, 110.18, -6.30]
+  N13: [-12.32, 103.91, -6.23]
+  N14: [-7.55, 96.09, 11.55]
+  N15: [-14.55, 101.45, 0]
+  N16: [0, 89.82, -7.27]
+  N17: [-12.60, 98.55, -7.27]
+  N18: [3.64, 110.18, -6.30]
+  N19: [-0.76, 103.91, -13.78]
+  N20: [-13.78, 96.09, -0.76]
+  N21: [-7.27, 101.45, -12.60]
+  N22: [6.30, 89.82, -3.64]
+  N23: [0, 98.55, -14.55]
+  N24: [7.27, 110.18, 0]
+  N25: [11.55, 103.91, -7.55]
+  N26: [-6.23, 96.09, -12.32]
+  N27: [7.27, 101.45, -12.60]
+  N28: [6.30, 89.82, 3.64]
+  N29: [12.60, 98.55, -7.27]
+  N30: [3.64, 110.18, 6.30]
+  N31: [12.32, 103.91, 6.23]
+  N32: [7.55, 96.09, -11.55]
+  N33: [14.55, 101.45, 0]
+  N34: [0, 89.82, 7.27]
+  N35: [12.60, 98.55, 7.27]
+  N36: [-3.64, 110.18, 6.30]
+  N37: [0, 100, 0]
+
+pair_groups:
+  rods:
+    - [N1,N2]	# rod 1
+    - [N3,N4]	# rod 2
+    - [N5,N6]	# rod 3
+    - [N7,N8]	# rod 4
+    - [N9,N10]	# rod 5
+    - [N11,N12]	# rod 6
+    - [N13,N14]	# rod 7
+    - [N15,N16]	# rod 8
+    - [N17,N18]	# rod 9
+    - [N19,N20]	# rod 10
+    - [N21,N22]	# rod 11
+    - [N23,N24]	# rod 12
+    - [N25,N26]	# rod 13
+    - [N27,N28]	# rod 14
+    - [N29,N30]	# rod 15
+    - [N31,N32]	# rod 16
+    - [N33,N34]	# rod 17
+    - [N35,N36]	# rod 18
+
+  blue:
+    - [N1,N3]	# cable 1
+    - [N1,N5]	# cable 2
+    - [N1,N36]	# cable 3
+    - [N2,N28]	# cable 4
+    - [N2,N35]	# cable 5
+    - [N2,N33]	# cable 6
+    - [N3,N8]	# cable 7
+    - [N3,N35]	# cable 8
+#   - [N3,N37]	# cable 9
+    - [N4,N10]	# cable 10
+    - [N4,N14]	# cable 11
+    - [N4,N34]	# cable 12
+#   - [N4,N37]	# cable 13
+  red:
+    - [N5,N8]	# cable 14
+    - [N5,N9]	# cable 15
+#   - [N5,N37]	# cable 16
+    - [N6,N7]	# cable 17
+    - [N6,N12]	# cable 18
+    - [N6,N36]	# cable 19
+#   - [N6,N37]	# cable 20
+    - [N7,N9]	# cable 21
+    - [N7,N11]	# cable 22
+    - [N8,N34]	# cable 23
+    - [N9,N14]	# cable 24
+#   - [N9,N37]	# cable 25
+    - [N10,N20]	# cable 26
+  green:
+    - [N10,N16]	# cable 27
+#   - [N10,N37]	# cable 28
+    - [N11,N14]	# cable 29
+    - [N11,N15]	# cable 30
+#   - [N11,N37]	# cable 31
+    - [N12,N13]	# cable 32
+    - [N12,N18]	# cable 33
+#   - [N12,N37]	# cable 34
+    - [N13,N15]	# cable 35
+    - [N13,N17]	# cable 36
+    - [N15,N20]	# cable 37
+#   - [N15,N37]	# cable 38
+    - [N16,N22]	# cable 39
+  purple:
+    - [N16,N26]	# cable 40
+#   - [N16,N37]	# cable 41
+    - [N17,N20]	# cable 42
+    - [N17,N21]	# cable 43
+#   - [N17,N37]	# cable 44
+    - [N18,N19]	# cable 45
+    - [N18,N24]	# cable 46
+#   - [N18,N37]	# cable 47
+    - [N19,N21]	# cable 48
+    - [N19,N23]	# cable 49
+    - [N21,N26]	# cable 50
+#   - [N21,N37]	# cable 51
+    - [N22,N28]	# cable 52
+  orange:
+    - [N22,N32]	# cable 53
+#   - [N22,N37]	# cable 54
+    - [N23,N26]	# cable 55
+    - [N23,N27]	# cable 56
+    - [N23,N27]	# cable 57
+    - [N24,N25]	# cable 58
+    - [N24,N30]	# cable 59
+#   - [N24,N37]	# cable 60
+    - [N25,N27]	# cable 61
+    - [N25,N29]	# cable 62
+    - [N27,N32]	# cable 63
+#   - [N27,N37]	# cable 64
+    - [N28,N34]	# cable 65
+  yellow:  
+#   - [N28,N37]	# cable 66
+    - [N29,N32]	# cable 67
+    - [N29,N33]	# cable 68
+#   - [N29,N37]	# cable 69
+    - [N30,N31]	# cable 70
+    - [N30,N36]	# cable 71
+#   - [N30,N37]	# cable 72
+    - [N31,N35]	# cable 73
+    - [N31,N33]	# cable 74
+#   - [N33,N37]	# cable 75
+#   - [N34,N37]	# cable 76
+#   - [N35,N37]	# cable 77
+#   - [N36,N37]	# cable 78
+builders:
+  rods:
+    class: tgRodInfo
+    parameters:
+      density: 0.688
+      radius: 0.28
+      friction: 0.99
+      roll_friction: 0.90
+      restitution: 0.0
+
+  basicString: &basicString
+    class: tgBasicActuatorInfo
+    parameters:
+      stiffness: 5000
+      damping: 5000
+      pretension: 4800
+      history: 0
+      max_tension: 50000
+      target_velocity: 100
+
+  blue: *basicString
+  red: *basicString
+  green: *basicString
+  purple: *basicString
+  orange: *basicString
+  yellow: *basicString
