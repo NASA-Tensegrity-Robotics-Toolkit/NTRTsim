@@ -141,12 +141,33 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
   // std::cout << "onStep within BelkaWalkingController..." << std::endl;
 	// cablesWithTags[i]->setControlInput(nextRestLength,dt);
 
-  // For the motors: assume the first four entries in u_in are for the leg motors, in degrees.
+  // For the leg motors: assume the first four entries in u_in are for the leg motors, in degrees.
   for(size_t i=0; i < legHinges.size(); i++){
     // legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
     // In order to work with the keyboard callback, u_in is now stored in the model.
     legHinges[i]->setMotorTarget((subjectBelka->getU())[i] * (M_PI/180.0), dt);
   }
+
+  // For the spine retraction percentages: first, the left/right cables, which are actually HF and HB
+  std::vector<tgBasicActuator*> cbl_HF = cable_ptrs["HF"];
+  std::vector<tgBasicActuator*> cbl_HB = cable_ptrs["HB"];
+  std::vector<double> rl_HF = init_rest_lens["HF"];
+  std::vector<double> rl_HB = init_rest_lens["HB"];
+  for(size_t i=0; i < cbl_HF.size(); i++)
+  {
+    // Assuming horizontal left bend is positive cable retraction for HF,
+    // and since u[4] is a percent retraction (example, =0.05 is 5% retraction),
+    // the rest length now should be (1-u[4])*init_rest_len
+    cbl_HF[i]->setControlInput((1 - subjectBelka->getU()[4])*rl_HF[i], dt);
+  }
+  for(size_t i=0; i < cbl_HB.size(); i++)
+  {
+    // Assuming horizontal left bend is cable extension for HB,
+    // and since u[4] is a percent retraction,
+    // the rest length now should be (1+u[4])*init_rest_len
+    cbl_HB[i]->setControlInput((1 + subjectBelka->getU()[4])*rl_HB[i], dt);
+  }
+
 }
 	
  

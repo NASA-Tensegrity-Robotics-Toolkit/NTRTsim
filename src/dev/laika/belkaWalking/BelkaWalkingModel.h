@@ -105,8 +105,8 @@ private:
 
     // Amount to increment the leg angles and spine cable retraction percentages.
     // Might want to eventually change this later programatically so is a variable not a #define.
-    int ang_incr = 5; // degrees
-    int cbl_incr = 0.05; // percent
+    double ang_incr = 5.0; // degrees
+    double cbl_incr = 0.02; // percent
 
     // A little helper to roll over the joint angle, should stay between -180 < 0 <180.
     double adjTheta(double theta);
