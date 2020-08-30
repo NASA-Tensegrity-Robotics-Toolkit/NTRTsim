@@ -99,7 +99,7 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
   cableTags.push_back("HB");
   // Next four are the spine rotation.
   cableTags.push_back("SFR");
-  cableTags.push_back("SRL");
+  cableTags.push_back("SFL");
   cableTags.push_back("SBF");
   cableTags.push_back("SBL");
   // For all the strings in the list, call initializeActuators.
@@ -168,6 +168,36 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
     cbl_HB[i]->setControlInput((1 + subjectBelka->getU()[4])*rl_HB[i], dt);
   }
 
+  // Then, the CCW/CW spine rotation, which involves two cables each.
+  // The CWW (?) cables
+  std::vector<tgBasicActuator*> cbl_SFR = cable_ptrs["SFR"];
+  std::vector<tgBasicActuator*> cbl_SBF = cable_ptrs["SBF"];
+  std::vector<double> rl_SFR = init_rest_lens["SFR"];
+  std::vector<double> rl_SBF = init_rest_lens["SBF"];
+  // The CW (?) cables
+  std::vector<tgBasicActuator*> cbl_SFL = cable_ptrs["SFL"];
+  std::vector<tgBasicActuator*> cbl_SBL = cable_ptrs["SBL"];
+  std::vector<double> rl_SFL = init_rest_lens["SFL"];
+  std::vector<double> rl_SBL = init_rest_lens["SBL"];
+
+  for(size_t i=0; i < cbl_SFR.size(); i++)
+  {
+    // Assuming CCW is a positive cable retraction for SFR and SBF,
+    // and since u[5] is a percent retraction (example, =0.05 is 5% retraction),
+    // the rest length now should be (1-u[5])*init_rest_len
+    // we can assume that both SFR and SBF are the same length vectors.
+    cbl_SFR[i]->setControlInput((1 - subjectBelka->getU()[5])*rl_SFR[i], dt);
+    cbl_SBF[i]->setControlInput((1 - subjectBelka->getU()[5])*rl_SBF[i], dt);
+  }
+  for(size_t i=0; i < cbl_SFL.size(); i++)
+  {
+    // Assuming CWW is a cable extension for SFL and SBL,
+    // and since u[5] is a percent retraction,
+    // the rest length now should be (1+u[5])*init_rest_len
+    // we can assume that both SFL and SBL are the same length vectors.
+    cbl_SFL[i]->setControlInput((1 + subjectBelka->getU()[5])*rl_SFL[i], dt);
+    cbl_SBL[i]->setControlInput((1 + subjectBelka->getU()[5])*rl_SBL[i], dt);
+  }
 }
 	
  

@@ -395,7 +395,7 @@ void BelkaWalkingModel::updateU(unsigned char key)
   
   case 'U':
     u_in[4] += cbl_incr;
-    std::cout << "len " << u_in.size() << " Left/Right % = " << u_in[4] << std::endl;
+    std::cout << "Left/Right % = " << u_in[4] << std::endl;
     break;
   
   case 'J':

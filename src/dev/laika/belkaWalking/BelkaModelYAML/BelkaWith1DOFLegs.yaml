@@ -81,7 +81,7 @@ bond_groups:
   SFR:
    t1/t2/t3/t4/t5/node_node:
      - [right, back] 
-  SRL:
+  SFL:
    t1/t2/t3/t4/t5/node_node: 
      - [right, front]
   SBF: 
@@ -177,16 +177,17 @@ builders:
     parameters:
       stiffness: 1226
       damping: 100.0
-      pretension: 0.0
+      pretension: 5.0
       history: 1
       max_tension: 7000.0
       target_velocity: 12.0
-  SRL:
+  
+  SFL:
     class: tgBasicActuatorInfo
     parameters:
       stiffness: 1226
       damping: 100.0
-      pretension: 0.0
+      pretension: 5.0
       history: 1
       max_tension: 7000.0
       target_velocity: 12.0
@@ -196,7 +197,7 @@ builders:
     parameters:
       stiffness: 1226.0
       damping: 100.0
-      pretension: 0.0
+      pretension: 5.0
       history: 1
       max_tension: 7000.0
       target_velocity: 12.0
@@ -206,7 +207,7 @@ builders:
     parameters:
       stiffness: 1226.0
       damping: 100.0
-      pretension: 0.0
+      pretension: 5.0
       history: 1
       max_tension: 7000.0
       target_velocity: 12.0
