@@ -74,12 +74,42 @@ public:
      * Helper to hand off the leg joints to the controller.
      */
     std::vector<btHingeConstraint*> getLegHinges();
+
+    /**
+     * Overriding tgModel's keyboard callback to manually control the robot.
+     * Presumably this is through the GLUT interface to Bullet Physics.
+     */
+    virtual void keyboardCallback(unsigned char key, int x, int y);
+
+    /**
+     * For the controller: control input vector.
+     */
+    std::vector<double> getU(){return u_in;}
     
 private:
 	
     // the leg hinges
     std::vector<btHingeConstraint*> legHinges;
-    
+
+    /**
+     * Frustratingly enough, there isn't a good method for event-based notification of the controller
+     * when passing in new information. Instead, we'll need to store the control input vector
+     * in the model, and have the controller ask for it. 
+     */
+    std::vector<double> u_in;
+
+    /**
+     * Helper that will update the control input (given to the controller) given a key press.
+     */
+    void updateU(unsigned char key);
+
+    // Amount to increment the leg angles and spine cable retraction percentages.
+    // Might want to eventually change this later programatically so is a variable not a #define.
+    int ang_incr = 5; // degrees
+    int cbl_incr = 0.05; // percent
+
+    // A little helper to roll over the joint angle, should stay between -180 < 0 <180.
+    double adjTheta(double theta);
 };
 
 #endif

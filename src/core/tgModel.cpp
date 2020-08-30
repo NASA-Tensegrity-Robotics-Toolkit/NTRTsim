@@ -29,6 +29,7 @@
 #include "abstractMarker.h"
 // The C++ Standard Library
 #include <stdexcept>
+#include <iostream>
 
 tgModel::tgModel()
 {
@@ -250,4 +251,13 @@ operator<<(std::ostream& os, const tgModel& obj)
 {
     os << obj.toString() << std::endl;
     return os;
+}
+
+void tgModel::keyboardCallback(unsigned char key, int x, int y)
+{
+  // No actions taken by this base class, but its childen might want to do something.
+  for (size_t i = 0; i < m_children.size(); i++)
+  {
+    m_children[i]->keyboardCallback(key, x, y);
+  }
 }

@@ -47,7 +47,6 @@
  * The entry point.
  * @param[in] argc the number of command-line arguments
  * @param[in] argv argv[0] is the executable name
- * @param[in] argv argv[1] is the path of the YAML encoded structure
  * @return 0
  */
 int main(int argc, char** argv)

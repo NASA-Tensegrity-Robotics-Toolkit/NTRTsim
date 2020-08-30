@@ -203,6 +203,12 @@ protected:
      * It must be non-negative.
      */
     double m_renderTime;
+
+    /**
+     * Children may need access to the world.
+     */
+    /** A reference to the tgWorld being simulated. */
+    tgWorld& m_world;
     
 private:
 
@@ -210,9 +216,6 @@ private:
     bool invariant() const;
 
 private:
-
-    /** A reference to the tgWorld being simulated. */
-    tgWorld& m_world;
 
     /** Ensures the world has been initialized before running */
     bool m_initialized;

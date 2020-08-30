@@ -278,3 +278,12 @@ bool tgSimulation::invariant() const
 {
   return true;
 }   
+
+void tgSimulation::keyboardCallback(unsigned char key, int x, int y)
+{
+  // Pass the callback down to each model.
+  for (size_t i = 0; i < m_models.size(); i++)
+  {
+    m_models[i]->keyboardCallback(key, x, y);
+  }
+}

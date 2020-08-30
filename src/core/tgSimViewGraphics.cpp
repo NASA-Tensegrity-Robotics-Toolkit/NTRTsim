@@ -28,6 +28,7 @@
 // This application
 #include "tgBulletUtil.h"
 #include "tgSimulation.h"
+#include "tgWorld.h" // needed so we can pass along the keyboard callback.
 // Bullet OpenGL_FreeGlut (patched files)
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
@@ -170,6 +171,14 @@ void tgSimViewGraphics::displayCallback()
         glFlush();
         swapBuffers();
     }
+}
+
+void tgSimViewGraphics::keyboardCallback(unsigned char key, int x, int y)
+{
+    // First, let the older code do its thing. Call the superclass' function.
+    PlatformDemoApplication::keyboardCallback(key, x, y);
+    // Pass it on to the simulation, which will take it from there.
+    m_pSimulation->keyboardCallback(key, x, y);
 }
 
 void tgSimViewGraphics::clientResetScene()

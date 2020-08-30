@@ -134,6 +134,12 @@ public:
      * Contains a smaller set of rendering functions than clientMoveAndDisplay
      */
     virtual void displayCallback();
+
+    /**
+     * Overload for the GLUT keyboard callback. Comes to us through 
+     * tgDemoApplication/tgGlutDemoApplication, defined as PlatformDemoApplication
+     */
+    virtual void keyboardCallback(unsigned char key, int x, int y);
     
     /**
      * Called when the space bar is pressed. Calls reset,

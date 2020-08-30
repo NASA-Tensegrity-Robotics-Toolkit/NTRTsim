@@ -112,13 +112,14 @@ private:
 
   // a global constant: max motor impulse. Since we want high stiffness here let's let the motor be powerful. Maybe 2000?
   // This creates a bad large impulse on the ground. Make it smaller so the robot doesn't kick itself upward.
-  double max_im = 5.0;
+  double max_im = 4.0;
 
   /**
    * The control inputs here will be the four legs, then spine L/R and CW/CCW. Total of 6.
    * We'll map the L/R and CW/CCW into percentages of each of the relevant tagged cables.
    */
-  std::vector<double> u_in;
+  // NOTE: THIS IS NOW IN BelkaWalkingModel!!!
+  // std::vector<double> u_in;
 
 };
 

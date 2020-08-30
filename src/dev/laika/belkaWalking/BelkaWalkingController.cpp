@@ -110,18 +110,6 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
   }
   // ***NOTE: leg hinges must be done elsewhere. At this point, they're not populated in the model yet.
 
-  // Initialize our control inputs to zero. That means leg angle of zero (i.e. perp to ground), and 0% retraction for bending/rotation cables.
-  // I'm still unclear as to what version of C++ we're using, so just to be super backward compatible, 
-  // here's an ugly loop. There are 6 inputs.
-  double initial_angle = 20.0;
-  u_in.clear();
-  for(size_t i=0; i < 4; i++){
-    u_in.push_back(initial_angle);
-  }
-  // tack on the two retractions.
-  u_in.push_back(0.0); 
-  u_in.push_back(0.0);
-
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
@@ -129,9 +117,9 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
 {
   // Frustratingly, the leg hinges aren't populated in the model until AFTER the controller's onSetup method is called.
   // So, we've got to collect the pointers here.
+  // First, cast the pointer to a BelkaWalkingModel from the superclass TensegrityModel.
+  BelkaWalkingModel* subjectBelka = tgCast::cast<TensegrityModel, BelkaWalkingModel>(subject);
   if(legHinges.size() == 0){
-    // First, cast the pointer to a BelkaWalkingModel from the superclass TensegrityModel.
-    BelkaWalkingModel* subjectBelka = tgCast::cast<TensegrityModel, BelkaWalkingModel>(subject);
     legHinges = subjectBelka->getLegHinges();
     // Enable the motors now.
     for(size_t i=0; i < legHinges.size(); i++){
@@ -155,7 +143,9 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
 
   // For the motors: assume the first four entries in u_in are for the leg motors, in degrees.
   for(size_t i=0; i < legHinges.size(); i++){
-    legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
+    // legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
+    // In order to work with the keyboard callback, u_in is now stored in the model.
+    legHinges[i]->setMotorTarget((subjectBelka->getU())[i] * (M_PI/180.0), dt);
   }
 }
 	

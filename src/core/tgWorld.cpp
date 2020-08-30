@@ -31,6 +31,7 @@
 // The C++ Standard Library
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 
 tgWorld::Config::Config(double g, double ws) :
 gravity(g),

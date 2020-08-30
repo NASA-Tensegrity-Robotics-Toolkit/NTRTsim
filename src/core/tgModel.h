@@ -204,6 +204,12 @@ public:
       return nodes;
     }
 
+    /**
+     * From the tgSimulation (and passed down through tgSimViewGraphics), react to a key press.
+     * Presumably this is through the GLUT interface to Bullet Physics.
+     */
+    virtual void keyboardCallback(unsigned char key, int x, int y);
+
 private:
 
     /** Integrity predicate. */

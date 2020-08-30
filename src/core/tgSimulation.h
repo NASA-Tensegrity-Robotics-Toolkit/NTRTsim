@@ -126,6 +126,11 @@ public:
      */
     tgWorld& getWorld() const;
 
+    /**
+     * Called by tgSimViewGraphics via GLUT things. Or if you want, via whatever sim view you'd like.
+     */
+    void keyboardCallback(unsigned char key, int x, int y);
+
  private:
     
     /**

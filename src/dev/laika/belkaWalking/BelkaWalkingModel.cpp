@@ -297,10 +297,138 @@ void BelkaWalkingModel::setup(tgWorld& world)
   legHinges.push_back(legBackRightHinge);
   legHinges.push_back(legFrontLeftHinge);
   legHinges.push_back(legFrontRightHinge);
+
+  // Initialize our control inputs to zero. That means leg angle of zero (i.e. perp to ground), and 0% retraction for bending/rotation cables.
+  // I'm still unclear as to what version of C++ we're using, so just to be super backward compatible, 
+  // here's an ugly loop. There are 6 inputs.
+  double initial_angle = 0.0;
+  u_in.clear();
+  for(size_t i=0; i < 4; i++){
+    u_in.push_back(initial_angle);
+  }
+  // tack on the two retractions.
+  u_in.push_back(0.0); 
+  u_in.push_back(0.0);
 }
 
 std::vector<btHingeConstraint*> BelkaWalkingModel::getLegHinges(){
   return legHinges;
+}
+
+void BelkaWalkingModel::keyboardCallback(unsigned char key, int x, int y)
+{
+  // DEBUGGING
+  // std::cout << "Caught key press " << key << " in BelkaWalkingModel." << std::endl;
+  // though it's kind redundant, cleaner if the helper does the job
+  updateU(key);
+}
+
+void BelkaWalkingModel::updateU(unsigned char key)
+{
+  // We have 6 control inputs, and two keys each to adjust them +/-. Twelve keys.
+  // Also, since the parents use up most of the lower-case keys, all upper-case here.
+  // Key map:
+  // -------------
+  // W E R T   U I
+  // S D F G   J K
+  // -------------
+  // W = LegA+
+  // S = LegA-
+  // E = LegB+
+  // ...
+  // G = LegD-
+  // U = bend right
+  // J = bend left
+  // I = CCW spine
+  // K = CW spine
+
+  // NOTE: all the angles have to be constrained between -180, 180.
+  switch (key)
+  {
+  case 'W':
+    u_in[0] += ang_incr;
+    u_in[0] = adjTheta(u_in[0]);
+    std::cout << "LegA theta = " << u_in[0] << std::endl;
+    break;
+  
+  case 'S':
+    u_in[0] -= ang_incr;
+    u_in[0] = adjTheta(u_in[0]);
+    std::cout << "LegA theta = " << u_in[0] << std::endl;
+    break;
+  
+  case 'E':
+    u_in[1] += ang_incr;
+    u_in[1] = adjTheta(u_in[1]);
+    std::cout << "LegB theta = " << u_in[1] << std::endl;
+    break;
+  
+  case 'D':
+    u_in[1] -= ang_incr;
+    u_in[1] = adjTheta(u_in[1]);
+    std::cout << "LegB theta = " << u_in[1] << std::endl;
+    break;
+  
+  case 'R':
+    u_in[2] += ang_incr;
+    u_in[2] = adjTheta(u_in[2]);
+    std::cout << "LegC theta = " << u_in[2] << std::endl;
+    break;
+  
+  case 'F':
+    u_in[2] -= ang_incr;
+    u_in[2] = adjTheta(u_in[2]);
+    std::cout << "LegC theta = " << u_in[2] << std::endl;
+    break;
+  
+  case 'T':
+    u_in[3] += ang_incr;
+    u_in[3] = adjTheta(u_in[3]);
+    std::cout << "LegD theta = " << u_in[3] << std::endl;
+    break;
+  
+  case 'G':
+    u_in[3] -= ang_incr;
+    u_in[3] = adjTheta(u_in[3]);
+    std::cout << "LegD theta = " << u_in[3] << std::endl;
+    break;
+  
+  case 'U':
+    u_in[4] += cbl_incr;
+    std::cout << "Left/Right % = " << u_in[4] << std::endl;
+    break;
+  
+  case 'J':
+    u_in[4] -= cbl_incr;
+    std::cout << "Left/Right % = " << u_in[4] << std::endl;
+    break;
+  
+  case 'I':
+    u_in[5] += cbl_incr;
+    std::cout << "CCW/CW % = " << u_in[5] << std::endl;
+    break;
+  
+  case 'K':
+    u_in[5] -= cbl_incr;
+    std::cout << "CCW/CW % = " << u_in[5] << std::endl;
+    break;
+  
+  default:
+    break;
+  }
+}
+
+double BelkaWalkingModel::adjTheta(double theta)
+{
+  if( theta > 180.0 )
+  {
+    theta -= 360;
+  }
+  else if( theta < -180.0 )
+  {
+    theta += 360;
+  }
+  return theta;
 }
 
 // TO-DO: add teardown method and properly recreate the hinges.
