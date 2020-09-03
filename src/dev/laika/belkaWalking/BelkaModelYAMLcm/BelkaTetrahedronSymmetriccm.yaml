@@ -1,14 +1,19 @@
 nodes:
 
-# Units are now in decimeters (scaling all up by a factor of 10.)
+# # Below is a symmetric version of this tetrahedron:
+#   center: [0, 10, 0]
+#   front: [10, 10, 10]
+#   right: [-10, 20, 0]
+#   back: [10, 10, -10] 
+#   left: [-10, 0, 0]
 
 # And finally, the symmetric tetrahedron from the CAD model of Belka, same as MATLAB but rotated
 # units of cm.
   center: [0, 0, 0]
-  front: [1.42, 0, 1.42]
-  right: [-1.42, 1.42, 0]
-  back: [1.42, 0, -1.42] 
-  left: [-1.42, -1.42, 0]
+  front: [14.2, 0, 14.2]
+  right: [-14.2, 14.2, 0]
+  back: [14.2, 0, -14.2] 
+  left: [-14.2, -14.2, 0]
 
 pair_groups:
   tetrarod:
@@ -23,4 +28,4 @@ builders:
     class: tgRodInfo
     parameters:
       density: 0.01
-      radius: 0.1
+      radius: 1.0

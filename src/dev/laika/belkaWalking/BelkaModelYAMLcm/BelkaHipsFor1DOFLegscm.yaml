@@ -1,4 +1,4 @@
-# Units are now in decimeters (scaling all up by a factor of 10.)
+# Units are currently in cm
 # These hips are just one box.
 # NOTE that these can be used for both legs on one end, but need to use a
 # different file for the shoulders and for the hips.
@@ -14,11 +14,11 @@ nodes:
   # first two are the base connection for the hips
   # the hips frame is 19.2cm away from the center of its closest vertebra
   V1: [0, 0, 0]   
-  V2: [1.92, 0, 0]
+  V2: [19.2, 0, 0]
   # second two are the two endpoints of the "T"
   # the legs are 17.8cm away from the centerline
-  V3: [1.92, 0, 1.78]
-  V4: [1.92, 0, -1.78]
+  V3: [19.2, 0, 17.8]
+  V4: [19.2, 0, -17.8]
 
 pair_groups:
   # The base part of the hips will be a box
@@ -36,12 +36,12 @@ builders:
     class: tgBoxInfo
     parameters:
       density: 0.015 # was 0.014
-      width: 0.2 # 2cm
-      height: 0.2
+      width: 2.0
+      height: 2.0
       
   # "rods" just big cylinders really
   hipsBack:
     class: tgRodInfo
     parameters:
       density: 0.015 # really light hips, since they're big.
-      radius: 0.2 # more "cylinder" than "rod"
+      radius: 2.0 # more "cylinder" than "rod"

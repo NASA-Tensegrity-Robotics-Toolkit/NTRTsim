@@ -223,12 +223,17 @@ void BelkaWalkingModel::setup(tgWorld& world)
   // where h is the vector in the world frame, r is the CoM.
   // So, let's define the desired hinge position of all four shoulders. 
   // First, as created in BelkaWith1DOFLegs.yaml, before the final shift: 19.2cm left/right, 19cm fudge factor into/out of the board
-  btVector3 legBLworld = btVector3(19.2, 0.0, -19.0);
-  btVector3 legBRworld = btVector3(19.2, 0.0, 19.0);
-  btVector3 legFLworld = btVector3(-76.0, 0.0, -19.0);
-  btVector3 legFRworld = btVector3(-76.0, 0.0, -19.0);
+  // btVector3 legBLworld = btVector3(19.2, 0.0, -19.0);
+  // btVector3 legBRworld = btVector3(19.2, 0.0, 19.0);
+  // btVector3 legFLworld = btVector3(-76.0, 0.0, -19.0);
+  // btVector3 legFRworld = btVector3(-76.0, 0.0, -19.0);
+  // Now in decimeters
+  btVector3 legBLworld = btVector3(1.92, 0.0, -1.90);
+  btVector3 legBRworld = btVector3(1.92, 0.0, 1.90);
+  btVector3 legFLworld = btVector3(-7.60, 0.0, -1.90);
+  btVector3 legFRworld = btVector3(-7.60, 0.0, -1.90);
   // Adjust all vectors in accordance with the robot's final location at the start of the simulation
-  btVector3 finaltrans = btVector3(0.0, 29.1, 0.0);
+  btVector3 finaltrans = btVector3(0.0, 4.35, 0.0);
   legBLworld += finaltrans;
   legBRworld += finaltrans;
   legFLworld += finaltrans;

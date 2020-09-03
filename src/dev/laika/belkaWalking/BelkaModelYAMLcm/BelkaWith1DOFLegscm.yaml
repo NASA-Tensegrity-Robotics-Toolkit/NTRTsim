@@ -11,13 +11,11 @@
 # Notes: tetrahedron are offset by the bar endpoint length (14.2cm)
 # The shoulders are aligned exactly with the first vertebra already
 
-# Units are now in decimeters (scaling all up by a factor of 10.)
-
 substructures:
 
   t1/t2/t3/t4/t5:
     path: ./BelkaTetrahedronSymmetric.yaml
-    offset: [-1.42, 0 , 0]
+    offset: [-14.2, 0 , 0]
     translation: [0, 0, 0]
     
   hips:
@@ -43,7 +41,7 @@ substructures:
   front:
     path: ./BelkaShouldersFor1DOFLegs.yaml
     offset: [0, 0, 0]
-    translation: [-5.68, 0, 0]
+    translation: [-56.8, 0, 0]
     rotation:
       axis: [0, 1, 0]
       angle: 180
@@ -55,17 +53,17 @@ substructures:
   # Legs are 19.2cm from the vertebra-to-hip/shoulder connection point (along longitudinal axis), and 17.8+fudge from centerline
   backlegsleft:
     path: ./BelkaStickLegBackLeft.yaml
-    translation: [1.92, -2.45, -1.9]
+    translation: [19.2, -24.5, -19]
   backlegsright:
     path: ./BelkaStickLegBackRight.yaml
-    translation: [1.92, -2.45, 1.9]
+    translation: [19.2, -24.5, 19]
   # the shoulders' legs should be at -56.8 - 19.2 = 76
   frontlegsleft:
     path: ./BelkaStickLegFrontLeft.yaml
-    translation: [-7.6, -2.45, -1.9] # 60 offset + 15 for hips
+    translation: [-76, -24.5, -19] # 60 offset + 15 for hips
   frontlegsright:
     path: ./BelkaStickLegFrontRight.yaml
-    translation: [-7.6, -2.45, 1.9]
+    translation: [-76, -24.5, 19]
 
 bond_groups:
   HF:
@@ -130,7 +128,7 @@ builders:
     class: tgRodInfo
     parameters:
       density: 0.014
-      radius: 0.025
+      radius: 0.25
       friction: 0.5
       roll_friction: 0.5
 

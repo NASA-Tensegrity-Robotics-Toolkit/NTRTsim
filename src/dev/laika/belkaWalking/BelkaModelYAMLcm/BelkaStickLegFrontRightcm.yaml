@@ -1,4 +1,4 @@
-# Units are now in decimeters (scaling all up by a factor of 10.)
+# Units are currently in cm
 # This file defines one leg, as a "stick."
 # It will be one long box with a ball at its foot,
 # like the legs on the current Laika.
@@ -10,7 +10,7 @@ nodes:
   # From MATLAB statics, leg is 27.5 cm high.
   # But, to visualize this by itself, put the start of the leg "up".
   # If we want to have a r=3cm radius ball at the bottom, legtop should be total_h - 3cm = 24.5cm
-  legtop: [0, 2.45, 0]
+  legtop: [0, 24.5, 0]
   endpoint: [0, 0, 0]
 
 pair_groups:
@@ -24,12 +24,12 @@ builders:
     class: tgBoxInfo
     parameters:
       density: 0.01 # was 0.014
-      width: 0.2
-      height: 0.05
+      width: 2
+      height: 0.5
 
   # Spheres are created according to node names.
   endpoint:
     class: tgSphereInfo
     parameters:
       density: 0.01
-      radius: 0.3
+      radius: 3

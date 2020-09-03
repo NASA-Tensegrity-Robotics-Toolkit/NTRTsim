@@ -15,6 +15,13 @@ clc;
 % I'm assuming that we've already done the math to create the robot's
 % leg, foot, shoulder, hip models.
 
+% THIS SECTION: for the Belka model as of 2020-09-03.
+
+% Physical parameters of the models.
+
+%%
+% BELOW: WAS FOR IROS2018 in centimeters.
+
 % All below, we use the following scaling.
 % For example, an s=100 means we're using length units of cm.
 % ^EDIT: this script is not set up properly. Procedure SHOULD BE:
