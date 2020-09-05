@@ -28,6 +28,7 @@ builders:
       height: 0.05
 
   # Spheres are created according to node names.
+  # NOTE this is overriden! I think by back left?
   endpoint:
     class: tgSphereInfo
     parameters:

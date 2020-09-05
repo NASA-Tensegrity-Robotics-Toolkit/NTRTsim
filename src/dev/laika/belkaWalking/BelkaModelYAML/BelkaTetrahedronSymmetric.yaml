@@ -22,5 +22,5 @@ builders:
   tetrarod:
     class: tgRodInfo
     parameters:
-      density: 0.01
+      density: 0.3235
       radius: 0.1

@@ -32,4 +32,4 @@ builders:
     class: tgSphereInfo
     parameters:
       density: 0.01
-      radius: 0.3
+      radius: 0.2

@@ -129,87 +129,87 @@ builders:
   connectorRod:
     class: tgRodInfo
     parameters:
-      density: 0.014
+      density: 0.1
       radius: 0.025
       friction: 0.5
       roll_friction: 0.5
 
-  HR:
+  HR: # this is the "horizontal top" set of cables.
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 20.0
+      pretension: 56.0 # should be 5.6 N
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
-  HF:
+  HF: # this is the "horizontal left" set of cables
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 20.0
+      pretension: 56.0 # should be 5.6 N
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
-  HB:
+  HB: # this is the "horizontal right" set of cables
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 20.0
+      pretension: 56.0 # should be 5.6 N
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
-  HL:
+  HL: # this is the "horizontal bottom" / ventral cables
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1000.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 20.0
+      pretension: 140 # should be 14 N
       history: 1
       max_tension: 70000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
   SFR:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226
+      stiffness: 1500
       damping: 100.0
-      pretension: 5.0
+      pretension: 135.0 # should be 13.5 N
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
   
   SFL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226
+      stiffness: 1500
       damping: 100.0
-      pretension: 5.0
+      pretension: 135.0 # should be 13.5 N
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
   SBF:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 5.0
+      pretension: 135.0 # should be 13.5 N
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      target_velocity: 1.0
 
   SBL:
     class: tgBasicActuatorInfo
     parameters:
-      stiffness: 1226.0
+      stiffness: 1500.0
       damping: 100.0
-      pretension: 5.0
+      pretension: 135.0 # should be 13.5 N
       history: 1
       max_tension: 7000.0
-      target_velocity: 12.0
+      target_velocity: 1.0

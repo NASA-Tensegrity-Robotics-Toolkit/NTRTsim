@@ -35,7 +35,7 @@ builders:
   shouldersBase:
     class: tgBoxInfo
     parameters:
-      density: 0.015 # was 0.014
+      density: 6.05 # was 0.014
       width: 0.2
       height: 0.2
       
@@ -43,5 +43,5 @@ builders:
   shouldersBack:
     class: tgRodInfo
     parameters:
-      density: 0.015 # really light hips, since they're big.
+      density: 6.05 # really light hips, since they're big.
       radius: 0.2 # more "cylinder" than "rod"

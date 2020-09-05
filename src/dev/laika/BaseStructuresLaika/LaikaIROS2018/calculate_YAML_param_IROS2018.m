@@ -15,57 +15,80 @@ clc;
 % I'm assuming that we've already done the math to create the robot's
 % leg, foot, shoulder, hip models.
 
-% THIS SECTION: for the Belka model as of 2020-09-03.
+%% THIS SECTION: for the Belka model as of 2020-09-03.
 
 % Physical parameters of the models.
+% These are all in meters. We'll apply the scaling analysis later.
+
+% Legs
+leg_height = 0.245;     % 24.5 cm
+leg_width = 0.02;       % 2 cm
+leg_length_Y = 0.005;   % the left-right dimension, with respect to Laika. 5mm
+foot_radius = 0.01;     % 2 cm 
+
+% Hips/Shoulders
+% The base box
+hip_length_x = 0.192; % 19 cm
+hip_width_y = 0.02; % 2 cm
+hip_height_z = 0.02; % cm
+% The ends of the "T"
+hip_T_length = 2 * 0.178; % 17.8 cm away from centerline in each direction
+hip_T_radius = 0.02; % 2 cm
+
+% Tetrahedra
+rod_r = 0.01; % 1 cm
+% now that the tetrahedron is symmetric, we just have to specify this 3D
+% hypotenuse length
+rod_edge_pt = 0.142; % 14.2 cm
+
 
 %%
-% BELOW: WAS FOR IROS2018 in centimeters.
-
-% All below, we use the following scaling.
-% For example, an s=100 means we're using length units of cm.
-% ^EDIT: this script is not set up properly. Procedure SHOULD BE:
-% (1) get everything in SI units
-% (2) apply scaling factor AFTER all in SI units. 
-% ...right now, we're applying scaling factor to non-SI units and it's
-% getting all mixed up. For example, should get density in kg/m^3 by just
-% convering g/cm^3 the regular high-school physics way, then after that,
-% apply the 's'.
-s = 100;
-
-% Physical parameters of the models. Lengths in cm.
-% YAML uses half-extents for the box dimensions! These are*full* extents.
-
-% Legs:
-leg_height = 17.85;
-leg_width = 0.3; 
-leg_length_Y = 2.5; % the left-right dimension, with respect to Laika
-foot_radius = 1.25;
-
-% Shoulders/hips:
-% the base box
-hip_length_X = 12.6;
-hip_height = 6;
-hip_length_Y = 7;
-% the two "ends" of the "T"
-hip_T_height = 6;
-hip_T_width = 0.3;
-hip_T_length_Y = 17.6;
-
-% Vertebrae:
-rod_r = 0.64; % cm. THis is roughly 1/4 inch.
-% For the standard vertebrae, let's declare each node location,
-% then get the total length vector.
-% We'll name them top, bottom, right, left (tbrl).
-v_t = [6.5, 0, 9.6];
-v_b = [6.5, 0, -9.6];
-v_r = [-6.5, 9.6, 0];
-v_l = [-6.5, -9.6, 0];
-% For the rotating vertebra: same thing.
-v_rot_t = [5.5, 0, 9.2];
-v_rot_b = [5.5, 0, -9.2];
-v_rot_r = [-5.5, 9.2, 0];
-v_rot_l = [-5.5, -9.2, 0];
+% % BELOW: WAS FOR IROS2018 in centimeters.
+% 
+% % All below, we use the following scaling.
+% % For example, an s=100 means we're using length units of cm.
+% % ^EDIT: this script is not set up properly. Procedure SHOULD BE:
+% % (1) get everything in SI units
+% % (2) apply scaling factor AFTER all in SI units. 
+% % ...right now, we're applying scaling factor to non-SI units and it's
+% % getting all mixed up. For example, should get density in kg/m^3 by just
+% % convering g/cm^3 the regular high-school physics way, then after that,
+% % apply the 's'.
+% s = 100;
+% 
+% % Physical parameters of the models. Lengths in cm.
+% % YAML uses half-extents for the box dimensions! These are*full* extents.
+% 
+% % Legs:
+% leg_height = 17.85;
+% leg_width = 0.3; 
+% leg_length_Y = 2.5; % the left-right dimension, with respect to Laika
+% foot_radius = 1.25;
+% 
+% % Shoulders/hips:
+% % the base box
+% hip_length_X = 12.6;
+% hip_height = 6;
+% hip_length_Y = 7;
+% % the two "ends" of the "T"
+% hip_T_height = 6;
+% hip_T_width = 0.3;
+% hip_T_length_Y = 17.6;
+% 
+% % Vertebrae:
+% rod_r = 0.64; % cm. THis is roughly 1/4 inch.
+% % For the standard vertebrae, let's declare each node location,
+% % then get the total length vector.
+% % We'll name them top, bottom, right, left (tbrl).
+% v_t = [6.5, 0, 9.6];
+% v_b = [6.5, 0, -9.6];
+% v_r = [-6.5, 9.6, 0];
+% v_l = [-6.5, -9.6, 0];
+% % For the rotating vertebra: same thing.
+% v_rot_t = [5.5, 0, 9.2];
+% v_rot_b = [5.5, 0, -9.2];
+% v_rot_r = [-5.5, 9.2, 0];
+% v_rot_l = [-5.5, -9.2, 0];
 
 %% (1) Density of rigid bodies
 
@@ -79,10 +102,35 @@ v_rot_l = [-5.5, -9.2, 0];
 leg_vol = (leg_height * leg_width * leg_length_Y) + ...
           ( (4/3) * pi * foot_radius^3);
       
-rear_vol_cm = 2 * leg_vol + ...
-           hip_length_X * hip_height * hip_length_Y + ...
-           hip_T_height * hip_T_width * hip_T_length_Y;
+hip_vol = 2 * leg_vol + ...
+           hip_length_x * hip_width_y * hip_height_z + ...
+           hip_T_length * pi * hip_T_radius^2;
 
+% Tetrahedron:
+% Length along the major axis of cylindrical "leg" is
+ell = rod_edge_pt * sqrt(3);
+% Total volume is four of these
+vert_vol = 4 * pi * rod_r^2 * ell;
+
+% The masses of each part are (copied from BelkaLatticeTensioning)
+% vertebrae are light. In kg.
+vert_m = 0.1;
+% On 2019-07-24, shoulders and hips are (from Solidworks)
+hip_m = 3.519;
+
+% Density = mass/volume
+v_dens = vert_m / vert_vol;
+hip_dens = hip_m / hip_vol;
+
+% We're simulating in decimeters. Going from meters to decimeters is
+scaling = 10;
+v_dens_dm = (1/scaling^3) * v_dens;
+hip_dens_dm = (1/scaling^3) * hip_dens;
+       
+return;       
+
+%%
+% BELOW: old attempts at hacking the density conversion.
 % Convert volume in cm^3 to m^3: that's 1/(10^3).
 rear_vol_m = rear_vol_cm * (1e-6);
        
