@@ -33,3 +33,6 @@ builders:
     parameters:
       density: 0.01
       radius: 0.2
+      friction: 1.0
+      roll_friction: 1.0
+      restitution: 0.5
