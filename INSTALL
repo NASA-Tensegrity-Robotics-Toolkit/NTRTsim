@@ -24,7 +24,7 @@ anything.
   - Some Linux prerequisites, outside of the setup script file. Make
     sure the following are installed: 
     
-    Ubuntu (you can use sudo apt-get install):
+    Ubuntu (you can use sudo apt install):
 	- g++ (the compiler for cmake)
 	- libglib2.0-dev
 	- curl
@@ -33,8 +33,9 @@ anything.
 	- cmake
 	- build-essential
         - unzip
+	- python-dev (depending on you linux setup)
 
-    Fedora/CentOS (you can use sudo yum install):
+    Fedora/CentOS (you can use sudo dnf install):
 	- gcc-c++ (the compiler for cmake)
 	- glib2-devel and glib2-devel.i686
 	- curl
