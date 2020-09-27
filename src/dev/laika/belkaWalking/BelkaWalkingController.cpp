@@ -110,6 +110,15 @@ void BelkaWalkingController::onSetup(TensegrityModel& subject)
   }
   // ***NOTE: leg hinges must be done elsewhere. At this point, they're not populated in the model yet.
 
+  // Initialize our PID control variables to zero
+  // I'm still unclear as to what version of C++ we're using, so just to be super backward compatible, 
+  accum_err.clear();
+  prev_err.clear();
+  for(size_t i=0; i < 4; i++){
+    accum_err.push_back(0.0);
+    prev_err.push_back(0.0);
+  }
+
   std::cout << "Finished setting up the controller." << std::endl;    
 }
 
@@ -143,9 +152,24 @@ void BelkaWalkingController::onStep(TensegrityModel& subject, double dt)
 
   // For the leg motors: assume the first four entries in u_in are for the leg motors, in degrees.
   for(size_t i=0; i < legHinges.size(); i++){
+    //////// FOR THE POSITION FEEDBACK ONLY:
     // legHinges[i]->setMotorTarget(u_in[i]*M_PI/180.0, dt);
     // In order to work with the keyboard callback, u_in is now stored in the model.
-    legHinges[i]->setMotorTarget((subjectBelka->getU())[i] * (M_PI/180.0), dt);
+    // legHinges[i]->setMotorTarget((subjectBelka->getU())[i] * (M_PI/180.0), dt);
+
+    /////// FOR OUR PID FEEDBACK:
+    // Assume that our I, D locals are properly sized. Difference in angle (radians) is:
+    double err_i = ((subjectBelka->getU())[i] * (M_PI/180.0)) - legHinges[i]->getHingeAngle();
+    // std::cout << "Leg " << i << " error: " << err_i << std::endl;
+    // update the integrator
+    accum_err[i] += err_i;
+    // the target velocity will now be... (PID!)
+    double vtarg_i = m_KP*err_i + m_KI*accum_err[i] + m_KD*(err_i-prev_err[i]);
+    // std::cout << "Leg " << i << " vtarg: " << vtarg_i << std::endl;
+    // store for the derivative term...
+    prev_err[i] = err_i;
+    // Finally, set the target velocity.
+    legHinges[i]->enableAngularMotor(true, vtarg_i, max_im);
   }
 
   // For the spine retraction percentages: first, the left/right cables, which are actually HF and HB

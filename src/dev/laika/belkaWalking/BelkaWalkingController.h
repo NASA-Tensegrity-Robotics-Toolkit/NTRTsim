@@ -112,7 +112,23 @@ private:
 
   // a global constant: max motor impulse. Since we want high stiffness here let's let the motor be powerful. Maybe 2000?
   // This creates a bad large impulse on the ground. Make it smaller so the robot doesn't kick itself upward.
-  double max_im = 0.1;
+  // Note: 0.05 is the minimum that lets the robot right itself. 
+  double max_im = 1.0;
+
+  // We'll do a PID feedback controller from angle->velocity on the hinge motor. 
+  // With the timestep of 0.00005, the gain corresponding to setMotorTarget's (1/dt) is 20,000
+  double m_KP = 5.0;
+  double m_KI = 0.001;
+  double m_KD = 0.001;
+  // Seems we might actually not need much of the I or D at all. Previously, we were effectively doing bang-bang, 
+  // with an extremely high P constant and a limit via max_im. Now with true P control it actually seems to be fine
+  // double m_KI = 0.05;
+  // double m_KD = 500.0;
+  // also need some extra states for the I and D feedback. We'll have these for each leg
+  // double m_accumulatedError; // for I
+  std::vector<double> accum_err;
+  // double m_prevError; //  for D.
+  std::vector<double> prev_err;
 
   /**
    * The control inputs here will be the four legs, then spine L/R and CW/CCW. Total of 6.
