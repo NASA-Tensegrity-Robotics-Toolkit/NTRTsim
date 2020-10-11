@@ -1,0 +1,9 @@
+Belka Open-Loop Gait Timepoints Trajectory,,,,,,,
+Usage: times and control inputs,,,,,,,
+There are 6 inputs.,,,,,,,
+Simulation time (sec),legA,legB,legC,legD,spineHoriz,spineRot,EmptyColForSavingExtraComma
+0,0,0,0,0,0,0,
+1,0,0,0,0,-0.08,-0.065,
+2,20,0,0,0,-0.08,-0.065,
+3,20,0,0,0,-0.08,0.055,
+4,20,0,20,0,-0.08,0.055,

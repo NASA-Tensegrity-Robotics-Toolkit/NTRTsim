@@ -12,6 +12,7 @@ link_libraries(core
 
 add_executable(AppBelkaWalking
   BelkaWalkingController.cpp
+  BelkaWalkingFileController.cpp
   BelkaWalkingModel.cpp
   AppBelkaWalking.cpp
 )

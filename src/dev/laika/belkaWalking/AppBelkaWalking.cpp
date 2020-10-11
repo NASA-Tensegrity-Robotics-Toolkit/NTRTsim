@@ -28,6 +28,7 @@
 // This application
 // #include "yamlbuilder/TensegrityModel.h"
 #include "BelkaWalkingController.h"
+#include "BelkaWalkingFileController.h"
 #include "BelkaWalkingModel.h"
 // This library
 #include "core/terrain/tgBoxGround.h"
@@ -71,7 +72,6 @@ int main(int argc, char** argv)
     tgWorld world(config, ground);
 
     // create the view
-    // const double timestep_physics = 0.00001; // seconds
     const double timestep_physics = 0.00005;
     // const double timestep_physics = 0.0001; // seconds
     // const double timestep_physics = 0.001;
@@ -119,7 +119,12 @@ int main(int argc, char** argv)
     */
 
     // Call the constructor for the controller. Tags are now hard-coded.
-    BelkaWalkingController* const controller = new BelkaWalkingController();
+    // For keyboard control only:
+    // BelkaWalkingController* const controller = new BelkaWalkingController();
+    // Now, reading control inputs from a CSV file:
+    std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_ac_20deg_2020-10-11.csv");
+    BelkaWalkingFileController* const controller = new BelkaWalkingFileController(input_traj);
+
     // Attach the controller to the model. Must happen before running the
     // simulation.
     myModel->attach(controller);
