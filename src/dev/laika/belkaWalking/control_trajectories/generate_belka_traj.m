@@ -106,7 +106,44 @@ for i = 1:size(u_pts,2)
         % (since there's a first row of zeros.) Since first column is time,
         t_u(idx0 : idxf, i+1) = v_ij;
     end
+    % We have an off-by-one error on the last line because we did the
+    % indexing "up until" a timepoint not including that timepoint.
+    t_u(end, 2:end) = t_u(end-1, 2:end);
 end
+
+%% (3) Save results
+
+filename = 'belka_acbd_20deg_2020-10-11.csv';
+disp('Saving Belka trajectory file...');
+
+% Write the header
+hdr = {};
+hdr{1} = 'Belka Open-Loop Gait Timepoints Trajectory';
+hdr{2} = 'Usage: times and control inputs';
+hdr{3} = 'There are 6 inputs.';
+hdr{4} = 'Simulation time (sec),legA,legB,legC,legD,spineHoriz,spineRot,';
+fid = fopen(filename, 'w');
+for k=1:size(hdr,2)
+    fprintf(fid, '%s\n', string(hdr{k}));
+end
+% fclose(fid);
+
+% Write the data table
+% Frustratingly enough, MATLAB doesn't have an option for appending an
+% extra comma at the end, so we go row by row with fprintf... ugh
+for r = 1:size(t_u, 1)
+    row_r = t_u(r,:);
+    for c = 1:size(row_r,2)
+        % dlmwrite(filename, t_u, '-append');
+        fprintf(fid, '%f,', row_r(c));
+    end
+    % append a newline
+    fprintf(fid, '\n');
+end
+fclose(fid);
+
+disp('Done.');
+
 
 
 
