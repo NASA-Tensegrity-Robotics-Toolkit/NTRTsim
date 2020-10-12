@@ -10,9 +10,9 @@ clc;
 
 % All inputs will use the same dt,
 dt = 0.01;
-% Specify the max time manually, for ease. 
-% We'll apply a hold on the last value for each input until this max time.
-t_max = 10;
+% Apply a short hold at the end of the gait, this makes it so we don't have
+% to "double up" the final timepoint
+holdtime = dt;
 
 % We'll specify pairs of [timepoint, value] that will be used to
 % interpolate.
@@ -77,20 +77,59 @@ u6 = [0, 0;
 % To iterate nicer, later, put these all in a cell array
 u_pts = {u1, u2, u3, u4, u5, u6};
 
+% Some adjustments to the gait, now:
+% Startup delay
+waittime = 5;
+% Speedup factor
+speedup = 1.5;
+% Number of steps / repeats of the gait
+nstep = 5;
+
+% First, apply the speedup: needed for calibrating the total time for one
+% step of the gait
+for i = 1:size(u_pts,2)
+    % speedup
+    u_pts{i}(:,1) = u_pts{i}(:,1) / speedup;
+end
+
+% For repeating the steps, find the maximum end time for the whole gait
+allpts_beforeadjust = cell2mat(u_pts');
+t_max_beforeadjust = max(allpts_beforeadjust(:,1));
+
+% Apply the other two adjustments
+for i = 1:size(u_pts,2)
+    % Number of steps: pattern the gait and adjust by intervals of t_max.
+    % Get the base pattern
+    u_pts_i_onestep = u_pts{i};
+    for n = 1 : nstep
+        % Adjust the times only
+        nextgait = [u_pts_i_onestep(:,1) + t_max_beforeadjust * n, u_pts_i_onestep(:,2)];
+        % add on to the end
+        u_pts{i} = [u_pts{i}; nextgait];
+    end
+    % startup delay: adjust all timepoints forward EXCEPT THE FIRST, since
+    % we still want a zero at the beginning
+    u_pts{i}(2:end,1) = u_pts{i}(2:end,1) + waittime;
+end
+
+% For preallocation, find the maximum end time for the whole gait AGAIN now
+% after adjustments
+allpts = cell2mat(u_pts');
+t_max = max(allpts(:,1));
+
 % Add the "final timepoint" to each for the hold.
 for i = 1:size(u_pts,2)
     % the value to hold is...
     hold_val = u_pts{i}(end, 2);
     % add in the last point
-    u_pts{i}(end+1, :) = [t_max, hold_val];
+    u_pts{i}(end+1, :) = [t_max + holdtime, hold_val];
 end
 
-% TO-DO: ADD A CHECK THAT TMAX IS GREATER THAN MAX OF THESE TIMES
 
 %% (2) Generate the interpolated timepoints for each.
 
 % Grid out the times
-t = [0:dt:t_max]';
+t = [0:dt:t_max+holdtime]';
 
 % Preallocate the result. One time index plus six inputs is seven columns
 t_u = zeros(size(t,1), 7);
@@ -126,8 +165,8 @@ for i = 1:size(u_pts,2)
         % Insert into the appropriate place in the trajectory. 
         % ASSUMING THE TIMEPOINTS ARE IN INTERVALS OF DT, the index that
         % should start this segment is
-        idx0 = t0_ij/dt + 1;
-        idxf = idx0 + size(v_ij,1)-1;
+        idx0 = floor(t0_ij/dt + 1);
+        idxf = floor(idx0 + size(v_ij,1)-1);
         % (since there's a first row of zeros.) Since first column is time,
         t_u(idx0 : idxf, i+1) = v_ij;
     end
