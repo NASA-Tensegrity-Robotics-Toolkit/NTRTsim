@@ -648,11 +648,11 @@ diff -rupN NTRTTests/env/build/bullet/Demos/OpenGL_FreeGlut/tgDemoApplication.cp
 -				wireColor += btVector3 (0.f,1.f, 0.f);
 +				if (i & 1)
 +				{
-+					wireColor += btVector3 (1.f,0.f,0.f);
++					wireColor = btVector3 (1.0f,0.3f,0.3f);
 +				}
 +				else
 +				{			
-+					wireColor += btVector3 (.5f,0.f,0.f);
++					wireColor = btVector3 (1.0f,0.3f,0.3f);
 +				}
  			}
 -			else
