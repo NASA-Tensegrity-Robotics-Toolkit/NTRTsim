@@ -7,5 +7,5 @@
 substructures:
   BelkaTranslated:
     path: ./BelkaModelYAML/BelkaWith1DOFLegs.yaml
-    translation: [0, 4.35, 0]
+    translation: [0, 4.25, 0]
 

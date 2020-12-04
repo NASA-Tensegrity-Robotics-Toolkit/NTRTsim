@@ -122,7 +122,8 @@ int main(int argc, char** argv)
     // For keyboard control only:
     // BelkaWalkingController* const controller = new BelkaWalkingController();
     // Now, reading control inputs from a CSV file:
-    std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_acbd_20deg_2020-10-11.csv");
+    // std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_acbd_20deg_2020-10-11.csv");
+    std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_withmirror_20deg_2020-12-4.csv");
     BelkaWalkingFileController* const controller = new BelkaWalkingFileController(input_traj);
 
     // Attach the controller to the model. Must happen before running the

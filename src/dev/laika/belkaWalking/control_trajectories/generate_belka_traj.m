@@ -25,53 +25,103 @@ holdtime = dt;
 % FOR THE ACBD GAIT:
 
 % Leg A, degrees
+% Step rightwards:
+% u1 = [0, 0;
+%     0.5, 0;
+%     0.6, 20;
+%     2.8, 20;
+%     2.9, 0];
+% Step leftwards: switches with u2
 u1 = [0, 0;
-    0.5, 0;
-    0.6, 20;
-    2.8, 20;
-    2.9, 0];
-
-% Leg B
-u2 = [0, 0;
     1.8, 0;
     1.9, 20;
     2.8, 20;
     2.9, 0];
 
-% Leg C
-u3 = [0, 0;
-    1.0, 0;
-    1.1, 20;
+% Leg B
+% Step rightwards:
+% u2 = [0, 0;
+%     1.8, 0;
+%     1.9, 20;
+%     2.8, 20;
+%     2.9, 0];
+% Step leftwards: switches with u1. ADJUSTED
+u2 = [0, 0;
+    0.6, 0;
+    0.7, 20;
     2.8, 20;
     2.9, 0];
 
-% Leg D
-u4 = [0, 0;
+% Leg C
+% Step rightwards:
+% u3 = [0, 0;
+%     1.0, 0;
+%     1.1, 20;
+%     2.8, 20;
+%     2.9, 0];
+% Step leftwards: switches with u4
+u3 = [0, 0;
     2.4, 0;
     2.5, 20;
     2.8, 20;
     2.9, 0];
 
+% Leg D
+% Step rightwards:
+% u4 = [0, 0;
+%     2.4, 0;
+%     2.5, 20;
+%     2.8, 20;
+%     2.9, 0];
+% Step leftwards: switches with u3
+u4 = [0, 0;
+    1.0, 0;
+    1.1, 20;
+    2.8, 20;
+    2.9, 0];
+
 % Spine Horizontal Left/Right, as a percent retraction.
+% Step rightwards:
+% u5 = [0, 0;
+%     0.2, 0;
+%     0.4, -0.08;
+%     1.2, -0.08;
+%     1.6, 0.18;
+%     2.6, 0.18;
+%     2.8, 0];
+% Step leftwards: negative direction. ADJUSTED
 u5 = [0, 0;
     0.2, 0;
-    0.4, -0.08;
-    1.2, -0.08;
-    1.6, 0.18;
-    2.6, 0.18;
+    0.4, 0.09;
+    1.2, 0.09;
+    1.6, -0.18;
+    2.6, -0.18;
     2.8, 0];
 
 % Spine Rotation CW/CCW, as a percent retraction.
+% Step rightwards:
+% u6 = [0, 0;
+%     0.2, 0;
+%     0.4, -0.065;
+%     0.8, -0.065;
+%     1.0, 0.055;
+%     1.2, 0.055;
+%     1.3, 0.040;
+%     2.0, 0.040;
+%     2.2, -0.065;
+%     2.6, -0.065;
+%     2.8, 0];
+% Step leftwards: negative direction. ADJUSTED
 u6 = [0, 0;
     0.2, 0;
-    0.4, -0.065;
-    0.8, -0.065;
-    1.0, 0.055;
-    1.2, 0.055;
-    1.3, 0.040;
-    2.0, 0.040;
-    2.2, -0.065;
-    2.6, -0.065;
+    0.6, 0.045;
+    0.8, 0.045;
+    1.0, -0.075;
+    1.2, -0.075;
+    1.3, -0.065;
+    2.0, -0.065;
+    2.2, 0.045;
+    2.6, 0.045;
     2.8, 0];
 
 % To iterate nicer, later, put these all in a cell array
@@ -81,9 +131,17 @@ u_pts = {u1, u2, u3, u4, u5, u6};
 % Startup delay
 waittime = 5;
 % Speedup factor
-speedup = 1.5;
-% Number of steps / repeats of the gait
-nstep = 5;
+% speedup = 1.5; % 1.5 is a nice number for the actual simulation
+speedup = 1;
+% To make the gait symmetric: insert a mirrored left/right step after each
+% of the original.
+mirror_gait = 0;
+% Let the robot settle a bit before switching to mirrored step
+mirror_delay = 0.7;
+% Number of steps / repeats of the gait. If mirror_gait, total steps will
+% end up being 2*nsteps.
+% nstep = 5; % 5 is nice for a visualization
+nstep = 0;
 
 % First, apply the speedup: needed for calibrating the total time for one
 % step of the gait
@@ -95,6 +153,28 @@ end
 % For repeating the steps, find the maximum end time for the whole gait
 allpts_beforeadjust = cell2mat(u_pts');
 t_max_beforeadjust = max(allpts_beforeadjust(:,1));
+
+% If selected, add a mirrored step to the end of this single step.
+if mirror_gait == 1
+    % preallocate
+    u_pts_mirror = u_pts;
+    % Legs: A is opposite B, and C is opposite D.
+    u_pts_mirror{1} = u_pts{2};
+    u_pts_mirror{2} = u_pts{1};
+    u_pts_mirror{3} = u_pts{4};
+    u_pts_mirror{4} = u_pts{3};
+    % For horizonal left/right and rotation, these are defined vs. 0 as
+    % neutral position, so make them negative to flip direction
+    u_pts_mirror{5}(:,2) = -u_pts{5}(:,2);
+    u_pts_mirror{6}(:,2) = -u_pts{6}(:,2);
+    % we want mirrored step to begin after the end of the regular one plus
+    % the delay
+    for i=1:size(u_pts, 2)
+        u_pts_mirror{i}(:,1) = u_pts_mirror{i}(:,1) + t_max_beforeadjust + mirror_delay;
+        u_pts{i} = [u_pts{i}; u_pts_mirror{i}];
+    end
+    t_max_beforeadjust = t_max_beforeadjust*2 + mirror_delay;
+end
 
 % Apply the other two adjustments
 for i = 1:size(u_pts,2)
@@ -177,7 +257,7 @@ end
 
 %% (3) Save results
 
-filename = 'belka_acbd_20deg_2020-10-11.csv';
+filename = 'belka_withmirror_20deg_2020-12-4.csv';
 disp('Saving Belka trajectory file...');
 
 % Write the header
