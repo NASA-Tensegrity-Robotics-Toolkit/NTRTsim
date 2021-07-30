@@ -36,6 +36,11 @@
 #include "core/tgSimulation.h"
 #include "core/tgSimViewGraphics.h"
 #include "core/tgWorld.h"
+// For tracking positions:
+#include "sensors/tgDataLogger2.h"
+#include "sensors/tgSphereSensorInfo.h"
+#include "sensors/tgCompoundRigidSensorInfo.h"
+#include "sensors/tgSpringCableActuatorSensorInfo.h"
 // Bullet Physics
 #include "LinearMath/btVector3.h"
 // The C++ Standard Library
@@ -122,8 +127,10 @@ int main(int argc, char** argv)
     // For keyboard control only:
     // BelkaWalkingController* const controller = new BelkaWalkingController();
     // Now, reading control inputs from a CSV file:
-    std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_acbd_20deg_2020-10-11.csv");
-    // std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_withmirror_20deg_2020-12-4.csv");
+    // std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_acbd_20deg_2020-10-11.csv");
+    std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_withmirror_20deg_2020-12-4.csv");
+    // std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_acbd_longer_20deg_2020-12-31.csv");
+    // std::string input_traj("~/repositories/NTRTsim/src/dev/laika/belkaWalking/control_trajectories/belka_bdac_longer_20deg_2020-12-31.csv");
     BelkaWalkingFileController* const controller = new BelkaWalkingFileController(input_traj);
 
     // Attach the controller to the model. Must happen before running the
@@ -132,6 +139,29 @@ int main(int argc, char** argv)
 
     // Add the model to the world
     simulation.addModel(myModel);
+
+    // has to end with the prefix to the log file name.
+    std::string log_filename = "~/NTRTsim_logs/AppBelkaWalking_";
+    double samplingTimeInterval = 0.1;
+    tgDataLogger2* myDataLogger = new tgDataLogger2(log_filename, samplingTimeInterval);
+    // add the model to the data logger
+    myDataLogger->addSenseable(myModel);
+    // Make it so the data logger can dispatch sphere sensors
+    //abstractMarkerSensorInfo* myAbstractMarkerSensorInfo = new abstractMarkerSensorInfo();
+    // Correlating the cable lengths to foot positions.
+    tgSpringCableActuatorSensorInfo* mySCASensorInfo = new tgSpringCableActuatorSensorInfo();
+    // for the compound bodies (this should be all vertebrae)
+    tgCompoundRigidSensorInfo* myCRSensorInfo = new tgCompoundRigidSensorInfo();
+    tgSphereSensorInfo* mySphereSensorInfo = new tgSphereSensorInfo();
+    //DEBUGGING: rods too
+    //tgRodSensorInfo* myRodSensorInfo = new tgRodSensorInfo();
+    //myDataLogger->addSensorInfo(myAbstractMarkerSensorInfo);
+    myDataLogger->addSensorInfo(mySCASensorInfo);
+    myDataLogger->addSensorInfo(myCRSensorInfo);
+    myDataLogger->addSensorInfo(mySphereSensorInfo);
+    //myDataLogger->addSensorInfo(myRodSensorInfo);
+    // Add the data logger to the simulation.
+    simulation.addDataManager(myDataLogger);
 
     // Finally, run the simulation.
     simulation.run();
