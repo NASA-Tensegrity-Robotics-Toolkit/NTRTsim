@@ -35,7 +35,7 @@ def plot_from_file(filename, start_row=2):
 
 def plot_multiple_files(f1, f2, f3, start_row=2):
     timept1 = 10.0
-    timept2 = 28.0
+    timept2 = 29.5
     titlefontsize = 12
     axisfontsize = 9
     dat1 = np.genfromtxt(f1, delimiter=',', skip_header=(start_row))
@@ -65,6 +65,7 @@ def plot_multiple_files(f1, f2, f3, start_row=2):
     z3 = z3 - z3[0]
     # timepoints should be same for all runs, since constant sampling rate
     tp1_idx = np.where(t1 >= timept1)[0][0]
+    tp2_idx = np.where(t1 >= timept2)[0][0]
     # plotting
     fig, ax = plt.subplots(1,figsize=[6,4])
     ax.set_xlabel('X (m)', fontsize=axisfontsize)
@@ -72,9 +73,18 @@ def plot_multiple_files(f1, f2, f3, start_row=2):
     ax.plot(x1, z1, linestyle='-', linewidth=2)
     ax.plot(x2, z2, linestyle='-', linewidth=2)
     ax.plot(x3, z3, linestyle='-', linewidth=2)
-    ax.scatter(x1[tp1_idx], z1[tp1_idx], marker='x', c='k', s=50, zorder=1)
-    ax.scatter(x2[tp1_idx], z2[tp1_idx], marker='x', c='k', s=50, zorder=1)
-    ax.scatter(x3[tp1_idx], z3[tp1_idx], marker='x', c='k', s=50, zorder=1)
+    ax.scatter(0, 0, marker='o', c='k', s=50, zorder=10)
+    plt.annotate("0 sec.", (0,0), textcoords="offset points", xytext=(0, -15), ha='center')
+    ax.scatter(x1[tp1_idx], z1[tp1_idx], marker='x', c='k', s=50, zorder=10)
+    ax.scatter(x2[tp1_idx], z2[tp1_idx], marker='x', c='k', s=50, zorder=10)
+    ax.scatter(x3[tp1_idx], z3[tp1_idx], marker='x', c='k', s=50, zorder=10)
+    plt.annotate("10 sec.", (x2[tp1_idx], z2[tp1_idx]), textcoords="offset points", xytext=(0, -15), ha='center')
+    ax.scatter(x1[tp2_idx], z1[tp2_idx], marker='x', c='k', s=50, zorder=10)
+    ax.scatter(x2[tp2_idx], z2[tp2_idx], marker='x', c='k', s=50, zorder=10)
+    ax.scatter(x3[tp2_idx], z3[tp2_idx], marker='x', c='k', s=50, zorder=10)
+    plt.annotate("30 sec.", (x1[tp2_idx], z1[tp2_idx]), textcoords="offset points", xytext=(0, -25), ha='center')
+    plt.annotate("30 sec.", (x2[tp2_idx], z2[tp2_idx]), textcoords="offset points", xytext=(0, -15), ha='center')
+    plt.annotate("30 sec.", (x3[tp2_idx], z3[tp2_idx]), textcoords="offset points", xytext=(0, -15), ha='center')
     ax.grid(True)
     ax.set_ylim([-15, 15])
     # ax.tick_params(axis='y', labelcolor=color_angle)
