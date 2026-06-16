@@ -36,17 +36,36 @@
 #include <sstream> // for ease of converting tags to strings.
 #include <iostream> // for writing output to the terminal
 #include <algorithm> // // for std::find, used with blacklist.
-// Includes from boost
-#include <boost/regex.hpp>
+#include <cctype>
 
-/**
- * The regular expression for use in picking out compound tags.
- * Define it here, since it will be used in a variety of places.
- * The following regex should match the characters "compound_" with
- * six alphanumeric characters at the end. (This is the hash that
- * tgRigidAutoCompounder creates.)
- */
-static const boost::regex compound_regex("compound_\\w{6}");
+static bool isWordChar(char c)
+{
+    return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+}
+
+// Match "compound_" followed by six word characters (same as compound_\w{6}).
+static bool findCompoundTag(const std::string& tags, std::string& matchedTag)
+{
+    const std::string prefix = "compound_";
+    size_t pos = 0;
+    while ((pos = tags.find(prefix, pos)) != std::string::npos) {
+        if (tags.size() >= pos + prefix.size() + 6) {
+            bool valid = true;
+            for (size_t i = 0; i < 6; ++i) {
+                if (!isWordChar(tags[pos + prefix.size() + i])) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid) {
+                matchedTag = tags.substr(pos, prefix.size() + 6);
+                return true;
+            }
+        }
+        pos += prefix.size();
+    }
+    return false;
+}
 
 /**
  * Nothing to do in this constructor. A sensor info doesn't have any data.
@@ -87,21 +106,9 @@ std::map<std::string, int> tgCompoundRigidSensorInfo::getCompoundTags(tgModel* p
     tagstream << descendants[i]->getTags();
     std::string tags = tagstream.str();
     // (b) use a regular expression to pick out any compound tags
-    boost::smatch matches;
-    bool anymatches = boost::regex_search(tags, matches, compound_regex);
-    // If there are zero matches, do nothing: this descendant is not compound.
-    // Note that matches is only initialized if anymatches is true.
-    // In other words, we CANNOT do a check of matches.size() here instead,
-    // since if matches.size() == 0, then matches will not have been initialized.
+    std::string matchedTag;
+    bool anymatches = findCompoundTag(tags, matchedTag);
     if( anymatches ) {
-      // Note that there should be AT MOST one match.
-      // No rigid body should ever be part of more than one compound: if
-      // it was part of two compounds, those compounds would be the same!!
-      // TO-DO: write some verifying code (maybe in tgRigidAutoCompounder)
-      // to enforce this.
-      if (matches.size() >= 2 ){
-	throw std::runtime_error("A tgModel has more than one compound tag in its tag list, inside tgCompoundRigidSensorInfo. This is impossible, and something is very wrong.");
-      }
       // Confirm that the specific descendant is actually a rigid body.
       // It's possible that some not-rigid-bodies could have erroneous tags...
       tgBaseRigid* pBaseRigid =
@@ -110,7 +117,7 @@ std::map<std::string, int> tgCompoundRigidSensorInfo::getCompoundTags(tgModel* p
 	throw std::runtime_error("A tgModel that is NOT a rigid body has a compound tag attached to it. Only rigid bodies should have compound tags.");
       }
       // Finally, if everything is good, add to the index of counts for this tag.
-      compounds[matches.str(0)] += 1;
+      compounds[matchedTag] += 1;
     }
   }
   

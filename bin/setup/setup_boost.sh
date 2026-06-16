@@ -78,6 +78,7 @@ function unpack_boost()
     # Create directory and unpack
     if check_directory_exists "$BOOST_BUILD_DIR"; then
         echo "- Boost is already unpacked to '$BOOST_BUILD_DIR' -- skipping."
+        patch_boost_for_modern_clang "$BOOST_BUILD_DIR"
         return
     fi
 
@@ -90,6 +91,26 @@ function unpack_boost()
     tar xf "$DOWNLOADS_DIR/$boost_pkg" --strip 1 
     popd > /dev/null
 
+    patch_boost_for_modern_clang "$BOOST_BUILD_DIR"
+}
+
+# Boost 1.53 string-compares compiler versions, so clang 16 looks older than 4.0
+function patch_boost_for_modern_clang()
+{
+    local boost_dir="$1"
+    local darwin_jam="$boost_dir/tools/build/v2/tools/darwin.jam"
+    local darwin_py="$boost_dir/tools/build/v2/tools/darwin.py"
+
+    if [ -f "$darwin_jam" ] && [ "$(uname)" = "Darwin" ]; then
+        sed -i '' '/-fcoalesce-templates/d' "$darwin_jam"
+        sed -i '' '/-Wno-long-double/d' "$darwin_jam"
+    fi
+
+    if [ -f "$darwin_py" ] && [ "$(uname)" = "Darwin" ]; then
+        sed -i '' "/fcoalesce-templates/d" "$darwin_py"
+        sed -i '' "/Wno-long-double/d" "$darwin_py"
+        sed -i '' "/no-cpp-precomp/d" "$darwin_py"
+    fi
 }
 
 # Build the package under the build directory specified in in install.conf
@@ -104,8 +125,10 @@ function build_boost()
         return
     fi
 
-    #To make gcc as the default compiler, this line uncomments the line ';using gcc' in user-config.jam file of the boost library.
-    sed -i 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+    # Legacy macOS installs used gcc 4.x; modern Apple clang should use the darwin toolset.
+    if [ "$(uname)" != "Darwin" ]; then
+        sed -i 's/^# using gcc ;/using gcc ;/g' tools/build/v2/user-config.jam
+    fi
 
     # Perform the build
     #./bootstrap.sh --prefix="$BOOST_INSTALL_PREFIX" --with-libraries=system || { echo "Boost bootstrap failed."; exit 1; } # Lite
@@ -153,6 +176,15 @@ function env_link_boost()
         rm boost 2>/dev/null
         create_exist_symlink "$BOOST_INSTALL_PREFIX/include/boost" boost
     fi
+    popd > /dev/null
+
+    # Library Files (needed when using a system/homebrew boost install)
+    pushd "$LIB_DIR" > /dev/null
+    for lib in "$BOOST_INSTALL_PREFIX/lib"/libboost*; do
+        if [ -e "$lib" ]; then
+            create_exist_symlink "$lib" "$(basename "$lib")"
+        fi
+    done
     popd > /dev/null
 
 }

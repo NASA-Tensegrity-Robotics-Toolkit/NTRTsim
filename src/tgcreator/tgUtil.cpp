@@ -16,6 +16,8 @@
  * governing permissions and limitations under the License.
 */
 
+#include <ctime>
+
 /// Rand seeding simular to the evolution and terrain classes. 
 #ifdef _WIN32
 
@@ -26,9 +28,14 @@
 
 //  For everything else
 unsigned long long rdtsc(){
+#if defined(__aarch64__) || defined(__arm64__)
+    // Apple Silicon / ARM64 has no rdtsc instruction
+    return static_cast<unsigned long long>(time(0));
+#else
     unsigned int lo,hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((unsigned long long)hi << 32) | lo;
+#endif
 }
 
 #endif

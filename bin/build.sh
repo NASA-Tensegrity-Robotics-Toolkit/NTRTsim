@@ -180,9 +180,9 @@ build_type="Unix Makefiles"
 #build_type="Eclipse CDT4 - Unix Makefiles"
 
 if $CMAKE_COMPILER_WARNINGS_FLAG; then
-    cmake_cxx_flags="-Wall -Wno-long-long"
+    cmake_cxx_flags="-Wall -Wno-long-long -std=c++11"
 else
-    cmake_cxx_flags=""
+    cmake_cxx_flags="-std=c++11"
 fi
 
 cmake_cross_platform

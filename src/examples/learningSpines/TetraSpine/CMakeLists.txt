@@ -28,3 +28,5 @@ add_executable(AppTetraSpineSerial
 target_link_libraries(AppTetraSpineSerial ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
 configure_file("controlVars.json" "controlVars.json" COPYONLY)
 
+ntrt_add_runme(AppTetraSpineLearning DESCRIPTION "Run the tetra spine learning demo")
+ntrt_add_runme(AppTetraSpineSerial SCRIPT_NAME runme-AppTetraSpineSerial DESCRIPTION "Run the tetra spine serialization demo")

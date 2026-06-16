@@ -156,6 +156,8 @@ function build_bullet()
     echo "- Building Bullet Physics under $BULLET_BUILD_DIR"
     pushd "$BULLET_BUILD_DIR" > /dev/null
 
+    patch_modern_cmake "$BULLET_BUILD_DIR"
+
     # Perform the build
     # If you turn double precision on, turn it on in inc.CMakeBullet.txt as well for the NTRT build
     "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
@@ -163,7 +165,7 @@ function build_bullet()
         -DBUILD_EXTRAS=ON \
         -DCMAKE_INSTALL_PREFIX="$BULLET_INSTALL_PREFIX" \
         -DCMAKE_C_FLAGS="-fPIC" \
-        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC -std=c++11" \
         -DCMAKE_C_COMPILER="gcc" \
         -DCMAKE_CXX_COMPILER="g++" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \

@@ -141,7 +141,13 @@ public:
      */
     virtual void clientResetScene();
 
-private:    
+    /**
+     * Point the camera at the simulation and enable auto-tracking.
+     * Call after models are added, before run().
+     */
+    void frameScene(float cameraDistance = 40.0f);
+
+private:
     tgGLDebugDrawer*    gDebugDrawer;   
 };
 

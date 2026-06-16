@@ -110,16 +110,21 @@ function build_yamlcpp()
     echo "- Building YamlCPP under $YAMLCPP_BUILD_DIR"
     pushd "$YAMLCPP_BUILD_DIR" > /dev/null
 
+    patch_modern_cmake "$YAMLCPP_BUILD_DIR"
+
     # Perform the build
     # If you turn double precision on, turn it on in inc.CMakeYamlCPP.txt as well for the NTRT build
     "$ENV_DIR/bin/cmake" . -G "Unix Makefiles" \
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_EXTRAS=ON \
+        -DYAML_CPP_BUILD_TOOLS=OFF \
+        -DBoost_NO_SYSTEM_PATHS=ON \
+        -DBoost_INCLUDE_DIR="$INCLUDE_DIR" \
         -DCMAKE_INSTALL_PREFIX="$YAMLCPP_INSTALL_PREFIX" \
         -DCMAKE_C_COMPILER="gcc" \
         -DCMAKE_CXX_COMPILER="g++" \
         -DCMAKE_C_FLAGS="-fPIC" \
-        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC -std=c++11" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \

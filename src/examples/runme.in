@@ -1,0 +1,20 @@
+#!/bin/bash
+# @APP_DESCRIPTION@
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+NTRT_ROOT="$SCRIPT_DIR"
+while [ ! -f "$NTRT_ROOT/bin/build.sh" ] && [ "$NTRT_ROOT" != "/" ]; do
+  NTRT_ROOT="$(dirname "$NTRT_ROOT")"
+done
+if [ ! -f "$NTRT_ROOT/bin/build.sh" ]; then
+  echo "Could not find NTRT root (expected bin/build.sh)" >&2
+  exit 1
+fi
+
+DYLD_LIBRARY_PATH="$NTRT_ROOT/env/lib"
+while IFS= read -r libdir; do
+  DYLD_LIBRARY_PATH="$libdir:$DYLD_LIBRARY_PATH"
+done < <(find "$NTRT_ROOT/build" -name '*.dylib' -exec dirname {} \; 2>/dev/null | sort -u)
+export DYLD_LIBRARY_PATH
+
+exec "$SCRIPT_DIR/@APP_NAME@" "$@"

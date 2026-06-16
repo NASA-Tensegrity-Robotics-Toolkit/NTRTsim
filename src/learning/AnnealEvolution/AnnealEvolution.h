@@ -31,6 +31,7 @@
 #include "AnnealEvoPopulation.h"
 #include "AnnealEvoMember.h"
 #include <fstream>
+#include <random>
 #include <boost/iterator/iterator_concepts.hpp>
 
 class AnnealEvolution
@@ -50,7 +51,7 @@ public:
 private:
     int populationSize;
     int numberOfControllers;
-    std::tr1::ranlux64_base_01 eng;
+    std::ranlux48_base eng;
     std::vector< AnnealEvoPopulation *> populations;
     std::vector <AnnealEvoMember *>  selectedControllers;
     std::vector< std::vector< double > > scoresOfTheGeneration;

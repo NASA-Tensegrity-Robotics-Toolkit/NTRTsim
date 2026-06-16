@@ -10,5 +10,7 @@ link_libraries(tgcreator
 add_executable(AppPrismModel
     PrismModel.cpp
     AppPrismModel.cpp
-) 
+)
+
+ntrt_add_runme(AppPrismModel DESCRIPTION "Run the 3-strut tensegrity prism demo")
 

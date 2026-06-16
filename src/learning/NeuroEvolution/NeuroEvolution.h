@@ -31,6 +31,7 @@
 #include "NeuroEvoPopulation.h"
 #include "NeuroEvoMember.h"
 #include <fstream>
+#include <random>
 
 class NeuroEvolution
 {
@@ -49,7 +50,7 @@ public:
 private:
 	int populationSize;
 	int numberOfControllers;
-	std::tr1::ranlux64_base_01 eng;
+	std::ranlux48_base eng;
 	std::vector< NeuroEvoPopulation *> populations;
 	std::vector <NeuroEvoMember *>  selectedControllers;
 	std::vector< std::vector< double > > scoresOfTheGeneration;

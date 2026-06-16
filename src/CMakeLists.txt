@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 PROJECT(NASA_Tensegrity_Robotics_Toolkit)
 
+add_definitions(-DBOOST_NO_CXX11_HDR_TUPLE -DBOOST_NO_CXX11_HDR_ARRAY -DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
+
 # Add your subdirectories here
 subdirs(
     core

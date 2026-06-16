@@ -23,6 +23,25 @@ function ensure_install_prefix_writable()
     rm "$1/tensegrity.deleteme"
 }
 
+# Update legacy cmake_policy(OLD) directives for CMake 4.x compatibility
+function patch_modern_cmake()
+{
+    local target_dir="$1"
+    if [ ! -d "$target_dir" ]; then
+        return
+    fi
+
+    while IFS= read -r -d '' file; do
+        if grep -q 'cmake_policy(SET CMP.*OLD)' "$file" 2>/dev/null; then
+            if [ "$(uname)" = "Darwin" ]; then
+                sed -i '' 's/cmake_policy(SET CMP\([0-9]*\) OLD)/cmake_policy(SET CMP\1 NEW)/g' "$file"
+            else
+                sed -i 's/cmake_policy(SET CMP\([0-9]*\) OLD)/cmake_policy(SET CMP\1 NEW)/g' "$file"
+            fi
+        fi
+    done < <(find "$target_dir" -name CMakeLists.txt -print0)
+}
+
 
 function source_conf()
 {

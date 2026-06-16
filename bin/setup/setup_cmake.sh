@@ -51,13 +51,18 @@ popd > /dev/null
 ##############################################################################
 
 if type cmake >/dev/null 2>&1; then
-    cmake_info=$(cmake --version)
-    echo "- CMake is installed ($cmake_info). Creating link under env/bin."; 
+    real_cmake=$(command -v cmake)
+    cmake_info=$("$real_cmake" --version)
+    echo "- CMake is installed ($cmake_info). Creating wrapper under env/bin."; 
     
-    # Make a symlink under env to the existing cmake install
+    # Wrap system cmake so legacy third-party deps work with CMake 4.x
     pushd "$ENV_BIN_DIR" > /dev/null
-    rm cmake 2>/dev/null  # delete any existing symlink
-    create_exist_symlink `which cmake` cmake
+    rm cmake 2>/dev/null
+    cat > cmake <<EOF
+#!/bin/bash
+exec "$real_cmake" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "\$@"
+EOF
+    chmod a+x cmake
     popd > /dev/null
 else
     echo "ERROR: CMake must be installed and available on the path before continuing."

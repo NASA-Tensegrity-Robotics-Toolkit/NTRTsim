@@ -30,7 +30,7 @@
 
 #include <string>
 #include <vector>
-#include <tr1/random>
+#include <random>
 #include "learning/Configuration/configuration.h"
 
 
@@ -39,7 +39,7 @@ class AnnealEvoMember
 public:
     AnnealEvoMember(configuration config);
     ~AnnealEvoMember();
-    void mutate(std::tr1::ranlux64_base_01 *eng, double T);
+    void mutate(std::ranlux48_base *eng, double T);
 
     void copyFrom(AnnealEvoMember *otherMember);
     void saveToFile(const char* outputFilename);

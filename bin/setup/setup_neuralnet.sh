@@ -114,8 +114,28 @@ function patch_neuralnet()
     # Add some additional functions (Brian, 1/7/15)
     patch -p6 < "$SETUP_DIR/patches/neuralNet/NNPatch2_1.patch" || { echo "- ERROR: Failed to patch NeuralNet, 2nd patch"; exit 1; }
     patch -p6 < "$SETUP_DIR/patches/neuralNet/NNPatch2_2.patch" || { echo "- ERROR: Failed to patch NeuralNet, 3rd patch"; exit 1; }
+
+    patch_neuralnet_modern_stdlib
     
     popd > /dev/null
+}
+
+# libc++ on modern macOS removed <tr1/random>
+function patch_neuralnet_modern_stdlib()
+{
+    local nn_dir="$NEURALNET_BUILD_DIR/nnImplementationV2/Neural Network v2"
+    if [ ! -f "$nn_dir/neuralNetwork.h" ]; then
+        return
+    fi
+    sed -i '' 's|<tr1/random>|<random>|g' "$nn_dir/neuralNetwork.h"
+    sed -i '' \
+        -e 's|std::tr1::ranlux64_base_01|std::ranlux48_base|g' \
+        -e 's|std::ranlux48_base_01|std::ranlux48_base|g' \
+        -e 's|std::tr1::uniform_real|std::uniform_real_distribution|g' \
+        -e 's|std::uniform_real|std::uniform_real_distribution|g' \
+        -e 's|std::tr1::normal_distribution|std::normal_distribution|g' \
+        -e 's|std::tr1::|std::|g' \
+        "$nn_dir/neuralNetwork.h" "$nn_dir/neuralNetwork.cpp"
 }
 
 # Build the package under the build directory specified in in install.conf
@@ -124,6 +144,8 @@ function build_neuralnet()
 
     echo "- Building NeuralNet under $NEURALNET_BUILD_DIR"
     pushd "$NEURALNET_BUILD_DIR" > /dev/null
+
+    patch_modern_cmake "$NEURALNET_BUILD_DIR"
 
     # Perform the build
     # If you turn double precision on, turn it on in inc.CMakeJsonCPP.txt as well for the NTRT build
@@ -134,7 +156,7 @@ function build_neuralnet()
         -DCMAKE_C_FLAGS="-fPIC" \
         -DCMAKE_C_COMPILER="gcc" \
         -DCMAKE_CXX_COMPILER="g++" \
-        -DCMAKE_CXX_FLAGS="-fPIC" \
+        -DCMAKE_CXX_FLAGS="-fPIC -std=c++11" \
         -DCMAKE_EXE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_MODULE_LINKER_FLAGS="-fPIC" \
         -DCMAKE_SHARED_LINKER_FLAGS="-fPIC" \
@@ -206,6 +228,7 @@ function main()
 
     if check_file_exists "$NEURALNET_PACKAGE_DIR/CMakeLists.txt"; then
         echo "- NeuralNet is already unpacked to $NEURALNET_BUILD_DIR -- skipping."
+        patch_neuralnet_modern_stdlib
         build_neuralnet
         install_neuralnet
         env_link_neuralnet

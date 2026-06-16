@@ -13,3 +13,5 @@ link_libraries(tgcreator
 ) 
 
 target_link_libraries(AppPrismModel_Serialize ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
+
+ntrt_add_runme(AppPrismModel_Serialize DESCRIPTION "Run the serialized 3-strut prism demo")

@@ -32,6 +32,7 @@
 #include "tgGLDebugDrawer.h"
 // The Bullet Physics library
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 
 tgSimViewGraphics::tgSimViewGraphics(tgWorld& world,
                      double stepSize,
@@ -101,11 +102,41 @@ void tgSimViewGraphics::render()
     }
 }
 
+void tgSimViewGraphics::frameScene(float cameraDistance)
+{
+    if (m_dynamicsWorld && m_dynamicsWorld->getNumCollisionObjects() > 0)
+    {
+        btVector3 ps(0, 0, 0);
+        int nps = 0;
+        const btCollisionObjectArray& objects =
+            m_dynamicsWorld->getCollisionObjectArray();
+        for (int i = 0; i < objects.size(); ++i)
+        {
+            const btRigidBody* pRigid = btRigidBody::upcast(objects[i]);
+            // Skip static ground; frame on dynamic tensegrity bodies only.
+            if (pRigid && pRigid->getInvMass() > 0)
+            {
+                ps += pRigid->getCenterOfMassPosition();
+                ++nps;
+            }
+        }
+        if (nps > 0)
+        {
+            m_cameraTargetPosition = ps / static_cast<double>(nps);
+        }
+    }
+    m_autocam = true;
+    setCameraDistance(cameraDistance);
+    // Do not call updateCamera() here: OpenGL context is not created until
+    // tgglutmain() runs. Reshape/render callbacks apply these settings.
+}
+
 void tgSimViewGraphics::run(int steps) 
 {
     if (isInitialzed())
     {
-        tgglutmain(1024, 600, "Tensegrity Demo", this);
+        frameScene();
+        tgglutmain(1024, 768, "Tensegrity Demo", this);
 
         glutMainLoop();
         
@@ -179,4 +210,5 @@ void tgSimViewGraphics::clientResetScene()
 
     tgWorld& world = m_pSimulation->getWorld();
     tgBulletUtil::worldToDynamicsWorld(world).setDebugDrawer(gDebugDrawer);
+    frameScene();
 }

@@ -25,4 +25,7 @@ add_executable(AppTetraSpineCol
 add_executable(AppContactCables
     ContactCableDemo.cpp
     AppContactCables.cpp
-) 
+)
+
+ntrt_add_runme(AppTetraSpineCol DESCRIPTION "Run the tetra spine collision demo")
+ntrt_add_runme(AppContactCables SCRIPT_NAME runme-AppContactCables DESCRIPTION "Run the contact cables demo")

@@ -15,5 +15,6 @@ add_executable(AppRibModelLearning
     RibModel.cpp
     AppRibModelLearning.cpp
     
-) 
+)
 
+ntrt_add_runme(AppRibModelLearning DESCRIPTION "Run the rib model learning demo")

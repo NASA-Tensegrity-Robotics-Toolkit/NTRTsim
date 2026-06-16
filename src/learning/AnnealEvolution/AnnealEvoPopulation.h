@@ -36,7 +36,7 @@ public:
     AnnealEvoPopulation(int numControllers,configuration config);
     ~AnnealEvoPopulation();
     std::vector<AnnealEvoMember *> controllers;
-    void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate, double T);
+    void mutate(std::ranlux48_base *eng,std::size_t numToMutate, double T);
     void orderPopulation();
     AnnealEvoMember * selectMemberToEvaluate();
     AnnealEvoMember * getMember(int i){return controllers[i];};

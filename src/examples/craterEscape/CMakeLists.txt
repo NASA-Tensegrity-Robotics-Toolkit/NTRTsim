@@ -16,5 +16,6 @@ add_executable(AppEscape
     EscapeModel.cpp
     EscapeController.cpp
     AppEscape.cpp
-) 
+)
 
+ntrt_add_runme(AppEscape DESCRIPTION "Run the crater escape demo")

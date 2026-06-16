@@ -26,3 +26,4 @@ add_executable(AppTetraSpineStatic
 target_link_libraries(AppTetraSpineStatic ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
 target_link_libraries(tetraSpineHardware ${ENV_LIB_DIR}/libjsoncpp.a FileHelpers)
 
+ntrt_add_runme(AppTetraSpineStatic DESCRIPTION "Run the tetra spine static demo")

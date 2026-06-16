@@ -56,8 +56,8 @@ NeuroEvoMember::~NeuroEvoMember()
 	delete nn;
 }
 
-void NeuroEvoMember::mutate(std::tr1::ranlux64_base_01 *eng){
-	std::tr1::uniform_real<double> unif(0, 1);
+void NeuroEvoMember::mutate(std::ranlux48_base *eng){
+	std::uniform_real_distribution<double> unif(0, 1);
 	if(unif(*eng)  > 0.5)
 	{
 		return;
@@ -69,7 +69,7 @@ void NeuroEvoMember::mutate(std::tr1::ranlux64_base_01 *eng){
 	else
 	{
 		double dev = 3.0 / 100.0;   // 10 percent of interval 0-1
-		std::tr1::normal_distribution<double> normal(0, dev);
+		std::normal_distribution<double> normal(0, dev);
 		for(std::size_t i=0;i<statelessParameters.size();i++)
 		{
 			if(unif(*eng)  > 0.5)
@@ -104,7 +104,7 @@ void NeuroEvoMember::copyFrom(NeuroEvoMember* otherMember)
 	}
 }
 
-void NeuroEvoMember::copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::tr1::ranlux64_base_01 *eng)
+void NeuroEvoMember::copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::ranlux48_base *eng)
 {
     if(numInputs>0)
     {
@@ -114,7 +114,7 @@ void NeuroEvoMember::copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *othe
     }
     else
     {
-        std::tr1::uniform_real<double> unif(0, 1);
+        std::uniform_real_distribution<double> unif(0, 1);
         for (int i = 0; i < numOutputs; i++)
         {
             if (unif(*eng) > 0.5)

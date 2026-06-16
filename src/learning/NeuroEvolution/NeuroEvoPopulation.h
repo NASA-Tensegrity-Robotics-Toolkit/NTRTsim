@@ -29,15 +29,15 @@
 
 #include "NeuroEvoMember.h"
 #include <vector>
-#include <tr1/random>
+#include <random>
 
 class NeuroEvoPopulation {
 public:
 	NeuroEvoPopulation(int numControllers, configuration& config);
 	~NeuroEvoPopulation();
 	std::vector<NeuroEvoMember *> controllers;
-    void mutate(std::tr1::ranlux64_base_01 *eng,std::size_t numToMutate);
-	void combineAndMutate(std::tr1::ranlux64_base_01 *eng, std::size_t numToMutate, std::size_t numToCombine);
+    void mutate(std::ranlux48_base *eng,std::size_t numToMutate);
+	void combineAndMutate(std::ranlux48_base *eng, std::size_t numToMutate, std::size_t numToCombine);
 	void orderPopulation();
 	NeuroEvoMember * getMember(int i){return controllers[i];};
 

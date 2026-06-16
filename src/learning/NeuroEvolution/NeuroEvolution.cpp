@@ -34,6 +34,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <ctime>
 
 using namespace std;
 
@@ -46,9 +47,13 @@ using namespace std;
 
 //  For everything else
 unsigned long long rdtsc(){
+#if defined(__aarch64__) || defined(__arm64__)
+    return static_cast<unsigned long long>(time(0));
+#else
     unsigned int lo,hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((unsigned long long)hi << 32) | lo;
+#endif
 }
 
 #endif

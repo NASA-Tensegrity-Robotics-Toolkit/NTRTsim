@@ -6,9 +6,9 @@ subdirs(
     caterpillar
     #RBTests - Depricated as of v1.1
     sphereFeet
-    TetraSpineStatic
+    # TetraSpineStatic  # missing CMakeLists.txt
     hardwareLearning
-    hardwareSineWaves
+    # hardwareSineWaves  # missing CMakeLists.txt
     handTunedSineWaves
     muscleNPTests
     tetraCollisions

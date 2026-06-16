@@ -1,17 +1,19 @@
 Project(examples)
 
+include(${CMAKE_SOURCE_DIR}/examples/NTRTExampleRunme.cmake)
+
 # Add additional example application directories here.
 subdirs(
     3_prism
     3_prism_serialize
-    contactCables/
+    contactCables
     NestedTetrahedrons
     SUPERball
     learningSpines
     testjson
     craterEscape
-    IROS_2015/
-    motorModel/
+    IROS_2015
+    motorModel
 )
 
 

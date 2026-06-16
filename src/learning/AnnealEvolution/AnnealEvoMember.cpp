@@ -51,15 +51,15 @@ AnnealEvoMember::~AnnealEvoMember()
 {
 }
 
-void AnnealEvoMember::mutate(std::tr1::ranlux64_base_01 *eng, double T){
+void AnnealEvoMember::mutate(std::ranlux48_base *eng, double T){
     
     assert (T <= 1.0);
-    std::tr1::uniform_real<double> unif(0, 1);
+    std::uniform_real_distribution<double> unif(0, 1);
 
     //TODO: for each weight of the NN with 0.5 probability mutate it
 
     double dev = devBase * T / 100.0; 
-    std::tr1::normal_distribution<double> normal(0, dev);
+    std::normal_distribution<double> normal(0, dev);
     for(std::size_t i=0;i<statelessParameters.size();i++)
     {
         double newParam;

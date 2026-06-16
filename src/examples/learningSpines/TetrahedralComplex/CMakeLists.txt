@@ -19,4 +19,6 @@ add_executable(AppFlemonsSpineLearning
     FlemonsSpineModelLearning.cpp
     AppFlemonsSpineLearning.cpp
     
-) 
+)
+
+ntrt_add_runme(AppFlemonsSpineLearning DESCRIPTION "Run the Flemons spine learning demo")

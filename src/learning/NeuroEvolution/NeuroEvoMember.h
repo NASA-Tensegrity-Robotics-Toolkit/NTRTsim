@@ -29,7 +29,7 @@
 
 #include <string>
 #include <vector>
-#include <tr1/random>
+#include <random>
 #include "learning/Configuration/configuration.h"
 
 // Forward Declarations
@@ -40,14 +40,14 @@ class NeuroEvoMember
 public:
 	NeuroEvoMember(configuration config);
 	~NeuroEvoMember();
-	void mutate(std::tr1::ranlux64_base_01 *eng);
+	void mutate(std::ranlux48_base *eng);
 
 	neuralNetwork* getNn(){
 		return nn;
 	}
 
     void copyFrom(NeuroEvoMember *otherMember);
-    void copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::tr1::ranlux64_base_01 *eng);
+    void copyFrom(NeuroEvoMember *otherMember1, NeuroEvoMember *otherMember2, std::ranlux48_base *eng);
 	void saveToFile(const char* outputFilename);
 	void loadFromFile(const char* inputFilename);
 

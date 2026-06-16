@@ -5,4 +5,6 @@ add_executable(AppNestedStructureTest
     NestedStructureSineWaves.cpp
     AppNestedTetrahedrons.cpp
     
-) 
+)
+
+ntrt_add_runme(AppNestedStructureTest DESCRIPTION "Run the nested tetrahedrons demo")

@@ -60,7 +60,7 @@ NeuroEvoPopulation::~NeuroEvoPopulation()
 	}
 }
 
-void NeuroEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t numMutate)
+void NeuroEvoPopulation::mutate(std::ranlux48_base *engPntr,std::size_t numMutate)
 {
 	if(numMutate>controllers.size()/2)
 	{
@@ -77,9 +77,9 @@ void NeuroEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t 
 	return;
 }
 
-void NeuroEvoPopulation::combineAndMutate(std::tr1::ranlux64_base_01 *eng, std::size_t numToMutate, std::size_t numToCombine)
+void NeuroEvoPopulation::combineAndMutate(std::ranlux48_base *eng, std::size_t numToMutate, std::size_t numToCombine)
 {
-    std::tr1::uniform_real<double> unif(0, 1);
+    std::uniform_real_distribution<double> unif(0, 1);
     
     if(numToMutate + numToCombine > controllers.size())
     {

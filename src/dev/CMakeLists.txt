@@ -14,7 +14,7 @@ subdirs(
     muscleNP
     jbruce
     dhustigschultz
-    eajung
+    # eajung  # missing top-level CMakeLists.txt
     ezhu
     mcdaly
 	bgigous

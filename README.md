@@ -1,6 +1,19 @@
 NASA Tensegrity Robotics Toolkit
 ===============
 
+2026-06-16 - macOS refresh (in progress)
+--------
+
+This repository is being refreshed to build and run on macOS as of June 2026.
+The refresh has been tested on macOS only so far; behavior on Linux and other
+platforms is not yet verified.
+
+The last upstream `master` state before this work is preserved as the git tag
+**`pre-mac-refresh`** (commit `0443cbd5`, 2020-09-21). Check it out to
+compare against or return to the prior codebase:
+
+    git checkout pre-mac-refresh
+
 2020-04-10 - Created new branch to support g++ 4.8
 --------
 

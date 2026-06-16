@@ -18,5 +18,6 @@ add_executable(AppFlemonsSpineLearningCL
     FlemonsSpineModelLearningCL.cpp
     AppFlemonsSpineLearningCL.cpp
     
-) 
+)
 
+ntrt_add_runme(AppFlemonsSpineLearningCL DESCRIPTION "Run the octahedral Flemons spine learning demo")

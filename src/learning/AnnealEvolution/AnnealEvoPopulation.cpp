@@ -57,7 +57,7 @@ AnnealEvoPopulation::~AnnealEvoPopulation()
     }
 }
 
-void AnnealEvoPopulation::mutate(std::tr1::ranlux64_base_01 *engPntr,std::size_t numMutate, double T)
+void AnnealEvoPopulation::mutate(std::ranlux48_base *engPntr,std::size_t numMutate, double T)
 {
     for(std::size_t i=0;i<numMutate;i++)
     {
